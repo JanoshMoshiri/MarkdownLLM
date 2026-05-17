@@ -66,6 +66,85 @@ Ask yourself:
 
 4. **Who is this for?** — If someone reads your instructions and disagrees with the philosophy, should they use this system? (If yes, your instructions aren't clear enough.)
 
+## Defining Domain-Specific Reasoning Patterns
+
+If your domain involves constraints, compliance, complex tradeoffs, or specialized reasoning (law, finance, healthcare, etc.), define **reasoning lenses** that guide how LLMs should think within your domain.
+
+### What Are Reasoning Lenses?
+
+Reasoning lenses are multiple perspectives through which an LLM should evaluate decisions or changes. Instead of encoding constraints as rules, you encode them as reasoning patterns.
+
+**Example: A compliance-heavy domain might define:**
+
+```markdown
+## Reasoning Lenses
+
+When working within this domain, reason through these three perspectives:
+
+### Lens 1: Domain Logic
+"What does this thing or change accomplish in the domain's terms?"
+What is the business or operational outcome?
+
+### Lens 2: Compliance Logic  
+"Would this violate GDPR, data residency, audit requirements, 
+or other regulatory constraints? How could it be mitigated?"
+
+### Lens 3: Audit Logic
+"Can we explain this decision to a regulator or auditor? 
+Is the change traceable and justified?"
+
+All three lenses must align before proceeding.
+If they conflict, surface the conflict to the user for resolution.
+```
+
+**Why this works:**
+- LLMs naturally reason through multiple perspectives
+- Lenses encode constraints without being rigid rules
+- Conflicts become explicit (domain says yes, compliance says no)
+- The LLM learns to weigh tradeoffs rather than just following rules
+- Decisions are explainable (we reasoned through all three lenses)
+
+### Creating Your Lenses
+
+In your `[domain].instructions.md`, add a "Reasoning Lenses" section that:
+
+1. **Names each lens** — Give it a clear, domain-specific name
+2. **Explains the lens** — What perspective does it represent?
+3. **Lists what matters** — What signals or symptoms should trigger attention?
+4. **Describes outcomes** — What should LLMs do if lenses conflict?
+
+### Reinforcing Lenses Through Examples
+
+Create `type: example` things that show how each lens applies:
+
+```yaml
+---
+id: example-multi-lens-reasoning
+type: example
+pattern_type: reasoning
+demonstrates: all-lenses-aligned
+applies_to: [your-domain]
+---
+
+# Example: All Lenses Aligned
+
+## The Decision
+[Describe a decision made within the domain]
+
+## Lens 1: Domain Logic ✓
+[Shows why this makes sense for domain goals]
+
+## Lens 2: Compliance Logic ✓  
+[Shows how this respects constraints]
+
+## Lens 3: Audit Logic ✓
+[Shows how this is traceable/explainable]
+
+Result: All lenses aligned → proceed confidently
+```
+
+Then create contrasting examples showing conflicts or failures.
+
 ## Examples
 
 See `domains/life-manager/life-manager.instructions.md` for a complete, real-world example. Notice how it:
