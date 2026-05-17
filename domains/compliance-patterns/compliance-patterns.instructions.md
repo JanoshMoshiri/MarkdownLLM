@@ -50,9 +50,28 @@ Example of a decision where lenses conflict, and how to handle it.
 
 ## Philosophy
 
-Compliance doesn't have to be a burden. When you encode it as reasoning patterns and examples, it becomes part of how the system thinks. LLMs naturally learn from examples, so compliance becomes reinforced through every decision, not imposed as external constraints.
+### Why Examples Matter (Verifiability)
 
-The examples here are starting points. Your domain will grow its own library as you discover patterns specific to your context and constraints.
+LLMs excel at **verifiable** reasoning—tasks with clear right/wrong answers—and struggle with **non-verifiable** tasks (pure opinion, abstract preference). Compliance is inherently verifiable:
+
+- ✓ Data classified or not classified
+- ✓ Access logged or not logged  
+- ✓ Data residency UK or non-UK
+- ✓ Retention policy followed or violated
+
+By providing both **positive examples** (compliant patterns) and **negative examples** (violations with explanations), we create verifiability. The LLM learns not just "what to do" but "why this is right and that is wrong"—transforming compliance from an abstract requirement into a verifiable pattern.
+
+**Contrast creates clarity.** Showing both the correct GDPR data handling pattern AND the violation pattern (with consequences) gives the LLM two concrete reference points. This is why anti-patterns paired with their remediation are more effective than rules alone—the LLM can verify its reasoning against both.
+
+### Integration with Reasoning Lenses
+
+Compliance doesn't have to be a burden. When you encode it as reasoning patterns and examples, it becomes part of how the system thinks. The multi-lens approach (domain logic, compliance logic, audit logic) makes compliance reasoning explicit and verifiable at every decision point.
+
+LLMs naturally learn from examples, so compliance becomes reinforced through every decision, not imposed as external constraints.
+
+### Growing Your Pattern Library
+
+The examples here are starting points. Your domain will grow its own library as you discover patterns specific to your context and constraints. Each new example you add teaches the system what compliance looks like in your specific context.
 
 ## For Regulators
 

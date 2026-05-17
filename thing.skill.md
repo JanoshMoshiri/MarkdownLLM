@@ -249,12 +249,22 @@ created: 2026-05-18
 
 Example things are a teaching mechanism for LLMs. They serve as inductive learning—showing rather than telling how patterns should work.
 
+**Why examples work better than rules:**
+
+LLMs excel at **verifiable reasoning**—tasks where patterns can be checked against clear criteria—and struggle with non-verifiable tasks. Compliance patterns are inherently verifiable (data classified or not, access logged or not, etc.). A single rule ("classify personal data") is abstract; positive + negative examples create verifiability:
+
+- **Positive example**: Shows what good classification looks like (verifiable)
+- **Negative example**: Shows violations and consequences (verifiable contrast)
+- **Together**: LLM learns the pattern boundary, not just a rule
+
+This mirrors how humans learn—contrast creates clarity that rules alone don't provide.
+
 **Common use cases:**
-- Compliance patterns (GDPR, audit trails, data handling)
+- Compliance patterns (GDPR, audit trails, data handling) — *especially useful for verifiable decisions*
 - Architectural patterns (how to structure complex domains)
 - Naming conventions (what field names mean what)
 - Edge cases (showing how to handle ambiguous situations)
-- Anti-patterns (showing what breaks and why)
+- Anti-patterns (showing what breaks and why) — *pairs negative examples with remediation*
 
 **Examples are discoverable:** When an LLM encounters a domain with example things, it naturally learns from them. You don't need to explicitly reference them; they guide reasoning through pattern recognition.
 
