@@ -22,12 +22,12 @@ The complexity doesn't disappear—it just moves. Instead of writing conditional
 
 ## How It Works
 
-1. Your life exists as a collection of "things to do" in a git repository
+1. Your life exists as a collection of "things" in a git repository
 2. Each thing is a markdown file with YAML metadata and narrative body
 3. When you need help, you talk to Claude (via your phone, via any interface)
-4. Claude reads the relevant things to do, understands the structure and context
+4. Claude reads the relevant things, understands the structure and context
 5. Claude reasons about what you're asking, what matters, what's next
-6. Claude updates your things to do files, creates reminders, updates your calendar
+6. Claude updates your thing files, creates reminders, updates your calendar
 7. Your phone notifies you of changes and reminders
 8. You talk to Claude again with new information or requests
 
@@ -41,7 +41,7 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 
 ## Core Principles
 
-**Atomic Units:** Everything is a thing to do. No special cases. A project, a task, a subtask, a dependency—all things to do. This creates consistency and composability.
+**Atomic Units:** Everything is a thing. No special cases. A project, a task, a subtask, a dependency—all things. This creates consistency and composability.
 
 **Minimal Core, Emergent Detail:** You start with minimal required metadata. As your life becomes more complex, new fields emerge naturally. Your schema grows with your needs, not ahead of them.
 

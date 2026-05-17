@@ -7,16 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Initial framework and core definition files
-- Life manager example domain
-- Read and write mode prompts
-- Manifesto explaining the paradigm
-
 ### Coming Soon
 - Additional domain examples (project management, knowledge base, financial tracking)
 - Tools and utilities for working with the framework
 - Integration guides for popular LLMs and platforms
+
+## [1.1.0] - 2026-05-17
+
+### Changed
+- **Restructured core framework files for generalization**
+  - `thing.skill.md` — Generalized from "thing to do" specific language to work as a specification for *any* domain's atomic unit
+  - `read.prompt.md` — Generalized to work with any domain; removed life-management specific references
+  - `write.prompt.md` — Generalized prompt guidance; removed phone/calendar integration specifics
+- **README.md** — Updated to clarify distinction between specification files (universal foundation) and instantiated domains (domain-specific examples)
+
+### Added
+- **Domain structure** — Created `domains/` folder to organize domain-specific implementations
+- **domains/life-manager/** folder containing:
+  - `life-manager.instructions.md` — Domain-specific philosophy and principles for life management
+  - `read.prompt.md` — Life-management-specific read prompt with concrete examples
+  - `write.prompt.md` — Life-management-specific write prompt including phone/calendar integration guidance
+- **instructions-guide.md** — Comprehensive guide for creating domain-specific instructions files
+
+### Removed
+- Duplicate `life-manager.instructions.md` from root level (consolidated into `domains/` structure)
+
+### Clarified
+- Core framework now clearly separates:
+  - **Specification** (root level): Universal files that apply to any domain
+  - **Implementation** (domains/): Domain-specific instantiations of the framework
 
 ## [1.0.0] - 2026-05-17
 
