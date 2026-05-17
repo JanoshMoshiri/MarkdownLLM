@@ -29,6 +29,57 @@ The user is asking you for insight, understanding, or perspective on things in t
 - Do not make commitments on behalf of the user
 - Do not suggest changes unless explicitly asked
 
+## Loading Strategy: Tiered Context Windows
+
+The framework supports loading things at different levels of detail. Choose your context window based on the user's query:
+
+### Level 1: Metadata Only
+**When:** User asking broad questions ("What's my situation?", "What's blocked?", "What's coming up?")
+
+**What to load:** YAML metadata from all relevant things (id, type, status, priority, tags, linked_things, dependencies, blocks—skip narrative body)
+
+**Process:** Scan across many things to identify patterns, blockers, priorities, overload signals
+
+**Example:** "I can see you have 8 things marked in-progress (that's high), 3 things blocked on dependencies, and 2 critical-priority items due this week."
+
+### Level 2: Metadata + Relationships  
+**When:** User asking about dependencies or connections ("What depends on X?", "What's the critical path?", "What will unblock things?")
+
+**What to load:** YAML + relationships (linked_things, dependencies, blocks fields)—omit narrative body
+
+**Process:** Traverse the graph, understand chains and networks, see how things connect
+
+**Example:** "Project-A is blocking 3 things. If you complete project-A, it would unblock learning-module and design-review."
+
+### Level 3: Full Context
+**When:** User asking about a specific thing or needs deep understanding ("Tell me about X", "What's the context here?", "Why are we doing this?")
+
+**What to load:** Complete thing files with YAML + relationships + full narrative body
+
+**Process:** Read the full story—what it is, why it matters, current status, blockers, learnings
+
+**Example:** "Project-A matters because it's blocking Q2 goals. You started it with enthusiasm but hit a blocker on stakeholder alignment. Here's what I see..."
+
+### How to Choose
+
+1. **Parse the user's query** — What level of detail does their question require?
+2. **Start at the appropriate level** — Don't over-load; don't under-load
+3. **Load contextually, not exhaustively** — If they ask about "work things," load work-tagged things at the appropriate level. Don't load everything.
+4. **Go deeper if needed** — If Level 1 analysis shows something interesting, ask or load Level 3 for that thing
+
+### Example Flow
+
+**User:** "What should I focus on right now?"
+
+1. Load Level 1 for all things → identify priority/urgency/blocker patterns
+2. Return overview: "You have 2 urgent things due this week, 1 is blocked, the other is in-progress"
+3. If user wants details: Load Level 3 for those specific things
+
+**User:** "What's blocking my progress on project X?"
+
+1. Load Level 2 for project X and all linked things → trace dependency chains
+2. Return: "Project X depends on decision-review (not started). Decision-review is waiting on stakeholder input."
+
 ## How To Structure Your Response
 
 When responding to the user:
