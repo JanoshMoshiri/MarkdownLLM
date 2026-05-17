@@ -213,6 +213,63 @@ And evolve to include energy cost estimates, resource lists, progress metrics, d
 
 The system grows with your needs, not ahead of them.
 
+## Special Type: Example
+
+For building pattern libraries and teaching LLMs domain-specific reasoning, create things with `type: example`:
+
+```yaml
+---
+id: example-[pattern-name]
+type: example
+pattern_type: [what kind of pattern]
+demonstrates: [compliance/good-practice/anti-pattern/edge-case]
+applies_to: [which domains or thing-types this pattern applies to]
+created: 2026-05-18
+---
+
+# [Pattern Name]
+
+## The Pattern
+[Clear description of what this example demonstrates]
+
+## Why It Matters
+[The reasoning: why is this pattern important to follow?]
+
+## Structure/Code Example
+[Show the correct structure or code pattern]
+
+## Anti-Patterns (What NOT to Do)
+[Common mistakes or violations of this pattern]
+
+## How to Adapt
+[How to apply this pattern to your specific domain]
+```
+
+**When to use Example things:**
+
+Example things are a teaching mechanism for LLMs. They serve as inductive learning—showing rather than telling how patterns should work.
+
+**Why examples work better than rules:**
+
+LLMs excel at **verifiable reasoning**—tasks where patterns can be checked against clear criteria—and struggle with non-verifiable tasks. Compliance patterns are inherently verifiable (data classified or not, access logged or not, etc.). A single rule ("classify personal data") is abstract; positive + negative examples create verifiability:
+
+- **Positive example**: Shows what good classification looks like (verifiable)
+- **Negative example**: Shows violations and consequences (verifiable contrast)
+- **Together**: LLM learns the pattern boundary, not just a rule
+
+This mirrors how humans learn—contrast creates clarity that rules alone don't provide.
+
+**Common use cases:**
+- Compliance patterns (GDPR, audit trails, data handling) — *especially useful for verifiable decisions*
+- Architectural patterns (how to structure complex domains)
+- Naming conventions (what field names mean what)
+- Edge cases (showing how to handle ambiguous situations)
+- Anti-patterns (showing what breaks and why) — *pairs negative examples with remediation*
+
+**Examples are discoverable:** When an LLM encounters a domain with example things, it naturally learns from them. You don't need to explicitly reference them; they guide reasoning through pattern recognition.
+
+**Scaling through examples:** As your system grows, your library of example things becomes organizational knowledge—versioned, auditable, and automatically referenced by any LLM working within your domains.
+
 ## Multi-Level Context Windows
 
 A powerful feature of this framework is that the same thing file can be used at different levels of detail depending on context. An LLM (or human reasoning) can interact with a thing at multiple granularities:

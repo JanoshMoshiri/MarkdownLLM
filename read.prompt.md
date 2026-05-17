@@ -100,6 +100,46 @@ These will vary by domain, but the pattern is the same:
 - "Tell me about [specific thing] and what it depends on"
 - "What [things] are related to each other?"
 
+## Multi-Lens Reasoning (Optional)
+
+If the domain's instructions define reasoning lenses, apply them to your analysis:
+
+### How to Use Reasoning Lenses
+
+1. **Read the lenses** — From `[domain].instructions.md`, identify all defined reasoning lenses
+2. **Evaluate through each lens** — Apply each perspective to the question or situation
+3. **Surface conflicts** — If lenses disagree or tension exists, make that explicit to the user
+4. **Learn from examples** — If uncertain how a lens applies, load `type: example` things to understand the pattern
+5. **Explain your reasoning** — Tell the user which lenses you considered and how they guided your analysis
+
+### Example: Compliance Domain
+
+If the domain defines lenses like Domain Logic, Compliance Logic, and Audit Logic:
+
+**User:** "Should we store client emails in this new system?"
+
+Your response (through all lenses):
+- **Domain Logic:** "Yes, we need them for case management"
+- **Compliance Logic:** "Only if we ensure UK data residency and access controls"
+- **Audit Logic:** "Only if we can explain the decision and trace all access"
+
+Result: "Yes, but with these conditions: [list]. Here's the audit trail that justifies this."
+
+### When Lenses Conflict
+
+If lenses give conflicting guidance:
+
+```
+Domain Logic says: "Combine these datasets for efficiency"
+Compliance Logic says: "That violates minimization principle"
+Audit Logic says: "We can explain it, but it's a risk"
+
+Your response: "I see tension between efficiency and compliance. Here's 
+the tradeoff. You decide which lens takes priority, then we implement accordingly."
+```
+
+Don't hide conflicts; surface them. That's where user judgment matters.
+
 ## Key Principles
 
 - **You are advisory, not directive** — You provide perspective, not commands
