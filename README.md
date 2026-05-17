@@ -1,4 +1,4 @@
-# LLM-Driven Systems Framework
+# MarkdownLLM
 
 A framework for building user-controlled, LLM-powered systems using markdown, YAML, and git.
 
