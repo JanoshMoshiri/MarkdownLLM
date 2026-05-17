@@ -12,6 +12,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tools and utilities for working with the framework
 - Integration guides for popular LLMs and platforms
 
+## [1.2.0] - 2026-05-17
+
+### Added
+- **Tiered Context Windows** — Multi-level loading strategy for scalability
+  - Level 1: Metadata only (for broad questions and landscape scanning)
+  - Level 2: Metadata + relationships (for dependency traversal and critical path analysis)
+  - Level 3: Full context (for deep work and detailed reasoning)
+- **scalability-guide.md** — Comprehensive guide covering:
+  - Philosophy of multi-level abstraction inspired by neural networks
+  - Three scaling approaches: Contextual Loading (now), Incremental Summarization (medium-scale), Full Tiered System (long-term)
+  - Feel-based signals for when to scale
+  - Progressive adoption pattern
+
+### Enhanced
+- **thing.skill.md** — Added "Multi-Level Context Windows" section explaining how the same thing file works at different levels of granularity
+- **read.prompt.md** — Added "Loading Strategy" section with guidance on choosing context levels and tab-based examples for each level
+- **write.prompt.md** — Added "Loading Strategy" section adapted for write operations, emphasizing cascading effects and dependency updates
+
+### Framework Improvements
+- Implemented adaptive context loading (LLM determines relevance dynamically, not pre-labeled)
+- Aligned scalability approach with neural network principles: multiple abstraction levels, dynamic attention, holistic reasoning
+- Enables scaling from 10s to 1000s of things while maintaining framework elegance
+- Progressive adoption: users discover tiering naturally when they need it (no forced optimization)
+
+### Why This Matters
+The framework now scales efficiently without requiring indexed search or special query languages. By leveraging the LLM's native pattern-matching ability at appropriate levels of abstraction, systems can grow from simple to complex while staying true to the core philosophy: definitions, markdown files, and holistic LLM reasoning.
+
 ## [1.1.0] - 2026-05-17
 
 ### Changed
