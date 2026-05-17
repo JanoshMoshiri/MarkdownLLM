@@ -213,6 +213,91 @@ And evolve to include energy cost estimates, resource lists, progress metrics, d
 
 The system grows with your needs, not ahead of them.
 
+## Multi-Level Context Windows
+
+A powerful feature of this framework is that the same thing file can be used at different levels of detail depending on context. An LLM (or human reasoning) can interact with a thing at multiple granularities:
+
+### Level 1: Metadata Only
+Load just the YAML frontmatter without the narrative body:
+```yaml
+id: project-alpha
+type: project
+status: in-progress
+priority: high
+due_date: 2026-06-15
+tags: [work, launch]
+linked_things:
+  - id: feature-auth
+    relation: subtask
+  - id: budget-review
+    relation: dependency
+```
+
+**Use case:** Quick overview across many things. "What's active? What's blocked? What has dependencies?" Scan 50-100 things to understand the landscape.
+
+### Level 2: Metadata + Relationships
+Include the YAML plus the linked_things, dependencies, and blocks fields, but omit the narrative body:
+```yaml
+id: project-alpha
+type: project
+status: in-progress
+priority: high
+linked_things: [...]
+dependencies: [budget-review]
+blocks: [deployment-plan]
+```
+
+**Use case:** Traversing the graph. "Show me what blocks X," "What depends on Y," "What's the critical path?" Understand connections without full details.
+
+### Level 3: Full Context
+The complete thing file with YAML, all metadata, and full narrative body:
+```
+---
+id: project-alpha
+...
+---
+
+# Project Alpha
+
+## What This Is
+A major product launch...
+
+## Current Status
+...
+
+## Next Steps
+...
+
+## Dependencies
+...
+```
+
+**Use case:** Deep work on a specific thing. Understanding not just what it is, but why it matters, what the context was, what learnings exist.
+
+### How LLMs Use These Levels
+
+When you ask an LLM (Claude or any agent) to help with your things, it should:
+
+1. **Determine what context level is relevant** — Based on your query, what granularity is needed?
+2. **Load contextually** — Fetch the appropriate level for the relevant things
+3. **Reason across the loaded context** — Process holistically at that granularity
+4. **Respond or act** — Provide insights or make updates appropriate to that level
+
+This mirrors how neural networks process information at multiple abstraction levels simultaneously. The LLM doesn't pre-declare what matters; it reasons about relevance in the moment and loads what's needed.
+
+### Progressive Adoption
+
+You don't need to think about levels initially. When you start with a domain:
+- Everything is Level 3 (full context)
+- Your system is small enough that Claude reads everything
+
+As your system grows:
+- You naturally feel the need to ask broad questions ("What's my situation?") — that's Level 1
+- You start asking about dependencies and relationships ("What blocks this?") — that's Level 2
+- You drill into specific things for operational work — that's Level 3
+
+You discover the levels organically. See the scalability-guide.md for more on when and how tiering becomes relevant.
+
 ## Why This Structure Works
 
 - **Parseable:** The YAML is reliable for Claude to extract structure
@@ -220,3 +305,4 @@ The system grows with your needs, not ahead of them.
 - **Composable:** Every thing relates the same way, enabling graphs and trees
 - **Narrative:** The body keeps the human reasoning and context intact
 - **Emergent:** The schema evolves as your life evolves
+- **Scalable:** The same files work at multiple levels of granularity

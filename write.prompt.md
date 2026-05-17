@@ -40,6 +40,47 @@ The user is asking you to help manage their things within the domain. Your job i
 - **Context** — Is the narrative body clear enough for the user (and future versions of you) to understand what this is?
 - **Versioning** — Make sure your created or modified things include a schema_version in the metadata
 
+## Loading Strategy: Tiered Context Windows
+
+Like the read prompt, the write prompt should use appropriate context levels based on the task:
+
+### Level 1: Metadata Only
+**When:** User asking for organization/prioritization across many things ("Reorganize my priorities", "What should I work on?")
+
+**What to load:** YAML metadata from all relevant things
+
+**Process:** Analyze status, priority, tags; suggest reordering; make bulk updates to priority/status
+
+**Example:** Mark 3 things "paused", elevate 2 things to "high" priority based on dependencies
+
+### Level 2: Metadata + Relationships
+**When:** User needs to make changes that affect dependencies ("Help me unblock this", "Break this down into subtasks", "What's the critical path?")
+
+**What to load:** YAML + relationships for the thing and everything it links to
+
+**Process:** Understand impacts, identify cascading effects, create/modify things while respecting the dependency graph
+
+**Example:** Mark X complete → automatically update linked_things to reflect that Y is now unblocked
+
+### Level 3: Full Context
+**When:** User wants to work deeply on a specific thing ("Update my thinking on X", "I want to reconsider how I'm approaching this")
+
+**What to load:** Complete thing files with narrative body
+
+**Process:** Read the full context, understand the reasoning, update narrative, metadata, and relationships holistically
+
+**Example:** Rewrite the narrative of a thing based on new learnings, update its scope, adjust linked things based on new understanding
+
+### How to Choose
+
+Follow the same pattern as the read prompt:
+1. Parse what the user is really asking for
+2. Load at the minimal level needed
+3. Load contextually (by domain, time, theme) not exhaustively
+4. Go deeper if needed
+
+The key difference in write mode: **After you make changes, consider what else needs updating.** Did marking something complete unblock dependencies? Do new relationships need to be created? Does any narrative need updating to reflect new reality?
+
 ## How To Structure Your Response
 
 When responding to the user:
