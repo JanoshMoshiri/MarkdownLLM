@@ -1,18 +1,20 @@
-# Thing To Do - Skill Definition
+# Thing - Skill Definition
 
-## What Is A Thing To Do?
+## What Is A Thing?
 
-A thing to do is the atomic unit of the life management system. Everything is a thing to do. A project is a thing to do. A task within that project is a thing to do. A subtask is a thing to do. A dependency or blocker is a thing to do. Even a simple action like "brush teeth" is a thing to do.
+A thing is the atomic unit of this framework. Everything is a thing. A project is a thing. A task within a project is a thing. A subtask is a thing. A dependency is a thing. A concept, an article, a recipe, a design pattern—all things. Even a simple action is a thing.
 
-A thing to do is:
+What kind of things? That depends on your domain. This is the specification that applies to any domain.
+
+A thing is:
 - **Self-contained:** It has all the information needed to understand what it is
-- **Linkable:** It can reference other things to do and be referenced by them
-- **Mutable:** It can change status, gain detail, gain context, split into subtasks
+- **Linkable:** It can reference other things and be referenced by them
+- **Mutable:** It can change status, gain detail, gain context, split into sub-things
 - **Reasonably scoped:** Large enough to be meaningful, small enough to be actionable
 
-## Structure Of A Thing To Do
+## Structure Of A Thing
 
-Every thing to do file follows this pattern:
+Every thing file follows this pattern:
 
 ```
 ---
@@ -40,7 +42,7 @@ These fields must be present in every thing to do:
 
 **type** (string)
 - What kind of thing this is
-- Values: `thing-to-do` (catch-all for simple actions), `task`, `project`, `subtask`, `goal`, `milestone`, `recurring`, or any other type that emerges as you use the system
+- Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
 - Helps Claude understand scope and context
 
 **status** (string)
@@ -68,8 +70,8 @@ These aren't required, but they unlock richer reasoning from Claude:
 - Can change as circumstances change
 
 **tags** (array of strings)
-- Categorical labels
-- Examples: `work`, `health`, `finance`, `learning`, `project-x`
+- Categorical labels relevant to your domain
+- Examples depend on domain: `urgent`, `research`, `reviewed`, `published`, `draft`, `[category]`
 - Helps Claude search and filter contextually
 - Can be as specific or general as needed
 
@@ -124,76 +126,76 @@ The body should include:
 
 The structure of the body is flexible. Use headers, lists, prose, whatever makes sense. Claude will understand it.
 
-## How To Create A Thing To Do
+## How To Create A Thing
 
-1. **Choose an ID:** Make it descriptive but short. `brush-teeth`, not `personal-hygiene-daily-tooth-brushing-routine`. You'll type these a lot.
+1. **Choose an ID:** Make it descriptive but short. `chocolate-chip-cookies`, not `comprehensive-chocolate-chip-cookie-baking-instructions`. You'll reference these often.
 
-2. **Choose a Type:** Is this a project? A task? A simple action? Start simple; it can change.
+2. **Choose a Type:** What is this in your domain? Start simple; it can change.
 
-3. **Set Initial Metadata:** At minimum: id, type, status, created. Add due_date if there's a deadline. Add tags for categorization.
+3. **Set Initial Metadata:** At minimum: id, type, status, created. Add other fields if they're relevant now.
 
 4. **Write the Body:** Explain what this is and why it matters. Keep it brief unless detail is needed.
 
-5. **Link If Needed:** If this relates to other things or has subtasks, add those references now or later as they become clear.
+5. **Link If Needed:** If this relates to other things or has sub-things, add those references now or later as they become clear.
 
-Example minimal thing:
+Example minimal thing (recipe domain):
 ```
 ---
-id: brush-teeth
-type: thing-to-do
+id: chocolate-chip-cookies
+type: recipe
 status: not-started
 created: 2026-05-17
 tags:
-  - health
-  - daily
+  - dessert
+  - baking
 ---
 
-# Brush Teeth
+# Chocolate Chip Cookies
 
-Morning dental hygiene. Do this before breakfast.
+Classic chocolate chip cookies. Good for gatherings or just a snack.
 ```
 
-Example richer thing:
+Example richer thing (content/research domain):
 ```
 ---
-id: quarterly-planning
-type: project
+id: ai-reasoning-article
+type: article
 status: in-progress
 priority: high
-due_date: 2026-06-15
+due_date: 2026-06-01
 created: 2026-05-17
 tags:
-  - planning
-  - quarterly
-  - work
+  - ai
+  - machine-learning
+  - published
 linked_things:
-  - id: gather-metrics
-    relation: subtask
-  - id: stakeholder-alignment
-    relation: subtask
-  - id: budget-review
+  - id: research-survey
     relation: dependency
+  - id: code-examples
+    relation: subtask
+  - id: ai-limitations-article
+    relation: related
 ---
 
-# Quarterly Planning Q2 2026
+# How LLMs Reason: A Technical Deep Dive
 
 ## What This Is
-High-level planning session to set direction for Q3. Involves reviewing Q2 performance, gathering team feedback, and establishing priorities.
+A comprehensive article exploring the mechanisms of LLM reasoning, from transformer architecture to in-context learning to multi-step inference.
 
 ## Why It Matters
-This shapes how we allocate resources and where we focus energy for the next quarter. It's a forcing function for alignment.
+This helps readers understand what's actually happening inside LLMs, moving beyond marketing claims to technical reality.
 
 ## Current Status
-Just started. Waiting on Q2 metrics to be finalized.
+Research phase complete. Writing first draft now. Waiting on code examples to be finalized.
 
 ## Next Steps
-- [ ] Get final metrics from finance
-- [ ] Conduct team one-on-ones
-- [ ] Draft priorities
-- [ ] Present to stakeholders
+- [ ] Complete research synthesis
+- [ ] Write technical sections
+- [ ] Add code examples and visualizations
+- [ ] Get peer feedback
 
 ## Blockers
-Budget review not complete yet.
+Waiting for collaborator to finish the code examples section.
 ```
 
 ## Evolution And Growth
