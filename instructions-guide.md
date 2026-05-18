@@ -1,12 +1,135 @@
 # Instructions Guide
 
-When you create a domain using this framework, you define it with an `[domain].instructions.md` file. This file is the philosophical and operational charter for your domain—where you explain *why* this system exists and *how* it should work within your specific context.
+When you create a domain using this framework, you define it through a structured set of files. This guide explains how those files work together to create a complete, coherent domain specification.
 
-## What Is An Instructions File?
+## Domain Structure: Five Essential Components
 
-An instructions file is not a technical specification (that's what `thing.skill.md` provides). It's your domain's constitution: the beliefs, principles, and paradigm shifts that justify why you're using this framework for this particular problem.
+Every domain requires these five components (in priority order):
 
-## Structure
+### 1. Instructions File (`[domain].instructions.md`)
+The philosophical and operational charter for your domain—where you explain *why* this system exists and *how* it should work within your specific context.
+
+**Purpose:** Establish the paradigm, principles, and reasoning patterns that guide all work within the domain.
+
+**Not a technical specification** (that's for `thing.skill.md`). Rather, it's your domain's constitution: the beliefs and paradigm shifts that justify why you're using this framework for this particular problem.
+
+### 2. Application File (`[domain].application.md`)
+A thing that defines what this domain *is* and *does* at the top level.
+
+**Purpose:** Serve as the entry point that answers: "What problem does this application solve? What does it deliver? How does it work?"
+
+**Structure:** A thing file (`type: application`) with metadata and narrative that explains:
+- The problem it solves
+- What it delivers (inputs → process → outputs)
+- How it works (references to workflows/processes)
+- Who uses it and why
+- Related files and resources
+
+**Why this matters:** Without an explicit application definition, you have guidance documents but no atomic "thing" that defines the domain itself. The application thing becomes the single point of reference for everything else.
+
+### 3. Workflow/Process Thing(s) (`[name].md`)
+One or more atomic things that define how the application executes.
+
+**Purpose:** Orchestrate the steps, phases, or processes that the application uses to accomplish its work.
+
+**Structure:** Things with `type: workflow` or `type: process` that describe:
+- Phases or major steps
+- What happens at each step
+- Roles and responsibilities
+- Expert checkpoints
+- Handoff points and conditions for transition
+
+**Why this matters:** Workflows are the operational heartbeat. They coordinate when LLMs work in different modes, when expert input is required, and how findings accumulate.
+
+**Can you have multiple workflows?** Yes. Complex domains may have several processes or workflows. Each is an atomic thing that the application thing references.
+
+### 4. Domain-Specific Read Prompt (`read.prompt.md`)
+Guidance for how Claude (or other LLMs) should traverse, understand, and reason about things within this domain.
+
+**Purpose:** Teach the LLM how to read and analyze things in your specific domain context.
+
+**Content:** Domain-specific versions of:
+- How to load and traverse things
+- What thing types exist in this domain
+- Reasoning patterns specific to this domain (especially if you've defined reasoning lenses)
+- Examples of typical read-mode queries
+- How to apply domain-specific analysis
+
+**Where it lives:** `domains/[domain]/read.prompt.md`
+
+**Based on:** Generic `read.prompt.md` in the root, tailored to your domain's instructions and workflow.
+
+### 5. Domain-Specific Write Prompt (`write.prompt.md`)
+Guidance for how Claude should create, update, and manage things within this domain.
+
+**Purpose:** Teach the LLM how to make decisions and updates within your domain context.
+
+**Content:** Domain-specific versions of:
+- How to create new things with appropriate metadata
+- How to update existing things based on user requests
+- How to apply domain-specific reasoning (especially reasoning lenses)
+- How to think about dependencies, impacts, and consequences
+- When to ask for clarification vs. when to proceed
+- Examples of typical write-mode tasks
+
+**Where it lives:** `domains/[domain]/write.prompt.md`
+
+**Based on:** Generic `write.prompt.md` in the root, tailored to your domain's instructions and workflow.
+
+---
+
+## How These Five Components Interact
+
+```
+instructions.md
+  ↓ (defines philosophy and principles)
+application.md (thing)
+  ↓ (describes what it does)
+workflow.md (thing) + [other process things]
+  ↓ (orchestrates execution)
+read.prompt.md + write.prompt.md
+  ↓ (guide LLM behavior)
+[instances: data things created by users]
+```
+
+**Example flow:**
+
+1. **User reads instructions.md** → Understands why this domain exists and what drives decisions
+2. **User reads application.md** → Understands what problem is being solved and what gets delivered
+3. **User follows workflow.md** → Knows the steps, phases, and checkpoints
+4. **User invokes read.prompt.md** → Claude reads and analyzes things according to domain rules
+5. **User invokes write.prompt.md** → Claude creates/updates things according to domain rules
+6. **Instances accumulate in git** → The domain's data grows and evolves
+
+---
+
+## Minimal Domain vs. Complex Domain
+
+### Minimal Domain (1-2 workflows)
+All five components are required, but they can be concise:
+- **instructions.md** — 500-800 words explaining philosophy
+- **application.md** — Describes what the domain does and delivers
+- **workflow.md** — Single atomic workflow thing
+- **read.prompt.md** — Tailored read guidance
+- **write.prompt.md** — Tailored write guidance
+
+**Example:** Life Manager, simple project tracking
+
+### Complex Domain (multiple workflows/processes)
+All five components scale to handle complexity:
+- **instructions.md** — More detailed; may define multiple reasoning lenses
+- **application.md** — Describes top-level application; references multiple workflows
+- **[workflow-1].md, [workflow-2].md, [process-3].md** — Multiple orchestration things, each handling different aspects
+- **read.prompt.md** — More detailed guidance for navigating complex domains
+- **write.prompt.md** — More detailed guidance for creating different thing types
+
+**Example:** Prototype-to-Production (with Phase 1-5 orchestration), Financial System (with transactions, budgets, forecasting workflows)
+
+---
+
+## Creating an Instructions File
+
+## Instructions File Structure
 
 Your domain's `[domain].instructions.md` should include:
 
@@ -53,6 +176,52 @@ Examples:
 - "Not a calendar (but it drives calendar entries)"
 - "Not a database (but it acts like one through git)"
 - "Not replacing human intuition (but augmenting decision-making)"
+
+## Creating Your Application File
+
+Once your instructions are written, create `[domain].application.md` as a thing file:
+
+```yaml
+---
+id: application-[domain-name]
+type: application
+status: active
+created: [ISO date]
+schema_version: 2.0
+linked_things:
+  - id: [primary-workflow]
+    relation: primary-process
+  - id: [secondary-workflow] (if applicable)
+    relation: related-process
+---
+
+# [Domain Name] Application
+
+## What This Application Is
+[One clear paragraph: the domain's purpose and scope]
+
+## The Problem It Solves
+[What's broken about traditional approaches? What does this framework invert?]
+
+## What It Delivers
+**Input:** [What goes in?]
+**Process:** [What happens?]
+**Output:** [What comes out?]
+
+## How It Works
+[References to workflow(s): "This application executes via [workflow-name], which orchestrates..."]
+
+## Key Principles
+[List 3-5 core principles guiding this application]
+
+## Who Uses This Application
+[Describe the roles and how they interact with the application]
+
+## Related Files
+[Links to instructions, workflows, prompts, thing.skill.md]
+```
+
+The application thing is your domain's entry point. Someone reading it should immediately understand what problem you're solving and what the system delivers.
 
 ## Before You Write
 
