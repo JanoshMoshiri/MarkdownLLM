@@ -12,6 +12,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tools and utilities for working with the framework
 - Integration guides for popular LLMs and platforms
 
+## [1.4.0] - 2026-05-18
+
+### Added
+- **Five-Component Domain Pattern** — Complete framework documentation for building applications
+  - Explicit requirements: Instructions, Application, Workflow(s), and Read/Write Prompts
+  - Each component has a clear purpose, structure, and interaction pattern
+  - Minimal and complex domain patterns documented
+- **Application File Specification** — New `[domain].application.md` as atomic thing that answers "what problem does this solve?"
+  - Application thing type with standard metadata
+  - Explicit problem definition and delivery specification
+  - Links to supporting workflows and resources
+- **Comprehensive Getting Started Guide** — Expanded `instructions-guide.md` with:
+  - Complete five-component workflow for building domains
+  - Visual diagram showing component relationships and data flow
+  - Detailed sections on each component's purpose and structure
+  - Patterns for minimal vs. complex domains
+- **Updated README** — Restructured to emphasize the five-component pattern
+  - Expanded application examples with structured descriptions
+  - Step-by-step guide from understanding principles to implementation
+  - Clarified distinction between domain definitions and application instances
+- **Prototype-to-Production Reference Domain** — Replaced life-manager as primary example domain
+  - Demonstrates the complete five-component pattern
+  - Shows how complex workflows are orchestrated
+
+### Changed
+- README.md now guides users through the five-component pattern explicitly
+- Getting Started section provides concrete steps for each component
+- Example domains restructured as Example Applications with consistent documentation
+- Clarified terminology: "domain applications" vs. "instances of things"
+
 ## [1.3.0] - 2026-05-18
 
 ### Added
