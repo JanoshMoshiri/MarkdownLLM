@@ -51,6 +51,16 @@ This file is a running record of work done, decisions made, and work remaining. 
   - Removed "Using This Framework" (Personal/Team/Org) — unproven scale claims and a vendor-specific "Interact with Claude" reference violating Principle 5
   - Softened FAQ "production-ready" answer to honestly reflect the draft/stable status spread in frontmatter
 - [x] Committed per git-workflow.md conventions: `framework: clean README — remove structural debt from independent review`
+- [x] Added CONTRIBUTING.md guidelines: per-file versioning note and frozen naming conventions
+- [x] Committed: `framework: update CONTRIBUTING — versioning note and frozen naming conventions`
+- [x] Reviewed and calibrated CHANGELOG.md tone across all release entries:
+  - Removed "no architectural gaps" claim from 2.1.0 (specs carry `status: draft`)
+  - Dropped "Operational Excellence" title from 2.2.0 — factual description instead
+  - Dropped "Major Additions" from 2.1.0 — additions speak for themselves
+  - Acknowledged draft status in 2.1.0 "Why This Matters" section
+  - Softened vendor alignment claims in 2.0.0 ("follows similar patterns" not "mirrors")
+  - Trimmed stale "Coming Soon" to genuinely planned items; renamed to "Planned"
+- [x] Committed: `framework: calibrate CHANGELOG tone — align confidence with actual spec maturity`
 
 #### Decisions Made
 
@@ -66,11 +76,11 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 #### To Do (Remaining from Session 4 Review)
 
-- [ ] CONTRIBUTING.md: add versioning note (independent versioning is intentional, not inconsistency)
-- [ ] CONTRIBUTING.md: state naming conventions are frozen
+- [x] CONTRIBUTING.md: add versioning note (independent versioning is intentional, not inconsistency)
+- [x] CONTRIBUTING.md: state naming conventions are frozen
 - [ ] validate.thing.skill.md: add validation honesty paragraph (LLM-performed, not deterministic)
 - [ ] scalability-guide.md: add cost/performance honesty section (tiered loading reduces but doesn't eliminate cost)
-- [ ] CHANGELOG.md: tone calibration on "Unreleased" and 2.2.0 sections
+- [x] CHANGELOG.md: tone calibration on "Unreleased" and 2.2.0 sections
 - [ ] New: limitations.md — when not to use this framework
 - [ ] New: comparison/differentiation section or document
 - [ ] New: schema migration mechanics
