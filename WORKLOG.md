@@ -65,6 +65,59 @@ This file is a running record of work done, decisions made, and work remaining. 
 - The "elegant constraint" argument — that structure beats scale, and a well-defined domain makes a small model outperform a large unstructured one — is the framework's strongest selling point and wasn't visible in the README until now.
 - The interface spec's deliverables section was subtly misframing the framework's responsibility. The framework doesn't generate output; it provides the structure that makes the LLM's output reliable. This distinction matters for how adopters understand what they're building.
 
+### Session 4 — Independent Review Integration
+
+**Context:** This session captures the findings of a full comprehensive review conducted by an independent agent in a separate session (no access to this AGENTS.md or WORKLOG). The review is logged here as a normal session entry per framework convention. No implementation work was done in this session — findings are recorded as todos.
+
+#### Completed
+
+- [x] Received and read full independent review of the MarkdownLLM v2.1 framework
+- [x] Extracted all identified gaps and action items into the todo list below
+- [x] Noted reviewer corrections to previous under-credits (validation, concurrency, commit discipline, triggers, discovery) — no action required; these were already addressed in prior sessions
+
+#### Decisions Made
+
+- Independent reviews conducted outside this agent's session context are still recorded here as normal sessions — the WORKLOG is the intent record regardless of where the work originated
+- Review findings are treated as authoritative input; the distinction between "gaps in spec" and "gaps in presentation/proof" is adopted from the reviewer's framing
+
+#### To Do — From Independent Review
+
+**Priority 1 — Presentation integrity (high credibility impact, fast to fix)**
+
+- [ ] **README reconciliation** — Remove the duplicate `## License` section (the one with unfilled placeholder text `[Your chosen license…]`); resolve the "MIT License … All rights reserved" contradiction (MIT and "all rights reserved" are mutually exclusive); remove the duplicate `## Contributing` section; remove the three orphaned application description paragraphs (Financial Tracking, Health & Fitness, Creative Writing) that appear after the FAQ with no parent heading; consolidate the two "Getting Started" sequences into one
+- [ ] **README: production-ready vs. draft contradiction** — README FAQ claims "the framework… is production-ready"; half the foundational specs carry `status: draft` in their own frontmatter. Trust the frontmatter. Soften the README claim to reflect that the architecture is proven but the specs are still maturing.
+- [ ] **CHANGELOG tone calibration** — The "Unreleased" tone reads as more triumphant than a v2.x draft-status framework warrants ("the framework now has no architectural gaps"). Align the changelog's prose confidence level with the actual frontmatter status values of the specs it describes.
+
+**Priority 2 — Honesty and transparency additions**
+
+- [ ] **Validation honesty paragraph** — `validate.thing.skill.md` is detailed and rigorous, but every check is still LLM-performed, not deterministic. For the regulated domains the framework explicitly courts (compliance, law, finance, healthcare), one honest paragraph should be added: "Validation is LLM-performed; for high-assurance domains, pair with a deterministic CI check (a YAML/link linter is ~100 lines of Python) outside the framework." Thoroughness of the spec must not imply a stronger guarantee than the mechanism provides.
+- [ ] **Cost/performance honesty** — Tiered loading is presented as the scaling answer, but even Level-1 metadata loading across 1,000 things is a large context payload. The scalability guide correctly notes 1,000+ "breaks" without tiering, but there is no measured sense of what a session costs in tokens/latency at a realistic size (e.g. 200 things). The framework's rejection of indexing/search on philosophical grounds is defensible — it should not be presented as cost-free.
+
+**Priority 3 — Missing specifications**
+
+- [ ] **Failure-mode / limitations document** — "When not to use this framework." Real-time systems, high-write-concurrency domains, anything requiring transactional guarantees, anything where LLM reasoning over full state is too slow or expensive. The manifesto's old "What This Is Not" gestured at this; there is no dedicated honest spec. A "don't use it for X" document is expected for any systems-design framework targeting adoption.
+- [ ] **Comparison / differentiation section** — How is this different from: plain `AGENTS.md`/`CLAUDE.md` conventions; Obsidian-vault-plus-LLM; spec-driven tools like SpecKit; RAG over a markdown corpus? The differentiator is the `thing` spec + tiered loading + triggers + validation as a coherent whole — this should be stated explicitly. The markdown-as-LLM-state idea is actively converging with other tools; name the difference or readers will assume there isn't one.
+- [ ] **Schema migration / evolution mechanics** — `write.thing.md` references `schema_version: 2.0` on things; the manifesto says schemas "emerge" — but there is no spec for what happens when a field is renamed or a new required field is added across hundreds of existing things. `domain-refresh.md` handles framework-version propagation to domains; it is not clear it handles data schema migration. If it does not, that is a gap.
+
+**Priority 4 — Proof and demonstration**
+
+- [ ] **End-to-end worked example** — The framework is entirely specification and static pattern examples. No transcript, no session recording, no "here's a real run: agent loaded, read 12 things, produced this, committed this, here's token count and wall-clock time." The "elegant constraint" claim (small model + structure beats large model without) is asserted in the manifesto and README, never demonstrated. One recorded end-to-end session — real domain, ~15 populated things, a query, the agent's reads, the writes, the commits, the token cost — converts this from "impressive design document" to "framework I'd trust." This may also address the prior session's todo on a non-trivial worked example.
+- [ ] **Populate at least one example domain with 12–15 real, messy, interlinked instance things** — overlapping deadlines, broken dependencies, triggers mid-flight — to show the system under realistic load. The compliance pattern pair is good pedagogy; it is not proof the loop runs.
+
+**Priority 5 — Housekeeping**
+
+- [ ] **`.markdownllm` marker file** — Verify its contents match the `version: 2.1` declared in `AGENTS.md`. Listed in the repo file list but content alignment not confirmed.
+- [ ] **CONTRIBUTING versioning note** — `AGENTS.md` is `version: 2.1`; some skills are `version: 2.0`; `validate.thing.skill.md` is `version: 1.0`. Independent versioning is a stated framework feature — add a one-line note in `CONTRIBUTING.md` so readers do not interpret the version spread as inconsistency.
+- [ ] **Freeze naming conventions in CONTRIBUTING** — The naming conventions (`-specification`, `.thing.`, `.skill.md`) churned across v1.x → v2.x and each rename was a breaking change. The conventions have now stabilised — state explicitly in CONTRIBUTING that they are frozen going forward.
+
+#### Reflections
+
+- The reviewer's central verdict is accurate and matches prior session assessments: the architecture is sound, internally rigorous, and considerably more complete than a first skim suggests. The gaps are presentational and operational, not foundational.
+- The two highest-leverage actions from the review are precisely the same two identified in previous sessions: (1) fix the README, (2) produce one real end-to-end demonstration. The independent confirmation strengthens the case for prioritising these.
+- The framing of "proof vs. specification" is useful: the framework has more than enough specification; it has no proof. Any new spec work is lower leverage than one working example right now.
+
+---
+
 ### Session 2
 
 #### Completed
