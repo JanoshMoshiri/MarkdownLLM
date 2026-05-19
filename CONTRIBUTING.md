@@ -79,6 +79,8 @@ The framework is self-describing — its own specifications are things within th
 - **Follow the pattern** — New domains should follow the three-layer structure (AGENTS.md, skills/, things/).
 - **Be respectful** — We're building something together. Assume good intent.
 - **Validate before submitting** — Check that linked_things references are valid, required fields are present, and the validation checklist passes.
+- **Version numbers are per-file, not global** — A file at `version: 1.0` alongside one at `version: 2.1` is intentional, not inconsistency. Version tracks that file's own change history; `status` (`draft`/`evolving`/`stable`) tracks maturity. Newer specs start at 1.0 when introduced regardless of the overall framework version.
+- **Naming conventions are frozen** — The patterns `-specification`, `.thing.`, `.skill.md` stabilised at v2.x and are not subject to further change. Renames are breaking changes to all domains using the framework.
 
 ## What We're Looking For
 
