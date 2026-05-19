@@ -1,3 +1,18 @@
+---
+id: scalability-guide
+type: guide
+status: stable
+version: 1.0
+created: 2026-05-17
+linked_things:
+  - id: thing-specification
+    relation: extends
+  - id: read-thing-specification
+    relation: informs
+  - id: write-thing-specification
+    relation: informs
+---
+
 # Scalability Guide
 
 When you start with this framework, everything is simple: you have a few things, Claude reads them all, reasons holistically, and responds. But as your system grows—from dozens to hundreds to thousands of things—you need a strategy for keeping that reasoning efficient.

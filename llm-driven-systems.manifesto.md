@@ -1,3 +1,22 @@
+---
+id: llm-driven-systems-manifesto
+type: manifesto
+status: stable
+version: 2.0
+created: 2026-05-13
+linked_things:
+  - id: thing-specification
+    relation: defines
+  - id: interface-specification
+    relation: defines
+  - id: git-workflow-specification
+    relation: defines
+  - id: scalability-guide
+    relation: informs
+  - id: domain-specification-guide
+    relation: informs
+---
+
 # LLM-Driven Systems Manifesto
 
 ## The Paradigm Shift
@@ -11,6 +30,40 @@ This is breaking down.
 A new pattern is emerging: **humans define domains, LLMs reason within those domains, and structured data in version control becomes the persistent state.**
 
 This is not about replacing humans or automating everything. It's about inverting the relationship. Instead of building applications that users interact with, we're building definition files that LLMs understand, and then letting the LLM be the active reasoning engine while humans provide direction and oversight.
+
+## Origins and Influences
+
+This framework did not emerge from nothing. It builds upon decades of proven thinking in software architecture and leverages conventions that already exist in the LLM ecosystem.
+
+### Standing On Shoulders
+
+**Clean Architecture** (Robert C. Martin) is a direct ancestor of this thinking. The principle that systems should be organised into layers with clear boundaries, that dependencies should point inward toward core business logic, and that the details (databases, UIs, frameworks) should be plugins — not foundations — informed the three-layer model here. Interface is replaceable. Storage is replaceable. Only the domain reasoning at the centre matters.
+
+**SOLID Principles** (also Robert C. Martin) shaped the atomic, composable nature of things. Single Responsibility: each thing does one thing. Open/Closed: things are extensible through new fields without modifying existing structure. Dependency Inversion: skills depend on abstractions (thing.md), not on specific data instances.
+
+These ideas are not new. What's new is applying them to a world where the "logic layer" is an LLM, the "database" is git, and the "interface" is whatever channel connects you to intelligence.
+
+### Building On What Exists
+
+A core philosophy of this framework is: **do not invent what already exists.** Build upon it.
+
+- **AGENTS.md** — This file convention is an existing standard, adopted across GitHub Copilot, OpenAI Codex, Cursor, Windsurf, Gemini CLI, and stewarded by the Agentic AI Foundation under the Linux Foundation. We didn't create it. We use it.
+- **.skill.md** — The skill file convention is an existing standard for packaging reusable LLM capabilities. We didn't create it. We use it.
+- **YAML frontmatter** — A convention used across static site generators, documentation tools, and content management systems for decades. We didn't create it. We use it.
+- **Markdown** — The universal plain-text format. Readable by humans, parseable by machines, diffable by git. We didn't create it. We use it.
+- **Git** — Decades of proven version control. Branching, merging, history, collaboration, rollback. We didn't create it. We use it.
+- **LLMs themselves** — The reasoning engine. We don't build LLMs. We define domains they can reason within.
+- **Existing input routes** — VS Code, CLI tools, mobile apps, voice-to-text. We don't build interfaces. We leverage what already connects humans to LLMs.
+
+This is a deliberate philosophical choice. Every piece of infrastructure this framework relies on is already proven, already understood, already maintained by others. The framework's contribution is **the pattern of how these pieces compose** — not the pieces themselves.
+
+This means:
+- **Lower barrier to entry** — Everything here is something people already know
+- **No vendor lock-in** — Every component is interchangeable with equivalents
+- **Durability** — The framework survives any single tool disappearing because it depends on patterns, not products
+- **Focus** — Energy goes into domain definition and reasoning patterns, not infrastructure
+
+The insight is that the LLM era doesn't need new protocols, new databases, or new interface paradigms. It needs a clear architecture for how existing tools compose around a new kind of intelligence. That's what this framework provides.
 
 ## The Three Decoupled Layers
 
@@ -102,25 +155,50 @@ Git isn't just for code. It's for your life, your knowledge, your work, your tho
 
 You get temporal history. You can see how things evolved. You can compare versions. You can collaborate. You can migrate. You can audit.
 
+But git is more than version control in this framework — **git is the state machine.** In a traditional application, writing to the database is the moment state becomes real. Here, the commit is that moment. Everything before the commit is working state. Everything after is persisted, versioned, auditable truth.
+
+This means commit discipline matters. Commits should happen at the boundary where domain state changes meaning: when a thing is created, when a status transitions, when a write session completes. Each commit message should describe the domain state change — not "modified 3 files" but "complete: data-collection → unblocks quarterly-review." Git log becomes a readable narrative of your domain's evolution.
+
+This also means git history becomes the event stream. Triggers that watch for state changes (a dependency resolved, a due date passed) evaluate against committed history. Session orientation reads recent commits to understand what changed. The three layers — working session narrative (worklog), commit history (git log), and exact modifications (git diff) — together provide complete traceability from intent through action to detail.
+
+See `git-workflow.md` for the full operational specification.
+
 ### 7. Transparent and Auditable
 
 Your entire system is readable. No black boxes. The LLM's reasoning can be explained because it's working from clear definitions and explicit data.
 
 You can see what changed, when, and why (if you document it). You can disagree with the LLM and override it. You remain in control.
 
+### 8. Self-Describing (Fractal)
+
+The system can describe itself within itself. The same pattern — YAML frontmatter, markdown body, relationships, statuses — applies at every scale: to data instances, to domain specifications, to the framework's own definitions.
+
+This is a fractal property. In nature, fractals are patterns that recur at every level of magnification — the same structure whether you look at the whole or any part. This framework has the same quality: a thing is a thing whether it's a task in your life manager, a compliance pattern in your regulatory domain, or a specification that defines how things work.
+
+This is not a requirement imposed on domain builders. It's a property that emerges naturally from the design: if everything is a thing, then everything — including the definitions themselves — can be structured, linked, validated, and reasoned about using the same patterns.
+
+The implications:
+
+- A framework that can define itself proves its own universality
+- No special cases exist — the rules apply to themselves
+- An LLM can reason about the system and about itself within the system using the same skills
+- Evolution of the framework is tracked, validated, and auditable just like evolution of domain data
+
 ## How It Works In Practice
 
-1. **Define your domain** — Create an instructions file that explains what you're building and why. Create a skill file that defines your atomic unit.
+1. **Define your domain** — Create an AGENTS.md at root that orchestrates how the LLM interacts with your domain. Create skills that define your domain's philosophy, read/write patterns, and workflows.
 
-2. **Define interaction** — Create prompt files for different modes (read, write, analyze, whatever makes sense for your domain).
+2. **Define your atomic unit** — Reference thing.md to understand how things are structured. Create domain-specific thing types with appropriate metadata.
 
-3. **Create instances** — Your actual data lives in files. Each file is an instance of your atomic unit, with metadata and narrative body.
+3. **Create instances** — Your actual data lives as thing files in `things/`. Each file is an instance of your atomic unit, with YAML metadata and narrative body.
 
-4. **Invoke the LLM** — Feed the definition files and relevant data files to the LLM with a prompt. The LLM reads, understands, reasons, and either provides insights or makes updates.
+4. **Interact through any route** — Speak, type, or otherwise communicate your intent through any input route (VS Code, CLI, mobile, voice). The agent auto-loads and reasons within your domain.
 
-5. **Let it flow** — Updates from the LLM feed to your interface (phone notifications, calendar entries, dashboard updates). You interact and provide new direction.
+5. **Let it flow** — The agent produces things (persistent state) and deliverables (documents, code, images, notifications) depending on what you need. Updates flow back through your output route.
 
-6. **Iterate** — The loop repeats. Over time, your definitions evolve. Your schema grows. The system becomes more sophisticated.
+6. **Commit at meaningful boundaries** — Each state change is committed with a structured message. Git log becomes your domain's event narrative. Triggers evaluate against committed history.
+
+7. **Iterate** — The loop repeats. Definitions evolve. Schema grows. Triggers catch what needs attention. The system becomes more sophisticated while remaining transparent.
 
 Git preserves all of it. You have a complete audit trail and history.
 
@@ -136,7 +214,7 @@ Git preserves all of it. You have a complete audit trail and history.
 
 **Collaboration.** If multiple people need to work within the system, git's collaboration tools work naturally. Merge, branch, resolve conflicts using standard git workflows.
 
-**Auditing.** Everything is transparent and versioned. You can see exactly what changed, when, and trace the reasoning.
+**Auditing.** Everything is transparent and versioned at three layers: your session worklog captures intent and decisions; git log captures state changes with structured commit messages; git diff captures the exact modifications. Together, these provide complete traceability — from why a decision was made, through what changed, down to the specific bytes that were modified. No black boxes. No lost context.
 
 ## Elegant Constraint Enables Efficiency
 
@@ -186,20 +264,41 @@ The tools will evolve. IDEs will gain better support for working with these syst
 
 But the core insight is stable: humans define domains, LLMs reason within them, and versioned markdown files become the lingua franca.
 
+## Self-Describing Architecture
+
+The framework describes itself within itself. Its own specifications are things — with YAML frontmatter, IDs, types, statuses, versions, and explicit relationships to each other.
+
+This is not circular. It is fractal.
+
+A circular reference is A depends on B depends on A — a loop with no resolution. A fractal is a pattern that recurs at every scale — the same structure appearing whether you look at the whole or any part.
+
+The MarkdownLLM framework defines how things work. The framework's own specifications are things. They have frontmatter. They have relationships. They have statuses (`draft`, `evolving`, `stable`). They can be validated by the same validation skill that validates domain things. They are committed following the same git-workflow conventions that domains follow.
+
+**Why this matters:**
+
+- **Proof of universality** — If the framework can represent itself, it can represent anything. If it couldn't, that would reveal a gap.
+- **Dogfooding** — Every principle the framework espouses is tested against itself. "Everything is a thing" is either true or it isn't. It is.
+- **Agent-navigable** — The framework's own AGENTS.md lets an LLM reason about the framework itself — understanding which specs exist, how they relate, which are mature, which are drafts.
+- **No special cases** — There is no category of "meta-stuff that doesn't follow the rules." The rules apply everywhere, including to themselves.
+
+This is the philosophical endpoint of definition-driven systems: the system that defines itself, manages itself, and evolves itself — with a human directing and an LLM reasoning.
+
 ## Getting Started
 
 If you want to build a system using this pattern:
 
 1. **Start small.** Pick a domain you care about. Define it clearly.
 
-2. **Create your definition files.** Instructions, skills, prompts. Be explicit about the rules of your system.
+2. **Create your AGENTS.md.** This is the entry point — auto-discovered by the LLM tool. It orchestrates everything else.
 
-3. **Create a few instances.** Your actual data. Show the LLM what you mean by concrete examples.
+3. **Create your skills.** Specification (philosophy), read (how to analyse), write (how to modify), workflow (process patterns). These teach the LLM how to work within your domain.
 
-4. **Interact with the LLM.** Use the prompts you defined. Let the LLM read your data and reason about it.
+4. **Create a few things.** Your actual data. Show the system what you mean by concrete instances with frontmatter and narrative.
 
-5. **Iterate.** Your definitions will evolve. Your schema will grow. Document the changes and commit to git.
+5. **Interact with the LLM.** Through whatever route works — VS Code, CLI, voice, mobile. The agent loads, skills guide reasoning, things provide context.
 
-6. **Share and adapt.** Once you've built something useful, share the definitions. Others can fork and adapt them for their own domains.
+6. **Commit meaningfully.** Each state change gets a structured commit. Git becomes your domain's event stream and audit trail.
+
+7. **Iterate and share.** Your definitions will evolve. Document changes in the WORKLOG. Commit everything. Once you've built something useful, share it — others can fork and adapt for their own domains.
 
 This is the new way of building systems. Not with code and databases and complex integrations. With clear thinking, structured data, and partnership with intelligence.

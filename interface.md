@@ -1,0 +1,216 @@
+---
+id: interface-specification
+type: specification
+status: draft
+version: 1.0
+created: 2026-05-19
+linked_things:
+  - id: llm-driven-systems-manifesto
+    relation: implements
+  - id: thing-specification
+    relation: complements
+  - id: git-workflow-specification
+    relation: complements
+---
+
+# Interface
+
+## What This Specifies
+
+This document defines the I/O layer of the LLM-driven systems framework — how humans communicate with their agent and what comes back out. It completes the three-layer architecture:
+
+- **Storage** — `thing.md` (persistent state as markdown files in git)
+- **Processing** — `read.thing.md` / `write.thing.md` (how the LLM reasons within domains)
+- **Interface** — this file (how input gets in and output gets delivered)
+
+## The Core Principle: Use Existing Routes
+
+The framework does not define a new interface protocol. It does not require you to build a client, a web app, a chat widget, or a custom API.
+
+Instead, it leverages whatever route already exists between you and a capable LLM. The interface is a thin, replaceable pipe. Any channel that can deliver natural language to an LLM and receive structured output back is a valid interface.
+
+This is a deliberate design choice:
+
+- Interface technology changes faster than anything else in the stack
+- Building a custom interface couples you to a platform and creates maintenance burden
+- Existing routes are already optimised for the interaction patterns you need
+- The framework's value is in the domain definition and data layer, not in the I/O mechanism
+
+## Input Routes
+
+An input route is any channel through which a human can communicate intent to their agent. The agent lives in the domain repository (AGENTS.md + skills + things); the input route is how you reach it.
+
+### Currently Viable Routes
+
+| Route | How It Works | Discovery |
+|-------|-------------|-----------|
+| **VS Code + GitHub Copilot** | AGENTS.md auto-discovered at workspace root. Chat or voice input via editor. | Automatic |
+| **Claude Code (CLI)** | CLAUDE.md at root references AGENTS.md. Terminal-based interaction. | Automatic |
+| **OpenAI Codex CLI** | AGENTS.md auto-discovered. Terminal-based interaction. | Automatic |
+| **Cursor / Windsurf** | AGENTS.md auto-discovered at workspace root. Editor-based chat. | Automatic |
+| **Gemini CLI** | AGENTS.md auto-discovered. Terminal-based interaction. | Automatic |
+| **Mobile chat apps** | Feed AGENTS.md + context to any LLM API via mobile client (Claude iOS, ChatGPT, etc.) | Manual context |
+| **Voice-to-text + any route** | OS-level speech recognition (Windows Speech, macOS Dictation, etc.) feeds text into any of the above routes. | Transparent |
+
+### The Pattern
+
+Every input route follows the same pattern:
+
+```
+Human intent (voice, text, gesture)
+    ↓
+Input route (VS Code, CLI, mobile, API)
+    ↓
+Agent discovery (AGENTS.md loaded automatically or manually)
+    ↓
+LLM receives: agent context + skills + relevant things + user request
+    ↓
+Processing begins
+```
+
+The framework doesn't care which route you used. Once intent reaches the agent, the processing layer takes over identically regardless of how you got there.
+
+### Voice as a First-Class Input
+
+Voice input deserves specific mention. In practice, many interactions with an LLM agent are conversational — you're thinking out loud, explaining context, giving direction. Speech-to-text at the OS level (Windows Speech Recognition, macOS Dictation, mobile voice keyboards) converts voice into text before it reaches any route.
+
+This means voice is not a separate route — it's a transparent layer beneath any route. You speak, the OS transcribes, the text enters VS Code or a CLI or a mobile app. The LLM never knows or cares that the input was spoken.
+
+This has implications:
+
+- **No special voice protocol needed** — OS-level transcription is sufficient
+- **Conversational tone is natural** — LLMs handle informal, spoken-style input well
+- **Accessibility is built-in** — Voice input works for anyone who can speak, regardless of typing ability
+- **Speed advantage** — Speaking is faster than typing for most people; combined with an LLM that reasons about your domain, this creates a rapid feedback loop
+
+## Output Types
+
+The agent produces two fundamentally different categories of output:
+
+### 1. Things (Persistent State)
+
+Things are the agent's memory and working state. They live in the `things/` directory as markdown files with YAML frontmatter. They are:
+
+- **Internal to the system** — the agent reads and writes them to maintain understanding
+- **Structured for LLM consumption** — optimised for parsing and reasoning, not human presentation
+- **Versioned in git** — complete history, rollback capability, audit trail
+- **The source of truth** — everything the agent knows is encoded here
+
+Things are not outputs delivered to the user. They are the persistent substrate the agent operates on.
+
+### 2. Deliverables (Produced Artefacts)
+
+Deliverables are what the agent produces *for the user* based on its understanding of the domain and the things within it. They are:
+
+- **External to the system** — produced for human consumption or downstream use
+- **Formatted for purpose** — documents, code, images, presentations, whatever the user needs
+- **Generated on demand** — created when the user requests them, not maintained as persistent state
+- **Derived from things** — the agent reasons over its things and produces deliverables that synthesise, transform, or present that knowledge
+
+### Deliverable Types
+
+The agent can produce any artefact type that the underlying LLM supports:
+
+| Category | Examples | Use Cases |
+|----------|----------|-----------|
+| **Documents** | Word (.docx), PDF, markdown, plain text | Reports, proposals, specifications, letters, summaries |
+| **Code** | Source files, scripts, configurations, infrastructure-as-code | Software, automation, tooling, integrations |
+| **Data** | CSV, JSON, YAML, spreadsheets | Exports, analysis outputs, structured data |
+| **Visual** | Images, diagrams, charts, architecture drawings | Presentations, documentation, design |
+| **Audio** | Speech synthesis, audio summaries | Accessibility, podcasts, briefings |
+| **Video** | Generated explanations, walkthroughs | Training, documentation, communication |
+| **Structured outputs** | Calendar entries, notifications, reminders, emails | Workflow integration, time management |
+
+### The Relationship Between Things and Deliverables
+
+```
+Things (persistent state)
+    ↓ agent reasons over them
+Understanding (in-context)
+    ↓ user requests a deliverable
+Deliverable (produced artefact)
+    ↓ delivered via output route
+Human receives the result
+```
+
+A deliverable is a *projection* of the agent's understanding at a point in time. The things remain. The deliverable is a snapshot, a transformation, a synthesis.
+
+**Example:**
+
+- Your domain has 30 things representing project tasks, dependencies, blockers, and decisions
+- You ask: "Produce me a status report for the steering committee"
+- The agent reads the relevant things, reasons about status, and produces a Word document
+- The Word document is a deliverable — it doesn't live in `things/`; it's an artefact produced for a specific audience and purpose
+- The things that informed it remain unchanged and continue to evolve
+
+### Where Deliverables Live
+
+Deliverables are not things. They don't belong in `things/`. Options:
+
+- **Working directory** — produced in the current workspace for immediate use
+- **Dedicated output folder** — `outputs/` or `deliverables/` if you want to track them
+- **External systems** — sent directly to email, calendar, file share, or other tools
+- **Ephemeral** — some deliverables are consumed immediately and don't need to persist (a verbal summary, a notification)
+
+This is a domain-level decision. Your AGENTS.md or workflow skill can specify where deliverables are placed.
+
+## Output Routes
+
+Output routes mirror input routes — the response travels back through the same channel:
+
+```
+Processing complete
+    ↓
+Output formed (thing updates + optional deliverable)
+    ↓
+Output route (same channel as input, or specified destination)
+    ↓
+Human receives: response, deliverable, notification, or confirmation
+```
+
+In practice:
+
+- **VS Code + Copilot** — response appears in chat; files created/modified in workspace
+- **CLI tools** — response printed to terminal; files written to disk
+- **Mobile apps** — response appears in conversation
+- **Notifications** — calendar entries, reminders, and alerts pushed to phone/OS
+
+## What This Is Not
+
+- **Not a new protocol** — no WebSocket spec, no REST API, no message format to implement
+- **Not an interface framework** — no UI components, no rendering logic, no display layer
+- **Not platform-specific** — works on any OS, any device, any LLM tool
+- **Not prescriptive** — use whatever route suits your context; switch freely
+
+## Design Implications
+
+### For Domain Builders
+
+When creating a domain, you don't need to think about interface. Your AGENTS.md, skills, and things work identically regardless of how the user reaches them. Focus on:
+
+- Clear agent orchestration (AGENTS.md)
+- Well-defined skills
+- Well-structured things
+
+The interface takes care of itself.
+
+### For the Framework
+
+The framework remains interface-agnostic. As new LLM tools emerge (new IDEs, new CLI tools, new mobile apps, new voice assistants), they become valid routes automatically — as long as they can load AGENTS.md and feed context to an LLM.
+
+This is future-proofing through absence of opinion. The framework doesn't couple to any interface, so it survives all interface changes.
+
+### For Scalability
+
+As systems grow, the interface doesn't change. A domain with 10 things and a domain with 1,000 things use the same routes. The scalability challenge is in the processing layer (context windows, tiered loading) — not in the I/O layer.
+
+## Summary
+
+| Concern | Answer |
+|---------|--------|
+| How does input get in? | Through any existing route to an LLM (VS Code, CLI, mobile, voice) |
+| What does the agent produce internally? | Things (persistent state in git) |
+| What does the agent produce for the user? | Deliverables (documents, code, images, video, audio, notifications) |
+| Do I need to build an interface? | No. Use what exists. |
+| Is voice supported? | Yes, transparently, via OS-level speech-to-text feeding into any route |
+| What if a new tool emerges? | It becomes a valid route if it can load AGENTS.md and pass context to an LLM |
