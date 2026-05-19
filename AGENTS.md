@@ -34,7 +34,6 @@ This is the MarkdownLLM framework — a specification for building LLM-driven sy
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
 3. **Autocommit**: stage changed files + commit with structured message following git-workflow.md conventions
-4. Update WORKLOG.md at session end
 
 ## Framework Specifications (Things)
 
@@ -100,8 +99,6 @@ Load relevant specifications and skills
 Reason and execute within framework principles
     ↓
 Commit changes following git-workflow.md conventions
-    ↓
-Update WORKLOG.md at session end
 ```
 
 ## Validation Checklist
