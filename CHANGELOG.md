@@ -16,18 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integration points for domain workflow skills and AGENTS.md startup sequences
 - Anti-patterns and concrete example (domain discovering autocommit capability)
 
-### Coming Soon
-- Additional domain examples (project management, knowledge base, financial tracking)
-- Tools and utilities for working with the framework
-- Migration strategy for evolving schemas
+### Planned
+- Migration strategy for evolving thing schemas
 - Concurrency and multi-agent patterns
-- Security and access control guidance
+- Limitations and failure-mode documentation
 
 ## [2.2.0] - 2026-05-19
 
-### Operational Excellence: Triggers, Validation, Commit Conventions, and Skill File Standardization
+### Triggers, Validation, Commit Conventions, and Skill File Standardization
 
-This release operationalizes the framework through comprehensive trigger support, explicit validation patterns, structured git conventions, and standardized skill file format.
+This release adds trigger support, validation patterns, structured git conventions, and standardized skill file format to the existing architecture.
 
 ### Added
 
@@ -92,9 +90,9 @@ This release operationalizes the framework through comprehensive trigger support
 
 ## [2.1.0] - 2026-05-19
 
-### Major Additions: Interface, Git Workflow, Validation, Triggers, Self-Describing Architecture
+### Interface, Git Workflow, Validation, Triggers, Self-Describing Architecture
 
-This release completes the three-layer architecture, adds operational specifications that were previously gaps, and makes the framework self-describing (fractal).
+This release adds operational specifications that were previously gaps and makes the framework self-describing (fractal). New specs carry `status: draft` and will mature through use.
 
 ### Added
 
@@ -150,16 +148,16 @@ This release completes the three-layer architecture, adds operational specificat
 
 ### Why This Matters
 
-The framework now has no architectural gaps. The three decoupled layers (Interface, Processing, Storage) each have explicit specifications. Things can be reactive (triggers). Integrity is verifiable (validation). Git usage is disciplined (workflow). And the whole system proves its own universality by describing itself within itself.
+The three decoupled layers (Interface, Processing, Storage) each now have explicit specifications, though several carry `status: draft` and are expected to evolve through real-world use. Things can be reactive (triggers). Integrity is verifiable (validation). Git usage is disciplined (workflow). The system describes itself within itself.
 
-The philosophy of "build on what exists" is now explicit — this framework invents no new infrastructure, protocols, or interfaces. It composes existing proven tools (AGENTS.md, .skill.md, YAML, markdown, git, LLMs) into a new architectural pattern.
+The framework composes existing proven tools (AGENTS.md, .skill.md, YAML, markdown, git, LLMs) into a new architectural pattern — it invents no new infrastructure, protocols, or interfaces.
 - Integration guides for popular LLMs and platforms
 
 ## [2.0.0] - 2026-05-19
 
 ### Major Refactoring: Three-Layer Simplification
 
-This release represents a significant architectural refinement, moving from a confusing five-component approach to a clean, elegant three-layer model that mirrors how production LLM systems (OpenAI, Anthropic, Google) actually work.
+This release represents a significant architectural refinement, moving from a five-component approach to a three-layer model that follows similar patterns to production LLM agent systems.
 
 ### Changed (Breaking)
 
@@ -210,7 +208,7 @@ Layer 3: THING.MD (foundational specification) → THINGS/ (instances)
 
 The previous framework conflated several concepts (instructions, skills, specs, prompts) in ways that didn't match how actual agent systems work. This version:
 
-- **Aligns with production patterns** — Uses the same AGENTS.md + SKILL.md structure that OpenAI, Anthropic, and other frameworks use
+- **Follows emerging patterns** — Uses the AGENTS.md + SKILL.md structure adopted by several LLM agent frameworks
 - **Eliminates confusion** — Clear distinction between discovery (AGENTS.md), capabilities (skills), definition (thing.md), and instances (things)
 - **Improves scalability** — Each domain is fully deployable independently, with clear entry point (AGENTS.md)
 - **Enables multi-vendor usage** — Agent files auto-discover across different LLM tools
