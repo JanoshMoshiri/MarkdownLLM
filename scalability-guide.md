@@ -39,21 +39,19 @@ This breaks. It's expensive, slow, and inefficient. Claude needs to search or in
 
 **The root problem:** Treating all information as equally important, all the time.
 
-## The Philosophy: How Neural Networks Handle Complexity
+## The Scaling Principle: Attention Through Abstraction
 
-Your instinct was right to look at how neural networks work. A neural network doesn't load all its weights equally. It doesn't activate every neuron for every input. Instead:
+The solution mirrors how any efficient reasoning system handles complexity: **load at the right level of detail for the task at hand.**
 
-1. **Edges matter, not nodes** — Neural networks process through connections and attention patterns, not by loading every piece of data
-2. **Multiple levels of abstraction** — Different layers process information at different scales simultaneously
-3. **Attention is dynamic** — Relevant patterns light up based on the input; irrelevant patterns stay quiet
-4. **Efficiency through abstraction** — High-level patterns are captured at lower resolution before deeper processing
+Not everything needs full context all the time. A broad question ("What's overdue?") needs metadata across many things. A deep question ("What's blocking this project?") needs relationships for a subset. A specific question ("What should I do about this?") needs the full narrative of one or two things.
 
-Translated to your system:
+This gives you three actionable rules:
 
-- **Don't load all things equally** — Load at the level of detail you need for the task
-- **Use abstraction levels** — Metadata for broad questions, relationships for connections, full narrative for depth
-- **Let Claude's attention work** — Don't pre-index or search; let Claude reason about relevance given what's loaded
-- **Scale through layers** — As systems grow, add summarization layers without changing the core structure
+1. **Match loading depth to query scope** — Broad queries get metadata. Connection queries get relationships. Deep queries get full context. Never load everything at full depth for a broad question.
+2. **Let the agent choose the level** — The read/write specs already define tiered loading (Level 1: metadata, Level 2: relationships, Level 3: full context). The agent picks the appropriate level based on what you're asking.
+3. **Compress completed work** — Things that are done don't need to occupy the same space as things that are active. Summarise them. The detail is still in git history if you ever need it.
+
+These three rules scale from 50 things to 5,000 without changing the data structure, the file format, or the framework architecture.
 
 ## Three Approaches to Scaling
 

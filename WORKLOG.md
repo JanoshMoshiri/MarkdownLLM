@@ -6,6 +6,36 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ## 19 May 2026
 
+### Session 3
+
+#### Completed
+
+- [x] Full framework review against manifesto principles — all 5 core principles and 2 meta-principles verified as honoured. No violations found.
+- [x] Added "The Elegant Constraint" section to README.md — the structure-beats-scale argument is now front and centre, not buried in session notes
+- [x] Reworked scalability-guide.md "neural network analogy" section — replaced with actionable "Attention Through Abstraction" section: three concrete rules (match depth to scope, let agent choose level, compress completed work) instead of extended analogy
+- [x] Reframed interface.md deliverables section — clarified that the framework holds structure/state; the LLM generates deliverables. Removed visual/audio/video rows that implied the framework produces output. Added explicit statement that output capability depends on the LLM, not the framework.
+
+#### Decisions Made
+
+- "Elegant constraint" is a key differentiator and belongs in the README, not just in session notes — it's the strongest argument for why someone would adopt this framework over unstructured prompting
+- Neural network analogy in scalability guide was trimmed to a direct, actionable section — the philosophical depth was valuable during design but the guide should be practical for adopters
+- Interface deliverables reframing: the framework defines the system the LLM operates within; it does not itself produce deliverables. This is an important distinction for how the framework is understood externally.
+
+#### To Investigate / Future Work
+
+- **Quickstart guide (QUICKSTART.md)** — A 5-minute on-ramp: clone, create 3 files, interact with agent, see it work. The domain-specification-guide is comprehensive but too dense for first contact. A quickstart that gets someone to a working domain in minutes would dramatically improve adoption.
+- **Non-trivial worked example** — The compliance-patterns example has 2 things; life-manager has zero. Neither demonstrates triggers firing, validation catching errors, or git workflow in action. Need an example with 10-15 things showing relationships, triggers, validation, and a session narrative proving the system works end-to-end.
+- **Multi-agent / multi-domain patterns** — What happens when domains share things or one agent's output feeds another agent's input? ProducFlow2 hints at this (domain inside framework repo) but there's no specification for domain composition.
+- **Migration / evolution strategy** — The manifesto says schemas evolve but there's no concrete guidance for: adding a required field to an existing domain, migrating N things, upgrade paths. This becomes critical once domains grow beyond trivial size.
+- **Security and access control** — Any domain with sensitive data (compliance, financial, health) needs guidance on: who can read/write things, secrets handling, PII in git-committed files.
+- **Reasoning lenses placement** — Currently embedded in read.thing.md and write.thing.md as optional sections. Only the compliance domain naturally uses them. Worth investigating whether these should move to an advanced patterns appendix to reduce cognitive load in the core read/write specs, or whether they earn their place as domains mature.
+
+#### Reflections
+
+- The framework is internally consistent at v2.2. The gaps are operational (on-ramp, proof, composition) not architectural. Nothing needs restructuring.
+- The "elegant constraint" argument — that structure beats scale, and a well-defined domain makes a small model outperform a large unstructured one — is the framework's strongest selling point and wasn't visible in the README until now.
+- The interface spec's deliverables section was subtly misframing the framework's responsibility. The framework doesn't generate output; it provides the structure that makes the LLM's output reliable. This distinction matters for how adopters understand what they're building.
+
 ### Session 2
 
 #### Completed

@@ -247,6 +247,23 @@ These tools auto-discover `AGENTS.md` at root—no special configuration needed.
 
 ---
 
+## The Elegant Constraint
+
+A well-defined domain makes even a small model powerful. An undefined domain makes even the largest model mediocre.
+
+This is the framework's core insight: **structure beats scale.** When an LLM operates within a clearly defined domain — with explicit thing types, known relationships, declared triggers, and validated integrity — it reasons with precision and consistency. Without that structure, the same LLM produces vague, inconsistent, and unreliable output regardless of its parameter count.
+
+What this means in practice:
+
+- A **smaller, cheaper model** with a well-defined MarkdownLLM domain will outperform a larger, expensive model with no structure — because the domain constrains reasoning to what matters and eliminates ambiguity
+- **Consistency compounds** — every session builds on committed state, validated things, and structured history. The agent doesn't start from zero; it starts from a rich, reliable context
+- **Cost scales with precision, not volume** — tiered context loading means the agent loads only what it needs. A broad question scans metadata. A deep question loads full context. You pay for what you use
+- **The domain is the product** — the LLM is replaceable (vendor agnostic); the domain definition is the durable asset. Your investment is in defining the domain well, not in picking the right model
+
+This is why the framework exists. Not to add complexity, but to provide the minimal structure that makes LLM reasoning reliable across sessions, across vendors, and across scale.
+
+---
+
 ## Core Principles
 
 These principles guide everything in MarkdownLLM:
