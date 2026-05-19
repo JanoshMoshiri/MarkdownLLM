@@ -35,6 +35,48 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ## 19 May 2026
 
+### Session 5
+
+#### Completed
+
+- [x] Reviewed all Session 4 (independent review) findings and produced a detailed prioritised plan across 5 priority levels
+- [x] Analysed README in full detail — identified 8 specific structural problems with precise line references and rationale for each
+- [x] Implemented all 8 README fixes in a single editing pass:
+  - Removed placeholder license section (template residue, never filled in)
+  - Fixed MIT + "All rights reserved" legal contradiction — removed the phrase
+  - Consolidated two Contributing sections into a single pointer to CONTRIBUTING.md
+  - Deleted three orphaned application description blocks (Financial Tracking, Health & Fitness, Creative Writing) — no parent heading, no matching example domains in repo
+  - Removed second Getting Started sequence and third "Start here:" footer — single on-ramp now
+  - Removed duplicate "How This Works With LLMs" and "Elegant Constraint Enables Efficiency" sections — the canonical "The Elegant Constraint" section (added Session 3) already makes the argument better
+  - Removed "Using This Framework" (Personal/Team/Org) — unproven scale claims and a vendor-specific "Interact with Claude" reference violating Principle 5
+  - Softened FAQ "production-ready" answer to honestly reflect the draft/stable status spread in frontmatter
+- [x] Committed per git-workflow.md conventions: `framework: clean README — remove structural debt from independent review`
+
+#### Decisions Made
+
+- README editing worked from the bottom up to keep line references stable — removed the entire tail section in one replacement, then handled the FAQ independently
+- The "Using This Framework" scale section (Personal/Team/Org) was removed entirely rather than trimmed — the scale claims are not backed by any example or specification in the repo, and the vendor-specific reference was a Principle 5 violation. No version of it was worth keeping.
+- Contributing section now delegates to CONTRIBUTING.md rather than duplicating guidance — single source of truth for contribution process
+- All 8 README changes landed in a single commit with a detailed body listing each change — this is one logical unit of work (README structural cleanup) even though it touched many lines
+
+#### Reflections
+
+- The README had accumulated ~130 lines of duplicate and abandoned content — 28% of the file. This is a normal consequence of iterative writing without a cleanup pass. The independent review was the right trigger for this.
+- Having a detailed plan before editing made the implementation fast and confident — no second-guessing which sections to keep.
+
+#### To Do (Remaining from Session 4 Review)
+
+- [ ] CONTRIBUTING.md: add versioning note (independent versioning is intentional, not inconsistency)
+- [ ] CONTRIBUTING.md: state naming conventions are frozen
+- [ ] validate.thing.skill.md: add validation honesty paragraph (LLM-performed, not deterministic)
+- [ ] scalability-guide.md: add cost/performance honesty section (tiered loading reduces but doesn't eliminate cost)
+- [ ] CHANGELOG.md: tone calibration on "Unreleased" and 2.2.0 sections
+- [ ] New: limitations.md — when not to use this framework
+- [ ] New: comparison/differentiation section or document
+- [ ] New: schema migration mechanics
+- [ ] Proof: end-to-end worked example with real token/time data
+- [ ] Proof: populate life-manager with 12-15 real, messy, interlinked things
+
 ### Session 3
 
 #### Completed
