@@ -1,9 +1,17 @@
 ---
+id: compliance-patterns-read-thing-skill
 name: Compliance Patterns Read Thing Skill
-type: prompt
+type: skill
 mode: read
+status: stable
+version: 2.0
+created: 2026-05-18
+linked_things:
+  - id: compliance-patterns-specification
+    relation: implements
+  - id: compliance-patterns-workflow-skill
+    relation: complements
 description: How to read and learn from compliance example patterns
-version: 1.0
 applies_to: "compliance-patterns/**/*.md"
 ---
 
@@ -18,6 +26,7 @@ Before responding:
 1. Read `compliance-patterns-specification.skill.md` — understand the multi-lens framework
 2. Reference `../thing.md` — understand example thing structure
 3. Load relevant pattern things based on the request
+4. Check triggers — report any orphaned anti-patterns or incomplete examples that need attention
 
 ## Your Task
 

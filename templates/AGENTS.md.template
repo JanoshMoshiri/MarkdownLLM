@@ -21,36 +21,65 @@ applies_to: "**/*.md"
 1. Load all skills from `./skills/`
 2. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
 3. Load thing.md (foundational specification for all atomic units)
+4. Evaluate triggers — scan things for time-based, dependency, or threshold triggers that fire since last session
 
 ### On User Request
 1. **Clarify intent** — What operation? (read, write, analyze, update, etc.)
 2. **Load relevant skill** — Match intent to appropriate skill (specification, read.thing.skill, write.thing.skill, workflow)
 3. **Load context** — Load relevant things from `./things/` directory
 4. **Execute** — Follow skill guidance while maintaining consistency with principles
+5. **Validate** — After writes, invoke validation (structural, referential, domain-specific)
+6. **Commit** — Persist changes following git-workflow conventions
 
 ### On Output
-1. Update thing files if changes were made
-2. Reference the relevant skills for consistency
+1. Validate thing files if changes were made
+2. Commit with structured message: `action: description` (e.g., `create: new-thing-id`, `update: thing-id status`)
 3. Report what changed and why
+4. Evaluate triggers — check if writes caused dependency or threshold triggers to fire
 
 ## Skills Directory
 
-All reusable capabilities in this domain are stored as SKILL.md files:
+All reusable capabilities in this domain are stored as skill files:
 
 - **[domain]-specification.skill.md** — Philosophy, principles, and reasoning patterns
 - **[domain]-read.thing.skill.md** — How to read, analyze, and reason about things
 - **[domain]-write.thing.skill.md** — How to create and update things
 - **[domain]-workflow.skill.md** — Process orchestration and execution patterns
 
-## Foundational Specification
+## Foundational Specifications
 
-- **thing.md** — The atomic unit specification (loaded from MarkdownLLM). All things in `./things/` conform to this structure.
+Loaded from the MarkdownLLM framework root:
+
+- **thing.md** — The atomic unit specification (structure for all things)
+- **validate.thing.skill.md** — Validation skill (structural, referential, semantic checks)
+- **git-workflow.md** — When and how to commit (git as state machine)
+- **interface.md** — I/O layer (input routes and output types)
 
 ## Things Directory
 
-Atomic unit instances following thing.skill.md pattern:
+Atomic unit instances following thing.md pattern:
 
 - `./things/` — Contains all your domain-specific things (data instances)
+
+## Thing Types in This Domain
+
+[List the types of things this domain instantiates]
+
+- `type: [type-name]` — [Description]
+- `type: [type-name]` — [Description]
+
+## Triggers (Domain-Specific)
+
+[Define triggers that apply to things in this domain. Triggers are declarative conditions that signal the agent to pay attention.]
+
+### Time-Based
+- [Example: Weekly review — evaluates every Monday]
+
+### Dependency
+- [Example: When a blocking thing completes, notify dependent things]
+
+### Threshold
+- [Example: When count of in-progress things exceeds 5, warn about overload]
 
 ## Usage Pattern
 
@@ -59,20 +88,30 @@ User Request
     ↓ (auto-discovered)
 Load AGENTS.md
     ↓
+Evaluate triggers (session start)
+    ↓
 Load relevant skill(s) from ./skills/
     ↓
 Load relevant things from ./things/
     ↓
 Execute with consistency checks
     ↓
-Update things/ and report changes
+Validate changes
+    ↓
+Commit with structured message
+    ↓
+Evaluate triggers (post-write)
+    ↓
+Report changes
 ```
 
 ## Validation Checklist
 
-Before executing, verify:
+Before committing, verify:
 
 - [ ] Relevant skill loaded for this operation
-- [ ] thing.md structure being followed
+- [ ] thing.md structure followed (id, type, status, created present)
 - [ ] Domain principles maintained
 - [ ] Changes scoped to appropriate things
+- [ ] linked_things references are valid (targets exist)
+- [ ] Commit message follows `action: description` convention

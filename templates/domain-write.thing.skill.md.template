@@ -1,9 +1,19 @@
 ---
+id: [domain]-write-thing-skill
 name: [Domain] Write Thing Skill
-type: prompt
+type: skill
 mode: write
-description: How to create, update, and manage [domain] things
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-specification
+    relation: implements
+  - id: [domain]-read-thing-skill
+    relation: complements
+  - id: [domain]-workflow-skill
+    relation: complements
+description: How to create, update, and manage [domain] things
 applies_to: "[domain]/**/*.md"
 ---
 
@@ -40,7 +50,10 @@ When a user requests a change:
 2. **Load context** — Read relevant things to understand impact
 3. **Reason through implications** — What else changes? What dependencies exist?
 4. **Propose or execute** — Create/update things according to domain principles
-5. **Report changes** — Explain what changed and why
+5. **Validate** — Run validation checks (structural, referential, domain-specific)
+6. **Commit** — Persist with structured commit message
+7. **Evaluate triggers** — Check if changes caused any triggers to fire
+8. **Report changes** — Explain what changed and why
 
 ## Creating New Things
 
@@ -51,7 +64,7 @@ When creating a new thing:
 ---
 id: unique-identifier
 type: [domain-specific-type]
-status: [draft/active/planning]
+status: [not-started/in-progress/blocked/paused/completed/cancelled]
 created: ISO-datetime
 linked_things:
   - id: related-thing-id
@@ -71,7 +84,7 @@ linked_things:
 
 - **id** — Descriptive, unique identifier (e.g., `project-redesign-homepage`)
 - **type** — Domain thing type (e.g., `project`, `task`, `decision`)
-- **status** — Current state according to domain patterns
+- **status** — Current state: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`
 - **created** — ISO 8601 datetime when created
 - **linked_things** — Explicit references to related things
 
@@ -80,7 +93,7 @@ linked_things:
 [List domain-specific optional fields]
 
 **Example:**
-- **priority** —`low`, `medium`, `high`, `critical`
+- **priority** — `low`, `medium`, `high`, `critical`
 - **assigned_to** — Person responsible
 - **due_date** — ISO date when this is due
 - **tags** — Domain-specific tags for filtering/organization
@@ -98,6 +111,36 @@ When updating a thing:
 ### When to Ask vs. When to Proceed
 
 **Ask the user for clarification when:**
+- The request is ambiguous and could mean multiple things
+- The change would have significant cascading effects
+- You'd need to delete or cancel existing things
+
+**Proceed without asking when:**
+- The intent is clear and the change is straightforward
+- You're creating something new with no conflicts
+- You're updating status based on explicit user input
+
+## Post-Write Validation
+
+After every create or update, validate:
+
+1. **Structural** — YAML is valid, required fields present, id format correct
+2. **Referential** — All linked_things targets exist, no orphaned references
+3. **Domain-specific** — Domain rules from specification are met (types valid, status transitions legal)
+
+If validation fails, fix the issue before committing.
+
+## Git Commit Conventions
+
+After validated writes, commit with structured messages:
+
+- `create: [thing-id]` — New thing created
+- `update: [thing-id] [what-changed]` — Existing thing modified
+- `complete: [thing-id]` — Thing marked completed
+- `archive: [thing-id]` — Thing archived or cancelled
+- `batch: [description]` — Multiple related changes in one commit
+
+Each commit should represent one logical change to domain state.
 - The request conflicts with domain principles
 - Multiple interpretations exist
 - The impact on other things is significant

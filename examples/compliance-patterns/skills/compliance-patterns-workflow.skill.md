@@ -1,8 +1,19 @@
 ---
+id: compliance-patterns-workflow-skill
 name: Compliance Patterns Workflow
-type: workflow
+type: skill
+mode: workflow
+status: stable
+version: 2.0
+created: 2026-05-18
+linked_things:
+  - id: compliance-patterns-specification
+    relation: implements
+  - id: compliance-patterns-read-thing-skill
+    relation: orchestrates
+  - id: compliance-patterns-write-thing-skill
+    relation: orchestrates
 description: How domain builders integrate compliance patterns into their domains
-version: 1.0
 applies_to: "compliance-patterns/**/*.md"
 ---
 
@@ -110,8 +121,8 @@ Periodically:
 
 Your domain (life-manager, project-tracking, healthcare-system, etc.) will integrate compliance patterns like this:
 
-1. **In your domain.instructions.skill.md** — Reference compliance patterns that apply to your context
-2. **In your domain's read/write prompts** — Include guidance about when to reference compliance patterns
+1. **In your domain's specification skill** — Reference compliance patterns that apply to your context
+2. **In your domain's read/write skills** — Include guidance about when to reference compliance patterns
 3. **In your domain's things/** — Create domain-specific examples and patterns
 4. **In decision-making** — When faced with a compliance question, load relevant patterns and reason through multi-lens framework
 
@@ -165,3 +176,29 @@ As your domain grows:
 4. **Formalize patterns** — Document recurring patterns as reusable things
 5. **Build your library** — Over time, your domain has a rich pattern library
 6. **Audit naturally** — Your git history IS your compliance documentation
+
+## Trigger Integration
+
+### Session Start
+When the agent starts a session in a compliance-aware domain:
+- Check for orphaned anti-patterns (no remediation link)
+- Check for incomplete examples (missing lenses)
+- Report pattern consistency issues
+
+### Post-Write
+After creating or updating patterns:
+- Verify anti-pattern ↔ pattern links are bidirectional
+- Check if new patterns invalidate or need linking to existing anti-patterns
+- Validate all three lenses are present in examples
+
+## Git Commit Points
+
+Natural commit moments in the compliance patterns workflow:
+
+- After documenting a new pattern: `create: pattern-[id]`
+- After documenting an anti-pattern: `create: anti-pattern-[id]`
+- After creating a multi-lens example: `create: example-[id]`
+- After linking patterns together: `link: [id] remediated-by [id]`
+- After updating for regulatory changes: `update: [id] regulation-version`
+
+Each commit creates an auditable record of how compliance documentation evolved.
