@@ -198,3 +198,146 @@ If the user asks you to fix issues (not just report them), apply the write.thing
 - **Info is observational** — they mean something is worth the user's attention but may be intentional
 - **Validation is helpful, not hostile** — the goal is to catch problems early, not to gatekeep
 - **Universal rules are fixed; domain rules are discovered** — read the domain spec to know what extra rules apply
+
+## Validation Examples
+
+Concrete examples anchor the agent's reasoning. Use these as reference patterns when validating.
+
+### Clean Thing (Passes All Levels)
+
+```yaml
+---
+id: quarterly-review-prep
+type: task
+status: in-progress
+created: 2026-05-10
+due_date: 2026-06-15
+priority: high
+linked_things:
+  - id: data-collection
+    relation: depends-on
+  - id: stakeholder-feedback
+    relation: depends-on
+dependencies: [data-collection, stakeholder-feedback]
+triggers:
+  - type: dependency
+    watch: [data-collection, stakeholder-feedback]
+    condition: all_completed
+    action: suggest_completion
+---
+
+# Quarterly Review Prep
+
+## Summary
+Prepare the Q2 quarterly review presentation for leadership.
+
+## Current State
+Data collection is complete. Waiting on stakeholder feedback before finalising slides.
+
+## Next Steps
+- Incorporate feedback once received
+- Draft executive summary
+- Schedule review meeting
+```
+
+**Why it passes:**
+- Level 1: All required fields present, valid YAML, correct status value, ISO date format
+- Level 2: `data-collection` and `stakeholder-feedback` exist as thing files; dependencies match linked_things; no circular references
+- Level 3: `type: task` is a declared domain type; priority field present per domain spec
+- Level 4: Narrative matches metadata — status says `in-progress`, body confirms work is underway but not complete
+
+### Level 1 Failure: Structural
+
+```yaml
+---
+id: Budget Analysis
+type: task
+status: active
+created: last week
+linked_things:
+  - data-collection
+---
+
+```
+
+**Violations:**
+| Check | Issue | Severity |
+|-------|-------|----------|
+| `id` format | Contains uppercase and space — should be `budget-analysis` | Warning |
+| `status` value | `active` is not a valid status (should be `in-progress`) | Error |
+| `created` format | `last week` is not ISO 8601 | Error |
+| `linked_things` structure | Entry is a bare string, not an object with `id` and `relation` | Error |
+| Markdown body | No content after frontmatter — empty thing | Warning |
+
+### Level 2 Failure: Referential
+
+```yaml
+---
+id: design-review
+type: task
+status: blocked
+created: 2026-05-12
+dependencies: [client-sign-off, legacy-migration]
+blocks: [launch-prep]
+linked_things:
+  - id: client-sign-off
+    relation: depends-on
+  - id: legacy-migration
+    relation: depends-on
+  - id: launch-prep
+    relation: blocks
+---
+
+# Design Review
+
+## Summary
+Final design review before launch.
+
+## Blocked By
+Waiting on client sign-off and legacy migration to complete.
+```
+
+**Violations (assuming domain context):**
+| Check | Issue | Severity |
+|-------|-------|----------|
+| `dependencies` ID exists | `legacy-migration` — no thing file with this ID exists in the domain | Error |
+| Bidirectional consistency | This thing lists `blocks: [launch-prep]` but `launch-prep` does not list `design-review` in its `dependencies` | Warning |
+
+### Level 4 Concern: Semantic Mismatch
+
+```yaml
+---
+id: onboarding-docs
+type: task
+status: completed
+created: 2026-03-01
+priority: low
+---
+
+# Onboarding Documentation
+
+## Summary
+Create onboarding docs for new team members.
+
+## Current State
+Still drafting the technical setup section. Need input from DevOps on 
+the CI/CD pipeline before this can be finalised. Hoping to have a first 
+draft ready by end of month.
+```
+
+**Observations:**
+| Check | Issue | Severity |
+|-------|-------|----------|
+| Metadata-narrative mismatch | Status says `completed` but body says "still drafting" and "hoping to have a first draft ready" — this thing is clearly `in-progress`, not `completed` | Warning |
+| Staleness | Created 2026-03-01, status `completed`, but narrative describes ongoing work — likely the status was updated prematurely or the narrative is stale | Info |
+
+## Validation Guarantee
+
+Every check in this skill is LLM-performed. The agent reads YAML, follows relationships, and reasons about coherence — but it is not a deterministic parser. The examples above anchor the agent's pattern-matching and make results highly consistent in practice, but they remain non-deterministic. Structural checks (Levels 1-2) are reliable because the examples provide clear positive/negative anchors. Semantic checks (Level 4) are inherently subjective and advisory.
+
+**For domains requiring auditable assurance** — compliance, finance, healthcare, or any domain subject to regulatory scrutiny — pair this skill with deterministic procedural checks outside the framework:
+
+- **Levels 1-2 (structural, referential):** A YAML linter and link-integrity checker (~100 lines of Python) can run as a pre-commit hook or CI step, providing byte-level deterministic parsing that an LLM cannot guarantee.
+- **Levels 3-4 (domain-specific, semantic):** These remain the LLM's strength — reasoning about coherence, scope, and intent is something code cannot replicate.
+
+The intended division of labour: procedural scripts guarantee the mechanical checks; this skill provides the reasoning checks. Together they cover what neither can alone.
