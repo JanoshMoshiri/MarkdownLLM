@@ -320,147 +320,18 @@ This lets you evolve guidance without breaking existing data.
 
 ### "Is this production-ready?"
 
-The framework itself is production-ready (and used in production systems). The examples are complete and usable, but you'll adapt them to your specific domain.
-
----
-
-## Getting Started
-
-1. **Read** `llm-driven-systems.manifesto.md` (10 min)
-2. **Read** `thing.md` (10 min)
-3. **Read** `domain-specification-guide.md` (30 min, reference as you build)
-4. **Explore** one example domain: `examples/life-manager/` or `examples/compliance-patterns/`
-5. **Create** your own domain repository using the structure described above
-6. **Build** your first domain with AGENTS.md, skills, and things
-7. **Interact** with your LLM and iterate
+The architecture is proven and actively used. Individual specifications range from `draft` to `stable` — check each file's frontmatter `status` field for maturity level. The examples are complete and usable, but you'll adapt them to your specific domain.
 
 ---
 
 ## Contributing
 
-This is a specification, not a closed system. If you:
-- Create a domain using this framework
-- Discover patterns that should be documented
-- Find gaps or unclear guidance
-- Want to add examples
-
-You're invited to contribute back. The goal is for MarkdownLLM to grow with real-world use.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines. In short: fork, follow `git-workflow.md` commit conventions, ensure YAML frontmatter stays valid, and submit a pull request.
 
 ---
 
 ## License
 
-[Your chosen license—typically MIT or similar for frameworks]
+This framework is released under the MIT License. See [LICENSE](LICENSE) for details.
 
----
-
-## Questions?
-
-See `domain-specification-guide.md` for comprehensive guidance, or open an issue with questions about how to apply the framework to your domain.
-
-### Financial Tracking Application
-**What it does:** Track spending, budgets, and financial patterns; enable data-driven financial decisions
-
-**Thing types:** Transactions, accounts, budgets, goals, categories
-
-**Metadata:** Amount, category, date, account, tags, recurring status
-
-**Reasoning:** What spending patterns exist? Where can we optimize? What anomalies?
-
-**Workflow:** Transaction capture → categorization → analysis workflow
-
----
-
-### Health & Fitness Application
-**What it does:** Track health and fitness activities; reason about patterns and progress
-
-**Thing types:** Workouts, meals, sleep logs, health goals, metrics
-
-**Metadata:** Date, type, duration, metrics, intensity, notes
-
-**Reasoning:** What patterns exist? Progress toward goals? What adjustments needed?
-
-**Workflow:** Data capture → pattern analysis → adjustment recommendation workflow
-
----
-
-### Creative Writing Application
-**What it does:** Structure and develop stories while keeping narrative free-form
-
-**Thing types:** Stories, characters, scenes, arcs, plot points, ideas, notes
-
-**Metadata:** Status, tags, related items, word count, emotional tone, continuity notes
-
-**Reasoning:** Character consistency? Plot continuity? Narrative flow? Pacing?
-
-**Workflow:** Ideation → outlining → drafting → revision → publication workflow
-
-## How This Works With LLMs
-
-You're not asking the LLM to figure out your application and solve your problems simultaneously. You've already defined the application. Now the LLM just needs to:
-
-1. Read your domain definitions (AGENTS.md, skills/, thing.md structures)
-2. Understand the atomic units and reasoning patterns
-3. Parse your data (instances) and understand the context
-4. Apply reasoning within those clear constraints
-5. Provide insights or make updates according to the domain rules
-
-This is far more reliable and efficient than free-form prompting. A smaller, cheaper LLM can handle complex applications because the application itself provides the structure and boundaries.
-
-## Elegant Constraint Enables Efficiency
-
-The dominant assumption in the LLM space is: bigger models are always better.
-
-This framework inverts that. When you provide clear domain definitions, explicit rules, and structured data, even smaller LLMs can reason effectively about complex systems. The complexity isn't in the model—it's in how well the system is defined.
-
-A well-designed system using a smaller model beats a poorly-designed system using a larger model.
-
-## Using This Framework
-
-### For Building Personal Applications
-- Define a domain and its application
-- Create your definition files (AGENTS.md, specification.skill.md, read/write.skill.md, workflow.skill.md)
-- Create data files as you work
-- Interact with Claude using the prompts you've defined
-- Own your data completely; your application lives in git
-
-### For Building Team Applications
-- Define shared domain applications
-- Create shared definition files (AGENTS.md at root, shared skills/, shared things/)
-- Use git for collaboration on both definitions and data
-- Multiple people can work within the same application
-- Merge, branch, resolve conflicts like any git project
-- Shared definitions ensure consistency across team
-
-### For Building Organizational Applications
-- Different teams define their own applications and domains
-- Teams link applications together (project manager links to knowledge base links to financials)
-- Shared definitions at the organizational level ensure consistency
-- Git audit trail for compliance, governance, and transparency
-- Applications can be composed and integrated without tight coupling
-
-## License
-
-This framework is released under the MIT License. See LICENSE file for details.
-
-Copyright © 2026 JMYM Software Ltd. All rights reserved.
-
-## Contributing
-
-This is a template and specification. Fork it, adapt it, make it your own. If you create domain definitions or examples you think would be useful, consider contributing them back.
-
-## Questions?
-
-This is a new way of thinking about systems and LLM collaboration. Read the manifesto. Try building something small. See what works. Iterate.
-
-Your system will be unique to your needs. That's the point.
-
----
-
-**Start here:**
-
-1. Read `llm-driven-systems.manifesto.md` — understand the philosophy and paradigm shift
-2. Read `thing.md` — understand what a thing is and how it's structured
-3. Look at `examples/life-manager/` or `examples/compliance-patterns/` — see how a complete domain is structured
-4. Read `domain-specification-guide.md` — learn the three-layer pattern (Agent → Skills → Things) for creating your own domain
-5. Create your domain repository following the pattern: AGENTS.md at root, then skills/ and things/ directories
+Copyright © 2026 JMYM Software Ltd.
