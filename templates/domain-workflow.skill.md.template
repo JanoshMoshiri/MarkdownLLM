@@ -117,6 +117,29 @@ Each commit represents a meaningful state change in the domain.
 - **If [problem]:** Then [recovery action]
 - **If [another problem]:** Then [another recovery]
 
+## Framework Refresh Workflow
+
+Invoked at session start or on explicit request. Implements domain-refresh.md.
+
+### Trigger
+- Session start (as part of orientation)
+- Explicit user request: "check framework", "refresh from framework", "what's new in the framework"
+
+### Steps
+1. Resolve `framework_root` from AGENTS.md frontmatter
+2. Read `{framework_root}/CHANGELOG.md` — identify entries after `framework_version_seen`
+3. Read `{framework_root}/WORKLOG.md` — recent sessions only
+4. Scan foundational spec versions (thing.md, git-workflow.md, etc.)
+5. Compare: what does this domain not yet use that the framework now offers?
+6. Report to user with recommendations
+7. If authorised: update domain AGENTS.md and skills
+8. Update `framework_version_seen` in domain frontmatter
+9. Commit: `refresh: absorbed framework v{version} changes`
+
+### Commit Convention
+- `refresh: absorbed framework v{version} changes`
+- `refresh: updated skills for {capability}`
+
 ## Integration with the Agent
 
 [How does this workflow connect to the overall agent orchestration?]

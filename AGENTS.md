@@ -51,6 +51,7 @@ The framework defines itself through these interconnected specifications:
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: draft`)
 - **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: draft`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: draft`)
+- **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: draft`)
 
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)

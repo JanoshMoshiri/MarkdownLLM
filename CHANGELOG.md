@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+**Domain Refresh Specification (domain-refresh.md):**
+- Defines the nested git repository deployment architecture (framework repo + isolated domain repos, .gitignore contract)
+- Specifies the refresh process: how domain agents check CHANGELOG, WORKLOG, and foundational specs for framework evolution
+- Refresh algorithm with version tracking via `framework_version_seen` frontmatter field
+- Integration points for domain workflow skills and AGENTS.md startup sequences
+- Anti-patterns and concrete example (domain discovering autocommit capability)
+
 ### Coming Soon
 - Additional domain examples (project management, knowledge base, financial tracking)
 - Tools and utilities for working with the framework

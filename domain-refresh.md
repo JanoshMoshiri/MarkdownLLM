@@ -1,0 +1,249 @@
+---
+id: domain-refresh-specification
+type: specification
+status: draft
+version: 1.0
+created: 2026-05-19
+linked_things:
+  - id: framework-discovery-specification
+    relation: extends
+  - id: git-workflow-specification
+    relation: references
+  - id: domain-specification-guide
+    relation: references
+  - id: thing-specification
+    relation: references
+---
+
+# Domain Refresh
+
+## What This Specifies
+
+This document defines how domain agents discover and absorb framework evolution. It covers two concerns:
+
+1. **Deployment Architecture** — The nested git repository model that enables independent domain versioning within a shared framework
+2. **Refresh Process** — How a domain agent checks the framework for changes and updates its own understanding accordingly
+
+## Why This Exists
+
+The framework evolves. New specifications are added (e.g., autocommit mode, triggers, self-describing architecture). Domains created before those additions have no mechanism to discover them — they continue operating with stale assumptions about what the framework offers.
+
+The framework is self-describing: its documentation *is* its functionality. When a domain agent reads updated specs, it gains new capabilities. The refresh process formalises this: it is the mechanism by which domains stay current with the framework they inhabit.
+
+## Deployment Architecture
+
+### The Nested Repository Model
+
+The MarkdownLLM framework uses a nested git repository architecture:
+
+```
+MarkdownLLM/                    ← Framework git repo
+├── .gitignore                  ← Contains: domains/
+├── thing.md
+├── git-workflow.md
+├── domain-refresh.md           ← This specification
+├── ...foundational specs...
+├── templates/
+├── examples/
+└── domains/
+    ├── DomainA/                ← Independent git repo
+    │   ├── AGENTS.md
+    │   ├── skills/
+    │   └── things/
+    └── DomainB/                ← Independent git repo
+        ├── AGENTS.md
+        ├── skills/
+        └── things/
+```
+
+### Key Properties
+
+| Property | Mechanism | Purpose |
+|----------|-----------|---------|
+| **Isolation** | Framework `.gitignore` excludes `domains/` | Domain commits never appear in framework history |
+| **Independence** | Each domain has its own `.git` | Domains version independently with their own branches, tags, remotes |
+| **Shared foundation** | `framework_root` in domain AGENTS.md | Domains resolve framework specs via relative path (see framework-discovery.md) |
+| **Read-only relationship** | Domains read framework specs; never write to them | Framework evolves independently of domains |
+
+### Why This Architecture
+
+1. **Clean separation of concerns** — Framework evolution and domain evolution are decoupled. A framework version bump doesn't force domain commits.
+2. **Independent deployment** — Domains can be extracted to standalone repos at any time (see framework-discovery.md: Standalone Domain Deployment).
+3. **No submodule complexity** — The nested model avoids git submodule pain while achieving the same isolation.
+4. **Multiple domains, one framework** — Many domains can share a single framework installation without conflicts.
+
+### The `.gitignore` Contract
+
+The framework's `.gitignore` MUST contain:
+
+```
+domains/
+```
+
+This is not optional. Without it, domain files would appear as untracked files in the framework repo, creating noise and potentially exposing domain-specific data in framework commits.
+
+## The Refresh Process
+
+### When To Refresh
+
+A domain agent should check for framework updates:
+
+1. **Session start** — As part of the existing session-start orientation (see git-workflow.md: Session Start Orientation)
+2. **On explicit request** — When a user says "check the framework" or "update yourself from framework"
+3. **After framework version bump** — When the domain agent notices `framework_root` contains specs with newer versions than last seen
+
+### What To Check
+
+The refresh process reads these framework files in order:
+
+| File | Purpose | What To Look For |
+|------|---------|------------------|
+| `CHANGELOG.md` | What shipped | New features, breaking changes, new specs added |
+| `WORKLOG.md` | How it evolved | Recent session context, decisions made, direction |
+| Foundational specs | Current definitions | Version bumps, new sections, changed behaviour |
+| `AGENTS.md` | Framework self-description | New skills listed, new spec types, updated workflows |
+
+### The Refresh Algorithm
+
+```
+1. Read {framework_root}/CHANGELOG.md
+   → Identify entries newer than domain's last known framework version
+   → Flag: new specifications, breaking changes, new capabilities
+
+2. Read {framework_root}/WORKLOG.md (recent entries only)
+   → Understand current framework direction and recent decisions
+
+3. Scan foundational specs for version changes:
+   → thing.md (version field in frontmatter)
+   → git-workflow.md
+   → interface.md
+   → validate.thing.skill.md
+   → read.thing.md
+   → write.thing.md
+   → Any NEW specs not previously known
+
+4. Compare against domain's current understanding:
+   → Does the domain AGENTS.md reference capabilities it doesn't use?
+   → Are there new framework features the domain should adopt?
+   → Are there breaking changes that require domain updates?
+
+5. Report findings to the user:
+   → New capabilities available
+   → Breaking changes requiring action
+   → Recommended updates to domain skills or AGENTS.md
+
+6. If authorised, update domain files:
+   → Update domain AGENTS.md to reference new framework capabilities
+   → Update domain skills to use new patterns
+   → Commit with message: refresh: absorbed framework v{version} changes
+```
+
+### What The Domain May Update
+
+After a refresh, the domain agent may modify:
+
+- **Domain AGENTS.md** — Add references to new framework capabilities, update startup sequence
+- **Domain skills** — Incorporate new patterns (e.g., adding trigger evaluation when triggers were added to the framework)
+- **Domain WORKLOG** — Record what was discovered and adopted
+
+The domain MUST NOT modify:
+
+- Framework files (read-only relationship)
+- Domain things (refresh is about capabilities, not data)
+
+### Version Tracking
+
+To know whether a refresh is needed, the domain can track the last-known framework version. This is optional metadata in the domain's AGENTS.md frontmatter:
+
+```yaml
+---
+name: My Domain
+framework_root: ../..
+framework_version_seen: 2.2.0
+---
+```
+
+When `framework_version_seen` is less than the framework's current version (from CHANGELOG.md), a refresh is indicated.
+
+If this field is absent, the domain should perform a full refresh on first encounter and add the field afterward.
+
+## Generating Domain Skills From This Spec
+
+This specification is foundational — it defines the *what* and *why* of domain refresh. Domain agents operationalise it through their workflow skill.
+
+### Integration Point: Domain Workflow Skill
+
+The domain's `[domain]-workflow.skill.md` should include a **Refresh** workflow that implements this specification. The workflow skill template should add:
+
+```markdown
+## Refresh Workflow
+
+### Trigger
+- Session start (as part of orientation)
+- Explicit user request: "check framework", "refresh from framework", "what's new in the framework"
+
+### Steps
+1. Resolve `framework_root` from AGENTS.md frontmatter
+2. Read `{framework_root}/CHANGELOG.md` — identify entries after `framework_version_seen`
+3. Read `{framework_root}/WORKLOG.md` — recent sessions only
+4. Scan foundational spec versions (thing.md, git-workflow.md, etc.)
+5. Compare: what does this domain not yet use that the framework now offers?
+6. Report to user with recommendations
+7. If authorised: update domain AGENTS.md and skills
+8. Update `framework_version_seen` in domain frontmatter
+9. Commit: `refresh: absorbed framework v{version} changes`
+
+### Commit Convention
+- `refresh: absorbed framework v{version} changes`
+- `refresh: updated skills for {capability}`
+```
+
+### Integration Point: Domain AGENTS.md
+
+The domain AGENTS.md startup sequence (step 2 in the template) should include refresh awareness:
+
+```markdown
+### On Startup
+1. Resolve `framework_root` from frontmatter
+2. Load foundational specs from framework root
+3. **Check framework version against `framework_version_seen`**
+4. **If newer: surface to user that refresh is available**
+5. Load domain skills
+6. Evaluate triggers
+```
+
+## Relationship To Other Specifications
+
+- **framework-discovery.md** — Defines *how* domains find the framework. This spec defines *what domains do* once they've found it and it has changed.
+- **git-workflow.md** — Provides the session-start orientation pattern that refresh extends. Also defines the commit conventions refresh uses.
+- **domain-specification-guide.md** — The guide for creating domains. Should reference this spec as the mechanism for keeping domains current.
+- **thing.md** — Foundational spec. When its version changes, domains need to know.
+
+## Anti-Patterns
+
+| Anti-Pattern | Why It's Wrong | Correct Approach |
+|--------------|---------------|------------------|
+| Domain auto-refreshes silently | User loses visibility of what changed | Always report findings before modifying |
+| Domain modifies framework files | Violates read-only relationship | Domains only read framework; humans evolve framework |
+| Refresh rewrites domain things | Conflates capability updates with data changes | Refresh updates skills and AGENTS.md only |
+| Skipping CHANGELOG, reading only specs | Misses context, breaking changes, and intent | CHANGELOG is the primary signal; specs are verification |
+
+## Example: A Domain Discovers Autocommit
+
+Before refresh, a domain's AGENTS.md says:
+```markdown
+### On Output
+1. Validate thing files
+2. Report what changed
+```
+
+The framework added autocommit mode in v2.1.0. After refresh:
+
+```markdown
+### On Output
+1. Validate thing files
+2. **Autocommit** (if `git.autocommit: true`): stage + commit with structured message
+3. Report what changed
+```
+
+The domain gained a capability by reading updated framework specs and updating its own operational definition. The documentation *was* the upgrade.
