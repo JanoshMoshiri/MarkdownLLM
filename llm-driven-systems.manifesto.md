@@ -145,7 +145,7 @@ This is a subtle but important inversion. Humans can read it (because markdown i
 
 ### 5. Vendor Agnostic
 
-Use standard conventions (.instructions.md, .skill.md, .prompt.md). Don't lock yourself to one LLM vendor or framework.
+Use standard conventions (AGENTS.md, .skill.md, YAML frontmatter). Don't lock yourself to one LLM vendor or framework.
 
 Any LLM should be able to read your definitions and operate within your system. This gives you optionality and future-proofs your investment.
 

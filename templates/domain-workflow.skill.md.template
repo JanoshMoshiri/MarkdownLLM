@@ -1,8 +1,19 @@
 ---
+id: [domain]-workflow-skill
 name: [Domain] Workflow
-type: workflow
-description: Processes and orchestration patterns for [domain]
+type: skill
+mode: workflow
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-specification
+    relation: implements
+  - id: [domain]-read-thing-skill
+    relation: orchestrates
+  - id: [domain]-write-thing-skill
+    relation: orchestrates
+description: Processes and orchestration patterns for [domain]
 applies_to: "[domain]/**/*.md"
 ---
 
@@ -51,21 +62,49 @@ applies_to: "[domain]/**/*.md"
 - How do you decide?
 - What are the consequences?
 
+## Trigger Integration
+
+[How triggers interact with this workflow]
+
+### Session Start Triggers
+When the agent starts a session, evaluate:
+- Time-based triggers (are any overdue? what's scheduled?)
+- Dependency triggers (did anything change since last session that unblocks work?)
+- Threshold triggers (are any limits exceeded?)
+
+Report triggered conditions before proceeding with user request.
+
+### Post-Write Triggers
+After any write operation, evaluate:
+- Did completing a thing unblock any dependent things?
+- Did creating a new thing exceed a threshold?
+- Should the user be notified of cascading effects?
+
+## Git Commit Points
+
+[Where in the workflow should commits happen?]
+
+- After creating new things → `create: [thing-id]`
+- After status changes → `update: [thing-id] status`
+- After batch operations → `batch: [description]`
+- At phase transitions → `workflow: [phase-name] complete`
+
+Each commit represents a meaningful state change in the domain.
+
+## Validation Checkpoints
+
+[At what points should things be validated?]
+
+- **Before phase transition:** Validate all things involved in the current phase
+- **After batch writes:** Run full validation on modified things
+- **On demand:** User requests integrity check
+
 ## Roles and Responsibilities (If Applicable)
 
 [If multiple people or agents are involved, clarify roles]
 
 - **[Role 1]** — What they do
 - **[Role 2]** — What they do
-
-## Checkpoints and Validation
-
-[At what points should things be reviewed or validated?]
-
-- **Checkpoint 1:** Before phase transition
-  - What should be validated?
-  - What criteria must be met?
-  - Who validates?
 
 ## Example Flow
 

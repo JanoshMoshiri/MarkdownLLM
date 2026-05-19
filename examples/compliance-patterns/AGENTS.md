@@ -1,7 +1,7 @@
 ---
 name: Compliance Patterns Library
 description: Reference patterns for encoding compliance as verifiable reasoning using multi-lens frameworks
-version: 1.0
+version: 2.0
 applies_to: "**/*.md"
 ---
 
@@ -18,6 +18,7 @@ This is a reference library for domain builders creating systems that operate un
 3. **Contrast Creates Clarity** — Show both compliant patterns AND violations (with consequences) so the LLM can learn the boundary
 4. **Atomic Patterns** — Each example is self-contained; they compose into a searchable pattern library
 5. **Git as Audit Trail** — All changes and decisions are versioned; compliance documentation is built-in
+6. **Self-Describing** — Patterns are things with full frontmatter; the library validates itself
 
 ## What This IS and IS NOT
 
@@ -39,6 +40,7 @@ This is a reference library for domain builders creating systems that operate un
 1. Load all skills from `./skills/`
 2. Register: compliance-patterns-specification.skill.md, compliance-patterns-read.thing.skill.md, compliance-patterns-write.thing.skill.md, compliance-patterns-workflow.skill.md
 3. Load thing.md for understanding example patterns
+4. Evaluate triggers — check for patterns referencing outdated regulations or unlinked anti-patterns
 
 ### On User Request
 1. **Clarify intent** — Are they studying patterns, creating their own domain, or auditing compliance?
@@ -48,6 +50,8 @@ This is a reference library for domain builders creating systems that operate un
 5. **Generate guidance** — Help them apply patterns to their context
 
 ### On Output
+- Validate any new patterns (structural, referential, domain-specific)
+- Commit with structured message (e.g., `create: pattern-new-id`, `update: example-id`)
 - Reference specific examples and reasoning lenses
 - Explain the multi-lens approach
 - Show how to extend patterns for their domain
@@ -60,8 +64,15 @@ All reusable capabilities for compliance pattern documentation:
 - **compliance-patterns-read.thing.skill.md** — How to read and learn from compliance examples
 - **compliance-patterns-write.thing.skill.md** — How to create and document new patterns
 - **compliance-patterns-workflow.skill.md** — How domain builders integrate these patterns
-**Foundational Specification:**
-- **thing.md** — The atomic unit specification (foundational structure for all things)
+
+## Foundational Specifications
+
+Loaded from the MarkdownLLM framework root:
+
+- **thing.md** — The atomic unit specification (structure for all things)
+- **validate.thing.skill.md** — Validation skill (structural, referential, semantic checks)
+- **git-workflow.md** — When and how to commit (git as state machine)
+- **interface.md** — I/O layer (input routes and output types)
 
 ## Things Directory
 
@@ -72,6 +83,15 @@ Thing types:
 - `type: anti-pattern` — A violation with explanations
 - `type: example` — A concrete scenario showing multi-lens reasoning
 - `type: decision-tree` — A framework for making verified decisions
+
+## Triggers
+
+### Dependency
+- **Orphaned anti-pattern** — When a `type: anti-pattern` has no `linked_things` entry with relation `remediated-by`, flag it for linking
+- **Incomplete example** — When a `type: example` doesn't show all three lenses (domain, compliance, audit), flag it
+
+### Relationship
+- **Pattern update cascade** — When a `type: pattern` is updated, check all `type: anti-pattern` things that reference it for consistency
 
 ## Key Concept: Multi-Lens Reasoning
 
@@ -90,14 +110,31 @@ Domain Builder or Auditor
     ↓ (auto-discovered)
 Load Compliance Patterns Agent
     ↓
+Evaluate triggers (orphaned patterns, incomplete examples)
+    ↓
 Load relevant skills (read, write, or workflow)
     ↓
 Load relevant pattern things from ./things/
     ↓
 Reason about patterns and apply to domain
     ↓
+Validate new/modified patterns
+    ↓
+Commit with structured message
+    ↓
 Document new patterns or reference existing ones
 ```
+
+## Validation Checklist
+
+Before committing, verify:
+
+- [ ] Pattern has all three lenses documented (domain, compliance, audit)
+- [ ] Anti-patterns link to their remediation pattern
+- [ ] Examples show concrete scenarios (not abstract rules)
+- [ ] thing.md structure followed (id, type, status, created present)
+- [ ] linked_things references are valid (targets exist)
+- [ ] Commit message follows `action: description` convention
 
 ## Validation Checklist
 

@@ -14,6 +14,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Concurrency and multi-agent patterns
 - Security and access control guidance
 
+## [2.2.0] - 2026-05-19
+
+### Operational Excellence: Triggers, Validation, Commit Conventions, and Skill File Standardization
+
+This release operationalizes the framework through comprehensive trigger support, explicit validation patterns, structured git conventions, and standardized skill file format.
+
+### Added
+
+**Triggers System Implementation:**
+- Integrated trigger documentation throughout domain specifications
+- Session-start triggers: time-based (due dates, stale items), dependency-based (unblocked work), threshold-based (overload warnings)
+- Post-write triggers: validate state changes, cascade effects, notify dependents
+- Trigger examples in both example domains (Life Manager, Compliance Patterns)
+- Trigger integration with git commit history for temporal reasoning
+
+**Validation Framework:**
+- Four-level validation strategy in domain-specification-guide.md: structural, referential, domain-specific, semantic
+- Three severity tiers: error, warning, info
+- Post-write validation checkpoints and procedures
+- Validation checklists in example AGENTS.md files
+- Validation sections in all templates and example skill files
+
+**Git Commit Conventions:**
+- Structured commit message format: `action: description` (e.g., `create: task-id`, `update: project status`)
+- Commit points in workflows: create, status-change, batch operations, phase transitions, archive
+- Git log as event stream for trigger evaluation
+- Examples of commit conventions in all skill files and workflow documentation
+
+**Skill File Standardization:**
+- All skill files now have complete YAML frontmatter: `id`, `type`, `status`, `version`, `created`, `linked_things`
+- Updated skill file frontmatter in both example domains (Life Manager, Compliance Patterns)
+- Status field shows skill maturity: `draft`, `evolving`, `stable`
+- Relationship metadata showing which skills implement/orchestrate/complement each other
+- Consistent versioning across all skills
+
+### Changed
+
+**Examples Updated to v2.0:**
+- Life Manager AGENTS.md → v2.0 with trigger integration, validation checkpoints, commit conventions
+- Compliance Patterns AGENTS.md → v2.0 with dependency triggers, post-write validation, audit trail integration
+- All example skill files enhanced with: proper frontmatter, trigger sections, validation rules, commit conventions
+
+**Domain-Specification-Guide Enhanced:**
+- Updated to v2.1 with comprehensive trigger documentation
+- Added git-workflow and interface-specification as linked references
+- Expanded skill file templates with trigger sections, validation checkpoints, commit conventions
+- Clarified thing status values: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`
+- Added domain-specific validation rules patterns
+- Enhanced AGENTS.md template with trigger evaluation flow
+
+**Templates Updated for Standardized Skill Format:**
+- AGENTS.md.template — Added trigger section, validation checklist, git commit conventions
+- domain-specification.skill.md.template — Added id, status, linked_things frontmatter; added validation rules and triggers sections
+- domain-read.thing.skill.md.template — Added skill file frontmatter structure; added trigger checking; enhanced context loading strategy
+- domain-write.thing.skill.md.template — Added validation checklist and procedures; added post-write trigger evaluation; structured commit conventions
+- domain-workflow.skill.md.template — Added trigger integration, git commit points, validation checkpoints
+
+**Manifesto Updated:**
+- Clarified vendor agnostic principle: use AGENTS.md, .skill.md, and YAML frontmatter (not .instructions.md, .prompt.md conventions)
+
+### Refined
+
+- Example compliance patterns enhanced with bidirectional linking (positive patterns ↔ anti-patterns)
+- Life Manager thing types standardized with clear status transitions and domain validation rules
+- Trigger examples across domains show concrete, actionable conditions (overdue, unblocked, threshold)
+- Post-write validation examples demonstrate three-level checks (structural, referential, domain-specific)
+
 ## [2.1.0] - 2026-05-19
 
 ### Major Additions: Interface, Git Workflow, Validation, Triggers, Self-Describing Architecture

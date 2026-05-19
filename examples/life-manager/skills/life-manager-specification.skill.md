@@ -1,12 +1,22 @@
 ---
-name: Life Manager specification 
-type: specification 
+id: life-manager-specification
+name: Life Manager Specification
+type: specification
+status: stable
+version: 2.0
+created: 2026-05-18
+linked_things:
+  - id: life-manager-read-thing-skill
+    relation: informs
+  - id: life-manager-write-thing-skill
+    relation: informs
+  - id: life-manager-workflow-skill
+    relation: informs
 description: Philosophy, principles, and paradigm for life management using LLM reasoning
-version: 1.0
 applies_to: "life-manager/**/*.md"
 ---
 
-# Life Manager specification 
+# Life Manager Specification
 
 ## Philosophy
 
@@ -55,7 +65,7 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 
 **LLM-Centric Structure:** The metadata and body are optimized for Claude to parse and reason with, not for you to read. Claude is the primary consumer. Readability for humans is secondary.
 
-**Vendor Agnostic:** Uses standard conventions (.instructions.md, .skill.md, .prompt.md files) so any LLM—Claude, Copilot, any other agent—can understand and operate within the system.
+**Vendor Agnostic:** Uses standard conventions (AGENTS.md, .skill.md files, YAML frontmatter) so any LLM—Claude, Copilot, any other agent—can understand and operate within the system.
 
 **Versioned, Durable:** Git means your entire life management system is versioned, backed up, and transparent. You can see how things evolved. You can roll back if needed.
 
@@ -77,4 +87,27 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 
 ## What This System Is
 
-A way to externalize your life management to an intelligent partner (Claude) while keeping your data completely in your control, in a format you can understand, in a repository you own.
+A way to externalize your life management to an intelligent partner while keeping your data completely in your control, in a format you can understand, in a repository you own.
+
+## Domain-Specific Validation Rules
+
+Beyond the universal structural checks (id, type, status, created present):
+
+- Things of `type: project` should have at least one `linked_things` entry
+- Things of `type: task` should have `priority` set
+- Things of `type: goal` should have a narrative body explaining the desired outcome
+- Status transitions should be logical: `not-started` → `in-progress` → `completed` (with `blocked`/`paused` as temporary states)
+
+## Triggers
+
+### Time-Based
+- **Weekly review** — Every Monday, scan all active things for overdue items and stale work
+- **Due date approaching** — 2 days before `due_date`, alert the user
+
+### Dependency
+- **Unblocked** — When a blocking thing completes, notify the user about newly unblocked work
+- **New blocker** — When something becomes blocked, trace downstream impact
+
+### Threshold
+- **Overload** — More than 5 things `status: in-progress` simultaneously → suggest focusing
+- **Stale work** — Thing `status: in-progress` for 14+ days without changes → flag for review
