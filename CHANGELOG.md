@@ -12,6 +12,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tools and utilities for working with the framework
 - Integration guides for popular LLMs and platforms
 
+## [2.0.0] - 2026-05-19
+
+### Major Refactoring: Three-Layer Simplification
+
+This release represents a significant architectural refinement, moving from a confusing five-component approach to a clean, elegant three-layer model that mirrors how production LLM systems (OpenAI, Anthropic, Google) actually work.
+
+### Changed (Breaking)
+
+**Framework Architecture Simplified:**
+- Renamed: `[domain]-instructions.skill.md` → `[domain]-specification.skill.md`
+  - Clarifies that this is domain philosophy/principles, not instructions to follow
+  - Better aligns with industry terminology (AGENTS.md + SKILL.md standards)
+  
+- Key distinction established: `thing.md` is foundational **specification**, not a skill
+  - `thing.md` — Universal atomic unit specification (not a `.skill.md` file)
+  - Skills (`.skill.md` files) — Reusable capabilities (specification, read, write, workflow)
+  - Previous confusion between "skill files" and "spec files" eliminated
+
+**Updated All References Throughout:**
+- Templates: All four domain templates use `specification` and correct file extensions
+- Examples: Both `life-manager/` and `compliance-patterns/` restructured with new naming
+- Documentation: README, domain-specification-guide, CONTRIBUTING all updated
+- Core docs: All skill files now reference `thing.md` (not `thing.skill.md`)
+
+### Architecture Now Fully Cohesive
+
+**Three Clear Layers:**
+```
+Layer 1: AGENTS.md
+  ↓ auto-discovers at root
+Layer 2: SKILLS/ 
+  (specification, read.thing, write.thing, workflow .skill.md files)
+  ↓ reusable capabilities
+Layer 3: THING.MD (foundational specification) → THINGS/ (instances)
+```
+
+**Vendor-Agnostic Discovery:**
+- `AGENTS.md` sits at repository root and is auto-discovered by:
+  - OpenAI Codex, GitHub Copilot, Cursor, Windsurf, Gemini CLI (natively)
+  - Claude Code (via CLAUDE.md wrapper referencing AGENTS.md)
+- Skills are portable across all vendors (standard YAML frontmatter + markdown)
+- Domain repos can be deployed independently with their own AGENTS.md
+
+### Documentation Improvements
+
+- **README.md** — Restructured to match three-layer model; removed dated references to "five-component pattern"
+- **domain-specification-guide.md** — Renamed from "instructions-guide"; updated all structural diagrams
+- **CONTRIBUTING.md** — Updated contribution guidelines to reflect three-layer pattern
+- **Template files** — All template filenames and content use consistent naming
+- **Example domains** — Both examples now show clean structure with specification.skill.md, not instructions.skill.md
+
+### Why This Matters
+
+The previous framework conflated several concepts (instructions, skills, specs, prompts) in ways that didn't match how actual agent systems work. This version:
+
+- **Aligns with production patterns** — Uses the same AGENTS.md + SKILL.md structure that OpenAI, Anthropic, and other frameworks use
+- **Eliminates confusion** — Clear distinction between discovery (AGENTS.md), capabilities (skills), definition (thing.md), and instances (things)
+- **Improves scalability** — Each domain is fully deployable independently, with clear entry point (AGENTS.md)
+- **Enables multi-vendor usage** — Agent files auto-discover across different LLM tools
+- **Simplifies onboarding** — New users understand: "Agent loads first, then skills, then things"
+
+### Technical Accuracy
+
+- **Vendor maturity confirmed** — AGENTS.md is now stewarded by the Agentic AI Foundation (under Linux Foundation) with broad cross-tool support
+- **Discovery mechanism validated** — Verified Codex walk-from-root-to-cwd behavior and auto-discovery across tools
+- **Framework positioning correct** — MarkdownLLM is the library/template specification; domains are deployed separately with their own root AGENTS.md
+
 ## [1.4.0] - 2026-05-18
 
 ### Added
