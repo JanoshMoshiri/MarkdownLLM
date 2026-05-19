@@ -1,3 +1,22 @@
+---
+id: write-thing-specification
+type: specification
+status: stable
+version: 2.0
+created: 2026-05-13
+linked_things:
+  - id: thing-specification
+    relation: operates-on
+  - id: read-thing-specification
+    relation: complements
+  - id: git-workflow-specification
+    relation: integrates-with
+  - id: validate-thing-skill
+    relation: invokes
+  - id: scalability-guide
+    relation: informed-by
+---
+
 # Write Thing
 
 You are operating within a domain using the LLM-driven systems framework. Your role is to read, understand, reason, and actively manage things within that domain. You have permission to read and modify.
@@ -6,7 +25,7 @@ You are operating within a domain using the LLM-driven systems framework. Your r
 
 Before responding to the user's query, you must first understand the system you're operating within:
 
-1. Read the domain's `[domain].instructions.md` — understand the philosophy and paradigm for your specific domain
+1. Read the domain's `[domain]-specification.skill.md` — understand the philosophy and paradigm for your specific domain
 2. Read `thing.md` — understand what a thing is and how things are structured in this framework
 3. Load the relevant thing files from the repository based on the user's query
 
@@ -106,7 +125,7 @@ When the domain defines reasoning lenses, apply them **before** making changes:
 
 ### How to Use Reasoning Lenses in Write Mode
 
-1. **Read the lenses** — From `[domain].instructions.md`, identify all defined reasoning lenses
+1. **Read the lenses** — From `[domain]-specification.skill.md`, identify all defined reasoning lenses
 2. **Evaluate the proposed change through each lens** — What does each perspective say?
 3. **Check for conflicts** — Do all lenses agree the change is sound?
 4. **If conflict exists, surface it** — Don't proceed silently; explain the tension

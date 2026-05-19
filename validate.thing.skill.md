@@ -1,0 +1,200 @@
+---
+name: Validate Thing
+type: skill
+mode: validate
+description: Universal validation of thing files — structural integrity, referential consistency, and semantic coherence
+version: 1.0
+applies_to: "**/things/**/*.md"
+---
+
+# Validate Thing Skill
+
+You are validating thing files within a domain using the LLM-driven systems framework. Your role is to check that things are structurally sound, referentially consistent, and semantically coherent. You report issues clearly so they can be fixed.
+
+## System Context
+
+Before validating:
+
+1. Read `thing.md` — understand the universal required structure for all things
+2. Read the domain's `[domain]-specification.skill.md` — understand domain-specific field requirements, valid types, and constraints
+3. Load the thing files to be validated
+
+## When Validation Runs
+
+Validation is invoked at three moments:
+
+1. **After writes** — When the agent creates or modifies things, validate before committing. Issues are caught before they persist.
+2. **Session start** — Quick scan during orientation. Report: "N things have issues since your last session."
+3. **On demand** — User asks "validate my things", "check integrity", or "are my things clean?"
+
+## Validation Levels
+
+Validate in order. Each level builds on the previous. Stop and report at the first level where issues are found, unless the user asks for a full report.
+
+### Level 1: Structural Validation
+
+**What:** Is each thing file well-formed and does it meet the universal minimum requirements defined in `thing.md`?
+
+**Check every thing file for:**
+
+| Check | Rule | Severity |
+|-------|------|----------|
+| YAML frontmatter exists | File starts with `---` and has a closing `---` | Error |
+| YAML is parseable | No syntax errors in the frontmatter block | Error |
+| `id` present | Field exists and is not empty | Error |
+| `id` format | Lowercase, hyphens only, no spaces (e.g., `my-thing-id`) | Warning |
+| `id` matches filename | The `id` value matches the filename (without `.md` extension) | Warning |
+| `type` present | Field exists and is not empty | Error |
+| `status` present | Field exists and is not empty | Error |
+| `status` value valid | One of: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled` | Error |
+| `created` present | Field exists and is not empty | Error |
+| `created` format | Valid ISO 8601 date or datetime | Error |
+| `due_date` format | If present, valid ISO 8601 date | Warning |
+| `linked_things` structure | If present, each entry has at minimum `id` and `relation` | Error |
+| `dependencies` structure | If present, is an array of strings (IDs) | Error |
+| `blocks` structure | If present, is an array of strings (IDs) | Error |
+| `triggers` structure | If present, each entry has `type` and `action` | Error |
+| Markdown body exists | Content exists after the YAML frontmatter closing `---` | Warning |
+| Title heading exists | Markdown body starts with a `#` heading | Warning |
+
+**Severity definitions:**
+- **Error** — Must be fixed. The thing is malformed and may cause incorrect reasoning.
+- **Warning** — Should be fixed. The thing is functional but doesn't follow conventions.
+
+### Level 2: Referential Validation
+
+**What:** Do relationships between things hold? Do referenced IDs point to things that actually exist?
+
+**Requires:** Loading all thing files in the domain (metadata only — Level 1 context window).
+
+| Check | Rule | Severity |
+|-------|------|----------|
+| `linked_things` IDs exist | Every `id` in `linked_things` corresponds to an existing thing file | Error |
+| `dependencies` IDs exist | Every ID in `dependencies` corresponds to an existing thing file | Error |
+| `blocks` IDs exist | Every ID in `blocks` corresponds to an existing thing file | Error |
+| Trigger `watch` IDs exist | Every ID in trigger `watch` fields corresponds to an existing thing file | Error |
+| `parent` ID exists | If `parent` is set, the referenced thing file exists | Error |
+| Bidirectional consistency | If A lists B in `blocks`, B should list A in `dependencies` (or at minimum in `linked_things`) | Warning |
+| No circular dependencies | Following the dependency chain does not loop back to the starting thing | Error |
+| No orphaned things | Thing has at least one relationship, one trigger, or is referenced by another thing. Completely isolated things are flagged. | Info |
+| No duplicate IDs | No two thing files in the domain share the same `id` value | Error |
+
+**Severity addition:**
+- **Info** — Not necessarily wrong, but worth knowing. Orphaned things may be intentional (new, standalone) or may be forgotten.
+
+### Level 3: Domain-Specific Validation
+
+**What:** Does this thing satisfy the rules defined in the domain's specification skill?
+
+**Requires:** Reading `[domain]-specification.skill.md` to discover domain constraints.
+
+**What to look for in the domain spec:**
+
+1. **Valid types** — The spec lists thing types for this domain (e.g., `project`, `task`, `goal`, `pattern`). Check that each thing's `type` matches one of the declared types.
+
+2. **Required domain fields** — The spec may declare fields that are mandatory in this domain beyond the universal core. For example, a compliance domain might require `data_classification` on every thing, or a project management domain might require `assigned_to`.
+
+3. **Valid relationship types** — The spec may define which `relation` values are valid in `linked_things` for this domain (e.g., `subtask`, `blocks`, `supports`, `contrasts-with`).
+
+4. **Status transitions** — If the spec defines a state machine (valid transitions between statuses), check that the current status is reachable. For example, a domain might say things cannot go directly from `not-started` to `completed` without passing through `in-progress`.
+
+5. **Domain reasoning lenses** — If the spec defines reasoning lenses (e.g., domain logic, compliance logic, audit logic), check that things of certain types have the metadata those lenses require. For example, if the compliance lens requires `audit_logging_enabled`, flag things that handle personal data but lack this field.
+
+**If no domain spec exists** (e.g., validating things in a domain that hasn't defined a specification skill), skip Level 3 entirely. Universal validation (Levels 1-2) still applies.
+
+| Check | Rule | Severity |
+|-------|------|----------|
+| Type is declared | Thing's `type` matches a type listed in the domain spec | Warning |
+| Domain-required fields present | All fields the domain spec marks as required are present | Error |
+| Relationship types valid | `relation` values in `linked_things` match domain-defined types | Warning |
+| Status transition valid | If domain defines a state machine, current status is reachable | Warning |
+| Lens-required fields present | If domain defines reasoning lenses with field requirements, those fields exist on applicable things | Warning |
+
+### Level 4: Semantic Validation
+
+**What:** Does the thing make sense as a whole? Does the narrative match the metadata? Is it well-scoped?
+
+**Requires:** Full context (Level 3 context window — complete thing files with narrative body).
+
+This level uses your reasoning, not mechanical checks. Read the thing holistically and assess:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| Metadata-narrative consistency | Status says `completed` but body says "waiting on feedback". Priority says `low` but body describes an urgent deadline. Tags don't match the content. | Warning |
+| Scope appropriateness | Is this thing trying to do too much? Should it be split into sub-things? Is it so small it should be merged with a parent? | Info |
+| Staleness | Status is `in-progress` but `created` date is months ago with no recent narrative updates. May be abandoned rather than active. | Info |
+| Narrative completeness | Does the body explain what this thing is and why it matters? Or is it just a title with empty metadata? | Info |
+| Trigger coherence | Do the triggers make sense for this thing? Is it watching things that are relevant to it? Are the actions appropriate? | Info |
+| Duplicate or redundant | Does this thing substantially overlap with another thing in scope or intent? | Info |
+
+**Important:** Level 4 is advisory. These are observations, not errors. Present them as "I noticed..." rather than "Fix this."
+
+## How To Validate
+
+### Scoping: What To Validate
+
+| User Request | Scope |
+|-------------|-------|
+| "Validate my things" | All things in `things/` — Levels 1-3, Level 4 if few enough things |
+| "Validate this thing" | Single thing — all four levels |
+| "Quick check" | All things — Level 1 only |
+| "Check my links" | All things — Level 2 only |
+| "Deep review of X" | Single thing — all four levels with detailed narrative |
+| "Are my things clean?" | All things — Levels 1-2, summary of issues |
+| After a write operation | The thing(s) just modified — Levels 1-2 |
+
+### Reporting Format
+
+Report validation results grouped by severity, then by thing:
+
+```
+## Validation Report
+
+### Errors (must fix)
+- **thing-id-1**: Missing required field `status`
+- **thing-id-2**: `linked_things` references `nonexistent-id` — no matching thing file found
+- **thing-id-3**: YAML syntax error on line 5 — unexpected character
+
+### Warnings (should fix)
+- **thing-id-4**: `id` contains uppercase characters — convention is lowercase-hyphenated
+- **thing-id-5**: Status is `completed` but narrative body says "still waiting on approval"
+- **thing-id-6**: Blocks `thing-id-7` but `thing-id-7` doesn't list it as a dependency
+
+### Info (worth knowing)
+- **thing-id-8**: Orphaned — no relationships, not referenced by any other thing
+- **thing-id-9**: Created 3 months ago, status `in-progress`, no narrative updates — may be stale
+
+### Summary
+- Things checked: 24
+- Errors: 3
+- Warnings: 3
+- Info: 2
+- Clean: 16
+```
+
+### Fixing Issues
+
+When reporting issues, suggest the fix:
+
+- For missing fields: "Add `status: not-started` to the frontmatter"
+- For broken links: "Either create a thing with id `nonexistent-id`, or remove the reference from `linked_things`"
+- For bidirectional inconsistency: "Add `dependencies: [thing-id-6]` to `thing-id-7`'s frontmatter, or add a `linked_things` entry"
+- For semantic issues: "The body mentions waiting on approval but status is `completed` — consider updating status to `blocked` or updating the narrative"
+
+If the user asks you to fix issues (not just report them), apply the write.thing skill to make corrections. Validate again after fixing to confirm resolution.
+
+## What You Don't Do
+
+- Do not silently fix issues without reporting them — always tell the user what you found and what you changed
+- Do not enforce domain rules when no domain spec exists — fall back to universal rules only
+- Do not treat Info-level observations as errors — they are advisory
+- Do not block the user from working because of warnings — report and move on
+- Do not invent validation rules beyond what `thing.md` and the domain spec define
+
+## Key Principles
+
+- **Errors are structural** — they mean the thing is broken and the agent may reason incorrectly over it
+- **Warnings are conventional** — they mean the thing works but doesn't follow best practice
+- **Info is observational** — they mean something is worth the user's attention but may be intentional
+- **Validation is helpful, not hostile** — the goal is to catch problems early, not to gatekeep
+- **Universal rules are fixed; domain rules are discovered** — read the domain spec to know what extra rules apply
