@@ -1,4 +1,33 @@
-# Work Log
+---
+id: framework-worklog
+type: artifact
+status: evolving
+version: 2.1
+created: 2026-05-13
+linked_things:
+  - id: llm-driven-systems-manifesto
+    relation: documents
+  - id: thing-specification
+    relation: documents
+  - id: read-thing-specification
+    relation: documents
+  - id: write-thing-specification
+    relation: documents
+  - id: validate-thing-skill
+    relation: documents
+  - id: git-workflow-specification
+    relation: documents
+  - id: interface-specification
+    relation: documents
+  - id: framework-discovery-specification
+    relation: documents
+  - id: scalability-guide
+    relation: documents
+  - id: domain-specification-guide
+    relation: documents
+---
+
+# Framework Work Log
 
 This file is a running record of work done, decisions made, and work remaining. It is updated at the end of every session. It serves both as a progress tracker and as a historical record for retrospective reflection.
 
