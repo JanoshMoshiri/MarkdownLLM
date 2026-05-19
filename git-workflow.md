@@ -1,0 +1,325 @@
+---
+id: git-workflow-specification
+type: specification
+status: draft
+version: 1.0
+created: 2026-05-19
+linked_things:
+  - id: llm-driven-systems-manifesto
+    relation: implements
+  - id: thing-specification
+    relation: complements
+  - id: interface-specification
+    relation: complements
+  - id: write-thing-specification
+    relation: integrates-with
+  - id: validate-thing-skill
+    relation: integrates-with
+---
+
+# Git Workflow
+
+## What This Specifies
+
+This document defines how git is used within the LLM-driven systems framework — not just as backup or version control, but as the **state machine** that makes things persistent, auditable, and reactive.
+
+The manifesto establishes *why* git (versioned, portable, transparent). This document establishes *how* git operates within a domain: when to commit, what commit messages mean, who commits, and how git history becomes the event stream that drives triggers and session orientation.
+
+## Git As The State Machine
+
+In a traditional application, writing to the database is the moment state becomes real. A user clicks "save," the database updates, and the new state is persisted.
+
+In this framework, the **commit** is that moment.
+
+Everything before the commit is working state — files on disk, modifications in progress, things the agent has created or changed but not yet persisted. Everything after the commit is truth — versioned, diffable, auditable, rollbackable.
+
+This distinction matters because:
+
+- **Triggers evaluate against committed state** — A dependency trigger watching for `status: completed` fires based on what's been committed, not what's in the working directory
+- **Session orientation reads committed history** — When the agent loads at session start, it looks at what commits have happened since last session to understand what changed
+- **Audit trails require commits** — A change that was never committed never happened, from the system's perspective
+- **Rollback operates on commits** — If the agent makes a bad change, you can revert the specific commit that introduced it
+
+The working directory is draft. The commit is publication.
+
+## When To Commit
+
+Commits should happen at the boundary where domain state changes meaning. Not after every keystroke (noise), not once a day (lost granularity). Each commit should answer: **"What changed in my domain and why?"**
+
+### Natural Commit Points
+
+**After a thing is created**
+
+A new thing exists in the domain. That's a discrete, meaningful state change. Commit it.
+
+```
+create: quarterly-review-prep (task, high, due 2026-06-15)
+```
+
+**After a status transition**
+
+Status changes are the most significant events in the system. They're what triggers watch for. They represent real progress, real blockers, real decisions. Commit each one.
+
+```
+complete: data-collection → unblocks quarterly-review-prep, stakeholder-feedback
+```
+
+```
+block: design-review — waiting on stakeholder availability
+```
+
+**After a write session**
+
+The user asked the agent to do something that modified multiple things — reorganise priorities, break down a project, batch-update statuses. Those changes form a logical unit of work. Commit them together.
+
+```
+reprioritize: 3 tasks elevated to high, 2 deferred to next quarter
+```
+
+```
+split: project-redesign → 4 subtasks created
+```
+
+**After validation and fixes**
+
+The agent ran validation, found issues, and fixed them. Commit the fixes as a unit.
+
+```
+validate: fixed 2 broken links, added missing status field to task-budget
+```
+
+**At session end**
+
+Safety net. Before closing a session, any uncommitted changes should be committed. Nothing should be left in working state across sessions.
+
+```
+session-end: uncommitted changes from session 2 (19 May 2026)
+```
+
+### The Rule
+
+**One commit per meaningful state change.** If you can describe what changed in a single sentence that makes domain sense, that's one commit. If you need two sentences about unrelated changes, that's two commits.
+
+## Commit Message Conventions
+
+Commit messages in this framework are not about files — they're about domain state. They should be readable by a human scanning `git log` and by an agent evaluating what happened since last session.
+
+### Format
+
+```
+<action>: <description>
+```
+
+### Actions
+
+| Action | When | Example |
+|--------|------|---------|
+| `create` | New thing created | `create: quarterly-review-prep (task, high, due 2026-06-15)` |
+| `complete` | Thing marked completed | `complete: data-collection → unblocks 2 things` |
+| `update` | Thing metadata or narrative changed | `update: project-redesign — revised scope and timeline` |
+| `block` | Thing became blocked | `block: design-review — waiting on stakeholder input` |
+| `unblock` | Thing unblocked | `unblock: quarterly-review-prep — dependencies resolved` |
+| `reprioritize` | Priority changes across things | `reprioritize: 3 tasks elevated to high` |
+| `split` | Thing broken into sub-things | `split: project-redesign → 4 subtasks` |
+| `merge` | Things combined | `merge: task-a + task-b → combined-task` |
+| `cancel` | Thing cancelled | `cancel: legacy-migration — no longer needed` |
+| `archive` | Thing archived or moved | `archive: q1 completed projects` |
+| `validate` | Validation fixes applied | `validate: fixed 3 broken links` |
+| `session-end` | Uncommitted changes at session close | `session-end: changes from session 2 (19 May)` |
+| `framework` | Changes to skills, agent, or framework files | `framework: update write.thing.md — add trigger evaluation` |
+
+### Multi-Thing Commits
+
+When a single action affects multiple things (a write session, a reprioritisation), list the key changes in the commit body:
+
+```
+reprioritize: Q2 realignment — 5 things updated
+
+- quarterly-review-prep: medium → high
+- budget-analysis: low → medium  
+- legacy-docs: high → low (deferred to Q3)
+- team-onboarding: medium → high
+- office-move: paused → cancelled
+```
+
+### What Makes A Good Commit Message
+
+- **Domain-level language** — "complete: data-collection" not "modify data-collection.md"
+- **Consequence-aware** — "complete: data-collection → unblocks 2 things" tells you the impact
+- **Scannable** — The first line tells the whole story; details go in the body
+- **Consistent action verbs** — Use the standard actions so `git log` is parseable
+
+## Who Commits
+
+### The Recommended Pattern: Agent Commits Locally, Human Pushes
+
+The agent commits freely to the local repository after each meaningful state change. The human reviews commits before pushing to the remote.
+
+**Why this works:**
+
+- **Granular history** — Each state change is a separate commit with a meaningful message
+- **No friction** — The agent doesn't pause for human approval on every change
+- **Review before publish** — You can scan `git log` before pushing, revert anything you disagree with
+- **Rollback capability** — Individual commits can be reverted without affecting others
+- **Push is the deliberate gate** — Pushing to remote is the human saying "I'm satisfied with these changes"
+
+**In practice (VS Code + Copilot):**
+
+1. You ask the agent to update things
+2. The agent modifies files and commits with structured messages
+3. You continue working — more changes, more commits
+4. At session end (or whenever you choose), you review the commits: `git log --oneline -10`
+5. If everything looks good, push: `git push`
+6. If something is wrong, revert the specific commit: `git revert <hash>`
+
+**In practice (CLI tools):**
+
+Same pattern. The agent commits. You push when ready.
+
+### Alternative: Agent Stages, Human Commits
+
+For users who want more control:
+
+1. The agent modifies files and stages them (`git add`)
+2. The agent suggests a commit message
+3. The human reviews the staged diff, approves or adjusts the message, and commits
+
+This adds friction but gives the human approval over every commit. Useful for sensitive domains (compliance, financial) where every committed change should be deliberately approved.
+
+### What The Agent Should Not Do
+
+- **Never push without explicit human instruction** — Push is always a deliberate human action
+- **Never force-push** — History is sacred in this framework
+- **Never amend published commits** — Once pushed, commits are immutable
+- **Never commit credentials, secrets, or sensitive data** — Things may contain personal or regulated information; the agent should be aware of what's being committed
+
+## Git Log As Event Stream
+
+When commits happen at meaningful state boundaries with structured messages, `git log` becomes a parseable event stream.
+
+### Session Start Orientation
+
+When the agent loads at session start, it can check recent commits to understand what happened since the last session:
+
+```
+git log --oneline --since="2026-05-18"
+```
+
+Output:
+```
+a1b2c3d complete: data-collection → unblocks 2 things
+e4f5g6h create: stakeholder-feedback (task, high, due 2026-06-01)
+i7j8k9l reprioritize: 3 tasks elevated to high
+m0n1o2p session-end: changes from session 1 (18 May)
+```
+
+The agent immediately knows: data-collection was completed, a new task was created, priorities shifted. This is richer context than just reading the current state of things — it's the *narrative of what happened*.
+
+### Trigger Evaluation Against History
+
+Triggers watch for state changes. Git history records state changes. The connection:
+
+1. Agent loads at session start
+2. Scans recent commits for status transitions (`complete:`, `block:`, `unblock:`)
+3. Checks: "Do any active triggers watch the things that changed?"
+4. If a dependency trigger was watching `data-collection` for completion, and the commit log shows `complete: data-collection`, the trigger fires
+
+Git history is the event log. Triggers are the listeners. The agent is the evaluator.
+
+### Diff As Truth
+
+When the agent needs to verify what actually changed (not just what the commit message says), `git diff` provides byte-level truth:
+
+```
+git diff HEAD~1 -- things/quarterly-review-prep.md
+```
+
+This shows exactly what fields changed, what narrative was updated, what relationships were added. Useful for:
+
+- Verifying that a "complete" commit actually set `status: completed`
+- Understanding the scope of a "reprioritize" batch change
+- Auditing what the agent did during a write session
+
+## Three Layers Of Auditability
+
+The framework now has three complementary audit layers:
+
+| Layer | What It Captures | Granularity | Created By |
+|-------|-----------------|-------------|------------|
+| **WORKLOG** | Session narrative — what was discussed, decided, and planned | Session-level | Human + agent |
+| **Git log** | State changes — what changed in the domain and why | Commit-level | Agent (commits) |
+| **Git diff** | Exact modifications — what bytes changed in which files | Byte-level | Automatic |
+
+These layers serve different audiences and purposes:
+
+- **WORKLOG** answers: "What were we thinking and why?" (intent and context)
+- **Git log** answers: "What happened and in what order?" (events and sequence)
+- **Git diff** answers: "What exactly changed?" (forensic detail)
+
+Together, they provide complete traceability from intent through action to detail.
+
+## Branching (Future Consideration)
+
+For single-user domains, working on `main` is sufficient. But branching has potential for two scenarios that may emerge as the framework matures:
+
+### Speculative Exploration
+
+"What if I reprioritise everything around this new goal?"
+
+1. Create a branch: `git checkout -b explore/q3-reprioritize`
+2. Let the agent reorganise things on the branch
+3. Review the diff against `main`: `git diff main`
+4. If you like it, merge. If not, delete the branch.
+5. No risk to your current state.
+
+### Multi-User Domains
+
+When two or more people work within the same domain:
+
+1. Each person works on their own branch (or the agent creates per-session branches)
+2. Changes are reviewed via pull request before merging to `main`
+3. Conflicts are resolved at merge time — git handles file-level conflicts; the agent can help reason about semantic conflicts (two people updated the same thing's priority differently)
+4. `main` is always the agreed-upon truth
+
+This follows the standard git-flow pattern that development teams already know. The framework doesn't need to invent a new collaboration model — git already solved this.
+
+**This is noted for future development. Start with `main` only.**
+
+## Integration With Other Framework Components
+
+### With write.thing.md
+
+The write skill should be aware of commit points. After modifying things, the agent should commit with a structured message. The write workflow becomes: reason → modify → validate → commit.
+
+### With validate.thing.skill.md
+
+Validation can run as a pre-commit check. Before the agent commits, it validates the things being committed. If errors exist, the commit is held until they're resolved. Warnings are noted in the commit message body.
+
+### With Triggers (thing.md)
+
+Triggers evaluate against committed state. A dependency trigger watching for `status: completed` doesn't fire on a file save — it fires when the commit containing that status change is made. This means commit discipline directly affects trigger reliability.
+
+### With interface.md
+
+The push action is an output route decision. When and how you push to remote depends on your interface:
+
+- VS Code: push via source control panel or terminal
+- CLI: `git push` when ready
+- Automated: a scheduled push (if your domain warrants it)
+
+### With WORKLOG
+
+The WORKLOG is committed as part of `session-end`. It's a thing in the repository — versioned, diffable, auditable. The WORKLOG captures the narrative that commit messages can't: why decisions were made, what was discussed, what's planned next.
+
+## Summary
+
+| Concern | Answer |
+|---------|--------|
+| When is state "real"? | At commit time |
+| When to commit? | After each meaningful state change (creation, status transition, write session, session end) |
+| What do commit messages say? | Domain state changes, not file modifications |
+| Who commits? | Agent commits locally; human pushes to remote |
+| Who pushes? | Always the human, always deliberate |
+| How does history help? | Git log is the event stream; triggers evaluate against it; session orientation reads it |
+| What about branching? | `main` only for now; branching for exploration and collaboration later |
+| What about rollback? | Revert specific commits; granular commits make this surgical, not destructive |

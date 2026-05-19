@@ -150,7 +150,7 @@ As you create your own domains, you'll use templates:
 Read these in order:
 1. **llm-driven-systems.manifesto.md** — Understand the philosophy
 2. **thing.md** — Understand the atomic unit
-3. **Instructions-guide.md** — Understand how to create domains (domain-specification-guide.md)
+3. **domain-specification-guide.md** — Understand how to create domains
 
 ### Step 2: See It In Action
 
@@ -311,7 +311,7 @@ The framework itself is production-ready (and used in production systems). The e
 
 1. **Read** `llm-driven-systems.manifesto.md` (10 min)
 2. **Read** `thing.md` (10 min)
-3. **Read** `instructions-guide.md` (30 min, reference as you build)
+3. **Read** `domain-specification-guide.md` (30 min, reference as you build)
 4. **Explore** one example domain: `examples/life-manager/` or `examples/compliance-patterns/`
 5. **Create** your own domain repository using the structure described above
 6. **Build** your first domain with AGENTS.md, skills, and things
@@ -339,7 +339,7 @@ You're invited to contribute back. The goal is for MarkdownLLM to grow with real
 
 ## Questions?
 
-See `instructions-guide.md` for comprehensive guidance, or open an issue with questions about how to apply the framework to your domain.
+See `domain-specification-guide.md` for comprehensive guidance, or open an issue with questions about how to apply the framework to your domain.
 
 ### Financial Tracking Application
 **What it does:** Track spending, budgets, and financial patterns; enable data-driven financial decisions
