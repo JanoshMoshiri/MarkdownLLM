@@ -6,6 +6,27 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ## 19 May 2026
 
+### Session 2
+
+#### Completed
+
+- [x] Updated all 5 templates to v2.1 patterns: AGENTS.md.template (triggers, validation, git commit, foundational specs), domain-specification.skill.md.template (added id, status, created, linked_things, validation rules, triggers), domain-read.thing.skill.md.template (`type: prompt` → `type: skill` with `mode: read`, full frontmatter, trigger awareness), domain-write.thing.skill.md.template (`type: prompt` → `type: skill` with `mode: write`, post-write validation, git commit, trigger evaluation), domain-workflow.skill.md.template (`type: workflow` → `type: skill` with `mode: workflow`, trigger integration, git commit points, validation checkpoints)
+- [x] Updated life-manager example (5 files) to v2.1: AGENTS.md (triggers section, foundational specs, vendor-neutral language), specification skill (full frontmatter, validation rules, triggers), read skill (type: skill, mode: read, trigger awareness), write skill (post-write validation, git commit, trigger evaluation), workflow skill (trigger integration, git commit points)
+- [x] Updated compliance-patterns example (6 files) to v2.1: AGENTS.md (triggers, foundational specs, validation checklist), specification skill (full frontmatter, validation rules), read skill (type: skill, mode: read), write skill (post-write validation, git commit), workflow skill (trigger integration, git commit points), both example things (added status: stable, linked_things with cross-references)
+- [x] Updated domain-specification-guide.md inline code examples to v2.1: bumped to v2.1, added git-workflow and interface to linked_things, updated AGENTS.md template section, updated all skill frontmatter examples, updated thing creation example status values
+- [x] Fixed manifesto stale reference: Principle 5 (Vendor Agnostic) `.instructions.md, .skill.md, .prompt.md` → `AGENTS.md, .skill.md, YAML frontmatter`
+- [x] Verified zero remaining `type: prompt` references across entire workspace (grep confirmed)
+
+#### Decisions Made
+
+- All templates and examples updated in lockstep — ensures anyone bootstrapping a new domain from templates gets v2.1 patterns immediately
+- Status values in thing creation example changed from `draft/active/complete` to `not-started/in-progress/blocked/paused/completed/cancelled` — aligns with the richer lifecycle model needed for real workflow tracking
+- Vendor-neutral language enforced throughout — "Claude" references replaced with "LLM" in all examples to honour Principle 5
+
+#### Reflections
+
+*None recorded.*
+
 ### Session 1
 
 #### Completed
@@ -196,12 +217,12 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ### Framework Gaps (Identified 19 May)
 
-- [ ] Document the interface layer — describe how users connect to their agent (VS Code + Copilot, Claude Code CLI, mobile chat, voice-to-text) and clarify that the framework uses existing routes, not a new protocol
-- [ ] Document the output layer — things are persistent state; outputs (documents, images, code, video, audio) are deliverables the agent produces from that state. Define this distinction explicitly.
-- [ ] Define a trigger/event system — optional fields or patterns for automated re-evaluation (due date passed, dependency resolved, status changed)
-- [ ] Specify the git workflow — commit message conventions, who commits (human vs LLM), branching strategy, PR vs direct-to-main, conflict handling
+- [x] Document the interface layer — describe how users connect to their agent (VS Code + Copilot, Claude Code CLI, mobile chat, voice-to-text) and clarify that the framework uses existing routes, not a new protocol *(done: interface.md created in v2.1)*
+- [x] Document the output layer — things are persistent state; outputs (documents, images, code, video, audio) are deliverables the agent produces from that state. Define this distinction explicitly. *(done: interface.md, things vs deliverables section)*
+- [x] Define a trigger/event system — optional fields or patterns for automated re-evaluation (due date passed, dependency resolved, status changed) *(done: triggers section in thing.md, v2.1)*
+- [x] Specify the git workflow — commit message conventions, who commits (human vs LLM), branching strategy, PR vs direct-to-main, conflict handling *(done: git-workflow.md created in v2.1)*
 - [ ] Address referential integrity — what happens when a thing is deleted or renamed; detection and repair of broken `linked_things` references
-- [ ] Create a validation/linting specification — schema validation for thing files (required fields present, valid status values, link integrity)
+- [x] Create a validation/linting specification — schema validation for thing files (required fields present, valid status values, link integrity) *(done: validate.thing.skill.md created in v2.1)*
 - [ ] Address context budget vs small model claim — skill compression or inline summaries for constrained-context deployments where 8K-16K tokens is the limit
 - [ ] Document concurrency/multi-agent patterns — what happens when two LLM sessions operate on the same domain simultaneously; semantic conflict resolution beyond git merge
 - [ ] Define a testing/verification approach for skills — how domain authors verify their skills produce intended behavior
@@ -219,8 +240,8 @@ This file is a running record of work done, decisions made, and work remaining. 
 - [ ] Extract Phase 4 (Production Architecture & Design) into a skill once methodology is proven
 - [x] Evaluate whether hooks are useful for enforcing encoding discipline at session end
 - [ ] Monitor `post-encoding-commit.hook.md` on next change — if pre-commit sequence grows further, extract orchestration to a commit-protocol prompt (Open/Closed boundary noted in governance review 14 May)
-- [ ] Create Phase 0 decision register — resolve open questions on execution environment, transfer mechanism, storage, context capture, and dependency handling before Phase 0 can be encoded into `.instructions.md`
-- [ ] Design prerequisite process — how prototypes are received, transferred, and prepared for analysis
+- [x] Create Phase 0 decision register — resolve open questions on execution environment, transfer mechanism, storage, context capture, and dependency handling *(done: all 8 decisions locked, encoded in ProducFlow2 domain)*
+- [x] Design prerequisite process — how prototypes are received, transferred, and prepared for analysis *(done: producflow-environment.skill.md created with full Phase 0 workflow)*
 
 ### Prototype Analysis — Reverb
 
