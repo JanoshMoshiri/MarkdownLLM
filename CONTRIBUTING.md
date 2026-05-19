@@ -6,12 +6,12 @@ Thank you for your interest in this framework!
 
 ### Share Your Domain Definitions
 
-If you've built domain definitions (instructions.md, skill.md, and prompts) for a domain not yet covered, consider contributing them:
+If you've built domain definitions (skills with frontmatter, example things, and AGENTS.md) for a domain not yet covered, consider contributing them:
 
-1. Create a folder for your domain (e.g., `domains/project-management/`)
-2. Include your instructions, skill, and prompt files
+1. Create a folder for your domain (e.g., `examples/project-management/`)
+2. Include your AGENTS.md, skills/ directory (specification, read, write, workflow .skill.md files), and things/ directory with examples
 3. Include a README explaining your domain and how to use it
-4. Add examples of real instances if helpful
+4. Add examples of real thing instances if helpful
 5. Submit a pull request
 
 ### Improve Existing Files
@@ -44,7 +44,7 @@ If you've used this framework and learned something useful:
 - **Keep it simple** — The whole point is elegant constraint and clarity. Don't over-complicate things.
 - **Document thoroughly** — New domains should be well-documented with examples.
 - **Be respectful** — We're building something together. Assume good intent.
-- **Follow the pattern** — New domains should follow the same structure (instructions, skill, prompts, examples).
+- **Follow the pattern** — New domains should follow the three-layer structure (AGENTS.md, skills/, things/) with specifications, read/write prompts, workflows, and examples.
 
 ## What We're Looking For
 

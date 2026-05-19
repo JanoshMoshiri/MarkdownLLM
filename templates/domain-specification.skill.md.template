@@ -1,0 +1,76 @@
+---
+name: [Domain] Specification
+type: specification
+description: Philosophy, principles, and reasoning patterns for [domain]
+version: 1.0
+applies_to: "[domain]/**/*.md"
+---
+
+# [Domain] Specification
+
+## Philosophy
+
+[Explain the paradigm shift. What problem are you solving? What's broken about traditional approaches? Why does this framework work better?]
+
+### The Core Insight
+
+[1-2 sentences capturing the essence of why this domain approach is different]
+
+## Core Principles
+
+List 4-7 principles that guide how things work in this domain. Each should be:
+- Specific enough to inform decisions
+- Universal enough to apply across all use cases in the domain
+
+**Example structure:**
+
+- **Atomic Units:** Everything is a thing. No special cases or exceptions.
+- **Minimal Core, Emergent Detail:** Start simple; let the schema grow with your needs.
+- **LLM-Centric Structure:** Optimized for LLM reasoning, not manual editing.
+- **Vendor Agnostic:** Uses standard conventions so any LLM can understand.
+- **Versioned & Durable:** Git tracks everything; full audit trail.
+
+## How It Works
+
+Describe the user interaction loop:
+1. What does the user do?
+2. How does the LLM understand their request?
+3. What happens in the system?
+4. What information is returned?
+
+Keep it concrete but concise (3-5 sentences).
+
+## What This System Is / What It Is Not
+
+**Is:**
+- [Positive description of capability or scope]
+- [Another positive capability]
+
+**Is Not:**
+- [What it doesn't try to do]
+- [Integration it doesn't provide]
+
+[This prevents feature creep and sets clear expectations]
+
+## Reasoning Patterns (Optional)
+
+If your domain involves specialized reasoning, lenses, or frameworks, document them here:
+
+### [Lens Name]
+[Explanation of the perspective]
+- [What signals matter]
+- [How conflicts are resolved]
+
+### [Another Lens]
+[Explanation]
+- [What matters]
+- [How decisions are made]
+
+## Domain-Specific Thing Types
+
+[Brief description of the thing types you instantiate in this domain]
+
+**Example:**
+- `type: project` — A complete unit of work
+- `type: task` — A subtask of a project
+- `type: dependency` — A relationship or blocker between things

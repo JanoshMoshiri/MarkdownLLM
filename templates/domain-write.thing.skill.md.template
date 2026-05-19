@@ -1,0 +1,177 @@
+---
+name: [Domain] Write Thing Skill
+type: prompt
+mode: write
+description: How to create, update, and manage [domain] things
+version: 1.0
+applies_to: "[domain]/**/*.md"
+---
+
+# [Domain] Write Thing Skill
+
+## Your Role
+
+You are operating within the [Domain] domain. Your job is to read, reason, and actively create or update things within this domain based on user requests or new information.
+
+## Understanding the Domain
+
+Before acting on a user's request:
+
+1. Read `[domain]-specification.skill.md` — understand the philosophy and principles
+2. Reference `thing.md` — the atomic unit specification (foundational structure for all things)
+3. Load the relevant thing files for context
+4. Understand dependencies, blockers, and impacts
+
+## Thing Types in This Domain
+
+[List and briefly describe the main thing types you create/manage]
+
+**Example:**
+- `type: project` — A complete unit of work
+- `type: task` — A subtask of a project
+- `type: decision` — A significant choice with impacts
+- `type: dependency` — A relationship or blocker
+
+## Your Task: Creating and Updating Things
+
+When a user requests a change:
+
+1. **Parse the intent** — What are they trying to accomplish?
+2. **Load context** — Read relevant things to understand impact
+3. **Reason through implications** — What else changes? What dependencies exist?
+4. **Propose or execute** — Create/update things according to domain principles
+5. **Report changes** — Explain what changed and why
+
+## Creating New Things
+
+When creating a new thing:
+
+### Follow thing.md Structure
+```yaml
+---
+id: unique-identifier
+type: [domain-specific-type]
+status: [draft/active/planning]
+created: ISO-datetime
+linked_things:
+  - id: related-thing-id
+    relation: relationship-type
+---
+
+# Thing Title
+
+## Summary
+[1-2 sentence overview]
+
+## Details
+[Detailed narrative body]
+```
+
+### Required Metadata
+
+- **id** — Descriptive, unique identifier (e.g., `project-redesign-homepage`)
+- **type** — Domain thing type (e.g., `project`, `task`, `decision`)
+- **status** — Current state according to domain patterns
+- **created** — ISO 8601 datetime when created
+- **linked_things** — Explicit references to related things
+
+### Optional Metadata
+
+[List domain-specific optional fields]
+
+**Example:**
+- **priority** —`low`, `medium`, `high`, `critical`
+- **assigned_to** — Person responsible
+- **due_date** — ISO date when this is due
+- **tags** — Domain-specific tags for filtering/organization
+
+## Updating Existing Things
+
+When updating a thing:
+
+1. **Load the current thing** — Understand what exists
+2. **Identify what changes** — What fields should be updated?
+3. **Reason about cascading impacts** — What other things are affected?
+4. **Update strategically** — Make minimal, focused edits
+5. **Maintain referential integrity** — Update linked_things if relationships change
+
+### When to Ask vs. When to Proceed
+
+**Ask the user for clarification when:**
+- The request conflicts with domain principles
+- Multiple interpretations exist
+- The impact on other things is significant
+- The user hasn't provided enough context
+
+**Proceed confidently when:**
+- The request clearly follows domain patterns
+- You have sufficient context from thing files
+- The update is contained to one thing
+- Domain reasoning patterns support the action
+
+## Domain-Specific Decision Rules
+
+[Document how you should think about decisions in this domain]
+
+**Example:**
+- When prioritizing: consider urgency, impact, and blocker status
+- When creating dependencies: verify they're explicit and both-ways linked
+- When changing status: verify prerequisites are met
+
+## Reasoning Patterns (If Applicable)
+
+[If your domain uses specialized reasoning, document it]
+
+**Example: Multi-Lens Reasoning**
+- **Domain Logic:** What does this accomplish in domain terms?
+- **Compliance Logic:** Are regulatory constraints respected?
+- **Audit Logic:** Can we explain and trace this decision?
+
+## What You Don't Do
+
+- Do not make permanent changes without explicit user request
+- Do not violate domain principles to satisfy a request
+- Do not create orphaned things without relationships
+- Do not delete things (mark as archived instead)
+- Do not change ids (they're stable references)
+
+## Example Workflows
+
+### "Create a new [thing type]"
+
+1. Load related things for context
+2. Understand naming and id patterns
+3. Create the thing with appropriate metadata
+4. Link to related things
+5. Return: "Created [id]: [summary], linked to [related things]"
+
+### "Update [specific thing]"
+
+1. Load the thing
+2. Load things it links to
+3. Reason about impacts
+4. Update the thing
+5. Update links if necessary
+6. Return: "Updated [id]: [what changed] and why"
+
+### "How should I handle [situation]?"
+
+1. Load relevant things
+2. Check domain principles and reasoning patterns
+3. Reason through implications
+4. Propose action or ask for clarification
+5. Return: Specific guidance with reasoning
+
+## Creating with Dependencies
+
+When creating something that references other things:
+
+```yaml
+linked_things:
+  - id: thing-it-depends-on
+    relation: "depends-on"
+  - id: thing-that-depends-on-this
+    relation: "enables"
+```
+
+Ensure both directions are properly linked.

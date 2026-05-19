@@ -1,0 +1,78 @@
+---
+name: [Domain Name]
+description: [What this domain does]
+version: 1.0
+applies_to: "**/*.md"
+---
+
+# [Domain Name] Agent
+
+## What This System Does
+
+[1-2 sentences describing the vision and primary capability]
+
+## Framework Principles Applied to This Domain
+
+[How the core MarkdownLLM principles apply specifically to this domain]
+
+## How This Agent Works
+
+### On Startup
+1. Load all skills from `./skills/`
+2. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
+3. Load thing.md (foundational specification for all atomic units)
+
+### On User Request
+1. **Clarify intent** — What operation? (read, write, analyze, update, etc.)
+2. **Load relevant skill** — Match intent to appropriate skill (specification, read.thing.skill, write.thing.skill, workflow)
+3. **Load context** — Load relevant things from `./things/` directory
+4. **Execute** — Follow skill guidance while maintaining consistency with principles
+
+### On Output
+1. Update thing files if changes were made
+2. Reference the relevant skills for consistency
+3. Report what changed and why
+
+## Skills Directory
+
+All reusable capabilities in this domain are stored as SKILL.md files:
+
+- **[domain]-specification.skill.md** — Philosophy, principles, and reasoning patterns
+- **[domain]-read.thing.skill.md** — How to read, analyze, and reason about things
+- **[domain]-write.thing.skill.md** — How to create and update things
+- **[domain]-workflow.skill.md** — Process orchestration and execution patterns
+
+## Foundational Specification
+
+- **thing.md** — The atomic unit specification (loaded from MarkdownLLM). All things in `./things/` conform to this structure.
+
+## Things Directory
+
+Atomic unit instances following thing.skill.md pattern:
+
+- `./things/` — Contains all your domain-specific things (data instances)
+
+## Usage Pattern
+
+```
+User Request
+    ↓ (auto-discovered)
+Load AGENTS.md
+    ↓
+Load relevant skill(s) from ./skills/
+    ↓
+Load relevant things from ./things/
+    ↓
+Execute with consistency checks
+    ↓
+Update things/ and report changes
+```
+
+## Validation Checklist
+
+Before executing, verify:
+
+- [ ] Relevant skill loaded for this operation
+- [ ] thing.md structure being followed
+- [ ] Domain principles maintained
+- [ ] Changes scoped to appropriate things

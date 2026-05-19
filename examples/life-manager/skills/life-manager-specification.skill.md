@@ -1,4 +1,12 @@
-# Life Manager System
+---
+name: Life Manager specification 
+type: specification 
+description: Philosophy, principles, and paradigm for life management using LLM reasoning
+version: 1.0
+applies_to: "life-manager/**/*.md"
+---
+
+# Life Manager specification 
 
 ## Philosophy
 
@@ -50,6 +58,15 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 **Vendor Agnostic:** Uses standard conventions (.instructions.md, .skill.md, .prompt.md files) so any LLM—Claude, Copilot, any other agent—can understand and operate within the system.
 
 **Versioned, Durable:** Git means your entire life management system is versioned, backed up, and transparent. You can see how things evolved. You can roll back if needed.
+
+## Thing Types in Life Manager
+
+- **project** — A complete unit of work with phases and deliverables
+- **task** — A discrete piece of work (atomic or part of a project)
+- **goal** — A desired outcome or state (personal, professional, health, etc.)
+- **dependency** — An explicit relationship, blocker, or prerequisite between things
+- **recurring** — Something that happens regularly (weekly, monthly, etc.)
+- **decision** — A significant choice with impacts on other things
 
 ## What This System Is Not
 
