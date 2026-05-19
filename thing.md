@@ -1,4 +1,4 @@
-# Thing - Skill Definition
+# Thing Definition
 
 ## What Is A Thing?
 

@@ -1,4 +1,4 @@
-# Write Prompt
+# Write Thing
 
 You are operating within a domain using the LLM-driven systems framework. Your role is to read, understand, reason, and actively manage things within that domain. You have permission to read and modify.
 
@@ -7,7 +7,7 @@ You are operating within a domain using the LLM-driven systems framework. Your r
 Before responding to the user's query, you must first understand the system you're operating within:
 
 1. Read the domain's `[domain].instructions.md` — understand the philosophy and paradigm for your specific domain
-2. Read `thing.skill.md` — understand what a thing is and how things are structured in this framework
+2. Read `thing.md` — understand what a thing is and how things are structured in this framework
 3. Load the relevant thing files from the repository based on the user's query
 
 ## Your Task
@@ -42,7 +42,7 @@ The user is asking you to help manage their things within the domain. Your job i
 
 ## Loading Strategy: Tiered Context Windows
 
-Like the read prompt, the write prompt should use appropriate context levels based on the task:
+Like the read thing, the write thing should use appropriate context levels based on the task:
 
 ### Level 1: Metadata Only
 **When:** User asking for organization/prioritization across many things ("Reorganize my priorities", "What should I work on?")
@@ -73,7 +73,7 @@ Like the read prompt, the write prompt should use appropriate context levels bas
 
 ### How to Choose
 
-Follow the same pattern as the read prompt:
+Follow the same pattern as the read thing:
 1. Parse what the user is really asking for
 2. Load at the minimal level needed
 3. Load contextually (by domain, time, theme) not exhaustively

@@ -98,18 +98,18 @@ with compliance (we minimize data, control access, maintain audit trail).
 ## The Lesson
 
 Violations often come from convenience, not malice:
-- "Store everything for safety" → violates minimization
-- "External service is easier" → violates residency
-- "Everyone might need it" → violates least privilege
 
-Good compliance isn't burdensome if it's built in. Thinking through dimensions (classification, residency, access, logging, minimization, retention) takes 5 minutes now, prevents audits and fines later.
+- It's easier to store everything than decide what matters
+- It's simpler to give everyone access than maintain an access matrix
+- It's faster to use any cloud service than keep data local
+- It's less work to delete on "task completion" than follow a retention policy
 
-## When an LLM Sees This Anti-Pattern
+**But compliance isn't about effort. It's about protecting data subjects and respecting their rights.**
 
-It learns:
-- What mistakes look like
-- What consequences follow
-- How to transform bad patterns into good ones
-- The importance of multi-lens reasoning
+When you build compliance into the thing structure itself (metadata, fields, reasoning), compliance becomes the default, not the exception.
 
-This is why examples matter—they teach by showing both what to do and what not to do.
+## Related Patterns
+
+- See `example-gdpr-compliant-data-handling.md` for the corrected approach
+- See `pattern-gdpr-data-residency.md` for detailed residency requirements
+- See `pattern-access-control-matrix.md` for least-privilege implementation

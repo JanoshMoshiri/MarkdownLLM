@@ -1,0 +1,89 @@
+---
+name: [Domain] Workflow
+type: workflow
+description: Processes and orchestration patterns for [domain]
+version: 1.0
+applies_to: "[domain]/**/*.md"
+---
+
+# [Domain] Workflow
+
+## Primary Process
+
+[Describe the main workflow/process that orchestrates things in this domain]
+
+### Phases or Steps
+
+[Break down the primary workflow into major phases or steps]
+
+**Phase 1: [Name]**
+- What happens in this phase
+- What things are involved
+- What signals completion
+- What leads to the next phase
+
+**Phase 2: [Name]**
+- What happens
+- What things are involved
+- Completion signals
+- Next phase transition
+
+**Phase 3: [Name]**
+[Continue for all major phases]
+
+## Sub-Processes (If Applicable)
+
+[If your domain has multiple workflows, describe them here]
+
+**Process: [Name]**
+- When this process is used
+- How it relates to the primary workflow
+- What things it involves
+- How it connects back to the main flow
+
+## Decision Points
+
+[If your workflow includes critical decisions, document them]
+
+**Decision: [Name]**
+- What question is being asked?
+- What options exist?
+- How do you decide?
+- What are the consequences?
+
+## Roles and Responsibilities (If Applicable)
+
+[If multiple people or agents are involved, clarify roles]
+
+- **[Role 1]** — What they do
+- **[Role 2]** — What they do
+
+## Checkpoints and Validation
+
+[At what points should things be reviewed or validated?]
+
+- **Checkpoint 1:** Before phase transition
+  - What should be validated?
+  - What criteria must be met?
+  - Who validates?
+
+## Example Flow
+
+[Walk through a concrete example of the workflow in action]
+
+## Failure Modes and Recovery
+
+[What can go wrong? How do you recover?]
+
+- **If [problem]:** Then [recovery action]
+- **If [another problem]:** Then [another recovery]
+
+## Integration with the Agent
+
+[How does this workflow connect to the overall agent orchestration?]
+
+When the agent receives a user request:
+1. [How request is classified to this workflow]
+2. [Which phase this request relates to]
+3. [What the agent should do]
+4. [How to report progress]

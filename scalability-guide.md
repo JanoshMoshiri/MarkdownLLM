@@ -174,7 +174,7 @@ Claude:
 ```
 
 **Implementation:**
-- Structured in thing.skill.md (already done)
+- Structured in thing.md (already done)
 - Prompts are aware of levels and choose them strategically
 - As you use the system at scale, this becomes natural
 
@@ -228,7 +228,7 @@ This keeps the framework simple while still enabling complex systems.
 
 **Questions?**
 
-- How do I know which level to load for my query? See `read.prompt.md` and `write.prompt.md` for guidance.
+- How do I know which level to load for my query? See `read.thing.md` and `write.thing.md` for guidance.
 - Can I use summaries with my existing domain? Yes. Create a thing with `type: summary` and it works.
 - Should I architect for Approach 3 from day one? No. Start with Approach 1, migrate as needed.
 - What if I want to stay small forever? Great. Approach 1 works indefinitely for systems under 100-200 things.
