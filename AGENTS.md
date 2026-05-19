@@ -3,6 +3,10 @@ name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
 version: 2.1
 applies_to: "**/*.md"
+framework_root: .
+git:
+  autocommit: true
+  branch: main
 ---
 
 # MarkdownLLM Framework Agent
@@ -14,10 +18,11 @@ This is the MarkdownLLM framework — a specification for building LLM-driven sy
 ## How This Agent Works
 
 ### On Startup
-1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, scalability-guide.md)
+1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, scalability-guide.md, framework-discovery.md)
 2. Load all skills (validate.thing.skill.md, read.thing.md, write.thing.md)
 3. Load the manifesto for philosophical grounding (llm-driven-systems.manifesto.md)
 4. Load the domain guide for operational context (domain-specification-guide.md)
+5. Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
 ### On User Request
 1. **Clarify intent** — Is the user working on the framework itself? Creating a new domain? Asking about the philosophy? Seeking guidance?
@@ -28,7 +33,7 @@ This is the MarkdownLLM framework — a specification for building LLM-driven sy
 ### On Output
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
-3. Follow git-workflow.md commit conventions for all changes
+3. **Autocommit**: stage changed files + commit with structured message following git-workflow.md conventions
 4. Update WORKLOG.md at session end
 
 ## Framework Specifications (Things)
@@ -44,7 +49,8 @@ The framework defines itself through these interconnected specifications:
 - **write.thing.md** — How LLMs create, update, and manage things. (`type: specification`, `status: stable`)
 - **validate.thing.skill.md** — How to validate thing integrity (structural, referential, semantic). (`type: skill`, `status: draft`)
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: draft`)
-- **git-workflow.md** — Git as state machine: commit points, conventions, event stream. (`type: specification`, `status: draft`)
+- **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: draft`)
+- **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: draft`)
 
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)

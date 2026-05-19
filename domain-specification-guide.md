@@ -100,6 +100,32 @@ Things follow the structure defined in `thing.md`. Your domain instantiates this
 
 ---
 
+## Framework Discovery
+
+When a domain is nested inside a MarkdownLLM framework repository (e.g., at `domains/my-domain/`), the domain agent needs to locate the framework's foundational specs. Two mechanisms support this:
+
+### 1. `framework_root` in Frontmatter (Primary)
+
+Declare the relative path from the domain root to the framework root in your AGENTS.md frontmatter:
+
+```yaml
+framework_root: ../..
+```
+
+The agent resolves this at startup to load `thing.md`, `git-workflow.md`, `validate.thing.skill.md`, and `interface.md`.
+
+### 2. `.markdownllm` Marker File (Fallback)
+
+The framework root contains a `.markdownllm` file. If `framework_root` is not declared, the agent walks up the directory tree looking for this marker. This ensures discovery works even if frontmatter is incomplete.
+
+### Standalone Domains
+
+If your domain is deployed as its own repository (not nested), set `framework_root: .` and either copy the foundational specs into your root or include the framework as a git submodule.
+
+See **framework-discovery.md** for the full specification.
+
+---
+
 ## Domain Structure: What You Need to Create
 
 Every domain requires these essential components in this structure:
@@ -138,6 +164,10 @@ name: [Domain Name]
 description: What this domain does
 version: 1.0
 applies_to: "**/*.md"
+framework_root: ../..
+git:
+  autocommit: true
+  branch: main
 ---
 
 # [Domain Name] Agent
@@ -151,10 +181,11 @@ applies_to: "**/*.md"
 ## How This Agent Works
 
 ### On Startup
-1. Load all skills from ./skills/
-2. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
-3. Load thing.md for understanding atomic units
-4. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
+1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
+2. Load foundational specs from framework root: thing.md, validate.thing.skill.md, git-workflow.md, interface.md
+3. Load all skills from ./skills/
+4. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
+5. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
 
 ### On User Request
 1. **Clarify intent:** What operation? (read, write, analyze, etc.)
@@ -162,11 +193,11 @@ applies_to: "**/*.md"
 3. **Load context:** Load relevant things from ./things/ directory
 4. **Execute:** Follow skill guidance while maintaining consistency
 5. **Validate:** After writes, invoke validation (structural, referential, domain-specific)
-6. **Commit:** Persist changes following git-workflow conventions
+6. **Autocommit:** If `git.autocommit: true`, stage + commit with structured message
 
 ### On Output
 1. Validate thing files if changes were made
-2. Commit with structured message: `action: description`
+2. **Autocommit** (if enabled): stage changed files + commit with structured `action: description` message
 3. Report what changed and why
 4. Evaluate triggers (post-write)
 

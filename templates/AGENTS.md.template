@@ -3,6 +3,10 @@ name: [Domain Name]
 description: [What this domain does]
 version: 1.0
 applies_to: "**/*.md"
+framework_root: [relative path to MarkdownLLM framework root, e.g. ../.. ]
+git:
+  autocommit: true
+  branch: main
 ---
 
 # [Domain Name] Agent
@@ -18,10 +22,11 @@ applies_to: "**/*.md"
 ## How This Agent Works
 
 ### On Startup
-1. Load all skills from `./skills/`
-2. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
-3. Load thing.md (foundational specification for all atomic units)
-4. Evaluate triggers — scan things for time-based, dependency, or threshold triggers that fire since last session
+1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
+2. Load foundational specs from framework root: thing.md, validate.thing.skill.md, git-workflow.md, interface.md
+3. Load all skills from `./skills/`
+4. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
+5. Evaluate triggers — scan things for time-based, dependency, or threshold triggers that fire since last session
 
 ### On User Request
 1. **Clarify intent** — What operation? (read, write, analyze, update, etc.)
@@ -33,7 +38,7 @@ applies_to: "**/*.md"
 
 ### On Output
 1. Validate thing files if changes were made
-2. Commit with structured message: `action: description` (e.g., `create: new-thing-id`, `update: thing-id status`)
+2. **Autocommit** (if `git.autocommit: true`): stage changed files + commit with structured message `action: description`
 3. Report what changed and why
 4. Evaluate triggers — check if writes caused dependency or threshold triggers to fire
 

@@ -323,3 +323,149 @@ The WORKLOG is committed as part of `session-end`. It's a thing in the repositor
 | How does history help? | Git log is the event stream; triggers evaluate against it; session orientation reads it |
 | What about branching? | `main` only for now; branching for exploration and collaboration later |
 | What about rollback? | Revert specific commits; granular commits make this surgical, not destructive |
+
+---
+
+## Autocommit Mode
+
+### The Problem With Manual Commit Prompting
+
+The workflow above describes *when* to commit, but relies on the user explicitly asking the agent to commit. In practice, this creates a gap: the agent modifies things, the user continues working, and uncommitted state accumulates. The git-as-state-machine model breaks down when commits don't happen at state boundaries.
+
+### The Solution: Autocommit Directive
+
+A domain or framework agent can declare **autocommit mode** in its AGENTS.md. When autocommit is active, the agent commits automatically after every meaningful state change — without waiting for user prompting.
+
+#### Declaring Autocommit
+
+In AGENTS.md frontmatter:
+
+```yaml
+---
+name: My Domain
+version: 1.0
+applies_to: "**/*.md"
+git:
+  autocommit: true
+  branch: main
+---
+```
+
+Or in the agent's behavioural rules:
+
+```markdown
+## Git Behaviour
+
+This agent operates in **autocommit mode**. After every state change to a thing
+(creation, status transition, update, deletion), the agent:
+
+1. Validates the changed things
+2. Stages the modified files
+3. Commits with a structured message following git-workflow.md conventions
+4. Continues with the next operation
+
+No user prompting is required. The commit happens as part of the write operation itself.
+```
+
+#### When Autocommit Fires
+
+Autocommit triggers at the same natural commit points defined earlier in this spec:
+
+| Event | Autocommit Action |
+|-------|-------------------|
+| Thing created | `git add` + `git commit -m "create: {id} ({type}, {status})"` |
+| Status transition | `git add` + `git commit -m "complete/block/unblock: {id} → {consequence}"` |
+| Thing updated | `git add` + `git commit -m "update: {id} — {what changed}"` |
+| Batch operation | `git add` + `git commit -m "{action}: {summary}"` |
+| Validation fixes | `git add` + `git commit -m "validate: {summary}"` |
+| Session end | `git add` + `git commit -m "session-end: {summary}"` |
+
+#### The Autocommit Sequence
+
+```
+Agent modifies thing(s)
+    ↓
+Validate changed things (structural, referential)
+    ↓ (pass)
+git add <changed files>
+    ↓
+git commit -m "<structured message>"
+    ↓
+Continue to next operation or report to user
+```
+
+If validation fails:
+```
+Agent modifies thing(s)
+    ↓
+Validate changed things
+    ↓ (fail)
+Fix validation errors
+    ↓
+Re-validate
+    ↓ (pass)
+git add + git commit
+```
+
+#### Autocommit Does NOT Push
+
+The safety boundary remains: **autocommit commits locally only**. Push is still a deliberate human action. This preserves:
+
+- The ability to review before publishing
+- The ability to revert locally without affecting remotes
+- The human gate for shared repositories
+
+#### Framework-Level Autocommit
+
+The **framework-level agent** (the AGENTS.md at the repository root) can declare autocommit to ensure that all framework specification changes are persisted immediately:
+
+```yaml
+git:
+  autocommit: true
+  branch: main
+```
+
+This means: when working at the framework level, any modification to specifications, guides, skills, or framework configuration is automatically committed. The framework agent acts as the steward of persistent state.
+
+#### Domain-Level Autocommit
+
+Individual domains can independently choose their commit mode:
+
+- **autocommit: true** — Every thing change is automatically committed. Best for domains where state persistence is critical (compliance, audit trails, production analysis).
+- **autocommit: false** — Manual commit mode. The agent stages changes but waits for user instruction to commit. Best for exploratory or draft-heavy work.
+
+A domain inherits no commit behaviour from the framework. Each domain declares its own `git` configuration.
+
+#### Batch Awareness
+
+Autocommit is **operation-aware**, not file-aware. If a single user request results in modifications to 5 things (e.g., "reprioritise my Q3 tasks"), the agent:
+
+1. Makes all 5 modifications
+2. Validates all 5
+3. Commits once with a batch message: `reprioritize: 5 tasks updated for Q3 alignment`
+
+It does NOT commit after each individual file change. The commit boundary is the **logical operation**, not the file save.
+
+#### Scope Boundary: Current Operation Only
+
+Autocommit commits **only the files modified in the current operation**. It does not commit:
+
+- Files left uncommitted from previous sessions (they remain in the working directory)
+- Files staged but not modified in this operation
+- Files in `.gitignore` or otherwise excluded
+
+This ensures that:
+- Stale changes from previous sessions aren't accidentally bundled into new commits
+- Each commit reflects exactly what the agent did in the current operation
+- You maintain explicit control over leftover uncommitted changes (review or discard them intentionally)
+
+#### Interaction With Triggers
+
+Autocommit strengthens the trigger system. Because commits happen immediately after state changes, triggers that watch for committed state (dependency triggers, threshold triggers) evaluate promptly rather than waiting for the user to remember to commit.
+
+```
+Thing A completed → autocommit fires → commit recorded →
+    trigger evaluates → Thing B unblocked → autocommit fires → commit recorded
+```
+
+This creates a reactive chain where state changes propagate through the system automatically.
