@@ -1,8 +1,18 @@
 ---
+id: [domain]-specification
 name: [Domain] Specification
 type: specification
-description: Philosophy, principles, and reasoning patterns for [domain]
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-read-thing-skill
+    relation: informs
+  - id: [domain]-write-thing-skill
+    relation: informs
+  - id: [domain]-workflow-skill
+    relation: informs
+description: Philosophy, principles, and reasoning patterns for [domain]
 applies_to: "[domain]/**/*.md"
 ---
 
@@ -74,3 +84,25 @@ If your domain involves specialized reasoning, lenses, or frameworks, document t
 - `type: project` — A complete unit of work
 - `type: task` — A subtask of a project
 - `type: dependency` — A relationship or blocker between things
+
+## Domain-Specific Validation Rules
+
+[Define what makes a thing valid in this domain, beyond the universal structural checks in validate.thing.skill.md]
+
+**Example:**
+- Things of `type: project` must have a `linked_things` entry with relation `supports` pointing to a goal
+- Things of `type: task` must have `priority` field set
+- Status transitions: `not-started` → `in-progress` → `completed` (no skipping)
+
+## Triggers
+
+[Define domain-specific triggers that signal the agent to pay attention]
+
+### Time-Based
+- [Example: Weekly review trigger — every Monday, scan all active things]
+
+### Dependency
+- [Example: When a thing with `status: blocked` has its blocker complete, alert the user]
+
+### Threshold
+- [Example: When more than 5 things are `status: in-progress`, suggest focusing]

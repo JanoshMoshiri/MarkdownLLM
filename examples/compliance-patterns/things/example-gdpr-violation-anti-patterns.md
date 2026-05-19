@@ -1,10 +1,14 @@
 ---
 id: example-gdpr-violation-anti-patterns
 type: example
+status: stable
 pattern_type: data-handling
 demonstrates: anti-pattern
 applies_to: [client-matter, document-storage]
 created: 2026-05-18
+linked_things:
+  - id: example-gdpr-compliant-data-handling
+    relation: remediated-by
 ---
 
 # GDPR Violation: Anti-Patterns to Avoid

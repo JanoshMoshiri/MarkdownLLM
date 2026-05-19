@@ -1,10 +1,14 @@
 ---
 id: example-gdpr-compliant-data-handling
 type: example
+status: stable
 pattern_type: data-handling
 demonstrates: compliance
 applies_to: [client-matter, document-storage, communication, personal-data]
 created: 2026-05-18
+linked_things:
+  - id: example-gdpr-violation-anti-patterns
+    relation: contrasts-with
 ---
 
 # GDPR Compliant: Data Handling Pattern

@@ -1,9 +1,19 @@
 ---
+id: life-manager-write-thing-skill
 name: Life Manager Write Thing Skill
-type: prompt
+type: skill
 mode: write
+status: stable
+version: 2.0
+created: 2026-05-18
+linked_things:
+  - id: life-manager-specification
+    relation: implements
+  - id: life-manager-read-thing-skill
+    relation: complements
+  - id: life-manager-workflow-skill
+    relation: complements
 description: How to create, update, and manage life management things
-version: 1.0
 applies_to: "life-manager/**/*.md"
 ---
 
@@ -205,6 +215,32 @@ When creating or significantly modifying things:
 - Ensure all required core fields are present: id, type, status, created
 - Add emergent fields only if they serve a clear purpose in your reasoning
 - If modifying an existing thing's version, update the version number to reflect the change
+
+## Post-Write Validation
+
+After every create or update, validate:
+
+1. **Structural** — YAML is valid, required fields present (id, type, status, created), id format correct
+2. **Referential** — All linked_things targets exist, no orphaned references
+3. **Domain-specific** — Projects have linked goals, tasks have priority set, status transitions are logical
+
+If validation fails, fix the issue before committing.
+
+## Git Commit Conventions
+
+After validated writes, commit with structured messages:
+
+- `create: [thing-id]` — New thing created
+- `update: [thing-id] [what-changed]` — Existing thing modified
+- `complete: [thing-id]` — Thing marked completed
+- `batch: [description]` — Multiple related changes in one commit
+
+## Trigger Evaluation (Post-Write)
+
+After writes, check:
+- Did completing a thing unblock any dependent things? → Notify user
+- Did creating new things push in-progress count above 5? → Warn about overload
+- Did any due dates become relevant? → Surface upcoming deadlines
 
 ## Integration With Phone And Calendar
 

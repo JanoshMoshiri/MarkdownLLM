@@ -1,8 +1,19 @@
 ---
+id: life-manager-workflow-skill
 name: Life Manager Workflow
-type: workflow
+type: skill
+mode: workflow
+status: stable
+version: 2.0
+created: 2026-05-18
+linked_things:
+  - id: life-manager-specification
+    relation: implements
+  - id: life-manager-read-thing-skill
+    relation: orchestrates
+  - id: life-manager-write-thing-skill
+    relation: orchestrates
 description: Process orchestration and execution patterns for life management
-version: 1.0
 applies_to: "life-manager/**/*.md"
 ---
 
@@ -170,13 +181,44 @@ Every quarter, zoom out completely:
 
 ## Integration with the Agent
 
-When you make a request to Claude in Life Manager:
+When you make a request in Life Manager:
 
 1. **Parse your intent:** Are you asking for insight (read mode) or making a change (write mode)?
 2. **Load context:** Read relevant things from your `things/` directory
-3. **Reason within the workflow:** Where are you in the loop? What phase applies?
-4. **Recommend or execute:** Suggest what you should do next, or make updates if you've explicitly asked
-5. **Report:** Tell you what changed and why
+3. **Evaluate triggers:** Check for fired triggers (overdue, unblocked, threshold exceeded)
+4. **Reason within the workflow:** Where are you in the loop? What phase applies?
+5. **Recommend or execute:** Suggest what you should do next, or make updates if you've explicitly asked
+6. **Validate:** After writes, run structural and referential checks
+7. **Commit:** Persist changes with structured commit messages
+8. **Report:** Tell you what changed and why, including any triggers that fired
+
+## Trigger Integration
+
+### Session Start Triggers
+When the agent starts a session, evaluate:
+- **Time-based:** Are any things overdue? What's due within 2 days? Is it weekly review day?
+- **Dependency:** Did anything complete since last session that unblocks other things?
+- **Threshold:** Are more than 5 things in-progress? Are any things stale (14+ days without update)?
+
+Report triggered conditions before processing user request.
+
+### Post-Write Triggers
+After any write:
+- Did completing a thing unblock dependents? → Notify user
+- Did creating new things push in-progress above threshold? → Warn
+- Did a status change cascade to related things? → Report
+
+## Git Commit Points
+
+Natural commit moments in the life management workflow:
+
+- After capture (Phase 1): `create: [thing-id]`
+- After clarify (Phase 2): `update: [thing-id] narrative`
+- After commit/execute (Phase 3-4): `update: [thing-id] status`
+- After review (Phase 5): `complete: [thing-id]` or `batch: weekly-review`
+- After abandon/defer (Phase 6): `archive: [thing-id]`
+
+Each commit represents one logical change to your life's state.
 
 **Example flows:**
 

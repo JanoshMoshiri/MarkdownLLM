@@ -1,9 +1,17 @@
 ---
+id: [domain]-read-thing-skill
 name: [Domain] Read Thing Skill
-type: prompt
+type: skill
 mode: read
-description: How to read, analyze, and reason about [domain] things
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-specification
+    relation: implements
+  - id: [domain]-workflow-skill
+    relation: complements
+description: How to read, analyze, and reason about [domain] things
 applies_to: "[domain]/**/*.md"
 ---
 
@@ -20,6 +28,7 @@ Before answering the user's query:
 1. Read `[domain]-specification.skill.md` — understand the philosophy and principles
 2. Reference `thing.md` — the atomic unit specification (foundational structure for all things)
 3. Load the relevant thing files based on the user's query
+4. Check triggers — report any triggered conditions since last session
 
 ## Thing Types in This Domain
 
@@ -38,7 +47,8 @@ When a user asks a question, you:
 2. **Load relevant context** — Read thing files that relate to their query
 3. **Understand relationships** — Follow linked_things, dependencies, blocks
 4. **Reason contextually** — Use narrative context to understand why things matter
-5. **Provide insight** — Answer thoughtfully, drawing on full context
+5. **Report triggers** — If any triggers have fired, surface them in your response
+6. **Provide insight** — Answer thoughtfully, drawing on full context
 
 ## Loading Strategy: Context Windows
 
@@ -98,6 +108,8 @@ Choose your context level based on the user's query:
 
 1. Load metadata for all blocked things
 2. Navigate relationships to find what blocks them
+3. Identify resolution paths
+4. Return: "These things are blocked, and here's what unblocks them"
 3. Load full context for blocking things
 4. Return: "Here's what's blocking you and when it might be resolved"
 

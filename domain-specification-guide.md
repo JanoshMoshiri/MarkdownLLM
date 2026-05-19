@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: evolving
-version: 2.0
+version: 2.1
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -14,6 +14,10 @@ linked_things:
   - id: write-thing-specification
     relation: references
   - id: validate-thing-skill
+    relation: references
+  - id: git-workflow-specification
+    relation: references
+  - id: interface-specification
     relation: references
 ---
 
@@ -128,19 +132,9 @@ Your `AGENTS.md` at the root defines:
 
 **Template structure:**
 
-## Creating Your Agent File (AGENTS.md)
-
-Your `AGENTS.md` at the root defines:
-- What this domain is and what it accomplishes
-- Which skills to load and when
-- Behavioral rules and protocols
-- How the LLM should approach problems in this context
-
-**Template structure:**
-
 ```markdown
 ---
-name: [Domain Name] Agent
+name: [Domain Name]
 description: What this domain does
 version: 1.0
 applies_to: "**/*.md"
@@ -160,27 +154,48 @@ applies_to: "**/*.md"
 1. Load all skills from ./skills/
 2. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
 3. Load thing.md for understanding atomic units
+4. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
 
 ### On User Request
 1. **Clarify intent:** What operation? (read, write, analyze, etc.)
-2. **Load relevant skill:** Match to appropriate prompt or instruction skill
+2. **Load relevant skill:** Match to appropriate skill
 3. **Load context:** Load relevant things from ./things/ directory
 4. **Execute:** Follow skill guidance while maintaining consistency
+5. **Validate:** After writes, invoke validation (structural, referential, domain-specific)
+6. **Commit:** Persist changes following git-workflow conventions
 
 ### On Output
-1. Update thing files if changes made
-2. Reference skills for consistency
+1. Validate thing files if changes were made
+2. Commit with structured message: `action: description`
 3. Report what changed and why
+4. Evaluate triggers (post-write)
 
 ## Skills Directory
 
-All reusable capabilities stored as SKILL.md files:
+All reusable capabilities stored as skill files:
 
 - **[domain]-specification.skill.md** — Philosophy and principles
 - **[domain]-read.thing.skill.md** — Read and analyze things
 - **[domain]-write.thing.skill.md** — Create and update things
 - **[domain]-workflow.skill.md** — Process orchestration
+
+## Foundational Specifications
+
 - **thing.md** — Atomic unit specification
+- **validate.thing.skill.md** — Validation skill
+- **git-workflow.md** — Commit conventions
+- **interface.md** — I/O layer
+
+## Triggers (Domain-Specific)
+
+### Time-Based
+- [When time-based conditions should fire]
+
+### Dependency
+- [When dependency changes should alert]
+
+### Threshold
+- [When limits are exceeded]
 
 ## Usage Pattern
 
@@ -188,20 +203,29 @@ User Request
   ↓
 Load this AGENTS.md (auto-discovered)
   ↓
+Evaluate triggers (session start)
+  ↓
 Load relevant skill from ./skills/
   ↓
 Load relevant things from ./things/
   ↓
 Execute with consistency checks
   ↓
-Update things/ and report changes
+Validate changes
+  ↓
+Commit with structured message
+  ↓
+Evaluate triggers (post-write)
+  ↓
+Report changes
 
 ## Validation Checklist
 
 - [ ] Relevant skill loaded for this operation
-- [ ] thing.md patterns followed
+- [ ] thing.md patterns followed (id, type, status, created present)
+- [ ] linked_things references valid (targets exist)
 - [ ] Framework principles maintained
-- [ ] Changes scoped appropriately
+- [ ] Commit message follows `action: description` convention
 ```
 
 ---
@@ -217,10 +241,18 @@ The philosophy and operational charter for your domain.
 **Frontmatter:**
 ```yaml
 ---
+id: [domain]-specification
 name: [Domain] Specification
 type: specification
-description: Philosophy, principles, and reasoning patterns for [domain]
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-read-thing-skill
+    relation: informs
+  - id: [domain]-write-thing-skill
+    relation: informs
+description: Philosophy, principles, and reasoning patterns for [domain]
 applies_to: "[domain]/**/*.md"
 ---
 ```
@@ -254,11 +286,17 @@ Guidance for how LLMs should traverse, understand, and reason about things withi
 **Frontmatter:**
 ```yaml
 ---
+id: [domain]-read-thing-skill
 name: [Domain] Read Thing Skill
-type: prompt
+type: skill
 mode: read
-description: How to read, analyze, and reason about [domain] things
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-specification
+    relation: implements
+description: How to read, analyze, and reason about [domain] things
 applies_to: "[domain]/**/*.md"
 ---
 ```
@@ -280,11 +318,19 @@ Guidance for how LLMs should create, update, and manage things within your domai
 **Frontmatter:**
 ```yaml
 ---
+id: [domain]-write-thing-skill
 name: [Domain] Write Thing Skill
-type: prompt
+type: skill
 mode: write
-description: How to create, update, and manage [domain] things
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-specification
+    relation: implements
+  - id: [domain]-read-thing-skill
+    relation: complements
+description: How to create, update, and manage [domain] things
 applies_to: "[domain]/**/*.md"
 ---
 ```
@@ -307,10 +353,21 @@ Process orchestration and execution patterns for your domain.
 **Frontmatter:**
 ```yaml
 ---
+id: [domain]-workflow-skill
 name: [Domain] Workflow
-type: workflow
-description: Processes and orchestration patterns for [domain]
+type: skill
+mode: workflow
+status: draft
 version: 1.0
+created: [ISO-date]
+linked_things:
+  - id: [domain]-specification
+    relation: implements
+  - id: [domain]-read-thing-skill
+    relation: orchestrates
+  - id: [domain]-write-thing-skill
+    relation: orchestrates
+description: Processes and orchestration patterns for [domain]
 applies_to: "[domain]/**/*.md"
 ---
 ```
@@ -338,7 +395,7 @@ Things are instances of your atomic unit, following the structure defined in `th
 ---
 id: unique-identifier
 type: [domain-specific-type]
-status: [draft/active/complete]
+status: [not-started/in-progress/blocked/paused/completed/cancelled]
 created: ISO-datetime
 linked_things:
   - id: related-thing-id
@@ -352,9 +409,6 @@ linked_things:
 
 ## Content
 [Detailed narrative body]
-
-## Related Items
-[Links to other things, if not in linked_things]
 ```
 
 Thing types are domain-specific but follow `thing.md` patterns for metadata, relationships, and structure.

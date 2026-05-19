@@ -1,9 +1,19 @@
 ---
+id: compliance-patterns-write-thing-skill
 name: Compliance Patterns Write Thing Skill
-type: prompt
+type: skill
 mode: write
+status: stable
+version: 2.0
+created: 2026-05-18
+linked_things:
+  - id: compliance-patterns-specification
+    relation: implements
+  - id: compliance-patterns-read-thing-skill
+    relation: complements
+  - id: compliance-patterns-workflow-skill
+    relation: complements
 description: How to document and create new compliance patterns
-version: 1.0
 applies_to: "compliance-patterns/**/*.md"
 ---
 
@@ -196,7 +206,33 @@ When creating a new pattern:
 ## Version Management
 
 When creating patterns:
-- Always include `schema_version: 2.0` in metadata
-- Ensure required fields: id, type, domain, applies_to/violates, created
+- Ensure required fields: id, type, status, created
 - Link to related patterns/anti-patterns for discoverability
 - Add emergent fields (severity, reasoning_type, etc.) if they serve the pattern
+
+## Post-Write Validation
+
+After every create or update, validate:
+
+1. **Structural** — YAML valid, required fields present (id, type, status, created)
+2. **Referential** — All linked_things targets exist, anti-patterns link to remediation
+3. **Domain-specific** — All three lenses documented, concrete scenarios included (not just abstract rules)
+
+If validation fails, fix the issue before committing.
+
+## Git Commit Conventions
+
+After validated writes, commit with structured messages:
+
+- `create: pattern-[id]` — New compliant pattern documented
+- `create: anti-pattern-[id]` — New violation pattern documented
+- `create: example-[id]` — New multi-lens scenario documented
+- `update: [thing-id] [what-changed]` — Existing pattern refined
+- `link: [thing-id] to [thing-id]` — New relationship established
+
+## Trigger Evaluation (Post-Write)
+
+After writes, check:
+- Did creating an anti-pattern without a remediation link trigger the orphan warning?
+- Did the new pattern contrast with any existing anti-patterns that should reference it?
+- Does the example cover all three lenses completely?

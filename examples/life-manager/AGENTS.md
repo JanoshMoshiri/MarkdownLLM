@@ -1,7 +1,7 @@
 ---
 name: Life Manager
 description: A system for managing your life and work as interconnected things using LLM reasoning
-version: 1.0
+version: 2.0
 applies_to: "**/*.md"
 ---
 
@@ -9,15 +9,16 @@ applies_to: "**/*.md"
 
 ## What This System Does
 
-This system transforms how you manage your life by inverting the traditional app model. Instead of rigid interfaces and predefined schemas, you structure your life as atomic things in a git repository, and Claude becomes your reasoning engine—understanding context, making connections, and helping you prioritize what matters.
+This system transforms how you manage your life by inverting the traditional app model. Instead of rigid interfaces and predefined schemas, you structure your life as atomic things in a git repository, and the LLM becomes your reasoning engine—understanding context, making connections, and helping you prioritize what matters.
 
 ## Framework Principles Applied to Life Management
 
 1. **Atomic Units** — Everything is a thing: projects, tasks, goals, dependencies, recurring actions. No special cases.
 2. **Minimal Core, Emergent Detail** — Start with basic metadata; let your schema grow as your life becomes more complex.
-3. **LLM-Centric Structure** — Optimized for Claude to reason about your life semantically, not for you to manually manage data.
+3. **LLM-Centric Structure** — Optimized for the LLM to reason about your life semantically, not for you to manually manage data.
 4. **Vendor Agnostic** — Works with any capable LLM using standard markdown and YAML conventions.
 5. **Versioned and Durable** — Git tracks your entire life management history; complete transparency and rollback capability.
+6. **Self-Describing** — This domain is itself a thing within the MarkdownLLM framework. The specifications describe the system they govern.
 
 ## How This Agent Works
 
@@ -25,6 +26,7 @@ This system transforms how you manage your life by inverting the traditional app
 1. Load all skills from `./skills/`
 2. Register: life-manager-specification.skill.md, life-manager-read.thing.skill.md, life-manager-write.thing.skill.md, life-manager-workflow.skill.md
 3. Load thing.md reference for understanding atomic units
+4. Evaluate triggers — scan things for overdue items, unblocked dependencies, threshold breaches since last session
 
 ### On User Request
 1. **Clarify intent** — What are they trying to accomplish? (Get status, plan next steps, resolve a blocker, understand connections?)
@@ -34,10 +36,11 @@ This system transforms how you manage your life by inverting the traditional app
 5. **Take action** — Update things, create new things, or provide insights
 
 ### On Output
-1. Update thing files if changes were made  
-2. Explain what changed and why
-3. Highlight new blockers or opportunities
-4. Show interconnections with other things
+1. Validate thing files if changes were made (structural, referential, domain-specific)
+2. Commit with structured message (e.g., `create: task-buy-groceries`, `update: project-kitchen-reno status`)
+3. Explain what changed and why
+4. Evaluate triggers — check if writes unblocked dependencies or exceeded thresholds
+5. Highlight new blockers or opportunities
 
 ## Skills Directory
 
@@ -47,8 +50,15 @@ All reusable capabilities for life management:
 - **life-manager-read.thing.skill.md** — How to read your life, identify patterns, provide insights
 - **life-manager-write.thing.skill.md** — How to create and update your life things
 - **life-manager-workflow.skill.md** — The execution flow and decision patterns
-**Foundational Specification:**
-- **thing.md** — The atomic unit specification (foundational structure for all things)
+
+## Foundational Specifications
+
+Loaded from the MarkdownLLM framework root:
+
+- **thing.md** — The atomic unit specification (structure for all things)
+- **validate.thing.skill.md** — Validation skill (structural, referential, semantic checks)
+- **git-workflow.md** — When and how to commit (git as state machine)
+- **interface.md** — I/O layer (input routes and output types)
 
 ## Things Directory
 
@@ -62,6 +72,20 @@ Thing types in this system:
 - `type: recurring` — Something that happens regularly
 - `type: decision` — A significant choice with impacts
 
+## Triggers
+
+### Time-Based
+- **Weekly review** — Every Monday, scan all active things: what's overdue? What's at risk? What completed since last review?
+- **Due date approaching** — 2 days before due_date, alert the user
+
+### Dependency
+- **Unblocked** — When a thing with `status: completed` is referenced as a blocker by another thing, notify: "[thing] is now unblocked"
+- **New blocker** — When a thing moves to `status: blocked`, trace what it blocks downstream
+
+### Threshold
+- **Overload warning** — When more than 5 things are `status: in-progress` simultaneously, suggest focusing
+- **Stale items** — When a thing has been `status: in-progress` for more than 14 days without updates, flag it
+
 ## Usage Pattern
 
 ```
@@ -69,13 +93,21 @@ Your Request
     ↓ (auto-discovered)
 Load Life Manager AGENTS.md
     ↓
+Evaluate triggers (session start)
+    ↓
 Load appropriate skill (read, write, workflow)
     ↓
 Load relevant things (projects, tasks, goals, dependencies)
     ↓
 Reason semantically about your life and request
     ↓
-Update things and report what changed + why
+Validate changes
+    ↓
+Commit with structured message
+    ↓
+Evaluate triggers (post-write)
+    ↓
+Report what changed + why
 ```
 
 ## What This System Is / Is Not
@@ -94,10 +126,13 @@ Update things and report what changed + why
 
 ## Validation Checklist
 
-Before executing, verify:
+Before committing, verify:
 
 - [ ] Relevant skill loaded (read.thing.skill or write.thing.skill)
-- [ ] thing.md patterns followed
+- [ ] thing.md patterns followed (id, type, status, created present)
+- [ ] linked_things references are valid (targets exist)
+- [ ] Domain principles maintained
+- [ ] Commit message follows `action: description` convention
 - [ ] Life Manager principles maintained
 - [ ] Changes scoped appropriately
 - [ ] Relationships and linked_things accurate

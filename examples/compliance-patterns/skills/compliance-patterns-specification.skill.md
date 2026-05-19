@@ -1,12 +1,22 @@
 ---
-name: Compliance Patterns specification 
-type: specification 
+id: compliance-patterns-specification
+name: Compliance Patterns Specification
+type: specification
+status: stable
+version: 2.0
+created: 2026-05-18
+linked_things:
+  - id: compliance-patterns-read-thing-skill
+    relation: informs
+  - id: compliance-patterns-write-thing-skill
+    relation: informs
+  - id: compliance-patterns-workflow-skill
+    relation: informs
 description: Philosophy and approach to encoding compliance as verifiable reasoning
-version: 1.0
 applies_to: "compliance-patterns/**/*.md"
 ---
 
-# Compliance Patterns specification 
+# Compliance Patterns Specification
 
 ## What This Domain Is
 
@@ -147,6 +157,24 @@ When you encounter a compliance decision in your domain:
 - A complete compliance solution (domain-specific)
 - A substitute for expert legal/compliance review
 - Production code
+
+## Domain-Specific Validation Rules
+
+Beyond the universal structural checks (id, type, status, created present):
+
+- Things of `type: pattern` must document all three lenses (domain, compliance, audit)
+- Things of `type: anti-pattern` must have a `linked_things` entry with relation `remediated-by`
+- Things of `type: example` must include a concrete scenario (not just abstract rules)
+- Things of `type: decision-tree` must show branching logic with clear outcomes at each node
+
+## Triggers
+
+### Dependency
+- **Orphaned anti-pattern** — Anti-pattern without a remediation link → flag for completion
+- **Stale regulation reference** — If a pattern references a regulation version, flag when newer versions are known
+
+### Relationship
+- **Pattern consistency** — When a pattern is updated, verify all anti-patterns that contrast with it still make sense
 
 ## Integration with Reasoning Lenses
 
