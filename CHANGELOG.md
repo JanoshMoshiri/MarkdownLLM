@@ -10,6 +10,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Coming Soon
 - Additional domain examples (project management, knowledge base, financial tracking)
 - Tools and utilities for working with the framework
+- Migration strategy for evolving schemas
+- Concurrency and multi-agent patterns
+- Security and access control guidance
+
+## [2.1.0] - 2026-05-19
+
+### Major Additions: Interface, Git Workflow, Validation, Triggers, Self-Describing Architecture
+
+This release completes the three-layer architecture, adds operational specifications that were previously gaps, and makes the framework self-describing (fractal).
+
+### Added
+
+**New Specifications:**
+- **interface.md** — The I/O layer specification. Documents input routes (VS Code, CLI, mobile, voice), the thin-interface principle (use existing routes, don't build new ones), and the things vs deliverables distinction (things are persistent state; deliverables are produced artefacts like documents, code, images, video, audio).
+- **git-workflow.md** — Git as state machine specification. Defines commit points (after creation, status transition, write session, session end), structured commit message conventions (action: description), who commits (agent locally, human pushes), git log as event stream for triggers, and three-layer auditability (worklog → git log → git diff).
+- **validate.thing.skill.md** — Universal validation skill. Four-level validation: structural (valid YAML, required fields), referential (link integrity, bidirectional consistency), domain-specific (rules from specification skill), semantic (LLM-reasoned coherence checks). Three severity tiers: error, warning, info.
+
+**Triggers System (in thing.md):**
+- Declarative trigger conditions as YAML metadata on things
+- Four trigger types: time-based (due_date_passed, stale), dependency-based (watch IDs for status changes), threshold-based (subtasks_complete, blocked_duration), relationship-based (watch connected things)
+- Declarative actions: surface, re_evaluate, suggest_completion, unblock, escalate, cascade, notify
+- Three evaluation moments: session start, after writes, scheduled invocation
+- Idempotent evaluation — no extra state needed; git history provides temporal context
+
+**Self-Describing Architecture:**
+- All foundational specs now have YAML frontmatter (id, type, status, version, created, linked_things)
+- Root AGENTS.md created — the framework orchestrates itself as a domain
+- Framework specs are things within the framework they define (fractal/self-describing property)
+- Spec types: `manifesto`, `specification`, `skill`, `guide`
+- Spec statuses: `draft`, `evolving`, `stable`, `deprecated`
+
+**WORKLOG.md:**
+- Session-based work log adopted for this repository
+- Captures completed work, decisions made, reflections, and forward planning
+- Complements CHANGELOG (what shipped) with WORKLOG (how it evolved session by session)
+
+### Changed
+
+**Manifesto (llm-driven-systems.manifesto.md):**
+- Added "Origins and Influences" section — credits Clean Architecture (Robert C. Martin) and SOLID principles; establishes "build on what exists" philosophy (AGENTS.md, .skill.md, YAML, markdown, git are all existing conventions)
+- Added Principle 8: "Self-Describing (Fractal)" — the system describes itself within itself; same pattern at every scale
+- Expanded Principle 6: "Version-Controlled Everything" — git as state machine, commit discipline, event stream, three audit layers
+- Updated "How It Works In Practice" — references AGENTS.md, triggers, deliverables, commit conventions
+- Updated "Getting Started" — reflects current workflow (AGENTS.md first, commit meaningfully, WORKLOG)
+- Expanded "Auditing" in "What This Enables" — three-layer auditability model
+
+**Domain Specification Guide (domain-specification-guide.md):**
+- Added "The Self-Describing Principle" section — domain specs can themselves be things
+- Updated checklist — includes validation, commit conventions, triggers
+- Expanded Key Takeaways from 7 to 10 points (git as state machine, interface routes, validation, self-describing)
+
+**CONTRIBUTING.md:**
+- Restructured to reflect current framework structure
+- Added "Everything is a thing" guideline (all files should have frontmatter)
+- Added git-workflow.md conventions for contributors
+- Added validation requirement before submitting
+- Listed full framework file structure with roles
+
+**Core Spec Fixes:**
+- Fixed `read.thing.md` and `write.thing.md` — updated old `[domain].instructions.md` references to `[domain]-specification.skill.md`
+- Fixed `README.md` — updated 3 references from `Instructions-guide.md` to `domain-specification-guide.md`
+
+### Why This Matters
+
+The framework now has no architectural gaps. The three decoupled layers (Interface, Processing, Storage) each have explicit specifications. Things can be reactive (triggers). Integrity is verifiable (validation). Git usage is disciplined (workflow). And the whole system proves its own universality by describing itself within itself.
+
+The philosophy of "build on what exists" is now explicit — this framework invents no new infrastructure, protocols, or interfaces. It composes existing proven tools (AGENTS.md, .skill.md, YAML, markdown, git, LLMs) into a new architectural pattern.
 - Integration guides for popular LLMs and platforms
 
 ## [2.0.0] - 2026-05-19

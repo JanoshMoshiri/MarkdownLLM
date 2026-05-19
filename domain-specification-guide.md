@@ -1,3 +1,22 @@
+---
+id: domain-specification-guide
+type: guide
+status: evolving
+version: 2.0
+created: 2026-05-13
+linked_things:
+  - id: llm-driven-systems-manifesto
+    relation: operationalises
+  - id: thing-specification
+    relation: references
+  - id: read-thing-specification
+    relation: references
+  - id: write-thing-specification
+    relation: references
+  - id: validate-thing-skill
+    relation: references
+---
+
 # Domain Specification Guide
 
 This guide explains how to create a complete domain specification using the MarkdownLLM framework. The framework uses a **three-layer architecture**: Agent (orchestration) → Skills (reusable capabilities) → Things (data instances).
@@ -501,15 +520,36 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 ## Getting Started: Complete Checklist
 
 - [ ] **Understand** — Read `llm-driven-systems.manifesto.md` and `thing.md`
-- [ ] **Plan** — Answer: What problem? What atomic units? What workflows? 
+- [ ] **Plan** — Answer: What problem? What atomic units? What workflows?
 - [ ] **Create AGENTS.md** — Your orchestration entry point at root
-- [ ] **Create skills/** — Instructions, read/write prompts, workflow
-- [ ] **Understand thing.md** — The atomic unit specification
+- [ ] **Create skills/** — Specification, read/write thing skills, workflow
+- [ ] **Understand thing.md** — The atomic unit specification (including triggers)
 - [ ] **Create examples** — A few things in `things/` to demonstrate your schema
+- [ ] **Add validation rules** — Domain-specific required fields and valid types in your specification skill (validated by `validate.thing.skill.md`)
+- [ ] **Define commit conventions** — Follow `git-workflow.md` patterns for structured commit messages
 - [ ] **Enable tooling** — Configure GitHub Copilot or Claude Code if needed
 - [ ] **Test** — Feed agent + skills + things to your LLM and validate
 - [ ] **Iterate** — Refine skills as you learn what works
-- [ ] **Commit** — Version control everything in git
+- [ ] **Commit** — Version control everything in git with meaningful messages
+
+---
+
+## The Self-Describing Principle
+
+The MarkdownLLM framework itself is a domain within this framework. Its specifications are things with YAML frontmatter, relationships, statuses, and versions. The framework's AGENTS.md orchestrates its own evolution.
+
+**What this means for you:**
+
+When you create a domain, your AGENTS.md, skills, and even documentation can be things. They can have frontmatter. They can have relationships to each other. They can be validated. They can have statuses (`draft`, `evolving`, `stable`).
+
+This is not required — a minimal domain can have simple skill files without full thing metadata. But as your domain matures, giving your skills and documentation the same structure as your data things creates:
+
+- **Navigability** — The agent can traverse relationships between your specs and your data
+- **Maturity tracking** — You can see which skills are stable vs. still evolving
+- **Validation** — The same validation skill that checks your things can check your specs
+- **Consistency** — One pattern, everywhere, no special cases
+
+This is the fractal nature of the framework: the same structure at every scale, from the framework itself down to a single thing instance.
 
 ---
 
@@ -518,7 +558,10 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 1. **Three layers, one pattern:** Agent (orchestration) → Skills (capabilities) → Things (data)
 2. **Agent auto-loads:** No manual includes needed; it's discovered at startup
 3. **Skills are composable:** Each skill stands alone but references others
-4. **Things follow spec:** All instances follow `thing.md` patterns
-5. **Vendor agnostic:** Works across GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini
-6. **Scalable:** Add domains, workflows, thing types without restructuring
-7. **Transparent:** Everything versioned in git; all logic explicit and readable
+4. **Things follow spec:** All instances follow `thing.md` patterns (including triggers)
+5. **Everything is a thing:** Your domain's specs, skills, and data all share the same structure (YAML frontmatter + markdown body). The framework itself follows this pattern — it is self-describing.
+6. **Git is the state machine:** Commits are where state becomes real. Commit at meaningful boundaries. Structured messages make git log a domain narrative. See `git-workflow.md`.
+7. **Interface is existing routes:** Use VS Code, CLI, mobile, voice — whatever connects you to an LLM. Don't build a new interface. See `interface.md`.
+8. **Validation is built in:** `validate.thing.skill.md` checks structural integrity, referential consistency, and semantic coherence. Domain-specific rules live in your specification skill.
+9. **Vendor agnostic:** Works across GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini
+10. **Transparent:** Everything versioned in git; all logic explicit and readable; three audit layers (worklog, git log, git diff)
