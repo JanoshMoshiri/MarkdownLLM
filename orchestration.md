@@ -304,12 +304,39 @@ This specification doesn't replace anything. It formalizes what was implicit:
 
 ## When To Create A Prompt vs. Leave It Implicit
 
-Not everything needs a prompt. The test:
+Not everything needs a prompt. Over-specifying reasoning constrains the LLM rather than enabling it. The framework's strength is that LLMs reason well from narrative prose — prompts should sharpen that reasoning, not replace it.
 
-- **Create a prompt** when you find yourself writing the same reasoning pattern in multiple workflows, or when a hook point needs specific structured thinking that an LLM might otherwise skip or handle inconsistently.
-- **Leave it implicit** when the reasoning is obvious from context and the LLM will handle it naturally from the skill instructions alone.
+### Create A Prompt When
 
-The framework's default prompts (cascade-completion, evaluate-triggers, validate-before-commit, session-orientation, surface-attention) cover the mechanical orchestration that should happen consistently. Domain prompts cover the *domain-specific reasoning* that the LLM needs structured guidance to perform well.
+- The same reasoning pattern repeats across multiple workflows or domains
+- A hook point needs structured thinking that an LLM might skip or handle inconsistently
+- The reasoning involves a specific sequence of checks that must happen in order (like validation or cascading)
+- Getting it wrong has consequences (missed cascades, broken references, unsurfaced conflicts)
+
+### Leave It Implicit When
+
+- The reasoning is obvious from context and the skill instructions are sufficient
+- The LLM naturally handles it without structured guidance
+- The prompt would just restate what's already in a skill file
+- The scenario is rare or domain-specific enough that a general template wouldn't fit
+
+### Red Flags: Signs Of Over-Specification
+
+Watch for these — they indicate a prompt is becoming too prescriptive:
+
+- **The reasoning template is longer than the narrative prose it replaced.** A prompt should be tighter than a skill paragraph, not more verbose.
+- **The template contains conditional branching logic** ("if X but not Y unless Z"). This is programming in prose. The LLM can reason about conditions — it doesn't need them scripted.
+- **The prompt duplicates logic from another prompt or skill.** If two prompts cover overlapping territory, merge or eliminate one.
+- **The prompt specifies exact output text rather than output structure.** Guide the shape of reasoning, not the words.
+- **Domain-level prompts exceed ~10 for a single domain.** This suggests the domain is encoding procedures rather than reasoning guidance. Consider whether some prompts should be absorbed into the workflow skill's narrative.
+
+### The Litmus Test
+
+Read the prompt's reasoning template and ask: "Is this a checklist a competent person would use, or a procedure manual an intern would follow?" If it reads like a procedure manual, it's over-specified. Simplify until it reads like a checklist.
+
+### Quantity Guidance
+
+The framework ships with 6 prompts. These cover the universal mechanical orchestration — the lifecycle events that every domain needs handled consistently. A typical domain should add 2–5 domain-specific prompts for its unique reasoning patterns. If a domain has more than 10 custom prompts, that's a signal to review whether some should be consolidated or left implicit.
 
 ## File Organization
 

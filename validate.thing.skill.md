@@ -2,9 +2,14 @@
 name: Validate Thing
 type: skill
 mode: validate
-description: Universal validation of thing files — structural integrity, referential consistency, and semantic coherence
-version: 1.0
+description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, and orchestration graph integrity
+version: 1.1
 applies_to: "**/things/**/*.md"
+linked_things:
+  - id: thing-specification
+    relation: validates
+  - id: orchestration-specification
+    relation: validates
 ---
 
 # Validate Thing Skill
@@ -189,7 +194,56 @@ If the user asks you to fix issues (not just report them), apply the write.thing
 - Do not enforce domain rules when no domain spec exists — fall back to universal rules only
 - Do not treat Info-level observations as errors — they are advisory
 - Do not block the user from working because of warnings — report and move on
-- Do not invent validation rules beyond what `thing.md` and the domain spec define
+- Do not invent validation rules beyond what `thing.md`, `orchestration.md`, and the domain spec define
+
+## Prompt Validation
+
+Prompts (`type: prompt`) are things and pass through all four validation levels above. They also have additional checks specific to their role in the orchestration layer.
+
+### Prompt Structural Checks
+
+These extend Level 1 for prompt things:
+
+| Check | Rule | Severity |
+|-------|------|----------|
+| `type` is `prompt` | Confirm the thing is declared as a prompt | Error |
+| `inputs` present | Array of input declarations exists in frontmatter | Warning |
+| `inputs` structure | Each entry has `name` and `description` | Warning |
+| `outputs` present | Array of output declarations exists in frontmatter | Warning |
+| `outputs` structure | Each entry has `name` and `description` | Warning |
+| `bound_to` present | At least one binding declaration exists | Warning |
+| `bound_to` structure | Each entry has `hook` field | Error |
+| Reasoning template exists | Markdown body contains a reasoning template section | Warning |
+
+### Prompt Referential Checks
+
+These extend Level 2 by validating the orchestration graph:
+
+| Check | Rule | Severity |
+|-------|------|----------|
+| `bound_to` hooks exist | Each `hook` value matches a hook point declared in `orchestration.md` or a domain workflow skill | Error |
+| No orphaned prompts | Prompt has at least one valid binding — a prompt that binds to nothing never fires | Warning |
+| No missing prompts | All prompt IDs referenced in binding declarations (in AGENTS.md, orchestration.md, or workflow skills) have corresponding prompt files | Error |
+| Input/output chain consistency | If prompt A's output feeds prompt B's input (same hook, B runs after A), B's declared input names should match A's declared output names | Warning |
+
+### Prompt Semantic Checks
+
+These extend Level 4 with orchestration-specific observations:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| Reasoning template scope | Is the template focused on one reasoning task, or does it try to do too much? Prompts should be tighter than skills. | Info |
+| Duplication across prompts | Does this prompt's reasoning template overlap significantly with another prompt or with prose in a skill file? | Warning |
+| Quantity check | Are there more than 10 domain-level prompts? This signals potential over-specification. | Info |
+
+### Prompt Validation Scope
+
+| Trigger | What to check |
+|---------|--------------|
+| After creating or modifying a prompt | That prompt — structural + referential |
+| "Validate my prompts" | All prompts — structural + referential + semantic |
+| Session start (if prompts changed since last session) | Changed prompts — structural + referential |
+| "Validate the orchestration" | All prompts + all bindings + hook point consistency |
 
 ## Key Principles
 
