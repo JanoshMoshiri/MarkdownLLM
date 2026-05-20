@@ -334,4 +334,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines. In short: fork, foll
 
 This framework is released under the MIT License. See [LICENSE](LICENSE) for details.
 
-Copyright © 2026 JMYM Software Ltd.
+Copyright © 2026 JMTM Software Ltd.
