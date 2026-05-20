@@ -18,7 +18,7 @@ This is the MarkdownLLM framework — a specification for building LLM-driven sy
 ## How This Agent Works
 
 ### On Startup
-1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, scalability-guide.md, framework-discovery.md)
+1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, orchestration.md, scalability-guide.md, framework-discovery.md)
 2. Load all skills (validate.thing.skill.md, read.thing.md, write.thing.md)
 3. Load the manifesto for philosophical grounding (llm-driven-systems.manifesto.md)
 4. Load the domain guide for operational context (domain-specification-guide.md)
@@ -49,6 +49,7 @@ The framework defines itself through these interconnected specifications:
 - **validate.thing.skill.md** — How to validate thing integrity (structural, referential, semantic). (`type: skill`, `status: draft`)
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: draft`)
 - **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: draft`)
+- **orchestration.md** — Hook points, prompts, and bindings: how reasoning is triggered and what reasoning fires. (`type: specification`, `status: draft`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: draft`)
 - **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: draft`)
 
