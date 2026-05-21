@@ -1,11 +1,17 @@
 framework: MarkdownLLM
-version: 2.1
+version: 2.3
 foundational_specs:
   - thing.md
-  - validate.thing.md
-  - git-workflow.md
-  - interface.md
   - read.thing.md
   - write.thing.md
+  - validate.thing.md
+  - interface.md
+  - git-workflow.md
+  - framework-discovery.md
+  - domain-refresh.md
+  - orchestration.md
+  - llm-driven-systems.manifesto.md
+  - scalability-guide.md
+  - domain-specification-guide.md
 domains:
   - domains/ProducFlow2

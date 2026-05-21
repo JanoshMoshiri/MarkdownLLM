@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 2.1
+version: 2.3
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -18,11 +18,12 @@ This is the MarkdownLLM framework — a specification for building LLM-driven sy
 ## How This Agent Works
 
 ### On Startup
-1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, scalability-guide.md, framework-discovery.md)
+1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, framework-discovery.md, domain-refresh.md)
 2. Load operational specs (validate.thing.md, read.thing.md, write.thing.md)
 3. Load the manifesto for philosophical grounding (llm-driven-systems.manifesto.md)
 4. Load the domain guide for operational context (domain-specification-guide.md)
-5. Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
+5. Load supporting specs as needed (scalability-guide.md, orchestration.md)
+6. Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
 ### On User Request
 1. **Clarify intent** — Is the user working on the framework itself? Creating a new domain? Asking about the philosophy? Seeking guidance?
@@ -41,7 +42,7 @@ The framework defines itself through these interconnected specifications:
 
 ### Foundational
 - **llm-driven-systems.manifesto.md** — Philosophy, paradigm shift, core principles. The "why." (`type: manifesto`, `status: stable`)
-- **thing.md** — The atomic unit specification. What a thing is, how it's structured, triggers. (`type: specification`, `status: evolving`)
+- **thing.md** — The atomic unit specification. What a thing is, how it's structured, triggers. (`type: specification`, `status: stable`)
 
 ### Operational
 - **read.thing.md** — How LLMs read and reason about things without modification. (`type: specification`, `status: stable`)
@@ -55,7 +56,7 @@ The framework defines itself through these interconnected specifications:
 
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
-- **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: evolving`)
+- **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
 
 ### Examples
 - **examples/life-manager/** — Personal life and work management domain

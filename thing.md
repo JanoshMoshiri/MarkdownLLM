@@ -1,8 +1,8 @@
 ---
 id: thing-specification
 type: specification
-status: evolving
-version: 2.1
+status: stable
+version: 2.3
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
