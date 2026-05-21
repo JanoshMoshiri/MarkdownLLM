@@ -188,8 +188,8 @@ These are prompts that ship with the framework and apply to any domain:
 
 Domains define their own prompts for domain-specific reasoning:
 
-- **generate-phase-report** — (ProducFlow) Structure findings into a phase report with embedded questions
-- **format-expert-questions** — (ProducFlow) Extract uncertainties and format them for expert review
+- **generate-phase-report** — (Business Flow) Structure findings into a phase report with embedded questions
+- **format-expert-questions** — (Business Flow) Extract uncertainties and format them for expert review
 - **apply-compliance-lenses** — (Compliance) Evaluate a change through all regulatory lenses
 - **prioritize-by-energy** — (Life Manager) Factor energy cost into priority recommendations
 
@@ -294,7 +294,7 @@ Orchestration doesn't replace the narrative specs — it's an additional tool fo
 - **thing.md** triggers remain the primary attention mechanism. They work through natural LLM reasoning without orchestration. Domains that adopt orchestration can use the `post-write` hook to make trigger evaluation more systematic.
 - **write.thing.md** already guides the LLM to consider downstream effects through prose. Orchestration is for domains where "consider" isn't reliable enough and "always execute this checklist" is needed.
 - **git-workflow.md** commit points are natural moments where orchestration hooks can attach — but they work fine without explicit hooks, driven by the narrative spec alone.
-- **Workflow skills** (like ProducFlow's phase gates) are the primary use case for domain-level orchestration — structured workflows where phase transitions need explicit, repeatable reasoning.
+- **Workflow skills** (like a domain's phase gates) are the primary use case for domain-level orchestration — structured workflows where phase transitions need explicit, repeatable reasoning.
 
 ## Design Principles
 

@@ -29,7 +29,7 @@ This file is a running record of independent reviews of the framework's state, c
 
 ### Review — 21 May 2026, 14:30
 
-**Scope:** Full holistic review of the framework post-v2.3.0. All 12 specifications, both examples, templates, ProducFlow2 domain, WORKLOG, and CHANGELOG read end-to-end.
+**Scope:** Full holistic review of the framework post-v2.3.0. All 12 specifications, both examples, templates, domain examples, WORKLOG, and CHANGELOG read end-to-end.
 
 **Overall Verdict:** Architecturally sound, internally coherent, philosophically clear. The framework is in the "beautifully specified but underproven" phase — the design decisions are right, the evidence they work under real load is thin.
 
@@ -61,9 +61,9 @@ This file is a running record of independent reviews of the framework's state, c
 
 3. **"Who actually evaluates triggers" problem** — The trigger system specifies *what* and *when* well, but the "scheduled invocation" mechanism (cron, GitHub Actions, calendar event) is mentioned once and never specified. Without it, time-based triggers (due_date_passed, stale) only fire during active sessions — dramatically reducing their utility. Either spec a reference implementation of scheduled invocation or explicitly acknowledge the limitation.
 
-4. **Multi-domain composition gap** — `framework_root` handles discovery upward (domain → framework). Nothing exists for lateral composition (domain ↔ domain). What happens when Domain A produces things Domain B needs? When two domains share a thing type? When an agent reasons across domain boundaries? ProducFlow2 hints at this but no specification exists.
+4. **Multi-domain composition gap** — `framework_root` handles discovery upward (domain → framework). Nothing exists for lateral composition (domain ↔ domain). What happens when Domain A produces things Domain B needs? When two domains share a thing type? When an agent reasons across domain boundaries? No specification exists for domain composition.
 
-5. **Examples don't prove the system** — Compliance-patterns has 2 things. Life-manager has zero things. Neither shows triggers firing, validation catching real errors, tiered loading in action, session-start orientation working, or git log being parsed as an event stream. ProducFlow2 is the only real domain but it's specialized (prototype-to-production for law firms) and doesn't demonstrate generalizability.
+5. **Examples don't prove the system** — Compliance-patterns has 2 things. Life-manager has zero things. Neither shows triggers firing, validation catching real errors, tiered loading in action, session-start orientation working, or git log being parsed as an event stream. The included domain examples are specialized and don't demonstrate generalizability.
 
 ---
 

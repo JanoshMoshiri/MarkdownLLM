@@ -629,7 +629,7 @@ Essential skills, can be concise:
 - **[domain]-workflow.skill.md** — Single atomic workflow or process description
 - **AGENTS.md** — Orchestration entry point
 
-**Example:** Life Manager (simple task tracking), Prototype-to-Production (single five-phase analysis).
+**Example:** Life Manager (simple task tracking), Business Process Analysis (single five-phase analysis).
 
 ### Complex Domain (multiple workflows/processes)
 

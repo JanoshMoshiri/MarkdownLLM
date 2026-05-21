@@ -21,7 +21,7 @@ This document defines how domain agents discover the MarkdownLLM framework root 
 
 ## The Problem
 
-A domain lives at a path like `domains/ProducFlow2/` within a MarkdownLLM repository. When the LLM tool discovers and loads that domain's `AGENTS.md`, it has no inherent knowledge of the repository structure above it. The domain agent says "Load thing.md" but doesn't know *where* thing.md lives.
+A domain lives at a path like `domains/my-domain/` within a MarkdownLLM repository. When the LLM tool discovers and loads that domain's `AGENTS.md`, it has no inherent knowledge of the repository structure above it. The domain agent says "Load thing.md" but doesn't know *where* thing.md lives.
 
 This creates a failure mode: the domain agent loads, reads its skills, reads its things — but cannot access the foundational framework specifications it needs to reason correctly.
 
@@ -58,7 +58,7 @@ With `framework_root` declared, the domain agent can resolve paths to:
 
 ### Example
 
-A domain at `domains/ProducFlow2/`:
+A domain at `domains/my-domain/`:
 
 ```yaml
 framework_root: ../..

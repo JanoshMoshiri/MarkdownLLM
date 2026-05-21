@@ -43,7 +43,7 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 #### Completed
 
-- [x] Conducted full holistic framework review — read all 12 specs, manifesto, examples, templates, ProducFlow2 domain, WORKLOG, and CHANGELOG end-to-end
+- [x] Conducted full holistic framework review — read all 12 specs, manifesto, examples, templates, domain examples, WORKLOG, and CHANGELOG end-to-end
 - [x] Created REVIEWLOG.md — new framework artifact for tracking periodic reviews of framework state, cohesion, and direction. Format mirrors WORKLOG: daily blocks → timestamped review blocks → subsections (works well, tensions, over-engineered, under-engineered, missing from todos, reflections)
 - [x] Populated first review entry (21 May 2026, 14:30) with detailed assessment across all subsections
 
@@ -80,7 +80,7 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 #### Completed
 
-- [x] Evaluated orchestration layer after real-world testing in ProducFlow domain
+- [x] Evaluated orchestration layer after real-world testing in a domain workflow
 - [x] Concluded: framework-level orchestration made LLM reasoning too rigid — lost the natural flow that narrative specs provide
 - [x] Refactored orchestration to opt-in domain-level pattern:
   - Moved `prompts/` → `templates/prompts/` (templates, not mandatory reasoning)
@@ -91,7 +91,7 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 #### Decisions Made
 
-- **Framework-level orchestration creates rigidity, not value.** Testing in ProducFlow showed that binding prompts to lifecycle hooks universally caused the LLM to execute reasoning mechanically rather than calibrating naturally. The analysis workflow lost its natural reasoning flow — responses became formulaic and rigid.
+- **Framework-level orchestration creates rigidity, not value.** Testing in a domain workflow showed that binding prompts to lifecycle hooks universally caused the LLM to execute reasoning mechanically rather than calibrating naturally. The analysis workflow lost its natural reasoning flow — responses became formulaic and rigid.
 - **Narrative specs are the right primary mechanism.** write.thing.md's "consider what else needs updating" is a nudge — the LLM decides how much attention to pay. A bound prompt is a procedure — the LLM executes it completely. Nudges produce better reasoning for most domains.
 - **Orchestration earns its place at domain level, not framework level.** Domains with strict phase gates (compliance, regulated environments, multi-person teams) benefit from explicit hook/prompt/binding declarations. Simpler domains get bogged down by them.
 - **Prompts become templates, not mandates.** The 6 prompt files are valuable as starting points for domains that opt into orchestration — they show the pattern and provide a foundation to adapt. But they should never fire universally.
@@ -164,14 +164,14 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 - [x] Full review of entire MarkdownLLM 2.0 workspace — all core files, examples, templates, and changelog read end-to-end
 - [x] Assessed cohesion of the framework — confirmed three-layer architecture (Agent → Skills → Things) is consistently applied across all documentation and examples
 - [x] Identified and fixed minor inconsistencies: README referencing old `Instructions-guide.md` filename (now `domain-specification-guide.md`); `read.thing.md` and `write.thing.md` referencing old `[domain].instructions.md` naming (now `[domain]-specification.skill.md`)
-- [x] Created WORKLOG.md in MarkdownLLM repo (this file), adopting the same day/session format proven in ProjectProd
+- [x] Created WORKLOG.md in MarkdownLLM repo (this file), adopting the day/session format
 - [x] Captured 10 identified gaps/areas for future work (see To Do and Decisions Made)
 
 #### Decisions Made
 
 - The interface layer is deliberately not specified as a new protocol — the framework leverages existing interface routes (VS Code + GitHub Copilot, Claude Code CLI, mobile chat apps, voice-to-text in OS) rather than inventing a new one. The interface section needs to be *described and defined* in the manifesto/README, not *built*.
 - The output side of the framework is broader than just things — the agent can produce documents (Word, PDF), images, software code, videos, audio. This needs explicit documentation as a concept: things are the agent's persistent memory/state; outputs are the agent's deliverables produced from that state.
-- WORKLOG adopted for this repo — serves as session history, progress tracker, and captures forward planning. Same format as ProjectProd worklog.
+- WORKLOG adopted for this repo — serves as session history, progress tracker, and captures forward planning.
 - The framework is cohesive and internally consistent at the specification level; the gaps are operational (how to deploy end-to-end) not architectural.
 - The "elegant constraint" argument (smaller models + well-defined domains) is a key differentiator that should be promoted more prominently.
 
@@ -220,7 +220,7 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 
 - **Quickstart guide (QUICKSTART.md)** — A 5-minute on-ramp: clone, create 3 files, interact with agent, see it work. The domain-specification-guide is comprehensive but too dense for first contact. A quickstart that gets someone to a working domain in minutes would dramatically improve adoption.
 - **Non-trivial worked example** — The compliance-patterns example has 2 things; life-manager has zero. Neither demonstrates triggers firing, validation catching errors, or git workflow in action. Need an example with 10-15 things showing relationships, triggers, validation, and a session narrative proving the system works end-to-end.
-- **Multi-agent / multi-domain patterns** — What happens when domains share things or one agent's output feeds another agent's input? ProducFlow2 hints at this (domain inside framework repo) but there's no specification for domain composition.
+- **Multi-agent / multi-domain patterns** — What happens when domains share things or one agent's output feeds another agent's input? No specification exists for domain composition across boundaries.
 - **Migration / evolution strategy** — The manifesto says schemas evolve but there's no concrete guidance for: adding a required field to an existing domain, migrating N things, upgrade paths. This becomes critical once domains grow beyond trivial size.
 - **Security and access control** — Any domain with sensitive data (compliance, financial, health) needs guidance on: who can read/write things, secrets handling, PII in git-committed files.
 - **Reasoning lenses placement** — Currently embedded in read.thing.md and write.thing.md as optional sections. Only the compliance domain naturally uses them. Worth investigating whether these should move to an advanced patterns appendix to reduce cognitive load in the core read/write specs, or whether they earn their place as domains mature.
@@ -336,173 +336,6 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 
 ---
 
-## Predecessor Project History
-
-*The entries below are from the ProjectProd project (prototype-to-production analysis framework) — the original project that led to the creation of MarkdownLLM. The governance patterns, decision registers, and process design work done here directly informed the framework's specifications. Retained for historical context and traceability.*
-
----
-
-## 15 May 2026
-
-### Session 1
-
-#### Completed
-
-- [x] Reviewed manager conversation (Paul Hill, 14 May) in detail — extracted practical questions on prototype intake and environment
-- [x] Identified Phase 0: Intake & Inception as a required precursor to Phase 1 Discovery
-- [x] Named the root constraint missed in earlier analysis: prototype cannot touch firm infrastructure until productionised
-- [x] Structured Phase 0 into two separate concerns: process design (the steps) and environment design (the infrastructure prerequisites)
-- [x] Grouped Paul’s questions into four decision areas: execution environment; transfer and receipt; storage and collaboration; context and intent capture; dependency and cost
-
-#### Decisions Made
-
-- Phase 0: Intake & Inception is part of this process (same `.instructions.md`), not a separate framework — the outputs of Phase 0 (artefact in `Prototype/`, intent document) are what Phase 1 needs to begin
-- The prototype cannot be run on firm infrastructure at any stage before productionisation — this is the root constraint driving all intake design decisions
-- Static analysis (reading code, configs, architecture) can happen on a firm machine; dynamic analysis (running the prototype) requires an isolated machine with no firm network access
-- Environment decisions are infrastructure prerequisites, not process steps — they belong in a separate project-level document once decided
-- The next step is a decision register: turn Paul’s open questions into structured decision items before Phase 0 can be written into `.instructions.md`
-
-#### Reflections
-
-*None recorded.*
-
-### Session 2
-
-#### Completed
-
-- [x] Created `DECISIONS.md` — Phase 0 decision register with 8 structured decision areas, root constraint stated, summary table
-- [x] Decided Decision 1 (Execution environment): dedicated sandbox physical machine — strong isolation, analyst-controlled, no firm credentials or network
-- [x] Decided Decision 2 (Transfer and receipt): private externally-hosted git repository — clean audit trail, developer-familiar workflow, satisfies root constraint
-- [x] Decided Decision 3 (Prototype storage): prototype stays on sandbox; analysis outputs stored in a separate external analysis repository and brought into firm infrastructure on completion
-- [x] Identified Decision 3 needed splitting — original "storage and collaboration" conflated prototype storage, analysis repo structure, and cross-analyst coordination
-- [x] Added Decision 4 (Analysis repository structure, ownership, lifecycle) — open questions on repo count, ownership model, and data retention implications
-- [x] Added Decision 5 (Cross-analyst collaboration model) — branch strategy and coordination between two analysts on same prototype
-- [x] Added Decision 6 (External party collaboration) — Teams site for creator collaboration; noted firm already uses B2B guest access pattern
-- [x] Renumbered original Decisions 4–5 to Decisions 7–8 to accommodate new decisions
-- [x] Identified previously unconsidered factors: repo ownership and analyst-departure continuity; data retention obligations for analysis outputs on external repos; Teams conversation history as a retention-liable record; IP and confidentiality of externally-developed prototype code; who creates and owns the prototype repo in Decision 2
-
-#### Decisions Made
-
-- Prototype artefacts stay on the sandbox; analysis outputs are the product of analyst work and can return to firm infrastructure once analysis is complete
-- Decision 3 is three concerns, not one: storage (resolved), repository structure (Decision 4), cross-analyst coordination (Decision 5) — these have distinct ownership and lifecycle questions
-- Firm B2B guest access in Teams (already standard practice for external clients) is the likely pattern for external creator collaboration — data stays in firm tenant; this is firm infrastructure but in a governed way, which is acceptable for communication
-- The Teams collaboration channel and the context/intent capture decision (Decision 7) are linked — the intent capture artefact may naturally emerge from the Teams conversation rather than being a separate step
-
-#### Reflections
-
-*None recorded.*
-
----
-
-## 14 May 2026
-
-### Session 1
-
-#### Completed
-
-- [x] Reviewed conversation insights on customisation file layering, agent files, and hooks
-- [x] Established creation order principle: instructions → prompts → skills → agent files (agent file is the framing layer, built last)
-- [x] Documented agent file considerations: coherence, over-generalisation, persona consistency, scope control, adaptability
-- [x] Documented hooks governance: complexity, maintenance, reliability, timing
-- [x] Amended `customisation-governance.instructions.md` — added Creation Order principle, Hooks Governance section, updated File Boundary Definitions table to include agent files and hooks
-- [x] Created `.github/prompts/create-agent.prompt.md` — pre-flight checklist for agent files, mirrors `create-skill.prompt.md`
-
-#### Decisions Made
-
-- Agent files are the framing layer and should be crafted after the components they orchestrate (instructions, prompts, skills) are defined
-- Hooks governance is documented proactively in the governance file so considerations are encoded before hooks are adopted
-- `create-agent.prompt.md` is a governance checklist (like `create-skill.prompt.md`), not a speculative skill — governance can be proactive, methodology cannot
-- Agent file considerations and hooks considerations originate from a voice session conversation — encoded here rather than left only in conversation
-
-#### Reflections
-
-*None recorded.*
-
-### Session 2
-
-#### Completed
-
-- [x] Added outcome-first principle (Check 0) to `create-agent.prompt.md` — outcome and verifiability as prerequisite before any file is written
-- [x] Updated creation order in `customisation-governance.instructions.md` to begin with outcome definition
-- [x] Developed hook evaluation rubric (four filters) and encoded in Hooks Governance section
-- [x] Updated layered loading section — hooks positioned alongside the context stack, not within it
-- [x] Restructured Hooks Governance — evaluation rubric added, risks separated under sub-heading, "not yet adopted" note removed
-- [x] Updated governance file boundary table to list all current files by exact path
-- [x] Created `.github/hooks/post-encoding-commit.hook.md` — git commit hook with no-push rule and graceful failure
-- [x] Created `.github/prompts/end-session.prompt.md` — WORKLOG update prompt (to be renamed `update-worklog.prompt.md`)
-- [x] Renamed `new-session.prompt.md` → `start-session.prompt.md`
-- [x] Updated `start-session.prompt.md` Step 3 to reference end-session prompt and commit hook
-- [x] Updated README to reflect current `.github/` structure
-- [x] Committed interim framework changes
-- [x] Restructured WORKLOG to day → session hierarchy
-- [x] Renamed `end-session.prompt.md` → `update-worklog.prompt.md` and updated all references
-- [x] Created `.github/hooks/pre-commit-validate.hook.md` — structural validation with four checks (file registration, prompt/hook/instructions frontmatter)
-- [x] Created `.github/prompts/review-governance.prompt.md` — qualitative governance review covering all eight governing principles
-- [x] Updated `post-encoding-commit.hook.md` — added pre-commit sequence: validate → governance review checkpoint → commit
-- [x] Updated governance table and README to include pre-commit-validate and review-governance
-- [x] Ran governance review — framework compliant; two monitoring notes recorded
-- [x] Fixed `update-worklog.prompt.md` — template and determining-block logic updated to match new day/session WORKLOG format
-- [x] Tested post-encoding-commit hook sequence in practice (first real execution)
-- [x] Reviewed meeting analysis with manager (Paul Hill) — identified prerequisite process gap: the front-of-process (how a prototype lands in the analysis environment) is not yet designed and is the first place reality will break the framework
-
-#### Decisions Made
-
-- Hook evaluation rubric — four filters: side effect not the work; trigger named and precise; fails gracefully; human review not required
-- Hooks operate alongside the context stack, not within it — different axis: what executes unconditionally at trigger points vs what is in context
-- WORKLOG update is a prompt (not a hook) — it is the primary work of the update action, not a side effect, and requires human review before committing
-- Git commit is the true hook — passes all four filters; side effect of encoding, well-defined trigger, graceful failure, no additional review needed at that point
-- post-encoding-commit should not chain to WORKLOG update — start-session's WORKLOG read is the natural validation; no hard block needed in the commit hook
-- `end-session.prompt.md` to be renamed `update-worklog.prompt.md` — responsibility is WORKLOG update, not session lifecycle management
-- WORKLOG format: day as top-level (`## D MMM YYYY`), sessions as sub-sections (`### Session N`, resetting per day), sub-sections at `####` level
-- pre-commit-validate is a hook (mechanical checks, no judgement needed, passes all four filters); governance review is a prompt (requires judgement, must remain a deliberate human action)
-- post-encoding-commit now orchestrates a pre-commit sequence — this places it at the Open/Closed boundary; if the sequence grows, extract to a commit-protocol prompt
-- Governance review is a checkpoint not a blocker — the commit can proceed whether or not review has been run, but the question must be asked and answered each time
-- Next session focus is the prerequisite process — how a prototype moves from its origin (personal machine, external context, recording, partial artefact) into the analysis environment safely; this precedes Phase 1 (Discovery) and may be a new phase, a separate process, or an intake checklist; Paul's framing from the meeting makes clear this is the first real bottleneck and the place the workflow will break in practice if not designed
-
-#### Reflections
-
-*None recorded.*
-
----
-
-## 13 May 2026
-
-### Session 1
-
-#### Completed
-
-- [x] Explored the prototype-to-production analysis concept and defined the problem space
-- [x] Read and understood the Reverb prototype (Phase 1 Discovery completed informally)
-- [x] Read the Service Configuration Document template — understood its structure and scope
-- [x] Defined the five-phase analysis process (Discovery → Data Flow → Gap Analysis → Production Design → SCD Population)
-- [x] Established the priority ordering: Security → Vulnerability → Architecture, applied within and across all phases
-- [x] Decided on instructions + prompt + skills architecture for encoding the process
-- [x] Created `.instructions.md` — analysis process, firm constraints, phase definitions, SOLID principles in Phase 4
-- [x] Created `.github/instructions/customisation-governance.instructions.md` — firm vs project level distinction, layered loading, progressive extraction, single responsibility, versioning, create vs amend rules
-- [x] Created `.github/prompts/prototype-analysis.prompt.md` — entry point for running the analysis
-- [x] Created `.github/prompts/create-skill.prompt.md` — pre-flight checklist for creating skills
-- [x] Created `.github/prompts/new-session.prompt.md` — session orientation protocol
-- [x] Created `README.md` — framework overview written from generic, reusable perspective
-- [x] Created `.gitignore` — excludes `Prototype/` from version control
-- [x] Moved Reverb prototype and SCD template into `Prototype/` folder
-- [x] Initialised git repository
-- [x] Created remote repository at burgessalmon.ghe.com/Technology/ProjectProd and pushed
-- [x] Created `WORKLOG.md` (this file)
-
-#### Decisions Made
-
-- SCD is an output of the process, not an input — populate only after production solution is built and tested
-- `Prototype/` is gitignored — working material, not part of the committed framework
-- Firm-level content (constraints, governance) separates from project-level content (analysis findings)
-- Skills are extracted from proven work, never written speculatively
-- SOLID and clean architecture are named evaluation criteria in Phase 4, not background assumptions
-
-#### Reflections
-
-*None recorded.*
-
----
-
 ## To Do
 
 ### Framework Gaps (Identified 19 May)
@@ -522,23 +355,7 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 
 ### Framework Development
 
-- [ ] Add dynamic input variable to `prototype-analysis.prompt.md` for cases where multiple prototypes exist in `Prototype/`
-- [ ] Delete personal repo at burgessalmon.ghe.com/Janosh-Moshiri/ProjectProd (no longer needed)
-- [ ] Consider migrating firm-level constraints and governance to user-level storage when stable (available across all workspaces)
-- [ ] Extract Phase 2 (Data Flow & Security Classification) into a skill once methodology is proven through at least one real execution
-- [ ] Extract Phase 3 (Gap Analysis) into a skill once methodology is proven
-- [ ] Extract Phase 4 (Production Architecture & Design) into a skill once methodology is proven
 - [x] Evaluate whether hooks are useful for enforcing encoding discipline at session end
-- [ ] Monitor `post-encoding-commit.hook.md` on next change — if pre-commit sequence grows further, extract orchestration to a commit-protocol prompt (Open/Closed boundary noted in governance review 14 May)
-- [x] Create Phase 0 decision register — resolve open questions on execution environment, transfer mechanism, storage, context capture, and dependency handling *(done: all 8 decisions locked, encoded in ProducFlow2 domain)*
-- [x] Design prerequisite process — how prototypes are received, transferred, and prepared for analysis *(done: producflow-environment.skill.md created with full Phase 0 workflow)*
-
-### Prototype Analysis — Reverb
-
-- [ ] Phase 2: Data Flow & Security Classification — execute formally against Reverb
-- [ ] Phase 3: Gap Analysis — produce gap register for Reverb
-- [ ] Phase 4: Production Architecture & Design — design production solution for Reverb
-- [ ] Phase 5: SCD Population — populate Service Configuration Document (after production solution is built and tested)
 
 ---
 

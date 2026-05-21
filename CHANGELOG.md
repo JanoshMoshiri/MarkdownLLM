@@ -259,7 +259,7 @@ The previous framework conflated several concepts (instructions, skills, specs, 
   - Expanded application examples with structured descriptions
   - Step-by-step guide from understanding principles to implementation
   - Clarified distinction between domain definitions and application instances
-- **Prototype-to-Production Reference Domain** — Replaced life-manager as primary example domain
+- **Reference Domain** — Added as primary example domain
   - Demonstrates the complete five-component pattern
   - Shows how complex workflows are orchestrated
 
