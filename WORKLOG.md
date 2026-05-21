@@ -35,7 +35,7 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ## 21 May 2026
 
-### Session 7
+### Session 1
 
 #### Completed
 
@@ -69,7 +69,7 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 
 ## 20 May 2026
 
-### Session 6
+### Session 1
 
 *Note: This entry was written retroactively on 21 May 2026.*
 
@@ -116,57 +116,49 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 
 ## 19 May 2026
 
-### Session 5
+### Session 1
 
 #### Completed
 
-- [x] Reviewed all Session 4 (independent review) findings and produced a detailed prioritised plan across 5 priority levels
-- [x] Analysed README in full detail — identified 8 specific structural problems with precise line references and rationale for each
-- [x] Implemented all 8 README fixes in a single editing pass:
-  - Removed placeholder license section (template residue, never filled in)
-  - Fixed MIT + "All rights reserved" legal contradiction — removed the phrase
-  - Consolidated two Contributing sections into a single pointer to CONTRIBUTING.md
-  - Deleted three orphaned application description blocks (Financial Tracking, Health & Fitness, Creative Writing) — no parent heading, no matching example domains in repo
-  - Removed second Getting Started sequence and third "Start here:" footer — single on-ramp now
-  - Removed duplicate "How This Works With LLMs" and "Elegant Constraint Enables Efficiency" sections — the canonical "The Elegant Constraint" section (added Session 3) already makes the argument better
-  - Removed "Using This Framework" (Personal/Team/Org) — unproven scale claims and a vendor-specific "Interact with Claude" reference violating Principle 5
-  - Softened FAQ "production-ready" answer to honestly reflect the draft/stable status spread in frontmatter
-- [x] Committed per git-workflow.md conventions: `framework: clean README — remove structural debt from independent review`
-- [x] Added CONTRIBUTING.md guidelines: per-file versioning note and frozen naming conventions
-- [x] Committed: `framework: update CONTRIBUTING — versioning note and frozen naming conventions`
-- [x] Reviewed and calibrated CHANGELOG.md tone across all release entries:
-  - Removed "no architectural gaps" claim from 2.1.0 (specs carry `status: draft`)
-  - Dropped "Operational Excellence" title from 2.2.0 — factual description instead
-  - Dropped "Major Additions" from 2.1.0 — additions speak for themselves
-  - Acknowledged draft status in 2.1.0 "Why This Matters" section
-  - Softened vendor alignment claims in 2.0.0 ("follows similar patterns" not "mirrors")
-  - Trimmed stale "Coming Soon" to genuinely planned items; renamed to "Planned"
-- [x] Committed: `framework: calibrate CHANGELOG tone — align confidence with actual spec maturity`
+- [x] Full review of entire MarkdownLLM 2.0 workspace — all core files, examples, templates, and changelog read end-to-end
+- [x] Assessed cohesion of the framework — confirmed three-layer architecture (Agent → Skills → Things) is consistently applied across all documentation and examples
+- [x] Identified and fixed minor inconsistencies: README referencing old `Instructions-guide.md` filename (now `domain-specification-guide.md`); `read.thing.md` and `write.thing.md` referencing old `[domain].instructions.md` naming (now `[domain]-specification.skill.md`)
+- [x] Created WORKLOG.md in MarkdownLLM repo (this file), adopting the same day/session format proven in ProjectProd
+- [x] Captured 10 identified gaps/areas for future work (see To Do and Decisions Made)
 
 #### Decisions Made
 
-- README editing worked from the bottom up to keep line references stable — removed the entire tail section in one replacement, then handled the FAQ independently
-- The "Using This Framework" scale section (Personal/Team/Org) was removed entirely rather than trimmed — the scale claims are not backed by any example or specification in the repo, and the vendor-specific reference was a Principle 5 violation. No version of it was worth keeping.
-- Contributing section now delegates to CONTRIBUTING.md rather than duplicating guidance — single source of truth for contribution process
-- All 8 README changes landed in a single commit with a detailed body listing each change — this is one logical unit of work (README structural cleanup) even though it touched many lines
+- The interface layer is deliberately not specified as a new protocol — the framework leverages existing interface routes (VS Code + GitHub Copilot, Claude Code CLI, mobile chat apps, voice-to-text in OS) rather than inventing a new one. The interface section needs to be *described and defined* in the manifesto/README, not *built*.
+- The output side of the framework is broader than just things — the agent can produce documents (Word, PDF), images, software code, videos, audio. This needs explicit documentation as a concept: things are the agent's persistent memory/state; outputs are the agent's deliverables produced from that state.
+- WORKLOG adopted for this repo — serves as session history, progress tracker, and captures forward planning. Same format as ProjectProd worklog.
+- The framework is cohesive and internally consistent at the specification level; the gaps are operational (how to deploy end-to-end) not architectural.
+- The "elegant constraint" argument (smaller models + well-defined domains) is a key differentiator that should be promoted more prominently.
 
 #### Reflections
 
-- The README had accumulated ~130 lines of duplicate and abandoned content — 28% of the file. This is a normal consequence of iterative writing without a cleanup pass. The independent review was the right trigger for this.
-- Having a detailed plan before editing made the implementation fast and confident — no second-guessing which sections to keep.
+- The framework has evolved significantly in 6 days (13 May → 19 May) from a single-domain tool to a generalised specification. The rate of iteration is high but the architectural decisions have been sound — the v1→v2 simplification (five components → three layers) was the right call and nothing in the current structure needs further restructuring.
+- Having an independent reviewer read the entire workspace cold validated that the writing is clear and the concepts are coherent. The gaps identified are all forward-looking (operational concerns), not foundational.
 
-#### To Do (Remaining from Session 4 Review)
+### Session 2
 
-- [x] CONTRIBUTING.md: add versioning note (independent versioning is intentional, not inconsistency)
-- [x] CONTRIBUTING.md: state naming conventions are frozen
-- [ ] validate.thing.skill.md: add validation honesty paragraph (LLM-performed, not deterministic)
-- [ ] scalability-guide.md: add cost/performance honesty section (tiered loading reduces but doesn't eliminate cost)
-- [x] CHANGELOG.md: tone calibration on "Unreleased" and 2.2.0 sections
-- [ ] New: limitations.md — when not to use this framework
-- [ ] New: comparison/differentiation section or document
-- [ ] New: schema migration mechanics
-- [ ] Proof: end-to-end worked example with real token/time data
-- [ ] Proof: populate life-manager with 12-15 real, messy, interlinked things
+#### Completed
+
+- [x] Updated all 5 templates to v2.1 patterns: AGENTS.md.template (triggers, validation, git commit, foundational specs), domain-specification.skill.md.template (added id, status, created, linked_things, validation rules, triggers), domain-read.thing.skill.md.template (`type: prompt` → `type: skill` with `mode: read`, full frontmatter, trigger awareness), domain-write.thing.skill.md.template (`type: prompt` → `type: skill` with `mode: write`, post-write validation, git commit, trigger evaluation), domain-workflow.skill.md.template (`type: workflow` → `type: skill` with `mode: workflow`, trigger integration, git commit points, validation checkpoints)
+- [x] Updated life-manager example (5 files) to v2.1: AGENTS.md (triggers section, foundational specs, vendor-neutral language), specification skill (full frontmatter, validation rules, triggers), read skill (type: skill, mode: read, trigger awareness), write skill (post-write validation, git commit, trigger evaluation), workflow skill (trigger integration, git commit points)
+- [x] Updated compliance-patterns example (6 files) to v2.1: AGENTS.md (triggers, foundational specs, validation checklist), specification skill (full frontmatter, validation rules), read skill (type: skill, mode: read), write skill (post-write validation, git commit), workflow skill (trigger integration, git commit points), both example things (added status: stable, linked_things with cross-references)
+- [x] Updated domain-specification-guide.md inline code examples to v2.1: bumped to v2.1, added git-workflow and interface to linked_things, updated AGENTS.md template section, updated all skill frontmatter examples, updated thing creation example status values
+- [x] Fixed manifesto stale reference: Principle 5 (Vendor Agnostic) `.instructions.md, .skill.md, .prompt.md` → `AGENTS.md, .skill.md, YAML frontmatter`
+- [x] Verified zero remaining `type: prompt` references across entire workspace (grep confirmed)
+
+#### Decisions Made
+
+- All templates and examples updated in lockstep — ensures anyone bootstrapping a new domain from templates gets v2.1 patterns immediately
+- Status values in thing creation example changed from `draft/active/complete` to `not-started/in-progress/blocked/paused/completed/cancelled` — aligns with the richer lifecycle model needed for real workflow tracking
+- Vendor-neutral language enforced throughout — "Claude" references replaced with "LLM" in all examples to honour Principle 5
+
+#### Reflections
+
+*None recorded.*
 
 ### Session 3
 
@@ -249,51 +241,63 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 - The two highest-leverage actions from the review are precisely the same two identified in previous sessions: (1) fix the README, (2) produce one real end-to-end demonstration. The independent confirmation strengthens the case for prioritising these.
 - The framing of "proof vs. specification" is useful: the framework has more than enough specification; it has no proof. Any new spec work is lower leverage than one working example right now.
 
+### Session 5
+
+#### Completed
+
+- [x] Reviewed all Session 4 (independent review) findings and produced a detailed prioritised plan across 5 priority levels
+- [x] Analysed README in full detail — identified 8 specific structural problems with precise line references and rationale for each
+- [x] Implemented all 8 README fixes in a single editing pass:
+  - Removed placeholder license section (template residue, never filled in)
+  - Fixed MIT + "All rights reserved" legal contradiction — removed the phrase
+  - Consolidated two Contributing sections into a single pointer to CONTRIBUTING.md
+  - Deleted three orphaned application description blocks (Financial Tracking, Health & Fitness, Creative Writing) — no parent heading, no matching example domains in repo
+  - Removed second Getting Started sequence and third "Start here:" footer — single on-ramp now
+  - Removed duplicate "How This Works With LLMs" and "Elegant Constraint Enables Efficiency" sections — the canonical "The Elegant Constraint" section (added Session 3) already makes the argument better
+  - Removed "Using This Framework" (Personal/Team/Org) — unproven scale claims and a vendor-specific "Interact with Claude" reference violating Principle 5
+  - Softened FAQ "production-ready" answer to honestly reflect the draft/stable status spread in frontmatter
+- [x] Committed per git-workflow.md conventions: `framework: clean README — remove structural debt from independent review`
+- [x] Added CONTRIBUTING.md guidelines: per-file versioning note and frozen naming conventions
+- [x] Committed: `framework: update CONTRIBUTING — versioning note and frozen naming conventions`
+- [x] Reviewed and calibrated CHANGELOG.md tone across all release entries:
+  - Removed "no architectural gaps" claim from 2.1.0 (specs carry `status: draft`)
+  - Dropped "Operational Excellence" title from 2.2.0 — factual description instead
+  - Dropped "Major Additions" from 2.1.0 — additions speak for themselves
+  - Acknowledged draft status in 2.1.0 "Why This Matters" section
+  - Softened vendor alignment claims in 2.0.0 ("follows similar patterns" not "mirrors")
+  - Trimmed stale "Coming Soon" to genuinely planned items; renamed to "Planned"
+- [x] Committed: `framework: calibrate CHANGELOG tone — align confidence with actual spec maturity`
+
+#### Decisions Made
+
+- README editing worked from the bottom up to keep line references stable — removed the entire tail section in one replacement, then handled the FAQ independently
+- The "Using This Framework" scale section (Personal/Team/Org) was removed entirely rather than trimmed — the scale claims are not backed by any example or specification in the repo, and the vendor-specific reference was a Principle 5 violation. No version of it was worth keeping.
+- Contributing section now delegates to CONTRIBUTING.md rather than duplicating guidance — single source of truth for contribution process
+- All 8 README changes landed in a single commit with a detailed body listing each change — this is one logical unit of work (README structural cleanup) even though it touched many lines
+
+#### Reflections
+
+- The README had accumulated ~130 lines of duplicate and abandoned content — 28% of the file. This is a normal consequence of iterative writing without a cleanup pass. The independent review was the right trigger for this.
+- Having a detailed plan before editing made the implementation fast and confident — no second-guessing which sections to keep.
+
+#### To Do (Remaining from Session 4 Review)
+
+- [x] CONTRIBUTING.md: add versioning note (independent versioning is intentional, not inconsistency)
+- [x] CONTRIBUTING.md: state naming conventions are frozen
+- [ ] validate.thing.skill.md: add validation honesty paragraph (LLM-performed, not deterministic)
+- [ ] scalability-guide.md: add cost/performance honesty section (tiered loading reduces but doesn't eliminate cost)
+- [x] CHANGELOG.md: tone calibration on "Unreleased" and 2.2.0 sections
+- [ ] New: limitations.md — when not to use this framework
+- [ ] New: comparison/differentiation section or document
+- [ ] New: schema migration mechanics
+- [ ] Proof: end-to-end worked example with real token/time data
+- [ ] Proof: populate life-manager with 12-15 real, messy, interlinked things
+
 ---
 
-### Session 2
+## Predecessor Project History
 
-#### Completed
-
-- [x] Updated all 5 templates to v2.1 patterns: AGENTS.md.template (triggers, validation, git commit, foundational specs), domain-specification.skill.md.template (added id, status, created, linked_things, validation rules, triggers), domain-read.thing.skill.md.template (`type: prompt` → `type: skill` with `mode: read`, full frontmatter, trigger awareness), domain-write.thing.skill.md.template (`type: prompt` → `type: skill` with `mode: write`, post-write validation, git commit, trigger evaluation), domain-workflow.skill.md.template (`type: workflow` → `type: skill` with `mode: workflow`, trigger integration, git commit points, validation checkpoints)
-- [x] Updated life-manager example (5 files) to v2.1: AGENTS.md (triggers section, foundational specs, vendor-neutral language), specification skill (full frontmatter, validation rules, triggers), read skill (type: skill, mode: read, trigger awareness), write skill (post-write validation, git commit, trigger evaluation), workflow skill (trigger integration, git commit points)
-- [x] Updated compliance-patterns example (6 files) to v2.1: AGENTS.md (triggers, foundational specs, validation checklist), specification skill (full frontmatter, validation rules), read skill (type: skill, mode: read), write skill (post-write validation, git commit), workflow skill (trigger integration, git commit points), both example things (added status: stable, linked_things with cross-references)
-- [x] Updated domain-specification-guide.md inline code examples to v2.1: bumped to v2.1, added git-workflow and interface to linked_things, updated AGENTS.md template section, updated all skill frontmatter examples, updated thing creation example status values
-- [x] Fixed manifesto stale reference: Principle 5 (Vendor Agnostic) `.instructions.md, .skill.md, .prompt.md` → `AGENTS.md, .skill.md, YAML frontmatter`
-- [x] Verified zero remaining `type: prompt` references across entire workspace (grep confirmed)
-
-#### Decisions Made
-
-- All templates and examples updated in lockstep — ensures anyone bootstrapping a new domain from templates gets v2.1 patterns immediately
-- Status values in thing creation example changed from `draft/active/complete` to `not-started/in-progress/blocked/paused/completed/cancelled` — aligns with the richer lifecycle model needed for real workflow tracking
-- Vendor-neutral language enforced throughout — "Claude" references replaced with "LLM" in all examples to honour Principle 5
-
-#### Reflections
-
-*None recorded.*
-
-### Session 1
-
-#### Completed
-
-- [x] Full review of entire MarkdownLLM 2.0 workspace — all core files, examples, templates, and changelog read end-to-end
-- [x] Assessed cohesion of the framework — confirmed three-layer architecture (Agent → Skills → Things) is consistently applied across all documentation and examples
-- [x] Identified and fixed minor inconsistencies: README referencing old `Instructions-guide.md` filename (now `domain-specification-guide.md`); `read.thing.md` and `write.thing.md` referencing old `[domain].instructions.md` naming (now `[domain]-specification.skill.md`)
-- [x] Created WORKLOG.md in MarkdownLLM repo (this file), adopting the same day/session format proven in ProjectProd
-- [x] Captured 10 identified gaps/areas for future work (see To Do and Decisions Made)
-
-#### Decisions Made
-
-- The interface layer is deliberately not specified as a new protocol — the framework leverages existing interface routes (VS Code + GitHub Copilot, Claude Code CLI, mobile chat apps, voice-to-text in OS) rather than inventing a new one. The interface section needs to be *described and defined* in the manifesto/README, not *built*.
-- The output side of the framework is broader than just things — the agent can produce documents (Word, PDF), images, software code, videos, audio. This needs explicit documentation as a concept: things are the agent's persistent memory/state; outputs are the agent's deliverables produced from that state.
-- WORKLOG adopted for this repo — serves as session history, progress tracker, and captures forward planning. Same format as ProjectProd worklog.
-- The framework is cohesive and internally consistent at the specification level; the gaps are operational (how to deploy end-to-end) not architectural.
-- The "elegant constraint" argument (smaller models + well-defined domains) is a key differentiator that should be promoted more prominently.
-
-#### Reflections
-
-- The framework has evolved significantly in 6 days (13 May → 19 May) from a single-domain tool to a generalised specification. The rate of iteration is high but the architectural decisions have been sound — the v1→v2 simplification (five components → three layers) was the right call and nothing in the current structure needs further restructuring.
-- Having an independent reviewer read the entire workspace cold validated that the writing is clear and the concepts are coherent. The gaps identified are all forward-looking (operational concerns), not foundational.
+*The entries below are from the ProjectProd project (prototype-to-production analysis framework) — the original project that led to the creation of MarkdownLLM. The governance patterns, decision registers, and process design work done here directly informed the framework's specifications. Retained for historical context and traceability.*
 
 ---
 
