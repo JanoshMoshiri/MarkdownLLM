@@ -18,7 +18,7 @@ These systems work across vendor boundaries—use Claude, Codex, Gemini, or any 
 MarkdownLLM is built on a simple, elegant model:
 
 ```
-AGENT.md (Orchestration & Discovery)
+AGENTS.md (Orchestration & Discovery)
       ↓ auto-loads at startup
 SKILLS/ (Reusable Capabilities)
       ↓ specifications, prompts, workflows as .skill.md files
@@ -268,9 +268,10 @@ Using **domain-specification-guide.md** as your guide, tell your LLM agent what 
 1. **Create AGENTS.md** — Your orchestration entry point with `framework_root` set correctly
 2. **Create skills/** — All four skill types tailored to your domain
 3. **Create initial things/** — Seed examples of your atomic units
-4. **Configure tooling** — Set up your LLM tool (see Vendor Tooling Integration below)
 
 The agent is the thing that creates the domain for you. Describe your vision; let it build the structure.
+
+> **Note:** You may need to configure your LLM tool first — see Vendor Tooling Integration below.
 
 ### Step 6: Interact and Iterate
 
@@ -388,7 +389,7 @@ If it supports markdown and YAML, yes. MarkdownLLM is vendor-agnostic. It works 
 - Google Gemini CLI ✓
 - Cursor ✓
 - Windsurf ✓
-- Any LLM that can read files ✓
+- Any LLM tool with file system access (read, write, navigate) ✓
 
 ### "How do I version and update skills?"
 

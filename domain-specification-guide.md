@@ -74,7 +74,7 @@ Things follow the structure defined in `thing.md`. Your domain instantiates this
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ AGENT.md (Root)                                              │
+│ AGENTS.md (Root)                                             │
 │ ├─ Discovered automatically by tool/harness                  │
 │ ├─ Orchestrates skills loading                               │
 │ ├─ Defines behavioral rules                                  │
@@ -566,7 +566,20 @@ These tools auto-discover `AGENTS.md` at the root—no configuration needed.
 
 ## Getting Started: Step-by-Step
 
-### Step 1: Plan Your Domain
+### Step 1: Set Up the Deployment Model
+
+Clone the MarkdownLLM framework repository and create your domain inside `domains/`:
+
+```bash
+git clone https://github.com/[org]/MarkdownLLM.git
+cd MarkdownLLM
+mkdir domains/my-domain && cd domains/my-domain
+git init
+```
+
+The framework's `.gitignore` already excludes `domains/`, so your domain has its own independent git history. See the Deployment Model section above for details.
+
+### Step 2: Plan Your Domain
 
 Answer these questions:
 - What problem does this domain solve?
@@ -574,38 +587,33 @@ Answer these questions:
 - What workflows or processes orchestrate them?
 - What skills will the LLM need to reason effectively?
 
-### Step 2: Create Your AGENTS.md
+### Step 3: Let the Agent Build It
 
-Write `AGENTS.md` at the root of your domain repository. This is your entry point—the file that auto-loads every session.
+Open your domain folder in your LLM tool (GitHub Copilot, Claude Code, Codex CLI, etc.) and describe what you want. The agent should create:
 
-### Step 3: Create Your Skills
-
-In `skills/` directory, create:
-- `[domain]-specification.skill.md`
-- `[domain]-read.thing.skill.md`
-- `[domain]-write.thing.skill.md`
-- `[domain]-workflow.skill.md`
+- `AGENTS.md` at root — with `framework_root: ../..` pointing to the framework
+- `skills/` directory with the four baseline skills:
+  - `[domain]-specification.skill.md`
+  - `[domain]-read.thing.skill.md`
+  - `[domain]-write.thing.skill.md`
+  - `[domain]-workflow.skill.md`
+- `things/` directory with initial examples
 
 > `thing.md` is a framework foundational spec — your domain discovers it automatically via `framework_root`. Do not copy it into your domain.
 
-### Step 4: Understand Your Atomic Unit
+### Step 4: Test Your Domain
 
-Read `thing.md`—this is your specification for how things work. Instantiate it for your domain's thing types.
+Start a new session in your domain workspace. The LLM should:
+- Auto-discover AGENTS.md at root
+- Load your skills and understand the domain
+- Follow the workflow when you make requests
+- Reason according to your principles
 
-### Step 5: Create Your First Things
+If the agent doesn't behave as expected, refine your skills — they're the guidance that shapes reasoning.
 
-Create a few example things in `things/` following `thing.md` patterns and your domain-specific schema.
+### Step 5: Iterate
 
-### Step 6: Test with Your LLM
-
-Feed your AGENTS.md + skills + things to your LLM and test:
-- Does the agent understand the domain?
-- Does it follow the workflow?
-- Does it reason according to your principles?
-
-### Step 7: Iterate
-
-Update skills and define new thing types as you learn what works. Commit everything to git.
+Update skills and define new thing types as you learn what works. Commit everything to git — it's your audit trail and the mechanism that makes state persistent.
 
 ---
 
@@ -674,16 +682,19 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 
 ## Getting Started: Complete Checklist
 
+- [ ] **Prerequisites** — Confirm you have an LLM tool with file system access (Copilot, Claude Code, Codex CLI, etc.)
 - [ ] **Understand** — Read `llm-driven-systems.manifesto.md` and `thing.md`
 - [ ] **Plan** — Answer: What problem? What atomic units? What workflows?
-- [ ] **Create AGENTS.md** — Your orchestration entry point at root
-- [ ] **Create skills/** — Specification, read/write thing skills, workflow
-- [ ] **Understand thing.md** — The atomic unit specification (including triggers)
+- [ ] **Clone framework** — Clone the MarkdownLLM repository
+- [ ] **Create domain folder** — Create your domain inside `domains/` and initialise a git repo
+- [ ] **Create AGENTS.md** — Your orchestration entry point at root, with `framework_root: ../..`
+- [ ] **Create skills/** — Specification, read/write thing skills, workflow (let the agent build these)
+- [ ] **Understand thing.md** — The atomic unit specification (including triggers) — do NOT copy it into your domain
 - [ ] **Create examples** — A few things in `things/` to demonstrate your schema
 - [ ] **Add validation rules** — Domain-specific required fields and valid types in your specification skill (validated by `validate.thing.md`)
 - [ ] **Define commit conventions** — Follow `git-workflow.md` patterns for structured commit messages
 - [ ] **Enable tooling** — Configure GitHub Copilot or Claude Code if needed
-- [ ] **Test** — Feed agent + skills + things to your LLM and validate
+- [ ] **Test** — Start a new session; verify the agent auto-discovers AGENTS.md and follows your domain
 - [ ] **Iterate** — Refine skills as you learn what works
 - [ ] **Commit** — Version control everything in git with meaningful messages
 
