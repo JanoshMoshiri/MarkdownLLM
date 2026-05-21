@@ -14,4 +14,4 @@ foundational_specs:
   - scalability-guide.md
   - domain-specification-guide.md
 domains:
-  - domains/ProducFlow2
+  - domains/
