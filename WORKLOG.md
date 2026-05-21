@@ -51,6 +51,8 @@ This file is a running record of work done, decisions made, and work remaining. 
 - [x] Fixed CONTRIBUTING: added `orchestration.md`, `framework-discovery.md`, and `domain-refresh.md` to framework structure listing
 - [x] Adopted new CHANGELOG format: per-push entries with concise summaries, version numbers retained, WORKLOG handles detail
 - [x] Migrated `[Unreleased]` domain-refresh content into `[2.2.1]`; created `[2.3.0]` for this push
+- [x] Renamed `validate.thing.skill.md` → `validate.thing.md`: reclassified as `type: specification` with proper frontmatter (`id: validate-thing-specification`, `status: stable`, `created: 2026-05-19`). Updated all 18 files referencing the old name/ID.
+- [x] Promoted all 6 framework specs from `status: draft` to `status: stable` — rationale: once pushed to remote, it’s not a draft
 
 #### Decisions Made
 

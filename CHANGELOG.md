@@ -21,6 +21,8 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 - Made orchestration opt-in: demoted from framework-level to domain-level pattern after real-world testing showed it made LLM reasoning rigid
 - Moved prompt files from `prompts/` to `templates/prompts/` (templates, not mandates)
 - Updated orchestration.md (v1.0 → v1.1): added "When To Use / When Not To Use" guidance
+- Renamed `validate.thing.skill.md` → `validate.thing.md`, reclassified as `type: specification` (matches read.thing.md / write.thing.md pattern)
+- Promoted all framework specs from `status: draft` to `status: stable` — pushed to remote = not draft
 - Fixed consistency gaps: README now lists all 12 framework specs, CONTRIBUTING lists newer specs, WORKLOG frontmatter updated
 - Fixed README stale status values (`draft/active/complete` → canonical thing.md values)
 - Fixed README "Templates (Future Organization)" → reflects current state
