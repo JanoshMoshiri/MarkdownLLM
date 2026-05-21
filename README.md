@@ -64,7 +64,7 @@ Skills are completely vendor-agnostic—they use standard markdown + YAML. This 
 ---
 id: unique-identifier
 type: domain-specific-type
-status: draft/active/complete
+status: not-started/in-progress/blocked/paused/completed/cancelled
 created: ISO-datetime
 linked_things:
   - id: related-id
@@ -120,6 +120,18 @@ These files define the pattern; they apply to any domain:
 
 - **scalability-guide.md** — Strategies for handling complex systems as they grow.
 
+- **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode.
+
+- **interface.md** — The I/O layer: input routes, output types, things vs deliverables.
+
+- **validate.thing.skill.md** — Universal validation skill: structural, referential, semantic checks.
+
+- **framework-discovery.md** — How domain agents locate the framework root and foundational specs.
+
+- **domain-refresh.md** — How domain agents discover framework evolution and update themselves.
+
+- **orchestration.md** — Opt-in pattern for domains that need structured hook points, prompts, and bindings.
+
 ### Example Domains
 
 Example instantiations showing how to apply the framework:
@@ -132,14 +144,15 @@ Each example has:
 - Thing files demonstrating the domain's atomic units
 - Comments showing how the pieces fit together
 
-### Templates (Future Organization)
+### Templates
 
-As you create your own domains, you'll use templates:
+Starting-point templates for bootstrapping new domains:
 - `templates/AGENTS.md.template` — Starting point for orchestration
 - `templates/[domain]-specification.skill.md.template` — Starting point for philosophy/principles
 - `templates/[domain]-read.thing.skill.md.template` — Starting point for read guidance
 - `templates/[domain]-write.thing.skill.md.template` — Starting point for write guidance
 - `templates/[domain]-workflow.skill.md.template` — Starting point for process patterns
+- `templates/prompts/` — Prompt templates for domains that opt into orchestration (6 reasoning templates)
 
 ---
 

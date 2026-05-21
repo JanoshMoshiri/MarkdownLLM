@@ -25,6 +25,10 @@ linked_things:
     relation: documents
   - id: domain-specification-guide
     relation: documents
+  - id: orchestration-specification
+    relation: documents
+  - id: domain-refresh-specification
+    relation: documents
 ---
 
 # Framework Work Log
@@ -34,6 +38,23 @@ This file is a running record of work done, decisions made, and work remaining. 
 ---
 
 ## 21 May 2026
+
+### Session 2
+
+#### Completed
+
+- [x] Full framework review — checked all specs, README, CONTRIBUTING, WORKLOG, CHANGELOG for consistency against recent changes
+- [x] Fixed README: stale status values in thing example (`draft/active/complete` → canonical set from thing.md)
+- [x] Fixed README: Foundation Files section now lists all 12 framework specs (was only listing the original 5)
+- [x] Fixed README: Templates heading updated from "Future Organization" to reflect current state (templates exist, prompts included)
+- [x] Fixed WORKLOG: added `orchestration-specification` and `domain-refresh-specification` to frontmatter `linked_things`
+- [x] Fixed CONTRIBUTING: added `orchestration.md`, `framework-discovery.md`, and `domain-refresh.md` to framework structure listing
+
+#### Decisions Made
+
+- Pre-push review identified 7 items; 5 fixed immediately (README, CONTRIBUTING, WORKLOG). Changelog to be handled separately with a revised approach.
+
+---
 
 ### Session 1
 

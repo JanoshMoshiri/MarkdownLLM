@@ -53,6 +53,9 @@ The framework is self-describing — its own specifications are things within th
 - `git-workflow.md` — Git as state machine (commit points, conventions, event stream)
 - `read.thing.md` — How LLMs read and reason about things
 - `write.thing.md` — How LLMs create and manage things
+- `orchestration.md` — Opt-in pattern: hook points, prompts, and bindings for structured workflows
+- `framework-discovery.md` — How domain agents locate the framework root
+- `domain-refresh.md` — How domain agents discover and absorb framework evolution
 
 **Skills (type: skill):**
 - `validate.thing.skill.md` — Thing validation (structural, referential, semantic)
