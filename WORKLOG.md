@@ -39,6 +39,22 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ## 21 May 2026
 
+### Session 3
+
+#### Completed
+
+- [x] Conducted full holistic framework review — read all 12 specs, manifesto, examples, templates, ProducFlow2 domain, WORKLOG, and CHANGELOG end-to-end
+- [x] Created REVIEWLOG.md — new framework artifact for tracking periodic reviews of framework state, cohesion, and direction. Format mirrors WORKLOG: daily blocks → timestamped review blocks → subsections (works well, tensions, over-engineered, under-engineered, missing from todos, reflections)
+- [x] Populated first review entry (21 May 2026, 14:30) with detailed assessment across all subsections
+
+#### Decisions Made
+
+- REVIEWLOG complements the WORKLOG: WORKLOG tracks what was done; REVIEWLOG tracks how well what exists is working. Separate files because they serve different purposes and different reading patterns.
+- Review format uses numbered points with bold titles + 1–2 sentence explanations — detailed enough to extract actionable items, concise enough to scan without being overwhelming.
+- Reflections section left blank at review time by convention — filled in later with hindsight, maintaining the same pattern as WORKLOG reflections.
+
+---
+
 ### Session 2
 
 #### Completed
