@@ -22,8 +22,7 @@ AGENT.md (Orchestration & Discovery)
       ↓ auto-loads at startup
 SKILLS/ (Reusable Capabilities)
       ↓ specifications, prompts, workflows as .skill.md files
-THING.md (Foundational Specification)
-      ↓ atomic unit definition
+      ↓ foundational specs discovered via framework_root
 THINGS/ (Data Instances)
       → instances following thing.md structure
 ```
@@ -52,7 +51,8 @@ This solves the "lost context on new session" problem: the agent is always the e
 - **Read Thing Skill** (`[domain]-read.thing.skill.md`) — How to analyze things without modification
 - **Write Thing Skill** (`[domain]-write.thing.skill.md`) — How to create and update things
 - **Workflow Skill** (`[domain]-workflow.skill.md`) — Process orchestration and execution flow
-- **Foundational Specification** (`thing.md`) — Specification for atomic units (works across all domains, not a skill file)
+
+> **Note:** The foundational specification `thing.md` is not part of your domain's skills directory. It lives in the framework root and is discovered automatically via `framework_root` (see [framework-discovery.md](framework-discovery.md)).
 
 Skills are completely vendor-agnostic—they use standard markdown + YAML. This means they work across GitHub Copilot, Claude Code, OpenAI Codex, Cursor, Windsurf, and Gemini CLI.
 
@@ -156,6 +156,32 @@ Starting-point templates for bootstrapping new domains:
 
 ---
 
+## Prerequisites: What You Need
+
+MarkdownLLM requires an **LLM interface that can traverse file directories, read and write files, and (optionally) search the internet**. This is not a library you import or a CLI you install — it's a structural framework that lives in your file system, and the LLM must be able to interact with that file system directly.
+
+**Tools that work today:**
+
+| Tool | File Access | Write Files | Discovery | Status |
+|------|------------|-------------|-----------|--------|
+| GitHub Copilot (VS Code) | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
+| Claude Code | ✓ | ✓ | CLAUDE.md → AGENTS.md | Fully supported |
+| OpenAI Codex CLI | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
+| Cursor | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
+| Windsurf | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
+| Gemini CLI | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
+
+**What does NOT work:**
+
+- ChatGPT web interface (no file system access)
+- Claude web interface (no persistent file access)
+- Any LLM API without a file-access harness
+- Simple prompt-based interactions without tool use
+
+The key requirement is that the LLM must be able to: (1) discover and read AGENTS.md automatically, (2) navigate directory structures, (3) read markdown files, and (4) create and modify files. If your tool can do all four, it will work with MarkdownLLM.
+
+---
+
 ## How To Use This Framework
 
 ### Step 1: Understand the Foundation
@@ -174,43 +200,85 @@ Explore `examples/life-manager/` or `examples/compliance-patterns/`:
 
 ### Step 3: Create Your Domain Repository
 
-For your own domain, create a new repository (or directory) with:
+Each domain is an **agent app** — a self-contained, LLM-driven application. The LLM agent itself is your primary interface for creating and working within a domain. You describe what you want; the agent builds the structure.
+
+> **Important:** You don't copy `thing.md` into your domain. That's a foundational framework specification — your domain discovers it automatically via the `framework_root` mechanism (see [framework-discovery.md](framework-discovery.md)).
+
+Your domain repository needs this structure:
 
 ```
-my-domain-repo/
-├── AGENTS.md              ← Discovered at startup
-├── thing.md               ← Foundational spec (from MarkdownLLM)
-├── skills/                ← Reusable capabilities
-│   ├── [domain]-specification.skill.md
-│   ├── [domain]-read.thing.skill.md
-│   ├── [domain]-write.thing.skill.md
-│   └── [domain]-workflow.skill.md
-├── things/                ← Data instances
-│   ├── thing-1.md
-│   ├── thing-2.md
+my-domain/
+├── AGENTS.md                              ← Discovered at startup (orchestration)
+├── skills/                                ← Reusable capabilities
+│   ├── [domain]-specification.skill.md    ← Philosophy, principles, reasoning patterns
+│   ├── [domain]-read.thing.skill.md       ← How to read and analyze things
+│   ├── [domain]-write.thing.skill.md      ← How to create and update things
+│   └── [domain]-workflow.skill.md         ← Process orchestration and flow
+├── things/                                ← Data instances
+│   ├── run-1/                             ← Subfolder per workflow run or flow
+│   │   ├── thing-1.md
+│   │   └── thing-2.md
+│   ├── run-2/
+│   │   └── thing-3.md
 │   └── ...
-└── docs/
-    └── Extended documentation (optional)
+└── docs/                                  ← Extended documentation (optional)
 ```
 
-### Step 4: Define Your Domain
+**Minimum skills required:** The four skill files above are the baseline. A simple domain may have a single workflow skill describing one input → process → output flow. Complex domains may have multiple workflow skills or specialised skills for different concerns.
 
-Using **domain-specification-guide.md** as your template:
+**Things subfolders:** In practice, each time you run through a workflow (e.g., analysing a product, processing a batch, running an assessment), the things generated will be organised into subfolders within `things/`. This keeps runs separate and traceable.
 
-1. **Create AGENTS.md** — Orchestration entry point
-2. **Create skills/** — All four skill types for your domain
-3. **Create things/** — Examples of your atomic units
-4. **Enable tooling** — Configure your LLM tool (GitHub Copilot, Claude Code, etc.)
+### Step 4: Set Up the Deployment Model (Nested Repository)
 
-### Step 5: Interact With Your LLM
+The recommended way to work with the framework is the **nested repository model**:
 
-Feed your AGENTS.md + relevant skills + relevant things to your LLM. The LLM:
-- Reads the agent for orchestration
+1. **Clone the MarkdownLLM framework repository**
+2. The framework's `.gitignore` already ignores the `domains/` folder
+3. **Create your domain inside `domains/`** — this is where your domain repository lives
+4. **Initialise a separate git repo** inside your domain folder (e.g., `domains/my-domain/`)
+
+```
+MarkdownLLM/                        ← Framework git repo (cloned)
+├── .gitignore                       ← Contains: domains/
+├── thing.md                         ← Foundational specs (shared)
+├── git-workflow.md
+├── validate.thing.md
+├── ...other framework specs...
+└── domains/
+    └── my-domain/                   ← Your domain git repo (independent)
+        ├── .git/                    ← Your own git history
+        ├── AGENTS.md               ← framework_root: ../..
+        ├── skills/
+        ├── things/
+        └── docs/
+```
+
+**Why this works:**
+- The framework `.gitignore` ensures your domain files never appear in framework commits — clean separation
+- Your domain has its own `.git`, so it versions independently with its own branches, tags, and remotes
+- The `framework_root: ../..` field in your AGENTS.md lets the domain agent discover and load foundational specs (thing.md, validate.thing.md, etc.) from the framework above
+- You can have multiple domains in `domains/`, each with their own git repo, all sharing the same framework
+
+See [domain-refresh.md](domain-refresh.md) for the full deployment architecture specification.
+
+### Step 5: Let the Agent Build Your Domain
+
+Using **domain-specification-guide.md** as your guide, tell your LLM agent what domain you want to create. The agent should:
+
+1. **Create AGENTS.md** — Your orchestration entry point with `framework_root` set correctly
+2. **Create skills/** — All four skill types tailored to your domain
+3. **Create initial things/** — Seed examples of your atomic units
+4. **Configure tooling** — Set up your LLM tool (see Vendor Tooling Integration below)
+
+The agent is the thing that creates the domain for you. Describe your vision; let it build the structure.
+
+### Step 6: Interact and Iterate
+
+Once your domain exists, every session starts the same way:
+- The LLM discovers AGENTS.md at root
 - Loads skills for guidance
 - Reads things for context
 - Executes with consistency
-
-### Step 6: Iterate and Grow
 
 As you work:
 - Update skills when you learn what works better

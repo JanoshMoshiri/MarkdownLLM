@@ -25,6 +25,16 @@ linked_things:
 
 This guide explains how to create a complete domain specification using the MarkdownLLM framework. The framework uses a **three-layer architecture**: Agent (orchestration) → Skills (reusable capabilities) → Things (data instances).
 
+## Prerequisites
+
+Creating a domain requires an **LLM tool that can traverse file directories, read and write files**, and discover agent files automatically. Each domain is an **agent app** — a self-contained, LLM-driven application — and **the LLM agent is your primary tool for creating it**.
+
+**Compatible tools:** GitHub Copilot (VS Code), Claude Code, OpenAI Codex CLI, Cursor, Windsurf, Gemini CLI — any tool where the LLM has direct file system access and auto-discovers AGENTS.md at the workspace root.
+
+**Not compatible:** Web-based chat interfaces (ChatGPT, Claude web) or raw API calls without a file-access harness. The LLM must be able to navigate directories, read markdown files, and create/modify files.
+
+> **The agent creates the domain for you.** You describe what you want — the problem domain, the types of things you'll work with, the workflows — and the LLM agent builds the structure: AGENTS.md, skills, initial things. You iterate from there.
+
 ## The Three-Layer Architecture
 
 ### Layer 1: Agent (Orchestration & Discovery)
@@ -46,7 +56,8 @@ The **agent file** (`AGENTS.md` or `agent.md`) sits at the root of your domain a
 - **Read Thing Skill** (`[domain]-read.thing.skill.md`) — How to read and analyze things
 - **Write Thing Skill** (`[domain]-write.thing.skill.md`) — How to create and update things
 - **Workflow Skill** (`[domain]-workflow.skill.md`) — Process orchestration and execution patterns
-- **Definition Skill** (`thing.md`) — Specification for atomic units (shared across all domains)
+
+> **Note:** The foundational specification `thing.md` lives in the framework root, not in your domain. Your domain discovers it automatically via the `framework_root` mechanism (see framework-discovery.md).
 
 Skills are agnostic to the tool or LLM—they use standard markdown + YAML, making them portable across Copilot, Claude, Codex, Gemini, etc.
 
@@ -75,8 +86,9 @@ Things follow the structure defined in `thing.md`. Your domain instantiates this
 │ ├─ [domain]-specification.skill.md (Philosophy & Principles)  │
 │ ├─ [domain]-read.thing.skill.md (Read Guidance)             │
 │ ├─ [domain]-write.thing.skill.md (Write Guidance)           │
-│ ├─ [domain]-workflow.skill.md (Process Patterns)             │
-│ └─ thing.md (Atomic Unit Specification)                │
+│ └─ [domain]-workflow.skill.md (Process Patterns)             │
+│     ↑ Foundational specs (thing.md, etc.) resolved via       │
+│       framework_root — not copied into your domain           │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -131,20 +143,77 @@ See **framework-discovery.md** for the full specification.
 Every domain requires these essential components in this structure:
 
 ```
-my-domain-repo/              ← Root of deployed domain
-├── AGENTS.md                 ← Discovered at startup (orchestration)
+my-domain/                        ← Root of your domain (its own git repo)
+├── AGENTS.md                     ← Discovered at startup (orchestration)
 ├── skills/
-│   ├── [domain]-specification.skill.md
-│   ├── [domain]-read.thing.skill.md
-│   ├── [domain]-write.thing.skill.md
-│   └── [domain]-workflow.skill.md (reference to MarkdownLLM spec)
+│   ├── [domain]-specification.skill.md   ← Philosophy, principles, reasoning
+│   ├── [domain]-read.thing.skill.md      ← How to read and analyze things
+│   ├── [domain]-write.thing.skill.md     ← How to create and update things
+│   └── [domain]-workflow.skill.md        ← Process orchestration and flow
 ├── things/
-│   ├── thing-1.md
-│   ├── thing-2.md
+│   ├── run-1/                    ← Subfolder per workflow run or flow
+│   │   ├── thing-1.md
+│   │   └── thing-2.md
+│   ├── run-2/
+│   │   └── thing-3.md
 │   └── ...
 └── docs/ (optional)
     └── Extended documentation
 ```
+
+> **You do NOT need `thing.md` in your domain.** It's a foundational framework specification discovered via `framework_root` — see Framework Discovery above.
+
+**Things subfolders:** In practice, each time you execute a workflow (e.g., analysing a product, processing a batch, running an assessment), the things generated are organised into subfolders within `things/`. This keeps runs separate, traceable, and avoids a flat directory of hundreds of files.
+
+---
+
+## Deployment Model: The Nested Repository Pattern
+
+The recommended way to work with the framework uses a **nested repository architecture** where your domain lives inside the framework's `domains/` folder but maintains its own independent git history.
+
+### How It Works
+
+```
+MarkdownLLM/                        ← Framework git repo (cloned from GitHub)
+├── .gitignore                       ← Contains: domains/
+├── thing.md                         ← Foundational specs (shared, read-only)
+├── git-workflow.md
+├── validate.thing.md
+├── interface.md
+├── ...other framework specs...
+├── templates/                       ← Starting-point templates
+├── examples/                        ← Reference implementations
+└── domains/
+    └── my-domain/                   ← Your domain git repo (independent)
+        ├── .git/                    ← Your own git history
+        ├── AGENTS.md               ← framework_root: ../..
+        ├── skills/
+        ├── things/
+        └── docs/
+```
+
+### Setup Steps
+
+1. **Clone the framework:** `git clone https://github.com/[org]/MarkdownLLM.git`
+2. **Create your domain folder:** `mkdir domains/my-domain && cd domains/my-domain`
+3. **Initialise a git repo:** `git init`
+4. **Tell the agent to create your domain** — describe what you want and let it build the structure
+
+### Why This Model
+
+| Property | Mechanism | Purpose |
+|----------|-----------|---------|
+| **Isolation** | Framework `.gitignore` excludes `domains/` | Your domain files never appear in framework commits |
+| **Independence** | Each domain has its own `.git` | Domains version independently with their own branches, tags, remotes |
+| **Shared foundation** | `framework_root: ../..` in domain AGENTS.md | Domain agent discovers framework specs via relative path |
+| **Read-only relationship** | Domains read framework specs; never write to them | Framework evolves independently |
+| **Multiple domains** | Many domains can live under `domains/` | All share one framework installation |
+
+### The `.gitignore` Contract
+
+The framework's `.gitignore` **must** contain `domains/`. Without this, your domain files would appear as untracked files in the framework repo, breaking the isolation model. This is already configured in the framework repository.
+
+See [domain-refresh.md](domain-refresh.md) for the full deployment architecture and refresh process.
 
 ---
 
@@ -516,7 +585,8 @@ In `skills/` directory, create:
 - `[domain]-read.thing.skill.md`
 - `[domain]-write.thing.skill.md`
 - `[domain]-workflow.skill.md`
-- Copy or reference `thing.md` from MarkdownLLM
+
+> `thing.md` is a framework foundational spec — your domain discovers it automatically via `framework_root`. Do not copy it into your domain.
 
 ### Step 4: Understand Your Atomic Unit
 

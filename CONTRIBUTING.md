@@ -9,10 +9,11 @@ Thank you for your interest in this framework!
 If you've built a domain using the framework (AGENTS.md, skills, example things), consider contributing it as an example:
 
 1. Create a folder for your domain (e.g., `examples/project-management/`)
-2. Include your AGENTS.md, skills/ directory (specification, read, write, workflow .skill.md files), and things/ directory with examples
-3. Ensure all files have YAML frontmatter following `thing.md` patterns
-4. Include examples of real thing instances demonstrating your domain's types
-5. Submit a pull request
+2. Include your AGENTS.md and skills/ directory (specification, read, write, workflow .skill.md files)
+3. Include a things/ directory with example instances demonstrating your domain's types
+4. Ensure all files have YAML frontmatter following `thing.md` patterns
+5. Do NOT include `thing.md` in your domain — it's a foundational framework spec, not domain-specific
+6. Submit a pull request
 
 ### Improve Framework Specifications
 
@@ -100,12 +101,21 @@ The framework is self-describing — its own specifications are things within th
 
 ## Getting Started
 
-1. Read the manifesto to understand the philosophy
-2. Read `thing.md` to understand the atomic unit
-3. Read `domain-specification-guide.md` to understand how domains are created
-4. Look at `examples/life-manager/` or `examples/compliance-patterns/`
-5. Try building something in your own domain
-6. Share what you learn
+### Prerequisites
+
+You need an **LLM tool with file system access** — one that can traverse directories, read and write files, and auto-discover AGENTS.md. Compatible tools include GitHub Copilot (VS Code), Claude Code, OpenAI Codex CLI, Cursor, Windsurf, and Gemini CLI. Web-based chat interfaces (ChatGPT, Claude web) will not work — the LLM must have direct access to your file system.
+
+### Setting Up Your Own Domain
+
+1. **Clone the framework** — `git clone` this repository
+2. **Read the manifesto** — `llm-driven-systems.manifesto.md` explains the philosophy
+3. **Read `domain-specification-guide.md`** — the step-by-step guide for creating domains
+4. **Create your domain** inside `domains/` — the framework `.gitignore` already ignores this folder
+5. **Initialise a git repo** in your domain folder — each domain is its own independent repository
+6. **Tell your LLM agent to build it** — describe your domain; the agent creates AGENTS.md, skills, and initial things for you
+7. **Explore examples** — look at `examples/life-manager/` or `examples/compliance-patterns/` for reference
+8. **Iterate** — refine skills and thing types as you learn what works
+9. **Share what you learn** — contribute examples, improvements, or insights back to the framework
 
 ## Questions?
 
