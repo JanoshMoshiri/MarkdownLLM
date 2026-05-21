@@ -2,7 +2,7 @@
 id: validate-thing-specification
 name: Validate Thing
 type: specification
-status: draft
+status: stable
 version: 1.1
 created: 2026-05-19
 description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, and orchestration graph integrity

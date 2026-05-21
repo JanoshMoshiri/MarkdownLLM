@@ -46,12 +46,12 @@ The framework defines itself through these interconnected specifications:
 ### Operational
 - **read.thing.md** — How LLMs read and reason about things without modification. (`type: specification`, `status: stable`)
 - **write.thing.md** — How LLMs create, update, and manage things. (`type: specification`, `status: stable`)
-- **validate.thing.md** — How to validate thing integrity (structural, referential, semantic). (`type: specification`, `status: draft`)
-- **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: draft`)
-- **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: draft`)
-- **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: draft`)
-- **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: draft`)
-- **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: draft`)
+- **validate.thing.md** — How to validate thing integrity (structural, referential, semantic). (`type: specification`, `status: stable`)
+- **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: stable`)
+- **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: stable`)
+- **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: stable`)
+- **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
+- **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: stable`)
 
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)

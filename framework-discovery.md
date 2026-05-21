@@ -1,7 +1,7 @@
 ---
 id: framework-discovery-specification
 type: specification
-status: draft
+status: stable
 version: 1.0
 created: 2026-05-19
 linked_things:

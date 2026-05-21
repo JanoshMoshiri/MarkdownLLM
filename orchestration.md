@@ -1,7 +1,7 @@
 ---
 id: orchestration-specification
 type: specification
-status: draft
+status: stable
 version: 1.1
 created: 2026-05-20
 linked_things:
