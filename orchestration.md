@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -21,24 +21,35 @@ linked_things:
 
 ## What This Specifies
 
-This document defines the orchestration layer of the LLM-driven systems framework — how reasoning is triggered, what reasoning happens when it's triggered, and how the two are bound together.
+This document defines the orchestration pattern — an **opt-in** tool for domains that need structured reasoning flow beyond what the framework's narrative specs naturally provide.
 
-The framework already has the building blocks:
-
-- **Triggers** (in `thing.md`) define conditions on individual things
-- **Skills** define comprehensive instruction sets for major operations
-- **Workflows** (in domain skill files) define phase-by-phase sequences
-- **Git commit points** (in `git-workflow.md`) define when state becomes real
-
-What's missing is the connective tissue. This document introduces three primitives that make orchestration explicit, portable, and composable:
+Orchestration introduces three primitives:
 
 1. **Hook points** — Named moments in the lifecycle where reasoning can be attached
 2. **Prompts** — Reusable reasoning templates smaller than skills, more structured than trigger actions
 3. **Bindings** — Declarations that connect hook points to prompts
 
-Together, these turn implicit "the LLM should probably check X after Y happens" into explicit, declarative orchestration that any LLM can follow without guessing.
+## When To Use Orchestration
 
-## Why A Separate Specification
+Orchestration is **not mandatory**. The framework's narrative specs (write.thing.md, thing.md triggers, validate.thing.skill.md) already guide LLM reasoning effectively through prose. LLMs naturally calibrate effort from narrative instruction — they reason about whether something is relevant, how deep to go, and whether the context warrants it.
+
+**Use orchestration when:**
+- Your domain has strict phase-gated workflows (e.g., compliance, regulated environments)
+- Consistency matters more than flexibility (multi-person teams, audit requirements)
+- Specific high-consequence moments must never be skipped (pre-deployment checks, approval gates)
+- You need repeatable, documented reasoning that fires identically every time
+
+**Don't use orchestration when:**
+- Narrative prose in skills and specs is sufficient for the LLM to reason correctly
+- Your domain is exploratory or evolving quickly
+- Rigidity would slow down natural reasoning and iteration
+- The LLM already handles the reasoning well without explicit structure
+
+The difference: narrative prose is a *nudge* — the LLM decides how much attention to pay. A bound prompt is a *procedure* — the LLM executes it completely. Choose accordingly.
+
+## The Primitives
+
+### Why A Separate Specification
 
 Triggers in `thing.md` answer: "When should this *thing* get attention?"
 
@@ -188,7 +199,7 @@ A binding connects a hook point to one or more prompts. It's the declaration tha
 
 ### Binding Structure
 
-Bindings are declared in a domain's AGENTS.md or workflow skill, or in the framework root for framework-level bindings.
+Bindings are declared in a domain's AGENTS.md or workflow skill.
 
 ```yaml
 bindings:
@@ -236,16 +247,13 @@ bindings:
     invoke: [surface-attention]         # Third: decide what to tell the user
 ```
 
-### Framework vs Domain Bindings
+### Binding Scope
 
-Framework-level bindings (defined in the root AGENTS.md or this spec) provide baseline orchestration that every domain inherits. Domain-level bindings (defined in the domain's AGENTS.md or workflow skill) add domain-specific orchestration on top.
+Bindings are domain-level declarations. Each domain defines its own bindings based on what structured reasoning it needs. There are no framework-level bindings that domains inherit — orchestration is entirely opt-in.
 
-Domain bindings can:
-- **Add** new bindings to framework hook points
-- **Add** bindings to domain-specific hook points
-- **Override** framework bindings for a specific hook if the domain needs different behavior (declared explicitly with `override: true`)
-
-They cannot remove framework hook points — only extend them.
+A domain's bindings live in its workflow skill or AGENTS.md. They can attach to:
+- **Framework hook points** (session-start, post-write, pre-commit, etc.) — these moments exist in every domain
+- **Domain hook points** — custom moments defined by the domain's workflow
 
 ## Putting It Together
 
@@ -279,26 +287,26 @@ User: "I finished the data collection task"
     moved it from blocked to not-started. It's now your highest priority item."
 ```
 
-## How This Changes Existing Specs
+## Relationship To Existing Specs
 
-This specification doesn't replace anything. It formalizes what was implicit:
+Orchestration doesn't replace the narrative specs — it's an additional tool for domains that need more structure:
 
-- **thing.md** triggers remain unchanged — they're thing-scoped conditions. Orchestration provides the *mechanism* for when triggers get evaluated (the `session-start` and `post-write` hooks).
-- **write.thing.md** "After you make changes, consider what else needs updating" becomes explicit: the `post-write` hook with `cascade-completion` and `evaluate-triggers` bound to it.
-- **git-workflow.md** commit points become hook points. "After validation and fixes" becomes the `pre-commit` hook.
-- **Workflow skills** phase gates become domain hook points with prompts bound to them.
+- **thing.md** triggers remain the primary attention mechanism. They work through natural LLM reasoning without orchestration. Domains that adopt orchestration can use the `post-write` hook to make trigger evaluation more systematic.
+- **write.thing.md** already guides the LLM to consider downstream effects through prose. Orchestration is for domains where "consider" isn't reliable enough and "always execute this checklist" is needed.
+- **git-workflow.md** commit points are natural moments where orchestration hooks can attach — but they work fine without explicit hooks, driven by the narrative spec alone.
+- **Workflow skills** (like ProducFlow's phase gates) are the primary use case for domain-level orchestration — structured workflows where phase transitions need explicit, repeatable reasoning.
 
 ## Design Principles
 
 1. **Declarative, not imperative** — Hooks declare *when*, prompts declare *what*, bindings declare *which*. None of them contain code or execution logic.
 
-2. **Composable** — Multiple prompts can bind to one hook. Prompts can be reused across hooks. Domains inherit and extend framework bindings.
+2. **Composable** — Multiple prompts can bind to one hook. Prompts can be reused across hooks. Domains define their own bindings independently.
 
 3. **Transparent** — Reading the bindings tells you exactly what happens at each lifecycle moment. No hidden behavior, no implicit chains.
 
 4. **LLM-native** — Prompts are natural language reasoning templates, not function signatures. The LLM reads them and reasons accordingly. There is no runtime, no interpreter, no execution engine — just structured attention direction.
 
-5. **Progressive** — A domain can start with zero custom hooks and zero custom prompts (framework defaults handle everything). As the domain matures, it can add precision where needed.
+5. **Opt-in** — A domain starts with zero orchestration (narrative specs handle everything). As the domain matures and identifies moments where structured reasoning adds value, it can adopt hooks, prompts, and bindings incrementally.
 
 6. **Idempotent** — Running the same prompt at the same hook with the same context produces the same reasoning. No side effects beyond the thing modifications the prompt recommends.
 
@@ -336,26 +344,28 @@ Read the prompt's reasoning template and ask: "Is this a checklist a competent p
 
 ### Quantity Guidance
 
-The framework ships with 6 prompts. These cover the universal mechanical orchestration — the lifecycle events that every domain needs handled consistently. A typical domain should add 2–5 domain-specific prompts for its unique reasoning patterns. If a domain has more than 10 custom prompts, that's a signal to review whether some should be consolidated or left implicit.
+The framework provides 6 prompt templates (in `templates/prompts/`) as starting points. A domain that adopts orchestration should typically use 2–5 prompts for its unique reasoning patterns. If a domain has more than 10 prompts, that's a signal to review whether some should be consolidated or left implicit.
 
 ## File Organization
 
 ```
 framework-root/
-├── orchestration.md              ← this file (the specification)
-├── prompts/                      ← framework-level prompts
-│   ├── cascade-completion.md
-│   ├── evaluate-triggers.md
-│   ├── validate-before-commit.md
-│   ├── session-orientation.md
-│   └── surface-attention.md
+├── orchestration.md              ← this file (the specification — defines the pattern)
+├── templates/
+│   └── prompts/                  ← starting-point prompt templates
+│       ├── cascade-completion.md
+│       ├── evaluate-triggers.md
+│       ├── validate-before-commit.md
+│       ├── session-orientation.md
+│       ├── surface-attention.md
+│       └── detect-conflicts.md
 └── domains/
     └── [domain]/
         ├── skills/
         │   └── [domain]-workflow.skill.md  ← domain hook points + bindings declared here
-        └── prompts/                        ← domain-level prompts
+        └── prompts/                        ← domain-level prompts (copied/adapted from templates or created fresh)
             ├── generate-phase-report.md
             └── format-expert-questions.md
 ```
 
-Prompts are things. They live in directories, have frontmatter, have IDs, and can be linked to other things. They follow the same structural rules as everything else in the framework.
+Prompts are things. They live in the domain's `prompts/` directory, have frontmatter, have IDs, and can be linked to other things. They follow the same structural rules as everything else in the framework. The framework's `templates/prompts/` provides starting points — domains copy and adapt what they need rather than inheriting a mandatory set.
