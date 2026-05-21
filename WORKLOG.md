@@ -33,6 +33,40 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 21 May 2026
+
+### Session 7
+
+#### Completed
+
+- [x] Evaluated orchestration layer after real-world testing in ProducFlow domain
+- [x] Concluded: framework-level orchestration made LLM reasoning too rigid — lost the natural flow that narrative specs provide
+- [x] Refactored orchestration to opt-in domain-level pattern:
+  - Moved `prompts/` → `templates/prompts/` (templates, not mandatory reasoning)
+  - Removed orchestration.md from AGENTS.md startup loading
+  - Reframed AGENTS.md description: "opt-in pattern for domains that need structured orchestration"
+  - Updated orchestration.md (v1.0 → v1.1): added "When To Use / When Not To Use" section, removed inherited framework bindings, updated file organization and design principles
+- [x] Committed: `framework: make orchestration opt-in, move prompts to templates`
+
+#### Decisions Made
+
+- **Framework-level orchestration creates rigidity, not value.** Testing in ProducFlow showed that binding prompts to lifecycle hooks universally caused the LLM to execute reasoning mechanically rather than calibrating naturally. The analysis workflow lost its natural reasoning flow — responses became formulaic and rigid.
+- **Narrative specs are the right primary mechanism.** write.thing.md's "consider what else needs updating" is a nudge — the LLM decides how much attention to pay. A bound prompt is a procedure — the LLM executes it completely. Nudges produce better reasoning for most domains.
+- **Orchestration earns its place at domain level, not framework level.** Domains with strict phase gates (compliance, regulated environments, multi-person teams) benefit from explicit hook/prompt/binding declarations. Simpler domains get bogged down by them.
+- **Prompts become templates, not mandates.** The 6 prompt files are valuable as starting points for domains that opt into orchestration — they show the pattern and provide a foundation to adapt. But they should never fire universally.
+- **The framework's principle of progressive complexity is validated.** Start simple (narrative specs), add structure only when a domain's needs demand it. The orchestration spec remains available — it just doesn't impose itself.
+
+#### Key Insight
+
+The distinction between a *nudge* and a *procedure* is the critical finding. Narrative prose lets the LLM reason proportionally — it naturally calibrates depth based on context. Structured orchestration (hooks + prompts + bindings) forces complete execution regardless of context. For framework-level concerns, nudges are almost always better. For domain-level concerns with high-consequence moments, procedures earn their place.
+
+#### Reflections
+
+- This is the framework's first real-world feedback loop producing a rollback. The orchestration layer was well-designed in theory but too rigid in practice. The healthy response is to demote it, not delete it — the concepts are sound, the scope was wrong.
+- The fact that testing caught this within a day validates the framework's "draft → evolving → stable" status system. orchestration.md was correctly marked as draft; it evolved through use.
+
+---
+
 ## 20 May 2026
 
 ### Session 6
