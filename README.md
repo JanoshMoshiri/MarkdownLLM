@@ -124,7 +124,7 @@ These files define the pattern; they apply to any domain:
 
 - **interface.md** — The I/O layer: input routes, output types, things vs deliverables.
 
-- **validate.thing.skill.md** — Universal validation skill: structural, referential, semantic checks.
+- **validate.thing.md** — Universal validation specification: structural, referential, semantic checks.
 
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs.
 

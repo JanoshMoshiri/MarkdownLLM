@@ -56,9 +56,7 @@ The framework is self-describing — its own specifications are things within th
 - `orchestration.md` — Opt-in pattern: hook points, prompts, and bindings for structured workflows
 - `framework-discovery.md` — How domain agents locate the framework root
 - `domain-refresh.md` — How domain agents discover and absorb framework evolution
-
-**Skills (type: skill):**
-- `validate.thing.skill.md` — Thing validation (structural, referential, semantic)
+- `validate.thing.md` — Thing validation (structural, referential, semantic)
 
 **Guides (type: guide):**
 - `scalability-guide.md` — Scaling from tens to thousands of things

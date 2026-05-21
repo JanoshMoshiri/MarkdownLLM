@@ -87,7 +87,7 @@ If your domain involves specialized reasoning, lenses, or frameworks, document t
 
 ## Domain-Specific Validation Rules
 
-[Define what makes a thing valid in this domain, beyond the universal structural checks in validate.thing.skill.md]
+[Define what makes a thing valid in this domain, beyond the universal structural checks in validate.thing.md]
 
 **Example:**
 - Things of `type: project` must have a `linked_things` entry with relation `supports` pointing to a goal

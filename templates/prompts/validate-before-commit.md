@@ -21,7 +21,7 @@ bound_to:
 linked_things:
   - id: orchestration-specification
     relation: defined-by
-  - id: validate-thing-skill
+  - id: validate-thing-specification
     relation: implements
   - id: git-workflow-specification
     relation: integrates-with
@@ -31,7 +31,7 @@ linked_things:
 
 ## Purpose
 
-Before committing changes, verify that modified things maintain structural and referential integrity. Catch errors before they become part of the committed state. This prompt implements a focused subset of `validate.thing.skill.md` optimized for the pre-commit moment.
+Before committing changes, verify that modified things maintain structural and referential integrity. Catch errors before they become part of the committed state. This prompt implements a focused subset of `validate.thing.md` optimized for the pre-commit moment.
 
 ## Reasoning Template
 

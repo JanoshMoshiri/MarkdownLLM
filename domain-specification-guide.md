@@ -13,7 +13,7 @@ linked_things:
     relation: references
   - id: write-thing-specification
     relation: references
-  - id: validate-thing-skill
+  - id: validate-thing-specification
     relation: references
   - id: git-workflow-specification
     relation: references
@@ -112,7 +112,7 @@ Declare the relative path from the domain root to the framework root in your AGE
 framework_root: ../..
 ```
 
-The agent resolves this at startup to load `thing.md`, `git-workflow.md`, `validate.thing.skill.md`, and `interface.md`.
+The agent resolves this at startup to load `thing.md`, `git-workflow.md`, `validate.thing.md`, and `interface.md`.
 
 ### 2. `.markdownllm` Marker File (Fallback)
 
@@ -182,7 +182,7 @@ git:
 
 ### On Startup
 1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
-2. Load foundational specs from framework root: thing.md, validate.thing.skill.md, git-workflow.md, interface.md
+2. Load foundational specs from framework root: thing.md, validate.thing.md, git-workflow.md, interface.md
 3. Load all skills from ./skills/
 4. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
 5. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
@@ -213,7 +213,7 @@ All reusable capabilities stored as skill files:
 ## Foundational Specifications
 
 - **thing.md** — Atomic unit specification
-- **validate.thing.skill.md** — Validation skill
+- **validate.thing.md** — Validation skill
 - **git-workflow.md** — Commit conventions
 - **interface.md** — I/O layer
 
@@ -610,7 +610,7 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 - [ ] **Create skills/** — Specification, read/write thing skills, workflow
 - [ ] **Understand thing.md** — The atomic unit specification (including triggers)
 - [ ] **Create examples** — A few things in `things/` to demonstrate your schema
-- [ ] **Add validation rules** — Domain-specific required fields and valid types in your specification skill (validated by `validate.thing.skill.md`)
+- [ ] **Add validation rules** — Domain-specific required fields and valid types in your specification skill (validated by `validate.thing.md`)
 - [ ] **Define commit conventions** — Follow `git-workflow.md` patterns for structured commit messages
 - [ ] **Enable tooling** — Configure GitHub Copilot or Claude Code if needed
 - [ ] **Test** — Feed agent + skills + things to your LLM and validate
@@ -647,6 +647,6 @@ This is the fractal nature of the framework: the same structure at every scale, 
 5. **Everything is a thing:** Your domain's specs, skills, and data all share the same structure (YAML frontmatter + markdown body). The framework itself follows this pattern — it is self-describing.
 6. **Git is the state machine:** Commits are where state becomes real. Commit at meaningful boundaries. Structured messages make git log a domain narrative. See `git-workflow.md`.
 7. **Interface is existing routes:** Use VS Code, CLI, mobile, voice — whatever connects you to an LLM. Don't build a new interface. See `interface.md`.
-8. **Validation is built in:** `validate.thing.skill.md` checks structural integrity, referential consistency, and semantic coherence. Domain-specific rules live in your specification skill.
+8. **Validation is built in:** `validate.thing.md` checks structural integrity, referential consistency, and semantic coherence. Domain-specific rules live in your specification skill.
 9. **Vendor agnostic:** Works across GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini
 10. **Transparent:** Everything versioned in git; all logic explicit and readable; three audit layers (worklog, git log, git diff)

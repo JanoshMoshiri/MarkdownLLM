@@ -11,7 +11,7 @@ linked_things:
     relation: complements
   - id: write-thing-specification
     relation: complements
-  - id: validate-thing-skill
+  - id: validate-thing-specification
     relation: enforced-by
   - id: git-workflow-specification
     relation: complements

@@ -1,9 +1,11 @@
 ---
+id: validate-thing-specification
 name: Validate Thing
-type: skill
-mode: validate
-description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, and orchestration graph integrity
+type: specification
+status: draft
 version: 1.1
+created: 2026-05-19
+description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, and orchestration graph integrity
 applies_to: "**/things/**/*.md"
 linked_things:
   - id: thing-specification

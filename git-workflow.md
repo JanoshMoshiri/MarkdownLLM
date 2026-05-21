@@ -13,7 +13,7 @@ linked_things:
     relation: complements
   - id: write-thing-specification
     relation: integrates-with
-  - id: validate-thing-skill
+  - id: validate-thing-specification
     relation: integrates-with
 ---
 
@@ -291,7 +291,7 @@ This follows the standard git-flow pattern that development teams already know. 
 
 The write skill should be aware of commit points. After modifying things, the agent should commit with a structured message. The write workflow becomes: reason → modify → validate → commit.
 
-### With validate.thing.skill.md
+### With validate.thing.md
 
 Validation can run as a pre-commit check. Before the agent commits, it validates the things being committed. If errors exist, the commit is held until they're resolved. Warnings are noted in the commit message body.
 

@@ -56,7 +56,7 @@ All reusable capabilities for life management:
 Loaded from the MarkdownLLM framework root:
 
 - **thing.md** — The atomic unit specification (structure for all things)
-- **validate.thing.skill.md** — Validation skill (structural, referential, semantic checks)
+- **validate.thing.md** — Validation skill (structural, referential, semantic checks)
 - **git-workflow.md** — When and how to commit (git as state machine)
 - **interface.md** — I/O layer (input routes and output types)
 

@@ -23,7 +23,7 @@ git:
 
 ### On Startup
 1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
-2. Load foundational specs from framework root: thing.md, validate.thing.skill.md, git-workflow.md, interface.md
+2. Load foundational specs from framework root: thing.md, validate.thing.md, git-workflow.md, interface.md
 3. Load all skills from `./skills/`
 4. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
 5. Evaluate triggers — scan things for time-based, dependency, or threshold triggers that fire since last session
@@ -56,7 +56,7 @@ All reusable capabilities in this domain are stored as skill files:
 Loaded from the MarkdownLLM framework root:
 
 - **thing.md** — The atomic unit specification (structure for all things)
-- **validate.thing.skill.md** — Validation skill (structural, referential, semantic checks)
+- **validate.thing.md** — Validation skill (structural, referential, semantic checks)
 - **git-workflow.md** — When and how to commit (git as state machine)
 - **interface.md** — I/O layer (input routes and output types)
 

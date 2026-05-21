@@ -117,7 +117,7 @@ The refresh process reads these framework files in order:
    → thing.md (version field in frontmatter)
    → git-workflow.md
    → interface.md
-   → validate.thing.skill.md
+   → validate.thing.md
    → read.thing.md
    → write.thing.md
    → Any NEW specs not previously known

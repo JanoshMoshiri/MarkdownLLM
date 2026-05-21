@@ -13,7 +13,7 @@ linked_things:
     relation: documents
   - id: write-thing-specification
     relation: documents
-  - id: validate-thing-skill
+  - id: validate-thing-specification
     relation: documents
   - id: git-workflow-specification
     relation: documents

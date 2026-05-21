@@ -31,7 +31,7 @@ Orchestration introduces three primitives:
 
 ## When To Use Orchestration
 
-Orchestration is **not mandatory**. The framework's narrative specs (write.thing.md, thing.md triggers, validate.thing.skill.md) already guide LLM reasoning effectively through prose. LLMs naturally calibrate effort from narrative instruction — they reason about whether something is relevant, how deep to go, and whether the context warrants it.
+Orchestration is **not mandatory**. The framework's narrative specs (write.thing.md, thing.md triggers, validate.thing.md) already guide LLM reasoning effectively through prose. LLMs naturally calibrate effort from narrative instruction — they reason about whether something is relevant, how deep to go, and whether the context warrants it.
 
 **Use orchestration when:**
 - Your domain has strict phase-gated workflows (e.g., compliance, regulated environments)

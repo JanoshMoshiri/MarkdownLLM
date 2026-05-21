@@ -11,7 +11,7 @@ linked_things:
     relation: complements
   - id: git-workflow-specification
     relation: integrates-with
-  - id: validate-thing-skill
+  - id: validate-thing-specification
     relation: invokes
   - id: scalability-guide
     relation: informed-by

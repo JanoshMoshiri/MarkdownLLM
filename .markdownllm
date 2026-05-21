@@ -2,7 +2,7 @@ framework: MarkdownLLM
 version: 2.1
 foundational_specs:
   - thing.md
-  - validate.thing.skill.md
+  - validate.thing.md
   - git-workflow.md
   - interface.md
   - read.thing.md

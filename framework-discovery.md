@@ -17,7 +17,7 @@ linked_things:
 
 ## What This Specifies
 
-This document defines how domain agents discover the MarkdownLLM framework root and load foundational specifications. Without this mechanism, a domain agent operating inside a nested directory has no way to locate the shared specifications (thing.md, git-workflow.md, validate.thing.skill.md, interface.md) that all domains depend on.
+This document defines how domain agents discover the MarkdownLLM framework root and load foundational specifications. Without this mechanism, a domain agent operating inside a nested directory has no way to locate the shared specifications (thing.md, git-workflow.md, validate.thing.md, interface.md) that all domains depend on.
 
 ## The Problem
 
@@ -50,7 +50,7 @@ With `framework_root` declared, the domain agent can resolve paths to:
 | Specification | Resolved Path |
 |---------------|---------------|
 | thing.md | `{framework_root}/thing.md` |
-| validate.thing.skill.md | `{framework_root}/validate.thing.skill.md` |
+| validate.thing.md | `{framework_root}/validate.thing.md` |
 | git-workflow.md | `{framework_root}/git-workflow.md` |
 | interface.md | `{framework_root}/interface.md` |
 | read.thing.md | `{framework_root}/read.thing.md` |
@@ -83,7 +83,7 @@ When a domain agent loads, its startup sequence becomes:
 3. Verify framework root exists (check for `thing.md` as sentinel)
 4. Load foundational specifications from framework root:
    - `{framework_root}/thing.md`
-   - `{framework_root}/validate.thing.skill.md`
+   - `{framework_root}/validate.thing.md`
    - `{framework_root}/git-workflow.md`
    - `{framework_root}/interface.md`
 5. Load domain skills from `./skills/`
@@ -104,7 +104,7 @@ framework: MarkdownLLM
 version: 2.1
 foundational_specs:
   - thing.md
-  - validate.thing.skill.md
+  - validate.thing.md
   - git-workflow.md
   - interface.md
   - read.thing.md
@@ -148,7 +148,7 @@ Copy only `thing.md` and reference the framework repo for the rest. Acceptable f
 
 ## Validation
 
-When validating a domain (using validate.thing.skill.md), check:
+When validating a domain (using validate.thing.md), check:
 
 - [ ] `framework_root` is present in domain AGENTS.md frontmatter
 - [ ] The resolved path exists and contains `thing.md`
@@ -162,4 +162,4 @@ When validating a domain (using validate.thing.skill.md), check:
 | What's the fallback? | Walk up directories looking for `.markdownllm` marker |
 | What if deployed standalone? | Copy specs, use submodule, or minimal bundle |
 | What's the sentinel file? | `thing.md` — if it exists at the resolved path, the framework root is valid |
-| What specs must be loadable? | thing.md, validate.thing.skill.md, git-workflow.md, interface.md |
+| What specs must be loadable? | thing.md, validate.thing.md, git-workflow.md, interface.md |

@@ -19,7 +19,7 @@ This is the MarkdownLLM framework — a specification for building LLM-driven sy
 
 ### On Startup
 1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, scalability-guide.md, framework-discovery.md)
-2. Load all skills (validate.thing.skill.md, read.thing.md, write.thing.md)
+2. Load operational specs (validate.thing.md, read.thing.md, write.thing.md)
 3. Load the manifesto for philosophical grounding (llm-driven-systems.manifesto.md)
 4. Load the domain guide for operational context (domain-specification-guide.md)
 5. Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
@@ -46,7 +46,7 @@ The framework defines itself through these interconnected specifications:
 ### Operational
 - **read.thing.md** — How LLMs read and reason about things without modification. (`type: specification`, `status: stable`)
 - **write.thing.md** — How LLMs create, update, and manage things. (`type: specification`, `status: stable`)
-- **validate.thing.skill.md** — How to validate thing integrity (structural, referential, semantic). (`type: skill`, `status: draft`)
+- **validate.thing.md** — How to validate thing integrity (structural, referential, semantic). (`type: specification`, `status: draft`)
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: draft`)
 - **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: draft`)
 - **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: draft`)
