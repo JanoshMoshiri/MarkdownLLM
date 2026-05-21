@@ -33,6 +33,53 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 20 May 2026
+
+### Session 6
+
+*Note: This entry was written retroactively on 21 May 2026.*
+
+#### Completed
+
+- [x] Created orchestration.md — new foundational specification defining the orchestration layer: hook points (named lifecycle moments like session-start, post-write, pre-commit), prompts (reusable reasoning templates), and bindings (declarations connecting hooks to prompts). Formalises what was previously implicit across thing.md triggers, git-workflow.md commit points, and domain workflow phase gates into composable, portable orchestration primitives.
+- [x] Updated AGENTS.md to reference orchestration.md in the framework specifications list
+- [x] Committed: `framework: add orchestration.md — hook points, prompts, and bindings`
+- [x] Created 6 framework prompt templates in prompts/ directory:
+  - cascade-completion.md — propagate progress when things complete
+  - evaluate-triggers.md — scan for trigger conditions that are now true
+  - validate-before-commit.md — structural/referential/semantic pre-commit checks
+  - session-orientation.md — orient the agent at session start
+  - surface-attention.md — prioritise and filter what the user hears about
+  - detect-conflicts.md — catch logical/lens/dependency conflicts before changes land
+  - Each prompt is a thing (type: prompt) with explicit inputs, outputs, and bound_to declarations linking to orchestration.md hook points
+- [x] Committed: `framework: create framework prompt templates (6 prompts)`
+- [x] Reinforced orchestration.md guardrails:
+  - Expanded "When To Create A Prompt" with create/leave-implicit criteria
+  - Added red flags section for over-specification detection
+  - Added litmus test and quantity guidance (6 framework, 2–5 per domain)
+- [x] Extended validate.thing.skill.md (v1.0 → v1.1) with Prompt Validation section:
+  - Structural checks: inputs/outputs/bound_to presence and format
+  - Referential checks: hook existence, orphan/missing prompt detection, I/O chain consistency
+  - Semantic checks: scope focus, duplication detection, quantity threshold
+  - Added linked_things to frontmatter (thing-spec, orchestration-spec)
+- [x] Committed: `framework: reinforce guardrails + add prompt validation`
+- [x] Fixed typo in README.md
+- [x] Committed: `Typo fix in readme`
+
+#### Decisions Made
+
+- The orchestration layer sits between the existing specs (thing.md triggers, git-workflow.md commit points) and formalises the implicit reasoning patterns into explicit, portable primitives — hook points, prompts, and bindings
+- Prompt templates are things themselves (type: prompt) — they follow the same frontmatter + narrative body pattern as all other framework specifications, keeping the system self-describing
+- Six framework-level prompts is the right quantity — covers the core lifecycle moments without over-specifying. Domain-specific prompts should add 2–5 more per domain.
+- Validation was extended to cover prompts because they are now first-class things in the system — structural, referential, and semantic checks mirror the existing thing validation patterns
+
+#### Reflections
+
+- The orchestration spec closes the last major architectural gap — the framework now has explicit definitions for when reasoning fires, what reasoning runs, and how they connect. This was previously scattered implicitly across triggers, commit points, and workflow skills.
+- The prompt templates demonstrate the framework eating its own dogfood: each prompt is a thing, validated by the same validation skill, committed per the same git workflow.
+
+---
+
 ## 19 May 2026
 
 ### Session 5
