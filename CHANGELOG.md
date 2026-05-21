@@ -2,24 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## Format Change (from v2.3.0 onwards)
 
-### Added
+Prior entries followed [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) with detailed per-feature breakdowns. From v2.3.0, the changelog adopts a **per-push** format:
+
+- **Each entry corresponds to a push to the remote** — the moment changes land on main in the public repo
+- **Entries are concise summaries**, not exhaustive lists — the WORKLOG holds session-level detail
+- **Version numbers are incremented per push** (patch for fixes/consistency, minor for new specs or behavioural changes, major for breaking changes)
+
+The WORKLOG is the detailed internal record. The CHANGELOG is the external-facing record of what shipped.
+
+---
+
+## [2.3.0] - 2026-05-21
+
+- Made orchestration opt-in: demoted from framework-level to domain-level pattern after real-world testing showed it made LLM reasoning rigid
+- Moved prompt files from `prompts/` to `templates/prompts/` (templates, not mandates)
+- Updated orchestration.md (v1.0 → v1.1): added "When To Use / When Not To Use" guidance
+- Fixed consistency gaps: README now lists all 12 framework specs, CONTRIBUTING lists newer specs, WORKLOG frontmatter updated
+- Fixed README stale status values (`draft/active/complete` → canonical thing.md values)
+- Fixed README "Templates (Future Organization)" → reflects current state
+- Adopted per-push changelog format (this change)
+
+---
+
+## [2.2.1] - 2026-05-19
 
 **Domain Refresh Specification (domain-refresh.md):**
 - Defines the nested git repository deployment architecture (framework repo + isolated domain repos, .gitignore contract)
 - Specifies the refresh process: how domain agents check CHANGELOG, WORKLOG, and foundational specs for framework evolution
 - Refresh algorithm with version tracking via `framework_version_seen` frontmatter field
 - Integration points for domain workflow skills and AGENTS.md startup sequences
-- Anti-patterns and concrete example (domain discovering autocommit capability)
 
-### Planned
-- Migration strategy for evolving thing schemas
-- Concurrency and multi-agent patterns
-- Limitations and failure-mode documentation
+---
 
 ## [2.2.0] - 2026-05-19
 

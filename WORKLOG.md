@@ -49,6 +49,8 @@ This file is a running record of work done, decisions made, and work remaining. 
 - [x] Fixed README: Templates heading updated from "Future Organization" to reflect current state (templates exist, prompts included)
 - [x] Fixed WORKLOG: added `orchestration-specification` and `domain-refresh-specification` to frontmatter `linked_things`
 - [x] Fixed CONTRIBUTING: added `orchestration.md`, `framework-discovery.md`, and `domain-refresh.md` to framework structure listing
+- [x] Adopted new CHANGELOG format: per-push entries with concise summaries, version numbers retained, WORKLOG handles detail
+- [x] Migrated `[Unreleased]` domain-refresh content into `[2.2.1]`; created `[2.3.0]` for this push
 
 #### Decisions Made
 
