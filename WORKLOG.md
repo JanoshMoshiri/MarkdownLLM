@@ -37,6 +37,36 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 22 May 2026
+
+### Session 1
+
+#### Completed
+
+- [x] Complete rewrite of README.md — reframed from human-instruction-manual style to agent-first-human-directed partnership model
+- [x] Added agent-user transcript to README showing a domain being created through conversation
+- [x] Updated llm-driven-systems.manifesto.md (v2.0 → v2.1) — added "Discovery: The Partnership Without Configuration" section explaining how auto-discovery of AGENTS.md enables zero-configuration partnership
+- [x] Revised manifesto "Getting Started" section to emphasize design intent, feedback loops, and ongoing collaboration (7 steps → 8 steps)
+- [x] Updated domain-specification-guide.md (v2.3 → v2.4) — reframed "Creating Your Agent File" as a design document where humans make deliberate decisions about agent behavior, workflows, constraints, and conflict handling
+- [x] Renamed guide Step 2 from "Plan Your Domain" to "Design Your Domain" with richer design questions
+- [x] Renamed guide Step 5 from "Iterate" to "Use It, Refine It, Grow It" with concrete feedback examples
+- [x] Full framework coherence review — all specs checked against new framing
+- [x] Updated CHANGELOG with new version entry
+
+#### Decisions Made
+
+- **The README was incorrectly framed.** It read as a human instruction manual ("here's how YOU set it up"). The framework's actual model is: specs are for agents to consume, the human directs and refines, the partnership produces the system. Rewrote to reflect this.
+- **"Agent-First" as principle #1 was too exclusive.** Changed to "Agent-Consumed, Human-Directed" in the README — captures both sides of the partnership.
+- **write.thing.md does NOT need a partnership preamble.** The agent already understands its role from the instructions themselves. Partnership framing matters in human-facing documents (README, manifesto, guide), not in agent-facing specs.
+- **Discovery deserved its own manifesto section.** It's the mechanism that makes the partnership zero-configuration — the thing that means humans don't have to teach agents how to use the framework. The framework teaches the agent.
+- **AGENTS.md is a design document, not a template.** The domain-specification-guide was presenting it as "fill this in." It's actually where humans make deliberate design decisions about agent behavior, reasoning style, workflows, and constraints.
+
+#### Key Insight
+
+The framework's framing was subtly wrong — not in what it built, but in how it presented itself. The specs themselves (thing.md, write.thing.md, orchestration.md, read.thing.md) already correctly model the partnership: human defines constraints, agent operates within them, conflicts get surfaced. The gap was in the outward-facing documentation (README, manifesto, guide) which didn't articulate the human's ongoing role clearly enough. The specs were right; the explanation was incomplete.
+
+---
+
 ## 21 May 2026
 
 ### Session 3

@@ -16,6 +16,15 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [2.4.0] - 2026-05-22
+
+- Rewrote README.md: reframed from human instruction manual to agent-first, human-directed partnership model. Added agent-user transcript showing domain creation through conversation.
+- Updated llm-driven-systems.manifesto.md (v2.0 → v2.1): added "Discovery: The Partnership Without Configuration" section. Revised Getting Started to emphasize design intent, feedback loops, and ongoing collaboration.
+- Updated domain-specification-guide.md (v2.3 → v2.4): reframed AGENTS.md creation as design decisions (not template-filling). "Plan Your Domain" → "Design Your Domain". "Iterate" → "Use It, Refine It, Grow It" with concrete feedback examples.
+- Core framing clarification: specs are written for agents to consume; humans direct, design, use, and refine; the partnership produces the system. No structural/architectural changes — the specs already modelled this correctly.
+
+---
+
 ## [2.3.0] - 2026-05-21
 
 - Made orchestration opt-in: demoted from framework-level to domain-level pattern after real-world testing showed it made LLM reasoning rigid
