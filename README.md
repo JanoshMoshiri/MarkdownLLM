@@ -1,64 +1,178 @@
 # MarkdownLLM
 
-A specification and framework for building definition-driven, LLM-powered systems using markdown, YAML, and git.
+A framework discovered by agents, directed by humans, grown together. You define the domain. The agent reasons within it. Together you build definition-driven systems that start from a structured foundation and evolve through use.
 
-## What Is This?
+## The Core Idea
 
-MarkdownLLM enables you to create **LLM-powered systems where**:
+Every specification in this framework is written for an agent to discover, load, and reason with. The agent is the one reading `thing.md`. The agent is the one following `write.thing.md`. The agent is the one validating against `validate.thing.md`. These files are the agent's operating manual.
 
-- **You define the domain** — atomic units, workflows, and reasoning patterns
-- **An LLM reasons within that domain** — understanding context, making connections, suggesting improvements
-- **Git stores your data** — markdown files with structured metadata that you control completely
-- **Discovery works automatically** — your agent file loads at startup; skills auto-resolve; context persists
+But you are the one with the vision. You define what the domain is. You shape the orchestration. You design the workflows. You use the output. You come back and say "this isn't working right" or "we need to handle this case." You are the directing intelligence throughout — not just at creation, but in every session, every refinement, every decision that matters.
 
-These systems work across vendor boundaries—use Claude, Codex, Gemini, or any LLM. The framework itself is vendor-agnostic.
+**This is the partnership:** The agent handles execution within the framework — discovering specs, reasoning about structure, creating and validating things, maintaining consistency across sessions. You handle direction — defining what matters, making tradeoff decisions, providing feedback, and evolving the system as your understanding deepens.
 
-## The Architecture: Three Layers
+Neither works without the other. An agent without structure produces inconsistent, unreliable output. A human without an agent has to manually maintain all the structural discipline that makes a system coherent over time. Together — with the framework as the shared language — you create something elegantly extendable: fluid but structured, growing but consistent, definition-driven but never rigid.
 
-MarkdownLLM is built on a simple, elegant model:
+---
+
+## How It Works
+
+```
+You open a workspace containing MarkdownLLM
+    |
+Your agent discovers AGENTS.md automatically
+    |
+The agent loads foundational specs (thing.md, skills, guides)
+    |
+You describe what you want to build
+    |
+The agent proposes structure — you refine it
+    |
+The agent creates your domain — skills, things, workflows
+    |
+You use it, provide feedback, direct evolution
+    |
+Git captures every state change
+    |
+Every future session starts from full context — and you continue
+```
+
+There is no setup step. There is no installation. The framework is a set of files that an agent discovers and uses.
+
+But "discovers and uses" doesn't mean the agent runs on its own. You are in the loop at every meaningful point: defining what gets built, deciding how workflows should run, using the output, and feeding back what needs to change. The agent provides the structural discipline and reasoning consistency. You provide the direction, the domain expertise, and the judgment.
+
+This is an ongoing relationship, not a one-shot generation. Every session you come back, the agent picks up where you left off — with full context, consistent reasoning, and the ability to act on whatever you need next.
+
+---
+
+## A Domain Being Created
+
+Here's what it looks like in practice — a developer and their agent creating a domain together. Notice how the developer directs, the agent proposes and builds, and both iterate until the structure is right:
+
+```
+------------------------------------------------------------
+Developer -> Agent
+------------------------------------------------------------
+
+I want to create a domain for managing compliance patterns.
+We deal with GDPR, PCI-DSS, and SOC2. Each pattern should
+capture the regulation, the technical requirement, what good
+looks like, and common anti-patterns. I need to be able to
+run assessments against a codebase and track findings.
+
+------------------------------------------------------------
+Agent -> Developer
+------------------------------------------------------------
+
+I've read the MarkdownLLM framework specifications. Based on
+thing.md and the domain-specification-guide, here's what I'll
+create for your compliance-patterns domain:
+
+**Thing types:**
+- `compliance-pattern` — The reusable pattern (regulation,
+  requirement, good implementation, anti-patterns)
+- `assessment-finding` — A specific finding when running a
+  pattern against code
+- `assessment-run` — Groups findings from a single assessment
+
+**Skills:**
+- Specification skill defining your compliance philosophy
+- Read skill for analyzing patterns without modification
+- Write skill for creating patterns and recording findings
+- Workflow skill for the assessment execution flow
+
+**Structure:**
+
+domains/compliance-patterns/
+├── AGENTS.md
+├── skills/
+│   ├── compliance-patterns-specification.skill.md
+│   ├── compliance-patterns-read.thing.skill.md
+│   ├── compliance-patterns-write.thing.skill.md
+│   └── compliance-patterns-workflow.skill.md
+└── things/
+    ├── patterns/
+    └── assessments/
+
+Shall I proceed? Any changes to the thing types or workflow?
+
+------------------------------------------------------------
+Developer -> Agent
+------------------------------------------------------------
+
+Yeah that looks good. Add a severity field to findings —
+critical, high, medium, low. And the workflow should support
+batch assessments where I point it at a repo and it checks
+all relevant patterns.
+
+------------------------------------------------------------
+Agent -> Developer
+------------------------------------------------------------
+
+Done. I've created the full domain:
+
+- AGENTS.md — orchestration with framework_root: ../..
+- 4 skill files — all tailored to compliance assessment
+- Severity levels in the write skill's thing schema
+- Batch assessment workflow in the workflow skill
+- 1 seed pattern (GDPR data handling) as a working example
+
+The workflow skill defines three modes:
+1. Single pattern check (one pattern, one codebase)
+2. Batch assessment (all patterns, one codebase)
+3. Gap analysis (compare findings across runs)
+
+Everything is committed. Next session, I'll discover the
+domain's AGENTS.md and we can start creating patterns or
+running assessments immediately.
+```
+
+That's it. The developer described intent. The agent understood the framework, proposed a structure, incorporated feedback, and built the domain. No manual file creation. No template copying. No configuration. Just a conversation.
+
+And this isn't the end — it's the beginning. Next session the developer comes back, the agent loads the domain with full context, and they continue: creating patterns, running assessments, refining workflows based on what's actually working. The system grows through use, directed by the human, executed by the agent, structured by the framework.
+
+---
+
+## The Architecture (For Agents)
+
+The framework gives agents a three-layer model to work within:
 
 ```
 AGENTS.md (Orchestration & Discovery)
-      ↓ auto-loads at startup
-SKILLS/ (Reusable Capabilities)
-      ↓ specifications, prompts, workflows as .skill.md files
-      ↓ foundational specs discovered via framework_root
-THINGS/ (Data Instances)
-      → instances following thing.md structure
+      | auto-discovered at session start
+SKILLS/ (Reasoning Capabilities)
+      | specifications, prompts, workflows as .skill.md files
+      | foundational specs resolved via framework_root
+THINGS/ (Structured Data Instances)
+      -> atomic units following thing.md specification
 ```
 
-### Layer 1: Agent (Orchestration & Discovery)
+### Layer 1: AGENTS.md (Discovery & Orchestration)
 
-Your **AGENTS.md** file sits at the root of your domain and is automatically discovered by the LLM tool/harness when a session starts. It:
+The agent's entry point. Automatically discovered by the LLM harness at session start. It tells the agent:
 
-- **Auto-loads** — No manual includes needed; the discovery mechanism finds it
-- **Orchestrates** — Tells the LLM which skills to load and how to use them
-- **Sets the protocol** — Defines behavioral rules and reasoning patterns
-- **Bootstraps context** — Ensures the vision and structure persist across sessions
+- What domain this is and what it does
+- Where to find skills (reasoning guidance)
+- Where to find the framework root (foundational specs)
+- Behavioral rules and session protocol
 
-This solves the "lost context on new session" problem: the agent is always the entry point.
+**Why this matters:** Every session begins with full context. The agent never starts cold. It always knows what domain it's in, what skills are available, and how to reason within the domain's constraints.
 
-### Layer 2: Skills (Reusable Capabilities)
+### Layer 2: Skills (Agent Reasoning Guidance)
 
-**Skills** are atomic, reusable capabilities. Each `.skill.md` file contains:
+Skills are instructions *for the agent* — they define how to think about and operate within the domain. Each `.skill.md` file is a capability the agent loads when needed:
 
-- **YAML frontmatter** — Metadata (name, type, applies_to patterns, dependencies)
-- **Markdown narrative** — Detailed guidance for that capability
+- **Specification Skill** — The domain's philosophy, principles, and reasoning patterns
+- **Read Thing Skill** — How to analyze existing things without modification
+- **Write Thing Skill** — How to create, update, and validate things
+- **Workflow Skill** — Process orchestration: what steps to follow, in what order, for what purpose
 
-**Skill types in your domain:**
+Skills are the agent's expertise. They encode domain knowledge in a form the agent can reason with, consistently, across sessions and across vendors.
 
-- **Specification Skill** (`[domain]-specification.skill.md`) — Philosophy, principles, domain paradigm, reasoning patterns
-- **Read Thing Skill** (`[domain]-read.thing.skill.md`) — How to analyze things without modification
-- **Write Thing Skill** (`[domain]-write.thing.skill.md`) — How to create and update things
-- **Workflow Skill** (`[domain]-workflow.skill.md`) — Process orchestration and execution flow
+> **Foundational specs** (`thing.md`, `validate.thing.md`, etc.) live in the framework root — not in domain skills directories. The agent discovers them via `framework_root` (see [framework-discovery.md](framework-discovery.md)).
 
-> **Note:** The foundational specification `thing.md` is not part of your domain's skills directory. It lives in the framework root and is discovered automatically via `framework_root` (see [framework-discovery.md](framework-discovery.md)).
+### Layer 3: Things (Structured Data)
 
-Skills are completely vendor-agnostic—they use standard markdown + YAML. This means they work across GitHub Copilot, Claude Code, OpenAI Codex, Cursor, Windsurf, and Gemini CLI.
-
-### Layer 3: Things (Data Instances)
-
-**Things** are your actual data—each is a markdown file with YAML frontmatter and narrative:
+Things are the actual data — each is a markdown file with YAML frontmatter and narrative body:
 
 ```yaml
 ---
@@ -80,222 +194,146 @@ Brief overview
 Detailed narrative
 ```
 
-All things follow `thing.md` patterns. Your domain instantiates it for specific types (projects, requirements, analyses, etc.).
+Things are atomic (self-contained), linked (explicitly related to other things), and versioned (git-tracked). The agent creates them, reads them, updates them, and validates their integrity — all following the patterns defined in skills.
 
 ---
 
-## Why This Structure?
+## Why This Works
 
-### Problem: Context Loss Across Sessions
+### The Problem: Without Structure
 
-Traditional LLM-powered systems rely on manual includes or context passing. When you start a new session, you have to remember to load the system definition. Worse, you might load partial definitions, leading to inconsistent behavior.
+An agent without domain structure produces inconsistent, unreliable output. It starts every session from zero. It invents schemas on the fly. It contradicts previous work. The human has to re-explain everything, re-establish context, and hope for consistency.
 
-**MarkdownLLM solves this:** AGENTS.md is automatically discovered at root. It loads first. Every session has the complete orchestration and can resolve all skills.
+A human without an agent has to manually maintain all the structural discipline: validating relationships, checking integrity, remembering what was decided last session, keeping schemas consistent as things grow. It's possible, but it doesn't scale.
 
-### Solution: Automatic Discovery + Composable Skills
+### The Solution: A Shared Framework
 
-- **Agent files are discovered**, not included — They're the entry point by design
-- **Skills are composable** — Each skill stands alone but references others; no complex dependency chains
-- **Things are atomic** — Each instance is self-contained but links to related instances through explicit relationships
+MarkdownLLM gives both parties what they need:
 
-This is how leading AI systems (OpenAI, Anthropic, Google) structure agent frameworks. MarkdownLLM applies that pattern to any domain you want to build.
+**For the agent:**
+- **Automatic discovery** — AGENTS.md is found at session start. No human has to remember to "load the context."
+- **Persistent knowledge** — Skills encode how to reason. Things encode what's been done. Git encodes what changed and when.
+- **Composable structure** — Each spec is self-contained but explicitly linked. The agent loads exactly what it needs.
+- **Validated integrity** — `validate.thing.md` gives the agent rules to check its own work against.
+- **Consistency across sessions** — The agent behaves the same way whether it's the first session or the hundredth.
+
+**For the human:**
+- **Full transparency** — Every file is readable. You can always see what the agent built, how it reasoned, what it changed.
+- **Control at every level** — You define the domain, the orchestration, the workflows. The agent operates within your constraints.
+- **Conflict surfacing** — When the agent encounters tradeoffs, it raises them. You decide.
+- **Cumulative progress** — Every session builds on the last. Your refinements compound. Nothing is lost.
+
+**The result:** A smaller model with a well-defined domain outperforms a larger model with no structure. Structure beats scale. But it's the human-agent partnership that creates and maintains that structure over time.
 
 ---
 
-## What's Included
+## What's In This Repository
 
-### Foundation Files
+### Foundational Specifications (Agent-Consumed)
 
-These files define the pattern; they apply to any domain:
+These are the specs the agent loads and reasons with:
 
-- **llm-driven-systems.manifesto.md** — The philosophy. Read this first to understand why this works.
+| File | Purpose |
+|------|---------|
+| [thing.md](thing.md) | The atomic unit specification — what a thing is, how it's structured |
+| [read.thing.md](read.thing.md) | How agents read and analyze things |
+| [write.thing.md](write.thing.md) | How agents create and update things |
+| [validate.thing.md](validate.thing.md) | How agents validate thing integrity |
+| [interface.md](interface.md) | I/O layer: input routes, output types, deliverables vs things |
+| [git-workflow.md](git-workflow.md) | Git as state machine: commits, conventions, autocommit |
+| [framework-discovery.md](framework-discovery.md) | How domain agents locate the framework root |
+| [domain-refresh.md](domain-refresh.md) | How domain agents discover framework evolution |
+| [orchestration.md](orchestration.md) | Opt-in hook points and structured prompts |
+| [scalability-guide.md](scalability-guide.md) | Scaling from tens to thousands of things |
 
-- **thing.md** — The specification for the atomic unit. Defines metadata, structure, linking, and relationships.
+### Philosophy
 
-- **domain-specification-guide.md** — Complete guide for creating a domain using the three-layer model. Step-by-step with templates.
+| File | Purpose |
+|------|---------|
+| [llm-driven-systems.manifesto.md](llm-driven-systems.manifesto.md) | The paradigm — why definition-driven systems work |
+| [domain-specification-guide.md](domain-specification-guide.md) | How agents create new domains (the guide they follow) |
 
-- **read.thing.md** — Generic guidance for how LLMs should read your system (get insights without modifying data).
+### Examples
 
-- **write.thing.md** — Generic guidance for how LLMs should read, reason, and update your system.
+Working domain implementations the agent can reference:
 
-- **scalability-guide.md** — Strategies for handling complex systems as they grow.
-
-- **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode.
-
-- **interface.md** — The I/O layer: input routes, output types, things vs deliverables.
-
-- **validate.thing.md** — Universal validation specification: structural, referential, semantic checks.
-
-- **framework-discovery.md** — How domain agents locate the framework root and foundational specs.
-
-- **domain-refresh.md** — How domain agents discover framework evolution and update themselves.
-
-- **orchestration.md** — Opt-in pattern for domains that need structured hook points, prompts, and bindings.
-
-### Example Domains
-
-Example instantiations showing how to apply the framework:
-
-- **examples/compliance-patterns/** — Shows how to structure a domain around regulatory compliance (GDPR example)
-- **examples/life-manager/** — Shows how to structure a domain for personal task and project management
-
-Each example has:
-- Its own skills directory (specification, read/write prompts, workflow)
-- Thing files demonstrating the domain's atomic units
-- Comments showing how the pieces fit together
+- **[examples/compliance-patterns/](examples/compliance-patterns/)** — Regulatory compliance pattern library
+- **[examples/life-manager/](examples/life-manager/)** — Personal life and work management
 
 ### Templates
 
-Starting-point templates for bootstrapping new domains:
-- `templates/AGENTS.md.template` — Starting point for orchestration
-- `templates/[domain]-specification.skill.md.template` — Starting point for philosophy/principles
-- `templates/[domain]-read.thing.skill.md.template` — Starting point for read guidance
-- `templates/[domain]-write.thing.skill.md.template` — Starting point for write guidance
-- `templates/[domain]-workflow.skill.md.template` — Starting point for process patterns
-- `templates/prompts/` — Prompt templates for domains that opt into orchestration (6 reasoning templates)
+Starting structures the agent uses when scaffolding a new domain:
+
+- `templates/AGENTS.md.template`
+- `templates/[domain]-specification.skill.md.template`
+- `templates/[domain]-read.thing.skill.md.template`
+- `templates/[domain]-write.thing.skill.md.template`
+- `templates/[domain]-workflow.skill.md.template`
+- `templates/prompts/` — Orchestration prompt templates
 
 ---
 
-## Prerequisites: What You Need
+## Getting Started
 
-MarkdownLLM requires an **LLM interface that can traverse file directories, read and write files, and (optionally) search the internet**. This is not a library you import or a CLI you install — it's a structural framework that lives in your file system, and the LLM must be able to interact with that file system directly.
+### What You Need
 
-**Tools that work today:**
+An LLM tool with file system access. That's it.
 
-| Tool | File Access | Write Files | Discovery | Status |
-|------|------------|-------------|-----------|--------|
-| GitHub Copilot (VS Code) | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
-| Claude Code | ✓ | ✓ | CLAUDE.md → AGENTS.md | Fully supported |
-| OpenAI Codex CLI | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
-| Cursor | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
-| Windsurf | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
-| Gemini CLI | ✓ | ✓ | AGENTS.md auto-load | Fully supported |
+| Tool | Discovery | Status |
+|------|-----------|--------|
+| GitHub Copilot (VS Code) | AGENTS.md auto-load | Fully supported |
+| Claude Code | CLAUDE.md -> AGENTS.md | Fully supported |
+| OpenAI Codex CLI | AGENTS.md auto-load | Fully supported |
+| Cursor | AGENTS.md auto-load | Fully supported |
+| Windsurf | AGENTS.md auto-load | Fully supported |
+| Gemini CLI | AGENTS.md auto-load | Fully supported |
 
-**What does NOT work:**
+**What does NOT work:** Any interface without file system access (ChatGPT web, Claude web, bare API calls without tool use). The agent must be able to discover files, read them, and write them.
 
-- ChatGPT web interface (no file system access)
-- Claude web interface (no persistent file access)
-- Any LLM API without a file-access harness
-- Simple prompt-based interactions without tool use
+### Step 1: Clone the Framework
 
-The key requirement is that the LLM must be able to: (1) discover and read AGENTS.md automatically, (2) navigate directory structures, (3) read markdown files, and (4) create and modify files. If your tool can do all four, it will work with MarkdownLLM.
+```bash
+git clone https://github.com/JanoshMoshiri/MarkdownLLM.git
+cd MarkdownLLM
+```
+
+### Step 2: Talk to Your Agent
+
+Open the workspace in your LLM tool. The agent will discover AGENTS.md automatically. Then just tell it what you want:
+
+> "I want to create a domain for tracking architectural decisions across our microservices. Each decision should capture the context, options considered, decision made, and consequences."
+
+The agent reads the framework specs, proposes a structure, and builds it. You refine through conversation.
+
+### Step 3: The Agent Builds Your Domain
+
+The agent will:
+1. Create `domains/your-domain/` with its own git repo
+2. Write AGENTS.md with `framework_root: ../..`
+3. Create all four skill files tailored to your domain
+4. Scaffold initial things as working examples
+5. Commit everything
+
+### Step 4: Work Within Your Domain
+
+This is where the real work happens — and it never stops. Every session in your domain workspace starts with the agent discovering your AGENTS.md, loading your skills, and understanding your things. Full context. Consistent reasoning. Audit trail in git.
+
+But you're not a passenger. You are:
+- **Defining workflows** — telling the agent how processes should run
+- **Using the output** — consuming what the agent produces, applying it to real work
+- **Providing feedback** — "this pattern doesn't capture edge cases well" or "the assessment needs a remediation step"
+- **Directing evolution** — new thing types emerge as you discover what you need
+- **Making decisions** — when the agent surfaces conflicts or tradeoffs, you decide
+
+The system grows through this loop. Skills refine as you learn what guidance produces better results. Workflows adapt as your process matures. The domain becomes more precise, more useful, more yours — but always structured, always consistent, always traceable.
 
 ---
 
-## How To Use This Framework
+## Vendor Configuration
 
-### Step 1: Understand the Foundation
+### GitHub Copilot (VS Code)
 
-Read these in order:
-1. **llm-driven-systems.manifesto.md** — Understand the philosophy
-2. **thing.md** — Understand the atomic unit
-3. **domain-specification-guide.md** — Understand how to create domains
-
-### Step 2: See It In Action
-
-Explore `examples/life-manager/` or `examples/compliance-patterns/`:
-- Look at how the specification skill defines philosophy
-- See how read/write prompts tailor guidance to the domain
-- Notice how thing files instantiate the spec
-
-### Step 3: Create Your Domain Repository
-
-Each domain is an **agent app** — a self-contained, LLM-driven application. The LLM agent itself is your primary interface for creating and working within a domain. You describe what you want; the agent builds the structure.
-
-> **Important:** You don't copy `thing.md` into your domain. That's a foundational framework specification — your domain discovers it automatically via the `framework_root` mechanism (see [framework-discovery.md](framework-discovery.md)).
-
-Your domain repository needs this structure:
-
-```
-my-domain/
-├── AGENTS.md                              ← Discovered at startup (orchestration)
-├── skills/                                ← Reusable capabilities
-│   ├── [domain]-specification.skill.md    ← Philosophy, principles, reasoning patterns
-│   ├── [domain]-read.thing.skill.md       ← How to read and analyze things
-│   ├── [domain]-write.thing.skill.md      ← How to create and update things
-│   └── [domain]-workflow.skill.md         ← Process orchestration and flow
-├── things/                                ← Data instances
-│   ├── run-1/                             ← Subfolder per workflow run or flow
-│   │   ├── thing-1.md
-│   │   └── thing-2.md
-│   ├── run-2/
-│   │   └── thing-3.md
-│   └── ...
-└── docs/                                  ← Extended documentation (optional)
-```
-
-**Minimum skills required:** The four skill files above are the baseline. A simple domain may have a single workflow skill describing one input → process → output flow. Complex domains may have multiple workflow skills or specialised skills for different concerns.
-
-**Things subfolders:** In practice, each time you run through a workflow (e.g., analysing a product, processing a batch, running an assessment), the things generated will be organised into subfolders within `things/`. This keeps runs separate and traceable.
-
-### Step 4: Set Up the Deployment Model (Nested Repository)
-
-The recommended way to work with the framework is the **nested repository model**:
-
-1. **Clone the MarkdownLLM framework repository**
-2. The framework's `.gitignore` already ignores the `domains/` folder
-3. **Create your domain inside `domains/`** — this is where your domain repository lives
-4. **Initialise a separate git repo** inside your domain folder (e.g., `domains/my-domain/`)
-
-```
-MarkdownLLM/                        ← Framework git repo (cloned)
-├── .gitignore                       ← Contains: domains/
-├── thing.md                         ← Foundational specs (shared)
-├── git-workflow.md
-├── validate.thing.md
-├── ...other framework specs...
-└── domains/
-    └── my-domain/                   ← Your domain git repo (independent)
-        ├── .git/                    ← Your own git history
-        ├── AGENTS.md               ← framework_root: ../..
-        ├── skills/
-        ├── things/
-        └── docs/
-```
-
-**Why this works:**
-- The framework `.gitignore` ensures your domain files never appear in framework commits — clean separation
-- Your domain has its own `.git`, so it versions independently with its own branches, tags, and remotes
-- The `framework_root: ../..` field in your AGENTS.md lets the domain agent discover and load foundational specs (thing.md, validate.thing.md, etc.) from the framework above
-- You can have multiple domains in `domains/`, each with their own git repo, all sharing the same framework
-
-See [domain-refresh.md](domain-refresh.md) for the full deployment architecture specification.
-
-### Step 5: Let the Agent Build Your Domain
-
-Using **domain-specification-guide.md** as your guide, tell your LLM agent what domain you want to create. The agent should:
-
-1. **Create AGENTS.md** — Your orchestration entry point with `framework_root` set correctly
-2. **Create skills/** — All four skill types tailored to your domain
-3. **Create initial things/** — Seed examples of your atomic units
-
-The agent is the thing that creates the domain for you. Describe your vision; let it build the structure.
-
-> **Note:** You may need to configure your LLM tool first — see Vendor Tooling Integration below.
-
-### Step 6: Interact and Iterate
-
-Once your domain exists, every session starts the same way:
-- The LLM discovers AGENTS.md at root
-- Loads skills for guidance
-- Reads things for context
-- Executes with consistency
-
-As you work:
-- Update skills when you learn what works better
-- Add new thing types when your schema evolves
-- Commit everything to git (it's your audit trail)
-- Let structure emerge from use
-
----
-
-## Vendor Tooling Integration
-
-The framework works across different LLM tools. Configure based on what you use:
-
-### GitHub Copilot (in VS Code)
-
-Enable AGENTS.md support in your VS Code settings:
+Enable AGENTS.md discovery:
 
 ```json
 {
@@ -304,11 +342,9 @@ Enable AGENTS.md support in your VS Code settings:
 }
 ```
 
-This tells Copilot to auto-discover AGENTS.md at your workspace root.
+### Claude Code
 
-### Claude Code (Standalone)
-
-Claude Code looks for `CLAUDE.md` at root. You can create a simple wrapper:
+Create a `CLAUDE.md` wrapper at root:
 
 ```markdown
 ---
@@ -319,13 +355,38 @@ description: What this domain does
 # [Domain] - Claude Code Instructions
 
 @AGENTS.md
-
-[Optional Claude-specific rules]
 ```
 
-### OpenAI Codex, Cursor, Windsurf, Gemini CLI
+### Codex, Cursor, Windsurf, Gemini CLI
 
-These tools auto-discover `AGENTS.md` at root—no special configuration needed.
+No configuration needed — these auto-discover AGENTS.md at root.
+
+---
+
+## The Deployment Model
+
+The recommended structure is the **nested repository model**:
+
+```
+MarkdownLLM/                        <- Framework git repo
+├── .gitignore                       <- Contains: domains/
+├── thing.md                         <- Foundational specs
+├── ...other framework specs...
+└── domains/
+    └── your-domain/                 <- Your domain git repo (independent)
+        ├── .git/
+        ├── AGENTS.md               <- framework_root: ../..
+        ├── skills/
+        ├── things/
+        └── docs/
+```
+
+- Framework and domain version independently
+- `framework_root: ../..` lets the domain agent discover foundational specs
+- Multiple domains can share the same framework installation
+- The framework's `.gitignore` keeps domains out of framework commits
+
+See [domain-refresh.md](domain-refresh.md) for the full deployment architecture.
 
 ---
 
@@ -333,87 +394,60 @@ These tools auto-discover `AGENTS.md` at root—no special configuration needed.
 
 A well-defined domain makes even a small model powerful. An undefined domain makes even the largest model mediocre.
 
-This is the framework's core insight: **structure beats scale.** When an LLM operates within a clearly defined domain — with explicit thing types, known relationships, declared triggers, and validated integrity — it reasons with precision and consistency. Without that structure, the same LLM produces vague, inconsistent, and unreliable output regardless of its parameter count.
+**Structure beats scale.** When an agent operates within a clearly defined domain — with explicit thing types, known relationships, declared triggers, and validated integrity — it reasons with precision and consistency. Without that structure, the same agent produces vague, inconsistent output regardless of its parameter count.
 
-What this means in practice:
+- **The domain is the product.** The LLM is replaceable (vendor agnostic); the domain definition is the durable asset. And the domain is something you and your agent build together over time.
+- **Consistency compounds.** Every session builds on committed state, validated things, and structured history. Your refinements accumulate. Nothing is lost.
+- **Cost scales with precision, not volume.** Tiered context loading means the agent loads only what it needs.
 
-- A **smaller, cheaper model** with a well-defined MarkdownLLM domain will outperform a larger, expensive model with no structure — because the domain constrains reasoning to what matters and eliminates ambiguity
-- **Consistency compounds** — every session builds on committed state, validated things, and structured history. The agent doesn't start from zero; it starts from a rich, reliable context
-- **Cost scales with precision, not volume** — tiered context loading means the agent loads only what it needs. A broad question scans metadata. A deep question loads full context. You pay for what you use
-- **The domain is the product** — the LLM is replaceable (vendor agnostic); the domain definition is the durable asset. Your investment is in defining the domain well, not in picking the right model
-
-This is why the framework exists. Not to add complexity, but to provide the minimal structure that makes LLM reasoning reliable across sessions, across vendors, and across scale.
+This is why the framework exists. Not to add complexity, but to provide the minimal structure that makes a true human-agent partnership productive — across sessions, across vendors, and across scale.
 
 ---
 
 ## Core Principles
 
-These principles guide everything in MarkdownLLM:
-
-1. **Definition-Driven** — Structure emerges from clear definitions, not from rigid templates
-2. **Atomic & Composable** — Everything is a thing; everything links explicitly
-3. **Minimal Core, Emergent Detail** — Start simple; let the schema grow with use
-4. **LLM-Centric** — Optimized for how LLMs reason, not for manual editing
-5. **Vendor Agnostic** — Works across Claude, Codex, Gemini, and others
-6. **Version-Controlled** — Git is your source of truth
-7. **Transparent** — No black boxes; all logic is explicit and readable
+1. **Agent-Consumed, Human-Directed** — Every specification is written for agents to load and reason with. Every decision is made by the human who directs the system.
+2. **Definition-Driven** — Structure emerges from clear definitions, not rigid templates.
+3. **Atomic & Composable** — Everything is a thing; everything links explicitly.
+4. **Minimal Core, Emergent Detail** — Start simple; let the schema grow through use.
+5. **Vendor Agnostic** — Works across any LLM with file system access.
+6. **Version-Controlled** — Git is the source of truth.
+7. **Transparent** — No black boxes; all logic is explicit and readable. You can always see what the agent did and why.
 
 ---
 
-## Frequently Asked Questions
+## FAQ
 
 ### "Why not just prompt engineering?"
 
-Prompt engineering works for small, one-off tasks. But as systems grow:
-- You lose context across sessions (frameworks prevent this)
-- You have inconsistent reasoning patterns (skills formalize patterns)
-- You can't reuse logic across domains (skills are composable)
-- You can't audit what changed (git gives you a complete history)
-
-MarkdownLLM takes proven patterns from enterprise LLM systems and applies them to *any* domain.
+Prompts are ephemeral. They don't persist across sessions, can't be versioned meaningfully, can't validate themselves, and can't compose. MarkdownLLM gives your agent a persistent, structured, self-validating foundation to reason within. The difference between a prompt and a framework is the difference between giving directions once and building a map.
 
 ### "Why markdown and YAML?"
 
-- **Markdown** is human-readable, version-control friendly, and LLM-friendly
-- **YAML** is simple enough for humans to edit, rich enough for structure
-- **Git** gives you free versioning, diffing, blame, and history
-- Together, they're portable across any LLM and any tool
+Because agents can read them, write them, diff them, and reason about them. Because git can version them. Because humans can read them too — and that transparency is what makes the human-agent collaboration work. You can always see what your agent built, verify it, and refine it.
 
-### "Can I use this with [favorite model/tool]?"
+### "Do I need to understand the specs to use this?"
 
-If it supports markdown and YAML, yes. MarkdownLLM is vendor-agnostic. It works with:
-- OpenAI Codex ✓
-- GitHub Copilot ✓
-- Anthropic Claude (direct API) ✓
-- Claude Code ✓
-- Google Gemini CLI ✓
-- Cursor ✓
-- Windsurf ✓
-- Any LLM tool with file system access (read, write, navigate) ✓
+No. The agent understands the specs. You understand your domain. You describe what you want; the agent applies the framework. Over time you'll naturally absorb the patterns because you can read everything the agent produces — but you never need to study the specs upfront.
 
-### "How do I version and update skills?"
+### "Can I use this with [model/tool]?"
 
-Skills have a `version` field in their frontmatter. As skills evolve:
-- Update the version number
-- Git tracks the change
-- Your thing files continue working with old skills until you deliberately update
-
-This lets you evolve guidance without breaking existing data.
+If your LLM tool can read files, write files, and navigate directories — yes. The framework is vendor-agnostic by design. Switch models, switch tools, your domain persists unchanged.
 
 ### "Is this production-ready?"
 
-The architecture is proven and actively used. Individual specifications range from `draft` to `stable` — check each file's frontmatter `status` field for maturity level. The examples are complete and usable, but you'll adapt them to your specific domain.
+The architecture is proven and actively used. Specifications range from `draft` to `stable` (check frontmatter). The examples are working domains. Your specific domain will mature through use — that's by design.
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines. In short: fork, follow `git-workflow.md` commit conventions, ensure YAML frontmatter stays valid, and submit a pull request.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Fork, follow `git-workflow.md` commit conventions, keep YAML frontmatter valid, submit a PR.
 
 ---
 
 ## License
 
-This framework is released under the MIT License. See [LICENSE](LICENSE) for details.
+MIT License. See [LICENSE](LICENSE).
 
-Copyright © 2026 JMTM Software Ltd.
+Copyright (c) 2026 JMTM Software Ltd.
