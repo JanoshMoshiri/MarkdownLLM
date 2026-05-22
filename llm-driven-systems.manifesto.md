@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-13
 linked_things:
   - id: thing-specification
@@ -84,6 +84,18 @@ The new pattern decouples these entirely:
 **Storage:** Git repositories containing markdown files with YAML frontmatter. Your data lives in plain text, versioned, human-readable, completely portable. Not in databases or proprietary formats. In git.
 
 These three layers are now independent. You can swap the interface without touching storage. You can change which LLM you use without rewriting anything. You can migrate your data by copying files.
+
+## Discovery: The Partnership Without Configuration
+
+The architecture above only works if an agent can *find it*. This is where discovery comes in — and it's what makes the human-agent partnership effortless.
+
+When you open a workspace, the agent discovers `AGENTS.md` at root. This is not something you configure or invoke — it's a convention that LLM tools already support. The agent reads AGENTS.md, finds the skills it should load, resolves `framework_root` to locate foundational specifications, and enters the domain fully oriented. No manual context loading. No "here, read this file first." The agent arrives ready.
+
+This is what enables the relationship to be natural. You don't need to teach the agent how to use the framework — the framework teaches the agent. You don't need to remember what context to provide — the agent discovers it. You just start talking about what you want to do, and the agent is already grounded in the domain's philosophy, structure, and history.
+
+Discovery is also what makes the system grow without friction. When you add a new skill, the agent picks it up next session. When you commit new things, they're part of the context the agent reads. When the framework itself evolves, domain agents can detect and incorporate those changes through the refresh mechanism. The system expands and the agent adapts — with the human directing where it goes, and the agent handling how to get there.
+
+This is the quiet foundation beneath everything else: a set of file conventions that mean an agent can enter any MarkdownLLM domain and immediately understand what it is, how it works, and how to help.
 
 ## Why This Works
 
@@ -289,16 +301,18 @@ If you want to build a system using this pattern:
 
 1. **Start small.** Pick a domain you care about. Define it clearly.
 
-2. **Create your AGENTS.md.** This is the entry point — auto-discovered by the LLM tool. It orchestrates everything else.
+2. **Create your AGENTS.md.** This is where you design how the agent should behave within your domain — what skills it loads, what reasoning patterns it follows, what constraints it operates within. The agent discovers this automatically. You're not configuring a tool; you're defining a collaborator's operating principles.
 
-3. **Create your skills.** Specification (philosophy), read (how to analyse), write (how to modify), workflow (process patterns). These teach the LLM how to work within your domain.
+3. **Create your skills.** Specification (philosophy), read (how to analyse), write (how to modify), workflow (process patterns). These are the agent's expertise for your domain — the guidance that makes it reason consistently and well.
 
 4. **Create a few things.** Your actual data. Show the system what you mean by concrete instances with frontmatter and narrative.
 
-5. **Interact with the LLM.** Through whatever route works — VS Code, CLI, voice, mobile. The agent loads, skills guide reasoning, things provide context.
+5. **Interact.** Through whatever route works — VS Code, CLI, voice, mobile. The agent loads, skills guide reasoning, things provide context. You direct; the agent executes.
 
-6. **Commit meaningfully.** Each state change gets a structured commit. Git becomes your domain's event stream and audit trail.
+6. **Use the output. Provide feedback.** This is not a one-shot generation. You use what the agent produces. You come back with refinements. You say "this workflow needs another step" or "this thing type should capture X." The system grows through this loop.
 
-7. **Iterate and share.** Your definitions will evolve. Document changes in the WORKLOG. Commit everything. Once you've built something useful, share it — others can fork and adapt for their own domains.
+7. **Commit meaningfully.** Each state change gets a structured commit. Git becomes your domain's event stream and audit trail.
 
-This is the new way of building systems. Not with code and databases and complex integrations. With clear thinking, structured data, and partnership with intelligence.
+8. **Iterate and share.** Your definitions will evolve. Skills refine. Thing types mature. Workflows adapt. Document the journey. Once you've built something useful, share it — others can fork and adapt for their own domains.
+
+This is the new way of building systems. Not with code and databases and complex integrations. With clear thinking, structured definitions, and an ongoing partnership between human direction and machine reasoning.
