@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.3
+version: 2.4
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -33,7 +33,7 @@ Creating a domain requires an **LLM tool that can traverse file directories, rea
 
 **Not compatible:** Web-based chat interfaces (ChatGPT, Claude web) or raw API calls without a file-access harness. The LLM must be able to navigate directories, read markdown files, and create/modify files.
 
-> **The agent creates the domain for you.** You describe what you want — the problem domain, the types of things you'll work with, the workflows — and the LLM agent builds the structure: AGENTS.md, skills, initial things. You iterate from there.
+> **The agent builds the domain with you.** You describe the problem space, make design decisions about workflows and structure, and provide feedback as things take shape. The agent applies the framework patterns, creates the files, and maintains structural integrity. You iterate together — and that iteration doesn't end at creation. You continue to direct, refine, and evolve the domain through use.
 
 ## The Three-Layer Architecture
 
@@ -219,13 +219,17 @@ See [domain-refresh.md](domain-refresh.md) for the full deployment architecture 
 
 ## Creating Your Agent File (AGENTS.md)
 
-Your `AGENTS.md` at the root defines:
-- What this domain is and what it accomplishes
-- Which skills to load and when
-- Behavioral rules and protocols
-- How the LLM should approach problems in this context
+Your `AGENTS.md` is where you design how the agent behaves within your domain. This is not a template to fill in mechanically — it's a design document where you make deliberate decisions about:
 
-**Template structure:**
+- **What this domain is** — The vision, the problem space, what it accomplishes
+- **How the agent should reason** — What skills to load, what principles to follow, what lenses to apply
+- **What workflows to orchestrate** — The processes your domain follows, in what order, with what checkpoints
+- **What constraints apply** — Behavioral rules, validation requirements, when to ask for human input
+- **How to handle conflicts** — When reasoning lenses disagree, when tradeoffs arise, what gets surfaced to you
+
+These are *your* design decisions. The agent operates within whatever you define here. As you use the domain and learn what works, you'll refine these decisions — tightening constraints that are too loose, relaxing ones that are too rigid, adding workflows you didn't anticipate.
+
+**Template structure (starting point — adapt to your needs):**
 
 ```markdown
 ---
@@ -579,13 +583,16 @@ git init
 
 The framework's `.gitignore` already excludes `domains/`, so your domain has its own independent git history. See the Deployment Model section above for details.
 
-### Step 2: Plan Your Domain
+### Step 2: Design Your Domain
 
-Answer these questions:
-- What problem does this domain solve?
-- What are your atomic units (thing types)?
-- What workflows or processes orchestrate them?
-- What skills will the LLM need to reason effectively?
+This is where you think — not the agent. Answer these questions:
+- **What problem does this domain solve?** What's the vision?
+- **What are your atomic units (thing types)?** What does a "thing" look like here?
+- **What workflows or processes orchestrate them?** What sequence of steps matters?
+- **What reasoning constraints should the agent follow?** Are there lenses, compliance requirements, quality gates?
+- **How will you use the output?** What do you need the agent to produce for you?
+
+You don't need to answer these perfectly upfront. Start with what you know. The agent will help you structure it, and the answers will sharpen through use. But the design intent is yours — the agent executes within whatever you define.
 
 ### Step 3: Let the Agent Build It
 
@@ -611,9 +618,16 @@ Start a new session in your domain workspace. The LLM should:
 
 If the agent doesn't behave as expected, refine your skills — they're the guidance that shapes reasoning.
 
-### Step 5: Iterate
+### Step 5: Use It, Refine It, Grow It
 
-Update skills and define new thing types as you learn what works. Commit everything to git — it's your audit trail and the mechanism that makes state persistent.
+This is where the real value emerges. You use the domain. You run workflows. You consume the output. And then you come back with feedback:
+
+- "This workflow needs an extra step before the final gate"
+- "The write skill should capture rationale, not just decisions"
+- "We need a new thing type for tracking remediation actions"
+- "The agent is being too conservative — loosen this constraint"
+
+Update skills. Define new thing types. Adjust workflows. The agent picks up every change next session — no reconfiguration needed. Your domain becomes more precise, more useful, more aligned with how you actually work. Commit everything to git — it's your audit trail and the mechanism that makes state persistent.
 
 ---
 
