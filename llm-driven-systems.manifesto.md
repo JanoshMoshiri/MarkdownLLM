@@ -41,7 +41,7 @@ This framework did not emerge from nothing. It builds upon decades of proven thi
 
 **SOLID Principles** (also Robert C. Martin) shaped the atomic, composable nature of things. Single Responsibility: each thing does one thing. Open/Closed: things are extensible through new fields without modifying existing structure. Dependency Inversion: skills depend on abstractions (thing.md), not on specific data instances.
 
-These ideas are not new. What's new is applying them to a world where the "logic layer" is an LLM, the "database" is git, and the "interface" is whatever channel connects you to intelligence.
+These ideas are not new. What's new is applying them to a world where the "logic layer" is an LLM, the "database" is git, and the "interface" is whatever channel connects you to the LLM.
 
 ### Building On What Exists
 
