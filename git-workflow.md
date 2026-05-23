@@ -394,6 +394,20 @@ git commit -m "<structured message>"
 Continue to next operation or report to user
 ```
 
+#### Terminal Execution Note
+
+When executing git commands via tool-based terminals (VS Code Copilot, Cursor, etc.), **run `git add` and `git commit` as separate sequential commands** — not chained with semicolons or `&&`. Some terminal tool implementations simplify or collapse chained commands, causing only the first command to execute. This results in files being staged but never committed (or neither staged nor committed), silently breaking autocommit.
+
+```
+# DO — separate commands
+git add <files>
+git commit -m "<message>"
+
+# DON'T — chained (may be collapsed by terminal tools)
+git add <files>; git commit -m "<message>"
+git add <files> && git commit -m "<message>"
+```
+
 If validation fails:
 ```
 Agent modifies thing(s)
