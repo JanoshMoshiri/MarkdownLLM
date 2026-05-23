@@ -14,6 +14,24 @@ Neither works without the other. An agent without structure produces inconsisten
 
 ---
 
+## The Framework Is a Domain
+
+The framework is self-describing. Its specifications — `thing.md`, `write.thing.md`, `validate.thing.md` — are themselves things, written in the same markdown-and-YAML format they define. The framework has its own `AGENTS.md`, its own skills, its own commit conventions. It follows the same patterns that every domain follows, because it's expressed with the same building blocks.
+
+This means the framework is itself a domain — the foundational domain. It has an agent that manages it, just as every domain has an agent that manages it. The framework agent knows the specifications, maintains them, evolves them, and scaffolds new domains when you ask. But its relationship to the framework is exactly the same as a domain agent's relationship to its domain: it discovers `AGENTS.md`, loads its skills, reasons within its boundaries, and commits its changes.
+
+**Every domain has its own agent.** You can have many domains sitting within the framework — compliance patterns, life management, product workflows — and each one has its own `AGENTS.md`, its own skills, its own things, its own git history, its own agent. The pattern is the same at every level:
+
+```
+AGENTS.md → skills → things → git
+```
+
+The framework is simply the first instance of this pattern. When you open the framework workspace, the framework agent operates. When you open a domain workspace, that domain's agent operates. Each agent knows its own world and manages its own world. The difference is scope, not structure.
+
+**The handoff when creating a domain:** You open the framework workspace, tell the framework agent to create a domain, and once it's built, you open the domain folder as its own workspace. From that point forward, that domain's agent is your working partner. The framework agent only comes back into play if you want to create another domain or evolve the framework itself.
+
+---
+
 ## How It Works
 
 ```
@@ -121,14 +139,16 @@ The workflow skill defines three modes:
 2. Batch assessment (all patterns, one codebase)
 3. Gap analysis (compare findings across runs)
 
-Everything is committed. Next session, I'll discover the
-domain's AGENTS.md and we can start creating patterns or
-running assessments immediately.
+Everything is committed. Your domain is ready.
+
+Open domains/compliance-patterns/ as its own workspace —
+the domain agent will discover its AGENTS.md and you can
+start creating patterns or running assessments immediately.
 ```
 
-That's it. The developer described intent. The agent understood the framework, proposed a structure, incorporated feedback, and built the domain. No manual file creation. No template copying. No configuration. Just a conversation.
+That's it. The developer described intent. The framework agent understood the specifications, proposed a structure, incorporated feedback, and built the domain. That's the framework agent's job — scaffolding domains from the framework's patterns.
 
-And this isn't the end — it's the beginning. Next session the developer comes back, the agent loads the domain with full context, and they continue: creating patterns, running assessments, refining workflows based on what's actually working. The system grows through use, directed by the human, executed by the agent, structured by the framework.
+What comes next is different. The developer opens the domain folder as its own workspace. The domain agent discovers the domain's `AGENTS.md`, loads its skills, and takes over from there — creating patterns, running assessments, refining workflows based on what's actually working. The domain agent knows the domain. It evolves the domain. The framework agent never enters the picture again unless the developer wants to create another domain or work on the framework itself.
 
 ---
 
@@ -314,7 +334,25 @@ The agent will:
 4. Scaffold initial things as working examples
 5. Commit everything
 
-### Step 4: Work Within Your Domain
+### Step 4: Open Your Domain as Its Own Workspace
+
+Once the domain is created, **open the domain folder as a new workspace** in your editor:
+
+```bash
+cd domains/your-domain
+code .
+```
+
+This is the key transition: you move from the framework workspace (where you created the domain) into the domain workspace (where you'll do all future work). From this point forward:
+
+- The domain's `AGENTS.md` is what your agent discovers at session start
+- The domain's `.git/` tracks all your domain-specific commits independently
+- The framework specs are still accessible via `framework_root: ../..` — the agent resolves them through the relative path
+- You never need to return to the framework workspace for day-to-day domain work
+
+The domain is now a self-contained project with its own repository, its own agent configuration, and its own git history. The framework is the foundation it reads from — not the workspace you operate within.
+
+### Step 5: Work Within Your Domain
 
 This is where the real work happens — and it never stops. Every session in your domain workspace starts with the agent discovering your AGENTS.md, loading your skills, and understanding your things. Full context. Consistent reasoning. Audit trail in git.
 

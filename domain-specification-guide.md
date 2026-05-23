@@ -35,6 +35,14 @@ Creating a domain requires an **LLM tool that can traverse file directories, rea
 
 > **The agent builds the domain with you.** You describe the problem space, make design decisions about workflows and structure, and provide feedback as things take shape. The agent applies the framework patterns, creates the files, and maintains structural integrity. You iterate together — and that iteration doesn't end at creation. You continue to direct, refine, and evolve the domain through use.
 
+## The Framework Is a Domain — And So Is Yours
+
+The framework itself is a domain. It uses the same building blocks it defines — `AGENTS.md`, skills, things with YAML frontmatter, git-backed state. The framework's agent manages the framework: maintaining specs, evolving the system, and scaffolding new domains when you ask.
+
+When you create a domain, you're creating another instance of the same pattern. Your domain gets its own `AGENTS.md`, its own skills, its own things, its own git history — and its own agent. The domain agent knows your domain, operates within it, and evolves it through use.
+
+The key distinction: **the framework agent scaffolds domains; the domain agent operates within them.** You use the framework workspace to create a domain, then you open the domain as its own workspace and work from there. From that point forward, the domain agent is your partner — it discovers the domain's `AGENTS.md` and reasons within the domain's boundaries.
+
 ## The Three-Layer Architecture
 
 ### Layer 1: Agent (Orchestration & Discovery)
@@ -594,11 +602,11 @@ This is where you think — not the agent. Answer these questions:
 
 You don't need to answer these perfectly upfront. Start with what you know. The agent will help you structure it, and the answers will sharpen through use. But the design intent is yours — the agent executes within whatever you define.
 
-### Step 3: Let the Agent Build It
+### Step 3: Let the Framework Agent Build It
 
-Open your domain folder in your LLM tool (GitHub Copilot, Claude Code, Codex CLI, etc.) and describe what you want. The agent should create:
+Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent discovers the framework's `AGENTS.md`, knows the specifications, and knows how to scaffold domains. Describe what you want — the framework agent will create everything inside `domains/my-domain/`:
 
-- `AGENTS.md` at root — with `framework_root: ../..` pointing to the framework
+- `AGENTS.md` at domain root — with `framework_root: ../..` pointing to the framework
 - `skills/` directory with the four baseline skills:
   - `[domain]-specification.skill.md`
   - `[domain]-read.thing.skill.md`
@@ -608,9 +616,20 @@ Open your domain folder in your LLM tool (GitHub Copilot, Claude Code, Codex CLI
 
 > `thing.md` is a framework foundational spec — your domain discovers it automatically via `framework_root`. Do not copy it into your domain.
 
-### Step 4: Test Your Domain
+### Step 4: Open Your Domain as Its Own Workspace
 
-Start a new session in your domain workspace. The LLM should:
+Once the framework agent has scaffolded your domain, open the domain folder as its own workspace:
+
+```bash
+cd domains/my-domain
+code .
+```
+
+This is the handoff. From this point forward, the **domain agent** takes over — it discovers the domain's `AGENTS.md`, loads its skills, and operates within the domain. You don't return to the framework workspace for day-to-day domain work.
+
+### Step 5: Test Your Domain
+
+In your domain workspace, the domain agent should:
 - Auto-discover AGENTS.md at root
 - Load your skills and understand the domain
 - Follow the workflow when you make requests
@@ -618,7 +637,7 @@ Start a new session in your domain workspace. The LLM should:
 
 If the agent doesn't behave as expected, refine your skills — they're the guidance that shapes reasoning.
 
-### Step 5: Use It, Refine It, Grow It
+### Step 6: Use It, Refine It, Grow It
 
 This is where the real value emerges. You use the domain. You run workflows. You consume the output. And then you come back with feedback:
 
@@ -701,14 +720,13 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 - [ ] **Plan** — Answer: What problem? What atomic units? What workflows?
 - [ ] **Clone framework** — Clone the MarkdownLLM repository
 - [ ] **Create domain folder** — Create your domain inside `domains/` and initialise a git repo
-- [ ] **Create AGENTS.md** — Your orchestration entry point at root, with `framework_root: ../..`
-- [ ] **Create skills/** — Specification, read/write thing skills, workflow (let the agent build these)
+- [ ] **Scaffold domain** — From the framework workspace, tell the framework agent to build your domain (AGENTS.md, skills, example things)
+- [ ] **Open domain workspace** — Open the domain folder as its own workspace — the domain agent takes over from here
 - [ ] **Understand thing.md** — The atomic unit specification (including triggers) — do NOT copy it into your domain
-- [ ] **Create examples** — A few things in `things/` to demonstrate your schema
 - [ ] **Add validation rules** — Domain-specific required fields and valid types in your specification skill (validated by `validate.thing.md`)
 - [ ] **Define commit conventions** — Follow `git-workflow.md` patterns for structured commit messages
 - [ ] **Enable tooling** — Configure GitHub Copilot or Claude Code if needed
-- [ ] **Test** — Start a new session; verify the agent auto-discovers AGENTS.md and follows your domain
+- [ ] **Test** — Verify the domain agent auto-discovers AGENTS.md and follows your domain
 - [ ] **Iterate** — Refine skills as you learn what works
 - [ ] **Commit** — Version control everything in git with meaningful messages
 
