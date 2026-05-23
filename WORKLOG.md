@@ -37,6 +37,65 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 23 May 2026
+
+### Session 1
+
+#### Topic: Thing Compression & Rolling Window — Design Discussion
+
+Exploratory session discussing a new framework capability to break through the hard ceiling on domain thing count. No spec drafted yet — intentionally staying in design phase.
+
+#### Problem Statement
+
+The scalability guide acknowledges a hard ceiling (~200-300 active things before friction, ~1,000 before breaking). Current approaches (contextual loading, manual summaries, tiered loading) mitigate but don't solve. The domain needs a lifecycle mechanism that automatically manages thing density over time.
+
+#### Proposed Solution: Rolling Window + Compression
+
+- **Rolling window:** Things active within the last 30 days remain at full depth
+- **Compression:** Things outside the window are automatically compressed to stubs (frontmatter + summary)
+- **Pin mechanism:** `pin: true` in frontmatter exempts a thing from auto-compression regardless of age
+- **Reversibility:** Full content preserved in git history and/or archive folder
+
+#### Design Decisions (Agreed)
+
+- **Window size:** 30 days
+- **Compression format:** Agent's choice — optimized for LLM scanning + git-friendliness. Current leaning: stub format (frontmatter with added `summary` field, narrative body stripped). Keeps things as valid thing files, just lighter.
+- **Pin/bypass:** Yes — `pin: true` prevents auto-compression for things that are old but still relevant (reference material, ongoing paused projects, recurring items)
+
+#### Design Decisions (Open — Suggestions Given)
+
+- **Retrieval mechanism — three options proposed:**
+  - **Option A: Query-Time Scan** — Agent always loads all stubs, matches query against summaries. Simplest but doesn't scale past ~1,000 compressed things.
+  - **Option B: Manifest Index** — Single `_archive-manifest.md` file listing all compressed things with id, type, status, summary, compressed_date. Agent searches one file instead of opening hundreds.
+  - **Option C: Relationship-Triggered** — Active things retain `linked_things` refs to compressed things. When agent follows a dead reference, it auto-retrieves from archive. Organic but doesn't cover "what did I do about X?" queries.
+  - **Recommended: B + C combined** — Manifest for user-initiated discovery ("what was that project?"), relationship links for organic graph traversal ("what's blocking this?"). Covers both access patterns.
+
+#### Frontmatter Additions (Proposed)
+
+```yaml
+compressed: true
+compressed_date: 2026-04-20
+summary: "One-line description of what this thing was about"
+last_active: 2026-04-18
+pin: false
+```
+
+#### Capacity Impact (Estimated)
+
+- Active window: ~50-80 things at full depth (current normal capacity)
+- Compressed stubs: 500+ things at ~100-150 tokens each
+- Net effect: 5-10x capacity increase per domain without breaking context limits
+
+#### Next Steps
+
+- [ ] Decide on retrieval mechanism (B+C recommended)
+- [ ] Draft `thing-compression.md` spec (or similar name)
+- [ ] Design the compression skill/prompt that performs the maintenance
+- [ ] Define rehydration triggers and promotion logic (compressed → active)
+- [ ] Update scalability-guide.md to reference the new spec as Approach 4
+
+---
+
 ## 22 May 2026
 
 ### Session 1
