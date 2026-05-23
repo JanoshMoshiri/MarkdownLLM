@@ -96,6 +96,51 @@ pin: false
 
 ---
 
+### Session 2
+
+#### Topic: Prior Agent Conversation Review — Compression Design Critique
+
+Reviewed a prior conversation with a different agent that had explored the same rolling window / compression idea. The purpose was to assess whether the prior conversation changed anything in the current design direction.
+
+#### What the Prior Conversation Got Right
+
+- **`decompress_cost` / rehydration token estimate** — Surfacing the approximate token cost of loading a rehydrated thing is genuinely useful. Worth including as a frontmatter field (e.g., `rehydration_tokens`).
+- **`references_from_active` in archive frontmatter** — Equivalent to Option C (relationship-triggered retrieval). Valuable because it tells the agent which active things have dependencies on compressed ones, enabling organic graph traversal.
+- **Option B (structured prose summary) over binary payloads** — The prior agent correctly favoured human-readable narrative summaries over encoded blobs, which is aligned with the framework's principles.
+- **Phase-based implementation** — Sensible sequencing: define the format first, then the compression process, then the retrieval patterns, then a worked proof.
+
+#### The Critical Flaw — Binary Compression Is Wrong for This Framework
+
+The prior agent proposed actual binary compression: gzip/zstd payloads, base64-encoded blobs in markdown bodies, checksums, and external decompression operations. This is fundamentally incompatible with the framework for several reasons:
+
+1. **LLMs cannot execute decompression.** The framework has no tooling layer. The agent cannot inflate a gzip blob; any "decompression" would require external infrastructure the framework intentionally avoids.
+2. **Binary blobs break human-readability.** A core principle of the framework is that every file is readable by a human in a text editor. Base64 payloads violate this.
+3. **Git diffs on binary blobs are meaningless.** The audit trail — one of the framework's key values — is destroyed when file bodies become encoded data.
+4. **Period archives (e.g. "Q1 2026 = 47 things in one file") lose individual thing identity.** You cannot hot-link to a specific thing inside a bulk archive. The graph of `linked_things` relationships breaks.
+
+The prior agent conflated two different problems: **storage compression** (reducing bytes on disk) and **context compression** (reducing what the LLM loads per session). The framework only needs the second. "Compression" in this context means: narrative stripping — the thing body is summarised into a `summary` frontmatter field, not encoded.
+
+#### Where This Lands
+
+The WORKLOG Session 1 direction is confirmed as correct:
+
+- Each thing remains an individual file
+- "Compression" = narrative stub: frontmatter retained, body replaced by a `summary` field
+- No binary encoding, no external tooling, no period-container archives
+- Still valid markdown things, individually addressable, meaningful git diffs, human-readable
+
+The one idea from the prior conversation worth carrying forward is the **period summary thing** concept — not as a bulk container for compressed things, but as an optional narrative overview of a time window (e.g., a `type: period-summary` thing that captures what happened in a given month). This would complement the individual stubs, not replace them.
+
+#### Three Open Design Tensions (Deferred to Next Session)
+
+The following tensions were identified but not resolved. They should be the starting point of the next design session:
+
+1. **What is a thing's "age"?** `last_active` doesn't exist yet. Does it update on read, on write, or only on explicit human engagement? Recurring items may be old by timestamp but very much alive.
+2. **Automatic vs. on-demand compression triggering.** Does the agent compress automatically during normal operation, or only when the user explicitly requests it? Auto is more elegant; on-demand is safer. This tension determines the shape of everything else — resolve it first.
+3. **Manifest as a thing vs. special artifact.** If using Option B (manifest index), should `_archive-manifest.md` follow the thing format (uniform system) or be a special framework artifact (simpler to scan and reason about)?
+
+---
+
 ## 22 May 2026
 
 ### Session 1
