@@ -141,6 +141,122 @@ The following tensions were identified but not resolved. They should be the star
 
 ---
 
+### Session 3
+
+#### Topic: Prior Art Research — Established Patterns for Thing Compression
+
+Research session to identify existing, proven paradigms that align with the compression/archival pattern being designed. The framework's philosophy is to conduct existing well-proven patterns in a new arrangement — not to reinvent the wheel.
+
+#### Five Established Patterns Identified
+
+**1. S3 Lifecycle Policies (AWS) — Closest direct match**
+- Declarative rule-based transitions: "After 30 days, transition from Standard to Glacier"
+- Age is the trigger; multiple tiers (Hot → Warm → Cold → Delete)
+- Per-bucket (= per-domain) configuration
+- Transparent retrieval from cold storage (just takes longer)
+- **What we take**: Declarative config model. Rules declared in domain AGENTS.md, not procedural code.
+
+**2. Hierarchical Storage Management (HSM) — The general paradigm (IBM, 1978)**
+- Automatic migration between hot/cold tiers based on access patterns
+- Transparent retrieval: user accesses data the same way regardless of tier
+- System handles promotion back to hot when cold data is accessed
+- **What we take**: Transparency — agent handles tier management invisibly to user.
+- **What we heed**: HSM research shows users get frustrated by silent migration → validates `suggest` mode first.
+
+**3. Log Rotation (logrotate) — The operational pattern**
+- Time-based or size-based triggers
+- Compress old, keep N recent, delete oldest
+- Runs as a scheduled job (cron)
+- **What we take**: The maintenance rhythm. Compression runs at session-start as a periodic check, not continuously.
+
+**4. Information Lifecycle Management (ILM) — The lifecycle model**
+- Five phases: Creation → Distribution → Use → Maintenance → Disposition
+- Records transition: active → semi-active → inactive
+- **Legal holds** freeze records at any stage regardless of age
+- **What we take**: Legal hold = `pin: true`. Same concept, proven in records management for decades.
+
+**5. LSM Trees (Log-Structured Merge Trees) — The compaction/retrieval model**
+- Recent writes in memory (C0), older data compacted to sorted runs on disk (C1, C2...)
+- **Bloom filters** provide fast "is it here?" checks without reading full data
+- **What we take**: Manifest = Bloom filter. Quick scan to determine if a thing exists in archive without opening individual files.
+
+#### Key Refinement From Research: Age + Eligibility
+
+The most important insight: no established pattern uses age *alone* as the trigger. S3 lifecycle rules filter by tags AND age. ILM uses status AND age. HSM uses access frequency AND time.
+
+Our trigger should be: **age (outside 30-day window) + status eligibility**. Things with active statuses are auto-exempt:
+
+```yaml
+compression:
+  window: 30d
+  mode: suggest
+  pin_statuses: [in-progress, blocked, paused]
+```
+
+Only `completed` and `cancelled` things are eligible for compression. Active things never compress regardless of age. This eliminates the edge case of compressing something the user is still working on.
+
+#### Design Tensions Resolved
+
+1. **What is a thing's "age"?** → Resolved: `last_active` updates on commit (when the thing's file is committed with changes). Simple, auditable, no ambiguity. Git is the source of truth.
+2. **Automatic vs. on-demand?** → Resolved: `suggest` mode first (agent proposes, user approves). Domains can escalate to `auto` once they trust the mechanism. Mirrors the autocommit pattern progression.
+3. **Manifest as thing vs. artifact?** → Resolved: Artifact (same category as WORKLOG). Has frontmatter for identification, body is structured index. Not a domain thing.
+
+#### Retrieval Mechanism — Final Design (B+C Combined)
+
+Three retrieval paths, mapped to established patterns:
+
+| Path | Trigger | Pattern Source | Example |
+|---|---|---|---|
+| Period summary | User asks about a time window | ILM reporting | "What happened in Q1?" |
+| Manifest search | User asks about a specific old thing | LSM Bloom filter | "What was that bike task?" |
+| Relationship traversal | Agent follows a dead link | HSM auto-promote | "What blocks this?" |
+
+#### Proposed Implementation Plan
+
+**Phase 1: Specification (Draft)**
+- Write `thing-lifecycle.md` — the compression spec defining format, rules, triggers, retrieval
+- Define the compressed stub format (frontmatter + summary field)
+- Define the manifest artifact format
+- Define the compression eligibility rules (age + status)
+- Define retrieval paths and rehydration behaviour
+- Status: `draft`
+
+**Phase 2: Domain Configuration**
+- Extend AGENTS.md frontmatter schema with `compression:` block
+- Define config options: `window`, `mode` (off/suggest/auto), `pin_statuses`, `pin` field on individual things
+- Update domain-specification-guide.md to reference lifecycle configuration
+
+**Phase 3: Compression Skill**
+- Create `compress-things.skill.md` (or equivalent domain skill template)
+- Defines the maintenance routine: scan things → identify eligible → generate summaries → write stubs → update manifest → commit
+- Runs at session-start or on-demand
+
+**Phase 4: Retrieval Skill**
+- Create retrieval logic: manifest search, relationship-triggered auto-retrieve, period summary generation
+- Define rehydration: how to restore a compressed thing from git history or archive folder
+- Define promotion logic: if a compressed thing is accessed N times, auto-restore to active window
+
+**Phase 5: Scalability Guide Update**
+- Add as "Approach 4: Lifecycle Compression" to scalability-guide.md
+- Position between Approach 2 (manual summaries) and Approach 3 (tiered loading)
+- Reference the established patterns as prior art
+
+**Phase 6: Proof / Validation**
+- Apply to a real domain (ProducFlow2 has enough things to test)
+- Validate: compression works, retrieval works, manifest stays accurate, git diffs are clean
+- Promote spec from `draft` → `evolving` → `stable`
+
+#### Decision: Spec and Defer
+
+This feature is a real gap but not an immediate blocker. The framework principle of "don't fix until broken" applies. The recommendation is:
+
+- **Spec now** (Phase 1) — capture the design while it's fresh, establish the vocabulary and format
+- **Defer deployment** (Phases 2-6) — implement when a domain actually hits the ceiling and needs it
+
+This gives the framework a ready answer when someone hits the scaling wall, without over-engineering the present.
+
+---
+
 ## 22 May 2026
 
 ### Session 1
