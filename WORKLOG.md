@@ -257,6 +257,34 @@ This gives the framework a ready answer when someone hits the scaling wall, with
 
 ---
 
+### Session 4
+
+#### Topic: Spec and Defer — Terminology Correction, Manifesto Update, Specification Drafted
+
+Final session in the lifecycle design arc. Corrected terminology, added framework evolution principle to manifesto, and drafted the full specification.
+
+#### Completed
+
+- [x] **Terminology correction**: Adopted ILM terminology throughout — "disposition to semi-active storage" instead of "compression." The mechanism is broader than making files smaller; it's a lifecycle transition between storage tiers.
+- [x] **Manifesto updated** (v2.1): Added "Spec When Foreseeable, Deploy When Felt" subsection under "Building On What Exists." Captures the framework's evolutionary discipline — design solutions for foreseeable problems, deploy them when the friction is real.
+- [x] **thing-lifecycle.md created** (v0.1, status: draft): Full specification covering the rolling window, disposition process, stub format, eligibility rules, manifest artifact, three retrieval paths, rehydration process, domain configuration, period summaries, and capacity impact estimates. Draws explicitly from the five prior art patterns identified in Session 3.
+- [x] **git-workflow.md updated** (earlier this session): Added terminal execution note about chained commands being collapsed by tool terminals.
+
+#### Key Terminology Decisions
+
+| Old term | New term | Rationale |
+|---|---|---|
+| Compression | Disposition | ILM standard term; "compression" implies encoding |
+| Compressed thing | Semi-active thing | Describes the storage tier, not the process |
+| Decompression | Rehydration | Standard term for restoring from cold/semi-active |
+| Archive | Semi-active storage | "Archive" implies finality; semi-active implies retrievability |
+
+#### Decision: Spec and Defer (Confirmed)
+
+Phase 1 (specification) is now complete. Phases 2-6 (deployment) are deferred until a domain encounters the scaling ceiling. The spec sits in the repo as `thing-lifecycle.md` with `status: draft`, ready to activate when needed. The AGENTS.md has **not** been updated to reference this spec — it will be incorporated into the framework's startup loading only when deployed.
+
+---
+
 ## 22 May 2026
 
 ### Session 1

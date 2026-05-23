@@ -65,6 +65,12 @@ This means:
 
 The insight is that the LLM era doesn't need new protocols, new databases, or new interface paradigms. It needs a clear architecture for how existing tools compose around a new kind of intelligence. That's what this framework provides.
 
+### Spec When Foreseeable, Deploy When Felt
+
+The framework specs problems when they're foreseeable and deploys solutions when they're felt. A well-understood future problem earns a specification — a documented design ready to activate. But implementation waits until the friction is real. This prevents over-engineering while ensuring the framework has answers ready when domains outgrow their current patterns.
+
+This is the conductor's discipline: know the full score, but only bring in each section when the music calls for it.
+
 ## The Three Decoupled Layers
 
 Traditional applications couple three concerns:
