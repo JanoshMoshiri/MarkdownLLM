@@ -58,6 +58,8 @@ version: 1.0
 created: [ISO-date]
 session: [YYYY-MM-DD]
 source: human|agent|both
+confidence: high|medium|low
+origin: stated|inferred|synthesised
 promoted_to: [thing-id]        # populate if status becomes promoted
 linked_things:
   - id: [related-thing-id]

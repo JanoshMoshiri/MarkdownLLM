@@ -117,6 +117,20 @@ These aren't required, but they unlock richer reasoning from Claude:
 - Inverse of dependencies
 - Helps Claude understand impact
 
+**confidence** (string)
+- How certain the domain is that the content of this thing is correct
+- Values: `high`, `medium`, `low`
+- Defaults to `high` if omitted — so only add when there is genuine uncertainty
+- Particularly important for `type: insight` and `type: specification` things where the LLM should calibrate how firmly to treat content as ground truth
+- When `confidence: low`, the LLM should surface the uncertainty rather than reason from the thing as fact
+
+**origin** (string)
+- The provenance of this thing's content — who or what produced it
+- Values: `stated` (explicitly said by the human), `inferred` (concluded by the agent from other things), `synthesised` (assembled by the agent from multiple sources)
+- Critical for LLM trust calibration: an `inferred` thing should be treated differently from a `stated` one
+- Defaults to `stated` if omitted — only add when the content was not directly expressed by a human
+- Works in tandem with `confidence`: a thing that is both `origin: inferred` and `confidence: low` should always be surfaced for human review before being acted on
+
 #### Emergent Fields
 
 These fields will emerge over time as your system evolves:
