@@ -15,6 +15,55 @@ git:
 
 This is the MarkdownLLM framework — a specification for building LLM-driven systems where humans define domains, LLMs reason within them, and git-versioned markdown files are the persistent state. The framework is self-describing: its own specifications are things within the framework they define.
 
+## Three-Layer Architecture
+
+Every domain in this framework — including the framework itself — follows the same three-layer pattern:
+
+```
+Layer 1: AGENTS.md        ← Entry point; discovered automatically; orchestrates everything
+Layer 2: skills/*.md      ← Reusable capabilities loaded by the agent at startup
+Layer 3: things/*.md      ← Data instances — the actual content the domain manages
+                              ↓
+                          Git — the audit trail, state machine, and version history
+```
+
+| Layer | File Pattern | Purpose |
+|---|---|---|
+| **Agent** | `AGENTS.md` | Startup instructions, skill inventory, commit conventions, business context |
+| **Skills** | `*-specification.skill.md` | Philosophy, principles, reasoning patterns for the domain |
+| | `*-read.thing.skill.md` | How to analyse things without modifying them |
+| | `*-write.thing.skill.md` | How to create, update, and validate things |
+| | `*-workflow.skill.md` | End-to-end process orchestration |
+| **Things** | `things/**/*.md` | Data instances — every item the domain tracks |
+
+## Standard Thing Structure
+
+Every thing — regardless of domain or type — shares this YAML frontmatter structure:
+
+```yaml
+---
+id: unique-kebab-case-identifier
+type: specification|skill|guide|manifesto|[domain-specific-type]
+status: draft|evolving|stable|deprecated
+version: 1.0
+created: YYYY-MM-DD
+tags: [tag1, tag2]
+priority: high|medium|low          # optional
+dependencies: [other-thing-id]     # optional; things that must exist first
+linked_things:
+  - id: related-thing-id
+    relation: informs|implements|extends|complements|references|documents
+# Plus any domain-specific fields — schema grows with domain needs
+---
+
+# Thing Title
+
+Narrative body: context, rationale, current state, next steps, blockers.
+This is where the reasoning lives — not just the data.
+```
+
+**Emergent schema:** Core fields are fixed. Everything else is added as the domain's complexity requires it. Never over-define upfront.
+
 ## How This Agent Works
 
 ### On Startup
@@ -67,11 +116,15 @@ The framework defines itself through these interconnected specifications:
 
 ## Framework Principles (Applied To Itself)
 
-1. **Self-Describing** — The framework is a domain within itself. Its specifications are things with frontmatter, relationships, statuses, and versions.
-2. **Atomic & Composable** — Each spec is self-contained but explicitly linked to others. You can read any one spec independently, but together they form a complete system.
-3. **Evolving** — Specifications have status (`draft`, `evolving`, `stable`). New specs start as drafts and mature through use.
-4. **Vendor Agnostic** — This AGENTS.md works with GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini CLI.
-5. **Git-Backed** — All framework evolution is committed with structured messages. The WORKLOG captures session narrative. Git log captures state changes.
+1. **Definition-Driven** — Humans define the constraints; LLMs reason within them. Not prompt-driven, not fully autonomous — definition-driven. The structure is the interface.
+2. **Self-Describing** — The framework is a domain within itself. Its specifications are things with frontmatter, relationships, statuses, and versions.
+3. **Atomic & Composable** — Each spec is self-contained but explicitly linked to others. You can read any one spec independently, but together they form a complete system.
+4. **Minimal Core, Emergent Detail** — Start with the essential structure. Let the schema grow with domain needs. Never over-engineer upfront; add complexity only when it earns its place.
+5. **Evolving** — Specifications have status (`draft`, `evolving`, `stable`). New specs start as drafts and mature through use.
+6. **Vendor Agnostic** — This AGENTS.md works with GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini CLI. No vendor-specific memory stores required — the framework is the memory.
+7. **Transparent & Auditable** — Every decision, every state change, every reasoning step is committed to git. Full history is always available.
+8. **Git-Backed** — Git is the state machine, not just version control. Commit messages are the event stream. The WORKLOG captures session narrative.
+9. **Elegant Constraint Enables Efficiency** — Well-defined systems let smaller models perform reliably. Structure isn't overhead; it's the mechanism that makes reasoning consistent across sessions and vendors.
 
 ## Thing Types In This Domain
 
@@ -79,6 +132,18 @@ The framework defines itself through these interconnected specifications:
 - `type: specification` — Foundational definitions of how things work
 - `type: skill` — Reusable capabilities the agent can invoke
 - `type: guide` — Operational guidance for using the framework
+
+## Key Innovations
+
+1. **Automatic Discovery** — AGENTS.md is discovered at workspace open. No manual includes, no configuration. The agent finds its own context.
+2. **Multi-Lens Reasoning** — Complex decisions are analysed through multiple lenses simultaneously (e.g. Domain Logic, Compliance Logic, Audit Logic). Each lens asks different questions of the same data.
+3. **Tiered Context Loading** — Agents choose their context depth based on the query:
+   - *Level 1* — Metadata only (frontmatter fields; fast, broad)
+   - *Level 2* — Relationships + metadata (linked_things, dependencies)
+   - *Level 3* — Full context (complete thing files including narrative body)
+4. **Pattern Libraries via Examples** — `type: example` things teach through positive and negative patterns. The agent learns domain conventions by reading worked examples, not just rules.
+5. **Nested Repo Isolation** — Domains live as independent git repos nested within the framework directory. The framework's `.gitignore` excludes all domain folders. Domain history is always separate from framework history.
+6. **Scalable Structure** — The same three-layer pattern works from 10 things to 10,000. Abstraction layers (type grouping, status filtering, tag taxonomies) emerge as the domain grows.
 
 ## Status Values For Framework Specs
 
