@@ -1,0 +1,26 @@
+---
+id: [descriptive-insight-id]
+type: insight
+status: active
+version: 1.0
+created: [ISO-date]
+session: [YYYY-MM-DD]
+source: human|agent|both
+confidence: high|medium|low
+origin: stated|inferred|synthesised
+promoted_to:                           # populate if status becomes promoted
+linked_things:
+  - id: [related-thing-id]
+    relation: informs|challenges|supports
+---
+
+# [Insight Title — name the idea, not the session]
+
+## The Insight
+[One to three sentences: the actual idea, view, or hypothesis. State it directly.]
+
+## Why It Matters
+[Why this is worth carrying forward — what decisions or threads it affects.]
+
+## Context
+[What triggered this in the session — the question, tension, or observation that surfaced it.]

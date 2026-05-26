@@ -84,17 +84,16 @@ These two hard hooks are part of every agent's operating contract with the frame
 **When it fires:** At the end of any session in which a domain was discussed or modified.
 
 **What must happen:**
-1. Scan the session for insights worth preserving — emerging ideas, held views, unresolved tensions, open questions, or hypotheses that surfaced in dialogue
-2. Apply the preservation test: *Would a fresh agent starting this domain cold benefit from knowing this?* If yes, create a `type: insight` thing in `things/insights/` within the domain
-3. Load the domain's `continuity.md` (the continuity brief)
-4. Update it: add new open threads, remove resolved ones, update live insights and pending decisions
-5. Commit all new insight things and the updated continuity brief
+1. Scan the session for insights worth preserving — emerging ideas, held views, unresolved tensions, open questions, or hypotheses that surfaced in dialogue. Apply the preservation test: *Would a fresh agent starting this domain cold benefit from knowing this?* If yes, create a `type: insight` thing in `things/insights/`.
+2. Scan for contradictions introduced this session — did anything created or modified assert something that conflicts with an existing thing? If yes: resolve in-session where clear (declare `relation: supersedes`), or create a `type: conflict` thing in `things/conflicts/` and add `relation: contradicts` to both parties. Be conservative — only flag genuine semantic contradictions.
+3. Load the domain's `continuity.md`. Update it: add new open threads, remove resolved ones, update live insights, add any new open conflicts, update pending decisions.
+4. Commit all new insight things, conflict things, and the updated continuity brief.
 
 **Why it's hard:** Generative knowledge — the reasoning, emerging views, and unresolved threads from a session — evaporates by default. The WORKLOG records what was done; the continuity brief preserves what is still live. Without this step, every session starts cold. The framework's value compounds across sessions only if continuity is explicitly maintained.
 
-**What failure looks like:** Sessions that are productive in isolation but don't build on each other. The same ideas surfaced, debated, and forgotten repeatedly. An agent that cannot answer: *"What were we working through last time?"*
+**What failure looks like:** Sessions that are productive in isolation but don't build on each other. The same ideas surfaced, debated, and forgotten repeatedly. Contradictions accumulating silently until the domain holds two incompatible positions simultaneously. An agent that cannot answer: *"What were we working through last time?"*
 
-**Full specification:** See `session-memory.md` for the extraction heuristic, insight structure, and continuity brief format.
+**Full specification:** See `session-memory.md` (insight extraction, continuity brief format) and `belief-revision.md` (conflict detection and resolution).
 
 ### Declaring Domain-Level Hard Hooks
 

@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 2.5
+version: 2.6
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -71,7 +71,7 @@ This is where the reasoning lives — not just the data.
 2. Load operational specs (validate.thing.md, read.thing.md, write.thing.md)
 3. Load the manifesto for philosophical grounding (llm-driven-systems.manifesto.md)
 4. Load the domain guide for operational context (domain-specification-guide.md)
-5. Load supporting specs as needed (scalability-guide.md, orchestration.md, session-memory.md, belief-revision.md)
+5. Load supporting specs as needed (scalability-guide.md, orchestration.md, session-memory.md, belief-revision.md, retrospective.md)
 6. Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
 ### On User Request
@@ -110,6 +110,7 @@ The framework defines itself through these interconnected specifications:
 - **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: stable`)
 - **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things and the domain `continuity-brief`. Defines the mandatory `session-end:continuity` ritual. (`type: specification`, `status: stable`)
 - **belief-revision.md** — How the framework handles contradictions between things: `type: conflict`, `relation: supersedes`/`contradicts`, and the belief revision process. (`type: specification`, `status: stable`)
+- **retrospective.md** — Periodic domain quality reflection: `type: retrospective`, when to write one, and how it produces insights, surfaces latent conflicts, and improves reasoning over time. (`type: specification`, `status: stable`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
 - **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: stable`)
 
@@ -145,6 +146,7 @@ The framework defines itself through these interconnected specifications:
 - `type: insight` — An emerging idea, held view, or hypothesis from a session, preserved for future context (framework-reserved)
 - `type: continuity-brief` — The domain's live forward-looking session-continuity document; one per domain (framework-reserved)
 - `type: conflict` — A documented contradiction between two things, held as a first-class thing until resolved (framework-reserved)
+- `type: retrospective` — A periodic quality reflection on domain reasoning; one per period, not per session (framework-reserved)
 
 ## Key Innovations
 

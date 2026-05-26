@@ -1,0 +1,37 @@
+---
+id: [descriptive-conflict-id]
+type: conflict
+status: open
+created: [ISO-date]
+session: [YYYY-MM-DD]
+parties:
+  - [thing-id-a]
+  - [thing-id-b]
+resolution:                            # populate when resolved: superseded|both-valid|dismissed
+resolved_by:                           # populate if resolution: superseded
+confidence: low|medium
+origin: stated|inferred
+linked_things:
+  - id: [thing-id-a]
+    relation: contradicts
+  - id: [thing-id-b]
+    relation: contradicts
+---
+
+# [Conflict Title — name the tension, not the things]
+
+## The Clash
+[One clear paragraph: what do these two things disagree about? State the contradiction plainly.]
+
+## Position A — [thing-id-a]
+[One paragraph: what does thing A assert? Quote or paraphrase directly.]
+
+## Position B — [thing-id-b]
+[One paragraph: what does thing B assert? Quote or paraphrase directly.]
+
+## The Resolution Question
+[What needs to be known, decided, or experienced to close this?
+What kind of answer would resolve it?]
+
+## Resolution
+[Populate when status changes to resolved. What was decided, and why.]

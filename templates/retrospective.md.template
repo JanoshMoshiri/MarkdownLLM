@@ -1,0 +1,37 @@
+---
+id: [domain]-retrospective-[YYYY-MM]
+type: retrospective
+status: draft
+created: [ISO-date]
+period_start: [ISO-date]
+period_end: [ISO-date]
+domain: [domain-id]
+linked_things:
+  - id: [domain]-continuity-brief
+    relation: informs
+---
+
+# [Domain] Retrospective — [Month Year]
+
+## What We Were Trying To Do
+[One paragraph: what were the domain's main objectives during this period?]
+
+## What Worked
+[Where did reasoning hold up? What decisions proved sound in retrospect?
+What approaches produced good outcomes?]
+
+## What Didn't Work
+[Where were we wrong, uncertain, or inconsistent?
+What decisions turned out to be poorly reasoned?
+What did we have to revisit or reverse?]
+
+## Patterns We Noticed
+[Are there recurring themes — types of questions we consistently struggle with?
+Types of things that keep going stale? Blind spots that keep appearing?]
+
+## What Should Change
+[Concrete adjustments: to how things are structured, to how the domain
+operates, to which specs need updating, to which beliefs need revisiting.]
+
+## Open Questions Going Forward
+[Questions this retrospective raised that don't yet have answers.]

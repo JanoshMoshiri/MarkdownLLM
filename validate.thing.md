@@ -139,6 +139,7 @@ This level uses your reasoning, not mechanical checks. Read the thing holistical
 | `supersedes` without update | A `linked_things` entry has `relation: supersedes` but the referenced thing has no corresponding `superseded-by` link or `status: deprecated` | Warning |
 | Open conflict not in continuity brief | A `type: conflict` thing with `status: open` exists but is not listed in `continuity.md` | Warning |
 | Stale open conflict | A `type: conflict` thing has `status: open` and has not been updated in more than 30 days | Info |
+| No recent retrospective | The domain has been active for more than 60 days since the last `type: retrospective` thing (or has none at all) | Info |
 
 **Important:** Level 4 is advisory. These are observations, not errors. Present them as "I noticed..." rather than "Fix this."
 

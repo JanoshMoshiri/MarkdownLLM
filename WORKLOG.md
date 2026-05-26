@@ -96,6 +96,28 @@ The user confirmed that `type: conflict` should be a first-class type — not a 
 
 ---
 
+### Session 3
+
+#### Topic: Polish Pass — Hook Consistency, Templates, and Retrospective Spec
+
+Addressed four remaining gaps identified in the post-implementation review.
+
+#### Completed
+
+- [x] **orchestration.md updated** (v1.3 → v1.4): `session-end:continuity` hard hook text brought up to date — now explicitly covers both insight extraction (Step 1) and belief revision / conflict detection (Step 2). Previously only referenced session-memory.md; now also references belief-revision.md.
+- [x] **templates/insight.md.template created**: Starting-point template for `type: insight` things with all recommended fields pre-populated.
+- [x] **templates/conflict.md.template created**: Starting-point template for `type: conflict` things with parties, resolution fields, and five standard body sections.
+- [x] **retrospective.md created** (v1.0, `status: stable`): Full spec defining `type: retrospective` — periodic quality reflection on domain reasoning. Defines when to write one (time, volume, milestone triggers), what it produces (insights, latent conflicts surfaced, spec updates), and the metacognitive principle: the difference between a domain that has *run* for a year and one that has *learned* for a year.
+- [x] **templates/retrospective.md.template created**: Starting-point template for retrospective things.
+- [x] **validate.thing.md updated**: Added "no recent retrospective" as an Info check — domains active for 60+ days without a retrospective are flagged.
+- [x] **AGENTS.md updated** (v2.5 → v2.6): `retrospective.md` added to startup loading, Operational specs list, and Thing Types.
+
+#### Priority Order Agreed (Cross-Domain Work Deferred)
+
+Cross-domain pattern transfer was identified as a significant future capability but deliberately deferred until single-domain fundamentals are proven in practice. The agreed order: session memory → belief revision → retrospective → cross-domain (when the time comes).
+
+---
+
 ## 23 May 2026
 
 ### Session 1
