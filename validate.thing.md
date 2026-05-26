@@ -3,15 +3,17 @@ id: validate-thing-specification
 name: Validate Thing
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-19
-description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, and orchestration graph integrity
+description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, conflict detection, and orchestration graph integrity
 applies_to: "**/things/**/*.md"
 linked_things:
   - id: thing-specification
     relation: validates
   - id: orchestration-specification
     relation: validates
+  - id: belief-revision-specification
+    relation: integrates-with
 ---
 
 # Validate Thing Skill
@@ -133,6 +135,10 @@ This level uses your reasoning, not mechanical checks. Read the thing holistical
 | Narrative completeness | Does the body explain what this thing is and why it matters? Or is it just a title with empty metadata? | Info |
 | Trigger coherence | Do the triggers make sense for this thing? Is it watching things that are relevant to it? Are the actions appropriate? | Info |
 | Duplicate or redundant | Does this thing substantially overlap with another thing in scope or intent? | Info |
+| `contradicts` without conflict thing | A `linked_things` entry has `relation: contradicts` but no `type: conflict` thing exists listing both parties | Error |
+| `supersedes` without update | A `linked_things` entry has `relation: supersedes` but the referenced thing has no corresponding `superseded-by` link or `status: deprecated` | Warning |
+| Open conflict not in continuity brief | A `type: conflict` thing with `status: open` exists but is not listed in `continuity.md` | Warning |
+| Stale open conflict | A `type: conflict` thing has `status: open` and has not been updated in more than 30 days | Info |
 
 **Important:** Level 4 is advisory. These are observations, not errors. Present them as "I noticed..." rather than "Fix this."
 

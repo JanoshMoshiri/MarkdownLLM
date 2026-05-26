@@ -65,7 +65,11 @@ These fields must be present in every thing to do:
 - What kind of thing this is
 - Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
 - Helps Claude understand scope and context
-- Two types are **framework-reserved** and have fixed semantics regardless of domain: `insight` (an emerging idea or held view from a session, preserved for future context) and `continuity-brief` (the domain's live forward-looking session-continuity document). See `session-memory.md` for their full specification.
+- Three types are **framework-reserved** and have fixed semantics regardless of domain:
+  - `insight` — an emerging idea or held view from a session, preserved for future context
+  - `continuity-brief` — the domain's live forward-looking session-continuity document (one per domain)
+  - `conflict` — a documented contradiction between two other things, held as a first-class thing until resolved
+  - See `session-memory.md` and `belief-revision.md` for full specifications.
 
 **status** (string)
 - Current state of this thing
@@ -104,8 +108,13 @@ These aren't required, but they unlock richer reasoning from Claude:
 
 **linked_things** (array of objects)
 - Relationships to other things
-- Structure: `{ id: "thing-id", relation: "subtask|dependency|blocks|related|similar", notes: "optional context" }`
+- Structure: `{ id: "thing-id", relation: "[type]", notes: "optional context" }`
 - Allows Claude to traverse the graph of your life
+- Common relation values: `subtask`, `dependency`, `blocks`, `related`, `similar`, `informs`, `implements`, `complements`
+- Framework-reserved relation values (fixed semantics across all domains):
+  - `supersedes` — this thing's content replaces the referenced thing's content
+  - `contradicts` — this thing is in active unresolved tension with the referenced thing; a `type: conflict` thing must exist listing both parties
+  - `superseded-by` — the inverse of `supersedes`; this thing's content has been replaced
 
 **dependencies** (array of strings - ids)
 - List of things that must be done before this

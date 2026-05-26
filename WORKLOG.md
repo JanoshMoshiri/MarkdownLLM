@@ -70,6 +70,32 @@ The framework was strong at structured output and weak at preserving the reasoni
 
 ---
 
+### Session 2
+
+#### Topic: Gap Analysis — Confidence/Origin Tracking and Contradiction Detection
+
+Two gaps identified from the cognitive science analysis of the previous session were addressed.
+
+**Gap 2 (Confidence/Origin) — Closed**
+
+- [x] **thing.md updated**: Added `confidence` (`high|medium|low`) and `origin` (`stated|inferred|synthesised`) as recommended fields. Both default-safe (omission = high/stated). Combined `origin: inferred` + `confidence: low` always surfaces for human review. Closes the LLM trust calibration gap — the agent can now distinguish between what a human stated and what it inferred or synthesised.
+
+**Gap 1 (Contradiction Detection) — Closed**
+
+The user confirmed that `type: conflict` should be a first-class type — not a sub-status of insight. A conflict is a clash of perspective with its own identity and lifecycle, independent of whether it resolves.
+
+- [x] **belief-revision.md created** (v1.0, `status: stable`): Full spec defining `type: conflict`, `relation: supersedes` / `relation: contradicts` / `relation: superseded-by`, three resolution outcomes (superseded, both-valid, dismissed), conflict detection (human-stated vs agent-inferred), and the conflict lifecycle. Key principle embedded: holding a contradiction in explicit tension is a valid, meaningful state — not a gap to paper over.
+- [x] **thing.md updated**: `conflict` added as third framework-reserved type. `linked_things.relation` extended with `supersedes`, `contradicts`, `superseded-by` as framework-reserved relation values.
+- [x] **validate.thing.md updated** (v1.1 → v1.2): Added four conflict-related checks to Level 4 Semantic Validation: `contradicts` without conflict thing (Error), `supersedes` without inverse link (Warning), open conflict not in continuity brief (Warning), stale open conflict (Info).
+- [x] **session-memory.md updated**: Added Step 3 (Belief Revision) to the session-end ritual, inserted between insight extraction and continuity brief update.
+- [x] **AGENTS.md updated** (v2.4 → v2.5): Added `belief-revision.md` to startup loading, Operational specs list, and Thing Types.
+
+#### Key Design Decision
+
+`type: conflict` is distinct from `type: insight`. An insight is something held by one party; a conflict is a collision between two things already in the domain. The difference matters for how the agent reasons: an insight is additive, a conflict is a rupture that demands explicit handling.
+
+---
+
 ## 23 May 2026
 
 ### Session 1

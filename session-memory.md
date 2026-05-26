@@ -163,7 +163,20 @@ Apply the **preservation test**: *Would a fresh agent starting this domain cold 
 
 For each insight worth preserving, create a `type: insight` thing in `things/insights/`.
 
-### Step 3: Update The Continuity Brief
+### Step 3: Belief Revision — Check For Contradictions
+
+Before updating the continuity brief, scan for contradictions introduced this session:
+
+- Did any new insight or modification assert something that conflicts with an existing thing?
+- Do any two things now in view hold incompatible positions?
+
+For each contradiction found:
+1. If it can be resolved in-session (one position clearly supersedes the other): update the relevant things, declare `relation: supersedes` / `relation: superseded-by`, and mark the old position deprecated if appropriate.
+2. If it cannot be resolved in-session: create a `type: conflict` thing in `things/conflicts/`, add `relation: contradicts` to both parties' `linked_things`, and add the conflict to the continuity brief as an open thread.
+
+Be conservative — only flag genuine semantic contradictions, not differences in emphasis or scope. When uncertain, surface for human confirmation rather than silently creating a conflict thing. Full spec: `belief-revision.md`.
+
+### Step 4: Update The Continuity Brief
 
 Load `continuity.md`. Make these updates:
 - Add new open threads from this session
@@ -171,11 +184,12 @@ Load `continuity.md`. Make these updates:
 - Add new live insight IDs (with one-line summaries)
 - Remove insights that were promoted or dismissed
 - Update pending decisions — remove resolved ones, add new ones
+- Add any new open conflicts (from Step 3) as open threads
 - Refresh the questions list
 
-### Step 4: Commit
+### Step 5: Commit
 
-Commit all new insight things and the updated continuity brief following `git-workflow.md` conventions.
+Commit all new insight things, new conflict things, and the updated continuity brief following `git-workflow.md` conventions.
 
 ---
 
