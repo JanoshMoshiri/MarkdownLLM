@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -15,6 +15,8 @@ linked_things:
     relation: complements
   - id: llm-driven-systems-manifesto
     relation: implements
+  - id: session-memory-specification
+    relation: enforces
 ---
 
 # Orchestration
@@ -76,6 +78,23 @@ These two hard hooks are part of every agent's operating contract with the frame
 **Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
 
 **What failure looks like:** Domain AGENTS.md and skills appearing in `git log` of the framework repo. A remediation session required just to restore the correct structure.
+
+#### `session-end:continuity` — Preserve Generative Knowledge
+
+**When it fires:** At the end of any session in which a domain was discussed or modified.
+
+**What must happen:**
+1. Scan the session for insights worth preserving — emerging ideas, held views, unresolved tensions, open questions, or hypotheses that surfaced in dialogue
+2. Apply the preservation test: *Would a fresh agent starting this domain cold benefit from knowing this?* If yes, create a `type: insight` thing in `things/insights/` within the domain
+3. Load the domain's `continuity.md` (the continuity brief)
+4. Update it: add new open threads, remove resolved ones, update live insights and pending decisions
+5. Commit all new insight things and the updated continuity brief
+
+**Why it's hard:** Generative knowledge — the reasoning, emerging views, and unresolved threads from a session — evaporates by default. The WORKLOG records what was done; the continuity brief preserves what is still live. Without this step, every session starts cold. The framework's value compounds across sessions only if continuity is explicitly maintained.
+
+**What failure looks like:** Sessions that are productive in isolation but don't build on each other. The same ideas surfaced, debated, and forgotten repeatedly. An agent that cannot answer: *"What were we working through last time?"*
+
+**Full specification:** See `session-memory.md` for the extraction heuristic, insight structure, and continuity brief format.
 
 ### Declaring Domain-Level Hard Hooks
 

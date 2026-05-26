@@ -37,6 +37,39 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 27 May 2026
+
+### Session 1
+
+#### Topic: Session Memory — Bridging Generative Knowledge Across Sessions
+
+Design and implementation session. Identified a structural gap in the framework and closed it with two new primitives and a mandatory ritual.
+
+#### Problem Identified
+
+The framework handles **resolved knowledge** well (specs, decisions, tasks as things) but had no mechanism for **generative knowledge** — the reasoning, emerging views, open questions, and unresolved threads that arise during a session. Every session was starting cold. The WORKLOG captures what was done retrospectively; nothing captured what was still live and needed to return.
+
+#### Completed
+
+- [x] **session-memory.md created** (v1.0, `status: stable`): Full specification defining `type: insight`, `type: continuity-brief`, and the session-end extraction ritual. Covers the preservation test, extraction heuristic, lifecycle of both types, and their relationship to WORKLOG and git.
+- [x] **orchestration.md updated** (v1.2 → v1.3): Added `session-end:continuity` as the third framework-level hard hook, alongside `post-write:commit` and `pre-domain-scaffold:isolate`. Hard hook fires at the end of any session involving a domain.
+- [x] **thing.md updated**: Added a note to the `type` field documenting `insight` and `continuity-brief` as framework-reserved types with a pointer to `session-memory.md`.
+- [x] **templates/continuity-brief.md.template created**: Starting-point template for domain continuity briefs with the four standard sections (Open Threads, Live Insights, Pending Decisions, Questions For Next Session).
+- [x] **AGENTS.md updated** (v2.3 → v2.4): Added `session-memory.md` to startup loading (step 5), added `session-end:continuity` as a hard hook in the On Output section, added `session-memory.md` to the Operational specs list, added `insight` and `continuity-brief` to Thing Types.
+
+#### Design Decisions
+
+- **Insight extraction, not conversation logging.** Raw session transcripts were rejected; the framework extracts crystallised insights instead. Aligns with "minimal core, emergent detail" — only non-obvious, future-relevant items are preserved.
+- **Continuity brief lives at domain root** (as `continuity.md`), not in `things/`. It's an operational document that the agent always loads at session start — like WORKLOG.md, not like a data instance.
+- **`session-end:continuity` is a hard hook**, not a soft binding. The value compounds across sessions only if continuity is maintained reliably; making it optional would undermine the mechanism.
+- **WORKLOG and continuity brief are complementary, not redundant.** WORKLOG = retrospective audit trail (always grows). Continuity brief = forward-looking live state (stays lean, resolved items removed).
+
+#### Key Insight From This Session
+
+The framework was strong at structured output and weak at preserving the reasoning that produced it. Generative knowledge — the dialogue, the competing views, the open questions — is often where the real domain intelligence lives. The session-memory primitives make that intelligence first-class rather than ephemeral.
+
+---
+
 ## 23 May 2026
 
 ### Session 1

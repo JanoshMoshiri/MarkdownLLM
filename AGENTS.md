@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 2.3
+version: 2.4
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -71,7 +71,7 @@ This is where the reasoning lives — not just the data.
 2. Load operational specs (validate.thing.md, read.thing.md, write.thing.md)
 3. Load the manifesto for philosophical grounding (llm-driven-systems.manifesto.md)
 4. Load the domain guide for operational context (domain-specification-guide.md)
-5. Load supporting specs as needed (scalability-guide.md, orchestration.md)
+5. Load supporting specs as needed (scalability-guide.md, orchestration.md, session-memory.md)
 6. Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
 ### On User Request
@@ -85,6 +85,8 @@ This is where the reasoning lives — not just the data.
 > **[HARD HOOK: `post-write:commit`]** After creating or modifying any `.md` file with YAML frontmatter, commit it to the **owning repo** before completing the response. Walk up the directory tree from the modified file to find the correct `.git` root — never assume it is the framework repo. Full spec: `orchestration.md` → Hard Hooks.
 
 > **[HARD HOOK: `pre-domain-scaffold:isolate`]** When scaffolding a new domain, the isolation sequence is mandatory and must complete before any domain files are committed anywhere: (1) `git init` in the domain folder, (2) add domain path to framework `.gitignore`, (3) commit `.gitignore` to framework repo, (4) commit domain files to domain repo, (5) create remote and push. Never commit domain files to the framework repo. Full spec: `orchestration.md` → Hard Hooks.
+
+> **[HARD HOOK: `session-end:continuity`]** At the end of any session where a domain was discussed or modified: (1) scan the session for insights worth preserving, (2) create `type: insight` things for any that pass the preservation test, (3) update the domain's `continuity.md` — add new threads, remove resolved ones, (4) commit everything. Full spec: `session-memory.md` and `orchestration.md` → Hard Hooks.
 
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
@@ -106,6 +108,7 @@ The framework defines itself through these interconnected specifications:
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: stable`)
 - **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: stable`)
 - **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: stable`)
+- **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things and the domain `continuity-brief`. Defines the mandatory `session-end:continuity` ritual. (`type: specification`, `status: stable`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
 - **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: stable`)
 
@@ -138,6 +141,8 @@ The framework defines itself through these interconnected specifications:
 - `type: specification` — Foundational definitions of how things work
 - `type: skill` — Reusable capabilities the agent can invoke
 - `type: guide` — Operational guidance for using the framework
+- `type: insight` — An emerging idea, held view, or hypothesis from a session, preserved for future context (framework-reserved)
+- `type: continuity-brief` — The domain's live forward-looking session-continuity document; one per domain (framework-reserved)
 
 ## Key Innovations
 

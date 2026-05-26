@@ -1,0 +1,49 @@
+---
+id: [domain]-continuity-brief
+type: continuity-brief
+status: live
+version: 1.0
+created: [ISO-date]
+domain: [domain-id]
+last_updated: [ISO-date]
+---
+
+# [Domain] Continuity Brief
+
+This document bridges sessions. It is updated at the end of each session and loaded at the start of the next. It captures what is **still live** — not what was done (that's the WORKLOG), but what still needs to return.
+
+Keep it short. If it grows past ~30 lines, stale items have accumulated.
+
+---
+
+## Open Threads
+
+Unresolved design questions, active tensions, or lines of reasoning that are mid-flight.
+
+- **[Thread title]:** [What the tension or question is, and what is needed to close it]
+
+---
+
+## Live Insights
+
+Active `type: insight` things that need to return in a future session.
+
+- **[insight-id]:** [One-line summary of what the insight is]
+
+---
+
+## Pending Decisions
+
+Decisions raised but not yet made. Two options noted where possible.
+
+| Decision | Option A | Option B | Context |
+|----------|----------|----------|---------|
+| [What needs deciding] | [First option] | [Second option] | [Relevant constraint] |
+
+---
+
+## Questions For Next Session
+
+Specific questions that must be answered before certain threads can progress.
+
+- [ ] [Question]

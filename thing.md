@@ -65,6 +65,7 @@ These fields must be present in every thing to do:
 - What kind of thing this is
 - Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
 - Helps Claude understand scope and context
+- Two types are **framework-reserved** and have fixed semantics regardless of domain: `insight` (an emerging idea or held view from a session, preserved for future context) and `continuity-brief` (the domain's live forward-looking session-continuity document). See `session-memory.md` for their full specification.
 
 **status** (string)
 - Current state of this thing
