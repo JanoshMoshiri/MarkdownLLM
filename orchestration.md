@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -28,6 +28,70 @@ Orchestration introduces three primitives:
 1. **Hook points** — Named moments in the lifecycle where reasoning can be attached
 2. **Prompts** — Reusable reasoning templates smaller than skills, more structured than trigger actions
 3. **Bindings** — Declarations that connect hook points to prompts
+
+## Hard Hooks vs Soft Hooks
+
+All hooks described in this document — the bindings, prompts, and domain-level hook points — are **soft hooks**: opt-in, configured per domain, active only when a binding explicitly declares them. A domain that omits orchestration entirely continues to work fine; the narrative specs guide the LLM through reasoning without structural enforcement.
+
+Some behaviors, however, are fundamental to the framework's integrity regardless of domain, configuration, or context. These are **hard hooks** — non-negotiable procedures that fire unconditionally. No binding declaration is needed. No domain configuration enables or disables them. They are part of the agent's standing operating contract with the framework.
+
+### The Distinction
+
+| | Soft Hook | Hard Hook |
+|---|---|---|
+| **Activation** | Requires a binding declaration | Always active — no configuration needed |
+| **Skippable?** | Yes, if not bound | Never |
+| **Defined by** | Domain AGENTS.md or workflow skill | Framework AGENTS.md |
+| **Purpose** | Domain-specific structured reasoning | Framework integrity invariants |
+
+### Framework-Level Hard Hooks
+
+These two hard hooks are part of every agent's operating contract with the framework. They fire regardless of whether a domain uses orchestration.
+
+#### `post-write:commit` — Commit Every Thing
+
+**When it fires:** After any `.md` file containing YAML frontmatter is created or modified.
+
+**What must happen:**
+1. Identify the owning git repository — walk up the directory tree from the modified file until a `.git` directory is found
+2. Stage the modified files: `git add` from that repo's root
+3. Commit with a structured message following git-workflow.md conventions
+4. Do not complete the response without this step
+
+**Why it's hard:** Git is the framework's state machine. An uncommitted change is a change that doesn't exist yet — the "single source of truth" principle is violated by any thing that exists only in a working directory. This cannot be left to convention or memory.
+
+**What failure looks like:** Thing files created in a session but never committed. State that exists in files but not in history. The session ends and the work is only partially real.
+
+#### `pre-domain-scaffold:isolate` — Every Domain Gets Its Own Repo
+
+**When it fires:** When creating a new domain — specifically, when generating a new `AGENTS.md` in a new directory under the framework.
+
+**What must happen, in order:**
+1. `git init` inside the new domain directory — before any domain files are committed anywhere
+2. Add the domain's path to the framework's `.gitignore` — immediately, as part of the same operation
+3. Commit the `.gitignore` change to the framework repo — so the framework never tracks the domain
+4. Commit the domain files to the domain's own repo
+5. Create a remote repository and push
+
+**Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
+
+**What failure looks like:** Domain AGENTS.md and skills appearing in `git log` of the framework repo. A remediation session required just to restore the correct structure.
+
+### Declaring Domain-Level Hard Hooks
+
+Domains can declare their own hard hooks in their AGENTS.md using a `hard_hooks` block. A domain hard hook is a behavior that must fire for that domain's integrity, regardless of context.
+
+```yaml
+hard_hooks:
+  - hook: session-end
+    action: "Update WORKLOG.md and commit before the session closes"
+  - hook: post-write
+    action: "After updating any return thing, check if its companion deadline thing needs updating"
+```
+
+Domain hard hooks are scoped to that domain only. They do not propagate to the framework. They are the domain's standing operating procedures — behaviors the domain agent must always perform, with no exceptions.
+
+---
 
 ## When To Use Orchestration
 

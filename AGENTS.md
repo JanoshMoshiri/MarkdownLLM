@@ -81,9 +81,15 @@ This is where the reasoning lives — not just the data.
 4. **Execute** — Reason within the framework's own principles while helping the user
 
 ### On Output
+
+> **[HARD HOOK: `post-write:commit`]** After creating or modifying any `.md` file with YAML frontmatter, commit it to the **owning repo** before completing the response. Walk up the directory tree from the modified file to find the correct `.git` root — never assume it is the framework repo. Full spec: `orchestration.md` → Hard Hooks.
+
+> **[HARD HOOK: `pre-domain-scaffold:isolate`]** When scaffolding a new domain, the isolation sequence is mandatory and must complete before any domain files are committed anywhere: (1) `git init` in the domain folder, (2) add domain path to framework `.gitignore`, (3) commit `.gitignore` to framework repo, (4) commit domain files to domain repo, (5) create remote and push. Never commit domain files to the framework repo. Full spec: `orchestration.md` → Hard Hooks.
+
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
-3. **Autocommit**: stage changed files + commit with structured message following git-workflow.md conventions
+3. Commit with a structured message following git-workflow.md conventions
+4. WORKLOG updated with session activity
 
 ## Framework Specifications (Things)
 
