@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.4
+version: 2.5
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -18,6 +18,12 @@ linked_things:
   - id: git-workflow-specification
     relation: references
   - id: interface-specification
+    relation: references
+  - id: session-memory-specification
+    relation: references
+  - id: belief-revision-specification
+    relation: references
+  - id: retrospective-specification
     relation: references
 ---
 
@@ -153,12 +159,16 @@ Every domain requires these essential components in this structure:
 ```
 my-domain/                        ← Root of your domain (its own git repo)
 ├── AGENTS.md                     ← Discovered at startup (orchestration)
+├── continuity.md                 ← Live session-continuity brief; loaded at start, updated at end
 ├── skills/
 │   ├── [domain]-specification.skill.md   ← Philosophy, principles, reasoning
 │   ├── [domain]-read.thing.skill.md      ← How to read and analyze things
 │   ├── [domain]-write.thing.skill.md     ← How to create and update things
 │   └── [domain]-workflow.skill.md        ← Process orchestration and flow
 ├── things/
+│   ├── insights/                 ← type: insight things
+│   ├── conflicts/                ← type: conflict things
+│   ├── retrospectives/           ← type: retrospective things
 │   ├── run-1/                    ← Subfolder per workflow run or flow
 │   │   ├── thing-1.md
 │   │   └── thing-2.md
@@ -266,7 +276,8 @@ git:
 2. Load foundational specs from framework root: thing.md, validate.thing.md, git-workflow.md, interface.md
 3. Load all skills from ./skills/
 4. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
-5. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
+5. Load `continuity.md` if it exists — understand open threads, live insights, and pending decisions from the last session
+6. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
 
 ### On User Request
 1. **Clarify intent:** What operation? (read, write, analyze, etc.)
@@ -281,6 +292,7 @@ git:
 2. **Autocommit** (if enabled): stage changed files + commit with structured `action: description` message
 3. Report what changed and why
 4. Evaluate triggers (post-write)
+5. **Session end:** The `session-end:continuity` hard hook fires — extract insights, check for conflicts, update `continuity.md`. Full spec: `session-memory.md` and `belief-revision.md`.
 
 ## Skills Directory
 
@@ -527,6 +539,38 @@ Thing types are domain-specific but follow `thing.md` patterns for metadata, rel
 
 ---
 
+## Knowledge Management
+
+The framework includes primitives that help domains accumulate understanding across sessions. These are available to every domain automatically — you don’t need to configure them.
+
+### `continuity.md` — The Live Session Brief
+
+Place a `continuity.md` file at your domain root. This is your domain’s forward-looking continuity document: open threads, live insights, pending decisions, questions for next session. The agent loads it at session start and updates it at session end.
+
+Seed it from `templates/continuity-brief.md.template`.
+
+### `type: insight` — Preserved Ideas
+
+Insights are emerging ideas, held views, or hypotheses that surface during a session but aren’t yet ready to become specs or domain things. They live in `things/insights/`. At session end, the agent extracts insights worth preserving and commits them.
+
+Seed from `templates/insight.md.template`.
+
+### `type: conflict` — Contradictions Held Explicitly
+
+When two things in your domain conflict, the agent creates a `type: conflict` thing in `things/conflicts/` rather than silently picking one. Conflicts are held in tension until you resolve them: which view supersedes, whether both are valid, or whether to dismiss.
+
+Seed from `templates/conflict.md.template`.
+
+### `type: retrospective` — Periodic Quality Reflection
+
+After significant activity — typically monthly, or after >10 new conflicts or >20 new insights — write a retrospective to reflect on the domain’s reasoning quality. What’s working? What patterns have emerged? What should change?
+
+Seed from `templates/retrospective.md.template`.
+
+**Full specifications:** `session-memory.md`, `belief-revision.md`, `retrospective.md`.
+
+---
+
 ## Vendor Tooling Integration
 
 Different tools discover agent files differently. Configure your setup based on where your domain lives:
@@ -607,12 +651,13 @@ You don't need to answer these perfectly upfront. Start with what you know. The 
 Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent discovers the framework's `AGENTS.md`, knows the specifications, and knows how to scaffold domains. Describe what you want — the framework agent will create everything inside `domains/my-domain/`:
 
 - `AGENTS.md` at domain root — with `framework_root: ../..` pointing to the framework
+- `continuity.md` at domain root — seeded from `templates/continuity-brief.md.template`
 - `skills/` directory with the four baseline skills:
   - `[domain]-specification.skill.md`
   - `[domain]-read.thing.skill.md`
   - `[domain]-write.thing.skill.md`
   - `[domain]-workflow.skill.md`
-- `things/` directory with initial examples
+- `things/` directory with initial examples and knowledge sub-folders (`insights/`, `conflicts/`, `retrospectives/`)
 
 > `thing.md` is a framework foundational spec — your domain discovers it automatically via `framework_root`. Do not copy it into your domain.
 
@@ -722,6 +767,7 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 - [ ] **Create domain folder** — Create your domain inside `domains/` and initialise a git repo
 - [ ] **Scaffold domain** — From the framework workspace, tell the framework agent to build your domain (AGENTS.md, skills, example things)
 - [ ] **Open domain workspace** — Open the domain folder as its own workspace — the domain agent takes over from here
+- [ ] **Set up continuity** — Create `continuity.md` at domain root using `templates/continuity-brief.md.template`; loaded at session start, updated at session end
 - [ ] **Understand thing.md** — The atomic unit specification (including triggers) — do NOT copy it into your domain
 - [ ] **Add validation rules** — Domain-specific required fields and valid types in your specification skill (validated by `validate.thing.md`)
 - [ ] **Define commit conventions** — Follow `git-workflow.md` patterns for structured commit messages
@@ -763,3 +809,4 @@ This is the fractal nature of the framework: the same structure at every scale, 
 8. **Validation is built in:** `validate.thing.md` checks structural integrity, referential consistency, and semantic coherence. Domain-specific rules live in your specification skill.
 9. **Vendor agnostic:** Works across GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini
 10. **Transparent:** Everything versioned in git; all logic explicit and readable; three audit layers (worklog, git log, git diff)
+11. **Knowledge compounds:** Session insights, contradictions, and retrospectives accumulate as first-class `type: insight`, `type: conflict`, and `type: retrospective` things. The domain learns across sessions, not just within them.
