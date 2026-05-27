@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.3
+version: 2.5
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -65,11 +65,12 @@ These fields must be present in every thing to do:
 - What kind of thing this is
 - Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
 - Helps Claude understand scope and context
-- Three types are **framework-reserved** and have fixed semantics regardless of domain:
+- Four types are **framework-reserved** and have fixed semantics regardless of domain:
   - `insight` — an emerging idea or held view from a session, preserved for future context
   - `continuity-brief` — the domain's live forward-looking session-continuity document (one per domain)
   - `conflict` — a documented contradiction between two other things, held as a first-class thing until resolved
-  - See `session-memory.md` and `belief-revision.md` for full specifications.
+  - `retrospective` — a periodic quality reflection on domain reasoning; one per period, not per session
+  - See `session-memory.md`, `belief-revision.md`, and `retrospective.md` for full specifications.
 
 **status** (string)
 - Current state of this thing

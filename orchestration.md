@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.3
+version: 1.4
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -16,6 +16,8 @@ linked_things:
   - id: llm-driven-systems-manifesto
     relation: implements
   - id: session-memory-specification
+    relation: enforces
+  - id: belief-revision-specification
     relation: enforces
 ---
 

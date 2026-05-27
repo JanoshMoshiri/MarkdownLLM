@@ -15,6 +15,8 @@ linked_things:
     relation: integrates-with
   - id: llm-driven-systems-manifesto
     relation: implements
+  - id: belief-revision-specification
+    relation: integrates-with
 ---
 
 # Session Memory

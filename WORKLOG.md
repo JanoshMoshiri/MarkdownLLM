@@ -142,7 +142,22 @@ After implementing the four new primitives (session-memory, belief-revision, ret
 #### Design Decision
 
 The tiered pattern was already present in the framework for *things* (Level 1 metadata / Level 2 relationships / Level 3 full context). Applying the same principle to *spec loading* is a natural extension — not a new idea, just a previously missing application of an existing principle.
+#### Consistency Pass — Bugs Fixed
 
+A full review before session close surfaced five bugs and two design gaps.
+
+**Bugs fixed:**
+- `orchestration.md` version corrected: 1.3 → 1.4 (WORKLOG said 1.4; frontmatter was never updated)
+- `thing.md` version corrected: 2.3 → 2.5 (two rounds of changes since v2.3, neither incremented)
+- `thing.md` reserved types: `retrospective` was missing (added to AGENTS.md in Session 3 but not to thing.md)
+- `session-memory.md` linked_things: added `belief-revision-specification` (ritual Step 3 depends on it)
+- `orchestration.md` linked_things: added `belief-revision-specification` (hook text explicitly references it)
+
+**Design gaps noted (not fixed — deferred):**
+- `domain-specification-guide.md` predates session-memory/belief-revision/retrospective; new domains created with current guide won't know these primitives exist
+- `thing-lifecycle.md` (draft, v0.1) exists at root but is not listed in AGENTS.md's spec inventory
+
+**CHANGELOG updated to v2.5.0** — covers all four sessions of 27 May 2026.
 ---
 
 ## 23 May 2026

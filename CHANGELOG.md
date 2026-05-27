@@ -16,6 +16,33 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [2.5.0] - 2026-05-27
+
+Four structural gaps in the framework's knowledge management capabilities closed. New specs cover session continuity, contradiction handling, and periodic reflection. Startup loading made context-window-efficient.
+
+**New specs:**
+- `session-memory.md` (v1.0) — how sessions preserve generative knowledge; defines `type: insight`, `type: continuity-brief`, and the mandatory session-end extraction ritual
+- `belief-revision.md` (v1.0) — how contradictions between things are held and resolved; defines `type: conflict`, `relation: supersedes/contradicts/superseded-by`, three resolution outcomes
+- `retrospective.md` (v1.0) — periodic domain quality reflection; defines `type: retrospective`, when to write one, and what it produces
+
+**New templates:** `insight.md.template`, `conflict.md.template`, `retrospective.md.template`, `continuity-brief.md.template`
+
+**Behavioural changes:**
+- `orchestration.md` (v1.3 → v1.4): `session-end:continuity` added as third framework hard hook; covers both insight extraction and belief revision / conflict detection
+- `AGENTS.md` (v2.3 → v2.7): startup sequence replaced with tiered loading (Tier 0 ~15k / Tier 1 ~33k / Tier 2 on demand); eliminates up to 75% of startup context cost on Q&A sessions
+- `thing.md` (v2.3 → v2.5): four framework-reserved types (`insight`, `continuity-brief`, `conflict`, `retrospective`); framework-reserved relation values (`supersedes`, `contradicts`, `superseded-by`); new recommended fields `confidence` and `origin`
+- `validate.thing.md` (v1.1 → v1.2): conflict-integrity checks added to Level 4 Semantic Validation; retrospective staleness Info check
+
+**Bug fixes (consistency pass):**
+- `orchestration.md` frontmatter version corrected (1.3 → 1.4)
+- `thing.md` version corrected (2.3 → 2.5); `retrospective` added to reserved types list
+- `session-memory.md` linked_things: added `belief-revision-specification`
+- `orchestration.md` linked_things: added `belief-revision-specification`
+
+**Known gaps (deferred):** `domain-specification-guide.md` does not yet reference the new knowledge primitives (continuity.md, insight, conflict, retrospective). A new domain created with the current guide starts without awareness of these. Tracked for a future patch.
+
+---
+
 ## [2.4.0] - 2026-05-22
 
 - Rewrote README.md: reframed from human instruction manual to agent-first, human-directed partnership model. Added agent-user transcript showing domain creation through conversation.
