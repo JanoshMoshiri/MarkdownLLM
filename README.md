@@ -235,12 +235,12 @@ MarkdownLLM gives both parties what they need:
 - **Persistent knowledge** — Skills encode how to reason. Things encode what's been done. Git encodes what changed and when.
 - **Composable structure** — Each spec is self-contained but explicitly linked. The agent loads exactly what it needs.
 - **Validated integrity** — `validate.thing.md` gives the agent rules to check its own work against.
-- **Consistency across sessions** — The agent behaves the same way whether it's the first session or the hundredth.
+- **Continuity across sessions** — At session end, insights and open threads are preserved as `type: insight` things and a live continuity brief. The next session picks up exactly where this one left off — not by reloading a conversation, but by reading structured, committed knowledge.
 
 **For the human:**
 - **Full transparency** — Every file is readable. You can always see what the agent built, how it reasoned, what it changed.
 - **Control at every level** — You define the domain, the orchestration, the workflows. The agent operates within your constraints.
-- **Conflict surfacing** — When the agent encounters tradeoffs, it raises them. You decide.
+- **Contradiction tracking** — When things in your domain conflict, the agent surfaces them as first-class `type: conflict` things held in explicit tension until resolved. You decide: which view supersedes, whether both are valid in context, or whether the tension should be held until more is known.
 - **Cumulative progress** — Every session builds on the last. Your refinements compound. Nothing is lost.
 
 **The result:** A smaller model with a well-defined domain outperforms a larger model with no structure. Structure beats scale. But it's the human-agent partnership that creates and maintains that structure over time.
@@ -265,6 +265,9 @@ These are the specs the agent loads and reasons with:
 | [domain-refresh.md](domain-refresh.md) | How domain agents discover framework evolution |
 | [orchestration.md](orchestration.md) | Opt-in hook points and structured prompts |
 | [scalability-guide.md](scalability-guide.md) | Scaling from tens to thousands of things |
+| [session-memory.md](session-memory.md) | Session-end continuity: `type: insight`, `type: continuity-brief`, extraction ritual |
+| [belief-revision.md](belief-revision.md) | Contradiction tracking: `type: conflict`, relation types, belief revision process |
+| [retrospective.md](retrospective.md) | Periodic quality reflection: `type: retrospective`, when to write, what it produces |
 
 ### Philosophy
 
@@ -290,6 +293,10 @@ Starting structures the agent uses when scaffolding a new domain:
 - `templates/[domain]-write.thing.skill.md.template`
 - `templates/[domain]-workflow.skill.md.template`
 - `templates/prompts/` — Orchestration prompt templates
+- `templates/continuity-brief.md.template` — Domain continuity brief
+- `templates/insight.md.template` — `type: insight` things
+- `templates/conflict.md.template` — `type: conflict` things
+- `templates/retrospective.md.template` — `type: retrospective` things
 
 ---
 
