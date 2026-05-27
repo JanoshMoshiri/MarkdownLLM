@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 2.6
+version: 2.7
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -67,18 +67,39 @@ This is where the reasoning lives — not just the data.
 ## How This Agent Works
 
 ### On Startup
-1. Load all foundational specifications from root (thing.md, interface.md, git-workflow.md, framework-discovery.md, domain-refresh.md)
-2. Load operational specs (validate.thing.md, read.thing.md, write.thing.md)
-3. Load the manifesto for philosophical grounding (llm-driven-systems.manifesto.md)
-4. Load the domain guide for operational context (domain-specification-guide.md)
-5. Load supporting specs as needed (scalability-guide.md, orchestration.md, session-memory.md, belief-revision.md, retrospective.md)
-6. Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
+
+**Determine session intent before loading specs.** Loading all framework specs eagerly costs ~60k tokens — up to 65% of a model's context window before any work begins. Load only what the session needs.
+
+**Tier 0 — Always load (~15k tokens):**
+- `AGENTS.md` — this file (already loaded)
+- `thing.md` — the atomic unit; required for all reasoning about the framework
+- `orchestration.md` — hard hooks are always active; commit behaviour is non-negotiable
+
+**Tier 1 — Load when the session involves reading, writing, or committing things (~18k additional):**
+- `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md`
+
+**Tier 2 — Load on demand by query type:**
+
+| Query type | Load |
+|---|---|
+| Creating or scaffolding a new domain | `domain-specification-guide.md` |
+| Scaling, structure, or performance concerns | `scalability-guide.md` |
+| Philosophical or "why" questions | `llm-driven-systems.manifesto.md` |
+| I/O, deliverables, or output format questions | `interface.md` |
+| Domain agent locating the framework | `framework-discovery.md` |
+| Domain agent refreshing from framework evolution | `domain-refresh.md` |
+| Session-end work, insights, continuity briefs | `session-memory.md` |
+| Contradictions, conflicts, belief revision | `belief-revision.md` |
+| Periodic quality reflection | `retrospective.md` |
+
+**Typical session cost:** Tier 0 alone ≈ 15k tokens. Tier 0 + Tier 1 ≈ 33k tokens. Full load (rare — new domain creation) ≈ 60k tokens.
+
+Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
 ### On User Request
-1. **Clarify intent** — Is the user working on the framework itself? Creating a new domain? Asking about the philosophy? Seeking guidance?
-2. **Load relevant specs** — Match intent to the appropriate specification or guide
-3. **Load examples if needed** — Reference `examples/` for concrete demonstrations
-4. **Execute** — Reason within the framework's own principles while helping the user
+1. **Route intent** — Identify the query type. Determine which Tier 1 and Tier 2 specs the session needs and load them before proceeding.
+2. **Load examples if needed** — Reference `examples/` for concrete demonstrations
+3. **Execute** — Reason within the framework's own principles while helping the user
 
 ### On Output
 

@@ -118,6 +118,33 @@ Cross-domain pattern transfer was identified as a significant future capability 
 
 ---
 
+### Session 4
+
+#### Topic: Tiered Startup Loading — Context Window Cost Analysis and Fix
+
+#### Problem Identified
+
+After implementing the four new primitives (session-memory, belief-revision, retrospective, confidence/origin), the "load all specs at startup" instruction in AGENTS.md had grown to **~60,185 tokens** of mandatory load before any user query was processed. That is 30–65% of a typical model's context window (128k–200k) consumed before any domain work begins.
+
+#### Completed
+
+- [x] **AGENTS.md updated** (v2.6 → v2.7): Replaced the flat "load all" startup sequence with an explicit three-tier loading strategy. Tier 0 (always, ~15k): AGENTS.md, thing.md, orchestration.md. Tier 1 (reading/writing sessions, ~33k total): adds read.thing.md, write.thing.md, validate.thing.md, git-workflow.md. Tier 2 (on-demand by query type): all remaining specs loaded only when the session intent requires them. A routing table maps query type to the correct spec.
+- [x] **"On User Request" tightened**: Step 1 is now "Route intent — determine which Tier 2 specs the session needs before proceeding." Replaces the vague "clarify intent / load relevant specs" pair.
+
+#### Context Window Impact
+
+| Session type | Before | After |
+|---|---|---|
+| Q&A / informational | ~60k tokens | ~15k tokens (75% reduction) |
+| Standard read/write session | ~60k tokens | ~33k tokens (45% reduction) |
+| New domain creation | ~60k tokens | ~60k tokens (unchanged — full load legitimately needed) |
+
+#### Design Decision
+
+The tiered pattern was already present in the framework for *things* (Level 1 metadata / Level 2 relationships / Level 3 full context). Applying the same principle to *spec loading* is a natural extension — not a new idea, just a previously missing application of an existing principle.
+
+---
+
 ## 23 May 2026
 
 ### Session 1
