@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.4
+version: 1.5
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -80,22 +80,6 @@ These two hard hooks are part of every agent's operating contract with the frame
 **Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
 
 **What failure looks like:** Domain AGENTS.md and skills appearing in `git log` of the framework repo. A remediation session required just to restore the correct structure.
-
-#### `session-end:continuity` — Preserve Generative Knowledge
-
-**When it fires:** At the end of any session in which a domain was discussed or modified.
-
-**What must happen:**
-1. Scan the session for insights worth preserving — emerging ideas, held views, unresolved tensions, open questions, or hypotheses that surfaced in dialogue. Apply the preservation test: *Would a fresh agent starting this domain cold benefit from knowing this?* If yes, create a `type: insight` thing in `things/insights/`.
-2. Scan for contradictions introduced this session — did anything created or modified assert something that conflicts with an existing thing? If yes: resolve in-session where clear (declare `relation: supersedes`), or create a `type: conflict` thing in `things/conflicts/` and add `relation: contradicts` to both parties. Be conservative — only flag genuine semantic contradictions.
-3. Load the domain's `continuity.md`. Update it: add new open threads, remove resolved ones, update live insights, add any new open conflicts, update pending decisions.
-4. Commit all new insight things, conflict things, and the updated continuity brief.
-
-**Why it's hard:** Generative knowledge — the reasoning, emerging views, and unresolved threads from a session — evaporates by default. The WORKLOG records what was done; the continuity brief preserves what is still live. Without this step, every session starts cold. The framework's value compounds across sessions only if continuity is explicitly maintained.
-
-**What failure looks like:** Sessions that are productive in isolation but don't build on each other. The same ideas surfaced, debated, and forgotten repeatedly. Contradictions accumulating silently until the domain holds two incompatible positions simultaneously. An agent that cannot answer: *"What were we working through last time?"*
-
-**Full specification:** See `session-memory.md` (insight extraction, continuity brief format) and `belief-revision.md` (conflict detection and resolution).
 
 ### Declaring Domain-Level Hard Hooks
 
@@ -267,6 +251,8 @@ These are prompts that ship with the framework and apply to any domain:
 - **session-orientation** — At session start, summarize what's changed since last session
 - **surface-attention** — Determine which things need user attention and in what priority order
 - **detect-conflicts** — Check if a proposed change conflicts with existing state (lens conflicts, dependency violations)
+- **session-end-continuity** — At session end, extract insights, check for contradictions, and update the continuity brief
+- **worklog-update** — At session end, append a structured entry to WORKLOG.md summarising what was done
 
 ### Domain Prompts
 
@@ -302,6 +288,11 @@ bindings:
       - session-orientation
       - evaluate-triggers
       - surface-attention
+    
+  - hook: session-end
+    invoke:
+      - session-end-continuity
+      - worklog-update
     
   - hook: phase-gate
     when: "expert confirms phase complete"

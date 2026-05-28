@@ -148,7 +148,9 @@ last_updated: [ISO-date-of-last-session]
 
 ## The Session-End Extraction Ritual
 
-This ritual is a **framework-level hard hook** (`session-end:continuity`). See `orchestration.md` for the full hard hook definition. It fires at the end of any session in which a domain was discussed or modified.
+This ritual is implemented as the **`session-end-continuity` prompt** bound to the `session-end` hook point. See `templates/prompts/session-end-continuity.md` for the full prompt template, and `orchestration.md` → Bindings for how it is invoked.
+
+The prompt is explicitly invoked at session end — either by the user requesting it, or by the agent recognising the session is closing. It is not automatic; it requires a deliberate trigger.
 
 ### Step 1: Scan For Insights
 
@@ -228,6 +230,6 @@ If the agent encounters a domain without a `continuity.md`, it should:
 ## Relationship To Other Specs
 
 - **thing.md** — `insight` and `continuity-brief` are framework-reserved types defined here. All other type mechanics (frontmatter, linking, triggers) are inherited from `thing.md`.
-- **orchestration.md** — The `session-end:continuity` hard hook is the enforcement mechanism that makes this ritual mandatory rather than optional.
+- **orchestration.md** — The `session-end-continuity` and `worklog-update` prompts are bound to the `session-end` hook point. These are explicitly invoked prompts, not automatic hooks — they require the user or agent to trigger them at session close.
 - **write.thing.md** — Creating and updating insight things follows standard write operations. The session-end ritual is an extension of the write workflow.
 - **git-workflow.md** — Insight things and continuity brief updates are committed following standard conventions. The session-end commit is the natural pairing of the `post-write:commit` hard hook.

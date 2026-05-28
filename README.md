@@ -235,7 +235,7 @@ MarkdownLLM gives both parties what they need:
 - **Persistent knowledge** — Skills encode how to reason. Things encode what's been done. Git encodes what changed and when.
 - **Composable structure** — Each spec is self-contained but explicitly linked. The agent loads exactly what it needs.
 - **Validated integrity** — `validate.thing.md` gives the agent rules to check its own work against.
-- **Continuity across sessions** — At session end, insights and open threads are preserved as `type: insight` things and a live continuity brief. The next session picks up exactly where this one left off — not by reloading a conversation, but by reading structured, committed knowledge.
+- **Continuity across sessions** — At session end, the `session-end-continuity` and `worklog-update` prompts preserve insights and open threads as structured, committed knowledge. The next session picks up exactly where this one left off — not by reloading a conversation, but by reading committed state.
 
 **For the human:**
 - **Full transparency** — Every file is readable. You can always see what the agent built, how it reasoned, what it changed.
@@ -263,9 +263,9 @@ These are the specs the agent loads and reasons with:
 | [git-workflow.md](git-workflow.md) | Git as state machine: commits, conventions, autocommit |
 | [framework-discovery.md](framework-discovery.md) | How domain agents locate the framework root |
 | [domain-refresh.md](domain-refresh.md) | How domain agents discover framework evolution |
-| [orchestration.md](orchestration.md) | Opt-in hook points and structured prompts |
+| [orchestration.md](orchestration.md) | Opt-in hook points, structured prompts, and session-end bindings |
 | [scalability-guide.md](scalability-guide.md) | Scaling from tens to thousands of things |
-| [session-memory.md](session-memory.md) | Session-end continuity: `type: insight`, `type: continuity-brief`, extraction ritual |
+| [session-memory.md](session-memory.md) | Session continuity: `type: insight`, `type: continuity-brief`, and the `session-end-continuity` prompt |
 | [belief-revision.md](belief-revision.md) | Contradiction tracking: `type: conflict`, relation types, belief revision process |
 | [retrospective.md](retrospective.md) | Periodic quality reflection: `type: retrospective`, when to write, what it produces |
 

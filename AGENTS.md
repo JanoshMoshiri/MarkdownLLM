@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 2.7
+version: 2.8
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -107,7 +107,7 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 
 > **[HARD HOOK: `pre-domain-scaffold:isolate`]** When scaffolding a new domain, the isolation sequence is mandatory and must complete before any domain files are committed anywhere: (1) `git init` in the domain folder, (2) add domain path to framework `.gitignore`, (3) commit `.gitignore` to framework repo, (4) commit domain files to domain repo, (5) create remote and push. Never commit domain files to the framework repo. Full spec: `orchestration.md` → Hard Hooks.
 
-> **[HARD HOOK: `session-end:continuity`]** At the end of any session where a domain was discussed or modified: (1) scan the session for insights worth preserving, (2) create `type: insight` things for any that pass the preservation test, (3) update the domain's `continuity.md` — add new threads, remove resolved ones, (4) commit everything. Full spec: `session-memory.md` and `orchestration.md` → Hard Hooks.
+> **[BOUND PROMPT: `session-end`]** At the end of any session where a domain was discussed or modified, invoke the `session-end` bound prompts: `session-end-continuity` (extract insights, check for contradictions, update continuity brief) and `worklog-update` (append structured session entry to WORKLOG.md). These are explicitly invoked — not automatic. Full spec: `orchestration.md` → Bindings, `templates/prompts/session-end-continuity.md`, `templates/prompts/worklog-update.md`.
 
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
