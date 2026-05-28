@@ -37,6 +37,36 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 28 May 2026
+
+### Session 1
+
+#### Topic: Session-End Hook Review and Reclassification as Prompt
+
+Reviewed the insight/session-memory/belief-revision system's practical effectiveness. Identified that `session-end:continuity` was classified as a hard hook but lacked an observable trigger, causing it to drift in practice. Refactored it to its proper classification.
+
+#### Completed
+
+- [x] **Reviewed all 5 framework insights** and assessed how the session-memory system was working in practice
+- [x] **Created `templates/prompts/session-end-continuity.md`**: The extraction ritual rewritten as a prompt with declared inputs/outputs, bound to `session-end`
+- [x] **Created `templates/prompts/worklog-update.md`**: WORKLOG append as a companion prompt, also bound to `session-end`
+- [x] **Refactored orchestration.md** (v1.4 → v1.5): Removed hard hook, added prompts to framework prompts list, added `session-end` binding
+- [x] **Updated AGENTS.md**: Replaced hard hook callout with `[BOUND PROMPT: session-end]` block
+- [x] **Updated session-memory.md**: Adjusted ritual section to reference prompt-based invocation
+- [x] **Updated README.md**: Reflected new classification in spec table and descriptions
+
+#### Decisions
+
+- **Reclassify session-end:continuity as a bound prompt, not a hard hook**: Hard hooks require observable, agent-caused triggers. "Session is ending" is not observable — it depends on external signal. Honest classification fixes the drift problem at its root.
+- **Add worklog-update as a second session-end prompt**: WORKLOG updates were implicit before; making them a named prompt alongside continuity extraction gives both equal visibility.
+- **No VS Code .prompt.md shortcut**: Decided against creating a Copilot-specific slash command to maintain vendor agnosticism. The natural-language trigger ("end of session") works across all platforms.
+
+#### Deferred
+
+- [ ] **Framework-level continuity.md**: The framework domain itself doesn't have a continuity brief. Should be created to practise what the spec preaches.
+
+---
+
 ## 27 May 2026
 
 ### Session 1
