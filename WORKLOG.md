@@ -41,6 +41,26 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ### Session 1
 
+#### Topic: Holistic Framework Review and Housekeeping
+
+Full end-to-end review of the framework post-v2.5.0. Read all 15 specs, AGENTS.md, InnoTriage domain, insights, templates, examples, WORKLOG, and CHANGELOG. Created the REVIEWLOG as a new companion artifact (periodic quality reviews, separate from WORKLOG's session narrative). Identified tensions, over/under-engineering, and promoted one stale insight.
+
+#### Completed
+
+- [x] **Created REVIEWLOG.md**: New framework artifact for periodic quality reviews; complements WORKLOG by tracking *how well* things work rather than *what was done*
+- [x] **Full framework review written**: Verdict, 6 strengths, 6 tensions, 4 over-engineered areas, 5 under-engineered areas documented
+- [x] **Promoted stale insight**: `domain-spec-guide-predates-knowledge-primitives` → status: promoted (the guide already incorporated knowledge primitives at v2.5)
+- [x] **Made thing-lifecycle.md discoverable**: Added to AGENTS.md Tier 2 loading table and spec inventory under new "Deferred" heading — fixing the "ghost spec" problem identified in the review
+
+#### Decisions
+
+- **REVIEWLOG as a separate artifact, not a WORKLOG section**: Reviews ask different questions than session logs. Keeping them separate lets each maintain its own rhythm (sessions are per-conversation, reviews are periodic).
+- **InnoTriage alias convention**: Used "InnoTriage" as the review alias for the ProducFlow2 domain for readability.
+
+---
+
+### Session 2
+
 #### Topic: Session-End Hook Review and Reclassification as Prompt
 
 Reviewed the insight/session-memory/belief-revision system's practical effectiveness. Identified that `session-end:continuity` was classified as a hard hook but lacked an observable trigger, causing it to drift in practice. Refactored it to its proper classification.
