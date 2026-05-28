@@ -83,7 +83,7 @@ This is where the reasoning lives — not just the data.
 | Query type | Load |
 |---|---|
 | Creating or scaffolding a new domain | `domain-specification-guide.md` |
-| Scaling, structure, or performance concerns | `scalability-guide.md` |
+| Scaling, structure, or performance concerns | `scalability-guide.md`, `thing-lifecycle.md` (draft) |
 | Philosophical or "why" questions | `llm-driven-systems.manifesto.md` |
 | I/O, deliverables, or output format questions | `interface.md` |
 | Domain agent locating the framework | `framework-discovery.md` |
@@ -138,6 +138,9 @@ The framework defines itself through these interconnected specifications:
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
+
+### Deferred (Spec When Foreseeable, Deploy When Felt)
+- **thing-lifecycle.md** — Rolling window, disposition to stubs, rehydration from git history, manifest index. Addresses the 200–300 thing ceiling. (`type: specification`, `status: draft`)
 
 ### Examples
 - **examples/life-manager/** — Personal life and work management domain

@@ -1,14 +1,15 @@
 ---
 id: domain-spec-guide-predates-knowledge-primitives
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-05-27
 confidence: high
 origin: stated
 source: session — consistency review
 session: 2026-05-27 Session 4
-tags: [domain-specification-guide, continuity, insight, conflict, retrospective, deferred]
+promoted_to: domain-specification-guide
+tags: [domain-specification-guide, continuity, insight, conflict, retrospective]
 linked_things:
   - id: domain-specification-guide
     relation: references
@@ -40,4 +41,6 @@ The domain-specification-guide is how new domains are bootstrapped. It is the fi
 
 ## Context
 
-Deliberately deferred — adding this to the guide is a small but non-trivial update because it requires deciding *where in the domain creation flow* these concepts are introduced (before or after the first session? as optional extensions? as Day 1 setup?). Not urgent for domains that are actively developed with a human in the loop, but important before the framework is used more autonomously.
+Originally deferred during the 27 May Session 4 consistency pass. The guide was subsequently updated to v2.5 with all knowledge primitives integrated: `continuity.md` in the domain structure, `type: insight`/`type: conflict`/`type: retrospective` in a dedicated Knowledge Management section, session-end:continuity in the AGENTS.md template, and knowledge sub-folders in the scaffolding steps. The design question (where in the creation flow to introduce these) was resolved as Day 1 setup — they are part of the initial scaffold, not optional extensions.
+
+Promoted to `status: promoted` on 28 May 2026 during holistic framework review.
