@@ -49,6 +49,41 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 29 May 2026
+
+### Session 1
+
+#### Topic: Validation Pass + SRP Analysis (Thing Cohesion and Decomposition Review)
+
+Two-part session. First: ran a full validation pass against the newly defined decomposition rules in thing.md (v2.6→v2.8), fixing 9 structural and referential issues across the framework. Second: conducted a full SRP analysis of every framework spec and insight against the three decomposition tests now defined in thing.md.
+
+#### Completed
+
+- [x] **Validation pass run**: 9 issues found and fixed — `origin: both` corrected to `origin: synthesised` in 3 insights; status vocabulary expanded in thing.md v2.8 and validate.thing.md v1.3; missing `linked_things` entries added to orchestration.md, interface.md, domain-specification-guide.md, WORKLOG.md, REVIEWLOG.md; CHANGELOG updated with two missing version entries (v2.6.0, v2.7.0)
+- [x] **Full SRP analysis conducted**: All 17 specs, both guides, the manifesto, and 6 insights evaluated against rate-of-change test, consumer test, and relation-signal test
+- [x] **8 issues identified and documented in REVIEWLOG**: 2 high, 3 medium, 3 low — none blocking, all actionable
+- [x] **REVIEWLOG updated**: New 29 May review entry added with full findings, summary table, and suggested priorities
+
+#### Issues Identified (for next session to action)
+
+| # | Files | Issue | Severity |
+|---|---|---|---|
+| 1 | `thing.md` | `type: example` embedded; all other reserved types have own specs | High |
+| 2 | `read.thing.md` + `write.thing.md` | Multi-lens reasoning duplicated across both | High |
+| 3 | `domain-refresh.md` + `framework-discovery.md` | Deployment architecture split between two specs | Medium |
+| 4 | `validate.thing.md` | Skill frontmatter fields (`name`, `description`, `applies_to`) on a thing spec | Medium |
+| 5 | `write.thing.md` | References `schema_version` field not defined in `thing.md` | Medium |
+| 6 | `thing.md` | Framework-internal types (`specification`, `guide`, `manifesto`) undocumented | Low |
+| 7 | `scalability-guide.md` | `type: summary` used without definition | Low |
+| 8 | `domain-specification-guide.md` | High-detail repetition of framework-discovery content | Low |
+
+#### Decisions
+
+- **Fix #1 and #2 first**: They directly contradict the decomposition principle just added to thing.md — the framework's own rules apply to itself
+- **No continuity.md for the framework**: Still deferred (noted in 28 May Session 2 as an open item)
+
+---
+
 ## 28 May 2026
 
 ### Session 1

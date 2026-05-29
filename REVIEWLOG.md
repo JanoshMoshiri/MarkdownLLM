@@ -49,6 +49,128 @@ This file is a running record of independent reviews of the framework's state, c
 
 ---
 
+## 29 May 2026
+
+### Review — 29 May 2026
+
+**Scope:** Full SRP (Single Responsibility Principle) analysis of the entire framework, triggered by the addition of the Thing Cohesion and Decomposition section to `thing.md` (v2.6→v2.8). Every spec file, guide, and insight in the framework was read and evaluated against the three decomposition tests now defined in thing.md: rate-of-change test, consumer test, and relation-signal test. The analysis was conducted in two passes — before and after a validation run that fixed 9 structural/referential issues mid-session.
+
+**Overall Verdict:** The framework's decomposition discipline is strong at the spec level but has several internal violations of the rules it now formally defines. None are severe enough to break reasoning today, but items #1 and #2 (example type embedding, multi-lens duplication) directly contradict the decomposition principle in the same file that defines it. These should be addressed before the decomposition rules are promoted as a core framework teaching.
+
+---
+
+#### What The Validation Run Fixed (Not SRP Issues — Structural/Referential)
+
+These were found and fixed mid-session by the validation pass (commit `a9834a8`):
+
+1. `origin: both` in 3 insight files — invalid value, changed to `origin: synthesised`
+2. Status vocabulary gap — `thing.md` v2.8 + `validate.thing.md` v1.3 now document all three status vocabularies (domain workflow / spec lifecycle / insight lifecycle)
+3. Missing `linked_things` entries in `orchestration.md`, `interface.md`, `domain-specification-guide.md`, `WORKLOG.md`, `REVIEWLOG.md`
+4. Missing `CHANGELOG.md` entries for v2.6.0 and v2.7.0
+
+---
+
+#### SRP Violations Found — Open
+
+**Issue 1 — HIGH: `type: example` embedded in `thing.md`**
+
+All other framework-reserved types with complex structure have their own dedicated specs: `insight` and `continuity-brief` → `session-memory.md`, `conflict` → `belief-revision.md`, `retrospective` → `retrospective.md`. The `type: example` block (~50 lines: its own frontmatter template, "when to use," the positive/negative contrast rationale, scaling through pattern libraries) lives inside `thing.md`. Its reason to change is *how LLMs learn inductively*, independent of the core schema. Consumer test fails: a domain creator building a pattern library must strip schema definitions, decomposition rules, and lifecycle sections to reach the example guidance.
+
+**Recommended fix:** Extract to `example-things.md` (or incorporate into `domain-specification-guide.md`). Replace the block in `thing.md` with a one-liner pointer, matching the pattern for all other reserved types.
+
+---
+
+**Issue 2 — HIGH: Multi-lens reasoning duplicated across `read.thing.md` and `write.thing.md`**
+
+The multi-lens reasoning section (5-step evaluation process, compliance domain example, conflict handling) appears identically in both specs. If the pattern evolves, two files need updating. No canonical source exists. Consumer test fails: a domain spec guide explaining how to define lenses has no single place to reference.
+
+**Recommended fix:** Extract to a standalone `reasoning-lenses.md` spec, or consolidate into `domain-specification-guide.md`. Both `read.thing.md` and `write.thing.md` replace the section with a sentence pointing to the canonical source.
+
+---
+
+**Issue 3 — MEDIUM: Deployment architecture split between `domain-refresh.md` and `framework-discovery.md`**
+
+`domain-refresh.md` has a "Deployment Architecture" section covering the nested repo model, key properties table, `.gitignore` contract, and architectural rationale. `framework-discovery.md` has a "Standalone Domain Deployment" section covering Options A (copy), B (submodule), C (minimal bundle). These cover the same topic — how domain repos are structured relative to the framework — and change together. Consumer test fails: a reader who needs the full deployment picture must read both and merge them.
+
+**Recommended fix:** `framework-discovery.md` becomes canonical for all deployment architecture. `domain-refresh.md` reduces its architecture section to a 2-sentence summary with a link.
+
+---
+
+**Issue 4 — MEDIUM: `validate.thing.md` uses skill frontmatter fields, not thing frontmatter**
+
+```yaml
+name: Validate Thing           ← not in thing.md schema
+description: Universal validation...   ← not in thing.md schema
+applies_to: "**/things/**/*.md"        ← skill convention, not thing convention
+```
+
+These three fields are `.skill.md` conventions. The spec that validates other things' structural conformance to `thing.md` does not itself conform to `thing.md`. Survived the validation pass because the structural checks don't flag non-standard fields as errors.
+
+**Recommended fix:** Remove `name`, `description`, and `applies_to` from the frontmatter. Add a description to the opening paragraph of the markdown body if needed.
+
+---
+
+**Issue 5 — MEDIUM: `write.thing.md` instructs agents to add `schema_version` — a field not in `thing.md`**
+
+The Version Management section says: *"Always include `schema_version: 2.0` (or current version) in the metadata."* But `thing.md` lists no `schema_version` field anywhere (not required, not recommended, not emergent). An agent following `write.thing.md` would add a field with no definition. `validate.thing.md` doesn't validate it either.
+
+**Recommended fix:** Either add `schema_version` to `thing.md` as a recommended field with rationale, or replace the instruction in `write.thing.md` with guidance on `version` (the field actually used on framework specs).
+
+---
+
+**Issue 6 — LOW: `type: specification`, `type: guide`, `type: manifesto` undocumented as framework-internal types**
+
+`thing.md` v2.8 added special status behaviour for these types (they use lifecycle statuses: `draft`, `evolving`, `stable`, `deprecated`). But the types themselves are never formally defined anywhere. The framework-reserved types list (`insight`, `continuity-brief`, `conflict`, `retrospective`) does not include them. A domain creator reading `thing.md` would not know these types exist or that they carry special semantics. The distinction (framework-reserved = for domain use; framework-internal = for framework specs only) is implicit, not stated.
+
+**Recommended fix:** Add a "Framework-Internal Types" note to `thing.md` clarifying that `specification`, `guide`, and `manifesto` are used by the framework's own files, carry lifecycle status semantics, and should not be used for domain things.
+
+---
+
+**Issue 7 — LOW: `scalability-guide.md` introduces `type: summary` without a definition**
+
+Approach 2 (Incremental Summarisation) describes creating `type: summary` things. But `thing.md` does not define this type, and `thing-lifecycle.md` addresses the same problem through a different mechanism (stubs/disposition). No guidance exists on which to use or how a summary thing should be structured.
+
+**Recommended fix:** Either add a brief `type: summary` note to `thing.md` as an informal type for manual summarisation (distinct from the formal lifecycle mechanism), or add a note in `scalability-guide.md` Approach 2 distinguishing it from `thing-lifecycle.md`.
+
+---
+
+**Issue 8 — LOW: `domain-specification-guide.md` repeats framework-discovery content at high detail**
+
+The guide's "Framework Discovery" section (~30 lines) reproduces the `framework_root` mechanism and `.markdownllm` fallback at a detail level close enough to the canonical spec that it could drift independently.
+
+**Recommended fix:** Reduce to a 3-sentence orientation + a link to `framework-discovery.md`. Guides should orient, not restate.
+
+---
+
+#### Summary Table
+
+| # | File(s) | Issue | Severity |
+|---|---|---|---|
+| 1 | `thing.md` | `type: example` embedded; all other reserved types have own specs | **High** |
+| 2 | `read.thing.md` + `write.thing.md` | Multi-lens reasoning duplicated across both | **High** |
+| 3 | `domain-refresh.md` + `framework-discovery.md` | Deployment architecture split between two specs | Medium |
+| 4 | `validate.thing.md` | Skill frontmatter fields on a thing spec | Medium |
+| 5 | `write.thing.md` | References `schema_version` field not defined in `thing.md` | Medium |
+| 6 | `thing.md` | Framework-internal types (`specification`, `guide`, `manifesto`) undocumented | Low |
+| 7 | `scalability-guide.md` | `type: summary` used without definition | Low |
+| 8 | `domain-specification-guide.md` | High-detail repetition of framework-discovery content | Low |
+
+---
+
+#### Suggested Priorities
+
+1. Fix issues #1 and #2 first — they directly contradict the decomposition principle that was just added to thing.md
+2. Fix issues #3, #4, #5 as a batch — all medium severity, all clean extraction/removal operations
+3. Fix issues #6, #7, #8 opportunistically — low severity, can be addressed when touching the relevant files
+
+---
+
+#### Reflections
+
+*To be filled in on retrospective review.*
+
+---
+
 ## 28 May 2026
 
 ### Review — 28 May 2026
