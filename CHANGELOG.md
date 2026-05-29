@@ -18,11 +18,13 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ## [2.8.0] - 2026-05-29
 
-SRP violation corrections across 8 issues identified in the 29 May review sweep. Two new specs extracted from embedded duplicated content; six existing specs corrected for structural conformance.
+SRP violation corrections across 8 issues identified in the 29 May review sweep. Two new specs extracted from embedded/duplicated content; six existing specs corrected for structural conformance.
 
-**New specs:**
-- `example-things.md` (v1.0) — full specification for `type: example` things; extracted from `thing.md` where it was embedded alongside unrelated schema content
-- `reasoning-lenses.md` (v1.0) — canonical multi-lens reasoning spec; extracted from identical duplication in `read.thing.md` and `write.thing.md`
+**Why these were extracted rather than fixed inline:** `thing.md` v2.8 added the Thing Cohesion and Decomposition principle — the framework's formal statement that content serving different audiences or changing at different rates belongs in separate specs. The two highest-severity issues (embedded example type spec, duplicated multi-lens reasoning) were direct violations of the rule in the same file that defines it; leaving them would have undermined the principle as a teaching tool. Extraction also improves context economics: content previously embedded in Tier 0 (`thing.md`) and Tier 1 (`read/write.thing.md`) — loaded in every session — is now in Tier 2 specs loaded only on demand. **Baseline context load is lower post-v2.8.0 than pre-v2.8.0.**
+
+**New specs (Tier 2 — demand-loaded only):**
+- `example-things.md` (v1.0) — full specification for `type: example` things; extracted from `thing.md` where it was embedded alongside unrelated schema content (~50 lines removed from Tier 0)
+- `reasoning-lenses.md` (v1.0) — canonical multi-lens reasoning spec; extracted from identical duplication in `read.thing.md` and `write.thing.md` (~95 lines removed from Tier 1)
 
 **SRP violations corrected:**
 - `thing.md` (v2.8 → v2.9): replaced `type: example` embedded block with pointer to `example-things.md`; added "Framework-Internal Types" note clarifying `specification`, `guide`, `manifesto` are framework-internal and should not be used for domain things
