@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-05-28
 confidence: medium
-origin: both
+origin: synthesised
 source: session — holistic framework review
 session: 2026-05-28
 tags: [hooks, compliance, context-pressure, agent-behaviour]

@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.7
+version: 2.8
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -76,7 +76,9 @@ These fields must be present in every thing to do:
 
 **status** (string)
 - Current state of this thing
-- Values: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`
+- Values for domain things (tasks, projects, goals, etc.): `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`
+- Values for framework specification things (`type: specification`, `type: guide`, `type: manifesto`): `draft`, `evolving`, `stable`, `deprecated` — these reflect lifecycle maturity, not workflow state
+- Values for insight things (`type: insight`): `active`, `promoted`, `dismissed` — see `session-memory.md`
 - Updated by Claude as work progresses
 
 **created** (ISO 8601 date)

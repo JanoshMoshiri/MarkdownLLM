@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-05-28
 confidence: high
-origin: both
+origin: synthesised
 source: session — holistic framework review
 session: 2026-05-28
 tags: [consistency, tracking, single-source-of-truth, discoverability]

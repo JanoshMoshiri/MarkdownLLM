@@ -3,7 +3,7 @@ id: validate-thing-specification
 name: Validate Thing
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-19
 description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, conflict detection, and orchestration graph integrity
 applies_to: "**/things/**/*.md"
@@ -55,7 +55,7 @@ Validate in order. Each level builds on the previous. Stop and report at the fir
 | `id` matches filename | The `id` value matches the filename (without `.md` extension) | Warning |
 | `type` present | Field exists and is not empty | Error |
 | `status` present | Field exists and is not empty | Error |
-| `status` value valid | One of: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled` | Error |
+| `status` value valid | One of: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`. **Exception:** `type: specification`, `type: guide`, and `type: manifesto` things use lifecycle statuses: `draft`, `evolving`, `stable`, `deprecated`. `type: insight` things use: `active`, `promoted`, `dismissed`. | Error |
 | `created` present | Field exists and is not empty | Error |
 | `created` format | Valid ISO 8601 date or datetime | Error |
 | `due_date` format | If present, valid ISO 8601 date | Warning |

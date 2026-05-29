@@ -11,11 +11,35 @@ linked_things:
     relation: evaluates
   - id: thing-specification
     relation: evaluates
+  - id: read-thing-specification
+    relation: evaluates
+  - id: write-thing-specification
+    relation: evaluates
+  - id: validate-thing-specification
+    relation: evaluates
   - id: git-workflow-specification
     relation: evaluates
   - id: interface-specification
     relation: evaluates
   - id: orchestration-specification
+    relation: evaluates
+  - id: session-memory-specification
+    relation: evaluates
+  - id: belief-revision-specification
+    relation: evaluates
+  - id: retrospective-specification
+    relation: evaluates
+  - id: scalability-guide
+    relation: evaluates
+  - id: domain-specification-guide
+    relation: evaluates
+  - id: trigger-specification
+    relation: evaluates
+  - id: thing-lifecycle-specification
+    relation: evaluates
+  - id: framework-discovery-specification
+    relation: evaluates
+  - id: domain-refresh-specification
     relation: evaluates
 ---
 

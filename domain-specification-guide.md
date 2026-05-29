@@ -25,6 +25,8 @@ linked_things:
     relation: references
   - id: retrospective-specification
     relation: references
+  - id: trigger-specification
+    relation: references
 ---
 
 # Domain Specification Guide

@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-05-28
 confidence: high
-origin: both
+origin: synthesised
 source: session — session-end hook review and refactor
 session: 2026-05-28
 tags: [hooks, orchestration, design-principle, classification]

@@ -19,6 +19,8 @@ linked_things:
     relation: enforces
   - id: belief-revision-specification
     relation: enforces
+  - id: trigger-specification
+    relation: complements
 ---
 
 # Orchestration

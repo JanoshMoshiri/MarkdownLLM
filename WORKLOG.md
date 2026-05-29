@@ -29,6 +29,18 @@ linked_things:
     relation: documents
   - id: domain-refresh-specification
     relation: documents
+  - id: session-memory-specification
+    relation: documents
+  - id: belief-revision-specification
+    relation: documents
+  - id: retrospective-specification
+    relation: documents
+  - id: thing-lifecycle-specification
+    relation: documents
+  - id: trigger-specification
+    relation: documents
+  - id: framework-reviewlog
+    relation: complements
 ---
 
 # Framework Work Log

@@ -16,6 +16,31 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [2.7.0] - 2026-05-29
+
+- `trigger-specification.md` (v1.0, `status: stable`) created as a standalone spec for the trigger system. Previously, trigger documentation lived only in `thing.md` with a forward reference. Now a full specification covering all four trigger types, all condition and action values, evaluation semantics, and idempotency rules. Added to AGENTS.md Tier 2 loading and framework spec inventory.
+
+---
+
+## [2.6.0] - 2026-05-28
+
+**Session-end reclassification:**
+- `orchestration.md` (v1.4 → v1.5): `session-end:continuity` removed as third framework hard hook. Reclassified as a bound prompt — hard hooks require observable, agent-caused triggers; "session is ending" does not meet that criterion. The ritual remains mandatory but is invoked explicitly, not via hard hook.
+- `AGENTS.md` (v2.7 → v2.8): Replaced hard hook callout with `[BOUND PROMPT: session-end]` block. Updated On Output section accordingly.
+- `session-memory.md`: Ritual section updated to reference prompt-based invocation rather than hard hook.
+
+**New prompt templates:**
+- `templates/prompts/session-end-continuity.md` — The continuity extraction ritual as a declared prompt with inputs/outputs
+- `templates/prompts/worklog-update.md` — WORKLOG append as a companion prompt, both bound to `session-end`
+
+**Discoverability fix:**
+- `AGENTS.md`: `thing-lifecycle.md` (draft spec addressing the 200–300 thing scaling ceiling) added to Tier 2 loading table and spec inventory under new "Deferred" heading. Fixes "ghost spec" problem — existed at root since 23 May but was invisible to framework discovery mechanisms.
+
+**New framework artifact:**
+- `REVIEWLOG.md` created as a periodic quality review log. Complements the WORKLOG (session narrative) by tracking how well the framework works, not just what was done. First review written: full holistic review post-v2.5.0.
+
+---
+
 ## [2.5.0] - 2026-05-27
 
 Four structural gaps in the framework's knowledge management capabilities closed. New specs cover session continuity, contradiction handling, and periodic reflection. Startup loading made context-window-efficient.

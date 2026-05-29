@@ -11,6 +11,10 @@ linked_things:
     relation: complements
   - id: git-workflow-specification
     relation: complements
+  - id: read-thing-specification
+    relation: complements
+  - id: write-thing-specification
+    relation: complements
 ---
 
 # Interface
