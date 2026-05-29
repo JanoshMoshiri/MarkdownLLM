@@ -91,6 +91,7 @@ This is where the reasoning lives — not just the data.
 | Session-end work, insights, continuity briefs | `session-memory.md` |
 | Contradictions, conflicts, belief revision | `belief-revision.md` |
 | Periodic quality reflection | `retrospective.md` |
+| Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
 
 **Typical session cost:** Tier 0 alone ≈ 15k tokens. Tier 0 + Tier 1 ≈ 33k tokens. Full load (rare — new domain creation) ≈ 60k tokens.
 
@@ -120,7 +121,7 @@ The framework defines itself through these interconnected specifications:
 
 ### Foundational
 - **llm-driven-systems.manifesto.md** — Philosophy, paradigm shift, core principles. The "why." (`type: manifesto`, `status: stable`)
-- **thing.md** — The atomic unit specification. What a thing is, how it's structured, triggers. (`type: specification`, `status: stable`)
+- **thing.md** — The atomic unit specification: schema definition, field reference, cohesion and decomposition principle. (`type: specification`, `status: stable`)
 
 ### Operational
 - **read.thing.md** — How LLMs read and reason about things without modification. (`type: specification`, `status: stable`)
@@ -134,6 +135,7 @@ The framework defines itself through these interconnected specifications:
 - **retrospective.md** — Periodic domain quality reflection: `type: retrospective`, when to write one, and how it produces insights, surfaces latent conflicts, and improves reasoning over time. (`type: specification`, `status: stable`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
 - **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: stable`)
+- **trigger-specification.md** — Declarative attention signals: all trigger types, condition values, action values, evaluation semantics, and idempotency. Extends thing.md. (`type: specification`, `status: stable`)
 
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
