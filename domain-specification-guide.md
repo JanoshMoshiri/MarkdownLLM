@@ -130,27 +130,9 @@ Things follow the structure defined in `thing.md`. Your domain instantiates this
 
 ## Framework Discovery
 
-When a domain is nested inside a MarkdownLLM framework repository (e.g., at `domains/my-domain/`), the domain agent needs to locate the framework's foundational specs. Two mechanisms support this:
+Domains locate framework specs at startup by resolving the `framework_root` relative path declared in their AGENTS.md frontmatter. As a fallback, the agent walks up the directory tree looking for a `.markdownllm` marker file. Standalone domains set `framework_root: .` and co-locate or submodule the framework specs.
 
-### 1. `framework_root` in Frontmatter (Primary)
-
-Declare the relative path from the domain root to the framework root in your AGENTS.md frontmatter:
-
-```yaml
-framework_root: ../..
-```
-
-The agent resolves this at startup to load `thing.md`, `git-workflow.md`, `validate.thing.md`, and `interface.md`.
-
-### 2. `.markdownllm` Marker File (Fallback)
-
-The framework root contains a `.markdownllm` file. If `framework_root` is not declared, the agent walks up the directory tree looking for this marker. This ensures discovery works even if frontmatter is incomplete.
-
-### Standalone Domains
-
-If your domain is deployed as its own repository (not nested), set `framework_root: .` and either copy the foundational specs into your root or include the framework as a git submodule.
-
-See **framework-discovery.md** for the full specification.
+See `framework-discovery.md` for the full specification, including the startup sequence, marker file format, nested repository model, and all standalone deployment options.
 
 ---
 

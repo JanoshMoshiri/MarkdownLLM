@@ -16,6 +16,26 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [2.8.0] - 2026-05-29
+
+SRP violation corrections across 8 issues identified in the 29 May review sweep. Two new specs extracted from embedded duplicated content; six existing specs corrected for structural conformance.
+
+**New specs:**
+- `example-things.md` (v1.0) — full specification for `type: example` things; extracted from `thing.md` where it was embedded alongside unrelated schema content
+- `reasoning-lenses.md` (v1.0) — canonical multi-lens reasoning spec; extracted from identical duplication in `read.thing.md` and `write.thing.md`
+
+**SRP violations corrected:**
+- `thing.md` (v2.8 → v2.9): replaced `type: example` embedded block with pointer to `example-things.md`; added "Framework-Internal Types" note clarifying `specification`, `guide`, `manifesto` are framework-internal and should not be used for domain things
+- `read.thing.md` (v2.0 → v2.1): multi-lens section replaced with pointer to `reasoning-lenses.md`
+- `write.thing.md` (v2.0 → v2.1): multi-lens section replaced with pointer; removed undefined `schema_version: 2.0` instruction, replaced with guidance on `version` for framework specs
+- `validate.thing.md` (v1.3 → v1.4): removed `name`, `description`, `applies_to` skill-convention fields from frontmatter; description incorporated into spec body
+- `framework-discovery.md` (v1.0 → v1.1): became canonical for all deployment architecture; nested repository model section added (previously only in `domain-refresh.md`)
+- `domain-refresh.md` (v1.0 → v1.1): Deployment Architecture section reduced to 2-sentence summary + link to `framework-discovery.md`
+- `domain-specification-guide.md`: Framework Discovery section reduced from ~30-line restatement to 3-sentence orientation + link to `framework-discovery.md`
+- `scalability-guide.md` (v1.0 → v1.1): `type: summary` usage clarified — note added distinguishing manual summary things from the formal `thing-lifecycle.md` mechanism
+
+---
+
 ## [2.7.0] - 2026-05-29
 
 - `trigger-specification.md` (v1.0, `status: stable`) created as a standalone spec for the trigger system. Previously, trigger documentation lived only in `thing.md` with a forward reference. Now a full specification covering all four trigger types, all condition and action values, evaluation semantics, and idempotency rules. Added to AGENTS.md Tier 2 loading and framework spec inventory.

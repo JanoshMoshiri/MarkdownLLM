@@ -137,6 +137,9 @@ The framework defines itself through these interconnected specifications:
 - **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: stable`)
 - **trigger-specification.md** — Declarative attention signals: all trigger types, condition values, action values, evaluation semantics, and idempotency. Extends thing.md. (`type: specification`, `status: stable`)
 
+- **example-things.md** — Full specification for `type: example` things: frontmatter template, when to use examples, and why examples work better than rules for inductive LLM learning. (`type: specification`, `status: stable`)
+- **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)
+
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)

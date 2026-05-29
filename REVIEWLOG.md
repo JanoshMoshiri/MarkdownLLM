@@ -144,16 +144,16 @@ The guide's "Framework Discovery" section (~30 lines) reproduces the `framework_
 
 #### Summary Table
 
-| # | File(s) | Issue | Severity |
-|---|---|---|---|
-| 1 | `thing.md` | `type: example` embedded; all other reserved types have own specs | **High** |
-| 2 | `read.thing.md` + `write.thing.md` | Multi-lens reasoning duplicated across both | **High** |
-| 3 | `domain-refresh.md` + `framework-discovery.md` | Deployment architecture split between two specs | Medium |
-| 4 | `validate.thing.md` | Skill frontmatter fields on a thing spec | Medium |
-| 5 | `write.thing.md` | References `schema_version` field not defined in `thing.md` | Medium |
-| 6 | `thing.md` | Framework-internal types (`specification`, `guide`, `manifesto`) undocumented | Low |
-| 7 | `scalability-guide.md` | `type: summary` used without definition | Low |
-| 8 | `domain-specification-guide.md` | High-detail repetition of framework-discovery content | Low |
+| # | File(s) | Issue | Severity | Status |
+|---|---|---|---|---|
+| 1 | `thing.md` | `type: example` embedded; all other reserved types have own specs | **High** | ✓ Fixed — extracted to `example-things.md` |
+| 2 | `read.thing.md` + `write.thing.md` | Multi-lens reasoning duplicated across both | **High** | ✓ Fixed — extracted to `reasoning-lenses.md` |
+| 3 | `domain-refresh.md` + `framework-discovery.md` | Deployment architecture split between two specs | Medium | ✓ Fixed — `framework-discovery.md` is now canonical |
+| 4 | `validate.thing.md` | Skill frontmatter fields on a thing spec | Medium | ✓ Fixed — `name`, `description`, `applies_to` removed |
+| 5 | `write.thing.md` | References `schema_version` field not defined in `thing.md` | Medium | ✓ Fixed — replaced with `version` guidance |
+| 6 | `thing.md` | Framework-internal types (`specification`, `guide`, `manifesto`) undocumented | Low | ✓ Fixed — "Framework-Internal Types" note added |
+| 7 | `scalability-guide.md` | `type: summary` used without definition | Low | ✓ Fixed — note distinguishing summary things from `thing-lifecycle.md` |
+| 8 | `domain-specification-guide.md` | High-detail repetition of framework-discovery content | Low | ✓ Fixed — reduced to 3-sentence orientation + link |
 
 ---
 

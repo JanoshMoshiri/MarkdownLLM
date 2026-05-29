@@ -2,7 +2,7 @@
 id: framework-discovery-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-19
 linked_things:
   - id: domain-specification-guide
@@ -118,7 +118,51 @@ This serves two purposes:
 1. **Fallback discovery** — If `framework_root` is not declared in a domain's frontmatter, the agent can walk up directories looking for this marker
 2. **Self-documentation** — Tells any agent (or human) what this repository is and what foundational specs are available
 
-## Standalone Domain Deployment
+## Deployment Architecture
+
+The framework supports two deployment modes.
+
+### Nested Repository Model (Recommended)
+
+The standard deployment uses a nested git repository architecture: domains live inside the framework directory but maintain independent git histories.
+
+```
+MarkdownLLM/                    ← Framework git repo
+├── .gitignore                  ← Contains: domain/
+├── thing.md
+├── git-workflow.md
+├── ...foundational specs...
+├── templates/
+├── examples/
+└── domain/
+    ├── DomainA/                ← Independent git repo
+    │   ├── AGENTS.md
+    │   ├── skills/
+    │   └── things/
+    └── DomainB/                ← Independent git repo
+        ├── AGENTS.md
+        ├── skills/
+        └── things/
+```
+
+**Key properties:**
+
+| Property | Mechanism | Purpose |
+|----------|-----------|--------|
+| **Isolation** | Framework `.gitignore` excludes `domain/` | Domain commits never appear in framework history |
+| **Independence** | Each domain has its own `.git` | Domains version independently with their own branches, tags, remotes |
+| **Shared foundation** | `framework_root` in domain AGENTS.md | Domains resolve framework specs via relative path |
+| **Read-only relationship** | Domains read framework specs; never write to them | Framework evolves independently of domains |
+
+**Why this architecture:**
+1. **Clean separation of concerns** — Framework evolution and domain evolution are decoupled
+2. **Independent deployment** — Domains can be extracted to standalone repos at any time
+3. **No submodule complexity** — Avoids git submodule pain while achieving the same isolation
+4. **Multiple domains, one framework** — Many domains share a single framework installation without conflicts
+
+**The `.gitignore` contract:** The framework's `.gitignore` MUST contain `domain/`. Without it, domain files appear as untracked files in the framework repo.
+
+### Standalone Domain Deployment
 
 When a domain is deployed as its own repository (not nested inside the framework repo), there are two options:
 

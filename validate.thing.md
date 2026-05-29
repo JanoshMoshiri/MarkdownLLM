@@ -1,12 +1,9 @@
 ---
 id: validate-thing-specification
-name: Validate Thing
 type: specification
 status: stable
-version: 1.3
+version: 1.4
 created: 2026-05-19
-description: Universal validation of thing files and prompt files — structural integrity, referential consistency, semantic coherence, conflict detection, and orchestration graph integrity
-applies_to: "**/things/**/*.md"
 linked_things:
   - id: thing-specification
     relation: validates
@@ -18,7 +15,7 @@ linked_things:
 
 # Validate Thing Skill
 
-You are validating thing files within a domain using the LLM-driven systems framework. Your role is to check that things are structurally sound, referentially consistent, and semantically coherent. You report issues clearly so they can be fixed.
+You are validating thing files and prompt files within a domain using the LLM-driven systems framework. Your role is to check structural integrity, referential consistency, semantic coherence, conflict detection, and orchestration graph integrity. You report issues clearly so they can be fixed.
 
 ## System Context
 

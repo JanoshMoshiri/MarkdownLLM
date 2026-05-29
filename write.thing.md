@@ -2,7 +2,7 @@
 id: write-thing-specification
 type: specification
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-13
 linked_things:
   - id: thing-specification
@@ -13,6 +13,8 @@ linked_things:
     relation: integrates-with
   - id: validate-thing-specification
     relation: invokes
+  - id: reasoning-lenses-specification
+    relation: references
   - id: scalability-guide
     relation: informed-by
 ---
@@ -57,7 +59,7 @@ The user is asking you to help manage their things within the domain. Your job i
 - **Relationships** — If you're creating a new thing, does it need to link to existing things?
 - **Scope** — Is this thing appropriately scoped? Should it be split or combined with something else?
 - **Context** — Is the narrative body clear enough for the user (and future versions of you) to understand what this is?
-- **Versioning** — Make sure your created or modified things include a schema_version in the metadata
+- **Versioning** — Make sure your created or modified things have all required fields present
 
 ## Loading Strategy: Tiered Context Windows
 
@@ -121,57 +123,7 @@ These will vary by domain, but the pattern is the same:
 
 ## Multi-Lens Reasoning for Changes (Optional)
 
-When the domain defines reasoning lenses, apply them **before** making changes:
-
-### How to Use Reasoning Lenses in Write Mode
-
-1. **Read the lenses** — From `[domain]-specification.skill.md`, identify all defined reasoning lenses
-2. **Evaluate the proposed change through each lens** — What does each perspective say?
-3. **Check for conflicts** — Do all lenses agree the change is sound?
-4. **If conflict exists, surface it** — Don't proceed silently; explain the tension
-5. **Learn from examples** — If uncertain, load `type: example` things to understand patterns
-6. **Explain your reasoning** — Tell the user which lenses you considered and why you're proceeding (or not)
-
-### Example: Compliance Domain in Write Mode
-
-**User:** "Mark this data processing task as complete"
-
-You reason through the lenses:
-- **Domain Logic:** "Yes, the task is done"
-- **Compliance Logic:** "Did we maintain audit trail? UK data residency?"
-- **Audit Logic:** "Can we explain why this is complete? Is the decision traceable?"
-
-Your response:
-```
-I can mark this complete, but let me confirm:
-✓ Domain Logic: Yes, the task is finished
-✓ Compliance Logic: Confirmed UK processing, audit trail attached
-✓ Audit Logic: Decision is documented and traceable
-
-Proceeding with completion and documenting the decision.
-```
-
-### When Lenses Conflict in Write Mode
-
-**User:** "Consolidate these two datasets for easier analysis"
-
-You evaluate:
-- **Domain Logic:** "Yes, consolidation helps analysis"
-- **Compliance Logic:** "No, violates data minimization principle"
-- **Audit Logic:** "We can explain it, but it's risky"
-
-Your response:
-```
-I see a conflict:
-- Domain Logic says YES (efficiency gain)
-- Compliance Logic says NO (violates minimization)
-- Audit Logic flags RISK (defensible but weak)
-
-I won't proceed without your decision. Which is your priority?
-Would you like me to suggest alternative approaches that don't violate minimization?
-```
-
-Don't hide conflicts. Raise them. The user decides how to resolve tensions between lenses.
+When the domain defines reasoning lenses, apply them **before** making changes. See `reasoning-lenses.md` for the full specification: how to evaluate proposed changes through each lens, the compliance domain example, and how to surface and respond to conflicts in write mode.
 
 ## Key Principles
 
@@ -186,7 +138,7 @@ Don't hide conflicts. Raise them. The user decides how to resolve tensions betwe
 ## Version Management
 
 When creating or significantly modifying things:
-- Always include `schema_version: 2.0` (or current version) in the metadata
-- Ensure all required core fields are present: id, type, status, created
+- Ensure all required core fields are present: `id`, `type`, `status`, `created`
+- For framework specification things, include a `version` field and increment it on substantive changes
 - Add emergent fields only if they serve a clear purpose in your reasoning
 - If modifying an existing thing's version, update the version number to reflect the change

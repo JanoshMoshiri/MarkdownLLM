@@ -2,7 +2,7 @@
 id: domain-refresh-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-19
 linked_things:
   - id: framework-discovery-specification
@@ -32,45 +32,7 @@ The framework is self-describing: its documentation *is* its functionality. When
 
 ## Deployment Architecture
 
-### The Nested Repository Model
-
-The MarkdownLLM framework uses a nested git repository architecture:
-
-```
-MarkdownLLM/                    ← Framework git repo
-├── .gitignore                  ← Contains: domains/
-├── thing.md
-├── git-workflow.md
-├── domain-refresh.md           ← This specification
-├── ...foundational specs...
-├── templates/
-├── examples/
-└── domains/
-    ├── DomainA/                ← Independent git repo
-    │   ├── AGENTS.md
-    │   ├── skills/
-    │   └── things/
-    └── DomainB/                ← Independent git repo
-        ├── AGENTS.md
-        ├── skills/
-        └── things/
-```
-
-### Key Properties
-
-| Property | Mechanism | Purpose |
-|----------|-----------|---------|
-| **Isolation** | Framework `.gitignore` excludes `domains/` | Domain commits never appear in framework history |
-| **Independence** | Each domain has its own `.git` | Domains version independently with their own branches, tags, remotes |
-| **Shared foundation** | `framework_root` in domain AGENTS.md | Domains resolve framework specs via relative path (see framework-discovery.md) |
-| **Read-only relationship** | Domains read framework specs; never write to them | Framework evolves independently of domains |
-
-### Why This Architecture
-
-1. **Clean separation of concerns** — Framework evolution and domain evolution are decoupled. A framework version bump doesn't force domain commits.
-2. **Independent deployment** — Domains can be extracted to standalone repos at any time (see framework-discovery.md: Standalone Domain Deployment).
-3. **No submodule complexity** — The nested model avoids git submodule pain while achieving the same isolation.
-4. **Multiple domains, one framework** — Many domains can share a single framework installation without conflicts.
+The framework uses a nested git repository architecture: domain repos live inside the framework directory but maintain independent git histories through `.gitignore` isolation. See `framework-discovery.md` for the full deployment architecture specification, including the nested model, key properties, the `.gitignore` contract, and standalone deployment options.
 
 ### The `.gitignore` Contract
 

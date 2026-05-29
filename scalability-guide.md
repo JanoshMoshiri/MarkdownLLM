@@ -2,7 +2,7 @@
 id: scalability-guide
 type: guide
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-17
 linked_things:
   - id: thing-specification
@@ -141,6 +141,8 @@ created: 2026-05-17
 - Adds another layer of files to manage
 
 **When to use:** When you have 200-500 things and notice patterns of "completed" or "archived" things that clutter current queries.
+
+> **Note on `type: summary` vs `thing-lifecycle.md`:** Summary things are an informal, manually-maintained mechanism — you decide when to write one and what it covers. `thing-lifecycle.md` (draft) defines a formal lifecycle mechanism for rolling things into stubs and disposition archives. Use summary things as a lightweight, immediate option; the lifecycle mechanism is for domains that need a structured, systematic approach.
 
 ### Approach 3: Full Tiered System (Long Term)
 
