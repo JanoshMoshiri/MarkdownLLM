@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.5
+version: 2.6
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -112,6 +112,11 @@ These aren't required, but they unlock richer reasoning from Claude:
 - Structure: `{ id: "thing-id", relation: "[type]", notes: "optional context" }`
 - Allows Claude to traverse the graph of your life
 - Common relation values: `subtask`, `dependency`, `blocks`, `related`, `similar`, `informs`, `implements`, `complements`
+- Decomposition relation values — signal that two things should be structurally separate (see **Thing Cohesion and Decomposition**):
+  - `instance-of` — this thing is a specific occurrence of the referenced methodology, pattern, or template
+  - `derived-from` — this thing's content was produced by applying the referenced thing
+  - `template-for` — this thing is a reusable skeleton; the referenced thing is a filled-in instance
+  - `applies-to` — this thing is a methodology, rule, or pattern applied to the referenced subject
 - Framework-reserved relation values (fixed semantics across all domains):
   - `supersedes` — this thing's content replaces the referenced thing's content
   - `contradicts` — this thing is in active unresolved tension with the referenced thing; a `type: conflict` thing must exist listing both parties
@@ -427,6 +432,137 @@ status: not-started
 And evolve to include energy cost estimates, resource lists, progress metrics, decision points, and rich narrative context as you actually work on it.
 
 The system grows with your needs, not ahead of them.
+
+## Thing Cohesion and Decomposition
+
+A well-formed thing is cohesive: everything within it belongs together, changes together, and serves the same audience. When a thing violates this, reasoning costs rise — the LLM must load irrelevant content, mentally filter before acting, and risk cross-contaminating stable knowledge with volatile data. Loose coupling between things and tight coherence within them is what keeps the system cheap to reason on.
+
+### The Decomposition Principle
+
+**A thing has a single identity and a single reason to change.**
+
+If content within a thing:
+- Serves a different audience than the rest of the thing
+- Changes at a different rate
+- Could be reused independently in another context
+
+...it is a candidate for extraction into its own thing, linked back via `linked_things`.
+
+This is the Single Responsibility Principle applied to knowledge units. It keeps things small enough to reason on cheaply, stable enough to link with confidence, and clean enough to reuse without copying.
+
+### The Consumer Test
+
+Before creating or expanding a thing, ask:
+
+> *If I needed to reuse part of this in a different context, would I have to copy-paste and strip out irrelevant material?*
+
+If yes — **decompose**. Extract the reusable content into its own thing and link from both consumers. The original thing stays coherent. The extracted thing becomes independently useful.
+
+### Rate of Change Hierarchy
+
+Content that changes at different rates belongs in different things. Mixing stability levels within a single thing makes every update a potential source of contamination.
+
+| Content Type | Change Cadence | Should Not Contain |
+|---|---|---|
+| Methodology | Stable — changes when the *process* improves | Instance data from specific engagements |
+| Environment baseline | Changes when *infrastructure* changes | The discovery process used to produce it |
+| Derived output | Changes per engagement or run | The methodology that produced it |
+| Template | Structural skeleton — rarely changes | Specific filled-in values or instances |
+
+**Rule of thumb:** If updating one part of the thing should never require reading or modifying another part — they belong in separate things.
+
+### Concrete Examples
+
+#### Anti-Pattern: Coupled (Do Not Do This)
+
+```yaml
+---
+id: production-env-assessment-org-alpha
+type: methodology
+status: stable
+---
+```
+
+```markdown
+# Production Environment Assessment
+
+## Methodology
+1. Interview infrastructure leads
+2. Review IaC repositories
+3. Map service dependencies
+4. Assess compliance posture
+
+## Org Alpha Baseline
+- Cloud: AWS eu-west-1
+- Services: 47 microservices
+- Compliance: ISO 27001 certified
+- Key constraint: No third-party egress without security review
+```
+
+**Problem:** The methodology is stable and reusable across any organisation. The Org Alpha baseline is specific and will change when their environment changes. When Org Alpha updates their cloud region, you must open the methodology thing to make that edit — risking accidental methodology drift and preventing clean reuse of the methodology elsewhere.
+
+#### Decomposed (Do This)
+
+**Thing 1 — The methodology:**
+```yaml
+---
+id: production-env-assessment-methodology
+type: methodology
+status: stable
+linked_things:
+  - id: org-alpha-production-baseline
+    relation: instance-of
+---
+```
+
+```markdown
+# Production Environment Assessment Methodology
+
+A repeatable process for discovering production environment constraints and landscape for professional organisations.
+
+1. Interview infrastructure leads
+2. Review IaC repositories
+3. Map service dependencies
+4. Assess compliance posture
+```
+
+**Thing 2 — The derived instance:**
+```yaml
+---
+id: org-alpha-production-baseline
+type: environment-baseline
+status: evolving
+linked_things:
+  - id: production-env-assessment-methodology
+    relation: derived-from
+---
+```
+
+```markdown
+# Org Alpha Production Environment Baseline
+
+Derived from the production environment assessment methodology.
+
+- Cloud: AWS eu-west-1
+- Services: 47 microservices
+- Compliance: ISO 27001 certified
+- Key constraint: No third-party egress without security review
+```
+
+Now each thing has a single reason to change. The methodology improves independently. The baseline updates when Org Alpha's environment changes. Either can be loaded independently without contamination from the other.
+
+### Relationship Types as Decomposition Indicators
+
+Certain relation values in `linked_things` are signals that two things should be — or already are — separate. When you find yourself wanting to express one of these relations, the framework is telling you that separation is the right structure.
+
+| Relation | What It Signals |
+|---|---|
+| `instance-of` | A specific occurrence of a pattern, methodology, or template — always a separate thing |
+| `derived-from` | Content was produced by applying another thing — the output belongs in its own thing |
+| `template-for` | A reusable skeleton with a specific instantiation — template and instance are different things |
+| `applies-to` | A methodology, rule, or pattern applied to a specific subject — separate the general from the specific |
+
+**Rule:** If you are about to embed content that could honestly be described by one of these relations — stop. Create the second thing instead. Link them. The relation becomes the coupling mechanism, and loose coupling is the goal.
 
 ## Special Type: Example
 
