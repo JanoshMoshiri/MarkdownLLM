@@ -11,6 +11,8 @@ linked_things:
     relation: informs
   - id: write-thing-specification
     relation: informs
+  - id: thing-lifecycle-specification
+    relation: complements
 ---
 
 # Scalability Guide

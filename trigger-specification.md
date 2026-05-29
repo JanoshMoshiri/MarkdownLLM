@@ -7,7 +7,7 @@ created: 2026-05-29
 linked_things:
   - id: thing-specification
     relation: extends
-  - id: orchestration
+  - id: orchestration-specification
     relation: complements
 ---
 

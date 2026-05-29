@@ -11,6 +11,8 @@ linked_things:
     relation: references
   - id: git-workflow-specification
     relation: references
+  - id: domain-refresh-specification
+    relation: complements
 ---
 
 # Framework Discovery
