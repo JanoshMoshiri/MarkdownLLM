@@ -4,6 +4,7 @@ description: [What this domain does]
 version: 1.0
 applies_to: "**/*.md"
 framework_root: [relative path to MarkdownLLM framework root, e.g. ../.. ]
+framework_version_seen: [framework version at time of domain creation, e.g. 2.8]
 git:
   autocommit: true
   branch: main
@@ -22,11 +23,32 @@ git:
 ## How This Agent Works
 
 ### On Startup
-1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
-2. Load foundational specs from framework root: thing.md, validate.thing.md, git-workflow.md, interface.md
-3. Load all skills from `./skills/`
-4. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
-5. Evaluate triggers — scan things for time-based, dependency, or threshold triggers that fire since last session
+
+**Tier 0 — Always load:**
+- `AGENTS.md` — this file (already loaded)
+- `{framework_root}/thing.md` — atomic unit; required for all thing reasoning
+- `{framework_root}/orchestration.md` — hard hooks are always active; non-negotiable
+
+**Version check (session-start hard hook — never skip):** Read `{framework_root}/.markdownllm` — extract the `version` field (first few lines only). Compare against `framework_version_seen` above. If they differ: surface the mismatch to the user, load `{framework_root}/validate.thing.md` and validate all domain things, then offer a full refresh via `{framework_root}/domain-refresh.md`. If they match: proceed.
+
+**Tier 1 — Load when session involves reading, writing, or committing things:**
+- `{framework_root}/read.thing.md`, `{framework_root}/write.thing.md`, `{framework_root}/validate.thing.md`, `{framework_root}/git-workflow.md`
+- Domain skills (load those relevant to session intent):
+  - `[domain]-specification.skill.md`
+  - `[domain]-read.thing.skill.md`
+  - `[domain]-write.thing.skill.md`
+  - `[domain]-workflow.skill.md`
+
+**Tier 2 — Load on demand by query type:**
+
+| Query type | Load |
+|---|---|
+| Framework refresh or "what’s changed" | `{framework_root}/domain-refresh.md` |
+| Session-end, insights, continuity briefs | `{framework_root}/session-memory.md` |
+| Contradictions or conflicting things | `{framework_root}/belief-revision.md` |
+| Periodic quality reflection | `{framework_root}/retrospective.md` |
+| Trigger evaluation or creation | `{framework_root}/trigger-specification.md` |
+| Scaling, structure, lifecycle | `{framework_root}/scalability-guide.md` |
 
 ### On User Request
 1. **Clarify intent** — What operation? (read, write, analyze, update, etc.)

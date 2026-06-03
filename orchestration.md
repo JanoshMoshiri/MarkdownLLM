@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.5
+version: 1.6
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -21,6 +21,8 @@ linked_things:
     relation: enforces
   - id: trigger-specification
     relation: complements
+  - id: domain-refresh-specification
+    relation: enforces
 ---
 
 # Orchestration
@@ -82,6 +84,27 @@ These two hard hooks are part of every agent's operating contract with the frame
 **Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
 
 **What failure looks like:** Domain AGENTS.md and skills appearing in `git log` of the framework repo. A remediation session required just to restore the correct structure.
+
+#### `session-start:version-check` — Check Framework Version Before Every Session
+
+**When it fires:** At the start of every session where the agent has `framework_root` declared in its AGENTS.md frontmatter.
+
+**What must happen:**
+1. Read `{framework_root}/.markdownllm` — extract the `version` field only (first few lines; tiny file)
+2. Compare against `framework_version_seen` in the domain's own AGENTS.md frontmatter
+3. If `framework_version_seen` is absent: treat as fully stale — surface to user and offer a full refresh
+4. If versions match: proceed normally, no further action
+5. If versions differ (framework is newer):
+   a. Surface to user: "Framework has updated to v{framework_version} — this domain is on v{framework_version_seen}"
+   b. Load `{framework_root}/validate.thing.md` and run validation against all domain things — this catches breaking changes before the session proceeds
+   c. Report validation findings to the user
+   d. Offer a full refresh via `{framework_root}/domain-refresh.md`
+
+**Why it's hard:** Domains operating on stale framework assumptions may produce invalid things or miss capabilities that now exist. A version mismatch is a known-unknown — the domain knows it doesn't know what changed. Running validation immediately on mismatch ensures existing things remain compliant under updated spec definitions before any new work begins. Catching this at session start, not mid-session, is the only reliable way to surface it.
+
+**Context cost:** Minimal. `.markdownllm` is a tiny file. Reading only its first few lines to extract `version` costs negligible context. `validate.thing.md` is only loaded when a mismatch is confirmed — not on every session.
+
+**What failure looks like:** Domain continues operating on a stale framework version. New things are created without awareness of updated patterns. Existing things may be invalid under new spec definitions without the domain or user knowing.
 
 ### Declaring Domain-Level Hard Hooks
 

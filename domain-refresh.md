@@ -2,7 +2,7 @@
 id: domain-refresh-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-19
 linked_things:
   - id: framework-discovery-specification
@@ -13,6 +13,8 @@ linked_things:
     relation: references
   - id: thing-specification
     relation: references
+  - id: orchestration-specification
+    relation: implemented-by
 ---
 
 # Domain Refresh
@@ -50,9 +52,9 @@ This is not optional. Without it, domain files would appear as untracked files i
 
 A domain agent should check for framework updates:
 
-1. **Session start** — As part of the existing session-start orientation (see git-workflow.md: Session Start Orientation)
-2. **On explicit request** — When a user says "check the framework" or "update yourself from framework"
-3. **After framework version bump** — When the domain agent notices `framework_root` contains specs with newer versions than last seen
+1. **Session start** — Automatically, via the `session-start:version-check` hard hook (see orchestration.md). This fires every session without configuration.
+2. **On explicit request** — When a user says "check the framework", "update yourself from framework", or similar
+3. **On validation failure** — When validation surfaces things that don't conform to current spec definitions, a refresh may explain why
 
 ### What To Check
 
@@ -65,17 +67,23 @@ The refresh process reads these framework files in order:
 | Foundational specs | Current definitions | Version bumps, new sections, changed behaviour |
 | `AGENTS.md` | Framework self-description | New skills listed, new spec types, updated workflows |
 
+> **Note:** The version *detection* step (reading `.markdownllm` and comparing to `framework_version_seen`) is handled by the `session-start:version-check` hard hook before the refresh process begins. The steps below assume a mismatch has already been confirmed.
+
 ### The Refresh Algorithm
 
 ```
-1. Read {framework_root}/CHANGELOG.md
-   → Identify entries newer than domain's last known framework version
+1. (Already done by hard hook) Version mismatch confirmed:
+   → domain framework_version_seen < {framework_root}/.markdownllm version
+   → validate.thing.md was run against domain things; findings reported to user
+
+2. Read {framework_root}/CHANGELOG.md
+   → Identify entries newer than framework_version_seen
    → Flag: new specifications, breaking changes, new capabilities
 
-2. Read {framework_root}/WORKLOG.md (recent entries only)
+3. Read {framework_root}/WORKLOG.md (recent entries only)
    → Understand current framework direction and recent decisions
 
-3. Scan foundational specs for version changes:
+4. Scan foundational specs for version changes:
    → thing.md (version field in frontmatter)
    → git-workflow.md
    → interface.md
@@ -84,17 +92,17 @@ The refresh process reads these framework files in order:
    → write.thing.md
    → Any NEW specs not previously known
 
-4. Compare against domain's current understanding:
+5. Compare against domain's current understanding:
    → Does the domain AGENTS.md reference capabilities it doesn't use?
    → Are there new framework features the domain should adopt?
    → Are there breaking changes that require domain updates?
 
-5. Report findings to the user:
+6. Report findings to the user:
    → New capabilities available
    → Breaking changes requiring action
    → Recommended updates to domain skills or AGENTS.md
 
-6. If authorised, update domain files:
+7. If authorised, update domain files:
    → Update domain AGENTS.md to reference new framework capabilities
    → Update domain skills to use new patterns
    → Commit with message: refresh: absorbed framework v{version} changes
@@ -115,21 +123,19 @@ The domain MUST NOT modify:
 
 ### Version Tracking
 
-To know whether a refresh is needed, the domain can track the last-known framework version. This is optional metadata in the domain's AGENTS.md frontmatter:
+To know whether a refresh is needed, the domain tracks the last-known framework version via the `framework_version_seen` field in its AGENTS.md frontmatter:
 
 ```yaml
 ---
 name: My Domain
-framework_root: ../..
-framework_version_seen: 2.2.0
+framework_root: ../..  
+framework_version_seen: 2.8
 ---
 ```
 
-When `framework_version_seen` is less than the framework's current version (from CHANGELOG.md), a refresh is indicated.
+**The canonical version source is `{framework_root}/.markdownllm`.** This is a tiny file; domain agents read only its `version` field at session start (via the `session-start:version-check` hard hook). They do not read CHANGELOG.md to detect a mismatch — that would waste context on every session regardless of whether anything changed.
 
-If this field is absent, the domain should perform a full refresh on first encounter and add the field afterward.
-
-## Generating Domain Skills From This Spec
+When `framework_version_seen` is lower than the `.markdownllm` version, a refresh is indicated. The hard hook surfaces this automatically and triggers validation. If this field is absent from a domain's frontmatter, treat the domain as fully stale — run a full refresh and add the field afterward.
 
 This specification is foundational — it defines the *what* and *why* of domain refresh. Domain agents operationalise it through their workflow skill.
 

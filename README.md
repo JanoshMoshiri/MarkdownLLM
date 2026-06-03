@@ -495,4 +495,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Fork, follow `git-workflo
 
 MIT License. See [LICENSE](LICENSE).
 
-Copyright (c) 2026 JMTM Software Ltd.
+Copyright (c) 2026 Janosh Moshiri.

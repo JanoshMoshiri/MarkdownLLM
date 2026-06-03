@@ -49,6 +49,44 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 2 June 2026
+
+### Session 1
+
+#### Topic: Framework version-check mechanism — diagnosis and fix
+
+Investigated why the domain refresh mechanism wasn't working in practice, identified the root cause, and implemented a complete fix across the framework and both live domains.
+
+#### Problem Diagnosed
+
+The version check existed in documentation (`domain-refresh.md`, eco-essentials AGENTS.md) but was never executing. Root causes:
+1. **Pull-based with no hard hook** — Detecting a version mismatch required reading CHANGELOG.md, which required the agent to choose to read CHANGELOG.md. Circular. No hard hook enforced it.
+2. **Wrong source file** — CHANGELOG.md is a long narrative document; using it for version detection wastes context on every session, even when nothing has changed.
+3. **jmtm-software had no check at all** — domain-refresh.md was Tier 2 only, only loaded on explicit user request.
+4. **`.markdownllm` was stale** — The sentinel file showed v2.3 while the framework was at v2.8, proving the double-maintenance problem.
+
+#### Completed
+
+- [x] **`.markdownllm` updated**: version 2.3 → 2.8; `role: canonical-version-sentinel` field added; established as the single authoritative version source
+- [x] **`orchestration.md` updated** (v1.5 → v1.6): Added `session-start:version-check` as the third framework-level hard hook. Reads only the `version` field from `.markdownllm` (tiny file, negligible context cost). On mismatch: surface to user, load `validate.thing.md`, run validation against domain things, offer full refresh.
+- [x] **`domain-refresh.md` updated** (v1.1 → v1.2): Version source changed from CHANGELOG.md to `.markdownllm`. Refresh algorithm updated — detection step now owned by the hard hook; algorithm begins after mismatch is confirmed. Version tracking section updated to mark `framework_version_seen` as required (not optional).
+- [x] **`framework-discovery.md` updated** (v1.1 → v1.2): `.markdownllm` elevated from "discovery marker" to "discovery and version sentinel." Example updated to v2.8. Summary table updated.
+- [x] **eco-essentials AGENTS.md**: Tier 0 version check updated — now references `.markdownllm`, not CHANGELOG.md; explicit instruction on mismatch behaviour added.
+- [x] **jmtm-software AGENTS.md**: Version check added to Tier 0 for the first time (previously had none).
+- [x] **`templates/AGENTS.md.template` updated**: `framework_version_seen` added to frontmatter; startup sequence replaced with full tiered pattern matching current domain AGENTS.md files.
+- [x] **Insight created**: `version-mismatch-triggers-validation-cascade.md` — the cascade from version mismatch into validate.thing.md and its generalisation as a Tier 0 check design pattern.
+- [x] **LICENSE**: Copyright holder name corrected (JMTM Software Ltd → Janosh Moshiri).
+- [x] All changes committed: framework repo (2 commits), eco-essentials repo (1 commit), jmtm-software repo (1 commit).
+
+#### Decisions
+
+- **`.markdownllm` is the canonical version source**: Single source of truth. AGENTS.md `version` field is descriptive metadata only. When they diverge, `.markdownllm` is authoritative.
+- **Tiny sentinel over CHANGELOG.md for detection**: CHANGELOG.md is the right place to understand *what* changed; `.markdownllm` is the right place to detect *whether* anything changed. Different jobs, different files.
+- **Version mismatch cascades into validate.thing.md**: Not just surfaced — validated. A newer framework version may have changed what valid things look like. Validation answers the urgent question before the session proceeds.
+- **`session-start:version-check` as a hard hook, not a startup checklist item**: Checklist items are skipped. Hard hooks are not. The same principle that fixed `session-end:continuity` (28 May Session 2) applies here.
+
+---
+
 ## 29 May 2026
 
 ### Session 1

@@ -2,7 +2,7 @@
 id: framework-discovery-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-19
 linked_things:
   - id: domain-specification-guide
@@ -97,13 +97,17 @@ If `framework_root` is missing from frontmatter, the agent should:
 2. If found, use that directory as the framework root
 3. If not found, warn the user that foundational specs cannot be located
 
-## The `.markdownllm` Marker File
+## The `.markdownllm` Sentinel File
 
-As a fallback discovery mechanism, the framework root directory contains a `.markdownllm` file. This is a simple YAML file that identifies the directory as a MarkdownLLM framework root:
+The framework root directory contains a `.markdownllm` file. This file serves two roles:
+
+1. **Discovery** — If `framework_root` is not declared in a domain's frontmatter, the agent walks up the directory tree looking for this file. Finding it means you've found the framework root.
+2. **Canonical version source** — The `version` field in this file is the authoritative framework version. Domain agents read only this field at session start (via the `session-start:version-check` hard hook in orchestration.md) to detect whether their `framework_version_seen` is stale. Reading a tiny sentinel file instead of CHANGELOG.md keeps Tier 0 context cost negligible.
 
 ```yaml
 framework: MarkdownLLM
-version: 2.1
+version: 2.8
+role: canonical-version-sentinel
 foundational_specs:
   - thing.md
   - validate.thing.md
@@ -113,10 +117,7 @@ foundational_specs:
   - write.thing.md
 ```
 
-This serves two purposes:
-
-1. **Fallback discovery** — If `framework_root` is not declared in a domain's frontmatter, the agent can walk up directories looking for this marker
-2. **Self-documentation** — Tells any agent (or human) what this repository is and what foundational specs are available
+**Important:** `version` in `.markdownllm` is the single source of truth for the framework version. The `version` field in the framework's `AGENTS.md` frontmatter is descriptive metadata. When they diverge, `.markdownllm` is authoritative. Keep them in sync on every version bump by convention.
 
 ## Deployment Architecture
 
@@ -207,5 +208,5 @@ When validating a domain (using validate.thing.md), check:
 | How does a domain find framework specs? | `framework_root` relative path in AGENTS.md frontmatter |
 | What's the fallback? | Walk up directories looking for `.markdownllm` marker |
 | What if deployed standalone? | Copy specs, use submodule, or minimal bundle |
-| What's the sentinel file? | `thing.md` — if it exists at the resolved path, the framework root is valid |
+| What's the sentinel file? | `.markdownllm` — discovery marker and canonical version source |
 | What specs must be loadable? | thing.md, validate.thing.md, git-workflow.md, interface.md |
