@@ -49,6 +49,31 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 5 June 2026
+
+### Session 1
+
+#### Topic: Priority triage and framework continuity brief evaluation
+
+Reviewed the full backlog across all three active areas (framework, eco-essentials, jmtm-software). Evaluated the two remaining deferred framework items — thing-lifecycle.md and framework continuity.md — and made explicit decisions on both.
+
+#### Completed
+
+- [x] **Full priority list compiled**: Backlog reviewed across all three areas; items ranked by urgency (JMTM annual accounts deadline in 26 days is highest priority)
+- [x] **Insight created**: `continuity-briefs-solve-external-state-drift.md` — captures why the pattern applies to domains with external state but not to the framework itself
+
+#### Decisions
+
+- **thing-lifecycle.md stays deferred**: Explicit "feel the pain first" decision. No current domain is near the ~200 thing threshold. Implement when the ceiling is actually approached.
+- **Framework continuity.md stays deferred (with concrete rationale)**: Continuity briefs solve real-world state drift — state that changes between sessions outside the agent's control. The framework has no such state; its state is the git history. WORKLOG + REVIEWLOG + AGENTS.md already serve the purpose. Create only if new sessions consistently lose context despite reading those files.
+
+#### Deferred
+
+- [ ] **thing-lifecycle.md**: Promote from draft when a domain approaches ~200 things
+- [ ] **Framework continuity.md**: Create only if session orientation becomes noticeably difficult
+
+---
+
 ## 2 June 2026
 
 ### Session 1
