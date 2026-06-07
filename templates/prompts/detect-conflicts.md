@@ -2,37 +2,79 @@
 id: detect-conflicts
 type: prompt
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-20
 inputs:
   - name: proposed-change
-    description: "The modification the agent is about to make (thing ID, field, old value, new value)"
+    description: "Change mode: the modification the agent is about to make (thing ID, field, old value, new value)"
   - name: affected-thing
-    description: "Full context of the thing being modified"
+    description: "Change mode: full context of the thing being modified"
+  - name: relationship-index
+    description: "Scan mode: the domain's relationships index (things/_index/relationships.md), if it maintains one — the edge list for systematic scanning"
   - name: domain-lenses
     description: "Reasoning lenses defined in the domain specification (if any)"
 outputs:
   - name: conflicts
     description: "List of detected conflicts with severity and affected parties"
   - name: recommendation
-    description: "proceed, warn-and-proceed, or block-and-ask"
+    description: "proceed, warn-and-proceed, or block-and-ask (change mode); or conflict things to create (scan mode)"
 bound_to:
   - hook: post-write
     when: "a significant change is proposed (status, priority, scope, or deletion)"
+  - hook: on-status-change
+    when: "a spec moves to stable, or an insight is promoted — its claims now carry full weight and should be checked against the corpus"
+  - hook: retrospective
 linked_things:
   - id: orchestration-specification
     relation: defined-by
   - id: write-thing-specification
     relation: integrates-with
+  - id: belief-revision-specification
+    relation: integrates-with
+  - id: derived-index-specification
+    relation: operates-on
 ---
 
 # Detect Conflicts
 
 ## Purpose
 
-Before a significant change is finalized, check whether it conflicts with existing state, domain constraints, or reasoning lenses. This prompt catches problems that structural validation won't — logical contradictions, lens conflicts, and domain rule violations.
+Catch problems that structural validation won't — logical contradictions, lens
+conflicts, and domain rule violations. This prompt runs in two modes.
 
-## Reasoning Template
+## Two Modes
+
+**Change mode** (bound to `post-write`) — the original use: before a single
+significant change is finalised, check whether *that change* conflicts with existing
+state. Reactive, narrow, cheap. Use the Reasoning Template below.
+
+**Scan mode** (bound to `on-status-change` and `retrospective`) — proactive: sweep the
+corpus for contradictions that already exist but no one has flagged. The framework's
+belief-revision machinery (`belief-revision.md`) is only as good as the moment a
+conflict is *noticed*; change mode only notices conflicts a fresh edit introduces. Scan
+mode is how standing contradictions get found.
+
+### Scan Mode Reasoning
+
+Triggered when claims gain weight or at periodic reflection:
+
+- **On `on-status-change`** — a spec moved to `stable`, or an insight was promoted. Its
+  assertions now carry full authority. Scope the scan to *that thing and its immediate
+  neighbours*: load its `linked_things` (Level 2), and check whether its now-authoritative
+  claims contradict any neighbour. This is a small subgraph — a few things, ~3–6k tokens.
+- **On `retrospective`** — full-domain sweep. Use the `relationships` index
+  (`things/_index/relationships.md`) if the domain maintains one: walk edges of type
+  `informs`, `implements`, `extends`, and for each pair load Level 2 only for the
+  endpoints and check for contradiction. The index keeps this affordable (see
+  `derived-index.md`); without it, fall back to a Level 2 load of all things, which is
+  why the full sweep is reserved for retrospective cadence.
+
+For any contradiction found in either mode, hand off to `belief-revision.md`: create a
+`type: conflict` thing with `origin: inferred`, `confidence: low`, add `contradicts`
+links to both parties, and surface for human confirmation before committing. Be
+conservative — flag genuine semantic contradiction, not difference in emphasis or scope.
+
+## Reasoning Template (Change Mode)
 
 ### 1. Dependency Conflicts
 

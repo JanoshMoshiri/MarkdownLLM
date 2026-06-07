@@ -1,0 +1,53 @@
+---
+id: [domain]-triggers-index
+type: index
+status: live
+index_of: triggers
+created: [ISO-date]
+generated: [ISO-datetime]
+generated_from: HEAD@[short-sha]
+coverage: [count of things scanned]
+framework_version: [version]
+---
+
+# [Domain] Triggers Index
+
+> Generated. Do not hand-edit. The things in `things/` are the source of truth;
+> this file is a regenerable cache (see `derived-index.md`). To correct it, rebuild.
+
+One row per active trigger across all things. Evaluated at `session-start` by the
+`evaluate-triggers` prompt so trigger evaluation does not require scanning every
+thing's frontmatter. A trigger is "active" if its owning thing's status is not in
+{completed, cancelled}.
+
+## Time-Based
+
+| Thing | Condition | Threshold | Watched field | Action |
+|---|---|---|---|---|
+| amazon-seller-account | due_date_passed | — | due_date: 2026-06-15 | surface |
+| category-gating-audit | stale | 30d | last-modified | surface |
+
+## Dependency-Based
+
+| Thing | Watches | On | Value | Action |
+|---|---|---|---|---|
+| fba-activation | [seller-account-approval] | status_changed_to | completed | unblock |
+
+## Threshold-Based
+
+| Thing | Condition | Threshold | Action |
+|---|---|---|---|
+| launch-prep | blocked_duration | 14d | escalate |
+
+## Relationship-Based
+
+| Thing | Watches | On | Value | Action |
+|---|---|---|---|---|
+| product-listing | parent-launch-plan | priority_changed | — | re_evaluate |
+
+## Notes
+
+- Rows are sorted by thing id within each section for stable diffs.
+- `generated_from` pins the commit this index reflects. If `HEAD` has advanced and
+  touched any thing with triggers, rebuild before trusting this index.
+- Empty sections may be omitted.

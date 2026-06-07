@@ -1,0 +1,48 @@
+---
+id: [domain]-schema-index
+type: index
+status: live
+index_of: schema
+created: [ISO-date]
+generated: [ISO-datetime]
+generated_from: HEAD@[short-sha]
+coverage: [count of things scanned]
+framework_version: [version]
+---
+
+# [Domain] Schema Registry
+
+> Generated. Do not hand-edit. The things in `things/` are the source of truth;
+> this file is a regenerable cache (see `derived-index.md`). To correct it, rebuild.
+
+The domain-specific frontmatter fields actually in use across the domain's things,
+excluding the universal core fields defined in `thing.md` (id, type, status,
+created, etc.). Reviewed at retrospective by the `review-schema-coherence` prompt
+to detect fields that have drifted apart in name but converged in meaning.
+
+Counts are recomputed at rebuild time, not hand-incremented — treat them as
+accurate as of `generated`, approximate thereafter.
+
+## Fields In Use
+
+| Field | Count | Used by types | Example values | First seen |
+|---|---|---|---|---|
+| effort | 12 | task, project | low, medium, high | 2026-05-14 |
+| energy_cost | 3 | task | low, medium, high | 2026-05-20 |
+| review_date | 8 | task, goal | 2026-07-01 | 2026-05-16 |
+| assigned_to | 5 | task | janosh | 2026-05-22 |
+
+## Candidate Overlaps
+
+> Populated by `review-schema-coherence` at retrospective. Pairs of fields that may
+> mean the same thing and should be considered for normalisation.
+
+- `effort` (12) vs `energy_cost` (3) — both ordinal low/medium/high on task-like
+  things. Candidate: consolidate to `effort`; migrate the 3 `energy_cost` things.
+
+## Notes
+
+- Universal core fields are intentionally excluded — this registry is for *emergent*
+  domain schema, which is where drift happens.
+- A field appearing on only one or two things is not necessarily wrong; it may be
+  genuinely emergent. Overlap (two field names, one meaning) is the signal worth acting on.

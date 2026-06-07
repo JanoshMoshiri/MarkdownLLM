@@ -2,11 +2,13 @@
 id: evaluate-triggers
 type: prompt
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-20
 inputs:
+  - name: trigger-index
+    description: "The domain's triggers index (things/_index/triggers.md), if it maintains one — the preferred scan substrate at scale"
   - name: things-to-scan
-    description: "Set of things to evaluate triggers for (all active things at session-start, or affected things after a write)"
+    description: "Set of things to evaluate triggers for — used directly when no trigger index exists, or as the affected subset after a write"
   - name: current-date
     description: "Today's date for time-based trigger evaluation"
   - name: git-history
@@ -32,9 +34,23 @@ linked_things:
 
 Scan things for trigger conditions that are currently true. This is the framework's proactive attention system — it ensures the agent notices what needs noticing without the user asking.
 
+## Choosing The Scan Substrate
+
+**If the domain maintains a `triggers` index** (`things/_index/triggers.md`), scan the
+index rather than every thing's frontmatter — this is the whole reason the index exists
+(see `derived-index.md`). The index already aggregates every active trigger, so reading
+it is O(index) instead of O(all things). Before trusting it, do the cheap staleness
+check: if `generated_from` is behind `HEAD` and intervening commits touched things with
+triggers, rebuild the index first (or fall back to a direct scan for this session and
+flag the index for rebuild).
+
+**If the domain has no trigger index** (small domains usually won't), scan
+`things-to-scan` directly. After a write, scan only the affected subset, index or not.
+
 ## Reasoning Template
 
-For each thing in the scan set, evaluate its `triggers` array (if present):
+For each trigger (from the index, or from each thing's `triggers` array directly),
+evaluate as follows:
 
 ### Time-Based Triggers
 
