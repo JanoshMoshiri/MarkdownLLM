@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.6
+version: 1.7
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -23,6 +23,8 @@ linked_things:
     relation: complements
   - id: domain-refresh-specification
     relation: enforces
+  - id: derived-index-specification
+    relation: integrates-with
 ---
 
 # Orchestration
@@ -120,6 +122,18 @@ hard_hooks:
 
 Domain hard hooks are scoped to that domain only. They do not propagate to the framework. They are the domain's standing operating procedures — behaviors the domain agent must always perform, with no exceptions.
 
+**Derived index maintenance is declared this way.** A domain that adopts a derived index (see `derived-index.md`) keeps it current by attaching maintenance to the `post-write` event — the one observable, agent-caused moment when the agent is already looking at the changed thing:
+
+```yaml
+hard_hooks:
+  - hook: post-write
+    action: "If the written thing has triggers, update things/_index/triggers.md in the same commit"
+  - hook: post-write
+    action: "If the written thing introduces a frontmatter field absent from things/_index/schema.md, register it in the same commit"
+```
+
+This is deliberately a *domain-level* hard hook, not a new framework-level one: indexes are opt-in and scale-triggered, so the obligation exists only for domains that have chosen to maintain an index. Incremental maintenance is backed by full rebuild — validation (`validate.thing.md` → Index Integrity) detects any drift and the index is regenerable from the things at any time.
+
 ---
 
 ## When To Use Orchestration
@@ -172,6 +186,7 @@ These exist in every domain. They fire based on framework mechanics, not domain 
 | `on-create` | After a new thing is created | New thing, potential parent/linked things |
 | `on-status-change` | After a thing's status field changes | Thing, old status, new status, downstream |
 | `on-error` | When validation or reasoning encounters a conflict | Error context, affected things |
+| `retrospective` | When a `type: retrospective` is being written (periodic reflection) | All things, all indexes, conflicts, insights since last retrospective |
 
 ### Domain-Level Hook Points
 
@@ -278,6 +293,10 @@ These are prompts that ship with the framework and apply to any domain:
 - **detect-conflicts** — Check if a proposed change conflicts with existing state (lens conflicts, dependency violations)
 - **session-end-continuity** — At session end, extract insights, check for contradictions, and update the continuity brief
 - **worklog-update** — At session end, append a structured entry to WORKLOG.md summarising what was done
+- **domain-velocity** — At session start, read git history as telemetry to surface stalled, churning, or untouched work the current-state snapshot can't see
+- **review-schema-coherence** — At retrospective, audit the domain's emergent frontmatter vocabulary (via the schema registry) for fields that have drifted apart in name but converged in meaning
+
+The reflexive prompts — `domain-velocity`, `evaluate-triggers` (against the triggers index), `detect-conflicts` (scan mode), and `review-schema-coherence` — let the agent reason *about* the domain, not just *within* it. Three of the four read a derived index rather than scanning every thing; see `derived-index.md`.
 
 ### Domain Prompts
 
@@ -326,7 +345,34 @@ bindings:
       - generate-next-phase-report
 ```
 
-### Binding Semantics
+### Reflexive Behaviour Bindings
+
+A domain that wants the agent to reason *about* itself — not just respond to requests —
+binds the reflexive prompts. These are the bindings that turn the derived indexes and
+the velocity/conflict/schema prompts into routine behaviour:
+
+```yaml
+bindings:
+  - hook: session-start
+    invoke:
+      - session-orientation       # what changed since last session
+      - domain-velocity           # what should have changed and didn't (reads git)
+      - evaluate-triggers         # what is now true (reads the triggers index)
+      - surface-attention         # what to tell the user, in priority order
+
+  - hook: on-status-change
+    when: "a spec moved to stable, or an insight was promoted"
+    invoke:
+      - detect-conflicts          # scan mode: do its now-authoritative claims clash with neighbours?
+
+  - hook: retrospective
+    invoke:
+      - detect-conflicts          # scan mode: full-domain sweep via the relationships index
+      - review-schema-coherence   # audit emergent field vocabulary via the schema registry
+```
+
+Index *maintenance* is not bound here — it rides the `post-write` hard hook (above).
+Bindings cover index *evaluation*: when and how the aggregated signal is read and acted on.
 
 - **hook** — Which hook point this binding attaches to
 - **when** (optional) — Additional condition that narrows when the binding fires. Without `when`, the binding fires every time the hook point fires.
@@ -451,14 +497,20 @@ The framework provides 6 prompt templates (in `templates/prompts/`) as starting 
 ```
 framework-root/
 ├── orchestration.md              ← this file (the specification — defines the pattern)
+├── derived-index.md              ← the derived-index pattern (what the reflexive prompts read)
 ├── templates/
-│   └── prompts/                  ← starting-point prompt templates
-│       ├── cascade-completion.md
-│       ├── evaluate-triggers.md
-│       ├── validate-before-commit.md
-│       ├── session-orientation.md
-│       ├── surface-attention.md
-│       └── detect-conflicts.md
+│   ├── prompts/                  ← starting-point prompt templates
+│   │   ├── cascade-completion.md
+│   │   ├── evaluate-triggers.md
+│   │   ├── validate-before-commit.md
+│   │   ├── session-orientation.md
+│   │   ├── surface-attention.md
+│   │   ├── detect-conflicts.md
+│   │   ├── domain-velocity.md
+│   │   └── review-schema-coherence.md
+│   └── indexes/                  ← starting-point derived-index templates
+│       ├── triggers.md.template
+│       └── schema.md.template
 └── domains/
     └── [domain]/
         ├── skills/

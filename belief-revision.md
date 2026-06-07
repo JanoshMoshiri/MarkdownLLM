@@ -2,7 +2,7 @@
 id: belief-revision-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -13,6 +13,8 @@ linked_things:
     relation: integrates-with
   - id: orchestration-specification
     relation: integrates-with
+  - id: derived-index-specification
+    relation: complements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -157,6 +159,24 @@ The agent should be conservative with inferred conflicts — only flag genuine s
 
 ---
 
+## When To Scan For Conflicts
+
+Human-stated and session-end detection both rely on a contradiction being *noticed* in the course of other work. That leaves a gap: contradictions that already exist in the corpus but that no single session happens to look at. As a domain grows, standing contradictions accumulate silently — exactly the failure this spec exists to prevent. Systematic scanning closes the gap by making conflict detection a scheduled reflexive behaviour, not only a reactive one.
+
+Scanning is implemented by the `detect-conflicts` prompt in **scan mode** (`templates/prompts/detect-conflicts.md`). It runs at two cadences, chosen so the cost is proportional to the value:
+
+### Event-triggered — when claims gain authority (`on-status-change`)
+
+When a `type: specification` thing moves to `status: stable`, or a `type: insight` is promoted, its assertions stop being provisional and start being load-bearing. That transition is the right moment to check them against what the domain already holds. The scan is scoped to *that thing and its immediate `linked_things` neighbours* — a small Level 2 load (~3–6k tokens), affordable on every such transition.
+
+### Periodic — full sweep at retrospective
+
+A retrospective is the natural place for the expensive, complete check: walk every relationship edge in the domain and test connected things for contradiction. This is where standing conflicts that no event surfaced finally get caught. To keep a full sweep affordable, the scan walks a `relationships` derived index (`things/_index/relationships.md`) where one exists — the edge list — loading full Level 2 context only for the endpoints of suspect edges, rather than loading the whole domain. Without an index, the full sweep falls back to a Level 2 load of all things, which is why it is reserved for retrospective cadence rather than run every session. See `derived-index.md`.
+
+Whatever surfaces a conflict — human, session-end, or scan — the resolution machinery is identical: create a `type: conflict` thing, link both parties with `relation: contradicts`, surface for confirmation, and resolve into one of the three outcomes.
+
+---
+
 ## Conflict Lifecycle
 
 ```
@@ -182,4 +202,5 @@ Resolved conflict things are **not deleted**. They are part of the domain's inte
 - **thing.md** — `conflict` joins `insight` and `continuity-brief` as a framework-reserved type. `supersedes` and `contradicts` are added as valid `linked_things.relation` values.
 - **validate.thing.md** — A `relation: contradicts` without a corresponding conflict thing is a validation error. Open conflicts older than 30 days without updates are surfaced as Info.
 - **session-memory.md** — The session-end ritual includes a belief revision step: scan for new contradictions, create conflict things where found.
-- **orchestration.md** — The `session-end:continuity` hard hook encompasses belief revision alongside insight extraction.
+- **orchestration.md** — The `session-end` bound prompts encompass belief revision alongside insight extraction. The `detect-conflicts` prompt (scan mode) is bound to `on-status-change` and `retrospective` for systematic detection.
+- **derived-index.md** — The `relationships` derived index makes the full-domain conflict sweep affordable by providing the edge list to walk, so the scan loads full context only for suspect endpoints.

@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.9
+version: 2.10
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -18,6 +18,8 @@ linked_things:
   - id: interface-specification
     relation: complements
   - id: trigger-specification
+    relation: extended-by
+  - id: derived-index-specification
     relation: extended-by
 ---
 
@@ -74,6 +76,7 @@ These fields must be present in every thing to do:
   - `retrospective` — a periodic quality reflection on domain reasoning; one per period, not per session
   - See `session-memory.md`, `belief-revision.md`, and `retrospective.md` for full specifications.
 - Three types are **framework-internal**: `specification`, `guide`, and `manifesto`. These are used by the framework's own spec files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
+- One type is **framework-generated**: `index`. An index thing is a regenerable cache that aggregates one signal (triggers, relationships, schema fields) across a domain's things, living in `things/_index/`. It is produced by the agent, not authored by hand, and uses status `live`/`stale`. The things are always the source of truth; the index is a derived copy. Full specification: `derived-index.md`.
 
 **status** (string)
 - Current state of this thing

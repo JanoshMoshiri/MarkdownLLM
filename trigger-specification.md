@@ -2,12 +2,14 @@
 id: trigger-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-29
 linked_things:
   - id: thing-specification
     relation: extends
   - id: orchestration-specification
+    relation: complements
+  - id: derived-index-specification
     relation: complements
 ---
 
@@ -129,8 +131,8 @@ Actions are declarative. They tell the agent what kind of response is appropriat
 
 ## When Triggers Are Evaluated
 
-1. **Session start** — The agent scans active things for trigger conditions. Any that are met get surfaced immediately: "3 things need attention since your last session." This is the primary evaluation point.
-2. **After every write** — When the agent modifies a thing, it checks whether any other things have triggers watching it and cascades accordingly. This is how completing a task automatically surfaces things it was blocking.
+1. **Session start** — The agent scans active things for trigger conditions. Any that are met get surfaced immediately: "3 things need attention since your last session." This is the primary evaluation point. **At scale, scanning every thing's frontmatter here becomes expensive.** A domain that has grown past the point where this is cheap maintains a `triggers` derived index (`things/_index/triggers.md`) — a regenerable aggregation of every active trigger — and the agent evaluates the index instead of re-reading all things. Index maintenance rides the `post-write` event; evaluation is performed by the `evaluate-triggers` prompt. See `derived-index.md`.
+2. **After every write** — When the agent modifies a thing, it checks whether any other things have triggers watching it and cascades accordingly. This is how completing a task automatically surfaces things it was blocking. If a triggers index exists, this same write is when its affected entry is updated (in the same commit).
 3. **Scheduled invocation** — An external mechanism (cron job, OS scheduler, GitHub Actions, a recurring calendar event) periodically invokes the agent with a "check triggers" intent.
 
 ## Idempotency

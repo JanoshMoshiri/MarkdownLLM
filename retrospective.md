@@ -2,7 +2,7 @@
 id: retrospective-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -12,6 +12,8 @@ linked_things:
   - id: belief-revision-specification
     relation: complements
   - id: git-workflow-specification
+    relation: integrates-with
+  - id: derived-index-specification
     relation: integrates-with
   - id: llm-driven-systems-manifesto
     relation: implements
@@ -107,6 +109,16 @@ A retrospective session is not passive. After completing the reflection, the age
 5. **Commit everything** per the standard `post-write:commit` hard hook
 
 ---
+
+## Reflexive Scans At Retrospective
+
+The retrospective is the natural home for the framework's *expensive* reflexive behaviours — the full-domain sweeps too costly to run every session. The `retrospective` hook point (`orchestration.md`) binds these prompts:
+
+1. **Full conflict scan** (`detect-conflicts`, scan mode) — walk the domain's relationship edges and test connected things for standing contradictions no session happened to notice. Surfaced conflicts become `type: conflict` things, feeding "What Didn't Work" and "Patterns We Noticed." See `belief-revision.md`.
+2. **Schema coherence review** (`review-schema-coherence`) — audit the domain's emergent frontmatter vocabulary via the schema registry for fields that have drifted apart in name but converged in meaning. Proposals feed "What Should Change." See `derived-index.md`.
+3. **Index rebuild** — regenerate the domain's derived indexes from the things and reset their provenance, so the period closes with indexes provably in sync with reality (`validate.thing.md` → Index Integrity).
+
+These scans are *why* the retrospective produces more than a written reflection: they mechanically surface aggregate problems the period accumulated, which the reflection then reasons about.
 
 ## Relationship To Other Primitives
 

@@ -2,7 +2,7 @@
 id: scalability-guide
 type: guide
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-17
 linked_things:
   - id: thing-specification
@@ -12,6 +12,8 @@ linked_things:
   - id: write-thing-specification
     relation: informs
   - id: thing-lifecycle-specification
+    relation: complements
+  - id: derived-index-specification
     relation: complements
 ---
 
@@ -208,6 +210,40 @@ Claude:
 
 **When to use:** When you have 500+ things across multiple domains or complex dependencies; or when you're building this as a long-term personal infrastructure.
 
+## Scaling Reflexive Behaviour: Derived Indexes
+
+The three approaches above scale the agent reasoning *within* the domain — responding to
+queries. A second cost appears when the agent reasons *about* the domain: evaluating every
+thing's triggers at session start, scanning every relationship for contradictions, auditing
+every frontmatter field for vocabulary drift. Each of these is an O(all things) scan, and
+unlike a user query — which is naturally scoped — these reflexive scans want to cover the
+*whole* domain every time they run. At 50 things that is fine. At 300 it is a tax on every
+session.
+
+The lever is the **derived index** (`derived-index.md`): a regenerable file under
+`things/_index/` that aggregates one signal — all active triggers, all edges, all emergent
+fields — so the reflexive behaviour reads the aggregate instead of re-scanning every thing.
+The index is maintained incrementally on `post-write` (when the agent is already looking at
+the changed thing) and is fully rebuildable from the things at any time. This converts an
+O(all things) read into an O(index) read, keeping reflexive behaviour roughly flat as the
+domain grows.
+
+Like summaries (Approach 2), indexes are **deploy-when-felt**: a small domain doesn't need
+them, and adding them early is pure overhead and an extra surface to keep honest. Reach for
+an index when a reflexive scan at session start starts to cost noticeably — in practice past
+~100–150 active things, or whenever you want a reflexive behaviour to run every session
+rather than on demand.
+
+> **Doesn't this contradict "don't build indexing"?** (See the Key Principle below.) No —
+> and the distinction matters. The principle forbids an opaque query/search/database layer
+> that becomes the thing the agent reasons over *instead of* the data, hiding state and
+> breaking transparency. A derived index is the opposite: a transparent, git-committed,
+> regenerable markdown file that holds no information not already in the things, and that
+> only *directs attention* — it tells the agent which things and which signal to look at,
+> then the agent reasons over the actual things. It is a map back to the data, not a
+> replacement for it. The reconciliation is recorded as an insight,
+> `derived-index-is-attention-cache-not-search-layer`.
+
 ## When You Hit the Limits
 
 You'll know it's time to scale when:
@@ -250,6 +286,8 @@ The system doesn't force you to scale. You scale when the benefit is obvious and
 **Scale through abstraction, not through search or indexing.**
 
 Don't build database functionality. Don't add query languages. Load at the right level of abstraction, let Claude's natural reasoning do the work, and let summaries emerge as your system grows.
+
+*Caveat — derived indexes are not the indexing this forbids.* This principle rules out an opaque query layer the agent reasons over instead of the data. A derived index (`derived-index.md`) is a transparent, regenerable map *back to* the data that only directs attention; the agent still reasons over the actual things. See the "Scaling Reflexive Behaviour" section above for the full reconciliation.
 
 This keeps the framework simple while still enabling complex systems.
 

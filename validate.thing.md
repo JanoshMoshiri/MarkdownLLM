@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 1.4
+version: 1.5
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -11,6 +11,8 @@ linked_things:
     relation: validates
   - id: belief-revision-specification
     relation: integrates-with
+  - id: derived-index-specification
+    relation: validates
 ---
 
 # Validate Thing Skill
@@ -52,7 +54,7 @@ Validate in order. Each level builds on the previous. Stop and report at the fir
 | `id` matches filename | The `id` value matches the filename (without `.md` extension) | Warning |
 | `type` present | Field exists and is not empty | Error |
 | `status` present | Field exists and is not empty | Error |
-| `status` value valid | One of: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`. **Exception:** `type: specification`, `type: guide`, and `type: manifesto` things use lifecycle statuses: `draft`, `evolving`, `stable`, `deprecated`. `type: insight` things use: `active`, `promoted`, `dismissed`. | Error |
+| `status` value valid | One of: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`. **Exception:** `type: specification`, `type: guide`, and `type: manifesto` things use lifecycle statuses: `draft`, `evolving`, `stable`, `deprecated`. `type: insight` things use: `active`, `promoted`, `dismissed`. `type: index` things use: `live`, `stale`. | Error |
 | `created` present | Field exists and is not empty | Error |
 | `created` format | Valid ISO 8601 date or datetime | Error |
 | `due_date` format | If present, valid ISO 8601 date | Warning |
@@ -200,7 +202,7 @@ If the user asks you to fix issues (not just report them), apply the write.thing
 - Do not enforce domain rules when no domain spec exists — fall back to universal rules only
 - Do not treat Info-level observations as errors — they are advisory
 - Do not block the user from working because of warnings — report and move on
-- Do not invent validation rules beyond what `thing.md`, `orchestration.md`, and the domain spec define
+- Do not invent validation rules beyond what `thing.md`, `orchestration.md`, `derived-index.md`, and the domain spec define
 
 ## Prompt Validation
 
@@ -250,6 +252,44 @@ These extend Level 4 with orchestration-specific observations:
 | "Validate my prompts" | All prompts — structural + referential + semantic |
 | Session start (if prompts changed since last session) | Changed prompts — structural + referential |
 | "Validate the orchestration" | All prompts + all bindings + hook point consistency |
+
+## Index Validation
+
+Derived indexes (`type: index`, in `things/_index/`) are caches that aggregate a signal
+across the domain's things. Because a cache can drift from the things it summarises —
+the recurring failure mode documented in `tracking-artifacts-can-drift-from-reality` —
+indexes get a dedicated integrity check. This check *is* the framework's defence against
+that drift: it makes a stale index detectable rather than silently wrong. Full pattern:
+`derived-index.md`.
+
+### Index Integrity Checks
+
+These extend Levels 1–2 for index things:
+
+| Check | Rule | Severity |
+|---|---|---|
+| `type` is `index` | Confirm the thing is declared as an index | Error |
+| Provenance present | `index_of`, `generated`, `generated_from`, `coverage` all present in frontmatter | Error |
+| Status valid for index | `status` is `live` or `stale` | Error |
+| Located in `_index/` | The file lives under `things/_index/` | Warning |
+| Coverage current | `coverage` equals the current count of in-scope things for this `index_of` | Warning |
+| Commit not behind | `generated_from` is `HEAD`, or commits since it touched no in-scope thing | Warning |
+| Rebuild-and-diff | Regenerate the index from the things in memory; compare to the stored body. Any divergence is drift. | Warning |
+| Framework version current | `framework_version` matches the live framework version (from `.markdownllm`) | Info |
+
+**Severity rationale:** drift is a **Warning**, never an Error. A stale index does not
+corrupt the domain — the things remain the source of truth. It only means the agent
+should rebuild before relying on the index. When this check finds drift, offer to rebuild
+the index (discard the body, re-scan the things, reset provenance) rather than hand-patch it.
+
+### Index Validation Scope
+
+| Trigger | What to check |
+|---|---|
+| After an index is updated (incremental, via `post-write`) | That index — provenance + coverage |
+| Session start (if the domain maintains indexes) | Each index — commit-not-behind + coverage (cheap staleness gate before trusting it) |
+| "Validate my indexes" / "are my indexes current?" | All indexes — full integrity including rebuild-and-diff |
+| At retrospective | All indexes — full rebuild-and-diff |
 
 ## Key Principles
 

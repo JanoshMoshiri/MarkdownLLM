@@ -1,5 +1,5 @@
 framework: MarkdownLLM
-version: 2.8
+version: 2.9
 role: canonical-version-sentinel
 foundational_specs:
   - thing.md
@@ -11,6 +11,7 @@ foundational_specs:
   - framework-discovery.md
   - domain-refresh.md
   - orchestration.md
+  - derived-index.md
   - llm-driven-systems.manifesto.md
   - scalability-guide.md
   - domain-specification-guide.md

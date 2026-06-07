@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 2.8
+version: 2.9
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -92,6 +92,7 @@ This is where the reasoning lives — not just the data.
 | Contradictions, conflicts, belief revision | `belief-revision.md` |
 | Periodic quality reflection | `retrospective.md` |
 | Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
+| Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 
 **Typical session cost:** Tier 0 alone ≈ 15k tokens. Tier 0 + Tier 1 ≈ 33k tokens. Full load (rare — new domain creation) ≈ 60k tokens.
 
@@ -136,6 +137,7 @@ The framework defines itself through these interconnected specifications:
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
 - **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: stable`)
 - **trigger-specification.md** — Declarative attention signals: all trigger types, condition values, action values, evaluation semantics, and idempotency. Extends thing.md. (`type: specification`, `status: stable`)
+- **derived-index.md** — The derived-index pattern: regenerable caches (`type: index`) that aggregate one signal — triggers, relationships, schema fields — across a domain so reflexive behaviour stays cheap at scale. Drift-safe by construction (provenance + validation rebuild-and-diff). Opt-in, deploy-when-felt. (`type: specification`, `status: draft`)
 
 - **example-things.md** — Full specification for `type: example` things: frontmatter template, when to use examples, and why examples work better than rules for inductive LLM learning. (`type: specification`, `status: stable`)
 - **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)
@@ -176,6 +178,7 @@ The framework defines itself through these interconnected specifications:
 - `type: continuity-brief` — The domain's live forward-looking session-continuity document; one per domain (framework-reserved)
 - `type: conflict` — A documented contradiction between two things, held as a first-class thing until resolved (framework-reserved)
 - `type: retrospective` — A periodic quality reflection on domain reasoning; one per period, not per session (framework-reserved)
+- `type: index` — A regenerable cache aggregating one signal (triggers, relationships, schema) across a domain's things, in `things/_index/`; the things are the source of truth (framework-generated)
 
 ## Key Innovations
 
@@ -188,6 +191,7 @@ The framework defines itself through these interconnected specifications:
 4. **Pattern Libraries via Examples** — `type: example` things teach through positive and negative patterns. The agent learns domain conventions by reading worked examples, not just rules.
 5. **Nested Repo Isolation** — Domains live as independent git repos nested within the framework directory. The framework's `.gitignore` excludes all domain folders. Domain history is always separate from framework history.
 6. **Scalable Structure** — The same three-layer pattern works from 10 things to 10,000. Abstraction layers (type grouping, status filtering, tag taxonomies) emerge as the domain grows.
+7. **Reflexive Behaviour via Derived Indexes** — The agent reasons not only *within* a domain but *about* it: domain velocity (git as telemetry), systematic trigger evaluation, conflict scanning, and schema-coherence review. At scale these run against regenerable derived indexes (`derived-index.md`) rather than re-scanning every thing — keeping reflexive work cheap, and drift-detectable through validation.
 
 ## Status Values For Framework Specs
 

@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -15,6 +15,8 @@ linked_things:
     relation: integrates-with
   - id: validate-thing-specification
     relation: integrates-with
+  - id: derived-index-specification
+    relation: complements
 ---
 
 # Git Workflow
@@ -225,6 +227,33 @@ Triggers watch for state changes. Git history records state changes. The connect
 4. If a dependency trigger was watching `data-collection` for completion, and the commit log shows `complete: data-collection`, the trigger fires
 
 Git history is the event log. Triggers are the listeners. The agent is the evaluator.
+
+### Git Log As Domain Telemetry
+
+Session orientation reads the log to answer "what changed since I was last here?" But the
+same log answers a sharper, reflexive question: **"what should have changed and didn't?"**
+This is *velocity* — the movement of the domain over time — and it is visible only in the
+history, never in the current state. A thing parked at `status: in-progress` for six weeks
+looks identical to one updated this morning until you consult its commit recency.
+
+Two reads expose it:
+
+```
+git log --format="%ad %s" --date=short -- things/      # full cadence of state changes
+git log --diff-filter=M --name-only --since="30 days ago" -- things/   # what actually moved recently
+```
+
+From these the agent reads velocity signals — stalled in-progress work, untouched
+high-priority commitments, churn without completion, unblocks that led nowhere, and the
+overall commit cadence (accelerating, steady, gone quiet). This is the reflexive
+counterpart to current-state orientation, performed by the `domain-velocity` prompt
+(`templates/prompts/domain-velocity.md`) at `session-start`.
+
+**Velocity needs no derived index.** Unlike triggers, schema, and relationships — which are
+aggregated into derived indexes to avoid re-scanning every thing (`derived-index.md`) — the
+velocity signal already lives in the git log, which is itself the authoritative event
+stream. Caching it would only add a surface that can drift from the history it summarises.
+Read the log directly.
 
 ### Diff As Truth
 
