@@ -2,7 +2,7 @@
 id: framework-worklog
 type: artifact
 status: evolving
-version: 2.1
+version: 2.2
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -39,6 +39,8 @@ linked_things:
     relation: documents
   - id: trigger-specification
     relation: documents
+  - id: derived-index-specification
+    relation: documents
   - id: framework-reviewlog
     relation: complements
 ---
@@ -46,6 +48,44 @@ linked_things:
 # Framework Work Log
 
 This file is a running record of work done, decisions made, and work remaining. It is updated at the end of every session. It serves both as a progress tracker and as a historical record for retrospective reflection.
+
+---
+
+## 8 June 2026
+
+### Session 1
+
+#### Topic: Reflexive behaviour — derived indexes + bound prompts (framework v2.9.0)
+
+Worked through four agent capabilities the framework wasn't exploiting (raised by Janosh): git history as queryable event stream, systematic trigger evaluation, systematic conflict scanning, and schema-drift review. Recognised they are one pattern, not four, and built it as a single new primitive.
+
+#### Design constraints honoured (from prior insights)
+
+- **`tracking-artifacts-can-drift-from-reality`** — naively, an index is a drift machine. Resolved by making indexes derived (things are truth), provenance-stamped, and validatable via rebuild-and-diff. The new Index Integrity check *is* the mitigation that insight proposed.
+- **`hard-hooks-require-observable-agent-caused-triggers`** — index maintenance rides the existing observable `post-write` event as a domain-level hard hook; no new framework hard hook. Index *evaluation* is a bound prompt.
+- **`hook-compliance-correlates-with-scope-not-awareness`** — indexes are opt-in and scale-triggered, not piled onto every session, so they don't degrade compliance on the hooks that matter.
+
+#### Completed
+
+- [x] **`derived-index.md` created** (v1.0, `status: draft`) — anchor spec for the pattern
+- [x] **New prompts**: `domain-velocity.md`, `review-schema-coherence.md`; **new index templates**: `triggers.md.template`, `schema.md.template`
+- [x] **Prompts updated**: `evaluate-triggers` (v1.1, reads index), `detect-conflicts` (v1.1, scan mode)
+- [x] **Specs updated**: `thing.md` (v2.10, `type: index`), `validate.thing.md` (v1.5, Index Integrity), `orchestration.md` (v1.7, retrospective hook + prompts + bindings + maintenance hook), `trigger-specification.md` (v1.1), `belief-revision.md` (v1.1, scan cadences), `retrospective.md` (v1.1, reflexive scans), `git-workflow.md` (v1.1, telemetry), `scalability-guide.md` (v1.2, reconciliation)
+- [x] **`AGENTS.md` (v2.9)** and **`.markdownllm` (v2.9)** updated — inventory, Tier 2 routing, `type: index`, new Key Innovation
+- [x] **Insights**: `reflexive-behaviors-are-indexes-plus-prompts`, `derived-index-is-attention-cache-not-search-layer`
+- [x] **CHANGELOG v2.9.0** written
+
+#### Decisions
+
+- **Velocity uses no index**: its signal already lives in git, the authoritative event stream. An index would only add a drift surface. This makes "does this signal already exist as ground truth?" a design question for any future reflexive behaviour.
+- **`derived-index.md` ships as `draft`**: the pattern is sound but unproven in a live domain. Neither eco-essentials nor jmtm-software is near the scale that warrants an index yet — deploy-when-felt. Promote to `evolving` after first real use.
+- **Scalability principle kept, not amended**: "no indexing" forbids an opaque query layer the agent reasons over *instead of* the data. A derived index points back *to* the data. Resolved as `both-valid`, recorded as an insight.
+
+#### Deferred / Next
+
+- [ ] **First live index deployment** — when a domain crosses ~100–150 things, deploy a triggers index and validate the maintenance/rebuild loop in practice; promote `derived-index.md` to `evolving`
+- [ ] **`relationships` index template** — described in `derived-index.md` but no template yet; add when the conflict-scan full sweep is first run for real
+- [ ] **thing-lifecycle.md** (still deferred): promote from draft when a domain approaches ~200 things
 
 ---
 

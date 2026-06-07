@@ -16,6 +16,43 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [2.9.0] - 2026-06-08
+
+Reflexive behaviour: the agent can now reason *about* a domain, not only *within* it — domain velocity, systematic trigger evaluation, systematic conflict scanning, and schema-coherence review. These four capabilities are unified under one new primitive rather than built as four bespoke mechanisms.
+
+**Why one primitive:** three of the four reduce to "aggregate a signal across all things, then read the aggregate instead of re-scanning everything." That is a **derived index**. The fourth — velocity — deliberately uses no index because its signal already lives in git (the authoritative event stream); caching it would only add a drift surface. The design was constrained by three prior insights: indexes are made drift-safe by construction (`tracking-artifacts-can-drift-from-reality`), maintenance rides the observable `post-write` event rather than a new hard hook (`hard-hooks-require-observable-agent-caused-triggers`), and the behaviour is opt-in/scale-triggered so it doesn't burden the agent on every session (`hook-compliance-correlates-with-scope-not-awareness`).
+
+**New spec (Tier 2 — demand-loaded):**
+- `derived-index.md` (v1.0, `status: draft`) — the derived-index pattern: `type: index` things in `things/_index/` that aggregate triggers, relationships, or schema fields. Provenance frontmatter + validation rebuild-and-diff make drift detectable rather than silent. Incremental maintenance on `post-write`, full rebuild on demand/at validation/at retrospective.
+
+**New prompt templates:**
+- `templates/prompts/domain-velocity.md` (v1.0) — reads git history as telemetry at session-start; surfaces stalled, churning, or untouched work
+- `templates/prompts/review-schema-coherence.md` (v1.0) — audits emergent frontmatter vocabulary for name-drift at retrospective
+
+**New index templates:**
+- `templates/indexes/triggers.md.template`, `templates/indexes/schema.md.template`
+
+**Prompts updated:**
+- `evaluate-triggers.md` (v1.0 → v1.1) — reads the triggers index when one exists; direct scan otherwise
+- `detect-conflicts.md` (v1.0 → v1.1) — adds **scan mode** (proactive corpus sweep) bound to `on-status-change` and `retrospective`, alongside the original change mode
+
+**Specs updated:**
+- `thing.md` (v2.9 → v2.10): `type: index` documented as framework-generated
+- `validate.thing.md` (v1.4 → v1.5): new **Index Integrity** validation (provenance, coverage, commit-not-behind, rebuild-and-diff) — the mechanism that catches index drift
+- `orchestration.md` (v1.6 → v1.7): new `retrospective` hook point; two new framework prompts; index maintenance documented as a domain-level `post-write` hard hook; reflexive-behaviour binding examples
+- `trigger-specification.md` (v1.0 → v1.1): session-start evaluation points at the triggers index at scale
+- `belief-revision.md` (v1.0 → v1.1): new "When To Scan For Conflicts" — event-triggered (claims gaining authority) and periodic (retrospective full sweep)
+- `retrospective.md` (v1.0 → v1.1): reflexive scans (full conflict scan, schema review, index rebuild) run at retrospective cadence
+- `git-workflow.md` (v1.0 → v1.1): "Git Log As Domain Telemetry" — velocity signals read directly from history, no index
+- `scalability-guide.md` (v1.1 → v1.2): derived indexes as the scale lever for reflexive behaviour, with explicit reconciliation of the "no indexing" principle
+- `AGENTS.md` (v2.8 → v2.9), `.markdownllm` (v2.8 → v2.9): inventory, Tier 2 routing, `type: index`, new Key Innovation
+
+**Insights captured:**
+- `reflexive-behaviors-are-indexes-plus-prompts` — the four-into-one unification
+- `derived-index-is-attention-cache-not-search-layer` — reconciles derived indexes with the scalability "no indexing" principle (both-valid)
+
+---
+
 ## [2.8.0] - 2026-05-29
 
 SRP violation corrections across 8 issues identified in the 29 May review sweep. Two new specs extracted from embedded/duplicated content; six existing specs corrected for structural conformance.
