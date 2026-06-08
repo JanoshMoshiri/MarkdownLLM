@@ -2,9 +2,11 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-13
 linked_things:
+  - id: the-notation-changed-not-the-primitives
+    relation: grounded-by
   - id: thing-specification
     relation: defines
   - id: interface-specification
@@ -30,6 +32,25 @@ This is breaking down.
 A new pattern is emerging: **humans define domains, LLMs reason within those domains, and structured data in version control becomes the persistent state.**
 
 This is not about replacing humans or automating everything. It's about inverting the relationship. Instead of building applications that users interact with, we're building definition files that LLMs understand, and then letting the LLM be the active reasoning engine while humans provide direction and oversight.
+
+### The Continuity Beneath The Shift
+
+It is tempting to read all of this as something wholly new. It is not — and seeing why is the key to the whole framework.
+
+A program has only ever been two things: **data structures** — what exists and how it is shaped — and **instructions** — what to do, in what order, under what conditions. Every language that ever compiled, from assembly to C++ to Python, was a notation for expressing those two invariants. The syntax differed wildly; the primitives never did.
+
+This framework is the same two things in a different notation:
+
+- `thing.md` defines the **data structure**.
+- The prompts in `templates/prompts/` are the **instructions**.
+- The hooks in `orchestration.md` are the **control flow**.
+- Git is the **state machine** — the commit is the moment state becomes real.
+
+What changed is the notation, and with it the reader of the notation. A compiler-parsable grammar gave way to natural language; a deterministic compiler gave way to a reasoning model. The artifact did not become something new — the program is still a program. It is simply written in a notation a mind can reason over rather than one a machine must parse, and so the reader can now hold ambiguity, weigh context, and revise its own understanding, which no compiler ever could.
+
+This is why the old discipline still governs the new medium. Clean Architecture and SOLID are not loose analogies borrowed for flavour — they apply because this is literally the same kind of artifact they were always about. The paradigm did not abolish software engineering. It freed software from the demand that its notation be mechanically parsable, and moved the leverage from *making the syntax precise enough to compile* to *making the definition clear enough to reason within*.
+
+See `the-notation-changed-not-the-primitives` for the canonical articulation.
 
 ## Origins and Influences
 
