@@ -46,12 +46,12 @@ exclusively on what only an LLM can do.
 
 ## Phases
 
-### Phase 0 — Baseline and honesty pass ⬅ IN PROGRESS
-- [ ] Write the framework's first `type: retrospective` (May–June period), folding in the review findings
-- [ ] Create the framework's own `continuity.md` (prescribed by session-memory.md; never existed)
-- [ ] Record the status-vocabulary contradiction as the framework's first `type: conflict` thing
-- [ ] Measure actual token costs per spec and per tier; replace asserted numbers in AGENTS.md with measured ones
-- [ ] Tag the repo `v2.9-pre-floor`
+### Phase 0 — Baseline and honesty pass ✅ COMPLETE (2026-06-11)
+- [x] Write the framework's first `type: retrospective` (May–June period), folding in the review findings → `framework-retrospective-2026-06`
+- [x] Create the framework's own `continuity.md` (prescribed by session-memory.md; never existed)
+- [x] Record the status-vocabulary contradiction as the framework's first `type: conflict` thing → `status-vocabulary-universal-vs-domain`
+- [x] Measure actual token costs per spec and per tier; replace asserted numbers in AGENTS.md with measured ones → Tier 0 = 13.5k, Tier 0+1 = 26.5k, full = 65.5k (`tools/measure-tokens.py`)
+- [x] Tag the repo `v2.9-pre-floor`
 
 **Done when:** retrospective committed, real token numbers in AGENTS.md, tag pushed.
 
@@ -117,6 +117,6 @@ exclusively on what only an LLM can do.
 
 ## Current State
 
-Phase 0 in progress (2026-06-11). This thing is the canonical plan; phase
-checkboxes are updated as work lands, and each phase completion is a commit
+Phase 0 complete (2026-06-11); Phase 1 is next. This thing is the canonical plan;
+phase checkboxes are updated as work lands, and each phase completion is a commit
 boundary.

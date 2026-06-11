@@ -51,6 +51,42 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 11 June 2026
+
+### Session 1
+
+#### Topic: Full framework review → transformation plan → Phase 0 baseline
+
+Independent full review of the framework (all specs, live jmtm-software domain, insights, prior REVIEWLOG) conducted at Janosh's request, followed by a seven-phase transformation plan and immediate execution of Phase 0.
+
+#### Key review findings
+
+- **Enforcement gap is live:** all 17 things in jmtm-software fail `validate.thing.md` Level 1 status checks (Error severity), undetected — LLM-only validation missed a mechanical rule violation in the only production domain.
+- **Spec self-contradiction:** Level 1's fixed status enum vs Level 3 / domain-guide's domain-defined state machines. The domain's vocabulary (`open → figures-ready → submitted → paid → reconciled`) is better modelling than the universal enum — the spec is wrong, not the domain.
+- **Pattern:** each failure mode answered with new prose machinery → more cognitive load → the documented cause of hook non-compliance. Six tracking surfaces on one repo.
+- **Provenance identified as a missing first-class layer** (Janosh built one in a private triage domain; generalising it is Phase 3 — pinned `informed_by: [{id, commit}]` decision records + `origin: external` quarantine).
+
+#### Completed (Phase 0)
+
+- [x] **`framework-v3-transformation-plan` created** (`type: plan`, registered in AGENTS.md) — the canonical seven-phase roadmap: deterministic floor (`mdllm` CLI + normative schemas), deletion pass, provenance spec, insight-staleness check, operative kernel, behavioral evals, new powers (regeneration, proactive triggers, small-model evals, CI)
+- [x] **First framework retrospective** (`framework-retrospective-2026-06`) — the framework had never applied `type: retrospective` to itself
+- [x] **First conflict thing** (`status-vocabulary-universal-vs-domain`, open) — `contradicts` links added to both parties per belief-revision.md; resolution designated to Phase 1
+- [x] **`continuity.md` initialised** for the framework domain (prescribed by session-memory.md; never existed)
+- [x] **Token baseline measured** (`tools/measure-tokens.py`, tiktoken o200k_base): Tier 0 = 13.5k, Tier 0+1 = 26.5k, full load = 65.5k. AGENTS.md asserted costs replaced with measured values
+- [x] **Repo tagged `v2.9-pre-floor`** — the before-state for everything the plan changes
+
+#### Decisions
+
+- **Domain-owned status vocabularies** (pending Phase 1 implementation): the normative domain schema declares types, required fields, statuses, and transitions; the six universal workflow values become the default when no schema exists.
+- **Tooling does mechanical checks; the LLM keeps semantic ones** — validate.thing.md Levels 1–3 delegate to `mdllm` in Phase 1; Level 4 remains LLM reasoning.
+- **Measure, don't assert:** token costs in AGENTS.md now carry their measurement method and date.
+
+#### To Do (next session)
+
+- [ ] Phase 1: build `tools/mdllm.py` (validate / triggers / index / tokens), define `things/_schema.yaml`, resolve the status conflict in thing.md + validate.thing.md, declare jmtm-software's vocabulary, wire pre-commit enforcement
+
+---
+
 ## 8 June 2026
 
 ### Session 1
