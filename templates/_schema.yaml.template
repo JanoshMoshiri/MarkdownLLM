@@ -1,0 +1,31 @@
+# Normative domain schema — read by tools/mdllm.py (the deterministic floor).
+# Place at <domain>/things/_schema.yaml (or domain root). Declares the thing
+# types, status vocabularies, and relation vocabulary this domain permits;
+# `mdllm validate` enforces exactly what is declared here.
+#
+# Framework-reserved types (insight, conflict, retrospective, continuity-brief,
+# decision, index, specification, guide, manifesto, skill, prompt) are built
+# into the tool — do NOT redeclare them.
+schema_version: 1
+domain: [domain-name]
+
+# options:
+#   id_filename_match: true   # default; set false only with a naming convention reason
+
+types:
+  [your-thing-type]:
+    statuses: [not-started, in-progress, completed] # the FULL lifecycle this type moves through
+    # required_fields: [field-a, field-b]           # enforced as Error when missing
+  [another-type]:
+    statuses: [open, figures-ready, submitted]
+
+# Relation vocabulary (validated at Warning severity). Start small — grow it
+# when a real link needs a relation that isn't here, prune at retrospectives.
+relations:
+  - informs
+  - implements
+  - references
+  - supersedes
+  - superseded-by
+  - contradicts
+  - derived-from

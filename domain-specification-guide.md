@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.6
+version: 2.7
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -757,6 +757,43 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 
 ---
 
+## The Deterministic Floor (v3): Schema, Hook, Kernel
+
+Since framework v3.0, three mechanical pieces are part of every new domain's
+scaffold — they replace diligence with construction:
+
+**1. Declare a normative schema.** Copy `templates/_schema.yaml.template` to
+`things/_schema.yaml` and declare your thing types, their status vocabularies,
+and your relation vocabulary. Without a schema, `mdllm validate` falls back to
+the default workflow vocabulary at advisory (Warning) severity; with one, your
+domain's own rules are enforced as Errors. The schema is the contract — status
+vocabularies are domain-owned, not framework-fixed.
+
+**2. Install the pre-commit hook.** From the framework root:
+`python tools/mdllm.py install-hook <domain-path>`. From then on, things with
+structural errors physically cannot be committed. Never re-perform mechanical
+checks by reasoning; never bypass the hook — if validation blocks a legitimate
+change, the schema is wrong, fix it with the human.
+
+**3. Load the kernel, not the specs.** The domain AGENTS.md "On Startup"
+section should load `{framework_root}/kernel.md` (~1.6k tokens of operative
+rules) instead of the full foundational specs. Load a full spec only when
+reasoning *about* the framework or when the kernel doesn't settle an ambiguity.
+
+Two knowledge primitives also matter at scaffold time:
+
+- **Decisions with pinned inputs** (`provenance.md`): when an output's
+  correctness depends on a judgement over domain knowledge, record a
+  `type: decision` thing in `things/decisions/` with `informed_by: [{id,
+  commit}]` pins. `mdllm provenance <domain>` enforces the chain — including
+  the quarantine rule: nothing may rest on an unverified `origin: external`
+  thing.
+- **Behavioural evals** (`evals/README.md`): once a workflow has a contracted
+  end state, encode it as a fixture and run `mdllm eval <domain> --fixture
+  <file>` as a regression net over committed state.
+
+---
+
 ## Getting Started: Complete Checklist
 
 - [ ] **Prerequisites** — Confirm you have an LLM tool with file system access (Copilot, Claude Code, Codex CLI, etc.)
@@ -768,7 +805,9 @@ Can we explain this decision to a regulator? Is it traceable and justified?
 - [ ] **Open domain workspace** — Open the domain folder as its own workspace — the domain agent takes over from here
 - [ ] **Set up continuity** — Create `continuity.md` at domain root using `templates/continuity-brief.md.template`; loaded at session start, updated at session end
 - [ ] **Understand thing.md** — The atomic unit specification (including triggers) — do NOT copy it into your domain
-- [ ] **Add validation rules** — Domain-specific required fields and valid types in your specification skill (validated by `validate.thing.md`)
+- [ ] **Declare the schema** — Copy `templates/_schema.yaml.template` to `things/_schema.yaml`: types, status vocabularies, relations (enforced by `mdllm validate`)
+- [ ] **Install the hook** — `python tools/mdllm.py install-hook <domain-path>` so structural errors cannot be committed
+- [ ] **Add semantic validation rules** — Judgement-level rules in your specification skill (the agent's layer, per `validate.thing.md` v2.0; the mechanical layer is the tool's)
 - [ ] **Define commit conventions** — Follow `git-workflow.md` patterns for structured commit messages
 - [ ] **Enable tooling** — Configure GitHub Copilot or Claude Code if needed
 - [ ] **Test** — Verify the domain agent auto-discovers AGENTS.md and follows your domain

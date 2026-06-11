@@ -41,7 +41,14 @@ python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --mode
 python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --model haiku --trials 5 --bare
 # inspect what a run would do without invoking an agent
 python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --dry-run
+# aggregate all recorded runs into the per-cell summary table
+python tools/mdllm.py eval . --report
 ```
+
+The bare condition is a real control: the framework checkout is not granted to
+the agent (`--add-dir` is framework-condition only), so a bare agent cannot
+discover the specs it is being measured without. Timed-out trials are recorded
+as 0/N, not discarded.
 
 ## The structure-beats-scale experiment
 
@@ -54,10 +61,20 @@ larger model without structure. The 2×2 that tests it:
 | **opus** | `--model opus` | `--model opus --bare` |
 
 Protocol: ≥5 trials per cell per fixture (models are stochastic — single runs
-mean nothing); score = assertion pass rate; report cost and wall time alongside.
-The first fixture (`vat-quarter-basic`) embeds a discriminator: blocked
+mean nothing); score = assertion pass rate; report cost and wall time alongside
+(`eval --report` builds the table from `evals/runs/*/result.json`). The first
+fixture (`vat-quarter-basic`) embeds a discriminator: blocked
 client-entertainment VAT that must *not* be reclaimed — summing naively gives
 430.00 instead of 380.00. Run directories are kept as evidence; prune manually.
+
+**Fairness note for interpreting the 2×2:** some assertions encode contracts
+the bare prompt does not state — e.g. the `has-deadline` link in
+`vat-quarter-basic` is named in the seed's AGENTS.md workflow but not in the
+`bare_preamble`. That asymmetry is the point (spontaneous structure is part of
+what the framework buys), but it caps the bare cells below 7/7 by construction.
+Report per-assertion results, not just totals, so the comparison stays honest:
+the figures assertions (output/input/net VAT) are condition-neutral; the
+link/status assertions measure structure-following.
 
 ## Conventions
 
