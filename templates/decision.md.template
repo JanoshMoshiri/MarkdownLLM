@@ -1,0 +1,35 @@
+---
+id: decision-[descriptive-kebab-case-id]
+type: decision
+status: made
+created: [ISO-date]
+session: [YYYY-MM-DD]
+decided_by: human|agent|both
+confidence: high|medium|low
+informed_by:
+  - id: [knowledge-thing-id]
+    commit: [short-sha of the commit whose version was actually used]
+linked_things:
+  - id: [produced-output-or-affected-thing]
+    relation: informs
+---
+
+# Decision: [Title — name the judgement, not the artefact]
+
+## Context
+[What question or judgement this decision answers, and why it arose now.]
+
+## Inputs Considered
+[What the pinned knowledge said — brief; the pins carry the full content.
+Never pin an `origin: external` thing that is not `verified: true`.]
+
+## Options
+[The realistic alternatives, each with its material trade-off. Include the
+rejected ones — they are half the value of the record.]
+
+## Decision
+[What was decided, by whom, and the reasoning that carried it.]
+
+## Consequences
+[What this commits the domain to; what outputs derive from it. Outputs link
+back here with `relation: derived-from`.]

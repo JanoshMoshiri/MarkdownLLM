@@ -12,6 +12,7 @@ foundational_specs:
   - domain-refresh.md
   - orchestration.md
   - derived-index.md
+  - provenance.md
   - llm-driven-systems.manifesto.md
   - scalability-guide.md
   - domain-specification-guide.md

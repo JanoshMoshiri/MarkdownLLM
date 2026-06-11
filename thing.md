@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.11
+version: 2.12
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -69,12 +69,13 @@ These fields must be present in every thing to do:
 - What kind of thing this is
 - Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
 - Helps Claude understand scope and context
-- Four types are **framework-reserved** and have fixed semantics regardless of domain:
+- Five types are **framework-reserved** and have fixed semantics regardless of domain:
   - `insight` — an emerging idea or held view from a session, preserved for future context
   - `continuity-brief` — the domain's live forward-looking session-continuity document (one per domain)
   - `conflict` — a documented contradiction between two other things, held as a first-class thing until resolved
   - `retrospective` — a periodic quality reflection on domain reasoning; one per period, not per session
-  - See `session-memory.md`, `belief-revision.md`, and `retrospective.md` for full specifications.
+  - `decision` — a judgement made from knowledge, with inputs pinned to git commits via `informed_by`
+  - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, and `provenance.md` for full specifications.
 - Three types are **framework-internal**: `specification`, `guide`, and `manifesto`. These are used by the framework's own spec files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
 - One type is **framework-generated**: `index`. An index thing is a regenerable cache that aggregates one signal (triggers, relationships, schema fields) across a domain's things, living in `things/_index/`. It is produced by the agent, not authored by hand, and uses status `live`/`stale`. The things are always the source of truth; the index is a derived copy. Full specification: `derived-index.md`.
 
@@ -159,10 +160,15 @@ These aren't required, but they unlock richer reasoning from Claude:
 
 **origin** (string)
 - The provenance of this thing's content — who or what produced it
-- Values: `stated` (explicitly said by the human), `inferred` (concluded by the agent from other things), `synthesised` (assembled by the agent from multiple sources)
+- Values: `stated` (explicitly said by the human), `inferred` (concluded by the agent from other things), `synthesised` (assembled by the agent from multiple sources), `external` (ingested from outside the human-agent pair — bank statements, emails, third-party documents; see `provenance.md`)
 - Critical for LLM trust calibration: an `inferred` thing should be treated differently from a `stated` one
 - Defaults to `stated` if omitted — only add when the content was not directly expressed by a human
 - Works in tandem with `confidence`: a thing that is both `origin: inferred` and `confidence: low` should always be surfaced for human review before being acted on
+- **`origin: external` triggers quarantine**: the thing carries `verified: false` until a human confirms its content, and no decision, calculation, or output may rest on it while unverified. Full rule: `provenance.md`
+
+**verified** (boolean)
+- Only meaningful on `origin: external` things: whether a human has confirmed the ingested content (reconciliation, review, spot-check)
+- `false` on creation; flipped to `true` with a narrative note of how it was verified
 
 #### Emergent Fields
 

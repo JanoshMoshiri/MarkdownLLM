@@ -93,6 +93,7 @@ This is where the reasoning lives — not just the data.
 | Periodic quality reflection | `retrospective.md` |
 | Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
+| Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 
 **Typical session cost (measured 2026-06-11):** Tier 0 alone ≈ 13.5k tokens. Tier 0 + Tier 1 ≈ 26.5k tokens. Full load (rare — new domain creation) ≈ 65.5k tokens. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
 
@@ -138,6 +139,7 @@ The framework defines itself through these interconnected specifications:
 - **domain-refresh.md** — How domain agents discover framework evolution and update themselves. Deployment architecture (nested repos, .gitignore isolation) and the refresh process. (`type: specification`, `status: stable`)
 - **trigger-specification.md** — Declarative attention signals: all trigger types, condition values, action values, evaluation semantics, and idempotency. Extends thing.md. (`type: specification`, `status: stable`)
 - **derived-index.md** — The derived-index pattern: regenerable caches (`type: index`) that aggregate one signal — triggers, relationships, schema fields — across a domain so reflexive behaviour stays cheap at scale. Drift-safe by construction (provenance + validation rebuild-and-diff). Opt-in, deploy-when-felt. (`type: specification`, `status: draft`)
+- **provenance.md** — Output traceability: `type: decision` records with inputs pinned to git commits (`informed_by`), `origin: external` quarantine for ingested content, the knowledge → decision → output chain, and the reverse-provenance index that enables diff-driven regeneration. Mechanically enforced by `mdllm provenance`. (`type: specification`, `status: draft`)
 
 - **example-things.md** — Full specification for `type: example` things: frontmatter template, when to use examples, and why examples work better than rules for inductive LLM learning. (`type: specification`, `status: stable`)
 - **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)
@@ -178,6 +180,7 @@ The framework defines itself through these interconnected specifications:
 - `type: continuity-brief` — The domain's live forward-looking session-continuity document; one per domain (framework-reserved)
 - `type: conflict` — A documented contradiction between two things, held as a first-class thing until resolved (framework-reserved)
 - `type: retrospective` — A periodic quality reflection on domain reasoning; one per period, not per session (framework-reserved)
+- `type: decision` — A judgement made from knowledge, inputs pinned to git commits via `informed_by`; the provenance chain's middle link (framework-reserved)
 - `type: index` — A regenerable cache aggregating one signal (triggers, relationships, schema) across a domain's things, in `things/_index/`; the things are the source of truth (framework-generated)
 - `type: plan` — A phased, multi-session work plan for evolving the framework; uses workflow statuses; phase checkboxes updated as work lands (domain-specific to the framework domain)
 

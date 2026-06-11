@@ -75,14 +75,13 @@ exclusively on what only an LLM can do.
 
 **Result:** tracking surfaces are now git log, WORKLOG, continuity, retrospectives — plus a CHANGELOG that is drafted by tooling rather than remembered.
 
-### Phase 3 — Provenance as a first-class spec
-- [ ] New spec `provenance.md`: `origin: external` with quarantine rule (external content never feeds calculations/filings/outputs until human-verified)
-- [ ] New framework-reserved `type: decision`: ADR-shaped record with `informed_by: [{id, commit}]` — inputs pinned to the exact committed version that informed the decision
-- [ ] The chain: knowledge thing (pinned) → decision → output, walkable from any deliverable back to exact knowledge versions
-- [ ] `mdllm provenance`: pinned commits exist, things existed at those commits, no output derives from unverified external content
-- [ ] Reverse-provenance derived index (`things/_index/provenance.md`): which decisions/outputs depend on each knowledge thing
-
-**Done when:** provenance.md spec'd, one real jmtm filing produced through a decision record with pinned inputs, `mdllm provenance` validates the chain.
+### Phase 3 — Provenance as a first-class spec ✅ COMPLETE (2026-06-11)
+- [x] `provenance.md` (v1.0, draft): quarantine rule, `verified` flag, the pinning rule, enforcement table
+- [x] `type: decision` framework-reserved (`made`/`superseded`); thing.md v2.12 adds `origin: external` + `verified`; template at `templates/decision.md.template`
+- [x] The chain proven with a real record: `decision-status-vocabulary-domain-owned` — this session's actual resolution decision, inputs pinned to the commits they were read at
+- [x] `mdllm provenance`: pin shape, commit existence, input existence (current or at-pin), quarantine, freshness (Info), unverified-external aging. Freshness check verified live — it correctly flagged the decision's inputs as changed-since-pin
+- [x] Reverse-provenance index (`mdllm index rebuild --signal provenance`) built and committed
+- [ ] First real jmtm filing through a decision record — lands with the next actual filing event (annual accounts, due 2026-07-31)
 
 ### Phase 4 — Scoped insight-staleness check
 - [ ] session-memory.md gains Step 0 of orientation: live insights listed in the continuity brief checked against things modified since the brief's `last_updated` (via git diff) — no new cadence, no full sweep

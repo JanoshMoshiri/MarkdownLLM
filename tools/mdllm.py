@@ -44,6 +44,7 @@ RESERVED_STATUSES = {
     "conflict": ["open", "resolved"],
     "retrospective": ["draft", "complete"],
     "index": ["live", "stale"],
+    "decision": ["made", "superseded"],
 }
 
 # The universal default workflow vocabulary — applies when no domain schema
@@ -548,6 +549,25 @@ def build_index_body(corpus: Corpus, signal: str) -> tuple[str, int]:
                 if isinstance(e, dict):
                     lines.append(f"- {t.id} --{e.get('relation')}--> {e.get('id')}")
         return "\n".join(lines), len(corpus.things)
+    if signal == "provenance":
+        # Reverse map: for each knowledge thing, which decisions pin it and
+        # which outputs derive from those decisions. See provenance.md.
+        dependents: dict[str, list[str]] = {}
+        for t in sorted(corpus.things, key=lambda x: x.id or ""):
+            for pin in t.meta.get("informed_by") or []:
+                if isinstance(pin, dict) and pin.get("id"):
+                    dependents.setdefault(pin["id"], []).append(
+                        f"{t.id} (pinned @{pin.get('commit', '?')})")
+            for e in t.meta.get("linked_things") or []:
+                if isinstance(e, dict) and e.get("relation") == "derived-from":
+                    dependents.setdefault(str(e.get("id")), []).append(
+                        f"{t.id} (derived-from)")
+        for src in sorted(dependents):
+            lines.append(f"## {src}")
+            for d in dependents[src]:
+                lines.append(f"- {d}")
+            lines.append("")
+        return "\n".join(lines), len(dependents)
     raise SystemExit(f"unknown signal: {signal}")
 
 
@@ -560,11 +580,13 @@ def cmd_index(args) -> int:
     for signal in signals:
         body, coverage = build_index_body(corpus, signal)
         fname = {"triggers": "triggers.md", "schema": "schema.md",
-                 "relationships": "relationships.md"}[signal]
+                 "relationships": "relationships.md",
+                 "provenance": "provenance.md"}[signal]
         path = idx_dir / fname
         domain = (corpus.schema or {}).get("domain", root.name)
         title = {"triggers": "Triggers Index", "schema": "Schema Registry",
-                 "relationships": "Relationships Index"}[signal]
+                 "relationships": "Relationships Index",
+                 "provenance": "Provenance Index (reverse)"}[signal]
         content = (
             "---\n"
             f"id: {domain}-{signal}-index\n"
@@ -648,6 +670,85 @@ def cmd_tokens(args) -> int:
 # ---------------------------------------------------------------- hook
 
 
+def cmd_provenance(args) -> int:
+    """Mechanical checks for provenance chains (provenance.md)."""
+    root = Path(args.path).resolve()
+    corpus, _ = scan(root)
+    by_id = corpus.by_id()
+    findings: list[Finding] = []
+    today = dt.date.today()
+
+    def commit_exists(sha: str) -> bool:
+        return subprocess.run(["git", "cat-file", "-e", f"{sha}^{{commit}}"],
+                              cwd=root, capture_output=True).returncode == 0
+
+    def exists_at(sha: str, thing_id: str) -> bool:
+        out = subprocess.run(["git", "ls-tree", "-r", "--name-only", sha],
+                             cwd=root, capture_output=True, text=True)
+        return out.returncode == 0 and any(
+            p.endswith(f"{thing_id}.md") for p in out.stdout.splitlines())
+
+    for t in corpus.things:
+        name = t.id or t.path.name
+        for i, pin in enumerate(t.meta.get("informed_by") or []):
+            if not isinstance(pin, dict) or not pin.get("id") or not pin.get("commit"):
+                findings.append(Finding(SEV_ERROR, name,
+                                f"`informed_by[{i}]` must have `id` and `commit`"))
+                continue
+            pid, sha = str(pin["id"]), str(pin["commit"])
+            if not commit_exists(sha):
+                findings.append(Finding(SEV_ERROR, name,
+                                f"pinned commit `{sha}` does not exist"))
+                continue
+            src = by_id.get(pid)
+            if src is None and not exists_at(sha, pid):
+                findings.append(Finding(SEV_ERROR, name,
+                                f"pinned input `{pid}` not found (current corpus "
+                                f"or at {sha})"))
+            if src is not None:
+                if (str(src.meta.get("origin")) == "external"
+                        and src.meta.get("verified") is not True):
+                    findings.append(Finding(SEV_ERROR, name,
+                                    f"pins UNVERIFIED external thing `{pid}` — "
+                                    f"quarantine rule violated"))
+                rel = src.path.relative_to(root).as_posix()
+                log = subprocess.run(["git", "log", "--oneline", f"{sha}..HEAD",
+                                      "--", rel], cwd=root, capture_output=True,
+                                     text=True)
+                if log.returncode == 0 and log.stdout.strip():
+                    n = len(log.stdout.strip().splitlines())
+                    findings.append(Finding(SEV_INFO, name,
+                                    f"input `{pid}` changed in {n} commit(s) since "
+                                    f"pin {sha} — decision may be dated"))
+
+        if str(t.meta.get("origin")) == "external" and t.meta.get("verified") is not True:
+            created = t.meta.get("created")
+            age = ""
+            if isinstance(created, (dt.date, dt.datetime)):
+                c = created.date() if isinstance(created, dt.datetime) else created
+                days = (today - c).days
+                age = f" ({days}d old)"
+                sev = SEV_INFO if days > 30 else None
+            else:
+                sev = SEV_INFO
+            if sev:
+                findings.append(Finding(sev, t.id or t.path.name,
+                                f"external thing still unverified{age}"))
+
+    errors = [x for x in findings if x.severity == SEV_ERROR]
+    print(f"## Provenance Report — {root}\n")
+    if not findings:
+        print("No provenance issues found.")
+    for title, group in (("Errors", errors),
+                         ("Info", [x for x in findings if x.severity == SEV_INFO])):
+        if group:
+            print(f"### {title}")
+            for x in group:
+                print(f"- **{x.thing}**: {x.message}")
+            print()
+    return 1 if errors else 0
+
+
 def cmd_changelog(args) -> int:
     """Draft a CHANGELOG entry from structured commit messages since a ref."""
     root = Path(args.path).resolve()
@@ -716,8 +817,12 @@ def main() -> int:
     i = sub.add_parser("index", help="check or rebuild derived indexes")
     i.add_argument("path", nargs="?", default=".")
     i.add_argument("action", choices=["check", "rebuild"])
-    i.add_argument("--signal", choices=["triggers", "schema", "relationships"])
+    i.add_argument("--signal", choices=["triggers", "schema", "relationships", "provenance"])
     i.set_defaults(fn=cmd_index)
+
+    pv = sub.add_parser("provenance", help="validate provenance chains (provenance.md)")
+    pv.add_argument("path", nargs="?", default=".")
+    pv.set_defaults(fn=cmd_provenance)
 
     k = sub.add_parser("tokens", help="measure spec token costs by tier")
     k.add_argument("path", nargs="?", default=".")
