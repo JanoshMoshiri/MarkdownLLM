@@ -83,8 +83,9 @@ exclusively on what only an LLM can do.
 - [x] Reverse-provenance index (`mdllm index rebuild --signal provenance`) built and committed
 - [ ] First real jmtm filing through a decision record — lands with the next actual filing event (annual accounts, due 2026-07-31)
 
-### Phase 4 — Scoped insight-staleness check
-- [ ] session-memory.md gains Step 0 of orientation: live insights listed in the continuity brief checked against things modified since the brief's `last_updated` (via git diff) — no new cadence, no full sweep
+### Phase 4 — Scoped insight-staleness check ✅ COMPLETE (2026-06-11)
+- [x] session-memory.md v1.1: Session-Start Staleness Check section — live insights × things changed since `last_updated`, no new cadence, full sweep stays at retrospective
+- [x] session-orientation prompt v1.1: the check is Step 0 of the reasoning template
 
 ### Phase 5 — The operative kernel
 - [ ] Each spec gains a delimited operative section (rules/tables/contracts) separate from rationale

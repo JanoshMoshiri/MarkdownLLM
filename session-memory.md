@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -143,6 +143,29 @@ last_updated: [ISO-date-of-last-session]
 - New thread opens: add it
 - Insight promoted to a spec: remove from brief, link via the promoted thing
 - Keep it short — if it grows past ~30 lines, stale items have accumulated
+
+---
+
+## The Session-Start Staleness Check
+
+Insights are written once and then re-enter every session as trusted context via
+the continuity brief — but the domain keeps moving after they're written. Without
+a check, a session can reason confidently from an insight whose factual basis
+changed three sessions ago.
+
+The check is **scoped, not a sweep** (added v1.1, transformation plan Phase 4):
+
+1. Take the live insight IDs from `continuity.md` — a small, bounded set
+2. Identify things modified since the brief's `last_updated` (git provides this
+   for free: commits or diff since that date, scoped to `things/`)
+3. Re-read only the live insights whose subject matter overlaps the changed
+   things; surface any that no longer hold rather than silently reasoning from them
+
+Cost: near-zero when nothing relevant changed; a few targeted reads when it did.
+The full-corpus contradiction sweep remains a retrospective-cadence behaviour
+(`belief-revision.md` → When To Scan For Conflicts) — this check exists precisely
+so that gap doesn't leak into every session. Implemented as Step 0 of the
+`session-orientation` prompt.
 
 ---
 

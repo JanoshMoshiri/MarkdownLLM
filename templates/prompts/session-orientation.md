@@ -2,7 +2,7 @@
 id: session-orientation
 type: prompt
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-20
 inputs:
   - name: git-log-since-last-session
@@ -32,6 +32,24 @@ linked_things:
 At the start of every session, orient the agent to the current state of the domain. This prompt ensures continuity across sessions — the agent quickly understands what happened since it was last active and what's most relevant right now.
 
 ## Reasoning Template
+
+### 0. Insight Staleness Check (scoped — not a sweep)
+
+The continuity brief's live insights enter this session as trusted context. Before
+trusting them, check whether the ground moved underneath them:
+
+1. Take the live insight IDs listed in `continuity.md` (a small, bounded set)
+2. List things modified since the brief's `last_updated`:
+   `git diff --name-only HEAD@{<last_updated>} -- things/` (or commits since that date)
+3. For each live insight whose *subject matter* overlaps the changed things
+   (its `linked_things`, or the things it plainly discusses): re-read the insight
+   against the change. Does it still hold?
+4. If undermined: surface it — "insight X may be stale: Y changed since it was
+   written" — and propose `dismissed`, revision, or a conflict thing. Do not
+   silently keep reasoning from it.
+
+This is deliberately scoped: live insights × changed things only. The full
+contradiction sweep stays at retrospective (`belief-revision.md` → When To Scan).
 
 ### 1. What Changed Since Last Session
 
