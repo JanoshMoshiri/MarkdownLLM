@@ -68,14 +68,14 @@ This is where the reasoning lives — not just the data.
 
 ### On Startup
 
-**Determine session intent before loading specs.** Loading all framework specs eagerly costs ~60k tokens — up to 65% of a model's context window before any work begins. Load only what the session needs.
+**Determine session intent before loading specs.** Loading all framework specs eagerly costs ~65.5k tokens (measured 2026-06-11, tiktoken o200k_base via `tools/measure-tokens.py`) — a large share of a model's working context before any work begins. Load only what the session needs.
 
-**Tier 0 — Always load (~15k tokens):**
+**Tier 0 — Always load (~13.5k tokens):**
 - `AGENTS.md` — this file (already loaded)
 - `thing.md` — the atomic unit; required for all reasoning about the framework
 - `orchestration.md` — hard hooks are always active; commit behaviour is non-negotiable
 
-**Tier 1 — Load when the session involves reading, writing, or committing things (~18k additional):**
+**Tier 1 — Load when the session involves reading, writing, or committing things (~13k additional):**
 - `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md`
 
 **Tier 2 — Load on demand by query type:**
@@ -94,7 +94,7 @@ This is where the reasoning lives — not just the data.
 | Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 
-**Typical session cost:** Tier 0 alone ≈ 15k tokens. Tier 0 + Tier 1 ≈ 33k tokens. Full load (rare — new domain creation) ≈ 60k tokens.
+**Typical session cost (measured 2026-06-11):** Tier 0 alone ≈ 13.5k tokens. Tier 0 + Tier 1 ≈ 26.5k tokens. Full load (rare — new domain creation) ≈ 65.5k tokens. Re-measure with `python tools/measure-tokens.py` after spec changes; do not assert costs.
 
 Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
