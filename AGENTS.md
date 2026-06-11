@@ -93,6 +93,7 @@ This is where the reasoning lives — not just the data.
 | Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
+| Human operator asking what changed / what the tools are / what the v3 experience is | `operator-guide.md` |
 
 **Typical session cost (measured 2026-06-11, post-kernel):** Tier 0 (AGENTS.md + kernel.md) ≈ 5.3k tokens — down from 26.5k for the pre-kernel Tier 0+1. Full-spec loads are now per-file and on-demand. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
 
@@ -146,6 +147,7 @@ The framework defines itself through these interconnected specifications:
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
+- **operator-guide.md** — Human-facing: what working in a domain feels like since v3, the mdllm toolbox with scenarios, and what remains the operator's job. The specs are agent-first; this is the human's walkthrough. (`type: guide`, `status: draft`)
 
 ### Deferred (Spec When Foreseeable, Deploy When Felt)
 - **thing-lifecycle.md** — Rolling window, disposition to stubs, rehydration from git history, manifest index. Addresses the 200–300 thing ceiling. (`type: specification`, `status: draft`)
