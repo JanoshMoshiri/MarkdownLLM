@@ -18,6 +18,14 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [3.3.0] - 2026-06-11
+
+**Eval Stage 2 — the model experiment is runnable.** `mdllm eval --run` seeds an isolated git workspace from a fixture's `seed/`, invokes a fresh headless agent (`claude -p`, json output → score/cost/time/turns per trial), and asserts the result. `--bare` strips AGENTS.md/skills/schema for the no-framework condition; `--trials N` for repeats. First fixture: `evals/vat-quarter-basic.yaml` — a synthetic VAT quarter with known-correct figures and a blocked-entertainment-VAT discriminator. The 2×2 structure-beats-scale protocol (haiku/opus × framework/bare) is documented in `evals/README.md`. Verified: negative test, dry-run seeding both conditions; live agent path untested pending `claude` CLI availability.
+
+Also (v3.2.1 review pass): `mdllm tokens` re-tiered to kernel reality (Tier 0 measured 5,592 tokens); README updated to describe the deterministic floor and provenance to the public.
+
+---
+
 ## [3.2.0] - 2026-06-11
 
 Transformation plan Phases 2–7 (same day as 3.0.0; drafted with `mdllm changelog`). The framework now has provenance, a 93%-smaller operative kernel, deterministic evals, and proactive adapters.
