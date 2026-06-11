@@ -783,6 +783,66 @@ python "$MDLLM" validate "{root}" --quiet || {{
 """
 
 
+def cmd_eval(args) -> int:
+    """Check a golden-scenario fixture's assertions against a domain's state.
+
+    Fixture (YAML): {name, description, assertions: [...]}. Assertion kinds:
+      - {thing_exists: <id>}
+      - {status: {id: <id>, equals: <value>}}
+      - {field: {id: <id>, name: <field>, equals: <value>}}
+      - {link: {from: <id>, relation: <rel>, to: <id>}}
+      - {validates_clean: true}        # zero mechanical Errors
+    """
+    root = Path(args.path).resolve()
+    fixture = yaml.safe_load(Path(args.fixture).read_text(encoding="utf-8"))
+    corpus, _ = scan(root)
+    by_id = corpus.by_id()
+    passed = failed = 0
+
+    def report(ok: bool, label: str):
+        nonlocal passed, failed
+        passed, failed = passed + ok, failed + (not ok)
+        print(f"  {'PASS' if ok else 'FAIL'}  {label}")
+
+    print(f"## Eval: {fixture.get('name', args.fixture)} — {root}\n")
+    for a in fixture.get("assertions") or []:
+        if "thing_exists" in a:
+            tid = a["thing_exists"]
+            report(tid in by_id, f"thing exists: {tid}")
+        elif "status" in a:
+            s = a["status"]
+            t = by_id.get(s["id"])
+            actual = str(t.meta.get("status")) if t else "<missing>"
+            report(actual == str(s["equals"]),
+                   f"status of {s['id']} == {s['equals']} (actual: {actual})")
+        elif "field" in a:
+            fa = a["field"]
+            t = by_id.get(fa["id"])
+            actual = t.meta.get(fa["name"]) if t else "<missing>"
+            report(actual == fa["equals"],
+                   f"{fa['id']}.{fa['name']} == {fa['equals']!r} (actual: {actual!r})")
+        elif "link" in a:
+            ln = a["link"]
+            t = by_id.get(ln["from"])
+            ok = bool(t) and any(
+                isinstance(e, dict) and e.get("id") == ln["to"]
+                and e.get("relation") == ln["relation"]
+                for e in t.meta.get("linked_things") or [])
+            report(ok, f"link: {ln['from']} --{ln['relation']}--> {ln['to']}")
+        elif "validates_clean" in a:
+            findings = []
+            for t in corpus.things:
+                findings.extend(validate_level1(t, corpus.schema))
+            findings.extend(validate_level2(corpus))
+            findings.extend(validate_level3(corpus))
+            errs = [x for x in findings if x.severity == SEV_ERROR]
+            report(not errs, f"validates clean (Errors: {len(errs)})")
+        else:
+            report(False, f"unknown assertion: {a}")
+    print(f"\n{passed} passed, {failed} failed")
+    return 1 if failed else 0
+
+
 KERNEL_RE = re.compile(r"<!--\s*kernel\s*-->\s*\n(.*?)<!--\s*/kernel\s*-->", re.DOTALL)
 
 
@@ -886,6 +946,11 @@ def main() -> int:
     k = sub.add_parser("tokens", help="measure spec token costs by tier")
     k.add_argument("path", nargs="?", default=".")
     k.set_defaults(fn=cmd_tokens)
+
+    ev = sub.add_parser("eval", help="check a golden-scenario fixture against domain state")
+    ev.add_argument("path", nargs="?", default=".")
+    ev.add_argument("--fixture", required=True)
+    ev.set_defaults(fn=cmd_eval)
 
     kn = sub.add_parser("kernel", help="generate kernel.md from spec kernel blocks")
     kn.add_argument("path", nargs="?", default=".")

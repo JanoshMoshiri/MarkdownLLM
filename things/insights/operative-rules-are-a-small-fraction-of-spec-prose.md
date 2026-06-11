@@ -1,0 +1,49 @@
+---
+id: operative-rules-are-a-small-fraction-of-spec-prose
+type: insight
+status: active
+version: 1.0
+created: 2026-06-11
+session: 2026-06-11
+source: agent
+confidence: high
+origin: synthesised
+tags: [kernel, context-economics, spec-writing, measurement]
+linked_things:
+  - id: tiered-loading-is-tiered-reading-applied-to-specs
+    relation: extends
+  - id: hook-compliance-correlates-with-scope-not-awareness
+    relation: supports
+---
+
+# Operative Rules Are a Small Fraction of Spec Prose
+
+## The Insight
+
+When the six Tier 0/1 specs were separated into operative rules (what the agent
+must do) and rationale (why), the rules measured **1.4k tokens against 21.4k of
+full prose — about 7%**. The other 93% is justification, history, examples, and
+reconciliation essays: valuable to the humans evolving the framework, costly to
+every session that only needs to *follow* it.
+
+Implication for spec writing: a spec is two documents sharing a file — a
+contract (for the executing agent) and a commentary (for the evolving human).
+The `<!-- kernel -->` block makes the split explicit, and `mdllm kernel`
+extracts the contracts into a generated, provenance-stamped `kernel.md` (a
+derived index over the spec corpus). Tier 0 dropped from 26.5k to 5.3k measured
+tokens with no rule lost.
+
+## Why It Matters
+
+This is the strongest lever yet found on hook compliance: the documented cause
+of missed hooks is context pressure, and 21k tokens of rationale was pure
+pressure. It also sets a discipline for future specs — write the kernel block
+first; if a rule can't be stated tersely there, it isn't a rule yet. And it
+quantifies the cost of letting justification accrete into operative documents.
+
+## Context
+
+Measured during transformation plan Phase 5 (2026-06-11) via
+`python tools/mdllm.py kernel`. Numbers are tiktoken o200k_base, re-measurable
+at any time. The kernel must be regenerated after any spec change — that duty
+is in the framework AGENTS.md validation checklist.

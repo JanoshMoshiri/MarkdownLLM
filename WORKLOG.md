@@ -81,7 +81,37 @@ Independent full review of the framework (all specs, live jmtm-software domain, 
 
 #### To Do (next session)
 
-- [ ] Phase 1: build `tools/mdllm.py` (validate / triggers / index / tokens), define `things/_schema.yaml`, resolve the status conflict in thing.md + validate.thing.md, declare jmtm-software's vocabulary, wire pre-commit enforcement
+- [x] Phase 1 — completed same day, Session 2 below
+
+### Session 2
+
+#### Topic: Transformation plan Phases 1–7 executed (framework v3.0 → v3.2)
+
+Continued directly from Session 1 at Janosh's direction ("keep going until the limit"). Six phases landed in one sitting, each at its own commit boundary.
+
+#### Completed
+
+- [x] **Phase 1 — deterministic floor (v3.0.0):** `tools/mdllm.py` (validate / triggers / index / tokens / install-hook); normative schemas for framework + jmtm; thing.md v2.11 + validate.thing.md v2.0 (tool owns mechanical, LLM owns semantic); conflict `status-vocabulary-universal-vs-domain` resolved (`superseded` — domain owns vocabularies); pre-commit hooks installed in both repos and **verified to block** a broken thing; framework 38/38 clean, jmtm 0 Errors
+- [x] **Phase 2 — deletion pass (v3.0.1):** REVIEWLOG migrated verbatim into `framework-retrospective-2026-05` (git tracked it as a rename) and deleted; `mdllm changelog` generator; speculative trigger machinery pruned (trigger-spec v1.2)
+- [x] **Phase 3 — provenance (v3.1.0):** provenance.md spec; `type: decision` with `informed_by: [{id, commit}]` pinning; `origin: external` + quarantine; `mdllm provenance` (pin shape/existence, quarantine, freshness); reverse-provenance index; **first real decision record** (`decision-status-vocabulary-domain-owned`) — freshness check fired correctly on it the same day
+- [x] **Phase 4:** scoped insight-staleness check — session-memory v1.1 + session-orientation prompt v1.1 (live insights × changed things; sweep stays at retrospective)
+- [x] **Phase 5 — operative kernel (v3.2.0):** `<!-- kernel -->` blocks in six Tier 0/1 specs; `mdllm kernel` generates kernel.md; **measured 1.6k tokens replacing 21.4k (93%)**; both AGENTS.md re-tiered (Tier 0 now ≈5.3k vs 26.5k); insight `operative-rules-are-a-small-fraction-of-spec-prose`
+- [x] **Phase 6 Stage 1:** `mdllm eval --fixture` assertion engine; first fixture `evals/jmtm-vat-2026q1-filed.yaml` passing 6/6 against the live domain
+- [x] **Phase 7 adapters:** GitHub Actions CI (validate + provenance + index drift), `adapters/scheduled-triggers.ps1` (daily toast on trigger hits), Claude Code PostToolUse adapter example
+- [x] `.markdownllm` foundational_specs list completed (six specs were missing); version 3.0
+
+#### Decisions
+
+- Kernel = `<!-- kernel -->` blocks extracted to a generated derived index, not a hand-maintained summary
+- Eval fixtures double as regression nets when asserted against production state
+- Freshness-after-pin is Info, never Error — dated decisions are a judgement call, not a defect
+
+#### To Do (next session)
+
+- [ ] Eval Stage 2: headless agent loop (seed worktree → fresh session → assert) — unblocks the small-model experiment
+- [ ] Tier 2 kernel blocks (low priority)
+- [ ] Register scheduled-triggers.ps1 in Task Scheduler before the accounts deadline window
+- [ ] `git push origin main --tags` (blocked for the agent this session) + push jmtm repo
 
 ---
 

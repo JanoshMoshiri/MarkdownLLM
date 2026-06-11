@@ -1,0 +1,16 @@
+{
+  "_comment": "Claude Code vendor adapter (transformation plan Phase 7). Merge the hooks block into the domain's .claude/settings.json. Runs the deterministic floor the moment a thing is written — earlier feedback than the pre-commit hook, same tool. Adjust the relative path to tools/mdllm.py for the domain's framework_root.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python tools/mdllm.py validate . --quiet"
+          }
+        ]
+      }
+    ]
+  }
+}

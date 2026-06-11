@@ -18,6 +18,24 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [3.2.0] - 2026-06-11
+
+Transformation plan Phases 2–7 (same day as 3.0.0; drafted with `mdllm changelog`). The framework now has provenance, a 93%-smaller operative kernel, deterministic evals, and proactive adapters.
+
+**Deletion pass (Phase 2):** REVIEWLOG migrated into `framework-retrospective-2026-05` and deleted; CHANGELOG entries now drafted by `mdllm changelog`; speculative trigger machinery pruned (`trigger-specification.md` v1.2).
+
+**Provenance (Phase 3):** `provenance.md` (draft) — `type: decision` records with inputs pinned to commits via `informed_by`; `origin: external` + `verified` quarantine for ingested content; `mdllm provenance` enforcement; reverse-provenance derived index; first real decision record committed (`decision-status-vocabulary-domain-owned`). `thing.md` v2.12.
+
+**Session memory (Phase 4):** scoped insight-staleness check at session start (`session-memory.md` v1.1, `session-orientation` prompt v1.1) — live insights × things changed since the brief's `last_updated`; the full sweep stays at retrospective.
+
+**Operative kernel (Phase 5):** `<!-- kernel -->` blocks in the six Tier 0/1 specs, extracted by `mdllm kernel` into a generated `kernel.md` — measured 1.6k tokens replacing 21.4k of full specs. Tier 0 session cost: 26.5k → ~5.3k.
+
+**Evals (Phase 6, Stage 1):** `mdllm eval --fixture` deterministic assertion engine; `evals/` with the first fixture passing 6/6 against the live jmtm domain as a regression net.
+
+**Adapters (Phase 7):** GitHub Actions workflow (validate + provenance + index drift on every push); `adapters/scheduled-triggers.ps1` (proactive deadline surfacing via Task Scheduler); Claude Code PostToolUse adapter example.
+
+---
+
 ## [3.0.0] - 2026-06-11
 
 **The Deterministic Floor.** Major version: mechanical validation moves from LLM honor-system to code, and domains now own their status vocabularies. Driven by the 2026-06-11 full review finding that all 17 things in the live jmtm-software domain violated the Level 1 status rule at Error severity, undetected.

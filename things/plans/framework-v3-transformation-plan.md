@@ -94,16 +94,18 @@ exclusively on what only an LLM can do.
 - [x] Framework + jmtm AGENTS.md re-tiered: kernel at Tier 0, full specs load individually on demand; kernel regeneration added to the validation checklist
 - [ ] Kernel blocks for Tier 2 specs (session-memory, belief-revision, provenance, triggers, derived-index) — next session; diminishing returns since they're demand-loaded
 
-### Phase 6 — Behavioral evals
-- [ ] 5–10 golden scenario fixtures per domain with expected assertions (files created, statuses set, figures correct, hooks fired)
-- [ ] `mdllm eval` runs scenarios against a fresh agent session and checks assertions
-- [ ] Run on every spec change — spec quality gets an answer that isn't anecdote
+### Phase 6 — Behavioral evals ⚙ STAGE 1 COMPLETE (2026-06-11)
+- [x] `mdllm eval --fixture`: deterministic assertion engine (thing_exists, status, field, link, validates_clean) — see `evals/README.md`
+- [x] First fixture: `evals/jmtm-vat-2026q1-filed.yaml` — regression net over the completed VAT cycle, 6/6 passing against the live domain
+- [ ] Stage 2: the full loop — seed a temp worktree, run a fresh headless agent session on the scenario prompt, assert the result. This is what makes spec changes measurable and enables the model experiment
+- [ ] Grow to 5–10 fixtures per domain as workflows complete
 
-### Phase 7 — New powers
-- [ ] Diff-driven regeneration: reverse-provenance index flags decisions/outputs whose pinned inputs changed; agent offers re-runs
-- [ ] Proactive operation: scheduled `mdllm triggers` + notification (jmtm deadlines surface without a session)
-- [ ] Test the manifesto: eval suite run on small vs large models — "structure beats scale" becomes a reproducible result
-- [ ] CI for domains: `mdllm validate && mdllm provenance && mdllm eval` on every push
+### Phase 7 — New powers ⚙ ADAPTERS LANDED (2026-06-11)
+- [x] Diff-driven regeneration *signal*: `mdllm provenance` freshness check + reverse-provenance index — verified live (it flagged the first decision's inputs as changed-since-pin the same day). Agent-offered re-runs ride on this
+- [x] Proactive operation: `adapters/scheduled-triggers.ps1` — daily `mdllm triggers` with Windows toast on hits; registration via schtasks (one command, documented in the script)
+- [x] CI: `.github/workflows/validate.yml` — validate + provenance + index drift on every push/PR
+- [x] Claude Code vendor adapter example: `adapters/claude-code.settings.example.json` (PostToolUse validation)
+- [ ] Test the manifesto: small-vs-large model eval run — blocked on Phase 6 Stage 2
 
 ## Sequencing
 
@@ -120,6 +122,10 @@ exclusively on what only an LLM can do.
 
 ## Current State
 
-Phase 0 complete (2026-06-11); Phase 1 is next. This thing is the canonical plan;
-phase checkboxes are updated as work lands, and each phase completion is a commit
-boundary.
+Phases 0–5 complete, Phase 6 Stage 1 and Phase 7 adapters landed — all on
+2026-06-11, the day the plan was written. Remaining open items: Tier 2 kernel
+blocks (5, low priority), eval Stage 2 (the headless agent loop), the
+small-model experiment (blocked on Stage 2), AGENTS version auto-mirroring
+(deferred), and the first jmtm filing through a decision record (lands with the
+annual accounts, due 2026-07-31). This thing is the canonical plan; phase
+checkboxes are updated as work lands.

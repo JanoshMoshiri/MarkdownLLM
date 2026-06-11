@@ -1,0 +1,23 @@
+name: deterministic-floor
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # provenance pins resolve against full history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Mechanical validation
+        run: python tools/mdllm.py validate .
+      - name: Provenance chains
+        run: python tools/mdllm.py provenance .
+      - name: Index drift
+        run: python tools/mdllm.py index . check

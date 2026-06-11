@@ -1,0 +1,13 @@
+name: jmtm VAT 2026 Feb-Apr filed correctly
+description: >
+  Regression net over the completed Feb-Apr 2026 VAT cycle: the return reached
+  submitted, its companion deadline was met, and the linkage between them holds.
+  Encodes the workflow skill's contract (Workflow 1, phases 1-5) against real
+  domain state. Fails if any future session corrupts this history.
+assertions:
+  - thing_exists: vat-return-2026-02-to-04
+  - thing_exists: filing-deadline-vat-2026-02-to-04
+  - status: { id: vat-return-2026-02-to-04, equals: submitted }
+  - status: { id: filing-deadline-vat-2026-02-to-04, equals: met }
+  - link: { from: vat-return-2026-02-to-04, relation: has-deadline, to: filing-deadline-vat-2026-02-to-04 }
+  - validates_clean: true

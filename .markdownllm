@@ -13,6 +13,12 @@ foundational_specs:
   - orchestration.md
   - derived-index.md
   - provenance.md
+  - session-memory.md
+  - belief-revision.md
+  - retrospective.md
+  - trigger-specification.md
+  - example-things.md
+  - reasoning-lenses.md
   - llm-driven-systems.manifesto.md
   - scalability-guide.md
   - domain-specification-guide.md

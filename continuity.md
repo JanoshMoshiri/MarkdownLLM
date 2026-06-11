@@ -12,13 +12,18 @@ last_updated: 2026-06-11
 
 ## Open Threads
 
-- **Transformation plan Phase 2 (next up):** deletion pass — generated CHANGELOG
-  (`mdllm changelog`), REVIEWLOG → retrospectives migration, prune speculative
-  trigger conditions. Then Phase 3 (provenance). Canonical plan:
-  `framework-v3-transformation-plan`.
-- **jmtm orphan records:** 8 expense/profile things have no links — real signal
-  from the validator; the domain agent should link them to the FY2025 accounts
-  or CT return when those are prepared.
+- **Eval Stage 2 (highest-value next):** the headless agent loop — seed temp
+  worktree, run fresh agent on scenario prompt, assert via `mdllm eval`. Unblocks
+  the small-vs-large model experiment (the manifesto's testable claim).
+- **Tier 2 kernel blocks:** session-memory, belief-revision, provenance,
+  triggers, derived-index — low priority (demand-loaded anyway).
+- **First jmtm decision-record filing:** annual accounts due 2026-07-31 — prepare
+  through a `type: decision` with pinned inputs (provenance.md's first production
+  use). Register `adapters/scheduled-triggers.ps1` in Task Scheduler before then.
+- **jmtm orphan records:** 8 expense/profile things unlinked — domain agent
+  should link them when the FY2025 accounts/CT return are prepared.
+- **Push pending:** all of 2026-06-11's commits (framework + jmtm) are local;
+  harness blocked direct push — Janosh runs `git push origin main --tags`.
 
 ## Live Insights
 
@@ -34,14 +39,14 @@ last_updated: 2026-06-11
 
 ## Pending Decisions
 
-- Kernel format (Phase 5): one generated `kernel.md` vs delimited operative
-  sections per spec.
+- (none — session 2026-06-11 cleared the queue)
 
 ## Decisions Made This Session (2026-06-11)
 
-- `mdllm` lives in `tools/` in the framework repo; domains reach it via
-  `framework_root`. Python + PyYAML baseline confirmed.
-- Relation vocabulary: declared-and-validated (Warning severity) in each domain's
-  schema, capturing actual use; prune at retrospectives.
-- Status vocabularies: domain-owned via schema (conflict
-  `status-vocabulary-universal-vs-domain` resolved, outcome `superseded`).
+- `mdllm` lives in `tools/`; Python + PyYAML. Relation vocabularies
+  declared-and-validated per domain schema. Status vocabularies domain-owned
+  (conflict resolved, `superseded` — see `decision-status-vocabulary-domain-owned`,
+  the first pinned decision record).
+- Kernel format: `<!-- kernel -->` blocks in specs, extracted by `mdllm kernel`
+  into generated `kernel.md`. Measured: 1.6k tokens replacing 21.4k (see insight
+  `operative-rules-are-a-small-fraction-of-spec-prose`).
