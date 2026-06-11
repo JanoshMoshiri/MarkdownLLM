@@ -1,7 +1,7 @@
 ---
 id: independent-review-2026-06-11-fable
 type: artifact
-status: evolving
+status: stable
 created: 2026-06-11
 linked_things:
   - id: framework-retrospective-2026-06
