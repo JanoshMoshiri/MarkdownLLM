@@ -66,14 +66,14 @@ exclusively on what only an LLM can do.
 
 **Verified:** framework 38/38 clean, jmtm 0 Errors, hook blocks broken things, framework bumped to v3.0.
 
-### Phase 2 — The deletion pass
-- [ ] CHANGELOG generated from structured commit messages (`mdllm changelog`); stop hand-writing
-- [ ] REVIEWLOG migrated into dated retrospective things; file deleted
-- [ ] Prompt input/output chain validation removed from validate.thing.md
-- [ ] Speculative trigger conditions (`in_progress_count`, `warn_overload`) pruned — return when felt
-- [ ] Version surfaces consolidated: `.markdownllm` canonical; AGENTS.md version mirrored by tooling
+### Phase 2 — The deletion pass ✅ COMPLETE (2026-06-11)
+- [x] CHANGELOG generated: `mdllm changelog --since <tag>` drafts entries from structured commits; header documents the new process
+- [x] REVIEWLOG migrated verbatim into `framework-retrospective-2026-05` (three May reviews); file deleted; WORKLOG link removed; validator confirmed zero broken references
+- [x] Prompt input/output chain validation removed (done in Phase 1's validate.thing.md v2.0 rewrite)
+- [x] Speculative trigger machinery pruned: `in_progress_count` condition + `warn_overload` action removed from trigger-specification.md v1.2 and from mdllm
+- [ ] AGENTS.md version auto-mirrored from `.markdownllm` by tooling — deferred (manual for now; `.markdownllm` remains canonical)
 
-**Done when:** four tracking surfaces remain (git log, WORKLOG, continuity, retrospectives) and nothing mechanically derivable is hand-maintained.
+**Result:** tracking surfaces are now git log, WORKLOG, continuity, retrospectives — plus a CHANGELOG that is drafted by tooling rather than remembered.
 
 ### Phase 3 — Provenance as a first-class spec
 - [ ] New spec `provenance.md`: `origin: external` with quarantine rule (external content never feeds calculations/filings/outputs until human-verified)

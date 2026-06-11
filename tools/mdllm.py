@@ -457,12 +457,6 @@ def cmd_triggers(args) -> int:
                     if subs and all(str(by_id[s].meta.get("status")) in TERMINAL_STATUSES
                                     for s in subs if s in by_id):
                         hits.append(f"{name}: all subtasks complete -> {action}")
-                elif cond == "in_progress_count":
-                    n = sum(1 for x in corpus.things
-                            if str(x.meta.get("status")) == "in-progress")
-                    if n > int(tr.get("threshold", 5)):
-                        hits.append(f"{name}: {n} things in-progress "
-                                    f"(threshold {tr.get('threshold')}) -> {action}")
                 elif cond == "blocked_duration":
                     skipped.append(f"{name}: `blocked_duration` needs status history "
                                    f"(evaluate via git log) — left to the agent")
@@ -654,6 +648,29 @@ def cmd_tokens(args) -> int:
 # ---------------------------------------------------------------- hook
 
 
+def cmd_changelog(args) -> int:
+    """Draft a CHANGELOG entry from structured commit messages since a ref."""
+    root = Path(args.path).resolve()
+    rng = f"{args.since}..HEAD" if args.since else "HEAD"
+    out = subprocess.run(["git", "log", "--format=%s", rng], cwd=root,
+                         capture_output=True, text=True, check=True).stdout
+    groups: dict[str, list[str]] = {}
+    for line in out.strip().splitlines():
+        prefix = line.split(":", 1)[0].strip() if ":" in line else "other"
+        groups.setdefault(prefix, []).append(line)
+    order = ["framework", "create", "update", "insight", "retrospective",
+             "session-end", "measure", "validate", "fix", "docs", "chore", "other"]
+    print(f"## [x.y.z] - {dt.date.today().isoformat()}\n")
+    print("<!-- drafted by `mdllm changelog`; set the version, write the one-paragraph")
+    print("     summary, prune noise — then commit. WORKLOG holds the detail. -->\n")
+    for key in sorted(groups, key=lambda k: order.index(k) if k in order else 99):
+        print(f"**{key}:**")
+        for line in groups[key]:
+            print(f"- {line}")
+        print()
+    return 0
+
+
 HOOK_BODY = """#!/bin/sh
 # mdllm pre-commit: deterministic validation floor (transformation plan Phase 1)
 MDLLM="{mdllm}"
@@ -705,6 +722,11 @@ def main() -> int:
     k = sub.add_parser("tokens", help="measure spec token costs by tier")
     k.add_argument("path", nargs="?", default=".")
     k.set_defaults(fn=cmd_tokens)
+
+    c = sub.add_parser("changelog", help="draft a CHANGELOG entry from commits")
+    c.add_argument("path", nargs="?", default=".")
+    c.add_argument("--since", help="ref to start from (e.g. a version tag)")
+    c.set_defaults(fn=cmd_changelog)
 
     h = sub.add_parser("install-hook", help="install git pre-commit validation hook")
     h.add_argument("path", nargs="?", default=".")

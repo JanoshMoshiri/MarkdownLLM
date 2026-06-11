@@ -1,54 +1,23 @@
 ---
-id: framework-reviewlog
-type: artifact
-status: evolving
-version: 1.0
+id: framework-retrospective-2026-05
+type: retrospective
+status: complete
 created: 2026-05-21
+period_start: 2026-05-13
+period_end: 2026-05-31
+domain: markdownllm-framework
 linked_things:
-  - id: framework-worklog
-    relation: complements
-  - id: llm-driven-systems-manifesto
-    relation: evaluates
-  - id: thing-specification
-    relation: evaluates
-  - id: read-thing-specification
-    relation: evaluates
-  - id: write-thing-specification
-    relation: evaluates
-  - id: validate-thing-specification
-    relation: evaluates
-  - id: git-workflow-specification
-    relation: evaluates
-  - id: interface-specification
-    relation: evaluates
-  - id: orchestration-specification
-    relation: evaluates
-  - id: session-memory-specification
-    relation: evaluates
-  - id: belief-revision-specification
-    relation: evaluates
-  - id: retrospective-specification
-    relation: evaluates
-  - id: scalability-guide
-    relation: evaluates
-  - id: domain-specification-guide
-    relation: evaluates
-  - id: trigger-specification
-    relation: evaluates
-  - id: thing-lifecycle-specification
-    relation: evaluates
-  - id: framework-discovery-specification
-    relation: evaluates
-  - id: domain-refresh-specification
-    relation: evaluates
+  - id: framework-retrospective-2026-06
+    relation: informs
 ---
 
-# Framework Review Log
+# MarkdownLLM Framework Retrospective — May 2026 (migrated reviews)
 
-This file is a running record of independent reviews of the framework's state, cohesion, and direction. It complements the WORKLOG (which tracks what was done) by tracking how well what exists is working and where the gaps are. Reviews are conducted periodically or on request.
-
----
-
+> **Provenance:** This thing carries the three independent framework reviews of
+> 21, 28, and 29 May 2026, migrated verbatim from `REVIEWLOG.md` when that file
+> was deleted in the transformation plan's Phase 2 deletion pass (2026-06-11).
+> Review content now lives where the framework's own primitives say it should:
+> in `type: retrospective` things. Reviews appear newest-first as originally kept.
 ## 29 May 2026
 
 ### Review — 29 May 2026
@@ -351,19 +320,3 @@ The guide's "Framework Discovery" section (~30 lines) reproduces the `framework_
 
 ---
 
-## Format Guide
-
-When updating this file:
-
-- **Day blocks** (`## D MMM YYYY`) — one per calendar day. All reviews done that day fall under the same day block. New days are added at the top of the history.
-- **Review blocks** (`### Review — D MMM YYYY, HH:MM`) — one per discrete review within a day. Each review gets its own sub-block with a timestamp.
-- **Sub-sections** (`####`) — each review block contains:
-  - **What Works Well** — Strengths of the current state. Numbered for reference.
-  - **What Doesn't Work Well / Tensions** — Problems, gaps, contradictions, credibility risks. Numbered.
-  - **What May Be Over-Engineered** — Where specification exceeds the value delivered. Numbered.
-  - **What May Be Under-Engineered** — Where gaps exist or guidance is insufficient. Numbered.
-  - **Missing From WORKLOG Todos** — Items not yet captured in the WORKLOG's todo list. Numbered.
-  - **Reflections** — Left blank at review time; filled in later with hindsight. May remain empty.
-- Reviews should be detailed enough to extract actionable items but concise enough to scan. Use numbered points with a bold title + 1–2 sentence explanation.
-- Do not delete old entries — this is a historical record.
-- **Private domain references** — The live domain used to validate the framework is private. In this log it is referred to as **InnoTriage** (an innovation triage and production analysis system for a regulated environment). Do not use its real name in public-facing files.

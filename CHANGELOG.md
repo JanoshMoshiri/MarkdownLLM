@@ -14,6 +14,8 @@ Prior entries followed [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 The WORKLOG is the detailed internal record. The CHANGELOG is the external-facing record of what shipped.
 
+**From v3.0.0 onwards, entries are generated, not hand-written:** draft with `python tools/mdllm.py changelog --since <last-version-tag>`, then set the version, add the one-paragraph summary, prune noise, and commit. Hand-maintaining a surface derivable from the commit stream was one of the drift sources the deletion pass (transformation plan Phase 2) removed.
+
 ---
 
 ## [3.0.0] - 2026-06-11

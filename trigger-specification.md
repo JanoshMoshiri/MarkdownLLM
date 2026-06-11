@@ -2,7 +2,7 @@
 id: trigger-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-29
 linked_things:
   - id: thing-specification
@@ -85,15 +85,12 @@ triggers:
     condition: blocked_duration
     threshold: 7d
     action: escalate
-  - type: threshold
-    condition: in_progress_count
-    threshold: 5
-    action: warn_overload
 ```
 
 - `subtasks_complete` — All linked things with relation `subtask` have status `completed`
 - `blocked_duration` — The thing has been in `blocked` status longer than `threshold`
-- `in_progress_count` — More than `threshold` things are simultaneously `in-progress` (system-level, not per-thing)
+
+*(v1.2 removed the speculative `in_progress_count` condition and `warn_overload` action — no domain ever used them. Per "spec when foreseeable, deploy when felt": they return if a domain feels the need.)*
 
 ### Relationship-based
 
@@ -125,7 +122,6 @@ Actions are declarative. They tell the agent what kind of response is appropriat
 | `suggest_completion` | Conditions indicate this thing may be done. Propose marking it complete. |
 | `unblock` | A dependency has been satisfied. Update status from `blocked` to the appropriate active state. |
 | `escalate` | Something has been stuck too long or a risk condition exists. Flag prominently. |
-| `warn_overload` | System-level signal that too many things are in-progress simultaneously. |
 | `cascade` | Check all things downstream of this one (things that depend on it, things it blocks). |
 | `notify` | Push through output route (calendar update, notification, reminder). |
 

@@ -41,8 +41,6 @@ linked_things:
     relation: documents
   - id: derived-index-specification
     relation: documents
-  - id: framework-reviewlog
-    relation: complements
 ---
 
 # Framework Work Log
