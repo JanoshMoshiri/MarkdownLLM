@@ -812,8 +812,18 @@ def cmd_changelog(args) -> int:
 
 HOOK_BODY = """#!/bin/sh
 # mdllm pre-commit: deterministic validation floor (transformation plan Phase 1)
-MDLLM="{mdllm}"
-python "$MDLLM" validate "{root}" --quiet || {{
+# Portable: repo root and interpreter are resolved at run time, mdllm.py via a
+# path relative to the repo root — so the same hook works wherever this repo is
+# checked out or mounted (Windows, WSL, CI, sandboxed agent harnesses).
+ROOT="$(git rev-parse --show-toplevel)"
+MDLLM="$ROOT/{rel}"
+PY="$(command -v python3 || command -v python)"
+if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
+  echo "mdllm: validation floor unavailable (python or $MDLLM not found) — commit blocked."
+  echo "Install Python 3.10+ with PyYAML, or re-run install-hook from the framework root."
+  exit 1
+fi
+"$PY" "$MDLLM" validate "$ROOT" --quiet || {{
   echo ""
   echo "mdllm: validation Errors — commit blocked. Fix or run with --no-verify (discouraged)."
   exit 1
@@ -1126,9 +1136,17 @@ def cmd_install_hook(args) -> int:
     mdllm = Path(__file__).resolve()
     hook = git_dir / "hooks" / "pre-commit"
     hook.parent.mkdir(exist_ok=True)
-    hook.write_text(HOOK_BODY.format(mdllm=mdllm.as_posix(), root=root.as_posix()),
-                    encoding="utf-8", newline="\n")
-    print(f"installed {hook}")
+    try:
+        import os
+        rel = Path(os.path.relpath(mdllm, root)).as_posix()
+    except ValueError:  # e.g. different drives on Windows — no relative path exists
+        rel = mdllm.as_posix()
+    hook.write_text(HOOK_BODY.format(rel=rel), encoding="utf-8", newline="\n")
+    try:
+        hook.chmod(hook.stat().st_mode | 0o111)
+    except OSError:
+        pass  # Windows: executability is not a file-mode concern
+    print(f"installed {hook} (mdllm via {rel})")
     return 0
 
 
@@ -1197,6 +1215,7 @@ def main() -> int:
     h = sub.add_parser("install-hook", help="install git pre-commit validation hook")
     h.add_argument("path", nargs="?", default=".")
     h.set_defaults(fn=cmd_install_hook)
+    # Hook body is portable since v3.4.1: root/interpreter resolved at run time.
 
     args = p.parse_args()
     return args.fn(args)
