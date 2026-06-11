@@ -1,8 +1,7 @@
 .claude/
 domains/
-domain/eco-essentials/
-domain/jmtm-software/
-domain/property-ventures/
-
-
+domain/
+adapters/logs/
 evals/runs/
+__pycache__/
+.pytest_cache/
