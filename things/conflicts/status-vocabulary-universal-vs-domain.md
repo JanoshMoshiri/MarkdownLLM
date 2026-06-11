@@ -1,24 +1,24 @@
 ---
 id: status-vocabulary-universal-vs-domain
 type: conflict
-status: open
+status: resolved
 created: 2026-06-11
 session: 2026-06-11
 parties:
   - validate-thing-specification
   - domain-specification-guide
-resolution:
-resolved_by:
+resolution: superseded
+resolved_by: domain-specification-guide
 confidence: medium
 origin: inferred
 linked_things:
   - id: validate-thing-specification
-    relation: contradicts
+    relation: references
   - id: domain-specification-guide
-    relation: contradicts
+    relation: references
   - id: framework-v3-transformation-plan
     relation: references
-    notes: "Phase 1 is the designated resolution path"
+    notes: "Phase 1 was the designated resolution path; resolved same day"
 ---
 
 # Universal Status Enum vs Domain-Defined State Machines
@@ -59,4 +59,16 @@ Phase 1 ships and both specs are updated.
 
 ## Resolution
 
-[Pending — expected outcome `superseded`, with the domain-schema rule surviving.]
+**Resolved 2026-06-11, same session, outcome `superseded`.** Position B (the
+guide's domain-defined state machines) survived. The domain owns its status
+vocabulary, declared in the normative schema (`things/_schema.yaml`) and enforced
+deterministically by `tools/mdllm.py validate`. The six universal workflow values
+became the advisory default applying only when a type declares no vocabulary.
+
+Implemented in: `thing.md` v2.11 (status field rewritten),
+`validate.thing.md` v2.0 (mechanical floor delegated to mdllm; status table
+replaced with domain-ownership rule), `domain-specification-guide.md` v2.6
+(schema declaration added to domain structure), and
+`domain/jmtm-software/things/_schema.yaml` (the live domain's vocabulary
+declared as correct rather than corrected). The `contradicts` links on both
+parties were downgraded to `references` per the resolution protocol.

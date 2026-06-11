@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.5
+version: 2.6
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -28,8 +28,8 @@ linked_things:
   - id: trigger-specification
     relation: references
   - id: validate-thing-specification
-    relation: contradicts
-    notes: "Status vocabulary: domain-defined state machines vs Level 1 fixed enum — see conflict status-vocabulary-universal-vs-domain; resolution designated to transformation plan Phase 1"
+    relation: complements
+    notes: "Conflict status-vocabulary-universal-vs-domain resolved 2026-06-11: domains declare their own status vocabularies in things/_schema.yaml; the guide's position survived"
 ---
 
 # Domain Specification Guide
@@ -153,6 +153,8 @@ my-domain/                        ← Root of your domain (its own git repo)
 │   ├── [domain]-write.thing.skill.md     ← How to create and update things
 │   └── [domain]-workflow.skill.md        ← Process orchestration and flow
 ├── things/
+│   ├── _schema.yaml              ← Normative schema: thing types, status vocabularies,
+│   │                                required fields, relation vocabulary (read by mdllm)
 │   ├── insights/                 ← type: insight things
 │   ├── conflicts/                ← type: conflict things
 │   ├── retrospectives/           ← type: retrospective things
@@ -167,6 +169,16 @@ my-domain/                        ← Root of your domain (its own git repo)
 ```
 
 > **You do NOT need `thing.md` in your domain.** It's a foundational framework specification discovered via `framework_root` — see Framework Discovery above.
+
+**The normative schema (`things/_schema.yaml`):** declare your thing types and —
+critically — **your own status vocabularies**. The domain owns its state machines:
+a tax return that moves `open → figures-ready → submitted → paid → reconciled`
+should say so, not squeeze into generic workflow statuses. The deterministic
+validator (`{framework_root}/tools/mdllm.py validate`) enforces whatever you
+declare; the six universal workflow values apply only as an advisory default when
+a type declares nothing. Install the validation floor in every new domain repo:
+`python {framework_root}/tools/mdllm.py install-hook <domain-path>` — after that,
+things with structural or referential Errors cannot be committed.
 
 **Things subfolders:** In practice, each time you execute a workflow (e.g., analysing a product, processing a batch, running an assessment), the things generated are organised into subfolders within `things/`. This keeps runs separate, traceable, and avoids a flat directory of hundreds of files.
 

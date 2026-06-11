@@ -12,14 +12,13 @@ last_updated: 2026-06-11
 
 ## Open Threads
 
-- **Transformation plan Phase 1 (next up):** build `tools/mdllm.py` (validate /
-  triggers / index / tokens), define the normative per-domain schema, resolve the
-  status-vocabulary conflict, wire pre-commit enforcement. Canonical plan:
+- **Transformation plan Phase 2 (next up):** deletion pass — generated CHANGELOG
+  (`mdllm changelog`), REVIEWLOG → retrospectives migration, prune speculative
+  trigger conditions. Then Phase 3 (provenance). Canonical plan:
   `framework-v3-transformation-plan`.
-- **Open conflict:** `status-vocabulary-universal-vs-domain` — universal status
-  enum vs domain-defined state machines. Resolution designated to Phase 1.
-- **Relation vocabulary proliferation** (~18 values in use vs ~8 blessed) — decide
-  in Phase 1 whether it becomes declared-and-validated or stays emergent.
+- **jmtm orphan records:** 8 expense/profile things have no links — real signal
+  from the validator; the domain agent should link them to the FY2025 accounts
+  or CT return when those are prepared.
 
 ## Live Insights
 
@@ -35,11 +34,14 @@ last_updated: 2026-06-11
 
 ## Pending Decisions
 
-- `mdllm` packaging: single file in `tools/` (lean) vs sibling repo domains vendor
-  (versionable independently).
-- Kernel format: one generated `kernel.md` vs delimited operative sections per spec.
+- Kernel format (Phase 5): one generated `kernel.md` vs delimited operative
+  sections per spec.
 
-## Questions For Next Session
+## Decisions Made This Session (2026-06-11)
 
-- Confirm Python + PyYAML as the `mdllm` baseline (Python 3.12 confirmed on the
-  primary machine, 2026-06-11).
+- `mdllm` lives in `tools/` in the framework repo; domains reach it via
+  `framework_root`. Python + PyYAML baseline confirmed.
+- Relation vocabulary: declared-and-validated (Warning severity) in each domain's
+  schema, capturing actual use; prune at retrospectives.
+- Status vocabularies: domain-owned via schema (conflict
+  `status-vocabulary-universal-vs-domain` resolved, outcome `superseded`).

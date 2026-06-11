@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.7
+version: 1.8
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -69,6 +69,8 @@ These two hard hooks are part of every agent's operating contract with the frame
 4. Do not complete the response without this step
 
 **Why it's hard:** Git is the framework's state machine. An uncommitted change is a change that doesn't exist yet — the "single source of truth" principle is violated by any thing that exists only in a working directory. This cannot be left to convention or memory.
+
+**Mechanical backstop (v3.0):** the commit boundary is also where the deterministic floor fires — the git `pre-commit` hook (installed via `python tools/mdllm.py install-hook`) runs full mechanical validation and blocks the commit on any Error. The agent does not enforce structural/referential integrity by diligence; the hook does it by construction. See `validate.thing.md` v2.0.
 
 **What failure looks like:** Thing files created in a session but never committed. State that exists in files but not in history. The session ends and the work is only partially real.
 

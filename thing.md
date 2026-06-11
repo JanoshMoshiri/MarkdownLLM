@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.10
+version: 2.11
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -80,10 +80,20 @@ These fields must be present in every thing to do:
 
 **status** (string)
 - Current state of this thing
-- Values for domain things (tasks, projects, goals, etc.): `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`
-- Values for framework specification things (`type: specification`, `type: guide`, `type: manifesto`): `draft`, `evolving`, `stable`, `deprecated` — these reflect lifecycle maturity, not workflow state
-- Values for insight things (`type: insight`): `active`, `promoted`, `dismissed` — see `session-memory.md`
-- Updated by Claude as work progresses
+- **The domain owns its status vocabulary.** Each domain declares the valid
+  statuses per thing type in its normative schema (`things/_schema.yaml`, read by
+  `tools/mdllm.py`). A compliance domain's return might move
+  `open → figures-ready → submitted → paid → reconciled`; a task domain might use
+  the universal defaults. Model the domain's real state machine — don't force it
+  into a generic one. (Resolution of conflict `status-vocabulary-universal-vs-domain`, 2026-06-11.)
+- The universal default vocabulary — used when no schema declares one for the
+  type: `not-started`, `in-progress`, `blocked`, `paused`, `completed`, `cancelled`
+- Framework-reserved types keep fixed vocabularies domains cannot redefine:
+  `specification`/`guide`/`manifesto`/`skill`/`prompt` use `draft`, `evolving`,
+  `stable`, `deprecated`; `insight` uses `active`, `promoted`, `dismissed`;
+  `conflict` uses `open`, `resolved`; `retrospective` uses `draft`, `complete`;
+  `continuity-brief` uses `live`; `index` uses `live`, `stale`
+- Updated by the agent as work progresses
 
 **created** (ISO 8601 date)
 - When this thing was created

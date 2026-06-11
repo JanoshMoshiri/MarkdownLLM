@@ -1,5 +1,5 @@
 framework: MarkdownLLM
-version: 2.9
+version: 3.0
 role: canonical-version-sentinel
 foundational_specs:
   - thing.md

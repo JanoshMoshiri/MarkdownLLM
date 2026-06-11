@@ -16,6 +16,31 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [3.0.0] - 2026-06-11
+
+**The Deterministic Floor.** Major version: mechanical validation moves from LLM honor-system to code, and domains now own their status vocabularies. Driven by the 2026-06-11 full review finding that all 17 things in the live jmtm-software domain violated the Level 1 status rule at Error severity, undetected.
+
+**New tooling:**
+- `tools/mdllm.py` — single-file CLI (Python, PyYAML): `validate` (structural + referential + schema checks, exit 1 on Errors), `triggers` (mechanical evaluation of time/dependency/threshold conditions + deadline horizon), `index check|rebuild` (derived-index rebuild-and-diff), `tokens` (tier cost measurement; replaces `measure-tokens.py`), `install-hook` (git pre-commit validation — commits with Errors are blocked by construction)
+
+**New normative schemas:**
+- `_schema.yaml` (framework domain) and `domain/[domain]/things/_schema.yaml` — declare thing types, **per-type status vocabularies**, required fields, and the relation vocabulary. The validator enforces what the domain declares.
+
+**Conflict resolved:**
+- `status-vocabulary-universal-vs-domain` (opened and resolved 2026-06-11, outcome `superseded`): the domain owns its status vocabulary; the six universal workflow values are the advisory default when no schema declares one. jmtm-software's compliance state machines were declared as correct rather than corrected.
+
+**Specs updated:**
+- `validate.thing.md` (v1.5 → v2.0): rewritten around the division of labour — the tool guarantees mechanical checks (old Levels 1–3 + index integrity); the LLM keeps semantic validation only. Prompt input/output chain validation removed (type-checking for an event system with no runtime).
+- `thing.md` (v2.10 → v2.11): status field rewritten — domain-declared vocabularies, reserved-type vocabularies fixed
+- `domain-specification-guide.md` (v2.5 → v2.6): `things/_schema.yaml` added to domain structure; floor installation added to scaffolding
+- `orchestration.md` (v1.7 → v1.8): `post-write:commit` hard hook gains its mechanical backstop note
+- `AGENTS.md` (v3.0): validation checklist delegates to the tool; measured token costs
+
+**Baseline (Phase 0, same day):**
+- First framework retrospective (`framework-retrospective-2026-06`), first conflict thing, `continuity.md` initialised, token costs measured (T0 13.5k / T0+T1 26.5k / full 65.5k), repo tagged `v2.9-pre-floor`, transformation plan committed as `framework-v3-transformation-plan`
+
+---
+
 ## [2.9.0] - 2026-06-08
 
 Reflexive behaviour: the agent can now reason *about* a domain, not only *within* it — domain velocity, systematic trigger evaluation, systematic conflict scanning, and schema-coherence review. These four capabilities are unified under one new primitive rather than built as four bespoke mechanisms.

@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 2.9
+version: 3.0
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -68,7 +68,7 @@ This is where the reasoning lives — not just the data.
 
 ### On Startup
 
-**Determine session intent before loading specs.** Loading all framework specs eagerly costs ~65.5k tokens (measured 2026-06-11, tiktoken o200k_base via `tools/measure-tokens.py`) — a large share of a model's working context before any work begins. Load only what the session needs.
+**Determine session intent before loading specs.** Loading all framework specs eagerly costs ~65.5k tokens (measured 2026-06-11, tiktoken o200k_base via `python tools/mdllm.py tokens`) — a large share of a model's working context before any work begins. Load only what the session needs.
 
 **Tier 0 — Always load (~13.5k tokens):**
 - `AGENTS.md` — this file (already loaded)
@@ -94,7 +94,7 @@ This is where the reasoning lives — not just the data.
 | Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 
-**Typical session cost (measured 2026-06-11):** Tier 0 alone ≈ 13.5k tokens. Tier 0 + Tier 1 ≈ 26.5k tokens. Full load (rare — new domain creation) ≈ 65.5k tokens. Re-measure with `python tools/measure-tokens.py` after spec changes; do not assert costs.
+**Typical session cost (measured 2026-06-11):** Tier 0 alone ≈ 13.5k tokens. Tier 0 + Tier 1 ≈ 26.5k tokens. Full load (rare — new domain creation) ≈ 65.5k tokens. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
 
 Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
@@ -221,9 +221,10 @@ Commit changes following git-workflow.md conventions
 
 Before committing framework changes:
 
-- [ ] Frontmatter present and complete (id, type, status, version, created, linked_things)
-- [ ] linked_things references are valid (target specs exist)
-- [ ] Status reflects reality (draft if new, evolving if actively changing)
+- [ ] `python tools/mdllm.py validate .` passes — the pre-commit hook runs this anyway and blocks commits with Errors; running it first means you fix findings in the same operation rather than at the commit boundary
+- [ ] Status reflects reality (draft if new, evolving if actively changing) — the tool checks vocabulary validity; *you* check truthfulness
 - [ ] Version incremented if substantive change to a stable spec
 - [ ] Commit message follows git-workflow.md conventions
 - [ ] WORKLOG updated with session activity
+
+> **The Deterministic Floor (v3.0):** mechanical validation (structural, referential, schema) is owned by `tools/mdllm.py` and enforced by the git pre-commit hook — never re-perform those checks by reasoning. The agent's validation responsibility is semantic only (validate.thing.md v2.0 → Layer 2). Domain status vocabularies are declared in `_schema.yaml` / `things/_schema.yaml`, not fixed by the framework.

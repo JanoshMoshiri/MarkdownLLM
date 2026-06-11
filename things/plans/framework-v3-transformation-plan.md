@@ -55,15 +55,16 @@ exclusively on what only an LLM can do.
 
 **Done when:** retrospective committed, real token numbers in AGENTS.md, tag pushed.
 
-### Phase 1 — The deterministic floor: `mdllm` CLI + normative schemas
-- [ ] Single-file Python CLI (`tools/mdllm.py`, stdlib + PyYAML): `validate` (Levels 1–2 mechanical checks), `triggers` (time/dependency/threshold evaluation), `index check|rebuild` (rebuild-and-diff), `tokens`
-- [ ] Normative per-domain schema (`things/_schema.yaml`): declared types, required fields per type, valid status vocabulary per type, allowed transitions
-- [ ] Resolve the status contradiction: thing.md + validate.thing.md change to "status must be in the domain's declared vocabulary; the six workflow values are the default when no schema exists"
-- [ ] Declare jmtm-software's status vocabulary in its schema (the domain was right, not wrong)
-- [ ] Git `pre-commit` hook running `mdllm validate --staged`; optional vendor adapters (e.g. Claude Code PostToolUse) in `adapters/`
-- [ ] Rewrite validate.thing.md contract: Levels 1–3 delegated to the tool; LLM keeps Level 4 semantic checks only
+### Phase 1 — The deterministic floor: `mdllm` CLI + normative schemas ✅ COMPLETE (2026-06-11)
+- [x] Single-file Python CLI (`tools/mdllm.py`, PyYAML): `validate`, `triggers` (+ deadline horizon), `index check|rebuild`, `tokens` (absorbed measure-tokens.py), `install-hook`
+- [x] Normative per-domain schema: framework `_schema.yaml` + jmtm `things/_schema.yaml` — types, status vocabularies, required fields, relation vocabulary, options
+- [x] Status contradiction resolved: thing.md v2.11 + validate.thing.md v2.0 — domain-declared vocabularies; universal six as advisory default. Conflict thing resolved (`superseded`, guide's position survived)
+- [x] jmtm-software vocabulary declared as correct (validates 0 Errors / 0 Warnings; 8 advisory orphan Infos remain for the domain agent)
+- [x] Pre-commit hooks installed in framework + jmtm repos; **verified to block** a deliberately broken thing (exit 1)
+- [x] validate.thing.md rewritten: tool owns mechanical floor; LLM keeps semantic layer; prompt I/O chain validation deleted
+- [ ] Vendor adapters (`adapters/` — e.g. Claude Code PostToolUse) — deferred to Phase 7 alongside CI
 
-**Done when:** `mdllm validate` passes clean on framework + jmtm, the pre-commit hook blocks a deliberately broken thing, validate.thing.md reflects the new division of labour.
+**Verified:** framework 38/38 clean, jmtm 0 Errors, hook blocks broken things, framework bumped to v3.0.
 
 ### Phase 2 — The deletion pass
 - [ ] CHANGELOG generated from structured commit messages (`mdllm changelog`); stop hand-writing

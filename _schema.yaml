@@ -1,0 +1,60 @@
+# Normative domain schema — MarkdownLLM framework domain (transformation plan Phase 1).
+# Read by tools/mdllm.py. Declares the types, status vocabularies, and relation
+# vocabulary this domain permits. Framework-reserved types (specification, guide,
+# manifesto, skill, prompt, insight, conflict, retrospective, continuity-brief,
+# index) are built into the tool and need no declaration here.
+schema_version: 1
+domain: framework
+
+options:
+  # Framework spec files are named by topic (thing.md) with ids suffixed
+  # -specification (thing-specification) — an established convention; links and
+  # history depend on the ids. Domain things (things/**) do match filenames.
+  id_filename_match: false
+
+types:
+  plan:
+    statuses: [not-started, in-progress, blocked, paused, completed, cancelled]
+  artifact: # WORKLOG, REVIEWLOG — generated running records
+    statuses: [evolving, stable, deprecated]
+
+# Declared relation vocabulary (validated at Warning severity).
+# Resolution of the 2026-06 retrospective's coherence finding: the vocabulary is
+# declared-and-validated, capturing the union in actual use. Prune at next
+# retrospective if any fall out of use.
+relations:
+  - informs
+  - implements
+  - extends
+  - extended-by
+  - complements
+  - references
+  - documents
+  - defines
+  - evaluates
+  - validates
+  - enforces
+  - enforced-by
+  - integrates-with
+  - operates-on
+  - operationalises
+  - invokes
+  - grounded-by
+  - informed-by
+  - implemented-by
+  - referenced-by
+  - invoked-by
+  - supports
+  - challenges
+  - supersedes
+  - superseded-by
+  - contradicts
+  - subtask
+  - dependency
+  - blocks
+  - related
+  - similar
+  - instance-of
+  - derived-from
+  - template-for
+  - applies-to
