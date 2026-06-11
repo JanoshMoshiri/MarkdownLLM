@@ -624,9 +624,10 @@ def cmd_index(args) -> int:
 # ---------------------------------------------------------------- tokens
 
 TIERS = {
-    "Tier 0 (always)": ["AGENTS.md", "thing.md", "orchestration.md"],
-    "Tier 1 (read/write/commit)": ["read.thing.md", "write.thing.md",
-                                   "validate.thing.md", "git-workflow.md"],
+    "Tier 0 (always)": ["AGENTS.md", "kernel.md"],
+    "Tier 1 (full specs, load individually on demand)": [
+        "thing.md", "orchestration.md", "read.thing.md", "write.thing.md",
+        "validate.thing.md", "git-workflow.md"],
     "Tier 2 (on demand)": [
         "domain-specification-guide.md", "scalability-guide.md", "thing-lifecycle.md",
         "llm-driven-systems.manifesto.md", "interface.md", "framework-discovery.md",
@@ -660,10 +661,8 @@ def cmd_tokens(args) -> int:
         totals[tier] = total
         print(f"  {'TIER TOTAL':<40} {total:>7,}\n")
     t0 = totals.get("Tier 0 (always)", 0)
-    t1 = totals.get("Tier 1 (read/write/commit)", 0)
     print(f"{'FULL LOAD':<42} {sum(totals.values()):>7,}")
-    print(f"{'Tier 0 alone':<42} {t0:>7,}")
-    print(f"{'Tier 0 + Tier 1':<42} {t0 + t1:>7,}")
+    print(f"{'Tier 0 (AGENTS.md + kernel.md)':<42} {t0:>7,}")
     return 0
 
 

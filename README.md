@@ -234,7 +234,7 @@ MarkdownLLM gives both parties what they need:
 - **Automatic discovery** — AGENTS.md is found at session start. No human has to remember to "load the context."
 - **Persistent knowledge** — Skills encode how to reason. Things encode what's been done. Git encodes what changed and when.
 - **Composable structure** — Each spec is self-contained but explicitly linked. The agent loads exactly what it needs.
-- **Validated integrity** — `validate.thing.md` gives the agent rules to check its own work against.
+- **Validated integrity** — mechanical validation (structure, references, schema conformance) is guaranteed by a deterministic tool, `tools/mdllm.py`, enforced by a git pre-commit hook: things with structural errors cannot be committed. The agent's validation duty is the part only reasoning can do — semantic coherence (`validate.thing.md`).
 - **Continuity across sessions** — At session end, the `session-end-continuity` and `worklog-update` prompts preserve insights and open threads as structured, committed knowledge. The next session picks up exactly where this one left off — not by reloading a conversation, but by reading committed state.
 
 **For the human:**
@@ -258,7 +258,8 @@ These are the specs the agent loads and reasons with:
 | [thing.md](thing.md) | The atomic unit specification — what a thing is, how it's structured |
 | [read.thing.md](read.thing.md) | How agents read and analyze things |
 | [write.thing.md](write.thing.md) | How agents create and update things |
-| [validate.thing.md](validate.thing.md) | How agents validate thing integrity |
+| [validate.thing.md](validate.thing.md) | The validation contract: the `mdllm` tool guarantees mechanical checks; the agent performs semantic ones |
+| [provenance.md](provenance.md) | Output traceability: `type: decision` records with commit-pinned inputs, quarantine for external content |
 | [interface.md](interface.md) | I/O layer: input routes, output types, deliverables vs things |
 | [git-workflow.md](git-workflow.md) | Git as state machine: commits, conventions, autocommit |
 | [framework-discovery.md](framework-discovery.md) | How domain agents locate the framework root |
@@ -282,6 +283,21 @@ Working domain implementations the agent can reference:
 
 - **[examples/compliance-patterns/](examples/compliance-patterns/)** — Regulatory compliance pattern library
 - **[examples/life-manager/](examples/life-manager/)** — Personal life and work management
+
+### The Deterministic Floor (`tools/mdllm.py`)
+
+Since v3.0, the framework pairs its specifications with a single-file CLI that guarantees everything mechanical, so the LLM spends its reliability on reasoning:
+
+```bash
+python tools/mdllm.py validate <domain>      # structure, references, schema — exit 1 on Errors
+python tools/mdllm.py install-hook <domain>  # pre-commit hook: broken things cannot be committed
+python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + horizon
+python tools/mdllm.py provenance <domain>    # decision pins resolve; no output rests on unverified content
+python tools/mdllm.py eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
+python tools/mdllm.py kernel                 # regenerate the operative kernel from spec blocks
+```
+
+Each domain declares its thing types and **its own status vocabularies** in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) (~1.6k tokens of operative rules) at session start instead of ~21k of full spec prose; the full specs remain the canonical elaboration, loaded on demand. Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
 
 ### Templates
 
