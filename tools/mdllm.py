@@ -817,7 +817,13 @@ HOOK_BODY = """#!/bin/sh
 # checked out or mounted (Windows, WSL, CI, sandboxed agent harnesses).
 ROOT="$(git rev-parse --show-toplevel)"
 MDLLM="$ROOT/{rel}"
-PY="$(command -v python3 || command -v python)"
+# Candidates are executed, not just resolved: on Windows, the Microsoft Store
+# ships alias stubs named python/python3 that command -v happily finds but
+# that only print an install hint and exit nonzero.
+PY=""
+for c in python3 python py; do
+  if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
+done
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
   echo "mdllm: validation floor unavailable (python or $MDLLM not found) — commit blocked."
   echo "Install Python 3.10+ with PyYAML, or re-run install-hook from the framework root."
