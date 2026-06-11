@@ -27,6 +27,9 @@ linked_things:
     relation: references
   - id: trigger-specification
     relation: references
+  - id: validate-thing-specification
+    relation: contradicts
+    notes: "Status vocabulary: domain-defined state machines vs Level 1 fixed enum — see conflict status-vocabulary-universal-vs-domain; resolution designated to transformation plan Phase 1"
 ---
 
 # Domain Specification Guide

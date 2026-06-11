@@ -13,6 +13,9 @@ linked_things:
     relation: integrates-with
   - id: derived-index-specification
     relation: validates
+  - id: domain-specification-guide
+    relation: contradicts
+    notes: "Status vocabulary: Level 1 fixed enum vs domain-defined state machines — see conflict status-vocabulary-universal-vs-domain; resolution designated to transformation plan Phase 1"
 ---
 
 # Validate Thing Skill
