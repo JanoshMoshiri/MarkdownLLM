@@ -70,13 +70,12 @@ This is where the reasoning lives — not just the data.
 
 **Determine session intent before loading specs.** Loading all framework specs eagerly costs ~65.5k tokens (measured 2026-06-11, tiktoken o200k_base via `python tools/mdllm.py tokens`) — a large share of a model's working context before any work begins. Load only what the session needs.
 
-**Tier 0 — Always load (~13.5k tokens):**
+**Tier 0 — Always load (~5.3k tokens):**
 - `AGENTS.md` — this file (already loaded)
-- `thing.md` — the atomic unit; required for all reasoning about the framework
-- `orchestration.md` — hard hooks are always active; commit behaviour is non-negotiable
+- `kernel.md` — the generated operative kernel: the rules of thing.md, orchestration.md, read/write/validate.thing.md, and git-workflow.md without their rationale (~1.6k tokens). Regenerate with `python tools/mdllm.py kernel` after any spec change.
 
-**Tier 1 — Load when the session involves reading, writing, or committing things (~13k additional):**
-- `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md`
+**Tier 1 — Load a full spec only when the kernel is not enough** — reasoning *about* the framework, evolving a spec, or resolving an ambiguity the kernel doesn't settle:
+- `thing.md`, `orchestration.md`, `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md` (~21.4k for all six — load individually, not wholesale)
 
 **Tier 2 — Load on demand by query type:**
 
@@ -95,7 +94,7 @@ This is where the reasoning lives — not just the data.
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 
-**Typical session cost (measured 2026-06-11):** Tier 0 alone ≈ 13.5k tokens. Tier 0 + Tier 1 ≈ 26.5k tokens. Full load (rare — new domain creation) ≈ 65.5k tokens. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
+**Typical session cost (measured 2026-06-11, post-kernel):** Tier 0 (AGENTS.md + kernel.md) ≈ 5.3k tokens — down from 26.5k for the pre-kernel Tier 0+1. Full-spec loads are now per-file and on-demand. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
 
 Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 
@@ -227,6 +226,7 @@ Before committing framework changes:
 - [ ] `python tools/mdllm.py validate .` passes — the pre-commit hook runs this anyway and blocks commits with Errors; running it first means you fix findings in the same operation rather than at the commit boundary
 - [ ] Status reflects reality (draft if new, evolving if actively changing) — the tool checks vocabulary validity; *you* check truthfulness
 - [ ] Version incremented if substantive change to a stable spec
+- [ ] Kernel regenerated (`python tools/mdllm.py kernel`) if any spec's `<!-- kernel -->` block or operative content changed
 - [ ] Commit message follows git-workflow.md conventions
 - [ ] WORKLOG updated with session activity
 

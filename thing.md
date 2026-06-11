@@ -25,6 +25,24 @@ linked_things:
 
 # Thing Definition
 
+<!-- kernel -->
+**A thing** = one markdown file: YAML frontmatter + narrative body. One identity, one reason to change.
+
+**Required fields:** `id` (kebab-case, stable, unique), `type`, `status`, `created` (ISO 8601).
+
+**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Emergent fields: add only when they serve reasoning.
+
+**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded.
+
+**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
+
+**Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md).
+
+**Decomposition:** extract content into its own linked thing when it serves a different audience, changes at a different rate, or could be reused independently. Wanting `instance-of`/`derived-from`/`template-for`/`applies-to` = the signal to separate.
+
+**Loading:** L1 metadata only · L2 +relationships · L3 full body. Match depth to query; never load everything for a broad question.
+<!-- /kernel -->
+
 ## What Is A Thing?
 
 A thing is the atomic unit of this framework. Everything is a thing. A project is a thing. A task within a project is a thing. A subtask is a thing. A dependency is a thing. A concept, an article, a recipe, a design pattern—all things. Even a simple action is a thing.

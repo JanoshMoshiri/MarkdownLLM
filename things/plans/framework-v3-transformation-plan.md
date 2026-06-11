@@ -87,10 +87,12 @@ exclusively on what only an LLM can do.
 - [x] session-memory.md v1.1: Session-Start Staleness Check section — live insights × things changed since `last_updated`, no new cadence, full sweep stays at retrospective
 - [x] session-orientation prompt v1.1: the check is Step 0 of the reasoning template
 
-### Phase 5 — The operative kernel
-- [ ] Each spec gains a delimited operative section (rules/tables/contracts) separate from rationale
-- [ ] `mdllm kernel` generates a provenance-stamped `kernel.md` loaded at Tier 0; full specs load only when reasoning *about* the framework
-- [ ] Measured against the Phase 0 baseline; target Tier 0 ~15k → ~5k tokens
+### Phase 5 — The operative kernel ✅ v1 COMPLETE (2026-06-11)
+- [x] `<!-- kernel -->` blocks added to the six Tier 0/1 specs (thing, orchestration, validate, git-workflow, read, write)
+- [x] `mdllm kernel` extracts blocks into provenance-stamped `kernel.md` (a derived index over the spec corpus)
+- [x] Measured: kernel.md = **1.6k tokens** replacing **21.4k** of full Tier 0+1 specs (93% reduction); new Tier 0 (AGENTS.md + kernel.md) ≈ 5.3k vs 26.5k baseline — target met
+- [x] Framework + jmtm AGENTS.md re-tiered: kernel at Tier 0, full specs load individually on demand; kernel regeneration added to the validation checklist
+- [ ] Kernel blocks for Tier 2 specs (session-memory, belief-revision, provenance, triggers, derived-index) — next session; diminishing returns since they're demand-loaded
 
 ### Phase 6 — Behavioral evals
 - [ ] 5–10 golden scenario fixtures per domain with expected assertions (files created, statuses set, figures correct, hooks fired)

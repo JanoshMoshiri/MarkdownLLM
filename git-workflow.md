@@ -21,6 +21,16 @@ linked_things:
 
 # Git Workflow
 
+<!-- kernel -->
+**The commit is the moment state becomes real.** Working directory = draft; commit = publication. Triggers, orientation, and audit all read committed state only.
+
+**Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
+
+**Message format:** `action: description` of the *domain state change* — `create: vat-return-2026-q1`, `complete: data-collection → unblocks quarterly-review`, never "modified 3 files". Git log is the domain's event stream and telemetry (velocity reads it directly; no index needed).
+
+**Autocommit:** per `git.autocommit` in AGENTS.md frontmatter. Always commit to the owning repo — walk up to the nearest `.git`.
+<!-- /kernel -->
+
 ## What This Specifies
 
 This document defines how git is used within the LLM-driven systems framework — not just as backup or version control, but as the **state machine** that makes things persistent, auditable, and reactive.

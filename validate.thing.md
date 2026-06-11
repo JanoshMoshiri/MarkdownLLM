@@ -20,6 +20,14 @@ linked_things:
 
 # Validate Thing
 
+<!-- kernel -->
+**Mechanical validation is the tool's job:** `python {framework_root}/tools/mdllm.py validate <path>` — structure, references, schema conformance, index integrity. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
+
+**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · open conflicts missing from continuity brief · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
+
+**Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
+<!-- /kernel -->
+
 You are validating things within a domain using the MarkdownLLM framework. Since
 v2.0, validation has two layers with a strict division of labour:
 

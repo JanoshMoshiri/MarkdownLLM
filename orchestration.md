@@ -29,6 +29,19 @@ linked_things:
 
 # Orchestration
 
+<!-- kernel -->
+**Hard hooks — always active, never skippable:**
+1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
+2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo.
+3. `session-start:version-check` — read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch: surface, run validation, offer `domain-refresh.md`.
+
+**Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
+
+**Domain hard hooks:** `hard_hooks: [{hook, action}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write`.
+
+**Restraint:** a prompt is a checklist, not a procedure manual; >10 domain prompts = over-specification; don't bind what narrative prose already handles reliably.
+<!-- /kernel -->
+
 ## What This Specifies
 
 This document defines the orchestration pattern — an **opt-in** tool for domains that need structured reasoning flow beyond what the framework's narrative specs naturally provide.
