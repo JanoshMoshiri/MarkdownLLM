@@ -150,6 +150,26 @@ Full framework review at Janosh's request (every spec, mdllm.py line-by-line, ev
 - Relations vocabulary prune (33 entries) deliberately deferred to the next retrospective per `_schema.yaml`'s own note — not this session's scope.
 - Full domain-specification-guide rewrite still open (tracked by insight `domain-spec-guide-predates-knowledge-primitives`); this session added the v3 addendum rather than rewriting 800 lines in a fix pass.
 
+### Session 5
+
+#### Topic: The full 2×2 ran — and measured convention-following, not reasoning
+
+The structure-beats-scale experiment executed end-to-end: 20 valid trials
+(haiku/opus × framework/bare, 5/cell, vat-quarter-basic), ~$7.2 total spend,
+all four cells run in parallel.
+
+#### Completed
+
+- [x] **Full 2×2 run:** haiku/bare 86% (0/5 perfect) · haiku/framework 94% (3/5) · opus/bare 89% (1/5) · opus/framework **100% (5/5)** — the only deterministic cell
+- [x] **Report hygiene:** pre-fix smoke run (20260611-125556, 1/7 against the pre-fix id template through the broken runner) moved to `evals/runs/_excluded-pre-fix/` so `eval --report` aggregates only valid trials
+- [x] **Honest reading recorded:** all 20 trials got the figures right (the blocked-VAT discriminator saturated); the entire variance was the asymmetric `has-deadline` link assertion — insight `first-2x2-measured-convention-following-not-reasoning`, results + reading added to `evals/README.md`
+- [x] Continuity brief updated; model-experiment open thread closed
+
+#### Decisions Made
+
+- haiku/framework link misses stay unpatched (per `fixture-fixes-correct-bugs-not-difficulty`): opus+framework 5/5 with identical AGENTS.md is the control proving the instructions are followable — patching would corrupt the measurement.
+- The manifesto's declarative claim is not yet supported *or* refuted by this run — the fixture couldn't put the reasoning component under load. Next session: a harder fixture whose condition-neutral core discriminates, plus a claim-language pass (tested-hypothesis framing) in README/manifesto.
+
 ---
 
 ## 8 June 2026

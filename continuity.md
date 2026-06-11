@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.0
+version: 1.1
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-11
@@ -12,13 +12,17 @@ last_updated: 2026-06-11
 
 ## Open Threads
 
-- **Run the model experiment (next session's centerpiece):** Stage 2 runner is
-  now confirmed working end-to-end on Windows (smoke test 2026-06-11, see
-  Decisions below) — scored 6/7 on vat-quarter-basic (haiku, framework). The
-  2×2 protocol (haiku/opus × framework/bare, ≥5 trials/cell) is in
-  `evals/README.md`. Next action: run the full protocol. The remaining 1/7
-  (`linked_things` vs `relations` on the has-deadline link) is a known finding,
-  not a bug — left as-is per `fixture-fixes-correct-bugs-not-difficulty`.
+- **Harder fixture + claim-language pass (next session's centerpiece):** the
+  full 2×2 ran (2026-06-11, 20 trials, see Decisions) but the fixture's
+  reasoning core saturated — every cell got the figures right, all variance
+  was the asymmetric `has-deadline` link. Two follow-ups: (1) design a
+  fixture whose condition-neutral core discriminates (candidates: partial
+  exemption, multi-quarter with conflicting/duplicate records, an
+  amendment/belief-revision flow, distractor things), then re-run the 2×2;
+  (2) soften the declarative structure-beats-scale claim in README.md
+  ("The result: ...") and manifesto §elegant-constraint to tested-hypothesis
+  framing, citing first results honestly. See
+  `first-2x2-measured-convention-following-not-reasoning`.
 - **Tier 2 kernel blocks:** session-memory, belief-revision, provenance,
   triggers, derived-index — low priority (demand-loaded anyway).
 - **First jmtm decision-record filing:** annual accounts due 2026-07-31 —
@@ -29,6 +33,13 @@ last_updated: 2026-06-11
 
 ## Live Insights
 
+- `first-2x2-measured-convention-following-not-reasoning` — the 2026-06-11
+  run's honest reading: structure bought determinism (opus+fw 5/5), the
+  diagonal went the manifesto's way at ~23% cost, but the reasoning claim
+  remains untested until a fixture's condition-neutral core discriminates.
+- `fixture-fixes-correct-bugs-not-difficulty` — when a Stage 2 trial fails,
+  fix fixture self-consistency bugs (id templates, schema names) but leave
+  genuine model reasoning/attention gaps as findings, not patches.
 - `hook-compliance-correlates-with-scope-not-awareness` — fix missed hooks by
   reducing load, not adding rules; the justification for the deterministic floor.
 - `tracking-artifacts-can-drift-from-reality` — motivates generated-not-maintained
@@ -37,29 +48,27 @@ last_updated: 2026-06-11
   mechanisms; canonical articulation of the paradigm.
 - `derived-index-is-attention-cache-not-search-layer` — governs the Phase 5 kernel
   (a derived index over the spec corpus itself).
-- `fixture-fixes-correct-bugs-not-difficulty` — when a Stage 2 trial fails,
-  fix fixture self-consistency bugs (id templates, schema names) but leave
-  genuine model reasoning/attention gaps as findings, not patches.
 - Remaining active insights in `things/insights/` inform spec-level detail.
 
 ## Pending Decisions
 
-- (none — session 2026-06-11 cleared the queue)
+- (none)
 
-## Decisions Made This Session (2026-06-11)
+## Decisions Made This Session (2026-06-11, session 5)
 
-- `mdllm` lives in `tools/`; Python + PyYAML. Relation vocabularies
-  declared-and-validated per domain schema. Status vocabularies domain-owned
-  (conflict resolved, `superseded` — see `decision-status-vocabulary-domain-owned`,
-  the first pinned decision record).
-- Kernel format: `<!-- kernel -->` blocks in specs, extracted by `mdllm kernel`
-  into generated `kernel.md`. Measured: 1.6k tokens replacing 21.4k (see insight
-  `operative-rules-are-a-small-fraction-of-spec-prose`).
-- Stage 2 smoke test (commit `1ada8ed`): fixed two Windows-only bugs in
-  `cmd_eval` — (1) `cmd[0]` was never set to the `shutil.which`-resolved path;
-  (2) resolving to `claude.CMD` still isn't enough, since invoking the shim
-  routes through cmd.exe and mangles `--permission-mode acceptEdits` /
-  `Bash(git:*)`. Now resolves to `claude-code/bin/claude.exe` directly. Also
-  fixed the vat-quarter-basic id-template mismatch (`vat-return-[YYYY-MM]-to-[MM]`).
-  Decided NOT to fix the `linked_things` vs `relations` gap — see
-  `fixture-fixes-correct-bugs-not-difficulty`.
+- **Full 2×2 executed** (~$7.2, 20 valid trials, vat-quarter-basic):
+  haiku/bare 86% (0/5 perfect) · haiku/fw 94% (3/5) · opus/bare 89% (1/5) ·
+  opus/fw **100% (5/5)** — the only deterministic cell. Per-trial detail in
+  `evals/runs/*/result.json`; table + honest reading in `evals/README.md`.
+- **haiku/fw link misses left unpatched:** opus/fw 5/5 with identical
+  AGENTS.md is the control proving the docs are followable — the gap is
+  capability under load (the measurement), not a clarity bug. Tuning the
+  spec until haiku passes would overfit the framework to one eval and
+  destroy the finding.
+- **Pre-fix smoke run excluded from the report** (moved to
+  `evals/runs/_excluded-pre-fix/`): it scored 1/7 against the
+  self-inconsistent pre-fix fixture through the broken Windows runner —
+  different fixture, different code path, not a valid trial.
+- **Claim status:** neither supported nor refuted — the experiment as run
+  couldn't load the reasoning component. No spec/manifesto edits made this
+  session (closing down); queued as next session's centerpiece.

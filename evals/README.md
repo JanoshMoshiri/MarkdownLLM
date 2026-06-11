@@ -76,6 +76,28 @@ Report per-assertion results, not just totals, so the comparison stays honest:
 the figures assertions (output/input/net VAT) are condition-neutral; the
 link/status assertions measure structure-following.
 
+### First results (2026-06-11, vat-quarter-basic, 5 trials/cell)
+
+| model | condition | fully passing | assertion pass rate | mean wall s | mean cost $ |
+|---|---|---|---|---|---|
+| haiku | bare | 0/5 | 30/35 (86%) | 64 | 0.070 |
+| haiku | framework | 3/5 | 33/35 (94%) | 77 | 0.096 |
+| opus | bare | 1/5 | 31/35 (89%) | 115 | 0.417 |
+| opus | framework | 5/5 | 35/35 (100%) | 197 | 0.858 |
+
+**Honest reading:** the fixture's reasoning core saturated — all 20 trials in
+all cells got the figures right, including the blocked-VAT trap. Every point
+of variance was the `has-deadline` link assertion (the asymmetric one above).
+So this run shows structure buying determinism (opus+framework is the only
+5/5 cell) and the diagonal going the manifesto's way at ~23% of the cost
+(haiku+framework 94% / $0.096 vs opus+bare 89% / $0.417), but it does **not**
+yet test the claim's reasoning component. A harder fixture, where the
+condition-neutral figures actually discriminate, is needed before the claim
+can cite this experiment. See insight
+`first-2x2-measured-convention-following-not-reasoning`. (The pre-fix smoke
+run lives in `evals/runs/_excluded-pre-fix/`, excluded from the report — it
+ran against the fixture's pre-fix id template through a broken runner.)
+
 ## Conventions
 
 - One fixture per scenario, named `<domain>-<scenario>.yaml`
