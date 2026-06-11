@@ -170,6 +170,32 @@ all four cells run in parallel.
 - haiku/framework link misses stay unpatched (per `fixture-fixes-correct-bugs-not-difficulty`): opus+framework 5/5 with identical AGENTS.md is the control proving the instructions are followable — patching would corrupt the measurement.
 - The manifesto's declarative claim is not yet supported *or* refuted by this run — the fixture couldn't put the reasoning component under load. Next session: a harder fixture whose condition-neutral core discriminates, plus a claim-language pass (tested-hypothesis framing) in README/manifesto.
 
+### Session 6
+
+#### Topic: External review committed through a new harness — Cowork as the first measured non-IDE data point
+
+An independent full-corpus review (Claude/Fable, run from Anthropic Cowork — a
+desktop agent sandbox) was accepted and committed, and the act of committing it
+became a live harness test: Cowork does not auto-discover AGENTS.md, and the
+installed pre-commit hook could not run there at all.
+
+#### Completed
+
+- [x] **Independent review accepted and filed:** `reviews/REVIEW-independent-2026-06-11.md` (artifact, stable) — verdict, contradictions (birth-path staleness: template/framework-discovery/guide:294), over/under-engineering calls, and a priority queue now registered as the top open thread in `continuity.md`
+- [x] **Hook portability fix:** the installed hook hardcoded `C:/Users/...` and bare `python` — unrunnable anywhere but the authoring machine. `install-hook` now emits a portable script (repo root via `git rev-parse`, interpreter via `command -v python3 || python`, relative mdllm path, explicit floor-unavailable error); reinstalled and verified passing in the sandbox
+- [x] **Insight recorded:** `agents-md-discovery-is-harness-dependent` — discovery and the floor are harness/environment properties; bootstrap line should become a first-class discovery route in framework-discovery.md
+- [x] **Commit test passed:** three structured commits through the validating hook from the sandbox (after clearing a stale `index.lock` via the harness's delete-permission flow); corpus clean at 48 things
+- [x] Continuity brief updated; session-end ritual run
+
+#### Decisions Made
+
+- Commits made by agents are authored under the operator's standard git identity, not an agent-named author — uniform log, authorship-by-session recorded here instead.
+- The review's action queue is adopted as-is into continuity; first items (birth-path staleness, examples under the floor) are next-session candidates alongside the harder eval fixture.
+
+#### Reflections
+
+- Cowork quirk worth remembering: its file mount can serve stale, truncated views of files *modified* by the harness's file tools (new files are fine). Near git this is dangerous — a truncated file could be staged. Workaround used: write commit-bound modifications through the shell side, which is authoritative.
+
 ---
 
 ## 8 June 2026

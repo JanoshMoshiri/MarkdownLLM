@@ -80,21 +80,18 @@ last_updated: 2026-06-11
 
 - (none)
 
-## Decisions Made This Session (2026-06-11, session 5)
+## Decisions Made This Session (2026-06-11, session 6)
 
-- **Full 2×2 executed** (~$7.2, 20 valid trials, vat-quarter-basic):
-  haiku/bare 86% (0/5 perfect) · haiku/fw 94% (3/5) · opus/bare 89% (1/5) ·
-  opus/fw **100% (5/5)** — the only deterministic cell. Per-trial detail in
-  `evals/runs/*/result.json`; table + honest reading in `evals/README.md`.
-- **haiku/fw link misses left unpatched:** opus/fw 5/5 with identical
-  AGENTS.md is the control proving the docs are followable — the gap is
-  capability under load (the measurement), not a clarity bug. Tuning the
-  spec until haiku passes would overfit the framework to one eval and
-  destroy the finding.
-- **Pre-fix smoke run excluded from the report** (moved to
-  `evals/runs/_excluded-pre-fix/`): it scored 1/7 against the
-  self-inconsistent pre-fix fixture through the broken Windows runner —
-  different fixture, different code path, not a valid trial.
-- **Claim status:** neither supported nor refuted — the experiment as run
-  couldn't load the reasoning component. No spec/manifesto edits made this
-  session (closing down); queued as next session's centerpiece.
+- **Review accepted** (status: stable): `reviews/REVIEW-independent-2026-06-11.md`
+  — its action queue stands as the top open thread above.
+- **First non-IDE harness test run (Cowork):** no AGENTS.md auto-discovery;
+  pre-commit hook couldn't execute (machine-absolute path, bare `python`).
+  Hook made portable and reinstalled (`fix:` commit); insight
+  `agents-md-discovery-is-harness-dependent` records both failure modes.
+  Operator to verify the reinstalled `.git/hooks/pre-commit` contains no
+  absolute path (it now resolves root and interpreter at run time).
+- **Commit authorship convention:** agent commits are authored as the operator's
+  standard identity (Janosh Moshiri, GitHub noreply) — no agent-named authors;
+  the WORKLOG records which sessions were agent-operated.
+- **Session-5 decisions** (full 2×2 results and the unpatched haiku link misses)
+  are preserved in WORKLOG 11 June, Session 5 — removed here to keep the brief lean.
