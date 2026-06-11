@@ -23,8 +23,9 @@ domain's types and status vocabularies are declared in `things/_schema.yaml`.
 ## VAT Return Workflow
 
 1. **Open** — create a `type: vat-return` thing for the period, id
-   `vat-return-[YYYY-MM]-to-[YYYY-MM]`, status `open`. Link the period's
-   `filing-deadline` thing with `relation: has-deadline`.
+   `vat-return-[YYYY-MM]-to-[MM]` (e.g. `vat-return-2026-02-to-04`, matching
+   the `filing-deadline-vat-[YYYY-MM]-to-[MM]` convention), status `open`.
+   Link the period's `filing-deadline` thing with `relation: has-deadline`.
 2. **Output VAT** — sum `vat_amount` across all `income-record` things dated in
    the period. Record as `output_vat`.
 3. **Input VAT** — sum `vat_amount` across `expense-record` things dated in the

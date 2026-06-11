@@ -934,6 +934,20 @@ def eval_report(root: Path) -> int:
     return 0
 
 
+def _resolve_claude_cli(exe: str) -> str:
+    """On Windows, npm installs `claude` as a .CMD shim around a real .exe;
+    running the shim via subprocess routes through cmd.exe, whose argument
+    quoting mangles flags containing `(`, `)`, `*` (e.g. `Bash(git:*)`,
+    `--permission-mode acceptEdits`). Resolve to the underlying binary."""
+    p = Path(exe)
+    if p.suffix.lower() in (".cmd", ".bat"):
+        real = (p.parent / "node_modules" / "@anthropic-ai" / "claude-code"
+                / "bin" / "claude.exe")
+        if real.is_file():
+            return str(real)
+    return exe
+
+
 def cmd_eval(args) -> int:
     """Stage 1 (default): assert a fixture against an existing domain's state.
     Stage 2 (--run): seed an isolated workspace, run a fresh headless agent on
@@ -987,6 +1001,7 @@ def cmd_eval(args) -> int:
         if not exe:
             sys.exit("mdllm: `claude` CLI not on PATH — install "
                      "@anthropic-ai/claude-code or use --dry-run")
+        cmd[0] = _resolve_claude_cli(exe)
         t0 = dt.datetime.now()
         try:
             proc = subprocess.run(cmd, cwd=run_dir, capture_output=True, text=True,
