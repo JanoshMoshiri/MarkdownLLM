@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.1
+version: 1.2
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-11
@@ -30,10 +30,20 @@ last_updated: 2026-06-11
 - **Harness support is now measured, not assumed:** first non-IDE harness
   session (Cowork, 2026-06-11) — no AGENTS.md auto-discovery; the installed
   pre-commit hook couldn't run (machine-absolute path, bare `python`). Hook
-  made portable same session (repo-relative, runtime interpreter resolution).
-  Remaining: spec the explicit bootstrap line in framework-discovery.md as a
-  first-class discovery route; re-mark the README vendor table designed-for vs
-  verified-on. See `agents-md-discovery-is-harness-dependent`.
+  made portable same session (repo-relative, runtime interpreter resolution)
+  — and that fix itself failed on the authoring machine next session (Windows
+  Store `python3` alias stub resolvable-but-not-executable; fixed `32d5c6f`,
+  hook now executes candidates rather than resolving them). Remaining: spec
+  the explicit bootstrap line in framework-discovery.md as a first-class
+  discovery route; re-mark the README vendor table designed-for vs
+  verified-on; consider `install-hook` self-testing its emitted script. See
+  `agents-md-discovery-is-harness-dependent`,
+  `portability-claims-need-execution-tests`.
+- **Domain visual map:** replicate `framework-map.md` for a live domain
+  (eco-essentials or jmtm-software) — same three-view structure (elevation,
+  link graph, floor mapping), but domains have skills and live things where
+  the framework has specs. Explicitly deferred by the operator (2026-06-11,
+  session 7) to a future session.
 - **Harder fixture + claim-language pass (next session's centerpiece):** the
   full 2×2 ran (2026-06-11, 20 trials, see Decisions) but the fixture's
   reasoning core saturated — every cell got the figures right, all variance
@@ -59,6 +69,10 @@ last_updated: 2026-06-11
   harness/environment properties, not framework properties; the Cowork session
   is the first measured harness data point (partial failure; hook fixed
   in-session).
+- `portability-claims-need-execution-tests` — a floor/portability claim is
+  verified only by executing the capability in the target environment;
+  resolution (command found, path exists) is not verification. The commit
+  test is the floor's execution probe in any new environment.
 - `first-2x2-measured-convention-following-not-reasoning` — the 2026-06-11
   run's honest reading: structure bought determinism (opus+fw 5/5), the
   diagonal went the manifesto's way at ~23% cost, but the reasoning claim
@@ -80,18 +94,20 @@ last_updated: 2026-06-11
 
 - (none)
 
-## Decisions Made This Session (2026-06-11, session 6)
+## Decisions Made This Session (2026-06-11, session 7)
 
-- **Review accepted** (status: stable): `reviews/REVIEW-independent-2026-06-11.md`
-  — its action queue stands as the top open thread above.
-- **First non-IDE harness test run (Cowork):** no AGENTS.md auto-discovery;
-  pre-commit hook couldn't execute (machine-absolute path, bare `python`).
-  Hook made portable and reinstalled (`fix:` commit); insight
-  `agents-md-discovery-is-harness-dependent` records both failure modes.
-  Operator to verify the reinstalled `.git/hooks/pre-commit` contains no
-  absolute path (it now resolves root and interpreter at run time).
-- **Commit authorship convention:** agent commits are authored as the operator's
-  standard identity (Janosh Moshiri, GitHub noreply) — no agent-named authors;
-  the WORKLOG records which sessions were agent-operated.
-- **Session-5 decisions** (full 2×2 results and the unpatched haiku link misses)
-  are preserved in WORKLOG 11 June, Session 5 — removed here to keep the brief lean.
+- **framework-map.md created** (`type: guide`, draft): the framework's visual
+  orientation layer — five-band elevation, spec-layer dependency graph from
+  `linked_things` frontmatter, mdllm subcommand → spec mapping. Mermaid, so it
+  diffs and renders on GitHub. Registered in AGENTS.md (Tier 2 routing +
+  Guides). Its "keeping this map honest" section names the mechanical source
+  of truth per view; frontmatter wins on disagreement.
+- **Hook interpreter resolution falsified and fixed** (`32d5c6f`): the
+  session-6 "portable" hook blocked all commits on the authoring machine —
+  `command -v python3` matched the Windows Store alias stub. `HOOK_BODY` now
+  executes candidates (`-c "import sys"`); 30 tests pass; both session
+  commits went through the repaired hook. Insight:
+  `portability-claims-need-execution-tests`.
+- **Session-6 decisions** (review acceptance, authorship convention, first
+  Cowork harness run) are preserved in WORKLOG 11 June, Session 6 — removed
+  here to keep the brief lean.

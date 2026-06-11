@@ -2,7 +2,7 @@
 id: framework-worklog
 type: artifact
 status: evolving
-version: 2.2
+version: 2.3
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -195,6 +195,33 @@ installed pre-commit hook could not run there at all.
 #### Reflections
 
 - Cowork quirk worth remembering: its file mount can serve stale, truncated views of files *modified* by the harness's file tools (new files are fine). Near git this is dangerous — a truncated file could be staged. Workaround used: write commit-bound modifications through the shell side, which is authoritative.
+
+### Session 7
+
+#### Topic: Visual orientation layer — framework-map.md; the "portable" hook falsified on its own authoring machine
+
+The operator raised that spec frameworks lack the shape-recognition intimacy a
+scrollable codebase gives a fifteen-year developer, and asked for a visual map
+of the framework. Three views were built interactively (elevation, spec
+dependency graph from `linked_things` frontmatter, mdllm subcommand → spec
+mapping) and committed as `framework-map.md`. The first commit attempt was
+blocked by the session-6 hook — exposing a second portability failure.
+
+#### Completed
+
+- [x] **framework-map.md created** (guide, draft): three Mermaid views — five-band elevation (entry / specs / things / floor / git), the spec layer's what-defines-what graph (manifesto → thing.md ← extensions; kernel-core boundary), and the nine-subcommand floor mapping (solid = enforces/measures, dashed = generates). Includes the compressed mental model ("one atom, six operative rules, everything else is layering"), the navigation rule (start at thing.md, follow one `extends` edge), and a "keeping this map honest" section naming each view's mechanical source of truth
+- [x] **Registered in AGENTS.md:** Tier 2 routing row (orienting in the framework structure) + Guides section entry
+- [x] **Hook interpreter fix (`32d5c6f`):** `command -v python3 || command -v python` matched the Windows Store alias stub (resolvable, not executable; the real install ships `python` only, so the stub short-circuited the chain) and blocked all commits on the authoring machine. `HOOK_BODY` now executes each candidate (`"$c" -c "import sys"`) before accepting it; hook reinstalled; 30/30 tests pass; both session commits landed through the repaired hook — no `--no-verify`
+- [x] **Insight recorded:** `portability-claims-need-execution-tests` — verification by resolution stops one step short of verification by execution; the commit test is the floor's execution probe in any new environment
+- [x] Continuity brief updated (v1.2); session-end ritual run
+
+#### Decisions Made
+
+- The framework map is hand-drawn (not generated) for now, with drift risk handled editorially: each view names its mechanical source of truth and frontmatter wins on disagreement. Generating it via a future `mdllm` subcommand stays an open possibility, not a commitment.
+
+#### Deferred
+
+- [ ] **Domain visual map** (eco-essentials or jmtm-software): same three-view structure adapted to a domain's shape (skills and live things instead of specs). Operator explicitly deferred to a future session.
 
 ---
 
