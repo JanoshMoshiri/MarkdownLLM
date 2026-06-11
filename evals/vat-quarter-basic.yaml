@@ -1,0 +1,28 @@
+name: VAT quarter prep (synthetic, known-correct figures)
+description: >
+  Stage 2 golden scenario. Seed: Meridian Web Studio Ltd, Feb-Apr 2026 — three
+  income records (output VAT 800 + 1200 + 500 = 2500.00) and four expenses, one
+  of which is blocked client entertainment (input VAT 240 + 60 + 80 = 380.00;
+  the 50.00 entertainment VAT must NOT be reclaimed). Correct net due: 2120.00.
+  The blocked-entertainment trap is the discriminator: a model that sums all
+  expense VAT gets 430.00 and fails.
+seed: evals/seeds/vat-quarter-basic
+prompt: |
+  Prepare the VAT return for the period 2026-02-01 to 2026-04-30, following the
+  VAT Return Workflow in AGENTS.md. Work through to figures-ready — do not
+  submit. Commit your changes as you go.
+bare_preamble: |
+  You are in a directory of markdown files with YAML frontmatter representing
+  the business records of Meridian Web Studio Ltd, a UK company on standard-rate
+  VAT. Create a file things/vat-return-2026-02-to-04.md with YAML frontmatter
+  (id, type: vat-return, status, created, output_vat, input_vat, net_vat_due)
+  recording the company's VAT position for the period, with status
+  figures-ready when the figures are complete.
+assertions:
+  - thing_exists: vat-return-2026-02-to-04
+  - status: { id: vat-return-2026-02-to-04, equals: figures-ready }
+  - field: { id: vat-return-2026-02-to-04, name: output_vat, equals: 2500.00 }
+  - field: { id: vat-return-2026-02-to-04, name: input_vat, equals: 380.00 }
+  - field: { id: vat-return-2026-02-to-04, name: net_vat_due, equals: 2120.00 }
+  - link: { from: vat-return-2026-02-to-04, relation: has-deadline, to: filing-deadline-vat-2026-02-to-04 }
+  - validates_clean: true

@@ -12,18 +12,19 @@ last_updated: 2026-06-11
 
 ## Open Threads
 
-- **Eval Stage 2 (highest-value next):** the headless agent loop — seed temp
-  worktree, run fresh agent on scenario prompt, assert via `mdllm eval`. Unblocks
-  the small-vs-large model experiment (the manifesto's testable claim).
+- **Run the model experiment (next session's centerpiece):** Stage 2 runner is
+  built and dry-run-verified; the 2×2 protocol (haiku/opus × framework/bare,
+  ≥5 trials/cell) is in `evals/README.md`. Needs `claude` CLI on PATH
+  (`npm i -g @anthropic-ai/claude-code`) — it was absent in the desktop-app
+  session that built the runner, so the agent-invocation path is untested.
+  First action: one live haiku framework trial as a smoke test.
 - **Tier 2 kernel blocks:** session-memory, belief-revision, provenance,
   triggers, derived-index — low priority (demand-loaded anyway).
-- **First jmtm decision-record filing:** annual accounts due 2026-07-31 — prepare
-  through a `type: decision` with pinned inputs (provenance.md's first production
-  use). Register `adapters/scheduled-triggers.ps1` in Task Scheduler before then.
-- **jmtm orphan records:** 8 expense/profile things unlinked — domain agent
-  should link them when the FY2025 accounts/CT return are prepared.
-- **Push pending:** all of 2026-06-11's commits (framework + jmtm) are local;
-  harness blocked direct push — Janosh runs `git push origin main --tags`.
+- **First jmtm decision-record filing:** annual accounts due 2026-07-31 —
+  prepare through a `type: decision` with pinned inputs. Register
+  `adapters/scheduled-triggers.ps1` in Task Scheduler before then.
+- **jmtm orphan records:** 8 expense/profile things unlinked — link them when
+  the FY2025 accounts/CT return are prepared.
 
 ## Live Insights
 

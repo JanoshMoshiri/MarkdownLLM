@@ -97,7 +97,9 @@ exclusively on what only an LLM can do.
 ### Phase 6 — Behavioral evals ⚙ STAGE 1 COMPLETE (2026-06-11)
 - [x] `mdllm eval --fixture`: deterministic assertion engine (thing_exists, status, field, link, validates_clean) — see `evals/README.md`
 - [x] First fixture: `evals/jmtm-vat-2026q1-filed.yaml` — regression net over the completed VAT cycle, 6/6 passing against the live domain
-- [ ] Stage 2: the full loop — seed a temp worktree, run a fresh headless agent session on the scenario prompt, assert the result. This is what makes spec changes measurable and enables the model experiment
+- [x] Stage 2: the full loop — `mdllm eval --run` seeds an isolated git workspace from the fixture's `seed/`, invokes a headless agent (`claude -p`, json output → score/cost/time/turns), asserts the result. `--bare` strips AGENTS.md/skills/schema for the no-framework condition; `--trials N`; `--dry-run`. Verified: workspace seeding both conditions, negative test (6/7 assertions fail against unworked seed), bare stripping
+- [x] First Stage 2 fixture: `evals/vat-quarter-basic.yaml` + synthetic seed domain (Meridian Web Studio) with known-correct arithmetic and a blocked-entertainment-VAT discriminator (naive sum 430 vs correct 380)
+- [ ] First live runs — needs `claude` CLI on PATH (not present in the desktop-app session that built this); protocol in `evals/README.md`
 - [ ] Grow to 5–10 fixtures per domain as workflows complete
 
 ### Phase 7 — New powers ⚙ ADAPTERS LANDED (2026-06-11)
@@ -105,7 +107,7 @@ exclusively on what only an LLM can do.
 - [x] Proactive operation: `adapters/scheduled-triggers.ps1` — daily `mdllm triggers` with Windows toast on hits; registration via schtasks (one command, documented in the script)
 - [x] CI: `.github/workflows/validate.yml` — validate + provenance + index drift on every push/PR
 - [x] Claude Code vendor adapter example: `adapters/claude-code.settings.example.json` (PostToolUse validation)
-- [ ] Test the manifesto: small-vs-large model eval run — blocked on Phase 6 Stage 2
+- [ ] Test the manifesto: small-vs-large model eval run — **unblocked**; 2×2 protocol documented in `evals/README.md`; needs `claude` CLI + ≥5 trials/cell
 
 ## Sequencing
 

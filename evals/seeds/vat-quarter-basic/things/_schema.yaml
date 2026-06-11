@@ -1,0 +1,22 @@
+# Normative schema — Meridian Web Studio Ltd (synthetic eval domain)
+schema_version: 1
+domain: meridian-vat
+
+types:
+  vat-return:
+    statuses: [open, figures-ready, submitted, paid, reconciled]
+  income-record:
+    statuses: [pending, confirmed]
+  expense-record:
+    statuses: [pending, confirmed]
+  filing-deadline:
+    statuses: [upcoming, met, missed]
+    required_fields: [due_date]
+
+relations:
+  - has-deadline
+  - tracks
+  - related
+  - references
+  - informs
+  - derived-from

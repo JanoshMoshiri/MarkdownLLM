@@ -108,10 +108,25 @@ Continued directly from Session 1 at Janosh's direction ("keep going until the l
 
 #### To Do (next session)
 
-- [ ] Eval Stage 2: headless agent loop (seed worktree → fresh session → assert) — unblocks the small-model experiment
+- [x] Eval Stage 2 — completed same day, Session 3 below
 - [ ] Tier 2 kernel blocks (low priority)
 - [ ] Register scheduled-triggers.ps1 in Task Scheduler before the accounts deadline window
-- [ ] `git push origin main --tags` (blocked for the agent this session) + push jmtm repo
+
+### Session 3
+
+#### Topic: Coherence review pass + Eval Stage 2 (the model experiment is now runnable)
+
+#### Completed
+
+- [x] **Review pass (v3.2.1):** full floor sweep clean on both repos; caught `mdllm tokens` still measuring pre-kernel tiering (fixed — Tier 0 measured 5,592 tokens, confirming the 5.3k claim) and the public README still describing v2.x (deterministic-floor section, provenance row, validated-integrity bullet updated)
+- [x] **Eval Stage 2 runner:** `mdllm eval --run` — seeds an isolated git workspace from the fixture's `seed/`, invokes a headless agent (`claude -p`, json → score/cost/time/turns), runs Stage 1 assertions on the result. Flags: `--model`, `--trials`, `--bare` (strips AGENTS.md/skills/schema for the no-framework condition), `--dry-run`, `--timeout`. Run dirs under `evals/runs/` (gitignored, kept as evidence)
+- [x] **First Stage 2 fixture:** `evals/vat-quarter-basic.yaml` + synthetic seed (Meridian Web Studio Ltd, 8 things, validates clean). Known-correct arithmetic: output 2500.00 / input 380.00 / net 2120.00, with a blocked-entertainment-VAT discriminator (naive sum = 430.00 → fail)
+- [x] **Verified without an agent:** negative test (6/7 assertions fail against the unworked seed — they discriminate), dry-run workspace seeding for both conditions, bare condition confirmed data-only
+- [x] `evals/README.md`: Stage 2 usage + the 2×2 structure-beats-scale protocol (haiku/opus × framework/bare, ≥5 trials/cell)
+
+#### Limits
+
+- `claude` CLI not on PATH in this desktop-app session — the actual agent-invocation path is **untested**. First action next session: install CLI, run one live haiku/framework trial as a smoke test, then the full 2×2.
 
 ---
 

@@ -27,11 +27,37 @@ assertions:
 running a workflow with the agent: did it leave the domain in the contracted
 state? Also usable in CI as a regression net over committed state.
 
-**Stage 2 (next):** the full loop — copy a fixture's `seed/` things into a temp
-worktree, run a fresh agent session against it with the scenario prompt
-(headless, e.g. `claude -p`), then run Stage 1 assertions on the result. That is
-what makes "did this spec change improve agent behaviour?" answerable, and what
-enables the small-model-vs-structure experiment from the manifesto.
+**Stage 2 (implemented):** the full loop. The fixture adds `seed` (a directory
+copied into an isolated git workspace under `evals/runs/`, gitignored) and
+`prompt` (the scenario instruction). The runner invokes a fresh headless agent
+(`claude -p`, requires the CLI on PATH: `npm i -g @anthropic-ai/claude-code`),
+then runs the Stage 1 assertions on whatever the agent left behind, recording
+score, wall time, cost, and turns per trial.
+
+```bash
+# the framework condition
+python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --model haiku --trials 5
+# the no-framework condition: same data, AGENTS.md/skills/schema stripped
+python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --model haiku --trials 5 --bare
+# inspect what a run would do without invoking an agent
+python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --dry-run
+```
+
+## The structure-beats-scale experiment
+
+The manifesto claims a smaller model in a well-defined domain outperforms a
+larger model without structure. The 2×2 that tests it:
+
+| | framework | bare |
+|---|---|---|
+| **haiku** | `--model haiku` | `--model haiku --bare` |
+| **opus** | `--model opus` | `--model opus --bare` |
+
+Protocol: ≥5 trials per cell per fixture (models are stochastic — single runs
+mean nothing); score = assertion pass rate; report cost and wall time alongside.
+The first fixture (`vat-quarter-basic`) embeds a discriminator: blocked
+client-entertainment VAT that must *not* be reclaimed — summing naively gives
+430.00 instead of 380.00. Run directories are kept as evidence; prune manually.
 
 ## Conventions
 

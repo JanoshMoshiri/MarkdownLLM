@@ -54,7 +54,8 @@ TERMINAL_STATUSES = {"completed", "cancelled", "met", "reconciled", "closed", "f
                      "resolved", "dismissed", "deprecated"}
 
 DEFAULT_EXCLUDES = {".git", ".claude", "node_modules", "templates", "examples",
-                    "domain", "domains", "tools", "adapters", "outputs", "deliverables"}
+                    "domain", "domains", "tools", "adapters", "evals", "outputs",
+                    "deliverables"}
 NON_THING_FILES = {"AGENTS.md", "CLAUDE.md", "README.md", "CONTRIBUTING.md",
                    "CHANGELOG.md", "LICENSE"}
 
@@ -782,28 +783,18 @@ python "$MDLLM" validate "{root}" --quiet || {{
 """
 
 
-def cmd_eval(args) -> int:
-    """Check a golden-scenario fixture's assertions against a domain's state.
-
-    Fixture (YAML): {name, description, assertions: [...]}. Assertion kinds:
-      - {thing_exists: <id>}
-      - {status: {id: <id>, equals: <value>}}
-      - {field: {id: <id>, name: <field>, equals: <value>}}
-      - {link: {from: <id>, relation: <rel>, to: <id>}}
-      - {validates_clean: true}        # zero mechanical Errors
-    """
-    root = Path(args.path).resolve()
-    fixture = yaml.safe_load(Path(args.fixture).read_text(encoding="utf-8"))
-    corpus, _ = scan(root)
+def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[str]]:
+    """Stage 1: deterministic assertions against a domain's current state."""
+    corpus, _ = scan(domain_root)
     by_id = corpus.by_id()
     passed = failed = 0
+    lines: list[str] = []
 
     def report(ok: bool, label: str):
         nonlocal passed, failed
         passed, failed = passed + ok, failed + (not ok)
-        print(f"  {'PASS' if ok else 'FAIL'}  {label}")
+        lines.append(f"  {'PASS' if ok else 'FAIL'}  {label}")
 
-    print(f"## Eval: {fixture.get('name', args.fixture)} — {root}\n")
     for a in fixture.get("assertions") or []:
         if "thing_exists" in a:
             tid = a["thing_exists"]
@@ -838,8 +829,103 @@ def cmd_eval(args) -> int:
             report(not errs, f"validates clean (Errors: {len(errs)})")
         else:
             report(False, f"unknown assertion: {a}")
-    print(f"\n{passed} passed, {failed} failed")
-    return 1 if failed else 0
+    return passed, failed, lines
+
+
+def seed_run_dir(root: Path, fixture: dict, run_dir: Path, bare: bool) -> None:
+    """Stage 2 workspace: copy the seed into an isolated git repo."""
+    import shutil
+    seed = root / fixture["seed"]
+    if not seed.is_dir():
+        sys.exit(f"mdllm: fixture seed not found: {seed}")
+    shutil.copytree(seed, run_dir)
+    if bare:
+        # The no-framework condition: same data, no operating system.
+        for p in ("AGENTS.md", "CLAUDE.md", "things/_schema.yaml"):
+            f = run_dir / p
+            if f.exists():
+                f.unlink()
+        skills = run_dir / "skills"
+        if skills.is_dir():
+            shutil.rmtree(skills)
+    subprocess.run(["git", "init", "-q"], cwd=run_dir, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=run_dir, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "seed"], cwd=run_dir, check=True)
+
+
+def cmd_eval(args) -> int:
+    """Stage 1 (default): assert a fixture against an existing domain's state.
+    Stage 2 (--run): seed an isolated workspace, run a fresh headless agent on
+    the fixture's prompt, then assert the result. See evals/README.md."""
+    root = Path(args.path).resolve()
+    fixture = yaml.safe_load(Path(args.fixture).read_text(encoding="utf-8"))
+    name = fixture.get("name", args.fixture)
+
+    if not args.run:
+        print(f"## Eval: {name} — {root}\n")
+        passed, failed, lines = check_assertions(fixture, root)
+        print("\n".join(lines))
+        print(f"\n{passed} passed, {failed} failed")
+        return 1 if failed else 0
+
+    # ---- Stage 2: agent-in-the-loop -------------------------------------
+    if "seed" not in fixture or "prompt" not in fixture:
+        sys.exit("mdllm: --run requires `seed` and `prompt` in the fixture")
+    prompt = fixture["prompt"]
+    if args.bare:
+        prompt = (fixture.get("bare_preamble",
+                  "You are in a directory of markdown files with YAML "
+                  "frontmatter representing business records.") + "\n\n" + prompt)
+    import json as _json
+    results = []
+    for trial in range(1, args.trials + 1):
+        run_id = (f"{dt.datetime.now():%Y%m%d-%H%M%S}-"
+                  f"{args.model}-{'bare' if args.bare else 'fw'}-t{trial}")
+        run_dir = root / "evals" / "runs" / run_id
+        run_dir.parent.mkdir(parents=True, exist_ok=True)
+        seed_run_dir(root, fixture, run_dir, args.bare)
+        cmd = ["claude", "-p", prompt, "--model", args.model,
+               "--output-format", "json", "--permission-mode", "acceptEdits",
+               "--allowedTools", "Edit Write Read Glob Grep Bash(git:*)",
+               "--add-dir", str(root)]
+        print(f"## Trial {trial}/{args.trials} — {run_id}")
+        if args.dry_run:
+            print(f"  workspace: {run_dir}")
+            print(f"  would run (cwd=workspace): {' '.join(cmd[:2])} "
+                  f"<prompt {len(prompt)} chars> {' '.join(cmd[3:])}")
+            continue
+        import shutil as _sh
+        exe = _sh.which("claude")
+        if not exe:
+            sys.exit("mdllm: `claude` CLI not on PATH — install "
+                     "@anthropic-ai/claude-code or use --dry-run")
+        t0 = dt.datetime.now()
+        proc = subprocess.run(cmd, cwd=run_dir, capture_output=True, text=True,
+                              timeout=args.timeout, encoding="utf-8")
+        wall = (dt.datetime.now() - t0).total_seconds()
+        cost = turns = None
+        try:
+            meta = _json.loads(proc.stdout)
+            cost, turns = meta.get("total_cost_usd"), meta.get("num_turns")
+        except (ValueError, TypeError):
+            pass
+        passed, failed, lines = check_assertions(fixture, run_dir)
+        print("\n".join(lines))
+        score = f"{passed}/{passed + failed}"
+        print(f"  score {score} · {wall:.0f}s · cost {cost} · turns {turns}\n")
+        results.append({"run_id": run_id, "model": args.model,
+                        "condition": "bare" if args.bare else "framework",
+                        "passed": passed, "failed": failed,
+                        "wall_s": round(wall), "cost_usd": cost, "turns": turns})
+        (run_dir / "result.json").write_text(
+            _json.dumps(results[-1], indent=2), encoding="utf-8")
+        if not args.keep and failed == 0:
+            pass  # keep by default — runs are evidence; prune manually
+    if results:
+        ok = sum(1 for r in results if r["failed"] == 0)
+        print(f"### {name}: {ok}/{len(results)} trials fully passing "
+              f"({args.model}, {'bare' if args.bare else 'framework'})")
+    return 0
 
 
 KERNEL_RE = re.compile(r"<!--\s*kernel\s*-->\s*\n(.*?)<!--\s*/kernel\s*-->", re.DOTALL)
@@ -949,6 +1035,16 @@ def main() -> int:
     ev = sub.add_parser("eval", help="check a golden-scenario fixture against domain state")
     ev.add_argument("path", nargs="?", default=".")
     ev.add_argument("--fixture", required=True)
+    ev.add_argument("--run", action="store_true",
+                    help="Stage 2: seed workspace + headless agent + assert")
+    ev.add_argument("--model", default="haiku")
+    ev.add_argument("--trials", type=int, default=1)
+    ev.add_argument("--bare", action="store_true",
+                    help="no-framework condition: strip AGENTS.md/skills/schema")
+    ev.add_argument("--keep", action="store_true")
+    ev.add_argument("--dry-run", action="store_true")
+    ev.add_argument("--timeout", type=int, default=900,
+                    help="seconds per trial (default 900)")
     ev.set_defaults(fn=cmd_eval)
 
     kn = sub.add_parser("kernel", help="generate kernel.md from spec kernel blocks")
