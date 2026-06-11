@@ -179,6 +179,7 @@ The framework defines itself through these interconnected specifications:
 - `type: conflict` — A documented contradiction between two things, held as a first-class thing until resolved (framework-reserved)
 - `type: retrospective` — A periodic quality reflection on domain reasoning; one per period, not per session (framework-reserved)
 - `type: index` — A regenerable cache aggregating one signal (triggers, relationships, schema) across a domain's things, in `things/_index/`; the things are the source of truth (framework-generated)
+- `type: plan` — A phased, multi-session work plan for evolving the framework; uses workflow statuses; phase checkboxes updated as work lands (domain-specific to the framework domain)
 
 ## Key Innovations
 
