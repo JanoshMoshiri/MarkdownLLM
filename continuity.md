@@ -14,10 +14,10 @@ last_updated: 2026-06-11
 
 - **Run the model experiment (next session's centerpiece):** Stage 2 runner is
   built and dry-run-verified; the 2×2 protocol (haiku/opus × framework/bare,
-  ≥5 trials/cell) is in `evals/README.md`. Needs `claude` CLI on PATH
-  (`npm i -g @anthropic-ai/claude-code`) — it was absent in the desktop-app
-  session that built the runner, so the agent-invocation path is untested.
-  First action: one live haiku framework trial as a smoke test.
+  ≥5 trials/cell) is in `evals/README.md`. `claude` CLI is now installed and on
+  PATH (v2.1.173, confirmed 2026-06-11) — the agent-invocation path is still
+  untested. First action: one live haiku framework trial as a smoke test:
+  `python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --model haiku --trials 1`
 - **Tier 2 kernel blocks:** session-memory, belief-revision, provenance,
   triggers, derived-index — low priority (demand-loaded anyway).
 - **First jmtm decision-record filing:** annual accounts due 2026-07-31 —
