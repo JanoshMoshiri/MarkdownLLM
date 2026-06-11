@@ -14,10 +14,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install pyyaml
-      - name: Mechanical validation
+      - run: pip install pyyaml pytest
+      - name: Floor self-tests (mdllm is what defines "valid" — test it first)
+        run: python -m pytest tools/tests -q
+      - name: Mechanical validation (includes version-sentinel sync)
         run: python tools/mdllm.py validate .
       - name: Provenance chains
         run: python tools/mdllm.py provenance .
+      - name: Kernel drift
+        run: python tools/mdllm.py kernel . --check
       - name: Index drift
         run: python tools/mdllm.py index . check

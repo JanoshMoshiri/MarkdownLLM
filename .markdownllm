@@ -1,5 +1,5 @@
 framework: MarkdownLLM
-version: 3.0
+version: 3.3.0
 role: canonical-version-sentinel
 foundational_specs:
   - thing.md
@@ -23,4 +23,5 @@ foundational_specs:
   - scalability-guide.md
   - domain-specification-guide.md
 domains:
-  - domains/
+  - domain/   # this install's live domains (nested repos, gitignored wholesale)
+  - domains/  # the documented convention; both are excluded by tool and gitignore

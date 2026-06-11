@@ -345,6 +345,42 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
     return f
 
 
+def version_tuple(v: str) -> tuple[int, int, int]:
+    parts = [int(x) for x in re.findall(r"\d+", str(v))[:3]]
+    return tuple(parts + [0] * (3 - len(parts)))  # type: ignore[return-value]
+
+
+def check_version_sync(root: Path) -> list[Finding]:
+    """Framework root only: `.markdownllm`, AGENTS.md frontmatter, and the
+    latest CHANGELOG entry must agree on the version. The sentinel is what
+    domain agents key their refresh off — a stale sentinel silently disables
+    domain-refresh for everything shipped since."""
+    sentinel = root / ".markdownllm"
+    if not sentinel.exists():
+        return []
+    versions: dict[str, str] = {}
+    data = yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {}
+    if data.get("version"):
+        versions[".markdownllm"] = str(data["version"])
+    agents = root / "AGENTS.md"
+    if agents.exists():
+        meta, _, _ = parse_frontmatter(agents.read_text(encoding="utf-8"))
+        if meta and meta.get("version"):
+            versions["AGENTS.md"] = str(meta["version"])
+    changelog = root / "CHANGELOG.md"
+    if changelog.exists():
+        m = re.search(r"^## \[(\d+(?:\.\d+){1,2})\]",
+                      changelog.read_text(encoding="utf-8"), re.MULTILINE)
+        if m:
+            versions["CHANGELOG.md"] = m.group(1)
+    if len({version_tuple(v) for v in versions.values()}) > 1:
+        detail = ", ".join(f"{k}={v}" for k, v in sorted(versions.items()))
+        return [Finding(SEV_ERROR, "framework-version",
+                f"version sentinel out of sync: {detail} — these must be "
+                f"bumped together (domain refresh keys off .markdownllm)")]
+    return []
+
+
 def validate_level3(corpus: Corpus) -> list[Finding]:
     f: list[Finding] = []
     schema = corpus.schema
@@ -376,6 +412,7 @@ def cmd_validate(args) -> int:
         findings.extend(validate_level1(t, corpus.schema))
     findings.extend(validate_level2(corpus))
     findings.extend(validate_level3(corpus))
+    findings.extend(check_version_sync(root))
 
     errors = [x for x in findings if x.severity == SEV_ERROR]
     warnings = [x for x in findings if x.severity == SEV_WARNING]
@@ -575,7 +612,8 @@ def build_index_body(corpus: Corpus, signal: str) -> tuple[str, int]:
 def cmd_index(args) -> int:
     root = Path(args.path).resolve()
     corpus, _ = scan(root)
-    signals = [args.signal] if args.signal else ["triggers", "schema", "relationships"]
+    signals = [args.signal] if args.signal else ["triggers", "schema",
+                                                 "relationships", "provenance"]
     idx_dir = root / "things" / "_index"
     rc = 0
     for signal in signals:
@@ -809,8 +847,16 @@ def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[s
             fa = a["field"]
             t = by_id.get(fa["id"])
             actual = t.meta.get(fa["name"]) if t else "<missing>"
-            report(actual == fa["equals"],
-                   f"{fa['id']}.{fa['name']} == {fa['equals']!r} (actual: {actual!r})")
+            expected = fa["equals"]
+            ok = actual == expected
+            if not ok and isinstance(expected, (int, float)) and not isinstance(expected, bool):
+                # `2500.00` written as the string "2500.00" is semantically
+                # correct — coerce before failing a numeric contract.
+                try:
+                    ok = abs(float(actual) - float(expected)) < 1e-9
+                except (TypeError, ValueError):
+                    ok = False
+            report(ok, f"{fa['id']}.{fa['name']} == {expected!r} (actual: {actual!r})")
         elif "link" in a:
             ln = a["link"]
             t = by_id.get(ln["from"])
@@ -853,11 +899,50 @@ def seed_run_dir(root: Path, fixture: dict, run_dir: Path, bare: bool) -> None:
     subprocess.run(["git", "commit", "-q", "-m", "seed"], cwd=run_dir, check=True)
 
 
+def eval_report(root: Path) -> int:
+    """Aggregate evals/runs/*/result.json into per-cell (model × condition)
+    pass rates — the summary table for the structure-beats-scale 2×2."""
+    import json as _json
+    runs_dir = root / "evals" / "runs"
+    results = []
+    for rj in sorted(runs_dir.glob("*/result.json")) if runs_dir.is_dir() else []:
+        try:
+            results.append(_json.loads(rj.read_text(encoding="utf-8")))
+        except ValueError:
+            print(f"  skipping unparseable {rj}")
+    if not results:
+        print(f"No run results under {runs_dir}")
+        return 1
+    cells: dict[tuple[str, str], list[dict]] = {}
+    for r in results:
+        cells.setdefault((str(r.get("model")), str(r.get("condition"))), []).append(r)
+    print(f"## Eval Report — {len(results)} trials, {len(cells)} cells\n")
+    print("| model | condition | trials | fully passing | assertion pass rate "
+          "| mean wall s | mean cost $ |")
+    print("|---|---|---|---|---|---|---|")
+    for (model, cond), rs in sorted(cells.items()):
+        full = sum(1 for r in rs if r.get("failed") == 0)
+        p = sum(r.get("passed", 0) for r in rs)
+        f_ = sum(r.get("failed", 0) for r in rs)
+        rate = f"{p}/{p + f_} ({p / (p + f_):.0%})" if p + f_ else "—"
+        walls = [r["wall_s"] for r in rs if r.get("wall_s") is not None]
+        costs = [r["cost_usd"] for r in rs if r.get("cost_usd") is not None]
+        mw = f"{sum(walls) / len(walls):.0f}" if walls else "—"
+        mc = f"{sum(costs) / len(costs):.3f}" if costs else "—"
+        print(f"| {model} | {cond} | {len(rs)} | {full}/{len(rs)} | {rate} "
+              f"| {mw} | {mc} |")
+    return 0
+
+
 def cmd_eval(args) -> int:
     """Stage 1 (default): assert a fixture against an existing domain's state.
     Stage 2 (--run): seed an isolated workspace, run a fresh headless agent on
     the fixture's prompt, then assert the result. See evals/README.md."""
     root = Path(args.path).resolve()
+    if args.report:
+        return eval_report(root)
+    if not args.fixture:
+        sys.exit("mdllm: eval requires --fixture (or --report)")
     fixture = yaml.safe_load(Path(args.fixture).read_text(encoding="utf-8"))
     name = fixture.get("name", args.fixture)
 
@@ -886,8 +971,11 @@ def cmd_eval(args) -> int:
         seed_run_dir(root, fixture, run_dir, args.bare)
         cmd = ["claude", "-p", prompt, "--model", args.model,
                "--output-format", "json", "--permission-mode", "acceptEdits",
-               "--allowedTools", "Edit Write Read Glob Grep Bash(git:*)",
-               "--add-dir", str(root)]
+               "--allowedTools", "Edit Write Read Glob Grep Bash(git:*)"]
+        if not args.bare:
+            # The seed's framework_root resolves to the framework checkout;
+            # the bare condition must NOT see it — that's the control.
+            cmd += ["--add-dir", str(root)]
         print(f"## Trial {trial}/{args.trials} — {run_id}")
         if args.dry_run:
             print(f"  workspace: {run_dir}")
@@ -900,8 +988,21 @@ def cmd_eval(args) -> int:
             sys.exit("mdllm: `claude` CLI not on PATH — install "
                      "@anthropic-ai/claude-code or use --dry-run")
         t0 = dt.datetime.now()
-        proc = subprocess.run(cmd, cwd=run_dir, capture_output=True, text=True,
-                              timeout=args.timeout, encoding="utf-8")
+        try:
+            proc = subprocess.run(cmd, cwd=run_dir, capture_output=True, text=True,
+                                  timeout=args.timeout, encoding="utf-8")
+        except subprocess.TimeoutExpired:
+            wall = (dt.datetime.now() - t0).total_seconds()
+            n_asserts = len(fixture.get("assertions") or [])
+            print(f"  TIMEOUT after {wall:.0f}s — trial recorded as 0/{n_asserts}\n")
+            results.append({"run_id": run_id, "model": args.model,
+                            "condition": "bare" if args.bare else "framework",
+                            "passed": 0, "failed": n_asserts,
+                            "wall_s": round(wall), "cost_usd": None,
+                            "turns": None, "timeout": True})
+            (run_dir / "result.json").write_text(
+                _json.dumps(results[-1], indent=2), encoding="utf-8")
+            continue
         wall = (dt.datetime.now() - t0).total_seconds()
         cost = turns = None
         try:
@@ -919,8 +1020,6 @@ def cmd_eval(args) -> int:
                         "wall_s": round(wall), "cost_usd": cost, "turns": turns})
         (run_dir / "result.json").write_text(
             _json.dumps(results[-1], indent=2), encoding="utf-8")
-        if not args.keep and failed == 0:
-            pass  # keep by default — runs are evidence; prune manually
     if results:
         ok = sum(1 for r in results if r["failed"] == 0)
         print(f"### {name}: {ok}/{len(results)} trials fully passing "
@@ -963,6 +1062,28 @@ def cmd_kernel(args) -> int:
         print(f"  {name:<40} {count(body):>6,} / {count(text):>6,} tokens")
 
     out = root / "kernel.md"
+    body = (
+        "# Framework Operative Kernel\n\n"
+        "Generated by `mdllm kernel` from the `<!-- kernel -->` blocks in the\n"
+        "foundational specs — the rules without the rationale. Load this at Tier 0\n"
+        "instead of the full specs; load a full spec only when reasoning *about*\n"
+        "the framework or when the kernel says to. Regenerate after any spec change.\n\n"
+        + "\n".join(sections))
+
+    if args.check:
+        # Drift check: compare the deterministic body (frontmatter carries
+        # timestamps/SHAs and is expected to differ between regenerations).
+        if not out.exists():
+            print("\nkernel.md missing — run `mdllm kernel` to generate it")
+            return 1
+        _, existing_body, _ = parse_frontmatter(out.read_text(encoding="utf-8"))
+        if existing_body.strip() != body.strip():
+            print("\nkernel: DRIFT — spec kernel blocks changed since kernel.md "
+                  "was generated; run `mdllm kernel` and commit the result")
+            return 1
+        print("\nkernel: in sync")
+        return 0
+
     content = (
         "---\n"
         "id: framework-kernel\n"
@@ -975,12 +1096,7 @@ def cmd_kernel(args) -> int:
         f"coverage: {len(sections)}\n"
         f"framework_version: {data.get('version', 'unknown')}\n"
         "---\n\n"
-        "# Framework Operative Kernel\n\n"
-        "Generated by `mdllm kernel` from the `<!-- kernel -->` blocks in the\n"
-        "foundational specs — the rules without the rationale. Load this at Tier 0\n"
-        "instead of the full specs; load a full spec only when reasoning *about*\n"
-        "the framework or when the kernel says to. Regenerate after any spec change.\n\n"
-        + "\n".join(sections))
+        + body)
     out.write_text(content, encoding="utf-8")
     print(f"\nwrote kernel.md — {count(content):,} tokens "
           f"(kernel blocks {kernel_total:,} / full specs {full_total:,})")
@@ -1005,6 +1121,10 @@ def cmd_install_hook(args) -> int:
 
 
 def main() -> int:
+    # Windows consoles default to a legacy codepage; spec prose is UTF-8.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(prog="mdllm", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -1034,14 +1154,15 @@ def main() -> int:
 
     ev = sub.add_parser("eval", help="check a golden-scenario fixture against domain state")
     ev.add_argument("path", nargs="?", default=".")
-    ev.add_argument("--fixture", required=True)
+    ev.add_argument("--fixture")
     ev.add_argument("--run", action="store_true",
                     help="Stage 2: seed workspace + headless agent + assert")
     ev.add_argument("--model", default="haiku")
     ev.add_argument("--trials", type=int, default=1)
     ev.add_argument("--bare", action="store_true",
                     help="no-framework condition: strip AGENTS.md/skills/schema")
-    ev.add_argument("--keep", action="store_true")
+    ev.add_argument("--report", action="store_true",
+                    help="aggregate evals/runs/*/result.json into per-cell pass rates")
     ev.add_argument("--dry-run", action="store_true")
     ev.add_argument("--timeout", type=int, default=900,
                     help="seconds per trial (default 900)")
@@ -1049,6 +1170,8 @@ def main() -> int:
 
     kn = sub.add_parser("kernel", help="generate kernel.md from spec kernel blocks")
     kn.add_argument("path", nargs="?", default=".")
+    kn.add_argument("--check", action="store_true",
+                    help="drift check: compare kernel.md against a fresh build")
     kn.set_defaults(fn=cmd_kernel)
 
     c = sub.add_parser("changelog", help="draft a CHANGELOG entry from commits")
