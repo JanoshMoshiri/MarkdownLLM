@@ -12,6 +12,28 @@ last_updated: 2026-06-11
 
 ## Open Threads
 
+- **Independent review (2026-06-11, external) — action queue:** full review at
+  `reviews/REVIEW-independent-2026-06-11.md`. Priority order: (1) fix
+  birth-path staleness — `templates/AGENTS.md.template` is pre-kernel,
+  `framework-discovery.md` is pre-v3 (stable but stale: v2.8 sentinel example,
+  `domain/` vs `domains/`), `domain-specification-guide.md:294` names a
+  "session-end:continuity hard hook" that doesn't exist (session-end is a bound
+  prompt); (2) bring `examples/` under the floor — excluded from validation,
+  both pre-v3, no framework_root, life-manager has zero things; (3) cold-start
+  scaffold eval (fresh agent + non-author human builds a domain from templates)
+  before the harder VAT fixture; (4) prune the relation vocabulary (~35 → ~12)
+  and replace hand-written token estimates with generated ones
+  (derived-index.md:146 and scalability-guide.md:263 disagree 10–20x);
+  (5) spec the read-side of quarantine — unverified `origin: external` bodies
+  still enter context at load; (6) limitations.md + differentiation answer;
+  (7) one page on concurrency.
+- **Harness support is now measured, not assumed:** first non-IDE harness
+  session (Cowork, 2026-06-11) — no AGENTS.md auto-discovery; the installed
+  pre-commit hook couldn't run (machine-absolute path, bare `python`). Hook
+  made portable same session (repo-relative, runtime interpreter resolution).
+  Remaining: spec the explicit bootstrap line in framework-discovery.md as a
+  first-class discovery route; re-mark the README vendor table designed-for vs
+  verified-on. See `agents-md-discovery-is-harness-dependent`.
 - **Harder fixture + claim-language pass (next session's centerpiece):** the
   full 2×2 ran (2026-06-11, 20 trials, see Decisions) but the fixture's
   reasoning core saturated — every cell got the figures right, all variance
@@ -33,6 +55,10 @@ last_updated: 2026-06-11
 
 ## Live Insights
 
+- `agents-md-discovery-is-harness-dependent` — discovery and the floor are
+  harness/environment properties, not framework properties; the Cowork session
+  is the first measured harness data point (partial failure; hook fixed
+  in-session).
 - `first-2x2-measured-convention-following-not-reasoning` — the 2026-06-11
   run's honest reading: structure bought determinism (opus+fw 5/5), the
   diagonal went the manifesto's way at ~23% cost, but the reasoning claim
