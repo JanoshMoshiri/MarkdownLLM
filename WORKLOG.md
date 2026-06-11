@@ -128,6 +128,28 @@ Continued directly from Session 1 at Janosh's direction ("keep going until the l
 
 - `claude` CLI not on PATH in this desktop-app session — the actual agent-invocation path is **untested**. First action next session: install CLI, run one live haiku/framework trial as a smoke test, then the full 2×2.
 
+### Session 4
+
+#### Topic: Comprehensive review → loose-ends fix pass (the floor verifies itself)
+
+Full framework review at Janosh's request (every spec, mdllm.py line-by-line, evals, adapters, live floor run), then immediate remediation of everything found. Verdict: architecture sound, gaps concentrated where the framework trusted itself without verification.
+
+#### Completed
+
+- [x] **Version sentinel bug fixed + made impossible to repeat:** `.markdownllm` and AGENTS.md still said 3.0 while CHANGELOG was at 3.3.0 — domain refresh was silently disarmed for everything shipped since v3.1. Re-synced, and `mdllm validate` now mechanically checks `.markdownllm` / AGENTS.md / latest CHANGELOG entry agree (Error severity → the pre-commit hook physically blocks a version bump that skips the sentinel)
+- [x] **mdllm self-test suite:** 30 pytest cases pinning frontmatter parsing, all three validation levels, reserved/declared/default vocabularies, eval assertions (incl. numeric coercion), kernel extraction, provenance index, sentinel sync. The floor was the framework's trust anchor and had zero tests. CI now runs them first
+- [x] **Drift gates closed:** `mdllm kernel --check` (rebuild-and-diff on the deterministic body) added to CI; `provenance` added to `index check` default signals — the only deployed index was the only one not being checked
+- [x] **Eval runner hardened for the 2×2:** bare condition no longer granted `--add-dir` to the framework checkout (control was contaminable); timeout now recorded as a 0/N trial instead of crashing the loop; `field` assertions coerce numeric strings ("2500.00" vs 2500.00 no longer a false negative); dead `--keep` flag removed; `eval --report` aggregates runs into the per-cell table
+- [x] **Fairness note in evals/README:** bare cells are capped below 7/7 by construction (link assertion unstated in bare preamble) — report per-assertion results, figures assertions are the condition-neutral core
+- [x] **Guide caught up to v3:** domain-specification-guide v2.7 gains the deterministic-floor scaffold section (schema → hook → kernel, decisions, evals) + checklist items; new `templates/_schema.yaml.template`
+- [x] **Hygiene:** `.gitignore` covers `domain/` wholesale (future domains auto-isolated); `mdllm` output UTF-8 on Windows consoles; `.markdownllm` documents the domain/-vs-domains/ layout
+
+#### Decisions Made
+
+- Version discipline is now mechanical, not ritual: the sentinel-sync check lives in `validate`, so the same hook that guards thing integrity guards release integrity. The CHANGELOG version heading is the source the others must match.
+- Relations vocabulary prune (33 entries) deliberately deferred to the next retrospective per `_schema.yaml`'s own note — not this session's scope.
+- Full domain-specification-guide rewrite still open (tracked by insight `domain-spec-guide-predates-knowledge-primitives`); this session added the v3 addendum rather than rewriting 800 lines in a fix pass.
+
 ---
 
 ## 8 June 2026

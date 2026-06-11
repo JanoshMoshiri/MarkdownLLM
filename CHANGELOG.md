@@ -18,6 +18,12 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [3.4.0] - 2026-06-11
+
+**The floor verifies itself.** A comprehensive review found the gaps concentrated where the framework trusted itself without verification — all closed this release. The version sentinel (`.markdownllm`) had silently stayed at 3.0 since v3.1, disarming domain refresh; it is re-synced and `mdllm validate` now enforces sentinel / AGENTS.md / CHANGELOG agreement as an Error, so the pre-commit hook blocks any future drift. The tool itself gains a 30-test pytest suite (run first in CI), `mdllm kernel --check` gates kernel drift, and `provenance` joins the default `index check` signals. Eval Stage 2 hardened ahead of the 2×2 experiment: the bare condition no longer sees the framework checkout, timeouts record as failed trials, numeric-string field values coerce before failing, and `eval --report` aggregates runs into the per-cell table (fairness caveat documented). Domain scaffolding catches up to v3: guide v2.7 adds the deterministic-floor section and `templates/_schema.yaml.template` ships.
+
+---
+
 ## [3.3.0] - 2026-06-11
 
 **Eval Stage 2 — the model experiment is runnable.** `mdllm eval --run` seeds an isolated git workspace from a fixture's `seed/`, invokes a fresh headless agent (`claude -p`, json output → score/cost/time/turns per trial), and asserts the result. `--bare` strips AGENTS.md/skills/schema for the no-framework condition; `--trials N` for repeats. First fixture: `evals/vat-quarter-basic.yaml` — a synthetic VAT quarter with known-correct figures and a blocked-entertainment-VAT discriminator. The 2×2 structure-beats-scale protocol (haiku/opus × framework/bare) is documented in `evals/README.md`. Verified: negative test, dry-run seeding both conditions; live agent path untested pending `claude` CLI availability.
