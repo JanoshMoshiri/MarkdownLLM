@@ -18,6 +18,12 @@ The WORKLOG is the detailed internal record. The CHANGELOG is the external-facin
 
 ---
 
+## [3.5.0] - 2026-06-12
+
+**The periphery comes under the floor.** The review's verdict — diligence still substituted for construction at the edges newcomers touch first — actioned on three fronts. Examples are no longer exempt: `mdllm validate` discovers `examples/*` as sub-corpora in the same run (so the pre-commit hook covers them), both examples declare `_schema.yaml`, and life-manager goes from zero things to an interlinked demonstration dataset — a project with subtasks, a goal fed by a recurring habit, live triggers (one deliberately overdue so `mdllm triggers` always has a find), and a decision record with commit-pinned inputs verified by `mdllm provenance`; example skills and AGENTS files rescoped to the v3 division of labour, pre-v3 residue (phantom statuses, an invented `schema_version` field, dependency-things) replaced. The relation vocabulary is pruned 35 → 13: inverse pairs collapsed to their forward direction (`supersedes`/`superseded-by` kept — the validator checks that backlink), near-synonyms merged, all 45 affected link entries migrated and prompt templates aligned. And the on-ramp exists: `first-hour.md` walks a newcomer's first sixty minutes; the README gains a For Humans section. Groundwork for the cold-start scaffold eval, which is next.
+
+---
+
 ## [3.4.0] - 2026-06-11
 
 **The floor verifies itself.** A comprehensive review found the gaps concentrated where the framework trusted itself without verification — all closed this release. The version sentinel (`.markdownllm`) had silently stayed at 3.0 since v3.1, disarming domain refresh; it is re-synced and `mdllm validate` now enforces sentinel / AGENTS.md / CHANGELOG agreement as an Error, so the pre-commit hook blocks any future drift. The tool itself gains a 30-test pytest suite (run first in CI), `mdllm kernel --check` gates kernel drift, and `provenance` joins the default `index check` signals. Eval Stage 2 hardened ahead of the 2×2 experiment: the bare condition no longer sees the framework checkout, timeouts record as failed trials, numeric-string field values coerce before failing, and `eval --report` aggregates runs into the per-cell table (fairness caveat documented). Domain scaffolding catches up to v3: guide v2.7 adds the deterministic-floor section and `templates/_schema.yaml.template` ships.
