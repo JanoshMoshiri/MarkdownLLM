@@ -12,6 +12,8 @@ Subcommands:
   triggers [path]      Evaluate time/dependency/threshold trigger conditions.
   index    [path] check|rebuild [--signal triggers|schema|relationships]
   tokens   [path]      Measure spec token costs by loading tier.
+  doctor   [path]      Probe the environment: floor prerequisites, hook
+                       execution (not just presence), framework version drift.
   install-hook [path]  Install a git pre-commit hook running `validate`.
 
 Requires: Python 3.10+, PyYAML. tiktoken optional (tokens falls back to heuristic).
@@ -1204,6 +1206,118 @@ def cmd_kernel(args) -> int:
     return 0
 
 
+def cmd_doctor(args) -> int:
+    """Probe the environment the floor depends on. A floor/portability claim
+    is verified only by executing the capability in the target environment
+    (insight: portability-claims-need-execution-tests) — so the hook check
+    *runs* the hook rather than checking the file exists. Exit 1 when the
+    floor cannot run here (degraded mode: run `mdllm validate` manually
+    before each commit, and say so)."""
+    import shutil
+    root = Path(args.path).resolve()
+    lines: list[str] = []
+    floor_ok = True
+
+    def report(status: str, label: str):
+        lines.append(f"  {status:4s}  {label}")
+
+    # interpreter + libraries (if we got this far, python and yaml exist)
+    py = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    if sys.version_info >= (3, 10):
+        report("OK", f"python {py}")
+    else:
+        report("FAIL", f"python {py} — floor requires 3.10+")
+        floor_ok = False
+    report("OK", f"pyyaml {getattr(yaml, '__version__', '?')}")
+    try:
+        import tiktoken
+        report("OK", f"tiktoken {getattr(tiktoken, '__version__', '?')} — token counts are measured")
+    except ImportError:
+        report("--", "tiktoken absent — `tokens` falls back to a chars/3.8 heuristic (fine)")
+
+    # git + identity
+    git = shutil.which("git")
+    if not git:
+        report("FAIL", "git not on PATH — the floor and the state machine need git")
+        print(f"## Doctor Report — {root}\n" + "\n".join(lines))
+        print("\nVerdict: DEGRADED — no git, no floor.")
+        return 1
+    gv = subprocess.run(["git", "--version"], capture_output=True, text=True)
+    report("OK", gv.stdout.strip())
+    for key in ("user.name", "user.email"):
+        cfg = subprocess.run(["git", "config", key], cwd=root,
+                             capture_output=True, text=True)
+        if cfg.returncode == 0 and cfg.stdout.strip():
+            report("OK", f"git {key} = {cfg.stdout.strip()}")
+        else:
+            report("WARN", f"git {key} unset — commits will fail until configured")
+
+    # repo + hook (executed, not just resolved)
+    inside = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
+                            capture_output=True, text=True)
+    if inside.returncode != 0:
+        report("FAIL", "not a git repository — `git init` first")
+        floor_ok = False
+    else:
+        git_dir = (root / inside.stdout.strip()).resolve()
+        hook = git_dir / "hooks" / "pre-commit"
+        if not hook.is_file():
+            report("FAIL", "pre-commit hook not installed — run `mdllm install-hook .`")
+            floor_ok = False
+        else:
+            run = subprocess.run(["git", "hook", "run", "pre-commit"], cwd=root,
+                                 capture_output=True, text=True)
+            if "is not a git command" in (run.stderr or ""):
+                report("WARN", "git < 2.36 — cannot execution-test the hook "
+                               "(file present; make one commit to verify)")
+            elif run.returncode == 0:
+                report("OK", "pre-commit hook EXECUTES (validation currently clean)")
+            elif run.returncode == 1 and "Validation" in (run.stdout or run.stderr or ""):
+                report("OK", "pre-commit hook EXECUTES (validation currently has Errors "
+                             "— it would block a commit, which is the point)")
+            else:
+                report("FAIL", f"pre-commit hook present but failed to execute "
+                               f"(exit {run.returncode}) — resolution is not verification")
+                floor_ok = False
+
+    # framework / domain version drift
+    sentinel = root / ".markdownllm"
+    if sentinel.is_file():
+        data = yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {}
+        report("OK", f"framework root — sentinel version {data.get('version')}")
+    else:
+        agents = root / "AGENTS.md"
+        meta = None
+        if agents.is_file():
+            meta, _, _ = parse_frontmatter(agents.read_text(encoding="utf-8"))
+        fr = (meta or {}).get("framework_root")
+        if fr:
+            fsent = (root / fr / ".markdownllm").resolve()
+            if fsent.is_file():
+                fdata = yaml.safe_load(fsent.read_text(encoding="utf-8")) or {}
+                fv, seen = str(fdata.get("version")), str(meta.get("framework_version_seen"))
+                if fv == seen:
+                    report("OK", f"domain current with framework {fv}")
+                else:
+                    report("WARN", f"domain last saw framework {seen}; framework is {fv} "
+                                   f"— run the domain-refresh process")
+            else:
+                report("FAIL", f"framework_root `{fr}` does not resolve to a framework "
+                               f"(.markdownllm not found at {fsent})")
+                floor_ok = False
+        else:
+            report("--", "no .markdownllm and no framework_root in AGENTS.md — "
+                         "neither a framework root nor a wired domain")
+
+    print(f"## Doctor Report — {root}\n")
+    print("\n".join(lines))
+    print(f"\nVerdict: {'FLOOR ACTIVE' if floor_ok else 'DEGRADED'} — "
+          + ("mechanical validation is enforced at the commit boundary."
+             if floor_ok else
+             "run `mdllm validate` manually before each commit, and say so."))
+    return 0 if floor_ok else 1
+
+
 def cmd_install_hook(args) -> int:
     root = Path(args.path).resolve()
     git_dir = root / ".git"
@@ -1287,6 +1401,11 @@ def main() -> int:
     c.add_argument("path", nargs="?", default=".")
     c.add_argument("--since", help="ref to start from (e.g. a version tag)")
     c.set_defaults(fn=cmd_changelog)
+
+    d = sub.add_parser("doctor", help="probe the environment: floor prerequisites, "
+                                      "hook execution, framework version drift")
+    d.add_argument("path", nargs="?", default=".")
+    d.set_defaults(fn=cmd_doctor)
 
     h = sub.add_parser("install-hook", help="install git pre-commit validation hook")
     h.add_argument("path", nargs="?", default=".")

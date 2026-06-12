@@ -149,6 +149,9 @@ whole system; everything else is refinement.
 - **The floor needs Python.** If the hook can't run on some machine (no
   Python, sandboxed git), you are in degraded mode: ask the agent to run
   `mdllm validate` manually before each commit and say so out loud.
+  `python tools/mdllm.py doctor <path>` checks all of this mechanically —
+  including whether the hook actually *executes*, not just exists — and
+  tells you which mode you're in.
 - **If validation blocks a legitimate change**, the schema is wrong, not
   you: extend `things/_schema.yaml` with the agent rather than fighting the
   finding.

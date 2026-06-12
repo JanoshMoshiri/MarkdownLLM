@@ -66,7 +66,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>9 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>10 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -176,6 +176,7 @@ flowchart LR
         C7["kernel"]
         C8["changelog"]
         C9["install-hook"]
+        C10["doctor"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -187,6 +188,7 @@ flowchart LR
         T7["kernel.md"]
         T8["CHANGELOG.md"]
         T9["git pre-commit hook"]
+        T10["floor availability itself"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -198,6 +200,7 @@ flowchart LR
     C7 -.->|generates| T7
     C8 -.->|drafts| T8
     C9 -.->|installs| T9
+    C10 -->|"execution-tests"| T10
 ```
 
 Notes on this view:
@@ -208,6 +211,9 @@ Notes on this view:
   reasoning.
 - `install-hook` is the floor enforcing itself: it wires `validate` into the
   commit boundary so the guarantee survives agents that forget to run it.
+- `doctor` is the floor checking it can exist here at all: prerequisites,
+  hook *execution* (resolution is not verification), and framework-version
+  drift for domains. Exit 1 means degraded mode — validate manually and say so.
 
 ## Keeping This Map Honest
 

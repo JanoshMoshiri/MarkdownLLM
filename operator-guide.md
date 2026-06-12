@@ -166,6 +166,7 @@ CI, or the agent — but all of them are yours to invoke directly.
 | `kernel [--check]` | Regenerates `kernel.md` from spec kernel blocks; `--check` gates drift | Framework maintenance (CI runs `--check` for you) |
 | `changelog --since <tag>` | Drafts a CHANGELOG entry from the commit stream | Framework release prep |
 | `install-hook [path]` | Installs the git pre-commit validation hook | Once per domain repo, at floor adoption |
+| `doctor [path]` | Probes the environment: prerequisites, hook *execution*, framework version drift; exit 1 = degraded mode | New machine, new harness, or "is the floor actually on here?" |
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
 

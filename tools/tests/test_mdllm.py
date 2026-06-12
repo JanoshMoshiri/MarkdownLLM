@@ -373,6 +373,37 @@ def test_assertions_domain_dir_scoping(tmp_path):
     assert (passed, failed) == (3, 0)
 
 
+# ---------------------------------------------------------------- doctor
+
+
+def _ns(**kw):
+    from types import SimpleNamespace
+    return SimpleNamespace(**kw)
+
+
+def _git_repo(tmp_path):
+    import subprocess
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "config", "user.email", "t@t"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=tmp_path, check=True)
+
+
+def test_doctor_degraded_without_hook(tmp_path, capsys):
+    _git_repo(tmp_path)
+    rc = mdllm.cmd_doctor(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert rc == 1 and "DEGRADED" in out and "hook not installed" in out
+
+
+def test_doctor_floor_active_with_hook(tmp_path, capsys):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/alpha.md", thing_text(GOOD))
+    mdllm.cmd_install_hook(_ns(path=str(tmp_path)))
+    rc = mdllm.cmd_doctor(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert rc == 0 and "FLOOR ACTIVE" in out and "EXECUTES" in out
+
+
 def test_assertions_scaffold_failures(tmp_path):
     fixture = {"domain_dir": "nope", "assertions": [
         {"file_exists": "nope/AGENTS.md"},

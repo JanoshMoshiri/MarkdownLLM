@@ -305,6 +305,7 @@ Since v3.0, the framework pairs its specifications with a single-file CLI that g
 ```bash
 python tools/mdllm.py validate <domain>      # structure, references, schema — exit 1 on Errors
 python tools/mdllm.py install-hook <domain>  # pre-commit hook: broken things cannot be committed
+python tools/mdllm.py doctor <domain>        # environment probe: hook executes? version drift? degraded mode?
 python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + horizon
 python tools/mdllm.py provenance <domain>    # decision pins resolve; no output rests on unverified content
 python tools/mdllm.py eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
