@@ -65,4 +65,20 @@ What is *not yet earned* is the broad-implications claim. One operator, who is t
 
 ---
 
+## Third Pass — Verification at v3.6.0 (same day)
+
+The operator shipped fixes within hours of the review; this section verifies them at HEAD `729e873` by execution, not by commit message.
+
+**Findings 1–5: fixed and verified.** (1) Self-test suite now provisions git identity via environment and skips the hook execution-test on git < 2.36 — 36 passed, 1 skipped in an environment where both failures previously reproduced; the fix commit confirms CI *was* red on `e90e2f2`, so the inference held. (2) `scaffold` now exits 1 on a partial birth sequence — executed in an identity-less environment: "BIRTH SEQUENCE INCOMPLETE", exit 1. (3) The phantom v3.6 reference is gone, and the fix is the stronger policy: spec prose no longer names versions at all. (4) Eval evidence is committed via an `evals/results/` JSON mirror (run workspaces are nested repos and rightly stay ignored — the right cut). (5) The fixture's version assertion is templated from the sentinel (`{framework_version}`). Validation clean across all corpora at 3.6.0; kernel in sync.
+
+**Finding 6: half-resolved, half-queued.** eco-essentials refreshed (verified, credited above). jmtm-software (3.0) and property-ventures (2.9) remain stale on disk with the pre-v3 procedure text; the continuity brief queues jmtm next. Open, tracked, correctly prioritised.
+
+**Finding 7: open, now registered.** The manifesto's cross-domain promise (§242) and the README's "no setup step" line are unchanged but now sit in the continuity queue rather than nowhere.
+
+**New since the review, worth recording:** the cold-start *rehearsal* ran — three informative trials, producing the insight `agents-drop-mechanical-birth-steps-not-semantic-ones` (agents missed mechanical birth steps until the guide routed to `mdllm scaffold`, then 11/11). That is the agent-only half of the eval doing exactly what it was built for, and it strengthens rather than replaces the case for the human half.
+
+The third pass changes nothing in the verdict but sharpens its first paragraph: the loop is not just fast, it closes. Review findings became commits with execution-verified fixes inside a day — twice running. The standing caution also survives intact: the loop closing on *reviewer-supplied* findings is still the framework correcting itself against itself. The human cold-start eval remains the only item on the queue that brings evidence in from outside.
+
+---
+
 One process note: the `post-write:commit` hard hook is unfulfilled for this file. The harness I reviewed from cannot safely commit — git operations through its filesystem mount showed index errors mid-session — so the commit is left to the operator. Which is itself the day's last data point for `agents-md-discovery-is-harness-dependent`: the floor's guarantees end where the harness's filesystem begins.
