@@ -2,7 +2,7 @@
 id: read-thing-specification
 type: specification
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-13
 linked_things:
   - id: thing-specification
@@ -18,7 +18,7 @@ linked_things:
 # Read Thing
 
 <!-- kernel -->
-**Read mode = analysis without modification.** No file changes, no status updates, no new things, no commitments on the user's behalf; suggest changes only when asked.
+**Read mode = analysis without modification.** No file changes, no status updates, no new things, no commitments on the user's behalf; suggest changes only when asked — except surfacing what a declared trigger fired on (a trigger is the domain's standing request to be told).
 
 **Load tiered, contextually:** L1 metadata for broad questions ("what's my situation?") · L2 +relationships for connection/path questions · L3 full body for deep questions about specific things. Load the relevant subset (by tag, time, domain), never everything. Go deeper only where L1 surfaced something.
 
@@ -53,6 +53,8 @@ The user is asking you for insight, understanding, or perspective on things in t
 - Do not update status, priority, or any metadata
 - Do not make commitments on behalf of the user
 - Do not suggest changes unless explicitly asked
+
+**The trigger exception:** session-start trigger evaluation is a read activity that exists to proactively surface unblocks, approaching deadlines, and threshold breaches. That is not a violation of the rule above — a declared trigger is the domain's standing, pre-authorised request to be told when its condition holds. The boundary: surface what fired and what it implies; don't act on it or recommend unrelated changes uninvited.
 
 ## Loading Strategy: Tiered Context Windows
 

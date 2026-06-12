@@ -139,13 +139,13 @@ Deploy an index when **the cost of scanning all things for a signal at session s
 
 ## Context Footprint
 
-The point of an index is to convert an O(all things) read into an O(index) read:
+The point of an index is to convert an O(all things) read into an O(index) read. A thing's frontmatter costs **~100–200 tokens** (measured 2026-06-12, tiktoken o200k_base, across the framework corpus and two live domains — per-domain averages 96–204; re-measure rather than assert, this is the same lesson as `tracking-artifacts-can-drift-from-reality`):
 
 | Operation | Without index | With index |
 |---|---|---|
-| Trigger evaluation, 50 things | ~20k tokens (all frontmatter) | ~1.5–3k (index only) |
+| Trigger evaluation, 50 things | ~5–10k tokens (all frontmatter at ~100–200/thing) | ~1.5–3k (index only) |
 | Schema review | full frontmatter scan | ~0.8–1.2k (registry) |
-| Conflict scan, full domain | Level 2 load of all things (~20–30k) | ~2–4k (relationship index) + targeted Level 2 on suspects |
+| Conflict scan, 50 things | Level 2 load of all things (~5–10k — L2 is frontmatter-resident) | ~2–4k (relationship index) + targeted Level 2 on suspects |
 
 The write-time cost of incremental maintenance is small and distributed across many sessions. The read-time cost stays roughly flat as the domain grows, because the index aggregates rather than reproduces. This is the same economics as tiered loading, applied to reflexive behaviour.
 

@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -102,7 +102,7 @@ validate: fixed 2 broken links, added missing status field to task-budget
 
 **At session end**
 
-Safety net. Before closing a session, any uncommitted changes should be committed. Nothing should be left in working state across sessions.
+Safety net — the backstop, not the invariant. The `post-write:commit` hard hook is the invariant: every write is committed before the response completes, so in a compliant session there is nothing left to commit here. This check exists for when the invariant was breached anyway — a hook that couldn't fire in the harness, an interrupted session, a missed write. Finding uncommitted changes at session end is a signal worth noting, not routine.
 
 ```
 session-end: uncommitted changes from session 2 (19 May 2026)

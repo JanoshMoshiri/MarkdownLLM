@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-06-11
-generated: 2026-06-11T08:06:05
-generated_from: HEAD@cc3b1cf
+created: 2026-06-12
+generated: 2026-06-12T07:13:55
+generated_from: HEAD@19b3d88
 coverage: 6
 framework_version: 3.4.0
 ---
@@ -37,7 +37,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 ## read.thing.md
 
-**Read mode = analysis without modification.** No file changes, no status updates, no new things, no commitments on the user's behalf; suggest changes only when asked.
+**Read mode = analysis without modification.** No file changes, no status updates, no new things, no commitments on the user's behalf; suggest changes only when asked — except surfacing what a declared trigger fired on (a trigger is the domain's standing request to be told).
 
 **Load tiered, contextually:** L1 metadata for broad questions ("what's my situation?") · L2 +relationships for connection/path questions · L3 full body for deep questions about specific things. Load the relevant subset (by tag, time, domain), never everything. Go deeper only where L1 surfaced something.
 

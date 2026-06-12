@@ -2,7 +2,7 @@
 id: scalability-guide
 type: guide
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-17
 linked_things:
   - id: thing-specification
@@ -260,9 +260,9 @@ These aren't hard thresholds—they're signals that your system has grown and op
 
 Tiered loading reduces cost — it does not eliminate it. Here's what to expect at realistic scale:
 
-**Metadata-only loading (Level 1):** Each thing's YAML frontmatter is typically 8-15 lines. At 200 things, that's 1,600-3,000 lines of YAML in context — roughly 4,000-8,000 tokens depending on field density. This is manageable but not negligible. At 500 things, Level 1 alone approaches 10,000-20,000 tokens. At 1,000 things, it exceeds most models' useful working context even at metadata-only depth.
+**Metadata-only loading (Level 1):** A thing's YAML frontmatter costs **~100–200 tokens** (measured 2026-06-12, tiktoken o200k_base, across the framework corpus and two live domains — per-domain averages ranged 96–204; richer frontmatter such as decision records with pinned inputs sits at the high end). At 200 things, Level 1 alone is roughly 20,000–40,000 tokens — a substantial share of working context before any reasoning begins. At 500 things, 50,000–100,000. At 1,000 things, metadata-only loading alone exceeds most models' useful working context. These figures are measured, not estimated — re-measure on your own corpus rather than trusting them, and expect derived indexes (`derived-index.md`) to become attractive well before the upper end.
 
-**Session cost:** A typical session that scans metadata, loads relationships for a subset, then deep-dives into 3-5 things might consume 15,000-30,000 tokens at 200-thing scale. At current pricing, this is pennies per session — but it compounds across daily use.
+**Session cost:** A typical session that scans metadata, loads relationships for a subset, then deep-dives into 3-5 things might consume 25,000-50,000 tokens at 200-thing scale. At current pricing, this is pennies to tens of pennies per session — but it compounds across daily use.
 
 **The framework's design choice:** This framework deliberately avoids indexing, search, or database layers. The LLM reasons directly over the data. This preserves transparency (no hidden state), portability (no infrastructure), and coherence (the agent sees what it reasons about). The trade-off is that cost scales linearly with domain size, even with tiering. Indexing would make cost sub-linear but would break the principle that the agent's context *is* the data.
 

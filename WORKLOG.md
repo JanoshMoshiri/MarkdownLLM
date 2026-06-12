@@ -1100,8 +1100,8 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 
 - [x] CONTRIBUTING.md: add versioning note (independent versioning is intentional, not inconsistency)
 - [x] CONTRIBUTING.md: state naming conventions are frozen
-- [ ] validate.thing.skill.md: add validation honesty paragraph (LLM-performed, not deterministic)
-- [ ] scalability-guide.md: add cost/performance honesty section (tiered loading reduces but doesn't eliminate cost)
+- [x] validate.thing.skill.md: add validation honesty paragraph (LLM-performed, not deterministic) *(superseded by v3: validate.thing.md v2.0 made mechanical validation deterministic via mdllm + pre-commit hook — stronger than the paragraph the review asked for)*
+- [x] scalability-guide.md: add cost/performance honesty section (tiered loading reduces but doesn't eliminate cost) *(done: "Cost and Performance Trade-offs" section; figures replaced with measured numbers 2026-06-12)*
 - [x] CHANGELOG.md: tone calibration on "Unreleased" and 2.2.0 sections
 - [ ] New: limitations.md — when not to use this framework
 - [ ] New: comparison/differentiation section or document
@@ -1119,7 +1119,7 @@ The distinction between a *nudge* and a *procedure* is the critical finding. Nar
 - [x] Document the output layer — things are persistent state; outputs (documents, images, code, video, audio) are deliverables the agent produces from that state. Define this distinction explicitly. *(done: interface.md, things vs deliverables section)*
 - [x] Define a trigger/event system — optional fields or patterns for automated re-evaluation (due date passed, dependency resolved, status changed) *(done: triggers section in thing.md, v2.1)*
 - [x] Specify the git workflow — commit message conventions, who commits (human vs LLM), branching strategy, PR vs direct-to-main, conflict handling *(done: git-workflow.md created in v2.1)*
-- [ ] Address referential integrity — what happens when a thing is deleted or renamed; detection and repair of broken `linked_things` references
+- [x] Address referential integrity — what happens when a thing is deleted or renamed; detection and repair of broken `linked_things` references *(detection done in v3: `mdllm validate` flags broken references as Errors and the pre-commit hook blocks them from being committed; repair remains a session activity guided by the findings)*
 - [x] Create a validation/linting specification — schema validation for thing files (required fields present, valid status values, link integrity) *(done: validate.thing.skill.md created in v2.1)*
 - [ ] Address context budget vs small model claim — skill compression or inline summaries for constrained-context deployments where 8K-16K tokens is the limit
 - [ ] Document concurrency/multi-agent patterns — what happens when two LLM sessions operate on the same domain simultaneously; semantic conflict resolution beyond git merge

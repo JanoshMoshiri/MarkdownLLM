@@ -133,7 +133,7 @@ The framework defines itself through these interconnected specifications:
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: stable`)
 - **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: stable`)
 - **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: stable`)
-- **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things and the domain `continuity-brief`. Defines the mandatory `session-end:continuity` ritual. (`type: specification`, `status: stable`)
+- **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things and the domain `continuity-brief`. Defines the session-end continuity ritual (invoked via the `session-end-continuity` bound prompt — explicit, not automatic). (`type: specification`, `status: stable`)
 - **belief-revision.md** — How the framework handles contradictions between things: `type: conflict`, `relation: supersedes`/`contradicts`, and the belief revision process. (`type: specification`, `status: stable`)
 - **retrospective.md** — Periodic domain quality reflection: `type: retrospective`, when to write one, and how it produces insights, surfaces latent conflicts, and improves reasoning over time. (`type: specification`, `status: stable`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
