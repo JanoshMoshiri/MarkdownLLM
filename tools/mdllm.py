@@ -1116,10 +1116,18 @@ def cmd_eval(args) -> int:
                 _json.dumps(results[-1], indent=2), encoding="utf-8")
             continue
         wall = (dt.datetime.now() - t0).total_seconds()
+        # Always persist the agent's raw output — a 2-second 1-turn "trial"
+        # is indistinguishable from a real one without it.
+        (run_dir / "agent-stdout.json").write_text(proc.stdout or "", encoding="utf-8")
+        if proc.stderr:
+            (run_dir / "agent-stderr.txt").write_text(proc.stderr, encoding="utf-8")
         cost = turns = None
         try:
             meta = _json.loads(proc.stdout)
             cost, turns = meta.get("total_cost_usd"), meta.get("num_turns")
+            if meta.get("is_error") or meta.get("subtype") not in (None, "success"):
+                print(f"  AGENT ERROR ({meta.get('subtype')}): "
+                      f"{str(meta.get('result'))[:200]}")
         except (ValueError, TypeError):
             pass
         passed, failed, lines = check_assertions(fixture, run_dir)

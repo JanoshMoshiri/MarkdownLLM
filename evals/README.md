@@ -13,12 +13,21 @@ python tools/mdllm.py eval <domain-path> --fixture evals/<fixture>.yaml
 ```yaml
 name: short fixture name
 description: what scenario this verifies
+domain_dir: client-tracker   # optional — scaffold fixtures: thing/status/field/link/
+                             # validates assertions scan this workspace subfolder
+allowed_tools: "..."         # optional — override the agent's tool allowlist
 assertions:
   - thing_exists: some-thing-id
   - status: { id: some-thing-id, equals: figures-ready }
   - field: { id: some-thing-id, name: net_vat_due, equals: 1234.56 }
   - link: { from: a-return, relation: has-deadline, to: a-deadline }
   - validates_clean: true
+  # scaffold-style (workspace-relative; added for the cold-start rehearsal):
+  - file_exists: client-tracker/AGENTS.md      # or a list — any match passes
+  - file_contains: { path: .gitignore, text: "client-tracker" }
+  - git_repo: client-tracker                   # subfolder is its own git repo
+  - git_commits: { path: client-tracker, min: 1 }
+  - min_things: 5
 ```
 
 ## The two-stage loop
@@ -97,6 +106,41 @@ can cite this experiment. See insight
 `first-2x2-measured-convention-following-not-reasoning`. (The pre-fix smoke
 run lives in `evals/runs/_excluded-pre-fix/`, excluded from the report — it
 ran against the fixture's pre-fix id template through a broken runner.)
+
+## The cold-start scaffold rehearsal (2026-06-12, cold-start-scaffold)
+
+The agent-only half of the cold-start eval: a fresh headless agent, an
+operator-voiced brief, read access to the framework, and eleven mechanical
+assertions over birth quality (isolation, commits, versioned AGENTS.md,
+schema, skills, hook, validates clean). Run the day `mdllm scaffold` was
+built — deliberately, in this order:
+
+| trial | guide state | score | miss | wall | cost |
+|---|---|---|---|---|---|
+| opus t1 | pre-scaffold | 10/11 | **zero commits in the domain repo** | 1019s | $6.43 |
+| haiku t1 | pre-scaffold | 10/11 | **no outer .gitignore isolation** | 325s | $0.52 |
+| haiku t2 | guide routes to `mdllm scaffold` | **11/11** | — (used the tool; its first commit is the scaffold commit) | 261s | $0.45 |
+
+**Honest reading (n=3, so a pattern, not a proof):** both pre-scaffold trials
+built structurally valid domains — schema declared, four skills, 9 things,
+validates clean, hook installed — and each dropped a *different mechanical*
+step of the `pre-domain-scaffold:isolate` sequence. The semantic half was
+reliably good; the mechanical half decayed exactly the way
+`hook-compliance-correlates-with-scope-not-awareness` predicts (the opus
+trial ran 96 turns and never committed). Mechanising the mechanical half
+(`mdllm scaffold`, same day) took the next trial to 11/11 at a fraction of
+the cost. The opus trial also left a stale `index.lock` on the *framework*
+repo despite a read-only instruction — agent git activity outside its
+workspace is real, which is why scaffold owns the outer-repo commit.
+Three additional trials died in 2s with an unparseable 1-turn result before
+the runner captured agent output (now in `runs/_excluded-cli-failures/`,
+excluded from the report; `agent-stdout.json`/`agent-stderr.txt` are persisted
+per-trial since the fix, so future failures are diagnosable).
+
+The human half of the cold-start eval still stands as designed — a non-author
+operator, observed not helped. This rehearsal cleared the path for it: the
+template bugs it would have hit (an unparseable `_schema.yaml.template`,
+undeclared relations) were found and fixed building the fixture.
 
 ## Conventions
 
