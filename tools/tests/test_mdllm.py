@@ -336,6 +336,41 @@ def test_provenance_index_reverse_map(tmp_path):
     assert coverage == 1 and "## k" in body and "d (pinned @abc1234)" in body
 
 
+# ---------------------------------------------------------------- scaffold
+
+
+def test_scaffold_birth_sequence(tmp_path, capsys):
+    _git_repo(tmp_path)
+    target = tmp_path / "client-x"
+    rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+    out = capsys.readouterr().out
+    assert rc == 0 and "first commit made" in out
+    # isolation: outer repo ignores the domain, committed before domain work
+    assert "client-x/" in (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    assert (target / ".git").exists()
+    assert (target / ".git" / "hooks" / "pre-commit").is_file()
+    # mechanical placeholders substituted; semantic ones intact
+    agents = (target / "AGENTS.md").read_text(encoding="utf-8")
+    assert "framework_version_seen: " in agents and "[relative path" not in agents
+    assert "[What this domain does]" in agents  # semantic half untouched
+    # the freshly scaffolded domain passes the floor with zero findings
+    corpus, findings = mdllm.scan(target)
+    for t in corpus.things:
+        findings.extend(mdllm.validate_level1(t, corpus.schema))
+    findings.extend(mdllm.validate_level2(corpus))
+    findings.extend(mdllm.validate_level3(corpus))
+    assert findings == [] and len(corpus.things) == 4
+
+
+def test_schema_unparseable_is_finding_not_crash(tmp_path):
+    write(tmp_path, "_schema.yaml", "types:\n  [oops]:\n    statuses: [a]\n")
+    write(tmp_path, "things/alpha.md", thing_text(GOOD))
+    corpus, findings = mdllm.scan(tmp_path)
+    assert corpus.schema is None
+    assert any("unparseable" in f.message for f in findings
+               if f.severity == mdllm.SEV_ERROR)
+
+
 # ------------------------------------------------- scaffold-style assertions
 
 

@@ -14,6 +14,9 @@ Subcommands:
   tokens   [path]      Measure spec token costs by loading tier.
   doctor   [path]      Probe the environment: floor prerequisites, hook
                        execution (not just presence), framework version drift.
+  scaffold <path>      Deterministic domain birth: instantiated templates,
+                       nested git repo, outer .gitignore isolation, hook,
+                       first commit. The semantic half stays with the agent.
   install-hook [path]  Install a git pre-commit hook running `validate`.
 
 Requires: Python 3.10+, PyYAML. tiktoken optional (tokens falls back to heuristic).
@@ -131,11 +134,18 @@ def load_schema(root: Path) -> dict | None:
 
 def scan(root: Path) -> tuple[Corpus, list[Finding]]:
     corpus = Corpus(root=root)
-    corpus.schema = load_schema(root)
+    findings: list[Finding] = []
+    try:
+        corpus.schema = load_schema(root)
+    except yaml.YAMLError as e:
+        # An unparseable schema must be a finding, not a crash — otherwise
+        # one bad edit to _schema.yaml takes the whole floor down with it.
+        corpus.schema = None
+        findings.append(Finding(SEV_ERROR, "_schema.yaml",
+                                f"schema unparseable — validating without it: {e}"))
     excludes = set(DEFAULT_EXCLUDES)
     if corpus.schema and isinstance(corpus.schema.get("exclude"), list):
         excludes |= set(corpus.schema["exclude"])
-    findings: list[Finding] = []
 
     for path in sorted(root.rglob("*.md")):
         rel = path.relative_to(root)
@@ -1318,8 +1328,9 @@ def cmd_doctor(args) -> int:
     return 0 if floor_ok else 1
 
 
-def cmd_install_hook(args) -> int:
-    root = Path(args.path).resolve()
+def install_hook(root: Path) -> str:
+    """Write the pre-commit validation hook into `root`'s git repo.
+    Returns the mdllm path the hook will use (for reporting)."""
     git_dir = root / ".git"
     if not git_dir.is_dir():
         sys.exit(f"mdllm: {root} is not a git repository root")
@@ -1336,7 +1347,123 @@ def cmd_install_hook(args) -> int:
         hook.chmod(hook.stat().st_mode | 0o111)
     except OSError:
         pass  # Windows: executability is not a file-mode concern
-    print(f"installed {hook} (mdllm via {rel})")
+    return rel
+
+
+def cmd_install_hook(args) -> int:
+    root = Path(args.path).resolve()
+    rel = install_hook(root)
+    print(f"installed {root / '.git' / 'hooks' / 'pre-commit'} (mdllm via {rel})")
+    return 0
+
+
+def cmd_scaffold(args) -> int:
+    """The pre-domain-scaffold:isolate hard hook, mechanised. Owns the
+    deterministic sequence of domain birth: directories, templates with
+    mechanical placeholders substituted (name, dates, framework_root,
+    framework_version_seen), a nested git repo, the outer repo's .gitignore
+    isolation (added and committed BEFORE the domain's first commit, per the
+    hard hook's ordering), the pre-commit hook, and the first commit.
+    What remains semantic — thing types and vocabularies in _schema.yaml,
+    skill content, AGENTS.md sections, the first real things — stays with
+    the agent and the human, where it belongs."""
+    import os
+    fw_root = Path(__file__).resolve().parents[1]
+    sentinel = fw_root / ".markdownllm"
+    if not sentinel.is_file():
+        sys.exit("mdllm: scaffold requires a framework checkout (.markdownllm not found)")
+    fw_version = str((yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {})
+                     .get("version"))
+    target = Path(args.path).resolve()
+    name = target.name
+    if not ID_RE.match(name):
+        sys.exit(f"mdllm: domain folder name must be kebab-case (got {name!r})")
+    if target.exists() and any(target.iterdir()):
+        sys.exit(f"mdllm: {target} exists and is not empty")
+    templates = fw_root / "templates"
+    title = " ".join(w.capitalize() for w in name.split("-"))
+    today = f"{dt.date.today():%Y-%m-%d}"
+    try:
+        rel_fw = Path(os.path.relpath(fw_root, target)).as_posix()
+    except ValueError:
+        rel_fw = fw_root.as_posix()
+
+    def instantiate(text: str) -> str:
+        text = (text.replace("[domain]", name)
+                    .replace("[Domain Name]", title)
+                    .replace("[Domain]", title)
+                    .replace("[ISO-date]", today))
+        text = re.sub(r"framework_root: \[[^\]]*\]", f"framework_root: {rel_fw}", text)
+        text = re.sub(r"framework_version_seen: \[[^\]]*\]",
+                      f"framework_version_seen: {fw_version}", text)
+        return text
+
+    (target / "things").mkdir(parents=True, exist_ok=True)
+    (target / "skills").mkdir(exist_ok=True)
+    written: list[str] = []
+    (target / "AGENTS.md").write_text(
+        instantiate((templates / "AGENTS.md.template").read_text(encoding="utf-8")),
+        encoding="utf-8", newline="\n")
+    written.append("AGENTS.md")
+    (target / "things" / "_schema.yaml").write_text(
+        (templates / "_schema.yaml.template").read_text(encoding="utf-8")
+        .replace("[domain-name]", name),
+        encoding="utf-8", newline="\n")
+    written.append("things/_schema.yaml")
+    for t in sorted(templates.glob("domain-*.skill.md.template")):
+        out_name = t.name.replace("domain-", f"{name}-", 1)
+        out_name = out_name[:-len(".template")]
+        (target / "skills" / out_name).write_text(
+            instantiate(t.read_text(encoding="utf-8")), encoding="utf-8", newline="\n")
+        written.append(f"skills/{out_name}")
+
+    # Isolation, in the hard hook's order: (1) domain repo exists,
+    # (2)+(3) outer repo ignores the domain BEFORE any domain commit,
+    # (4) domain's first commit. Step 5 (remote) stays with the human.
+    subprocess.run(["git", "init", "-q"], cwd=target, check=True)
+    outer = subprocess.run(["git", "rev-parse", "--show-toplevel"],
+                           cwd=target.parent, capture_output=True, text=True)
+    isolated_in = None
+    if outer.returncode == 0 and outer.stdout.strip():
+        outer_root = Path(outer.stdout.strip())
+        rel_t = Path(os.path.relpath(target, outer_root)).as_posix() + "/"
+        gi = outer_root / ".gitignore"
+        existing = gi.read_text(encoding="utf-8") if gi.is_file() else ""
+        if rel_t.rstrip("/") not in {ln.strip().rstrip("/") for ln in existing.splitlines()}:
+            gi.write_text(existing.rstrip("\n") + ("\n" if existing else "")
+                          + f"{rel_t}\n", encoding="utf-8", newline="\n")
+            subprocess.run(["git", "add", ".gitignore"], cwd=outer_root, check=True)
+            commit = subprocess.run(
+                ["git", "commit", "-q", "-m", f"chore: isolate domain {rel_t} (scaffold)"],
+                cwd=outer_root, capture_output=True, text=True)
+            if commit.returncode != 0:
+                print(f"WARN  outer .gitignore updated but commit failed in {outer_root}:"
+                      f" {commit.stderr.strip() or commit.stdout.strip()}")
+        isolated_in = outer_root
+
+    hook_via = install_hook(target)
+    subprocess.run(["git", "add", "-A"], cwd=target, check=True)
+    first = subprocess.run(
+        ["git", "commit", "-q", "-m", f"scaffold: {name} — framework v{fw_version}"],
+        cwd=target, capture_output=True, text=True)
+
+    print(f"## Scaffolded {name} — {target}\n")
+    for w in written:
+        print(f"  wrote {w}")
+    print(f"  git repo initialised; pre-commit hook installed (mdllm via {hook_via})")
+    if isolated_in:
+        print(f"  isolated: {isolated_in / '.gitignore'} ignores the domain")
+    if first.returncode == 0:
+        print(f"  first commit made (framework_version_seen: {fw_version})")
+    else:
+        print(f"  WARN  first commit failed — configure git user.name/user.email, "
+              f"then commit. ({first.stderr.strip() or first.stdout.strip()})")
+    print("\nStill yours (and your agent's) — the semantic half:")
+    print("  - AGENTS.md: name, description, principles, thing types")
+    print("  - things/_schema.yaml: declare your types and status vocabularies")
+    print("  - skills/: fill the four skill bodies with the domain's reasoning")
+    print("  - things/: create the first real things")
+    print("  - a remote, if the domain should have one")
     return 0
 
 
@@ -1406,6 +1533,12 @@ def main() -> int:
                                       "hook execution, framework version drift")
     d.add_argument("path", nargs="?", default=".")
     d.set_defaults(fn=cmd_doctor)
+
+    sc = sub.add_parser("scaffold", help="deterministic domain birth: templates, "
+                                         "nested repo, .gitignore isolation, hook, "
+                                         "first commit")
+    sc.add_argument("path", help="folder to create (its name becomes the domain name)")
+    sc.set_defaults(fn=cmd_scaffold)
 
     h = sub.add_parser("install-hook", help="install git pre-commit validation hook")
     h.add_argument("path", nargs="?", default=".")

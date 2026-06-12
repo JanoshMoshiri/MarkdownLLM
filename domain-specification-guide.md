@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.8
+version: 2.9
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -214,9 +214,8 @@ MarkdownLLM/                        ← Framework git repo (cloned from GitHub)
 ### Setup Steps
 
 1. **Clone the framework:** `git clone https://github.com/[org]/MarkdownLLM.git`
-2. **Create your domain folder:** `mkdir domains/my-domain && cd domains/my-domain`
-3. **Initialise a git repo:** `git init`
-4. **Tell the agent to create your domain** — describe what you want and let it build the structure
+2. **Scaffold the mechanical shell:** `python tools/mdllm.py scaffold domains/my-domain` — this performs the entire birth sequence deterministically: instantiated templates (AGENTS.md with `framework_root` and `framework_version_seen` filled in, `things/_schema.yaml`, the four skill files), `git init`, the framework-side `.gitignore` isolation *committed before any domain commit*, the pre-commit hook, and the domain's first commit. It satisfies the `pre-domain-scaffold:isolate` hard hook by construction.
+3. **Tell the agent to fill the semantic half** — describe what you want; the agent declares your thing types and vocabularies in `_schema.yaml`, writes the skill bodies, completes AGENTS.md, and creates seed things
 
 ### Why This Model
 

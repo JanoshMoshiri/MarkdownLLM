@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: kernel
 created: 2026-06-12
-generated: 2026-06-12T20:24:24
-generated_from: HEAD@aaedefa
+generated: 2026-06-12T23:22:06
+generated_from: HEAD@5a6b799
 coverage: 6
 framework_version: 3.5.0
 ---
@@ -73,7 +73,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Hard hooks — always active, never skippable:**
 1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
-2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo.
+2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch: surface, run validation, offer `domain-refresh.md`.
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).

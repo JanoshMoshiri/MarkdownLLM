@@ -64,11 +64,11 @@ When creating a new thing:
 ---
 id: unique-identifier
 type: [domain-specific-type]
-status: [not-started/in-progress/blocked/paused/completed/cancelled]
-created: ISO-datetime
+status: [a value from this type's vocabulary in things/_schema.yaml]
+created: ISO-date
 linked_things:
   - id: related-thing-id
-    relation: relationship-type
+    relation: related   # from the vocabulary declared in things/_schema.yaml
 ---
 
 # Thing Title
@@ -206,14 +206,16 @@ Each commit should represent one logical change to domain state.
 
 ## Creating with Dependencies
 
-When creating something that references other things:
+Sequencing lives in fields, not relations — `dependencies` (must finish
+first) and `blocks` (cannot start until this finishes), with `parent` for
+hierarchy:
 
 ```yaml
-linked_things:
-  - id: thing-it-depends-on
-    relation: "depends-on"
-  - id: thing-that-depends-on-this
-    relation: "enables"
+dependencies: [thing-that-must-finish-first]
+blocks: [thing-waiting-on-this]
+parent: containing-project-id
 ```
 
-Ensure both directions are properly linked.
+`linked_things` carries only what fields cannot: a *semantic* relation from
+the vocabulary declared in `things/_schema.yaml`. The validator checks that
+`blocks` targets list the inverse dependency — keep both sides honest.

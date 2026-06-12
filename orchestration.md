@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.8
+version: 1.9
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -32,7 +32,7 @@ linked_things:
 <!-- kernel -->
 **Hard hooks — always active, never skippable:**
 1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
-2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo.
+2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch: surface, run validation, offer `domain-refresh.md`.
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
@@ -97,6 +97,8 @@ These three hard hooks are part of every agent's operating contract with the fra
 3. Commit the `.gitignore` change to the framework repo — so the framework never tracks the domain
 4. Commit the domain files to the domain's own repo
 5. Create a remote repository and push
+
+**Mechanised since v3.6:** `python tools/mdllm.py scaffold <path>` performs steps 1–4 deterministically (plus instantiated templates and the pre-commit hook) — running it is the canonical way to satisfy this hook. Step 5 (the remote) stays with the human. The hook still binds when scaffolding by hand: the *ordering* is the invariant, not the tool.
 
 **Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
 

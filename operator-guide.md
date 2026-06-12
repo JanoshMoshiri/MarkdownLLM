@@ -167,6 +167,7 @@ CI, or the agent — but all of them are yours to invoke directly.
 | `changelog --since <tag>` | Drafts a CHANGELOG entry from the commit stream | Framework release prep |
 | `install-hook [path]` | Installs the git pre-commit validation hook | Once per domain repo, at floor adoption |
 | `doctor [path]` | Probes the environment: prerequisites, hook *execution*, framework version drift; exit 1 = degraded mode | New machine, new harness, or "is the floor actually on here?" |
+| `scaffold <path>` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, hook, first commit | Creating a new domain — the mechanical half is one command |
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
 

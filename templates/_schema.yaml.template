@@ -9,23 +9,32 @@
 schema_version: 1
 domain: [domain-name]
 
-# options:
-#   id_filename_match: true   # default; set false only with a naming convention reason
+options:
+  # The scaffolded skills use the framework's dotted naming convention
+  # (x-read.thing.skill.md) with plain kebab-case ids, so the id↔filename
+  # check is off. Flip to true if your domain's files all match their ids.
+  id_filename_match: false
 
-types:
-  [your-thing-type]:
-    statuses: [not-started, in-progress, completed] # the FULL lifecycle this type moves through
-    # required_fields: [field-a, field-b]           # enforced as Error when missing
-  [another-type]:
-    statuses: [open, figures-ready, submitted]
+# Declare one entry per thing type. The placeholders below are commented out
+# so this file is valid YAML from the moment it is copied — uncomment and
+# rename as your types emerge. (An unparseable schema breaks `mdllm validate`.)
+types: {}
+#  your-thing-type:
+#    statuses: [not-started, in-progress, completed] # the FULL lifecycle this type moves through
+#    # required_fields: [field-a, field-b]           # enforced as Error when missing
+#  another-type:
+#    statuses: [open, figures-ready, submitted]
 
 # Relation vocabulary (validated at Warning severity). Start small — grow it
 # when a real link needs a relation that isn't here, prune at retrospectives.
+# The first four are what the scaffolded skills already use.
 relations:
   - informs
   - implements
+  - complements
+  - orchestrates   # workflow skill sequencing other skills
   - references
+  - related
   - supersedes
   - superseded-by
   - contradicts
-  - derived-from

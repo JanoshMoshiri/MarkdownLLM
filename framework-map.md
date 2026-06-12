@@ -66,7 +66,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>10 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>11 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -177,6 +177,7 @@ flowchart LR
         C8["changelog"]
         C9["install-hook"]
         C10["doctor"]
+        C11["scaffold"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -189,6 +190,7 @@ flowchart LR
         T8["CHANGELOG.md"]
         T9["git pre-commit hook"]
         T10["floor availability itself"]
+        T11["pre-domain-scaffold:isolate<br/>hard hook"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -201,6 +203,7 @@ flowchart LR
     C8 -.->|drafts| T8
     C9 -.->|installs| T9
     C10 -->|"execution-tests"| T10
+    C11 -->|mechanises| T11
 ```
 
 Notes on this view:

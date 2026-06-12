@@ -94,8 +94,10 @@ What should happen next — and what you should do:
 - **The agent builds in isolation.** A new domain gets its *own* git
   repository, and the domain folder is added to the framework's
   `.gitignore`. This is mandatory, not stylistic — your domain's history
-  stays yours. Red flag worth catching in hour one: domain files appearing
-  in the *framework's* `git log`.
+  stays yours. The mechanical half of this is one command
+  (`python tools/mdllm.py scaffold <path>`), which the agent should reach
+  for. Red flag worth catching in hour one: domain files appearing in the
+  *framework's* `git log`.
 - **You get a seed thing or two**, not an empty shell. Ask for one if you
   don't get one.
 
