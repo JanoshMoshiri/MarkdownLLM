@@ -1,8 +1,10 @@
 ---
 name: Compliance Patterns Library
 description: Reference patterns for encoding compliance as verifiable reasoning using multi-lens frameworks
-version: 2.0
+version: 2.1
 applies_to: "**/*.md"
+framework_root: ../..
+framework_version_seen: 3.4.0
 ---
 
 # Compliance Patterns Library Agent
@@ -37,9 +39,9 @@ This is a reference library for domain builders creating systems that operate un
 ## How This Agent Works
 
 ### On Startup
-1. Load all skills from `./skills/`
-2. Register: compliance-patterns-specification.skill.md, compliance-patterns-read.thing.skill.md, compliance-patterns-write.thing.skill.md, compliance-patterns-workflow.skill.md
-3. Load thing.md for understanding example patterns
+1. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen` above
+2. Load `{framework_root}/kernel.md` — the framework's operative rules; load a full spec only when the kernel doesn't settle an ambiguity
+3. Load skills relevant to session intent: compliance-patterns-specification.skill.md, compliance-patterns-read.thing.skill.md, compliance-patterns-write.thing.skill.md, compliance-patterns-workflow.skill.md
 4. Evaluate triggers — check for patterns referencing outdated regulations or unlinked anti-patterns
 
 ### On User Request
@@ -67,10 +69,10 @@ All reusable capabilities for compliance pattern documentation:
 
 ## Foundational Specifications
 
-Loaded from the MarkdownLLM framework root:
+Resolved from the MarkdownLLM framework root via `framework_root` (the kernel covers their operative rules; load a full spec on demand):
 
 - **thing.md** — The atomic unit specification (structure for all things)
-- **validate.thing.md** — Validation skill (structural, referential, semantic checks)
+- **validate.thing.md** — The validation contract (mechanical layer: `mdllm`; semantic layer: the agent)
 - **git-workflow.md** — When and how to commit (git as state machine)
 - **interface.md** — I/O layer (input routes and output types)
 

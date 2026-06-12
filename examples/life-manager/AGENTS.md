@@ -1,8 +1,10 @@
 ---
 name: Life Manager
 description: A system for managing your life and work as interconnected things using LLM reasoning
-version: 2.0
+version: 2.1
 applies_to: "**/*.md"
+framework_root: ../..
+framework_version_seen: 3.4.0
 ---
 
 # Life Manager Agent
@@ -23,9 +25,9 @@ This system transforms how you manage your life by inverting the traditional app
 ## How This Agent Works
 
 ### On Startup
-1. Load all skills from `./skills/`
-2. Register: life-manager-specification.skill.md, life-manager-read.thing.skill.md, life-manager-write.thing.skill.md, life-manager-workflow.skill.md
-3. Load thing.md reference for understanding atomic units
+1. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen` above
+2. Load `{framework_root}/kernel.md` — the framework's operative rules; load a full spec only when the kernel doesn't settle an ambiguity
+3. Load skills relevant to session intent: life-manager-specification.skill.md, life-manager-read.thing.skill.md, life-manager-write.thing.skill.md, life-manager-workflow.skill.md
 4. Evaluate triggers — scan things for overdue items, unblocked dependencies, threshold breaches since last session
 
 ### On User Request
@@ -53,16 +55,18 @@ All reusable capabilities for life management:
 
 ## Foundational Specifications
 
-Loaded from the MarkdownLLM framework root:
+Resolved from the MarkdownLLM framework root via `framework_root` (the kernel covers their operative rules; load a full spec on demand):
 
 - **thing.md** — The atomic unit specification (structure for all things)
-- **validate.thing.md** — Validation skill (structural, referential, semantic checks)
+- **validate.thing.md** — The validation contract (mechanical layer: `mdllm`; semantic layer: the agent)
 - **git-workflow.md** — When and how to commit (git as state machine)
 - **interface.md** — I/O layer (input routes and output types)
 
 ## Things Directory
 
 Your life as interconnected atomic units: `./things/`
+
+> **Status of this example:** skills only — `things/` is not yet populated. This is an illustration of the domain structure, not a demonstration of the system under load (populating it with realistic, interlinked things is an open framework todo).
 
 Thing types in this system:
 - `type: project` — A complete unit of work with phases and deliverables
