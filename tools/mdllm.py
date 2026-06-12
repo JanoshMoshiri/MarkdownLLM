@@ -7,6 +7,8 @@ labour (validate.thing.md v2.0): this tool guarantees the mechanical checks
 
 Subcommands:
   validate [path]      Levels 1-3 mechanical validation. Exit 1 on Errors.
+                       Example domains under <path>/examples/ are validated
+                       as their own corpora in the same run.
   triggers [path]      Evaluate time/dependency/threshold trigger conditions.
   index    [path] check|rebuild [--signal triggers|schema|relationships]
   tokens   [path]      Measure spec token costs by loading tier.
@@ -405,36 +407,63 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
     return f
 
 
-def cmd_validate(args) -> int:
-    root = Path(args.path).resolve()
+def validate_corpus(root: Path) -> tuple[Corpus, list[Finding]]:
     corpus, findings = scan(root)
     for t in corpus.things:
         findings.extend(validate_level1(t, corpus.schema))
     findings.extend(validate_level2(corpus))
     findings.extend(validate_level3(corpus))
+    return corpus, findings
+
+
+def example_corpora(root: Path) -> list[Path]:
+    """Example domains live in <root>/examples/<name>/ with their own
+    AGENTS.md and _schema.yaml. They are excluded from the root corpus walk
+    (separate id space, separate schema) but they are NOT exempt from the
+    floor: validate discovers and checks each one as its own corpus, so the
+    pre-commit hook covers them in the same run."""
+    examples = root / "examples"
+    if not examples.is_dir():
+        return []
+    return sorted(d for d in examples.iterdir()
+                  if d.is_dir() and (d / "AGENTS.md").exists())
+
+
+def cmd_validate(args) -> int:
+    root = Path(args.path).resolve()
+    reports: list[tuple[Path, Corpus, list[Finding]]] = []
+    corpus, findings = validate_corpus(root)
     findings.extend(check_version_sync(root))
+    reports.append((root, corpus, findings))
+    for sub in example_corpora(root):
+        sub_corpus, sub_findings = validate_corpus(sub)
+        reports.append((sub, sub_corpus, sub_findings))
 
-    errors = [x for x in findings if x.severity == SEV_ERROR]
-    warnings = [x for x in findings if x.severity == SEV_WARNING]
-    infos = [x for x in findings if x.severity == SEV_INFO]
+    total_errors = 0
+    for rpt_root, rpt_corpus, rpt_findings in reports:
+        errors = [x for x in rpt_findings if x.severity == SEV_ERROR]
+        warnings = [x for x in rpt_findings if x.severity == SEV_WARNING]
+        infos = [x for x in rpt_findings if x.severity == SEV_INFO]
+        total_errors += len(errors)
 
-    if not args.quiet or errors:
-        print(f"## Validation Report — {root}")
-        print(f"schema: {'_schema.yaml found' if corpus.schema else 'none (default vocabulary, advisory)'}\n")
-        for title, group in (("Errors (must fix)", errors),
-                             ("Warnings (should fix)", warnings),
-                             ("Info (worth knowing)", infos)):
-            if group:
-                print(f"### {title}")
-                for x in group:
-                    print(f"- **{x.thing}**: {x.message}")
-                print()
-        print("### Summary")
-        print(f"- Things checked: {len(corpus.things)}")
-        print(f"- Errors: {len(errors)}  Warnings: {len(warnings)}  Info: {len(infos)}")
-        clean = len(corpus.things) - len({x.thing for x in findings})
-        print(f"- Clean: {max(clean, 0)}")
-    return 1 if errors else 0
+        if not args.quiet or errors:
+            print(f"## Validation Report — {rpt_root}")
+            print(f"schema: {'_schema.yaml found' if rpt_corpus.schema else 'none (default vocabulary, advisory)'}\n")
+            for title, group in (("Errors (must fix)", errors),
+                                 ("Warnings (should fix)", warnings),
+                                 ("Info (worth knowing)", infos)):
+                if group:
+                    print(f"### {title}")
+                    for x in group:
+                        print(f"- **{x.thing}**: {x.message}")
+                    print()
+            print("### Summary")
+            print(f"- Things checked: {len(rpt_corpus.things)}")
+            print(f"- Errors: {len(errors)}  Warnings: {len(warnings)}  Info: {len(infos)}")
+            clean = len(rpt_corpus.things) - len({x.thing for x in rpt_findings})
+            print(f"- Clean: {max(clean, 0)}")
+            print()
+    return 1 if total_errors else 0
 
 
 # ---------------------------------------------------------------- triggers

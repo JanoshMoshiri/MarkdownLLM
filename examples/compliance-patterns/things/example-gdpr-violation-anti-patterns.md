@@ -115,5 +115,5 @@ When you build compliance into the thing structure itself (metadata, fields, rea
 ## Related Patterns
 
 - See `example-gdpr-compliant-data-handling.md` for the corrected approach
-- See `pattern-gdpr-data-residency.md` for detailed residency requirements
-- See `pattern-access-control-matrix.md` for least-privilege implementation
+  (linked as `remediated-by` in the frontmatter — the library's convention for
+  pairing every violation with its fix)

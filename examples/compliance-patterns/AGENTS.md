@@ -1,7 +1,7 @@
 ---
 name: Compliance Patterns Library
 description: Reference patterns for encoding compliance as verifiable reasoning using multi-lens frameworks
-version: 2.1
+version: 3.0
 applies_to: "**/*.md"
 framework_root: ../..
 framework_version_seen: 3.4.0
@@ -52,7 +52,7 @@ This is a reference library for domain builders creating systems that operate un
 5. **Generate guidance** — Help them apply patterns to their context
 
 ### On Output
-- Validate any new patterns (structural, referential, domain-specific)
+- Validate new patterns semantically (all three lenses present? remediation linked? verifiable?) — the mechanical layer (structure, references, `_schema.yaml` vocabularies) is owned by `mdllm validate` and the pre-commit hook
 - Commit with structured message (e.g., `create: pattern-new-id`, `update: example-id`)
 - Reference specific examples and reasoning lenses
 - Explain the multi-lens approach
@@ -127,24 +127,22 @@ Commit with structured message
 Document new patterns or reference existing ones
 ```
 
-## Validation Checklist
+## Validation Checklist (Authoring)
 
-Before committing, verify:
+Mechanical validation (structure, references, declared vocabularies) is owned
+by `mdllm validate` and enforced by the pre-commit hook — never re-perform it
+by reasoning. Before committing a new or changed pattern, verify what the tool
+cannot:
 
 - [ ] Pattern has all three lenses documented (domain, compliance, audit)
-- [ ] Anti-patterns link to their remediation pattern
+- [ ] Anti-patterns link to their remediation pattern (`remediated-by`)
 - [ ] Examples show concrete scenarios (not abstract rules)
-- [ ] thing.md structure followed (id, type, status, created present)
-- [ ] linked_things references are valid (targets exist)
+- [ ] Example is verifiable (yes/no, true/false, not subjective)
 - [ ] Commit message follows `action: description` convention
 
-## Validation Checklist
-
-Before using a pattern in your domain, verify:
+## Adoption Checklist (Using a Pattern in Your Domain)
 
 - [ ] Pattern clearly shows compliant behavior
 - [ ] Anti-pattern clearly shows violation + consequence
 - [ ] Multi-lens reasoning is explicit (domain/compliance/audit)
-- [ ] Thing follows thing.md patterns
-- [ ] Example is verifiable (yes/no, true/false, not subjective)
-- [ ] Applicable to your domain context
+- [ ] Applicable to your domain context — adapt fields to your regulatory regime

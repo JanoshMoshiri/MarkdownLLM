@@ -279,10 +279,10 @@ These are the specs the agent loads and reasons with:
 
 ### Examples
 
-Illustrative domain structures the agent can reference. They demonstrate the shape of a domain (AGENTS.md, skills, thing types), not the system under real load:
+Small working domains the agent can reference. Each declares its own `_schema.yaml` and is validated by the same deterministic floor as the framework — `mdllm validate` checks every example as its own corpus, so a stale example blocks a commit the same way a stale spec does:
 
-- **[examples/compliance-patterns/](examples/compliance-patterns/)** — Regulatory compliance pattern library (skills + a small set of pattern things)
-- **[examples/life-manager/](examples/life-manager/)** — Personal life and work management (skills only; no things yet)
+- **[examples/compliance-patterns/](examples/compliance-patterns/)** — Regulatory compliance pattern library (skills + paired pattern/anti-pattern things)
+- **[examples/life-manager/](examples/life-manager/)** — Personal life and work management (skills + a small interlinked dataset: a project with subtasks, a goal fed by a recurring habit, live triggers, and a decision record with pinned inputs — fictional data, deliberately including one overdue task so `mdllm triggers` has something to find)
 
 For a domain in production use, the framework's own repository is the working example — it is a domain within itself, with live things, validation, and provenance.
 
@@ -501,7 +501,7 @@ If your LLM tool can read files, write files, and navigate directories — yes. 
 
 ### "Is this production-ready?"
 
-The architecture is actively used — the framework develops itself as a domain, and one production domain (statutory company filings) runs on it. Specifications range from `draft` to `stable` (check frontmatter). The `examples/` directory illustrates domain structure rather than demonstrating production load. Your specific domain will mature through use — that's by design.
+The architecture is actively used — the framework develops itself as a domain, and one production domain (statutory company filings) runs on it. Specifications range from `draft` to `stable` (check frontmatter). The `examples/` directory contains small validated demonstrations (under the same mechanical floor as the framework), not production load. Your specific domain will mature through use — that's by design.
 
 ---
 

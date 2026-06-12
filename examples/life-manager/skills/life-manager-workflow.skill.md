@@ -4,7 +4,7 @@ name: Life Manager Workflow
 type: skill
 mode: workflow
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-18
 linked_things:
   - id: life-manager-specification
@@ -41,7 +41,7 @@ Understanding what you've captured. What is this thing really? Why does it matte
 ### Phase 3: Commit
 Deciding what you're actually going to do right now vs. later.
 
-- Move thing from `status: planning` to `status: in-progress`
+- Move thing from `status: not-started` to `status: in-progress`
 - Update due dates if you're committing to a timeline
 - Link to calendar and notification systems
 
@@ -89,7 +89,7 @@ Every week, step back and assess:
 ### Quarterly Review
 Every quarter, zoom out completely:
 
-1. Did you achieve your quarterly goals? (Mark them achieved or deferred)
+1. Did you achieve your quarterly goals? (Mark them `achieved`, `abandoned`, or leave `active`)
 2. What worked? What didn't? (Patterns and learnings)
 3. New quarter, new goals? (Create new goal things)
 4. Portfolio changed? (Did you abandon projects? Start new ones?)
@@ -188,7 +188,7 @@ When you make a request in Life Manager:
 3. **Evaluate triggers:** Check for fired triggers (overdue, unblocked, threshold exceeded)
 4. **Reason within the workflow:** Where are you in the loop? What phase applies?
 5. **Recommend or execute:** Suggest what you should do next, or make updates if you've explicitly asked
-6. **Validate:** After writes, run structural and referential checks
+6. **Validate:** Semantic checks only — `mdllm validate` and the pre-commit hook own the mechanical layer
 7. **Commit:** Persist changes with structured commit messages
 8. **Report:** Tell you what changed and why, including any triggers that fired
 
@@ -224,5 +224,5 @@ Each commit represents one logical change to your life's state.
 
 - **"What should I focus on?"** → Read all active things, analyze workflow phase, recommend priorities
 - **"I finished X"** → Move X to complete, load all things blocked on X, unblock them, tell you what's now possible
-- **"I'm blocked on Y"** → Create dependency thing, mark dependent things blocked, help you unblock Y or defer dependents
+- **"I'm blocked on Y"** → Add Y to the blocked things' `dependencies`, set their status to `blocked`, add a dependency trigger watching Y, help you unblock Y or defer dependents
 - **"Review my week"** → Run weekly review workflow, show you what you accomplished, what changed, what's next

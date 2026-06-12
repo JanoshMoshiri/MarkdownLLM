@@ -3,7 +3,7 @@ id: life-manager-specification
 name: Life Manager Specification
 type: specification
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-18
 linked_things:
   - id: life-manager-read-thing-skill
@@ -59,7 +59,7 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 
 ## Core Principles
 
-**Atomic Units:** Everything is a thing. No special cases. A project, a task, a subtask, a dependency—all things. This creates consistency and composability.
+**Atomic Units:** Everything is a thing. No special cases. A project, a task, a goal, a decision—all things. (Relationships are not things: hierarchy and sequencing live in the `parent`, `dependencies`, and `blocks` fields.) This creates consistency and composability.
 
 **Minimal Core, Emergent Detail:** You start with minimal required metadata. As your life becomes more complex, new fields emerge naturally. Your schema grows with your needs, not ahead of them.
 
@@ -74,9 +74,10 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 - **project** — A complete unit of work with phases and deliverables
 - **task** — A discrete piece of work (atomic or part of a project)
 - **goal** — A desired outcome or state (personal, professional, health, etc.)
-- **dependency** — An explicit relationship, blocker, or prerequisite between things
 - **recurring** — Something that happens regularly (weekly, monthly, etc.)
-- **decision** — A significant choice with impacts on other things
+- **decision** — A significant choice with impacts on other things; framework-reserved, inputs pinned via `informed_by`
+
+Status vocabularies for these types are declared in `_schema.yaml` and enforced mechanically by `mdllm validate`.
 
 ## What This System Is Not
 
@@ -91,12 +92,14 @@ A way to externalize your life management to an intelligent partner while keepin
 
 ## Domain-Specific Validation Rules
 
-Beyond the universal structural checks (id, type, status, created present):
+The mechanical layer (structure, references, declared vocabularies, `priority`
+required on tasks) is owned by `mdllm validate` via `_schema.yaml` and the
+pre-commit hook. The semantic rules — the agent's responsibility — are:
 
-- Things of `type: project` should have at least one `linked_things` entry
-- Things of `type: task` should have `priority` set
+- Things of `type: project` should link their subtasks (`relation: subtask`)
 - Things of `type: goal` should have a narrative body explaining the desired outcome
 - Status transitions should be logical: `not-started` → `in-progress` → `completed` (with `blocked`/`paused` as temporary states)
+- Statuses should be *truthful*, not merely valid — an `in-progress` thing untouched for weeks is the classic lie
 
 ## Triggers
 

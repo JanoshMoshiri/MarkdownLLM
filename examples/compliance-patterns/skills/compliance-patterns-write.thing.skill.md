@@ -4,7 +4,7 @@ name: Compliance Patterns Write Thing Skill
 type: skill
 mode: write
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-18
 linked_things:
   - id: compliance-patterns-specification
@@ -212,13 +212,17 @@ When creating patterns:
 
 ## Post-Write Validation
 
-After every create or update, validate:
+The division of labour is fixed (framework `validate.thing.md` v2.0):
 
-1. **Structural** — YAML valid, required fields present (id, type, status, created)
-2. **Referential** — All linked_things targets exist, anti-patterns link to remediation
-3. **Domain-specific** — All three lenses documented, concrete scenarios included (not just abstract rules)
+- **Mechanical** — structure, references, `_schema.yaml` vocabularies — is
+  owned by `mdllm validate` and enforced by the git pre-commit hook. Never
+  re-perform these checks by reasoning.
+- **Semantic** — yours, after every write: all three lenses documented,
+  anti-patterns linked to remediation (`remediated-by`), scenarios concrete
+  rather than abstract, the example verifiable.
 
-If validation fails, fix the issue before committing.
+If the hook blocks a commit, fix the finding; if the finding is wrong, fix the
+schema with the human — never bypass the hook.
 
 ## Git Commit Conventions
 

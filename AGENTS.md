@@ -155,7 +155,8 @@ The framework defines itself through these interconnected specifications:
 - **thing-lifecycle.md** — Rolling window, disposition to stubs, rehydration from git history, manifest index. Addresses the 200–300 thing ceiling. (`type: specification`, `status: draft`)
 
 ### Examples
-- **examples/life-manager/** — Personal life and work management domain
+Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run at the framework root validates them in the same pass (they are excluded from the framework corpus walk — separate id space — but not from the floor).
+- **examples/life-manager/** — Personal life and work management domain (populated demonstration dataset; one deliberately overdue task for `mdllm triggers`)
 - **examples/compliance-patterns/** — Regulatory compliance pattern library
 
 ### Templates

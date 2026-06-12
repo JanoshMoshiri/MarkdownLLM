@@ -4,7 +4,7 @@ name: Life Manager Read Thing Skill
 type: skill
 mode: read
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-18
 linked_things:
   - id: life-manager-specification
@@ -60,11 +60,10 @@ When responding to the user:
 ## Thing Types in This Domain
 
 - `type: project` — A complete unit of work with phases, deliverables, and outcomes
-- `type: task` — A discrete piece of work, atomic or part of a project
+- `type: task` — A discrete piece of work, atomic or part of a project (hierarchy via `parent`, sequencing via `dependencies`/`blocks`)
 - `type: goal` — A desired outcome or desired state
-- `type: dependency` — An explicit relationship or blocker between things
 - `type: recurring` — Something that happens regularly
-- `type: decision` — A significant choice with impacts
+- `type: decision` — A significant choice, inputs pinned to commits (framework-reserved; see `provenance.md`)
 
 ## Examples Of Read-Mode Queries
 

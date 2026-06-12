@@ -1,7 +1,7 @@
 ---
 name: Life Manager
 description: A system for managing your life and work as interconnected things using LLM reasoning
-version: 2.1
+version: 3.0
 applies_to: "**/*.md"
 framework_root: ../..
 framework_version_seen: 3.4.0
@@ -38,7 +38,7 @@ This system transforms how you manage your life by inverting the traditional app
 5. **Take action** — Update things, create new things, or provide insights
 
 ### On Output
-1. Validate thing files if changes were made (structural, referential, domain-specific)
+1. Validate semantically if changes were made — statuses truthful, relationships meaningful; the mechanical layer (structure, references, schema) is owned by `mdllm validate` and the pre-commit hook
 2. Commit with structured message (e.g., `create: task-buy-groceries`, `update: project-kitchen-reno status`)
 3. Explain what changed and why
 4. Evaluate triggers — check if writes unblocked dependencies or exceeded thresholds
@@ -66,29 +66,35 @@ Resolved from the MarkdownLLM framework root via `framework_root` (the kernel co
 
 Your life as interconnected atomic units: `./things/`
 
-> **Status of this example:** skills only — `things/` is not yet populated. This is an illustration of the domain structure, not a demonstration of the system under load (populating it with realistic, interlinked things is an open framework todo).
+> **Status of this example:** populated with a small fictional but realistic
+> dataset — one project with three subtasks (one completed, one overdue, one
+> blocked), a goal fed by a recurring habit, a weekly review, and a decision
+> record with inputs pinned to git commits. One task is *deliberately* overdue
+> so `mdllm triggers` has something to find. The domain validates under
+> `mdllm validate` against `_schema.yaml`.
 
-Thing types in this system:
+Thing types in this system (status vocabularies declared in `_schema.yaml`):
 - `type: project` — A complete unit of work with phases and deliverables
-- `type: task` — A discrete piece of work (atomic or part of a project)
+- `type: task` — A discrete piece of work; hierarchy via `parent`, sequencing via `dependencies`/`blocks`
 - `type: goal` — A desired outcome or state
-- `type: dependency` — An explicit relationship or blocker between things
 - `type: recurring` — Something that happens regularly
-- `type: decision` — A significant choice with impacts
+- `type: decision` — A significant choice; framework-reserved, inputs pinned via `informed_by` (see `decision-hire-howell-joinery`)
 
 ## Triggers
 
-### Time-Based
-- **Weekly review** — Every Monday, scan all active things: what's overdue? What's at risk? What completed since last review?
-- **Due date approaching** — 2 days before due_date, alert the user
+Time, dependency, and threshold conditions are declared on the things
+themselves and evaluated mechanically — run
+`python {framework_root}/tools/mdllm.py triggers .` from this directory
+(the example dataset always has at least one hit, by design). What remains
+the agent's:
 
-### Dependency
-- **Unblocked** — When a thing with `status: completed` is referenced as a blocker by another thing, notify: "[thing] is now unblocked"
-- **New blocker** — When a thing moves to `status: blocked`, trace what it blocks downstream
-
-### Threshold
-- **Overload warning** — When more than 5 things are `status: in-progress` simultaneously, suggest focusing
-- **Stale items** — When a thing has been `status: in-progress` for more than 14 days without updates, flag it
+- **Acting on hits** — a fired trigger is an attention signal; deciding what
+  to do with it is reasoning
+- **Semantic conditions** — "more than 5 things in-progress, suggest focusing",
+  "in-progress for 14+ days, flag it as possibly stale" — judgement calls the
+  tool doesn't own
+- **Idempotency** — after acting on a `review_date_reached` trigger, advance
+  `review_date`; that update is what stops the trigger re-firing
 
 ## Usage Pattern
 
@@ -101,11 +107,11 @@ Evaluate triggers (session start)
     ↓
 Load appropriate skill (read, write, workflow)
     ↓
-Load relevant things (projects, tasks, goals, dependencies)
+Load relevant things (projects, tasks, goals)
     ↓
 Reason semantically about your life and request
     ↓
-Validate changes
+Validate semantically (the hook owns the mechanical layer)
     ↓
 Commit with structured message
     ↓
@@ -130,13 +136,12 @@ Report what changed + why
 
 ## Validation Checklist
 
-Before committing, verify:
+Mechanical validation (structure, references, declared vocabularies) is owned
+by `mdllm validate` and enforced by the pre-commit hook — never re-perform it
+by reasoning. Before committing, verify what the tool cannot:
 
 - [ ] Relevant skill loaded (read.thing.skill or write.thing.skill)
-- [ ] thing.md patterns followed (id, type, status, created present)
-- [ ] linked_things references are valid (targets exist)
-- [ ] Domain principles maintained
+- [ ] Statuses truthful, not merely valid
+- [ ] Relationships meaningful (the right relation, not just a resolvable id)
+- [ ] Changes scoped appropriately; narrative bodies updated to match reality
 - [ ] Commit message follows `action: description` convention
-- [ ] Life Manager principles maintained
-- [ ] Changes scoped appropriately
-- [ ] Relationships and linked_things accurate

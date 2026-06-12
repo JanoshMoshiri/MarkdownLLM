@@ -4,7 +4,7 @@ name: Life Manager Write Thing Skill
 type: skill
 mode: write
 status: stable
-version: 2.0
+version: 3.0
 created: 2026-05-18
 linked_things:
   - id: life-manager-specification
@@ -57,24 +57,32 @@ The user is asking you to help manage their life and work. Your job is to:
 - **Relationships** — If you're creating a new thing, does it need to link to existing things?
 - **Scope** — Is this thing appropriately scoped? Should it be split or combined with something else?
 - **Context** — Is the narrative body clear enough for future Claude (or the user) to understand what this is?
-- **Versioning** — Make sure your created or modified things include a schema_version in the metadata
+- **Vocabulary** — Statuses and relations come from `_schema.yaml`; if a legitimate change needs a value that isn't declared, extend the schema with the human rather than improvising
 
 ## Thing Types and How to Create Them
+
+Status vocabularies are declared in `_schema.yaml` and enforced by
+`mdllm validate` — the values below are that declaration, not a suggestion.
+Hierarchy uses the `parent` field; sequencing uses `dependencies`/`blocks`;
+`linked_things` carries only what fields cannot (a relation with meaning).
+There is no "dependency thing" — fields express sequencing, things hold content.
 
 ### Project
 ```yaml
 ---
 id: project-[name]
 type: project
-status: planning|in-progress|blocked|paused|complete
+status: not-started|in-progress|blocked|paused|completed|cancelled
 priority: low|medium|high|critical
-created: ISO-datetime
+created: ISO-date
 due_date: ISO-date (optional)
 linked_things:
-  - id: related-goal-id
-    relation: "supports"
   - id: task-1-id
-    relation: "contains"
+    relation: subtask
+triggers:
+  - type: threshold
+    condition: subtasks_complete
+    action: "all subtasks done — review the project for completion"
 ---
 
 # [Project Name]
@@ -100,15 +108,12 @@ linked_things:
 ---
 id: task-[name]
 type: task
-status: not-started|in-progress|blocked|complete
-priority: low|medium|high|critical
-created: ISO-datetime
+status: not-started|in-progress|blocked|paused|completed|cancelled
+priority: low|medium|high|critical   # required for tasks (_schema.yaml)
+created: ISO-date
 due_date: ISO-date (optional)
-linked_things:
-  - id: project-id
-    relation: "part-of"
-  - id: dependency-id
-    relation: "depends-on"
+parent: project-id (if part of a project)
+dependencies: [task-that-must-finish-first]
 ---
 
 # [Task Name]
@@ -128,9 +133,9 @@ linked_things:
 ---
 id: goal-[name]
 type: goal
-status: not-started|in-progress|deferred|achieved
-timeframe: quarter|year|ongoing
-created: ISO-datetime
+status: active|achieved|abandoned
+created: ISO-date
+target_date: ISO-date (optional, emergent)
 ---
 
 # [Goal Name]
@@ -143,38 +148,37 @@ created: ISO-datetime
 
 ## Progress So Far
 [What you've done toward this goal]
-
-## Related Things
-[Projects and tasks that support this goal]
 ```
 
-### Dependency
+### Recurring
 ```yaml
 ---
-id: dep-[description]
-type: dependency
-created: ISO-datetime
-linked_things:
-  - id: blocker-id
-    relation: "blocks"
-  - id: blocked-id
-    relation: "blocked-by"
+id: recurring-[name]
+type: recurring
+status: active|paused|retired
+created: ISO-date
+cadence: weekly|monthly|quarterly
+review_date: ISO-date (next occurrence; advance it when done)
+triggers:
+  - type: time
+    condition: review_date_reached
+    action: "[what to do, then advance review_date]"
 ---
 
-# [Dependency Description]
+# [Recurring Name]
 
-## What's Blocked
-[The thing that can't proceed]
+## What Happens
+[The recurring activity]
 
-## What's Blocking
-[The thing that's preventing progress]
-
-## Unblock Criteria
-[What needs to happen for this to be resolved]
-
-## Timeline Impact
-[How this affects overall timeline]
+## Why It Recurs
+[What the habit serves]
 ```
+
+### Decision
+`type: decision` is framework-reserved (status `made`/`superseded`): record a
+significant choice with its inputs pinned to git commits via `informed_by`.
+See `decision-hire-howell-joinery` in `things/` for a worked example, and the
+framework's `provenance.md` for the rules `mdllm provenance` enforces.
 
 ## How To Structure Your Response
 
@@ -208,23 +212,26 @@ When responding to the user:
 - **You reason about capacity** — Help the user avoid overcommit by flagging when too much is in-progress or blocked
 - **You surface insights** — Point out patterns: recurring delays, consistently underestimated effort, dependencies blocking progress
 
-## Version Management
+## Schema Evolution
 
-When creating or significantly modifying things:
-- Always include `schema_version: 2.0` (or current version) in the metadata
-- Ensure all required core fields are present: id, type, status, created
 - Add emergent fields only if they serve a clear purpose in your reasoning
-- If modifying an existing thing's version, update the version number to reflect the change
+  (`target_date` on goals grew this way)
+- New status value or thing type needed? Extend `_schema.yaml` with the human
+  first — the validator enforces exactly what is declared there
 
 ## Post-Write Validation
 
-After every create or update, validate:
+The division of labour is fixed (framework `validate.thing.md` v2.0):
 
-1. **Structural** — YAML is valid, required fields present (id, type, status, created), id format correct
-2. **Referential** — All linked_things targets exist, no orphaned references
-3. **Domain-specific** — Projects have linked goals, tasks have priority set, status transitions are logical
+- **Mechanical** — structure, references, schema vocabulary — is owned by
+  `mdllm validate` and enforced by the git pre-commit hook. Never re-perform
+  these checks by reasoning.
+- **Semantic** — is the status *truthful*, is the narrative current, are the
+  relationships *meaningful* (not merely resolvable), should completing this
+  thing cascade anywhere — is yours, after every write.
 
-If validation fails, fix the issue before committing.
+If the hook blocks a commit, fix the finding; if the finding is wrong, fix the
+schema with the human — never bypass the hook.
 
 ## Git Commit Conventions
 
