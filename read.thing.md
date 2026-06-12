@@ -6,13 +6,11 @@ version: 2.2
 created: 2026-05-13
 linked_things:
   - id: thing-specification
-    relation: operates-on
+    relation: extends
   - id: write-thing-specification
     relation: complements
   - id: reasoning-lenses-specification
     relation: references
-  - id: scalability-guide
-    relation: informed-by
 ---
 
 # Read Thing

@@ -13,7 +13,7 @@ linked_things:
   - id: hook-compliance-correlates-with-scope-not-awareness
     relation: supports
   - id: operative-rules-are-a-small-fraction-of-spec-prose
-    relation: related
+    relation: complements
 ---
 
 # Fixture Fixes Correct Bugs, Not Difficulty

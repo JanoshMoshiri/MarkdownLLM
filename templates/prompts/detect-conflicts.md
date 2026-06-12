@@ -26,13 +26,13 @@ bound_to:
   - hook: retrospective
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: write-thing-specification
-    relation: integrates-with
+    relation: complements
   - id: belief-revision-specification
-    relation: integrates-with
+    relation: complements
   - id: derived-index-specification
-    relation: operates-on
+    relation: references
 ---
 
 # Detect Conflicts

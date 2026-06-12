@@ -12,9 +12,6 @@ linked_things:
   - id: framework-discovery-specification
     relation: challenges
     notes: "Discovery assumes the harness injects AGENTS.md; a growing class of harnesses does not"
-  - id: independent-review-2026-06-11-fable
-    relation: informed-by
-    notes: "Observed live during the 2026-06-11 independent review session (Cowork)"
 ---
 
 # AGENTS.md Discovery — And The Floor — Are Harness-Dependent

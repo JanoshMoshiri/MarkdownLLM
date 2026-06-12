@@ -6,7 +6,7 @@ version: 2.8
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
-    relation: operationalises
+    relation: implements
   - id: thing-specification
     relation: references
   - id: read-thing-specification
@@ -26,6 +26,8 @@ linked_things:
   - id: retrospective-specification
     relation: references
   - id: trigger-specification
+    relation: references
+  - id: reasoning-lenses-specification
     relation: references
   - id: validate-thing-specification
     relation: complements

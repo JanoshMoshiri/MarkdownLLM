@@ -14,11 +14,11 @@ bound_to:
   - hook: pre-commit
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: validate-thing-specification
     relation: implements
   - id: git-workflow-specification
-    relation: integrates-with
+    relation: complements
 ---
 
 # Validate Before Commit

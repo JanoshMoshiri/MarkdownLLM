@@ -13,8 +13,6 @@ linked_things:
     relation: references
   - id: thing-specification
     relation: references
-  - id: orchestration-specification
-    relation: implemented-by
 ---
 
 # Domain Refresh

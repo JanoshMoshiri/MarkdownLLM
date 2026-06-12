@@ -14,7 +14,7 @@ linked_things:
   - id: write-thing-specification
     relation: informs
   - id: git-workflow-specification
-    relation: integrates-with
+    relation: complements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---

@@ -9,8 +9,6 @@ linked_things:
     relation: extends
   - id: domain-specification-guide
     relation: complements
-  - id: scalability-guide
-    relation: referenced-by
 ---
 
 # Example Things

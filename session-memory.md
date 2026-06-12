@@ -8,15 +8,15 @@ linked_things:
   - id: thing-specification
     relation: extends
   - id: orchestration-specification
-    relation: integrates-with
+    relation: complements
   - id: write-thing-specification
     relation: complements
   - id: git-workflow-specification
-    relation: integrates-with
+    relation: complements
   - id: llm-driven-systems-manifesto
     relation: implements
   - id: belief-revision-specification
-    relation: integrates-with
+    relation: complements
 ---
 
 # Session Memory

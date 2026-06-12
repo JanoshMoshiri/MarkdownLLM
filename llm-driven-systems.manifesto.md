@@ -5,14 +5,6 @@ status: stable
 version: 2.3
 created: 2026-05-13
 linked_things:
-  - id: the-notation-changed-not-the-primitives
-    relation: grounded-by
-  - id: thing-specification
-    relation: defines
-  - id: interface-specification
-    relation: defines
-  - id: git-workflow-specification
-    relation: defines
   - id: scalability-guide
     relation: informs
   - id: domain-specification-guide

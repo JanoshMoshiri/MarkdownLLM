@@ -8,11 +8,11 @@ linked_things:
   - id: thing-specification
     relation: extends
   - id: validate-thing-specification
-    relation: integrates-with
+    relation: complements
   - id: session-memory-specification
-    relation: integrates-with
+    relation: complements
   - id: orchestration-specification
-    relation: integrates-with
+    relation: complements
   - id: derived-index-specification
     relation: complements
   - id: llm-driven-systems-manifesto

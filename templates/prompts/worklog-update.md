@@ -18,7 +18,7 @@ bound_to:
   - hook: session-end
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: session-memory-specification
     relation: complements
 ---

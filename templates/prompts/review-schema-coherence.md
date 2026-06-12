@@ -18,13 +18,13 @@ bound_to:
   - hook: retrospective
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: derived-index-specification
-    relation: operates-on
+    relation: references
   - id: retrospective-specification
-    relation: integrates-with
+    relation: complements
   - id: thing-specification
-    relation: follows
+    relation: references
 ---
 
 # Review Schema Coherence

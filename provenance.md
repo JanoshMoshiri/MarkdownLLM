@@ -8,9 +8,7 @@ linked_things:
   - id: thing-specification
     relation: extends
   - id: git-workflow-specification
-    relation: integrates-with
-  - id: validate-thing-specification
-    relation: enforced-by
+    relation: complements
   - id: derived-index-specification
     relation: complements
   - id: interface-specification

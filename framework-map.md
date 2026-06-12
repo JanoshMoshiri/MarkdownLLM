@@ -20,8 +20,6 @@ linked_things:
     relation: documents
   - id: operator-guide
     relation: complements
-  - id: tracking-artifacts-can-drift-from-reality
-    relation: informed-by
 ---
 
 # Framework Map — The Visual Architecture
@@ -148,9 +146,9 @@ Notes on this view:
 
 - **The navigation rule:** when lost, start at `thing.md` and follow one
   `extends` edge outward. Every extension spec's first frontmatter relation is
-  `extends: thing-specification` (exception: `reasoning-lenses` is
-  `invoked-by` read/write rather than extending the atom, but it lives in the
-  same band).
+  `extends: thing-specification` (exception: `reasoning-lenses` carries no
+  outbound links — read/write reference it rather than it extending the atom,
+  but it lives in the same band).
 - The guides column never defines semantics — it only points back inward. You
   can ignore it entirely when reasoning about what the framework *is*;
   it matters when scaffolding, scaling, or refreshing a domain.

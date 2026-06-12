@@ -12,9 +12,9 @@ linked_things:
   - id: interface-specification
     relation: complements
   - id: write-thing-specification
-    relation: integrates-with
+    relation: complements
   - id: validate-thing-specification
-    relation: integrates-with
+    relation: complements
   - id: derived-index-specification
     relation: complements
 ---

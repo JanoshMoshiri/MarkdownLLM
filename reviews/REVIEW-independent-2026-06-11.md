@@ -9,6 +9,7 @@ linked_things:
     notes: "External review one release after the first retrospective; action queue registered in continuity 2026-06-11"
   - id: agents-md-discovery-is-harness-dependent
     relation: informs
+    notes: "Observed live during the 2026-06-11 independent review session (Cowork)"
 ---
 
 # Independent Review — MarkdownLLM Framework v3.4.0

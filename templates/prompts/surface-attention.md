@@ -20,11 +20,13 @@ bound_to:
   - hook: session-start
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: evaluate-triggers
-    relation: consumes-output-of
+    relation: references
+    notes: "Consumes this prompt's output (runs after it in declaration order)"
   - id: session-orientation
-    relation: consumes-output-of
+    relation: references
+    notes: "Consumes this prompt's output (runs after it in declaration order)"
 ---
 
 # Surface Attention

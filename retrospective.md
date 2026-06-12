@@ -12,9 +12,9 @@ linked_things:
   - id: belief-revision-specification
     relation: complements
   - id: git-workflow-specification
-    relation: integrates-with
+    relation: complements
   - id: derived-index-specification
-    relation: integrates-with
+    relation: complements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---

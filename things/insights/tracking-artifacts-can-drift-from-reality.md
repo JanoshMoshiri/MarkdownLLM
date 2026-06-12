@@ -16,6 +16,8 @@ linked_things:
     relation: references
   - id: validate-thing-specification
     relation: informs
+  - id: framework-map
+    relation: informs
 ---
 
 # Tracking Artifacts Can Drift From Reality

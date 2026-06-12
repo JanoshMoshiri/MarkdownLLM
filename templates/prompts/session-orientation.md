@@ -20,9 +20,9 @@ bound_to:
   - hook: session-start
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: read-thing-specification
-    relation: follows
+    relation: references
 ---
 
 # Session Orientation

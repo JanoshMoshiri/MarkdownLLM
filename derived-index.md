@@ -8,9 +8,7 @@ linked_things:
   - id: thing-specification
     relation: extends
   - id: orchestration-specification
-    relation: integrates-with
-  - id: validate-thing-specification
-    relation: enforced-by
+    relation: complements
   - id: trigger-specification
     relation: complements
   - id: belief-revision-specification
@@ -18,7 +16,7 @@ linked_things:
   - id: scalability-guide
     relation: complements
   - id: git-workflow-specification
-    relation: integrates-with
+    relation: complements
   - id: tracking-artifacts-can-drift-from-reality
     relation: implements
   - id: llm-driven-systems-manifesto

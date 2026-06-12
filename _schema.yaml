@@ -19,42 +19,25 @@ types:
     statuses: [evolving, stable, deprecated]
 
 # Declared relation vocabulary (validated at Warning severity).
-# Resolution of the 2026-06 retrospective's coherence finding: the vocabulary is
-# declared-and-validated, capturing the union in actual use. Prune at next
-# retrospective if any fall out of use.
+# Pruned 2026-06-12 (independent-review action 5): 35 -> 13. Inverse pairs
+# collapsed to their forward direction (the link lives on the dependent thing;
+# `supersedes`/`superseded-by` is the one pair kept, because the validator
+# itself checks the backlink). Near-synonyms merged: integrates-with ->
+# complements, enforces/evaluates -> validates, operationalises -> implements.
+# Grow only when a real link needs a relation that isn't here.
 relations:
-  - informs
-  - implements
-  - extends
-  - extended-by
-  - complements
-  - references
-  - documents
-  - defines
-  - evaluates
-  - validates
-  - enforces
-  - enforced-by
-  - integrates-with
-  - operates-on
-  - operationalises
-  - invokes
-  - grounded-by
-  - informed-by
-  - implemented-by
-  - referenced-by
-  - invoked-by
-  - supports
-  - challenges
-  - supersedes
-  - superseded-by
-  - contradicts
-  - subtask
-  - dependency
-  - blocks
-  - related
-  - similar
-  - instance-of
-  - derived-from
-  - template-for
-  - applies-to
+  # semantic
+  - informs        # source of reasoning or evidence for the target
+  - implements     # realises the target's principle, contract, or ritual
+  - extends        # builds on the target, adding fields or semantics
+  - references     # cites the target; weakest directed link
+  - complements    # adjacent concern; read together (symmetric)
+  - documents      # running record of the target (WORKLOG, maps)
+  - validates      # mechanically or semantically checks the target
+  - supports       # evidence in favour (insights; belief revision)
+  - challenges     # evidence against (insights; belief revision)
+  # mechanical — fixed semantics, checked by mdllm validate / triggers
+  - contradicts    # requires a type: conflict thing listing both parties
+  - supersedes     # replaces the target's content
+  - superseded-by  # inverse of supersedes; validator checks this backlink
+  - subtask        # drives the subtasks_complete threshold trigger

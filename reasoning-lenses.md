@@ -4,13 +4,6 @@ type: specification
 status: stable
 version: 1.0
 created: 2026-05-29
-linked_things:
-  - id: read-thing-specification
-    relation: invoked-by
-  - id: write-thing-specification
-    relation: invoked-by
-  - id: domain-specification-guide
-    relation: referenced-by
 ---
 
 # Reasoning Lenses

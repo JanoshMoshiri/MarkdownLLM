@@ -8,23 +8,23 @@ linked_things:
   - id: thing-specification
     relation: extends
   - id: write-thing-specification
-    relation: integrates-with
+    relation: complements
   - id: git-workflow-specification
-    relation: integrates-with
+    relation: complements
   - id: interface-specification
     relation: complements
   - id: llm-driven-systems-manifesto
     relation: implements
   - id: session-memory-specification
-    relation: enforces
+    relation: implements
   - id: belief-revision-specification
-    relation: enforces
+    relation: implements
   - id: trigger-specification
     relation: complements
   - id: domain-refresh-specification
-    relation: enforces
+    relation: implements
   - id: derived-index-specification
-    relation: integrates-with
+    relation: complements
 ---
 
 # Orchestration

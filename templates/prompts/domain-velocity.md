@@ -18,9 +18,9 @@ bound_to:
   - hook: session-start
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: git-workflow-specification
-    relation: operates-on
+    relation: references
   - id: derived-index-specification
     relation: complements
 ---

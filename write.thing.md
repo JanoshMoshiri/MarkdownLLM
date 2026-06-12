@@ -6,17 +6,15 @@ version: 2.1
 created: 2026-05-13
 linked_things:
   - id: thing-specification
-    relation: operates-on
+    relation: extends
   - id: read-thing-specification
     relation: complements
   - id: git-workflow-specification
-    relation: integrates-with
+    relation: complements
   - id: validate-thing-specification
-    relation: invokes
+    relation: references
   - id: reasoning-lenses-specification
     relation: references
-  - id: scalability-guide
-    relation: informed-by
 ---
 
 # Write Thing

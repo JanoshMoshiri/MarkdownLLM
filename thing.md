@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.12
+version: 2.13
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -11,16 +11,10 @@ linked_things:
     relation: complements
   - id: write-thing-specification
     relation: complements
-  - id: validate-thing-specification
-    relation: enforced-by
   - id: git-workflow-specification
     relation: complements
   - id: interface-specification
     relation: complements
-  - id: trigger-specification
-    relation: extended-by
-  - id: derived-index-specification
-    relation: extended-by
 ---
 
 # Thing Definition
@@ -148,7 +142,8 @@ These aren't required, but they unlock richer reasoning from Claude:
 - Relationships to other things
 - Structure: `{ id: "thing-id", relation: "[type]", notes: "optional context" }`
 - Allows Claude to traverse the graph of your life
-- Common relation values: `subtask`, `dependency`, `blocks`, `related`, `similar`, `informs`, `implements`, `complements`
+- Common relation values: `subtask`, `related`, `informs`, `implements`, `extends`, `references`, `complements`, `documents`
+- Keep the vocabulary small: declare it in `_schema.yaml`, prefer the forward direction over inverse pairs (the link lives on the dependent thing), and don't duplicate the `dependencies`/`blocks` fields as relations
 - Decomposition relation values — signal that two things should be structurally separate (see **Thing Cohesion and Decomposition**):
   - `instance-of` — this thing is a specific occurrence of the referenced methodology, pattern, or template
   - `derived-from` — this thing's content was produced by applying the referenced thing

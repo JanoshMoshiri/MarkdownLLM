@@ -23,9 +23,9 @@ bound_to:
   - hook: post-write
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: thing-specification
-    relation: operates-on
+    relation: references
 ---
 
 # Evaluate Triggers

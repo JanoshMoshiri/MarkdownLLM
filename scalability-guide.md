@@ -15,6 +15,8 @@ linked_things:
     relation: complements
   - id: derived-index-specification
     relation: complements
+  - id: example-things-specification
+    relation: references
 ---
 
 # Scalability Guide

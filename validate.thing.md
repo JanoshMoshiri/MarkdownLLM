@@ -10,8 +10,10 @@ linked_things:
   - id: orchestration-specification
     relation: validates
   - id: belief-revision-specification
-    relation: integrates-with
+    relation: complements
   - id: derived-index-specification
+    relation: validates
+  - id: provenance-specification
     relation: validates
   - id: domain-specification-guide
     relation: complements

@@ -21,9 +21,9 @@ bound_to:
     when: "a thing was marked completed"
 linked_things:
   - id: orchestration-specification
-    relation: defined-by
+    relation: implements
   - id: thing-specification
-    relation: operates-on
+    relation: references
 ---
 
 # Cascade Completion
