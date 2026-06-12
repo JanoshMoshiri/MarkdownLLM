@@ -71,7 +71,8 @@ larger model without structure. The 2×2 that tests it:
 
 Protocol: ≥5 trials per cell per fixture (models are stochastic — single runs
 mean nothing); score = assertion pass rate; report cost and wall time alongside
-(`eval --report` builds the table from `evals/runs/*/result.json`). The first
+(`eval --report` builds the table from `evals/results/*.json`, the committed
+evidence mirror). The first
 fixture (`vat-quarter-basic`) embeds a discriminator: blocked
 client-entertainment VAT that must *not* be reclaimed — summing naively gives
 430.00 instead of 380.00. Run directories are kept as evidence; prune manually.

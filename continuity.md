@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.3
+version: 1.4
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-12
@@ -20,19 +20,33 @@ last_updated: 2026-06-12
   (validate discovers `examples/*` sub-corpora, both declare `_schema.yaml`,
   life-manager populated with a working dataset incl. pinned decision record),
   relation vocabulary pruned 35 → 13 (corpus migrated, templates aligned),
-  `first-hour.md` on-ramp created and registered. **Remaining, in priority
-  order:** (1) **cold-start scaffold eval — the fortnight's centrepiece**
-  (fresh agent + non-author human builds a domain from templates; recruit one
-  person from the operator's orbit; observe, don't help; score like the 2×2;
-  gaps filed as findings per `fixture-fixes-correct-bugs-not-difficulty`);
-  (2) fix what the eval surfaces, then write limitations.md + the "why not
-  just CLAUDE.md + a notes folder" answer (trivial to write honestly after
-  watching a real newcomer); (3) spec the read-side of quarantine —
-  unverified `origin: external` bodies still enter context at load;
-  (4) one page on concurrency; (5) consider promoting
-  generate-or-validate-or-delete from tactic to stated principle (review
-  §Needs More Thinking). Deferred until after the eval: harder VAT fixture,
-  multi-harness eval matrix, domain visual map.
+  `first-hour.md` on-ramp created and registered. **Session 3 (12 Jun,
+  3.6.0):** the agent-only rehearsal ran (10/11, 10/11, then 11/11 once the
+  guide routed to the new `mdllm scaffold`); `doctor` shipped;
+  eco-essentials completed the first real refresh (2.8 → 3.5.0). **Remaining,
+  in priority order:** (1) **cold-start eval with a real human — still the
+  centrepiece, now de-risked** (recruit one non-author person; observe, don't
+  help; the agent-side path and templates are proven; both reviews agree this
+  outranks everything); (2) **refresh jmtm-software** (statutory stakes;
+  AGENTS still teaches the pre-v3 validation procedure; working tree had
+  uncommitted changes mid-session 3 — check whose, finish or refresh
+  cleanly) and property-ventures after it; (3) fix what the human eval
+  surfaces, then limitations.md + the "why not CLAUDE.md + a notes folder"
+  answer; (4) read-side of quarantine; (5) one page on concurrency (the
+  jmtm mid-session collision and the trial agent's framework `index.lock`
+  are now two live exhibits); (6) generate-or-validate-or-delete as stated
+  principle. Deferred until after the eval: harder VAT fixture, multi-harness
+  matrix, domain visual map.
+- **Second independent review (2026-06-12) — structural observations left
+  with the operator:** findings 1–5 fixed in 3.6.0 same-day. Still open as
+  *decisions*, not tasks: WORKLOG is ~93KB of hand-maintained prose and "the
+  next REVIEWLOG" (generate-or-validate-or-delete applies); review cadence is
+  exhausted until new evidence exists (next review after the human eval, not
+  before); release cadence vs domain refresh cost — domains sit 1–5 versions
+  behind a framework that versions daily (mechanisable: most of a refresh is
+  re-copying three boilerplate blocks — scaffold-adjacent); manifesto still
+  promises cross-domain linking no spec defines; README "no setup step" story
+  vs first-hour's honest prerequisites — pick one.
 - **Harness support is now measured, not assumed:** first non-IDE harness
   session (Cowork, 2026-06-11) — no AGENTS.md auto-discovery; the installed
   pre-commit hook couldn't run (machine-absolute path, bare `python`). Hook
@@ -100,7 +114,23 @@ last_updated: 2026-06-12
 
 - (none)
 
-## Decisions Made This Session (2026-06-12, session 2)
+## Decisions Made This Session (2026-06-12, session 3)
+
+- **Rehearsal before tool, deliberately:** the pre-scaffold trials were run
+  first so the tool's justification would be measured, not assumed — and the
+  post-tool trial closed the loop at 11/11. The full protocol and honest
+  reading live in `evals/README.md`; the generalisable lesson in
+  `agents-drop-mechanical-birth-steps-not-semantic-ones`.
+- **jmtm refresh deferred mid-session:** its working tree had uncommitted
+  modifications (parallel session suspected) — single-writer-by-convention
+  respected rather than raced.
+- **Excluded-trial evidence kept:** harness failures are excluded from the
+  report but their result.json files are committed under
+  `evals/results/excluded/` — exclusion with evidence, not deletion.
+- **Spec prose no longer names framework versions** (review #2 finding 3
+  generalised): the sentinel is the only version surface.
+
+## Decisions Made Session 2 (2026-06-12)
 
 - **The fortnight's strategy set by the operator:** point the v3 medicine at
   the periphery and at a user who isn't the author. Week one (this session)

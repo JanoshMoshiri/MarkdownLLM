@@ -99,6 +99,27 @@ Operator set the fortnight's direction: point the v3 medicine at the periphery a
 - Example schemas keep two-to-three domain-specific relations (`supports`, `orchestrates`; `contrasts-with`/`remediated-by`/`demonstrates` in compliance) — declared, lean, and teaching the "declare what you use" habit rather than pretending the canonical nine cover everything.
 - The deliberately overdue task is a feature, not stale data — documented as such in the thing body and AGENTS.md so nobody "fixes" it.
 
+### Session 3 — Measure → mechanise → re-measure: the birth path, plus doctor and the first real refresh
+
+#### Topic
+
+Operator authorised four items in one go (none from the standing queue): the agent-only cold-start rehearsal, `mdllm scaffold`, `mdllm doctor`, and the eco-essentials refresh. A second independent review (`reviews/REVIEW-independent-2026-06-12.md`) landed mid-session from a parallel Cowork session; its actionable findings were fixed before close. Released as **3.6.0**.
+
+#### Completed
+
+- [x] **Cold-start scaffold rehearsal** (`6bcc982`, results `8292d12`): fixture `evals/cold-start-scaffold.yaml` + 5 new assertion kinds (file/git/min_things, fixture-scoped `domain_dir`) + per-fixture report grouping. Results (3 informative trials): opus 10/11 — built a structurally perfect domain across 96 turns and *never committed*; haiku 10/11 — committed but skipped the outer `.gitignore` isolation; haiku vs the scaffold-aware guide **11/11**, first commit = the tool's. Insight filed: `agents-drop-mechanical-birth-steps-not-semantic-ones`. Three 2s CLI failures were opaque → runner now persists `agent-stdout.json`/`agent-stderr.txt` per trial.
+- [x] **`mdllm scaffold`** (`e90e2f2`): the isolation hard hook as code — templates instantiated (name/dates/`framework_root`/`framework_version_seen`), nested repo, outer-repo `.gitignore` committed *before* the first domain commit, hook installed, first commit; exit 1 on partial birth (review #2 finding 2). Building it caught `_schema.yaml.template` shipping as **unparseable YAML** (placeholder keys) — now valid-on-copy, and an unparseable schema is a validation Error, not a crash. Registered: orchestration v1.9, guide v2.9, AGENTS hard-hook text, framework-map (11 subcommands), operator-guide, README, first-hour.
+- [x] **`mdllm doctor`** (`5a6b799`): environment probe — prerequisites, hook *execution* (`git hook run`; resolution is not verification), framework-version drift for domains, explicit degraded-mode verdict (exit 1). Its self-test executes the emitted hook in a fresh repo — the install-hook self-test from the continuity queue.
+- [x] **eco-essentials refreshed 2.8 → 3.5.0** (domain commit `c746e0e`): first real five-version refresh through `domain-refresh.md` — floor adopted (`things/_schema.yaml`, hook, 12 things 0 findings, doctor FLOOR ACTIVE), AGENTS v2.0 kernel-tiered with the v3 validation split. Refresh contract held: capabilities updated, things untouched; relation prune + type lifecycles queued for the domain's next retrospective.
+- [x] **Second independent review actioned** (`4641264`, findings 1–5): self-tests provision git identity via env and skip the hook execution-test on git < 2.36 (CI was red on `e90e2f2` — caught same-day); scaffold exits non-zero on partial birth; the phantom "since v3.6" reference removed (spec prose no longer names framework versions); eval evidence mirrored to committed `evals/results/` (run workspaces are nested repos and cannot be partially tracked); fixture versions templated from the sentinel via `{framework_version}`.
+- [x] 37 floor self-tests passing; `mdllm validate .` clean across all three corpora; sentinel/AGENTS/CHANGELOG synced at 3.6.0; kernel regenerated
+
+#### Decisions Made
+
+- The three 2-second 1-turn trials are excluded from the report as harness failures, not model performances — but their evidence is kept (`evals/results/excluded/`).
+- jmtm-software was **not** refreshed this session despite review #2 recommending it next: its working tree showed uncommitted AGENTS/WORKLOG modifications mid-session (likely the operator's parallel session) — refreshing under another writer's feet is exactly the concurrency hazard the queue already names. It stays first in line, before the July filing.
+- Review #2's structural observations (WORKLOG size, review cadence exhaustion, release-cadence vs refresh-cost) are queued as operator decisions, not actioned unilaterally.
+
 ---
 
 ## 11 June 2026
