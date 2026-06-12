@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.7
+version: 2.8
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -255,6 +255,7 @@ description: What this domain does
 version: 1.0
 applies_to: "**/*.md"
 framework_root: ../..
+framework_version_seen: [copy the version field from {framework_root}/.markdownllm]
 git:
   autocommit: true
   branch: main
@@ -272,9 +273,9 @@ git:
 
 ### On Startup
 1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
-2. Load foundational specs from framework root: thing.md, validate.thing.md, git-workflow.md, interface.md
-3. Load all skills from ./skills/
-4. Register: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
+2. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen`
+3. Load `{framework_root}/kernel.md` — the operative rules of the foundational specs (~1.6k tokens); load a full spec only when the kernel doesn't settle an ambiguity
+4. Load skills relevant to session intent: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
 5. Load `continuity.md` if it exists — understand open threads, live insights, and pending decisions from the last session
 6. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
 
@@ -291,7 +292,7 @@ git:
 2. **Autocommit** (if enabled): stage changed files + commit with structured `action: description` message
 3. Report what changed and why
 4. Evaluate triggers (post-write)
-5. **Session end:** The `session-end:continuity` hard hook fires — extract insights, check for conflicts, update `continuity.md`. Full spec: `session-memory.md` and `belief-revision.md`.
+5. **Session end:** Explicitly invoke the `session-end-continuity` bound prompt — extract insights, check for conflicts, update `continuity.md`. This is a bound prompt, not a hard hook: "the session is ending" is not an observable, agent-caused event, so it never fires automatically — the agent or human must invoke it. There are exactly three hard hooks (`post-write:commit`, `pre-domain-scaffold:isolate`, `session-start:version-check`); see `orchestration.md`. Full spec: `session-memory.md` and `belief-revision.md`.
 
 ## Skills Directory
 

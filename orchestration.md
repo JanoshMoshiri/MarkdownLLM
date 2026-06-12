@@ -69,7 +69,7 @@ Some behaviors, however, are fundamental to the framework's integrity regardless
 
 ### Framework-Level Hard Hooks
 
-These two hard hooks are part of every agent's operating contract with the framework. They fire regardless of whether a domain uses orchestration.
+These three hard hooks are part of every agent's operating contract with the framework. They fire regardless of whether a domain uses orchestration.
 
 #### `post-write:commit` — Commit Every Thing
 

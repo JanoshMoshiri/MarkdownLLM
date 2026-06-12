@@ -4,7 +4,7 @@ description: [What this domain does]
 version: 1.0
 applies_to: "**/*.md"
 framework_root: [relative path to MarkdownLLM framework root, e.g. ../.. ]
-framework_version_seen: [framework version at time of domain creation, e.g. 2.8]
+framework_version_seen: [framework version at time of domain creation — copy the `version` field from {framework_root}/.markdownllm, e.g. 3.4.0]
 git:
   autocommit: true
   branch: main
@@ -26,13 +26,13 @@ git:
 
 **Tier 0 — Always load:**
 - `AGENTS.md` — this file (already loaded)
-- `{framework_root}/thing.md` — atomic unit; required for all thing reasoning
-- `{framework_root}/orchestration.md` — hard hooks are always active; non-negotiable
+- `{framework_root}/kernel.md` — the generated operative kernel: the rules of thing.md, orchestration.md, read/write/validate.thing.md, and git-workflow.md without their rationale (~1.6k tokens). The hard hooks it carries are always active; non-negotiable.
+- `continuity.md` (if it exists) — open threads, live insights, and pending decisions from the last session
 
-**Version check (session-start hard hook — never skip):** Read `{framework_root}/.markdownllm` — extract the `version` field (first few lines only). Compare against `framework_version_seen` above. If they differ: surface the mismatch to the user, load `{framework_root}/validate.thing.md` and validate all domain things, then offer a full refresh via `{framework_root}/domain-refresh.md`. If they match: proceed.
+**Version check (session-start hard hook — never skip):** Read `{framework_root}/.markdownllm` — extract the `version` field (first few lines only). Compare against `framework_version_seen` above. If they differ: surface the mismatch to the user, run `python {framework_root}/tools/mdllm.py validate .` over the domain, then offer a full refresh via `{framework_root}/domain-refresh.md`. If they match: proceed.
 
-**Tier 1 — Load when session involves reading, writing, or committing things:**
-- `{framework_root}/read.thing.md`, `{framework_root}/write.thing.md`, `{framework_root}/validate.thing.md`, `{framework_root}/git-workflow.md`
+**Tier 1 — Load a full spec only when the kernel is not enough** — reasoning *about* the framework, or resolving an ambiguity the kernel doesn't settle:
+- `{framework_root}/thing.md`, `{framework_root}/read.thing.md`, `{framework_root}/write.thing.md`, `{framework_root}/validate.thing.md`, `{framework_root}/git-workflow.md`, `{framework_root}/orchestration.md` — load individually, not wholesale
 - Domain skills (load those relevant to session intent):
   - `[domain]-specification.skill.md`
   - `[domain]-read.thing.skill.md`
@@ -49,6 +49,7 @@ git:
 | Periodic quality reflection | `{framework_root}/retrospective.md` |
 | Trigger evaluation or creation | `{framework_root}/trigger-specification.md` |
 | Scaling, structure, lifecycle | `{framework_root}/scalability-guide.md` |
+| Decisions, pinned inputs, external content | `{framework_root}/provenance.md` |
 
 ### On User Request
 1. **Clarify intent** — What operation? (read, write, analyze, update, etc.)
@@ -59,10 +60,14 @@ git:
 6. **Commit** — Persist changes following git-workflow conventions
 
 ### On Output
-1. Validate thing files if changes were made
-2. **Autocommit** (if `git.autocommit: true`): stage changed files + commit with structured message `action: description`
+1. Validate thing files if changes were made — semantic checks only; mechanical validation (structure, references, schema) is owned by `mdllm` and the pre-commit hook
+2. **Autocommit** (if `git.autocommit: true`): stage changed files + commit with structured message `action: description` (the `post-write:commit` hard hook)
 3. Report what changed and why
 4. Evaluate triggers — check if writes caused dependency or threshold triggers to fire
+
+### At Session End
+
+When a session that touched domain things is wrapping up, explicitly invoke the `session-end-continuity` bound prompt — extract insights, check for contradictions, update `continuity.md`. This is a bound prompt, not a hard hook: it does not fire automatically, so the agent (or human) must invoke it. Full spec: `{framework_root}/session-memory.md`.
 
 ## Skills Directory
 
@@ -75,10 +80,10 @@ All reusable capabilities in this domain are stored as skill files:
 
 ## Foundational Specifications
 
-Loaded from the MarkdownLLM framework root:
+Resolved from the MarkdownLLM framework root (the kernel covers their operative rules; load a full spec on demand):
 
 - **thing.md** — The atomic unit specification (structure for all things)
-- **validate.thing.md** — Validation skill (structural, referential, semantic checks)
+- **validate.thing.md** — The validation contract (mechanical layer: `mdllm`; semantic layer: the agent)
 - **git-workflow.md** — When and how to commit (git as state machine)
 - **interface.md** — I/O layer (input routes and output types)
 
@@ -87,6 +92,7 @@ Loaded from the MarkdownLLM framework root:
 Atomic unit instances following thing.md pattern:
 
 - `./things/` — Contains all your domain-specific things (data instances)
+- `./things/_schema.yaml` — The domain's normative schema: thing types, status vocabularies, relation vocabulary. Declared at scaffold time (copy `templates/_schema.yaml.template`); enforced by `mdllm validate` and the pre-commit hook.
 
 ## Thing Types in This Domain
 
@@ -137,8 +143,8 @@ Report changes
 Before committing, verify:
 
 - [ ] Relevant skill loaded for this operation
-- [ ] thing.md structure followed (id, type, status, created present)
-- [ ] Domain principles maintained
+- [ ] Domain principles maintained — semantic coherence is the agent's check (validate.thing.md → Layer 2)
 - [ ] Changes scoped to appropriate things
-- [ ] linked_things references are valid (targets exist)
 - [ ] Commit message follows `action: description` convention
+
+> **The Deterministic Floor:** structure (id, type, status, created), reference integrity, and schema conformance are checked by `python {framework_root}/tools/mdllm.py validate .` and enforced by the pre-commit hook (`python {framework_root}/tools/mdllm.py install-hook .` at scaffold time). Never re-perform those checks by reasoning.

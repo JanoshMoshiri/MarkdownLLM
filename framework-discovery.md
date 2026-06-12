@@ -2,7 +2,7 @@
 id: framework-discovery-specification
 type: specification
 status: stable
-version: 1.2
+version: 2.0
 created: 2026-05-19
 linked_things:
   - id: domain-specification-guide
@@ -19,7 +19,7 @@ linked_things:
 
 ## What This Specifies
 
-This document defines how domain agents discover the MarkdownLLM framework root and load foundational specifications. Without this mechanism, a domain agent operating inside a nested directory has no way to locate the shared specifications (thing.md, git-workflow.md, validate.thing.md, interface.md) that all domains depend on.
+This document defines how domain agents discover the MarkdownLLM framework root and load the framework's operative rules. Without this mechanism, a domain agent operating inside a nested directory has no way to locate the shared kernel and specifications (kernel.md, thing.md, git-workflow.md, validate.thing.md) that all domains depend on.
 
 ## The Problem
 
@@ -49,14 +49,16 @@ The `framework_root` value is a relative path using POSIX separators (`/`). It p
 
 With `framework_root` declared, the domain agent can resolve paths to:
 
-| Specification | Resolved Path |
+| Resource | Resolved Path |
 |---------------|---------------|
+| kernel.md (Tier 0 — the generated operative kernel) | `{framework_root}/kernel.md` |
 | thing.md | `{framework_root}/thing.md` |
 | validate.thing.md | `{framework_root}/validate.thing.md` |
 | git-workflow.md | `{framework_root}/git-workflow.md` |
 | interface.md | `{framework_root}/interface.md` |
 | read.thing.md | `{framework_root}/read.thing.md` |
 | write.thing.md | `{framework_root}/write.thing.md` |
+| the mdllm CLI (validation, hooks, triggers, provenance) | `{framework_root}/tools/mdllm.py` |
 
 ### Example
 
@@ -82,15 +84,12 @@ When a domain agent loads, its startup sequence becomes:
 
 1. Read own `AGENTS.md` frontmatter
 2. Resolve `framework_root` to an absolute path
-3. Verify framework root exists (check for `thing.md` as sentinel)
-4. Load foundational specifications from framework root:
-   - `{framework_root}/thing.md`
-   - `{framework_root}/validate.thing.md`
-   - `{framework_root}/git-workflow.md`
-   - `{framework_root}/interface.md`
-5. Load domain skills from `./skills/`
-6. Load domain things from `./things/`
-7. Evaluate triggers
+3. Verify framework root exists (check for the `.markdownllm` sentinel)
+4. Version check (`session-start:version-check` hard hook): compare the sentinel's `version` against `framework_version_seen` in the domain frontmatter
+5. Load `{framework_root}/kernel.md` — the generated operative kernel (~1.6k tokens). Do **not** eagerly load the full foundational specs; load a full spec only when the kernel doesn't settle an ambiguity (see the tier tables in AGENTS.md and `templates/AGENTS.md.template`)
+6. Load domain skills from `./skills/` relevant to session intent
+7. Load `continuity.md` if it exists, then domain things from `./things/` as the session requires
+8. Evaluate triggers
 
 If `framework_root` is missing from frontmatter, the agent should:
 1. Look for a `.markdownllm` marker file by walking up the directory tree
@@ -106,16 +105,22 @@ The framework root directory contains a `.markdownllm` file. This file serves tw
 
 ```yaml
 framework: MarkdownLLM
-version: 2.8
+version: 3.4.0
 role: canonical-version-sentinel
 foundational_specs:
   - thing.md
-  - validate.thing.md
-  - git-workflow.md
-  - interface.md
   - read.thing.md
   - write.thing.md
+  - validate.thing.md
+  - interface.md
+  - git-workflow.md
+  # ...the full list lives in the real sentinel; this example is illustrative
+domains:
+  - domains/  # the documented convention for nested domain repos
+  - domain/   # legacy spelling; also excluded by tool and gitignore
 ```
+
+The example above is abbreviated — the live `.markdownllm` at the framework root is the authoritative copy, including the complete `foundational_specs` list. Don't hand-maintain copies of it elsewhere.
 
 **Important:** `version` in `.markdownllm` is the single source of truth for the framework version. The `version` field in the framework's `AGENTS.md` frontmatter is descriptive metadata. When they diverge, `.markdownllm` is authoritative. Keep them in sync on every version bump by convention.
 
@@ -129,13 +134,13 @@ The standard deployment uses a nested git repository architecture: domains live 
 
 ```
 MarkdownLLM/                    ← Framework git repo
-├── .gitignore                  ← Contains: domain/
+├── .gitignore                  ← Contains: domains/
 ├── thing.md
 ├── git-workflow.md
 ├── ...foundational specs...
 ├── templates/
 ├── examples/
-└── domain/
+└── domains/
     ├── DomainA/                ← Independent git repo
     │   ├── AGENTS.md
     │   ├── skills/
@@ -150,7 +155,7 @@ MarkdownLLM/                    ← Framework git repo
 
 | Property | Mechanism | Purpose |
 |----------|-----------|--------|
-| **Isolation** | Framework `.gitignore` excludes `domain/` | Domain commits never appear in framework history |
+| **Isolation** | Framework `.gitignore` excludes `domains/` | Domain commits never appear in framework history |
 | **Independence** | Each domain has its own `.git` | Domains version independently with their own branches, tags, remotes |
 | **Shared foundation** | `framework_root` in domain AGENTS.md | Domains resolve framework specs via relative path |
 | **Read-only relationship** | Domains read framework specs; never write to them | Framework evolves independently of domains |
@@ -161,7 +166,7 @@ MarkdownLLM/                    ← Framework git repo
 3. **No submodule complexity** — Avoids git submodule pain while achieving the same isolation
 4. **Multiple domains, one framework** — Many domains share a single framework installation without conflicts
 
-**The `.gitignore` contract:** The framework's `.gitignore` MUST contain `domain/`. Without it, domain files appear as untracked files in the framework repo.
+**The `.gitignore` contract:** The framework's `.gitignore` MUST contain `domains/` (the documented convention). The legacy spelling `domain/` is also excluded by the framework's gitignore and by `mdllm`'s default excludes, for installs that predate the convention. Without the exclusion, domain files appear as untracked files in the framework repo.
 
 ### Standalone Domain Deployment
 
@@ -209,4 +214,4 @@ When validating a domain (using validate.thing.md), check:
 | What's the fallback? | Walk up directories looking for `.markdownllm` marker |
 | What if deployed standalone? | Copy specs, use submodule, or minimal bundle |
 | What's the sentinel file? | `.markdownllm` — discovery marker and canonical version source |
-| What specs must be loadable? | thing.md, validate.thing.md, git-workflow.md, interface.md |
+| What must be loadable? | kernel.md at Tier 0; the full specs (thing.md, validate.thing.md, git-workflow.md, interface.md, …) on demand |
