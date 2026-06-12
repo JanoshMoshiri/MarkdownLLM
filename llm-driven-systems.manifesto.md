@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: stable
-version: 2.2
+version: 2.3
 created: 2026-05-13
 linked_things:
   - id: the-notation-changed-not-the-primitives
@@ -69,7 +69,7 @@ These ideas are not new. What's new is applying them to a world where the "logic
 A core philosophy of this framework is: **do not invent what already exists.** Build upon it.
 
 - **AGENTS.md** — This file convention is an existing standard, adopted across GitHub Copilot, OpenAI Codex, Cursor, Windsurf, Gemini CLI, and stewarded by the Agentic AI Foundation under the Linux Foundation. We didn't create it. We use it.
-- **.skill.md** — The skill file convention is an existing standard for packaging reusable LLM capabilities. We didn't create it. We use it.
+- **.skill.md** — The skill file convention is an emerging convention for packaging reusable LLM capabilities — not yet a standard with a steward like AGENTS.md, but a pattern converging across agent tooling. We didn't create it. We use it.
 - **YAML frontmatter** — A convention used across static site generators, documentation tools, and content management systems for decades. We didn't create it. We use it.
 - **Markdown** — The universal plain-text format. Readable by humans, parseable by machines, diffable by git. We didn't create it. We use it.
 - **Git** — Decades of proven version control. Branching, merging, history, collaboration, rollback. We didn't create it. We use it.
@@ -279,7 +279,7 @@ This has profound implications:
 
 **Sustainability.** Less compute means less power consumption. It's better for the environment and your infrastructure costs.
 
-The insight is this: **elegant constraint is more powerful than raw capability.** A smaller model operating within a well-defined system will outperform a larger model operating without structure.
+The insight is this: **elegant constraint is more powerful than raw capability.** The claim, stated carefully: a smaller model operating within a well-defined system can match or outperform a larger model operating without structure. This is the framework's central hypothesis — now measured rather than asserted. The first eval results (2026-06-11, `evals/README.md`) showed structure buying determinism, and the small-model-with-structure cell beating the large-model-without cell at roughly a quarter of the cost; the harder reasoning component of the claim remains untested until a more discriminating fixture exists.
 
 This is about shifting the optimization target. Instead of "how do we build more powerful models," ask "how do we design systems that enable smaller models to be effective." The answer is clarity, structure, and constraint.
 

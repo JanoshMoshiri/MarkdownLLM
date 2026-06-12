@@ -243,7 +243,7 @@ MarkdownLLM gives both parties what they need:
 - **Contradiction tracking** — When things in your domain conflict, the agent surfaces them as first-class `type: conflict` things held in explicit tension until resolved. You decide: which view supersedes, whether both are valid in context, or whether the tension should be held until more is known.
 - **Cumulative progress** — Every session builds on the last. Your refinements compound. Nothing is lost.
 
-**The result:** A smaller model with a well-defined domain outperforms a larger model with no structure. Structure beats scale. But it's the human-agent partnership that creates and maintains that structure over time.
+**The hypothesis — now under measurement:** a smaller model with a well-defined domain can match or outperform a larger model with no structure. First eval results (2026-06-11, 2×2 model × framework, 20 trials) support part of it: structure bought determinism (the framework + large-model cell was the only one to pass all assertions in all trials), and the small-model-with-framework cell edged out the large-model-without cell (94% vs 89% of assertions) at roughly a quarter of the cost — but the fixture's reasoning core proved too easy to discriminate, so the stronger reasoning claim is still untested. See [evals/README.md](evals/README.md) for the honest read. It's the human-agent partnership that creates and maintains the structure either way.
 
 ---
 
@@ -279,10 +279,12 @@ These are the specs the agent loads and reasons with:
 
 ### Examples
 
-Working domain implementations the agent can reference:
+Illustrative domain structures the agent can reference. They demonstrate the shape of a domain (AGENTS.md, skills, thing types), not the system under real load:
 
-- **[examples/compliance-patterns/](examples/compliance-patterns/)** — Regulatory compliance pattern library
-- **[examples/life-manager/](examples/life-manager/)** — Personal life and work management
+- **[examples/compliance-patterns/](examples/compliance-patterns/)** — Regulatory compliance pattern library (skills + a small set of pattern things)
+- **[examples/life-manager/](examples/life-manager/)** — Personal life and work management (skills only; no things yet)
+
+For a domain in production use, the framework's own repository is the working example — it is a domain within itself, with live things, validation, and provenance.
 
 ### The Deterministic Floor (`tools/mdllm.py`)
 
@@ -324,12 +326,14 @@ An LLM tool with file system access. That's it.
 
 | Tool | Discovery | Status |
 |------|-----------|--------|
-| GitHub Copilot (VS Code) | AGENTS.md auto-load | Fully supported |
-| Claude Code | CLAUDE.md -> AGENTS.md | Fully supported |
-| OpenAI Codex CLI | AGENTS.md auto-load | Fully supported |
-| Cursor | AGENTS.md auto-load | Fully supported |
-| Windsurf | AGENTS.md auto-load | Fully supported |
-| Gemini CLI | AGENTS.md auto-load | Fully supported |
+| Claude Code | CLAUDE.md -> AGENTS.md | Verified in use (the framework's own development and evals run on it) |
+| GitHub Copilot (VS Code) | AGENTS.md auto-load | Designed for; not yet exercised |
+| OpenAI Codex CLI | AGENTS.md auto-load | Designed for; not yet exercised |
+| Cursor | AGENTS.md auto-load | Designed for; not yet exercised |
+| Windsurf | AGENTS.md auto-load | Designed for; not yet exercised |
+| Gemini CLI | AGENTS.md auto-load | Designed for; not yet exercised |
+
+The framework relies only on the cross-vendor AGENTS.md convention plus plain files and git, so it is vendor-agnostic *by design* — but "designed for" is a claim, not a measurement. Discovery and hook execution are harness properties, and the one non-IDE harness tested so far surfaced real differences (no AGENTS.md auto-discovery; the pre-commit hook initially couldn't run). Treat the table as a compatibility intent until an eval has exercised each row.
 
 **What does NOT work:** Any interface without file system access (ChatGPT web, Claude web, bare API calls without tool use). The agent must be able to discover files, read them, and write them.
 
@@ -455,7 +459,7 @@ See [domain-refresh.md](domain-refresh.md) for the full deployment architecture.
 
 A well-defined domain makes even a small model powerful. An undefined domain makes even the largest model mediocre.
 
-**Structure beats scale.** When an agent operates within a clearly defined domain — with explicit thing types, known relationships, declared triggers, and validated integrity — it reasons with precision and consistency. Without that structure, the same agent produces vague, inconsistent output regardless of its parameter count.
+**Structure beats scale — the framework's central hypothesis, now being tested rather than asserted.** When an agent operates within a clearly defined domain — with explicit thing types, known relationships, declared triggers, and validated integrity — it reasons with precision and consistency. The first measured results (see [evals/README.md](evals/README.md)) show structure buying determinism and cost-efficiency; whether it also buys reasoning quality on genuinely hard tasks is the open question the eval harness exists to answer.
 
 - **The domain is the product.** The LLM is replaceable (vendor agnostic); the domain definition is the durable asset. And the domain is something you and your agent build together over time.
 - **Consistency compounds.** Every session builds on committed state, validated things, and structured history. Your refinements accumulate. Nothing is lost.
@@ -497,7 +501,7 @@ If your LLM tool can read files, write files, and navigate directories — yes. 
 
 ### "Is this production-ready?"
 
-The architecture is proven and actively used. Specifications range from `draft` to `stable` (check frontmatter). The examples are working domains. Your specific domain will mature through use — that's by design.
+The architecture is actively used — the framework develops itself as a domain, and one production domain (statutory company filings) runs on it. Specifications range from `draft` to `stable` (check frontmatter). The `examples/` directory illustrates domain structure rather than demonstrating production load. Your specific domain will mature through use — that's by design.
 
 ---
 
