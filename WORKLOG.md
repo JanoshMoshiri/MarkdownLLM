@@ -76,6 +76,29 @@ Worked the "Contradictions and Staleness" section of `reviews/REVIEW-independent
 - Token figures now follow the AGENTS.md convention everywhere: carry measurement method and date, instruct re-measurement, never assert.
 - The fate of `reviews/REVIEW-independent-2026-06-11.md` itself (keep in full vs reduce to a continuity reference) is deferred to Janosh.
 
+### Session 2
+
+#### Topic: Week one of the post-review push — periphery under the floor (review actions 5, 2, and the on-ramp)
+
+Operator set the fortnight's direction: point the v3 medicine at the periphery and at a user who isn't the author, with the cold-start scaffold eval as the centrepiece. This session cleared the three prerequisites in dependency order — vocabulary first (so everything downstream teaches the final set), then examples, then the on-ramp. Released as **3.5.0**.
+
+#### Completed
+
+- [x] **Relation vocabulary pruned 35 → 13** (`161601c`): 9 semantic (informs, implements, extends, references, complements, documents, validates, supports, challenges) + 4 mechanical (contradicts, supersedes, superseded-by, subtask — each checked by `mdllm validate`/`triggers`). Inverse pairs collapsed to forward direction; the one entry with a `notes:` field had the note moved to the surviving side. 45 link entries migrated by script with per-edit assertions; 14 pure-inverse entries deleted where the forward link already existed; 4 forward links added where it didn't (validate.thing → provenance, scalability-guide → example-things, domain-spec-guide → reasoning-lenses, tracking-artifacts insight → framework-map). thing.md (v2.13) vocabulary guidance rewritten; prompt templates migrated off undeclared relations (`defined-by`, `follows`, `consumes-output-of`); framework-map prose updated. Decomposition relations (instance-of etc.) stay in thing.md as universal guidance — they're a semantic rule, not framework-corpus vocabulary.
+- [x] **Examples under the floor** (`bdb9571`): `mdllm validate` gains `example_corpora()` discovery — `examples/*/` with an AGENTS.md validates as its own corpus in the same run, so the pre-commit hook now covers examples (first exercised on that very commit). Both examples declare `_schema.yaml` (types, statuses, lean relations, `id_filename_match: false` for dotted skill filenames).
+- [x] **life-manager populated** — 12 things, fictional but realistic: kitchen-renovation project with three subtasks (one completed, one *deliberately* overdue so `mdllm triggers` always demonstrates a hit — verified firing, one task blocked with a dependency trigger watching its blocker), a 10k goal fed by a recurring run, a weekly review with `review_date_reached` idempotency documented, and `decision-hire-howell-joinery` (`c8edb7e`) with `informed_by` pinned to `bdb9571` — `mdllm provenance` verifies clean.
+- [x] **Example skills upgraded to v3**: write skill (v3.0) teaching templates now match the declared schema — pre-v3 residue removed (`planning`/`complete` statuses, invented `schema_version` field, dependency-things, quoted ad-hoc relations); hierarchy = `parent`, sequencing = `dependencies`/`blocks`; Post-Write Validation rescoped to the mechanical/semantic split in both domains' write skills; AGENTS checklists rescoped likewise; compliance-patterns phantom pattern references removed.
+- [x] **first-hour.md created** (`aaedefa`, `type: guide`, draft v1.0): a newcomer's sixty minutes — look at one real thing before involving the agent, confirm discovery (with the paste-line fallback), scaffold something real-but-small, install the hook and deliberately break a status to watch the floor catch it, one real session. Registered in AGENTS.md Tier 2 + Guides; README gains a For Humans section and a top-of-page pointer.
+- [x] `mdllm validate .` clean across all three corpora (50 + 6 + 12 things, 0 findings); kernel regenerated; sentinel/AGENTS/CHANGELOG synced at 3.5.0 (`b1c43f2`)
+
+#### Decisions Made
+
+- Sequencing: prune before examples before on-ramp, so every downstream surface teaches the final vocabulary.
+- life-manager populated rather than deleted (the review allowed either): a worked dataset is what the cold-start eval participant will copy, and the example now demonstrates triggers, provenance, and the floor end-to-end.
+- `type: dependency` dropped from life-manager: fields (`parent`, `dependencies`, `blocks`) express hierarchy and sequencing; things are for content. The write skill now states this as a rule of thumb.
+- Example schemas keep two-to-three domain-specific relations (`supports`, `orchestrates`; `contrasts-with`/`remediated-by`/`demonstrates` in compliance) — declared, lean, and teaching the "declare what you use" habit rather than pretending the canonical nine cover everything.
+- The deliberately overdue task is a feature, not stale data — documented as such in the thing body and AGENTS.md so nobody "fixes" it.
+
 ---
 
 ## 11 June 2026

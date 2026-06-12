@@ -2,10 +2,10 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.2
+version: 1.3
 created: 2026-06-11
 domain: markdownllm-framework
-last_updated: 2026-06-11
+last_updated: 2026-06-12
 ---
 
 # Framework Continuity Brief
@@ -15,23 +15,24 @@ last_updated: 2026-06-11
 - **Independent review (2026-06-11, external) — action queue:** full review at
   `reviews/REVIEW-independent-2026-06-11.md` (operator to decide whether the
   file stays in full or reduces to this reference). **Staleness pass done
-  2026-06-12 (session 1):** birth-path fixed (template, framework-discovery
-  v2.0, guide:294 phantom hard hook removed), examples got framework_root +
-  v3 startup + honest framing, token estimates replaced with measured
-  (~100–200 tokens/thing frontmatter), README + manifesto claims softened to
-  tested-hypothesis, vendor table re-marked designed-for vs verified-on,
-  minor tensions resolved (read.thing trigger exception, git-workflow
-  invariant/backstop, WORKLOG To-Dos), sweep caught validate-before-commit
-  prompt re-performing mechanical checks (rescoped v2.0). **Remaining, in
-  priority order:** (1) bring `examples/` under the floor — still excluded
-  from validation, no `_schema.yaml`, life-manager has zero things;
-  (2) cold-start scaffold eval (fresh agent + non-author human builds a
-  domain from templates) before the harder VAT fixture; (3) prune the
-  relation vocabulary (~35 → ~12); (4) spec the read-side of quarantine —
+  2026-06-12 session 1** (detail: WORKLOG 12 Jun). **Week-one prerequisites
+  done 2026-06-12 session 2, shipped as 3.5.0:** examples under the floor
+  (validate discovers `examples/*` sub-corpora, both declare `_schema.yaml`,
+  life-manager populated with a working dataset incl. pinned decision record),
+  relation vocabulary pruned 35 → 13 (corpus migrated, templates aligned),
+  `first-hour.md` on-ramp created and registered. **Remaining, in priority
+  order:** (1) **cold-start scaffold eval — the fortnight's centrepiece**
+  (fresh agent + non-author human builds a domain from templates; recruit one
+  person from the operator's orbit; observe, don't help; score like the 2×2;
+  gaps filed as findings per `fixture-fixes-correct-bugs-not-difficulty`);
+  (2) fix what the eval surfaces, then write limitations.md + the "why not
+  just CLAUDE.md + a notes folder" answer (trivial to write honestly after
+  watching a real newcomer); (3) spec the read-side of quarantine —
   unverified `origin: external` bodies still enter context at load;
-  (5) limitations.md + differentiation answer; (6) one page on concurrency;
-  (7) consider promoting generate-or-validate-or-delete from tactic to
-  stated principle (review §Needs More Thinking).
+  (4) one page on concurrency; (5) consider promoting
+  generate-or-validate-or-delete from tactic to stated principle (review
+  §Needs More Thinking). Deferred until after the eval: harder VAT fixture,
+  multi-harness eval matrix, domain visual map.
 - **Harness support is now measured, not assumed:** first non-IDE harness
   session (Cowork, 2026-06-11) — no AGENTS.md auto-discovery; the installed
   pre-commit hook couldn't run (machine-absolute path, bare `python`). Hook
@@ -99,19 +100,26 @@ last_updated: 2026-06-11
 
 - (none)
 
-## Decisions Made This Session (2026-06-12, session 1)
+## Decisions Made This Session (2026-06-12, session 2)
 
-- **Review staleness pass executed in full** (findings 1–8 of the
-  Contradictions and Staleness section) plus a sweep that caught the same
-  disease on adjacent surfaces — notably `validate-before-commit.md` still
-  instructing mechanical validation by reasoning at the exact boundary the
-  hook owns (rescoped to semantic-only, v2.0). Detail in WORKLOG 12 June.
-- **Scope line drawn:** accuracy fixes were executed; scope-changing
-  recommendations (examples under the floor, vocabulary prune, quarantine
-  read-side, limitations.md, concurrency) stay queued as operator decisions.
-- **Token-figure convention generalised:** every cost number in the specs now
-  carries measurement method + date and a re-measure instruction
-  (frontmatter ≈ 100–200 tokens/thing is the new measured basis).
-- **Session-7 decisions** (framework-map creation, hook interpreter fix) are
-  preserved in WORKLOG 11 June, Session 7 — removed here to keep the brief
+- **The fortnight's strategy set by the operator:** point the v3 medicine at
+  the periphery and at a user who isn't the author. Week one (this session)
+  cleared the prerequisites; the cold-start scaffold eval is the centrepiece;
+  model-science work (harder fixture, harness matrix) explicitly deferred
+  until the eval lands.
+- **Sequencing inside week one:** vocabulary prune first so the examples and
+  on-ramp teach the final relation set; examples second; on-ramp last.
+- **life-manager populated rather than deleted** (the review allowed either):
+  the worked dataset is what a cold-start participant copies, and it now
+  demonstrates triggers, provenance, and the floor end-to-end — including one
+  *deliberately* overdue task so `mdllm triggers` always has a find (a
+  feature; documented in-thing so nobody "fixes" it).
+- **`type: dependency` dropped from life-manager:** `parent`/`dependencies`/
+  `blocks` fields express hierarchy and sequencing; things are for content.
+- **Relation prune shape:** 9 semantic + 4 mechanical relations; the
+  `supersedes`/`superseded-by` pair survives because the validator itself
+  checks the backlink; decomposition relations remain thing.md universal
+  guidance rather than framework-corpus vocabulary.
+- **Session-1 decisions** (staleness pass, token-figure convention) are
+  preserved in WORKLOG 12 June, Session 1 — removed here to keep the brief
   lean.
