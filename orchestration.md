@@ -98,7 +98,7 @@ These three hard hooks are part of every agent's operating contract with the fra
 4. Commit the domain files to the domain's own repo
 5. Create a remote repository and push
 
-**Mechanised since v3.6:** `python tools/mdllm.py scaffold <path>` performs steps 1–4 deterministically (plus instantiated templates and the pre-commit hook) — running it is the canonical way to satisfy this hook. Step 5 (the remote) stays with the human. The hook still binds when scaffolding by hand: the *ordering* is the invariant, not the tool.
+**Mechanised by the `scaffold` subcommand:** `python tools/mdllm.py scaffold <path>` performs steps 1–4 deterministically (plus instantiated templates and the pre-commit hook), and exits non-zero if any step of the sequence fails — running it is the canonical way to satisfy this hook. Step 5 (the remote) stays with the human. The hook still binds when scaffolding by hand: the *ordering* is the invariant, not the tool. (Spec prose does not name framework versions — the sentinel is the only version surface; a hand-written "since vX.Y" drifted here within hours of being written.)
 
 **Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
 

@@ -1,0 +1,10 @@
+{
+  "run_id": "20260611-141615-haiku-bare-t5",
+  "model": "haiku",
+  "condition": "bare",
+  "passed": 6,
+  "failed": 1,
+  "wall_s": 80,
+  "cost_usd": 0.0741032,
+  "turns": 19
+}

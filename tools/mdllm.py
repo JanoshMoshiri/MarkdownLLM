@@ -991,12 +991,16 @@ def seed_run_dir(root: Path, fixture: dict, run_dir: Path, bare: bool) -> None:
 
 
 def eval_report(root: Path) -> int:
-    """Aggregate evals/runs/*/result.json into per-cell (model × condition)
-    pass rates — the summary table for the structure-beats-scale 2×2."""
+    """Aggregate evals/results/*.json (the committed evidence mirror; legacy
+    fallback: evals/runs/*/result.json) into per-cell pass rates."""
     import json as _json
-    runs_dir = root / "evals" / "runs"
     results = []
-    for rj in sorted(runs_dir.glob("*/result.json")) if runs_dir.is_dir() else []:
+    res_dir = root / "evals" / "results"
+    paths = sorted(res_dir.glob("*.json")) if res_dir.is_dir() else []
+    if not paths:
+        runs_dir = root / "evals" / "runs"
+        paths = sorted(runs_dir.glob("*/result.json")) if runs_dir.is_dir() else []
+    for rj in paths:
         try:
             results.append(_json.loads(rj.read_text(encoding="utf-8")))
         except ValueError:
@@ -1053,6 +1057,22 @@ def cmd_eval(args) -> int:
     if not args.fixture:
         sys.exit("mdllm: eval requires --fixture (or --report)")
     fixture = yaml.safe_load(Path(args.fixture).read_text(encoding="utf-8"))
+    sentinel = root / ".markdownllm"
+    if sentinel.is_file():
+        # Fixtures must not hardcode the framework version (it breaks on the
+        # next release) — `{framework_version}` resolves from the sentinel.
+        fv = str((yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {})
+                 .get("version"))
+
+        def _subst(o):
+            if isinstance(o, str):
+                return o.replace("{framework_version}", fv)
+            if isinstance(o, list):
+                return [_subst(x) for x in o]
+            if isinstance(o, dict):
+                return {k: _subst(v) for k, v in o.items()}
+            return o
+        fixture = _subst(fixture)
     name = fixture.get("name", args.fixture)
 
     if not args.run:
@@ -1072,6 +1092,17 @@ def cmd_eval(args) -> int:
                   "frontmatter representing business records.") + "\n\n" + prompt)
     import json as _json
     results = []
+
+    def record(run_id: str, run_dir: Path, res: dict) -> None:
+        """Run dirs are gitignored workspaces; evals/results/ is the committed
+        evidence mirror — the claim and the data travel together."""
+        results.append(res)
+        payload = _json.dumps(res, indent=2)
+        (run_dir / "result.json").write_text(payload, encoding="utf-8")
+        res_dir = root / "evals" / "results"
+        res_dir.mkdir(parents=True, exist_ok=True)
+        (res_dir / f"{run_id}.json").write_text(payload, encoding="utf-8")
+
     for trial in range(1, args.trials + 1):
         run_id = (f"{dt.datetime.now():%Y%m%d-%H%M%S}-"
                   f"{args.model}-{'bare' if args.bare else 'fw'}-t{trial}")
@@ -1106,14 +1137,12 @@ def cmd_eval(args) -> int:
             wall = (dt.datetime.now() - t0).total_seconds()
             n_asserts = len(fixture.get("assertions") or [])
             print(f"  TIMEOUT after {wall:.0f}s — trial recorded as 0/{n_asserts}\n")
-            results.append({"run_id": run_id, "fixture": name,
-                            "model": args.model,
-                            "condition": "bare" if args.bare else "framework",
-                            "passed": 0, "failed": n_asserts,
-                            "wall_s": round(wall), "cost_usd": None,
-                            "turns": None, "timeout": True})
-            (run_dir / "result.json").write_text(
-                _json.dumps(results[-1], indent=2), encoding="utf-8")
+            record(run_id, run_dir, {"run_id": run_id, "fixture": name,
+                   "model": args.model,
+                   "condition": "bare" if args.bare else "framework",
+                   "passed": 0, "failed": n_asserts,
+                   "wall_s": round(wall), "cost_usd": None,
+                   "turns": None, "timeout": True})
             continue
         wall = (dt.datetime.now() - t0).total_seconds()
         # Always persist the agent's raw output — a 2-second 1-turn "trial"
@@ -1134,13 +1163,11 @@ def cmd_eval(args) -> int:
         print("\n".join(lines))
         score = f"{passed}/{passed + failed}"
         print(f"  score {score} · {wall:.0f}s · cost {cost} · turns {turns}\n")
-        results.append({"run_id": run_id, "fixture": name,
-                        "model": args.model,
-                        "condition": "bare" if args.bare else "framework",
-                        "passed": passed, "failed": failed,
-                        "wall_s": round(wall), "cost_usd": cost, "turns": turns})
-        (run_dir / "result.json").write_text(
-            _json.dumps(results[-1], indent=2), encoding="utf-8")
+        record(run_id, run_dir, {"run_id": run_id, "fixture": name,
+               "model": args.model,
+               "condition": "bare" if args.bare else "framework",
+               "passed": passed, "failed": failed,
+               "wall_s": round(wall), "cost_usd": cost, "turns": turns})
     if results:
         ok = sum(1 for r in results if r["failed"] == 0)
         print(f"### {name}: {ok}/{len(results)} trials fully passing "
@@ -1429,6 +1456,8 @@ def cmd_scaffold(args) -> int:
     # (2)+(3) outer repo ignores the domain BEFORE any domain commit,
     # (4) domain's first commit. Step 5 (remote) stays with the human.
     subprocess.run(["git", "init", "-q"], cwd=target, check=True)
+    broken: list[str] = []  # any partial birth = exit 1; this hook's whole
+    #                         point is that incomplete sequences cannot pass silently
     outer = subprocess.run(["git", "rev-parse", "--show-toplevel"],
                            cwd=target.parent, capture_output=True, text=True)
     isolated_in = None
@@ -1445,8 +1474,8 @@ def cmd_scaffold(args) -> int:
                 ["git", "commit", "-q", "-m", f"chore: isolate domain {rel_t} (scaffold)"],
                 cwd=outer_root, capture_output=True, text=True)
             if commit.returncode != 0:
-                print(f"WARN  outer .gitignore updated but commit failed in {outer_root}:"
-                      f" {commit.stderr.strip() or commit.stdout.strip()}")
+                broken.append(f"outer .gitignore updated but commit failed in "
+                              f"{outer_root}: {commit.stderr.strip() or commit.stdout.strip()}")
         isolated_in = outer_root
 
     hook_via = install_hook(target)
@@ -1454,6 +1483,10 @@ def cmd_scaffold(args) -> int:
     first = subprocess.run(
         ["git", "commit", "-q", "-m", f"scaffold: {name} — framework v{fw_version}"],
         cwd=target, capture_output=True, text=True)
+    if first.returncode != 0:
+        broken.append(f"first domain commit failed — configure git user.name/"
+                      f"user.email, then commit. "
+                      f"({first.stderr.strip() or first.stdout.strip()})")
 
     print(f"## Scaffolded {name} — {target}\n")
     for w in written:
@@ -1463,16 +1496,18 @@ def cmd_scaffold(args) -> int:
         print(f"  isolated: {isolated_in / '.gitignore'} ignores the domain")
     if first.returncode == 0:
         print(f"  first commit made (framework_version_seen: {fw_version})")
-    else:
-        print(f"  WARN  first commit failed — configure git user.name/user.email, "
-              f"then commit. ({first.stderr.strip() or first.stdout.strip()})")
+    for b in broken:
+        print(f"  FAIL  {b}")
     print("\nStill yours (and your agent's) — the semantic half:")
     print("  - AGENTS.md: name, description, principles, thing types")
     print("  - things/_schema.yaml: declare your types and status vocabularies")
     print("  - skills/: fill the four skill bodies with the domain's reasoning")
     print("  - things/: create the first real things")
     print("  - a remote, if the domain should have one")
-    return 0
+    if broken:
+        print("\nBIRTH SEQUENCE INCOMPLETE — the isolation invariant did not "
+              "fully hold; fix the FAIL lines before using the domain.")
+    return 1 if broken else 0
 
 
 # ---------------------------------------------------------------- main

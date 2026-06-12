@@ -5,12 +5,29 @@ silently changes what "valid" means for every domain. These tests pin the
 behaviour of each mechanical check. Run: python -m pytest tools/tests -q
 """
 
+import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import mdllm  # noqa: E402
+
+# Tests that commit (scaffold's nested repo, hook execution) must not depend
+# on the machine's global git identity — CI runners and sandboxes have none.
+# (portability-claims-need-execution-tests, applied to the test suite itself.)
+for _k in ("GIT_AUTHOR_NAME", "GIT_COMMITTER_NAME"):
+    os.environ.setdefault(_k, "floor-tests")
+for _k in ("GIT_AUTHOR_EMAIL", "GIT_COMMITTER_EMAIL"):
+    os.environ.setdefault(_k, "floor-tests@local")
+
+
+def _git_supports_hook_run() -> bool:
+    import re as _re
+    import subprocess as _sp
+    out = _sp.run(["git", "--version"], capture_output=True, text=True)
+    m = _re.search(r"(\d+)\.(\d+)", out.stdout or "")
+    return bool(m) and (int(m.group(1)), int(m.group(2))) >= (2, 36)
 
 
 # ---------------------------------------------------------------- helpers
@@ -431,6 +448,9 @@ def test_doctor_degraded_without_hook(tmp_path, capsys):
 
 
 def test_doctor_floor_active_with_hook(tmp_path, capsys):
+    import pytest
+    if not _git_supports_hook_run():
+        pytest.skip("git < 2.36 — doctor reports WARN instead of execution-testing")
     _git_repo(tmp_path)
     write(tmp_path, "things/alpha.md", thing_text(GOOD))
     mdllm.cmd_install_hook(_ns(path=str(tmp_path)))

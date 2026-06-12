@@ -104,7 +104,7 @@ yet test the claim's reasoning component. A harder fixture, where the
 condition-neutral figures actually discriminate, is needed before the claim
 can cite this experiment. See insight
 `first-2x2-measured-convention-following-not-reasoning`. (The pre-fix smoke
-run lives in `evals/runs/_excluded-pre-fix/`, excluded from the report — it
+run's evidence lives in `evals/results/excluded/`, excluded from the report — it
 ran against the fixture's pre-fix id template through a broken runner.)
 
 ## The cold-start scaffold rehearsal (2026-06-12, cold-start-scaffold)
@@ -133,9 +133,12 @@ the cost. The opus trial also left a stale `index.lock` on the *framework*
 repo despite a read-only instruction — agent git activity outside its
 workspace is real, which is why scaffold owns the outer-repo commit.
 Three additional trials died in 2s with an unparseable 1-turn result before
-the runner captured agent output (now in `runs/_excluded-cli-failures/`,
+the runner captured agent output (evidence in `evals/results/excluded/`,
 excluded from the report; `agent-stdout.json`/`agent-stderr.txt` are persisted
-per-trial since the fix, so future failures are diagnosable).
+per-trial since the fix, so future failures are diagnosable). Scored evidence
+is mirrored to `evals/results/` — committed with the repo — because the run
+workspaces themselves are gitignored nested repos; the claim and the data
+travel together.
 
 The human half of the cold-start eval still stands as designed — a non-author
 operator, observed not helped. This rehearsal cleared the path for it: the

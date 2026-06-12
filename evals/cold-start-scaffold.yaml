@@ -34,7 +34,7 @@ assertions:
   - git_repo: client-tracker
   - git_commits: { path: client-tracker, min: 1 }
   - file_contains: { path: client-tracker/AGENTS.md, text: "framework_root:" }
-  - file_contains: { path: client-tracker/AGENTS.md, text: "framework_version_seen: 3.5.0" }
+  - file_contains: { path: client-tracker/AGENTS.md, text: "framework_version_seen: {framework_version}" }
   - file_exists: [client-tracker/things/_schema.yaml, client-tracker/_schema.yaml]
   - file_exists: client-tracker/skills
   - min_things: 5

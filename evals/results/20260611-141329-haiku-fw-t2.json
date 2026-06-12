@@ -1,0 +1,10 @@
+{
+  "run_id": "20260611-141329-haiku-fw-t2",
+  "model": "haiku",
+  "condition": "framework",
+  "passed": 7,
+  "failed": 0,
+  "wall_s": 82,
+  "cost_usd": 0.08928860000000001,
+  "turns": 18
+}

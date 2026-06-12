@@ -1,0 +1,10 @@
+{
+  "run_id": "20260611-142118-opus-fw-t4",
+  "model": "opus",
+  "condition": "framework",
+  "passed": 7,
+  "failed": 0,
+  "wall_s": 200,
+  "cost_usd": 0.7621684999999999,
+  "turns": 35
+}

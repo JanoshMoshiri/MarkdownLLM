@@ -2,6 +2,11 @@
 domains/
 domain/
 adapters/logs/
+# Run workspaces are bulky, ephemeral, and are themselves git repos (cannot
+# be partially tracked). The scored evidence is the basis of the framework's
+# empirical claims — committed state is the only real state — so the runner
+# mirrors each result.json into evals/results/, which IS tracked
+# (review 2026-06-12, finding 4).
 evals/runs/
 __pycache__/
 .pytest_cache/

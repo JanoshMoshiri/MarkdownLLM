@@ -1,0 +1,10 @@
+{
+  "run_id": "20260611-142023-opus-bare-t5",
+  "model": "opus",
+  "condition": "bare",
+  "passed": 6,
+  "failed": 1,
+  "wall_s": 92,
+  "cost_usd": 0.3641715,
+  "turns": 17
+}
