@@ -2,20 +2,14 @@
 id: validate-before-commit
 type: prompt
 status: stable
-version: 1.0
+version: 2.0
 created: 2026-05-20
 inputs:
   - name: staged-things
     description: "Thing files that have been modified and are about to be committed"
-  - name: all-thing-ids
-    description: "Index of all thing IDs in the domain for referential checks"
 outputs:
   - name: validation-result
-    description: "pass or fail with specific issues"
-  - name: auto-fixes
-    description: "Issues that were automatically corrected"
-  - name: blocking-issues
-    description: "Issues that prevent commit and require user input"
+    description: "pass or pass-with-warnings, with specific semantic issues"
 bound_to:
   - hook: pre-commit
 linked_things:
@@ -31,49 +25,25 @@ linked_things:
 
 ## Purpose
 
-Before committing changes, verify that modified things maintain structural and referential integrity. Catch errors before they become part of the committed state. This prompt implements a focused subset of `validate.thing.md` optimized for the pre-commit moment.
+Before committing changes, verify that modified things make semantic sense. This prompt implements the *judgement* subset of `validate.thing.md` optimized for the pre-commit moment.
+
+**Since v3.0, structural and referential validation are not this prompt's job.** The mdllm pre-commit hook (`python {framework_root}/tools/mdllm.py install-hook .`) runs full mechanical validation — YAML well-formedness, required fields, id format, status vocabulary against the schema, reference integrity — deterministically, and blocks the commit on any Error. Never re-perform those checks by reasoning. If the hook is not installed (or cannot run in this environment), say so explicitly and run `mdllm validate .` manually before committing — do not substitute reasoning for the tool.
 
 ## Reasoning Template
 
 For each staged thing file, run these checks in order:
 
-### 1. Structural Validation
-
-Verify the thing is well-formed:
-
-- [ ] YAML frontmatter present and parseable
-- [ ] Required fields exist: `id`, `type`, `status`, `created`
-- [ ] `id` is lowercase, hyphenated, no spaces
-- [ ] `status` is a valid value for the domain
-- [ ] `created` is valid ISO 8601 date
-- [ ] Markdown body exists below frontmatter
-
-**On failure:** Auto-fix if possible (e.g., add missing `created` from git history). If not fixable, block commit and report.
-
-### 2. Referential Validation
-
-Verify that references point to real things:
-
-- [ ] All IDs in `dependencies` array exist in the domain
-- [ ] All IDs in `blocks` array exist in the domain
-- [ ] All IDs in `linked_things[].id` exist in the domain
-- [ ] `parent` ID exists if specified
-- [ ] All IDs in `triggers[].watch` arrays exist
-
-**On failure:** Report broken references. Do not auto-fix — the user may have forgotten to create the referenced thing.
-
-### 3. Semantic Validation
+### 1. Semantic Validation
 
 Verify that the thing makes logical sense:
 
 - [ ] Status `completed` things don't have unsatisfied dependencies on non-completed things (circular)
 - [ ] Status `blocked` things have at least one non-completed dependency or a documented reason
 - [ ] Priority is consistent with stated urgency in narrative (flag mismatches, don't auto-correct)
-- [ ] No duplicate IDs across the staged set
 
-**On failure:** Warn but don't block unless it's a duplicate ID (which always blocks).
+**On failure:** Warn but don't block; surface to the user.
 
-### 4. Consistency Validation
+### 2. Consistency Validation
 
 If multiple things are staged together, verify cross-thing consistency:
 
@@ -85,21 +55,17 @@ If multiple things are staged together, verify cross-thing consistency:
 
 | Severity | Action |
 |----------|--------|
-| Auto-fixable structural issue | Fix silently, note in commit |
-| Broken reference | Block commit, report to user |
+| Mechanical issue (structure, references, schema) | The hook blocks the commit; fix the thing (or, with the human, the schema) — never reason around it |
 | Semantic warning | Warn but allow commit |
-| Duplicate ID | Block commit |
 | Cross-thing inconsistency | Warn but allow commit |
 
 ## Output Format
 
 ```
-Pre-commit validation:
+Pre-commit semantic review:
 - Checked: [count] things
-- Auto-fixed: [list of fixes applied]
 - Warnings: [list of non-blocking issues]
-- Blocked: [list of blocking issues, if any]
-- Result: PASS | FAIL
+- Result: PASS | PASS WITH WARNINGS
 ```
 
-If FAIL, the agent reports the blocking issues and asks the user how to proceed before committing.
+Mechanical failures surface as hook output at the commit boundary, not in this report.

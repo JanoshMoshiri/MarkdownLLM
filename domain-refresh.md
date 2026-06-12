@@ -128,8 +128,8 @@ To know whether a refresh is needed, the domain tracks the last-known framework 
 ```yaml
 ---
 name: My Domain
-framework_root: ../..  
-framework_version_seen: 2.8
+framework_root: ../..
+framework_version_seen: 3.4.0   # copy the version field from {framework_root}/.markdownllm
 ---
 ```
 

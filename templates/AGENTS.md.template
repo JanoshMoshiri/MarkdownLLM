@@ -56,7 +56,7 @@ git:
 2. **Load relevant skill** — Match intent to appropriate skill (specification, read.thing.skill, write.thing.skill, workflow)
 3. **Load context** — Load relevant things from `./things/` directory
 4. **Execute** — Follow skill guidance while maintaining consistency with principles
-5. **Validate** — After writes, invoke validation (structural, referential, domain-specific)
+5. **Validate** — After writes, perform semantic validation (domain rules, coherence); the structural/referential/schema layer is owned by `mdllm` and the pre-commit hook
 6. **Commit** — Persist changes following git-workflow conventions
 
 ### On Output

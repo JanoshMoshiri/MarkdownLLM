@@ -50,7 +50,7 @@ When a user requests a change:
 2. **Load context** — Read relevant things to understand impact
 3. **Reason through implications** — What else changes? What dependencies exist?
 4. **Propose or execute** — Create/update things according to domain principles
-5. **Validate** — Run validation checks (structural, referential, domain-specific)
+5. **Validate** — Perform semantic validation (domain rules, coherence); mechanical checks are owned by `mdllm` and the pre-commit hook
 6. **Commit** — Persist with structured commit message
 7. **Evaluate triggers** — Check if changes caused any triggers to fire
 8. **Report changes** — Explain what changed and why
@@ -122,13 +122,12 @@ When updating a thing:
 
 ## Post-Write Validation
 
-After every create or update, validate:
+After every create or update:
 
-1. **Structural** — YAML is valid, required fields present, id format correct
-2. **Referential** — All linked_things targets exist, no orphaned references
-3. **Domain-specific** — Domain rules from specification are met (types valid, status transitions legal)
+1. **Mechanical (the tool's layer — do not re-perform by reasoning)** — YAML validity, required fields, id format, reference integrity, and schema conformance are checked by `python {framework_root}/tools/mdllm.py validate .` and enforced by the pre-commit hook. Broken things cannot be committed.
+2. **Semantic (your layer)** — Domain rules from the specification skill are met: the status transition makes sense, the narrative matches the metadata, cascading impacts on linked things are handled.
 
-If validation fails, fix the issue before committing.
+If the hook blocks a legitimate change, the schema is wrong — fix `things/_schema.yaml` with the human; never bypass the hook.
 
 ## Git Commit Conventions
 
