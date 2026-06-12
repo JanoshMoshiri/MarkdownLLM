@@ -49,6 +49,35 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 12 June 2026
+
+### Session 1
+
+#### Topic: Independent-review staleness pass — all eight findings actioned
+
+Worked the "Contradictions and Staleness" section of `reviews/REVIEW-independent-2026-06-11.md` end to end, then swept the repo for the same disease on adjacent surfaces.
+
+#### Completed
+
+- [x] **Finding 1 — `templates/AGENTS.md.template` to v3:** Tier 0 loads kernel.md + continuity.md (was full thing.md + orchestration.md); version-check via `mdllm validate`; `_schema.yaml` and deterministic-floor sections added; session-end documented as bound prompt; `framework_version_seen` example now 3.4.0
+- [x] **Finding 2 — `framework-discovery.md` (v1.2 → v2.0):** startup sequence is kernel-tiered; sentinel example updated to 3.4.0 and marked illustrative (live `.markdownllm` authoritative — no more hand-maintained copies); deployment diagram + `.gitignore` contract corrected `domain/` → `domains/` with the legacy spelling noted
+- [x] **Finding 3 — `domain-specification-guide.md` (v2.7 → v2.8):** line 294's phantom fourth hard hook removed — session-end continuity is a bound prompt, explicitly invoked; the three real hard hooks named; embedded template startup aligned to kernel pattern, gains `framework_version_seen`
+- [x] **Finding 4 (partial) — examples:** both example AGENTS.md declare `framework_root` + `framework_version_seen`, run the version check, load the kernel; life-manager carries an explicit "skills only, no things yet" status note; README stops calling them working implementations (illustrative structure; the framework repo itself is the working example)
+- [x] **Finding 5 — token estimates measured:** derived-index.md and scalability-guide.md (v1.2 → v1.3) disagreed 10–20×; both now derive from one measured basis — ~100–200 tokens per thing's frontmatter (2026-06-12, tiktoken o200k_base, framework corpus + two live domains, per-domain averages 96–204)
+- [x] **Finding 6 — README claim softened:** "The result:" → tested-hypothesis framing citing the 2×2 honestly (determinism shown, small+framework beat large+bare at ~¼ cost, reasoning claim untested); Elegant Constraint section states the claim as the hypothesis under measurement; vendor table re-marked verified-in-use (Claude Code) vs designed-for (the other five)
+- [x] **Finding 7 — minor tensions:** read.thing.md (v2.1 → v2.2) trigger exception made explicit (a declared trigger is a pre-authorised attention request) — kernel block updated, kernel regenerated and in sync; git-workflow.md (v1.1 → v1.2) names `post-write:commit` the invariant and the session-end commit the backstop; three stale WORKLOG To-Dos marked done (validation honesty superseded by the floor; cost honesty section exists; referential-integrity detection closed by mdllm)
+- [x] **Finding 8 — manifesto (v2.2 → v2.3):** `.skill.md` re-described as emerging convention, not existing standard; §elegant-constraint claim restated carefully with first eval results
+- [x] **Sweep finds:** orchestration.md "These two hard hooks" → three (section defines three); `templates/prompts/validate-before-commit.md` (v1.0 → v2.0) rescoped — it instructed re-performing mechanical validation by reasoning at the exact boundary the hook now owns; write-skill template and template AGENTS.md validate steps now name the mechanical/semantic split; domain-refresh.md `framework_version_seen` example 2.8 → 3.4.0
+- [x] `mdllm validate .` clean (50 things, 0 findings); `mdllm kernel --check` in sync
+
+#### Decisions Made
+
+- The review's staleness section was actioned in full; its larger recommendations (un-exclude examples from validation, populate life-manager, cold-start scaffold eval, relation-vocabulary prune, read-side quarantine, limitations.md, concurrency page) remain in the continuity action queue as operator decisions — they change scope, not just accuracy.
+- Token figures now follow the AGENTS.md convention everywhere: carry measurement method and date, instruct re-measurement, never assert.
+- The fate of `reviews/REVIEW-independent-2026-06-11.md` itself (keep in full vs reduce to a continuity reference) is deferred to Janosh.
+
+---
+
 ## 11 June 2026
 
 ### Session 1

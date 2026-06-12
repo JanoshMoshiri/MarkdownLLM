@@ -13,20 +13,25 @@ last_updated: 2026-06-11
 ## Open Threads
 
 - **Independent review (2026-06-11, external) — action queue:** full review at
-  `reviews/REVIEW-independent-2026-06-11.md`. Priority order: (1) fix
-  birth-path staleness — `templates/AGENTS.md.template` is pre-kernel,
-  `framework-discovery.md` is pre-v3 (stable but stale: v2.8 sentinel example,
-  `domain/` vs `domains/`), `domain-specification-guide.md:294` names a
-  "session-end:continuity hard hook" that doesn't exist (session-end is a bound
-  prompt); (2) bring `examples/` under the floor — excluded from validation,
-  both pre-v3, no framework_root, life-manager has zero things; (3) cold-start
-  scaffold eval (fresh agent + non-author human builds a domain from templates)
-  before the harder VAT fixture; (4) prune the relation vocabulary (~35 → ~12)
-  and replace hand-written token estimates with generated ones
-  (derived-index.md:146 and scalability-guide.md:263 disagree 10–20x);
-  (5) spec the read-side of quarantine — unverified `origin: external` bodies
-  still enter context at load; (6) limitations.md + differentiation answer;
-  (7) one page on concurrency.
+  `reviews/REVIEW-independent-2026-06-11.md` (operator to decide whether the
+  file stays in full or reduces to this reference). **Staleness pass done
+  2026-06-12 (session 1):** birth-path fixed (template, framework-discovery
+  v2.0, guide:294 phantom hard hook removed), examples got framework_root +
+  v3 startup + honest framing, token estimates replaced with measured
+  (~100–200 tokens/thing frontmatter), README + manifesto claims softened to
+  tested-hypothesis, vendor table re-marked designed-for vs verified-on,
+  minor tensions resolved (read.thing trigger exception, git-workflow
+  invariant/backstop, WORKLOG To-Dos), sweep caught validate-before-commit
+  prompt re-performing mechanical checks (rescoped v2.0). **Remaining, in
+  priority order:** (1) bring `examples/` under the floor — still excluded
+  from validation, no `_schema.yaml`, life-manager has zero things;
+  (2) cold-start scaffold eval (fresh agent + non-author human builds a
+  domain from templates) before the harder VAT fixture; (3) prune the
+  relation vocabulary (~35 → ~12); (4) spec the read-side of quarantine —
+  unverified `origin: external` bodies still enter context at load;
+  (5) limitations.md + differentiation answer; (6) one page on concurrency;
+  (7) consider promoting generate-or-validate-or-delete from tactic to
+  stated principle (review §Needs More Thinking).
 - **Harness support is now measured, not assumed:** first non-IDE harness
   session (Cowork, 2026-06-11) — no AGENTS.md auto-discovery; the installed
   pre-commit hook couldn't run (machine-absolute path, bare `python`). Hook
@@ -35,8 +40,8 @@ last_updated: 2026-06-11
   Store `python3` alias stub resolvable-but-not-executable; fixed `32d5c6f`,
   hook now executes candidates rather than resolving them). Remaining: spec
   the explicit bootstrap line in framework-discovery.md as a first-class
-  discovery route; re-mark the README vendor table designed-for vs
-  verified-on; consider `install-hook` self-testing its emitted script. See
+  discovery route (vendor table re-marked designed-for vs verified-on
+  2026-06-12); consider `install-hook` self-testing its emitted script. See
   `agents-md-discovery-is-harness-dependent`,
   `portability-claims-need-execution-tests`.
 - **Domain visual map:** replicate `framework-map.md` for a live domain
@@ -94,20 +99,19 @@ last_updated: 2026-06-11
 
 - (none)
 
-## Decisions Made This Session (2026-06-11, session 7)
+## Decisions Made This Session (2026-06-12, session 1)
 
-- **framework-map.md created** (`type: guide`, draft): the framework's visual
-  orientation layer — five-band elevation, spec-layer dependency graph from
-  `linked_things` frontmatter, mdllm subcommand → spec mapping. Mermaid, so it
-  diffs and renders on GitHub. Registered in AGENTS.md (Tier 2 routing +
-  Guides). Its "keeping this map honest" section names the mechanical source
-  of truth per view; frontmatter wins on disagreement.
-- **Hook interpreter resolution falsified and fixed** (`32d5c6f`): the
-  session-6 "portable" hook blocked all commits on the authoring machine —
-  `command -v python3` matched the Windows Store alias stub. `HOOK_BODY` now
-  executes candidates (`-c "import sys"`); 30 tests pass; both session
-  commits went through the repaired hook. Insight:
-  `portability-claims-need-execution-tests`.
-- **Session-6 decisions** (review acceptance, authorship convention, first
-  Cowork harness run) are preserved in WORKLOG 11 June, Session 6 — removed
-  here to keep the brief lean.
+- **Review staleness pass executed in full** (findings 1–8 of the
+  Contradictions and Staleness section) plus a sweep that caught the same
+  disease on adjacent surfaces — notably `validate-before-commit.md` still
+  instructing mechanical validation by reasoning at the exact boundary the
+  hook owns (rescoped to semantic-only, v2.0). Detail in WORKLOG 12 June.
+- **Scope line drawn:** accuracy fixes were executed; scope-changing
+  recommendations (examples under the floor, vocabulary prune, quarantine
+  read-side, limitations.md, concurrency) stay queued as operator decisions.
+- **Token-figure convention generalised:** every cost number in the specs now
+  carries measurement method + date and a re-measure instruction
+  (frontmatter ≈ 100–200 tokens/thing is the new measured basis).
+- **Session-7 decisions** (framework-map creation, hook interpreter fix) are
+  preserved in WORKLOG 11 June, Session 7 — removed here to keep the brief
+  lean.
