@@ -867,8 +867,15 @@ fi
 
 
 def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[str]]:
-    """Stage 1: deterministic assertions against a domain's current state."""
-    corpus, _ = scan(domain_root)
+    """Stage 1: deterministic assertions against a domain's current state.
+
+    `domain_root` is the workspace; if the fixture declares `domain_dir`
+    (scaffold-style fixtures, where the agent *creates* the domain in a
+    subfolder), thing/status/field/link/validates assertions scan that
+    subfolder while file/git assertions stay workspace-relative."""
+    ws = domain_root
+    droot = (ws / fixture["domain_dir"]) if fixture.get("domain_dir") else ws
+    corpus, _ = scan(droot) if droot.is_dir() else (Corpus(root=droot), [])
     by_id = corpus.by_id()
     passed = failed = 0
     lines: list[str] = []
@@ -918,6 +925,33 @@ def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[s
             findings.extend(validate_level3(corpus))
             errs = [x for x in findings if x.severity == SEV_ERROR]
             report(not errs, f"validates clean (Errors: {len(errs)})")
+        elif "file_exists" in a:
+            paths = a["file_exists"]
+            paths = [paths] if isinstance(paths, str) else paths
+            report(any((ws / p).exists() for p in paths),
+                   f"file exists: {' or '.join(paths)}")
+        elif "file_contains" in a:
+            fc = a["file_contains"]
+            f_ = ws / fc["path"]
+            ok = f_.is_file() and fc["text"] in f_.read_text(encoding="utf-8")
+            report(ok, f"{fc['path']} contains {fc['text']!r}")
+        elif "git_repo" in a:
+            report((ws / a["git_repo"] / ".git").exists(),
+                   f"own git repo: {a['git_repo']}")
+        elif "git_commits" in a:
+            gc = a["git_commits"]
+            tgt = ws / gc["path"]
+            n = 0
+            if (tgt / ".git").exists():
+                out = subprocess.run(["git", "rev-list", "--count", "HEAD"],
+                                     cwd=tgt, capture_output=True, text=True)
+                if out.returncode == 0 and out.stdout.strip().isdigit():
+                    n = int(out.stdout.strip())
+            report(n >= gc.get("min", 1),
+                   f"git commits in {gc['path']}: {n} (need >= {gc.get('min', 1)})")
+        elif "min_things" in a:
+            report(len(corpus.things) >= a["min_things"],
+                   f"things in domain >= {a['min_things']} (actual: {len(corpus.things)})")
         else:
             report(False, f"unknown assertion: {a}")
     return passed, failed, lines
@@ -958,14 +992,17 @@ def eval_report(root: Path) -> int:
     if not results:
         print(f"No run results under {runs_dir}")
         return 1
-    cells: dict[tuple[str, str], list[dict]] = {}
+    cells: dict[tuple[str, str, str], list[dict]] = {}
     for r in results:
-        cells.setdefault((str(r.get("model")), str(r.get("condition"))), []).append(r)
+        # Legacy runs predate the fixture tag (the 2026-06-11 2x2 was all one
+        # fixture); group them under their known name rather than "?".
+        fx = str(r.get("fixture", "VAT quarter prep (synthetic, known-correct figures)"))
+        cells.setdefault((fx, str(r.get("model")), str(r.get("condition"))), []).append(r)
     print(f"## Eval Report — {len(results)} trials, {len(cells)} cells\n")
-    print("| model | condition | trials | fully passing | assertion pass rate "
+    print("| fixture | model | condition | trials | fully passing | assertion pass rate "
           "| mean wall s | mean cost $ |")
-    print("|---|---|---|---|---|---|---|")
-    for (model, cond), rs in sorted(cells.items()):
+    print("|---|---|---|---|---|---|---|---|")
+    for (fx, model, cond), rs in sorted(cells.items()):
         full = sum(1 for r in rs if r.get("failed") == 0)
         p = sum(r.get("passed", 0) for r in rs)
         f_ = sum(r.get("failed", 0) for r in rs)
@@ -974,7 +1011,8 @@ def eval_report(root: Path) -> int:
         costs = [r["cost_usd"] for r in rs if r.get("cost_usd") is not None]
         mw = f"{sum(walls) / len(walls):.0f}" if walls else "—"
         mc = f"{sum(costs) / len(costs):.3f}" if costs else "—"
-        print(f"| {model} | {cond} | {len(rs)} | {full}/{len(rs)} | {rate} "
+        fx_short = fx if len(fx) <= 40 else fx[:37] + "..."
+        print(f"| {fx_short} | {model} | {cond} | {len(rs)} | {full}/{len(rs)} | {rate} "
               f"| {mw} | {mc} |")
     return 0
 
@@ -1030,7 +1068,8 @@ def cmd_eval(args) -> int:
         seed_run_dir(root, fixture, run_dir, args.bare)
         cmd = ["claude", "-p", prompt, "--model", args.model,
                "--output-format", "json", "--permission-mode", "acceptEdits",
-               "--allowedTools", "Edit Write Read Glob Grep Bash(git:*)"]
+               "--allowedTools", fixture.get("allowed_tools",
+                                             "Edit Write Read Glob Grep Bash(git:*)")]
         if not args.bare:
             # The seed's framework_root resolves to the framework checkout;
             # the bare condition must NOT see it — that's the control.
@@ -1055,7 +1094,8 @@ def cmd_eval(args) -> int:
             wall = (dt.datetime.now() - t0).total_seconds()
             n_asserts = len(fixture.get("assertions") or [])
             print(f"  TIMEOUT after {wall:.0f}s — trial recorded as 0/{n_asserts}\n")
-            results.append({"run_id": run_id, "model": args.model,
+            results.append({"run_id": run_id, "fixture": name,
+                            "model": args.model,
                             "condition": "bare" if args.bare else "framework",
                             "passed": 0, "failed": n_asserts,
                             "wall_s": round(wall), "cost_usd": None,
@@ -1074,7 +1114,8 @@ def cmd_eval(args) -> int:
         print("\n".join(lines))
         score = f"{passed}/{passed + failed}"
         print(f"  score {score} · {wall:.0f}s · cost {cost} · turns {turns}\n")
-        results.append({"run_id": run_id, "model": args.model,
+        results.append({"run_id": run_id, "fixture": name,
+                        "model": args.model,
                         "condition": "bare" if args.bare else "framework",
                         "passed": passed, "failed": failed,
                         "wall_s": round(wall), "cost_usd": cost, "turns": turns})

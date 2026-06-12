@@ -1,0 +1,43 @@
+name: Cold-start domain scaffold (agent-only rehearsal)
+description: >
+  Birth-path rehearsal for the cold-start eval (independent-review action 4).
+  A fresh headless agent, given only an operator-voiced brief and read access
+  to the framework checkout, scaffolds a new domain in an empty workspace.
+  Scores the mechanical half of birth quality: own git repo with commits,
+  isolation honoured in the outer workspace's .gitignore, AGENTS.md carrying
+  framework_root + framework_version_seen, a declared _schema.yaml, at least
+  the four guide-mandated skills plus a seed thing, pre-commit hook installed,
+  and the result validating clean. The human half of the cold-start eval (a
+  non-author operator) runs later; every gap this rehearsal surfaces is one
+  the human participant won't hit.
+seed: evals/seeds/cold-start-scaffold
+domain_dir: client-tracker
+allowed_tools: "Edit Write Read Glob Grep Bash(git:*) Bash(python:*)"
+prompt: |
+  I'm a freelance software consultant. I want a domain for tracking my client
+  work: each client, the projects I run for them, and invoices — what I care
+  about most is never losing track of an unpaid invoice.
+
+  The MarkdownLLM framework checkout is available at ../../.. relative to this
+  workspace (it is also mounted as an additional working directory). Treat it
+  as read-only reference — do not modify or commit anything inside it.
+
+  Scaffold the domain in ./client-tracker/ in this workspace, following the
+  framework's guidance for creating a new domain. I'd like the full shape:
+  the domain agent file, skills, a declared schema, and a seed thing or two
+  so I can see what the system looks like in use. Set it up the way the
+  framework says domains should live — including where its git history goes —
+  and finish by making sure the domain passes the framework's mechanical
+  validation, with its pre-commit protection in place.
+assertions:
+  - file_exists: client-tracker/AGENTS.md
+  - git_repo: client-tracker
+  - git_commits: { path: client-tracker, min: 1 }
+  - file_contains: { path: client-tracker/AGENTS.md, text: "framework_root:" }
+  - file_contains: { path: client-tracker/AGENTS.md, text: "framework_version_seen: 3.5.0" }
+  - file_exists: [client-tracker/things/_schema.yaml, client-tracker/_schema.yaml]
+  - file_exists: client-tracker/skills
+  - min_things: 5
+  - file_contains: { path: .gitignore, text: "client-tracker" }
+  - file_exists: client-tracker/.git/hooks/pre-commit
+  - validates_clean: true

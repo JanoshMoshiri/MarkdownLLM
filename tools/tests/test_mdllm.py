@@ -334,3 +334,52 @@ def test_provenance_index_reverse_map(tmp_path):
     corpus, _ = scan(tmp_path)
     body, coverage = mdllm.build_index_body(corpus, "provenance")
     assert coverage == 1 and "## k" in body and "d (pinned @abc1234)" in body
+
+
+# ------------------------------------------------- scaffold-style assertions
+
+
+def test_assertions_file_and_git(tmp_path):
+    import subprocess
+    write(tmp_path, ".gitignore", "client-tracker/\n")
+    write(tmp_path, "client-tracker/AGENTS.md",
+          "---\nname: x\nframework_root: ../..\n---\n# A\n")
+    sub = tmp_path / "client-tracker"
+    subprocess.run(["git", "init", "-q"], cwd=sub, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=sub, check=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                    "commit", "-q", "-m", "x"], cwd=sub, check=True)
+    fixture = {"assertions": [
+        {"file_exists": "client-tracker/AGENTS.md"},
+        {"file_exists": ["missing.md", "client-tracker/AGENTS.md"]},
+        {"file_contains": {"path": "client-tracker/AGENTS.md",
+                           "text": "framework_root:"}},
+        {"git_repo": "client-tracker"},
+        {"git_commits": {"path": "client-tracker", "min": 1}},
+        {"file_contains": {"path": ".gitignore", "text": "client-tracker"}},
+    ]}
+    passed, failed, _ = mdllm.check_assertions(fixture, tmp_path)
+    assert (passed, failed) == (6, 0)
+
+
+def test_assertions_domain_dir_scoping(tmp_path):
+    write(tmp_path, "client-tracker/things/alpha.md", thing_text(GOOD))
+    fixture = {"domain_dir": "client-tracker", "assertions": [
+        {"thing_exists": "alpha"},
+        {"min_things": 1},
+        {"validates_clean": True},
+    ]}
+    passed, failed, _ = mdllm.check_assertions(fixture, tmp_path)
+    assert (passed, failed) == (3, 0)
+
+
+def test_assertions_scaffold_failures(tmp_path):
+    fixture = {"domain_dir": "nope", "assertions": [
+        {"file_exists": "nope/AGENTS.md"},
+        {"git_repo": "nope"},
+        {"git_commits": {"path": "nope", "min": 1}},
+        {"min_things": 1},
+        {"file_contains": {"path": ".gitignore", "text": "nope"}},
+    ]}
+    passed, failed, _ = mdllm.check_assertions(fixture, tmp_path)
+    assert (passed, failed) == (0, 5)
