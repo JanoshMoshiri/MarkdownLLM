@@ -2,6 +2,8 @@
 
 A framework discovered by agents, directed by humans, grown together. You define the domain. The agent reasons within it. Together you build definition-driven systems that start from a structured foundation and evolve through use.
 
+> **New here?** Your first sixty minutes are mapped, step by step, in [first-hour.md](first-hour.md). Nearly everything else in this repository is written for your agent to read — that page (and the [operator-guide](operator-guide.md) after it) is written for you.
+
 ## The Core Idea
 
 Every specification in this framework is written for an agent to discover, load, and reason with. The agent is the one reading `thing.md`. The agent is the one following `write.thing.md`. The agent is the one validating against `validate.thing.md`. These files are the agent's operating manual.
@@ -248,6 +250,16 @@ MarkdownLLM gives both parties what they need:
 ---
 
 ## What's In This Repository
+
+### For Humans
+
+The two documents written for the operator rather than the agent, plus the visual map:
+
+| File | Purpose |
+|------|---------|
+| [first-hour.md](first-hour.md) | A newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor |
+| [operator-guide.md](operator-guide.md) | The steady state — what the tooling carries for you, recurring scenarios, what remains your job |
+| [framework-map.md](framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping |
 
 ### Foundational Specifications (Agent-Consumed)
 

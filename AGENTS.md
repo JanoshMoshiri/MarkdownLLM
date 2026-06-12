@@ -94,6 +94,7 @@ This is where the reasoning lives — not just the data.
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 | Human operator asking what changed / what the tools are / what the v3 experience is | `operator-guide.md` |
+| Human newcomer's first session; onboarding a non-author operator | `first-hour.md` |
 | Orienting in the framework structure; what links to what; spec graph navigation | `framework-map.md` |
 
 **Typical session cost (measured 2026-06-11, post-kernel):** Tier 0 (AGENTS.md + kernel.md) ≈ 5.3k tokens — down from 26.5k for the pre-kernel Tier 0+1. Full-spec loads are now per-file and on-demand. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
@@ -149,6 +150,7 @@ The framework defines itself through these interconnected specifications:
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
 - **operator-guide.md** — Human-facing: what working in a domain feels like since v3, the mdllm toolbox with scenarios, and what remains the operator's job. The specs are agent-first; this is the human's walkthrough. (`type: guide`, `status: draft`)
+- **first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: draft`)
 - **framework-map.md** — Visual architecture map (Mermaid): the five-band elevation, the spec-layer dependency graph, and the mdllm subcommand → spec mapping. Derived from frontmatter links, `mdllm --help`, and the tier table; the frontmatter wins on disagreement. (`type: guide`, `status: draft`)
 
 ### Deferred (Spec When Foreseeable, Deploy When Felt)
