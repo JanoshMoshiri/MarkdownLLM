@@ -89,6 +89,7 @@ This is where the reasoning lives — not just the data.
 | Domain agent refreshing from framework evolution | `domain-refresh.md` |
 | Session-end work, insights, continuity briefs | `session-memory.md` |
 | Contradictions, conflicts, belief revision | `belief-revision.md` |
+| Significantly changing a rule, workflow, or thing the domain reasons from; reconciling a change across its dependents | `change-reconciliation.md` |
 | Periodic quality reflection | `retrospective.md` |
 | Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
