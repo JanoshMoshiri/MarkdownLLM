@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 3.6.0
+version: 3.7.0
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -142,6 +142,7 @@ The framework defines itself through these interconnected specifications:
 - **trigger-specification.md** — Declarative attention signals: all trigger types, condition values, action values, evaluation semantics, and idempotency. Extends thing.md. (`type: specification`, `status: stable`)
 - **derived-index.md** — The derived-index pattern: regenerable caches (`type: index`) that aggregate one signal — triggers, relationships, schema fields — across a domain so reflexive behaviour stays cheap at scale. Drift-safe by construction (provenance + validation rebuild-and-diff). Opt-in, deploy-when-felt. (`type: specification`, `status: draft`)
 - **provenance.md** — Output traceability: `type: decision` records with inputs pinned to git commits (`informed_by`), `origin: external` quarantine for ingested content, the knowledge → decision → output chain, and the reverse-provenance index that enables diff-driven regeneration. Mechanically enforced by `mdllm provenance`. (`type: specification`, `status: draft`)
+- **change-reconciliation.md** — How a domain stays consistent across change: the human declares an inflection, then a scale-free four-beat pass (cue → assimilate → walk → seal) reconciles the change against its blast radius using the relationships and reverse-provenance indexes. Semantic consistency is maintained at the point of change, not by sweeping. (`type: specification`, `status: draft`)
 
 - **example-things.md** — Full specification for `type: example` things: frontmatter template, when to use examples, and why examples work better than rules for inductive LLM learning. (`type: specification`, `status: stable`)
 - **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)

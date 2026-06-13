@@ -714,6 +714,7 @@ TIERS = {
         "domain-refresh.md", "session-memory.md", "belief-revision.md",
         "retrospective.md", "trigger-specification.md", "derived-index.md",
         "example-things.md", "reasoning-lenses.md", "provenance.md",
+        "change-reconciliation.md",
     ],
 }
 

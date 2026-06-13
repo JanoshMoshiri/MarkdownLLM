@@ -54,10 +54,10 @@ flowchart TD
         AGENTS["AGENTS.md<br/>entry point — auto-discovered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
-    subgraph specs ["specification layer — 22 spec things"]
+    subgraph specs ["specification layer — 23 spec things"]
         MANIFESTO["manifesto<br/>the why"]
         THING["thing.md<br/>+ core operative specs"]
-        EXT["extensions<br/>+ guides — 15 specs"]
+        EXT["extensions<br/>+ guides — 16 specs"]
     end
     subgraph memory ["domain memory — things/"]
         INSIGHTS["insights"]
@@ -116,6 +116,7 @@ flowchart TD
         TRIG["trigger-specification"]
         DIDX["derived-index"]
         PROV["provenance"]
+        CRECON["change-reconciliation"]
         SMEM["session-memory"]
         BREV["belief-revision"]
         RETRO["retrospective"]
