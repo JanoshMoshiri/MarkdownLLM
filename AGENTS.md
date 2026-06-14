@@ -117,8 +117,9 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
-3. Commit with a structured message following git-workflow.md conventions
-4. WORKLOG updated with session activity
+3. If adding or removing a spec, walk its **dark-region** touch points by hand — the prose dependencies the indexes cannot see (see `change-reconciliation.md` → Walking the Dark Region): the Tier 2 routing table and the spec catalog in this file, `framework-map.md` (View 1 counts + View 2 node), `.markdownllm` `foundational_specs`, the `TIERS` map in `tools/mdllm.py`, and `mdllm kernel` regen if a core spec changed.
+4. Commit with a structured message following git-workflow.md conventions
+5. WORKLOG updated with session activity
 
 ## Framework Specifications (Things)
 

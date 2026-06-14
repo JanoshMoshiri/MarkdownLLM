@@ -17,6 +17,8 @@ linked_things:
     relation: complements
   - id: consistency-is-maintained-at-change-not-by-sweeping
     relation: implements
+  - id: mechanical-assimilation-is-blind-to-prose-dependencies
+    relation: implements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -102,6 +104,25 @@ workflow restructure runs the identical pass with a wall of touch points. There
 is no separate "big sweep" procedure and no "small edit" procedure; there is one
 pass, sized by the blast radius the change actually has. That self-similarity is
 the signal that this is a primitive, not a checklist.
+
+## Walking the Dark Region
+
+Assimilate is complete only over **declared** edges — the `linked_things`
+relations and `informed_by`/`derived-from` pins the `relationships` and
+`provenance` indexes can walk. Dependencies expressed in **prose** are invisible
+to them: routing tables, narrative cross-references, embedded lists, one thing
+named in another's body. These are the *dark region*. The indexes will report a
+clean, complete assimilation while a real dependency sits untouched in plain
+text.
+
+This is not a defect to automate away — it is the structural reason the **Walk is
+human-backed**. The mechanical assimilate narrows the field and guarantees the
+*declared* set is complete; the expert is the irreducible backstop for the prose
+the machine cannot read. So when a change is significant, ask explicitly: *what
+refers to this in prose, not in frontmatter?* And shrink the dark region over time
+by promoting prose mentions into declared edges — the same reason the framework
+says to link rather than mention. Captured as the insight
+`mechanical-assimilation-is-blind-to-prose-dependencies`.
 
 ## Enforcement
 
