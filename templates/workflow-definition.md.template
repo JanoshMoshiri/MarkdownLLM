@@ -4,7 +4,9 @@ type: workflow-definition
 status: draft           # reserved: draft | evolving | stable | deprecated
 created: [ISO-date]
 # Stages as DATA, not prose. `to` lists the legal next stages — a graph with
-# cycles, not a linear sequence. An empty `to` marks a terminal stage.
+# cycles, not a linear sequence. `to: []` means terminal (by definition, not
+# "edges unwritten"). Runs point UP to this definition via their `definition:`
+# field, so the definition carries no link back to its runs.
 stages:
   - id: [first-stage]
     to: [[second-stage]]
@@ -12,9 +14,6 @@ stages:
     to: [[third-stage], [first-stage]]   # may loop back
   - id: [third-stage]
     to: []                               # terminal
-linked_things:
-  - id: [a-filled-run-id]
-    relation: template-for
 ---
 
 # [Process Name] — Definition

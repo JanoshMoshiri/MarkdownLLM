@@ -15,9 +15,6 @@ stages:
     to: [complete, fitting]      # snags may send work back to the fitter
   - id: complete
     to: []                       # terminal
-linked_things:
-  - id: run-kitchen-renovation
-    relation: template-for
 ---
 
 # Home Renovation — Definition

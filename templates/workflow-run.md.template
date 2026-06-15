@@ -1,13 +1,12 @@
 ---
 id: run-[instance-name]
 type: workflow-run
-status: active           # reserved: active | paused | complete | abandoned
+status: active           # reserved: active | paused | completed | abandoned
 created: [ISO-date]
-current_stage: [stage-id]          # MUST be a stage id in the linked definition
-held_by: [operator-or-agent-id]    # advisory claim; omit when the run is unheld
+definition: [process-name]-definition   # structural pointer to the workflow-definition (floor-resolved)
+current_stage: [stage-id]               # MUST be a stage id in that definition
+held_by: [operator-or-agent-id]         # advisory claim (coordination-claim.md); omit when unheld
 linked_things:
-  - id: [process-name]-definition
-    relation: instance-of          # the definition pointer (do NOT add a `definition:` field)
   # Accrued decisions link here as they are made (provenance.md):
   # - id: decision-[some-call]
   #   relation: informs

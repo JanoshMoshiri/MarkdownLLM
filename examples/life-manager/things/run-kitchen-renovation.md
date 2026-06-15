@@ -3,12 +3,11 @@ id: run-kitchen-renovation
 type: workflow-run
 status: active
 created: 2026-06-15
+definition: home-renovation-process
 current_stage: materials
 held_by: homeowner
 tags: [home, renovation]
 linked_things:
-  - id: home-renovation-process
-    relation: instance-of
   - id: project-kitchen-renovation
     relation: references
   - id: decision-hire-howell-joinery

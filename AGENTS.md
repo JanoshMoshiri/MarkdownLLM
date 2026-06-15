@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 3.9.0
+version: 3.10.0
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -95,6 +95,7 @@ This is where the reasoning lives — not just the data.
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 | Multi-stage, multi-session process instances; workflow run-state; stage cursors | `workflow-state.md` |
+| Two operators/sessions contending for one thing; advisory claims, leases | `coordination-claim.md` |
 | Human operator asking what changed / what the tools are / what the v3 experience is | `operator-guide.md` |
 | Human newcomer's first session; onboarding a non-author operator | `first-hour.md` |
 | Orienting in the framework structure; what links to what; spec graph navigation | `framework-map.md` |
@@ -146,7 +147,8 @@ The framework defines itself through these interconnected specifications:
 - **derived-index.md** — The derived-index pattern: regenerable caches (`type: index`) that aggregate one signal — triggers, relationships, schema fields — across a domain so reflexive behaviour stays cheap at scale. Drift-safe by construction (provenance + validation rebuild-and-diff). Opt-in, deploy-when-felt. (`type: specification`, `status: draft`)
 - **provenance.md** — Output traceability: `type: decision` records with inputs pinned to git commits (`informed_by`), `origin: external` quarantine for ingested content, the knowledge → decision → output chain, and the reverse-provenance index that enables diff-driven regeneration. Mechanically enforced by `mdllm provenance`. (`type: specification`, `status: draft`)
 - **change-reconciliation.md** — How a domain stays consistent across change: the human declares an inflection, then a scale-free four-beat pass (cue → assimilate → walk → seal) reconciles the change against its blast radius using the relationships and reverse-provenance indexes. Semantic consistency is maintained at the point of change, not by sweeping. (`type: specification`, `status: draft`)
-- **workflow-state.md** — Workflow run-state as a primitive: `workflow-definition` (stages as data + allowed transitions) and `workflow-run` (a `current_stage` cursor, an advisory `held_by` claim, resume in the body). The decomposition principle applied to processes; floor checks stage-membership, agent judges transition legality. Reserve-but-draft. (`type: specification`, `status: draft`)
+- **workflow-state.md** — Workflow run-state as a primitive: `workflow-definition` (stages as data + allowed transitions) and `workflow-run` (a structural `definition` pointer, a `current_stage` cursor, resume in the body). The decomposition principle applied to processes; the floor enforces `current_stage` ∈ the definition's stages, the agent judges transition legality. Reserve-but-draft. (`type: specification`, `status: draft`)
+- **coordination-claim.md** — The advisory-claim convention (`held_by` + optional `held_until` lease) for same-target contention: read-and-respected, not a lock; deploy-when-felt on a contended thing. General, not workflow-specific — `workflow-run` and `continuity.md` are its consumers. (`type: specification`, `status: draft`)
 
 - **example-things.md** — Full specification for `type: example` things: frontmatter template, when to use examples, and why examples work better than rules for inductive LLM learning. (`type: specification`, `status: stable`)
 - **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)

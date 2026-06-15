@@ -140,9 +140,36 @@ def test_workflow_types_are_reserved():
     # workflow-definition / workflow-run carry fixed vocabularies a domain
     # cannot redefine (reserve-but-draft: workflow-state.md).
     allowed, declared = mdllm.valid_statuses_for("workflow-run", {"types": {"workflow-run": {"statuses": ["nope"]}}})
-    assert allowed == ["active", "paused", "complete", "abandoned"] and declared
+    assert allowed == ["active", "paused", "completed", "abandoned"] and declared
     allowed, declared = mdllm.valid_statuses_for("workflow-definition", None)
     assert allowed == ["draft", "evolving", "stable", "deprecated"] and declared
+
+
+def _workflow_corpus(tmp_path, current_stage: str):
+    write(tmp_path, "_schema.yaml", "schema_version: 1\ndomain: t\n")
+    write(tmp_path, "things/proc.md", thing_text(
+        "id: proc\ntype: workflow-definition\nstatus: stable\ncreated: 2026-06-16\n"
+        "stages:\n  - id: intake\n    to: [review]\n  - id: review\n    to: []",
+        "# Proc\n\nA process.\n"))
+    write(tmp_path, "things/run.md", thing_text(
+        f"id: run\ntype: workflow-run\nstatus: active\ncreated: 2026-06-16\n"
+        f"definition: proc\ncurrent_stage: {current_stage}", "# Run\n\nA run.\n"))
+    return messages(all_findings(tmp_path), mdllm.SEV_ERROR)
+
+
+def test_workflow_run_current_stage_must_be_in_definition(tmp_path):
+    assert _workflow_corpus(tmp_path, "intake") == []          # valid stage: clean
+    errs = _workflow_corpus(tmp_path, "intkae")                # typo: caught
+    assert any("current_stage" in m and "not a stage" in m for m in errs)
+
+
+def test_workflow_run_requires_definition(tmp_path):
+    write(tmp_path, "_schema.yaml", "schema_version: 1\ndomain: t\n")
+    write(tmp_path, "things/run.md", thing_text(
+        "id: run\ntype: workflow-run\nstatus: active\ncreated: 2026-06-16\n"
+        "current_stage: intake", "# Run\n\nA run.\n"))
+    errs = messages(all_findings(tmp_path), mdllm.SEV_ERROR)
+    assert any("missing `definition`" in m for m in errs)
 
 
 def test_version_lt_orders_dotted_versions():

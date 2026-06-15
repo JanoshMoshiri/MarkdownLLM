@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.15
+version: 2.16
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -26,7 +26,7 @@ linked_things:
 
 **Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Emergent fields: add only when they serve reasoning.
 
-**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/complete/abandoned.
+**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned.
 
 **Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 
@@ -109,7 +109,7 @@ These fields must be present in every thing to do:
   `conflict` uses `open`, `resolved`; `retrospective` uses `draft`, `complete`;
   `continuity-brief` uses `live`; `index` uses `live`, `stale`;
   `workflow-definition` uses `draft`, `evolving`, `stable`, `deprecated`;
-  `workflow-run` uses `active`, `paused`, `complete`, `abandoned`
+  `workflow-run` uses `active`, `paused`, `completed`, `abandoned`
 - Updated by the agent as work progresses
 
 **created** (ISO 8601 date)

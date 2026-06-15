@@ -3,11 +3,11 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-06-15
-generated: 2026-06-15T20:13:06
-generated_from: HEAD@da47a5a
+created: 2026-06-16
+generated: 2026-06-16T00:40:02
+generated_from: HEAD@d29ddcd
 coverage: 6
-framework_version: 3.8.0
+framework_version: 3.10.0
 ---
 
 # Framework Operative Kernel
@@ -25,7 +25,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Emergent fields: add only when they serve reasoning.
 
-**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/complete/abandoned.
+**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned.
 
 **Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 

@@ -2,11 +2,13 @@
 id: workflow-state-specification
 type: specification
 status: draft
-version: 0.2
+version: 0.3
 created: 2026-06-15
 linked_things:
   - id: thing-specification
     relation: extends
+  - id: coordination-claim-specification
+    relation: complements
   - id: interface-specification
     relation: complements
   - id: git-workflow-specification
@@ -36,7 +38,9 @@ It is a deliberately **narrow** primitive. Almost everything is inherited from `
 
 Do not read this as a free-standing invention. It is the **decomposition principle of `thing.md` applied to processes.** A run is the *instance* of a workflow *definition* — exactly the `template-for` / `instance-of` pair the decomposition section already governs.
 
-Today, a workflow definition living as prose inside a skill *violates* that principle: the skeleton and the (non-existent) instance are fused, so run-state smears across `continuity.md` and a pile of related things. Separating the definition (`template-for`) from the run (`instance-of`) finishes the decomposition. The cursor, claim, and resume point are what the *instance side* legitimately needs that no prior instance-thing did.
+Today, a workflow definition living as prose inside a skill *violates* that principle: the skeleton and the (non-existent) instance are fused, so run-state smears across `continuity.md` and a pile of related things. Separating the definition from the run finishes the decomposition. The cursor, claim, and resume point are what the *instance side* legitimately needs that no prior instance-thing did.
+
+**A note on the pointer.** Conceptually this is the `template-for`/`instance-of` relationship the decomposition section describes. *Mechanically*, the run carries the pointer as a singular structural field — `definition:` — not a `linked_things` relation. This follows the `parent` precedent: a singular, load-bearing pointer that the floor must resolve to exactly one target earns its own field rather than living as a relation the floor has to scan and filter. The decomposition principle still justifies the *separation* (definition and run are two things); the field is just how the instance names its template.
 
 ## Why It Is a Primitive (running the framework's own razor)
 
@@ -45,13 +49,14 @@ Today, a workflow definition living as prose inside a skill *violates* that prin
 - It is a thing (`thing.md`): frontmatter + body, one identity, one reason to change.
 - It accrues decisions with pinned inputs (`provenance.md`: `linked_things` → `type: decision`).
 - It commits at stage transitions (`git-workflow.md` meaning boundaries).
-- Its pointer to the definition is `instance-of` — an existing decomposition relation. **Do not add a redundant `definition:` field.**
+- It names its definition with a structural `definition:` field, modelled on `parent` — the framework's existing pattern for a singular load-bearing pointer.
 
 **Irreducibly new — what earns primitive status:**
 
 1. **The cursor — `current_stage`.** A pointer into an externally-defined, possibly-looping sequence. `status` models a thing's *own* lifecycle and cannot also carry "position N in a process defined elsewhere" without meaning two different things across domains (a cohesion violation). The two are distinct fields.
-2. **The coordination claim — `held_by`.** A visible "who holds this instance right now," which nothing in the framework expressed because nothing had needed to.
-3. **The per-instance resume point.** Continuity does this at *domain* granularity (`continuity.md`, one per domain); nothing did it per-run. It lives in the run's **body**, not a field.
+2. **The per-instance resume point.** Continuity does this at *domain* granularity (`continuity.md`, one per domain); nothing did it per-run. It lives in the run's **body**, not a field.
+
+(A third candidate — the **coordination claim** `held_by` — turned out *not* to be workflow-specific: it is a general advisory-claim convention that belongs to any contended singleton, so it has been decomposed out into its own micro-spec, `coordination-claim.md`. A `workflow-run` simply *uses* it.)
 
 ## `workflow-definition` — The Structured Skeleton
 
@@ -73,17 +78,17 @@ stages:
   - id: draft
     to: [review]
   - id: review
-    to: [draft, complete]       # rework loop, or finish
-  - id: complete
-    to: []                      # terminal
-linked_things:
-  - id: <a-filled-run-id>
-    relation: template-for
+    to: [draft, done]           # rework loop, or finish
+  - id: done
+    to: []                      # terminal — see the convention below
 ---
 ```
 
-- **`stages[].id`** — the stage set. The cheap mechanical fact: `run.current_stage` must be one of these.
-- **`stages[].to`** — the directed edges out of each stage. This is the *semantic* fact: whether a given move was legal given the loops. An empty `to` marks a terminal stage.
+The definition carries no link back to its runs: a definition has many runs, and each run points *up* to it via its `definition:` field, exactly as children point up to a `parent` rather than the parent enumerating children.
+
+- **`stages[].id`** — the stage set. The cheap mechanical fact: `run.current_stage` must be one of these (floor-checked — see Division of Labour).
+- **`stages[].to`** — the directed edges out of each stage. This is the *semantic* fact: whether a given move was legal given the loops.
+- **`to: []` means terminal — by definition.** An empty edge list is the explicit marker of a terminal stage, not "edges not written yet." A definition with a non-terminal stage whose edges are genuinely unfinished is simply a draft the author has not completed; there is no ambiguous third state. (If a future definition-completeness linter is built, this is the rule it enforces.)
 
 The body holds what the stages *mean* — entry/exit criteria, what each stage produces, who acts. That prose is the definition's reason to change; the run never edits it.
 
@@ -93,13 +98,12 @@ The body holds what the stages *mean* — entry/exit criteria, what each stage p
 ---
 id: run-<instance>
 type: workflow-run
-status: active          # reserved vocab: active | paused | complete | abandoned
+status: active          # reserved vocab: active | paused | completed | abandoned
 created: <ISO-date>
+definition: <process>-definition        # the structural pointer to the definition
 current_stage: research                 # MUST be a stage id in the definition
-held_by: <operator-or-agent-id>         # advisory coordination claim; omit when unheld
+held_by: <operator-or-agent-id>         # advisory claim (coordination-claim.md); omit when unheld
 linked_things:
-  - id: <process>-definition
-    relation: instance-of               # the definition pointer (inherited)
   - id: decision-<some-call>
     relation: informs                   # accrued decisions (provenance)
 ---
@@ -117,14 +121,17 @@ The immediate next move and what it is blocked on, if anything.
 
 Field discipline:
 
+- **`definition`** — the structural pointer to the `workflow-definition` this run instances. Singular and required; the floor resolves it to read the stage set.
 - **`current_stage`** — the cursor. Changing it *is* a stage transition; commit it at that boundary.
-- **`held_by`** — advisory only. The agent reads and respects it; it is not a lock. Omit (or clear) when the instance is unheld.
-- **`status`** — the run's *own* lifecycle, orthogonal to `current_stage`. A run can be `paused` mid-pipeline, or `complete` only once it reaches a terminal stage.
+- **`held_by`** — the advisory coordination claim defined in `coordination-claim.md`; not a lock. Omit (or clear) when the instance is unheld.
+- **`status`** — the run's *own* lifecycle, orthogonal to `current_stage`: `active`, `paused`, `completed` (only once a terminal stage is reached), or `abandoned`.
+
+**Blocked-ness lives on the work, not the cursor.** There is deliberately no `blocked` run-status. A run is a *pointer* into a process; it is `active` whenever it is live, even while the underlying work is stuck. Blockage is a property of the *work things* the run coordinates (a `task` blocked on a dependency, a deadline overdue) — read it there, not from the cursor. This keeps the run tiny and stops two things from claiming the same fact.
 
 ## What Not to Duplicate
 
 - **No `stage_history` array.** The history of `current_stage` changes *is* the commit log — git is the event stream (`git-workflow.md`). Frontmatter holds the present cursor; git holds the path.
-- **No `definition:` field.** The `instance-of` link already points at the definition.
+- **No reverse link from the definition.** Runs point up via `definition:`; the definition does not enumerate its runs.
 - **No resume field.** The resume narrative is the body.
 
 Keep that discipline and the run thing stays tiny — the tell that the primitive is clean.
@@ -135,19 +142,17 @@ This follows the framework's standard split (`validate.thing.md`):
 
 | Check | Owner | What |
 |---|---|---|
-| `current_stage` ∈ definition's stage set | **floor** (mechanical) | Cheap set-membership. Lands *when felt* — after the discipline has run on a real domain, not before. |
+| `definition` resolves, and `current_stage` ∈ its stage set | **floor** (mechanical) | Pure referential integrity — the same class as "`linked_things` targets must exist." Enforced now: `mdllm validate` errors on a missing `definition`, an unresolved one, a `definition` that is not a `workflow-definition`, or a `current_stage` the definition does not declare. |
 | Was this a *legal* transition? | **agent** (semantic, Layer 2) | Judges the move against `stages[].to` and the loop structure. |
 
-Do **not** push cyclic-traversal legality into the floor. That is Layer 2, and forcing it mechanical is how this spec would bloat.
+The membership check earns its place immediately because it is referential, not semantic: a typo'd `current_stage` is the honour-system hole the floor exists to close, and leaving it unchecked is exactly the failure mode (`hook-compliance`/jmtm) the deterministic floor was built to kill. Do **not**, however, push cyclic-traversal *legality* into the floor — judging whether a move was allowed given the loops is Layer 2, and forcing it mechanical is how this spec would bloat. (Cross-domain case: when the `definition` lives in another corpus the floor cannot see, membership is unresolvable and is skipped, not failed.)
 
 ## Concurrency and Coordination
 
 Run-state decomposition is most of the concurrency answer, not a separate workstream:
 
 - **Different instances → different files.** Two operators working two different runs touch two different files; git merges them without thought. The old hazard — `continuity.md` as a single-writer singleton — is decomposed away.
-- **Same-instance contention** is rare and small. The `held_by` advisory claim handles it: a committed, visible "who holds this," read and respected by convention. Not a distributed lock.
-
-  **The claim generalizes (named here, deploy when felt).** The same convention fits *any* singleton two operators might co-edit — `continuity.md` above all, the framework's least concurrency-safe object. The ready-to-adopt field pair is `held_by` (who holds it) plus an optional `held_until` (an ISO timestamp lease, after which the claim is stale and may be taken over). A claim with no `held_until` is held until explicitly released; a claim past its `held_until` is advisory-expired and the next operator may clear it, noting the takeover. This is deliberately *not* deployed beyond `workflow-run` yet — it is reserved in prose so the day a singleton actually collides, the schema and the staleness rule already exist rather than being invented under pressure (the same "spec when foreseeable, deploy when felt" discipline the primitive itself follows).
+- **Same-instance contention** is rare and small. A `workflow-run` carries the advisory `held_by` claim defined in `coordination-claim.md` — a committed, visible "who holds this," read and respected by convention, not a distributed lock. The claim convention is general (it applies to any contended singleton, `continuity.md` included), which is why it lives in its own spec rather than here; this spec only declares that a run *uses* it.
 - **Git stays the system of record.** It is the audit trail. If a separate coordination layer is ever introduced for true runtime concurrency, treat it strictly as coordination and checkpoint its state back into the committed run-state thing at every meaning boundary. The durable schema is the contract — designed once, shared by a purely-local domain and any future coordinated deployment.
 
 ## Hand-off (interface.md)
@@ -161,13 +166,14 @@ Mature this on the ladder the framework already has — **reserve-but-draft**:
 1. The originating idea is captured as `workflow-run-is-the-decomposition-principle-applied-to-processes` (`type: insight`).
 2. The types are *reserved* (fixed status vocabularies, built into the floor) so cross-domain consumers can rely on the semantics — but this spec stays **`draft`**.
 3. Exercise it on a real domain before promoting past draft. The filled instance in `examples/life-manager/` (a renovation process + a live run) is the first exercise.
-4. Let the `mdllm` membership check (`current_stage` ∈ definition stages) land **when felt**, after the discipline has run — not ahead of need.
+4. The floor's referential checks (`definition` resolves; `current_stage` ∈ its stages) are **already enforced** — they are integrity, not semantics. What stays deferred is *transition-legality* across the loop graph, which is the agent's Layer-2 judgment until a domain shows it needs more.
 
 A type being reserved but undeployed in most domains is expected: it is exactly how the framework treats `conflict`, `retrospective`, and `index`. "Spec when foreseeable, deploy when felt" means primitives are *available*, not mandatory. A recipe domain never minting a workflow run is no different from its never minting a conflict.
 
 ## Relationship to Other Specifications
 
-- **thing.md** — This extends the decomposition principle to processes; `workflow-definition`/`workflow-run` are a `template-for`/`instance-of` pair.
+- **thing.md** — This extends the decomposition principle to processes (definition and run are separate things); the run names its definition with a structural `definition:` field modelled on `parent`.
+- **coordination-claim.md** — Defines the advisory `held_by`/`held_until` convention a run uses for same-instance contention; general, not workflow-specific.
 - **git-workflow.md** — Stage transition = checkpoint boundary; the commit log is the run's `stage_history`.
 - **provenance.md** — A run's accrued decisions are `type: decision` things linked from it, inputs pinned to commits.
 - **interface.md** — A run produces deliverables on hand-off; the cross-domain consumer reads `current_stage`.

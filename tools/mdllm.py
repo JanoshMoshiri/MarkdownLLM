@@ -53,14 +53,14 @@ RESERVED_STATUSES = {
     "index": ["live", "stale"],
     "decision": ["made", "superseded"],
     "workflow-definition": ["draft", "evolving", "stable", "deprecated"],
-    "workflow-run": ["active", "paused", "complete", "abandoned"],
+    "workflow-run": ["active", "paused", "completed", "abandoned"],
 }
 
 # The universal default workflow vocabulary — applies when no domain schema
 # declares a vocabulary for the thing's type.
 DEFAULT_STATUSES = ["not-started", "in-progress", "blocked", "paused", "completed", "cancelled"]
 TERMINAL_STATUSES = {"completed", "cancelled", "met", "reconciled", "closed", "filed",
-                     "resolved", "dismissed", "deprecated"}
+                     "resolved", "dismissed", "deprecated", "abandoned"}
 
 DEFAULT_EXCLUDES = {".git", ".claude", "node_modules", "templates", "examples",
                     "domain", "domains", "tools", "adapters", "evals", "outputs",
@@ -274,6 +274,8 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
                     refs.append((fld, rid))
         if isinstance(meta.get("parent"), str):
             refs.append(("parent", meta["parent"]))
+        if isinstance(meta.get("definition"), str):
+            refs.append(("definition", meta["definition"]))
         for tr in meta.get("triggers") or []:
             if isinstance(tr, dict):
                 watch = tr.get("watch")
@@ -322,6 +324,36 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
                         f.append(Finding(SEV_WARNING, name,
                                  f"supersedes `{entry.get('id')}` but target has no "
                                  f"`superseded-by` link and is not deprecated"))
+
+    # workflow-run cursor integrity (workflow-state.md): a run points at its
+    # definition via the structural `definition` field, and `current_stage` must
+    # be a stage that definition declares. Pure referential integrity — the
+    # floor's job, same class as "linked_things targets must exist". (Transition
+    # *legality* across the loop graph stays the agent's Layer-2 judgment.)
+    for t in corpus.things:
+        if str(t.meta.get("type")) != "workflow-run":
+            continue
+        name = t.id or t.path.name
+        defn_id, cur = t.meta.get("definition"), t.meta.get("current_stage")
+        if not isinstance(defn_id, str):
+            f.append(Finding(SEV_ERROR, name,
+                     "workflow-run missing `definition` (the workflow-definition it instances)"))
+            continue
+        if cur is None:
+            f.append(Finding(SEV_ERROR, name, "workflow-run missing `current_stage`"))
+        target = ids.get(defn_id, [None])[0]
+        if target is None:
+            continue  # unknown id already reported by the referential check above
+        if str(target.meta.get("type")) != "workflow-definition":
+            f.append(Finding(SEV_ERROR, name,
+                     f"`definition` `{defn_id}` is not a workflow-definition"))
+            continue
+        stage_ids = {s["id"] for s in target.meta.get("stages") or []
+                     if isinstance(s, dict) and isinstance(s.get("id"), str)}
+        if cur is not None and str(cur) not in stage_ids:
+            f.append(Finding(SEV_ERROR, name,
+                     f"`current_stage` `{cur}` is not a stage in `{defn_id}` "
+                     f"(stages: {sorted(stage_ids)})"))
 
     # circular dependencies
     graph = {t.id: [d for d in (t.meta.get("dependencies") or []) if isinstance(d, str)]
@@ -716,7 +748,7 @@ TIERS = {
         "domain-refresh.md", "session-memory.md", "belief-revision.md",
         "retrospective.md", "trigger-specification.md", "derived-index.md",
         "example-things.md", "reasoning-lenses.md", "provenance.md",
-        "change-reconciliation.md", "workflow-state.md",
+        "change-reconciliation.md", "workflow-state.md", "coordination-claim.md",
     ],
 }
 

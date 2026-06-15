@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.2
+version: 1.3
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -54,10 +54,10 @@ flowchart TD
         AGENTS["AGENTS.md<br/>entry point — auto-discovered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
-    subgraph specs ["specification layer — 26 spec things"]
+    subgraph specs ["specification layer — 27 spec things"]
         MANIFESTO["manifesto<br/>the why"]
         THING["thing.md<br/>+ core operative specs"]
-        EXT["extensions<br/>+ guides — 19 specs"]
+        EXT["extensions<br/>+ guides — 20 specs"]
     end
     subgraph memory ["domain memory — things/"]
         INSIGHTS["insights"]
@@ -118,6 +118,7 @@ flowchart TD
         PROV["provenance"]
         CRECON["change-reconciliation"]
         WSTATE["workflow-state (draft)"]
+        COORD["coordination-claim (draft)"]
         SMEM["session-memory"]
         BREV["belief-revision"]
         RETRO["retrospective"]
