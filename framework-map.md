@@ -54,10 +54,10 @@ flowchart TD
         AGENTS["AGENTS.md<br/>entry point — auto-discovered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
-    subgraph specs ["specification layer — 23 spec things"]
+    subgraph specs ["specification layer — 25 spec things"]
         MANIFESTO["manifesto<br/>the why"]
         THING["thing.md<br/>+ core operative specs"]
-        EXT["extensions<br/>+ guides — 16 specs"]
+        EXT["extensions<br/>+ guides — 18 specs"]
     end
     subgraph memory ["domain memory — things/"]
         INSIGHTS["insights"]
@@ -131,6 +131,8 @@ flowchart TD
         DISC["framework-discovery"]
         REFR["domain-refresh"]
         IFACE["interface"]
+        FH["first-hour"]
+        FMAP["framework-map"]
     end
 
     MAN -->|defines| THING
