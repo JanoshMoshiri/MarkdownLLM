@@ -2,7 +2,7 @@
 id: belief-revision-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -101,7 +101,7 @@ Two new valid values are added to `linked_things.relation`:
 
 ### `supersedes`
 
-This thing's content replaces the referenced thing's content. The referenced thing's position was held previously and is now considered incorrect or outdated.
+This thing's content replaces the referenced thing's content. Most often the referenced position was held previously and is now considered incorrect or outdated — replacement by *correction*, which is this spec's concern. The same relation also marks replacement by *consolidation*: a thing whose content, while not wrong, has been absorbed into the referent because the two duplicated a single responsibility (`thing.md` → The Inverse: Composition). The relation is neutral as to which; the distinction is whether a `conflict` was involved.
 
 ```yaml
 linked_things:

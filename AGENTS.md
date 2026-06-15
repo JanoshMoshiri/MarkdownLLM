@@ -75,7 +75,7 @@ This is where the reasoning lives — not just the data.
 - `kernel.md` — the generated operative kernel: the rules of thing.md, orchestration.md, read/write/validate.thing.md, and git-workflow.md without their rationale (~1.6k tokens). Regenerate with `python tools/mdllm.py kernel` after any spec change.
 
 **Tier 1 — Load a full spec only when the kernel is not enough** — reasoning *about* the framework, evolving a spec, or resolving an ambiguity the kernel doesn't settle:
-- `thing.md`, `orchestration.md`, `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md` (~21.4k for all six — load individually, not wholesale)
+- `thing.md`, `orchestration.md`, `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md` (~22.3k for all six — load individually, not wholesale)
 
 **Tier 2 — Load on demand by query type:**
 
@@ -240,4 +240,4 @@ Before committing framework changes:
 - [ ] Commit message follows git-workflow.md conventions
 - [ ] WORKLOG updated with session activity
 
-> **The Deterministic Floor (v3.0):** mechanical validation (structural, referential, schema) is owned by `tools/mdllm.py` and enforced by the git pre-commit hook — never re-perform those checks by reasoning. The agent's validation responsibility is semantic only (validate.thing.md v2.0 → Layer 2). Domain status vocabularies are declared in `_schema.yaml` / `things/_schema.yaml`, not fixed by the framework.
+> **The Deterministic Floor (v3.0):** mechanical validation (structural, referential, schema) is owned by `tools/mdllm.py` and enforced by the git pre-commit hook — never re-perform those checks by reasoning. The agent's validation responsibility is semantic only (validate.thing.md → Layer 2). Domain status vocabularies are declared in `_schema.yaml` / `things/_schema.yaml`, not fixed by the framework.

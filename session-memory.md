@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -220,6 +220,18 @@ Commit all new insight things, new conflict things, and the updated continuity b
 
 ---
 
+## Insight Lifecycle Management
+
+The lifecycle table above defines the *states* (`active` / `promoted` / `dismissed`); this section defines how an insight *moves* between them, because states without a driver silently accumulate. An insight is a thing, so its management is the thing-level cohesion discipline applied — not a mechanism special to insights.
+
+**Promotion and dismissal are driven, not incidental.** Left alone, an `active` insight re-enters every session via the continuity brief and is never reckoned with. The driver is the retrospective: its **insight triage** beat (`retrospective.md` → What A Retrospective Produces) walks the standing backlog and forces each `active` insight to a disposition — promote (populate `promoted_to`), dismiss, consolidate, or keep-active-with-a-stated-reason. Promotion is also a belief-revision trigger: a promoted insight's assertions stop being provisional, so they are scanned against their neighbours (`belief-revision.md`).
+
+**An active insight must stay in circulation.** "Live" is defined by presence in `continuity.md`. An `active` insight referenced nowhere live is *orphaned* — neither promoted, dismissed, nor returning to a session, and invisible to the session-start staleness check, which walks only the brief's live IDs. The floor surfaces this as a `validate` Info finding ("active insight not in continuity brief", the twin of the open-conflict check); triage is where it is reckoned with — restored to the brief or moved to a terminal status.
+
+**Consolidation is composition, not a bespoke merge.** As a domain accumulates, several insights commonly fragment a single idea — they are one responsibility wearing several files. Consolidate them per `thing.md` → The Inverse: Composition: fold into the cohesive survivor, redirect inbound links, and tombstone the rest as `dismissed` with `superseded-by` pointing at the survivor. Mechanical candidate detection — insights sharing two or more `linked_things` targets — runs at retrospective cadence; the merge judgement is the agent's, applied conservatively (relate, don't merge). This is *not* contradiction resolution: insights that genuinely disagree are a `conflict` (`belief-revision.md`), not folded together.
+
+---
+
 ## Extraction Heuristic
 
 **Preserve if:**
@@ -252,7 +264,7 @@ If the agent encounters a domain without a `continuity.md`, it should:
 
 ## Relationship To Other Specs
 
-- **thing.md** — `insight` and `continuity-brief` are framework-reserved types defined here. All other type mechanics (frontmatter, linking, triggers) are inherited from `thing.md`.
+- **thing.md** — `insight` and `continuity-brief` are framework-reserved types defined here. All other type mechanics (frontmatter, linking, triggers) are inherited from `thing.md` — including the cohesion discipline (decompose / compose) that governs insight consolidation (`thing.md` → The Inverse: Composition).
 - **orchestration.md** — The `session-end-continuity` and `worklog-update` prompts are bound to the `session-end` hook point. These are explicitly invoked prompts, not automatic hooks — they require the user or agent to trigger them at session close.
 - **write.thing.md** — Creating and updating insight things follows standard write operations. The session-end ritual is an extension of the write workflow.
 - **git-workflow.md** — Insight things and continuity brief updates are committed following standard conventions. The session-end commit is the natural pairing of the `post-write:commit` hard hook.

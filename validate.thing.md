@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -25,7 +25,7 @@ linked_things:
 <!-- kernel -->
 **Mechanical validation is the tool's job:** `python {framework_root}/tools/mdllm.py validate <path>` — structure, references, schema conformance, index integrity. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
 
-**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · open conflicts missing from continuity brief · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
+**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · open conflicts or active insights missing from continuity brief · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 <!-- /kernel -->
@@ -108,8 +108,9 @@ in this loop. Read things holistically and assess:
 | Staleness | `in-progress` for months with no narrative movement — abandoned rather than active | Info |
 | Narrative completeness | Does the body explain what this is and why it matters, or is it an empty title? | Info |
 | Trigger coherence | Do declared triggers make sense for this thing? Watching relevant things? Appropriate actions? | Info |
-| Duplicate or redundant | Substantial overlap in scope or intent with another thing | Info |
+| Duplicate or redundant | Substantial overlap in scope or intent with another thing — a candidate for composition (`thing.md` → The Inverse: Composition) | Info |
 | Open conflict not in continuity brief | A `type: conflict` with `status: open` missing from `continuity.md` | Warning |
+| Orphaned active insight | A `type: insight` with `status: active` referenced nowhere in `continuity.md` — neither circulating nor dispositioned (`session-memory.md` → Insight Lifecycle Management) | Info |
 | Stale open conflict | Open conflict untouched for 30+ days | Info |
 | No recent retrospective | Domain active 60+ days since the last `type: retrospective` (or none) | Info |
 

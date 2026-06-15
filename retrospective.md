@@ -2,7 +2,7 @@
 id: retrospective-specification
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -105,10 +105,11 @@ There is no obligation to write one on a fixed schedule. The purpose is reflecti
 A retrospective session is not passive. After completing the reflection, the agent should:
 
 1. **Create insights** for any new patterns or reframings identified in "Patterns We Noticed"
-2. **Surface latent conflicts** — if "What Didn't Work" reveals two positions the domain has been holding simultaneously without acknowledging it, create a `type: conflict` thing
-3. **Update specs** if "What Should Change" identifies a concrete improvement to an existing spec or skill
-4. **Update the continuity brief** with any new open questions
-5. **Commit everything** per the standard `post-write:commit` hard hook
+2. **Triage the standing insights** — walk the `active` insight backlog and force a disposition on each: *promote* (it has crystallised into a spec or decision — populate `promoted_to`), *dismiss* (considered and deliberately set aside), *consolidate* (fold genuine duplicates into one cohesive survivor per `thing.md` → The Inverse: Composition), or *keep active with a stated reason*. An insight that re-enters every session via the continuity brief without ever being reckoned with is the backlog rotting; the retrospective is where the population is pruned, not only grown. Full mechanics: `session-memory.md` → Insight Lifecycle Management.
+3. **Surface latent conflicts** — if "What Didn't Work" reveals two positions the domain has been holding simultaneously without acknowledging it, create a `type: conflict` thing
+4. **Update specs** if "What Should Change" identifies a concrete improvement to an existing spec or skill
+5. **Update the continuity brief** with any new open questions
+6. **Commit everything** per the standard `post-write:commit` hard hook
 
 ---
 
@@ -120,6 +121,7 @@ The retrospective is the natural home for the framework's *expensive* reflexive 
 2. **Schema coherence review** (`review-schema-coherence`) — audit the domain's emergent frontmatter vocabulary via the schema registry for fields that have drifted apart in name but converged in meaning. Proposals feed "What Should Change." See `derived-index.md`.
 3. **Index rebuild** — regenerate the domain's derived indexes from the things and reset their provenance, so the period closes with indexes provably in sync with reality (`validate.thing.md` → Index Integrity).
 4. **Change-driven reconciliation** (`change-reconciliation.md` → Retrospective Reconciliation) — for any change the period made *without* reconciling it at the time, run the full-corpus pass: freeze the period end as a baseline, reconstruct the delta from git, walk the affected set, and seal contradictions via `belief-revision.md`. This is the scan that catches the *twisted* domain — changes that landed with no change-time pass. Surfaced contradictions feed "What Didn't Work"; the realignment feeds "What Should Change." It is what makes running a retrospective *initiate* reconciliation, not merely reflect on it.
+5. **Insight triage & consolidation** (`session-memory.md` → Insight Lifecycle Management; `thing.md` → The Inverse: Composition) — the mechanical half of the triage beat above, two cheap passes the floor can compute. The *orphan check* lists `active` insights not referenced in `continuity.md` (the `validate` Info finding), so each is forced back into circulation or to a terminal status rather than going dark. The *composition pre-filter* clusters insights sharing two or more `linked_things` targets as merge candidates for the Walk to judge. The retrospective is the framework's sanctioned home for sweeps — it already runs the conflict and schema scans here — so composition joins them as a *quality* pass; this does not violate `consistency-is-maintained-at-change-not-by-sweeping`, which governs *correctness*, maintained at change.
 
 These scans are *why* the retrospective produces more than a written reflection: they mechanically surface aggregate problems the period accumulated, which the reflection then reasons about.
 

@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: kernel
 created: 2026-06-15
-generated: 2026-06-15T13:04:45
-generated_from: HEAD@1791f4e
+generated: 2026-06-15T13:29:55
+generated_from: HEAD@8e0785e
 coverage: 6
 framework_version: 3.7.0
 ---
@@ -55,7 +55,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Mechanical validation is the tool's job:** `python {framework_root}/tools/mdllm.py validate <path>` — structure, references, schema conformance, index integrity. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
 
-**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · open conflicts missing from continuity brief · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
+**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · open conflicts or active insights missing from continuity brief · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 
