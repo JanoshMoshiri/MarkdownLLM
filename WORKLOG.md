@@ -67,6 +67,7 @@ sweep and the session-end ritual.
 - [x] **Retrospective Reconciliation mode** added to the spec (freeze → reconstruct-from-git → full-corpus walk → seal) for realigning domains twisted before the pass existed.
 - [x] **Three insights**: `consistency-is-maintained-at-change-not-by-sweeping`, `mechanical-assimilation-is-blind-to-prose-dependencies`, `change-safety-is-defense-in-depth`.
 - [x] **Full coherence sweep**: validate 56/56 (+6 +12 examples), doctor FLOOR ACTIVE @3.7.0, kernel + provenance indexes in sync, 37 tests pass; fixed a pre-existing `framework-map` spec-count drift (23→25, it omitted first-hour + framework-map) caught by the textual trace, not the floor.
+- [x] **Wired `retrospective.md` → change-reconciliation (v1.2)**: added change-driven reconciliation as a fourth reflexive scan at the retrospective hook, plus a reciprocal declared edge — so running a retrospective now *initiates* the full-corpus pass instead of only reflecting. Checked `orchestration.md`: the binding invokes prompts; non-prompt passes (index rebuild, now reconciliation) live in retrospective.md — consistent, no edit needed.
 
 #### Decisions
 
