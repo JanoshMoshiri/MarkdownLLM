@@ -2,16 +2,22 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.4
+version: 1.5
 created: 2026-06-11
 domain: markdownllm-framework
-last_updated: 2026-06-12
+last_updated: 2026-06-15
 ---
 
 # Framework Continuity Brief
 
 ## Open Threads
 
+- **Apply change-reconciliation to a twisted live domain (next session's concrete
+  use):** a domain changed mid-process before the pass existed — realign it via
+  `change-reconciliation.md` → Retrospective Reconciliation (freeze a baseline
+  first, reconstruct the delta from git, full-corpus walk, seal to a new
+  baseline). Conversational and agent-driven after the domain's refresh; now
+  viable on a mid-tier model because the procedure is structure, not improvisation.
 - **Independent review (2026-06-11, external) — action queue:** full review at
   `reviews/REVIEW-independent-2026-06-11.md` (operator to decide whether the
   file stays in full or reduces to this reference). **Staleness pass done
@@ -108,11 +114,37 @@ last_updated: 2026-06-12
   mechanisms; canonical articulation of the paradigm.
 - `derived-index-is-attention-cache-not-search-layer` — governs the Phase 5 kernel
   (a derived index over the spec corpus itself).
+- `consistency-is-maintained-at-change-not-by-sweeping` — semantic consistency is
+  maintained at the point of change, not by periodic sweeping; the basis of
+  `change-reconciliation.md`.
+- `mechanical-assimilation-is-blind-to-prose-dependencies` — declared edges are
+  walkable, prose references are the dark region, the human is the backstop;
+  caught the routing-table miss on the spec's first live use.
+- `change-safety-is-defense-in-depth` — layer overlapping nets (design, static
+  trace, textual trace, walk, retrospective); no single net catches every dark
+  region, so a miss falls through to a cheaper one.
 - Remaining active insights in `things/insights/` inform spec-level detail.
 
 ## Pending Decisions
 
 - (none)
+
+## Decisions Made This Session (2026-06-15)
+
+- **`change-reconciliation.md` shipped (v3.7.0):** the evolve-phase gap is filled —
+  semantic consistency as a human-cued four-beat pass (cue, assimilate, walk,
+  seal), fractal across scale, running on the existing indexes. Designed in
+  dialogue; the human drove the two load-bearing reframes (change management not
+  sweeping; the driver, not the agent, names the inflection).
+- **The dark region is structural, not a defect to automate:** assimilate is
+  complete only over declared edges; prose dependencies are the human's backstop.
+  The textual-trace (grep) tier was added to narrow it to the conceptual residue,
+  and immediately caught a `framework-map` spec-count drift the floor could not see.
+- **Retrospective mode written into the spec, not left to the model:** structure
+  beats reasoning — capturing freeze→reconstruct-from-git→full-corpus-walk lowers
+  the model bar so a mid-tier agent can follow it rather than improvise.
+- **Invariants/test-suite tier deferred:** the retrospective is the standing
+  backstop; a second mechanism for the same job would be redundant machinery.
 
 ## Decisions Made This Session (2026-06-12, session 3)
 

@@ -49,6 +49,40 @@ This file is a running record of work done, decisions made, and work remaining. 
 
 ---
 
+## 15 June 2026
+
+### Session 1
+
+#### Topic: change-reconciliation — the evolve-phase spec, designed and shipped (v3.7.0)
+
+A long design dialogue on validating *reasoning* (not just structure) converged on
+a new extension spec and shipped it end-to-end, then closed with a full coherence
+sweep and the session-end ritual.
+
+#### Completed
+
+- [x] **`change-reconciliation.md` (new spec, v3.7.0)**: semantic consistency as a human-cued four-beat pass — cue (human declares the inflection), assimilate (declared edges via indexes, then textual trace via grep), walk (the agent's `validate.thing.md` Layer 2, one question per touch point), seal (revisions + `belief-revision` supersede mark in one commit). Fractal across scale; runs on existing infrastructure.
+- [x] **Registered the spec** across every surface: `.markdownllm` foundational_specs, AGENTS catalog + Tier 2 routing table + spec-change checklist, `tools/mdllm.py` TIERS, `framework-map.md` (counts + View 2 node), kernel regen, version bump.
+- [x] **Textual-trace tier** added to the Assimilate beat (grep for id + canonical name); the dark region formally tiered (declared / literal / conceptual).
+- [x] **Retrospective Reconciliation mode** added to the spec (freeze → reconstruct-from-git → full-corpus walk → seal) for realigning domains twisted before the pass existed.
+- [x] **Three insights**: `consistency-is-maintained-at-change-not-by-sweeping`, `mechanical-assimilation-is-blind-to-prose-dependencies`, `change-safety-is-defense-in-depth`.
+- [x] **Full coherence sweep**: validate 56/56 (+6 +12 examples), doctor FLOOR ACTIVE @3.7.0, kernel + provenance indexes in sync, 37 tests pass; fixed a pre-existing `framework-map` spec-count drift (23→25, it omitted first-hour + framework-map) caught by the textual trace, not the floor.
+
+#### Decisions
+
+- **The driver names the inflection, not the agent**: the pass is human-cued; mechanical assimilation runs only after the human "go." Recognising an inflection is the expert judgement the framework supplements, not automates.
+- **The dark region is structural**: declared edges are walkable, prose dependencies are not — the human is the irreducible backstop. The textual-trace tier narrows it to the conceptual residue but never empties it.
+- **Structure beats reasoning** (the session's ethos): retrospective mode written into the spec so a mid-tier model follows rather than improvises.
+- **Commit on the human's word, automatically**: the seal (commit + version + changelog) follows the human's approval — the decision is the human's, the commit is mechanical.
+
+#### Deferred
+
+- [ ] **Apply to a twisted live domain**: retrospective reconciliation of a real mid-process domain, conversationally after refresh — next session's concrete use.
+- [ ] **Invariants tier**: only if a contradiction-class recurs often enough to outgrow the retrospective.
+- [ ] **Proactive cue surface**: agent flagging high-fan-in edits mid-write (the run→evolve transition) — the one unguarded lifecycle boundary, parked.
+
+---
+
 ## 12 June 2026
 
 ### Session 1

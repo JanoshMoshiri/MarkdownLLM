@@ -15,6 +15,8 @@ linked_things:
     relation: complements
   - id: validate-thing-specification
     relation: complements
+  - id: retrospective-specification
+    relation: complements
   - id: consistency-is-maintained-at-change-not-by-sweeping
     relation: implements
   - id: mechanical-assimilation-is-blind-to-prose-dependencies
@@ -137,6 +139,45 @@ still ask explicitly: *what reasons about this without naming it?* And shrink th
 region over time by promoting prose mentions into declared edges — the same reason
 the framework says to link rather than mention. Captured as the insight
 `mechanical-assimilation-is-blind-to-prose-dependencies`.
+
+## Retrospective Reconciliation
+
+The four beats assume the pass runs *at* the change. A domain that was already
+changed without it — twisted, mid-process, with contradictions latent in the
+corpus — needs the same pass in a different mode: **full-corpus, reconstructed
+from history**, not delta-scoped from a clean inflection. This is the
+`retrospective.md` net catching what the change-time net never saw; the beats
+still hold, but their inputs change.
+
+1. **Freeze a baseline.** You cannot reconcile a moving target. Stop the change
+   and commit the current state to a known point — *even if it is internally
+   inconsistent* — before any sweep. Half-applied changes underneath make every
+   check untrustworthy and specifically poison the git-pinned tools. Reconcile
+   from a stable baseline to a stable baseline.
+
+2. **Assimilate from history and connectivity, not from a delta.** With no single
+   inflection to walk from, reconstruct the affected set two ways: `git log` /
+   `git diff` over the range of the twist — and `mdllm provenance`'s Freshness
+   check, which walks commits since each pin — supply *what changed*; the
+   `relationships` and `provenance` indexes supply *what is load-bearing now* (the
+   high-fan-in nodes worth checking regardless). Then the textual trace as in any
+   pass: grep for the touched things' ids and names.
+
+3. **Walk the whole field, expecting a larger human share.** Retrospectively you
+   are partly reconstructing intent you never recorded, so more touch points
+   resolve by judgement than by mechanism. The reconstruction is only as good as
+   the git history: well-committed twists are largely recoverable; loose or
+   uncommitted ones fall back to a full-corpus consistency scan plus the expert's
+   knowledge of the domain.
+
+4. **Seal to a new clean baseline.** Record contradictions through
+   `belief-revision.md`; commit the reconciled state as the point future passes
+   measure from.
+
+Retrospective reconciliation is a *one-time cleanup*, not a substitute for the
+discipline: once the domain is realigned, run the change-time pass on every
+subsequent change so it cannot re-twist. The retrospective is the cost of having
+skipped reconciliation, paid once.
 
 ## Enforcement
 
