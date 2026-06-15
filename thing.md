@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.13
+version: 2.14
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -32,7 +32,7 @@ linked_things:
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md).
 
-**Decomposition:** extract content into its own linked thing when it serves a different audience, changes at a different rate, or could be reused independently. Wanting `instance-of`/`derived-from`/`template-for`/`applies-to` = the signal to separate.
+**Cohesion (one reason to change):** decompose when content serves a different audience, changes at a different rate, or is independently reusable (`instance-of`/`derived-from`/`template-for`/`applies-to` = split). Compose the inverse: one responsibility spread across several things → consolidate into the cohesive survivor and mark the rest `superseded-by` it. Merge duplication, never contradiction.
 
 **Loading:** L1 metadata only · L2 +relationships · L3 full body. Match depth to query; never load everything for a broad question.
 <!-- /kernel -->
@@ -392,6 +392,33 @@ Certain relation values in `linked_things` are signals that two things should be
 | `applies-to` | A methodology, rule, or pattern applied to a specific subject — separate the general from the specific |
 
 **Rule:** If you are about to embed content that could honestly be described by one of these relations — stop. Create the second thing instead. Link them. The relation becomes the coupling mechanism, and loose coupling is the goal.
+
+### The Inverse: Composition
+
+Decomposition has a mirror image, and a domain that only ever splits will fragment. When a single responsibility is spread across several things — three insights circling one idea, two methodologies that have converged, a rule restated in four places — cohesion has been lost *between* things rather than *within* one. The fix is the inverse move: consolidate the fragments into the one thing that cohesively owns the responsibility, and redirect what pointed at them.
+
+This is the same Single Responsibility Principle read backwards. Decomposition asks *"does this thing hold more than one reason to change?"* Composition asks *"do these things share a single reason to change that no one of them fully owns?"* If yes, they are one responsibility wearing several files, and the duplication costs exactly what the coupling rules warn about: an update must touch every copy in lockstep, and reasoning must reconcile near-duplicates before it can act.
+
+#### The Duplication Test
+
+Before keeping two things separate, ask:
+
+> *If this idea changed, how many things would I have to edit in lockstep to keep them consistent?*
+
+If the honest answer is more than one, those things are not loosely coupled — they are a single responsibility that has been copied. Consolidate.
+
+#### How To Consolidate
+
+The inverse of extraction, run with the same care:
+
+1. **Choose the survivor** — the thing that most cohesively owns the responsibility, or write a new one that does.
+2. **Fold in** the distinct content of the fragments; drop what was mere restatement.
+3. **Redirect** every inbound reference to the survivor.
+4. **Tombstone** each absorbed thing: the survivor `supersedes` them, each fragment is `superseded-by` the survivor and moves to its terminal status (`dismissed` for an insight, `superseded` for a decision). Do not delete it — the tombstone keeps the merge walkable and git keeps the content. This reuses the framework's existing replacement vocabulary; no new relation is needed.
+
+Two boundaries keep composition honest. It is **not contradiction resolution** — it merges things that *agree* but duplicate; two things that genuinely disagree are a `conflict`, resolved through `belief-revision.md`, not folded together. And it is run **conservatively** — when two things look redundant but carry distinct provenance or context, link them rather than collapse them. Relate, don't merge.
+
+Like the full conflict scan, composition is a sweep-class refactor: it reshapes the corpus and wants the whole field in view, so it belongs at retrospective cadence rather than mid-session (`retrospective.md`).
 
 ## Special Type: Example
 

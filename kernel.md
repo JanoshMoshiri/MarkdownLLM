@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-06-13
-generated: 2026-06-13T22:15:57
-generated_from: HEAD@3c5db06
+created: 2026-06-15
+generated: 2026-06-15T13:04:45
+generated_from: HEAD@1791f4e
 coverage: 6
 framework_version: 3.7.0
 ---
@@ -31,7 +31,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md).
 
-**Decomposition:** extract content into its own linked thing when it serves a different audience, changes at a different rate, or could be reused independently. Wanting `instance-of`/`derived-from`/`template-for`/`applies-to` = the signal to separate.
+**Cohesion (one reason to change):** decompose when content serves a different audience, changes at a different rate, or is independently reusable (`instance-of`/`derived-from`/`template-for`/`applies-to` = split). Compose the inverse: one responsibility spread across several things → consolidate into the cohesive survivor and mark the rest `superseded-by` it. Merge duplication, never contradiction.
 
 **Loading:** L1 metadata only · L2 +relationships · L3 full body. Match depth to query; never load everything for a broad question.
 
