@@ -2,7 +2,7 @@
 id: workflow-state-specification
 type: specification
 status: draft
-version: 0.1
+version: 0.2
 created: 2026-06-15
 linked_things:
   - id: thing-specification
@@ -146,6 +146,8 @@ Run-state decomposition is most of the concurrency answer, not a separate workst
 
 - **Different instances → different files.** Two operators working two different runs touch two different files; git merges them without thought. The old hazard — `continuity.md` as a single-writer singleton — is decomposed away.
 - **Same-instance contention** is rare and small. The `held_by` advisory claim handles it: a committed, visible "who holds this," read and respected by convention. Not a distributed lock.
+
+  **The claim generalizes (named here, deploy when felt).** The same convention fits *any* singleton two operators might co-edit — `continuity.md` above all, the framework's least concurrency-safe object. The ready-to-adopt field pair is `held_by` (who holds it) plus an optional `held_until` (an ISO timestamp lease, after which the claim is stale and may be taken over). A claim with no `held_until` is held until explicitly released; a claim past its `held_until` is advisory-expired and the next operator may clear it, noting the takeover. This is deliberately *not* deployed beyond `workflow-run` yet — it is reserved in prose so the day a singleton actually collides, the schema and the staleness rule already exist rather than being invented under pressure (the same "spec when foreseeable, deploy when felt" discipline the primitive itself follows).
 - **Git stays the system of record.** It is the audit trail. If a separate coordination layer is ever introduced for true runtime concurrency, treat it strictly as coordination and checkpoint its state back into the committed run-state thing at every meaning boundary. The durable schema is the contract — designed once, shared by a purely-local domain and any future coordinated deployment.
 
 ## Hand-off (interface.md)

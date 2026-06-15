@@ -1,0 +1,67 @@
+# Shape-only validation record. Fill the placeholders with ABSTRACTED content
+# only — no operator, client, product, or domain-specific data. An empty
+# placeholder is honest; an invented detail is not. See evidence/README.md.
+# Save the filled copy as evidence/validation-record-<label>.md (it IS validated).
+---
+id: validation-record-[short-abstract-label]
+type: artifact
+status: draft
+created: [ISO-date]
+---
+
+# Validation Record — [Abstracted Label, e.g. "a regulated multi-stage filing domain"]
+
+## Context (one paragraph, fully abstracted)
+
+[What kind of problem the domain solves, at a level that identifies nothing.
+e.g. "A recurring, deadline-driven compliance process with multi-party inputs."]
+
+## The incumbent it displaced
+
+[What tool or method the operator used before adopting the framework, and the
+one or two pain points that drove the switch — abstracted.]
+
+## The workflow shape
+
+[The stage graph, as a redacted `workflow-definition` (see workflow-state.md).
+This is the disclosable core. Use stage names generic enough to identify nothing.]
+
+```yaml
+stages:
+  - id: [stage-a]
+    to: [[stage-b]]
+  - id: [stage-b]
+    to: [[stage-c], [stage-a]]   # note real loops — they are part of the shape
+  - id: [stage-c]
+    to: []
+```
+
+## Which primitives carried which load
+
+[For each framework primitive that did real work, one line on what it carried.
+This is the most useful evidence for an evaluator.]
+
+| Primitive | Load it carried |
+|---|---|
+| `thing` / decomposition | [...] |
+| `provenance` / `decision` | [...] |
+| `workflow-run` (if used) | [...] |
+| deterministic floor | [...] |
+| [other] | [...] |
+
+## What broke, what was missing, what was fixed
+
+- **Broke:** [failure modes encountered in real use — abstracted.]
+- **Missing:** [capabilities the domain needed that the framework lacked — this
+  is honest and valuable; gaps are evidence of real use.]
+- **Fixed:** [what changed in response.]
+
+## Outcome
+
+[The honest end state — e.g. "sustained to a marketed MVP, unobserved, with no
+hand-holding." Abstract any specifics.]
+
+## Disclosure note
+
+[One line recording who approved this abstraction level and on what date, so the
+record's provenance is itself auditable.]

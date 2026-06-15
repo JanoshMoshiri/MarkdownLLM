@@ -239,7 +239,7 @@ Git preserves all of it. You have a complete audit trail and history.
 
 **Portability.** Your data is just files. You can move it anywhere. Run it on any LLM. Integrate it with any tool that reads markdown and git.
 
-**Composability.** Multiple domains can coexist. Your life manager and your knowledge base can reference each other. Your financial tracking can link to your projects. They're all just files.
+**Composability.** Multiple domains can coexist — they're all just files under one framework. Within a domain, things compose freely. *Across* domains, composition is deliberate, not implicit: domains are isolated, separate-id-space repos by design, so one domain consuming another's output is a verified hand-off (treated as external input — quarantined until confirmed, see `provenance.md`), not a raw cross-repo link. The full cross-domain hand-off mechanism is foreseen but not yet specified (sketch: `things/insights/cross-domain-handoff-is-verified-external-input.md`); until it ships, treat cross-domain references as an explicit import, not a promise the framework already keeps.
 
 **Evolution.** You're not stuck with your initial design. The schema evolves. Fields emerge. Relationships change. Git preserves the history.
 
@@ -271,7 +271,12 @@ This has profound implications:
 
 **Sustainability.** Less compute means less power consumption. It's better for the environment and your infrastructure costs.
 
-The insight is this: **elegant constraint is more powerful than raw capability.** The claim, stated carefully: a smaller model operating within a well-defined system can match or outperform a larger model operating without structure. This is the framework's central hypothesis — now measured rather than asserted. The first eval results (2026-06-11, `evals/README.md`) showed structure buying determinism, and the small-model-with-structure cell beating the large-model-without cell at roughly a quarter of the cost; the harder reasoning component of the claim remains untested until a more discriminating fixture exists.
+The insight is this: **elegant constraint is more powerful than raw capability.** The claim, stated carefully: a smaller model operating within a well-defined system can match or outperform a larger model operating without structure.
+
+Two claims must be kept apart here, because the framework has good evidence for one and not the other:
+
+- **Utility — well-evidenced.** That the framework delivers real value is no longer in question: it is in production use, and at least one independent operator adopted it cold and carried a domain through to a marketed MVP. Structure buying determinism and consistency across sessions and vendors is demonstrated.
+- **Model-tier superiority — a hypothesis, still open.** That a *smaller* model with structure beats a *larger* one without it is the framework's central **hypothesis**, not a result. It rests on one eval (2026-06-11, `evals/README.md`) whose reasoning core *saturated* — the task was not discriminating enough to separate the conditions on reasoning quality, only on cost and determinism. The capability half of the claim stays untested until a harder, non-saturating fixture exists. Do not cite it as proven.
 
 This is about shifting the optimization target. Instead of "how do we build more powerful models," ask "how do we design systems that enable smaller models to be effective." The answer is clarity, structure, and constraint.
 

@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -66,7 +66,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>11 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>13 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -182,6 +182,8 @@ flowchart LR
         C9["install-hook"]
         C10["doctor"]
         C11["scaffold"]
+        C12["worklog"]
+        C13["refresh"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -195,6 +197,8 @@ flowchart LR
         T9["git pre-commit hook"]
         T10["floor availability itself"]
         T11["pre-domain-scaffold:isolate<br/>hard hook"]
+        T12["WORKLOG.md"]
+        T13["domain-refresh.md"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -208,6 +212,8 @@ flowchart LR
     C9 -.->|installs| T9
     C10 -->|"execution-tests"| T10
     C11 -->|mechanises| T11
+    C12 -.->|generates| T12
+    C13 -->|"reports drift for"| T13
 ```
 
 Notes on this view:

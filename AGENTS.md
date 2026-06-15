@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 3.8.0
+version: 3.9.0
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -179,7 +179,7 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 6. **Vendor Agnostic** — This AGENTS.md works with GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini CLI. No vendor-specific memory stores required — the framework is the memory.
 7. **Transparent & Auditable** — Every decision, every state change, every reasoning step is committed to git. Full history is always available.
 8. **Git-Backed** — Git is the state machine, not just version control. Commit messages are the event stream. The WORKLOG captures session narrative.
-9. **Elegant Constraint Enables Efficiency** — Well-defined systems let smaller models perform reliably. Structure isn't overhead; it's the mechanism that makes reasoning consistent across sessions and vendors.
+9. **Elegant Constraint Enables Efficiency (hypothesis, under test)** — Structure makes reasoning consistent across sessions and vendors — that much is demonstrated. The stronger claim that a *smaller* model with structure matches or beats a *larger* model without it is the framework's central **hypothesis**, not a proven result: it rests on one eval whose reasoning core saturated, and stays a hypothesis until a more discriminating fixture tests it. Keep this distinct from the framework's *utility*, which independent adoption evidences directly. (See the manifesto, "Elegant Constraint Enables Efficiency.")
 
 ## Thing Types In This Domain
 

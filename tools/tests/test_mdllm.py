@@ -145,6 +145,22 @@ def test_workflow_types_are_reserved():
     assert allowed == ["draft", "evolving", "stable", "deprecated"] and declared
 
 
+def test_version_lt_orders_dotted_versions():
+    assert mdllm._version_lt("3.4.0", "3.8.0")
+    assert mdllm._version_lt("3.7.0", "3.10.0")   # numeric, not lexical
+    assert not mdllm._version_lt("3.8.0", "3.8.0")
+    assert not mdllm._version_lt("3.9.0", "3.8.1")
+
+
+def test_changelog_versions_since(tmp_path):
+    cl = tmp_path / "CHANGELOG.md"
+    cl.write_text("# Changelog\n\n## [3.8.0] - 2026-06-15\n\n## [3.7.0] - 2026-06-13\n"
+                  "## [3.4.0] - 2026-06-11\n", encoding="utf-8")
+    since = mdllm._changelog_versions_since(cl, "3.4.0")
+    assert since == ["v3.8.0 (2026-06-15)", "v3.7.0 (2026-06-13)"]
+    assert mdllm._changelog_versions_since(cl, "3.8.0") == []
+
+
 def test_declared_domain_vocabulary():
     schema = {"types": {"vat-return": {"statuses": ["open", "figures-ready"]}}}
     allowed, declared = mdllm.valid_statuses_for("vat-return", schema)
