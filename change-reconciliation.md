@@ -37,8 +37,7 @@ never prevented, by a change to one of them.
 
 The premise is deliberately narrow: **a fresh thing on a clean slate carries no
 consistency risk** — there is nothing for it to contradict. Risk enters only at
-*change* to something the domain already reasons from. So consistency is not
-maintained by periodic sweeps that hunt for drift after it accumulates; it is
+*change* to something the domain already reasons from. So consistency is
 maintained at the moment of change, by reconciling that change against
 everything it touches. This is change management, applied to knowledge.
 
@@ -143,10 +142,11 @@ the framework says to link rather than mention. Captured as the insight
 ## Retrospective Reconciliation
 
 The four beats assume the pass runs *at* the change. A domain that was already
-changed without it — twisted, mid-process, with contradictions latent in the
-corpus — needs the same pass in a different mode: **full-corpus, reconstructed
-from history**, not delta-scoped from a clean inflection. This is the
-`retrospective.md` net catching what the change-time net never saw; the beats
+changed without it — twisted, with contradictions latent in the corpus, whether
+a legacy domain not yet under the discipline or a live one where an inflection
+went undeclared — needs the same pass in a different mode: **full-corpus,
+reconstructed from history**, not delta-scoped from a clean inflection. This is
+the `retrospective.md` net catching what the change-time net never saw; the beats
 still hold, but their inputs change.
 
 1. **Freeze a baseline.** You cannot reconcile a moving target. Stop the change
@@ -174,10 +174,22 @@ still hold, but their inputs change.
    `belief-revision.md`; commit the reconciled state as the point future passes
    measure from.
 
-Retrospective reconciliation is a *one-time cleanup*, not a substitute for the
-discipline: once the domain is realigned, run the change-time pass on every
-subsequent change so it cannot re-twist. The retrospective is the cost of having
-skipped reconciliation, paid once.
+Retrospective reconciliation is not a substitute for the change-time discipline
+— it is its **backward-looking mode**, and it runs in two situations. The first
+is **one-time realignment**: a domain that accumulated change before the
+discipline was adopted is twisted once, swept once, and reconciled at each change
+thereafter. The second is **recurring maintenance**: because the Cue is human
+(see *The Driver Names The Inflection*), an expert will sometimes edit without
+declaring the inflection, and those changes land un-reconciled. The change-time
+net cannot catch what was never handed to it, so the same backward pass runs
+periodically — bound to the `retrospective` hook (`retrospective.md` →
+Reflexive Scans At Retrospective) — as the net beneath the net.
+
+The two uses differ only in scope and cadence, not in kind: both freeze a
+baseline, reconstruct the delta from history, walk the affected set, and seal.
+The forward pass remains primary — the retrospective is the cost of reconciliation
+*skipped*, not a licence to skip it; it is what makes the discipline robust to
+the times the cue is missed, not a substitute for giving it.
 
 ## Enforcement
 
