@@ -1,7 +1,7 @@
 ---
 id: domain-refresh-specification
 type: specification
-status: stable
+status: evolving
 version: 1.3
 created: 2026-05-19
 linked_things:

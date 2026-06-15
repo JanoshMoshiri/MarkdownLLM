@@ -16,6 +16,7 @@ linked_things:
 ## 2026-06-15 — in progress
 
 - `9c4f7777b` create: workflow-state primitive + bidirectional version-check (v3.8.0)
+- `90d1d4b71` create: review back-half — worklog/refresh tools, honesty + meta-risk (v3.9.0)
 
 ## 2026-06-15 — session-end: session 5 (15 Jun) — insight lifecycle management + composition
 

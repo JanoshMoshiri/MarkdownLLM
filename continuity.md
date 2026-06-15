@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.6
+version: 1.7
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-15
@@ -12,6 +12,22 @@ last_updated: 2026-06-15
 
 ## Open Threads
 
+- **Third independent review (2026-06-15) — action queue largely cleared:** full
+  review at `reviews/REVIEW-independent-2026-06-15.md`. Items 1–2 shipped as
+  **3.8.0** (the `workflow-state` primitive — `workflow-definition` + `workflow-run`,
+  reserve-but-draft; bidirectional `session-start:version-check` with the advisory,
+  cached, non-blocking upstream leg). Items 3, 5–8 shipped as **3.9.0**
+  (`mdllm worklog` + `mdllm refresh`; model-tier claim demoted to hypothesis;
+  cross-domain promise retracted → `cross-domain-handoff-is-verified-external-input`;
+  advisory lease generalised in prose; `stable→evolving` relabel for
+  thing/orchestration/domain-refresh). **Remaining:** (a) **#4 narrative validation
+  record** — `evidence/` scaffold + shape-only template shipped; the narrative case
+  study waits on the operator's disclosure decision (after the brother conversation);
+  (b) **exercise the `workflow-run` primitive on a real domain** before promoting past
+  draft, and let the floor's `current_stage ∈ stages` check land then (life-manager
+  has a demo pair; a live domain is the real test — parallels the composition and
+  twisted-domain threads); (c) the harder-fixture eval below now carries the
+  model-tier *hypothesis*, not a settled claim.
 - **Apply change-reconciliation to a twisted live domain (next session's concrete
   use):** a domain changed mid-process before the pass existed — realign it via
   `change-reconciliation.md` → Retrospective Reconciliation (freeze a baseline
@@ -52,7 +68,10 @@ last_updated: 2026-06-15
   behind a framework that versions daily (mechanisable: most of a refresh is
   re-copying three boilerplate blocks — scaffold-adjacent); manifesto still
   promises cross-domain linking no spec defines; README "no setup step" story
-  vs first-hour's honest prerequisites — pick one.
+  vs first-hour's honest prerequisites — pick one. **Resolved in 3.9.0:** WORKLOG
+  generated (`mdllm worklog`), refresh mechanised (`mdllm refresh`), cross-domain
+  promise retracted. **Still open:** review cadence (next review after the human
+  eval) and the README-vs-first-hour story.
 - **Harness support is now measured, not assumed:** first non-IDE harness
   session (Cowork, 2026-06-11) — no AGENTS.md auto-discovery; the installed
   pre-commit hook couldn't run (machine-absolute path, bare `python`). Hook
@@ -77,9 +96,9 @@ last_updated: 2026-06-15
   fixture whose condition-neutral core discriminates (candidates: partial
   exemption, multi-quarter with conflicting/duplicate records, an
   amendment/belief-revision flow, distractor things), then re-run the 2×2;
-  (2) soften the declarative structure-beats-scale claim in README.md
-  ("The result: ...") and manifesto §elegant-constraint to tested-hypothesis
-  framing, citing first results honestly. See
+  (2) **done in 3.9.0 for the manifesto + AGENTS principle 9** (model-tier claim
+  demoted to explicit hypothesis, utility kept distinct) — the README "The result:"
+  line may still need the same softening. See
   `first-2x2-measured-convention-following-not-reasoning`.
 - **Tier 2 kernel blocks:** session-memory, belief-revision, provenance,
   triggers, derived-index — low priority (demand-loaded anyway).
@@ -88,14 +107,6 @@ last_updated: 2026-06-15
   `adapters/scheduled-triggers.ps1` in Task Scheduler before then.
 - **jmtm orphan records:** 8 expense/profile things unlinked — link them when
   the FY2025 accounts/CT return are prepared.
-- **Workflow-state vs knowledge-state memory (gap 4, parked):** the framework
-  captures *knowledge* state (things/insights/conflicts) well, but a multi-session
-  *workflow instance* mid-execution has no first-class "resume here" representation —
-  it lives only as continuity-brief prose. Workflows are *definitions* (domain
-  skills); there is no workflow *run*. Decide deliberately (like auto-identification):
-  Option A — a "Workflows In Flight" brief-section convention first; Option B — a
-  `type: workflow-state` primitive only if a domain shows real pain. Lean A; watch
-  for the pain before speccing.
 - **Exercise composition for real:** the consolidation half of `thing.md`'s cohesion
   discipline is specified (The Inverse: Composition) and bound at retrospective
   cadence, but never run. First real composition sweep at a domain (or framework)
@@ -140,6 +151,15 @@ last_updated: 2026-06-15
   was decompose-only; composition is its missing inverse, so "insight consolidation"
   was the existing thing-discipline applied to a reserved type, not a new primitive.
   Carries the razor: complete a half-applied discipline before inventing machinery.
+- `workflow-run-is-the-decomposition-principle-applied-to-processes` — workflow
+  run-state was not a new mechanism but the `template-for`/`instance-of` decomposition
+  applied to a process: `workflow-definition` (stages as data) + `workflow-run`
+  (cursor + advisory claim + resume). Decomposing run-state per instance also
+  dissolves most of the concurrency hazard (the `continuity.md` singleton).
+- `cross-domain-handoff-is-verified-external-input` (confidence: medium) — a
+  cross-domain hand-off is not a link but an import of external input, so it inherits
+  `origin: external` quarantine + provenance; reframes the retracted manifesto promise
+  and is the design to spec when a second concrete case appears.
 - Remaining active insights in `things/insights/` inform spec-level detail.
 
 ## Pending Decisions
@@ -162,6 +182,29 @@ last_updated: 2026-06-15
   the model bar so a mid-tier agent can follow it rather than improvise.
 - **Invariants/test-suite tier deferred:** the retrospective is the standing
   backstop; a second mechanism for the same job would be redundant machinery.
+
+## Decisions Made This Session (2026-06-15, session 3)
+
+- **The third independent review was actioned in two releases, not debated:** items
+  1–2 (workflow-state primitive + bidirectional version-check) as 3.8.0; items 3,
+  5–8 as 3.9.0. The throughline the review named — *harvest from where the framework
+  is already proven* — drove the choices.
+- **Workflow run-state is a reserved-but-draft primitive** (`workflow-definition` +
+  `workflow-run`), framed as decomposition applied to processes so it stays on the
+  spine. Floor membership check deferred until exercised on a real domain.
+- **Upstream version drift is advisory, not a gate** (operator's call): the upward
+  leg notifies and lets the expert decide; it reads git's cached remote state, never
+  a live network call at session start.
+- **WORKLOG kept but generated** (operator's call, both surfaces): `mdllm worklog`
+  from the commit stream; CHANGELOG stays external/per-version. 115KB → 21KB.
+- **`mdllm refresh` is floor-only** — reports the delta, `--seal` bumps
+  `framework_version_seen` after the agent's semantic adoption; never rewrites skills.
+- **Model-tier claim demoted to hypothesis; cross-domain promise retracted** —
+  honesty corrections, keeping proven utility distinct from the untested tier claim,
+  and not promising cross-domain linking until it is specified.
+- **`stable→evolving` by the structural-change bar:** only thing/orchestration/
+  domain-refresh flipped (each took a structural change this cycle); incidental
+  cross-reference edits do not unset `stable`. The rest of the core kept its label.
 
 ## Decisions Made This Session (2026-06-15, session 2)
 

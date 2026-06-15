@@ -1,7 +1,7 @@
 ---
 id: thing-specification
 type: specification
-status: stable
+status: evolving
 version: 2.15
 created: 2026-05-13
 linked_things:
