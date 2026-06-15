@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.5
+version: 1.6
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-15
@@ -88,6 +88,19 @@ last_updated: 2026-06-15
   `adapters/scheduled-triggers.ps1` in Task Scheduler before then.
 - **jmtm orphan records:** 8 expense/profile things unlinked — link them when
   the FY2025 accounts/CT return are prepared.
+- **Workflow-state vs knowledge-state memory (gap 4, parked):** the framework
+  captures *knowledge* state (things/insights/conflicts) well, but a multi-session
+  *workflow instance* mid-execution has no first-class "resume here" representation —
+  it lives only as continuity-brief prose. Workflows are *definitions* (domain
+  skills); there is no workflow *run*. Decide deliberately (like auto-identification):
+  Option A — a "Workflows In Flight" brief-section convention first; Option B — a
+  `type: workflow-state` primitive only if a domain shows real pain. Lean A; watch
+  for the pain before speccing.
+- **Exercise composition for real:** the consolidation half of `thing.md`'s cohesion
+  discipline is specified (The Inverse: Composition) and bound at retrospective
+  cadence, but never run. First real composition sweep at a domain (or framework)
+  retrospective is the live test — parallels the "apply change-reconciliation to a
+  twisted domain" thread.
 
 ## Live Insights
 
@@ -123,13 +136,17 @@ last_updated: 2026-06-15
 - `change-safety-is-defense-in-depth` — layer overlapping nets (design, static
   trace, textual trace, walk, retrospective); no single net catches every dark
   region, so a miss falls through to a cheaper one.
+- `composition-is-the-inverse-of-decomposition` — `thing.md`'s cohesion discipline
+  was decompose-only; composition is its missing inverse, so "insight consolidation"
+  was the existing thing-discipline applied to a reserved type, not a new primitive.
+  Carries the razor: complete a half-applied discipline before inventing machinery.
 - Remaining active insights in `things/insights/` inform spec-level detail.
 
 ## Pending Decisions
 
 - (none)
 
-## Decisions Made This Session (2026-06-15)
+## Decisions Made This Session (2026-06-15, session 1)
 
 - **`change-reconciliation.md` shipped (v3.7.0):** the evolve-phase gap is filled —
   semantic consistency as a human-cued four-beat pass (cue, assimilate, walk,
@@ -145,6 +162,24 @@ last_updated: 2026-06-15
   the model bar so a mid-tier agent can follow it rather than improvise.
 - **Invariants/test-suite tier deferred:** the retrospective is the standing
   backstop; a second mechanism for the same job would be redundant machinery.
+
+## Decisions Made This Session (2026-06-15, session 2)
+
+- **Insight management closed as two layers, not one feature:** insight-specific
+  lifecycle plumbing (promotion/dismissal triage driver, orphan guard) landed in
+  `retrospective.md` + `session-memory.md` + `validate.thing.md`; the consolidation
+  problem lifted *out* of the insight layer entirely and was fixed in `thing.md` as
+  the missing inverse of decomposition. Shipped as two atomic commits.
+- **Don't invent a primitive when a discipline is half-applied** (the session's
+  load-bearing reframe, the human's): "insight consolidation" was the cohesion
+  discipline `thing.md` already had, run in the compose direction. Captured as
+  `composition-is-the-inverse-of-decomposition`.
+- **Reuse `supersedes`, broaden its definition:** rather than a new `consolidates`
+  relation, composition tombstones via `supersedes` — which forced `belief-revision.md`'s
+  "incorrect or outdated" wording to widen to cover replacement-by-consolidation.
+  The one contradiction the reconciliation walk caught, resolved in-session.
+- **Gap 4 (workflow-state memory) parked deliberately**, not dropped — recorded as
+  an open thread with the A/B decision framed, lean-A.
 
 ## Decisions Made This Session (2026-06-12, session 3)
 

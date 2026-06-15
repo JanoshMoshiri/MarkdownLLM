@@ -84,6 +84,38 @@ sweep and the session-end ritual.
 
 ---
 
+### Session 2
+
+#### Topic: insight lifecycle management — and consolidation relocated to thing.md
+
+Started from "do we have all the pieces to manage insights and historical memory
+session to session?" Mapped the insight lifecycle, found the right-hand side
+(promote / dismiss / merge) was all unowned intake with no outflow, and split the
+fix into two layers: insight-specific plumbing, and a deeper correction to the
+atomic unit itself.
+
+#### Completed
+
+- [x] **`thing.md` (2.14) — The Inverse: Composition**: added the missing compose direction to Thing Cohesion and Decomposition (Duplication Test, consolidate procedure, tombstone via `supersedes`, guardrails: merge duplication not contradiction, relate-don't-merge). Kernel one-liner made bidirectional (Decomposition → Cohesion); kernel regenerated. Committed `8e0785e`.
+- [x] **Insight lifecycle plumbing** (committed `5500aa0`): `retrospective.md` (1.3) insight-triage produced-action + fifth reflexive scan binding the composition sweep cadence; `session-memory.md` (1.2) new Insight Lifecycle Management section (driven promotion/dismissal, orphan-must-circulate, consolidation = thing.md composition); `validate.thing.md` (2.1) orphaned-active-insight Info check (twin of the open-conflict check) in kernel checklist + Layer 2.
+- [x] **Reconciliation walk on the thing.md inflection**: broadened `belief-revision.md` (1.2) `supersedes` definition to cover replacement-by-consolidation, not only -by-correction — the one genuine contradiction the walk caught. Two dark-region textual drifts also caught and fixed in `AGENTS.md`: stale `validate.thing.md v2.0` reference dropped, six-spec token figure 21.4k → 22.3k.
+- [x] **Coherence sweep**: corpus + both example domains validate clean (75 things, 0 findings), kernel regenerated, 37/37 floor tests pass.
+- [x] **Insight**: `composition-is-the-inverse-of-decomposition`.
+
+#### Decisions
+
+- **Don't invent a primitive when a discipline is half-applied** (the human's reframe, load-bearing): "insight consolidation" was `thing.md`'s existing cohesion discipline run in the compose direction — an insight is a thing, so managing insights is managing things. The fix belonged in `thing.md`, not in a bespoke insight feature.
+- **Two layers, two commits**: insight-specific lifecycle (gaps 1–2) kept separate from the atomic-unit correction (gap 3) — each atomic, each reconciled.
+- **Reuse `supersedes` over a new relation**: composition tombstones with existing vocabulary; the cost was widening belief-revision's definition, paid in-session.
+- **Gap 4 (workflow-state vs knowledge-state memory) parked deliberately**: recorded as an open thread with the convention-vs-primitive decision framed (lean A), not dropped.
+
+#### Deferred
+
+- [ ] **First real composition sweep** at a retrospective — the discipline is specified and bound but never exercised.
+- [ ] **Workflow-state memory** (gap 4) — watch domains for the pain before speccing Option A/B.
+
+---
+
 ## 12 June 2026
 
 ### Session 1
