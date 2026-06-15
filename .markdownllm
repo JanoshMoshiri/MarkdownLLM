@@ -1,5 +1,5 @@
 framework: MarkdownLLM
-version: 3.7.0
+version: 3.8.0
 role: canonical-version-sentinel
 foundational_specs:
   - thing.md
@@ -13,6 +13,7 @@ foundational_specs:
   - orchestration.md
   - derived-index.md
   - provenance.md
+  - workflow-state.md
   - session-memory.md
   - belief-revision.md
   - change-reconciliation.md

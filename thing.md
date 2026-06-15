@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: stable
-version: 2.14
+version: 2.15
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -26,9 +26,9 @@ linked_things:
 
 **Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Emergent fields: add only when they serve reasoning.
 
-**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded.
+**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/complete/abandoned.
 
-**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
+**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md).
 
@@ -81,13 +81,15 @@ These fields must be present in every thing to do:
 - What kind of thing this is
 - Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
 - Helps Claude understand scope and context
-- Five types are **framework-reserved** and have fixed semantics regardless of domain:
+- Seven types are **framework-reserved** and have fixed semantics regardless of domain:
   - `insight` — an emerging idea or held view from a session, preserved for future context
   - `continuity-brief` — the domain's live forward-looking session-continuity document (one per domain)
   - `conflict` — a documented contradiction between two other things, held as a first-class thing until resolved
   - `retrospective` — a periodic quality reflection on domain reasoning; one per period, not per session
   - `decision` — a judgement made from knowledge, with inputs pinned to git commits via `informed_by`
-  - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, and `provenance.md` for full specifications.
+  - `workflow-definition` — a reusable process skeleton with its stages expressed as data and the transitions allowed between them
+  - `workflow-run` — one live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative
+  - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, `provenance.md`, and `workflow-state.md` for full specifications.
 - Three types are **framework-internal**: `specification`, `guide`, and `manifesto`. These are used by the framework's own spec files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
 - One type is **framework-generated**: `index`. An index thing is a regenerable cache that aggregates one signal (triggers, relationships, schema fields) across a domain's things, living in `things/_index/`. It is produced by the agent, not authored by hand, and uses status `live`/`stale`. The things are always the source of truth; the index is a derived copy. Full specification: `derived-index.md`.
 
@@ -105,7 +107,9 @@ These fields must be present in every thing to do:
   `specification`/`guide`/`manifesto`/`skill`/`prompt` use `draft`, `evolving`,
   `stable`, `deprecated`; `insight` uses `active`, `promoted`, `dismissed`;
   `conflict` uses `open`, `resolved`; `retrospective` uses `draft`, `complete`;
-  `continuity-brief` uses `live`; `index` uses `live`, `stale`
+  `continuity-brief` uses `live`; `index` uses `live`, `stale`;
+  `workflow-definition` uses `draft`, `evolving`, `stable`, `deprecated`;
+  `workflow-run` uses `active`, `paused`, `complete`, `abandoned`
 - Updated by the agent as work progresses
 
 **created** (ISO 8601 date)

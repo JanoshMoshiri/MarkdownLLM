@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: kernel
 created: 2026-06-15
-generated: 2026-06-15T13:29:55
-generated_from: HEAD@8e0785e
+generated: 2026-06-15T20:13:06
+generated_from: HEAD@da47a5a
 coverage: 6
-framework_version: 3.7.0
+framework_version: 3.8.0
 ---
 
 # Framework Operative Kernel
@@ -25,9 +25,9 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Emergent fields: add only when they serve reasoning.
 
-**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded.
+**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/complete/abandoned.
 
-**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
+**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md).
 
@@ -74,7 +74,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 **Hard hooks — always active, never skippable:**
 1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
-3. `session-start:version-check` — read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch: surface, run validation, offer `domain-refresh.md`.
+3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — no live fetch at session start); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
 

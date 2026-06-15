@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: stable
-version: 1.9
+version: 1.10
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -33,7 +33,7 @@ linked_things:
 **Hard hooks — always active, never skippable:**
 1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
-3. `session-start:version-check` — read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch: surface, run validation, offer `domain-refresh.md`.
+3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — no live fetch at session start); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
 
@@ -108,7 +108,9 @@ These three hard hooks are part of every agent's operating contract with the fra
 
 **When it fires:** At the start of every session where the agent has `framework_root` declared in its AGENTS.md frontmatter.
 
-**What must happen:**
+This hook checks version drift in **two directions** along the same chain — *published source → local framework → domain*. The downward leg keeps a domain current with the framework copy it inhabits; the upward leg tells the operator when that framework copy is itself behind its published source.
+
+**Downward leg — domain ← local framework (blocking-class: validate before proceeding):**
 1. Read `{framework_root}/.markdownllm` — extract the `version` field only (first few lines; tiny file)
 2. Compare against `framework_version_seen` in the domain's own AGENTS.md frontmatter
 3. If `framework_version_seen` is absent: treat as fully stale — surface to user and offer a full refresh
@@ -119,11 +121,19 @@ These three hard hooks are part of every agent's operating contract with the fra
    c. Report validation findings to the user
    d. Offer a full refresh via `{framework_root}/domain-refresh.md`
 
-**Why it's hard:** Domains operating on stale framework assumptions may produce invalid things or miss capabilities that now exist. A version mismatch is a known-unknown — the domain knows it doesn't know what changed. Running validation immediately on mismatch ensures existing things remain compliant under updated spec definitions before any new work begins. Catching this at session start, not mid-session, is the only reliable way to surface it.
+**Upward leg — local framework ← published source (advisory, cached, non-blocking):**
+1. Read the local `{framework_root}/.markdownllm` `version`
+2. Compare against the *cached* upstream version — git's existing remote-tracking knowledge, read without a network call: `git show origin/main:.markdownllm` (or the configured upstream ref). **Do not fetch live at session start** — a hard network call in a harness that may have no network is the `portability-claims-need-execution-tests` trap.
+3. If the local framework is behind: surface a single advisory line — "Local framework is v{local}; published source is v{upstream} (as of the last fetch) — consider pulling before this session." Then proceed. This is a **notification, not a gate**: the operator decides whether to update.
+4. If equal, ahead (unpublished local work), or the upstream ref is unavailable: stay silent (or note "upstream unknown — no recent fetch" only when asked).
 
-**Context cost:** Minimal. `.markdownllm` is a tiny file. Reading only its first few lines to extract `version` costs negligible context. `validate.thing.md` is only loaded when a mismatch is confirmed — not on every session.
+`mdllm doctor` reports both legs and is where a deliberate `git fetch` + re-check belongs.
 
-**What failure looks like:** Domain continues operating on a stale framework version. New things are created without awareness of updated patterns. Existing things may be invalid under new spec definitions without the domain or user knowing.
+**Why it's hard:** Domains operating on stale framework assumptions may produce invalid things or miss capabilities that now exist. A version mismatch is a known-unknown — the domain knows it doesn't know what changed. Running validation immediately on the downward mismatch ensures existing things remain compliant under updated spec definitions before any new work begins. The upward leg is softer by design — it coordinates humans, it does not protect integrity — so it advises rather than blocks. Catching both at session start, not mid-session, is the only reliable way to surface them.
+
+**Context cost:** Minimal. `.markdownllm` is a tiny file; the upstream read is a single `git show` against already-fetched objects. `validate.thing.md` is only loaded when a downward mismatch is confirmed — not on every session.
+
+**What failure looks like:** A domain continues operating on a stale framework version; or a framework copy silently lags its published source for weeks while operators coordinate updates by hand.
 
 ### Declaring Domain-Level Hard Hooks
 

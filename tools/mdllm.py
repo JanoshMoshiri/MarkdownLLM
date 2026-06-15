@@ -52,6 +52,8 @@ RESERVED_STATUSES = {
     "retrospective": ["draft", "complete"],
     "index": ["live", "stale"],
     "decision": ["made", "superseded"],
+    "workflow-definition": ["draft", "evolving", "stable", "deprecated"],
+    "workflow-run": ["active", "paused", "complete", "abandoned"],
 }
 
 # The universal default workflow vocabulary — applies when no domain schema
@@ -714,7 +716,7 @@ TIERS = {
         "domain-refresh.md", "session-memory.md", "belief-revision.md",
         "retrospective.md", "trigger-specification.md", "derived-index.md",
         "example-things.md", "reasoning-lenses.md", "provenance.md",
-        "change-reconciliation.md",
+        "change-reconciliation.md", "workflow-state.md",
     ],
 }
 
@@ -1252,6 +1254,47 @@ def cmd_kernel(args) -> int:
     return 0
 
 
+def _version_lt(a: str, b: str) -> bool:
+    """Semver-ish less-than over dotted numeric versions, tolerant of junk."""
+    def parts(v: str):
+        out = []
+        for chunk in str(v).split("."):
+            num = "".join(ch for ch in chunk if ch.isdigit())
+            out.append(int(num) if num else 0)
+        return out
+    pa, pb = parts(a), parts(b)
+    n = max(len(pa), len(pb))
+    pa += [0] * (n - len(pa))
+    pb += [0] * (n - len(pb))
+    return pa < pb
+
+
+def _upstream_sentinel_version(root: Path):
+    """Read the framework version from the *cached* upstream copy of
+    `.markdownllm` — git's remote-tracking objects, with no network call
+    (orchestration.md → session-start:version-check upward leg). Tries the
+    current branch's configured upstream first, then origin/main / origin/HEAD.
+    Returns the version string, or None when no fetched copy is available."""
+    refs = []
+    up = subprocess.run(["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}"],
+                        cwd=root, capture_output=True, text=True)
+    if up.returncode == 0 and up.stdout.strip():
+        refs.append(up.stdout.strip())
+    refs += ["origin/main", "origin/HEAD"]
+    for ref in refs:
+        show = subprocess.run(["git", "show", f"{ref}:.markdownllm"],
+                              cwd=root, capture_output=True, text=True)
+        if show.returncode == 0 and show.stdout.strip():
+            try:
+                data = yaml.safe_load(show.stdout) or {}
+            except yaml.YAMLError:
+                continue
+            v = data.get("version")
+            if v is not None:
+                return str(v)
+    return None
+
+
 def cmd_doctor(args) -> int:
     """Probe the environment the floor depends on. A floor/portability claim
     is verified only by executing the capability in the target environment
@@ -1330,7 +1373,26 @@ def cmd_doctor(args) -> int:
     sentinel = root / ".markdownllm"
     if sentinel.is_file():
         data = yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {}
-        report("OK", f"framework root — sentinel version {data.get('version')}")
+        local_v = str(data.get("version"))
+        report("OK", f"framework root — sentinel version {local_v}")
+        # Upstream leg (advisory, cached, non-blocking): compare the local
+        # sentinel against the *already-fetched* upstream copy. No live fetch —
+        # `git show` reads objects git already has (orchestration.md → upward
+        # leg). Never flips floor_ok: this coordinates humans, not integrity.
+        upstream_v = _upstream_sentinel_version(root)
+        if upstream_v is None:
+            report("--", "upstream version unknown — no fetched remote-tracking "
+                         "copy of .markdownllm (run `git fetch`, then `mdllm doctor`)")
+        elif upstream_v == local_v:
+            report("OK", f"framework current with published upstream {upstream_v} "
+                         f"(as of last fetch)")
+        elif _version_lt(local_v, upstream_v):
+            report("WARN", f"local framework is {local_v}; published upstream is "
+                           f"{upstream_v} (as of last fetch) — consider pulling. "
+                           f"Advisory only; does not block.")
+        else:
+            report("OK", f"local framework {local_v} is ahead of published upstream "
+                         f"{upstream_v} (unpushed work) — as of last fetch")
     else:
         agents = root / "AGENTS.md"
         meta = None

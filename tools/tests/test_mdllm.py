@@ -136,6 +136,15 @@ def test_reserved_statuses_cannot_be_redefined():
     assert allowed == ["active", "promoted", "dismissed"] and declared
 
 
+def test_workflow_types_are_reserved():
+    # workflow-definition / workflow-run carry fixed vocabularies a domain
+    # cannot redefine (reserve-but-draft: workflow-state.md).
+    allowed, declared = mdllm.valid_statuses_for("workflow-run", {"types": {"workflow-run": {"statuses": ["nope"]}}})
+    assert allowed == ["active", "paused", "complete", "abandoned"] and declared
+    allowed, declared = mdllm.valid_statuses_for("workflow-definition", None)
+    assert allowed == ["draft", "evolving", "stable", "deprecated"] and declared
+
+
 def test_declared_domain_vocabulary():
     schema = {"types": {"vat-return": {"statuses": ["open", "figures-ready"]}}}
     allowed, declared = mdllm.valid_statuses_for("vat-return", schema)

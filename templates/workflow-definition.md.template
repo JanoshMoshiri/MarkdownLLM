@@ -1,0 +1,46 @@
+---
+id: [process-name]-definition
+type: workflow-definition
+status: draft           # reserved: draft | evolving | stable | deprecated
+created: [ISO-date]
+# Stages as DATA, not prose. `to` lists the legal next stages — a graph with
+# cycles, not a linear sequence. An empty `to` marks a terminal stage.
+stages:
+  - id: [first-stage]
+    to: [[second-stage]]
+  - id: [second-stage]
+    to: [[third-stage], [first-stage]]   # may loop back
+  - id: [third-stage]
+    to: []                               # terminal
+linked_things:
+  - id: [a-filled-run-id]
+    relation: template-for
+---
+
+# [Process Name] — Definition
+
+A reusable skeleton for [what process this defines]. Runs of this process are
+`type: workflow-run` things that link here with `relation: instance-of` and
+carry a `current_stage` pointing at one of the stage ids above.
+
+## Stages
+
+**[first-stage]**
+- Entry criteria: [when a run enters this stage]
+- What it produces: [the deliverable or state change]
+- Exit / next: [what signals readiness to move, and to where]
+
+**[second-stage]**
+- Entry criteria: …
+- What it produces: …
+- Exit / next: … (note any rework loop back to [first-stage])
+
+**[third-stage] (terminal)**
+- Entry criteria: …
+- What "done" means for a run that reaches here
+
+## Notes
+
+The body is the definition's reason to change — entry/exit criteria, ownership,
+what each stage means. A run never edits this; it only advances its own cursor.
+Keep instance-specific data OUT of here (that belongs in the run).

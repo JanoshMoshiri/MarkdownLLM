@@ -35,3 +35,5 @@ relations:
   - subtask       # child of a project (drives the subtasks_complete trigger)
   - supports      # advances the referenced goal (domain-specific)
   - orchestrates  # workflow skill sequencing other skills (domain-specific)
+  - instance-of   # a workflow-run is an instance of a workflow-definition (workflow-state.md)
+  - template-for  # a workflow-definition is the skeleton for a filled run (workflow-state.md)

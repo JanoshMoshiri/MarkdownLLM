@@ -2,7 +2,7 @@
 id: domain-refresh-specification
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-19
 linked_things:
   - id: framework-discovery-specification
@@ -19,10 +19,11 @@ linked_things:
 
 ## What This Specifies
 
-This document defines how domain agents discover and absorb framework evolution. It covers two concerns:
+This document defines how domain agents discover and absorb framework evolution. It covers three concerns:
 
 1. **Deployment Architecture** — The nested git repository model that enables independent domain versioning within a shared framework
-2. **Refresh Process** — How a domain agent checks the framework for changes and updates its own understanding accordingly
+2. **Refresh Process** — How a domain agent checks the framework for changes and updates its own understanding accordingly (the *downward* leg: domain ← local framework)
+3. **Upstream Propagation** — How a domain agent surfaces when the *local framework copy itself* is behind its published source (the *upward* leg: local framework ← published source)
 
 ## Why This Exists
 
@@ -172,11 +173,28 @@ The domain AGENTS.md startup sequence (step 2 in the template) should include re
 ### On Startup
 1. Resolve `framework_root` from frontmatter
 2. Load foundational specs from framework root
-3. **Check framework version against `framework_version_seen`**
+3. **Check framework version against `framework_version_seen`** (downward leg)
 4. **If newer: surface to user that refresh is available**
-5. Load domain skills
-6. Evaluate triggers
+5. **Check the local framework against its cached upstream** (upward leg) — if behind, surface one advisory, non-blocking line
+6. Load domain skills
+7. Evaluate triggers
 ```
+
+## Upstream Propagation (The Upward Leg)
+
+The refresh process above is the *downward* leg: it keeps a domain current with the framework copy it inhabits. There is a symmetric concern one hop up the chain — *is the local framework copy itself behind its published source?* A framework that versions daily can drift weeks ahead of any given install, and today operators coordinate that update by hand.
+
+The fix is the same primitive, applied upward, and it is deliberately the **softest** of the version checks:
+
+- **Advisory, not blocking.** The downward leg protects *integrity* — stale assumptions can produce invalid things, so it validates before proceeding. The upward leg protects nothing; it only *coordinates humans*. It therefore surfaces a notification and lets the operator (the domain's expert) decide. It never gates a session.
+- **Cached, not live.** The check compares the local `.markdownllm` version against git's already-fetched remote-tracking copy (`git show origin/main:.markdownllm`). It does **not** perform a network fetch at session start — a hard network call in a harness that may have no network is the `portability-claims-need-execution-tests` trap. A deliberate `git fetch` followed by re-check is an explicit operator action, surfaced by `mdllm doctor`.
+- **Surfaced at session start.** The `session-start:version-check` hard hook (orchestration.md) runs both legs. The upward result is one advisory line when the local framework is behind: *"Local framework is v{local}; published upstream is v{upstream} (as of last fetch) — consider pulling."*
+
+### Mechanisation
+
+`mdllm doctor`, run at a framework root, reports the upstream leg directly: it reads the local sentinel, reads the cached upstream sentinel via `git show`, and prints OK / WARN / `--` (unknown — no fetched copy). It is the natural home for a deliberate fetch-and-recheck, because `doctor` is already the floor's "probe the environment" command and already reports the *downward* drift for wired domains.
+
+This leg intentionally adds no new persistent state and no new sentinel field: the local `.markdownllm` is the only version surface, and git's remote-tracking refs are the cache.
 
 ## Relationship To Other Specifications
 
