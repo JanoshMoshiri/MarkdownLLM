@@ -73,12 +73,21 @@ prevent.
 1. **Cue** — the driver declares an inflection: *this change is consequential.*
    This is the only non-mechanical beat, and the only one that initiates.
 
-2. **Assimilate** — gather the *complete* affected set in one pass, mechanically.
-   The substrate already exists: the `relationships` derived index supplies every
-   inbound `linked_things` edge; the `provenance` (reverse) index supplies every
-   decision pinned to the changed thing and every output derived from those
-   decisions. This is total recall, like a compiler listing every call site — it
-   decides nothing, it only reveals the shape.
+2. **Assimilate** — gather the *complete* affected set, mechanically, in two
+   passes of widening visibility:
+   - **Declared edges** — the `relationships` derived index supplies every inbound
+     `linked_things` edge; the `provenance` (reverse) index supplies every decision
+     pinned to the changed thing and every output derived from it. Total recall
+     over what is *declared*, like a compiler listing every call site.
+   - **Textual references** — then grep the corpus for the changed thing's `id` and
+     its canonical name(s). This lights the dependencies expressed in *prose* that
+     carry no declared edge — routing tables, cross-references, restatements: the
+     part of the dark region a literal-name search can reach. Like *find in files*
+     after *find all references*.
+
+   Both decide nothing; together they reveal the shape. What stays unlit after
+   both is the conceptual residue — only the Walk sees that (see Walking the Dark
+   Region).
 
 3. **Walk** — step through each touch point in turn, asking one question of each:
    *does this still hold, given what changed?* Three outcomes per point —
@@ -107,21 +116,26 @@ the signal that this is a primitive, not a checklist.
 
 ## Walking the Dark Region
 
-Assimilate is complete only over **declared** edges — the `linked_things`
-relations and `informed_by`/`derived-from` pins the `relationships` and
-`provenance` indexes can walk. Dependencies expressed in **prose** are invisible
-to them: routing tables, narrative cross-references, embedded lists, one thing
-named in another's body. These are the *dark region*. The indexes will report a
-clean, complete assimilation while a real dependency sits untouched in plain
-text.
+The dark region is the set of dependencies a change touches through **prose**
+rather than through a declared edge. It is not monolithic — it is tiered by how
+reachable each dependency is, and each tier has its own mechanical reach:
 
-This is not a defect to automate away — it is the structural reason the **Walk is
-human-backed**. The mechanical assimilate narrows the field and guarantees the
-*declared* set is complete; the expert is the irreducible backstop for the prose
-the machine cannot read. So when a change is significant, ask explicitly: *what
-refers to this in prose, not in frontmatter?* And shrink the dark region over time
-by promoting prose mentions into declared edges — the same reason the framework
-says to link rather than mention. Captured as the insight
+- **Declared edges** — `linked_things` relations and `informed_by`/`derived-from`
+  pins. The `relationships` and `provenance` indexes walk these in full.
+- **Literal references** — the thing's `id` or canonical name appearing as text in
+  another thing's body: routing tables, cross-references, restatements. A corpus
+  grep reaches these (the textual-trace step of Assimilate).
+- **Conceptual references** — a thing that reasons about the changed rule *without
+  naming it*. No mechanical pass reaches this; only the Walk does.
+
+The indexes plus grep narrow the dark region to that last tier — but never empty
+it. This is not a defect to automate away; it is the structural reason the **Walk
+is human-backed**. The mechanical assimilate guarantees the *declared* and
+*literally-named* sets are complete; the expert is the irreducible backstop for
+the conceptual residue the machine cannot read. So when a change is significant,
+still ask explicitly: *what reasons about this without naming it?* And shrink the
+region over time by promoting prose mentions into declared edges — the same reason
+the framework says to link rather than mention. Captured as the insight
 `mechanical-assimilation-is-blind-to-prose-dependencies`.
 
 ## Enforcement
@@ -130,7 +144,8 @@ The split follows the framework's standard division of labour:
 
 | Concern | Owner | Mechanism |
 |---|---|---|
-| The affected set is complete | Deterministic floor | `relationships` + `provenance` indexes (`derived-index.md`, `provenance.md`) |
+| The declared affected set is complete | Deterministic floor | `relationships` + `provenance` indexes (`derived-index.md`, `provenance.md`) |
+| Prose references the indexes miss | Deterministic floor (textual) | corpus grep for the thing's `id` and canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
 | Does each touch point still hold? | **Agent (semantic)** | `validate.thing.md` Layer 2 — the Walk |
