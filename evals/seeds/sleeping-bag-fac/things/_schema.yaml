@@ -1,0 +1,20 @@
+# Normative schema — Tarn & Fell Outfitters (synthetic eval domain)
+schema_version: 1
+domain: tarn-fell-fac
+
+types:
+  sleeping-bag:
+    statuses: [catalogued]
+    required_fields: [en_limit_celsius]
+  trip-plan:
+    statuses: [planned, assessed]
+    required_fields: [sleeper_sex, elevation_m, shelter, pad_r_value]
+  fac-assessment:
+    statuses: [draft, computed]
+
+relations:
+  - assesses
+  - references
+  - related
+  - informs
+  - derived-from

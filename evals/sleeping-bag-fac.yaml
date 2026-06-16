@@ -1,0 +1,68 @@
+name: Field-Adjusted Comfort (synthetic, unleakable rule)
+description: >
+  Stage 2 reasoning discriminator. Seed: Tarn & Fell Outfitters, a fictional
+  gear co-op with a proprietary Field-Adjusted Comfort (FAC) method that lives
+  ONLY in the seed AGENTS.md. The method adjusts a bag's EN Limit rating by
+  sleeper sex (+10 female), elevation (-1 per complete 800m above 1200m),
+  underside insulation (+4 if pad R-value below a surface-dependent threshold:
+  >=3.5 non-frozen / >=5.0 ice-snow / >=3.5 hammock regardless of being
+  off-ground), then rounds up (ceiling).
+
+  Five trip-plans, each isolating or combining a trap:
+    - trip-aonach-ridge   : female +10, 2400m (one 800m increment), pad 2.8<3.5 -> FAC  4.0
+    - trip-birch-hollow   : hammock inversion, pad 2.0<3.5 -> +4               -> FAC -1.0
+    - trip-glencoe-snowfield: snow threshold (pad 4.0 passes on soil, fails >=5.0) -> FAC -5.0
+    - trip-summit-bivvy   : -6.5 limit + ceil(1.5)=2, 2900m (two increments), hammock pad 5.0 OK -> FAC  2.0
+    - trip-lowland-meadow : control, no adjustments apply                       -> FAC -5.0
+
+  The discriminator is condition-neutral: the fac_celsius figures are
+  reconstructable only from the fictional FAC coefficients, which no training
+  data or web search contains. A bare agent, lacking the method, falls back to
+  the published EN Comfort rating or a plausible-but-wrong ad-hoc adjustment.
+  Naive EN-Comfort answers (-3, 0, -3, -1, 0) match none of the correct figures.
+  The hammock case (birch-hollow) discriminates on direction, not just
+  magnitude: the naive intuition (off the ground => no penalty) is inverted by
+  the rule (+4 penalty).
+seed: evals/seeds/sleeping-bag-fac
+prompt: |
+  Assess every trip-plan in things/, following the Field-Adjusted Comfort
+  method in AGENTS.md. Produce one fac-assessment thing per trip, with the
+  computed fac_celsius and status computed. Commit your changes as you go.
+bare_preamble: |
+  You are in a directory of markdown files with YAML frontmatter representing
+  the catalogue of Tarn & Fell Outfitters: sleeping-bag things (with EN/ISO
+  23537 Comfort, Limit and Extreme ratings) and trip-plan things (each naming a
+  sleeper's sex, the camp elevation in metres, the shelter and surface, the
+  sleeping-pad R-value, and the chosen bag). For each trip-plan, create a file
+  things/fac-<location>.md (the trip's id with the trip- prefix replaced by
+  fac-) with YAML frontmatter (id, type: fac-assessment, status, created,
+  fac_celsius) giving Tarn & Fell's Field-Adjusted Comfort temperature in whole
+  degrees Celsius for that sleeper, bag and conditions. Set status computed when
+  the figure is filled.
+assertions:
+  - thing_exists: fac-aonach-ridge
+  - status: { id: fac-aonach-ridge, equals: computed }
+  - field: { id: fac-aonach-ridge, name: fac_celsius, equals: 4.0 }
+  - link: { from: fac-aonach-ridge, relation: assesses, to: trip-aonach-ridge }
+
+  - thing_exists: fac-birch-hollow
+  - status: { id: fac-birch-hollow, equals: computed }
+  - field: { id: fac-birch-hollow, name: fac_celsius, equals: -1.0 }
+  - link: { from: fac-birch-hollow, relation: assesses, to: trip-birch-hollow }
+
+  - thing_exists: fac-glencoe-snowfield
+  - status: { id: fac-glencoe-snowfield, equals: computed }
+  - field: { id: fac-glencoe-snowfield, name: fac_celsius, equals: -5.0 }
+  - link: { from: fac-glencoe-snowfield, relation: assesses, to: trip-glencoe-snowfield }
+
+  - thing_exists: fac-summit-bivvy
+  - status: { id: fac-summit-bivvy, equals: computed }
+  - field: { id: fac-summit-bivvy, name: fac_celsius, equals: 2.0 }
+  - link: { from: fac-summit-bivvy, relation: assesses, to: trip-summit-bivvy }
+
+  - thing_exists: fac-lowland-meadow
+  - status: { id: fac-lowland-meadow, equals: computed }
+  - field: { id: fac-lowland-meadow, name: fac_celsius, equals: -5.0 }
+  - link: { from: fac-lowland-meadow, relation: assesses, to: trip-lowland-meadow }
+
+  - validates_clean: true
