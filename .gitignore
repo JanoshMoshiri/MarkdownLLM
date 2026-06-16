@@ -10,3 +10,4 @@ adapters/logs/
 evals/runs/
 __pycache__/
 .pytest_cache/
+domain/code-architect/
