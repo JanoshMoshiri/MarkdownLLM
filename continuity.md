@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.8
+version: 1.9
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-16
@@ -12,6 +12,34 @@ last_updated: 2026-06-16
 
 ## Open Threads
 
+- **Fourth review (2026-06-16, mechanical census) — shipped as 3.12.0, STAGED FOR
+  PUSH on branch `coherence-floor` (not yet on main):** full review at
+  `reviews/REVIEW-mechanical-census-2026-06-16.md`. It confirmed the
+  mechanical/semantic line is drawn correctly and found the real gap: the floor
+  *guaranteed* integrity at the commit boundary (`validate` in the hook) but left
+  generated-artifact freshness (`kernel`/`index` drift) and catalog coherence to
+  whether the agent remembered to run a command. New `mdllm coherence` mechanises
+  that slice, **corpus-general by design so domains inherit it** — general checks
+  (stable-staleness Info, dead-vocabulary Info, derived-index drift Error) run on
+  any corpus; framework-only checks (foundational_specs↔filesystem, TIERS↔catalog,
+  kernel drift) switch on at a `.markdownllm` root. Wired into `HOOK_BODY` as one
+  self-scoping line + CI; `kernel`/`index` refactored to share one body-builder
+  with coherence so the drift check cannot disagree with the generators. Also
+  retired two live contradictions (the `worklog-update` prompt now regenerates via
+  `mdllm worklog --write`; README no longer claims "no installation"). And `mdllm
+  doctor` gained a **hook-body freshness** check: `refresh --seal` bumps the
+  sentinel without reinstalling the hook, so doctor now flags an installed hook
+  that is stale vs the current `HOOK_BODY` (advisory). **Next:** (a) push/merge
+  the branch; (b) absorb into the live domains via `refresh` → `install-hook` →
+  `refresh --seal` (all three are behind: jmtm 3.6.0, eco 3.6.0, property 2.9;
+  absorption is near-invisible today — no indexes/`stable` skills/`.markdownllm`,
+  so coherence blocks nothing — the payoff is on-demand `mdllm coherence` and
+  automatic index-drift enforcement the day a domain deploys an index); (c) insight
+  candidate *existence ≠ currency — an installed/generated copy needs a freshness
+  check, not just an existence check* (generalises kernel/index/hook-body drift);
+  capture as a `type: insight` thing if it recurs; (d) Bucket 3 from the reviews
+  (sanitised validation record, `limitations.md`, cross-domain hand-off spec,
+  read-side quarantine) remains for the operator's later doc/evidence pass.
 - **Third independent review (2026-06-15) — action queue largely cleared:** full
   review at `reviews/REVIEW-independent-2026-06-15.md`. Items 1–2 shipped as
   **3.8.0** (the `workflow-state` primitive — `workflow-definition` + `workflow-run`,

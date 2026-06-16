@@ -15,6 +15,11 @@ linked_things:
 
 ## 2026-06-16 — in progress
 
+- `0902c1181` docs: add mechanical-census review (2026-06-16) — the review the coherence floor acts on
+- `a0070c921` update: mdllm doctor checks hook-body freshness — closes the sealed-but-stale-hook gap
+
+## 2026-06-16 — session-end: session 8 (16 Jun) — coherence floor closes the enforcement gap (v3.12.0)
+
 - `cf8f51c1a` create: mdllm coherence — corpus-general dark-region floor, wired into the commit boundary
 - `a211bdfe4` docs: CHANGELOG 3.12.0 + sentinel/AGENTS bump (coherence floor), kernel regen
 
