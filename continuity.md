@@ -2,10 +2,10 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.9
+version: 1.10
 created: 2026-06-11
 domain: markdownllm-framework
-last_updated: 2026-06-16
+last_updated: 2026-06-17
 ---
 
 # Framework Continuity Brief
@@ -124,17 +124,25 @@ last_updated: 2026-06-16
   link graph, floor mapping), but domains have skills and live things where
   the framework has specs. Explicitly deferred by the operator (2026-06-11,
   session 7) to a future session.
-- **Harder fixture + claim-language pass (next session's centerpiece):** the
-  full 2×2 ran (2026-06-11, 20 trials, see Decisions) but the fixture's
-  reasoning core saturated — every cell got the figures right, all variance
-  was the asymmetric `has-deadline` link. Two follow-ups: (1) design a
-  fixture whose condition-neutral core discriminates (candidates: partial
-  exemption, multi-quarter with conflicting/duplicate records, an
-  amendment/belief-revision flow, distractor things), then re-run the 2×2;
-  (2) **done in 3.9.0 for the manifesto + AGENTS principle 9** (model-tier claim
-  demoted to explicit hypothesis, utility kept distinct) — the README "The result:"
-  line may still need the same softening. See
-  `first-2x2-measured-convention-following-not-reasoning`.
+- **Harder fixture + claim-language pass — DONE (2026-06-17), with two findings:**
+  `sleeping-bag-fac` built (unleakable synthetic Field-Adjusted Comfort rule) and
+  the full 2×2 run. The reasoning core *discriminated* this time: **condition
+  decided the figures (framework 5/5 both models, bare 0/5 both), model tier only
+  decided the convention layer** (opus canonical links 21/21, haiku mis-keyed
+  16/21). Closes `first-2x2-measured-convention-following-not-reasoning`; captured
+  as `structure-decides-figures-scale-decides-convention`. Manifesto reworded to
+  v2.4 (the **Thesis** added as the headline; model-tier demoted from central
+  hypothesis to efficiency *corollary*; pre-floor cold-MVP anecdote retired).
+  **Two open follow-ups:** (1) **the bare control leaks** — an uninterrupted
+  opus-bare trial read the withheld method from `evals/seeds/.../AGENTS.md` inside
+  the repo and scored 16/21 (excluded under `results/excluded/`); bare workspaces
+  need real isolation (run outside the repo tree / OS sandbox), `--add-dir`
+  withheld is not sufficient — foreseen, deploy when felt; see
+  `withholding-is-not-isolation`. (2) **the longitudinal floor test** — this was
+  single-shot; the drift-resistance half of the thesis still needs a
+  multi-session fixture (the sleeping-bag rule is reusable as a component). Do
+  **not** re-run the 2×2 to "fix" the leak — the leaked trial is itself the
+  finding (operator's call, 2026-06-17).
 - **Tier 2 kernel blocks:** session-memory, belief-revision, provenance,
   triggers, derived-index — low priority (demand-loaded anyway).
 - **First jmtm decision-record filing:** annual accounts due 2026-07-31 —
@@ -200,11 +208,42 @@ last_updated: 2026-06-16
   `relationships` index must emit it or reverse recall goes blind. The sharper,
   lit-region sibling of `mechanical-assimilation-is-blind-to-prose-dependencies`:
   a forward resolver and a reverse index are two obligations, not one.
+- `structure-decides-figures-scale-decides-convention` — the sleeping-bag 2×2
+  result: structure is the deciding variable for reasoning correctness, model
+  tier is secondary and lands only in convention-adherence; closes the first-2×2
+  loop and supports the v2.4 thesis over the demoted model-tier corollary.
+- `withholding-is-not-isolation` — a control that removes information from the
+  agent's view but leaves it discoverable on the filesystem is defeated by a
+  capable agent; an opus-bare trial read the withheld seed `AGENTS.md` and said
+  so. A property of capability, not a defect — bare evals need real isolation.
+- `mis-keyed-links-pass-the-floor-silently` — an agent without a `linked_things`
+  exemplar writes relations under a near-miss key (`relations:`) that `validate`
+  ignores with no error; the declared edge is silently lost. Candidate
+  corpus-general floor Warning.
 - Remaining active insights in `things/insights/` inform spec-level detail.
 
 ## Pending Decisions
 
 - (none)
+
+## Decisions Made This Session (2026-06-17)
+
+- **Manifesto reworded to v2.4 — the Thesis became the headline:** the spine is
+  now *a reasoning processor inside a loosely-coupled software engine, for
+  consistency/auditability/integrity/drift-resistance, not determinism*. The
+  weak "structure beats scale" claim (largely already established) was demoted
+  from central hypothesis to an efficiency **corollary**; claims re-tiered into
+  thesis / utility / model-tier; the pre-floor cold-MVP anecdote retired as
+  evidence (the framework is not argued from anecdote).
+- **Pre-floor adoption anecdotes deliberately not recorded** (operator's call):
+  the brother's trading-platform domain and the eco-essentials warm-start both
+  ran on the superseded pre-floor architecture; held for a clean, sourced,
+  post-floor cold-start rather than banked as unverifiable testimony.
+- **The bare-control leak kept as a result, not re-run away** (operator's call):
+  a frontier model defeating a withhold-by-placement control is a valuable,
+  expected-to-intensify finding; re-running would discard it. Recorded as
+  `withholding-is-not-isolation`; the isolation hardening is foreseen, deployed
+  when felt.
 
 ## Decisions Made This Session (2026-06-16, session 7)
 

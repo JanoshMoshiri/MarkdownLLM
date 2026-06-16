@@ -1,0 +1,11 @@
+{
+  "run_id": "20260616-234603-haiku-fw-t2",
+  "fixture": "Field-Adjusted Comfort (synthetic, unleakable rule)",
+  "model": "haiku",
+  "condition": "framework",
+  "passed": 16,
+  "failed": 5,
+  "wall_s": 77,
+  "cost_usd": 0.11449279999999999,
+  "turns": 22
+}

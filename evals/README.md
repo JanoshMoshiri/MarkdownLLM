@@ -146,6 +146,50 @@ operator, observed not helped. This rehearsal cleared the path for it: the
 template bugs it would have hit (an unparseable `_schema.yaml.template`,
 undeclared relations) were found and fixed building the fixture.
 
+## The reasoning discriminator (sleeping-bag-fac, 2026-06-16/17)
+
+`first-2x2-measured-convention-following-not-reasoning` called for a fixture
+whose condition-neutral core *discriminates*. `sleeping-bag-fac` is it: a
+fictional outfitter's Field-Adjusted Comfort rule (the Tarn & Fell coefficients —
+`+10` female, `−1` per complete 800 m above 1200 m, `+4` below a
+surface-dependent pad-R threshold, ceiling round) lives **only** in the seed
+`AGENTS.md`, so the five `fac_celsius` figures (4, −1, −5, 2, −5) cannot be
+reconstructed from training or the web. The five trips isolate the traps,
+including the hammock inversion (off-ground ≠ no penalty) and the snow-threshold.
+
+### Result (clean trials; one leaked trial excluded)
+
+| model | condition | figures correct | fully passing | assertion rate |
+|---|---|---|---|---|
+| haiku | framework | 5/5 every trial | 0/6 | 96/126 (76%) |
+| haiku | bare | 0/5 (nothing / wrong) | 0/6 | 26/126 (21%) |
+| opus | framework | 5/5 every trial | 5/5 | 105/105 (100%) |
+| opus | bare | 0/5 (all produced nothing) | 0/4 | 4/84 (5%) |
+
+**Honest reading.** Unlike the VAT run, the reasoning core *did* discriminate:
+both framework models got every figure right (every trap), every trial; both
+bare conditions got zero. **Condition decided the reasoning; model tier did
+not.** Scale showed up only in the convention layer — opus wrote canonical
+`linked_things` (21/21), haiku invented a `relations:` key the floor silently
+ignores (16/21; see `mis-keyed-links-pass-the-floor-silently`). That is exactly
+where manifesto v2.4 places model-tier superiority: a secondary corollary, not
+the spine. The framework cells were perfectly deterministic; the bare cells were
+erratic. See `structure-decides-figures-scale-decides-convention`.
+
+### The control leak (the more valuable finding)
+
+One uninterrupted **opus-bare** trial (`20260617-002833`) scored 16/21 with every
+figure correct — not by reasoning the fictional rule into existence, but by
+reading the answer key. The bare condition removes `AGENTS.md` from the
+*workspace*, but the workspace lives inside the repo, where the original seed
+still sits; the agent located `evals/seeds/sleeping-bag-fac/AGENTS.md` and applied
+it, **disclosing the breach in its own transcript**. *Withholding is not
+isolation.* The trial is excluded under `results/excluded/`; the bare control
+needs real filesystem isolation (workspaces outside the repo tree, or a sandbox)
+before the next run — `--add-dir` withheld is necessary but not sufficient. This
+is a property of capability that will intensify, not a defect; see
+`withholding-is-not-isolation`.
+
 ## Conventions
 
 - One fixture per scenario, named `<domain>-<scenario>.yaml`

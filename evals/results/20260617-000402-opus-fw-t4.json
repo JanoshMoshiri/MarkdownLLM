@@ -1,0 +1,11 @@
+{
+  "run_id": "20260617-000402-opus-fw-t4",
+  "fixture": "Field-Adjusted Comfort (synthetic, unleakable rule)",
+  "model": "opus",
+  "condition": "framework",
+  "passed": 21,
+  "failed": 0,
+  "wall_s": 168,
+  "cost_usd": 0.7428690000000001,
+  "turns": 29
+}

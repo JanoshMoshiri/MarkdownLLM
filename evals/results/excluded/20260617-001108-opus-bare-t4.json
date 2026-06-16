@@ -1,0 +1,11 @@
+{
+  "run_id": "20260617-001108-opus-bare-t4",
+  "fixture": "Field-Adjusted Comfort (synthetic, unleakable rule)",
+  "model": "opus",
+  "condition": "bare",
+  "passed": 1,
+  "failed": 20,
+  "wall_s": 3,
+  "cost_usd": 0,
+  "turns": 1
+}
