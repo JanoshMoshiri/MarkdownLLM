@@ -19,6 +19,8 @@ linked_things:
     relation: complements
   - id: tracking-artifacts-can-drift-from-reality
     relation: implements
+  - id: structural-pointers-need-reverse-edge-indexing
+    relation: implements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -35,10 +37,12 @@ The four reflexive behaviours the framework wants are all the same shape:
 |---|---|---|
 | Systematic trigger evaluation | Every active trigger across all things | `triggers` index |
 | Schema coherence review | Every domain-specific frontmatter field in use | `schema` registry |
-| Systematic conflict scanning | Every `linked_things` edge | `relationships` index |
+| Systematic conflict scanning | Every declared edge — `linked_things` plus the structural pointers `definition`/`parent` | `relationships` index |
 | Domain velocity | *(none — reads git directly)* | no index needed |
 
 The first three are instances of one primitive defined here. The fourth — velocity — is deliberately *not* an index: it reads `git log` (already ground truth), so caching it would add a drift surface for no benefit. See `git-workflow.md` → Git Log As Domain Telemetry.
+
+The `relationships` index aggregates **every declared edge, wherever it lives** — not only `linked_things` relations but the singular structural pointers that earn their own field (`parent`, `definition`, modelled on `parent`). A declared edge in a structural field is no less declared than one in `linked_things`; omitting it would leave a reverse read over the index blind to a parent's children and a definition's runs, which is exactly the recall the change-reconciliation Assimilate beat depends on. The rule is general: any future singular load-bearing pointer added to the schema must also be emitted here, or it becomes an unwalked declared edge. See `structural-pointers-need-reverse-edge-indexing`.
 
 ## The Drift Problem This Must Not Repeat
 

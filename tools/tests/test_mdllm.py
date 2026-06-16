@@ -395,6 +395,26 @@ def test_kernel_block_extraction():
     assert [b.strip() for b in mdllm.KERNEL_RE.findall(text)] == ["rule one", "rule two"]
 
 
+def test_relationships_index_walks_structural_pointers(tmp_path):
+    # The relationships index must emit the singular structural pointers
+    # (`definition`, `parent`), not only `linked_things` — otherwise the
+    # change-reconciliation Assimilate beat is blind to a definition's runs and a
+    # parent's children. (structural-pointers-need-reverse-edge-indexing)
+    write(tmp_path, "things/proc.md", thing_text(
+        "id: proc\ntype: workflow-definition\nstatus: stable\ncreated: 2026-06-16\n"
+        "stages:\n  - id: intake\n    to: []", "# Proc\n\nA process.\n"))
+    write(tmp_path, "things/run.md", thing_text(
+        "id: run\ntype: workflow-run\nstatus: active\ncreated: 2026-06-16\n"
+        "definition: proc\ncurrent_stage: intake", "# Run\n\nA run.\n"))
+    write(tmp_path, "things/child.md", thing_text(
+        "id: child\ntype: task\nstatus: in-progress\ncreated: 2026-06-16\n"
+        "parent: proc"))
+    corpus, _ = scan(tmp_path)
+    body, _ = mdllm.build_index_body(corpus, "relationships")
+    assert "- run --definition--> proc" in body
+    assert "- child --parent--> proc" in body
+
+
 def test_provenance_index_reverse_map(tmp_path):
     write(tmp_path, "things/k.md", thing_text(GOOD.replace("alpha", "k")))
     write(tmp_path, "things/d.md", thing_text(

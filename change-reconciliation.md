@@ -21,6 +21,8 @@ linked_things:
     relation: implements
   - id: mechanical-assimilation-is-blind-to-prose-dependencies
     relation: implements
+  - id: structural-pointers-need-reverse-edge-indexing
+    relation: implements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -77,9 +79,13 @@ prevent.
 2. **Assimilate** — gather the *complete* affected set, mechanically, in two
    passes of widening visibility:
    - **Declared edges** — the `relationships` derived index supplies every inbound
-     `linked_things` edge; the `provenance` (reverse) index supplies every decision
-     pinned to the changed thing and every output derived from it. Total recall
-     over what is *declared*, like a compiler listing every call site.
+     `linked_things` edge *and* every inbound structural pointer (`definition`,
+     `parent`) — the singular load-bearing fields that name exactly one target
+     without being a `linked_things` relation, so a definition's runs and a parent's
+     children are recalled, not just `linked_things` dependents; the `provenance`
+     (reverse) index supplies every decision pinned to the changed thing and every
+     output derived from it. Total recall over what is *declared*, like a compiler
+     listing every call site.
    - **Textual references** — then grep the corpus for the changed thing's `id` and
      its canonical name(s). This lights the dependencies expressed in *prose* that
      carry no declared edge — routing tables, cross-references, restatements: the
@@ -121,8 +127,10 @@ The dark region is the set of dependencies a change touches through **prose**
 rather than through a declared edge. It is not monolithic — it is tiered by how
 reachable each dependency is, and each tier has its own mechanical reach:
 
-- **Declared edges** — `linked_things` relations and `informed_by`/`derived-from`
-  pins. The `relationships` and `provenance` indexes walk these in full.
+- **Declared edges** — `linked_things` relations, the singular structural pointers
+  (`definition`, `parent`), and `informed_by`/`derived-from` pins. The
+  `relationships` and `provenance` indexes walk these in full — a declared edge is
+  walked wherever it lives, whether in `linked_things` or in its own structural field.
 - **Literal references** — the thing's `id` or canonical name appearing as text in
   another thing's body: routing tables, cross-references, restatements. A corpus
   grep reaches these (the textual-trace step of Assimilate).
@@ -197,7 +205,7 @@ The split follows the framework's standard division of labour:
 
 | Concern | Owner | Mechanism |
 |---|---|---|
-| The declared affected set is complete | Deterministic floor | `relationships` + `provenance` indexes (`derived-index.md`, `provenance.md`) |
+| The declared affected set is complete | Deterministic floor | `relationships` (incl. structural `definition`/`parent` pointers) + `provenance` indexes (`derived-index.md`, `provenance.md`) |
 | Prose references the indexes miss | Deterministic floor (textual) | corpus grep for the thing's `id` and canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
