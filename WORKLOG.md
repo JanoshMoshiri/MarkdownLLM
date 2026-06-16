@@ -15,6 +15,11 @@ linked_things:
 
 ## 2026-06-16 — in progress
 
+- `cf8f51c1a` create: mdllm coherence — corpus-general dark-region floor, wired into the commit boundary
+- `a211bdfe4` docs: CHANGELOG 3.12.0 + sentinel/AGENTS bump (coherence floor), kernel regen
+
+## 2026-06-16 — session-end: session 7 (16 Jun) — reverse-edge indexing for structural pointers (v3.11.0)
+
 - `e29afcfe8` update: harden workflow-state from independent second review (v3.10.0)
 - `b2bc5e5c7` update: index structural pointers for reverse-edge recall + worklog portability fix (v3.11.0)
 
