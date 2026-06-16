@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: stable
-version: 2.3
+version: 2.4
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
@@ -43,6 +43,16 @@ What changed is the notation, and with it the reader of the notation. A compiler
 This is why the old discipline still governs the new medium. Clean Architecture and SOLID are not loose analogies borrowed for flavour — they apply because this is literally the same kind of artifact they were always about. The paradigm did not abolish software engineering. It freed software from the demand that its notation be mechanically parsable, and moved the leverage from *making the syntax precise enough to compile* to *making the definition clear enough to reason within*.
 
 See `the-notation-changed-not-the-primitives` for the canonical articulation.
+
+## The Thesis
+
+Strip the framework to one sentence: **treat the language model as a reasoning processor, and build a loosely-coupled, modular software engine around it — so that a non-deterministic processor yields a system that is consistent, auditable, and resistant to drift.**
+
+The goal is not to make the model deterministic. It cannot be, and pretending otherwise is the mistake. The goal is to surround a non-deterministic processor with the structures that make *any* software system maintainable, extensible, and long-lived — clear boundaries, modular units, explicit state, version control, enforced invariants — so that the **system** holds the properties the **processor** cannot guarantee alone.
+
+This is a synthesis, not a trade-off. The model brings what software never had: reasoning over ambiguity, weighing context, revising its own understanding. Software engineering brings what a model alone never has: consistency across time, an audit trail, integrity that does not depend on the processor *remembering* to be careful, and mechanisms that catch drift before it compounds — preventing it where the failure is mechanical, surfacing it for correction where the failure is semantic. The bet is that these combine — reasoning *and* engineering discipline at once — and that the whole is worth more than either part.
+
+That bet is what the framework exists to prove. Everything else in this document — the three decoupled layers, atomic things, git as the state machine, the deterministic floor — is machinery in service of it. To build or extend a domain is to build another instance of that machinery: structure placed around a reasoning processor so the system stays trustworthy over time.
 
 ## Origins and Influences
 
@@ -247,7 +257,7 @@ Git preserves all of it. You have a complete audit trail and history.
 
 **Auditing.** Everything is transparent and versioned at three layers: your session worklog captures intent and decisions; git log captures state changes with structured commit messages; git diff captures the exact modifications. Together, these provide complete traceability — from why a decision was made, through what changed, down to the specific bytes that were modified. No black boxes. No lost context.
 
-## Elegant Constraint Enables Efficiency
+## Corollary: Elegant Constraint Enables Efficiency
 
 There's a common assumption in the LLM space: bigger models are always better. More parameters, more tokens, more compute.
 
@@ -271,12 +281,13 @@ This has profound implications:
 
 **Sustainability.** Less compute means less power consumption. It's better for the environment and your infrastructure costs.
 
-The insight is this: **elegant constraint is more powerful than raw capability.** The claim, stated carefully: a smaller model operating within a well-defined system can match or outperform a larger model operating without structure.
+This corollary follows from the thesis. If the structure carries the domain's definition, explicit rules, and state, the processor is not asked to invent the system and reason within it at once — so a smaller, cheaper, faster model can do work an unstructured larger model cannot do reliably. **Elegant constraint can substitute for raw capability.** But this is a corollary about efficiency, not the spine — and it must not be mistaken for the central claim.
 
-Two claims must be kept apart here, because the framework has good evidence for one and not the other:
+Three claims must be kept apart, because the framework has different evidence for each:
 
-- **Utility — well-evidenced.** That the framework delivers real value is no longer in question: it is in production use, and at least one independent operator adopted it cold and carried a domain through to a marketed MVP. Structure buying determinism and consistency across sessions and vendors is demonstrated.
-- **Model-tier superiority — a hypothesis, still open.** That a *smaller* model with structure beats a *larger* one without it is the framework's central **hypothesis**, not a result. It rests on one eval (2026-06-11, `evals/README.md`) whose reasoning core *saturated* — the task was not discriminating enough to separate the conditions on reasoning quality, only on cost and determinism. The capability half of the claim stays untested until a harder, non-saturating fixture exists. Do not cite it as proven.
+- **The thesis — partially evidenced.** That structure gives a reasoning processor software-grade properties — consistency, auditability, integrity, drift-resistance — is the central claim. The mechanical half is demonstrated: the deterministic floor enforces integrity at the commit boundary and is covered by its own self-test suite. The longitudinal half — that a structured domain resists and corrects drift *across many sessions* where an unstructured one rots — is designed but not yet measured by a multi-session eval. Claim it as far as the floor reaches; no further.
+- **Utility — evidenced.** The framework delivers real value: it is in production use across live domains and hosts its own development as a domain. Structure buying consistency across sessions and vendors is demonstrated in that use. (Earlier external-adoption anecdotes — pre-floor and unverified — are deliberately held back and not cited as evidence; the framework is not argued from anecdote.)
+- **Model-tier superiority — a secondary, still-open hypothesis.** That a *smaller* model with structure beats a *larger* one without it is the efficiency corollary above — and its general form is already well-supported in the broader literature, so re-proving it adds little. The framework's own test of it rests on one eval (2026-06-11, `evals/README.md`) whose reasoning core *saturated*: the task separated the conditions only on cost and determinism, not reasoning quality. It stays untested until a harder, non-saturating fixture exists. Do not cite it as proven.
 
 This is about shifting the optimization target. Instead of "how do we build more powerful models," ask "how do we design systems that enable smaller models to be effective." The answer is clarity, structure, and constraint.
 
