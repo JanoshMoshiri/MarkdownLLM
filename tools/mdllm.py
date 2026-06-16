@@ -1712,6 +1712,24 @@ def cmd_doctor(args) -> int:
             report("FAIL", "pre-commit hook not installed — run `mdllm install-hook .`")
             floor_ok = False
         else:
+            # Body freshness: the installed hook is a copy frozen at install
+            # time. A domain that sealed to a newer framework but never re-ran
+            # install-hook keeps an older HOOK_BODY — the version sentinel then
+            # claims an enforcement level the hook does not actually run (e.g.
+            # `coherence` missing). Compare the copy against what install-hook
+            # would write now. Advisory, not fatal: the hook still runs
+            # `validate`, so the floor is active — just not current.
+            import os
+            try:
+                rel = Path(os.path.relpath(Path(__file__).resolve(), root)).as_posix()
+            except ValueError:
+                rel = Path(__file__).resolve().as_posix()
+            installed = hook.read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+            if installed != HOOK_BODY.format(rel=rel).replace("\r\n", "\n").strip():
+                report("WARN", "pre-commit hook body is STALE vs the current mdllm "
+                               "HOOK_BODY — re-run `mdllm install-hook` to pick up "
+                               "newer checks (the sentinel may claim enforcement the "
+                               "hook does not run)")
             run = subprocess.run(["git", "hook", "run", "pre-commit"], cwd=root,
                                  capture_output=True, text=True)
             if "is not a git command" in (run.stderr or ""):

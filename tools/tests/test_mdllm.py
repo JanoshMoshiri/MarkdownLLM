@@ -531,6 +531,26 @@ def test_doctor_floor_active_with_hook(tmp_path, capsys):
     assert rc == 0 and "FLOOR ACTIVE" in out and "EXECUTES" in out
 
 
+def test_doctor_warns_on_stale_hook_body(tmp_path, capsys):
+    # A hook installed at an older HOOK_BODY (here simulated by tampering) must
+    # be flagged — a domain that sealed to a newer framework without re-running
+    # install-hook is exactly this case. Advisory: floor stays active (rc 0).
+    import pytest
+    if not _git_supports_hook_run():
+        pytest.skip("git < 2.36 — doctor cannot execution-test the hook")
+    _git_repo(tmp_path)
+    write(tmp_path, "things/alpha.md", thing_text(GOOD))
+    mdllm.cmd_install_hook(_ns(path=str(tmp_path)))
+    hook = tmp_path / ".git" / "hooks" / "pre-commit"
+    # Differ from the current HOOK_BODY without breaking execution (a trailing
+    # comment) — models an older but still-runnable hook.
+    hook.write_text(hook.read_text(encoding="utf-8") + "# older-body marker\n",
+                    encoding="utf-8", newline="\n")
+    rc = mdllm.cmd_doctor(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert rc == 0 and "hook body is STALE" in out and "FLOOR ACTIVE" in out
+
+
 def test_assertions_scaffold_failures(tmp_path):
     fixture = {"domain_dir": "nope", "assertions": [
         {"file_exists": "nope/AGENTS.md"},

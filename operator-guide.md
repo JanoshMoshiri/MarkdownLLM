@@ -169,7 +169,7 @@ CI, or the agent — but all of them are yours to invoke directly.
 | `worklog [path] [--write]` | Generates WORKLOG.md from the commit stream (sessions split on `session-end:` commits) | Keeping the session log current without hand-maintaining it |
 | `refresh <domain> [--seal]` | Floor-only domain refresh: reports the version delta + unseen CHANGELOG entries; `--seal` bumps `framework_version_seen` after adoption | Bringing a stale domain current with the framework |
 | `install-hook [path]` | Installs the git pre-commit validation hook | Once per domain repo, at floor adoption |
-| `doctor [path]` | Probes the environment: prerequisites, hook *execution*, framework version drift (downward + upstream); exit 1 = degraded mode | New machine, new harness, or "is the floor actually on here?" |
+| `doctor [path]` | Probes the environment: prerequisites, hook *execution* and *body freshness* (is the installed hook current with `HOOK_BODY`?), framework version drift (downward + upstream); exit 1 = degraded mode | New machine, new harness, after a refresh, or "is the floor actually on here?" |
 | `scaffold <path>` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, hook, first commit | Creating a new domain — the mechanical half is one command |
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
