@@ -25,3 +25,5 @@ jobs:
         run: python tools/mdllm.py kernel . --check
       - name: Index drift
         run: python tools/mdllm.py index . check
+      - name: Catalog & label coherence (same checks the pre-commit hook runs)
+        run: python tools/mdllm.py coherence .

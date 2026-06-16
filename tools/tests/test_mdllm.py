@@ -541,3 +541,73 @@ def test_assertions_scaffold_failures(tmp_path):
     ]}
     passed, failed, _ = mdllm.check_assertions(fixture, tmp_path)
     assert (passed, failed) == (0, 5)
+
+
+# ---------------------------------------------------------------- coherence
+
+
+def test_coherence_unused_vocabulary_is_info(tmp_path):
+    # General check (no sentinel needed) — a domain's own _schema.yaml is its
+    # spec of its types, so this is the check a domain inherits.
+    write(tmp_path, "_schema.yaml",
+          "types:\n  used-type:\n    statuses: [a]\n"
+          "  ghost-type:\n    statuses: [b]\n")
+    write(tmp_path, "things/x.md", thing_text(
+        "id: x\ntype: used-type\nstatus: a\ncreated: 2026-06-01"))
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert any("declared type `ghost-type` is used by no thing" in m for m in infos)
+    assert not any("`used-type`" in m for m in infos)
+
+
+def test_coherence_domain_skips_framework_checks(tmp_path):
+    # No .markdownllm => general checks only. A missing kernel.md must NOT error
+    # here (a domain has no kernel) — the proof the hook is safe in a domain.
+    write(tmp_path, "things/x.md", thing_text(GOOD))
+    msgs = messages(mdllm.coherence_findings(tmp_path, 15))
+    assert not any("kernel" in m.lower() for m in msgs)
+    assert not any("foundational_specs" in m for m in msgs)
+
+
+def test_coherence_missing_foundational_spec_errors(tmp_path):
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\n"
+          "foundational_specs:\n  - present.md\n  - absent.md\n")
+    write(tmp_path, "present.md", "# Present\n")
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert any("`absent.md` listed in .markdownllm but not present" in m for m in errs)
+    assert not any("`present.md`" in m for m in errs)
+
+
+def test_coherence_tiers_warns_spec_without_tier_entry(tmp_path):
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\nfoundational_specs:\n  - not-in-tiers.md\n")
+    write(tmp_path, "not-in-tiers.md", "# x\n")
+    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
+    assert any("no entry in the TIERS map" in m for m in warns)
+
+
+def test_coherence_stable_staleness_is_info(tmp_path):
+    import subprocess
+    _git_repo(tmp_path)
+    spec = ("id: spec\ntype: specification\nstatus: stable\ncreated: 2026-06-01")
+    write(tmp_path, "things/spec.md", thing_text(spec))
+    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "add spec"], cwd=tmp_path, check=True)
+    write(tmp_path, "things/spec.md", thing_text(spec, "# Spec\n\nEdited.\n"))
+    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "edit spec"], cwd=tmp_path, check=True)
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert any("marked `stable` but changed" in m for m in infos)
+
+
+def test_coherence_index_drift_errors(tmp_path):
+    write(tmp_path, "things/a.md", thing_text(
+        GOOD + "linked_things:\n  - id: b\n    relation: relates-to"))
+    write(tmp_path, "things/b.md", thing_text(
+        "id: b\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    mdllm.cmd_index(_ns(path=str(tmp_path), action="rebuild", signal="relationships"))
+    # mutate the relationship so the stored index is now stale
+    write(tmp_path, "things/a.md", thing_text(
+        GOOD + "linked_things:\n  - id: b\n    relation: supersedes"))
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert any("DRIFT" in m for m in errs)

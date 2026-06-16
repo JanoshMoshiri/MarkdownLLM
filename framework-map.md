@@ -66,7 +66,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>13 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>14 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -185,6 +185,7 @@ flowchart LR
         C11["scaffold"]
         C12["worklog"]
         C13["refresh"]
+        C14["coherence"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -200,6 +201,7 @@ flowchart LR
         T11["pre-domain-scaffold:isolate<br/>hard hook"]
         T12["WORKLOG.md"]
         T13["domain-refresh.md"]
+        T14["change-reconciliation.md<br/>dark-region walk (catalog slice)"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -215,6 +217,7 @@ flowchart LR
     C11 -->|mechanises| T11
     C12 -.->|generates| T12
     C13 -->|"reports drift for"| T13
+    C14 -->|"mechanises catalog slice of"| T14
 ```
 
 Notes on this view:

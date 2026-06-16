@@ -56,7 +56,7 @@ Git captures every state change
 Every future session starts from full context — and you continue
 ```
 
-There is no setup step. There is no installation. The framework is a set of files that an agent discovers and uses.
+The knowledge layer needs no installation — it's a set of files an agent discovers and uses. The deterministic floor that enforces integrity at every commit does have prerequisites, installed once per repo: git, Python 3.10+, PyYAML, and the pre-commit hook (`mdllm install-hook`). See [`first-hour.md`](first-hour.md) for the real setup.
 
 But "discovers and uses" doesn't mean the agent runs on its own. You are in the loop at every meaningful point: defining what gets built, deciding how workflows should run, using the output, and feeding back what needs to change. The agent provides the structural discipline and reasoning consistency. You provide the direction, the domain expertise, and the judgment.
 

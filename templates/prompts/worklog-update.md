@@ -2,18 +2,14 @@
 id: worklog-update
 type: prompt
 status: stable
-version: 1.0
+version: 2.0
 created: 2026-05-28
 inputs:
-  - name: session-conversation
-    description: "The full session dialogue — work done, decisions made, topics discussed"
-  - name: current-worklog
-    description: "The domain's current WORKLOG.md"
   - name: current-date
-    description: "Today's date for the session heading"
+    description: "Today's date — for confirming the regenerated session heading"
 outputs:
-  - name: updated-worklog
-    description: "WORKLOG.md appended with this session's entry"
+  - name: regenerated-worklog
+    description: "WORKLOG.md regenerated from the commit stream and committed"
 bound_to:
   - hook: session-end
 linked_things:
@@ -27,59 +23,48 @@ linked_things:
 
 ## Purpose
 
-At the end of a session, append a structured entry to `WORKLOG.md` summarising what was done. The WORKLOG is retrospective — it records what happened, not what's still live. It serves as an audit trail and historical record.
+At the end of a session, regenerate `WORKLOG.md` so it reflects the session's
+commits. The WORKLOG is a **generated** artifact — `mdllm worklog` derives it
+from the commit stream (sessions delimited by `session-end:` commits; full
+detail lives in `git log`). It is never hand-edited. This prompt is the
+session-end reminder to regenerate it, not an instruction to author it.
+
+The WORKLOG records what happened, not what's still live — the continuity brief
+(`session-end-continuity`) carries forward state; this is the retrospective
+index over the commit history.
 
 ## Reasoning Template
 
-### 1. Identify The Session's Work
+### 1. Commit The Session's Work First
 
-Scan the session for:
-- Topics discussed or worked on
-- Decisions made (and their rationale)
-- Things created, modified, or completed
-- Design choices and trade-offs considered
-- Problems encountered and how they were resolved
-- Work deferred or explicitly left for a future session
+The WORKLOG is generated *from commits*, so anything not yet committed will not
+appear in it. Ensure the session's work is committed following
+`git-workflow.md` conventions — including a `session-end:` commit if this is the
+end of a working session (that is the delimiter `mdllm worklog` splits sessions
+on).
 
-### 2. Structure The Entry
+### 2. Regenerate
 
-Append to WORKLOG.md under today's date (create a new date heading if this is the first entry for the day, or add a new session sub-heading if one already exists):
+Run the floor:
 
-```markdown
-## [Date]
-
-### Session [N]
-
-#### Topic: [One-line summary of what the session was about]
-
-[1-3 sentence narrative: what was the goal and what happened]
-
-#### Completed
-
-- [x] **[Thing or action]**: [Brief description of what was done]
-- [x] ...
-
-#### Decisions
-
-- **[Decision]**: [What was decided and why — the rationale matters]
-
-#### Deferred
-
-- [ ] **[Item]**: [What was explicitly left for later and why]
+```sh
+mdllm worklog --write
 ```
 
-### 3. Commit
+This rewrites `WORKLOG.md` in place from `HEAD`. The system name and id are read
+from the local `AGENTS.md`, so the same command is correct in the framework and
+in any domain repo.
 
-Commit the updated WORKLOG.md following `git-workflow.md` conventions.
+### 3. Commit The Regenerated WORKLOG
 
-## Writing Heuristic
+Commit the regenerated `WORKLOG.md`. (Because it is derived, a future floor
+check may treat a stale WORKLOG as drift the way `kernel --check` and
+`index check` do — until then, regenerating it here is what keeps it honest.)
 
-**Include if:**
-- It represents work that changed the state of the domain
-- It's a decision that a future reader would want to trace
-- It's context needed to understand why things are the way they are
+## What Not To Do
 
-**Do not include if:**
-- It's routine navigation or exploration that led nowhere
-- It's conversation that didn't result in any state change or decision
-- It duplicates what's already recorded in thing frontmatter or commit messages
+- **Do not hand-edit `WORKLOG.md`.** The narrative detail belongs in the commit
+  messages it is generated from. If an entry reads poorly, fix the commit
+  message convention, not the generated file.
+- **Do not duplicate the continuity brief.** Live state is the continuity
+  brief's job; this is history.

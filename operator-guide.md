@@ -164,6 +164,7 @@ CI, or the agent — but all of them are yours to invoke directly.
 | `eval --run [--model M --trials N --bare --report]` | Seeds an isolated workspace, runs a headless agent, scores trials | Running the framework-vs-bare experiment |
 | `tokens [path]` | Measures spec token cost by loading tier | Checking session-cost impact after spec edits |
 | `kernel [--check]` | Regenerates `kernel.md` from spec kernel blocks; `--check` gates drift | Framework maintenance (CI runs `--check` for you) |
+| `coherence [path]` | Dark-region checks: generated-artifact (kernel/index) freshness, `foundational_specs`↔filesystem, stale `stable` labels, dead vocabulary. Corpus-general; framework-only checks switch on at a `.markdownllm` root. Runs in the pre-commit hook | After adding/removing a spec; suspected drift between catalog and disk |
 | `changelog --since <tag>` | Drafts a CHANGELOG entry from the commit stream | Framework release prep |
 | `worklog [path] [--write]` | Generates WORKLOG.md from the commit stream (sessions split on `session-end:` commits) | Keeping the session log current without hand-maintaining it |
 | `refresh <domain> [--seal]` | Floor-only domain refresh: reports the version delta + unseen CHANGELOG entries; `--seal` bumps `framework_version_seen` after adoption | Bringing a stale domain current with the framework |
