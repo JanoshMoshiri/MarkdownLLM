@@ -2,10 +2,10 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.7
+version: 1.8
 created: 2026-06-11
 domain: markdownllm-framework
-last_updated: 2026-06-15
+last_updated: 2026-06-16
 ---
 
 # Framework Continuity Brief
@@ -20,7 +20,14 @@ last_updated: 2026-06-15
   (`mdllm worklog` + `mdllm refresh`; model-tier claim demoted to hypothesis;
   cross-domain promise retracted → `cross-domain-handoff-is-verified-external-input`;
   advisory lease generalised in prose; `stable→evolving` relabel for
-  thing/orchestration/domain-refresh). **Remaining:** (a) **#4 narrative validation
+  thing/orchestration/domain-refresh). Items 1/5 hardened from a second independent
+  read as **3.10.0** (`definition:` pointer made structural; the `current_stage ∈
+  stages` membership check enforced now, not deferred). The structural `definition:`
+  field then exposed a **reverse-edge gap** closed as **3.11.0**: the `relationships`
+  index walked only `linked_things`, so a change to a `workflow-definition` could not
+  mechanically surface its runs (nor `parent` its children); the index now emits the
+  structural pointers, both reconciliation modes inherit the recall, and the rule is
+  pinned as `structural-pointers-need-reverse-edge-indexing`. **Remaining:** (a) **#4 narrative validation
   record** — `evidence/` scaffold + shape-only template shipped; the narrative case
   study waits on the operator's disclosure decision (after the brother conversation);
   (b) **exercise the `workflow-run` primitive on a real domain** before promoting past
@@ -160,11 +167,37 @@ last_updated: 2026-06-15
   cross-domain hand-off is not a link but an import of external input, so it inherits
   `origin: external` quarantine + provenance; reframes the retracted manifesto promise
   and is the design to spec when a second concrete case appears.
+- `structural-pointers-need-reverse-edge-indexing` — a relationship in a singular
+  load-bearing field (`parent`, `definition`) is still a *declared* edge; the
+  `relationships` index must emit it or reverse recall goes blind. The sharper,
+  lit-region sibling of `mechanical-assimilation-is-blind-to-prose-dependencies`:
+  a forward resolver and a reverse index are two obligations, not one.
 - Remaining active insights in `things/insights/` inform spec-level detail.
 
 ## Pending Decisions
 
 - (none)
+
+## Decisions Made This Session (2026-06-16, session 7)
+
+- **The reverse-edge gap was closed in the floor, not worked around (v3.11.0):**
+  the workflow-run `definition:` field exposed that the `relationships` index walked
+  only `linked_things` — so change-reconciliation's Assimilate beat could not
+  mechanically recall a definition's runs (nor `parent` its children). Fixed by
+  emitting structural pointers into the index; both forward and retrospective
+  reconciliation inherit it because both read the one index.
+- **The human cue stayed sacrosanct** (the line not crossed): the request was a
+  "mechanical hook into change-reconciliation," but only the *Assimilate* recall was
+  widened — no auto-trigger on definition edits, which would have violated *The Driver
+  Names The Inflection*. The fix lives one layer down in the floor; the spec's trigger
+  semantics are untouched.
+- **Captured as a forward-looking rule, not just a patch:**
+  `structural-pointers-need-reverse-edge-indexing` — any future singular load-bearing
+  pointer must also be emitted into the index, or it becomes an unwalked declared edge.
+  `parent` had the same latent gap since introduction; `definition:` made it bite.
+- **`mdllm worklog` portability bug fixed in the same bump:** hard-coded
+  `framework-worklog` id/title would dangle in a domain repo; now derived from the
+  local `AGENTS.md` `name`, with the manifesto link conditional on one existing.
 
 ## Decisions Made This Session (2026-06-15, session 1)
 

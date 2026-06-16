@@ -16,6 +16,7 @@ linked_things:
 ## 2026-06-16 — in progress
 
 - `e29afcfe8` update: harden workflow-state from independent second review (v3.10.0)
+- `b2bc5e5c7` update: index structural pointers for reverse-edge recall + worklog portability fix (v3.11.0)
 
 ## 2026-06-15 — session-end: session 6 (15 Jun) — review back-half + status relabel (#5b)
 
