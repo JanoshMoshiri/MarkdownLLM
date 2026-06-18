@@ -205,8 +205,8 @@ The split follows the framework's standard division of labour:
 
 | Concern | Owner | Mechanism |
 |---|---|---|
-| The declared affected set is complete | Deterministic floor | `relationships` (incl. structural `definition`/`parent` pointers) + `provenance` indexes (`derived-index.md`, `provenance.md`) |
-| Prose references the indexes miss | Deterministic floor (textual) | corpus grep for the thing's `id` and canonical name |
+| The declared affected set is complete | Deterministic floor | `mdllm touchpoints <id>` (live), over the same edges the `relationships` + `provenance` indexes hold (`derived-index.md`, `provenance.md`) |
+| Prose references the indexes miss | Deterministic floor (textual) | `mdllm touchpoints` literal tier + corpus grep for the thing's canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
 | Does each touch point still hold? | **Agent (semantic)** | `validate.thing.md` Layer 2 — the Walk |
@@ -219,10 +219,17 @@ The floor's job here is to make the agent **unable to not see** the shape of
 what a change disturbs; the judgement of what to do about it stays where it
 belongs.
 
-A domain may expose the Assimilate beat as a single affordance over the two
-existing indexes (a "touch points of X" read) without new infrastructure; this
-spec does not mandate a new `mdllm` subcommand, only the discipline of running
-the pass.
+The Assimilate beat is exposed as a floor affordance: `mdllm touchpoints <id>`
+reports the complete declared inbound set (every `linked_things` edge, the
+structural `parent`/`definition` pointers, and `informed_by` provenance pins)
+plus the literal textual references, computed fresh from the live corpus — not
+from the committed indexes, because assimilation must be complete *and* current.
+The subcommand is deliberately **invoked, never hooked**: it makes the blast
+radius impossible to not see, but the *Cue* — deciding a change is consequential
+enough to run the pass — stays the driver's (see *The Driver Names The
+Inflection*). The spec mandates the discipline of running the pass at an
+inflection, not the existence of the tool; the tool is the affordance that makes
+the discipline cheap.
 
 ## Relationship To Other Specs
 

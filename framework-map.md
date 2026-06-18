@@ -38,7 +38,9 @@ say what may be done to the atom; those six are distilled into
 2026-06-11 — re-measure with `mdllm tokens`, never assert); nine extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
-paper layer made mechanical, one subcommand per spec.
+paper layer made mechanical, each subcommand mechanising a piece of it (mostly
+one per spec; change-reconciliation has two — `coherence` for the catalog slice
+and `touchpoints` for the Assimilate beat).
 
 ## View 1 — Elevation: the five bands
 
@@ -66,7 +68,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>14 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>15 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -186,6 +188,7 @@ flowchart LR
         C12["worklog"]
         C13["refresh"]
         C14["coherence"]
+        C15["touchpoints"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -202,6 +205,7 @@ flowchart LR
         T12["WORKLOG.md"]
         T13["domain-refresh.md"]
         T14["change-reconciliation.md<br/>dark-region walk (catalog slice)"]
+        T15["change-reconciliation.md<br/>Assimilate beat"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -218,6 +222,7 @@ flowchart LR
     C12 -.->|generates| T12
     C13 -->|"reports drift for"| T13
     C14 -->|"mechanises catalog slice of"| T14
+    C15 -->|"assimilates for"| T15
 ```
 
 Notes on this view:

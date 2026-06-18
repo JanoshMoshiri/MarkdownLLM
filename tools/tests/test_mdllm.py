@@ -350,6 +350,50 @@ def test_brief_completeness_skipped_without_brief(tmp_path):
     assert not any("continuity brief" in m for m in messages(all_findings(tmp_path)))
 
 
+# ---------------------------------------------------------------- touchpoints
+
+
+def test_touchpoints_reports_declared_and_literal(tmp_path, capsys):
+    write(tmp_path, "things/target.md", thing_text(
+        "id: target\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    write(tmp_path, "things/dep.md", thing_text(
+        "id: dep\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "linked_things:\n  - id: target\n    relation: informs"))
+    write(tmp_path, "things/child.md", thing_text(
+        "id: child\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "parent: target"))
+    write(tmp_path, "things/d.md", thing_text(
+        "id: d\ntype: decision\nstatus: made\ncreated: 2026-06-01\n"
+        "informed_by:\n  - id: target\n    commit: abc1234"))
+    write(tmp_path, "things/mention.md", thing_text(
+        "id: mention\ntype: task\nstatus: in-progress\ncreated: 2026-06-01",
+        "# Mention\n\nThis discusses target only in prose.\n"))
+    rc = mdllm.cmd_touchpoints(_ns(path=str(tmp_path), id="target"))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "dep -> target" in out and "relation `informs`" in out
+    assert "child -> target" in out and "via `parent`" in out
+    assert "d -> target" in out and "informed_by @abc1234" in out
+    # mention names the target only in prose => literal tier, not declared
+    assert "mention" in out.split("Literal references")[1]
+    assert "Conceptual residue" in out
+
+
+def test_touchpoints_unknown_id_errors(tmp_path, capsys):
+    write(tmp_path, "things/a.md", thing_text(GOOD))
+    rc = mdllm.cmd_touchpoints(_ns(path=str(tmp_path), id="ghost"))
+    assert rc == 1 and "no thing with id `ghost`" in capsys.readouterr().out
+
+
+def test_touchpoints_leaf_has_no_risk(tmp_path, capsys):
+    write(tmp_path, "things/lonely.md", thing_text(
+        "id: lonely\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    rc = mdllm.cmd_touchpoints(_ns(path=str(tmp_path), id="lonely"))
+    out = capsys.readouterr().out
+    assert rc == 0 and "carries no\nconsistency risk" not in out  # wrapped; check phrase
+    assert "Nothing points at `lonely`" in out
+
+
 # ---------------------------------------------------------------- level 3
 
 
