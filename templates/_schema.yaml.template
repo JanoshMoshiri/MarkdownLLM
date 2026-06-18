@@ -38,3 +38,15 @@ relations:
   - supersedes
   - superseded-by
   - contradicts
+
+# Field registration (opt-in, Warning severity). The structural fields the floor
+# reads — id, type, status, created, the relational/trigger/provenance fields —
+# are CORE_FIELDS, built into the tool; you never declare them. Uncomment and
+# fill `known_fields` to also gate your domain's OWN emergent frontmatter fields:
+# once declared, a field used by a thing but listed in neither set is flagged as
+# a typo or an unregistered field. Register a new field here in the same write
+# that introduces it (the deciding-it-belongs is the point). Seed/audit the
+# in-use list any time with `mdllm index . rebuild --signal schema`.
+#known_fields:
+#  - owner
+#  - tags

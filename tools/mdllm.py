@@ -66,6 +66,30 @@ DEFAULT_STATUSES = ["not-started", "in-progress", "blocked", "paused", "complete
 TERMINAL_STATUSES = {"completed", "cancelled", "met", "reconciled", "closed", "filed",
                      "resolved", "dismissed", "deprecated", "abandoned"}
 
+# Universal frontmatter fields the floor itself reads and understands — the
+# built-in half of the field vocabulary (the CORE_FIELDS<->known_fields split
+# mirrors RESERVED_STATUSES<->_schema.yaml `types`: the tool owns the universal
+# set; each domain owns its emergent extension). Every field listed here is
+# read somewhere in this file (level 1-2 structure, triggers, workflow state,
+# provenance) or written onto a generated index/kernel thing. A domain's
+# `known_fields` in _schema.yaml extends this set; an in-use field in neither
+# is a typo or an unregistered field, which the field-registration check
+# (validate_level3) surfaces. Add to this set only when the tool learns to read
+# a new structural field — registering the framework's own emergent fields by
+# the same discipline domains follow.
+CORE_FIELDS = {
+    # identity & lifecycle (level 1)
+    "id", "type", "status", "created", "due_date", "review_date",
+    # relational graph (level 1-2 referential integrity)
+    "linked_things", "dependencies", "blocks", "parent", "parties", "definition",
+    # triggers & workflow-run cursor
+    "triggers", "current_stage", "stages",
+    # provenance (provenance.md)
+    "informed_by", "origin", "verified",
+    # generated-artifact frontmatter (index / kernel things)
+    "index_of", "generated", "generated_from", "coverage", "framework_version",
+}
+
 DEFAULT_EXCLUDES = {".git", ".claude", "node_modules", "templates", "examples",
                     "domain", "domains", "tools", "adapters", "evals", "outputs",
                     "deliverables"}
@@ -440,6 +464,26 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
         return f
     declared_types = set(schema.get("types") or {}) | set(RESERVED_STATUSES)
     relations = schema.get("relations")
+
+    # Field registration (opt-in, like `relations`): when a domain declares a
+    # `known_fields` list, any top-level frontmatter key outside CORE_FIELDS ∪
+    # known_fields ∪ the per-type required_fields is flagged. This closes the
+    # silent-loss hole — a mis-keyed field (e.g. `relations:` typed where
+    # `linked_things:` was meant) used to pass clean because the floor only
+    # validated the *values* of known fields, never the *set of keys*. Warning,
+    # not Error: the whole level-3 family is advisory (schema-gated), and the
+    # bug was silence — Warning already ends it. A domain that declares no
+    # known_fields gets no field check (no false alarms until it opts in). The
+    # descriptive companion is `mdllm index <path> rebuild --signal schema`,
+    # which enumerates every field in use — the bootstrap source for the list.
+    known_fields = schema.get("known_fields")
+    field_allow: set[str] | None = None
+    if isinstance(known_fields, list):
+        field_allow = set(CORE_FIELDS) | {str(k) for k in known_fields}
+        for tdef in (schema.get("types") or {}).values():
+            if isinstance(tdef, dict):
+                field_allow |= {str(r) for r in (tdef.get("required_fields") or [])}
+
     for t in corpus.things:
         name = t.id or t.path.name
         typ = str(t.meta.get("type", ""))
@@ -454,6 +498,13 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
                 if isinstance(entry, dict) and entry.get("relation") not in relations:
                     f.append(Finding(SEV_WARNING, name,
                              f"relation `{entry.get('relation')}` not in declared vocabulary"))
+        if field_allow is not None:
+            for key in t.meta:
+                if str(key) not in field_allow:
+                    f.append(Finding(SEV_WARNING, name,
+                             f"field `{key}` not in CORE_FIELDS or declared "
+                             f"`known_fields` — register it in _schema.yaml or fix "
+                             f"the typo"))
     return f
 
 

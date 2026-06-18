@@ -41,3 +41,28 @@ relations:
   - supersedes     # replaces the target's content
   - superseded-by  # inverse of supersedes; validator checks this backlink
   - subtask        # drives the subtasks_complete threshold trigger
+
+# Declared frontmatter-field vocabulary (validated at Warning severity, opt-in).
+# CORE_FIELDS (built into mdllm.py — id/type/status/created, the relational and
+# trigger fields, provenance, generated-index frontmatter) are universal and
+# need no declaration here; this list is the framework DOMAIN's emergent
+# extension. A field used by a thing but in neither set is flagged as a typo or
+# an unregistered field. Register a genuinely-new field here as part of the same
+# write-cascade that introduces it — the judgment that it belongs is the point;
+# never auto-sync. Bootstrap/audit the in-use set with
+# `mdllm index . rebuild --signal schema`.
+known_fields:
+  - version         # spec/manifesto/skill semantic version
+  - session         # session number a thing was created in
+  - confidence      # insight confidence (belief-revision)
+  - source          # provenance: where a claim came from
+  - tags            # free classification
+  - domain          # domain a thing belongs to
+  - period_start    # retrospective / measurement window
+  - period_end
+  - last_updated    # hand-maintained freshness stamp
+  - resolution      # conflict outcome
+  - resolved_by     # conflict resolver (decision id)
+  - decided_by      # decision author/authority
+  - promoted_to     # insight -> spec promotion target
+  - priority        # plan/task priority

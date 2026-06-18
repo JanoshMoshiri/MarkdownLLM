@@ -326,6 +326,39 @@ def test_undeclared_type_and_relation_warn_required_field_errors(tmp_path):
     assert any("relation `mystery-rel` not in declared vocabulary" in m for m in warns)
 
 
+def test_field_registration_is_opt_in(tmp_path):
+    # No `known_fields` declared => no field check, however exotic the keys.
+    write(tmp_path, "_schema.yaml", "types:\n  task:\n    statuses: [in-progress]\n")
+    write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "whatever_field: 1\nanother: 2"))
+    assert not any("CORE_FIELDS" in m for m in messages(all_findings(tmp_path)))
+
+
+def test_field_registration_flags_unregistered_field(tmp_path):
+    # Declaring `known_fields` activates the gate. CORE_FIELDS (status/created/
+    # linked_things), the declared field (owner), and a per-type required_field
+    # (period) all pass; the mis-keyed `relations` (the silent-loss bug) and an
+    # undeclared `tags` are flagged at Warning — never Error.
+    write(tmp_path, "_schema.yaml",
+          "types:\n  task:\n    statuses: [in-progress]\n    required_fields: [period]\n"
+          "known_fields:\n  - owner\n")
+    write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "period: q1\nowner: jm\ntags: [x]\n"
+        "relations:\n  - id: b\n    relation: informs"))   # mis-keyed linked_things
+    findings = all_findings(tmp_path)
+    warns = messages(findings, mdllm.SEV_WARNING)
+    assert any("field `relations` not in CORE_FIELDS" in m for m in warns)
+    assert any("field `tags` not in CORE_FIELDS" in m for m in warns)
+    # the legitimate fields are not flagged
+    assert not any("field `owner`" in m for m in warns)
+    assert not any("field `period`" in m for m in warns)
+    assert not any("field `status`" in m for m in warns)
+    # and it is strictly advisory — no field Error
+    assert not any("CORE_FIELDS" in m for m in messages(findings, mdllm.SEV_ERROR))
+
+
 # ---------------------------------------------------------------- scan
 
 

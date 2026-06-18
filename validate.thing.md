@@ -63,7 +63,17 @@ The tool enforces, deterministically:
   requires a back-link or deprecation.
 - **Schema (old Level 3):** the domain's normative schema (`things/_schema.yaml`
   or root `_schema.yaml`) declares thing types, **status vocabularies**, required
-  fields, and the relation vocabulary. The tool validates against it.
+  fields, the relation vocabulary, and (opt-in) the **frontmatter-field
+  vocabulary** (`known_fields`). The tool validates against it.
+- **Field registration (opt-in, Warning):** the floor reads a fixed set of
+  universal structural fields (`CORE_FIELDS`, built into the tool). When a domain
+  declares `known_fields` in its schema, any frontmatter key in neither set is
+  flagged — closing the silent-loss hole where a mis-keyed field (e.g.
+  `relations:` typed where `linked_things:` was meant) used to pass clean because
+  only field *values* were checked, never the *set of keys*. Registering a new
+  field is a deliberate act (decide it belongs, add it to `known_fields` in the
+  same write); the tool never auto-syncs. Enumerate the in-use set to bootstrap
+  or audit the list with `mdllm index <path> rebuild --signal schema`.
 - **Index integrity:** `mdllm index <path> check` performs the rebuild-and-diff
   drift detection for derived indexes (`derived-index.md`).
 
