@@ -2,10 +2,10 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.10
+version: 1.11
 created: 2026-06-11
 domain: markdownllm-framework
-last_updated: 2026-06-17
+last_updated: 2026-06-18
 ---
 
 # Framework Continuity Brief
@@ -58,10 +58,10 @@ last_updated: 2026-06-17
   pinned as `structural-pointers-need-reverse-edge-indexing`. **Remaining:** (a) **#4 narrative validation
   record** — `evidence/` scaffold + shape-only template shipped; the narrative case
   study waits on the operator's disclosure decision (after the brother conversation);
-  (b) **exercise the `workflow-run` primitive on a real domain** before promoting past
-  draft, and let the floor's `current_stage ∈ stages` check land then (life-manager
-  has a demo pair; a live domain is the real test — parallels the composition and
-  twisted-domain threads); (c) the harder-fixture eval below now carries the
+  (b) **DONE (2026-06-18)** — the `workflow-run` primitive is now in live use on a
+  real domain (private IP, not in the public corpus); the spec was promoted
+  draft→evolving and the floor's `current_stage ∈ stages` check is active;
+  (c) the harder-fixture eval below now carries the
   model-tier *hypothesis*, not a settled claim.
 - **Apply change-reconciliation to a twisted live domain (next session's concrete
   use):** a domain changed mid-process before the pass existed — realign it via
@@ -220,11 +220,68 @@ last_updated: 2026-06-17
   exemplar writes relations under a near-miss key (`relations:`) that `validate`
   ignores with no error; the declared edge is silently lost. Candidate
   corpus-general floor Warning.
-- Remaining active insights in `things/insights/` inform spec-level detail.
+- `framework-reserved-types-need-thing-md-as-single-source` — adding a
+  framework-reserved type must update `thing.md` first, then propagate; AGENTS.md
+  is a summary, not the source of truth.
+- `hard-hooks-require-observable-agent-caused-triggers` — a hook is only "hard" if
+  triggered by an agent-caused, agent-observable event; otherwise it is a prompt
+  bound to a hook point, explicitly invoked.
+- `operative-rules-are-a-small-fraction-of-spec-prose` — operative rules measured
+  ~1.4k of 21.4k tokens across the Tier 0/1 specs; the basis of the kernel (rules
+  without rationale at Tier 0).
+- `reflexive-behaviors-are-indexes-plus-prompts` — velocity, trigger-eval,
+  conflict-scan, and schema-review are one pattern: a derived index + a prompt;
+  the basis of `derived-index.md`.
+- `srp-extraction-is-tier-promotion` — extracting content from a low-tier spec into
+  its own spec auto-promotes it to Tier 2; following SRP and reducing baseline
+  context load are the same act.
+- `tiered-loading-is-tiered-reading-applied-to-specs` — the L1/L2/L3 tiered-reading
+  model for things, applied to spec loading; the basis of tiered startup + the kernel.
+- `version-mismatch-triggers-validation-cascade` — on a framework version mismatch
+  at session start, run validation immediately (new rules may invalidate things) —
+  don't merely surface the mismatch.
+- `continuity-briefs-solve-external-state-drift` — **dismiss candidate (confirm at
+  retrospective):** argued the framework needs no brief because it has no external
+  state drift; overtaken — the framework adopted this brief for cross-session
+  thread-tracking during heavy development. The general caution (don't apply a
+  domain pattern reflexively) survives; the "framework has none" claim does not.
 
 ## Pending Decisions
 
 - (none)
+
+## Decisions Made This Session (2026-06-18, session 9)
+
+- **The mechanical/semantic line was reviewed end-to-end and judged sound** — a
+  full from-the-inside overview (the framework reasoning about itself). The floor
+  owns the decidable, the agent the semantic judgment, the human the initiating
+  cue. The dark region is tiered (declared → literal → conceptual); it shrinks by
+  promoting prose to declared edges, not by automation, and tier 3 (conceptual) is
+  irreducible. Three gaps named: one fixed (below), one built (touchpoints), one
+  parked (cross-domain hand-off).
+- **The field-registration trilogy completed (shipped v3.13.0):** `known_fields`
+  joins `types` and `relations` as the third opt-in, domain-owned `_schema.yaml`
+  vocabulary; `CORE_FIELDS` is the tool-owned universal set. Closes the silent
+  mis-keyed-field hole (`mis-keyed-links-pass-the-floor-silently`). Warning, opt-in
+  — a domain sees nothing until it declares the list.
+- **A spec↔floor drift was found and closed, not papered over:** `session-memory.md`
+  promised a floor check ("active insight not in continuity brief" + the open-conflict
+  twin) that did not exist and disagreed with `validate.thing.md` (which assigned it
+  to the agent). Built the checks (Info, corpus-general); reconciled `validate.thing.md`
+  to the floor — detection mechanical, disposition the agent's. The promise is now true.
+- **`workflow-state` promoted draft→evolving** — exercised on a live domain; the
+  reserved types are unchanged, the spec's maturity advanced.
+- **The Assimilate beat became a floor affordance — `mdllm touchpoints <id>`:**
+  invoked never hooked (the cue stays human, per *The Driver Names The Inflection*),
+  computed live not from cached indexes (assimilation must be complete *and* current).
+  A discipline turned into a one-keystroke blast-radius read.
+- **Orphaned insights linked back into circulation:** the new completeness check
+  surfaced 8 active insights the brief named only by a catch-all; each is now listed
+  individually above. `continuity-briefs-solve-external-state-drift` is flagged a
+  dismiss candidate (overtaken — the framework now has a brief).
+- **Version bump deliberately bundled** (operator's call): the four changes shipped
+  together as 3.13.0 rather than four daily bumps; domains adopt at the paired
+  `refresh` → `--seal`, where the optional `known_fields` lists are added.
 
 ## Decisions Made This Session (2026-06-17)
 
