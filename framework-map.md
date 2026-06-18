@@ -117,7 +117,7 @@ flowchart TD
         DIDX["derived-index"]
         PROV["provenance"]
         CRECON["change-reconciliation"]
-        WSTATE["workflow-state (draft)"]
+        WSTATE["workflow-state (evolving)"]
         COORD["coordination-claim (draft)"]
         SMEM["session-memory"]
         BREV["belief-revision"]

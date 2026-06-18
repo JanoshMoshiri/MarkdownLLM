@@ -1,8 +1,8 @@
 ---
 id: workflow-state-specification
 type: specification
-status: draft
-version: 0.3
+status: evolving
+version: 0.4
 created: 2026-06-15
 linked_things:
   - id: thing-specification
@@ -161,11 +161,11 @@ A run produces deliverables, and those deliverables become another domain's inpu
 
 ## Maturity Path
 
-Mature this on the ladder the framework already has — **reserve-but-draft**:
+Mature this on the framework's **reserve-but-draft** ladder — now one rung up, at **reserved-and-evolving**:
 
 1. The originating idea is captured as `workflow-run-is-the-decomposition-principle-applied-to-processes` (`type: insight`).
-2. The types are *reserved* (fixed status vocabularies, built into the floor) so cross-domain consumers can rely on the semantics — but this spec stays **`draft`**.
-3. Exercise it on a real domain before promoting past draft. The filled instance in `examples/life-manager/` (a renovation process + a live run) is the first exercise.
+2. The types are *reserved* (fixed status vocabularies, built into the floor) so cross-domain consumers can rely on the semantics — held since they were first reserved.
+3. Exercised on a real domain. Beyond the `examples/life-manager/` demonstration pair (a renovation process + a live run), the primitive is now in active use in a live domain — which is what promotes this spec from `draft` to `evolving`. Remaining hardening (a definition-completeness linter, transition-legality affordances) lands as that use reveals the need.
 4. The floor's referential checks (`definition` resolves; `current_stage` ∈ its stages) are **already enforced** — they are integrity, not semantics. What stays deferred is *transition-legality* across the loop graph, which is the agent's Layer-2 judgment until a domain shows it needs more.
 
 A type being reserved but undeployed in most domains is expected: it is exactly how the framework treats `conflict`, `retrospective`, and `index`. "Spec when foreseeable, deploy when felt" means primitives are *available*, not mandatory. A recipe domain never minting a workflow run is no different from its never minting a conflict.
