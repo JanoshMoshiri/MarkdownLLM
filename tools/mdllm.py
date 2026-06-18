@@ -418,6 +418,31 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
         if not has_rel and t.id not in referenced:
             f.append(Finding(SEV_INFO, t.id or t.path.name,
                      "orphaned — no relationships, triggers, or inbound references"))
+
+    # continuity-brief completeness (session-memory.md → The Session-Start
+    # Staleness Check, Insight Lifecycle Management). An `active` insight or
+    # `open` conflict the live brief does not name is orphaned from session
+    # memory: it re-enters no future session and is invisible to the staleness
+    # check, which walks only the brief's live ids. The two are a deliberate
+    # pair ("the twin of the open-conflict check"). Info, corpus-general;
+    # skipped when the corpus has no continuity brief (a fresh scaffold has
+    # none yet — absence is not a defect). The brief names live things by id,
+    # so an id-substring test over the brief body is the mechanical proxy.
+    briefs = [t for t in corpus.things if str(t.meta.get("type")) == "continuity-brief"]
+    if briefs:
+        brief_text = "\n".join(t.body for t in briefs)
+        for t in corpus.things:
+            if not t.id or t.id not in known:
+                continue
+            typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
+            if typ == "insight" and status == "active" and t.id not in brief_text:
+                f.append(Finding(SEV_INFO, t.id,
+                         "active insight not in continuity brief — orphaned from "
+                         "session memory; promote, dismiss, or list it live"))
+            elif typ == "conflict" and status == "open" and t.id not in brief_text:
+                f.append(Finding(SEV_INFO, t.id,
+                         "open conflict not in continuity brief — add it as an "
+                         "open thread so it returns next session"))
     return f
 
 

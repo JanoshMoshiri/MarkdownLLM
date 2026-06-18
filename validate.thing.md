@@ -25,7 +25,7 @@ linked_things:
 <!-- kernel -->
 **Mechanical validation is the tool's job:** `python {framework_root}/tools/mdllm.py validate <path>` — structure, references, schema conformance, index integrity. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
 
-**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · open conflicts or active insights missing from continuity brief · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
+**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as missing from the brief (promote/dismiss/list) · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 <!-- /kernel -->
@@ -76,6 +76,13 @@ The tool enforces, deterministically:
   or audit the list with `mdllm index <path> rebuild --signal schema`.
 - **Index integrity:** `mdllm index <path> check` performs the rebuild-and-diff
   drift detection for derived indexes (`derived-index.md`).
+- **Session-memory completeness (Info):** an `active` insight or `open` conflict
+  not named in the domain's `continuity.md` is orphaned from session memory — it
+  returns to no future session and is invisible to the session-start staleness
+  check (which walks only the brief's live ids). Detection is mechanical; the
+  *disposition* (promote, dismiss, or list it live) is the agent's, driven at
+  retrospective cadence. Corpus-general; skipped when the corpus has no brief.
+  (`session-memory.md` → Insight Lifecycle Management.)
 
 Exit code 1 means Errors exist. The git `pre-commit` hook (installed via
 `mdllm install-hook`) runs the same validation, so things with Errors cannot be
@@ -119,8 +126,7 @@ in this loop. Read things holistically and assess:
 | Narrative completeness | Does the body explain what this is and why it matters, or is it an empty title? | Info |
 | Trigger coherence | Do declared triggers make sense for this thing? Watching relevant things? Appropriate actions? | Info |
 | Duplicate or redundant | Substantial overlap in scope or intent with another thing — a candidate for composition (`thing.md` → The Inverse: Composition) | Info |
-| Open conflict not in continuity brief | A `type: conflict` with `status: open` missing from `continuity.md` | Warning |
-| Orphaned active insight | A `type: insight` with `status: active` referenced nowhere in `continuity.md` — neither circulating nor dispositioned (`session-memory.md` → Insight Lifecycle Management) | Info |
+| Disposition of a flagged insight/conflict | The floor flags an `active` insight or `open` conflict missing from `continuity.md` (Layer 1); deciding whether to promote, dismiss, or list it live is yours, at retrospective cadence | Info |
 | Stale open conflict | Open conflict untouched for 30+ days | Info |
 | No recent retrospective | Domain active 60+ days since the last `type: retrospective` (or none) | Info |
 

@@ -306,6 +306,50 @@ def test_orphan_is_info(tmp_path):
     assert any("orphaned" in m for m in messages(all_findings(tmp_path), mdllm.SEV_INFO))
 
 
+def _brief(names):
+    body = "# Brief\n\n## Live Insights\n" + "".join(f"- `{n}`\n" for n in names)
+    return thing_text("id: dom-brief\ntype: continuity-brief\nstatus: live\n"
+                      "created: 2026-06-01", body)
+
+
+def test_active_insight_not_in_brief_is_info(tmp_path):
+    # session-memory.md promises the floor surfaces this. Active insight named
+    # in the brief: clean. Active insight absent: Info. Dismissed insight absent:
+    # not flagged (only `active` re-enters sessions).
+    write(tmp_path, "continuity.md", _brief(["listed-insight"]))
+    write(tmp_path, "things/insights/listed-insight.md", thing_text(
+        "id: listed-insight\ntype: insight\nstatus: active\ncreated: 2026-06-01"))
+    write(tmp_path, "things/insights/orphan-insight.md", thing_text(
+        "id: orphan-insight\ntype: insight\nstatus: active\ncreated: 2026-06-01"))
+    write(tmp_path, "things/insights/gone-insight.md", thing_text(
+        "id: gone-insight\ntype: insight\nstatus: dismissed\ncreated: 2026-06-01"))
+    brief = [(x.thing, x.message) for x in all_findings(tmp_path)
+             if x.severity == mdllm.SEV_INFO and "continuity brief" in x.message]
+    assert ("orphan-insight", ) == tuple(t for t, _ in brief)  # only the orphan
+    assert all("active insight not in continuity brief" in m for _, m in brief)
+
+
+def test_open_conflict_not_in_brief_is_info(tmp_path):
+    write(tmp_path, "continuity.md", _brief([]))
+    write(tmp_path, "things/conflicts/live-clash.md", thing_text(
+        "id: live-clash\ntype: conflict\nstatus: open\ncreated: 2026-06-01\n"
+        "parties: [a, b]"))
+    write(tmp_path, "things/conflicts/old-clash.md", thing_text(
+        "id: old-clash\ntype: conflict\nstatus: resolved\ncreated: 2026-06-01\n"
+        "parties: [a, b]"))
+    brief = [(x.thing, x.message) for x in all_findings(tmp_path)
+             if x.severity == mdllm.SEV_INFO and "continuity brief" in x.message]
+    assert ("live-clash", ) == tuple(t for t, _ in brief)
+    assert all("open conflict not in continuity brief" in m for _, m in brief)
+
+
+def test_brief_completeness_skipped_without_brief(tmp_path):
+    # No continuity brief (e.g. fresh scaffold) => the check is silent.
+    write(tmp_path, "things/insights/lone.md", thing_text(
+        "id: lone\ntype: insight\nstatus: active\ncreated: 2026-06-01"))
+    assert not any("continuity brief" in m for m in messages(all_findings(tmp_path)))
+
+
 # ---------------------------------------------------------------- level 3
 
 
