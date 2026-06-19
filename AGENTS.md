@@ -96,9 +96,9 @@ This is where the reasoning lives — not just the data.
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 | Multi-stage, multi-session process instances; workflow run-state; stage cursors | `workflow-state.md` |
 | Two operators/sessions contending for one thing; advisory claims, leases | `coordination-claim.md` |
-| Human operator asking what changed / what the tools are / what the v3 experience is | `operator-guide.md` |
-| Human newcomer's first session; onboarding a non-author operator | `first-hour.md` |
-| Orienting in the framework structure; what links to what; spec graph navigation | `framework-map.md` |
+| Human operator asking what changed / what the tools are / what the v3 experience is | `docs/operator-guide.md` |
+| Human newcomer's first session; onboarding a non-author operator | `docs/first-hour.md` |
+| Orienting in the framework structure; what links to what; spec graph navigation | `docs/framework-map.md` |
 
 **Typical session cost (measured 2026-06-11, post-kernel):** Tier 0 (AGENTS.md + kernel.md) ≈ 5.3k tokens — down from 26.5k for the pre-kernel Tier 0+1. Full-spec loads are now per-file and on-demand. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
 
@@ -119,7 +119,7 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
-3. If adding or removing a spec, run `mdllm coherence` — it now mechanically checks the catalog slice of the dark region (`.markdownllm` `foundational_specs` ↔ files on disk, the `TIERS` map in `tools/mdllm.py` ↔ the catalog, and `kernel.md` drift), and it runs in the pre-commit hook so a stale generated artifact blocks the commit. Then walk the **prose-only residue** the tool cannot read (see `change-reconciliation.md` → Walking the Dark Region): the Tier 2 routing table and the spec catalog in this file, and `framework-map.md` (View 1 counts + View 2 node). `mdllm kernel` regen is now caught by coherence rather than left to memory.
+3. If adding or removing a spec, run `mdllm coherence` — it now mechanically checks the catalog slice of the dark region (`.markdownllm` `foundational_specs` ↔ files on disk, the `TIERS` map in `tools/mdllm.py` ↔ the catalog, and `kernel.md` drift), and it runs in the pre-commit hook so a stale generated artifact blocks the commit. Then walk the **prose-only residue** the tool cannot read (see `change-reconciliation.md` → Walking the Dark Region): the Tier 2 routing table and the spec catalog in this file, and `docs/framework-map.md` (View 1 counts + View 2 node). `mdllm kernel` regen is now caught by coherence rather than left to memory.
 4. Commit with a structured message following git-workflow.md conventions
 5. WORKLOG updated with session activity
 
@@ -156,9 +156,9 @@ The framework defines itself through these interconnected specifications:
 ### Guides
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
-- **operator-guide.md** — Human-facing: what working in a domain feels like since v3, the mdllm toolbox with scenarios, and what remains the operator's job. The specs are agent-first; this is the human's walkthrough. (`type: guide`, `status: draft`)
-- **first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: draft`)
-- **framework-map.md** — Visual architecture map (Mermaid): the five-band elevation, the spec-layer dependency graph, and the mdllm subcommand → spec mapping. Derived from frontmatter links, `mdllm --help`, and the tier table; the frontmatter wins on disagreement. (`type: guide`, `status: draft`)
+- **docs/operator-guide.md** — Human-facing: what working in a domain feels like since v3, the mdllm toolbox with scenarios, and what remains the operator's job. The specs are agent-first; this is the human's walkthrough. (`type: guide`, `status: draft`)
+- **docs/first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: draft`)
+- **docs/framework-map.md** — Visual architecture map (Mermaid): the five-band elevation, the spec-layer dependency graph, and the mdllm subcommand → spec mapping. Derived from frontmatter links, `mdllm --help`, and the tier table; the frontmatter wins on disagreement. (`type: guide`, `status: draft`)
 
 ### Deferred (Spec When Foreseeable, Deploy When Felt)
 - **thing-lifecycle.md** — Rolling window, disposition to stubs, rehydration from git history, manifest index. Addresses the 200–300 thing ceiling. (`type: specification`, `status: draft`)

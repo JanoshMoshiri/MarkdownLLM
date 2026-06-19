@@ -32,9 +32,9 @@ each file's `linked_things` frontmatter, the subcommand list from
 here, not in the prose.
 
 **The compressed mental model: one atom, six operative rules, everything else
-is layering.** The manifesto defines [thing.md](thing.md); five operative specs
+is layering.** The manifesto defines [thing.md](../thing.md); five operative specs
 say what may be done to the atom; those six are distilled into
-[kernel.md](kernel.md) so a session starts on ~5.3k tokens (measured
+[kernel.md](../kernel.md) so a session starts on ~5.3k tokens (measured
 2026-06-11 — re-measure with `mdllm tokens`, never assert); nine extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
@@ -240,7 +240,7 @@ Notes on this view:
 ## Keeping This Map Honest
 
 This map is hand-drawn, and
-[tracking artifacts can drift from reality](things/insights/tracking-artifacts-can-drift-from-reality.md).
+[tracking artifacts can drift from reality](../things/insights/tracking-artifacts-can-drift-from-reality.md).
 Its sources of truth are mechanical — check against them, do not trust the map
 over them:
 

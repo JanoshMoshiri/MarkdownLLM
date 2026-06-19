@@ -217,5 +217,5 @@ Next:
   2. Let the agent discover AGENTS.md, then tell it what to build, e.g.:
        "I want a domain for tracking architectural decisions across our
         microservices — context, options considered, decision, consequences."
-  3. The full paced walkthrough is in first-hour.md.
+  3. The full paced walkthrough is in docs/first-hour.md.
 EOF

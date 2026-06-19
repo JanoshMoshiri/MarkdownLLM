@@ -6,7 +6,7 @@ Most work with an AI agent evaporates when the conversation ends. MarkdownLLM ma
 
 It's a framework discovered by agents, directed by humans, and grown together.
 
-> **New here?** Your first sixty minutes are mapped, step by step, in [first-hour.md](first-hour.md) — and [operator-guide.md](operator-guide.md) covers every hour after that. Nearly everything else in this repository is written for your agent to read; those two pages are written for you.
+> **New here?** Your first sixty minutes are mapped, step by step, in [first-hour.md](docs/first-hour.md) — and [operator-guide.md](docs/operator-guide.md) covers every hour after that. Nearly everything else in this repository is written for your agent to read; those two pages are written for you.
 
 ---
 
@@ -80,9 +80,9 @@ The two documents written for the operator rather than the agent, plus the visua
 
 | File | Purpose |
 |------|---------|
-| [first-hour.md](first-hour.md) | A newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor |
-| [operator-guide.md](operator-guide.md) | The steady state — what the tooling carries for you, recurring scenarios, what remains your job |
-| [framework-map.md](framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping |
+| [first-hour.md](docs/first-hour.md) | A newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor |
+| [operator-guide.md](docs/operator-guide.md) | The steady state — what the tooling carries for you, recurring scenarios, what remains your job |
+| [framework-map.md](docs/framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping |
 
 ### Foundational Specifications (Agent-Consumed)
 
@@ -190,7 +190,7 @@ Then open the folder in your LLM tool, let it discover `AGENTS.md`, and tell it 
 
 The agent reads the specs, proposes a structure, and builds it; you refine through conversation. Then you open the new domain folder as its own workspace and do all future work there.
 
-**That's the sketch — [first-hour.md](first-hour.md) is the real, paced walkthrough**, including watching the floor catch a deliberate error.
+**That's the sketch — [first-hour.md](docs/first-hour.md) is the real, paced walkthrough**, including watching the floor catch a deliberate error.
 
 ### What works
 
