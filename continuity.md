@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.13
+version: 1.14
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-19
@@ -292,8 +292,18 @@ last_updated: 2026-06-19
   violated the kernel rule) and `worklog-update` (a single mechanical command, folded
   into `session-end-continuity`'s commit step; session-end drops from two bound
   prompts to one). Closed the action `reviews/REVIEW-mechanical-census-2026-06-16.md`
-  had already flagged. No framework version bump — spec-internal reduction, validate +
-  coherence clean across all three corpora. Committed as `86a6b08`.
+  had already flagged. Spec-internal reduction, validate + coherence clean across all
+  three corpora. Committed as `86a6b08`.
+- **Framework bumped 3.13.0 → 3.14.0 at session close** (operator's call): not because
+  any single change demanded a minor bump, but to mark the day's accumulated work
+  (session 10 onboarding pass + session 11 orchestration reduction) so a domain or
+  collaborator picking the framework up this evening sees a newer sentinel than this
+  morning. Bumped `.markdownllm` + `AGENTS.md`; `kernel.md` regenerated. **The floor
+  taught a rule mid-bump:** `validate`'s `framework-version` check requires
+  `.markdownllm` == `AGENTS.md` == latest `CHANGELOG.md` heading — they bump together —
+  so the intended "defer the CHANGELOG to push time" was overridden and a `[3.14.0]`
+  entry was written now (covers session 10 onboarding + session 11 orchestration
+  reduction). **Committed but not yet pushed** — the push is the operator's to make.
 
 ## Decisions Made This Session (2026-06-19, session 10)
 
