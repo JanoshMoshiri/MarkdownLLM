@@ -2,10 +2,10 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.11
+version: 1.12
 created: 2026-06-11
 domain: markdownllm-framework
-last_updated: 2026-06-18
+last_updated: 2026-06-19
 ---
 
 # Framework Continuity Brief
@@ -155,6 +155,13 @@ last_updated: 2026-06-18
   cadence, but never run. First real composition sweep at a domain (or framework)
   retrospective is the live test — parallels the "apply change-reconciliation to a
   twisted domain" thread.
+- **Installer's consent-based missing-deps branch is unverified end-to-end:** the
+  happy path and both clone-from-remote one-liners are tested live (2026-06-19,
+  session 10), but the git/Python-*absent* path (detect package manager → prompt or
+  `-y`/`-Yes` → install → re-resolve) cannot be exercised without a clean machine.
+  Verify on a VM/container with no Python if it ever matters; the logic shares the
+  already-tested resolve/skip refactor, and falls back to a guided message when no
+  package manager is present.
 
 ## Live Insights
 
@@ -249,6 +256,41 @@ last_updated: 2026-06-18
 ## Pending Decisions
 
 - (none)
+
+## Decisions Made This Session (2026-06-19, session 10)
+
+- **Onboarding surfaces reworked for humans, no framework version bump** (operator's
+  call): the manifesto's *Paradigm Shift* was reframed to lead on the reasoning
+  processor (execute → *reason within*, landing on programs that find/fix their own
+  bugs and evolve) and gained a *System as Collaborator* subsection under Discovery;
+  the README was halved (~532→257 lines) into a captivating landing page + repo map;
+  `first-hour.md` was realigned to the new installer and promoted draft→evolving.
+  These are human-onboarding/tooling changes, not spec-contract changes — the
+  framework stays 3.13.0.
+- **A one-command installer shipped (`install.sh` / `install.ps1`):** checks
+  prerequisites, clones if needed, installs PyYAML + the pre-commit floor hook,
+  writes a Claude Code `CLAUDE.md` wrapper, and verifies with `mdllm doctor`. Missing
+  git/Python are **offered via the OS package manager with consent (`-y`/`-Yes` to
+  skip), never force-installed** — a deliberate "bundle, don't force" line (a script
+  cannot vendor an interpreter; consent-based package-manager install is the seamless
+  path within its powers). `CLAUDE.md` is gitignored; `*.sh` pinned to LF via
+  `.gitattributes` so a Windows checkout stays runnable on macOS/Linux. Both
+  one-liners verified live against the pushed remote.
+- **Human guides moved to `docs/`; foundational specs deliberately left flat:**
+  `operator-guide.md`, `first-hour.md`, `framework-map.md` are not in
+  `foundational_specs`/`TIERS`, so the move was contained (AGENTS Tier 2 + catalog,
+  README links, framework-map's own `../` links, install-script paths; validate +
+  coherence clean, guides still in corpus). The ~25 foundational specs stay at root
+  because `{framework_root}/<spec>.md` is a **published, hardcoded resolution
+  contract** (`framework-discovery.md` + every deployed domain's `AGENTS.md` +
+  `templates/AGENTS.md.template`); relocating them is a breaking cross-repo
+  migration, not a tidy. The categorization the flat layout appears to lack already
+  lives in frontmatter `type`/`status`, the AGENTS catalog, and `framework-map.md` —
+  a folder taxonomy would compete with it and risk drift.
+- **The root-clutter instinct was human-centric and ceded to the agent-first design**
+  (operator's framing): "this isn't for me, it's for the agent — this is the way it's
+  supposed to be." The flat spec list is the interface surface, not mess; left
+  untouched for exactly that reason.
 
 ## Decisions Made This Session (2026-06-18, session 9)
 
