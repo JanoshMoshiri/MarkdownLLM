@@ -1,8 +1,8 @@
 ---
 id: first-2x2-measured-convention-following-not-reasoning
 type: insight
-status: active
-version: 1.0
+status: dismissed
+version: 1.1
 created: 2026-06-11
 confidence: medium
 origin: synthesised
@@ -14,6 +14,8 @@ linked_things:
     relation: extends
   - id: hook-compliance-correlates-with-scope-not-awareness
     relation: supports
+  - id: structure-decides-figures-scale-decides-convention
+    relation: superseded-by
 ---
 
 # The First 2×2 Measured Convention-Following, Not Reasoning
@@ -89,3 +91,16 @@ the id-template and Windows CLI fixes) was moved to
 broken runner. One opus/bare trial spontaneously created the has-deadline
 link with no framework present; spontaneous structure is part of what the
 fairness note says the asymmetry measures.
+
+## Disposition
+
+**Dismissed — superseded (2026-06-19 retrospective).** This insight's open
+demand — *build a fixture whose condition-neutral core discriminates, so the
+framework's contribution to reasoning rather than convention is what is
+measured* — was met. The `sleeping-bag-fac` 2×2 (2026-06-16/17) used an
+unleakable synthetic rule and discriminated cleanly: structure decided the
+figures (framework 5/5 both models, bare 0/5 both), model tier decided only the
+link convention. That result is recorded as
+[[structure-decides-figures-scale-decides-convention]], which closes the loop
+this insight opened. Set aside in its favour; kept for the audit trail as the
+honest reading of the first run that motivated the better fixture.

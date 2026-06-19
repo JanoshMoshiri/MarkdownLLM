@@ -11,7 +11,7 @@ session: 2026-06-17
 tags: [evals, stage-2, structure-beats-scale, reasoning-discriminator, manifesto]
 linked_things:
   - id: first-2x2-measured-convention-following-not-reasoning
-    relation: extends
+    relation: supersedes
   - id: withholding-is-not-isolation
     relation: complements
   - id: mis-keyed-links-pass-the-floor-silently

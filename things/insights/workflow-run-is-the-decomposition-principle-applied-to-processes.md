@@ -1,13 +1,14 @@
 ---
 id: workflow-run-is-the-decomposition-principle-applied-to-processes
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-15
 session: 2026-06-15
 source: both
 confidence: high
 origin: synthesised
+promoted_to: workflow-state-specification
 tags: [thing-model, workflow, decomposition, concurrency, clean-architecture]
 linked_things:
   - id: workflow-state-specification
@@ -37,3 +38,13 @@ The razor it passes: almost everything is inherited (it is a thing; decisions pi
 ## Context
 
 Surfaced by the third independent review (2026-06-15), which moved this gap from theoretical ("gap 4, parked" in the continuity brief) to felt: a real domain running a multi-session pipeline was reconstructing instance state by hand every session. The review's framing — "spec when foreseeable, deploy when felt" — settled that a primitive being undeployed in a domain does not make it not-primitive, exactly how the framework already treats `conflict` and `index`.
+
+## Disposition
+
+**Promoted (2026-06-19 retrospective):** the primitive shipped as
+`workflow-state.md` (`workflow-definition` + `workflow-run`), and the spec was
+promoted draft→evolving in v3.13.0 once it was exercised on a live multi-session
+domain — the `current_stage ∈ stages` membership check is now active in the
+floor and the reverse-edge gap the `definition:` pointer exposed was closed in
+v3.11.0. The decomposition is finished and load-bearing; the insight has
+crystallised into the spec.

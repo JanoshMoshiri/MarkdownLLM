@@ -1,11 +1,12 @@
 ---
 id: mis-keyed-links-pass-the-floor-silently
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-16
 confidence: medium
 origin: synthesised
+promoted_to: validate-thing-specification
 source: session — sleeping-bag-fac smoke (haiku framework trial, 20260616-233024)
 session: 2026-06-16
 tags: [evals, stage-2, floor, validate, linked-things, fixture-design, coherence]
@@ -92,3 +93,10 @@ the five links fail), and that is reported honestly per-assertion. The
 condition-neutral reasoning core — the `fac_celsius` figures — is the
 discriminator, and it is unaffected. The candidate floor check above is the
 real follow-up.
+
+**Promoted (2026-06-19 retrospective):** the candidate floor check shipped as
+the field-registration trilogy in v3.13.0 — `known_fields` joins `types` and
+`relations` as the third opt-in `_schema.yaml` vocabulary, and `validate` now
+Warns on a top-level field outside the declared/`CORE_FIELDS` set. The silent
+mis-keyed-relation hole is closed; the insight has crystallised into
+`validate.thing.md` + `_schema.yaml`.

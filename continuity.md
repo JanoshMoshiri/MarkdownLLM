@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.14
+version: 1.15
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-19
@@ -187,10 +187,6 @@ last_updated: 2026-06-19
   verified only by executing the capability in the target environment;
   resolution (command found, path exists) is not verification. The commit
   test is the floor's execution probe in any new environment.
-- `first-2x2-measured-convention-following-not-reasoning` — the 2026-06-11
-  run's honest reading: structure bought determinism (opus+fw 5/5), the
-  diagonal went the manifesto's way at ~23% cost, but the reasoning claim
-  remains untested until a fixture's condition-neutral core discriminates.
 - `fixture-fixes-correct-bugs-not-difficulty` — when a Stage 2 trial fails,
   fix fixture self-consistency bugs (id templates, schema names) but leave
   genuine model reasoning/attention gaps as findings, not patches.
@@ -215,11 +211,6 @@ last_updated: 2026-06-19
   was decompose-only; composition is its missing inverse, so "insight consolidation"
   was the existing thing-discipline applied to a reserved type, not a new primitive.
   Carries the razor: complete a half-applied discipline before inventing machinery.
-- `workflow-run-is-the-decomposition-principle-applied-to-processes` — workflow
-  run-state was not a new mechanism but the `template-for`/`instance-of` decomposition
-  applied to a process: `workflow-definition` (stages as data) + `workflow-run`
-  (cursor + advisory claim + resume). Decomposing run-state per instance also
-  dissolves most of the concurrency hazard (the `continuity.md` singleton).
 - `cross-domain-handoff-is-verified-external-input` (confidence: medium) — a
   cross-domain hand-off is not a link but an import of external input, so it inherits
   `origin: external` quarantine + provenance; reframes the retracted manifesto promise
@@ -237,19 +228,12 @@ last_updated: 2026-06-19
   agent's view but leaves it discoverable on the filesystem is defeated by a
   capable agent; an opus-bare trial read the withheld seed `AGENTS.md` and said
   so. A property of capability, not a defect — bare evals need real isolation.
-- `mis-keyed-links-pass-the-floor-silently` — an agent without a `linked_things`
-  exemplar writes relations under a near-miss key (`relations:`) that `validate`
-  ignores with no error; the declared edge is silently lost. Candidate
-  corpus-general floor Warning.
 - `framework-reserved-types-need-thing-md-as-single-source` — adding a
   framework-reserved type must update `thing.md` first, then propagate; AGENTS.md
   is a summary, not the source of truth.
 - `hard-hooks-require-observable-agent-caused-triggers` — a hook is only "hard" if
   triggered by an agent-caused, agent-observable event; otherwise it is a prompt
   bound to a hook point, explicitly invoked.
-- `operative-rules-are-a-small-fraction-of-spec-prose` — operative rules measured
-  ~1.4k of 21.4k tokens across the Tier 0/1 specs; the basis of the kernel (rules
-  without rationale at Tier 0).
 - `reflexive-behaviors-are-indexes-plus-prompts` — velocity, trigger-eval,
   conflict-scan, and schema-review are one pattern: a derived index + a prompt;
   the basis of `derived-index.md`.
@@ -261,15 +245,30 @@ last_updated: 2026-06-19
 - `version-mismatch-triggers-validation-cascade` — on a framework version mismatch
   at session start, run validation immediately (new rules may invalidate things) —
   don't merely surface the mismatch.
-- `continuity-briefs-solve-external-state-drift` — **dismiss candidate (confirm at
-  retrospective):** argued the framework needs no brief because it has no external
-  state drift; overtaken — the framework adopted this brief for cross-session
-  thread-tracking during heavy development. The general caution (don't apply a
-  domain pattern reflexively) survives; the "framework has none" claim does not.
-
 ## Pending Decisions
 
 - (none)
+
+## Decisions Made This Session (2026-06-19, retrospective)
+
+- **Second June retrospective written** (`things/retrospectives/framework-retrospective-2026-06b.md`,
+  period 2026-06-11 → 2026-06-19, sessions 7–11, v3.10 → v3.14). The first June
+  retrospective closed on 06-11; this period tripped both the volume and milestone
+  triggers (the floor went scaffold → enforced). Headline finding: **the corrective
+  loop reversed polarity** — where the May retrospective criticised answering every
+  gap with more prose, this period answered gaps *mechanically and subtractively*
+  (coherence, field-registration, touchpoints) and ended by *deleting* two prompts.
+- **First real insight triage + composition sweep run** (the discipline specified in
+  `session-memory.md`, never before exercised). 28 active insights walked: **3 promoted**
+  (`mis-keyed-links-pass-the-floor-silently` → field-registration; `workflow-run-…` →
+  `workflow-state.md`; `operative-rules-…` → `framework-kernel`), **2 dismissed**
+  (`continuity-briefs-solve-external-state-drift`, claim overtaken; `first-2x2-…`,
+  superseded by `structure-decides-…` with the `supersedes`/`superseded-by` backlink
+  set). 23 remain active. The composition pre-filter flagged the change-safety cluster
+  but the call was *relate, don't merge* — distinct facets that already cross-link.
+- **Reflexive scans clean:** validate 0/0/0 across all three corpora, no orphaned active
+  insights, no new conflicts; coherence's only findings are two stale `stable` labels
+  (manifesto, session-memory) carried forward as a "What Should Change" item.
 
 ## Decisions Made This Session (2026-06-19, session 11)
 
