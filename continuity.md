@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.15
+version: 1.16
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-19
@@ -20,8 +20,9 @@ last_updated: 2026-06-19
   `kernel`/`index` drift — a generated-artifact freshness check in `tools/mdllm.py`.
   Tool-code work (out of scope for the surface-reduction pass that surfaced it).
   Generalises the `existence ≠ currency` candidate noted in the 2026-06-16 thread.
-- **Fourth review (2026-06-16, mechanical census) — shipped as 3.12.0, STAGED FOR
-  PUSH on branch `coherence-floor` (not yet on main):** full review at
+- **Fourth review (2026-06-16, mechanical census) — shipped as 3.12.0, NOW ON MAIN
+  (the `coherence-floor` branch was a stale leftover, fully merged and deleted
+  2026-06-19; the 3.13.0/3.14.0 work was built on top of it):** full review at
   `reviews/REVIEW-mechanical-census-2026-06-16.md`. It confirmed the
   mechanical/semantic line is drawn correctly and found the real gap: the floor
   *guaranteed* integrity at the commit boundary (`validate` in the hook) but left
@@ -37,9 +38,11 @@ last_updated: 2026-06-19
   `mdllm worklog --write`; README no longer claims "no installation"). And `mdllm
   doctor` gained a **hook-body freshness** check: `refresh --seal` bumps the
   sentinel without reinstalling the hook, so doctor now flags an installed hook
-  that is stale vs the current `HOOK_BODY` (advisory). **Next:** (a) push/merge
-  the branch; (b) absorb into the live domains via `refresh` → `install-hook` →
-  `refresh --seal` (all three are behind: jmtm 3.6.0, eco 3.6.0, property 2.9;
+  that is stale vs the current `HOOK_BODY` (advisory). **Next:** (a) DONE — the
+  work is on main; the branch is deleted; (b) absorb into the live domains via
+  `refresh` → `install-hook` → `refresh --seal` (all three are behind: jmtm 3.6.0,
+  eco 3.6.0, property 2.9; **this is felt-when-felt private-domain work — see
+  `felt-deployment-lands-in-undisclosable-work`**;
   absorption is near-invisible today — no indexes/`stable` skills/`.markdownllm`,
   so coherence blocks nothing — the payoff is on-demand `mdllm coherence` and
   automatic index-drift enforcement the day a domain deploys an index); (c) insight
@@ -64,8 +67,11 @@ last_updated: 2026-06-19
   mechanically surface its runs (nor `parent` its children); the index now emits the
   structural pointers, both reconciliation modes inherit the recall, and the rule is
   pinned as `structural-pointers-need-reverse-edge-indexing`. **Remaining:** (a) **#4 narrative validation
-  record** — `evidence/` scaffold + shape-only template shipped; the narrative case
-  study waits on the operator's disclosure decision (after the brother conversation);
+  record** — `evidence/` scaffold + shape-only template shipped; the cold-start human
+  eval **has happened informally (the operator's brother)** but a clean, sourced,
+  *disclosable* writeup is not producible now and may never be — this is the
+  disclosable-proxy backlog, not undone work (see
+  `felt-deployment-lands-in-undisclosable-work`);
   (b) **DONE (2026-06-18)** — the `workflow-run` primitive is now in live use on a
   real domain (private IP, not in the public corpus); the spec was promoted
   draft→evolving and the floor's `current_stage ∈ stages` check is active;
@@ -89,10 +95,12 @@ last_updated: 2026-06-19
   3.6.0):** the agent-only rehearsal ran (10/11, 10/11, then 11/11 once the
   guide routed to the new `mdllm scaffold`); `doctor` shipped;
   eco-essentials completed the first real refresh (2.8 → 3.5.0). **Remaining,
-  in priority order:** (1) **cold-start eval with a real human — still the
-  centrepiece, now de-risked** (recruit one non-author person; observe, don't
-  help; the agent-side path and templates are proven; both reviews agree this
-  outranks everything); (2) **refresh jmtm-software** (statutory stakes;
+  in priority order:** (1) **cold-start eval — happened informally (the brother);
+  what remains is a *disclosable* writeup, which is felt-when-felt and may not come**
+  (the agent-side path and templates are proven; the original "recruit a non-author,
+  observe, don't help" framing is satisfied in substance — see
+  `felt-deployment-lands-in-undisclosable-work`; reclassified from "the undone
+  centrepiece" to disclosable-proxy backlog); (2) **refresh jmtm-software** (statutory stakes;
   AGENTS still teaches the pre-v3 validation procedure; working tree had
   uncommitted changes mid-session 3 — check whose, finish or refresh
   cleanly) and property-ventures after it; (3) fix what the human eval
@@ -173,6 +181,12 @@ last_updated: 2026-06-19
 
 ## Live Insights
 
+- `felt-deployment-lands-in-undisclosable-work` — the framework's "deploy when felt"
+  trigger fires inside the operator's confidential law-firm work (client IP), so the
+  public repo structurally undercounts deployment; items shown as "deferred" are often
+  done-but-private. The evals are synthetic precisely as the disclosable proxy. Stop
+  reading public silence as immaturity; reserve open-thread status for genuinely-undone
+  or disclosable-proxy work. The razor for triaging felt-trigger threads (2026-06-19).
 - `hook-enforcement-has-three-anchors` — every hook anchors to agent-interpretation
   (portable, the default, sufficient for correctness), git/filesystem (mechanical,
   universal), or harness session lifecycle (needs an optional adapter); the anchor —
@@ -269,6 +283,16 @@ last_updated: 2026-06-19
 - **Reflexive scans clean:** validate 0/0/0 across all three corpora, no orphaned active
   insights, no new conflicts; coherence's only findings are two stale `stable` labels
   (manifesto, session-memory) carried forward as a "What Should Change" item.
+- **Post-retrospective correction — three stale framings reconciled** (operator's
+  three observations): (1) the `coherence-floor` branch was a stale leftover, fully
+  contained in `main` and never on the remote — deleted; the retrospective's "push the
+  staged work" finding was based on the stale thread and is corrected. (2) The
+  cold-start human eval **has happened informally (the brother)**; only a disclosable
+  writeup remains, reclassified from "the undone centrepiece" to disclosable-proxy
+  backlog. (3) The recurring "deploy when felt" deferrals are largely **felt in the
+  operator's confidential law-firm work** (client IP, invisible to the public repo) —
+  captured as `felt-deployment-lands-in-undisclosable-work`, which now governs how
+  felt-trigger threads are triaged. The retrospective doc was amended to match.
 
 ## Decisions Made This Session (2026-06-19, session 11)
 

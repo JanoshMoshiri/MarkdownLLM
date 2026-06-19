@@ -67,9 +67,11 @@ with a real non-author human.
 
 ## What Didn't Work
 
-- **The centrepiece still hasn't run.** The cold-start human eval has been "the
-  centrepiece, now de-risked" for two consecutive retrospectives. Every prerequisite
-  is proven; the eval itself has not happened. De-risking is not running.
+- **The disclosable evidence still hasn't been produced** *(corrected 2026-06-19 —
+  see note below)*. The cold-start human eval has happened **informally, with the
+  author's brother** — but a clean, sourced, *publishable* writeup is not producible
+  now and may never be. The gap is disclosable evidence, not the eval itself; the
+  framework had been mis-tracking "done but undisclosable" as "undone."
 - **A control was defeated, as foreseen.** An opus-bare trial read the withheld
   method from a seed `AGENTS.md` inside the repo (`withholding-is-not-isolation`).
   Correctly kept as a result rather than re-run away — but the isolation hardening it
@@ -80,10 +82,13 @@ with a real non-author human.
 - **Domains drifted further behind.** jmtm-software and eco-essentials sit at 3.6,
   property at 2.9, against a framework now at 3.14. The release-cadence-vs-refresh-cost
   tension was named in the last retrospective and is wider now, not narrower.
-- **Work accumulates in a staged-but-unpushed state.** The coherence branch
-  (3.12.0) is recorded "STAGED FOR PUSH … not yet on main"; session 11's commits are
-  "committed but not yet pushed." An unpushed commit is its own kind of drift — the
-  remote is stale against local reality.
+- **Stale tracking threads outlive the work they describe** *(corrected
+  2026-06-19)*. The continuity brief carried the coherence floor as "STAGED FOR PUSH
+  on branch `coherence-floor` (not yet on main)" — but that branch was a local-only
+  leftover, *fully merged* into main (3.13.0/3.14.0 were built on top of it), and is
+  now deleted. The work was never stuck; the *label* was. The real residual drift is
+  smaller: `main` is one retrospective commit ahead of `origin/main`, the operator's
+  to push.
 
 ## Patterns We Noticed
 
@@ -100,11 +105,17 @@ with a real non-author human.
   structural-pointers), the enforcement thread (hook-compliance → hard-hooks →
   *three-anchors*). Each cluster resolves toward a later insight that absorbs or
   supersedes the earlier ones — which is exactly what made this triage tractable.
-- **"Deploy when felt" is excellent at deferring the same three things.** The human
-  eval, the isolation hardening, and the domain refreshes recur as deferred items
-  every session. The framework is superb at *specifying* and *de-risking* and weak at
-  pulling the felt-trigger. The discipline is sound; the risk is that "felt" never
-  arrives for the highest-value items.
+- **"Deploy when felt" fires mostly off-camera** *(revised 2026-06-19)*. The
+  initial read was that the framework defers the same items every session because
+  "felt" never arrives. The truer reading, surfaced by the operator: the felt-trigger
+  *is* being pulled — inside confidential law-firm work that is the firm's IP and
+  cannot enter the public repo. The `workflow-run` primitive's first live use ("a real
+  domain, private IP") is the rule, not the exception. So the public repo
+  **structurally undercounts deployment**, and the evals are synthetic precisely to be
+  a *disclosable proxy* for evidence that exists but can't be shown. Captured as
+  `felt-deployment-lands-in-undisclosable-work`. The remaining honest public backlog is
+  the disclosable-proxy work (sanitised case study, `limitations.md`), not the
+  deployments themselves.
 - **The framework keeps catching itself overclaiming.** Model-tier superiority
   demoted (twice), cross-domain linking retracted, the manifesto re-tiered into
   thesis/utility/corollary, the cold-MVP anecdote retired as evidence. A healthy
@@ -113,8 +124,11 @@ with a real non-author human.
 
 ## What Should Change
 
-- **Push the staged work.** The coherence branch and the session 11 commits should
-  land on main and propagate to the live domains. Carry no further as "staged."
+- **Distinguish "undone" from "done but undisclosable" in the tracking.** Per
+  `felt-deployment-lands-in-undisclosable-work`: mark privately-exercised threads
+  *exercised privately; public artifact unavailable* and stop re-surfacing them.
+  Reserve open-thread status for genuinely-undone or disclosable-proxy work. (Push the
+  one-commit-ahead `main` to origin when ready — the only real staging residue.)
 - **Resolve the two stale `stable` labels.** Coherence flags `llm-driven-systems-manifesto`
   and `session-memory.md` as `stable` but changed within 15 commits. The manifesto's
   v2.4 reword and session-memory's insight-lifecycle additions are structural changes —
@@ -134,9 +148,11 @@ with a real non-author human.
 
 ## Open Questions Going Forward
 
-- **Does the cold-start human eval actually run — and if it keeps not running, should
-  it be reframed or dropped as the centrepiece?** A month as the named priority without
-  happening is itself data.
+- **Can the framework's confidential evidence ever be made disclosable — and if not,
+  what is the strongest *public* proof it can stand on?** The cold-start eval happened
+  privately; the real deployments are client IP. The honest answer may be that synthetic
+  evals + sanitised case studies are the permanent public ceiling, and that is fine —
+  but it should be a stated position, not a perpetual "todo."
 - **What is the longitudinal drift-resistance test?** The thesis's untested half needs
   a multi-session fixture; `sleeping-bag-fac` is reusable as a component.
 - **What is the standing domain-refresh policy?** (Feeds "What Should Change" above.)
@@ -172,3 +188,17 @@ with a real non-author human.
   lit-region sibling, foundational principle) that already cross-link correctly. The one
   genuine consolidation was the eval thread's first-2×2 → structure-decides supersession,
   handled above.
+
+---
+
+*Correction note (2026-06-19, same day):* immediately after this retrospective was
+first written, the operator's review corrected three findings that had rested on stale
+continuity-brief threads. (1) The `coherence-floor` branch was not staged work awaiting
+a push — it was a local-only leftover fully merged into `main`, now deleted. (2) The
+cold-start human eval had already happened informally (the operator's brother); only a
+*disclosable* writeup is outstanding. (3) The recurring "deploy when felt" deferrals are
+largely felt inside confidential law-firm work (client IP) invisible to the public repo.
+The affected sections above were revised in place and the realisation captured as
+`felt-deployment-lands-in-undisclosable-work`. The meta-finding stands and is sharpened:
+the framework's *tracking* drifts stale faster than its *work* does — which is exactly
+the class of problem a retrospective exists to catch.
