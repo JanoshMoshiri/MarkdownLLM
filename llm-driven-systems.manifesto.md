@@ -17,9 +17,9 @@ linked_things:
 
 We are at an inflection point in how humans and machines collaborate on complex systems.
 
-For decades, the dominant pattern has been: humans design systems, write code to implement those designs, and then use those systems. Applications are monolithic bundles where interface, logic, and storage are tightly coupled. To change behavior, you change code. To integrate new capabilities, you wire them together through APIs and integrations.
+For decades, a program could only do what it was told. Code is a fixed set of instructions, and the processing unit at its center carried them out exactly as written — no more, no less. To change what the system did, you changed the code.
 
-This is breaking down.
+What has changed is the processing unit itself. With an LLM at the center, a system no longer just carries out the instructions it is given — it reasons within them. It brings fresh ideas, insight, and inference to the data passed into it. This changes both what a program can do and what it *is*: programs can now identify the bugs within themselves and fix them, modify themselves, grow, change, and evolve — none of which a fixed set of instructions could ever do. That is the paradigm shift.
 
 A new pattern is emerging: **humans define domains, LLMs reason within those domains, and structured data in version control becomes the persistent state.**
 
@@ -125,6 +125,14 @@ This is what enables the relationship to be natural. You don't need to teach the
 Discovery is also what makes the system grow without friction. When you add a new skill, the agent picks it up next session. When you commit new things, they're part of the context the agent reads. When the framework itself evolves, domain agents can detect and incorporate those changes through the refresh mechanism. The system expands and the agent adapts — with the human directing where it goes, and the agent handling how to get there.
 
 This is the quiet foundation beneath everything else: a set of file conventions that mean an agent can enter any MarkdownLLM domain and immediately understand what it is, how it works, and how to help.
+
+### The System as Collaborator
+
+This partnership runs deeper than discovery. Working within a domain is not a single transaction — it is an accretive process. You don't have to hand the system a complete, finished input. You give it an initial set of data, and the reasoning at the center works from that. As you go, you add more: a new constraint, a fresh consideration, an answer to a question that just came up. The agent pulls together what was already in the domain, what you've just added, and the workflow you're following, and carries the work forward toward an output.
+
+Take a software development life cycle. You start with requirements, then move into design. You examine the constraints the design has to satisfy. As you work through those considerations, questions surface — some of which you'll want to take to your data team, or your infrastructure team. The process doesn't stall waiting for a complete specification up front; it accommodates information as it arrives, in the order it arrives.
+
+This is what changes the nature of the relationship. The system no longer just carries out the process and manages it — it participates in it. A defined system becomes one of the collaborators: an administrator that holds the state, an adviser that raises the questions worth asking, and an expert in whatever domain you've built. And the expertise compounds. The more you work within the domain, the more the agent has to reason from — every thing committed, every decision recorded, every relationship drawn becomes context it can draw on next time. The partnership doesn't just persist; it deepens.
 
 ## Why This Works
 
