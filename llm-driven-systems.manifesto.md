@@ -1,7 +1,7 @@
 ---
 id: llm-driven-systems-manifesto
 type: manifesto
-status: stable
+status: evolving
 version: 2.4
 created: 2026-05-13
 linked_things:

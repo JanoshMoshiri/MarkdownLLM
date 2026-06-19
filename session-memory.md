@@ -1,7 +1,7 @@
 ---
 id: session-memory-specification
 type: specification
-status: stable
+status: evolving
 version: 1.2
 created: 2026-05-27
 linked_things:
