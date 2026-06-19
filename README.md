@@ -172,20 +172,25 @@ What holds regardless of the verdict:
 
 ## Getting Started
 
-**Prerequisites:** an LLM tool with file-system access, plus `git`, Python 3.10+, and PyYAML for the deterministic floor.
+One command checks prerequisites, clones the framework, installs PyYAML and the deterministic-floor hook, and verifies the result with `mdllm doctor`:
 
 ```bash
-git clone https://github.com/JanoshMoshiri/MarkdownLLM.git
-cd MarkdownLLM
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.sh | bash
+
+# Windows (PowerShell)
+irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1 | iex
 ```
 
-Open the workspace in your LLM tool, let it discover `AGENTS.md`, and tell it what you want:
+You need an LLM tool with file-system access, plus `git` and Python 3.10+ — the installer offers to install the latter two if they're missing. Prefer to do it by hand? `git clone` the repo and `pip install pyyaml`.
+
+Then open the folder in your LLM tool, let it discover `AGENTS.md`, and tell it what you want:
 
 > "I want a domain for tracking architectural decisions across our microservices — each decision capturing the context, options considered, decision made, and consequences."
 
 The agent reads the specs, proposes a structure, and builds it; you refine through conversation. Then you open the new domain folder as its own workspace and do all future work there.
 
-**That's the sketch — [first-hour.md](first-hour.md) is the real, paced walkthrough**, including installing the floor and watching it catch a deliberate error.
+**That's the sketch — [first-hour.md](first-hour.md) is the real, paced walkthrough**, including watching the floor catch a deliberate error.
 
 ### What works
 
@@ -200,7 +205,7 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 
 ### Vendor setup
 
-- **Claude Code** — add a `CLAUDE.md` at root containing `@AGENTS.md`.
+- **Claude Code** — the installer writes a `CLAUDE.md` wrapper (`@AGENTS.md`) for you. If you cloned by hand, add one at root containing `@AGENTS.md`.
 - **GitHub Copilot (VS Code)** — set `"chat.useAgentsMdFile": true` and `"chat.useNestedAgentsMdFiles": true`.
 - **Codex, Cursor, Windsurf, Gemini CLI** — no configuration; they auto-discover `AGENTS.md` at root.
 

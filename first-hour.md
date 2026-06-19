@@ -1,7 +1,7 @@
 ---
 id: first-hour-guide
 type: guide
-status: draft
+status: evolving
 version: 1.0
 created: 2026-06-12
 linked_things:
@@ -40,11 +40,24 @@ A small Python tool (`tools/mdllm.py`) plus a git pre-commit hook mechanically
 blocks structurally broken changes, so the agent's reliability is spent on
 reasoning, not bookkeeping.
 
-## Minutes 0–10: Prerequisites and a Look Around
+## Minutes 0–10: Install, Then a Look Around
 
-You need: `git`, Python 3.10+, and PyYAML (`pip install pyyaml`). Clone the
-framework repository and open it — but before involving the agent, look at
-two things yourself:
+One command does the mechanical setup. It checks `git` and Python 3.10+
+(offering to install them through your package manager if they're missing),
+clones the framework into `./MarkdownLLM`, installs PyYAML and the validation
+floor, and finishes on a `doctor` report that should read **FLOOR ACTIVE**:
+
+```
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.sh | bash
+
+# Windows (PowerShell)
+irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1 | iex
+```
+
+Prefer to do it yourself? `git clone` the repo and `pip install pyyaml` — the
+script only removes those steps, it doesn't hide anything. Either way, open the
+cloned folder; then, before involving the agent, look at two things yourself:
 
 1. **One real thing.** Open
    `examples/life-manager/things/task-choose-worktop.md`. That is the entire
@@ -56,8 +69,9 @@ two things yourself:
    the domain is, what types exist, what to do on startup. Your domain will
    get one of these, written for you.
 
-Skip the README's full depth and skip `domain-specification-guide.md`
-entirely — that one is your *agent's* reading, not yours.
+The README is the one-page overview if you want the *why*; skip
+`domain-specification-guide.md` entirely — that one is your *agent's* reading,
+not yours.
 
 ## Minutes 10–15: Confirm the Agent Found the Framework
 
@@ -105,19 +119,18 @@ When it's done, open the domain folder as its own workspace. From now on you
 talk to *that* agent, in that workspace; the framework workspace is only for
 framework work.
 
-## Minutes 45–55: Install the Floor and Watch It Catch Something
+## Minutes 45–55: Watch the Floor Catch Something
 
-From the framework folder:
+The floor is already in place — the installer set it up for the framework, and
+`scaffold` installed the pre-commit hook inside your new domain. Prove it
+bites: open any thing in your domain, change its `status:` to `banana`, and run
 
 ```
-python tools/mdllm.py install-hook <path-to-your-domain>
 python tools/mdllm.py validate <path-to-your-domain>
 ```
 
-Then break something on purpose: open any thing in your domain, change its
-`status:` to `banana`, and run validate again. You get an Error naming the
-file, the field, and the legal values — and with the hook installed, that
-Error would have *blocked the commit*. Revert it.
+You get an Error naming the file, the field, and the legal values — and with
+the hook installed, that same Error would have *blocked the commit*. Revert it.
 
 That sixty-second exercise is the framework's core bargain: everything
 mechanical — structure, references, vocabularies — is checked by code at the
