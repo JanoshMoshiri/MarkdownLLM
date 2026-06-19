@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-06-18
-generated: 2026-06-18T19:27:28
-generated_from: HEAD@2c24948
+created: 2026-06-19
+generated: 2026-06-19T18:10:21
+generated_from: HEAD@4ec6834
 coverage: 6
 framework_version: 3.13.0
 ---
@@ -75,6 +75,8 @@ the framework or when the kernel says to. Regenerate after any spec change.
 1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — no live fetch at session start); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
+
+**Enforcement tiers (orthogonal to hard/soft):** every hook fires by **agent interpretation** — the agent reads the entry file and acts on the prose — which is portable across every harness and *sufficient for correctness* (it is the default). Hardening is optional and is the same move twice: the **git pre-commit hook** (`mdllm install-hook`) makes validation mechanical with no adapter (git is universal); optional **per-harness adapters** (`adapters/`) bind session-lifecycle hooks to real harness events. Adapters harden the lowest-consequence hooks — never required, never the difference between working and not.
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
 

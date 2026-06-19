@@ -265,6 +265,6 @@ If the agent encounters a domain without a `continuity.md`, it should:
 ## Relationship To Other Specs
 
 - **thing.md** — `insight` and `continuity-brief` are framework-reserved types defined here. All other type mechanics (frontmatter, linking, triggers) are inherited from `thing.md` — including the cohesion discipline (decompose / compose) that governs insight consolidation (`thing.md` → The Inverse: Composition).
-- **orchestration.md** — The `session-end-continuity` and `worklog-update` prompts are bound to the `session-end` hook point. These are explicitly invoked prompts, not automatic hooks — they require the user or agent to trigger them at session close.
+- **orchestration.md** — The `session-end-continuity` prompt is bound to the `session-end` hook point; regenerating the WORKLOG (`mdllm worklog --write`) is its closing mechanical step. It is an explicitly invoked prompt, not an automatic hook — the user or agent triggers it at session close.
 - **write.thing.md** — Creating and updating insight things follows standard write operations. The session-end ritual is an extension of the write workflow.
 - **git-workflow.md** — Insight things and continuity brief updates are committed following standard conventions. The session-end commit is the natural pairing of the `post-write:commit` hard hook.

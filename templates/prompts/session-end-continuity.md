@@ -96,9 +96,23 @@ Load `continuity.md`. Update:
 
 If no `continuity.md` exists, create one using `templates/continuity-brief.md.template`.
 
-### 5. Commit
+### 5. Commit, Then Regenerate The WORKLOG
 
-Commit all new insight things, conflict things, and the updated continuity brief following `git-workflow.md` conventions.
+Commit all new insight things, conflict things, and the updated continuity brief
+following `git-workflow.md` conventions — including a `session-end:` commit, which
+is the delimiter `mdllm worklog` splits sessions on.
+
+Then regenerate the WORKLOG as a closing **mechanical** step — it is not reasoning,
+it is a generated artifact derived from the commit stream:
+
+```sh
+mdllm worklog --write   # rewrites WORKLOG.md in place from HEAD; never hand-edit
+```
+
+Commit the regenerated `WORKLOG.md`. The system name and id are read from the
+local `AGENTS.md`, so the same command is correct in the framework and in any
+domain repo. The WORKLOG records what *happened* (history); the continuity brief
+above carries what's still *live* (state) — do not duplicate one into the other.
 
 ## Extraction Heuristic
 

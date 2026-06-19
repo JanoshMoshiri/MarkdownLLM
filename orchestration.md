@@ -35,6 +35,8 @@ linked_things:
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — no live fetch at session start); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 
+**Enforcement tiers (orthogonal to hard/soft):** every hook fires by **agent interpretation** — the agent reads the entry file and acts on the prose — which is portable across every harness and *sufficient for correctness* (it is the default). Hardening is optional and is the same move twice: the **git pre-commit hook** (`mdllm install-hook`) makes validation mechanical with no adapter (git is universal); optional **per-harness adapters** (`adapters/`) bind session-lifecycle hooks to real harness events. Adapters harden the lowest-consequence hooks — never required, never the difference between working and not.
+
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
 
 **Domain hard hooks:** `hard_hooks: [{hook, action}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write`.
@@ -51,6 +53,72 @@ Orchestration introduces three primitives:
 1. **Hook points** — Named moments in the lifecycle where reasoning can be attached
 2. **Prompts** — Reusable reasoning templates smaller than skills, more structured than trigger actions
 3. **Bindings** — Declarations that connect hook points to prompts
+
+## Enforcement: Three Anchors, Not Two
+
+The hard/soft distinction (next section) is about *configuration* — always-on vs
+opt-in. Orthogonal to it, and more important for portability, is a second
+question: **what actually makes a hook fire?** Every hook in this spec anchors to
+one of three surfaces, and the surface — not the label — decides whether the hook
+is enforced and whether it survives a change of harness.
+
+| Anchor | Fires because | Enforced? | Portable? |
+|---|---|---|---|
+| **Agent interpretation** | the agent reads the entry file (`AGENTS.md`) and acts on the prose | No — relies on the agent | ✅ Universal — every harness loads an entry file and runs an LLM over it |
+| **Git / filesystem** | a real mechanism fires (git `pre-commit` hook, a file write) | Yes — mechanical | ✅ Universal — git is present under every harness |
+| **Harness session lifecycle** | the harness decides a "session" started or ended | Only if an adapter binds it | ❌ Differs per harness |
+
+**Interpretation is the default, and it is sufficient for correctness.** The
+framework was built and run end-to-end under GitHub Copilot before it ever touched
+Claude Code; the agent read `AGENTS.md` and executed the prose. *That* is the
+portability layer — not git, not any vendor hook. A domain with zero adapters and
+zero mechanical hooks still works, because the universal substrate under every
+harness is an LLM reading the entry file.
+
+**Hardening is optional, and it is the same move twice.** Where being wrong is
+unrecoverable, trade "the agent should" for "the machine guarantees":
+
+- The **git pre-commit hook** (`mdllm install-hook`) hardens validation. It needs
+  no adapter because git is universal — which is why the one genuinely
+  load-bearing hook (`pre-commit` validation) is also the one that never has to
+  know which harness it runs under.
+- A **per-harness adapter** (`adapters/`) can harden the session-lifecycle hooks
+  by binding them to real harness events (Claude Code's `SessionStart`, `Stop`,
+  `PostToolUse`; the equivalent elsewhere). `adapters/claude-code.settings.example.json`
+  does exactly this for `post-write` validation.
+
+If a hook can only be hardened by an adapter and you write no adapter, it falls
+back to interpretation — which is where it started, and where the framework
+already works.
+
+### The Distribution
+
+Every hook and prompt, by anchor. Read the last column to see why interpretation
+is safe for almost all of them: git reconstructs state, and validation catches
+drift later, so a skipped hook degrades gracefully rather than corrupting.
+
+| Hook / Prompt | Anchor | Enforced by today | If the agent skips it |
+|---|---|---|---|
+| `pre-commit` validation | git/fs | ⚙️ git hook (mechanical) | **Can't** — commit is blocked |
+| `post-write:commit` (the commit act) | interpretation | the agent (git hook validates *if* a commit happens) | **Severe** — work stranded in the working dir |
+| `pre-domain-scaffold:isolate` | git/fs | ⚙️ `mdllm scaffold` | Moderate — repo pollution, needs cleanup |
+| `session-start:version-check` | harness-session | interpretation | Low — stale version; validation catches breaks later |
+| `session-start`, `session-end` | harness-session | interpretation | Low — orientation/worklog regenerable from git |
+| `post-write` | git/fs (file write) | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
+| `post-commit` | git/fs | interpretation (no bindings) | Low |
+| `on-create`, `on-status-change`, `on-error`, `retrospective` | interpretation (semantic) | interpretation — no mechanical detector possible | Moderate — downstream not cascaded |
+| reasoning prompts (`cascade-completion`, `evaluate-triggers`, `surface-attention`, `detect-conflicts`, `session-orientation`, `domain-velocity`, `review-schema-coherence`, `session-end-continuity`) | interpretation | interpretation — they *are* reasoning | Low–Moderate |
+
+Two consequences fall out:
+
+1. **Only `pre-commit` validation is mechanically enforced today**, and it is the
+   one hook with unrecoverable consequence. The floor is correctly sized — it
+   guards exactly what must never be wrong, and nothing more.
+2. **Adapters touch only the session-lifecycle rows**, the lowest-consequence rows
+   in the table. Keeping adapters optional is not a compromise — it is what keeps
+   MarkdownLLM a portable *substrate* rather than a harness-specific tool. The
+   moment an adapter became *required*, the framework would stop being
+   harness-agnostic.
 
 ## Hard Hooks vs Soft Hooks
 
@@ -314,12 +382,10 @@ These are prompts that ship with the framework and apply to any domain:
 
 - **cascade-completion** — Evaluate downstream impact when a thing completes
 - **evaluate-triggers** — Scan active things for trigger conditions that are now true
-- **validate-before-commit** — Run structural and referential validation on staged changes
 - **session-orientation** — At session start, summarize what's changed since last session
 - **surface-attention** — Determine which things need user attention and in what priority order
 - **detect-conflicts** — Check if a proposed change conflicts with existing state (lens conflicts, dependency violations)
-- **session-end-continuity** — At session end, extract insights, check for contradictions, and update the continuity brief
-- **worklog-update** — At session end, regenerate WORKLOG.md from the commit stream (`mdllm worklog --write`); it is a generated artifact, not hand-authored
+- **session-end-continuity** — At session end, extract insights, check for contradictions, update the continuity brief, and regenerate the WORKLOG (`mdllm worklog --write`) as its closing mechanical step
 - **domain-velocity** — At session start, read git history as telemetry to surface stalled, churning, or untouched work the current-state snapshot can't see
 - **review-schema-coherence** — At retrospective, audit the domain's emergent frontmatter vocabulary (via the schema registry) for fields that have drifted apart in name but converged in meaning
 
@@ -350,10 +416,6 @@ bindings:
       - cascade-completion
       - evaluate-triggers
     
-  - hook: pre-commit
-    invoke:
-      - validate-before-commit
-    
   - hook: session-start
     invoke:
       - session-orientation
@@ -363,7 +425,6 @@ bindings:
   - hook: session-end
     invoke:
       - session-end-continuity
-      - worklog-update
     
   - hook: phase-gate
     when: "expert confirms phase complete"
@@ -445,17 +506,15 @@ User: "I finished the data collection task"
            └── evaluate-triggers runs:
                "quarterly-review-prep had dependency trigger watching data-collection"
 
-3. Agent stages changes for commit
-   └── Hook fires: pre-commit
-       └── Binding: pre-commit → [validate-before-commit]
-           └── validate-before-commit runs:
-               "Structural check: ✓ | Referential check: ✓ | Semantic check: ✓"
-
-4. Agent commits
-   └── Hook fires: post-commit
+3. Agent commits
+   └── git pre-commit hook fires (mechanical, not a prompt):
+       "Structural check: ✓ | Referential check: ✓ | Schema check: ✓"
+       (Errors here block the commit. Semantic judgement is the agent's
+        standing job per validate.thing.md — not a separate pre-commit prompt.)
+   └── Hook point fires: post-commit
        (no bindings currently → nothing fires)
 
-5. Agent reports to user:
+4. Agent reports to user:
    "Marked data-collection complete. This unblocked quarterly-review-prep —
     moved it from blocked to not-started. It's now your highest priority item."
 ```
@@ -529,10 +588,10 @@ framework-root/
 │   ├── prompts/                  ← starting-point prompt templates
 │   │   ├── cascade-completion.md
 │   │   ├── evaluate-triggers.md
-│   │   ├── validate-before-commit.md
 │   │   ├── session-orientation.md
 │   │   ├── surface-attention.md
 │   │   ├── detect-conflicts.md
+│   │   ├── session-end-continuity.md
 │   │   ├── domain-velocity.md
 │   │   └── review-schema-coherence.md
 │   └── indexes/                  ← starting-point derived-index templates
