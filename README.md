@@ -2,9 +2,7 @@
 
 *Architecture for AI agents.*
 
-**Your agent is smart, but it works without a map of your world. MarkdownLLM gives it the structure to build one — a traversable knowledge base of its own definitions, navigable at a sensible context cost, with git history as the persistent memory of everything that's happened.**
-
-Agents today are aware — but their awareness is bounded by the context window. Windows are vast now, yet long-running work still overruns them, and when it does the tooling compacts — summarizing what came before so the task can continue, and that lossy squeeze is where things drift. None of this is unsolved territory: people are pushing at it from many directions — memory layers, knowledge graphs, retrieval pipelines, file-based memory. MarkdownLLM doesn't claim to invent these; it brings them together in one package designed for it from the ground up. It doesn't make your agent aware; it *extends* the awareness it already has — the work rides in files and git as it's made, so the agent re-grounds from them rather than from a window that compaction can thin.
+**The model was never the bottleneck.** Prompt engineering, harness engineering, looping — everything that actually moves the needle is something you put *around* the model: the structure you define before it starts, the rails that keep it on the plan. MarkdownLLM is the next layer of that, the one most people haven't named yet — a domain your agent maps for itself as typed, linked things in version control, with git history as the memory it carries between sessions. Not a smarter model. A model that finally knows where it is.
 
 You define a *domain* — anything you need to track and reason about over time — as typed, linked things in version control. The agent traverses that structure to reason with precision, and reads the history to know what changed and when. With the whole domain legible to it, the agent does more than execute: it notices drift, catches misalignment, and stays consistent across sessions. The agent handles execution and structural discipline; you bring direction and judgment. What you're left with is vendor-agnostic, fully transparent, and yours.
 
