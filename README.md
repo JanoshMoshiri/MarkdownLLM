@@ -1,5 +1,7 @@
 # MarkdownLLM
 
+*Architecture for AI agents.*
+
 **Describe what you want to build. Your agent builds a structured system you own — plain markdown and YAML in git — and every session it picks up exactly where you left off.**
 
 Most work with an AI agent evaporates when the conversation ends. MarkdownLLM makes it durable. You define a *domain* — anything you need to track and reason about over time — and the agent reasons within it, while structured files in version control become the persistent state. The agent handles execution and structural discipline; you bring direction and judgment. What you're left with is vendor-agnostic, fully transparent, and yours.
