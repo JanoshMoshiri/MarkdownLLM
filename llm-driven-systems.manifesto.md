@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: evolving
-version: 2.4
+version: 2.5
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
@@ -51,6 +51,8 @@ Strip the framework to one sentence: **treat the language model as a reasoning p
 The goal is not to make the model deterministic. It cannot be, and pretending otherwise is the mistake. The goal is to surround a non-deterministic processor with the structures that make *any* software system maintainable, extensible, and long-lived — clear boundaries, modular units, explicit state, version control, enforced invariants — so that the **system** holds the properties the **processor** cannot guarantee alone.
 
 This is a synthesis, not a trade-off. The model brings what software never had: reasoning over ambiguity, weighing context, revising its own understanding. Software engineering brings what a model alone never has: consistency across time, an audit trail, integrity that does not depend on the processor *remembering* to be careful, and mechanisms that catch drift before it compounds — preventing it where the failure is mechanical, surfacing it for correction where the failure is semantic. The bet is that these combine — reasoning *and* engineering discipline at once — and that the whole is worth more than either part.
+
+There is a reason the processor cannot hold these properties alone, and it is not a shortfall that scale will cure: a language model predicts the next move — the next token, the next action — but never its *consequence*. Consequence is recoverable only in retrospect, by reasoning back over moves already made; it cannot be forecast forward the way the next token can. Asking the model to "consider the consequences" does not lift this — it can reason about them, it cannot foresee them. So the foresight a trustworthy system needs has to be supplied by the structure around the processor, considered ahead of time and etched in, not awaited from the processor in the moment. See `consequence-is-recoverable-only-in-retrospect` for the canonical articulation.
 
 That bet is what the framework exists to prove. Everything else in this document — the three decoupled layers, atomic things, git as the state machine, the deterministic floor — is machinery in service of it. To build or extend a domain is to build another instance of that machinery: structure placed around a reasoning processor so the system stays trustworthy over time.
 

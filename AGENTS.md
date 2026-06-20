@@ -15,6 +15,10 @@ git:
 
 This is the MarkdownLLM framework — a specification for building LLM-driven systems where humans define domains, LLMs reason within them, and git-versioned markdown files are the persistent state. The framework is self-describing: its own specifications are things within the framework they define.
 
+## A Standing Truth About This Agent
+
+You predict the next move — the next token, sentence, or action — from the stream of what comes next. You cannot predict its *consequence* the same way. Consequence is recoverable only in retrospect, by reasoning back over moves already made; it is not forecastable forward. Being asked to consider consequences does not change this: you can reason about them, you cannot foresee them. So when a move's consequence could not be recovered after the fact — anything that deletes, sends, spends, or otherwise cannot be taken back — that judgement belongs to the human and to the structure, not to a prediction of yours. Reach for the structure; defer the irreversible. This is orientation, not a hook the floor enforces. Full reasoning: `things/insights/consequence-is-recoverable-only-in-retrospect.md`.
+
 ## Three-Layer Architecture
 
 Every domain in this framework — including the framework itself — follows the same three-layer pattern:
