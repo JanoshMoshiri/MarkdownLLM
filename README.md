@@ -2,9 +2,11 @@
 
 *Architecture for AI agents.*
 
-**Your agent is smart, but it works without a map. MarkdownLLM gives it one: a traversable knowledge base of structured definitions it can navigate at a sensible context cost, with git history as the persistent memory of everything that's happened.**
+**Your agent is smart, but it works without a map of your world. MarkdownLLM gives it one: a traversable knowledge base of structured definitions it can navigate at a sensible context cost, with git history as the persistent memory of everything that's happened.**
 
-Today's agents are capable but unaware — they execute well, yet they can't see the shape of the system they're working in, or what changed before they arrived. MarkdownLLM changes that. You define a *domain* — anything you need to track and reason about over time — as typed, linked things in version control. The agent traverses that structure to reason with precision, and reads git history to know what happened and when. With the whole domain legible to it, the agent does more than execute: it notices drift, catches misalignment, and stays consistent across sessions. The agent handles execution and structural discipline; you bring direction and judgment. What you're left with is vendor-agnostic, fully transparent, and yours.
+Agents today are aware — but their awareness is bounded by what fits in a single conversation. They reason well in the moment, yet the system they're working in — its shape, its history, what changed before they arrived — tends to stay out of reach, because there's rarely a structured place to hold it. Plenty of people are building toward this from different directions: memory layers, knowledge graphs, retrieval pipelines, file-based memory. MarkdownLLM brings those threads together into one coherent package — a way for an agent to assimilate information into its own traversable knowledge base, and to read git history as a memory of what's happened. It doesn't make your agent aware; it *extends* the awareness it already has, handing it the shape of the whole domain and the record of how it got there.
+
+You define a *domain* — anything you need to track and reason about over time — as typed, linked things in version control. The agent traverses that structure to reason with precision, and reads the history to know what changed and when. With the whole domain legible to it, the agent does more than execute: it notices drift, catches misalignment, and stays consistent across sessions. The agent handles execution and structural discipline; you bring direction and judgment. What you're left with is vendor-agnostic, fully transparent, and yours.
 
 It's a framework discovered by agents, directed by humans, and grown together.
 
