@@ -50,7 +50,7 @@ SKILLS/     — Reasoning capabilities (.skill.md); foundational specs via frame
 THINGS/     — Structured data instances (atomic units following thing.md)
 ```
 
-**Layer 1 — AGENTS.md.** The agent's entry point, auto-discovered by the LLM harness at session start. It declares what the domain is, where skills live, where the framework root is, and the session protocol. Every session begins with full context; the agent never starts cold.
+**Layer 1 — AGENTS.md.** The agent's entry point, auto-discovered by the LLM harness at session start. It declares what the domain is, where skills live, where the framework root is, and the session protocol. Every session begins by re-reading this structure; the agent never starts cold, because its bearings live in files, not in a context window that compaction can erode.
 
 **Layer 2 — Skills.** Instructions *for the agent* — how to think and operate within the domain: a specification skill (philosophy and principles), a read skill, a write skill, and a workflow skill. Foundational specs like `thing.md` live in the framework root, resolved via `framework_root` — see [framework-discovery.md](framework-discovery.md).
 
@@ -168,7 +168,7 @@ That's the framework's central hypothesis, **now being tested rather than assert
 What holds regardless of the verdict:
 
 - **The domain is the product.** The LLM is replaceable (vendor-agnostic); the domain definition is the durable asset you and your agent build over time.
-- **Consistency compounds.** Every session builds on committed state and validated things. Refinements accumulate; nothing is lost.
+- **Consistency compounds.** Every session builds on committed state and validated things — not a summarized memory of the last one. Refinements accumulate; nothing is lost to compaction.
 - **Cost scales with precision, not volume.** Tiered context loading means the agent loads only what it needs, not the whole specification.
 - **Transparency throughout.** Every file is readable; you can always see what the agent built, how it reasoned, and what it changed. Validation at the commit boundary keeps the mechanical half honest so reasoning can carry the rest.
 
@@ -247,7 +247,7 @@ Framework and domains version independently, and many domains can share one fram
 
 ## FAQ
 
-**Why not just prompt engineering?** Prompts are ephemeral — they don't persist across sessions, can't be versioned meaningfully, can't validate themselves, and can't compose. MarkdownLLM gives your agent a persistent, structured, self-validating foundation to reason within. The difference between a prompt and a framework is the difference between giving directions once and building a map.
+**Why not just prompt engineering?** It's not either/or — every session still starts with good prompting. The difference is what that prompting acts on. A prompt on its own is ephemeral: it can't hold state across sessions, version meaningfully, validate itself, or compose. MarkdownLLM gives the agent a persistent, structured world to build its own knowledge base in — so instead of giving directions once, you're giving your agent ground it can map, return to, and extend.
 
 **Why markdown and YAML?** Because agents can read, write, diff, and reason about them, git can version them, and humans can read them too — and that transparency is what makes the collaboration work.
 
