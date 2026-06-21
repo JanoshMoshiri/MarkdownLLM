@@ -181,6 +181,15 @@ last_updated: 2026-06-19
 
 ## Live Insights
 
+- `modeling-cognition-yields-a-learning-loop-not-a-coherence-loop` — the framework's
+  session→insight→retrospective→continuity cycle is an agent loop arrived at by modelling
+  how a mind learns (encode→consolidate→retrieve→apply), not by engineering a `while`-loop
+  harness. Anthropic's harness work passes task-state back for *within-run coherence*
+  (compaction, note-taking, memory tool) and explicitly disclaims a cross-session
+  learned-lesson mechanism; the framework carries *graded, promotable insight* for
+  *cross-run learning*. Same topology, different cargo — the cleaner cause behind the
+  manifesto thesis, and the razor for whether a new mechanism serves coherence or learning
+  (2026-06-21). Unbuilt sibling: the loop-scoped insight at per-iteration cadence.
 - `felt-deployment-lands-in-undisclosable-work` — the framework's "deploy when felt"
   trigger fires inside the operator's confidential law-firm work (client IP), so the
   public repo structurally undercounts deployment; items shown as "deferred" are often
