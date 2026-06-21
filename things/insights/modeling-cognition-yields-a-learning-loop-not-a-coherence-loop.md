@@ -2,7 +2,7 @@
 id: modeling-cognition-yields-a-learning-loop-not-a-coherence-loop
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-21
 session: 2026-06-21
 source: both
@@ -33,6 +33,18 @@ There are two ways to arrive at an agent loop, and they carry different cargo.
 **Cognition-first (this framework's path).** Don't start from a loop at all. Model how a mind accumulates understanding — *encode → consolidate → retrieve → apply* — and the loop falls out as a side effect. Session produces an **insight** (encode), the **retrospective** consolidates and triages it (consolidate), the **continuity brief** carries the live ones forward (retrieve), and the next session reasons within them (apply). The cargo here is not task state but **graded, typed, promotable insight** (`confidence`, `origin`, `promoted_to`, a lifecycle, a retrospective that asks ["is our reasoning working?"](../../retrospective.md)). The optimisation target is *learning across runs*.
 
 Same topology — both are loops. The difference is entirely **what survives the turn**, and that traces directly to which system you imitated. The harness path imitates a *task executor*, so it keeps what the task needs and the learning row is the thing it leaves on the floor. The cognition path imitates a *learner*, so cross-run accumulation isn't a feature that was added — it's the whole point of the thing being copied, and it comes for free.
+
+**The sharper point: the framework did not build a loop at all.** The loop already exists — it is the substrate, the `while` every agent runtime already runs. Recreating it would be the mistake [the-notation-changed-not-the-primitives](the-notation-changed-not-the-primitives.md) warns against, one level deeper. What the framework built is the *assimilation ritual* that rides on top: insight → retrospective → end-of-session continuity. That ritual is **loop-agnostic**. It does not replace or compete with the harness loop; it **composes onto** it.
+
+## Composition, Not Replacement
+
+This is the whole practical consequence, and it is deliberately small — there are no changes to make:
+
+- **You do not recreate the loop.** Loops exist. The contribution is not another loop; it is the learning layer that rides inside one.
+- **You attach the ritual.** To give any existing work-loop the framework's benefit, pin an **end-of-session continuity beat at the end of each iteration**. The insight / retrospective / continuity primitives are already loop-agnostic, so nothing in them changes — and nothing in the loop changes either. The learning property simply appears.
+- **The minimal load-bearing piece is end-of-session continuity.** A fully designed custom-loop integration (assimilation hooks, an explicit retrospective cadence) is nicer and is easy to add — but even with none of it, the end-of-session capture alone preserves the most important piece: the distilled *why* the next iteration reads instead of re-deriving.
+
+Integrating the ritual more natively into the knowledge framework — making "attach end-of-session to this loop" a first-class, one-line affordance — is a reasonable future tidy, not a prerequisite. The composition already works by hand.
 
 ## Why It Matters
 
