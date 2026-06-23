@@ -12,8 +12,8 @@
 | 1 — Taxonomy: anchor-primary | ✅ done | commit 45564c4; kernel/coherence/validate green |
 | 2 — Domain kernel + generator | ✅ done | `mdllm domain-kernel` + managed blocks + coherence drift + scaffold fill; jmtm migrated (182→141); 67 tests green |
 | 3 — Session-start adapter | ✅ done | `mdllm session-start` (version+velocity+drift) + SessionStart hook in adapter (covers Claude Code + VS Code Copilot); 71 tests green |
-| 4 — Deliberate slash commands | ⏳ in progress | started 2026-06-23 |
-| 5 — Rollout via existing rails | ⬜ not started | |
+| 4 — Deliberate slash commands | ✅ done | templates/commands/ (Claude) + templates/copilot-prompts/ (Copilot) for end-session & retrospective; human-invoked, no auto catch-up |
+| 5 — Rollout via existing rails | ⏳ in progress | started 2026-06-23; scaffold deploys kernel+adapter+slash, refresh regenerates, doctor staleness, version bump |
 
 Legend: ⬜ not started · ⏳ in progress · ✅ done · ⚠ blocked
 
