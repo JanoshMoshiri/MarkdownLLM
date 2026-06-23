@@ -35,11 +35,11 @@ linked_things:
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — no live fetch at session start); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 
-**Enforcement tiers (orthogonal to hard/soft):** every hook fires by **agent interpretation** — the agent reads the entry file and acts on the prose — which is portable across every harness and *sufficient for correctness* (it is the default). Hardening is optional and is the same move twice: the **git pre-commit hook** (`mdllm install-hook`) makes validation mechanical with no adapter (git is universal); optional **per-harness adapters** (`adapters/`) bind session-lifecycle hooks to real harness events. Adapters harden the lowest-consequence hooks — never required, never the difference between working and not.
+**Anchor decides enforcement (the primary axis); hard/soft is only config.** Every hook has one **anchor** — the surface that makes it fire: `interpretation` (the agent reads the entry file and acts — portable across every harness, *not* mechanically enforced, the default and sufficient for correctness), `git-fs` (a real git/filesystem mechanism fires — mechanical, universal), or `harness-session` (a harness lifecycle event — enforced only if a per-harness adapter binds it). `hard`/`soft` is config only — always-on vs opt-in — and does **not** imply enforcement: a `hard` + `interpretation` hook is exactly as skippable as a soft one, and is a hardening candidate. Hardening = moving a hook's anchor rightward without touching hard/soft: the **git pre-commit hook** (`mdllm install-hook`) makes validation `git-fs`; optional **per-harness adapters** (`adapters/`) bind `harness-session` hooks to real events. Adapters stay optional — never the difference between working and not.
 
-**Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
+**Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...], anchor?}` in AGENTS.md or workflow skill; declaration order = execution order; `anchor` defaults to `interpretation`).
 
-**Domain hard hooks:** `hard_hooks: [{hook, action}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write`.
+**Domain hard hooks:** `hard_hooks: [{hook, action, anchor?}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write` (anchor `git-fs`).
 
 **Restraint:** a prompt is a checklist, not a procedure manual; >10 domain prompts = over-specification; don't bind what narrative prose already handles reliably.
 <!-- /kernel -->
@@ -130,10 +130,18 @@ Some behaviors, however, are fundamental to the framework's integrity regardless
 
 | | Soft Hook | Hard Hook |
 |---|---|---|
-| **Activation** | Requires a binding declaration | Always active — no configuration needed |
-| **Skippable?** | Yes, if not bound | Never |
+| **Activation (config)** | Requires a binding declaration | Always active — no configuration needed |
+| **Always runs?** | Only if bound | Always *attempted* — never config-disabled |
+| **Enforced?** | Depends on **anchor**, not this column | Depends on **anchor**, not this column |
 | **Defined by** | Domain AGENTS.md or workflow skill | Framework AGENTS.md |
 | **Purpose** | Domain-specific structured reasoning | Framework integrity invariants |
+
+**Hard/soft is the *config* axis — always-on vs opt-in. It says nothing about
+enforcement.** Whether a hook actually fires is decided by its **anchor** (see
+*Enforcement: Three Anchors, Not Two* above). A `hard` hook anchored to
+`interpretation` is always *meant* to run but is skippable in practice until hardened
+— which is precisely why the two axes must be read together and never conflated. The
+old reading ("hard = never skippable") collapsed them and hid the gap.
 
 ### Framework-Level Hard Hooks
 
@@ -142,6 +150,8 @@ These three hard hooks are part of every agent's operating contract with the fra
 #### `post-write:commit` — Commit Every Thing
 
 **When it fires:** After any `.md` file containing YAML frontmatter is created or modified.
+
+**Anchor:** split — the *commit act* is `interpretation` (only the agent decides to commit), while the validation it triggers is `git-fs` (the pre-commit hook). The act is the hookable-but-skippable half; validation is the mechanical half.
 
 **What must happen:**
 1. Identify the owning git repository — walk up the directory tree from the modified file until a `.git` directory is found
@@ -159,6 +169,8 @@ These three hard hooks are part of every agent's operating contract with the fra
 
 **When it fires:** When creating a new domain — specifically, when generating a new `AGENTS.md` in a new directory under the framework.
 
+**Anchor:** `git-fs` when run via `mdllm scaffold` (mechanical, exits non-zero on a broken sequence); `interpretation` if performed by hand — the *ordering* is the invariant either way.
+
 **What must happen, in order:**
 1. `git init` inside the new domain directory — before any domain files are committed anywhere
 2. Add the domain's path to the framework's `.gitignore` — immediately, as part of the same operation
@@ -175,6 +187,8 @@ These three hard hooks are part of every agent's operating contract with the fra
 #### `session-start:version-check` — Check Framework Version Before Every Session
 
 **When it fires:** At the start of every session where the agent has `framework_root` declared in its AGENTS.md frontmatter.
+
+**Anchor:** `harness-session` — enforced only where a per-harness adapter binds the session-start lifecycle event; otherwise it falls back to `interpretation`. This is the framework's prime case of a `hard` hook whose anchor is *not* mechanically enforced: "hard" makes it always-active by config, but nothing forces it to fire. It is the canonical hardening target (see `adapters/`).
 
 This hook checks version drift in **two directions** along the same chain — *published source → local framework → domain*. The downward leg keeps a domain current with the framework copy it inhabits; the upward leg tells the operator when that framework copy is itself behind its published source.
 
@@ -271,17 +285,23 @@ A hook point is a named moment in the system lifecycle where reasoning can be at
 
 These exist in every domain. They fire based on framework mechanics, not domain logic.
 
-| Hook Point | When It Fires | Available Context |
-|------------|---------------|-------------------|
-| `session-start` | Agent loads and discovers AGENTS.md | All things, git log since last session |
-| `session-end` | Before the session closes | All modified things, uncommitted changes |
-| `pre-commit` | After changes are staged, before `git commit` | Staged files, changed thing metadata |
-| `post-commit` | After a successful commit | Commit message, changed thing IDs, diffs |
-| `post-write` | After any thing is modified (before commit) | Modified thing, its linked_things, triggers |
-| `on-create` | After a new thing is created | New thing, potential parent/linked things |
-| `on-status-change` | After a thing's status field changes | Thing, old status, new status, downstream |
-| `on-error` | When validation or reasoning encounters a conflict | Error context, affected things |
-| `retrospective` | When a `type: retrospective` is being written (periodic reflection) | All things, all indexes, conflicts, insights since last retrospective |
+The **Anchor** column is the default surface that fires each point (a binding may
+harden it rightward via an adapter): `interpretation` relies on the agent reading the
+entry file; `git-fs` fires on a real git/filesystem event; `harness-session` fires only
+if a per-harness adapter binds the lifecycle event (otherwise it falls back to
+interpretation).
+
+| Hook Point | When It Fires | Available Context | Anchor (default) |
+|------------|---------------|-------------------|------------------|
+| `session-start` | Agent loads and discovers AGENTS.md | All things, git log since last session | `harness-session` |
+| `session-end` | Before the session closes | All modified things, uncommitted changes | `harness-session` |
+| `pre-commit` | After changes are staged, before `git commit` | Staged files, changed thing metadata | `git-fs` |
+| `post-commit` | After a successful commit | Commit message, changed thing IDs, diffs | `git-fs` |
+| `post-write` | After any thing is modified (before commit) | Modified thing, its linked_things, triggers | `git-fs` |
+| `on-create` | After a new thing is created | New thing, potential parent/linked things | `interpretation` |
+| `on-status-change` | After a thing's status field changes | Thing, old status, new status, downstream | `interpretation` |
+| `on-error` | When validation or reasoning encounters a conflict | Error context, affected things | `interpretation` |
+| `retrospective` | When a `type: retrospective` is being written (periodic reflection) | All things, all indexes, conflicts, insights since last retrospective | `interpretation` |
 
 ### Domain-Level Hook Points
 

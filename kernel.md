@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-06-19
-generated: 2026-06-19T18:51:30
-generated_from: HEAD@f9d198b
+created: 2026-06-23
+generated: 2026-06-23T21:38:48
+generated_from: HEAD@9754b63
 coverage: 6
 framework_version: 3.14.0
 ---
@@ -76,10 +76,10 @@ the framework or when the kernel says to. Regenerate after any spec change.
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — no live fetch at session start); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 
-**Enforcement tiers (orthogonal to hard/soft):** every hook fires by **agent interpretation** — the agent reads the entry file and acts on the prose — which is portable across every harness and *sufficient for correctness* (it is the default). Hardening is optional and is the same move twice: the **git pre-commit hook** (`mdllm install-hook`) makes validation mechanical with no adapter (git is universal); optional **per-harness adapters** (`adapters/`) bind session-lifecycle hooks to real harness events. Adapters harden the lowest-consequence hooks — never required, never the difference between working and not.
+**Anchor decides enforcement (the primary axis); hard/soft is only config.** Every hook has one **anchor** — the surface that makes it fire: `interpretation` (the agent reads the entry file and acts — portable across every harness, *not* mechanically enforced, the default and sufficient for correctness), `git-fs` (a real git/filesystem mechanism fires — mechanical, universal), or `harness-session` (a harness lifecycle event — enforced only if a per-harness adapter binds it). `hard`/`soft` is config only — always-on vs opt-in — and does **not** imply enforcement: a `hard` + `interpretation` hook is exactly as skippable as a soft one, and is a hardening candidate. Hardening = moving a hook's anchor rightward without touching hard/soft: the **git pre-commit hook** (`mdllm install-hook`) makes validation `git-fs`; optional **per-harness adapters** (`adapters/`) bind `harness-session` hooks to real events. Adapters stay optional — never the difference between working and not.
 
-**Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...]}` in AGENTS.md or workflow skill; declaration order = execution order).
+**Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...], anchor?}` in AGENTS.md or workflow skill; declaration order = execution order; `anchor` defaults to `interpretation`).
 
-**Domain hard hooks:** `hard_hooks: [{hook, action}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write`.
+**Domain hard hooks:** `hard_hooks: [{hook, action, anchor?}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write` (anchor `git-fs`).
 
 **Restraint:** a prompt is a checklist, not a procedure manual; >10 domain prompts = over-specification; don't bind what narrative prose already handles reliably.
