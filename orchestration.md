@@ -30,7 +30,7 @@ linked_things:
 # Orchestration
 
 <!-- kernel -->
-**Hard hooks — always active, never skippable:**
+**Hard hooks — always active by config (enforcement depends on anchor — see below):**
 1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — no live fetch at session start); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.

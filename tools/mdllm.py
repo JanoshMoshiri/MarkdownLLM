@@ -1721,13 +1721,16 @@ def _dk_session_start(domain: Path, meta: dict) -> str:
         "in this file's frontmatter. On mismatch: surface it, run "
         "`python {framework_root}/tools/mdllm.py validate .`, then offer "
         "`{framework_root}/domain-refresh.md`.\n"
-        "4. **Velocity** — `domain-velocity`. Read `git log` over `things/`; surface the "
-        "single most important signal (stalled, untouched, churn) in your greeting — one "
-        "line if the domain is healthy.\n"
-        "5. **Triggers + attention** — `evaluate-triggers` then `surface-attention`: scan "
-        "things (or `things/_index/triggers.md` at scale) for fired conditions and order "
-        "what needs the user.\n"
-        "6. Then await intent.")
+        "4. **Orientation** — `session-orientation`: summarise what changed since last "
+        "session (new things, status transitions) and run the scoped insight-staleness "
+        "check (live insights in `continuity.md` × things changed since its `last_updated`).\n"
+        "5. **Velocity** — `domain-velocity`, the counterpart to orientation: read `git log` "
+        "over `things/` for what *should* have moved and hasn't (stalls, churn, untouched "
+        "commitments). One line if the domain is healthy.\n"
+        "6. **Triggers + attention** — `evaluate-triggers` then `surface-attention` (which "
+        "consumes orientation's snapshot): scan things (or `things/_index/triggers.md` at "
+        "scale) for fired conditions and order what needs the user.\n"
+        "7. Then await intent.")
 
 
 def _dk_tier_routing(domain: Path, meta: dict) -> str:
