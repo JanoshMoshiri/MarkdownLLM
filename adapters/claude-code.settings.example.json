@@ -1,13 +1,24 @@
 {
-  "_comment": "Claude Code vendor adapter (transformation plan Phase 7). Merge the hooks block into the domain's .claude/settings.json. Runs the deterministic floor the moment a thing is written — earlier feedback than the pre-commit hook, same tool. Adjust the relative path to tools/mdllm.py for the domain's framework_root.",
+  "_comment": "Optional harness adapter for Claude Code AND Copilot in VS Code (agent mode) — VS Code Copilot reads .claude/settings.json directly, so this one file hardens both. Merge the hooks block into the domain's .claude/settings.json. Opt-in: with no adapter, the AGENTS.md domain kernel still drives these by interpretation (the floor). The command paths assume framework_root: ../.. (domain two levels under the framework) and the hook's cwd is the domain root — adjust ../../tools/mdllm.py to your framework_root if it differs.",
+  "_anchors": "SessionStart hardens session-start:version-check (anchor harness-session); PostToolUse hardens post-write validation (anchor git-fs). Neither replaces the interpretation floor.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ../../tools/mdllm.py session-start ."
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "python tools/mdllm.py validate . --quiet"
+            "command": "python ../../tools/mdllm.py validate . --quiet"
           }
         ]
       }

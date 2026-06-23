@@ -846,3 +846,42 @@ def test_coherence_ignores_unmarked_agents(tmp_path):
     write(tmp_path, "AGENTS.md", "---\nname: T\n---\n\n# T\n\nPlain entry file.\n")
     errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
     assert not any("domain-kernel" in m for m in errs)
+
+
+# ---------------------------------------------------------------- session start
+
+
+def _wired_domain(tmp_path, fw_version: str, seen: str | None):
+    (tmp_path / "fw").mkdir()
+    (tmp_path / "fw" / ".markdownllm").write_text(
+        f"framework: X\nversion: {fw_version}\n", encoding="utf-8")
+    fm = "name: D\nframework_root: ../fw\n"
+    if seen is not None:
+        fm += f"framework_version_seen: {seen}\n"
+    write(tmp_path / "dom", "AGENTS.md", f"---\n{fm}---\n\n# D\n")
+    return tmp_path / "dom"
+
+
+def test_session_start_in_sync(tmp_path, capsys):
+    dom = _wired_domain(tmp_path, "3.14.0", "3.14.0")
+    mdllm.cmd_session_start(_ns(path=str(dom)))
+    assert "Version: in sync" in capsys.readouterr().out
+
+
+def test_session_start_detects_mismatch(tmp_path, capsys):
+    dom = _wired_domain(tmp_path, "3.14.0", "3.0.0")
+    mdllm.cmd_session_start(_ns(path=str(dom)))
+    assert "Version: MISMATCH" in capsys.readouterr().out
+
+
+def test_session_start_flags_unsealed_domain(tmp_path, capsys):
+    dom = _wired_domain(tmp_path, "3.14.0", None)
+    mdllm.cmd_session_start(_ns(path=str(dom)))
+    assert "Version: STALE" in capsys.readouterr().out
+
+
+def test_session_start_always_emits_imperative(tmp_path, capsys):
+    write(tmp_path / "dom", "AGENTS.md", "---\nname: D\n---\n\n# D\n")
+    mdllm.cmd_session_start(_ns(path=str(tmp_path / "dom")))
+    out = capsys.readouterr().out
+    assert "Session Start" in out and "before the user's first request" in out
