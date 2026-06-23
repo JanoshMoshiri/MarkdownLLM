@@ -1,13 +1,14 @@
 ---
 id: hook-enforcement-has-three-anchors
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-19
 session: 2026-06-19
 source: both
 confidence: high
 origin: synthesised
+promoted_to: orchestration-specification
 linked_things:
   - id: orchestration-specification
     relation: informs
