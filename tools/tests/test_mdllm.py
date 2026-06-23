@@ -752,3 +752,97 @@ def test_coherence_index_drift_errors(tmp_path):
         GOOD + "linked_things:\n  - id: b\n    relation: supersedes"))
     errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
     assert any("DRIFT" in m for m in errs)
+
+
+# ---------------------------------------------------------------- domain kernel
+
+
+def _agents_with_blocks(authored_tail: str = "KEEP VERBATIM") -> str:
+    blocks = "".join(
+        f"<!-- generated:{n} -->\n_(placeholder)_\n<!-- /generated:{n} -->\n\n"
+        for n in mdllm.DOMAIN_KERNEL_BLOCKS)
+    return ("---\nname: T\ndescription: d\nframework_root: ../..\n"
+            "framework_version_seen: 3.14.0\n---\n\n"
+            "# T Agent\n\n## What This System Does\n\nAuthored identity line.\n\n"
+            + blocks + f"## Authored Tail\n\n{authored_tail}.\n")
+
+
+def test_domain_kernel_fills_all_blocks(tmp_path):
+    text = _agents_with_blocks()
+    meta, _, _ = mdllm.parse_frontmatter(text)
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    new_text, written, missing = mdllm.apply_domain_kernel(text, blocks)
+    assert set(written) == set(mdllm.DOMAIN_KERNEL_BLOCKS)
+    assert missing == []
+    assert "_(placeholder)_" not in new_text  # every block was replaced
+
+
+def test_domain_kernel_preserves_authored_content(tmp_path):
+    text = _agents_with_blocks(authored_tail="UNIQUE-SENTINEL-9417")
+    meta, _, _ = mdllm.parse_frontmatter(text)
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    new_text, _, _ = mdllm.apply_domain_kernel(text, blocks)
+    assert "UNIQUE-SENTINEL-9417" in new_text          # authored tail kept
+    assert "Authored identity line." in new_text        # authored head kept
+    assert new_text.startswith("---\nname: T\n")         # frontmatter verbatim
+
+
+def test_domain_kernel_is_idempotent(tmp_path):
+    text = _agents_with_blocks()
+    meta, _, _ = mdllm.parse_frontmatter(text)
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    once, _, _ = mdllm.apply_domain_kernel(text, blocks)
+    twice, _, _ = mdllm.apply_domain_kernel(once, blocks)
+    assert once == twice
+    _, drifted = mdllm.domain_kernel_status(once, blocks)
+    assert drifted == []
+
+
+def test_domain_kernel_check_detects_drift(tmp_path):
+    meta, _, _ = mdllm.parse_frontmatter(_agents_with_blocks())
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    filled, _, _ = mdllm.apply_domain_kernel(_agents_with_blocks(), blocks)
+    tampered = filled.replace("Then await intent.", "Then do whatever.")
+    present, drifted = mdllm.domain_kernel_status(tampered, blocks)
+    assert "session-start" in present
+    assert "session-start" in drifted
+
+
+def test_domain_kernel_tier_lists_skills(tmp_path):
+    (tmp_path / "skills").mkdir()
+    (tmp_path / "skills" / "t-workflow.skill.md").write_text("x", encoding="utf-8")
+    meta, _, _ = mdllm.parse_frontmatter(_agents_with_blocks())
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    assert "skills/t-workflow.skill.md" in blocks["tier-routing"]
+
+
+def test_domain_kernel_hooks_include_domain_hard_hooks(tmp_path):
+    meta = {"hard_hooks": [{"hook": "post-write", "action": "rebuild the index",
+                            "anchor": "git-fs"}]}
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    h = blocks["hooks"]
+    assert "post-write" in h and "rebuild the index" in h and "`git-fs`" in h
+
+
+def test_domain_kernel_unmarked_agents_yields_no_blocks(tmp_path):
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, {})
+    plain = "---\nname: T\n---\n\n# T\n\nNo managed blocks here.\n"
+    _, written, missing = mdllm.apply_domain_kernel(plain, blocks)
+    assert written == []
+    assert set(missing) == set(mdllm.DOMAIN_KERNEL_BLOCKS)
+
+
+def test_coherence_flags_domain_kernel_drift(tmp_path):
+    meta, _, _ = mdllm.parse_frontmatter(_agents_with_blocks())
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    filled, _, _ = mdllm.apply_domain_kernel(_agents_with_blocks(), blocks)
+    tampered = filled.replace("Then await intent.", "Then improvise.")
+    write(tmp_path, "AGENTS.md", tampered)
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert any("domain-kernel block" in m for m in errs)
+
+
+def test_coherence_ignores_unmarked_agents(tmp_path):
+    write(tmp_path, "AGENTS.md", "---\nname: T\n---\n\n# T\n\nPlain entry file.\n")
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert not any("domain-kernel" in m for m in errs)

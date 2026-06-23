@@ -9,9 +9,9 @@
 
 | Phase | Status | Notes |
 |---|---|---|
-| 1 — Taxonomy: anchor-primary | ⏳ in progress | started 2026-06-23 |
-| 2 — Domain kernel + generator | ⬜ not started | |
-| 3 — Session-start adapter | ⬜ not started | |
+| 1 — Taxonomy: anchor-primary | ✅ done | commit 45564c4; kernel/coherence/validate green |
+| 2 — Domain kernel + generator | ✅ done | `mdllm domain-kernel` + managed blocks + coherence drift + scaffold fill; jmtm migrated (182→141); 67 tests green |
+| 3 — Session-start adapter | ⏳ in progress | started 2026-06-23 |
 | 4 — Deliberate slash commands | ⬜ not started | |
 | 5 — Rollout via existing rails | ⬜ not started | |
 

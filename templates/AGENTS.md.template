@@ -4,151 +4,77 @@ description: [What this domain does]
 version: 1.0
 applies_to: "**/*.md"
 framework_root: [relative path to MarkdownLLM framework root, e.g. ../.. ]
-framework_version_seen: [framework version at time of domain creation — copy the `version` field from {framework_root}/.markdownllm, e.g. 3.4.0]
+framework_version_seen: [framework version at time of domain creation — copy the `version` field from {framework_root}/.markdownllm, e.g. 3.14.0]
 git:
   autocommit: true
   branch: main
+# Optional domain hard hooks (surface in the generated Hooks block):
+# hard_hooks:
+#   - hook: post-write
+#     action: "If the written thing has triggers, update things/_index/triggers.md in the same commit"
+#     anchor: git-fs
 ---
 
 # [Domain Name] Agent
 
+> This file is the **domain kernel** — the slim, harness-loaded entry surface.
+> Sections marked `<!-- generated:NAME -->` are produced by
+> `python {framework_root}/tools/mdllm.py domain-kernel .` and **must not be
+> hand-edited** (the pre-commit coherence check fails on drift). Everything
+> outside those blocks is authored and preserved verbatim across regenerations.
+
 ## What This System Does
 
-[1-2 sentences describing the vision and primary capability]
+[1-2 sentences: the vision and primary capability of this domain]
 
-## A Standing Truth About This Agent
+<!-- generated:standing-truth -->
+_(managed by `mdllm domain-kernel` — do not hand-edit)_
+<!-- /generated:standing-truth -->
 
-You predict the next move — the next token, sentence, or action — from the stream of what comes next. You cannot predict its *consequence* the same way. Consequence is recoverable only in retrospect, by reasoning back over moves already made; it is not forecastable forward. Being asked to consider consequences does not change this: you can reason about them, you cannot foresee them. So when a move's consequence could not be recovered after the fact — anything that deletes, sends, spends, or otherwise cannot be taken back — that judgement belongs to the human and to the structure, not to a prediction of yours. Reach for the structure; defer the irreversible. This is orientation, not a hook the floor enforces. Full reasoning: `{framework_root}/things/insights/consequence-is-recoverable-only-in-retrospect.md`.
+## Session Start
+
+<!-- generated:session-start -->
+_(managed by `mdllm domain-kernel` — do not hand-edit)_
+<!-- /generated:session-start -->
+
+## Loading — Tiers
+
+<!-- generated:tier-routing -->
+_(managed by `mdllm domain-kernel` — do not hand-edit)_
+<!-- /generated:tier-routing -->
+
+## Hooks
+
+<!-- generated:hooks -->
+_(managed by `mdllm domain-kernel` — do not hand-edit)_
+<!-- /generated:hooks -->
 
 ## Framework Principles Applied to This Domain
 
-[How the core MarkdownLLM principles apply specifically to this domain]
-
-## How This Agent Works
-
-### On Startup
-
-**Tier 0 — Always load:**
-- `AGENTS.md` — this file (already loaded)
-- `{framework_root}/kernel.md` — the generated operative kernel: the rules of thing.md, orchestration.md, read/write/validate.thing.md, and git-workflow.md without their rationale (~1.6k tokens). The hard hooks it carries are always active; non-negotiable.
-- `continuity.md` (if it exists) — open threads, live insights, and pending decisions from the last session
-
-**Version check (session-start hard hook — never skip):** Read `{framework_root}/.markdownllm` — extract the `version` field (first few lines only). Compare against `framework_version_seen` above. If they differ: surface the mismatch to the user, run `python {framework_root}/tools/mdllm.py validate .` over the domain, then offer a full refresh via `{framework_root}/domain-refresh.md`. If they match: proceed.
-
-**Tier 1 — Load a full spec only when the kernel is not enough** — reasoning *about* the framework, or resolving an ambiguity the kernel doesn't settle:
-- `{framework_root}/thing.md`, `{framework_root}/read.thing.md`, `{framework_root}/write.thing.md`, `{framework_root}/validate.thing.md`, `{framework_root}/git-workflow.md`, `{framework_root}/orchestration.md` — load individually, not wholesale
-- Domain skills (load those relevant to session intent):
-  - `[domain]-specification.skill.md`
-  - `[domain]-read.thing.skill.md`
-  - `[domain]-write.thing.skill.md`
-  - `[domain]-workflow.skill.md`
-
-**Tier 2 — Load on demand by query type:**
-
-| Query type | Load |
-|---|---|
-| Framework refresh or "what’s changed" | `{framework_root}/domain-refresh.md` |
-| Session-end, insights, continuity briefs | `{framework_root}/session-memory.md` |
-| Contradictions or conflicting things | `{framework_root}/belief-revision.md` |
-| Periodic quality reflection | `{framework_root}/retrospective.md` |
-| Trigger evaluation or creation | `{framework_root}/trigger-specification.md` |
-| Scaling, structure, lifecycle | `{framework_root}/scalability-guide.md` |
-| Decisions, pinned inputs, external content | `{framework_root}/provenance.md` |
-
-### On User Request
-1. **Clarify intent** — What operation? (read, write, analyze, update, etc.)
-2. **Load relevant skill** — Match intent to appropriate skill (specification, read.thing.skill, write.thing.skill, workflow)
-3. **Load context** — Load relevant things from `./things/` directory
-4. **Execute** — Follow skill guidance while maintaining consistency with principles
-5. **Validate** — After writes, perform semantic validation (domain rules, coherence); the structural/referential/schema layer is owned by `mdllm` and the pre-commit hook
-6. **Commit** — Persist changes following git-workflow conventions
-
-### On Output
-1. Validate thing files if changes were made — semantic checks only; mechanical validation (structure, references, schema) is owned by `mdllm` and the pre-commit hook
-2. **Autocommit** (if `git.autocommit: true`): stage changed files + commit with structured message `action: description` (the `post-write:commit` hard hook)
-3. Report what changed and why
-4. Evaluate triggers — check if writes caused dependency or threshold triggers to fire
-
-### At Session End
-
-When a session that touched domain things is wrapping up, explicitly invoke the `session-end-continuity` bound prompt — extract insights, check for contradictions, update `continuity.md`. This is a bound prompt, not a hard hook: it does not fire automatically, so the agent (or human) must invoke it. Full spec: `{framework_root}/session-memory.md`.
-
-## Skills Directory
-
-All reusable capabilities in this domain are stored as skill files:
-
-- **[domain]-specification.skill.md** — Philosophy, principles, and reasoning patterns
-- **[domain]-read.thing.skill.md** — How to read, analyze, and reason about things
-- **[domain]-write.thing.skill.md** — How to create and update things
-- **[domain]-workflow.skill.md** — Process orchestration and execution patterns
-
-## Foundational Specifications
-
-Resolved from the MarkdownLLM framework root (the kernel covers their operative rules; load a full spec on demand):
-
-- **thing.md** — The atomic unit specification (structure for all things)
-- **validate.thing.md** — The validation contract (mechanical layer: `mdllm`; semantic layer: the agent)
-- **git-workflow.md** — When and how to commit (git as state machine)
-- **interface.md** — I/O layer (input routes and output types)
-
-## Things Directory
-
-Atomic unit instances following thing.md pattern:
-
-- `./things/` — Contains all your domain-specific things (data instances)
-- `./things/_schema.yaml` — The domain's normative schema: thing types, status vocabularies, relation vocabulary. Declared at scaffold time (copy `templates/_schema.yaml.template`); enforced by `mdllm validate` and the pre-commit hook.
+[How the core MarkdownLLM principles apply specifically to this domain — authored]
 
 ## Thing Types in This Domain
 
-[List the types of things this domain instantiates]
+[The types this domain instantiates — authored]
 
 - `type: [type-name]` — [Description]
 - `type: [type-name]` — [Description]
+
+## Skills Directory
+
+[Authored descriptions; the tier table above lists the skill files mechanically]
+
+- **[domain]-specification.skill.md** — Philosophy, principles, reasoning patterns
+- **[domain]-read.thing.skill.md** — How to read, analyse, and reason about things
+- **[domain]-write.thing.skill.md** — How to create and update things
+- **[domain]-workflow.skill.md** — Process orchestration and execution patterns
 
 ## Triggers (Domain-Specific)
 
-[Define triggers that apply to things in this domain. Triggers are declarative conditions that signal the agent to pay attention.]
+[Declarative conditions that signal the agent to pay attention — authored]
 
-### Time-Based
-- [Example: Weekly review — evaluates every Monday]
+## The Deterministic Floor
 
-### Dependency
-- [Example: When a blocking thing completes, notify dependent things]
-
-### Threshold
-- [Example: When count of in-progress things exceeds 5, warn about overload]
-
-## Usage Pattern
-
-```
-User Request
-    ↓ (auto-discovered)
-Load AGENTS.md
-    ↓
-Evaluate triggers (session start)
-    ↓
-Load relevant skill(s) from ./skills/
-    ↓
-Load relevant things from ./things/
-    ↓
-Execute with consistency checks
-    ↓
-Validate changes
-    ↓
-Commit with structured message
-    ↓
-Evaluate triggers (post-write)
-    ↓
-Report changes
-```
-
-## Validation Checklist
-
-Before committing, verify:
-
-- [ ] Relevant skill loaded for this operation
-- [ ] Domain principles maintained — semantic coherence is the agent's check (validate.thing.md → Layer 2)
-- [ ] Changes scoped to appropriate things
-- [ ] Commit message follows `action: description` convention
-
-> **The Deterministic Floor:** structure (id, type, status, created), reference integrity, and schema conformance are checked by `python {framework_root}/tools/mdllm.py validate .` and enforced by the pre-commit hook (`python {framework_root}/tools/mdllm.py install-hook .` at scaffold time). Never re-perform those checks by reasoning.
+<!-- generated:floor -->
+_(managed by `mdllm domain-kernel` — do not hand-edit)_
+<!-- /generated:floor -->
