@@ -13,7 +13,12 @@
 | 2 — Domain kernel + generator | ✅ done | `mdllm domain-kernel` + managed blocks + coherence drift + scaffold fill; jmtm migrated (182→141); 67 tests green |
 | 3 — Session-start adapter | ✅ done | `mdllm session-start` (version+velocity+drift) + SessionStart hook in adapter (covers Claude Code + VS Code Copilot); 71 tests green |
 | 4 — Deliberate slash commands | ✅ done | templates/commands/ (Claude) + templates/copilot-prompts/ (Copilot) for end-session & retrospective; human-invoked, no auto catch-up |
-| 5 — Rollout via existing rails | ⏳ in progress | started 2026-06-23; scaffold deploys kernel+adapter+slash, refresh regenerates, doctor staleness, version bump |
+| 5 — Rollout via existing rails | ✅ done | scaffold deploys slash cmds + fills kernel; refresh regenerates kernel; doctor reports kernel/adapter; bumped 3.14.0→**3.15.0** (minor — additive/backward-compat, NOT major; flagged for operator); jmtm sealed to 3.15.0; 74 tests green |
+
+**ALL PHASES COMPLETE (2026-06-23).** Version bumped to 3.15.0 (minor, not the
+"major" the plan loosely said — the changes are additive/opt-in, nothing breaks
+without the kernel/adapter; re-tag if a major is preferred). PreToolUse
+security/risk hooks remain the agreed future work.
 
 Legend: ⬜ not started · ⏳ in progress · ✅ done · ⚠ blocked
 

@@ -1209,6 +1209,21 @@ def cmd_refresh(args) -> int:
     else:
         print("\n  Framework is ahead but no newer CHANGELOG entries parsed — verify by hand.")
 
+    # Migration rail: regenerate the domain-kernel managed blocks so framework
+    # improvements to the generated operative sections land as part of absorbing
+    # the new version. Mechanical and idempotent — only the managed blocks change.
+    present, _ = domain_kernel_status(text, build_domain_kernel_blocks(domain, meta or {}))
+    if present:
+        new_ag, written, _ = apply_domain_kernel(
+            text, build_domain_kernel_blocks(domain, meta or {}))
+        if new_ag != text:
+            agents.write_text(new_ag, encoding="utf-8", newline="\n")
+            text = new_ag  # keep --seal's regex operating on the fresh text
+            print(f"\n  regenerated domain-kernel blocks: {', '.join(written)} "
+                  f"(commit AGENTS.md)")
+        else:
+            print("\n  domain-kernel blocks already in sync.")
+
     if args.seal:
         if "framework_version_seen:" in text:
             new = re.sub(r"(?m)^(framework_version_seen:).*$",
@@ -2249,6 +2264,35 @@ def cmd_doctor(args) -> int:
             report("--", "no .markdownllm and no framework_root in AGENTS.md — "
                          "neither a framework root nor a wired domain")
 
+    # domain-kernel freshness + harness adapter (advisory; existence != currency)
+    agents_p = root / "AGENTS.md"
+    if agents_p.is_file():
+        import json
+        atext = agents_p.read_text(encoding="utf-8")
+        ameta, _, _ = parse_frontmatter(atext)
+        present, drifted = domain_kernel_status(
+            atext, build_domain_kernel_blocks(root, ameta or {}))
+        if not present:
+            report("--", "AGENTS.md has no domain-kernel managed blocks "
+                         "(opt-in; the entry file runs by interpretation)")
+        elif drifted:
+            report("WARN", f"domain-kernel blocks STALE ({', '.join(drifted)}) — "
+                           f"run `mdllm domain-kernel .` and commit")
+        else:
+            report("OK", f"domain-kernel in sync ({len(present)} blocks)")
+        has_ss = False
+        settings = root / ".claude" / "settings.json"
+        if settings.is_file():
+            try:
+                has_ss = "SessionStart" in (json.loads(
+                    settings.read_text(encoding="utf-8")).get("hooks") or {})
+            except (ValueError, OSError):
+                has_ss = False
+        report("OK" if has_ss else "--",
+               "SessionStart adapter installed (.claude/settings.json)" if has_ss
+               else "no SessionStart adapter — session-start runs by interpretation "
+                    "(opt-in: adapters/claude-code.settings.example.json)")
+
     print(f"## Doctor Report — {root}\n")
     print("\n".join(lines))
     print(f"\nVerdict: {'FLOOR ACTIVE' if floor_ok else 'DEGRADED'} — "
@@ -2357,6 +2401,26 @@ def cmd_scaffold(args) -> int:
         ag_text, build_domain_kernel_blocks(target, ag_meta or {}))
     ag.write_text(ag_filled, encoding="utf-8", newline="\n")
 
+    # Deliberate-ritual slash commands (inert until the operator invokes them) —
+    # Claude Code `.claude/commands/` and Copilot `.github/prompts/`. The
+    # auto-firing SessionStart/PostToolUse adapter stays opt-in (hint printed below).
+    cmd_dir = target / ".claude" / "commands"
+    prm_dir = target / ".github" / "prompts"
+    if (templates / "commands").is_dir():
+        cmd_dir.mkdir(parents=True, exist_ok=True)
+        for src in sorted((templates / "commands").glob("*.md")):
+            (cmd_dir / src.name).write_text(
+                instantiate(src.read_text(encoding="utf-8")),
+                encoding="utf-8", newline="\n")
+            written.append(f".claude/commands/{src.name}")
+    if (templates / "copilot-prompts").is_dir():
+        prm_dir.mkdir(parents=True, exist_ok=True)
+        for src in sorted((templates / "copilot-prompts").glob("*.prompt.md")):
+            (prm_dir / src.name).write_text(
+                instantiate(src.read_text(encoding="utf-8")),
+                encoding="utf-8", newline="\n")
+            written.append(f".github/prompts/{src.name}")
+
     # Isolation, in the hard hook's order: (1) domain repo exists,
     # (2)+(3) outer repo ignores the domain BEFORE any domain commit,
     # (4) domain's first commit. Step 5 (remote) stays with the human.
@@ -2409,6 +2473,10 @@ def cmd_scaffold(args) -> int:
     print("  - skills/: fill the four skill bodies with the domain's reasoning")
     print("  - things/: create the first real things")
     print("  - a remote, if the domain should have one")
+    print("  - optional hardening: copy adapters/claude-code.settings.example.json → "
+          ".claude/settings.json to fire session-start + post-write validation "
+          "automatically (Claude Code / VS Code Copilot agent mode). Opt-in — the "
+          "domain kernel already drives these by interpretation.")
     if broken:
         print("\nBIRTH SEQUENCE INCOMPLETE — the isolation invariant did not "
               "fully hold; fix the FAIL lines before using the domain.")

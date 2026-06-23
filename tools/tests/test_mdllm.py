@@ -885,3 +885,47 @@ def test_session_start_always_emits_imperative(tmp_path, capsys):
     mdllm.cmd_session_start(_ns(path=str(tmp_path / "dom")))
     out = capsys.readouterr().out
     assert "Session Start" in out and "before the user's first request" in out
+
+
+# ---------------------------------------------------------------- phase 5 rollout
+
+
+def _agents_drifted(meta_fm: str) -> str:
+    body = "# D\n\n" + "".join(
+        f"<!-- generated:{n} -->\n_(old placeholder)_\n<!-- /generated:{n} -->\n\n"
+        for n in mdllm.DOMAIN_KERNEL_BLOCKS)
+    return f"---\n{meta_fm}---\n\n{body}"
+
+
+def test_scaffold_deploys_slash_commands(tmp_path):
+    _git_repo(tmp_path)
+    target = tmp_path / "client-y"
+    mdllm.cmd_scaffold(_ns(path=str(target)))
+    assert (target / ".claude" / "commands" / "end-session.md").is_file()
+    assert (target / ".claude" / "commands" / "retrospective.md").is_file()
+    assert (target / ".github" / "prompts" / "end-session.prompt.md").is_file()
+
+
+def test_refresh_regenerates_domain_kernel(tmp_path):
+    (tmp_path / "fw").mkdir()
+    (tmp_path / "fw" / ".markdownllm").write_text(
+        "framework: X\nversion: 3.15.0\n", encoding="utf-8")
+    (tmp_path / "fw" / "CHANGELOG.md").write_text(
+        "## [3.15.0] - 2026-06-23\n- new\n", encoding="utf-8")
+    dom = tmp_path / "dom"
+    write(dom, "AGENTS.md", _agents_drifted(
+        "name: D\nframework_root: ../fw\nframework_version_seen: 3.0.0\n"))
+    mdllm.cmd_refresh(_ns(path=str(dom), seal=False))
+    text = (dom / "AGENTS.md").read_text(encoding="utf-8")
+    _, drifted = mdllm.domain_kernel_status(
+        text, mdllm.build_domain_kernel_blocks(dom, {"name": "D"}))
+    assert drifted == []   # the stale placeholders were regenerated
+
+
+def test_doctor_reports_domain_kernel_status(tmp_path, capsys):
+    _git_repo(tmp_path)
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, {})
+    filled, _, _ = mdllm.apply_domain_kernel(_agents_drifted("name: D\n"), blocks)
+    write(tmp_path, "AGENTS.md", filled)
+    mdllm.cmd_doctor(_ns(path=str(tmp_path)))
+    assert "domain-kernel in sync" in capsys.readouterr().out
