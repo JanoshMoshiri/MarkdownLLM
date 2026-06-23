@@ -1,8 +1,6 @@
-.claude/
-# The installer writes CLAUDE.md (a Claude Code -> AGENTS.md wrapper) into a
-# fresh clone so the verified harness works out of the box. It's a local
-# convenience, not framework content — keep it out of contributors' git status.
-CLAUDE.md
+# .claude/ is now tracked: settings.json (the Claude Code / VS Code Copilot hook
+# adapter) and commands/ ship with the repo. Per-user local settings stay out:
+.claude/settings.local.json
 domains/
 domain/
 adapters/logs/
