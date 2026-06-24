@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.20
+version: 1.21
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-24
@@ -12,6 +12,39 @@ last_updated: 2026-06-24
 
 ## Open Threads
 
+- **[COMPLETE 2026-06-24] Terminal-dependency gate + full v3.15.0 doc reconciliation +
+  retrospective 06d.** **Shipped:** `validate` now blocks a terminal-status thing depending
+  on unfinished work (`8d3574e`) — `detect-conflicts` rule #1 as a *state invariant* (no diff;
+  terminal deps count resolved; 0 false positives across all corpora). Insight
+  `hard-invariants-encode-a-semantic-assumption` (`be13ceb`): a hard invariant freezes one
+  reading of an ambiguous field — false-positives are a modeling signal toward `linked_things`,
+  not a config escape; `dependencies` = hard-prerequisite semantics documented at the field in
+  `thing.md`. **Reconciliation:** full pass over the whole v3.15.0 arc (build + deployment + gate)
+  caught prose-dark-region drift the floor can't see — framework-map subcommand count 15→17,
+  `domain-refresh` missing the operator paste-step for the `.claude/settings.json` adapter, stale
+  README kernel figure (~1.6k→2.1k); fixed across framework-map / domain-refresh / CHANGELOG
+  (folded into 3.15.0, redated 06-24) / operator-guide / first-hour / README (`fa1cc6e`).
+  Retrospective `framework-retrospective-2026-06d` (`dcb5848`). New insight
+  `repeated-drift-promotes-a-fact-into-the-floor`: a prose mirror of a mechanical fact that drifts
+  a *second* time has earned a `coherence` check — one drift is an accident, two is a missing
+  check (generalises `prose-references-are-mechanically-checkable` from references to derived
+  counts). State clean: 82 things, 0 errors, coherence clean, 0 open conflicts, 77 tests green.
+  v3.15.0 stays (folded, not bumped).
+  **NEXT SESSION — operator's named going-forward piece (2026-06-24): PreToolUse tool hooks.**
+  The deliberately-deferred security/risk-reasoning hooks — the *action-side analogue of the
+  pre-commit gate*: a clearance check at the action boundary for irreversible delete/send/spend,
+  where `consequence-is-recoverable-only-in-retrospect` says the judgment belongs to human +
+  structure, not a forward prediction. Foundation left PreToolUse free for exactly this. Design
+  groundwork already laid (the `_dk_standing_truth` "defer the irreversible" block + the
+  action/state-boundary asymmetry). To scope next time: what it inspects (Bash/action calls),
+  what it *blocks* vs *asks* on, and where the mechanical-vs-interpretation line falls. (This is
+  now the operator's chosen focus; the prior "(a) live-domain test immediate next" remains open
+  but unprioritised below it.)
+  **Smaller deferred:** (i) framework-map subcommand count → mechanical `coherence` check (per
+  `repeated-drift-promotes-a-fact-into-the-floor`; retro 06d rec #2; small build). (ii) cascade
+  helper — mechanical downstream-set gathering for `cascade-completion`; scoped, operator weighing
+  overengineering. (iii) parked active insights still live:
+  `consequence-is-recoverable-only-in-retrospect`, `long-running-tasks-lack-pre-compaction-checkpoint`.
 - **[COMPLETE 2026-06-23] Domain-kernel + harness-hardening build — all 5 phases
   shipped as v3.15.0 (minor: additive/opt-in).** Full plan + progress table:
   `docs/plans/domain-kernel-hardening.md`. Commits are the ledger; this entry
