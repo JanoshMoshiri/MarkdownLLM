@@ -2,7 +2,7 @@
 id: cross-domain-handoff-is-built-inbound-only
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-24
 session: 2026-06-24
 source: both
@@ -46,36 +46,64 @@ post-completion read — stops at the domain boundary. So the consumer can only
 
 This is precisely [[directional-graph-reads-come-in-inbound-outbound-pairs]]
 applied one level up, and it is an instance of
-[[mechanism-pairs-come-from-two-reflection-axes]]:
+[[mechanism-pairs-come-from-two-reflection-axes]] — but with a **twist the lift
+exposes**: the domain boundary is asymmetric in a way the thing boundary is not.
 
 - **At the thing boundary**, the inbound/outbound pair is closed —
-  `touchpoints` (inbound) and `cascade` (outbound) both exist.
-- **At the domain boundary**, only the inbound half exists (quarantine-on-import).
-  The missing mirror is a **cross-boundary cascade**: a producer-side signal that
-  a consumed deliverable changed, carried across the seam to its consumers.
+  `touchpoints` (inbound) and `cascade` (outbound) both exist, and `cascade` can
+  genuinely *push* because the graph is shared: one repo, one id-space, edges to
+  walk forward.
+- **At the domain boundary**, there is no shared graph to push along. A literal
+  producer-side push would require A to hold a **registry of its consumers** —
+  which breaks domain isolation and the no-global-index rule outright. **A cannot
+  know who consumes it.** So the outbound obligation cannot be discharged as a
+  push; it *collapses onto the consumer side* as a standing poll.
+
+The corrected mirror, therefore, is not a cross-boundary cascade. It is
+**re-quarantine-on-drift**: the standing-check twin of quarantine-on-import, and
+both live on the consumer side, because the boundary is an isolation boundary that
+only the consumer ever chose to cross. Quarantine-on-import is a *one-time gate*
+at first consumption; re-quarantine-on-drift is the *standing check* that the
+pinned source has not moved underneath it. That asymmetry — push works one level
+down, only pull works one level up — is *why* this felt like a missing half rather
+than an obvious build.
 
 It is the known-unhandled: foreseen since 2026-06-15 (the hand-off design was
-deferred), but the duality lens reframes *what* is missing — not the whole
-hand-off mechanism, but specifically its outbound, producing-side half.
+deferred), but the duality lens reframes *what* is missing — not a producer push,
+but the consumer-side standing freshness check that re-opens the quarantine.
 
 ## Why It Matters
 
 It sharpens a deferred design from "spec cross-domain references some day" to a
-single, well-shaped question: **how does a change in a source domain reach the
-domains that consumed its outputs?** The answer must respect the constraints
-already established — separate id-spaces, independent gitignored repos, no global
-index ([[cross-domain-handoff-is-verified-external-input]]) — so it cannot be a
-live link. The candidate shape is a *commit-pinned reference triple*
-(`source_domain` + `source_id` + commit pin) on the consuming side, against which
-a producer-side or consumer-poll check can detect "the pinned commit moved" —
-the cross-domain analogue of `provenance`'s Freshness check, which already does
-exactly this *within* a domain. The machinery largely exists; what is missing is
-the seam-crossing wiring and the producer-side obligation.
+single, well-shaped question: **how does the consumer learn its pinned source
+moved?** — and the **keystone is that the framework already answers it for N=1.**
+The session-start *upward* version-check (`orchestration.md`) holds a pin
+(`framework_version_seen`) and compares it against the **cached remote-tracking
+state** of the framework repo — no live fetch — surfacing drift. That is exactly a
+consumer-side freshness poll against a pinned external source. The framework is
+simply the one source domain *every* domain imports from. Cross-domain hand-off is
+that same check generalised from the single privileged source to an arbitrary
+`source_domain`. The candidate shape: a commit-pinned reference triple
+(`source_domain` + `source_id` + `source_commit`) on the consumer, checked against
+the source's cached remote head, re-opening the quarantine (`verified: false`) on
+drift — which hands the human an **external inflection**, entering
+`change-reconciliation` on B's dependents. Three specs converge —
+`provenance` (the pin), `orchestration` version-check (the cached-remote compare),
+`change-reconciliation` (the re-opened quarantine as cue) — and none is reinvented.
 
 It also completes the framework's self-description: a symmetry/coverage map of the
 maintenance surfaces would show every interior cell filled and this one boundary
 cell empty — the visible hole that makes the gap impossible to not see, which is
 the floor's own design philosophy turned on the framework itself.
+
+**Scope marker.** This insight is the *consistency/freshness* facet only — keeping
+an already-established hand-off honest as the source moves. It is the narrow
+doorway into a much larger cross-domain I/O surface (discovery: how does a domain
+*search* another's content; awareness: how does a domain learn something useful
+exists elsewhere; permeability: whether frontmatter is inspectable across the
+seam without blurring domain boundaries). Those are deliberately *not* folded in
+here — they are a broader adjacent design space, candidate for their own
+insight(s) when worked.
 
 ## Status / Next
 
