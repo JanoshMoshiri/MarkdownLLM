@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: kernel
 created: 2026-06-24
-generated: 2026-06-24T17:12:03
-generated_from: HEAD@7c5bc3a
+generated: 2026-06-24T20:10:39
+generated_from: HEAD@943f27b
 coverage: 6
-framework_version: 3.15.0
+framework_version: 3.16.0
 ---
 
 # Framework Operative Kernel
