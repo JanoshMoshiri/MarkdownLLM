@@ -136,9 +136,10 @@ python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + h
 python tools/mdllm.py provenance <domain>    # decision pins resolve; no output rests on unverified content
 python tools/mdllm.py eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
 python tools/mdllm.py kernel                 # regenerate the operative kernel from spec blocks
+python tools/mdllm.py session-start <domain> # emit the startup ritual for a harness SessionStart hook to inject at t=0
 ```
 
-Each domain declares its thing types and **its own status vocabularies** in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) (~1.6k tokens of operative rules) at session start instead of ~21k of full spec prose; the full specs remain the canonical elaboration, loaded on demand. Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
+Each domain declares its thing types and **its own status vocabularies** in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) (~2.1k tokens of operative rules) at session start instead of ~21k of full spec prose; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a `SessionStart` hook so the agent runs version-check + velocity at t=0 rather than hoping it surfaces from a long entry file — `scaffold` writes this `.claude/settings.json` block for new domains (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
 
 ### Templates
 
@@ -208,6 +209,7 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 ### Vendor setup
 
 - **Claude Code** — the installer writes a `CLAUDE.md` wrapper (`@AGENTS.md`) for you. If you cloned by hand, add one at root containing `@AGENTS.md`.
+- **Optional hardening (Claude Code / Copilot in VS Code)** — copy the hooks block from [`adapters/claude-code.settings.example.json`](adapters/claude-code.settings.example.json) into `.claude/settings.json` to inject the session-start ritual and run `validate` after every write. One Claude-format file covers both harnesses. `scaffold` writes it for new domains; an existing domain adds it as a one-time operator paste — the agent can't, because the file carries permission rules. Opt-in: with no adapter the ritual still fires by interpretation.
 - **GitHub Copilot (VS Code)** — set `"chat.useAgentsMdFile": true` and `"chat.useNestedAgentsMdFiles": true`.
 - **Codex, Cursor, Windsurf, Gemini CLI** — no configuration; they auto-discover `AGENTS.md` at root.
 

@@ -53,6 +53,7 @@ that was always genuinely yours: judgment.
 |---|---|
 | Spot-check structure, statuses, and links after the agent wrote things | The pre-commit hook runs `mdllm validate`; commits containing Errors are blocked before they exist |
 | Remember which status values are legitimate for which thing type | `things/_schema.yaml` declares them; the validator enforces exactly what the domain declared |
+| Re-check by hand that a thing marked done didn't still hang on unfinished prerequisites | `mdllm validate` blocks a terminal-status thing that still depends on unfinished work — completing on top of an open prerequisite is an Error at the commit boundary (v3.15.0); if the edge was never really a prerequisite, model it as `linked_things` instead |
 | Notice when a derived index no longer matched the things | `mdllm index check` rebuilds and diffs; index drift is detectable, and CI checks it on every push |
 | Mentally track deadlines and re-raise them to the agent | `mdllm triggers` evaluates time/dependency/threshold conditions mechanically; the scheduled-triggers adapter surfaces them even with no session open |
 | Wonder whether the framework had moved on since the domain was scaffolded | The `session-start:version-check` hard hook compares the version sentinel against the domain's `framework_version_seen` every session — and since v3.4.0 the sentinel itself is drift-proofed (it had silently stalled once; that class of failure is now an Error the framework's own hook blocks) |

@@ -167,6 +167,14 @@ whole system; everything else is refinement.
   `python tools/mdllm.py doctor <path>` checks all of this mechanically —
   including whether the hook actually *executes*, not just exists — and
   tells you which mode you're in.
+- **The session-start ritual is hardened for you.** A scaffolded domain ships a
+  `.claude/settings.json` that injects the agent's startup ritual (load kernel,
+  version-check, velocity) the moment a session opens — so it can't be silently
+  skipped. One Claude-format file covers Claude Code and Copilot in VS Code.
+  Older domains adopt it via a one-time operator paste when they refresh (see
+  `domain-refresh.md`); the agent can't add it itself, because the file carries
+  permission rules. With no adapter the ritual still runs by interpretation — the
+  hook only makes it reliable.
 - **If validation blocks a legitimate change**, the schema is wrong, not
   you: extend `things/_schema.yaml` with the agent rather than fighting the
   finding.

@@ -51,7 +51,7 @@ This is not optional. Without it, domain files would appear as untracked files i
 
 A domain agent should check for framework updates:
 
-1. **Session start** — Automatically, via the `session-start:version-check` hard hook (see orchestration.md). This fires every session without configuration.
+1. **Session start** — via the `session-start:version-check` hard hook (see orchestration.md). By default this fires every session by *interpretation* (no configuration). A harness may additionally **harden** it so the ritual is injected mechanically at t=0 — see *Hardening: the harness adapter* below; that path needs a one-time `.claude/settings.json` step the operator (not the agent) performs.
 2. **On explicit request** — When a user says "check the framework", "update yourself from framework", or similar
 3. **On validation failure** — When validation surfaces things that don't conform to current spec definitions, a refresh may explain why
 
@@ -105,7 +105,28 @@ The refresh process reads these framework files in order:
    → Update domain AGENTS.md to reference new framework capabilities
    → Update domain skills to use new patterns
    → Commit with message: refresh: absorbed framework v{version} changes
+   → (operator step) if absorbing v3.15.0+, add the harness adapter hooks —
+     see "Hardening: the harness adapter" below
 ```
+
+### Hardening: The Harness Adapter (Operator, Optional)
+
+From **v3.15.0**, the session-start ritual and post-write validation can be
+*hardened* from interpretation to a real harness event: a `SessionStart` hook
+that injects the version/velocity ritual at t=0, and a `PostToolUse` hook that
+runs `validate` after every write. A new domain born via `mdllm scaffold` gets
+this `.claude/settings.json` block automatically. **An existing domain absorbing
+v3.15.0+ does not** — and the agent cannot add it: `.claude/settings.json`
+carries permission rules, so writing it is a self-modification the agent is
+blocked from (see `things/insights/agents-cannot-self-install-permission-bearing-hooks.md`).
+
+So this is a one-time **operator paste**, not an agent action. Copy the hooks
+block from [`adapters/claude-code.settings.example.json`](adapters/claude-code.settings.example.json)
+into the domain's `.claude/settings.json`, adjusting the `../../tools/mdllm.py`
+path to the domain's `framework_root`, then commit it (with `.gitignore` and
+`CLAUDE.md`). The same one Claude-format file hardens Claude Code **and** Copilot
+in VS Code. It is opt-in: with no adapter the ritual still fires by interpretation
+— hardening only removes the dependency on the agent remembering to run it.
 
 ### What The Domain May Update
 
@@ -119,6 +140,7 @@ The domain MUST NOT modify:
 
 - Framework files (read-only relationship)
 - Domain things (refresh is about capabilities, not data)
+- `.claude/settings.json` (operator-owned; permission-bearing, so the agent is structurally barred from writing it — surface the paste step to the operator instead)
 
 ### Version Tracking
 
