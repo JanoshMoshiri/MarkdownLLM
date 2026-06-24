@@ -417,6 +417,104 @@ def test_touchpoints_leaf_has_no_risk(tmp_path, capsys):
     assert "Nothing points at `lonely`" in out
 
 
+# ---------------------------------------------------------------- cascade
+
+
+def test_cascade_unblock_and_partial(tmp_path, capsys):
+    write(tmp_path, "things/target.md", thing_text(
+        "id: target\ntype: task\nstatus: completed\ncreated: 2026-06-01"))
+    write(tmp_path, "things/other.md", thing_text(
+        "id: other\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    # ready: its only prerequisite is the just-completed target
+    write(tmp_path, "things/ready.md", thing_text(
+        "id: ready\ntype: task\nstatus: blocked\ncreated: 2026-06-01\n"
+        "priority: high\ndependencies:\n  - target"))
+    # waiting: still blocked on `other`, which is not terminal
+    write(tmp_path, "things/waiting.md", thing_text(
+        "id: waiting\ntype: task\nstatus: blocked\ncreated: 2026-06-01\n"
+        "dependencies:\n  - target\n  - other"))
+    rc = mdllm.cmd_cascade(_ns(path=str(tmp_path), id="target"))
+    out = capsys.readouterr().out
+    assert rc == 0
+    unblock_section = out.split("Unblock candidates")[1].split("Partial")[0]
+    assert "ready" in unblock_section and "priority high" in unblock_section
+    assert "waiting — 1/2" in out
+
+
+def test_cascade_follows_blocks_reverse_edge(tmp_path, capsys):
+    # The prerequisite is declared by the target's `blocks`, not the downstream's
+    # `dependencies`; cascade must read both directions or go blind to it.
+    write(tmp_path, "things/target.md", thing_text(
+        "id: target\ntype: task\nstatus: completed\ncreated: 2026-06-01\n"
+        "blocks:\n  - downstream"))
+    write(tmp_path, "things/downstream.md", thing_text(
+        "id: downstream\ntype: task\nstatus: blocked\ncreated: 2026-06-01"))
+    rc = mdllm.cmd_cascade(_ns(path=str(tmp_path), id="target"))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "downstream" in out.split("Unblock candidates")[1].split("Partial")[0]
+
+
+def test_cascade_parent_rollup_completion_candidate(tmp_path, capsys):
+    write(tmp_path, "things/parent.md", thing_text(
+        "id: parent\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    write(tmp_path, "things/target.md", thing_text(
+        "id: target\ntype: task\nstatus: completed\ncreated: 2026-06-01\nparent: parent"))
+    write(tmp_path, "things/sib.md", thing_text(
+        "id: sib\ntype: task\nstatus: completed\ncreated: 2026-06-01\nparent: parent"))
+    rc = mdllm.cmd_cascade(_ns(path=str(tmp_path), id="target"))
+    out = capsys.readouterr().out
+    assert rc == 0 and "completion candidate" in out and "2/2" in out
+
+
+def test_cascade_parent_rollup_partial(tmp_path, capsys):
+    write(tmp_path, "things/parent.md", thing_text(
+        "id: parent\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    write(tmp_path, "things/target.md", thing_text(
+        "id: target\ntype: task\nstatus: completed\ncreated: 2026-06-01\nparent: parent"))
+    write(tmp_path, "things/sib.md", thing_text(
+        "id: sib\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\nparent: parent"))
+    rc = mdllm.cmd_cascade(_ns(path=str(tmp_path), id="target"))
+    out = capsys.readouterr().out
+    assert rc == 0 and "partial progress" in out and "1/2" in out
+
+
+def test_cascade_leaf_propagates_nowhere(tmp_path, capsys):
+    write(tmp_path, "things/lonely.md", thing_text(
+        "id: lonely\ntype: task\nstatus: completed\ncreated: 2026-06-01"))
+    rc = mdllm.cmd_cascade(_ns(path=str(tmp_path), id="lonely"))
+    out = capsys.readouterr().out
+    assert rc == 0 and "Nothing depends on `lonely`" in out
+
+
+def test_cascade_reports_does_not_apply(tmp_path, capsys):
+    # The floor reports; it never mutates domain state. `ready` stays blocked on disk.
+    write(tmp_path, "things/target.md", thing_text(
+        "id: target\ntype: task\nstatus: completed\ncreated: 2026-06-01"))
+    p = write(tmp_path, "things/ready.md", thing_text(
+        "id: ready\ntype: task\nstatus: blocked\ncreated: 2026-06-01\n"
+        "dependencies:\n  - target"))
+    mdllm.cmd_cascade(_ns(path=str(tmp_path), id="target"))
+    assert "status: blocked" in p.read_text(encoding="utf-8")
+
+
+def test_cascade_hypothetical_when_target_not_terminal(tmp_path, capsys):
+    write(tmp_path, "things/target.md", thing_text(
+        "id: target\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    write(tmp_path, "things/ready.md", thing_text(
+        "id: ready\ntype: task\nstatus: blocked\ncreated: 2026-06-01\n"
+        "dependencies:\n  - target"))
+    rc = mdllm.cmd_cascade(_ns(path=str(tmp_path), id="target"))
+    out = capsys.readouterr().out
+    assert rc == 0 and "HYPOTHETICAL" in out
+
+
+def test_cascade_unknown_id_errors(tmp_path, capsys):
+    write(tmp_path, "things/a.md", thing_text(GOOD))
+    rc = mdllm.cmd_cascade(_ns(path=str(tmp_path), id="ghost"))
+    assert rc == 1 and "no thing with id `ghost`" in capsys.readouterr().out
+
+
 # ---------------------------------------------------------------- level 3
 
 

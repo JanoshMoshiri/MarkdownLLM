@@ -68,7 +68,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>17 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>18 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -191,6 +191,7 @@ flowchart LR
         C15["touchpoints"]
         C16["domain-kernel"]
         C17["session-start"]
+        C18["cascade"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -210,6 +211,7 @@ flowchart LR
         T15["change-reconciliation.md<br/>Assimilate beat"]
         T16["AGENTS.md<br/>domain entry kernel"]
         T17["orchestration.md<br/>session-start:version-check"]
+        T18["write.thing.md<br/>post-completion cascade"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -229,6 +231,7 @@ flowchart LR
     C15 -->|"assimilates for"| T15
     C16 -.->|"generates"| T16
     C17 -.->|"emits ritual for"| T17
+    C18 -->|"gathers downstream for"| T18
 ```
 
 Notes on this view:

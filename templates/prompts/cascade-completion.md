@@ -2,7 +2,7 @@
 id: cascade-completion
 type: prompt
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-20
 inputs:
   - name: completed-thing
@@ -32,49 +32,30 @@ linked_things:
 
 When a thing is completed, evaluate what it unblocks and what should change downstream. This is the primary mechanism for automatic progress propagation.
 
-## Reasoning Template
+## Gather mechanically, dispose semantically
 
-Given the completed thing, perform these evaluations in order:
-
-### 1. Direct Dependency Resolution
-
-Find all things where `dependencies` includes the completed thing's ID.
-
-For each:
-- Are **all** of its dependencies now completed? → Change status from `blocked` to `not-started`
-- Are **some** but not all resolved? → No status change, but note progress
-
-### 2. Trigger Evaluation
-
-Find all things with `triggers` of type `dependency` that `watch` the completed thing.
-
-For each:
-- Does the trigger condition match? (e.g., `on: status_changed_to`, `value: completed`) → Execute the trigger's declared action
-- Common actions: `unblock` (change status), `surface` (notify user), `re_evaluate` (reassess the thing)
-
-### 3. Parent Completion Check
-
-If the completed thing has a `parent`:
-- Load all siblings (things sharing the same parent)
-- Are all siblings now completed? → Suggest completing the parent
-- Is a threshold trigger on the parent now satisfied? → Fire it
-
-### 4. Critical Path Awareness
-
-Among the things just unblocked:
-- Is any `priority: critical` or `priority: high`? → Surface immediately with emphasis
-- Does unblocking create a new longest chain? → Note it for the user
-
-## Output Format
-
-Report to the agent (not directly to user) in this structure:
+The downstream walk is mechanical — it is set membership over declared edges, exactly the kind of work the kernel forbids re-deriving by reasoning (`validate.thing.md`: *never re-perform a mechanical check by reasoning*). So **run the tool, then dispose of what it reports**:
 
 ```
-Cascade results for [completed-thing-id]:
-- Unblocked: [list of thing IDs moved from blocked → not-started]
-- Triggered: [list of trigger actions that fired]
-- Parent status: [suggest-completion | partial-progress | n/a]
-- Attention: [high-priority items that are now actionable]
+python {framework_root}/tools/mdllm.py cascade <completed-thing-id> [domain-path]
 ```
 
-The agent then incorporates this into its response to the user.
+`mdllm cascade` is the outbound mirror of `mdllm touchpoints`: where touchpoints answers *"what did I just put at risk?"*, cascade answers *"what did I just unblock?"*. It returns, for the completed thing:
+
+- **Unblock candidates** — things whose every prerequisite (read from both `dependencies` and the reverse `blocks` edge) is now terminal, priority-flagged.
+- **Partial progress** — downstream things still waiting on other prerequisites.
+- **Parent rollup** — whether the parent's children are now all terminal (a completion candidate).
+- **Trigger watchers** — things whose `triggers` watch the completed thing; evaluate these with `mdllm triggers`, which owns trigger evaluation.
+
+It **reports candidates; it never applies a status change** — that is this prompt's job.
+
+## Disposition (yours)
+
+For each candidate the tool surfaces, decide — the part no edge can settle:
+
+- **Unblock candidate** → does the thing's *narrative* hold a soft blocker the declared edges cannot see? If not, change its status (typically `blocked` → `not-started`) and cascade onward from that change.
+- **Parent completion candidate** → *suggest* completing the parent to the user; do not auto-complete a parent.
+- **Priority-flagged** unblocked work → surface it immediately, with emphasis, and note if it creates a new longest chain.
+- **Trigger watcher** → run `mdllm triggers` and act on its declared action.
+
+Then incorporate the dispositions into your response to the user. The mechanical set is the tool's; the judgment is yours.
