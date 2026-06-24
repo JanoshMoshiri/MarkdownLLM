@@ -2432,6 +2432,30 @@ def cmd_scaffold(args) -> int:
                 encoding="utf-8", newline="\n")
             written.append(f".github/prompts/{src.name}")
 
+    # Adapter: write .claude/settings.json so a new domain is hardened out of the
+    # box — SessionStart injects the ritual, PostToolUse runs the floor on write.
+    # One Claude-format file serves Claude Code AND VS Code Copilot (agent mode).
+    # Paths key off rel_fw (framework_root). Still optional in spirit: delete it
+    # and the domain kernel drives both by interpretation. Scaffold writes it
+    # directly (it runs as the tool, not through a permissions-gated editor).
+    import json as _json
+    settings = target / ".claude" / "settings.json"
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    settings.write_text(_json.dumps({
+        "hooks": {
+            "SessionStart": [
+                {"hooks": [{"type": "command",
+                            "command": f"python {rel_fw}/tools/mdllm.py session-start ."}]}
+            ],
+            "PostToolUse": [
+                {"matcher": "Write|Edit",
+                 "hooks": [{"type": "command",
+                            "command": f"python {rel_fw}/tools/mdllm.py validate . --quiet"}]}
+            ],
+        }
+    }, indent=2) + "\n", encoding="utf-8", newline="\n")
+    written.append(".claude/settings.json")
+
     # Isolation, in the hard hook's order: (1) domain repo exists,
     # (2)+(3) outer repo ignores the domain BEFORE any domain commit,
     # (4) domain's first commit. Step 5 (remote) stays with the human.
@@ -2484,10 +2508,10 @@ def cmd_scaffold(args) -> int:
     print("  - skills/: fill the four skill bodies with the domain's reasoning")
     print("  - things/: create the first real things")
     print("  - a remote, if the domain should have one")
-    print("  - optional hardening: copy adapters/claude-code.settings.example.json → "
-          ".claude/settings.json to fire session-start + post-write validation "
-          "automatically (Claude Code / VS Code Copilot agent mode). Opt-in — the "
-          "domain kernel already drives these by interpretation.")
+    print("  - hardened out of the box: .claude/settings.json fires session-start + "
+          "post-write validation automatically (Claude Code / VS Code Copilot agent "
+          "mode), and /end-session + /retrospective are installed. Delete .claude/ to "
+          "fall back to interpretation-only — the domain kernel still drives both.")
     if broken:
         print("\nBIRTH SEQUENCE INCOMPLETE — the isolation invariant did not "
               "fully hold; fix the FAIL lines before using the domain.")

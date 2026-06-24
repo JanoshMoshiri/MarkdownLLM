@@ -917,6 +917,17 @@ def test_scaffold_deploys_slash_commands(tmp_path):
     assert (target / ".github" / "prompts" / "end-session.prompt.md").is_file()
 
 
+def test_scaffold_writes_hardened_adapter(tmp_path):
+    import json
+    _git_repo(tmp_path)
+    target = tmp_path / "client-z"
+    mdllm.cmd_scaffold(_ns(path=str(target)))
+    settings = json.loads((target / ".claude" / "settings.json").read_text(encoding="utf-8"))
+    assert "SessionStart" in settings["hooks"] and "PostToolUse" in settings["hooks"]
+    cmd = settings["hooks"]["SessionStart"][0]["hooks"][0]["command"]
+    assert "session-start" in cmd and "tools/mdllm.py" in cmd
+
+
 def test_refresh_regenerates_domain_kernel(tmp_path):
     (tmp_path / "fw").mkdir()
     (tmp_path / "fw" / ".markdownllm").write_text(
