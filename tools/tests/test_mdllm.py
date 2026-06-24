@@ -887,6 +887,17 @@ def test_session_start_always_emits_imperative(tmp_path, capsys):
     assert "Session Start" in out and "before the user's first request" in out
 
 
+def test_session_start_framework_root_is_not_a_stale_domain(tmp_path, capsys):
+    # A framework root carries .markdownllm and points framework_root at itself;
+    # it must not report itself as a stale downstream domain.
+    (tmp_path / ".markdownllm").write_text("framework: X\nversion: 3.15.0\n", encoding="utf-8")
+    write(tmp_path, "AGENTS.md", "---\nname: F\nframework_root: .\n---\n\n# F\n")
+    mdllm.cmd_session_start(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "framework root (v3.15.0)" in out
+    assert "STALE" not in out
+
+
 # ---------------------------------------------------------------- phase 5 rollout
 
 

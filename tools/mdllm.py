@@ -1914,7 +1914,15 @@ def cmd_session_start(args) -> int:
            "3. Evaluate triggers and surface what needs the user.", ""]
 
     fr = meta.get("framework_root")
-    if not fr:
+    if (domain / ".markdownllm").is_file():
+        # This IS a framework root (it carries the sentinel), not a downstream
+        # domain — `framework_root: .` points at itself, so the domain
+        # version-check does not apply.
+        fv = str((yaml.safe_load((domain / ".markdownllm").read_text(encoding="utf-8"))
+                  or {}).get("version"))
+        out.append(f"- **Version:** framework root (v{fv}) — not a downstream domain; "
+                   f"no refresh applies.")
+    elif not fr:
         out.append("- **Version:** n/a — no `framework_root` in AGENTS.md.")
     else:
         sentinel = (domain / fr).resolve() / ".markdownllm"
