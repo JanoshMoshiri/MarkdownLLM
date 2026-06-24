@@ -262,6 +262,24 @@ last_updated: 2026-06-24
 
 ## Live Insights
 
+- `mechanism-pairs-come-from-two-reflection-axes` — the framework's "other side of the
+  coin" moments are the surface of two orthogonal reflection symmetries: spatial
+  (inbound ↔ outbound through the graph) + temporal (forward ↔ backward through time),
+  with a mechanical ↔ semantic labour axis running through both. Almost every mechanism
+  is one quadrant of (inbound/outbound) × (forward/backward). The generator behind
+  `directional-graph-reads` (spatial) and `change-reconciliation`'s prevented/created
+  framing (temporal). Razor: when you build a mechanism, check the mirror across each
+  axis before assuming it's done. Spine for a possible framework-map View 4
+  (symmetry/coverage). High confidence (2026-06-24).
+- `cross-domain-handoff-is-built-inbound-only` — the three maintenance surfaces all
+  govern a single domain's interior; the one surface that crosses the repo boundary
+  (cross-domain hand-off) is specified inbound-only. Consuming side exists
+  (quarantine-on-import); producing side does not — a change in source domain A sends no
+  staleness signal to consumers. `cascade` stops at the boundary. The
+  `directional-graph-reads` razor one level up: thing-boundary pair is closed
+  (touchpoints/cascade), domain-boundary pair is half-built. The standing known-unhandled;
+  candidate shape is a commit-pinned reference triple + a cross-domain Freshness check.
+  **Next: spec this out** (the active design thread). High confidence (2026-06-24).
 - `modeling-cognition-yields-a-learning-loop-not-a-coherence-loop` — the framework did
   **not** build a loop; loops already exist. It built the *assimilation ritual*
   (insight → retrospective → end-of-session continuity), which is loop-agnostic and
