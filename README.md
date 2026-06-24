@@ -1,14 +1,16 @@
 # MarkdownLLM
 
-*Architecture for AI agents.*
+*Build your own expert agent.*
 
-**The model was never the bottleneck.** Prompt engineering, harness engineering, looping — everything that actually moves the needle is something you put *around* the model: the structure you define before it starts, the rails that keep it on the plan. MarkdownLLM is the next layer of that, the one most people haven't named yet — a domain your agent maps for itself as typed, linked things in version control, with git history as the memory it carries between sessions. Not a smarter model. A model that finally knows where it is.
+MarkdownLLM lets you build your own expert agent. The more you work with it, the
+smarter it gets — it remembers everything you told it and exactly where you left
+off, so when you start a new session it already knows where you got to. It runs
+your workflows and keeps your tasks moving for days without losing the thread.
 
-You define a *domain* — anything you need to track and reason about over time — as typed, linked things in version control. The agent traverses that structure to reason with precision, and reads the history to know what changed and when. With the whole domain legible to it, the agent does more than execute: it notices drift, catches misalignment, and stays consistent across sessions. The agent handles execution and structural discipline; you bring direction and judgment. What you're left with is vendor-agnostic, fully transparent, and yours.
+A framework discovered by agents, directed by you, and grown together.
 
-It's a framework discovered by agents, directed by humans, and grown together.
-
-> **New here?** Your first sixty minutes are mapped, step by step, in [first-hour.md](docs/first-hour.md) — and [operator-guide.md](docs/operator-guide.md) covers every hour after that. Nearly everything else in this repository is written for your agent to read; those two pages are written for you.
+Works with the agent you already use — OpenClaw, Fable, or GLM. Lives right
+alongside your Obsidian vault. MarkdownLLM is the foundation it all sits on.
 
 ---
 
