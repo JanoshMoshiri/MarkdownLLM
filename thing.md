@@ -159,9 +159,17 @@ These aren't required, but they unlock richer reasoning from Claude:
   - `superseded-by` — the inverse of `supersedes`; this thing's content has been replaced
 
 **dependencies** (array of strings - ids)
-- List of things that must be done before this
+- List of things that must be done before this — a **hard prerequisite**, not a
+  soft association
 - Helps Claude understand sequencing
 - Can be empty
+- The floor enforces the prerequisite reading: a thing in a terminal status may
+  not depend on unfinished work (terminal dependencies — completed, cancelled,
+  deprecated, … — count as resolved). If a relationship is "builds on" / "relates
+  to" / "informs" rather than "must finish first", model it as `linked_things`,
+  not `dependencies` — that is the correct fix when the gate fires, not a reason
+  to weaken it (see
+  [hard-invariants-encode-a-semantic-assumption](things/insights/hard-invariants-encode-a-semantic-assumption.md))
 
 **blocks** (array of strings - ids)
 - List of things this blocks from starting
