@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(git commit -m 'framework: derived-index primitive + reflexive prompts \\(v2.9.0\\) *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'framework: integrate derived indexes across specs \\(v2.9.0\\) *)",
+      "Bash(git commit -m 'docs: CHANGELOG v2.9.0, WORKLOG entry, design insights *)",
+      "Bash(git commit -m ' *)",
+      "Bash(claude --version)",
+      "PowerShell(claude --version)",
+      "PowerShell(npm root -g)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "python tools/mdllm.py session-start ." } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write|Edit", "hooks": [ { "type": "command", "command": "python tools/mdllm.py validate . --quiet" } ] }
+    ]
+  }
+}
