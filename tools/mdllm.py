@@ -318,6 +318,20 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
             if rid not in known:
                 f.append(Finding(SEV_ERROR, name, f"`{fld}` references unknown id `{rid}`"))
 
+        # terminal-status invariant: a finished thing cannot depend on unfinished
+        # work (detect-conflicts rule #1, mechanised). Terminal deps (completed,
+        # cancelled, met, ...) count as resolved; dangling deps are caught above.
+        if str(meta.get("status")) in TERMINAL_STATUSES:
+            for dep in meta.get("dependencies") or []:
+                if not isinstance(dep, str):
+                    continue
+                dt = ids.get(dep, [None])[0]
+                if dt and str(dt.meta.get("status")) not in TERMINAL_STATUSES:
+                    f.append(Finding(SEV_ERROR, name,
+                             f"is `{meta.get('status')}` but dependency `{dep}` is "
+                             f"`{dt.meta.get('status')}` (not terminal) — a finished "
+                             f"thing cannot depend on unfinished work"))
+
         # bidirectional: A blocks B => B depends on A (or links A)
         for blocked in meta.get("blocks") or []:
             target = ids.get(blocked, [None])[0]

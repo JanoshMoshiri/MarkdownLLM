@@ -172,6 +172,29 @@ def test_workflow_run_requires_definition(tmp_path):
     assert any("missing `definition`" in m for m in errs)
 
 
+def _dep_corpus(tmp_path, dep_status, dependent_status="completed"):
+    write(tmp_path, "_schema.yaml", "schema_version: 1\ndomain: t\n")
+    write(tmp_path, "things/dep.md", thing_text(
+        f"id: dep\ntype: task\nstatus: {dep_status}\ncreated: 2026-06-01"))
+    write(tmp_path, "things/main.md", thing_text(
+        f"id: main\ntype: task\nstatus: {dependent_status}\ncreated: 2026-06-01\n"
+        "dependencies: [dep]"))
+    return messages(all_findings(tmp_path), mdllm.SEV_ERROR)
+
+
+def test_terminal_thing_cannot_depend_on_unfinished_work(tmp_path):
+    # the gate: a completed thing with an unfinished dependency is blocked
+    assert any("cannot depend on unfinished work" in e
+               for e in _dep_corpus(tmp_path, "in-progress"))
+    # dependency also terminal -> clean
+    assert _dep_corpus(tmp_path, "completed") == []
+    # a cancelled dependency counts as resolved -> clean
+    assert _dep_corpus(tmp_path, "cancelled") == []
+    # an unfinished dependent is fine -> the gate only guards terminal things
+    assert not any("unfinished work" in e
+                   for e in _dep_corpus(tmp_path, "in-progress", "in-progress"))
+
+
 def test_version_lt_orders_dotted_versions():
     assert mdllm._version_lt("3.4.0", "3.8.0")
     assert mdllm._version_lt("3.7.0", "3.10.0")   # numeric, not lexical

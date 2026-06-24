@@ -59,8 +59,9 @@ The tool enforces, deterministically:
 - **Referential (old Level 2):** all referenced ids exist (`linked_things`,
   `dependencies`, `blocks`, `parent`, `parties`, trigger `watch`); no duplicate
   ids; no circular dependencies; bidirectional consistency; orphan detection;
-  `contradicts` requires a conflict thing listing both parties; `supersedes`
-  requires a back-link or deprecation.
+  a terminal-status thing may not depend on unfinished work (terminal deps count
+  as resolved); `contradicts` requires a conflict thing listing both parties;
+  `supersedes` requires a back-link or deprecation.
 - **Schema (old Level 3):** the domain's normative schema (`things/_schema.yaml`
   or root `_schema.yaml`) declares thing types, **status vocabularies**, required
   fields, the relation vocabulary, and (opt-in) the **frontmatter-field
