@@ -2,7 +2,7 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.21
+version: 1.22
 created: 2026-06-11
 domain: markdownllm-framework
 last_updated: 2026-06-24
@@ -12,6 +12,35 @@ last_updated: 2026-06-24
 
 ## Open Threads
 
+- **[COMPLETE 2026-06-24, cascade session] `mdllm cascade` shipped as v3.16.0 +
+  live-domain test confirmed + PreToolUse parked by operator.** **Shipped:** `mdllm
+  cascade <id>` (`5718569`) — the outbound post-completion mirror of `touchpoints`:
+  gathers the downstream set a completion unblocks ("what did I just unblock?"), walking
+  dependency edges in BOTH directions (`dependencies` + reverse `blocks`), reporting
+  unblock candidates (priority-flagged) / partial progress / parent-completion candidate /
+  trigger watchers — **reports, never applies** (detection mechanical, disposition the
+  agent's); trigger eval left to `mdllm triggers`. `cascade-completion` prompt slimmed to
+  its semantic residue (run tool → dispose). framework-map View 3 + count 17→18; 8 floor
+  self-tests (85 total). Closes **smaller-deferred (ii)** below. Design rule pinned as
+  `directional-graph-reads-come-in-inbound-outbound-pairs` (`0e38ef5`). **Version bumped
+  3.15.0 → 3.16.0** (`6a715a6`, sentinel trio + kernel regenerated) — operator's call at
+  close, additive minor. **Live-domain test DONE:** operator confirmed jmtm-software's
+  `SessionStart` hook fired unprompted, ran the checks, registered slash commands, and
+  `/end-session` ran clean — the behavioural proof that was the last open piece of the
+  v3.15.0 deployment (closes follow-up (a) below). **PreToolUse PARKED by operator** (was
+  "next session's named focus"): a per-domain hardening affordance, not a floor gap —
+  "probably only needed for specific domains; things run fine without it." Stays available
+  (foundation leaves PreToolUse free), de-prioritised, not dropped. **Multi-Claude
+  emergence:** a parallel session built ON the cascade insight in real time (`943f27b`),
+  generalising it into `mechanism-pairs-come-from-two-reflection-axes` (spatial
+  inbound/outbound × temporal forward/backward × mechanical/semantic) and using it to
+  surface a real gap, `cross-domain-handoff-is-built-inbound-only` (the thing-boundary pair
+  is closed by touchpoints/cascade; the domain-boundary pair is half-built — producing side
+  missing). State: 83 things, 0 errors, coherence clean, 0 open conflicts, 85 tests green.
+  **NEW active design thread (parallel session's): spec the cross-domain hand-off
+  producing-side** — commit-pinned reference triple + cross-domain Freshness check; see
+  `cross-domain-handoff-is-built-inbound-only`. **Still open from below:** smaller-deferred
+  (i) framework-map subcommand count → mechanical `coherence` check (small build).
 - **[COMPLETE 2026-06-24] Terminal-dependency gate + full v3.15.0 doc reconciliation +
   retrospective 06d.** **Shipped:** `validate` now blocks a terminal-status thing depending
   on unfinished work (`8d3574e`) — `detect-conflicts` rule #1 as a *state invariant* (no diff;
@@ -30,7 +59,7 @@ last_updated: 2026-06-24
   check (generalises `prose-references-are-mechanically-checkable` from references to derived
   counts). State clean: 82 things, 0 errors, coherence clean, 0 open conflicts, 77 tests green.
   v3.15.0 stays (folded, not bumped).
-  **NEXT SESSION — operator's named going-forward piece (2026-06-24): PreToolUse tool hooks.**
+  **[PARKED by operator 2026-06-24, cascade session — see top entry] PreToolUse tool hooks.**
   The deliberately-deferred security/risk-reasoning hooks — the *action-side analogue of the
   pre-commit gate*: a clearance check at the action boundary for irreversible delete/send/spend,
   where `consequence-is-recoverable-only-in-retrospect` says the judgment belongs to human +
@@ -42,8 +71,7 @@ last_updated: 2026-06-24
   but unprioritised below it.)
   **Smaller deferred:** (i) framework-map subcommand count → mechanical `coherence` check (per
   `repeated-drift-promotes-a-fact-into-the-floor`; retro 06d rec #2; small build). (ii) cascade
-  helper — mechanical downstream-set gathering for `cascade-completion`; scoped, operator weighing
-  overengineering. (iii) parked active insights still live:
+  helper — **DONE, shipped v3.16.0 (see top entry).** (iii) parked active insights still live:
   `consequence-is-recoverable-only-in-retrospect`, `long-running-tasks-lack-pre-compaction-checkpoint`.
 - **[COMPLETE 2026-06-23] Domain-kernel + harness-hardening build — all 5 phases
   shipped as v3.15.0 (minor: additive/opt-in).** Full plan + progress table:
@@ -280,6 +308,13 @@ last_updated: 2026-06-24
   (touchpoints/cascade), domain-boundary pair is half-built. The standing known-unhandled;
   candidate shape is a commit-pinned reference triple + a cross-domain Freshness check.
   **Next: spec this out** (the active design thread). High confidence (2026-06-24).
+- `directional-graph-reads-come-in-inbound-outbound-pairs` — a mechanical read over the
+  relationship graph in one direction implies its opposite: `touchpoints` (inbound, "what did
+  I put at risk?") ↔ `cascade` (outbound, "what did I just unblock?") are one attention-cache
+  pattern pointed two ways, not two primitives. The razor against both under-building (shipping
+  only the inbound read) and over-building (the mirror is the same walk flipped, inheriting
+  report-not-apply). The concrete spatial-axis instance the parallel session generalised into
+  `mechanism-pairs-come-from-two-reflection-axes`. Built `mdllm cascade` (2026-06-24).
 - `modeling-cognition-yields-a-learning-loop-not-a-coherence-loop` — the framework did
   **not** build a loop; loops already exist. It built the *assimilation ritual*
   (insight → retrospective → end-of-session continuity), which is loop-agnostic and
