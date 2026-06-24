@@ -9,8 +9,7 @@ your workflows and keeps your tasks moving for days without losing the thread.
 
 A framework discovered by agents, directed by you, and grown together.
 
-Works with the agent you already use — OpenClaw, Fable, or GLM. Lives right
-alongside your Obsidian vault. MarkdownLLM is the foundation it all sits on.
+Works with the agent you already use — OpenClaw, Fable, or GLM. Integrates with your Obsidian brain. MarkdownLLM is the foundation it all sits on.
 
 ---
 
