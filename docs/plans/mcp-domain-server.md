@@ -261,8 +261,30 @@ publishes a *face it authored about itself*, never its raw interior.
   over stdio: `initialize`, `resources/list` + `resources/read` (`manifest://` is
   Server-Card-shaped, `thing://<domain>/<id>`), `tools/list` + `tools/call`
   (`query_things`, `get_deliverable` with the provenance triple). Pure stdlib, thin
-  transport over `scan()`; 7 floor self-tests incl. an end-to-end stdio roundtrip.
-- Phases 2–5 pending.
+  transport over `scan()`. Egress source-scopes (strips the producer's internal
+  graph). The pin is **per-thing** (the exposed thing's last-changed commit, source-
+  computed — never over-fires on unrelated source commits) and is carried on each
+  manifest `knows` entry.
+- **Phase 2 — landed.** `mdllm imports-check <consumer>` is re-quarantine-on-drift,
+  the consumer-side standing check. For each `origin: external` import it reads the
+  source's **exposed face via MCP** (a minimal stdio client, spawning the source
+  server through the `.mcp.json` address book) — **never the source's git**: a
+  freshness read is a horizontal cross-domain read and obeys the same membrane as
+  content. States: `fresh` / `stale` / `withdrawn` / `unreachable` / `no-address` /
+  `incomplete`. **Report-only** — detection is mechanical, the re-quarantine (flip to
+  `verified:false` / `status:stale`) is the agent's disposition; the floor never
+  mutates a domain's things. **Offline = `unreachable` ("freshness unknown"), never a
+  silent `fresh`.** Proven live (jmtm's import of code-architect reports `fresh`) +
+  self-tests for fresh→stale, unreachable, and no-route.
+- Phases 3–5 pending.
+
+**Why MCP, not git, for the freshness read (decided):** the framework version-check
+reads git (`.markdownllm`) because that's the **vertical/substrate** axis — public
+substrate every domain inherits. Peer freshness is the **horizontal** axis, which
+obeys the membrane: everything a consumer learns about a peer crosses through the
+porch, including "have you changed?". git-direct would breach the boundary *and*
+re-introduce the id-space leak (it needs the source's internal file path). Two-axis
+rule: vertical → git, horizontal → face.
 
 ## Open Questions
 

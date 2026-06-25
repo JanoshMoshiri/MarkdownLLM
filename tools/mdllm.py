@@ -2746,6 +2746,23 @@ def _mcp_render_thing(t: Thing) -> str:
     return f"---\n{fm}---\n\n{t.body.lstrip(chr(10))}"
 
 
+def _mcp_thing_commit(root: Path, t: Thing) -> str:
+    # The pin is *per-thing*: the last commit that touched this exposed thing,
+    # not the domain HEAD — so a freshness check fires only when the consumed
+    # thing actually changed, not on any commit to the source. Computed
+    # source-side; only the resulting commit crosses, never the file path.
+    try:
+        rel = t.path.relative_to(root)
+    except ValueError:
+        rel = t.path
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%h", "--", str(rel)],
+                             cwd=root, capture_output=True, text=True, check=True)
+        return out.stdout.strip() or "unknown"
+    except Exception:
+        return "unknown"
+
+
 def mcp_list_tools() -> list[dict]:
     return [
         {"name": "query_things",
@@ -2783,25 +2800,29 @@ def mcp_query_things(corpus: Corpus, typ=None, tag=None, status=None, text=None)
     return rows
 
 
-def mcp_get_deliverable(corpus: Corpus, domain_id: str, tid: str, head: str) -> dict | None:
+def mcp_get_deliverable(root: Path, corpus: Corpus, domain_id: str, tid: str) -> dict | None:
     # Allowlist lookup by id — never builds a filesystem path from caller input,
     # so the path-traversal / argument-injection class (the 2026 reference-server
     # CVEs) cannot apply. Only an *exposed* id resolves.
     t = {x.id: x for x in mcp_exposed_things(corpus)}.get(tid)
     if t is None:
         return None
-    return {"reference_triple": {"source_domain": domain_id,
-                                 "source_id": tid, "source_commit": head},
+    return {"reference_triple": {"source_domain": domain_id, "source_id": tid,
+                                 "source_commit": _mcp_thing_commit(root, t)},
             "frontmatter": _mcp_egress_meta(t.meta), "content": t.body}
 
 
-def mcp_build_manifest(corpus: Corpus, domain_id: str, head: str) -> dict:
-    # Server Card-shaped (the emerging MCP automatic-discovery convention).
+def mcp_build_manifest(root: Path, corpus: Corpus, domain_id: str) -> dict:
+    # Server Card-shaped (the emerging MCP automatic-discovery convention). Each
+    # `knows` entry carries the thing's per-thing `source_commit` so a consumer's
+    # freshness check reads current pins from the face in one call.
     things = mcp_exposed_things(corpus)
-    return {"name": domain_id, "domain_id": domain_id, "head_commit": head,
+    return {"name": domain_id, "domain_id": domain_id,
+            "head_commit": git_short_sha(root),
             "liveness": "corpus",  # read-only face; "agented" once run_domain_task lands
             "knows": [{"id": t.id, "type": t.meta.get("type"),
-                       "status": t.meta.get("status"), "summary": _mcp_summary(t)}
+                       "status": t.meta.get("status"), "summary": _mcp_summary(t),
+                       "source_commit": _mcp_thing_commit(root, t)}
                       for t in things],
             "can_do": [tool["name"] for tool in mcp_list_tools()],
             "who_i_know": []}  # outbound address book — a later phase
@@ -2817,11 +2838,11 @@ def mcp_list_resources(corpus: Corpus, domain_id: str) -> list[dict]:
     return res
 
 
-def mcp_read_resource(corpus: Corpus, domain_id: str, uri: str, head: str) -> dict | None:
+def mcp_read_resource(root: Path, corpus: Corpus, domain_id: str, uri: str) -> dict | None:
     import json
     if uri == f"manifest://{domain_id}":
         return {"uri": uri, "mimeType": "application/json",
-                "text": json.dumps(mcp_build_manifest(corpus, domain_id, head),
+                "text": json.dumps(mcp_build_manifest(root, corpus, domain_id),
                                     indent=2, default=str)}
     prefix = f"thing://{domain_id}/"
     if uri.startswith(prefix):
@@ -2850,7 +2871,6 @@ def cmd_mcp_serve(args) -> int:
     def handle(method: str, params: dict):
         if method.startswith("notifications/"):
             return None  # client-side lifecycle notice — nothing to answer
-        head = git_short_sha(root)  # live per request — freshness reads current HEAD
         if method == "initialize":
             return {"protocolVersion": params.get("protocolVersion", MCP_PROTOCOL_VERSION),
                     "capabilities": {"resources": {}, "tools": {}},
@@ -2861,7 +2881,7 @@ def cmd_mcp_serve(args) -> int:
         if method == "resources/list":
             return {"resources": mcp_list_resources(corpus, domain_id)}
         if method == "resources/read":
-            c = mcp_read_resource(corpus, domain_id, params.get("uri", ""), head)
+            c = mcp_read_resource(root, corpus, domain_id, params.get("uri", ""))
             if c is None:
                 raise _RpcError(-32002, f"resource not found or not exposed: {params.get('uri')}")
             return {"contents": [c]}
@@ -2874,7 +2894,7 @@ def cmd_mcp_serve(args) -> int:
                                         a.get("status"), a.get("text"))
                 return {"content": [{"type": "text", "text": json.dumps(rows, indent=2, default=str)}]}
             if name == "get_deliverable":
-                d = mcp_get_deliverable(corpus, domain_id, a.get("id", ""), head)
+                d = mcp_get_deliverable(root, corpus, domain_id, a.get("id", ""))
                 if d is None:
                     return {"content": [{"type": "text",
                             "text": f"not found or not exposed: {a.get('id')!r}"}], "isError": True}
@@ -2907,6 +2927,128 @@ def cmd_mcp_serve(args) -> int:
             log(f"error handling {method}: {e}")
             if mid is not None:
                 emit({"jsonrpc": "2.0", "id": mid, "error": {"code": -32603, "message": str(e)}})
+    return 0
+
+
+# ----------------------------------------------------- imports-check (freshness)
+#
+# Phase 2: re-quarantine-on-drift, the consumer-side standing check. The upward
+# version-check generalised from the one privileged source (the framework, the
+# vertical/substrate axis) to an arbitrary source_domain (the horizontal/peer
+# axis). It reads the source's *exposed face* through MCP — never its git — so the
+# freshness signal obeys the same membrane as content: everything the consumer
+# learns about the source crosses through the porch. Report-only: detection is
+# mechanical, the re-quarantine (flip to stale / verified:false) is the agent's
+# disposition (the floor never mutates a domain's things).
+
+
+def _load_address_book(consumer_root: Path) -> dict:
+    # The consumer's `.mcp.json` mcpServers map IS the address book — operator-
+    # wired, per trust zone. name -> {command, args}.
+    import json
+    p = consumer_root / ".mcp.json"
+    if not p.is_file():
+        return {}
+    try:
+        return (json.loads(p.read_text(encoding="utf-8")) or {}).get("mcpServers", {}) or {}
+    except Exception:
+        return {}
+
+
+def _mcp_client_manifest(command: str, args: list, cwd: Path, source_domain: str,
+                         timeout: int = 30) -> dict | None:
+    # A minimal MCP stdio *client*: spawn the source's server, read its manifest
+    # through the face. Returns the parsed manifest, or None when the source is
+    # unreachable (bad command/path, spawn failure, timeout, malformed) — the
+    # honest "freshness unknown" answer, never a silent "fresh".
+    import json
+    reqs = [{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+            {"jsonrpc": "2.0", "id": 2, "method": "resources/read",
+             "params": {"uri": f"manifest://{source_domain}"}}]
+    payload = "\n".join(json.dumps(r) for r in reqs) + "\n"
+    try:
+        out = subprocess.run([command, *args], input=payload, cwd=str(cwd),
+                             capture_output=True, text=True, timeout=timeout)
+    except Exception:
+        return None
+    for line in out.stdout.splitlines():
+        try:
+            msg = json.loads(line)
+        except Exception:
+            continue
+        if msg.get("id") == 2 and "result" in msg:
+            try:
+                return json.loads(msg["result"]["contents"][0]["text"])
+            except Exception:
+                return None
+    return None
+
+
+def imports_freshness(consumer_root: Path) -> list[dict]:
+    corpus, _ = scan(consumer_root)
+    book = _load_address_book(consumer_root)
+    manifests: dict[str, tuple[str, dict | None]] = {}  # spawn each source once
+    results = []
+    for t in corpus.things:
+        m = t.meta
+        if str(m.get("origin")) != "external":
+            continue
+        sd, sid, pin = m.get("source_domain"), m.get("source_id"), m.get("source_commit")
+        if not (sd and sid and pin):
+            results.append({"id": t.id, "state": "incomplete",
+                            "detail": "missing source_domain/source_id/source_commit"})
+            continue
+        if sd not in manifests:
+            cfg = book.get(sd)
+            if not cfg or not cfg.get("command"):
+                manifests[sd] = ("no-address", None)
+            else:
+                man = _mcp_client_manifest(cfg["command"], cfg.get("args", []),
+                                           consumer_root, sd)
+                manifests[sd] = ("ok", man) if man else ("unreachable", None)
+        state, man = manifests[sd]
+        row = {"id": t.id, "source": f"{sd}/{sid}", "pin": pin}
+        if state == "no-address":
+            row["state"] = "no-address-book-entry"
+        elif state == "unreachable":
+            row["state"] = "unreachable"  # freshness unknown — the honest answer
+        else:
+            current = next((k.get("source_commit") for k in man.get("knows", [])
+                            if k.get("id") == sid), None)
+            if current is None:
+                row["state"] = "withdrawn"  # no longer exposed by the source
+            else:
+                row["current"] = current
+                row["state"] = "fresh" if current == pin else "stale"
+        results.append(row)
+    return results
+
+
+def cmd_imports_check(args) -> int:
+    root = Path(args.path).resolve()
+    rows = imports_freshness(root)
+    if not rows:
+        print(f"imports-check: no external imports in {root.name}")
+        return 0
+    print(f"## Imports Freshness — {root.name}\n")
+    order = {"stale": 0, "unreachable": 1, "withdrawn": 2, "no-address-book-entry": 3,
+             "incomplete": 4, "fresh": 5}
+    for r in sorted(rows, key=lambda r: order.get(r["state"], 9)):
+        if r["state"] == "stale":
+            print(f"- STALE      {r['id']}  ({r['source']})  pinned {r['pin']} -> now {r['current']}")
+            print("             re-quarantine: re-read the source, then flip `verified: false`, `status: stale`")
+        elif r["state"] == "fresh":
+            print(f"- fresh      {r['id']}  ({r['source']})  @ {r['pin']}")
+        elif r["state"] == "unreachable":
+            print(f"- UNKNOWN    {r['id']}  ({r['source']})  unreachable — freshness cannot be determined")
+        elif r["state"] == "withdrawn":
+            print(f"- WITHDRAWN  {r['id']}  ({r['source']})  source no longer exposes `{r['source'].split('/')[-1]}`")
+        elif r["state"] == "no-address-book-entry":
+            print(f"- NO-ROUTE   {r['id']}  ({r['source']})  no .mcp.json entry for source domain")
+        else:
+            print(f"- INCOMPLETE {r['id']}  {r.get('detail','')}")
+    stale = sum(1 for r in rows if r["state"] == "stale")
+    print(f"\n{len(rows)} import(s); {stale} stale. Freshness is advisory — disposition is yours.")
     return 0
 
 
@@ -3037,6 +3179,11 @@ def main() -> int:
                         "(stdio) — the cross-domain producing side (Phase 1: read-only)")
     ms.add_argument("path", help="path to the domain directory to serve")
     ms.set_defaults(fn=cmd_mcp_serve)
+
+    ic = sub.add_parser("imports-check", help="re-quarantine-on-drift: check a "
+                        "domain's external imports against their sources' exposed faces")
+    ic.add_argument("path", nargs="?", default=".", help="the consumer domain")
+    ic.set_defaults(fn=cmd_imports_check)
 
     args = p.parse_args()
     return args.fn(args)

@@ -1105,9 +1105,10 @@ def test_mcp_query_things_filters(tmp_path):
 
 def test_mcp_get_deliverable_stamps_triple(tmp_path):
     corpus = _mcp_domain(tmp_path)
-    d = mdllm.mcp_get_deliverable(corpus, "dom", "rent-statement-2026", "abc1234")
-    assert d["reference_triple"] == {"source_domain": "dom",
-        "source_id": "rent-statement-2026", "source_commit": "abc1234"}
+    d = mdllm.mcp_get_deliverable(tmp_path, corpus, "dom", "rent-statement-2026")
+    assert d["reference_triple"]["source_domain"] == "dom"
+    assert d["reference_triple"]["source_id"] == "rent-statement-2026"
+    assert d["reference_triple"]["source_commit"] == "unknown"  # tmp_path isn't a git repo
     assert "Total income" in d["content"]
     # the producer's internal graph never crosses; descriptive fields do.
     assert "linked_things" not in d["frontmatter"]
@@ -1117,7 +1118,7 @@ def test_mcp_get_deliverable_stamps_triple(tmp_path):
 def test_mcp_egress_strips_producer_graph(tmp_path):
     corpus = _mcp_domain(tmp_path)
     # both crossing paths source-scope: the resource read carries no foreign ids.
-    th = mdllm.mcp_read_resource(corpus, "dom", "thing://dom/rent-statement-2026", "h")
+    th = mdllm.mcp_read_resource(tmp_path, corpus, "dom", "thing://dom/rent-statement-2026")
     assert "Rent Statement" in th["text"]            # body crosses
     assert "linked_things" not in th["text"]         # graph does not
     assert "internal-note" not in th["text"]         # the foreign id is gone
@@ -1126,25 +1127,102 @@ def test_mcp_egress_strips_producer_graph(tmp_path):
 def test_mcp_get_deliverable_refuses_unexposed_and_traversal(tmp_path):
     corpus = _mcp_domain(tmp_path)
     # only exposed ids resolve; unexposed and path-traversal strings both miss.
-    assert mdllm.mcp_get_deliverable(corpus, "dom", "internal-note", "h") is None
-    assert mdllm.mcp_get_deliverable(corpus, "dom", "../../etc/passwd", "h") is None
+    assert mdllm.mcp_get_deliverable(tmp_path, corpus, "dom", "internal-note") is None
+    assert mdllm.mcp_get_deliverable(tmp_path, corpus, "dom", "../../etc/passwd") is None
 
 
 def test_mcp_manifest_is_server_card_shaped(tmp_path):
-    m = mdllm.mcp_build_manifest(_mcp_domain(tmp_path), "dom", "abc1234")
-    assert m["domain_id"] == "dom" and m["head_commit"] == "abc1234"
+    corpus = _mcp_domain(tmp_path)
+    m = mdllm.mcp_build_manifest(tmp_path, corpus, "dom")
+    assert m["domain_id"] == "dom"
     assert [k["id"] for k in m["knows"]] == ["rent-statement-2026"]
+    assert "source_commit" in m["knows"][0]   # per-thing pin on the face
     assert set(m["can_do"]) == {"query_things", "get_deliverable"}
 
 
 def test_mcp_read_resource(tmp_path):
     corpus = _mcp_domain(tmp_path)
-    man = mdllm.mcp_read_resource(corpus, "dom", "manifest://dom", "h")
+    man = mdllm.mcp_read_resource(tmp_path, corpus, "dom", "manifest://dom")
     assert man and man["mimeType"] == "application/json"
-    th = mdllm.mcp_read_resource(corpus, "dom", "thing://dom/rent-statement-2026", "h")
+    th = mdllm.mcp_read_resource(tmp_path, corpus, "dom", "thing://dom/rent-statement-2026")
     assert th and "Rent Statement" in th["text"]
-    assert mdllm.mcp_read_resource(corpus, "dom", "thing://dom/internal-note", "h") is None
-    assert mdllm.mcp_read_resource(corpus, "dom", "bogus://x", "h") is None
+    assert mdllm.mcp_read_resource(tmp_path, corpus, "dom", "thing://dom/internal-note") is None
+    assert mdllm.mcp_read_resource(tmp_path, corpus, "dom", "bogus://x") is None
+
+
+# ----------------------------------------------- imports-check (Phase 2 freshness)
+
+def _git_commit(root, msg):
+    import subprocess as sp
+    sp.run(["git", "add", "-A"], cwd=root, check=True)
+    sp.run(["git", "commit", "-q", "-m", msg], cwd=root, check=True)
+
+
+def _git_short(root):
+    import subprocess as sp
+    return sp.run(["git", "rev-parse", "--short", "HEAD"], cwd=root,
+                  capture_output=True, text=True).stdout.strip()
+
+
+def _consumer_with_import(con, source_domain, source_id, pin, server_cfg):
+    import json
+    write(con, ".mcp.json", json.dumps({"mcpServers": {source_domain: server_cfg}}))
+    write(con, "things/imported.md", thing_text(
+        f"id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        f"origin: external\nverified: false\nsource_domain: {source_domain}\n"
+        f"source_id: {source_id}\nsource_commit: {pin}",
+        "# Imported Spec\n\nQuarantined.\n"))
+
+
+def test_imports_freshness_fresh_then_stale(tmp_path):
+    import subprocess as sp
+    src = tmp_path / "srcdom"
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+        "# The Spec\n\nv1.\n"))
+    sp.run(["git", "init", "-q"], cwd=src, check=True)
+    _git_commit(src, "create spec")
+    pin = _git_short(src)  # single commit: the spec's last-change == HEAD
+
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", pin,
+        {"command": sys.executable, "args": [str(Path(mdllm.__file__)), "mcp-serve", str(src)]})
+
+    # 1. FRESH — pin matches the source's current per-thing commit (read via the face)
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "fresh"
+
+    # 2. STALE — change the source thing and re-commit; the pin now lags
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+        "# The Spec\n\nv2 CHANGED.\n"))
+    _git_commit(src, "revise spec")
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "stale"
+    assert rows["imported-spec"]["current"] != pin
+
+
+def test_imports_freshness_unreachable_is_unknown(tmp_path):
+    # the offline case must report UNKNOWN, never a silent "fresh".
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", "deadbee",
+        {"command": "this-binary-does-not-exist-xyz", "args": ["mcp-serve", "/nope"]})
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "unreachable"
+
+
+def test_imports_freshness_no_address_book_entry(tmp_path):
+    con = tmp_path / "condom"
+    con.mkdir()  # no .mcp.json at all
+    write(con, "things/imported.md", thing_text(
+        "id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        "origin: external\nverified: false\nsource_domain: srcdom\n"
+        "source_id: the-spec\nsource_commit: deadbee",
+        "# Imported Spec\n\nQuarantined.\n"))
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "no-address-book-entry"
 
 
 def test_mcp_serve_stdio_roundtrip(tmp_path):
