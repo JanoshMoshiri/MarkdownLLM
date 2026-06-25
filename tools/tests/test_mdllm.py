@@ -1228,9 +1228,10 @@ def test_imports_freshness_no_address_book_entry(tmp_path):
 # --------------------------------------------- run_domain_task (Phase 3a, async stub)
 
 def test_run_domain_task_is_opt_in():
-    # read-only by default; the write/compute-capable tool appears only with --tasks
-    assert "run_domain_task" not in {t["name"] for t in mdllm.mcp_list_tools()}
-    assert "run_domain_task" in {t["name"] for t in mdllm.mcp_list_tools(True)}
+    # read-only by default; the task tools appear only with --tasks
+    assert {t["name"] for t in mdllm.mcp_list_tools()} == {"query_things", "get_deliverable"}
+    enabled = {t["name"] for t in mdllm.mcp_list_tools(True)}
+    assert {"run_domain_task", "get_task_result"} <= enabled
 
 
 def _write_fake_agent(tmp_path):
@@ -1253,14 +1254,16 @@ def _serve_tasks(tmp_path, agent_bin):
 
 
 def _poll_until_done(call, task_id):
+    # poll via the get_task_result *tool* — the path a standard MCP client uses
     import json as _json, time as _time
     for _ in range(50):
-        g = call({"jsonrpc": "2.0", "id": 9, "method": "tasks/get",
-                  "params": {"task_id": task_id}})
-        if g["result"]["status"] != "working":
-            return g["result"]
+        r = call({"jsonrpc": "2.0", "id": 9, "method": "tools/call",
+                  "params": {"name": "get_task_result", "arguments": {"task_id": task_id}}})
+        task = _json.loads(r["result"]["content"][0]["text"])
+        if task["status"] != "working":
+            return task
         _time.sleep(0.1)
-    return g["result"]
+    return task
 
 
 def test_run_domain_task_async_with_agent(tmp_path):

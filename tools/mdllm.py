@@ -2795,6 +2795,16 @@ def mcp_list_tools(tasks_enabled: bool = False) -> list[dict]:
              "inputSchema": {"type": "object", "properties": {
                  "task": {"type": "string"}, "context": {"type": "string"}},
                  "required": ["task"]}})
+        # The poll, as a *tool* (not just the `tasks/get` method) so a standard MCP
+        # client — which only surfaces tools to its agent — can complete the round
+        # trip today, before the MCP Tasks wire is finalised.
+        tools.append(
+            {"name": "get_task_result",
+             "description": "Fetch a run_domain_task's status and result by task_id. "
+                            "Poll until status is `completed` or `failed`.",
+             "inputSchema": {"type": "object",
+                             "properties": {"task_id": {"type": "string"}},
+                             "required": ["task_id"]}})
     return tools
 
 
@@ -2992,7 +3002,13 @@ def cmd_mcp_serve(args) -> int:
                 log(f"run_domain_task {tid} (working) for: {task!r}")
                 return {"content": [{"type": "text",
                         "text": json.dumps({"task_id": tid, "status": "working",
-                                            "poll": "tasks/get"}, indent=2)}]}
+                                            "poll": "get_task_result"}, indent=2)}]}
+            if name == "get_task_result":
+                task = task_store.get(a.get("task_id"))
+                if task is None:
+                    return {"content": [{"type": "text",
+                            "text": f"unknown task: {a.get('task_id')!r}"}], "isError": True}
+                return {"content": [{"type": "text", "text": json.dumps(task, indent=2, default=str)}]}
             return {"content": [{"type": "text", "text": f"unknown tool: {name!r}"}], "isError": True}
         raise _RpcError(-32601, f"method not found: {method}")
 
