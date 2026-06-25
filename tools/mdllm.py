@@ -2725,6 +2725,27 @@ def _mcp_summary(t: Thing) -> str:
     return ""
 
 
+# A crossing thing carries its descriptive frontmatter, never the producer's
+# internal relationship graph: those ids live in the producer's id-space and are
+# foreign / unresolvable to any consumer. Stripped on egress so the graph stays
+# reasoning-opaque across the boundary (the bright line). A cross-domain link, if
+# ever wanted, is a deliberate source-scoped exposure — never a raw leak of
+# foreign ids. (Surfaced by the first road test: the consumer tried to resolve a
+# producer-local `linked_things` id and found nothing.)
+_MCP_INTERNAL_GRAPH = ("linked_things", "dependencies", "blocks", "parent",
+                       "definition", "triggers")
+
+
+def _mcp_egress_meta(meta: dict) -> dict:
+    return {k: v for k, v in meta.items() if k not in _MCP_INTERNAL_GRAPH}
+
+
+def _mcp_render_thing(t: Thing) -> str:
+    import yaml
+    fm = yaml.safe_dump(_mcp_egress_meta(t.meta), sort_keys=False, allow_unicode=True)
+    return f"---\n{fm}---\n\n{t.body.lstrip(chr(10))}"
+
+
 def mcp_list_tools() -> list[dict]:
     return [
         {"name": "query_things",
@@ -2771,7 +2792,7 @@ def mcp_get_deliverable(corpus: Corpus, domain_id: str, tid: str, head: str) -> 
         return None
     return {"reference_triple": {"source_domain": domain_id,
                                  "source_id": tid, "source_commit": head},
-            "frontmatter": t.meta, "content": t.body}
+            "frontmatter": _mcp_egress_meta(t.meta), "content": t.body}
 
 
 def mcp_build_manifest(corpus: Corpus, domain_id: str, head: str) -> dict:
@@ -2807,8 +2828,7 @@ def mcp_read_resource(corpus: Corpus, domain_id: str, uri: str, head: str) -> di
         t = {x.id: x for x in mcp_exposed_things(corpus)}.get(uri[len(prefix):])
         if t is None:
             return None
-        return {"uri": uri, "mimeType": "text/markdown",
-                "text": t.path.read_text(encoding="utf-8")}
+        return {"uri": uri, "mimeType": "text/markdown", "text": _mcp_render_thing(t)}
     return None
 
 

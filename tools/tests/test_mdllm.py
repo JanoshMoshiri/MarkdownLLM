@@ -1079,7 +1079,8 @@ def test_doctor_reports_domain_kernel_status(tmp_path, capsys):
 def _mcp_domain(tmp_path):
     write(tmp_path, "things/income/rent.md", thing_text(
         "id: rent-statement-2026\ntype: deliverable\nstatus: completed\n"
-        "created: 2026-06-01\nexposed: true\ntags: [income]",
+        "created: 2026-06-01\nexposed: true\ntags: [income]\n"
+        "linked_things:\n  - id: internal-note\n    relation: informs",
         "# Rent Statement 2026\n\nTotal income: 12000.\n"))
     write(tmp_path, "things/internal/secret.md", thing_text(
         "id: internal-note\ntype: note\nstatus: in-progress\ncreated: 2026-06-01",
@@ -1108,6 +1109,18 @@ def test_mcp_get_deliverable_stamps_triple(tmp_path):
     assert d["reference_triple"] == {"source_domain": "dom",
         "source_id": "rent-statement-2026", "source_commit": "abc1234"}
     assert "Total income" in d["content"]
+    # the producer's internal graph never crosses; descriptive fields do.
+    assert "linked_things" not in d["frontmatter"]
+    assert d["frontmatter"]["type"] == "deliverable" and d["frontmatter"]["exposed"] is True
+
+
+def test_mcp_egress_strips_producer_graph(tmp_path):
+    corpus = _mcp_domain(tmp_path)
+    # both crossing paths source-scope: the resource read carries no foreign ids.
+    th = mdllm.mcp_read_resource(corpus, "dom", "thing://dom/rent-statement-2026", "h")
+    assert "Rent Statement" in th["text"]            # body crosses
+    assert "linked_things" not in th["text"]         # graph does not
+    assert "internal-note" not in th["text"]         # the foreign id is gone
 
 
 def test_mcp_get_deliverable_refuses_unexposed_and_traversal(tmp_path):
