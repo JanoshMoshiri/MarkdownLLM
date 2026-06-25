@@ -1225,6 +1225,58 @@ def test_imports_freshness_no_address_book_entry(tmp_path):
     assert rows["imported-spec"]["state"] == "no-address-book-entry"
 
 
+# --------------------------------------------- run_domain_task (Phase 3a, async stub)
+
+def test_run_domain_task_is_opt_in():
+    # read-only by default; the write/compute-capable tool appears only with --tasks
+    assert "run_domain_task" not in {t["name"] for t in mdllm.mcp_list_tools()}
+    assert "run_domain_task" in {t["name"] for t in mdllm.mcp_list_tools(True)}
+
+
+def test_run_domain_task_async_roundtrip(tmp_path):
+    # call returns a handle; poll tasks/get returns the (stub) deliverable —
+    # proves the async Tasks pattern with no live agent and no writes.
+    import json as _json, subprocess as _sp
+    _mcp_domain(tmp_path)
+    proc = _sp.Popen([sys.executable, str(Path(mdllm.__file__)), "mcp-serve",
+                      str(tmp_path), "--tasks"],
+                     stdin=_sp.PIPE, stdout=_sp.PIPE, stderr=_sp.DEVNULL, text=True)
+    try:
+        def call(req):
+            proc.stdin.write(_json.dumps(req) + "\n")
+            proc.stdin.flush()
+            return _json.loads(proc.stdout.readline())
+
+        call({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
+        r = call({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
+                  "params": {"name": "run_domain_task",
+                             "arguments": {"task": "update the contact form", "context": "ctx"}}})
+        handle = _json.loads(r["result"]["content"][0]["text"])
+        assert handle["task_id"].startswith("task_")
+        g = call({"jsonrpc": "2.0", "id": 3, "method": "tasks/get",
+                  "params": {"task_id": handle["task_id"]}})
+        assert g["result"]["status"] == "completed"
+        assert g["result"]["result"]["on_task"] == "update the contact form"
+        assert tmp_path.name in g["result"]["result"]["would_run"]
+    finally:
+        proc.stdin.close()
+        proc.wait(timeout=10)
+
+
+def test_run_domain_task_blocked_without_flag(tmp_path):
+    import json as _json, subprocess as _sp
+    _mcp_domain(tmp_path)
+    msgs = "\n".join(_json.dumps(m) for m in [
+        {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+        {"jsonrpc": "2.0", "id": 2, "method": "tools/call",
+         "params": {"name": "run_domain_task", "arguments": {"task": "x"}}},
+    ]) + "\n"
+    out = _sp.run([sys.executable, str(Path(mdllm.__file__)), "mcp-serve", str(tmp_path)],
+                  input=msgs, capture_output=True, text=True, timeout=30).stdout
+    by_id = {r.get("id"): r for r in (_json.loads(l) for l in out.splitlines() if l.strip())}
+    assert by_id[2]["result"]["isError"] is True   # not enabled without --tasks
+
+
 def test_mcp_serve_stdio_roundtrip(tmp_path):
     # End-to-end transport: drive the real stdio JSON-RPC loop as a subprocess.
     import json as _json, subprocess as _sp

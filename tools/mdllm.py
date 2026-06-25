@@ -2763,8 +2763,8 @@ def _mcp_thing_commit(root: Path, t: Thing) -> str:
         return "unknown"
 
 
-def mcp_list_tools() -> list[dict]:
-    return [
+def mcp_list_tools(tasks_enabled: bool = False) -> list[dict]:
+    tools = [
         {"name": "query_things",
          "description": "List this domain's exposed things, optionally filtered by "
                         "type, tag, status, or free text. Browse the face.",
@@ -2779,6 +2779,33 @@ def mcp_list_tools() -> list[dict]:
                          "properties": {"id": {"type": "string"}},
                          "required": ["id"]}},
     ]
+    if tasks_enabled:
+        # The live-agent hand-off: a caller passes input, THIS domain's own agent
+        # does the work in its own context and returns a deliverable — standard
+        # MCP tool-use with an agent executor. Long-running, so async: returns a
+        # task handle, the caller polls `tasks/get`. Opt-in (`--tasks`) because it
+        # is the first write/compute-capable surface. (Phase 3a: stub executor.)
+        tools.append(
+            {"name": "run_domain_task",
+             "description": "Ask this domain's own agent to perform a task with the "
+                            "given input and return a deliverable. Async: returns a "
+                            "task handle; poll `tasks/get`. The agent works in its own "
+                            "context — only the deliverable crosses (quarantined on "
+                            "the consumer's side).",
+             "inputSchema": {"type": "object", "properties": {
+                 "task": {"type": "string"}, "context": {"type": "string"}},
+                 "required": ["task"]}})
+    return tools
+
+
+def _mcp_stub_task_result(domain_id: str, task: str, context) -> dict:
+    # Phase 3a STUB — proves the async task round-trip without a live agent. Phase
+    # 3b replaces this with the domain's headless agent (it does the real work in
+    # its own repo, behind an authorization gate, and returns a deliverable); the
+    # wire is identical, the handle just sits in `working` for minutes instead.
+    return {"stub": True, "would_run": f"{domain_id}'s agent",
+            "on_task": task, "received_context": context is not None,
+            "note": "Phase 3b wires the real headless-agent executor behind this."}
 
 
 def mcp_query_things(corpus: Corpus, typ=None, tag=None, status=None, text=None) -> list[dict]:
@@ -2812,19 +2839,20 @@ def mcp_get_deliverable(root: Path, corpus: Corpus, domain_id: str, tid: str) ->
             "frontmatter": _mcp_egress_meta(t.meta), "content": t.body}
 
 
-def mcp_build_manifest(root: Path, corpus: Corpus, domain_id: str) -> dict:
+def mcp_build_manifest(root: Path, corpus: Corpus, domain_id: str,
+                       tasks_enabled: bool = False) -> dict:
     # Server Card-shaped (the emerging MCP automatic-discovery convention). Each
     # `knows` entry carries the thing's per-thing `source_commit` so a consumer's
     # freshness check reads current pins from the face in one call.
     things = mcp_exposed_things(corpus)
     return {"name": domain_id, "domain_id": domain_id,
             "head_commit": git_short_sha(root),
-            "liveness": "corpus",  # read-only face; "agented" once run_domain_task lands
+            "liveness": "agented" if tasks_enabled else "corpus",
             "knows": [{"id": t.id, "type": t.meta.get("type"),
                        "status": t.meta.get("status"), "summary": _mcp_summary(t),
                        "source_commit": _mcp_thing_commit(root, t)}
                       for t in things],
-            "can_do": [tool["name"] for tool in mcp_list_tools()],
+            "can_do": [tool["name"] for tool in mcp_list_tools(tasks_enabled)],
             "who_i_know": []}  # outbound address book — a later phase
 
 
@@ -2838,11 +2866,12 @@ def mcp_list_resources(corpus: Corpus, domain_id: str) -> list[dict]:
     return res
 
 
-def mcp_read_resource(root: Path, corpus: Corpus, domain_id: str, uri: str) -> dict | None:
+def mcp_read_resource(root: Path, corpus: Corpus, domain_id: str, uri: str,
+                      tasks_enabled: bool = False) -> dict | None:
     import json
     if uri == f"manifest://{domain_id}":
         return {"uri": uri, "mimeType": "application/json",
-                "text": json.dumps(mcp_build_manifest(root, corpus, domain_id),
+                "text": json.dumps(mcp_build_manifest(root, corpus, domain_id, tasks_enabled),
                                     indent=2, default=str)}
     prefix = f"thing://{domain_id}/"
     if uri.startswith(prefix):
@@ -2860,6 +2889,8 @@ def cmd_mcp_serve(args) -> int:
         sys.exit(f"mdllm: not a directory: {root}")
     corpus, _ = scan(root)
     domain_id = mcp_domain_id(root)
+    tasks_enabled = bool(getattr(args, "tasks", False))
+    task_store: dict[str, dict] = {}  # session-scoped (stdio: one client, one process)
 
     def log(msg: str) -> None:
         print(f"mcp-serve[{domain_id}]: {msg}", file=sys.stderr, flush=True)
@@ -2881,12 +2912,17 @@ def cmd_mcp_serve(args) -> int:
         if method == "resources/list":
             return {"resources": mcp_list_resources(corpus, domain_id)}
         if method == "resources/read":
-            c = mcp_read_resource(root, corpus, domain_id, params.get("uri", ""))
+            c = mcp_read_resource(root, corpus, domain_id, params.get("uri", ""), tasks_enabled)
             if c is None:
                 raise _RpcError(-32002, f"resource not found or not exposed: {params.get('uri')}")
             return {"contents": [c]}
         if method == "tools/list":
-            return {"tools": mcp_list_tools()}
+            return {"tools": mcp_list_tools(tasks_enabled)}
+        if method == "tasks/get":  # poll a run_domain_task handle (Tasks pattern)
+            task = task_store.get(params.get("task_id"))
+            if task is None:
+                raise _RpcError(-32602, f"unknown task: {params.get('task_id')}")
+            return task
         if method == "tools/call":
             name, a = params.get("name", ""), params.get("arguments") or {}
             if name == "query_things":
@@ -2899,11 +2935,28 @@ def cmd_mcp_serve(args) -> int:
                     return {"content": [{"type": "text",
                             "text": f"not found or not exposed: {a.get('id')!r}"}], "isError": True}
                 return {"content": [{"type": "text", "text": json.dumps(d, indent=2, default=str)}]}
+            if name == "run_domain_task":
+                if not tasks_enabled:
+                    return {"content": [{"type": "text",
+                            "text": "run_domain_task is not enabled on this server (start with --tasks)"}],
+                            "isError": True}
+                import uuid
+                tid = "task_" + uuid.uuid4().hex[:12]
+                # Phase 3a: the stub executor runs inline; 3b spawns the agent
+                # async and the handle returns `working` until it finishes.
+                task_store[tid] = {"task_id": tid, "status": "completed",
+                                   "task": a.get("task", ""),
+                                   "result": _mcp_stub_task_result(domain_id, a.get("task", ""),
+                                                                   a.get("context"))}
+                log(f"run_domain_task {tid} (stub) for: {a.get('task','')!r}")
+                return {"content": [{"type": "text",
+                        "text": json.dumps({"task_id": tid, "status": "completed",
+                                            "poll": "tasks/get"}, indent=2)}]}
             return {"content": [{"type": "text", "text": f"unknown tool: {name!r}"}], "isError": True}
         raise _RpcError(-32601, f"method not found: {method}")
 
     log(f"serving {len(mcp_exposed_things(corpus))} exposed thing(s) over stdio "
-        f"(MCP {MCP_PROTOCOL_VERSION})")
+        f"(MCP {MCP_PROTOCOL_VERSION}){' + run_domain_task [stub]' if tasks_enabled else ''}")
     for line in sys.stdin:
         line = line.strip()
         if not line:
@@ -3178,6 +3231,9 @@ def main() -> int:
     ms = sub.add_parser("mcp-serve", help="serve a domain's exposed face over MCP "
                         "(stdio) — the cross-domain producing side (Phase 1: read-only)")
     ms.add_argument("path", help="path to the domain directory to serve")
+    ms.add_argument("--tasks", action="store_true",
+                    help="expose run_domain_task — the live-agent hand-off "
+                         "(Phase 3a: stub executor; opt-in, write/compute-capable surface)")
     ms.set_defaults(fn=cmd_mcp_serve)
 
     ic = sub.add_parser("imports-check", help="re-quarantine-on-drift: check a "

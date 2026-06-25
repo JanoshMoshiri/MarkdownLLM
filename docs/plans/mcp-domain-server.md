@@ -276,7 +276,22 @@ publishes a *face it authored about itself*, never its raw interior.
   mutates a domain's things. **Offline = `unreachable` ("freshness unknown"), never a
   silent `fresh`.** Proven live (jmtm's import of code-architect reports `fresh`) +
   self-tests for fresh→stale, unreachable, and no-route.
-- Phases 3–5 pending.
+- **Phase 3a — landed.** `mdllm mcp-serve <domain> --tasks` exposes `run_domain_task`
+  (opt-in — the first write/compute-capable surface). It is standard MCP tool-use with
+  an *agent* executor, made async via the **Tasks pattern**: `tools/call` returns a
+  task handle, the caller polls `tasks/get` for the deliverable. Phase 3a ships a
+  **stub executor** (no live agent, no writes) that proves the handle→poll round-trip;
+  session-scoped in-memory task store (stdio). Proven live (jmtm calls
+  code-architect's `run_domain_task`, gets a handle, polls the result). The Tasks
+  *wire* isn't finalised upstream (H2 2026) — the pattern is kept thin in the transport
+  to align later.
+  **Topology (corrected, operator-reasoned):** the *skilled* domain exposes
+  `run_domain_task` (code-architect — it owns the design/codegen skill); the consumer
+  calls it with input (jmtm: "here's the website + the change I need"); the executor's
+  agent works **in its own context** and returns the change as a deliverable; the
+  **consumer applies it to its own files** (jmtm's agent writes the website). Neither
+  domain reaches into the other — the owning domain's agent always edits its own files.
+- **Phase 3b** (real headless-agent executor, behind an authorization gate), **4, 5** pending.
 
 **Why MCP, not git, for the freshness read (decided):** the framework version-check
 reads git (`.markdownllm`) because that's the **vertical/substrate** axis — public
