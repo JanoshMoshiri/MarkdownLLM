@@ -2,7 +2,7 @@
 id: mcp-domain-server-design
 type: specification
 status: draft
-version: 0.1
+version: 0.2
 created: 2026-06-25
 tags: [cross-domain, mcp, interface, provenance, design-draft]
 linked_things:
@@ -82,6 +82,9 @@ one live-agent tool) spawns a domain-scoped agent. Git remains the state machine
 - `manifest://<domain-id>` — the porch itself: name, liveness, the exposed
   catalog, the capability (tool) list, the address book ("who I know"), and the
   repo HEAD commit. This is the "give me your name, then your catalog" entry point.
+  **Shape it as / align it with an MCP Server Card** (the emerging automatic-
+  discovery convention, maturing H2 2026) so the organic discovery layer arrives as
+  a standard feature rather than a bespoke build.
 - `thing://<domain-id>/<thing-id>` — one exposed thing (frontmatter + body).
 - `resources/list` enumerates **only exposed things**, never the whole corpus (the
   semi-permeable membrane; see *Exposure Control*).
@@ -97,8 +100,8 @@ one live-agent tool) spawns a domain-scoped agent. Git remains the state machine
   {source_domain, source_id, source_commit}}` — the provenance-stamped fetch; the
   producing-side hand-off. (Browsing is `resources/read`; this is consume-with-
   provenance.)
-- `run_domain_task(task, inputs?)` → `{deliverable, reference_triple}` — the
-  **live-agent** capability. See below.
+- `run_domain_task(task, inputs?)` → **a Task handle** (not an inline result) — the
+  **live-agent** capability, async by construction. See below.
 
 Internal floor commands (`validate`, `touchpoints`, `cascade`, `index`) are **not**
 exposed — they are the domain's private floor. Only the curated face crosses.
@@ -108,17 +111,25 @@ exposed — they are the domain's private floor. Only the curated face crosses.
 - `prompts/list` / `prompts/get` over the domain's `type: prompt` things and skill
   prompt templates, filled with the caller's arguments.
 
-## How `run_domain_task` Hands Off To The Domain Agent
+## How `run_domain_task` Hands Off To The Domain Agent — Async, On The Tasks Primitive
 
 The server has no LLM, so a capability that needs reasoning must **spawn the
-domain's own agent**:
+domain's own agent** — and that agent runs for *minutes* (long-horizon reasoning),
+so the call **must be asynchronous**. Build it on MCP's **`Tasks` primitive**
+("call-now, fetch-later"), never a synchronous tool call that blocks or times out:
 
-1. `run_domain_task` launches a **headless, domain-scoped agent session** (Agent
-   SDK / `claude` headless), cwd = the domain repo, loading the domain kernel +
-   `AGENTS.md` — so it reasons in *its own* context, not the consumer's.
-2. The agent does the work within its domain (read / reason / write to its own
-   repo, committing to its own git), and produces a deliverable.
-3. The server wraps the deliverable with the reference triple and returns it.
+1. `run_domain_task` returns a **Task handle immediately**; the server launches a
+   **headless, domain-scoped agent session** (Agent SDK / `claude` headless),
+   cwd = the domain repo, loading the domain kernel + `AGENTS.md` — so it reasons
+   in *its own* context, not the consumer's.
+2. The task moves through MCP task states (`working` / `input_required` /
+   `completed` / `failed` / `cancelled`); the consumer polls or subscribes. The
+   agent works within its domain (read / reason / write to its own repo, committing
+   to its own git) and produces a deliverable.
+3. On `completed`, the server returns the deliverable wrapped with the reference
+   triple. `input_required` is the **native mid-task elicitation** channel — the
+   producer can ask the consumer/operator a clarifying question without breaking
+   the boundary — a sliver of the conversation layer, for free.
 
 **This is why the bright line holds:** the producer agent runs in its own process
 and context; the consumer receives only the returned deliverable, as quarantined
@@ -128,6 +139,51 @@ external input. The producer's reasoning is never visible to the consumer.
 > — the wrong direction here (it would make the producer think with the consumer's
 > head, blurring the boundary). We want the producer's *own* agent, so the server
 > spawns it. Worth stating because it is a real MCP design fork.
+
+## Design Guardrails — Hold These From The Ground Up
+
+These do not constrain the local build; they keep "seamless outside interaction"
+true later. They are the conditions under which adopting MCP *extends* us rather
+than boxing us in. Tracked against the **2025-11-25 MCP spec** (OAuth 2.1) and the
+2026 movements (Tasks, Server Cards, the MCP + A2A + WebMCP three-layer consensus).
+
+1. **Floor owns semantics; MCP is only transport.** Provenance, freshness,
+   quarantine, exposure live in `mdllm`; the MCP server only *projects* the domain.
+   This is the single line that insulates us from MCP's own churn *and* lets an
+   **A2A peer layer** (or REST, or whatever supersedes it) sit on top without
+   touching a single domain. The tool surface must therefore be **drivable by a
+   future peer/conversation layer** — design tools as capabilities A2A can call,
+   not as a closed UI.
+
+2. **One authorization model across both transports.** "Who may consume this
+   domain / what is exposed" is a **floor concept**, enforced identically over
+   stdio and HTTP — so going public is a transport + auth-config swap, not a
+   redesign. On HTTP, the standard is **OAuth 2.1** (2025-11-25 spec); no
+   long-lived API keys (a named MCP IAM failure mode). Locally, stdio is trusted-
+   subprocess, but the *authorization decisions* still route through the same floor
+   gate, so nothing is bolted on at the boundary later.
+
+3. **The server is stateless; git is the state.** No session state in the MCP
+   layer — every read is computed from the repo at a commit. This matches MCP's own
+   stateless-server scaling direction and keeps the HTTP version horizontally
+   scalable for free.
+
+### Security Model (in and out)
+
+The MCP boundary *is* the trust boundary; make both directions explicit.
+
+- **Consuming (inbound) — external content is data, never instructions.** A thing
+  pulled from another domain is `origin: external`, `verified: false`; nothing
+  rests on it until a human confirms (`provenance.md`). This is the structural
+  defence against **prompt injection / tool poisoning** — including a remote
+  server's *tool descriptions and manifest*, which are equally untrusted. The
+  operator-vetted address book is the **supply-chain** control: a domain is reached
+  only because the operator wired it, never auto-trusted.
+- **Serving (outbound) — never act on raw consumer input.** Resolve every requested
+  id against the **exposed allowlist**; never construct a filesystem path from a
+  consumer-supplied string (the path-traversal / argument-injection class behind
+  the 2026 reference-server CVEs). The server serves the curated face and nothing
+  outside it, by construction.
 
 ## Provenance & Freshness — Owned By The Floor, Not MCP
 
@@ -190,9 +246,14 @@ publishes a *face it authored about itself*, never its raw interior.
    whole consistency facet, end to end.
 2. **Freshness check in the floor.** Generalise the upward version-check to
    arbitrary `source_domain`s; re-quarantine-on-drift; wire into change-reconciliation.
-3. **`run_domain_task` (live-agent hand-off).** Spawn the domain-scoped headless agent.
+3. **`run_domain_task` (live-agent hand-off) — on the Tasks primitive.** Async by
+   construction (handle + states), spawning the domain-scoped headless agent;
+   `input_required` for mid-task elicitation.
 4. **Prompts.**
-5. **Streamable HTTP transport.** Reach beyond the local machine — config swap.
+5. **Streamable HTTP transport + OAuth 2.1.** Reach beyond the local machine —
+   transport + auth-config swap, the authorization gate already in the floor from
+   Phase 1. Align the manifest to the Server Card convention here for automatic
+   discovery; the A2A peer layer composes on top of this surface.
 
 ## Open Questions
 
