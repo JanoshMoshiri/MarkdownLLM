@@ -1072,3 +1072,83 @@ def test_doctor_reports_domain_kernel_status(tmp_path, capsys):
     write(tmp_path, "AGENTS.md", filled)
     mdllm.cmd_doctor(_ns(path=str(tmp_path)))
     assert "domain-kernel in sync" in capsys.readouterr().out
+
+
+# ------------------------------------------------------ mcp-serve (Phase 1)
+
+def _mcp_domain(tmp_path):
+    write(tmp_path, "things/income/rent.md", thing_text(
+        "id: rent-statement-2026\ntype: deliverable\nstatus: completed\n"
+        "created: 2026-06-01\nexposed: true\ntags: [income]",
+        "# Rent Statement 2026\n\nTotal income: 12000.\n"))
+    write(tmp_path, "things/internal/secret.md", thing_text(
+        "id: internal-note\ntype: note\nstatus: in-progress\ncreated: 2026-06-01",
+        "# Internal Note\n\nNot for export.\n"))
+    corpus, _ = mdllm.scan(tmp_path)
+    return corpus
+
+
+def test_mcp_exposed_only(tmp_path):
+    corpus = _mcp_domain(tmp_path)
+    # internal-note carries no `exposed: true` — it stays behind the membrane.
+    assert {t.id for t in mdllm.mcp_exposed_things(corpus)} == {"rent-statement-2026"}
+
+
+def test_mcp_query_things_filters(tmp_path):
+    corpus = _mcp_domain(tmp_path)
+    assert [r["id"] for r in mdllm.mcp_query_things(corpus)] == ["rent-statement-2026"]
+    assert mdllm.mcp_query_things(corpus, typ="note") == []   # not exposed at all
+    assert mdllm.mcp_query_things(corpus, text="income")      # body text hit
+    assert mdllm.mcp_query_things(corpus, text="nope") == []
+
+
+def test_mcp_get_deliverable_stamps_triple(tmp_path):
+    corpus = _mcp_domain(tmp_path)
+    d = mdllm.mcp_get_deliverable(corpus, "dom", "rent-statement-2026", "abc1234")
+    assert d["reference_triple"] == {"source_domain": "dom",
+        "source_id": "rent-statement-2026", "source_commit": "abc1234"}
+    assert "Total income" in d["content"]
+
+
+def test_mcp_get_deliverable_refuses_unexposed_and_traversal(tmp_path):
+    corpus = _mcp_domain(tmp_path)
+    # only exposed ids resolve; unexposed and path-traversal strings both miss.
+    assert mdllm.mcp_get_deliverable(corpus, "dom", "internal-note", "h") is None
+    assert mdllm.mcp_get_deliverable(corpus, "dom", "../../etc/passwd", "h") is None
+
+
+def test_mcp_manifest_is_server_card_shaped(tmp_path):
+    m = mdllm.mcp_build_manifest(_mcp_domain(tmp_path), "dom", "abc1234")
+    assert m["domain_id"] == "dom" and m["head_commit"] == "abc1234"
+    assert [k["id"] for k in m["knows"]] == ["rent-statement-2026"]
+    assert set(m["can_do"]) == {"query_things", "get_deliverable"}
+
+
+def test_mcp_read_resource(tmp_path):
+    corpus = _mcp_domain(tmp_path)
+    man = mdllm.mcp_read_resource(corpus, "dom", "manifest://dom", "h")
+    assert man and man["mimeType"] == "application/json"
+    th = mdllm.mcp_read_resource(corpus, "dom", "thing://dom/rent-statement-2026", "h")
+    assert th and "Rent Statement" in th["text"]
+    assert mdllm.mcp_read_resource(corpus, "dom", "thing://dom/internal-note", "h") is None
+    assert mdllm.mcp_read_resource(corpus, "dom", "bogus://x", "h") is None
+
+
+def test_mcp_serve_stdio_roundtrip(tmp_path):
+    # End-to-end transport: drive the real stdio JSON-RPC loop as a subprocess.
+    import json as _json, subprocess as _sp
+    _mcp_domain(tmp_path)
+    msgs = "\n".join(_json.dumps(m) for m in [
+        {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+        {"jsonrpc": "2.0", "method": "notifications/initialized"},
+        {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
+        {"jsonrpc": "2.0", "id": 3, "method": "tools/call",
+         "params": {"name": "get_deliverable", "arguments": {"id": "rent-statement-2026"}}},
+    ]) + "\n"
+    out = _sp.run([sys.executable, str(Path(mdllm.__file__)), "mcp-serve", str(tmp_path)],
+                  input=msgs, capture_output=True, text=True, timeout=30).stdout
+    by_id = {r.get("id"): r for r in (_json.loads(l) for l in out.splitlines() if l.strip())}
+    assert by_id[1]["result"]["serverInfo"]["name"] == "mdllm-domain:" + tmp_path.name
+    assert {t["name"] for t in by_id[2]["result"]["tools"]} == {"query_things", "get_deliverable"}
+    payload = _json.loads(by_id[3]["result"]["content"][0]["text"])
+    assert payload["reference_triple"]["source_id"] == "rent-statement-2026"

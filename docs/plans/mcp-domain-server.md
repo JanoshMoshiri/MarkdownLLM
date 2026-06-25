@@ -255,9 +255,21 @@ publishes a *face it authored about itself*, never its raw interior.
    Phase 1. Align the manifest to the Server Card convention here for automatic
    discovery; the A2A peer layer composes on top of this surface.
 
+## Build Status
+
+- **Phase 1 — landed.** `mdllm mcp-serve <domain-path>` serves the read-only face
+  over stdio: `initialize`, `resources/list` + `resources/read` (`manifest://` is
+  Server-Card-shaped, `thing://<domain>/<id>`), `tools/list` + `tools/call`
+  (`query_things`, `get_deliverable` with the provenance triple). Pure stdlib, thin
+  transport over `scan()`; 7 floor self-tests incl. an end-to-end stdio roundtrip.
+- Phases 2–5 pending.
+
 ## Open Questions
 
-- Exposure marker: reuse `interface.md` deliverables, or a distinct `exposed: true`?
+- ~~Exposure marker~~ **Resolved: `exposed: true` frontmatter** (opt-in; default
+  false). Note the floor already excludes `deliverables/` from `scan()` (interface
+  deliverables are outputs, not things), so exposed things live under normal thing
+  dirs — `interface.md` deliverable *files* are a separate, later concern.
 - Does `get_deliverable` duplicate `resources/read`, or should the consumer stamp
   the triple itself from resource `_meta`? (Leaning: keep both — browse vs. consume.)
 - Headless-agent runner: Agent SDK vs. `claude -p` headless vs. a generic adapter
