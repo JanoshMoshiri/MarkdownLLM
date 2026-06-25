@@ -2798,14 +2798,50 @@ def mcp_list_tools(tasks_enabled: bool = False) -> list[dict]:
     return tools
 
 
-def _mcp_stub_task_result(domain_id: str, task: str, context) -> dict:
-    # Phase 3a STUB — proves the async task round-trip without a live agent. Phase
-    # 3b replaces this with the domain's headless agent (it does the real work in
-    # its own repo, behind an authorization gate, and returns a deliverable); the
-    # wire is identical, the handle just sits in `working` for minutes instead.
-    return {"stub": True, "would_run": f"{domain_id}'s agent",
-            "on_task": task, "received_context": context is not None,
-            "note": "Phase 3b wires the real headless-agent executor behind this."}
+def _mcp_agent_prompt(domain_id: str, task: str, context) -> str:
+    parts = [f"You are the {domain_id} domain agent, answering a cross-domain "
+             f"request that arrived over MCP.",
+             f"A consumer domain has asked you to perform this task:\n\n{task}"]
+    if context:
+        parts.append(f"\nContext provided by the caller:\n\n{context}")
+    parts.append(
+        "\nProduce the requested change as your response — a diff, file contents, or a "
+        "precise spec the caller can apply. This is READ-AND-EMIT: do NOT modify or "
+        "commit this repository; the caller applies your output to its own files. "
+        "Return only the deliverable.")
+    return "\n".join(parts)
+
+
+def _mcp_agent_argv(prompt: str) -> list:
+    # Runtime is `claude -p <prompt>` (headless). Overridable via MDLLM_AGENT_BIN
+    # for tests / alternate runtimes; a `.py` override runs under this interpreter.
+    import os
+    binp = os.environ.get("MDLLM_AGENT_BIN", "claude")
+    if binp.endswith(".py"):
+        return [sys.executable, binp, "-p", prompt]
+    return [binp, "-p", prompt]
+
+
+def _mcp_run_agent(domain_root: Path, domain_id: str, task: str, context) -> tuple:
+    # The real executor: spawn the producer domain's headless agent in its own repo
+    # (cwd = the domain, so its AGENTS.md/skills load) and capture the deliverable.
+    # Adapter-optional: a missing runtime degrades to a clear `failed`, never a crash.
+    import os
+    argv = _mcp_agent_argv(_mcp_agent_prompt(domain_id, task, context))
+    timeout = int(os.environ.get("MDLLM_AGENT_TIMEOUT", "600"))
+    try:
+        out = subprocess.run(argv, cwd=str(domain_root), capture_output=True,
+                             text=True, timeout=timeout)
+    except FileNotFoundError:
+        return ("failed", {"error": "no-agent-runtime",
+                "detail": f"agent runtime not found ({argv[0]!r}); install it or set "
+                          f"MDLLM_AGENT_BIN"})
+    except subprocess.TimeoutExpired:
+        return ("failed", {"error": "timeout", "detail": f"agent exceeded {timeout}s"})
+    if out.returncode != 0:
+        return ("failed", {"error": "agent-error", "detail": (out.stderr or "").strip()[:2000]})
+    return ("completed", {"executor": argv[0], "on_task": task,
+                          "deliverable": out.stdout.strip()})
 
 
 def mcp_query_things(corpus: Corpus, typ=None, tag=None, status=None, text=None) -> list[dict]:
@@ -2940,23 +2976,29 @@ def cmd_mcp_serve(args) -> int:
                     return {"content": [{"type": "text",
                             "text": "run_domain_task is not enabled on this server (start with --tasks)"}],
                             "isError": True}
+                import threading
                 import uuid
-                tid = "task_" + uuid.uuid4().hex[:12]
-                # Phase 3a: the stub executor runs inline; 3b spawns the agent
-                # async and the handle returns `working` until it finishes.
-                task_store[tid] = {"task_id": tid, "status": "completed",
-                                   "task": a.get("task", ""),
-                                   "result": _mcp_stub_task_result(domain_id, a.get("task", ""),
-                                                                   a.get("context"))}
-                log(f"run_domain_task {tid} (stub) for: {a.get('task','')!r}")
+                tid, task = "task_" + uuid.uuid4().hex[:12], a.get("task", "")
+                ctx = a.get("context")
+                task_store[tid] = {"task_id": tid, "status": "working", "task": task}
+
+                def worker():  # the agent runs in the background; the handle is `working`
+                    status, result = _mcp_run_agent(root, domain_id, task, ctx)
+                    task_store[tid] = {"task_id": tid, "status": status,
+                                       "task": task, "result": result}
+                    log(f"run_domain_task {tid} -> {status}")
+
+                threading.Thread(target=worker, daemon=True).start()
+                log(f"run_domain_task {tid} (working) for: {task!r}")
                 return {"content": [{"type": "text",
-                        "text": json.dumps({"task_id": tid, "status": "completed",
+                        "text": json.dumps({"task_id": tid, "status": "working",
                                             "poll": "tasks/get"}, indent=2)}]}
             return {"content": [{"type": "text", "text": f"unknown tool: {name!r}"}], "isError": True}
         raise _RpcError(-32601, f"method not found: {method}")
 
     log(f"serving {len(mcp_exposed_things(corpus))} exposed thing(s) over stdio "
-        f"(MCP {MCP_PROTOCOL_VERSION}){' + run_domain_task [stub]' if tasks_enabled else ''}")
+        f"(MCP {MCP_PROTOCOL_VERSION})"
+        f"{' + run_domain_task (claude -p, read-and-emit)' if tasks_enabled else ''}")
     for line in sys.stdin:
         line = line.strip()
         if not line:

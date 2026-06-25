@@ -291,7 +291,18 @@ publishes a *face it authored about itself*, never its raw interior.
   agent works **in its own context** and returns the change as a deliverable; the
   **consumer applies it to its own files** (jmtm's agent writes the website). Neither
   domain reaches into the other — the owning domain's agent always edits its own files.
-- **Phase 3b** (real headless-agent executor, behind an authorization gate), **4, 5** pending.
+- **Phase 3b — landed.** The stub is replaced by the real executor: `run_domain_task`
+  spawns **`claude -p`** (headless, read-and-emit) in the producer domain on a
+  **background thread** — returns `working` immediately, the deliverable lands on
+  `tasks/get`. Runtime overridable via `MDLLM_AGENT_BIN`, and **adapter-optional**: a
+  missing runtime degrades to a clear `failed` (`no-agent-runtime`), never a crash.
+  The read-and-emit prompt has the agent *produce* the change (not commit its own
+  repo); the consumer applies it to its own files. Tested against a fake `claude -p`
+  (real async `working`→`completed`) + the no-runtime path. **Live run is operator-
+  driven** (needs `claude` auth + real tokens/minutes).
+- **Phase 4 (prompts), 5 (Streamable HTTP + OAuth 2.1)** pending — Phase 5 is the
+  external-agent test: a remote agent connecting to a domain over the wire, after
+  which the MCP integration can be claimed publicly.
 
 **Why MCP, not git, for the freshness read (decided):** the framework version-check
 reads git (`.markdownllm`) because that's the **vertical/substrate** axis — public

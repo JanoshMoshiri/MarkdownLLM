@@ -1233,31 +1233,78 @@ def test_run_domain_task_is_opt_in():
     assert "run_domain_task" in {t["name"] for t in mdllm.mcp_list_tools(True)}
 
 
-def test_run_domain_task_async_roundtrip(tmp_path):
-    # call returns a handle; poll tasks/get returns the (stub) deliverable —
-    # proves the async Tasks pattern with no live agent and no writes.
-    import json as _json, subprocess as _sp
-    _mcp_domain(tmp_path)
-    proc = _sp.Popen([sys.executable, str(Path(mdllm.__file__)), "mcp-serve",
+def _write_fake_agent(tmp_path):
+    # mimics `claude -p <prompt>`: emit a deliverable referencing the prompt
+    p = tmp_path / "fake_agent.py"
+    p.write_text(
+        "import sys\n"
+        "i = sys.argv.index('-p')\n"
+        "sys.stdout.write('FAKE DELIVERABLE :: ' + sys.argv[i + 1][:40])\n",
+        encoding="utf-8")
+    return p
+
+
+def _serve_tasks(tmp_path, agent_bin):
+    import os as _os, subprocess as _sp
+    env = dict(_os.environ, MDLLM_AGENT_BIN=str(agent_bin))
+    return _sp.Popen([sys.executable, str(Path(mdllm.__file__)), "mcp-serve",
                       str(tmp_path), "--tasks"],
-                     stdin=_sp.PIPE, stdout=_sp.PIPE, stderr=_sp.DEVNULL, text=True)
+                     stdin=_sp.PIPE, stdout=_sp.PIPE, stderr=_sp.DEVNULL, text=True, env=env)
+
+
+def _poll_until_done(call, task_id):
+    import json as _json, time as _time
+    for _ in range(50):
+        g = call({"jsonrpc": "2.0", "id": 9, "method": "tasks/get",
+                  "params": {"task_id": task_id}})
+        if g["result"]["status"] != "working":
+            return g["result"]
+        _time.sleep(0.1)
+    return g["result"]
+
+
+def test_run_domain_task_async_with_agent(tmp_path):
+    # async for real: the call returns `working` immediately, the agent runs on a
+    # background thread, and the deliverable lands on poll (fake `claude -p`).
+    import json as _json
+    _mcp_domain(tmp_path)
+    proc = _serve_tasks(tmp_path, _write_fake_agent(tmp_path))
     try:
         def call(req):
             proc.stdin.write(_json.dumps(req) + "\n")
             proc.stdin.flush()
             return _json.loads(proc.stdout.readline())
-
         call({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
         r = call({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
                   "params": {"name": "run_domain_task",
-                             "arguments": {"task": "update the contact form", "context": "ctx"}}})
+                             "arguments": {"task": "update the contact form"}}})
         handle = _json.loads(r["result"]["content"][0]["text"])
-        assert handle["task_id"].startswith("task_")
-        g = call({"jsonrpc": "2.0", "id": 3, "method": "tasks/get",
-                  "params": {"task_id": handle["task_id"]}})
-        assert g["result"]["status"] == "completed"
-        assert g["result"]["result"]["on_task"] == "update the contact form"
-        assert tmp_path.name in g["result"]["result"]["would_run"]
+        assert handle["status"] == "working"   # returns before the agent finishes
+        done = _poll_until_done(call, handle["task_id"])
+        assert done["status"] == "completed"
+        assert "FAKE DELIVERABLE" in done["result"]["deliverable"]
+    finally:
+        proc.stdin.close()
+        proc.wait(timeout=10)
+
+
+def test_run_domain_task_no_runtime_fails_gracefully(tmp_path):
+    # adapter-optional: a missing runtime degrades to a clear `failed`, never a crash.
+    import json as _json
+    _mcp_domain(tmp_path)
+    proc = _serve_tasks(tmp_path, "nonexistent-agent-binary-xyz")
+    try:
+        def call(req):
+            proc.stdin.write(_json.dumps(req) + "\n")
+            proc.stdin.flush()
+            return _json.loads(proc.stdout.readline())
+        call({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
+        r = call({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
+                  "params": {"name": "run_domain_task", "arguments": {"task": "x"}}})
+        tid = _json.loads(r["result"]["content"][0]["text"])["task_id"]
+        done = _poll_until_done(call, tid)
+        assert done["status"] == "failed"
+        assert done["result"]["error"] == "no-agent-runtime"
     finally:
         proc.stdin.close()
         proc.wait(timeout=10)
