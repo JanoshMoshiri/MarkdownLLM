@@ -1,0 +1,205 @@
+---
+id: mcp-domain-server-design
+type: specification
+status: draft
+version: 0.1
+created: 2026-06-25
+tags: [cross-domain, mcp, interface, provenance, design-draft]
+linked_things:
+  - id: interface-specification
+    relation: extends
+  - id: provenance-specification
+    relation: complements
+  - id: orchestration-specification
+    relation: complements
+  - id: change-reconciliation-specification
+    relation: complements
+  - id: cross-domain-handoff-is-built-inbound-only
+    relation: implements
+  - id: cross-domain-handoff-is-verified-external-input
+    relation: implements
+  - id: directional-graph-reads-come-in-inbound-outbound-pairs
+    relation: complements
+  - id: llm-driven-systems-manifesto
+    relation: implements
+---
+
+# MCP Domain Server — Design Draft
+
+**Status: design draft, not yet built.** This is the artifact we build from; the
+deciding insight (`cross-domain-handoff-is-built-inbound-only`) is already pinned.
+We capture the *implementation* insight when it ships, not before.
+
+## What This Designs
+
+The mechanism by which one domain exposes a curated face to another and lets the
+other consume it — built on **MCP (Model Context Protocol)**, the established
+agent-to-capability standard, so domains can later reach the wider agent community
+with no rewrite. It realises the cross-domain federation model: each domain is an
+MCP server (its *porch*); the consumer's client config is the *address book*
+(operator-wired, per trust zone); the floor still owns provenance and freshness.
+
+The guiding constraint, unchanged: **a domain stays comprehensible by reading only
+itself plus its quarantined external imports.** MCP is a process boundary, which
+*is* the trust boundary — only typed results and curated resources cross; the
+producer's reasoning never flows into the consumer.
+
+## Why MCP, And Why Not "Just HTTP"
+
+The porch maps 1:1 onto MCP's three server primitives:
+
+| Porch | MCP primitive |
+|---|---|
+| "what I know" (readable face) | **Resources** (read-only, URI-addressed) |
+| "what I can do" (needs a live agent) | **Tools** (callable; the call wakes the domain agent) |
+| templated workflows (`type: prompt` things) | **Prompts** (parameterised, client-invokable) |
+
+**Transport — local is stdio, not HTTP.** MCP has two transports: **stdio** (the
+client spawns the server as a subprocess — no port, no network) and **Streamable
+HTTP** (a URL, for remote/other-party agents). Locally, domains are stdio servers
+the consumer spawns on demand. Going public later is a **transport swap, not a
+rewrite** — same server, same primitives, different pipe. This is the whole reason
+to build on MCP now rather than bolt it on later.
+
+**Vanilla MCP is capability exposure, not conversation.** The open-ended
+agent-to-agent conversation is a *pattern composed on top* of tool calls (the cheap
+manifest/handshake layer is MCP; the expensive conversation is built atop it), not
+something the protocol hands you.
+
+## The Subcommand
+
+```
+mdllm mcp-serve <domain-path>            # stdio (default) — local
+mdllm mcp-serve <domain-path> --http [--port N]   # Streamable HTTP — later
+```
+
+A **thin adapter over the existing floor + repo.** The server holds no LLM of its
+own; it reads the domain via the same machinery `mdllm` already has, and (for the
+one live-agent tool) spawns a domain-scoped agent. Git remains the state machine.
+
+### Resources — the readable face ("what I know")
+
+- `manifest://<domain-id>` — the porch itself: name, liveness, the exposed
+  catalog, the capability (tool) list, the address book ("who I know"), and the
+  repo HEAD commit. This is the "give me your name, then your catalog" entry point.
+- `thing://<domain-id>/<thing-id>` — one exposed thing (frontmatter + body).
+- `resources/list` enumerates **only exposed things**, never the whole corpus (the
+  semi-permeable membrane; see *Exposure Control*).
+- Every resource carries `source_commit` in its `_meta` so the consumer can record
+  the reference triple and later detect drift.
+
+### Tools — capabilities ("what I can do")
+
+- `query_things(type?, tag?, status?, text?)` → list of `{id, type, status,
+  summary, source_commit}` over the **exposed set only**. Bounded discovery into
+  the corpus without exposing internals.
+- `get_deliverable(id)` → `{content, frontmatter, reference_triple:
+  {source_domain, source_id, source_commit}}` — the provenance-stamped fetch; the
+  producing-side hand-off. (Browsing is `resources/read`; this is consume-with-
+  provenance.)
+- `run_domain_task(task, inputs?)` → `{deliverable, reference_triple}` — the
+  **live-agent** capability. See below.
+
+Internal floor commands (`validate`, `touchpoints`, `cascade`, `index`) are **not**
+exposed — they are the domain's private floor. Only the curated face crosses.
+
+### Prompts — templated workflows
+
+- `prompts/list` / `prompts/get` over the domain's `type: prompt` things and skill
+  prompt templates, filled with the caller's arguments.
+
+## How `run_domain_task` Hands Off To The Domain Agent
+
+The server has no LLM, so a capability that needs reasoning must **spawn the
+domain's own agent**:
+
+1. `run_domain_task` launches a **headless, domain-scoped agent session** (Agent
+   SDK / `claude` headless), cwd = the domain repo, loading the domain kernel +
+   `AGENTS.md` — so it reasons in *its own* context, not the consumer's.
+2. The agent does the work within its domain (read / reason / write to its own
+   repo, committing to its own git), and produces a deliverable.
+3. The server wraps the deliverable with the reference triple and returns it.
+
+**This is why the bright line holds:** the producer agent runs in its own process
+and context; the consumer receives only the returned deliverable, as quarantined
+external input. The producer's reasoning is never visible to the consumer.
+
+> **Not MCP sampling.** MCP `sampling` lets the *server* borrow the *client's* LLM
+> — the wrong direction here (it would make the producer think with the consumer's
+> head, blurring the boundary). We want the producer's *own* agent, so the server
+> spawns it. Worth stating because it is a real MCP design fork.
+
+## Provenance & Freshness — Owned By The Floor, Not MCP
+
+MCP moves the bytes; **`mdllm` owns the semantics.**
+
+- The consumer records the reference triple (`source_domain` + `source_id` +
+  `source_commit`) on import; the imported thing is `origin: external`,
+  `verified: false` until a human confirms (`provenance.md` quarantine).
+- A floor check — the **generalised upward version-check** (`orchestration.md`),
+  lifted from the single privileged source (the framework) to an arbitrary
+  `source_domain` — re-reads the source's current `source_commit` (via
+  `manifest://` or `resources/read`) and compares it to the pin. **Drift re-opens
+  the quarantine** (`verified: false` again), which hands the human an *external
+  inflection* → `change-reconciliation` on the consumer's dependents.
+- This is `re-quarantine-on-drift`: the standing-check twin of quarantine-on-import
+  (`cross-domain-handoff-is-built-inbound-only`). Both consumer-side, because the
+  boundary is an isolation boundary only the consumer chose to cross.
+
+## The Address Book — The Client Config
+
+The consumer's host MCP config *is* the address book, operator-wired (the
+per-trust-zone address-zero / introducer). For a Claude Code host, e.g.:
+
+```jsonc
+// jmtm-software host — who it may consume from
+"mcpServers": {
+  "property-ventures": { "command": "mdllm", "args": ["mcp-serve", "domain/property-ventures"] },
+  "eco-essentials":    { "command": "mdllm", "args": ["mcp-serve", "domain/eco-essentials"] }
+}
+```
+
+Listing a server here is the intentional, expert-driven linking — discovery is
+*not* organic; the operator seeds it. Optional global discovery (a registry/crawl
+of manifests) layers on top later and never becomes required.
+
+## Exposure Control — Curating The Face
+
+Nothing crosses by default. A thing joins the exposed face only when its author
+opts it in — a frontmatter marker (`exposed: true`, or the existing `interface.md`
+deliverable concept). `resources/list` and `query_things` walk the exposed set
+only. This enforces the membrane and the comprehensible-alone razor: a domain
+publishes a *face it authored about itself*, never its raw interior.
+
+## Worked Flow (real domains)
+
+1. jmtm-software's host config lists `property-ventures` (stdio).
+2. jmtm's agent calls `property-ventures.get_deliverable("rental-income-statement-2026")`.
+3. The server reads the exposed thing, stamps the reference triple, returns it.
+4. jmtm imports it `origin: external`, `verified: false`; operator verifies; it
+   feeds the VAT return.
+5. property-ventures later revises and re-commits the statement.
+6. jmtm's freshness check sees the pinned `source_commit` moved → re-quarantines →
+   the VAT return enters change-reconciliation.
+
+## Phasing
+
+1. **Read-only face (stdio).** `manifest://` + `thing://` resources +
+   `query_things` + `get_deliverable`. Pure floor adapter, no agent. This alone
+   delivers the consumes-from hand-off + the freshness/re-quarantine path — the
+   whole consistency facet, end to end.
+2. **Freshness check in the floor.** Generalise the upward version-check to
+   arbitrary `source_domain`s; re-quarantine-on-drift; wire into change-reconciliation.
+3. **`run_domain_task` (live-agent hand-off).** Spawn the domain-scoped headless agent.
+4. **Prompts.**
+5. **Streamable HTTP transport.** Reach beyond the local machine — config swap.
+
+## Open Questions
+
+- Exposure marker: reuse `interface.md` deliverables, or a distinct `exposed: true`?
+- Does `get_deliverable` duplicate `resources/read`, or should the consumer stamp
+  the triple itself from resource `_meta`? (Leaning: keep both — browse vs. consume.)
+- Headless-agent runner: Agent SDK vs. `claude -p` headless vs. a generic adapter
+  per harness (anchor: this should stay harness-optional, like other adapters).
+- Where the freshness check fires: session-start (like the framework version-check),
+  retrospective cadence, or invoked (`mdllm imports-check`). Likely all three tiers.
