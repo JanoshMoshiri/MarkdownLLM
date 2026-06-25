@@ -92,6 +92,8 @@ CORE_FIELDS = {
     "triggers", "current_stage", "stages",
     # provenance (provenance.md)
     "informed_by", "origin", "verified",
+    # cross-domain interface (mcp-serve exposure — docs/plans/mcp-domain-server.md)
+    "exposed",
     # generated-artifact frontmatter (index / kernel things)
     "index_of", "generated", "generated_from", "coverage", "framework_version",
 }
