@@ -103,7 +103,10 @@ doorway into a much larger cross-domain I/O surface (discovery: how does a domai
 exists elsewhere; permeability: whether frontmatter is inspectable across the
 seam without blurring domain boundaries). Those are deliberately *not* folded in
 here — they are a broader adjacent design space, candidate for their own
-insight(s) when worked.
+insight(s) when worked. The **awareness** sub-facet is now captured as
+[[cross-domain-readiness-is-a-shared-signal-not-a-producer-push]] (producer-
+initiated hand-off of *new* output, surfaced by the heterogeneous multi-agent
+scenario).
 
 ## Status / Next
 

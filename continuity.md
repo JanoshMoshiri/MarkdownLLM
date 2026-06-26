@@ -317,6 +317,16 @@ last_updated: 2026-06-26
 
 ## Live Insights
 
+- `cross-domain-readiness-is-a-shared-signal-not-a-producer-push` — the *awareness*
+  half of the cross-domain producer side (distinct from freshness, which is built as
+  `imports-check`): when a producer makes something NEW a consumer never pinned, the
+  same wall holds (a domain can't enumerate its consumers), so the obligation collapses
+  onto a consumer-initiated pull against the operator's wired address book — readiness
+  is a property the producer *publishes* (`exposed:true` + commit), not a message it
+  *pushes*. Sharpened by the heterogeneous multi-agent scenario (calendar/Claude +
+  marketing/Codex + social/OpenClaude). Design fork open (lean: widen `imports-check`
+  to discovery-poll); operator deliberately on the fence — capture, don't decide.
+  Medium confidence (2026-06-26).
 - `live-agent-handoff-is-for-new-output-not-known-implementation` — `run_domain_task`
   is for producing NEW design/skill the consumer lacks, not implementing an
   already-specified change (that's the consumer's job; the spec is the deliverable;
