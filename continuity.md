@@ -2,16 +2,43 @@
 id: framework-continuity-brief
 type: continuity-brief
 status: live
-version: 1.22
+version: 1.23
 created: 2026-06-11
 domain: markdownllm-framework
-last_updated: 2026-06-24
+last_updated: 2026-06-26
 ---
 
 # Framework Continuity Brief
 
 ## Open Threads
 
+- **[MCP CROSS-DOMAIN SERVER — Phases 1–3 built & tested; Phase 1/2 live-proven
+  2026-06-26]** The cross-domain producing side, on MCP. Design:
+  `docs/plans/mcp-domain-server.md` (commits are the ledger). **Shipped (framework):**
+  `mdllm mcp-serve <domain>` — Phase 1 read-only face (`manifest://` Server-Card +
+  `thing://` resources; `query_things`/`get_deliverable`; egress source-scopes the
+  producer's graph, `287012b`); `mdllm imports-check` — Phase 2 freshness /
+  re-quarantine-on-drift, reads the source's face **via MCP not git** (horizontal reads
+  obey the membrane), report-only, offline=unknown, `aa95673`; **per-thing** commit
+  pins; `run_domain_task` — Phase 3 live-agent hand-off, async on the Tasks pattern,
+  `--tasks` opt-in, real `claude -p` read-and-emit executor on a background thread,
+  adapter-optional; `get_task_result` tool to poll; `wait:true` sync mode
+  (`1448982`→`8151343`). `exposed` is now a CORE_FIELD. **Cross-repo wiring:**
+  code-architect exposes `jmtm-website-architecture` (own repo); jmtm holds the
+  quarantined `external-spec` import (triple @78fd68a) + `.mcp.json` address book
+  (`--tasks` on) + hook-path fixed. **Live-proven 2026-06-26:** the Phase 1/2 spec→build
+  loop end to end — code-architect's verified architecture drove jmtm's real Resend
+  contact-form build (tsc clean, next build static; jmtm changes applied, **not yet
+  committed** — operator verifying/config). Boundary held; the agent self-corrected
+  (declined to misuse `run_domain_task`). **Topology (operator-corrected):** the
+  *skilled* domain exposes `run_domain_task`; the consumer calls with input and applies
+  the returned deliverable to its own files. **Pending/next:** (1) a *fitting*
+  `run_domain_task` live demo — a "design something new" task
+  (`live-agent-handoff-is-for-new-output-not-known-implementation`); (2) the
+  framework-vs-bare boundary A/B before any enforcement claim
+  (`boundary-respect-was-interpretation-not-enforcement`); (3) **Phase 5** — external
+  agent over Streamable HTTP + OAuth 2.1 (the marketing gate); (4) Phase 4 prompts
+  (minor); (5) jmtm website reply-to gap (operator's content call).
 - **[COMPLETE 2026-06-24, cascade session] `mdllm cascade` shipped as v3.16.0 +
   live-domain test confirmed + PreToolUse parked by operator.** **Shipped:** `mdllm
   cascade <id>` (`5718569`) — the outbound post-completion mirror of `touchpoints`:
@@ -290,6 +317,21 @@ last_updated: 2026-06-24
 
 ## Live Insights
 
+- `live-agent-handoff-is-for-new-output-not-known-implementation` — `run_domain_task`
+  is for producing NEW design/skill the consumer lacks, not implementing an
+  already-specified change (that's the consumer's job; the spec is the deliverable;
+  routing it back inverts ownership). The razor before any hand-off; a fitting demo is
+  a "design something new" task. Road-test-surfaced (2026-06-26).
+- `boundary-respect-was-interpretation-not-enforcement` — the agent honouring the
+  ownership boundary was interpretation over framework-supplied structure, NOT
+  mechanical enforcement; "the framework prevented X" is an overclaim. Proving the
+  framework's effect needs a fresh-session framework-vs-bare A/B (this run was doubly
+  confounded). Claims-integrity razor before any marketing (2026-06-26).
+- `a-crossing-thing-carries-its-producers-private-graph` — exposure controls WHICH
+  things cross; egress must source-scope WHAT's inside, since a thing's frontmatter
+  graph holds producer-id-space refs foreign to the consumer (strip on egress; content
+  + description + triple cross, the graph stays opaque). The granularity axis to the
+  inbound/outbound seam work (2026-06-26).
 - `mechanism-pairs-come-from-two-reflection-axes` — the framework's "other side of the
   coin" moments are the surface of two orthogonal reflection symmetries: spatial
   (inbound ↔ outbound through the graph) + temporal (forward ↔ backward through time),
