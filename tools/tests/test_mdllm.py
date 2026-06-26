@@ -1291,6 +1291,30 @@ def test_run_domain_task_async_with_agent(tmp_path):
         proc.wait(timeout=10)
 
 
+def test_run_domain_task_sync_returns_inline(tmp_path):
+    # synchronous (wait:true): the deliverable comes back in the call result, the
+    # standard tool shape — no handle, no polling.
+    import json as _json
+    _mcp_domain(tmp_path)
+    proc = _serve_tasks(tmp_path, _write_fake_agent(tmp_path))
+    try:
+        def call(req):
+            proc.stdin.write(_json.dumps(req) + "\n")
+            proc.stdin.flush()
+            return _json.loads(proc.stdout.readline())
+        call({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
+        r = call({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
+                  "params": {"name": "run_domain_task",
+                             "arguments": {"task": "quick task", "wait": True}}})
+        payload = _json.loads(r["result"]["content"][0]["text"])
+        assert payload["status"] == "completed"          # no task_id handle
+        assert "task_id" not in payload
+        assert "FAKE DELIVERABLE" in payload["result"]["deliverable"]
+    finally:
+        proc.stdin.close()
+        proc.wait(timeout=10)
+
+
 def test_run_domain_task_no_runtime_fails_gracefully(tmp_path):
     # adapter-optional: a missing runtime degrades to a clear `failed`, never a crash.
     import json as _json

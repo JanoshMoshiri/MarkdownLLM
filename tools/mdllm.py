@@ -2788,12 +2788,16 @@ def mcp_list_tools(tasks_enabled: bool = False) -> list[dict]:
         tools.append(
             {"name": "run_domain_task",
              "description": "Ask this domain's own agent to perform a task with the "
-                            "given input and return a deliverable. Async: returns a "
-                            "task handle; poll `tasks/get`. The agent works in its own "
-                            "context — only the deliverable crosses (quarantined on "
-                            "the consumer's side).",
+                            "given input and return a deliverable. Default is async "
+                            "(returns a task handle; poll `get_task_result`). Pass "
+                            "`wait: true` to run synchronously and return the "
+                            "deliverable inline — the standard tool shape, for fast "
+                            "tasks (a long task would time out a synchronous call). "
+                            "The agent works in its own context; only the deliverable "
+                            "crosses (quarantined on the consumer's side).",
              "inputSchema": {"type": "object", "properties": {
-                 "task": {"type": "string"}, "context": {"type": "string"}},
+                 "task": {"type": "string"}, "context": {"type": "string"},
+                 "wait": {"type": "boolean"}},
                  "required": ["task"]}})
         # The poll, as a *tool* (not just the `tasks/get` method) so a standard MCP
         # client — which only surfaces tools to its agent — can complete the round
@@ -2986,10 +2990,16 @@ def cmd_mcp_serve(args) -> int:
                     return {"content": [{"type": "text",
                             "text": "run_domain_task is not enabled on this server (start with --tasks)"}],
                             "isError": True}
+                task, ctx = a.get("task", ""), a.get("context")
+                if a.get("wait"):  # synchronous — the standard tool shape (fast tasks)
+                    status, result = _mcp_run_agent(root, domain_id, task, ctx)
+                    log(f"run_domain_task (sync) -> {status} for: {task!r}")
+                    return {"content": [{"type": "text", "text": json.dumps(
+                            {"status": status, "result": result}, indent=2, default=str)}],
+                            "isError": status == "failed"}
                 import threading
                 import uuid
-                tid, task = "task_" + uuid.uuid4().hex[:12], a.get("task", "")
-                ctx = a.get("context")
+                tid = "task_" + uuid.uuid4().hex[:12]
                 task_store[tid] = {"task_id": tid, "status": "working", "task": task}
 
                 def worker():  # the agent runs in the background; the handle is `working`

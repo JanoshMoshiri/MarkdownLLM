@@ -293,8 +293,12 @@ publishes a *face it authored about itself*, never its raw interior.
   domain reaches into the other — the owning domain's agent always edits its own files.
 - **Phase 3b — landed.** The stub is replaced by the real executor: `run_domain_task`
   spawns **`claude -p`** (headless, read-and-emit) in the producer domain on a
-  **background thread** — returns `working` immediately, the deliverable lands on
-  `tasks/get`. Runtime overridable via `MDLLM_AGENT_BIN`, and **adapter-optional**: a
+  **background thread** — returns `working` immediately, the deliverable lands on the
+  `get_task_result` tool (a *tool*, so a standard MCP client can poll it today; the
+  `tasks/get` method is also there for a future Tasks-aware client). A `wait: true`
+  arg runs it **synchronously** — deliverable inline, the standard tool shape, for
+  fast tasks (a long task would time out a sync call). Runtime overridable via
+  `MDLLM_AGENT_BIN`, and **adapter-optional**: a
   missing runtime degrades to a clear `failed` (`no-agent-runtime`), never a crash.
   The read-and-emit prompt has the agent *produce* the change (not commit its own
   repo); the consumer applies it to its own files. Tested against a fake `claude -p`
