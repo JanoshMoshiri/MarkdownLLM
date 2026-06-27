@@ -329,48 +329,56 @@ def test_orphan_is_info(tmp_path):
     assert any("orphaned" in m for m in messages(all_findings(tmp_path), mdllm.SEV_INFO))
 
 
-def _brief(names):
-    body = "# Brief\n\n## Live Insights\n" + "".join(f"- `{n}`\n" for n in names)
-    return thing_text("id: dom-brief\ntype: continuity-brief\nstatus: live\n"
-                      "created: 2026-06-01", body)
+def _links_to(tid, target, typ="plan", status="in-progress"):
+    # a thing of `status` that declares an inbound edge to `target`
+    return thing_text(f"id: {tid}\ntype: {typ}\nstatus: {status}\ncreated: 2026-06-01\n"
+                      f"linked_things:\n  - id: {target}\n    relation: references")
 
 
-def test_active_insight_not_in_brief_is_info(tmp_path):
-    # session-memory.md promises the floor surfaces this. Active insight named
-    # in the brief: clean. Active insight absent: Info. Dismissed insight absent:
-    # not flagged (only `active` re-enters sessions).
-    write(tmp_path, "continuity.md", _brief(["listed-insight"]))
-    write(tmp_path, "things/insights/listed-insight.md", thing_text(
-        "id: listed-insight\ntype: insight\nstatus: active\ncreated: 2026-06-01"))
-    write(tmp_path, "things/insights/orphan-insight.md", thing_text(
-        "id: orphan-insight\ntype: insight\nstatus: active\ncreated: 2026-06-01"))
+def test_active_insight_orphaned_from_live_graph_is_info(tmp_path):
+    # Liveness is graph-keyed (dissolve-continuity Phase B): an active insight is
+    # "in circulation" iff a NON-TERMINAL thing has an inbound edge to it.
+    # - live-ref-insight: a live (in-progress) plan points to it => clean.
+    # - orphan-insight: nothing points to it => Info.
+    # - terminal-ref-insight: only a completed (terminal) plan points to it => Info
+    #   (a terminal source does not confer liveness).
+    # - gone-insight: dismissed => not flagged (only `active` re-enters sessions).
+    write(tmp_path, "things/plans/live-plan.md", _links_to("live-plan", "live-ref-insight"))
+    write(tmp_path, "things/plans/done-plan.md",
+          _links_to("done-plan", "terminal-ref-insight", status="completed"))
+    for n in ("live-ref-insight", "orphan-insight", "terminal-ref-insight"):
+        write(tmp_path, f"things/insights/{n}.md", thing_text(
+            f"id: {n}\ntype: insight\nstatus: active\ncreated: 2026-06-01"))
     write(tmp_path, "things/insights/gone-insight.md", thing_text(
         "id: gone-insight\ntype: insight\nstatus: dismissed\ncreated: 2026-06-01"))
-    brief = [(x.thing, x.message) for x in all_findings(tmp_path)
-             if x.severity == mdllm.SEV_INFO and "continuity brief" in x.message]
-    assert ("orphan-insight", ) == tuple(t for t, _ in brief)  # only the orphan
-    assert all("active insight not in continuity brief" in m for _, m in brief)
+    flagged = sorted(x.thing for x in all_findings(tmp_path)
+                     if x.severity == mdllm.SEV_INFO
+                     and "no inbound edge from a live thing" in x.message)
+    assert flagged == ["orphan-insight", "terminal-ref-insight"]
 
 
-def test_open_conflict_not_in_brief_is_info(tmp_path):
-    write(tmp_path, "continuity.md", _brief([]))
-    write(tmp_path, "things/conflicts/live-clash.md", thing_text(
-        "id: live-clash\ntype: conflict\nstatus: open\ncreated: 2026-06-01\n"
-        "parties: [a, b]"))
+def test_open_conflict_orphaned_from_live_graph_is_info(tmp_path):
+    # Same graph rule for open conflicts: live inbound edge => clean, none => Info.
+    write(tmp_path, "things/plans/p.md", _links_to("p", "seen-clash"))
+    write(tmp_path, "things/conflicts/seen-clash.md", thing_text(
+        "id: seen-clash\ntype: conflict\nstatus: open\ncreated: 2026-06-01\nparties: [a, b]"))
+    write(tmp_path, "things/conflicts/lone-clash.md", thing_text(
+        "id: lone-clash\ntype: conflict\nstatus: open\ncreated: 2026-06-01\nparties: [a, b]"))
     write(tmp_path, "things/conflicts/old-clash.md", thing_text(
-        "id: old-clash\ntype: conflict\nstatus: resolved\ncreated: 2026-06-01\n"
-        "parties: [a, b]"))
-    brief = [(x.thing, x.message) for x in all_findings(tmp_path)
-             if x.severity == mdllm.SEV_INFO and "continuity brief" in x.message]
-    assert ("live-clash", ) == tuple(t for t, _ in brief)
-    assert all("open conflict not in continuity brief" in m for _, m in brief)
+        "id: old-clash\ntype: conflict\nstatus: resolved\ncreated: 2026-06-01\nparties: [a, b]"))
+    flagged = sorted(x.thing for x in all_findings(tmp_path)
+                     if x.severity == mdllm.SEV_INFO
+                     and "open conflict with no inbound edge" in x.message)
+    assert flagged == ["lone-clash"]
 
 
-def test_brief_completeness_skipped_without_brief(tmp_path):
-    # No continuity brief (e.g. fresh scaffold) => the check is silent.
+def test_insight_circulation_is_brief_independent(tmp_path):
+    # The check is now graph-keyed, NOT gated on a continuity brief existing: a
+    # lone active insight with no inbound edge is flagged even with no brief.
     write(tmp_path, "things/insights/lone.md", thing_text(
         "id: lone\ntype: insight\nstatus: active\ncreated: 2026-06-01"))
-    assert not any("continuity brief" in m for m in messages(all_findings(tmp_path)))
+    assert any("no inbound edge from a live thing" in m
+               for m in messages(all_findings(tmp_path), mdllm.SEV_INFO))
 
 
 # ---------------------------------------------------------------- touchpoints

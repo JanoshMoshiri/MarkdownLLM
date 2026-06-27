@@ -297,9 +297,16 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
     known = set(ids)
 
     referenced: set[str] = set()
+    # `referenced_by_live` is the inbound-edge set restricted to edges whose
+    # SOURCE is non-terminal — the graph signal for "still in circulation" that
+    # replaces continuity-brief presence as the liveness test (dissolve-continuity-
+    # into-reconciliation plan, Phase B). A thing nothing live points back to has
+    # fallen out of session memory.
+    referenced_by_live: set[str] = set()
     for t in corpus.things:
         name = t.id or t.path.name
         meta = t.meta
+        src_live = str(meta.get("status")) not in TERMINAL_STATUSES
         refs: list[tuple[str, str]] = []
         for entry in meta.get("linked_things") or []:
             if isinstance(entry, dict) and isinstance(entry.get("id"), str):
@@ -320,6 +327,8 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
                         refs.append(("triggers.watch", rid))
         for fld, rid in refs:
             referenced.add(rid)
+            if src_live:
+                referenced_by_live.add(rid)
             if rid not in known:
                 f.append(Finding(SEV_ERROR, name, f"`{fld}` references unknown id `{rid}`"))
 
@@ -441,30 +450,29 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
             f.append(Finding(SEV_INFO, t.id or t.path.name,
                      "orphaned — no relationships, triggers, or inbound references"))
 
-    # continuity-brief completeness (session-memory.md → The Session-Start
-    # Staleness Check, Insight Lifecycle Management). An `active` insight or
-    # `open` conflict the live brief does not name is orphaned from session
-    # memory: it re-enters no future session and is invisible to the staleness
-    # check, which walks only the brief's live ids. The two are a deliberate
-    # pair ("the twin of the open-conflict check"). Info, corpus-general;
-    # skipped when the corpus has no continuity brief (a fresh scaffold has
-    # none yet — absence is not a defect). The brief names live things by id,
-    # so an id-substring test over the brief body is the mechanical proxy.
-    briefs = [t for t in corpus.things if str(t.meta.get("type")) == "continuity-brief"]
-    if briefs:
-        brief_text = "\n".join(t.body for t in briefs)
-        for t in corpus.things:
-            if not t.id or t.id not in known:
-                continue
-            typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
-            if typ == "insight" and status == "active" and t.id not in brief_text:
-                f.append(Finding(SEV_INFO, t.id,
-                         "active insight not in continuity brief — orphaned from "
-                         "session memory; promote, dismiss, or list it live"))
-            elif typ == "conflict" and status == "open" and t.id not in brief_text:
-                f.append(Finding(SEV_INFO, t.id,
-                         "open conflict not in continuity brief — add it as an "
-                         "open thread so it returns next session"))
+    # Insight / conflict circulation (session-memory.md → Insight Lifecycle
+    # Management). Liveness is GRAPH-keyed, not file-keyed: an `active` insight or
+    # `open` conflict is "in circulation" iff some NON-TERMINAL thing has an
+    # inbound edge to it (`referenced_by_live`). One that nothing live points back
+    # to has fallen out of session memory — promote it (its lesson shipped),
+    # dismiss it, or link it from live work. This replaces the old "present in
+    # continuity.md" proxy (dissolve-continuity-into-reconciliation, Phase B):
+    # file-presence liveness was brittle — a backward-log cleanup could orphan a
+    # standing insight, and an insight with only OUTBOUND edges has discharged
+    # itself (a promotion candidate), which the inbound test surfaces by design.
+    for t in corpus.things:
+        if not t.id or t.id not in known:
+            continue
+        typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
+        if typ == "insight" and status == "active" and t.id not in referenced_by_live:
+            f.append(Finding(SEV_INFO, t.id,
+                     "active insight with no inbound edge from a live thing — "
+                     "orphaned from session memory; promote, dismiss, or link it "
+                     "from live work"))
+        elif typ == "conflict" and status == "open" and t.id not in referenced_by_live:
+            f.append(Finding(SEV_INFO, t.id,
+                     "open conflict with no inbound edge from a live thing — link "
+                     "it from the work it blocks so it returns next session"))
     return f
 
 
@@ -1879,8 +1887,9 @@ def _dk_session_start(domain: Path, meta: dict) -> str:
         "will pull you toward itself; resist until these are done.**\n\n"
         "1. Load `{framework_root}/kernel.md` — the operative kernel (rules without "
         "rationale). The hard hooks it carries are always active.\n"
-        "2. Load `continuity.md` if it exists — open threads, live insights, and pending "
-        "decisions from the last session.\n"
+        "2. Load `continuity.md` if it exists — the forward open threads from the last "
+        "session (backward history lives in git/WORKLOG; insight liveness is a graph "
+        "property, not brief presence — see session-memory.md).\n"
         "3. **Version check** — `session-start:version-check` (anchor `harness-session`). "
         "Read `{framework_root}/.markdownllm` `version`; compare to `framework_version_seen` "
         "in this file's frontmatter. On mismatch: surface it, run "

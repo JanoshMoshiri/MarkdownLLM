@@ -1,9 +1,10 @@
 ---
 id: agents-drop-mechanical-birth-steps-not-semantic-ones
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-12
+promoted_to: orchestration-specification
 confidence: medium
 origin: synthesised
 source: session — cold-start scaffold rehearsal (evals/cold-start-scaffold.yaml, 3 informative trials)
@@ -19,6 +20,13 @@ linked_things:
 ---
 
 # Agents Drop Mechanical Birth Steps, Not Semantic Ones
+
+> **Promoted 2026-06-27 → `orchestration.md`.** The lesson crystallised into the
+> shipped `pre-domain-scaffold:isolate` hard hook + `mdllm scaffold` (the mechanical
+> birth steps the agent kept dropping are now the floor's, not the agent's). The
+> insight discharged itself: it had only outbound edges and nothing live pointed
+> back, which the graph-keyed liveness check surfaced (dissolve-continuity Phase B).
+> Kept for audit; its assertions now live in the spec.
 
 ## The Insight
 

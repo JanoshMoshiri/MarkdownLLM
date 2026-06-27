@@ -94,8 +94,34 @@ The audit split this in two by what each cut depends on:
   check. So it can only go once Phase B re-keys liveness onto the graph. ~140 lines,
   removed in B.
 
-### Phase B — Re-key insight liveness off continuity onto the graph
-Prerequisite to retiring the file. In session-memory.md, redefine **live**:
+### Phase B — Re-key insight liveness off continuity onto the graph (DONE 2026-06-27)
+**Built.** The floor now computes `referenced_by_live` (inbound edges whose source
+is non-terminal) and keys the insight/conflict orphan check on it instead of
+continuity-brief text; the check is no longer brief-gated. `session-memory.md` and
+`retrospective.md` redefine **live** as "an inbound edge from a non-terminal thing";
+the session-start prompt no longer asserts brief-presence liveness. Tests re-keyed
+(graph liveness + the terminal-source-doesn't-count case); 96 pass.
+
+**Outcomes:**
+- The re-key surfaced an **11-insight backlog** (active insights kept live only by
+  prose, nothing in the graph pointing back) — the real worklist, previously hidden.
+- `agents-drop-mechanical-birth-steps-not-semantic-ones` **promoted** → it had only
+  outbound edges (discharged into `orchestration.md` / `mdllm scaffold`); status
+  `promoted`, `promoted_to: orchestration-specification`. Backlog now 10.
+- **Decided here (was an open question):** dropped the wall-clock staleness window —
+  liveness is purely structural (inbound from a live thing). A wall-clock grace makes
+  `validate` time-dependent/flaky and, more importantly, no-grace is *more* faithful
+  to "link rather than mention": a new insight should be linked from the work it
+  informs, not kept live by age. Newborn-grace is handled instead by a keep-active
+  disposition (below), not by a timer.
+- **New Phase C input (surfaced here):** a *deliberately parked* insight (e.g.
+  `cross-domain-readiness-…`, "capture don't decide", awaiting a trigger) legitimately
+  has no live inbound edge and should not be flagged forever. The fix is a
+  **keep-active disposition the floor reads** (a frontmatter marker / stated reason
+  that exempts it), not a prose mention — built in C alongside the forcing function.
+
+The original plan text for B:
+In session-memory.md, redefine **live**:
 `active` ∧ (inbound edge from a non-terminal thing ∨ within a staleness window).
 Re-point the floor orphan-check from "not in continuity.md" to "no inbound edge from
 a non-terminal thing" (the `relationships` index already computes in-degree). The
