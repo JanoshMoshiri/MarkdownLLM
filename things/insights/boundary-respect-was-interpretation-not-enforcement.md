@@ -2,7 +2,9 @@
 id: boundary-respect-was-interpretation-not-enforcement
 type: insight
 status: active
-version: 1.0
+disposition: keep-active
+disposition_reason: "Standing claims-integrity razor; the framework-vs-bare A/B that would substantiate the enforcement claim is still unbuilt."
+version: 1.1
 created: 2026-06-26
 session: 2026-06-26
 source: both

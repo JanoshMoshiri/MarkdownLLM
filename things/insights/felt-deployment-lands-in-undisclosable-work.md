@@ -2,7 +2,9 @@
 id: felt-deployment-lands-in-undisclosable-work
 type: insight
 status: active
-version: 1.0
+disposition: keep-active
+disposition_reason: "Standing razor for triaging felt-trigger threads — public silence is not immaturity; felt deployment lands in confidential work."
+version: 1.1
 created: 2026-06-19
 session: 2026-06-19
 source: stated

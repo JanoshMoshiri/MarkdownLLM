@@ -2,7 +2,9 @@
 id: repeated-drift-promotes-a-fact-into-the-floor
 type: insight
 status: active
-version: 1.0
+disposition: keep-active
+disposition_reason: "Standing razor for when a recurring drift has earned hardening into the deterministic floor."
+version: 1.1
 created: 2026-06-24
 session: 2026-06-24
 source: both

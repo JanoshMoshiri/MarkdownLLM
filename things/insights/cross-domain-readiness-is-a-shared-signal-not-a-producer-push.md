@@ -2,7 +2,9 @@
 id: cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 type: insight
 status: active
-version: 1.0
+disposition: keep-active
+disposition_reason: "Parked — capture-don't-decide; awaiting a real heterogeneous multi-agent hand-off before the awareness signal is designed."
+version: 1.1
 created: 2026-06-26
 session: 2026-06-26
 source: operator-scenario

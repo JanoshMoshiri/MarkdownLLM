@@ -381,6 +381,24 @@ def test_insight_circulation_is_brief_independent(tmp_path):
                for m in messages(all_findings(tmp_path), mdllm.SEV_INFO))
 
 
+def test_keep_active_disposition_exempts_orphan(tmp_path):
+    # A standing/parked insight with no live inbound edge is NOT orphaned when it
+    # carries `disposition: keep-active` + a reason (the deliberate reckoning).
+    # Without the reason, it is nudged instead (the reason is the whole point).
+    write(tmp_path, "things/insights/kept.md", thing_text(
+        "id: kept\ntype: insight\nstatus: active\ncreated: 2026-06-01\n"
+        'disposition: keep-active\ndisposition_reason: "a standing razor"'))
+    write(tmp_path, "things/insights/kept-no-reason.md", thing_text(
+        "id: kept-no-reason\ntype: insight\nstatus: active\ncreated: 2026-06-01\n"
+        "disposition: keep-active"))
+    orphaned = {x.thing for x in all_findings(tmp_path)
+                if "no inbound edge from a live thing" in x.message}
+    assert "kept" not in orphaned and "kept-no-reason" not in orphaned
+    needs_reason = {x.thing for x in all_findings(tmp_path)
+                    if "no `disposition_reason`" in x.message}
+    assert needs_reason == {"kept-no-reason"}
+
+
 # ---------------------------------------------------------------- touchpoints
 
 

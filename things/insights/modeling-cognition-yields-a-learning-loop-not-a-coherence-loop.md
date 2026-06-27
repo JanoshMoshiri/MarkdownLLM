@@ -2,7 +2,9 @@
 id: modeling-cognition-yields-a-learning-loop-not-a-coherence-loop
 type: insight
 status: active
-version: 1.1
+disposition: keep-active
+disposition_reason: "Standing razor for whether a new mechanism serves coherence or learning; the loop-scoped insight sibling it names is still unbuilt."
+version: 1.2
 created: 2026-06-21
 session: 2026-06-21
 source: both

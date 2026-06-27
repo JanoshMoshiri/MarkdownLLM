@@ -92,6 +92,11 @@ CORE_FIELDS = {
     "triggers", "current_stage", "stages",
     # provenance (provenance.md)
     "informed_by", "origin", "verified",
+    # insight-lifecycle disposition (session-memory.md) — the orphan check READS
+    # `disposition: keep-active` to honour a deliberately-kept standing/parked
+    # insight, so these are tool-read and belong in CORE (unlike promoted_to,
+    # which the tool only records).
+    "disposition", "disposition_reason",
     # cross-domain interface (mcp-serve exposure — docs/plans/mcp-domain-server.md)
     "exposed",
     # generated-artifact frontmatter (index / kernel things)
@@ -465,10 +470,20 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
             continue
         typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
         if typ == "insight" and status == "active" and t.id not in referenced_by_live:
-            f.append(Finding(SEV_INFO, t.id,
-                     "active insight with no inbound edge from a live thing — "
-                     "orphaned from session memory; promote, dismiss, or link it "
-                     "from live work"))
+            # A standing-razor or parked insight is genuinely live with no active
+            # dependant; `disposition: keep-active` is the deliberate reckoning that
+            # exempts it (the brake the backlog itself demanded — Phase C). The
+            # stated reason is the whole point, so keep-active without one is nudged.
+            if str(t.meta.get("disposition", "")) == "keep-active":
+                if not str(t.meta.get("disposition_reason", "")).strip():
+                    f.append(Finding(SEV_INFO, t.id,
+                             "insight marked keep-active but has no "
+                             "`disposition_reason` — state why it stays live"))
+            else:
+                f.append(Finding(SEV_INFO, t.id,
+                         "active insight with no inbound edge from a live thing — "
+                         "orphaned from session memory; promote, dismiss, link it "
+                         "from live work, or mark `disposition: keep-active`"))
         elif typ == "conflict" and status == "open" and t.id not in referenced_by_live:
             f.append(Finding(SEV_INFO, t.id,
                      "open conflict with no inbound edge from a live thing — link "
