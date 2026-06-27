@@ -88,11 +88,12 @@ The audit split this in two by what each cut depends on:
   the operator was already hand-pruning these to WORKLOG (the oldest block said so).
   Pure enforcement of the forward-only spec; nothing promoted because nothing was
   orphaned.
-- **A2 — the `## Live Insights` restatement (GATED on Phase B).** It is redundant
-  with the insight things, but deleting it *now* would orphan every insight under
-  the current "live = presence in continuity.md" rule and the `validate` orphan
-  check. So it can only go once Phase B re-keys liveness onto the graph. ~140 lines,
-  removed in B.
+- **A2 — the `## Live Insights` restatement (DONE 2026-06-27, after B).** Removed the
+  whole section (143 lines, 459 → 316) once Phase B re-keyed liveness onto the graph,
+  so the deletion changed no orphan findings (the check no longer reads the brief).
+  Continuity is now forward-only (Open Threads), 316 lines from the original 733 — its
+  spec. Also fixed the session-start prompt's staleness check to walk graph-live
+  insights, not "live insights in continuity.md".
 
 ### Phase B — Re-key insight liveness off continuity onto the graph (DONE 2026-06-27)
 **Built.** The floor now computes `referenced_by_live` (inbound edges whose source
