@@ -79,14 +79,20 @@ you unable to not-see; it never decides for you.
 ## Phases
 
 ### Phase A — Strip continuity to its spec (independent; do first)
-Remove the backward accretion from continuity.md: the `## Decisions Made This
-Session` blocks and the `## Live Insights` restatement. **Audit before deleting** —
-each "Decision Made" block must be confirmed recoverable (captured as a
-`type: decision` thing or legible in git); any decision that exists *only* in
-continuity is first promoted to a decision-thing, never lost. Result: continuity
-drops to its legitimate forward residue (Open Threads + Questions). Pure enforcement
-of the existing forward-only spec; no new mechanism. Stops the merge-magnet bleeding
-immediately.
+The audit split this in two by what each cut depends on:
+
+- **A1 — backward session logs (DONE 2026-06-27).** Removed the `## Pending
+  Decisions` placeholder and all 11 `## Decisions Made This Session` blocks
+  (~274 lines, 733 → 459). Audited recoverable first: every block points to its
+  home (retrospective things, named commits, insight things, spec changes in git);
+  the operator was already hand-pruning these to WORKLOG (the oldest block said so).
+  Pure enforcement of the forward-only spec; nothing promoted because nothing was
+  orphaned.
+- **A2 — the `## Live Insights` restatement (GATED on Phase B).** It is redundant
+  with the insight things, but deleting it *now* would orphan every insight under
+  the current "live = presence in continuity.md" rule and the `validate` orphan
+  check. So it can only go once Phase B re-keys liveness onto the graph. ~140 lines,
+  removed in B.
 
 ### Phase B — Re-key insight liveness off continuity onto the graph
 Prerequisite to retiring the file. In session-memory.md, redefine **live**:
