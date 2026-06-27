@@ -71,7 +71,27 @@ linked_things:
 ---
 ```
 
-### 3. Check For Contradictions
+### 3. Disposition The Standing Insights (the brake)
+
+Capture (step 2) grows the insight population every session; this step prunes it, so
+the two stay in balance — every act of capture is paired with an act of pruning.
+
+Run `python {framework_root}/tools/mdllm.py validate <domain>` and act on **every
+insight-disposition Info finding** the floor surfaces:
+- *"active insight with no inbound edge from a live thing"* — force a disposition:
+  **promote** (populate `promoted_to`; the insight's lesson has crystallised into a
+  spec/decision/thing), **dismiss** (considered, set aside), **consolidate** (fold a
+  genuine duplicate into a survivor), **link** it from live work (it has a real active
+  dependant), or **mark `disposition: keep-active`** with a one-line `disposition_reason`
+  (a standing razor or parked insight, deliberately kept).
+- *"insight marked keep-active but has no `disposition_reason`"* — add the reason or
+  re-disposition.
+
+This is a **forcing function, not a corpus sweep**: the floor already lists exactly the
+insights that need a decision, so none can quietly go dark. The deeper period-scoped
+work (composition/consolidation, conflict + schema scans) stays the retrospective's.
+
+### 4. Check For Contradictions
 
 Scan for contradictions introduced this session:
 - Did any new insight or modification assert something that conflicts with an existing thing?
@@ -83,20 +103,23 @@ For each contradiction found:
 
 Be conservative — only flag genuine semantic contradictions, not differences in emphasis or scope.
 
-### 4. Update The Continuity Brief
+### 5. Update The Continuity Brief
 
-Load `continuity.md`. Update:
-- Add new open threads from this session
+Load `continuity.md`. Update its **forward** content only:
+- Add new open threads (forward intent) from this session
 - Remove threads that resolved this session
-- Add new live insight IDs (with one-line summaries)
-- Remove insights that were promoted or dismissed
-- Update pending decisions
 - Add any new open conflicts as open threads
 - Refresh the questions list
 
+Do **not** maintain insight liveness here — it is a graph property (an inbound edge
+from a live thing) or a `disposition: keep-active` marker, handled in step 3. Do not
+list insight IDs, and do not write a backward "decisions made" log: history lives in
+git/WORKLOG. (continuity.md is being dissolved into a generated orientation view —
+see `dissolve-continuity-into-reconciliation`.)
+
 If no `continuity.md` exists, create one using `templates/continuity-brief.md.template`.
 
-### 5. Commit, Then Regenerate The WORKLOG
+### 6. Commit, Then Regenerate The WORKLOG
 
 Commit all new insight things, conflict things, and the updated continuity brief
 following `git-workflow.md` conventions — including a `session-end:` commit, which

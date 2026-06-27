@@ -8,9 +8,14 @@ when *you* judge the session worth it, never automatically. Follow
 `templates/prompts/session-end-continuity.md`:
 
 1. Scan this session for insights worth preserving → create `type: insight` things.
-2. Detect contradictions introduced this session → create `type: conflict` things.
-3. Update `continuity.md` (open threads, pending decisions, mid-flight position).
-4. Commit with a `session-end:` message, then regenerate the worklog:
+2. **Disposition the standing insights (the brake):** run `python tools/mdllm.py
+   validate .` and act on every insight-disposition finding — promote, dismiss,
+   consolidate, link from live work, or mark `disposition: keep-active` + a reason.
+   Capture (step 1) grows the population; this prunes it, so the two stay balanced.
+3. Detect contradictions introduced this session → create `type: conflict` things.
+4. Update `continuity.md` — **forward** open threads only (liveness is graph-keyed;
+   history lives in git/WORKLOG, not the brief).
+5. Commit with a `session-end:` message, then regenerate the worklog:
    `python tools/mdllm.py worklog --write`.
 
 If the session has no domain-relevant changes worth harvesting, say so and stop —

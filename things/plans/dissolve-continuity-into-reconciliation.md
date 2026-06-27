@@ -140,7 +140,16 @@ as a known transitional `validate` Info (non-blocking) until B re-keys liveness;
 this insight is B's first disposition. It is the live proof that file-presence
 liveness is brittle — a backward-log cleanup should never orphan a standing insight.
 
-### Phase C — Forcing function at end-session + the keep-active marker
+### Phase C — Forcing function at end-session + the keep-active marker (DONE 2026-06-27)
+**Built.** (a) The keep-active marker (`disposition: keep-active` + `disposition_reason`,
+read by the floor's orphan check) — applied to the 5 standing/parked insights, backlog
+5 → 0, 97 tests pass. (b) The forcing function — the end-session ritual
+(`session-end-continuity.md` + both `end-session` commands) gains a **mandatory
+disposition step** between capture and the continuity update, so per-session capture is
+paired with pruning; it also drops the now-defunct "maintain live insight IDs in the
+brief" instruction (liveness is graph-keyed). The deeper period sweep stays the
+retrospective's.
+
 Bind a **mandatory** disposition pass to end-session (not only the periodic
 retrospective). The floor lists retirement candidates — orphaned (no live inbound
 edge), promoted-but-not-archived, duplicate-cluster (composition pre-filter).
