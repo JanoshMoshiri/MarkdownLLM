@@ -62,7 +62,7 @@ The refresh process reads these framework files in order:
 | File | Purpose | What To Look For |
 |------|---------|------------------|
 | `CHANGELOG.md` | What shipped | New features, breaking changes, new specs added |
-| `WORKLOG.md` | How it evolved | Recent session context, decisions made, direction |
+| `mdllm worklog` (git log view) | How it evolved | Recent session context, decisions made, direction |
 | Foundational specs | Current definitions | Version bumps, new sections, changed behaviour |
 | `AGENTS.md` | Framework self-description | New skills listed, new spec types, updated workflows |
 
@@ -79,7 +79,7 @@ The refresh process reads these framework files in order:
    → Identify entries newer than framework_version_seen
    → Flag: new specifications, breaking changes, new capabilities
 
-3. Read {framework_root}/WORKLOG.md (recent entries only)
+3. Run `mdllm worklog {framework_root}` (or `git -C {framework_root} log`) — recent sessions only
    → Understand current framework direction and recent decisions
 
 4. Scan foundational specs for version changes:
@@ -134,7 +134,7 @@ After a refresh, the domain agent may modify:
 
 - **Domain AGENTS.md** — Add references to new framework capabilities, update startup sequence
 - **Domain skills** — Incorporate new patterns (e.g., adding trigger evaluation when triggers were added to the framework)
-- **Domain WORKLOG** — Record what was discovered and adopted
+- **The refresh commit** — Record what was discovered and adopted in a rich commit message (the backward record is git)
 
 The domain MUST NOT modify:
 
@@ -174,7 +174,7 @@ The domain's `[domain]-workflow.skill.md` should include a **Refresh** workflow 
 ### Steps
 1. Resolve `framework_root` from AGENTS.md frontmatter
 2. Read `{framework_root}/CHANGELOG.md` — identify entries after `framework_version_seen`
-3. Read `{framework_root}/WORKLOG.md` — recent sessions only
+3. Run `mdllm worklog {framework_root}` (on-demand view of git) — recent sessions only
 4. Scan foundational spec versions (thing.md, git-workflow.md, etc.)
 5. Compare: what does this domain not yet use that the framework now offers?
 6. Report to user with recommendations

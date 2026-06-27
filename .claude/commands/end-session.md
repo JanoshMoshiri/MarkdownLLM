@@ -16,8 +16,8 @@ when *you* judge the session worth it, never automatically. Follow
 4. Manage **open-loop things** — create/update a `plan` or work thing for new forward
    intent, move resolved ones to a terminal status (orient reads them; `continuity.md`
    is retired).
-5. Commit with a `session-end:` message, then regenerate the worklog:
-   `python tools/mdllm.py worklog --write`.
+5. Commit with a rich `session-end:` message — the commit *is* the backward record
+   (no WORKLOG file; `mdllm worklog` prints an on-demand view of git when wanted).
 
 If the session has no domain-relevant changes worth harvesting, say so and stop —
 not every session earns an insight.

@@ -281,21 +281,21 @@ This shows exactly what fields changed, what narrative was updated, what relatio
 
 ## Three Layers Of Auditability
 
-The framework now has three complementary audit layers:
+The framework has two complementary audit layers — both **git**:
 
 | Layer | What It Captures | Granularity | Created By |
 |-------|-----------------|-------------|------------|
-| **WORKLOG** | Session narrative — what was discussed, decided, and planned | Session-level | Human + agent |
-| **Git log** | State changes — what changed in the domain and why | Commit-level | Agent (commits) |
+| **Git log** | The backward record — what changed, in what order, and *why* (the commit message is the narrative) | Commit-level | Agent (commits) |
 | **Git diff** | Exact modifications — what bytes changed in which files | Byte-level | Automatic |
 
-These layers serve different audiences and purposes:
+These serve different purposes:
 
-- **WORKLOG** answers: "What were we thinking and why?" (intent and context)
-- **Git log** answers: "What happened and in what order?" (events and sequence)
+- **Git log** answers: "What happened, in what order, and why?" (events, sequence, intent)
 - **Git diff** answers: "What exactly changed?" (forensic detail)
 
-Together, they provide complete traceability from intent through action to detail.
+Together they provide complete traceability from intent through action to detail. The
+**commit message carries the narrative**, so write rich ones — there is no separate
+log to hold it.
 
 ## Branching (Future Consideration)
 
@@ -346,9 +346,13 @@ The push action is an output route decision. When and how you push to remote dep
 - CLI: `git push` when ready
 - Automated: a scheduled push (if your domain warrants it)
 
-### With WORKLOG
+### With `mdllm worklog`
 
-The WORKLOG is committed as part of `session-end`. It's a thing in the repository — versioned, diffable, auditable. The WORKLOG captures the narrative that commit messages can't: why decisions were made, what was discussed, what's planned next.
+`mdllm worklog` prints an on-demand, session-grouped *view* of the commit stream
+(sessions delimited by `session-end:` commits). It is **not** committed — a committed
+WORKLOG was generated *from* git and committed *back into* it (circular duplication,
+retired in v3.17; `orient-and-reconciliation-are-the-corpus-two-sides`). The backward
+record is git itself, and the narrative lives in the commit messages.
 
 ## Summary
 

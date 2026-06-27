@@ -210,7 +210,7 @@ But git is more than version control in this framework — **git is the state ma
 
 This means commit discipline matters. Commits should happen at the boundary where domain state changes meaning: when a thing is created, when a status transitions, when a write session completes. Each commit message should describe the domain state change — not "modified 3 files" but "complete: data-collection → unblocks quarterly-review." Git log becomes a readable narrative of your domain's evolution.
 
-This also means git history becomes the event stream. Triggers that watch for state changes (a dependency resolved, a due date passed) evaluate against committed history. Session orientation reads recent commits to understand what changed. The three layers — working session narrative (worklog), commit history (git log), and exact modifications (git diff) — together provide complete traceability from intent through action to detail.
+This also means git history becomes the event stream. Triggers that watch for state changes (a dependency resolved, a due date passed) evaluate against committed history. Session orientation reads recent commits to understand what changed. Two layers — commit history (git log, whose messages carry the narrative) and exact modifications (git diff) — together provide complete traceability from intent through action to detail.
 
 See `git-workflow.md` for the full operational specification.
 
@@ -265,7 +265,7 @@ Git preserves all of it. You have a complete audit trail and history.
 
 **Collaboration.** If multiple people need to work within the system, git's collaboration tools work naturally. Merge, branch, resolve conflicts using standard git workflows.
 
-**Auditing.** Everything is transparent and versioned at three layers: your session worklog captures intent and decisions; git log captures state changes with structured commit messages; git diff captures the exact modifications. Together, these provide complete traceability — from why a decision was made, through what changed, down to the specific bytes that were modified. No black boxes. No lost context.
+**Auditing.** Everything is transparent and versioned in git: the commit log captures state changes *and* intent in structured commit messages (an on-demand `mdllm worklog` groups them by session); git diff captures the exact modifications. Together, these provide complete traceability — from why a decision was made, through what changed, down to the specific bytes that were modified. No black boxes. No lost context.
 
 ## Corollary: Elegant Constraint Enables Efficiency
 

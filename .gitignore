@@ -13,3 +13,6 @@ evals/runs/
 __pycache__/
 .pytest_cache/
 domain/code-architect/
+
+# WORKLOG is an on-demand view of the commit stream (mdllm worklog), not a committed artifact
+WORKLOG.md

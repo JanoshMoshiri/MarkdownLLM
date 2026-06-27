@@ -25,7 +25,7 @@ linked_things:
 
 ## What This Specifies
 
-A retrospective is a periodic quality reflection on a domain's reasoning. It is not a session log (that's the WORKLOG), not a list of what's still live (that's the continuity brief), and not an individual idea (that's an insight).
+A retrospective is a periodic quality reflection on a domain's reasoning. It is not a session log (that's the commit stream, viewable via `mdllm worklog`), not a list of what's still live (that's the orient view — open-loop things), and not an individual idea (that's an insight).
 
 A retrospective asks a different set of questions: *Is our reasoning in this domain working? Where are we consistently uncertain or wrong? What patterns have we not anticipated? What should change about how we operate?*
 
@@ -129,8 +129,8 @@ These scans are *why* the retrospective produces more than a written reflection:
 
 | Primitive | Cadence | Direction | Asks |
 |---|---|---|---|
-| WORKLOG | Per session | Retrospective (what happened) | What did we do? |
-| Continuity brief | Per session | Prospective (what's live) | What still needs to return? |
+| Commit stream (`mdllm worklog`) | Per session | Retrospective (what happened) | What did we do? |
+| Orient view (open-loop things) | Per session | Prospective (what's live) | What still needs to return? |
 | Insight | Per session (on demand) | Additive (what emerged) | What's worth keeping from this session? |
 | Conflict | On detection | Holding (tension) | What are we not resolving? |
 | **Retrospective** | **Periodic** | **Evaluative (quality)** | **Is our reasoning working?** |
@@ -141,7 +141,7 @@ The retrospective is the only primitive that explicitly evaluates quality rather
 
 ## The Metacognitive Principle
 
-The framework can record indefinitely without improving. A WORKLOG that grows forever is a log; a domain that learns from its own patterns is something more. The retrospective is what turns accumulated experience into improved reasoning — the difference between a domain that has *run for a year* and one that has *learned for a year*.
+The framework can record indefinitely without improving. A commit log that grows forever is a log; a domain that learns from its own patterns is something more. The retrospective is what turns accumulated experience into improved reasoning — the difference between a domain that has *run for a year* and one that has *learned for a year*.
 
 This mirrors how high-performing teams operate: they ship work, they capture what happened, and they periodically step back to ask whether they're getting better. The retrospective is that third step.
 

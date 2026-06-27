@@ -102,8 +102,8 @@ and loaded at session start — has been **retired**
 one hand-maintained file, and both halves had better homes
 (`orient-and-reconciliation-are-the-corpus-two-sides`):
 
-- Its **backward** content (what was done) was always the **WORKLOG**'s job (generated
-  from the commit stream).
+- Its **backward** content (what was done) was always the **commit stream**'s (the
+  WORKLOG was only ever an on-demand view of it, also retired in v3.17).
 - Its **forward** content (what's still live) is now the **thing graph**, surfaced by
   the generated **orient** view (`mdllm session-start` → "Open loops": non-terminal
   work things + open conflicts). An open thread worth carrying is a thing, tracked and
@@ -228,18 +228,23 @@ The continuity brief stays lean. Git history has everything else.
 
 ## Initialising Session Memory In A Domain
 
-When scaffolding a new domain, `continuity.md` should be created alongside `AGENTS.md` and `WORKLOG.md`. Use the template at `templates/continuity-brief.md.template`.
+Session memory needs **no special files** — `continuity.md` and `WORKLOG.md` are both
+retired (v3.17). A new domain has session memory from its first commit:
+- **Backward** (what was done) = the commit stream (`mdllm worklog` views it on demand).
+- **Forward** (what's still live) = open-loop things + open conflicts, surfaced by the
+  generated orient view (`mdllm session-start`).
+- **Insights** = `type: insight` things, kept live by the graph (an inbound edge or a
+  `disposition: keep-active` marker).
 
-If the agent encounters a domain without a `continuity.md`, it should:
-1. Create one using the template
-2. Populate it with any live threads from the current session
-3. Commit it with a note that it is being initialised
+A domain still carrying a legacy `continuity.md` should dissolve it on refresh — the
+same way the framework did (`dissolve-continuity-into-reconciliation`): backward → git,
+forward → things, insights → graph.
 
 ---
 
 ## Relationship To Other Specs
 
 - **thing.md** — `insight` and `continuity-brief` are framework-reserved types defined here. All other type mechanics (frontmatter, linking, triggers) are inherited from `thing.md` — including the cohesion discipline (decompose / compose) that governs insight consolidation (`thing.md` → The Inverse: Composition).
-- **orchestration.md** — The `session-end-continuity` prompt is bound to the `session-end` hook point; regenerating the WORKLOG (`mdllm worklog --write`) is its closing mechanical step. It is an explicitly invoked prompt, not an automatic hook — the user or agent triggers it at session close.
+- **orchestration.md** — The `session-end-continuity` prompt is bound to the `session-end` hook point; it closes with a rich `session-end:` commit (the backward record is git — no WORKLOG file). It is an explicitly invoked prompt, not an automatic hook — the user or agent triggers it at session close.
 - **write.thing.md** — Creating and updating insight things follows standard write operations. The session-end ritual is an extension of the write workflow.
 - **git-workflow.md** — Insight things and continuity brief updates are committed following standard conventions. The session-end commit is the natural pairing of the `post-write:commit` hard hook.

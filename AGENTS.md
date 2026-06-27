@@ -119,13 +119,12 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 
 > **[HARD HOOK: `pre-domain-scaffold:isolate`]** When scaffolding a new domain, the isolation sequence is mandatory and must complete before any domain files are committed anywhere: (1) `git init` in the domain folder, (2) add domain path to framework `.gitignore`, (3) commit `.gitignore` to framework repo, (4) commit domain files to domain repo, (5) create remote and push. Never commit domain files to the framework repo. **Run `python tools/mdllm.py scaffold <path>` — it performs steps 1–4 deterministically plus instantiated templates and the pre-commit hook; only the remote and the semantic content stay with you.** Full spec: `orchestration.md` → Hard Hooks.
 
-> **[BOUND PROMPT: `session-end`]** At the end of any session where a domain was discussed or modified, invoke the `session-end-continuity` prompt: extract insights, check for contradictions, update the continuity brief, then regenerate `WORKLOG.md` from the commit stream as its closing mechanical step (`mdllm worklog --write` — it is generated, not hand-authored). Explicitly invoked — not automatic. Full spec: `orchestration.md` → Bindings, `templates/prompts/session-end-continuity.md`.
+> **[BOUND PROMPT: `session-end`]** At the end of any session where a domain was discussed or modified, invoke the `session-end-continuity` prompt: extract insights, disposition the standing insights (promote/dismiss/keep-active), check for contradictions, manage open-loop things, then close with a rich `session-end:` commit (the backward record is git — `continuity.md` and `WORKLOG.md` are retired). Explicitly invoked — not automatic. Full spec: `orchestration.md` → Bindings, `templates/prompts/session-end-continuity.md`.
 
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
 3. If adding or removing a spec, run `mdllm coherence` — it now mechanically checks the catalog slice of the dark region (`.markdownllm` `foundational_specs` ↔ files on disk, the `TIERS` map in `tools/mdllm.py` ↔ the catalog, and `kernel.md` drift), and it runs in the pre-commit hook so a stale generated artifact blocks the commit. Then walk the **prose-only residue** the tool cannot read (see `change-reconciliation.md` → Walking the Dark Region): the Tier 2 routing table and the spec catalog in this file, and `docs/framework-map.md` (View 1 counts + View 2 node). `mdllm kernel` regen is now caught by coherence rather than left to memory.
-4. Commit with a structured message following git-workflow.md conventions
-5. WORKLOG updated with session activity
+4. Commit with a structured message following git-workflow.md conventions (the commit is the backward record)
 
 ## Framework Specifications (Things)
 
@@ -184,7 +183,7 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 5. **Evolving** — Specifications have status (`draft`, `evolving`, `stable`). New specs start as drafts and mature through use.
 6. **Vendor Agnostic** — This AGENTS.md works with GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini CLI. No vendor-specific memory stores required — the framework is the memory.
 7. **Transparent & Auditable** — Every decision, every state change, every reasoning step is committed to git. Full history is always available.
-8. **Git-Backed** — Git is the state machine, not just version control. Commit messages are the event stream. The WORKLOG captures session narrative.
+8. **Git-Backed** — Git is the state machine, not just version control. Commit messages are the event stream and carry the session narrative (`mdllm worklog` prints an on-demand view; nothing is committed back).
 9. **Elegant Constraint Enables Efficiency (hypothesis, under test)** — Structure makes reasoning consistent across sessions and vendors — that much is demonstrated. The stronger claim that a *smaller* model with structure matches or beats a *larger* model without it is the framework's central **hypothesis**, not a proven result: it rests on one eval whose reasoning core saturated, and stays a hypothesis until a more discriminating fixture tests it. Keep this distinct from the framework's *utility*, which independent adoption evidences directly. (See the manifesto, "Elegant Constraint Enables Efficiency.")
 
 ## Thing Types In This Domain
@@ -247,7 +246,6 @@ Before committing framework changes:
 - [ ] Status reflects reality (draft if new, evolving if actively changing) — the tool checks vocabulary validity; *you* check truthfulness
 - [ ] Version incremented if substantive change to a stable spec
 - [ ] Kernel regenerated (`python tools/mdllm.py kernel`) if any spec's `<!-- kernel -->` block or operative content changed
-- [ ] Commit message follows git-workflow.md conventions
-- [ ] WORKLOG updated with session activity
+- [ ] Commit message follows git-workflow.md conventions (rich — the commit is the backward record)
 
 > **The Deterministic Floor (v3.0):** mechanical validation (structural, referential, schema) is owned by `tools/mdllm.py` and enforced by the git pre-commit hook — never re-perform those checks by reasoning. The agent's validation responsibility is semantic only (validate.thing.md → Layer 2). Domain status vocabularies are declared in `_schema.yaml` / `things/_schema.yaml`, not fixed by the framework.

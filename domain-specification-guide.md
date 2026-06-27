@@ -848,5 +848,5 @@ This is the fractal nature of the framework: the same structure at every scale, 
 7. **Interface is existing routes:** Use VS Code, CLI, mobile, voice — whatever connects you to an LLM. Don't build a new interface. See `interface.md`.
 8. **Validation is built in:** `validate.thing.md` checks structural integrity, referential consistency, and semantic coherence. Domain-specific rules live in your specification skill.
 9. **Vendor agnostic:** Works across GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini
-10. **Transparent:** Everything versioned in git; all logic explicit and readable; three audit layers (worklog, git log, git diff)
+10. **Transparent:** Everything versioned in git; all logic explicit and readable; two audit layers (git log — `mdllm worklog` views it; git diff)
 11. **Knowledge compounds:** Session insights, contradictions, and retrospectives accumulate as first-class `type: insight`, `type: conflict`, and `type: retrospective` things. The domain learns across sessions, not just within them.

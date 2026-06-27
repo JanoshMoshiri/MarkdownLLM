@@ -99,7 +99,7 @@ Scan for contradictions introduced this session:
 
 For each contradiction found:
 - **If resolvable in-session** (one position clearly supersedes): update relevant things, declare `relation: supersedes`, mark old position deprecated if appropriate.
-- **If not resolvable**: create a `type: conflict` thing in `things/conflicts/`, add `relation: contradicts` to both parties, and add the conflict to the continuity brief.
+- **If not resolvable**: create a `type: conflict` thing in `things/conflicts/`, add `relation: contradicts` to both parties — an open conflict is an open loop, surfaced by orient.
 
 Be conservative — only flag genuine semantic contradictions, not differences in emphasis or scope.
 
@@ -118,25 +118,16 @@ session-start` → "Open loops"). So at session end:
 
 Do **not** maintain a continuity brief, list insight IDs, or write a backward
 "decisions made" log — insight liveness is graph-keyed (step 3) and history lives in
-git/WORKLOG.
+the commit stream.
 
-### 6. Commit, Then Regenerate The WORKLOG
+### 6. Commit
 
-Commit all new insight things, conflict things, and the updated continuity brief
-following `git-workflow.md` conventions — including a `session-end:` commit, which
-is the delimiter `mdllm worklog` splits sessions on.
-
-Then regenerate the WORKLOG as a closing **mechanical** step — it is not reasoning,
-it is a generated artifact derived from the commit stream:
-
-```sh
-mdllm worklog --write   # rewrites WORKLOG.md in place from HEAD; never hand-edit
-```
-
-Commit the regenerated `WORKLOG.md`. The system name and id are read from the
-local `AGENTS.md`, so the same command is correct in the framework and in any
-domain repo. The WORKLOG records what *happened* (history); the continuity brief
-above carries what's still *live* (state) — do not duplicate one into the other.
+Commit all new insight things, conflict things, and updated open-loop things
+following `git-workflow.md` conventions — including a `session-end:` commit, which is
+the delimiter `mdllm worklog` groups sessions on. **Write a rich commit message:** the
+commit *is* the backward record now — there is no WORKLOG file to regenerate (retired
+in v3.17; `mdllm worklog` prints an on-demand view of the commit stream when you want
+it). History lives in git and nowhere else.
 
 ## Extraction Heuristic
 

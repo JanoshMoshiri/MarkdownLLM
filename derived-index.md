@@ -54,7 +54,7 @@ The governing rule:
 
 ## `type: index`
 
-Index files are things with `type: index`. They are framework-internal, generated artifacts — like the WORKLOG, they are not authored by hand as domain content.
+Index files are things with `type: index`. They are framework-internal, generated artifacts — derived from the corpus, not authored by hand as domain content.
 
 - **Status:** index things use `status: live` (current and regenerated) or `status: stale` (known to lag the things — a transitional state validation may set). They do not use workflow or lifecycle statuses.
 - **Location:** `things/_index/` within the domain. The leading underscore keeps generated indexes visually and lexically separate from authored things, and lets read operations skip the directory during ordinary thing scans.

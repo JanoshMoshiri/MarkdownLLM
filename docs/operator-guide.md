@@ -167,7 +167,7 @@ CI, or the agent — but all of them are yours to invoke directly.
 | `kernel [--check]` | Regenerates `kernel.md` from spec kernel blocks; `--check` gates drift | Framework maintenance (CI runs `--check` for you) |
 | `coherence [path]` | Dark-region checks: generated-artifact (kernel/index) freshness, `foundational_specs`↔filesystem, stale `stable` labels, dead vocabulary. Corpus-general; framework-only checks switch on at a `.markdownllm` root. Runs in the pre-commit hook | After adding/removing a spec; suspected drift between catalog and disk |
 | `changelog --since <tag>` | Drafts a CHANGELOG entry from the commit stream | Framework release prep |
-| `worklog [path] [--write]` | Generates WORKLOG.md from the commit stream (sessions split on `session-end:` commits) | Keeping the session log current without hand-maintaining it |
+| `worklog [path] [--write]` | Prints an on-demand session-grouped view of the commit stream (sessions split on `session-end:` commits); `--write` saves a gitignored local snapshot | Reviewing recent session history — not a committed file (retired v3.17) |
 | `refresh <domain> [--seal]` | Floor-only domain refresh: reports the version delta + unseen CHANGELOG entries; `--seal` bumps `framework_version_seen` after adoption | Bringing a stale domain current with the framework |
 | `install-hook [path]` | Installs the git pre-commit validation hook | Once per domain repo, at floor adoption |
 | `doctor [path]` | Probes the environment: prerequisites, hook *execution* and *body freshness* (is the installed hook current with `HOOK_BODY`?), framework version drift (downward + upstream); exit 1 = degraded mode | New machine, new harness, after a refresh, or "is the floor actually on here?" |

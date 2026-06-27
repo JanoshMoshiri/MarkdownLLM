@@ -205,7 +205,7 @@ flowchart LR
         T9["git pre-commit hook"]
         T10["floor availability itself"]
         T11["pre-domain-scaffold:isolate<br/>hard hook"]
-        T12["WORKLOG.md"]
+        T12["git log (on-demand view)"]
         T13["domain-refresh.md"]
         T14["change-reconciliation.md<br/>dark-region walk (catalog slice)"]
         T15["change-reconciliation.md<br/>Assimilate beat"]

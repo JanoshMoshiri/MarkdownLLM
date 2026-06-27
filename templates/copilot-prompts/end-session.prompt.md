@@ -9,10 +9,16 @@ when *you* judge the session worth it, never automatically. Follow
 `{framework_root}/templates/prompts/session-end-continuity.md`:
 
 1. Scan this session for insights worth preserving → create `type: insight` things.
-2. Detect contradictions introduced this session → create `type: conflict` things.
-3. Update `continuity.md` (open threads, pending decisions, mid-flight position).
-4. Commit with a `session-end:` message, then regenerate the worklog:
-   `python {framework_root}/tools/mdllm.py worklog --write`.
+2. **Disposition the standing insights (the brake):** run `python
+   {framework_root}/tools/mdllm.py validate .` and act on every insight-disposition
+   finding — promote, dismiss, consolidate, link from live work, or mark
+   `disposition: keep-active` + a reason.
+3. Detect contradictions introduced this session → create `type: conflict` things.
+4. Manage **open-loop things** — create/update a `plan` or work thing for new forward
+   intent, move resolved ones to a terminal status (orient reads them; `continuity.md`
+   is retired).
+5. Commit with a rich `session-end:` message — the commit *is* the backward record
+   (no WORKLOG file; `mdllm worklog` prints an on-demand view of git when wanted).
 
 If the session has no domain-relevant changes worth harvesting, say so and stop —
 not every session earns an insight.

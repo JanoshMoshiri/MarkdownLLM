@@ -224,7 +224,7 @@ Domains can declare their own hard hooks in their AGENTS.md using a `hard_hooks`
 ```yaml
 hard_hooks:
   - hook: session-end
-    action: "Update WORKLOG.md and commit before the session closes"
+    action: "Commit a rich session-end: message before the session closes (the commit is the backward record)"
   - hook: post-write
     action: "After updating any return thing, check if its companion deadline thing needs updating"
 ```
@@ -405,7 +405,7 @@ These are prompts that ship with the framework and apply to any domain:
 - **session-orientation** — At session start, summarize what's changed since last session
 - **surface-attention** — Determine which things need user attention and in what priority order
 - **detect-conflicts** — Check if a proposed change conflicts with existing state (lens conflicts, dependency violations)
-- **session-end-continuity** — At session end, extract insights, check for contradictions, update the continuity brief, and regenerate the WORKLOG (`mdllm worklog --write`) as its closing mechanical step
+- **session-end-continuity** — At session end, extract insights, disposition the standing insights, check for contradictions, manage open-loop things, and close with a rich `session-end:` commit (the backward record is git; `mdllm worklog` is an on-demand view, not a committed file)
 - **domain-velocity** — At session start, read git history as telemetry to surface stalled, churning, or untouched work the current-state snapshot can't see
 - **review-schema-coherence** — At retrospective, audit the domain's emergent frontmatter vocabulary (via the schema registry) for fields that have drifted apart in name but converged in meaning
 
