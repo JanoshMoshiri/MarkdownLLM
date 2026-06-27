@@ -100,8 +100,11 @@ one live-agent tool) spawns a domain-scoped agent. Git remains the state machine
   {source_domain, source_id, source_commit}}` — the provenance-stamped fetch; the
   producing-side hand-off. (Browsing is `resources/read`; this is consume-with-
   provenance.)
-- `run_domain_task(task, inputs?)` → **a Task handle** (not an inline result) — the
-  **live-agent** capability, async by construction. See below.
+- ~~`run_domain_task(task, inputs?)`~~ → **DEFERRED, built then reverted** (not a
+  shipped tool). The live-agent capability; its design is recorded below and in
+  [[decisions/phase-3-run-domain-task-reverted]], but it is **not** part of the read
+  face — a live-agent invocation is a different risk class, deferred to a later A2A
+  layer.
 
 Internal floor commands (`validate`, `touchpoints`, `cascade`, `index`) are **not**
 exposed — they are the domain's private floor. Only the curated face crosses.
@@ -112,6 +115,12 @@ exposed — they are the domain's private floor. Only the curated face crosses.
   prompt templates, filled with the caller's arguments.
 
 ## How `run_domain_task` Hands Off To The Domain Agent — Async, On The Tasks Primitive
+
+> **ARCHIVAL — DEFERRED CAPABILITY, NOT SHIPPED.** This section records a design
+> that was built (Phase 3a/3b) and then **reverted in full** (see Build Status and
+> [[decisions/phase-3-run-domain-task-reverted]]). It is kept as the explored
+> reasoning, not as a description of code in the tool. The live-agent hand-off is
+> deferred to a later, separate A2A peer layer with its own threat model.
 
 The server has no LLM, so a capability that needs reasoning must **spawn the
 domain's own agent** — and that agent runs for *minutes* (long-horizon reasoning),
@@ -246,9 +255,11 @@ publishes a *face it authored about itself*, never its raw interior.
    whole consistency facet, end to end.
 2. **Freshness check in the floor.** Generalise the upward version-check to
    arbitrary `source_domain`s; re-quarantine-on-drift; wire into change-reconciliation.
-3. **`run_domain_task` (live-agent hand-off) — on the Tasks primitive.** Async by
-   construction (handle + states), spawning the domain-scoped headless agent;
-   `input_required` for mid-task elicitation.
+3. **`run_domain_task` (live-agent hand-off) — DEFERRED, not on this roadmap.**
+   Built and reverted (see Build Status). The live-agent surface is a different
+   risk class from the read face; it belongs to a later, separate A2A peer layer
+   with its own threat model, not to the cross-domain read face. Left here only as
+   the record of the explored design.
 4. **Prompts.**
 5. **Streamable HTTP transport + OAuth 2.1.** Reach beyond the local machine —
    transport + auth-config swap, the authorization gate already in the floor from
@@ -276,34 +287,25 @@ publishes a *face it authored about itself*, never its raw interior.
   mutates a domain's things. **Offline = `unreachable` ("freshness unknown"), never a
   silent `fresh`.** Proven live (jmtm's import of code-architect reports `fresh`) +
   self-tests for fresh→stale, unreachable, and no-route.
-- **Phase 3a — landed.** `mdllm mcp-serve <domain> --tasks` exposes `run_domain_task`
-  (opt-in — the first write/compute-capable surface). It is standard MCP tool-use with
-  an *agent* executor, made async via the **Tasks pattern**: `tools/call` returns a
-  task handle, the caller polls `tasks/get` for the deliverable. Phase 3a ships a
-  **stub executor** (no live agent, no writes) that proves the handle→poll round-trip;
-  session-scoped in-memory task store (stdio). Proven live (jmtm calls
-  code-architect's `run_domain_task`, gets a handle, polls the result). The Tasks
-  *wire* isn't finalised upstream (H2 2026) — the pattern is kept thin in the transport
-  to align later.
-  **Topology (corrected, operator-reasoned):** the *skilled* domain exposes
-  `run_domain_task` (code-architect — it owns the design/codegen skill); the consumer
-  calls it with input (jmtm: "here's the website + the change I need"); the executor's
-  agent works **in its own context** and returns the change as a deliverable; the
-  **consumer applies it to its own files** (jmtm's agent writes the website). Neither
-  domain reaches into the other — the owning domain's agent always edits its own files.
-- **Phase 3b — landed.** The stub is replaced by the real executor: `run_domain_task`
-  spawns **`claude -p`** (headless, read-and-emit) in the producer domain on a
-  **background thread** — returns `working` immediately, the deliverable lands on the
-  `get_task_result` tool (a *tool*, so a standard MCP client can poll it today; the
-  `tasks/get` method is also there for a future Tasks-aware client). A `wait: true`
-  arg runs it **synchronously** — deliverable inline, the standard tool shape, for
-  fast tasks (a long task would time out a sync call). Runtime overridable via
-  `MDLLM_AGENT_BIN`, and **adapter-optional**: a
-  missing runtime degrades to a clear `failed` (`no-agent-runtime`), never a crash.
-  The read-and-emit prompt has the agent *produce* the change (not commit its own
-  repo); the consumer applies it to its own files. Tested against a fake `claude -p`
-  (real async `working`→`completed`) + the no-runtime path. **Live run is operator-
-  driven** (needs `claude` auth + real tokens/minutes).
+- **Phase 3 (`run_domain_task`) — built, then REVERTED at v3.16.x. Not in the tool.**
+  3a (async stub) and 3b (real `claude -p` executor on a background thread, plus the
+  `get_task_result` poll tool and `wait: true` sync mode) were built and tested
+  against a fake `claude -p` — and then **removed in full from `mdllm.py`** (the
+  `--tasks` flag, the executor, the task store, the task tools). The live agent path
+  **never ran once**. The decision and its reasoning are pinned in
+  [[decisions/phase-3-run-domain-task-reverted]]; the design reasoning below is kept
+  as the record of what was explored, not as a description of shipped code.
+  **Why reverted:** a live-agent invocation is a different *class* of risk from the
+  read face — resource exhaustion, agent-injection via task inputs, an unbounded
+  compute surface — and the content trust model ("external content is quarantined
+  data") was built for the *content* path and does not cover it. Keeping dormant
+  execution code behind an opt-in flag is an honour-system control where the floor
+  can give a mechanical guarantee instead (the framework's own founding correction):
+  removed, the surface cannot be reached at all. Built ahead of felt need, too — one
+  real consumer pair, no second. The live-agent hand-off belongs to a **later,
+  separate A2A peer layer** with its own threat model, never bolted onto the read
+  face. Re-open only when a second real consumer pair exists *and* it earns its own
+  project.
 - **Phase 4 (prompts), 5 (Streamable HTTP + OAuth 2.1)** pending — Phase 5 is the
   external-agent test: a remote agent connecting to a domain over the wire, after
   which the MCP integration can be claimed publicly.
