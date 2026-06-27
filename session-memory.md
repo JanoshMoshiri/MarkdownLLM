@@ -165,31 +165,37 @@ For each insight worth preserving, create a `type: insight` thing in `things/ins
 
 ### Step 3: Belief Revision — Check For Contradictions
 
-Before updating the continuity brief, scan for contradictions introduced this session:
+Before closing out, scan for contradictions introduced this session:
 
 - Did any new insight or modification assert something that conflicts with an existing thing?
 - Do any two things now in view hold incompatible positions?
 
 For each contradiction found:
 1. If it can be resolved in-session (one position clearly supersedes the other): update the relevant things, declare `relation: supersedes` / `relation: superseded-by`, and mark the old position deprecated if appropriate.
-2. If it cannot be resolved in-session: create a `type: conflict` thing in `things/conflicts/`, add `relation: contradicts` to both parties' `linked_things`, and add the conflict to the continuity brief as an open thread.
+2. If it cannot be resolved in-session: create a `type: conflict` thing in `things/conflicts/`, add `relation: contradicts` to both parties' `linked_things`. The open conflict *is* the open loop — orient surfaces it (`mdllm session-start` → "Open loops"); no separate brief entry is needed.
 
 Be conservative — only flag genuine semantic contradictions, not differences in emphasis or scope. When uncertain, surface for human confirmation rather than silently creating a conflict thing. Full spec: `belief-revision.md`.
 
-### Step 4: Update The Continuity Brief
+### Step 4: Manage Open-Loop Things
 
-Load `continuity.md`. Make these updates:
-- Add new open threads from this session
-- Remove threads that resolved in this session
-- Add new live insight IDs (with one-line summaries)
-- Remove insights that were promoted or dismissed
-- Update pending decisions — remove resolved ones, add new ones
-- Add any new open conflicts (from Step 3) as open threads
-- Refresh the questions list
+There is no brief to update — forward state lives in the thing graph, and the
+generated **orient** view (`mdllm session-start` → "Open loops") reads it. So instead
+of editing a singleton, reconcile the graph:
+- New forward intent from this session → create or update a `plan` or work thing.
+- Work that resolved this session → move it to a terminal status, so orient stops
+  surfacing it.
+- Open conflicts (from Step 3) are already open loops — orient surfaces them; nothing
+  else to record.
+- Insight liveness is graph-keyed, not brief-keyed: an `active` insight stays in
+  circulation via an inbound edge from a live thing (or a `disposition: keep-active`
+  marker), per *Insight Lifecycle Management* below — not by being listed anywhere.
 
 ### Step 5: Commit
 
-Commit all new insight things, new conflict things, and the updated continuity brief following `git-workflow.md` conventions.
+Commit all new insight things, new conflict things, and the open-loop updates with a
+rich `session-end:` message following `git-workflow.md` conventions. The commit **is**
+the backward record — there is no `continuity.md` or `WORKLOG.md` to update; `mdllm
+worklog` prints an on-demand, uncommitted view of the commit stream when wanted.
 
 ---
 

@@ -104,7 +104,7 @@ These are the specs the agent loads and reasons with:
 | [domain-refresh.md](domain-refresh.md) | How domain agents discover framework evolution |
 | [orchestration.md](orchestration.md) | Opt-in hook points, structured prompts, and session-end bindings |
 | [scalability-guide.md](scalability-guide.md) | Scaling from tens to thousands of things |
-| [session-memory.md](session-memory.md) | Session continuity: `type: insight`, `type: continuity-brief`, and the `session-end-continuity` prompt |
+| [session-memory.md](session-memory.md) | Session memory: `type: insight`, graph-keyed liveness, and the session-end extraction ritual. Forward state is the thing graph, surfaced by the generated **orient** view (`mdllm session-start` → "Open loops") — the hand-maintained `continuity.md` is retired (v3.17) |
 | [belief-revision.md](belief-revision.md) | Contradiction tracking: `type: conflict`, relation types, belief revision process |
 | [retrospective.md](retrospective.md) | Periodic quality reflection: `type: retrospective`, when to write, what it produces |
 
@@ -137,10 +137,10 @@ python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + h
 python tools/mdllm.py provenance <domain>    # decision pins resolve; no output rests on unverified content
 python tools/mdllm.py eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
 python tools/mdllm.py kernel                 # regenerate the operative kernel from spec blocks
-python tools/mdllm.py session-start <domain> # emit the startup ritual for a harness SessionStart hook to inject at t=0
+python tools/mdllm.py session-start <domain> # emit the startup ritual + orient view (open loops) for a SessionStart hook to inject at t=0
 ```
 
-Each domain declares its thing types and **its own status vocabularies** in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) (~2.1k tokens of operative rules) at session start instead of ~21k of full spec prose; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a `SessionStart` hook so the agent runs version-check + velocity at t=0 rather than hoping it surfaces from a long entry file — `scaffold` writes this `.claude/settings.json` block for new domains (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
+Each domain declares its thing types and **its own status vocabularies** in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) (~2.1k tokens of operative rules) at session start instead of ~21k of full spec prose; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a `SessionStart` hook so the agent runs version-check + velocity and reads the generated **orient** view — the open loops (non-terminal work things + open conflicts) that replace the retired `continuity.md` — at t=0 rather than hoping it surfaces from a long entry file — `scaffold` writes this `.claude/settings.json` block for new domains (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
 
 ### Templates
 
@@ -152,7 +152,6 @@ Starting structures the agent uses when scaffolding a new domain:
 - `templates/[domain]-write.thing.skill.md.template`
 - `templates/[domain]-workflow.skill.md.template`
 - `templates/prompts/` — Orchestration prompt templates
-- `templates/continuity-brief.md.template` — Domain continuity brief
 - `templates/insight.md.template` — `type: insight` things
 - `templates/conflict.md.template` — `type: conflict` things
 - `templates/retrospective.md.template` — `type: retrospective` things
