@@ -25,6 +25,9 @@ linked_things:
   - id: long-running-tasks-lack-pre-compaction-checkpoint
     relation: references
     notes: "The compaction-survival constraint rests on this named gap; keeping it live via a real dependant, not a prose mention"
+  - id: orient-and-reconciliation-are-the-corpus-two-sides
+    relation: references
+    notes: "The conceptual capstone — orient (session-memory state) is the dual of reconciliation (work-content state); this plan operationalises orient's forward view"
   - id: llm-driven-systems-manifesto
     relation: implements
     notes: "Fewer primitives: continuity stops being a primitive and becomes an application of reconciliation"

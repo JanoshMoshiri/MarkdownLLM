@@ -2089,6 +2089,43 @@ def _velocity_signal(domain: Path) -> str:
             f"Read `git log -- things/` for the full picture.")
 
 
+# Types that sit at a non-terminal status as a steady state (knowledge/reference),
+# so they are NOT "open work" — excluded from the forward orientation view.
+_ORIENT_KNOWLEDGE_TYPES = {"specification", "guide", "manifesto", "insight",
+                           "retrospective", "index", "continuity-brief", "prompt",
+                           "workflow-definition", "decision", "artifact"}
+
+
+def _orient_forward(domain: Path) -> list[str]:
+    """The forward half of orientation — the open loops the next session inherits,
+    computed from the thing graph. Orient is the session-memory counterpart to
+    change-reconciliation's work-content state: backward orientation is the commit
+    stream (velocity), this is its forward complement (what is still open). Replaces
+    the hand-maintained continuity brief (dissolve-continuity-into-reconciliation)."""
+    try:
+        corpus, _ = scan(domain)
+    except Exception:
+        return []
+    conflicts, loops = [], []
+    for t in corpus.things:
+        typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
+        if typ == "conflict" and status == "open":
+            conflicts.append(t.id)
+        elif typ not in _ORIENT_KNOWLEDGE_TYPES and status not in TERMINAL_STATUSES:
+            loops.append((t.id, typ, status))
+    lines: list[str] = []
+    if conflicts:
+        lines.append("- **Open conflicts (%d):** %s — resolve or carry forward."
+                     % (len(conflicts), ", ".join(f"`{c}`" for c in sorted(conflicts))))
+    if loops:
+        lines.append(f"- **Open loops ({len(loops)}):** forward work still in flight —")
+        for tid, typ, status in sorted(loops)[:15]:
+            lines.append(f"    - `{tid}` ({typ}, {status})")
+        if len(loops) > 15:
+            lines.append(f"    - …and {len(loops) - 15} more (`mdllm validate` lists all).")
+    return lines
+
+
 def cmd_session_start(args) -> int:
     domain = Path(args.path).resolve()
     agents = domain / "AGENTS.md"
@@ -2099,8 +2136,8 @@ def cmd_session_start(args) -> int:
 
     out = ["# MarkdownLLM — Session Start (run before the user's first request)", "",
            "The live request will pull you toward itself; do these first, then await intent:",
-           "1. Load `kernel.md` (operative kernel) and `continuity.md` if it exists.",
-           "2. Act on the version + velocity status below.",
+           "1. Load `kernel.md` (operative kernel).",
+           "2. Act on the version + velocity (backward) and open-loops (forward) status below.",
            "3. Evaluate triggers and surface what needs the user.", ""]
 
     fr = meta.get("framework_root")
@@ -2140,6 +2177,8 @@ def cmd_session_start(args) -> int:
         if drifted:
             out.append(f"- **Domain kernel: DRIFT** in {', '.join(drifted)} — run "
                        f"`mdllm domain-kernel .` and commit.")
+
+    out.extend(_orient_forward(domain))
 
     print("\n".join(out))
     return 0
