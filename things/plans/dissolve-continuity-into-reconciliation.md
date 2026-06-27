@@ -1,7 +1,7 @@
 ---
 id: dissolve-continuity-into-reconciliation
 type: plan
-status: in-progress
+status: completed
 version: 1.0
 created: 2026-06-27
 priority: high

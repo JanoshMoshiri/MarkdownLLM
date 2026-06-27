@@ -2,7 +2,9 @@
 id: long-running-tasks-lack-pre-compaction-checkpoint
 type: insight
 status: active
-version: 1.0
+disposition: keep-active
+disposition_reason: "Parked framework gap — long tasks can lose state on compaction; the continuity work mitigated it (open loops are committed things) but the general gap awaits a felt fix."
+version: 1.1
 created: 2026-06-20
 confidence: medium
 origin: synthesised

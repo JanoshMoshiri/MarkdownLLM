@@ -2,7 +2,9 @@
 id: orient-and-reconciliation-are-the-corpus-two-sides
 type: insight
 status: active
-version: 1.0
+disposition: keep-active
+disposition_reason: "Architectural capstone — the standing placement test for any new corpus-maintenance mechanism (work-content vs session-memory side)."
+version: 1.1
 created: 2026-06-27
 session: 2026-06-27
 source: both
