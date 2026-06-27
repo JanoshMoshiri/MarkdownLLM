@@ -16,9 +16,19 @@ linked_things:
     relation: supports
   - id: interface-specification
     relation: informs
+  - id: phase-3-run-domain-task-reverted
+    relation: informs
+    notes: "run_domain_task was reverted 2026-06-27; this is design knowledge for the deferred A2A layer, not a live tool"
 ---
 
 # The Live-Agent Hand-off Is For Producing New Output, Not Implementing What's Already Specified
+
+> **Reconciled 2026-06-27 — capability reverted.** `run_domain_task` (Phase 3) was
+> built and then removed in full ([[phase-3-run-domain-task-reverted]]); the
+> live-agent hand-off is deferred to a later, separate A2A peer layer. This insight
+> stands as **design knowledge for that future surface** — the razor for *when* a
+> live-agent hand-off earns its keep — not as documentation of a tool that ships
+> today. Read it in the future tense.
 
 ## The Insight
 

@@ -16,6 +16,9 @@ linked_things:
     relation: supports
   - id: live-agent-handoff-is-for-new-output-not-known-implementation
     relation: complements
+  - id: phase-3-run-domain-task-reverted
+    relation: supports
+    notes: "This insight's honour-system observation (boundary respect was interpretation, not enforced) is part of the reasoning that reverted run_domain_task"
   - id: llm-driven-systems-manifesto
     relation: challenges
 ---
@@ -59,6 +62,13 @@ ownership vs. misroute) **is** the framework's effect. Until that is run, no
 boundary-enforcement claim is substantiated.
 
 ## Context
+
+> **Reconciled 2026-06-27.** `run_domain_task` has since been reverted in full
+> ([[phase-3-run-domain-task-reverted]]). The anecdote's setting (the tool being
+> available) is now historical, but the insight's lesson not only holds — it
+> *informed the revert*: "boundary respect was interpretation, not enforcement" is
+> the same honour-system logic that ruled against keeping dormant execution code
+> behind an opt-in flag. The A/B eval named below is now a future-A2A concern.
 
 Surfaced 2026-06-26 when the jmtm agent declined to misuse `run_domain_task`
 (see [[live-agent-handoff-is-for-new-output-not-known-implementation]]). The
