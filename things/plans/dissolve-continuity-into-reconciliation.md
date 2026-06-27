@@ -101,6 +101,15 @@ Re-point the floor orphan-check from "not in continuity.md" to "no inbound edge 
 a non-terminal thing" (the `relationships` index already computes in-degree). The
 session-start staleness check walks this graph set, not the brief's live IDs.
 
+**Concrete first case (surfaced live by A1):** removing the backward logs orphaned
+`agents-drop-mechanical-birth-steps-not-semantic-ones` — it had been kept "live"
+only by a mention in a deleted decision-log block. It is **in-degree 0** yet
+`informs orchestration-specification` and motivated `mdllm scaffold`, so its lesson
+already crystallised into a shipped spec → a **promotion**, not a re-hide. Carried
+as a known transitional `validate` Info (non-blocking) until B re-keys liveness;
+this insight is B's first disposition. It is the live proof that file-presence
+liveness is brittle — a backward-log cleanup should never orphan a standing insight.
+
 ### Phase C — Forcing function at end-session
 Bind a **mandatory** disposition pass to end-session (not only the periodic
 retrospective). The floor lists retirement candidates — orphaned (no live inbound
