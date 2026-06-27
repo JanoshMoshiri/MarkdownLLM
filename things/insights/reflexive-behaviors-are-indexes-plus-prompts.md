@@ -1,9 +1,10 @@
 ---
 id: reflexive-behaviors-are-indexes-plus-prompts
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-08
+promoted_to: derived-index-specification
 confidence: high
 origin: synthesised
 source: session — reflexive behaviour design (git telemetry, trigger eval, conflict scan, schema review)

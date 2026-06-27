@@ -1,9 +1,10 @@
 ---
 id: a-crossing-thing-carries-its-producers-private-graph
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-26
+promoted_to: mcp-domain-server-design
 session: 2026-06-26
 source: both
 confidence: high

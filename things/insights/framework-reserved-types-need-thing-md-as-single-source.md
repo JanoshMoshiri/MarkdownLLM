@@ -1,8 +1,8 @@
 ---
 id: framework-reserved-types-need-thing-md-as-single-source
 type: insight
-status: active
-version: 1.0
+status: dismissed
+version: 1.1
 created: 2026-05-27
 confidence: high
 origin: inferred
@@ -15,6 +15,13 @@ linked_things:
 ---
 
 # Framework-Reserved Types Must Have thing.md As Their Single Source
+
+> **Dismissed 2026-06-27.** The fix shipped long ago — thing.md is now the canonical
+> reserved-types list (7 types, stable). What remained was a generic single-source-of-
+> truth reminder ("update thing.md first when adding a reserved type") already covered
+> by the framework's SRP/cohesion discipline, on a type set that no longer churns.
+> Origin `inferred`, the oldest insight in the corpus, no distinct ongoing teaching
+> value. Kept for audit, not deleted.
 
 ## The Insight
 

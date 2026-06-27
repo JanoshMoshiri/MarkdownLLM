@@ -1,9 +1,10 @@
 ---
 id: version-mismatch-triggers-validation-cascade
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-02
+promoted_to: orchestration-specification
 session: 2026-06-02
 source: both
 confidence: high

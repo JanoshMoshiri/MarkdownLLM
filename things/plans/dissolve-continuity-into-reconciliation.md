@@ -22,6 +22,9 @@ linked_things:
   - id: git-workflow-specification
     relation: references
     notes: "The commit is the durable checkpoint — open-loop things survive compaction by being committed"
+  - id: long-running-tasks-lack-pre-compaction-checkpoint
+    relation: references
+    notes: "The compaction-survival constraint rests on this named gap; keeping it live via a real dependant, not a prose mention"
   - id: llm-driven-systems-manifesto
     relation: implements
     notes: "Fewer primitives: continuity stops being a primitive and becomes an application of reconciliation"
@@ -137,14 +140,38 @@ as a known transitional `validate` Info (non-blocking) until B re-keys liveness;
 this insight is B's first disposition. It is the live proof that file-presence
 liveness is brittle — a backward-log cleanup should never orphan a standing insight.
 
-### Phase C — Forcing function at end-session
+### Phase C — Forcing function at end-session + the keep-active marker
 Bind a **mandatory** disposition pass to end-session (not only the periodic
 retrospective). The floor lists retirement candidates — orphaned (no live inbound
-edge), decayed (active past the staleness window, never built on),
-promoted-but-not-archived, duplicate-cluster (composition pre-filter). End-session
-**must** disposition each (promote / dismiss / consolidate / keep-with-reason). The
-brake lives at the same ritual as the growth, so every act of capture is also an act
-of pruning. Retrospective keeps the deeper period-scoped sweep.
+edge), promoted-but-not-archived, duplicate-cluster (composition pre-filter).
+End-session **must** disposition each (promote / dismiss / consolidate /
+keep-active-with-reason). The brake lives at the same ritual as the growth, so every
+act of capture is also an act of pruning. Retrospective keeps the deeper period-scoped
+sweep. (No wall-clock "decayed" signal — the staleness window was dropped in B.)
+
+**The keep-active marker (the backlog forced this).** A *deliberately parked* or
+*standing-razor* insight is genuinely live but has no natural active dependant; it
+must be recordable as keep-active in a way the floor reads, so it stops being flagged
+without a fake edge. Design: a frontmatter field (e.g. `disposition: keep-active` +
+a one-line `disposition_reason`) the orphan check honours. This is C's core build.
+
+**Backlog triage (2026-06-27 — first run of this disposition pass, done by hand):**
+of the 10 orphans the B re-key surfaced —
+- **Promoted (3):** `reflexive-behaviors-are-indexes-plus-prompts` → derived-index.md;
+  `version-mismatch-triggers-validation-cascade` → orchestration.md;
+  `a-crossing-thing-carries-its-producers-private-graph` → mcp-domain-server-design
+  (egress source-scoping shipped).
+- **Linked to a real dependant (1):** `long-running-tasks-lack-pre-compaction-checkpoint`
+  ← this plan (compaction-survival) — now live, off the backlog.
+- **Dismissed (1):** `framework-reserved-types-need-thing-md-as-single-source` — fix
+  shipped, residual is generic SRP on a stable type set.
+- **Keep-active (5):** `boundary-respect-was-interpretation-not-enforcement`,
+  `felt-deployment-lands-in-undisclosable-work`,
+  `modeling-cognition-yields-a-learning-loop-not-a-coherence-loop`,
+  `repeated-drift-promotes-a-fact-into-the-floor`,
+  `cross-domain-readiness-is-a-shared-signal-not-a-producer-push` (parked). The
+  **first customers of the keep-active marker** — flagged until C builds it. Backlog
+  after this pass: **5**, all keep-active.
 
 ### Phase D — Generated orientation; retire the file
 `mdllm orient <domain>` generates the session-start view: **backward** (recent
