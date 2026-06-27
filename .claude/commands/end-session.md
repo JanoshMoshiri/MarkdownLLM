@@ -13,8 +13,9 @@ when *you* judge the session worth it, never automatically. Follow
    consolidate, link from live work, or mark `disposition: keep-active` + a reason.
    Capture (step 1) grows the population; this prunes it, so the two stay balanced.
 3. Detect contradictions introduced this session → create `type: conflict` things.
-4. Update `continuity.md` — **forward** open threads only (liveness is graph-keyed;
-   history lives in git/WORKLOG, not the brief).
+4. Manage **open-loop things** — create/update a `plan` or work thing for new forward
+   intent, move resolved ones to a terminal status (orient reads them; `continuity.md`
+   is retired).
 5. Commit with a `session-end:` message, then regenerate the worklog:
    `python tools/mdllm.py worklog --write`.
 

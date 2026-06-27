@@ -35,12 +35,14 @@ At the start of every session, orient the agent to the current state of the doma
 
 ### 0. Insight Staleness Check (scoped — not a sweep)
 
-The continuity brief's live insights enter this session as trusted context. Before
-trusting them, check whether the ground moved underneath them:
+The domain's live insights enter this session as trusted context. Before trusting
+them, check whether the ground moved underneath them:
 
-1. Take the live insight IDs listed in `continuity.md` (a small, bounded set)
-2. List things modified since the brief's `last_updated`:
-   `git diff --name-only HEAD@{<last_updated>} -- things/` (or commits since that date)
+1. Take the **live insights** — `active`, and either holding a live inbound edge or
+   carrying a `disposition: keep-active` marker (a small, bounded set; liveness is a
+   graph property now, not continuity-brief presence — see `session-memory.md`).
+2. List things modified recently: `git diff --name-only` over the commits since you
+   were last active (or `-- things/`).
 3. For each live insight whose *subject matter* overlaps the changed things
    (its `linked_things`, or the things it plainly discusses): re-read the insight
    against the change. Does it still hold?

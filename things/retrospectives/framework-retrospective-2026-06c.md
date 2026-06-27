@@ -7,8 +7,6 @@ period_start: 2026-06-19
 period_end: 2026-06-23
 domain: markdownllm-framework
 linked_things:
-  - id: framework-continuity-brief
-    relation: informs
   - id: framework-retrospective-2026-06b
     relation: references
     notes: "Prior retrospective; this covers the single build that opened where it closed (v3.14 → v3.15)."

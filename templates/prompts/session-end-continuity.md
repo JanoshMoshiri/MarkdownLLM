@@ -11,15 +11,15 @@ inputs:
     description: "Current active insights in things/insights/"
   - name: existing-things
     description: "Domain things that may be contradicted by session content"
-  - name: continuity-brief
-    description: "The domain's current continuity.md (if it exists)"
+  - name: open-loops
+    description: "Non-terminal work things (plans, tasks) the session may open or close"
 outputs:
   - name: new-insights
     description: "type: insight things created in things/insights/"
   - name: new-conflicts
     description: "type: conflict things created in things/conflicts/ (if contradictions found)"
-  - name: updated-continuity-brief
-    description: "Updated continuity.md with new threads, resolved threads removed"
+  - name: updated-open-loops
+    description: "Open-loop things created or moved to a terminal status this session"
 bound_to:
   - hook: session-end
 linked_things:
@@ -103,21 +103,22 @@ For each contradiction found:
 
 Be conservative — only flag genuine semantic contradictions, not differences in emphasis or scope.
 
-### 5. Update The Continuity Brief
+### 5. Update The Open Loops (Forward State Is Things, Not A Brief)
 
-Load `continuity.md`. Update its **forward** content only:
-- Add new open threads (forward intent) from this session
-- Remove threads that resolved this session
-- Add any new open conflicts as open threads
-- Refresh the questions list
+Forward state lives in the **thing graph**, not a hand-maintained brief
+(`continuity.md` is retired — `orient-and-reconciliation-are-the-corpus-two-sides`).
+The session-start orientation generates the forward view from it (`mdllm
+session-start` → "Open loops"). So at session end:
+- **New forward intent this session** → create or update an open-loop thing (a
+  `plan` or domain work thing) at a non-terminal status. A loop worth carrying is a
+  thing, so it is tracked, surfaced by orient, and *retired by status* when done.
+- **Resolved this session** → move the relevant thing to a terminal status so orient
+  stops surfacing it.
+- **New contradictions** → the `conflict` things from step 4 are open loops already.
 
-Do **not** maintain insight liveness here — it is a graph property (an inbound edge
-from a live thing) or a `disposition: keep-active` marker, handled in step 3. Do not
-list insight IDs, and do not write a backward "decisions made" log: history lives in
-git/WORKLOG. (continuity.md is being dissolved into a generated orientation view —
-see `dissolve-continuity-into-reconciliation`.)
-
-If no `continuity.md` exists, create one using `templates/continuity-brief.md.template`.
+Do **not** maintain a continuity brief, list insight IDs, or write a backward
+"decisions made" log — insight liveness is graph-keyed (step 3) and history lives in
+git/WORKLOG.
 
 ### 6. Commit, Then Regenerate The WORKLOG
 

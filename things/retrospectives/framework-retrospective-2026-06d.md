@@ -10,8 +10,6 @@ linked_things:
   - id: framework-retrospective-2026-06c
     relation: references
     notes: "Prior retrospective; covered the v3.15.0 build through commit a21513b. This covers the deployment harvest and the terminal-dependency gate that landed after it, plus the doc reconciliation that closed the gap."
-  - id: framework-continuity-brief
-    relation: informs
   - id: agents-cannot-self-install-permission-bearing-hooks
     relation: references
   - id: hard-invariants-encode-a-semantic-assumption

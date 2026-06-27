@@ -185,13 +185,33 @@ of the 10 orphans the B re-key surfaced —
   **first customers of the keep-active marker** — flagged until C builds it. Backlog
   after this pass: **5**, all keep-active.
 
-### Phase D — Generated orientation; retire the file
-`mdllm orient <domain>` generates the session-start view: **backward** (recent
-commits / velocity, already there) + **forward** (open-loop things, open conflicts,
-Questions). Migrate continuity's remaining forward residue into open-loop things.
-Retire continuity.md the file; update session-memory.md, the session-start hook
-(orchestration.md), the scaffold, and `templates/`. Orientation is now a generated
-join — nothing hand-maintained.
+### Phase D — Generated orientation; retire the file (DONE 2026-06-27)
+**D1 — the generator.** `mdllm session-start` now emits the **forward** view
+(`_orient_forward`): open conflicts + non-terminal work things (knowledge/reference/
+artifact types excluded), the complement to velocity's backward commit-stream read.
+Header reframed "version+velocity (backward) and open-loops (forward)". Capstone
+insight `orient-and-reconciliation-are-the-corpus-two-sides` captured (born live).
+
+**D2 — migration + retirement (a retrospective-reconciliation of continuity itself).**
+The 316-line brief was triaged: ~7 `[COMPLETE]`/done entries and the stale MCP entry
+(it described the *reverted* Phase 3 as built) **dropped** — history is in git; 4
+deferred uses/exercises **dropped** (reasoning preserved in git + insights); the
+operator-chosen forward threads migrated to **3 plan things** —
+`mechanical-coherence-checks-backlog`, `pretooluse-action-boundary-gate` (paused),
+`evidence-and-eval-backlog`. **continuity.md deleted.** Rituals rewired: session-start
+prompt + `session-orientation` (graph-keyed staleness check), session-end (manages
+open-loop things, not a brief), `session-memory.md` (continuity-brief type marked
+RETIRED/deprecated).
+
+**Follow-ons (tracked, not done here):**
+- The `continuity-brief` **type** stays reserved-but-deprecated; removing it from the
+  floor (`thing.md`, `_schema`, reserved-status machinery, the orphan-check special-
+  case) is a clean teardown for when domains have all dropped their `continuity.md`.
+- **Cross-domain:** two jmtm items in the old brief (annual-accounts `decision`
+  filing **due 2026-07-31**; 8 unlinked expense/profile records) belong to the jmtm
+  domain, not the framework — move them into jmtm's own corpus (operator).
+- `framework-v3-transformation-plan` shows as a stale in-progress open loop (orient
+  working) — close it to `completed` if its phases are all done.
 
 ## Dependencies & Ordering
 A (independent, now) → B (liveness must leave the file before the file dies) →

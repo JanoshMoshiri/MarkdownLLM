@@ -94,72 +94,43 @@ linked_things:
 
 ---
 
-### `type: continuity-brief`
+### `type: continuity-brief` — RETIRED (superseded by orient)
 
-A continuity brief is the domain's live forward-looking session-continuity document. There is exactly one per domain.
+The continuity brief — a single per-domain `continuity.md`, updated at session end
+and loaded at session start — has been **retired**
+(`dissolve-continuity-into-reconciliation`). It conflated the corpus's two sides in
+one hand-maintained file, and both halves had better homes
+(`orient-and-reconciliation-are-the-corpus-two-sides`):
 
-**What it is:**
-- A rolling document that bridges sessions
-- Updated at session end, loaded at session start
-- Contains: open threads, live insights, pending decisions, and questions that need to return
+- Its **backward** content (what was done) was always the **WORKLOG**'s job (generated
+  from the commit stream).
+- Its **forward** content (what's still live) is now the **thing graph**, surfaced by
+  the generated **orient** view (`mdllm session-start` → "Open loops": non-terminal
+  work things + open conflicts). An open thread worth carrying is a thing, tracked and
+  retired by status — not a prose line that never gets pruned.
+- Its **live-insight registry** is gone: insight liveness is a graph property (an
+  inbound edge from a live thing, or a `disposition: keep-active` marker), not
+  brief presence.
 
-**What it is not:**
-- A log (the WORKLOG is the log — retrospective, audit trail)
-- A summary of what was done (WORKLOG handles this)
-- A substitute for thing files
-
-**Relationship to WORKLOG:**
-
-| | WORKLOG | Continuity Brief |
-|---|---|---|
-| **Direction** | Retrospective | Forward-looking |
-| **Content** | What was done, decided, discussed | What is still live |
-| **Audience** | Audit trail, human retrospective | Next session's agent |
-| **Growth** | Always grows (append-only) | Stays lean — resolved items are removed |
-
-**Location:** Domain root, named `continuity.md` — alongside WORKLOG.md and AGENTS.md.
-
-**Structure:**
-
-```yaml
----
-id: [domain]-continuity-brief
-type: continuity-brief
-status: live
-version: 1.0
-created: [ISO-date]
-domain: [domain-id]
-last_updated: [ISO-date-of-last-session]
----
-```
-
-**Body sections:**
-
-- **Open Threads** — Design questions, active tensions, or lines of reasoning that are mid-flight. One line per thread: what it is and what's needed to close it.
-- **Live Insights** — Active insight things that need to return. Listed by ID with a one-line summary.
-- **Pending Decisions** — Decisions raised but not yet made. Two candidate options noted where possible.
-- **Questions For Next Session** — Specific questions that must be answered before certain threads can progress.
-
-**Update discipline:**
-- Resolved thread: remove it — the WORKLOG has the history
-- New thread opens: add it
-- Insight promoted to a spec: remove from brief, link via the promoted thing
-- Keep it short — if it grows past ~30 lines, stale items have accumulated
+The `continuity-brief` type remains reserved-but-**deprecated** so domains mid-
+transition validate while they still carry a `continuity.md`; removing the type from
+the floor (`thing.md`, `_schema`, the reserved-status machinery) is a tracked
+follow-on. New domains should not create one.
 
 ---
 
 ## The Session-Start Staleness Check
 
-Insights are written once and then re-enter every session as trusted context via
-the continuity brief — but the domain keeps moving after they're written. Without
-a check, a session can reason confidently from an insight whose factual basis
-changed three sessions ago.
+Insights re-enter each session as trusted context — but the domain keeps moving after
+they're written. Without a check, a session can reason confidently from an insight
+whose factual basis changed three sessions ago.
 
-The check is **scoped, not a sweep** (added v1.1, transformation plan Phase 4):
+The check is **scoped, not a sweep**:
 
-1. Take the live insight IDs from `continuity.md` — a small, bounded set
-2. Identify things modified since the brief's `last_updated` (git provides this
-   for free: commits or diff since that date, scoped to `things/`)
+1. Take the **live insights** — `active`, with a live inbound edge or a
+   `disposition: keep-active` marker (a small, bounded set; liveness is graph-keyed)
+2. Identify things modified recently (git provides this for free: commits or diff
+   since you were last active, scoped to `things/`)
 3. Re-read only the live insights whose subject matter overlaps the changed
    things; surface any that no longer hold rather than silently reasoning from them
 

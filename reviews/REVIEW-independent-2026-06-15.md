@@ -7,9 +7,6 @@ linked_things:
   - id: independent-review-2026-06-12-fable
     relation: extends
     notes: "Third independent review, three days after the second; reassesses maturity given evidence of real adoption and centres on the workflow-state gap"
-  - id: framework-continuity-brief
-    relation: references
-    notes: "Action queue below maps onto the brief's parked gap-4 (workflow-state) and the concurrency thread"
   - id: framework-retrospective-2026-06
     relation: complements
     notes: "Extends the retrospective's What Should Change with a structural finding it did not yet hold: workflow run-state as a primitive"

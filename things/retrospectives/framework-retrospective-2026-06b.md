@@ -7,8 +7,6 @@ period_start: 2026-06-11
 period_end: 2026-06-19
 domain: markdownllm-framework
 linked_things:
-  - id: framework-continuity-brief
-    relation: informs
   - id: framework-retrospective-2026-06
     relation: references
     notes: "The prior retrospective; this one covers the period that opened where it closed (2026-06-11)."

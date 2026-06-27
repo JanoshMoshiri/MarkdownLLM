@@ -7,8 +7,6 @@ period_start: 2026-05-13
 period_end: 2026-06-11
 domain: markdownllm-framework
 linked_things:
-  - id: framework-continuity-brief
-    relation: informs
   - id: framework-v3-transformation-plan
     relation: informs
     notes: "The 'What Should Change' section is operationalised by this plan"

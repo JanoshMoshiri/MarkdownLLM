@@ -1,0 +1,38 @@
+---
+id: pretooluse-action-boundary-gate
+type: plan
+status: paused
+version: 1.0
+created: 2026-06-27
+priority: medium
+tags: [pretooluse, hooks, security, action-boundary, irreversibility]
+linked_things:
+  - id: consequence-is-recoverable-only-in-retrospect
+    relation: implements
+    notes: "The judgment that an action is irreversible belongs to human + structure, not a forward prediction"
+  - id: orchestration-specification
+    relation: extends
+  - id: hard-hooks-require-observable-agent-caused-triggers
+    relation: references
+---
+
+# PreToolUse Action-Boundary Gate
+
+The deliberately-deferred security/risk-reasoning hook — the **action-side analogue
+of the pre-commit gate**. The pre-commit hook gates the *state* boundary (validation
+before a commit becomes real); this gates the *action* boundary: a clearance check
+before an irreversible delete / send / spend. The foundation already leaves
+PreToolUse free for exactly this, and the design groundwork is laid (the
+"defer the irreversible" standing-truth block + the action/state-boundary asymmetry).
+
+Migrated from continuity on its retirement (`dissolve-continuity-into-reconciliation`).
+It was the operator's chosen focus, then **parked** ("probably only needed for
+specific domains; things run fine without it") — a per-domain hardening affordance,
+not a floor gap. Hence `paused`, not `not-started`.
+
+**To scope when resumed:**
+- What it inspects (Bash / action calls).
+- What it **blocks** outright vs. **asks** on (the clearance prompt).
+- Where the mechanical-vs-interpretation line falls — `consequence-is-recoverable-only-in-retrospect`
+  says the irreversibility judgment is human + structure, not a forward prediction,
+  so this is likely `interpretation`-anchored with a narrow `git-fs`/mechanical core.
