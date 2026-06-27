@@ -128,7 +128,7 @@ Invoked at session start or on explicit request. Implements domain-refresh.md.
 ### Steps
 1. Resolve `framework_root` from AGENTS.md frontmatter
 2. Read `{framework_root}/CHANGELOG.md` — identify entries after `framework_version_seen`
-3. Read `{framework_root}/WORKLOG.md` — recent sessions only
+3. Run `mdllm worklog {framework_root}` — an on-demand, session-grouped view of the commit stream (recent sessions only; no committed WORKLOG file)
 4. Scan foundational spec versions (thing.md, git-workflow.md, etc.)
 5. Compare: what does this domain not yet use that the framework now offers?
 6. Report to user with recommendations

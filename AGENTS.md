@@ -91,7 +91,7 @@ This is where the reasoning lives — not just the data.
 | I/O, deliverables, or output format questions | `interface.md` |
 | Domain agent locating the framework | `framework-discovery.md` |
 | Domain agent refreshing from framework evolution | `domain-refresh.md` |
-| Session-end work, insights, continuity briefs | `session-memory.md` |
+| Session-end work, insights, orientation (open loops) | `session-memory.md` |
 | Contradictions, conflicts, belief revision | `belief-revision.md` |
 | Significantly changing a rule, workflow, or thing the domain reasons from; reconciling a change across its dependents | `change-reconciliation.md` |
 | Periodic quality reflection | `retrospective.md` |
@@ -141,7 +141,7 @@ The framework defines itself through these interconnected specifications:
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: stable`)
 - **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: stable`)
 - **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: evolving`)
-- **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things and the domain `continuity-brief`. Defines the session-end continuity ritual (invoked via the `session-end-continuity` bound prompt — explicit, not automatic). (`type: specification`, `status: stable`)
+- **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things (kept live by the thing graph) and the generated **orient** view of open loops that replaces the retired `continuity.md`. Defines the session-end extraction ritual (invoked via the `session-end-continuity` bound prompt — explicit, not automatic). (`type: specification`, `status: stable`)
 - **belief-revision.md** — How the framework handles contradictions between things: `type: conflict`, `relation: supersedes`/`contradicts`, and the belief revision process. (`type: specification`, `status: stable`)
 - **retrospective.md** — Periodic domain quality reflection: `type: retrospective`, when to write one, and how it produces insights, surfaces latent conflicts, and improves reasoning over time. (`type: specification`, `status: stable`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
@@ -151,7 +151,7 @@ The framework defines itself through these interconnected specifications:
 - **provenance.md** — Output traceability: `type: decision` records with inputs pinned to git commits (`informed_by`), `origin: external` quarantine for ingested content, the knowledge → decision → output chain, and the reverse-provenance index that enables diff-driven regeneration. Mechanically enforced by `mdllm provenance`. (`type: specification`, `status: draft`)
 - **change-reconciliation.md** — How a domain stays consistent across change: the human declares an inflection, then a scale-free four-beat pass (cue → assimilate → walk → seal) reconciles the change against its blast radius using the relationships and reverse-provenance indexes. Semantic consistency is maintained at the point of change, not by sweeping. (`type: specification`, `status: draft`)
 - **workflow-state.md** — Workflow run-state as a primitive: `workflow-definition` (stages as data + allowed transitions) and `workflow-run` (a structural `definition` pointer, a `current_stage` cursor, resume in the body). The decomposition principle applied to processes; the floor enforces `current_stage` ∈ the definition's stages, the agent judges transition legality. Reserved, and now `evolving` — exercised on a live domain. (`type: specification`, `status: evolving`)
-- **coordination-claim.md** — The advisory-claim convention (`held_by` + optional `held_until` lease) for same-target contention: read-and-respected, not a lock; deploy-when-felt on a contended thing. General, not workflow-specific — `workflow-run` and `continuity.md` are its consumers. (`type: specification`, `status: draft`)
+- **coordination-claim.md** — The advisory-claim convention (`held_by` + optional `held_until` lease) for same-target contention: read-and-respected, not a lock; deploy-when-felt on a contended thing. General, not workflow-specific — `workflow-run` is its motivating consumer, and any contended singleton (a shared index, say) could adopt it. (`type: specification`, `status: draft`)
 
 - **example-things.md** — Full specification for `type: example` things: frontmatter template, when to use examples, and why examples work better than rules for inductive LLM learning. (`type: specification`, `status: stable`)
 - **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)
@@ -193,7 +193,7 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 - `type: skill` — Reusable capabilities the agent can invoke
 - `type: guide` — Operational guidance for using the framework
 - `type: insight` — An emerging idea, held view, or hypothesis from a session, preserved for future context (framework-reserved)
-- `type: continuity-brief` — The domain's live forward-looking session-continuity document; one per domain (framework-reserved)
+- `type: continuity-brief` — **Retired (v3.17), reserved-but-deprecated.** Was the domain's per-domain forward-looking session brief; superseded by the generated orient view (open-loop things). Kept reserved only so domains mid-transition still validate (framework-reserved)
 - `type: conflict` — A documented contradiction between two things, held as a first-class thing until resolved (framework-reserved)
 - `type: retrospective` — A periodic quality reflection on domain reasoning; one per period, not per session (framework-reserved)
 - `type: decision` — A judgement made from knowledge, inputs pinned to git commits via `informed_by`; the provenance chain's middle link (framework-reserved)

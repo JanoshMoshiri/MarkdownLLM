@@ -7,7 +7,7 @@ period_start: [ISO-date]
 period_end: [ISO-date]
 domain: [domain-id]
 linked_things:
-  - id: [domain]-continuity-brief
+  - id: [open-loop-or-insight-id]
     relation: informs
 ---
 

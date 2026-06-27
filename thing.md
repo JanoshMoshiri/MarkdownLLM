@@ -83,7 +83,7 @@ These fields must be present in every thing to do:
 - Helps Claude understand scope and context
 - Seven types are **framework-reserved** and have fixed semantics regardless of domain:
   - `insight` — an emerging idea or held view from a session, preserved for future context
-  - `continuity-brief` — the domain's live forward-looking session-continuity document (one per domain)
+  - `continuity-brief` — **retired (v3.17), reserved-but-deprecated**: was the domain's forward-looking session brief, now superseded by the generated orient view (open-loop things); kept reserved only so domains mid-transition still validate
   - `conflict` — a documented contradiction between two other things, held as a first-class thing until resolved
   - `retrospective` — a periodic quality reflection on domain reasoning; one per period, not per session
   - `decision` — a judgement made from knowledge, with inputs pinned to git commits via `informed_by`

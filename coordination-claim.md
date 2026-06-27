@@ -19,7 +19,7 @@ linked_things:
 
 An **advisory claim** is a small, visible "who holds this right now" marker that two operators (or two sessions) read and respect by convention. It is the framework's answer to *same-target contention* — the residue left after structural decomposition has separated everything that can be separated.
 
-It is its own concept, not part of any one consumer. A `workflow-run` uses it (`workflow-state.md`), but so could `continuity.md`, a shared index, or any contended singleton. Because the claim changes for its own reasons — coordination, not workflow semantics or thing structure — it earns its own spec rather than living inside `thing.md` or `workflow-state.md`. That is the decomposition principle of `thing.md` applied to this spec itself.
+It is its own concept, not part of any one consumer. A `workflow-run` uses it (`workflow-state.md`), but so could a shared index or any contended singleton. Because the claim changes for its own reasons — coordination, not workflow semantics or thing structure — it earns its own spec rather than living inside `thing.md` or `workflow-state.md`. That is the decomposition principle of `thing.md` applied to this spec itself.
 
 ## What It Is Not
 
@@ -49,7 +49,7 @@ The claim itself is committed state, so taking or releasing it is an ordinary wr
 
 ## Deploy When Felt
 
-This convention is **reserved, not mandatory**. Deploy it on a thing only once that thing is actually contended — most things in most domains are touched by one writer and need no claim. `workflow-run` carries it because multi-operator, multi-session runs are its motivating case. `continuity.md` is the next-most-likely adopter (a single-writer singleton that becomes a merge-conflict magnet the moment two sessions run), but it does not carry the fields until a domain feels the collision.
+This convention is **reserved, not mandatory**. Deploy it on a thing only once that thing is actually contended — most things in most domains are touched by one writer and need no claim. `workflow-run` carries it because multi-operator, multi-session runs are its motivating case. A shared derived index is the next-most-likely adopter (a single-writer singleton that becomes a merge-conflict magnet the moment two sessions run), but it does not carry the fields until a domain feels the collision.
 
 ## Related, Not Yet Specified: Working-Tree Contention
 

@@ -163,7 +163,26 @@ Apply the **preservation test**: *Would a fresh agent starting this domain cold 
 
 For each insight worth preserving, create a `type: insight` thing in `things/insights/`.
 
-### Step 3: Belief Revision — Check For Contradictions
+### Step 3: Disposition The Standing Insights (the brake)
+
+Step 2 grows the insight population every session; this step prunes it, so the two stay
+in balance — capture is paired with reckoning, and the population can't outrun the rate
+it's triaged. This is the session-cadence counterpart to the retrospective's deeper
+triage beat (`Insight Lifecycle Management` below).
+
+Run `python {framework_root}/tools/mdllm.py validate .` and act on **every
+insight-disposition Info finding** the floor surfaces — it lists exactly the insights
+that need a decision, so none can quietly go dark:
+- *"active insight with no inbound edge from a live thing"* — force a disposition:
+  **promote** (populate `promoted_to`), **dismiss**, **consolidate** a genuine duplicate
+  into a survivor, **link** it from live work, or mark **`disposition: keep-active`** with
+  a one-line `disposition_reason`.
+- *"keep-active with no `disposition_reason`"* — add the reason or re-disposition.
+
+This is a forcing function, not a corpus sweep: the deeper composition/consolidation and
+conflict/schema scans stay the retrospective's (`retrospective.md`).
+
+### Step 4: Belief Revision — Check For Contradictions
 
 Before closing out, scan for contradictions introduced this session:
 
@@ -176,7 +195,7 @@ For each contradiction found:
 
 Be conservative — only flag genuine semantic contradictions, not differences in emphasis or scope. When uncertain, surface for human confirmation rather than silently creating a conflict thing. Full spec: `belief-revision.md`.
 
-### Step 4: Manage Open-Loop Things
+### Step 5: Manage Open-Loop Things
 
 There is no brief to update — forward state lives in the thing graph, and the
 generated **orient** view (`mdllm session-start` → "Open loops") reads it. So instead
@@ -184,13 +203,13 @@ of editing a singleton, reconcile the graph:
 - New forward intent from this session → create or update a `plan` or work thing.
 - Work that resolved this session → move it to a terminal status, so orient stops
   surfacing it.
-- Open conflicts (from Step 3) are already open loops — orient surfaces them; nothing
+- Open conflicts (from Step 4) are already open loops — orient surfaces them; nothing
   else to record.
 - Insight liveness is graph-keyed, not brief-keyed: an `active` insight stays in
   circulation via an inbound edge from a live thing (or a `disposition: keep-active`
   marker), per *Insight Lifecycle Management* below — not by being listed anywhere.
 
-### Step 5: Commit
+### Step 6: Commit
 
 Commit all new insight things, new conflict things, and the open-loop updates with a
 rich `session-end:` message following `git-workflow.md` conventions. The commit **is**
@@ -228,7 +247,7 @@ The lifecycle table above defines the *states* (`active` / `promoted` / `dismiss
 - It's context that won't affect anything in the future
 - It was raised and fully resolved in the same session
 
-The continuity brief stays lean. Git history has everything else.
+Capture stays lean — preserve only what a cold agent would thank you for. Git history has everything else.
 
 ---
 

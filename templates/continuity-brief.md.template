@@ -10,7 +10,15 @@ last_updated: [ISO-date]
 
 # [Domain] Continuity Brief
 
-This document bridges sessions. It is updated at the end of each session and loaded at the start of the next. It captures what is **still live** — not what was done (that's the WORKLOG), but what still needs to return.
+> **⚠️ RETIRED (v3.17) — do not use for new domains.** The hand-maintained
+> continuity brief is superseded by the generated **orient** view: forward state
+> lives in the thing graph (open-loop things + open conflicts) and is surfaced by
+> `mdllm session-start`. This template is kept only so domains still carrying a
+> legacy `continuity.md` validate during transition; its teardown is tracked. New
+> domains create nothing here — see `session-memory.md` and
+> `domain-specification-guide.md` → *The Orient View*.
+
+This document bridges sessions. It is updated at the end of each session and loaded at the start of the next. It captures what is **still live** — not what was done (the commit stream, viewable via `mdllm worklog`), but what still needs to return.
 
 Keep it short. If it grows past ~30 lines, stale items have accumulated.
 

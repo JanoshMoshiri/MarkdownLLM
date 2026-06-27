@@ -88,7 +88,7 @@ When a domain agent loads, its startup sequence becomes:
 4. Version check (`session-start:version-check` hard hook): compare the sentinel's `version` against `framework_version_seen` in the domain frontmatter
 5. Load `{framework_root}/kernel.md` — the generated operative kernel (~1.6k tokens). Do **not** eagerly load the full foundational specs; load a full spec only when the kernel doesn't settle an ambiguity (see the tier tables in AGENTS.md and `templates/AGENTS.md.template`)
 6. Load domain skills from `./skills/` relevant to session intent
-7. Load `continuity.md` if it exists, then domain things from `./things/` as the session requires
+7. Read the orient view (`mdllm session-start` emits the open loops), then domain things from `./things/` as the session requires
 8. Evaluate triggers
 
 If `framework_root` is missing from frontmatter, the agent should:

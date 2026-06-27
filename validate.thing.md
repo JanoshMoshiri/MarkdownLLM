@@ -78,11 +78,15 @@ The tool enforces, deterministically:
 - **Index integrity:** `mdllm index <path> check` performs the rebuild-and-diff
   drift detection for derived indexes (`derived-index.md`).
 - **Session-memory completeness (Info):** an `active` insight or `open` conflict
-  not named in the domain's `continuity.md` is orphaned from session memory — it
-  returns to no future session and is invisible to the session-start staleness
-  check (which walks only the brief's live ids). Detection is mechanical; the
-  *disposition* (promote, dismiss, or list it live) is the agent's, driven at
-  retrospective cadence. Corpus-general; skipped when the corpus has no brief.
+  with no inbound edge from a live (non-terminal) thing is orphaned from session
+  memory — it returns to no future session and is invisible to the session-start
+  staleness check (which walks only the live, graph-connected insights). Liveness
+  is a **graph property, not presence in a brief** (`continuity.md` is retired);
+  a `disposition: keep-active` marker — carrying a `disposition_reason` — keeps a
+  standing or parked insight live without an inbound edge, and a `keep-active`
+  missing its reason is itself nudged. Detection is mechanical; the *disposition*
+  (promote, dismiss, link from live work, or keep-active) is the agent's, driven at
+  session-end and retrospective cadence. Corpus-general.
   (`session-memory.md` → Insight Lifecycle Management.)
 
 Exit code 1 means Errors exist. The git `pre-commit` hook (installed via
@@ -127,7 +131,7 @@ in this loop. Read things holistically and assess:
 | Narrative completeness | Does the body explain what this is and why it matters, or is it an empty title? | Info |
 | Trigger coherence | Do declared triggers make sense for this thing? Watching relevant things? Appropriate actions? | Info |
 | Duplicate or redundant | Substantial overlap in scope or intent with another thing — a candidate for composition (`thing.md` → The Inverse: Composition) | Info |
-| Disposition of a flagged insight/conflict | The floor flags an `active` insight or `open` conflict missing from `continuity.md` (Layer 1); deciding whether to promote, dismiss, or list it live is yours, at retrospective cadence | Info |
+| Disposition of a flagged insight/conflict | The floor flags an `active` insight or `open` conflict with no inbound edge from a live thing (Layer 1); deciding whether to promote, dismiss, link it from live work, or mark `keep-active` is yours, at session-end and retrospective cadence | Info |
 | Stale open conflict | Open conflict untouched for 30+ days | Info |
 | No recent retrospective | Domain active 60+ days since the last `type: retrospective` (or none) | Info |
 

@@ -148,7 +148,6 @@ Every domain requires these essential components in this structure:
 ```
 my-domain/                        ← Root of your domain (its own git repo)
 ├── AGENTS.md                     ← Discovered at startup (orchestration)
-├── continuity.md                 ← Live session-continuity brief; loaded at start, updated at end
 ├── skills/
 │   ├── [domain]-specification.skill.md   ← Philosophy, principles, reasoning
 │   ├── [domain]-read.thing.skill.md      ← How to read and analyze things
@@ -277,7 +276,7 @@ git:
 2. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen`
 3. Load `{framework_root}/kernel.md` — the operative rules of the foundational specs (~1.6k tokens); load a full spec only when the kernel doesn't settle an ambiguity
 4. Load skills relevant to session intent: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
-5. Load `continuity.md` if it exists — understand open threads, live insights, and pending decisions from the last session
+5. Read the **orient** view (`mdllm session-start` emits it) — the open loops (non-terminal work things + open conflicts) carried from prior sessions. Forward state is the thing graph, not a hand-kept brief; `continuity.md` is retired (v3.17)
 6. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
 
 ### On User Request
@@ -293,7 +292,7 @@ git:
 2. **Autocommit** (if enabled): stage changed files + commit with structured `action: description` message
 3. Report what changed and why
 4. Evaluate triggers (post-write)
-5. **Session end:** Explicitly invoke the `session-end-continuity` bound prompt — extract insights, check for conflicts, update `continuity.md`. This is a bound prompt, not a hard hook: "the session is ending" is not an observable, agent-caused event, so it never fires automatically — the agent or human must invoke it. There are exactly three hard hooks (`post-write:commit`, `pre-domain-scaffold:isolate`, `session-start:version-check`); see `orchestration.md`. Full spec: `session-memory.md` and `belief-revision.md`.
+5. **Session end:** Explicitly invoke the `session-end-continuity` bound prompt — extract insights, disposition the standing insights, check for conflicts, and manage open-loop things (no `continuity.md` to update — orient reads the thing graph). This is a bound prompt, not a hard hook: "the session is ending" is not an observable, agent-caused event, so it never fires automatically — the agent or human must invoke it. There are exactly three hard hooks (`post-write:commit`, `pre-domain-scaffold:isolate`, `session-start:version-check`); see `orchestration.md`. Full spec: `session-memory.md` and `belief-revision.md`.
 
 ## Skills Directory
 
@@ -544,11 +543,9 @@ Thing types are domain-specific but follow `thing.md` patterns for metadata, rel
 
 The framework includes primitives that help domains accumulate understanding across sessions. These are available to every domain automatically — you don’t need to configure them.
 
-### `continuity.md` — The Live Session Brief
+### The Orient View — Forward State Is The Thing Graph
 
-Place a `continuity.md` file at your domain root. This is your domain’s forward-looking continuity document: open threads, live insights, pending decisions, questions for next session. The agent loads it at session start and updates it at session end.
-
-Seed it from `templates/continuity-brief.md.template`.
+There is no file to place or maintain. A domain's forward-looking state — open threads, pending work, unresolved conflicts — lives in the **thing graph**, and the generated **orient** view surfaces it: `mdllm session-start` emits the open loops (non-terminal work things + open conflicts) at session start. The hand-maintained `continuity.md` brief is retired (v3.17) — a singleton that drifted and conflated the corpus's two sides; forward state is now things, and the backward record is the commit stream (`mdllm worklog` views it on demand). Nothing to seed: a new domain has session memory from its first commit.
 
 ### `type: insight` — Preserved Ideas
 
@@ -652,7 +649,6 @@ You don't need to answer these perfectly upfront. Start with what you know. The 
 Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent discovers the framework's `AGENTS.md`, knows the specifications, and knows how to scaffold domains. Describe what you want — the framework agent will create everything inside `domains/my-domain/`:
 
 - `AGENTS.md` at domain root — with `framework_root: ../..` pointing to the framework
-- `continuity.md` at domain root — seeded from `templates/continuity-brief.md.template`
 - `skills/` directory with the four baseline skills:
   - `[domain]-specification.skill.md`
   - `[domain]-read.thing.skill.md`
@@ -805,7 +801,7 @@ Two knowledge primitives also matter at scaffold time:
 - [ ] **Create domain folder** — Create your domain inside `domains/` and initialise a git repo
 - [ ] **Scaffold domain** — From the framework workspace, tell the framework agent to build your domain (AGENTS.md, skills, example things)
 - [ ] **Open domain workspace** — Open the domain folder as its own workspace — the domain agent takes over from here
-- [ ] **Set up continuity** — Create `continuity.md` at domain root using `templates/continuity-brief.md.template`; loaded at session start, updated at session end
+- [ ] **Nothing to set up for session memory** — forward state is the thing graph (surfaced by the `mdllm session-start` orient view) and the backward record is the commit stream; `continuity.md` and `WORKLOG.md` are retired (v3.17)
 - [ ] **Understand thing.md** — The atomic unit specification (including triggers) — do NOT copy it into your domain
 - [ ] **Declare the schema** — Copy `templates/_schema.yaml.template` to `things/_schema.yaml`: types, status vocabularies, relations (enforced by `mdllm validate`)
 - [ ] **Install the hook** — `python tools/mdllm.py install-hook <domain-path>` so structural errors cannot be committed

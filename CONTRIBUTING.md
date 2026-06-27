@@ -58,7 +58,7 @@ The framework is self-describing — its own specifications are things within th
 - `framework-discovery.md` — How domain agents locate the framework root
 - `domain-refresh.md` — How domain agents discover and absorb framework evolution
 - `validate.thing.md` — Thing validation (structural, referential, semantic)
-- `session-memory.md` — Session-end continuity: `type: insight`, `type: continuity-brief`, extraction ritual
+- `session-memory.md` — Session memory: `type: insight`, graph-keyed liveness, the orient view of open loops, and the session-end extraction ritual
 - `belief-revision.md` — Contradiction tracking: `type: conflict`, relation types, belief revision process
 - `retrospective.md` — Periodic quality reflection: `type: retrospective`, when to write, what it produces
 

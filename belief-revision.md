@@ -182,7 +182,7 @@ Whatever surfaces a conflict — human, session-end, or scan — the resolution 
 ```
 Detected (open)
     ↓
-Held in tension — appears in continuity-brief as open thread
+Held in tension — surfaces as an open loop (orient reads open conflicts)
     ↓
 Resolution reached (in-session or across sessions)
     ↓

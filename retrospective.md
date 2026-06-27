@@ -51,7 +51,7 @@ period_start: [ISO-date]
 period_end: [ISO-date]
 domain: [domain-id]
 linked_things:
-  - id: [continuity-brief-id]
+  - id: [open-loop-or-insight-id]
     relation: informs
 ---
 
@@ -81,7 +81,8 @@ These often produce insights or surface latent conflicts for resolution.]
 
 ## Open Questions Going Forward
 [Questions this retrospective raised that don't yet have answers — candidates
-for the continuity brief.]
+to carry forward as open-loop things (a `plan` or work thing), which the orient
+view then surfaces each session.]
 ```
 
 **Location:** `things/retrospectives/` within the domain.
@@ -105,10 +106,10 @@ There is no obligation to write one on a fixed schedule. The purpose is reflecti
 A retrospective session is not passive. After completing the reflection, the agent should:
 
 1. **Create insights** for any new patterns or reframings identified in "Patterns We Noticed"
-2. **Triage the standing insights** — walk the `active` insight backlog and force a disposition on each: *promote* (it has crystallised into a spec or decision — populate `promoted_to`), *dismiss* (considered and deliberately set aside), *consolidate* (fold genuine duplicates into one cohesive survivor per `thing.md` → The Inverse: Composition), or *keep active with a stated reason*. An insight that re-enters every session via the continuity brief without ever being reckoned with is the backlog rotting; the retrospective is where the population is pruned, not only grown. Full mechanics: `session-memory.md` → Insight Lifecycle Management.
+2. **Triage the standing insights** — walk the `active` insight backlog and force a disposition on each: *promote* (it has crystallised into a spec or decision — populate `promoted_to`), *dismiss* (considered and deliberately set aside), *consolidate* (fold genuine duplicates into one cohesive survivor per `thing.md` → The Inverse: Composition), or *keep active with a stated reason*. An insight that re-enters every session as live context (via an inbound edge from live work) without ever being reckoned with is the backlog rotting; the retrospective is where the population is pruned, not only grown. Full mechanics: `session-memory.md` → Insight Lifecycle Management.
 3. **Surface latent conflicts** — if "What Didn't Work" reveals two positions the domain has been holding simultaneously without acknowledging it, create a `type: conflict` thing
 4. **Update specs** if "What Should Change" identifies a concrete improvement to an existing spec or skill
-5. **Update the continuity brief** with any new open questions
+5. **Carry forward open questions as open-loop things** (a `plan` or work thing at a non-terminal status) — the orient view surfaces them next session; there is no continuity brief to update
 6. **Commit everything** per the standard `post-write:commit` hard hook
 
 ---
@@ -149,6 +150,6 @@ This mirrors how high-performing teams operate: they ship work, they capture wha
 
 ## Relationship To Other Specs
 
-- **session-memory.md** — Insights and the continuity brief operate at session granularity. The retrospective operates at period granularity. They are complementary, not redundant.
+- **session-memory.md** — Insights and the session-end extraction ritual operate at session granularity. The retrospective operates at period granularity. They are complementary, not redundant.
 - **belief-revision.md** — Retrospectives frequently surface latent conflicts that weren't visible at the session level. The retrospective process is a natural entry point for conflict creation.
 - **validate.thing.md** — A domain with no retrospective in over 60 days of active sessions may be flagged as an Info observation during validation ("no retrospective written since [date]").

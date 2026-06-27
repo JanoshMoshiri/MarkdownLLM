@@ -25,7 +25,7 @@ linked_things:
 
 ## What This Specifies
 
-The framework models **knowledge state** richly — insights, conflicts, decisions, provenance, continuity, belief revision. It barely modelled **workflow state**. Workflows existed only as *definitions* (prose in a `*-workflow.skill.md`); there was no representation of a workflow *run* — the state of a multi-stage, multi-session process *instance* as it advances. Run-state had to be reconstructed by hand each session.
+The framework models **knowledge state** richly — insights, conflicts, decisions, provenance, orientation, belief revision. It barely modelled **workflow state**. Workflows existed only as *definitions* (prose in a `*-workflow.skill.md`); there was no representation of a workflow *run* — the state of a multi-stage, multi-session process *instance* as it advances. Run-state had to be reconstructed by hand each session.
 
 This spec adds run-state as two framework-reserved types:
 
@@ -38,7 +38,7 @@ It is a deliberately **narrow** primitive. Almost everything is inherited from `
 
 Do not read this as a free-standing invention. It is the **decomposition principle of `thing.md` applied to processes.** A run is the *instance* of a workflow *definition* — exactly the `template-for` / `instance-of` pair the decomposition section already governs.
 
-Today, a workflow definition living as prose inside a skill *violates* that principle: the skeleton and the (non-existent) instance are fused, so run-state smears across `continuity.md` and a pile of related things. Separating the definition from the run finishes the decomposition. The cursor, claim, and resume point are what the *instance side* legitimately needs that no prior instance-thing did.
+Today, a workflow definition living as prose inside a skill *violates* that principle: the skeleton and the (non-existent) instance are fused, so run-state smears across session notes and a pile of related things. Separating the definition from the run finishes the decomposition. The cursor, claim, and resume point are what the *instance side* legitimately needs that no prior instance-thing did.
 
 **A note on the pointer.** Conceptually this is the `template-for`/`instance-of` relationship the decomposition section describes. *Mechanically*, the run carries the pointer as a singular structural field — `definition:` — not a `linked_things` relation. This follows the `parent` precedent: a singular, load-bearing pointer that the floor must resolve to exactly one target earns its own field rather than living as a relation the floor has to scan and filter. The decomposition principle still justifies the *separation* (definition and run are two things); the field is just how the instance names its template.
 
@@ -54,7 +54,7 @@ Today, a workflow definition living as prose inside a skill *violates* that prin
 **Irreducibly new — what earns primitive status:**
 
 1. **The cursor — `current_stage`.** A pointer into an externally-defined, possibly-looping sequence. `status` models a thing's *own* lifecycle and cannot also carry "position N in a process defined elsewhere" without meaning two different things across domains (a cohesion violation). The two are distinct fields.
-2. **The per-instance resume point.** Continuity does this at *domain* granularity (`continuity.md`, one per domain); nothing did it per-run. It lives in the run's **body**, not a field.
+2. **The per-instance resume point.** Session orientation does this at *domain* granularity (open-loop things, surfaced by the orient view); nothing did it per-run. It lives in the run's **body**, not a field.
 
 (A third candidate — the **coordination claim** `held_by` — turned out *not* to be workflow-specific: it is a general advisory-claim convention that belongs to any contended singleton, so it has been decomposed out into its own micro-spec, `coordination-claim.md`. A `workflow-run` simply *uses* it.)
 
@@ -151,8 +151,8 @@ The membership check earns its place immediately because it is referential, not 
 
 Run-state decomposition is most of the concurrency answer, not a separate workstream:
 
-- **Different instances → different files.** Two operators working two different runs touch two different files; git merges them without thought. The old hazard — `continuity.md` as a single-writer singleton — is decomposed away.
-- **Same-instance contention** is rare and small. A `workflow-run` carries the advisory `held_by` claim defined in `coordination-claim.md` — a committed, visible "who holds this," read and respected by convention, not a distributed lock. The claim convention is general (it applies to any contended singleton, `continuity.md` included), which is why it lives in its own spec rather than here; this spec only declares that a run *uses* it.
+- **Different instances → different files.** Two operators working two different runs touch two different files; git merges them without thought. The old hazard — a single-writer domain-level singleton (the retired `continuity.md` was one) — is decomposed away.
+- **Same-instance contention** is rare and small. A `workflow-run` carries the advisory `held_by` claim defined in `coordination-claim.md` — a committed, visible "who holds this," read and respected by convention, not a distributed lock. The claim convention is general (it applies to any contended singleton), which is why it lives in its own spec rather than here; this spec only declares that a run *uses* it.
 - **Git stays the system of record.** It is the audit trail. If a separate coordination layer is ever introduced for true runtime concurrency, treat it strictly as coordination and checkpoint its state back into the committed run-state thing at every meaning boundary. The durable schema is the contract — designed once, shared by a purely-local domain and any future coordinated deployment.
 
 ## Hand-off (interface.md)
