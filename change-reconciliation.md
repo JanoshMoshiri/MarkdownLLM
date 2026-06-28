@@ -133,7 +133,13 @@ reachable each dependency is, and each tier has its own mechanical reach:
   walked wherever it lives, whether in `linked_things` or in its own structural field.
 - **Literal references** — the thing's `id` or canonical name appearing as text in
   another thing's body: routing tables, cross-references, restatements. A corpus
-  grep reaches these (the textual-trace step of Assimilate).
+  grep reaches these (the textual-trace step of Assimilate). When a change *retires*
+  a named artefact, declare it in `_schema.yaml`'s `retired_terms` and that grep
+  becomes standing: `mdllm coherence` flags live occurrences of the dead name
+  (Warning, non-blocking), tuned to a clean baseline via per-term `allow` lists so
+  the next *unacknowledged* mention is the drift. It mechanises the trace, not the
+  judgement — it cannot tell "X is retired" from "lives in X", so disposition stays
+  the agent's (`existence-is-not-currency`; `repeated-drift-promotes-a-fact-into-the-floor`).
 - **Conceptual references** — a thing that reasons about the changed rule *without
   naming it*. No mechanical pass reaches this; only the Walk does.
 
