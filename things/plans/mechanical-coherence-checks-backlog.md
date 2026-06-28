@@ -12,6 +12,9 @@ linked_things:
     notes: "Each check here is a prose-mirror-of-a-mechanical-fact that has drifted ≥2x"
   - id: prose-references-are-mechanically-checkable
     relation: implements
+  - id: judgement-checks-need-a-suppression-list-which-is-itself-drift
+    relation: references
+    notes: "The gate for what belongs here: keep checks keyed to a same-builder source (count, broken-body-ref); reject ones that need a suppression list (the reverted retired-vocab check)."
 ---
 
 # Mechanical Coherence Checks Backlog
