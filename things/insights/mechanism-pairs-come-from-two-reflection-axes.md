@@ -2,7 +2,7 @@
 id: mechanism-pairs-come-from-two-reflection-axes
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-24
 session: 2026-06-24
 source: both
@@ -39,8 +39,11 @@ being surprises and become a checklist:
 - **Temporal axis — forward ↔ backward** (direction *through time*).
   Change-reconciliation at-change (forward, delta-scoped, human-cued) ↔
   retrospective reconciliation (backward, full-corpus, reconstructed from git).
-  Continuity brief (prospective) ↔ WORKLOG (retrospective). Consistency
-  *prevented* at write-time ↔ contradiction *created* at change-time.
+  Continuity brief (prospective) ↔ WORKLOG (retrospective) — *both retired at
+  v3.17; the pair was real, and its roles now live in session-start orientation
+  (forward) ↔ the `mdllm worklog` view (backward), which is the symmetry
+  surviving its instances.* Consistency *prevented* at write-time ↔ contradiction
+  *created* at change-time.
 - **Labour axis — mechanical ↔ semantic** (who does it), running through every
   quadrant: floor validation ↔ the Walk; "never re-perform a mechanical check by
   reasoning."

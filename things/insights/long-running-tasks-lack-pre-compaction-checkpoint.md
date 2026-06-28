@@ -4,7 +4,7 @@ type: insight
 status: active
 disposition: keep-active
 disposition_reason: "Parked framework gap — long tasks can lose state on compaction; the continuity work mitigated it (open loops are committed things) but the general gap awaits a felt fix."
-version: 1.1
+version: 1.2
 created: 2026-06-20
 confidence: medium
 origin: synthesised
@@ -34,7 +34,7 @@ This is recorded for transparency, not just memory. An operator with deep framew
 
 It also preserves the path if it ever becomes a felt problem, so the next person isn't starting cold:
 
-- **Where it would live:** an "Active Task Checkpoint" section in `continuity.md` — *distinct* from the session-end continuity sections, because it bridges a compaction (possibly mid-session), not a session close. Present only while a long task is in flight; removed on completion. Belongs in continuity, not as an `insight`, because it is disposable task-scoped state, not crystallised knowledge.
+- **Where it would live:** when this was written the proposed home was an "Active Task Checkpoint" section in `continuity.md`; continuity was dissolved into orientation at v3.17, so the checkpoint would now be transient, task-scoped state hung off the session-start open-loops/orientation view — still *distinct* from a session close, because it bridges a compaction (possibly mid-session). Present only while a long task is in flight; removed on completion. It belongs with disposable task-scoped state, **not** as an `insight`, because it is not crystallised knowledge.
 - **Baseline (portable):** an interpretation cadence — the agent refreshes and commits the checkpoint at meaningful sub-steps. Best-effort; "the agent should", not guaranteed.
 - **Hard mitigation (configurable):** bind the harness's pre-compaction hook (Claude Code's `PreCompact`; vendor equivalents as they appear) to fire the checkpoint automatically. This is a lowest-consequence, adapter-hardened hook in the sense of `orchestration.md` — never required, never the difference between working and not.
 

@@ -4,7 +4,7 @@ type: insight
 status: active
 disposition: keep-active
 disposition_reason: "Standing razor for whether a new mechanism serves coherence or learning; the loop-scoped insight sibling it names is still unbuilt."
-version: 1.2
+version: 1.3
 created: 2026-06-21
 session: 2026-06-21
 source: both
@@ -32,7 +32,7 @@ There are two ways to arrive at an agent loop, and they carry different cargo.
 
 **Engineering-first (the harness path).** Start from the `while` loop — *gather context → take action → verify → repeat* — and then engineer carry-forward so the loop survives the context window. This is what Anthropic's published harness work optimises: compaction ("summarising its contents, and reinitiating a new context window with the summary"), structured note-taking (`NOTES.md`, to-do lists, `claude-progress.txt`, `feature_list.json`), sub-agent distillation, the file-based memory tool, and git history. All of it is real memory — the loop is *not* hollow — but every piece carries **task state**, and the optimisation target is *coherence within a run*: "find the smallest set of high-signal tokens that maximise the likelihood of your desired outcome." Asked directly about learned lessons, the docs are blunt: these artifacts "serve immediate task completion **rather than cross-session learning accumulation**," with "no explicit mechanism for extracting generalizable lessons."
 
-**Cognition-first (this framework's path).** Don't start from a loop at all. Model how a mind accumulates understanding — *encode → consolidate → retrieve → apply* — and the loop falls out as a side effect. Session produces an **insight** (encode), the **retrospective** consolidates and triages it (consolidate), the **continuity brief** carries the live ones forward (retrieve), and the next session reasons within them (apply). The cargo here is not task state but **graded, typed, promotable insight** (`confidence`, `origin`, `promoted_to`, a lifecycle, a retrospective that asks ["is our reasoning working?"](../../retrospective.md)). The optimisation target is *learning across runs*.
+**Cognition-first (this framework's path).** Don't start from a loop at all. Model how a mind accumulates understanding — *encode → consolidate → retrieve → apply* — and the loop falls out as a side effect. Session produces an **insight** (encode), the **retrospective** consolidates and triages it (consolidate), **graph liveness keeps the live ones active and session-start orientation surfaces them** (retrieve), and the next session reasons within them (apply). The cargo here is not task state but **graded, typed, promotable insight** (`confidence`, `origin`, `promoted_to`, a lifecycle, a retrospective that asks ["is our reasoning working?"](../../retrospective.md)). The optimisation target is *learning across runs*.
 
 Same topology — both are loops. The difference is entirely **what survives the turn**, and that traces directly to which system you imitated. The harness path imitates a *task executor*, so it keeps what the task needs and the learning row is the thing it leaves on the floor. The cognition path imitates a *learner*, so cross-run accumulation isn't a feature that was added — it's the whole point of the thing being copied, and it comes for free.
 

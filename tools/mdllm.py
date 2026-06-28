@@ -2299,6 +2299,24 @@ def coherence_findings(root: Path, window: int) -> list[Finding]:
                     "DRIFT — spec kernel blocks changed since kernel.md was "
                     "generated; run `mdllm kernel` and commit the result"))
 
+        # framework-map subcommand count <-> the actual CLI surface. The map's
+        # own "Keeping This Map Honest" note already pins View 3 to `mdllm
+        # --help`; this makes that pin mechanical so the hand-drawn count can't
+        # silently drift when a subcommand lands — the exact repeat-offender the
+        # 2026-06d retrospective said to make checkable. Truth = the subparser
+        # registration calls in this file, one per subcommand.
+        fmap = root / "docs" / "framework-map.md"
+        if fmap.is_file():
+            actual = len(re.findall(r"sub\.add_parser\(",
+                                    Path(__file__).read_text(encoding="utf-8")))
+            stated = re.search(r"(\d+)\s+mechanical subcommands",
+                               fmap.read_text(encoding="utf-8"))
+            if stated and int(stated.group(1)) != actual:
+                findings.append(Finding(SEV_WARNING, "framework-map.md",
+                    f"says {stated.group(1)} mechanical subcommands but the CLI "
+                    f"defines {actual} — update the count and View 3 in the same "
+                    f"commit the subcommand landed"))
+
     return findings
 
 
