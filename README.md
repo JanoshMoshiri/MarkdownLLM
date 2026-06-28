@@ -199,6 +199,7 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 | Tool | Discovery | Status |
 |------|-----------|--------|
 | Claude Code | CLAUDE.md → AGENTS.md | Verified in use (the framework's own development and evals run on it) |
+| Codex (VS Code) | AGENTS.md auto-load | Exercised on a real project; not yet eval-measured |
 | GitHub Copilot, Codex CLI, Cursor, Windsurf, Gemini CLI | AGENTS.md auto-load | Designed for; not yet exercised |
 
 **What does NOT work:** any interface without file-system access (ChatGPT web, Claude web, bare API calls without tool use). The agent must be able to discover files, read them, and write them.
