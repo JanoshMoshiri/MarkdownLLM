@@ -847,53 +847,6 @@ def test_coherence_unused_vocabulary_is_info(tmp_path):
     assert not any("`used-type`" in m for m in infos)
 
 
-SCHEMA_NOTE = "types:\n  note:\n    statuses: [a]\n"
-
-
-def _note(body: str) -> str:
-    return thing_text("id: x\ntype: note\nstatus: a\ncreated: 2026-06-01",
-                      body=f"# T\n\n{body}\n")
-
-
-def test_coherence_retired_term_warns(tmp_path):
-    # Opt-in by `retired_terms` in _schema.yaml; a live literal occurrence of a
-    # retired artefact is a non-blocking Warning (the dark-region grep, mechanised).
-    write(tmp_path, "_schema.yaml", SCHEMA_NOTE +
-          "retired_terms:\n  - term: WORKLOG.md\n    since: 3.17.0\n    instead: git\n")
-    write(tmp_path, "things/x.md", _note("Write the result to WORKLOG.md each step."))
-    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
-    assert any("retired term `WORKLOG.md` appears live" in m for m in warns)
-
-
-def test_coherence_retired_term_allow_suppresses(tmp_path):
-    # A thing whose id/path matches an `allow` substring is acknowledged-historical.
-    write(tmp_path, "_schema.yaml", SCHEMA_NOTE +
-          "retired_terms:\n  - term: continuity.md\n    allow: [history]\n")
-    write(tmp_path, "things/history-note.md",
-          thing_text("id: history-note\ntype: note\nstatus: a\ncreated: 2026-06-01",
-                     body="# T\n\ncontinuity.md was retired in v3.17.\n"))
-    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
-    assert not any("continuity.md" in m for m in warns)
-
-
-def test_coherence_retired_term_is_case_sensitive(tmp_path):
-    # `WORKLOG.md` (dead file) must not match the live `worklog` subcommand.
-    write(tmp_path, "_schema.yaml", SCHEMA_NOTE +
-          "retired_terms:\n  - term: WORKLOG.md\n")
-    write(tmp_path, "things/x.md", _note("Run `mdllm worklog` to view the stream."))
-    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
-    assert not any("WORKLOG.md" in m for m in warns)
-
-
-def test_coherence_retired_term_skips_hyphen_compound(tmp_path):
-    # `continuity.md` must not match inside the live name session-end-continuity.md.
-    write(tmp_path, "_schema.yaml", SCHEMA_NOTE +
-          "retired_terms:\n  - term: continuity.md\n")
-    write(tmp_path, "things/x.md", _note("Invoke session-end-continuity.md at close."))
-    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
-    assert not any("continuity.md" in m for m in warns)
-
-
 def test_coherence_domain_skips_framework_checks(tmp_path):
     # No .markdownllm => general checks only. A missing kernel.md must NOT error
     # here (a domain has no kernel) — the proof the hook is safe in a domain.

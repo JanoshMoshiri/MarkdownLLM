@@ -133,13 +133,7 @@ reachable each dependency is, and each tier has its own mechanical reach:
   walked wherever it lives, whether in `linked_things` or in its own structural field.
 - **Literal references** — the thing's `id` or canonical name appearing as text in
   another thing's body: routing tables, cross-references, restatements. A corpus
-  grep reaches these (the textual-trace step of Assimilate). When a change *retires*
-  a named artefact, declare it in `_schema.yaml`'s `retired_terms` and that grep
-  becomes standing: `mdllm coherence` flags live occurrences of the dead name
-  (Warning, non-blocking), tuned to a clean baseline via per-term `allow` lists so
-  the next *unacknowledged* mention is the drift. It mechanises the trace, not the
-  judgement — it cannot tell "X is retired" from "lives in X", so disposition stays
-  the agent's (`existence-is-not-currency`; `repeated-drift-promotes-a-fact-into-the-floor`).
+  grep reaches these (the textual-trace step of Assimilate).
 - **Conceptual references** — a thing that reasons about the changed rule *without
   naming it*. No mechanical pass reaches this; only the Walk does.
 
@@ -152,6 +146,23 @@ still ask explicitly: *what reasons about this without naming it?* And shrink th
 region over time by promoting prose mentions into declared edges — the same reason
 the framework says to link rather than mention. Captured as the insight
 `mechanical-assimilation-is-blind-to-prose-dependencies`.
+
+**Scope: an inflection walks the whole corpus — every file, the insight corpus
+included.** The dark-region tiers above say *how reachable* a dependency is; they
+do not narrow *where* to look. The Walk is full-corpus by definition, and the
+trap is to reconcile only the surface a change visibly touched (the specs it
+edited) while the things it *didn't* touch carry stale references to it. After a
+significant inflection — a mechanism dissolved, an artefact retired, a rule
+inverted — the part most likely to drift is `things/insights/`: active insights
+written *before* the inflection still describe the old model as live, and nothing
+in the change's own diff points at them. Do not lean on a mechanical guard to
+remember this for you; resist the urge to spec a "retired-term check" or similar.
+A check that needs a hand-maintained suppression list to stay quiet is judgement
+in mechanical clothing — it adds a silent-failure surface (an over-broad
+suppression hides real drift) and a false sense that the Walk is covered. The
+floor is for checks that cannot disagree with truth (same-builder drift); the
+retire/rename case is irreducibly semantic, so it stays the human Walk's, over
+**all** files — see the retrospective's reflexive scan for the periodic net.
 
 ## Retrospective Reconciliation
 

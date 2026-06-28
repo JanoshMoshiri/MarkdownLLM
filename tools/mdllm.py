@@ -2243,49 +2243,6 @@ def coherence_findings(root: Path, window: int) -> list[Finding]:
             findings.append(Finding(SEV_INFO, "_schema.yaml",
                 f"declared type `{typ}` is used by no thing — dead vocabulary?"))
 
-    # --- general: retired-vocabulary reappearance (Warning) --------------
-    # Opt-in by data: only corpora that declare `retired_terms` in _schema.yaml
-    # are checked. A term a past change removed from the live model is the
-    # textual-trace step of the dark-region Walk (change-reconciliation.md) made
-    # mechanical — it mechanises the grep, not the judgement. The check CANNOT
-    # tell "X is retired" (correct) from "lives in X" (drift): both are the same
-    # characters, so the disposition stays the agent's, which is why this is a
-    # non-blocking Warning and why each entry carries an `allow` list of ids/paths
-    # where the term legitimately survives (history, the thing that retired it,
-    # specs that announce the retirement). Tune `allow` to a clean baseline and it
-    # becomes a forward regression guard: the next *unacknowledged* occurrence is
-    # the drift. `since`/`instead` make the finding self-explaining.
-    if corpus.schema:
-        for entry in (corpus.schema.get("retired_terms") or []):
-            term = entry.get("term") if isinstance(entry, dict) else entry
-            if not term:
-                continue
-            allow = entry.get("allow") or [] if isinstance(entry, dict) else []
-            since = entry.get("since") if isinstance(entry, dict) else None
-            instead = entry.get("instead") if isinstance(entry, dict) else None
-            # Case-SENSITIVE by default: artefact names carry meaning in their
-            # case (`WORKLOG` the dead file vs `worklog` the live subcommand), so
-            # folding case would conflate the retirement with its replacement.
-            # Opt into folding with `ignore_case: true` for prose concepts.
-            flags = re.IGNORECASE if (isinstance(entry, dict)
-                                      and entry.get("ignore_case")) else 0
-            # Token boundary that treats `-` as part of the token, so a retired
-            # `continuity.md` does not match inside the live compound name
-            # `session-end-continuity.md`. (`\b` alone breaks on the hyphen.)
-            pat = re.compile(rf"(?<![\w-]){re.escape(str(term))}(?![\w-])", flags)
-            for t in corpus.things:
-                rel = t.path.relative_to(root).as_posix()
-                if any(a and (a in rel or a in (t.id or "")) for a in allow):
-                    continue
-                if pat.search(t.body or ""):
-                    msg = f"retired term `{term}` appears live"
-                    if instead:
-                        msg += f" — use {instead} instead"
-                    if since:
-                        msg += f" (retired v{since})"
-                    msg += "; confirm it's historical, not drift"
-                    findings.append(Finding(SEV_WARNING, t.id or rel, msg))
-
     # --- general: derived-index drift (Error, deployed indexes only) -----
     findings.extend(index_drift_findings(root, corpus))
 
