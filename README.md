@@ -1,15 +1,12 @@
 # MarkdownLLM
 
-*Build your own expert agent.*
+*An operating environment for LLM agents — built from markdown and git.*
 
-MarkdownLLM lets you build your own expert agent. The more you work with it, the
-smarter it gets — it remembers everything you told it and exactly where you left
-off, so when you start a new session it already knows where you got to. It runs
-your workflows and keeps your tasks moving for days without losing the thread.
+Every agent session starts cold. Context windows compact, memory summaries blur, and a long-running loop just re-derives the same state faster each time instead of building on it. The model keeps getting better; the thing it works *in* hasn't.
 
-A framework discovered by agents, directed by you, and grown together.
+MarkdownLLM is that missing layer. Your agent's work lives as plain files — each unit a markdown *thing* with YAML frontmatter, explicitly linked to others and version-controlled in git. Its skills and your domain's schema are files too. Git is the state machine; a single-file CLI guarantees the mechanical half — validation, reference integrity, a pre-commit hook — so the model spends its reliability on reasoning. The agent's bearings live in committed files, so structure and history carry forward between sessions instead of eroding with the context window.
 
-Works with the agent you already use — OpenClaw, Fable, or GLM. Integrates with your Obsidian brain. MarkdownLLM is the foundation it all sits on.
+A framework discovered by agents, directed by you, and grown together. It works with any LLM tool that can read and write files — Claude Code, Codex, Cursor, and the like — and a domain is a valid Obsidian vault, so the human GUI comes for free.
 
 ---
 
