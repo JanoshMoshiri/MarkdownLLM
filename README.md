@@ -2,9 +2,9 @@
 
 *An operating environment for LLM agents — built from markdown and git.*
 
-Every agent session starts cold. Context windows compact, memory summaries blur, and a long-running loop just re-derives the same state faster each time instead of building on it. The model keeps getting better; the thing it works *in* hasn't.
+Every session starts from scratch. Memory files help, but context still compacts, and detail gets lost. You can preserve the detail, but front-loading it at session start can be costly. There are plenty of tools addressing these problems — making memory cheaper to store and faster to retrieve. But no unified solution.
 
-MarkdownLLM is that missing layer. Your agent's work lives as plain files — each unit a markdown *thing* with YAML frontmatter, explicitly linked to others and version-controlled in git. Its skills and your domain's schema are files too. Git is the state machine; a single-file CLI guarantees the mechanical half — validation, reference integrity, a pre-commit hook — so the model spends its reliability on reasoning. The agent's bearings live in committed files, so structure and history carry forward between sessions instead of eroding with the context window.
+Your agent's work lives as plain files — each unit a markdown *thing* with YAML frontmatter, explicitly linked to others and version-controlled in git. Its skills and your domain's schema are files too. Git is the state machine; a single-file CLI guarantees the mechanical half — validation, reference integrity, a pre-commit hook — so the model spends its reliability on reasoning. The agent's bearings live in committed files, so structure and history carry forward between sessions instead of eroding with the context window.
 
 A framework discovered by agents, directed by you, and grown together. It works with any LLM tool that can read and write files — Claude Code, Codex, Cursor, and the like — and a domain is a valid Obsidian vault, so the human GUI comes for free.
 
