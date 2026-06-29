@@ -2,7 +2,7 @@
 
 *An operating environment for LLM agents — built from markdown and git.*
 
-Every agent session starts from scratch, so you have to hand the agent its context back — sensibly, cheaply, without burying it. Plenty of tools already do the storing and the retrieving: Obsidian-style vaults, wiki links, cheap lookups. What they leave open is what happens after hundreds of sessions and a mountain of saved memory — when the question stops being *how do I retrieve this* and becomes *is any of it still true*. That's what MarkdownLLM is about: not storing more, but keeping what's stored coherent.
+Every agent session starts from scratch, so you have to hand the agent its context back — sensibly, cheaply, without burying it. Plenty of tools already do the storing and the retrieving: Obsidian vaults, LLM wiki, file lookups. What they leave open is what happens after hundreds of sessions and a mountain of saved memory — when the question stops being *how do I retrieve this* and becomes *is any of it still true*. That's what MarkdownLLM is about: not storing more, but keeping what's stored coherent.
 
 State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. The difference is that their integrity is non-negotiable. A deterministic floor — one CLI, one git pre-commit hook — checks structure, references, and schema on every commit; a record that doesn't hold together can't be committed at all. A reconciliation pass walks the blast radius of any consequential change; a retrospective sweeps for what slipped through. Each session, orientation is rebuilt from git history — not reloaded from a memory file. The result isn't more memory; it's state you can rely on.
 
