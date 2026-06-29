@@ -2,9 +2,9 @@
 
 *An operating environment for LLM agents — built from markdown and git.*
 
-Every session starts from scratch. Memory files help, but context still compacts, and detail gets lost. You can preserve the detail, but front-loading it at session start can be costly. There are plenty of tools addressing these problems — making memory cheaper to store and faster to retrieve. But no unified solution.
+Every agent session starts from scratch, so you have to hand the agent its context back — sensibly, cheaply, without burying it. Plenty of tools already do the storing and the retrieving: Obsidian-style vaults, wiki links, cheap lookups. What they leave open is what happens after hundreds of sessions and a mountain of saved memory — when the question stops being *how do I retrieve this* and becomes *is any of it still true*. That's what MarkdownLLM is about: not storing more, but keeping what's stored coherent.
 
-Your agent's work lives as plain files — each unit a markdown *thing* with YAML frontmatter, explicitly linked to others and version-controlled in git. Its skills and your domain's schema are files too. Git is the state machine; a single-file CLI guarantees the mechanical half — validation, reference integrity, a pre-commit hook — so the model spends its reliability on reasoning. The agent's bearings live in committed files, so structure and history carry forward between sessions instead of eroding with the context window.
+State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. The difference is that their integrity is non-negotiable. A deterministic floor — one CLI, one git pre-commit hook — checks structure, references, and schema on every commit; a record that doesn't hold together can't be committed at all. A reconciliation pass walks the blast radius of any consequential change; a retrospective sweeps for what slipped through. Each session, orientation is rebuilt from git history — not reloaded from a memory file. The result isn't more memory; it's state you can rely on.
 
 A framework discovered by agents, directed by you, and grown together. It works with any LLM tool that can read and write files — Claude Code, Codex, Cursor, and the like — and a domain is a valid Obsidian vault, so the human GUI comes for free.
 
@@ -46,7 +46,7 @@ SKILLS/     — Reasoning capabilities (.skill.md); foundational specs via frame
 THINGS/     — Structured data instances (atomic units following thing.md)
 ```
 
-**Layer 1 — AGENTS.md.** The agent's entry point, auto-discovered by the LLM harness at session start. It declares what the domain is, where skills live, where the framework root is, and the session protocol. Every session begins by re-reading this structure; the agent never starts cold, because its bearings live in files, not in a context window that compaction can erode.
+**Layer 1 — AGENTS.md.** The agent's entry point, auto-discovered by the LLM harness at session start. It declares what the domain is, where skills live, where the framework root is, and the session protocol. Every session begins by re-reading this structure; the agent rebuilds its bearings from committed state, not from a context window that compaction can erode.
 
 **Layer 2 — Skills.** Instructions *for the agent* — how to think and operate within the domain: a specification skill (philosophy and principles), a read skill, a write skill, and a workflow skill. Foundational specs like `thing.md` live in the framework root, resolved via `framework_root` — see [framework-discovery.md](framework-discovery.md).
 
