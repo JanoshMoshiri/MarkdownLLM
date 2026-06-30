@@ -1935,8 +1935,7 @@ def _dk_tier_routing(domain: Path, meta: dict) -> str:
                    if skills else "_(none yet)_")
     t2_specs = " · ".join(f"`{{framework_root}}/{n}`" for n in t2)
     return (
-        "**Tier 0 — always:** `AGENTS.md` (this file) · `{framework_root}/kernel.md` · "
-        "`continuity.md`\n\n"
+        "**Tier 0 — always:** `AGENTS.md` (this file) · `{framework_root}/kernel.md`\n\n"
         "**Tier 1 — load a full spec only when the kernel doesn't settle it:** "
         + t1_specs + "\n\n"
         "**Domain skills — load those relevant to session intent:** " + skills_line + "\n\n"
