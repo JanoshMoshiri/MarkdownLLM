@@ -15,6 +15,8 @@ linked_things:
     relation: complements
   - id: belief-revision-specification
     relation: complements
+  - id: divergence-is-an-unrouted-decision
+    relation: implements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -178,3 +180,8 @@ follow from its inputs? is a verification credible? — remain the LLM's layer.
   `supersedes`/`superseded-by` protocol.
 - **interface.md** — deliverables are projections of understanding; this spec
   makes the projection citable.
+- **`divergence-is-an-unrouted-decision`** — this spec is the **recorded-why
+  face** of that primitive: pinning makes a route-2 revision traceable, and the
+  `origin: external` / `verified: false` quarantine refuses to let an unrouted
+  external divergence silently inform an output — the no-silent-default law applied
+  to ingested reality.

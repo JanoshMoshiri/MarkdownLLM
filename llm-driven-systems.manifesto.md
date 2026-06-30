@@ -2,13 +2,16 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: evolving
-version: 2.5
+version: 2.6
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
     relation: informs
   - id: domain-specification-guide
     relation: informs
+  - id: divergence-is-an-unrouted-decision
+    relation: references
+    notes: "v2.6 names the divergence-routing primitive beneath change-reconciliation, belief-revision, provenance, and validate; this insight is its canonical articulation"
 ---
 
 # LLM-Driven Systems Manifesto
@@ -55,6 +58,18 @@ This is a synthesis, not a trade-off. The model brings what software never had: 
 There is a reason the processor cannot hold these properties alone, and it is not a shortfall that scale will cure: a language model predicts the next move — the next token, the next action — but never its *consequence*. Consequence is recoverable only in retrospect, by reasoning back over moves already made; it cannot be forecast forward the way the next token can. Asking the model to "consider the consequences" does not lift this — it can reason about them, it cannot foresee them. So the foresight a trustworthy system needs has to be supplied by the structure around the processor, considered ahead of time and etched in, not awaited from the processor in the moment. See `consequence-is-recoverable-only-in-retrospect` for the canonical articulation.
 
 That bet is what the framework exists to prove. Everything else in this document — the three decoupled layers, atomic things, git as the state machine, the deterministic floor — is machinery in service of it. To build or extend a domain is to build another instance of that machinery: structure placed around a reasoning processor so the system stays trustworthy over time.
+
+## The Primitive Beneath: A Divergence Is an Unrouted Decision
+
+A domain is a model of a reality it does not control. The thing-graph is the model; git and the world are the reality. The two will always diverge — that is not a defect to engineer away, it is the standing condition of any model-of-reality system. The discipline is not *preventing* divergence; it is **routing every divergence, and never letting one resolve by silent default or by blur.** Each divergence between the model and its reality is an *unrouted decision*, and there are exactly three honest routes:
+
+1. **Restore the model** — the divergence is a regression; bring reality back to the spec.
+2. **Revise the model** — the spec was wrong or incidental; change it, *with recorded rationale*.
+3. **Spawn new work** — the divergence is genuinely new scope; hand it to a requirement-driven process.
+
+The two cardinal sins are the failures to route at all: **silent default** (let it resolve however it falls out) and **blur** (call a regression an improvement, or new scope a bug-fix). Routing is informed by walking the graph both ways — forward for blast radius, backward for the provenance that keeps an incidental behaviour from being mistaken for a contract.
+
+This is named here as a **recognition, not a new mechanism.** It adds nothing to obey that the framework was not already obeying: it is the single spine beneath machinery that already exists, un-unified. `change-reconciliation` is the forward cascade once a divergence is routed; `belief-revision` is route 2 and the valid state of *holding* a contradiction rather than synthesising a false answer from both; `provenance` is the recorded *why* and the quarantine that refuses to let an unverified divergence inform an output silently; `validate`'s surface-don't-silently-fix rule is the no-silent-default law in mechanical form; and `re-quarantine-on-drift` is the same primitive on the cross-domain axis. Five faces, one primitive. Naming the spine costs no new ceremony — the faces each change at a different rate and rightly stay separate things; what drops is the number of *roots*. See `divergence-is-an-unrouted-decision` for the canonical articulation.
 
 ## Origins and Influences
 

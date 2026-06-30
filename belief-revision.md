@@ -15,6 +15,8 @@ linked_things:
     relation: complements
   - id: derived-index-specification
     relation: complements
+  - id: divergence-is-an-unrouted-decision
+    relation: implements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -204,3 +206,4 @@ Resolved conflict things are **not deleted**. They are part of the domain's inte
 - **session-memory.md** — The session-end ritual includes a belief revision step: scan for new contradictions, create conflict things where found.
 - **orchestration.md** — The `session-end` bound prompts encompass belief revision alongside insight extraction. The `detect-conflicts` prompt (scan mode) is bound to `on-status-change` and `retrospective` for systematic detection.
 - **derived-index.md** — The `relationships` derived index makes the full-domain conflict sweep affordable by providing the edge list to walk, so the scan loads full context only for suspect endpoints.
+- **`divergence-is-an-unrouted-decision`** — this spec is the **route-2 face** of that primitive: revising the model with recorded rationale, and the valid *holding* state before resolution. Making "we don't know which is right yet" first-class — rather than synthesising a plausible-but-wrong answer from both — is the anti-blur law in practice.

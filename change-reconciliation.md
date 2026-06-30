@@ -23,6 +23,8 @@ linked_things:
     relation: implements
   - id: structural-pointers-need-reverse-edge-indexing
     relation: implements
+  - id: divergence-is-an-unrouted-decision
+    relation: implements
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -264,3 +266,7 @@ the discipline cheap.
   `supersedes`/`superseded-by` protocol.
 - **git-workflow.md** — changes are reconciled and sealed at commit boundaries;
   the supersede mark and the revisions ride the same commit as the change.
+- **`divergence-is-an-unrouted-decision`** — this spec is the **forward-cascade
+  face** of that primitive: once the driver routes a divergence (the inflection),
+  the four beats cascade its consequences. The Walk's three outcomes —
+  consistent / revise / contradiction — are routing made operational.

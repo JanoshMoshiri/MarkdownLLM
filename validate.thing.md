@@ -15,6 +15,8 @@ linked_things:
     relation: validates
   - id: provenance-specification
     relation: validates
+  - id: divergence-is-an-unrouted-decision
+    relation: implements
   - id: domain-specification-guide
     relation: complements
     notes: "v2.0 resolved the status-vocabulary conflict (status-vocabulary-universal-vs-domain): domains own their vocabularies via the normative schema"
@@ -188,3 +190,8 @@ because they are judgement — that is their value, not their weakness. The
 framework's earlier design asked one reasoning system to provide both and got
 neither reliably. The split is the fix, and it is also the manifesto's own
 principle applied honestly: the LLM is the reasoning engine, not the parser.
+
+This spec is the **no-silent-default face** of the divergence-routing primitive
+(`divergence-is-an-unrouted-decision`): "do not silently fix issues — report what
+you found and changed" is that law made mechanical. A validation finding is a
+model–reality divergence surfaced for routing, never resolved by blur.
