@@ -3,17 +3,20 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-06-27
-generated: 2026-06-27T22:32:18
-generated_from: HEAD@6c8dddc
-coverage: 5
-framework_version: 3.17.0
+created: 2026-06-30
+generated: 2026-06-30T20:46:40
+generated_from: HEAD@9166772
+coverage: 6
+framework_version: 3.17.3
 ---
 
 # Provenance Index (reverse) — framework
 
 ## cross-domain-handoff-is-verified-external-input
 - phase-3-run-domain-task-reverted (pinned @4781b8d)
+
+## divergence-is-an-unrouted-decision
+- divergence-primitive-promotion (pinned @9166772)
 
 ## framework-retrospective-2026-06
 - decision-status-vocabulary-domain-owned (pinned @d4ac2f6)
