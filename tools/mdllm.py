@@ -2815,8 +2815,13 @@ def _mcp_summary(t: Thing) -> str:
 # ever wanted, is a deliberate source-scoped exposure — never a raw leak of
 # foreign ids. (Surfaced by the first road test: the consumer tried to resolve a
 # producer-local `linked_things` id and found nothing.)
+# The rule is "every relational field", not this list's history: `informed_by`
+# (provenance pins) and `parties` (conflict members) carry producer-local ids
+# just as much as `linked_things` does — they leaked for two versions because
+# the list was built from the road test's symptom, not from the rule (review 6,
+# finding 2).
 _MCP_INTERNAL_GRAPH = ("linked_things", "dependencies", "blocks", "parent",
-                       "definition", "triggers")
+                       "definition", "triggers", "informed_by", "parties")
 
 
 def _mcp_egress_meta(meta: dict) -> dict:

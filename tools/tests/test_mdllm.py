@@ -1125,7 +1125,9 @@ def _mcp_domain(tmp_path):
     write(tmp_path, "things/income/rent.md", thing_text(
         "id: rent-statement-2026\ntype: deliverable\nstatus: completed\n"
         "created: 2026-06-01\nexposed: true\ntags: [income]\n"
-        "linked_things:\n  - id: internal-note\n    relation: informs",
+        "linked_things:\n  - id: internal-note\n    relation: informs\n"
+        "informed_by:\n  - id: internal-note\n    commit: deadbee\n"
+        "parties: [internal-note]",
         "# Rent Statement 2026\n\nTotal income: 12000.\n"))
     write(tmp_path, "things/internal/secret.md", thing_text(
         "id: internal-note\ntype: note\nstatus: in-progress\ncreated: 2026-06-01",
@@ -1157,6 +1159,8 @@ def test_mcp_get_deliverable_stamps_triple(tmp_path):
     assert "Total income" in d["content"]
     # the producer's internal graph never crosses; descriptive fields do.
     assert "linked_things" not in d["frontmatter"]
+    assert "informed_by" not in d["frontmatter"]
+    assert "parties" not in d["frontmatter"]
     assert d["frontmatter"]["type"] == "deliverable" and d["frontmatter"]["exposed"] is True
 
 
@@ -1166,6 +1170,11 @@ def test_mcp_egress_strips_producer_graph(tmp_path):
     th = mdllm.mcp_read_resource(tmp_path, corpus, "dom", "thing://dom/rent-statement-2026")
     assert "Rent Statement" in th["text"]            # body crosses
     assert "linked_things" not in th["text"]         # graph does not
+    # provenance pins and conflict parties are relational too — the rule is
+    # "every field carrying producer-local ids", not the road test's symptom
+    # list (review 6, finding 2: these two leaked for two versions).
+    assert "informed_by" not in th["text"]
+    assert "parties" not in th["text"]
     assert "internal-note" not in th["text"]         # the foreign id is gone
 
 
