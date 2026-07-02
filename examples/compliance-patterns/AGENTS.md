@@ -4,7 +4,7 @@ description: Reference patterns for encoding compliance as verifiable reasoning 
 version: 3.0
 applies_to: "**/*.md"
 framework_root: ../..
-framework_version_seen: 3.17.3
+framework_version_seen: 3.17.4
 ---
 
 # Compliance Patterns Library Agent
