@@ -901,6 +901,30 @@ def test_coherence_index_drift_errors(tmp_path):
     assert any("DRIFT" in m for m in errs)
 
 
+# ---------------------------------------------------------------- triggers
+
+
+def test_triggers_reports_every_declared_type(tmp_path, capsys):
+    # Fired conditions print as hits; conditions the floor cannot evaluate
+    # print in the skipped section — never silence. `relationship` (and any
+    # unrecognised type) got exactly that silence until review 6, finding 3:
+    # the no-silent-default law violated in miniature by its own enforcer.
+    write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "due_date: 2026-06-10\n"
+        "triggers:\n"
+        "  - type: time\n    condition: due_date_passed\n    action: escalate\n"
+        "  - type: relationship\n    watch: b\n    on: status_changed_to\n"
+        "    action: re_evaluate\n"
+        "  - type: cosmic\n    condition: alignment\n    action: none\n"))
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "escalate" in out                                   # evaluated hit
+    assert "Not mechanically evaluable" in out                 # skipped section
+    assert "`relationship` trigger" in out and "left to the agent" in out
+    assert "unrecognised trigger type `cosmic`" in out
+
+
 # ---------------------------------------------------------------- domain kernel
 
 

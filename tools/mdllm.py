@@ -9,7 +9,9 @@ Subcommands:
   validate [path]      Levels 1-3 mechanical validation. Exit 1 on Errors.
                        Example domains under <path>/examples/ are validated
                        as their own corpora in the same run.
-  triggers [path]      Evaluate time/dependency/threshold trigger conditions.
+  triggers [path]      Evaluate time/dependency/threshold trigger conditions;
+                       relationship triggers (and blocked_duration) are listed
+                       as not mechanically evaluable — left to the agent.
   index    [path] check|rebuild [--signal triggers|schema|relationships]
   touchpoints <id> [path]  Assimilate beat (change-reconciliation): the declared
                        inbound set + literal references for one thing — "what did
@@ -699,6 +701,17 @@ def cmd_triggers(args) -> int:
                 elif cond == "blocked_duration":
                     skipped.append(f"{name}: `blocked_duration` needs status history "
                                    f"(evaluate via git log) — left to the agent")
+            elif ttype == "relationship":
+                # Watching another thing's field change needs event history the
+                # floor doesn't keep — same honesty line as blocked_duration,
+                # not silence (review 6, finding 3: the no-silent-default law
+                # violated in miniature by the tool that enforces it).
+                skipped.append(f"{name}: `relationship` trigger "
+                               f"(on: {tr.get('on', '?')}, watch: {tr.get('watch', '?')}) "
+                               f"needs change history — left to the agent")
+            else:
+                skipped.append(f"{name}: unrecognised trigger type `{ttype}` — "
+                               f"not evaluated")
 
     # Deadline scan: every non-terminal date-bearing thing, triggers or not.
     horizon: list[tuple[int, str]] = []
