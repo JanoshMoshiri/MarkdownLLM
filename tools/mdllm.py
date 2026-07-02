@@ -659,6 +659,22 @@ def cmd_triggers(args) -> int:
             return dt.date.fromisoformat(v[:10])
         return None
 
+    def last_activity(path: Path) -> dt.date:
+        # Staleness keys on the commit stream, not mtime: mtime is clone-local
+        # noise (a fresh checkout resets it, a stray touch renews it) while
+        # git history is the domain's actual activity record (review 5 drift
+        # item; thing-lifecycle's last_active-from-git is the same fact).
+        # mtime is the fallback for untracked files / no git.
+        try:
+            out = subprocess.run(
+                ["git", "log", "-1", "--format=%cs", "--", str(path)],
+                cwd=root, capture_output=True, text=True, check=True).stdout.strip()
+            if out:
+                return dt.date.fromisoformat(out)
+        except Exception:
+            pass
+        return dt.date.fromtimestamp(path.stat().st_mtime)
+
     for t in corpus.things:
         meta, name = t.meta, t.id or t.path.name
         status = str(meta.get("status", ""))
@@ -678,9 +694,9 @@ def cmd_triggers(args) -> int:
                         hits.append(f"{name}: review_date {rd} reached -> {action}")
                 elif cond == "stale":
                     thresh = str(tr.get("threshold", "30d")).rstrip("d")
-                    mtime = dt.date.fromtimestamp(t.path.stat().st_mtime)
-                    if (today - mtime).days > int(thresh):
-                        hits.append(f"{name}: unmodified {(today - mtime).days}d "
+                    last = last_activity(t.path)
+                    if (today - last).days > int(thresh):
+                        hits.append(f"{name}: unmodified {(today - last).days}d "
                                     f"(threshold {thresh}d) -> {action}")
             elif ttype == "dependency":
                 watch = tr.get("watch") or []

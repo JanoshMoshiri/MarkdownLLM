@@ -925,6 +925,30 @@ def test_triggers_reports_every_declared_type(tmp_path, capsys):
     assert "unrecognised trigger type `cosmic`" in out
 
 
+def test_stale_trigger_reads_git_history_not_mtime(tmp_path, capsys):
+    import subprocess
+    p = write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        "triggers:\n  - type: time\n    condition: stale\n"
+        "    threshold: 30d\n    action: revisit\n"))
+    # No git repo: mtime fallback — a freshly written file is not stale.
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    assert "revisit" not in capsys.readouterr().out
+    # Last commit for the file is months old but the working-copy mtime is
+    # fresh (a checkout or a stray touch does exactly this): activity is the
+    # commit stream, so the trigger fires anyway (review 5 drift item).
+    old = {**os.environ, "GIT_AUTHOR_DATE": "2026-05-01T12:00:00",
+           "GIT_COMMITTER_DATE": "2026-05-01T12:00:00"}
+    git = ["git", "-c", "user.email=t@t", "-c", "user.name=t"]
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    subprocess.run(git + ["add", "."], cwd=tmp_path, check=True)
+    subprocess.run(git + ["commit", "-q", "-m", "x"], cwd=tmp_path,
+                   check=True, env=old)
+    os.utime(p)  # mtime says "just now"; git says May
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    assert "revisit" in capsys.readouterr().out
+
+
 # ---------------------------------------------------------------- domain kernel
 
 
