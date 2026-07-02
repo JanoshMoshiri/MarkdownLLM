@@ -279,7 +279,7 @@ This shows exactly what fields changed, what narrative was updated, what relatio
 - Understanding the scope of a "reprioritize" batch change
 - Auditing what the agent did during a write session
 
-## Three Layers Of Auditability
+## Two Layers Of Auditability
 
 The framework has two complementary audit layers — both **git**:
 

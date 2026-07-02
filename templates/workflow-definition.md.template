@@ -19,8 +19,9 @@ stages:
 # [Process Name] — Definition
 
 A reusable skeleton for [what process this defines]. Runs of this process are
-`type: workflow-run` things that link here with `relation: instance-of` and
-carry a `current_stage` pointing at one of the stage ids above.
+`type: workflow-run` things that name this definition in their structural
+`definition:` field and carry a `current_stage` pointing at one of the stage
+ids above.
 
 ## Stages
 

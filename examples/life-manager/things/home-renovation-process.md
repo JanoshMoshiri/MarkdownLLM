@@ -20,9 +20,9 @@ stages:
 # Home Renovation — Definition
 
 A reusable skeleton for running a room renovation from quotes to a signed-off
-finish. A run of this process is a `type: workflow-run` thing that links here
-with `relation: instance-of` and carries a `current_stage` pointing at one of
-the stages below. The same skeleton fits a kitchen, a bathroom, or a loft —
+finish. A run of this process is a `type: workflow-run` thing that names this
+definition in its structural `definition:` field and carries a `current_stage`
+pointing at one of the stages below. The same skeleton fits a kitchen, a bathroom, or a loft —
 only the run differs.
 
 ## Stages
