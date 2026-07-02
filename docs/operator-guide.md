@@ -69,8 +69,8 @@ behalf became things the machinery holds by construction.
 
 You open a domain workspace and ask about the current VAT quarter. Before
 answering, the agent has already: loaded the domain AGENTS.md plus the
-framework kernel (~5.3k tokens of operative rules instead of ~26.5k of full
-specs), checked the framework version sentinel (silent when nothing changed),
+framework kernel (operative rules at a small fraction of the full-spec cost),
+checked the framework version sentinel (silent when nothing changed),
 read the generated **orient** view (the open loops — non-terminal work and open
 conflicts — that replace the retired hand-kept session brief), and evaluated
 triggers (a filing deadline inside its horizon gets surfaced unprompted). None

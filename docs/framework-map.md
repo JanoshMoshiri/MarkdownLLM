@@ -34,8 +34,8 @@ here, not in the prose.
 **The compressed mental model: one atom, six operative rules, everything else
 is layering.** The manifesto defines [thing.md](../thing.md); five operative specs
 say what may be done to the atom; those six are distilled into
-[kernel.md](../kernel.md) so a session starts on ~5.3k tokens (measured
-2026-06-11 — re-measure with `mdllm tokens`, never assert); nine extension
+[kernel.md](../kernel.md) so a session starts on a small fraction of the
+full-spec load (`mdllm tokens` measures it — never assert); nine extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
 paper layer made mechanical, each subcommand mechanising a piece of it (mostly
@@ -100,8 +100,8 @@ Built from the `linked_things` frontmatter of every root spec. The structure
 that falls out: the manifesto defines the atom; read/write/validate operate on
 it; git-workflow and orchestration flank it; everything else extends or
 applies. The six specs inside the dashed core are exactly the set
-`mdllm kernel` distils — which is why tier 0 dropped from 26.5k to 5.3k
-tokens.
+`mdllm kernel` distils — which is why the kernel's introduction cut tier 0
+to roughly a fifth of its pre-kernel cost (dated figures: CHANGELOG 3.2.0).
 
 ```mermaid
 flowchart TD

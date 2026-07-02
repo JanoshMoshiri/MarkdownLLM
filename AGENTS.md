@@ -72,14 +72,14 @@ This is where the reasoning lives — not just the data.
 
 ### On Startup
 
-**Determine session intent before loading specs.** Loading all framework specs eagerly costs ~65.5k tokens (measured 2026-06-11, tiktoken o200k_base via `python tools/mdllm.py tokens`) — a large share of a model's working context before any work begins. Load only what the session needs.
+**Determine session intent before loading specs.** Loading all framework specs eagerly costs tens of thousands of tokens — a large share of a model's working context before any work begins. Load only what the session needs. (`python tools/mdllm.py tokens` measures the current per-tier split; prose does not restate the figures — restated numbers have drifted three times.)
 
-**Tier 0 — Always load (~5.3k tokens):**
+**Tier 0 — Always load:**
 - `AGENTS.md` — this file (already loaded)
-- `kernel.md` — the generated operative kernel: the rules of thing.md, orchestration.md, read/write/validate.thing.md, and git-workflow.md without their rationale (~1.6k tokens). Regenerate with `python tools/mdllm.py kernel` after any spec change.
+- `kernel.md` — the generated operative kernel: the rules of thing.md, orchestration.md, read/write/validate.thing.md, and git-workflow.md without their rationale, at a small fraction of the full-spec cost. Regenerate with `python tools/mdllm.py kernel` after any spec change.
 
 **Tier 1 — Load a full spec only when the kernel is not enough** — reasoning *about* the framework, evolving a spec, or resolving an ambiguity the kernel doesn't settle:
-- `thing.md`, `orchestration.md`, `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md` (~22.3k for all six — load individually, not wholesale)
+- `thing.md`, `orchestration.md`, `read.thing.md`, `write.thing.md`, `validate.thing.md`, `git-workflow.md` (load individually, not wholesale)
 
 **Tier 2 — Load on demand by query type:**
 
@@ -104,7 +104,7 @@ This is where the reasoning lives — not just the data.
 | Human newcomer's first session; onboarding a non-author operator | `docs/first-hour.md` |
 | Orienting in the framework structure; what links to what; spec graph navigation | `docs/framework-map.md` |
 
-**Typical session cost (measured 2026-06-11, post-kernel):** Tier 0 (AGENTS.md + kernel.md) ≈ 5.3k tokens — down from 26.5k for the pre-kernel Tier 0+1. Full-spec loads are now per-file and on-demand. Re-measure with `python tools/mdllm.py tokens` after spec changes; do not assert costs.
+**Session cost:** the kernel's introduction cut Tier 0 to roughly a fifth of the pre-kernel Tier 0+1 load (the dated measurements live in CHANGELOG 3.2.0). Full-spec loads are per-file and on-demand. Measure with `python tools/mdllm.py tokens`; do not assert costs in prose.
 
 Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All state changes to framework specs are committed automatically.
 

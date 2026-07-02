@@ -274,7 +274,7 @@ git:
 ### On Startup
 1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
 2. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen`
-3. Load `{framework_root}/kernel.md` — the operative rules of the foundational specs (~1.6k tokens); load a full spec only when the kernel doesn't settle an ambiguity
+3. Load `{framework_root}/kernel.md` — the operative rules of the foundational specs (a small fraction of the full-spec cost; `mdllm tokens` measures the current split); load a full spec only when the kernel doesn't settle an ambiguity
 4. Load skills relevant to session intent: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
 5. Read the **orient** view (`mdllm session-start` emits it) — the open loops (non-terminal work things + open conflicts) carried from prior sessions. Forward state is the thing graph, not a hand-kept brief; `continuity.md` is retired (v3.17)
 6. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
@@ -774,8 +774,8 @@ checks by reasoning; never bypass the hook — if validation blocks a legitimate
 change, the schema is wrong, fix it with the human.
 
 **3. Load the kernel, not the specs.** The domain AGENTS.md "On Startup"
-section should load `{framework_root}/kernel.md` (~1.6k tokens of operative
-rules) instead of the full foundational specs. Load a full spec only when
+section should load `{framework_root}/kernel.md` (operative rules at a small
+fraction of the full-spec cost) instead of the full foundational specs. Load a full spec only when
 reasoning *about* the framework or when the kernel doesn't settle an ambiguity.
 
 Two knowledge primitives also matter at scaffold time:
