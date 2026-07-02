@@ -979,6 +979,25 @@ def test_domain_kernel_unmarked_agents_yields_no_blocks(tmp_path):
     assert set(missing) == set(mdllm.DOMAIN_KERNEL_BLOCKS)
 
 
+def test_generated_blocks_reference_only_live_subcommands(tmp_path):
+    # The domain-kernel drift check compares generated blocks against the same
+    # builder that writes them, so a builder naming a phantom subcommand is
+    # invisible to it. The parser registry is a DIFFERENT artifact: cross-check
+    # every emitted `mdllm <sub>` against it. (Regression: the generated
+    # session-start block shipped a nonexistent `mdllm orient` for weeks.)
+    import re
+    sub = next(a for a in mdllm.build_cli()._subparsers._group_actions)
+    live = set(sub.choices)
+    text = _agents_with_blocks()
+    meta, _, _ = mdllm.parse_frontmatter(text)
+    blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)
+    referenced = set()
+    for body in blocks.values():
+        referenced |= set(re.findall(r"`(?:python [^`]*mdllm\.py|mdllm) ([a-z][a-z-]*)", body))
+    assert referenced, "expected the generated blocks to reference subcommands"
+    assert referenced <= live, f"generated blocks name phantom subcommands: {referenced - live}"
+
+
 def test_coherence_flags_domain_kernel_drift(tmp_path):
     meta, _, _ = mdllm.parse_frontmatter(_agents_with_blocks())
     blocks = mdllm.build_domain_kernel_blocks(tmp_path, meta)

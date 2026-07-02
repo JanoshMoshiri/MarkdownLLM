@@ -1904,8 +1904,8 @@ def _dk_session_start(domain: Path, meta: dict) -> str:
         "1. Load `{framework_root}/kernel.md` — the operative kernel (rules without "
         "rationale). The hard hooks it carries are always active.\n"
         "2. Read the **open loops (forward)** the orientation generates — non-terminal "
-        "work things + open conflicts, computed from the graph (`mdllm session-start` / "
-        "`mdllm orient`). Backward history is the commit stream (velocity); insight "
+        "work things + open conflicts, computed from the graph (`mdllm session-start`). "
+        "Backward history is the commit stream (velocity); insight "
         "liveness is a graph property — see session-memory.md. (continuity.md is retired.)\n"
         "3. **Version check** — `session-start:version-check` (anchor `harness-session`). "
         "Read `{framework_root}/.markdownllm` `version`; compare to `framework_version_seen` "
@@ -3139,11 +3139,11 @@ def cmd_imports_check(args) -> int:
 # ---------------------------------------------------------------- main
 
 
-def main() -> int:
-    # Windows consoles default to a legacy codepage; spec prose is UTF-8.
-    for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8")
+def build_cli() -> argparse.ArgumentParser:
+    # Separate from main() so the parser registry is introspectable: generated
+    # prose that names a subcommand is tested against THIS, not against the
+    # builder that wrote it (a same-builder check is blind to a
+    # self-contradictory builder — the phantom `mdllm orient` incident).
     p = argparse.ArgumentParser(prog="mdllm", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -3269,7 +3269,15 @@ def main() -> int:
     ic.add_argument("path", nargs="?", default=".", help="the consumer domain")
     ic.set_defaults(fn=cmd_imports_check)
 
-    args = p.parse_args()
+    return p
+
+
+def main() -> int:
+    # Windows consoles default to a legacy codepage; spec prose is UTF-8.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+    args = build_cli().parse_args()
     return args.fn(args)
 
 
