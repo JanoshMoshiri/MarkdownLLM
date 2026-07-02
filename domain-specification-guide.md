@@ -622,16 +622,19 @@ These tools auto-discover `AGENTS.md` at the root—no configuration needed.
 
 ### Step 1: Set Up the Deployment Model
 
-Clone the MarkdownLLM framework repository and create your domain inside `domains/`:
+Clone the MarkdownLLM framework repository:
 
 ```bash
 git clone https://github.com/[org]/MarkdownLLM.git
 cd MarkdownLLM
-mkdir domains/my-domain && cd domains/my-domain
-git init
 ```
 
-The framework's `.gitignore` already excludes `domains/`, so your domain has its own independent git history. See the Deployment Model section above for details.
+Do **not** hand-create the domain directory or its git repo — birth is
+mechanical (`mdllm scaffold`, run in Step 3), and the eval record is blunt
+about why: hand-rolled birth sequences drop steps. The framework's
+`.gitignore` already excludes `domains/`, so your scaffolded domain will have
+its own independent git history. See the Deployment Model section above for
+details.
 
 ### Step 2: Design Your Domain
 
@@ -646,7 +649,7 @@ You don't need to answer these perfectly upfront. Start with what you know. The 
 
 ### Step 3: Let the Framework Agent Build It
 
-Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent discovers the framework's `AGENTS.md`, knows the specifications, and knows how to scaffold domains. Describe what you want — the framework agent will create everything inside `domains/my-domain/`:
+Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent discovers the framework's `AGENTS.md`, knows the specifications, and knows how to scaffold domains. Describe what you want — the agent runs `python tools/mdllm.py scaffold domains/my-domain` for the mechanical shell (templates, `git init`, `.gitignore` isolation, pre-commit hook, first commit — the whole birth sequence, deterministically) and then fills the semantic half inside `domains/my-domain/`:
 
 - `AGENTS.md` at domain root — with `framework_root: ../..` pointing to the framework
 - `skills/` directory with the four baseline skills:

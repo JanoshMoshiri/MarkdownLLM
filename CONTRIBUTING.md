@@ -21,7 +21,7 @@ The framework's own specs are things — they have frontmatter, relationships, s
 
 1. Fork the repository
 2. Make your changes — ensure YAML frontmatter stays valid and relationships remain consistent
-3. Run the validation checklist (see AGENTS.md) before submitting
+3. Run the floor before submitting: `python tools/mdllm.py validate .` and `python tools/mdllm.py coherence .` (the pre-commit hook runs both; `python tools/mdllm.py install-hook` installs it)
 4. Explain your reasoning in the pull request
 5. Follow `git-workflow.md` commit conventions in your commit messages
 
@@ -43,47 +43,22 @@ If you've used this framework and learned something useful:
 
 ## Framework Structure
 
-The framework is self-describing — its own specifications are things within the framework they define. The key files:
+The framework is self-describing — its own specifications are things within the framework they define. This file deliberately does **not** restate the spec inventory (a hand-copied list here drifted for months). The canonical sources:
 
-**Orchestration:**
-- `AGENTS.md` — Root agent file (auto-discovered by LLM tools)
-
-**Foundational Specifications (type: specification):**
-- `thing.md` — The atomic unit definition (structure, triggers, metadata)
-- `interface.md` — The I/O layer (input routes, output types, deliverables)
-- `git-workflow.md` — Git as state machine (commit points, conventions, event stream)
-- `read.thing.md` — How LLMs read and reason about things
-- `write.thing.md` — How LLMs create and manage things
-- `orchestration.md` — Opt-in pattern: hook points, prompts, and bindings for structured workflows
-- `framework-discovery.md` — How domain agents locate the framework root
-- `domain-refresh.md` — How domain agents discover and absorb framework evolution
-- `validate.thing.md` — Thing validation (structural, referential, semantic)
-- `session-memory.md` — Session memory: `type: insight`, graph-keyed liveness, the orient view of open loops, and the session-end extraction ritual
-- `belief-revision.md` — Contradiction tracking: `type: conflict`, relation types, belief revision process
-- `retrospective.md` — Periodic quality reflection: `type: retrospective`, when to write, what it produces
-
-**Guides (type: guide):**
-- `scalability-guide.md` — Scaling from tens to thousands of things
-- `domain-specification-guide.md` — How to create a new domain
-
-**Philosophy (type: manifesto):**
-- `llm-driven-systems.manifesto.md` — The paradigm shift and core principles
-
-**Examples:**
-- `examples/life-manager/` — Personal life and work management domain
-- `examples/compliance-patterns/` — Regulatory compliance pattern library
-
-**Templates:**
-- `templates/` — Starting-point templates for AGENTS.md and skills
+- **`.markdownllm`** — the machine-read catalog of foundational specs
+- **`AGENTS.md`** → *Framework Specifications* — the annotated inventory, with each spec's type and status
+- **`docs/framework-map.md`** — the visual architecture map
+- **`tools/mdllm.py`** — the mechanical floor (validation, coherence, scaffolding); `python tools/mdllm.py --help` lists the surface
+- **`examples/`** — complete example domains; **`templates/`** — starting-point templates
 
 ## Guidelines
 
 - **Keep it simple** — The whole point is elegant constraint and clarity. Don't over-complicate things.
-- **Everything is a thing** — All files should have YAML frontmatter with at minimum: id, type, status, version, created.
+- **Everything is a thing** — All files should have YAML frontmatter with at minimum: id, type, status, created (see `thing.md`; `version` is convention for specs, not a core field).
 - **Follow git-workflow.md** — Use structured commit messages (`create:`, `update:`, `framework:`, etc.)
 - **Follow the pattern** — New domains should follow the three-layer structure (AGENTS.md, skills/, things/).
 - **Be respectful** — We're building something together. Assume good intent.
-- **Validate before submitting** — Check that linked_things references are valid, required fields are present, and the validation checklist passes.
+- **Validate before submitting** — `python tools/mdllm.py validate .` must pass; it checks frontmatter, references, and schema conformance mechanically.
 - **Version numbers are per-file, not global** — A file at `version: 1.0` alongside one at `version: 2.1` is intentional, not inconsistency. Version tracks that file's own change history; `status` (`draft`/`evolving`/`stable`) tracks maturity. Newer specs start at 1.0 when introduced regardless of the overall framework version.
 - **Naming conventions are frozen** — The patterns `-specification`, `.thing.`, `.skill.md` stabilised at v2.x and are not subject to further change. Renames are breaking changes to all domains using the framework.
 
@@ -113,12 +88,11 @@ You need an **LLM tool with file system access** — one that can traverse direc
 1. **Clone the framework** — `git clone` this repository
 2. **Read the manifesto** — `llm-driven-systems.manifesto.md` explains the philosophy
 3. **Read `domain-specification-guide.md`** — the step-by-step guide for creating domains
-4. **Create your domain** inside `domains/` — the framework `.gitignore` already ignores this folder
-5. **Initialise a git repo** in your domain folder — each domain is its own independent repository
-6. **Tell your LLM agent to build it** — describe your domain; the agent creates AGENTS.md, skills, and initial things for you
-7. **Explore examples** — look at `examples/life-manager/` or `examples/compliance-patterns/` for reference
-8. **Iterate** — refine skills and thing types as you learn what works
-9. **Share what you learn** — contribute examples, improvements, or insights back to the framework
+4. **Scaffold your domain** — `python tools/mdllm.py scaffold domains/my-domain` performs the whole birth sequence deterministically (templates, `git init`, `.gitignore` isolation, pre-commit hook, first commit). Don't hand-roll it — hand-rolled births drop steps.
+5. **Tell your LLM agent to fill the semantic half** — describe your domain; the agent declares your thing types in `_schema.yaml`, writes the skill bodies, and creates seed things
+6. **Explore examples** — look at `examples/life-manager/` or `examples/compliance-patterns/` for reference
+7. **Iterate** — refine skills and thing types as you learn what works
+8. **Share what you learn** — contribute examples, improvements, or insights back to the framework
 
 ## Questions?
 
