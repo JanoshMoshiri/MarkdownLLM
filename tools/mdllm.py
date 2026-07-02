@@ -2329,6 +2329,22 @@ def coherence_findings(root: Path, window: int) -> list[Finding]:
                     f".markdownllm foundational_specs — loading map drifted "
                     f"from the catalog"))
 
+        # Example staleness: an example's framework_version_seen pins the
+        # framework version it was last walked against; a pin behind the
+        # sentinel means the example teaches an old shape (review 6: both
+        # examples sat at 3.4.0 for thirteen minor versions, invisibly).
+        # Same-builder — the sentinel is the only version source — and no
+        # suppression list: the only way to quiet it is the walk + re-pin.
+        fw_version = str(data.get("version", ""))
+        for ex in sorted((root / "examples").glob("*/AGENTS.md")):
+            emeta, _, _ = parse_frontmatter(ex.read_text(encoding="utf-8"))
+            seen = str(emeta.get("framework_version_seen", ""))
+            if fw_version and seen and seen != fw_version:
+                findings.append(Finding(SEV_WARNING, f"examples/{ex.parent.name}",
+                    f"pinned at framework_version_seen {seen} but the framework "
+                    f"is {fw_version} — walk the example against the current "
+                    f"shape, then re-pin"))
+
         # kernel drift, via the shared builder (cannot disagree with what
         # `mdllm kernel` would write — same source).
         kpath = root / "kernel.md"

@@ -886,6 +886,24 @@ def test_coherence_tiers_warns_tier_entry_missing_from_catalog(tmp_path):
     assert not any("`thing.md` is in the TIERS map" in m for m in warns)
 
 
+def test_coherence_example_staleness(tmp_path):
+    # An example pinned behind the sentinel teaches an old shape; only the
+    # walk + re-pin quiets the warning (review 6: both shipped examples sat
+    # at 3.4.0 for thirteen minor versions with nothing watching).
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 3.17.3\nfoundational_specs: []\n")
+    write(tmp_path, "examples/demo/AGENTS.md",
+          "---\nname: D\nframework_root: ../..\nframework_version_seen: 3.4.0\n"
+          "---\n\n# D\n")
+    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
+    assert any("framework_version_seen 3.4.0" in m for m in warns)
+    write(tmp_path, "examples/demo/AGENTS.md",
+          "---\nname: D\nframework_root: ../..\nframework_version_seen: 3.17.3\n"
+          "---\n\n# D\n")
+    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
+    assert not any("framework_version_seen" in m for m in warns)
+
+
 def test_coherence_stable_staleness_is_info(tmp_path):
     import subprocess
     _git_repo(tmp_path)
