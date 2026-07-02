@@ -1152,8 +1152,12 @@ TIERS = {
     "Tier 1 (full specs, load individually on demand)": [
         "thing.md", "orchestration.md", "read.thing.md", "write.thing.md",
         "validate.thing.md", "git-workflow.md"],
+    # thing-lifecycle.md is deliberately absent: it is a draft rotting against
+    # the live tool (review 5) and stays out of the loading map — and out of
+    # the .markdownllm catalog — until reconciled. The coherence check enforces
+    # that this map and the catalog agree in BOTH directions.
     "Tier 2 (on demand)": [
-        "domain-specification-guide.md", "scalability-guide.md", "thing-lifecycle.md",
+        "domain-specification-guide.md", "scalability-guide.md",
         "llm-driven-systems.manifesto.md", "interface.md", "framework-discovery.md",
         "domain-refresh.md", "session-memory.md", "belief-revision.md",
         "retrospective.md", "trigger-specification.md", "derived-index.md",
@@ -2312,6 +2316,18 @@ def coherence_findings(root: Path, window: int) -> list[Finding]:
                 findings.append(Finding(SEV_WARNING, "TIERS",
                     f"foundational spec `{name}` has no entry in the TIERS map "
                     f"(tools/mdllm.py) — tier routing drifted from the catalog"))
+
+        # ...and the mirror (directional graph reads come in inbound/outbound
+        # pairs): every TIERS entry must be in the catalog. A file routed by
+        # tier but absent from .markdownllm is loadable-but-uncatalogued —
+        # the reverse drift the one-directional check was blind to (review 6,
+        # finding 6: thing-lifecycle.md sat exactly there).
+        for name in sorted(tier_files):
+            if name not in specs:
+                findings.append(Finding(SEV_WARNING, "TIERS",
+                    f"`{name}` is in the TIERS map (tools/mdllm.py) but not in "
+                    f".markdownllm foundational_specs — loading map drifted "
+                    f"from the catalog"))
 
         # kernel drift, via the shared builder (cannot disagree with what
         # `mdllm kernel` would write — same source).

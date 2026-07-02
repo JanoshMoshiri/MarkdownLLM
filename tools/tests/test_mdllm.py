@@ -874,6 +874,18 @@ def test_coherence_tiers_warns_spec_without_tier_entry(tmp_path):
     assert any("no entry in the TIERS map" in m for m in warns)
 
 
+def test_coherence_tiers_warns_tier_entry_missing_from_catalog(tmp_path):
+    # The mirror direction (review 6, finding 6): directional graph reads come
+    # in inbound/outbound pairs, and this check ran catalog->TIERS only —
+    # thing-lifecycle.md sat in the loading map uncatalogued, invisibly.
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\nfoundational_specs:\n  - thing.md\n")
+    write(tmp_path, "thing.md", "# x\n")
+    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
+    assert any("in the TIERS map (tools/mdllm.py) but not in" in m for m in warns)
+    assert not any("`thing.md` is in the TIERS map" in m for m in warns)
+
+
 def test_coherence_stable_staleness_is_info(tmp_path):
     import subprocess
     _git_repo(tmp_path)

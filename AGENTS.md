@@ -86,7 +86,7 @@ This is where the reasoning lives — not just the data.
 | Query type | Load |
 |---|---|
 | Creating or scaffolding a new domain | `domain-specification-guide.md` |
-| Scaling, structure, or performance concerns | `scalability-guide.md`, `thing-lifecycle.md` (draft) |
+| Scaling, structure, or performance concerns | `scalability-guide.md` |
 | Philosophical or "why" questions | `llm-driven-systems.manifesto.md` |
 | I/O, deliverables, or output format questions | `interface.md` |
 | Domain agent locating the framework | `framework-discovery.md` |
@@ -164,7 +164,7 @@ The framework defines itself through these interconnected specifications:
 - **docs/framework-map.md** — Visual architecture map (Mermaid): the five-band elevation, the spec-layer dependency graph, and the mdllm subcommand → spec mapping. Derived from frontmatter links, `mdllm --help`, and the tier table; the frontmatter wins on disagreement. (`type: guide`, `status: draft`)
 
 ### Deferred (Spec When Foreseeable, Deploy When Felt)
-- **thing-lifecycle.md** — Rolling window, disposition to stubs, rehydration from git history, manifest index. Addresses the 200–300 thing ceiling. (`type: specification`, `status: draft`)
+- **thing-lifecycle.md** — Rolling window, disposition to stubs, rehydration from git history, manifest index. Addresses the 200–300 thing ceiling. Deliberately outside the TIERS loading map and the `.markdownllm` catalog until reconciled with the live tool — it predates the mtime→git `stale` fix and the current index mechanics. (`type: specification`, `status: draft`)
 
 ### Examples
 Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run at the framework root validates them in the same pass (they are excluded from the framework corpus walk — separate id space — but not from the floor).
