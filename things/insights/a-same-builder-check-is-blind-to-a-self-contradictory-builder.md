@@ -4,7 +4,7 @@ type: insight
 status: active
 disposition: keep-active
 disposition_reason: "Names the precise blind spot of every same-builder drift check (kernel, derived-index, domain-kernel) and tells the human Walk where to look — emitter source, not just corpus. Fresh, paid for by a real downstream miss; gates how vocabulary retirements are walked."
-version: 1.0
+version: 1.1
 created: 2026-06-30
 session: 2026-06-30
 source: both
@@ -77,6 +77,23 @@ holds **only to the extent the single source is internally consistent**. Where o
 builder emits multiple surfaces, cross-surface consistency is a semantic property,
 and like vocabulary retirement itself it stays the human Walk's — it cannot be
 floored, because there is no same-builder source to key it to.
+
+## Revision (v1.1, 2026-07-03): the closing claim was too strong
+
+The predicted failure recurred within days — the domain-kernel session-start
+builder emitted a phantom `mdllm orient` subcommand, coherence-clean in every
+scaffolded domain, caught only by an external review (review 6, finding 1) —
+and its fix **partially floored the unfloorable**. The blindness is
+*artifact-level, not file-level*: wherever the builder's emitted prose names
+something a **second, independently produced artifact** also defines — here the
+CLI parser registry, extracted to `build_cli()` in the same file — a mechanical
+cross-check exists, and a regression test now keys every emitted
+`` `mdllm <sub>` `` against the live registry (v3.17.4, b5211be). The refined
+rule: before conceding a generator surface to the human Walk, ask **"does
+anything else in the system independently define what this prose names?"** —
+a command registry, a schema, a file tree. Only the residue with no second
+artifact (the retired-vocabulary case that seeded this insight) is irreducibly
+the Walk's.
 
 ## Context
 

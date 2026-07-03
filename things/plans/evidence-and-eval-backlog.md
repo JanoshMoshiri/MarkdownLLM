@@ -14,6 +14,9 @@ linked_things:
     relation: implements
   - id: structure-decides-figures-scale-decides-convention
     relation: references
+  - id: operator-gated-work-is-scheduled-on-the-operators-calendar
+    relation: implements
+    notes: "The v2.0 reframe is this insight operationalised: two operator sessions with agent support, agent pre-work split out, felt-when-felt retired for this class."
 ---
 
 # Evidence & Eval Backlog
