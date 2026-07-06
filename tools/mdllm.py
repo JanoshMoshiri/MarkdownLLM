@@ -2779,7 +2779,15 @@ def cmd_scaffold(args) -> int:
         rel_t = Path(os.path.relpath(target, outer_root)).as_posix() + "/"
         gi = outer_root / ".gitignore"
         existing = gi.read_text(encoding="utf-8") if gi.is_file() else ""
-        if rel_t.rstrip("/") not in {ln.strip().rstrip("/") for ln in existing.splitlines()}:
+        # Ask git before appending: a blanket rule (e.g. `domain/`) may already
+        # isolate the path. A per-domain line — and the commit message naming it —
+        # publishes which domains exist in the outer repo's history; domain names
+        # are domain state, and domain state never enters the framework repo.
+        already_ignored = subprocess.run(
+            ["git", "check-ignore", "-q", rel_t],
+            cwd=outer_root, capture_output=True).returncode == 0
+        if not already_ignored and rel_t.rstrip("/") not in {
+                ln.strip().rstrip("/") for ln in existing.splitlines()}:
             gi.write_text(existing.rstrip("\n") + ("\n" if existing else "")
                           + f"{rel_t}\n", encoding="utf-8", newline="\n")
             subprocess.run(["git", "add", ".gitignore"], cwd=outer_root, check=True)

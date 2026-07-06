@@ -719,6 +719,23 @@ def test_scaffold_birth_sequence(tmp_path, capsys):
     assert findings == [] and len(corpus.things) == 4
 
 
+def test_scaffold_isolation_skips_when_blanket_rule_covers(tmp_path, capsys):
+    # A blanket `domain/` rule already isolates the path: scaffold must not
+    # append a named per-domain line nor make a commit naming the domain —
+    # domain names are domain state and must not enter the outer repo.
+    import subprocess
+    _git_repo(tmp_path)
+    (tmp_path / ".gitignore").write_text("domain/\n", encoding="utf-8")
+    target = tmp_path / "domain" / "client-y"
+    rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+    out = capsys.readouterr().out
+    assert rc == 0 and "first commit made" in out
+    assert "client-y" not in (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    log = subprocess.run(["git", "log", "--oneline", "--all"], cwd=tmp_path,
+                         capture_output=True, text=True).stdout
+    assert "client-y" not in log
+
+
 def test_schema_unparseable_is_finding_not_crash(tmp_path):
     write(tmp_path, "_schema.yaml", "types:\n  [oops]:\n    statuses: [a]\n")
     write(tmp_path, "things/alpha.md", thing_text(GOOD))
