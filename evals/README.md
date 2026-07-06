@@ -59,6 +59,18 @@ the agent (`--add-dir` is framework-condition only), so a bare agent cannot
 discover the specs it is being measured without. Timed-out trials are recorded
 as 0/N, not discarded.
 
+**Longitudinal fixtures (Stage 2 only):** replace the top-level `prompt` /
+`assertions` pair with a `sessions:` list — each entry `{name, prompt,
+assertions}`. The runner seeds the workspace once, then runs each session as a
+**fresh** headless agent (`claude -p`, no conversation memory) against the
+**same** workspace, checking that session's assertions after it exits. The only
+carrier between sessions is committed state — which is exactly the property
+under test: drift resistance. A session timeout aborts the chain (downstream
+sessions depend on its end state) and fails all remaining assertions. The
+result JSON gains a per-session breakdown; `--report` aggregates trial totals
+as before. Stage 1 (no `--run`) against an existing domain checks the *final*
+session's assertions — the end-state contract.
+
 ## The structure-beats-scale experiment
 
 The manifesto claims a smaller model in a well-defined domain outperforms a
@@ -189,6 +201,39 @@ needs real filesystem isolation (workspaces outside the repo tree, or a sandbox)
 before the next run — `--add-dir` withheld is necessary but not sufficient. This
 is a property of capability that will intensify, not a defect; see
 `withholding-is-not-isolation`.
+
+## The longitudinal floor test (sleeping-bag-longitudinal, built 2026-07-06, not yet run)
+
+Every eval above is single-shot; the drift-resistance half of the thesis —
+committed structure keeps *later, memoryless* sessions coherent — had never
+been tested. `sleeping-bag-longitudinal` is the fixture (evidence-and-eval-backlog,
+operator session 2; the fixture + runner protocol are the committed agent
+pre-work, the trial run is the operator's evening):
+
+1. **build** — the sleeping-bag-fac scenario as-is: five FAC figures from the
+   fictional rule (21 assertions + commit growth).
+2. **perturb** — operator-voiced fact change: the Aonach Ridge party moves to
+   3300 m and upgrades to an R 4.2 pad. New figure −1.0 discriminates on *both*
+   edits landing (elevation alone → 3, pad alone → 0); nothing in the prompt
+   names the assessment — the agent must find it via the `assesses` link. The
+   four untouched figures are re-asserted: the drift check.
+3. **amend-rule** — the inflection walk: the elevation adjustment tightens to
+   −1°C per complete 500 m. Both high camps must move (aonach −3.0; summit-bivvy
+   ceil(−6.5+10−3) = ceil(0.5) = **1.0** — the half-degree ceiling trap survives
+   the amendment) and the three low camps must *not* (900/1000/600 m — a corpus
+   walk that over-touches fails them).
+
+Session 3's aonach figure presumes session 2's committed state (3300 m) — the
+chained dependency is the design, not a defect: session N inherits session
+N−1's reality, which is what "longitudinal" means.
+
+Protocol for the run evening: ≥5 trials framework condition
+(`--fixture evals/sleeping-bag-longitudinal.yaml --run --model haiku --trials 5`,
+then opus), report per-session pass rates, not just totals — *where in the
+chain* drift enters is the finding. A bare longitudinal run is near-meaningless
+as designed (the bare preamble deliberately omits the FAC method, and session 3
+amends a file the bare condition deletes) — do not read a bare cell as a
+control without redesigning it.
 
 ## Conventions
 
