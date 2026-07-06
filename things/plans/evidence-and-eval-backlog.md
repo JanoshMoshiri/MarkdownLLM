@@ -50,8 +50,13 @@ root-AGENTS.md kernel question, the razor index, the review-moratorium decision.
 The 2×2 was single-shot; the drift-resistance half of the thesis has never seen a
 second session. Build → perturb → resume: three prompts, the sleeping-bag rule
 reused as the discriminator, the `mdllm eval` assertion engine already exists.
-**Agent pre-work (no gate):** fixture + runner protocol committed before the session,
-so the operator's evening is running sessions, not designing them. Do **not** re-run
+**Agent pre-work (no gate): DONE 2026-07-06** — `sessions:` support in the runner
+(chained fresh agents, one workspace, per-session assertions, timeout aborts the
+chain), the `sleeping-bag-longitudinal.yaml` fixture (build / perturb / amend-rule,
+expected figures worked from the seed rule), and the run-evening protocol in
+`evals/README.md`. The operator's evening is now running
+`eval . --fixture evals/sleeping-bag-longitudinal.yaml --run --model <m> --trials 5`
+per model and reading per-session pass rates. Do **not** re-run
 the 2×2 to "fix" the leak — the leaked trial is itself the finding.
 
 ## Behind those two
