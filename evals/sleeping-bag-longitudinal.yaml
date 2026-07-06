@@ -1,0 +1,123 @@
+name: FAC longitudinal (build / perturb / resume, drift resistance)
+description: >
+  The longitudinal floor test (evidence-and-eval-backlog, operator session 2).
+  Three FRESH headless agents run in sequence against the SAME workspace; the
+  only carrier between them is committed state, so the fixture measures the
+  drift-resistance half of the thesis: does committed structure keep later,
+  memoryless sessions coherent?
+
+  Session 1 (build) is the sleeping-bag-fac single-shot scenario: compute all
+  five Field-Adjusted Comfort figures from the fictional Tarn & Fell rule that
+  lives only in the seed AGENTS.md (unleakable — no training data contains it).
+
+  Session 2 (perturb) delivers a fact change, operator-voiced: the Aonach
+  Ridge party moves camp to 3300 m and upgrades to an R 4.2 pad. A fresh agent
+  must find what the change touches (the trip, then its assessment via the
+  assesses link), recompute, and leave the other four assessments untouched.
+  New figure -1.0 discriminates on BOTH edits landing: elevation alone gives
+  3 (-9 +10 female, -2 for two complete 800 m, +4 pad penalty kept), pad alone
+  gives 0 (-9 +10 -1, penalty dropped); only both give ceil(-9 +10 -2) = -1.
+  The four untouched figures re-asserted at their session-1 values are the
+  drift check.
+
+  Session 3 (rule amendment) is the inflection walk: Tarn & Fell revises the
+  elevation adjustment to -1 per complete 500 m above 1200 m. A fresh agent
+  must amend the method and reconcile EVERY assessment against it —
+  change-reconciliation across the corpus. Expected: aonach-ridge
+  ceil(-9 +10 -4) = -3 (2100 m above -> four complete 500s); summit-bivvy
+  ceil(-6.5 +10 -3) = ceil(0.5) = 1 (1700 m above -> three complete 500s; the
+  half-degree ceiling trap survives the amendment); birch-hollow (900 m),
+  glencoe-snowfield (1000 m) and lowland-meadow (600 m) sit at or below
+  1200 m — unchanged, the controls that a corpus walk must NOT touch.
+
+  Session 3's aonach figure depends on session 2's committed state (3300 m,
+  not 2400 m) — the chained dependency is the point, not a defect: a real
+  domain's session N inherits session N-1's reality.
+seed: evals/seeds/sleeping-bag-fac
+bare_preamble: |
+  You are in a directory of markdown files with YAML frontmatter representing
+  the catalogue of Tarn & Fell Outfitters: sleeping-bag things (with EN/ISO
+  23537 Comfort, Limit and Extreme ratings), trip-plan things (each naming a
+  sleeper's sex, the camp elevation in metres, the shelter and surface, the
+  sleeping-pad R-value, and the chosen bag), and possibly fac-assessment
+  things (id fac-<location>, field fac_celsius: Tarn & Fell's Field-Adjusted
+  Comfort temperature in whole degrees Celsius, status computed when filled).
+sessions:
+  - name: build
+    prompt: |
+      Assess every trip-plan in things/, following the Field-Adjusted Comfort
+      method in AGENTS.md. Produce one fac-assessment thing per trip, with the
+      computed fac_celsius and status computed. Commit your changes as you go.
+    assertions:
+      - thing_exists: fac-aonach-ridge
+      - status: { id: fac-aonach-ridge, equals: computed }
+      - field: { id: fac-aonach-ridge, name: fac_celsius, equals: 4.0 }
+      - link: { from: fac-aonach-ridge, relation: assesses, to: trip-aonach-ridge }
+
+      - thing_exists: fac-birch-hollow
+      - status: { id: fac-birch-hollow, equals: computed }
+      - field: { id: fac-birch-hollow, name: fac_celsius, equals: -1.0 }
+      - link: { from: fac-birch-hollow, relation: assesses, to: trip-birch-hollow }
+
+      - thing_exists: fac-glencoe-snowfield
+      - status: { id: fac-glencoe-snowfield, equals: computed }
+      - field: { id: fac-glencoe-snowfield, name: fac_celsius, equals: -5.0 }
+      - link: { from: fac-glencoe-snowfield, relation: assesses, to: trip-glencoe-snowfield }
+
+      - thing_exists: fac-summit-bivvy
+      - status: { id: fac-summit-bivvy, equals: computed }
+      - field: { id: fac-summit-bivvy, name: fac_celsius, equals: 2.0 }
+      - link: { from: fac-summit-bivvy, relation: assesses, to: trip-summit-bivvy }
+
+      - thing_exists: fac-lowland-meadow
+      - status: { id: fac-lowland-meadow, equals: computed }
+      - field: { id: fac-lowland-meadow, name: fac_celsius, equals: -5.0 }
+      - link: { from: fac-lowland-meadow, relation: assesses, to: trip-lowland-meadow }
+
+      - validates_clean: true
+      - git_commits: { path: ".", min: 2 }
+
+  - name: perturb
+    prompt: |
+      The Aonach Ridge party has changed their plans: they will now camp at
+      3300 m, and they have upgraded their sleeping pad to one rated R 4.2.
+      Update the domain to reflect the new plan. Commit your changes as you go.
+    assertions:
+      # Reality updated on the trip itself…
+      - field: { id: trip-aonach-ridge, name: elevation_m, equals: 3300 }
+      - field: { id: trip-aonach-ridge, name: pad_r_value, equals: 4.2 }
+      # …and the cascade reached the derived figure (found via the assesses
+      # link — nothing in the prompt names the assessment).
+      - status: { id: fac-aonach-ridge, equals: computed }
+      - field: { id: fac-aonach-ridge, name: fac_celsius, equals: -1.0 }
+      - link: { from: fac-aonach-ridge, relation: assesses, to: trip-aonach-ridge }
+      # Drift check: the four untouched assessments hold their figures.
+      - field: { id: fac-birch-hollow, name: fac_celsius, equals: -1.0 }
+      - field: { id: fac-glencoe-snowfield, name: fac_celsius, equals: -5.0 }
+      - field: { id: fac-summit-bivvy, name: fac_celsius, equals: 2.0 }
+      - field: { id: fac-lowland-meadow, name: fac_celsius, equals: -5.0 }
+      - validates_clean: true
+      - git_commits: { path: ".", min: 3 }
+
+  - name: amend-rule
+    prompt: |
+      Tarn & Fell has revised the Field-Adjusted Comfort method after a season
+      of field reports: the elevation adjustment is now -1 degree C for every
+      complete 500 m of camp elevation above 1200 m (previously every complete
+      800 m). All other parts of the method are unchanged. Update the method
+      and bring the domain fully in line with it. Commit your changes as you go.
+    assertions:
+      # The walk must reach both high camps…
+      - field: { id: fac-aonach-ridge, name: fac_celsius, equals: -3.0 }
+      - status: { id: fac-aonach-ridge, equals: computed }
+      - field: { id: fac-summit-bivvy, name: fac_celsius, equals: 1.0 }
+      - status: { id: fac-summit-bivvy, equals: computed }
+      # …and must NOT touch the camps the amendment cannot affect.
+      - field: { id: fac-birch-hollow, name: fac_celsius, equals: -1.0 }
+      - field: { id: fac-glencoe-snowfield, name: fac_celsius, equals: -5.0 }
+      - field: { id: fac-lowland-meadow, name: fac_celsius, equals: -5.0 }
+      # Structure held across three sessions.
+      - link: { from: fac-aonach-ridge, relation: assesses, to: trip-aonach-ridge }
+      - link: { from: fac-summit-bivvy, relation: assesses, to: trip-summit-bivvy }
+      - validates_clean: true
+      - git_commits: { path: ".", min: 4 }

@@ -1666,7 +1666,9 @@ def _resolve_claude_cli(exe: str) -> str:
 def cmd_eval(args) -> int:
     """Stage 1 (default): assert a fixture against an existing domain's state.
     Stage 2 (--run): seed an isolated workspace, run a fresh headless agent on
-    the fixture's prompt, then assert the result. See evals/README.md."""
+    the fixture's prompt — or, for a longitudinal fixture (`sessions:`), a
+    chain of fresh agents against the same workspace, assertions checked after
+    each session. See evals/README.md."""
     root = Path(args.path).resolve()
     if args.report:
         return eval_report(root)
@@ -1691,21 +1693,45 @@ def cmd_eval(args) -> int:
         fixture = _subst(fixture)
     name = fixture.get("name", args.fixture)
 
+    # A longitudinal fixture declares `sessions:` — a list of {name, prompt,
+    # assertions} — instead of one top-level prompt/assertions pair. Each
+    # session is a FRESH headless agent (`claude -p`, no conversation memory)
+    # against the SAME workspace, so the only carrier between sessions is
+    # committed state: exactly the drift-resistance property under test.
+    sessions = fixture.get("sessions")
+    if sessions:
+        for i, s in enumerate(sessions, 1):
+            if "prompt" not in s:
+                sys.exit(f"mdllm: sessions[{i}] missing `prompt`")
+
     if not args.run:
         print(f"## Eval: {name} — {root}\n")
-        passed, failed, lines = check_assertions(fixture, root)
+        target = fixture
+        if sessions:
+            # Against an existing domain, the end-state contract is the final
+            # session's assertions — earlier sessions describe intermediate
+            # states that no longer exist.
+            last = sessions[-1]
+            print(f"(longitudinal fixture — checking final session "
+                  f"'{last.get('name', len(sessions))}' assertions)\n")
+            target = {"assertions": last.get("assertions")}
+            if fixture.get("domain_dir"):
+                target["domain_dir"] = fixture["domain_dir"]
+        passed, failed, lines = check_assertions(target, root)
         print("\n".join(lines))
         print(f"\n{passed} passed, {failed} failed")
         return 1 if failed else 0
 
     # ---- Stage 2: agent-in-the-loop -------------------------------------
-    if "seed" not in fixture or "prompt" not in fixture:
-        sys.exit("mdllm: --run requires `seed` and `prompt` in the fixture")
-    prompt = fixture["prompt"]
-    if args.bare:
-        prompt = (fixture.get("bare_preamble",
-                  "You are in a directory of markdown files with YAML "
-                  "frontmatter representing business records.") + "\n\n" + prompt)
+    if "seed" not in fixture or not (sessions or "prompt" in fixture):
+        sys.exit("mdllm: --run requires `seed` and `prompt` (or `sessions`) "
+                 "in the fixture")
+    if not sessions:
+        sessions = [{"name": "main", "prompt": fixture["prompt"],
+                     "assertions": fixture.get("assertions")}]
+    bare_preamble = fixture.get("bare_preamble",
+                                "You are in a directory of markdown files with YAML "
+                                "frontmatter representing business records.")
     import json as _json
     results = []
 
@@ -1725,65 +1751,105 @@ def cmd_eval(args) -> int:
         run_dir = root / "evals" / "runs" / run_id
         run_dir.parent.mkdir(parents=True, exist_ok=True)
         seed_run_dir(root, fixture, run_dir, args.bare)
-        cmd = ["claude", "-p", prompt, "--model", args.model,
-               "--output-format", "json", "--permission-mode", "acceptEdits",
-               "--allowedTools", fixture.get("allowed_tools",
-                                             "Edit Write Read Glob Grep Bash(git:*)")]
-        if not args.bare:
-            # The seed's framework_root resolves to the framework checkout;
-            # the bare condition must NOT see it — that's the control.
-            cmd += ["--add-dir", str(root)]
-        print(f"## Trial {trial}/{args.trials} — {run_id}")
-        if args.dry_run:
-            print(f"  workspace: {run_dir}")
-            print(f"  would run (cwd=workspace): {' '.join(cmd[:2])} "
-                  f"<prompt {len(prompt)} chars> {' '.join(cmd[3:])}")
-            continue
-        import shutil as _sh
-        exe = _sh.which("claude")
-        if not exe:
-            sys.exit("mdllm: `claude` CLI not on PATH — install "
-                     "@anthropic-ai/claude-code or use --dry-run")
-        cmd[0] = _resolve_claude_cli(exe)
-        t0 = dt.datetime.now()
-        try:
-            proc = subprocess.run(cmd, cwd=run_dir, capture_output=True, text=True,
-                                  timeout=args.timeout, encoding="utf-8")
-        except subprocess.TimeoutExpired:
+        print(f"## Trial {trial}/{args.trials} — {run_id}"
+              + (f" ({len(sessions)} sessions)" if len(sessions) > 1 else ""))
+        t_passed = t_failed = 0
+        sess_records: list[dict] = []
+        aborted = False
+        for si, sess in enumerate(sessions, 1):
+            sname = str(sess.get("name", f"s{si}"))
+            prompt = sess["prompt"]
+            if args.bare:
+                prompt = bare_preamble + "\n\n" + prompt
+            # Per-session assertion view; file/git assertions stay
+            # workspace-relative via the fixture's domain_dir, same as Stage 1.
+            sfx = {"assertions": sess.get("assertions") or []}
+            if fixture.get("domain_dir"):
+                sfx["domain_dir"] = fixture["domain_dir"]
+            cmd = ["claude", "-p", prompt, "--model", args.model,
+                   "--output-format", "json", "--permission-mode", "acceptEdits",
+                   "--allowedTools", fixture.get("allowed_tools",
+                                                 "Edit Write Read Glob Grep Bash(git:*)")]
+            if not args.bare:
+                # The seed's framework_root resolves to the framework checkout;
+                # the bare condition must NOT see it — that's the control.
+                cmd += ["--add-dir", str(root)]
+            if args.dry_run:
+                print(f"  [{sname}] workspace: {run_dir}")
+                print(f"  [{sname}] would run (cwd=workspace): {' '.join(cmd[:2])} "
+                      f"<prompt {len(prompt)} chars> {' '.join(cmd[3:])}")
+                continue
+            import shutil as _sh
+            exe = _sh.which("claude")
+            if not exe:
+                sys.exit("mdllm: `claude` CLI not on PATH — install "
+                         "@anthropic-ai/claude-code or use --dry-run")
+            cmd[0] = _resolve_claude_cli(exe)
+            t0 = dt.datetime.now()
+            try:
+                proc = subprocess.run(cmd, cwd=run_dir, capture_output=True, text=True,
+                                      timeout=args.timeout, encoding="utf-8")
+            except subprocess.TimeoutExpired:
+                wall = (dt.datetime.now() - t0).total_seconds()
+                n_asserts = len(sess.get("assertions") or [])
+                # Downstream sessions depend on this one's end state — the
+                # chain is unresumable, so their assertions fail with it.
+                rest = sum(len(s.get("assertions") or []) for s in sessions[si:])
+                print(f"  [{sname}] TIMEOUT after {wall:.0f}s — session 0/{n_asserts}"
+                      + (f", chain aborted ({rest} downstream assertions failed)"
+                         if rest else ""))
+                sess_records.append({"name": sname, "passed": 0, "failed": n_asserts,
+                                     "wall_s": round(wall), "cost_usd": None,
+                                     "turns": None, "timeout": True})
+                t_failed += n_asserts + rest
+                aborted = True
+                break
             wall = (dt.datetime.now() - t0).total_seconds()
-            n_asserts = len(fixture.get("assertions") or [])
-            print(f"  TIMEOUT after {wall:.0f}s — trial recorded as 0/{n_asserts}\n")
-            record(run_id, run_dir, {"run_id": run_id, "fixture": name,
-                   "model": args.model,
-                   "condition": "bare" if args.bare else "framework",
-                   "passed": 0, "failed": n_asserts,
-                   "wall_s": round(wall), "cost_usd": None,
-                   "turns": None, "timeout": True})
+            # Always persist the agent's raw output — a 2-second 1-turn
+            # "trial" is indistinguishable from a real one without it.
+            suffix = "" if len(sessions) == 1 else f"-{si}-{sname}"
+            (run_dir / f"agent-stdout{suffix}.json").write_text(
+                proc.stdout or "", encoding="utf-8")
+            if proc.stderr:
+                (run_dir / f"agent-stderr{suffix}.txt").write_text(
+                    proc.stderr, encoding="utf-8")
+            cost = turns = None
+            try:
+                meta = _json.loads(proc.stdout)
+                cost, turns = meta.get("total_cost_usd"), meta.get("num_turns")
+                if meta.get("is_error") or meta.get("subtype") not in (None, "success"):
+                    print(f"  [{sname}] AGENT ERROR ({meta.get('subtype')}): "
+                          f"{str(meta.get('result'))[:200]}")
+            except (ValueError, TypeError):
+                pass
+            passed, failed, lines = check_assertions(sfx, run_dir)
+            if len(sessions) > 1:
+                print(f"  --- session {si}/{len(sessions)}: {sname} ---")
+            print("\n".join(lines))
+            print(f"  [{sname}] {passed}/{passed + failed} · {wall:.0f}s "
+                  f"· cost {cost} · turns {turns}")
+            t_passed += passed
+            t_failed += failed
+            sess_records.append({"name": sname, "passed": passed, "failed": failed,
+                                 "wall_s": round(wall), "cost_usd": cost,
+                                 "turns": turns})
+        if args.dry_run:
             continue
-        wall = (dt.datetime.now() - t0).total_seconds()
-        # Always persist the agent's raw output — a 2-second 1-turn "trial"
-        # is indistinguishable from a real one without it.
-        (run_dir / "agent-stdout.json").write_text(proc.stdout or "", encoding="utf-8")
-        if proc.stderr:
-            (run_dir / "agent-stderr.txt").write_text(proc.stderr, encoding="utf-8")
-        cost = turns = None
-        try:
-            meta = _json.loads(proc.stdout)
-            cost, turns = meta.get("total_cost_usd"), meta.get("num_turns")
-            if meta.get("is_error") or meta.get("subtype") not in (None, "success"):
-                print(f"  AGENT ERROR ({meta.get('subtype')}): "
-                      f"{str(meta.get('result'))[:200]}")
-        except (ValueError, TypeError):
-            pass
-        passed, failed, lines = check_assertions(fixture, run_dir)
-        print("\n".join(lines))
-        score = f"{passed}/{passed + failed}"
-        print(f"  score {score} · {wall:.0f}s · cost {cost} · turns {turns}\n")
-        record(run_id, run_dir, {"run_id": run_id, "fixture": name,
-               "model": args.model,
+        walls = [s["wall_s"] for s in sess_records if s.get("wall_s") is not None]
+        costs = [s["cost_usd"] for s in sess_records if s.get("cost_usd") is not None]
+        turns_ = [s["turns"] for s in sess_records if s.get("turns") is not None]
+        res = {"run_id": run_id, "fixture": name, "model": args.model,
                "condition": "bare" if args.bare else "framework",
-               "passed": passed, "failed": failed,
-               "wall_s": round(wall), "cost_usd": cost, "turns": turns})
+               "passed": t_passed, "failed": t_failed,
+               "wall_s": sum(walls) if walls else None,
+               "cost_usd": round(sum(costs), 6) if costs else None,
+               "turns": sum(turns_) if turns_ else None}
+        if len(sessions) > 1:
+            res["sessions"] = sess_records
+        if aborted:
+            res["timeout"] = True
+        print(f"  trial score {t_passed}/{t_passed + t_failed}\n")
+        record(run_id, run_dir, res)
     if results:
         ok = sum(1 for r in results if r["failed"] == 0)
         print(f"### {name}: {ok}/{len(results)} trials fully passing "
