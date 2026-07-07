@@ -1,7 +1,7 @@
 ---
 id: evidence-and-eval-backlog
 type: plan
-status: not-started
+status: in-progress
 version: 2.0
 created: 2026-06-27
 priority: high
