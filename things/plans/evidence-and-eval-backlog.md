@@ -59,6 +59,17 @@ expected figures worked from the seed rule), and the run-evening protocol in
 per model and reading per-session pass rates. Do **not** re-run
 the 2×2 to "fix" the leak — the leaked trial is itself the finding.
 
+**Attempted 2026-07-08 from a hosted agent session; blocked — and the block is
+itself confirming evidence.** All 15 nested `claude -p` agents 401'd before doing
+any work (`ANTHROPIC_API_KEY` unset; this session authenticates via a
+host-refreshed OAuth token that does **not** propagate to a spawned child
+process). Zero cost, zero tokens, nothing measured; the junk result JSONs were
+quarantined out of the report. The runner is agent-pre-built, but *executing* it
+still requires an authenticated operator terminal — the run cannot be launched
+from inside an agent session. That is exactly the v2.0 thesis made concrete: this
+is an operator-terminal task, not an agent task. **Run it from a local `claude`
+terminal** (file-based credentials on disk), haiku then opus, `--trials 5`.
+
 ## Behind those two
 
 - **Real bare-control isolation.** A frontier opus-bare trial defeated the

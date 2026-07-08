@@ -230,7 +230,10 @@ N−1's reality, which is what "longitudinal" means.
 Protocol for the run evening: ≥5 trials framework condition
 (`--fixture evals/sleeping-bag-longitudinal.yaml --run --model haiku --trials 5`,
 then opus), report per-session pass rates, not just totals — *where in the
-chain* drift enters is the finding. A bare longitudinal run is near-meaningless
+chain* drift enters is the finding. **Run from a terminal where `claude` has its
+own on-disk credentials** — the runner shells out to `claude -p`, and a hosted
+agent session's host-refreshed OAuth token does not propagate to that child (it
+401s; observed 2026-07-08). This is an operator-terminal task, not an agent task. A bare longitudinal run is near-meaningless
 as designed (the bare preamble deliberately omits the FAC method, and session 3
 amends a file the bare condition deletes) — do not read a bare cell as a
 control without redesigning it.
