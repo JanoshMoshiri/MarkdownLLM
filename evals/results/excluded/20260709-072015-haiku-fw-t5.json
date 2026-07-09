@@ -1,0 +1,37 @@
+{
+  "run_id": "20260709-072015-haiku-fw-t5",
+  "fixture": "FAC longitudinal (build / perturb / resume, drift resistance)",
+  "model": "haiku",
+  "condition": "framework",
+  "passed": 32,
+  "failed": 12,
+  "wall_s": 269,
+  "cost_usd": 0.317997,
+  "turns": 62,
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 17,
+      "failed": 5,
+      "wall_s": 116,
+      "cost_usd": 0.12069559999999999,
+      "turns": 22
+    },
+    {
+      "name": "perturb",
+      "passed": 7,
+      "failed": 4,
+      "wall_s": 62,
+      "cost_usd": 0.080455,
+      "turns": 17
+    },
+    {
+      "name": "amend-rule",
+      "passed": 8,
+      "failed": 3,
+      "wall_s": 91,
+      "cost_usd": 0.11684660000000001,
+      "turns": 23
+    }
+  ]
+}

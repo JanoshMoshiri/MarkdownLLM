@@ -59,16 +59,29 @@ expected figures worked from the seed rule), and the run-evening protocol in
 per model and reading per-session pass rates. Do **not** re-run
 the 2×2 to "fix" the leak — the leaked trial is itself the finding.
 
-**Attempted 2026-07-08 from a hosted agent session; blocked — and the block is
-itself confirming evidence.** All 15 nested `claude -p` agents 401'd before doing
-any work (`ANTHROPIC_API_KEY` unset; this session authenticates via a
-host-refreshed OAuth token that does **not** propagate to a spawned child
-process). Zero cost, zero tokens, nothing measured; the junk result JSONs were
-quarantined out of the report. The runner is agent-pre-built, but *executing* it
-still requires an authenticated operator terminal — the run cannot be launched
-from inside an agent session. That is exactly the v2.0 thesis made concrete: this
-is an operator-terminal task, not an agent task. **Run it from a local `claude`
-terminal** (file-based credentials on disk), haiku then opus, `--trials 5`.
+**First run 2026-07-09 (operator's authenticated terminal): haiku arm valid,
+opus arm void.** Two things were learned before a single figure could be read.
+(1) The run *cannot* be launched from a hosted agent session — nested `claude -p`
+401s because the host-refreshed OAuth token doesn't propagate to a child (the
+2026-07-08 attempt); it is an operator-terminal task, exactly the v2.0 thesis.
+(2) On the operator's terminal it ran, but haiku t5's perturb agent committed the
+fact-change to the **shared source seed** in the framework repo (`27409f4`),
+silently seeding every opus trial from perturbed inputs — the whole opus arm is
+invalid. Seed reverted (`16b3b77`); contaminated results quarantined. See new
+insight [[isolation-must-contain-writes-not-just-reads]] and the results section
+in `evals/README.md`.
+
+**Valid finding (haiku t1–t4 + smoke):** within-session reasoning and controls
+never drift; the *cross-session cascade* (perturb's edit → derived figure via the
+`assesses` link → amend recompute) is where drift enters — carried in 3/4, dropped
+in 1/4. The drift-resistance half of the thesis holds for within-session, and is
+real-but-imperfect across sessions at the cascade point.
+
+**Still owed (now blocked on isolation, not just the operator's calendar):** the
+opus longitudinal arm must be re-run from the restored seed with run workspaces
+**outside the repo tree** (an OS temp dir / sandbox) so an agent can neither read
+nor write the canonical seed. This merges with the "real bare-control isolation"
+item below — same fix, now required for the framework condition too.
 
 ## Behind those two
 

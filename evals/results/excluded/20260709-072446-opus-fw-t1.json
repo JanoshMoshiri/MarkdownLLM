@@ -1,0 +1,37 @@
+{
+  "run_id": "20260709-072446-opus-fw-t1",
+  "fixture": "FAC longitudinal (build / perturb / resume, drift resistance)",
+  "model": "opus",
+  "condition": "framework",
+  "passed": 43,
+  "failed": 1,
+  "wall_s": 438,
+  "cost_usd": 1.746285,
+  "turns": 72,
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 21,
+      "failed": 1,
+      "wall_s": 168,
+      "cost_usd": 0.7510710000000002,
+      "turns": 32
+    },
+    {
+      "name": "perturb",
+      "passed": 11,
+      "failed": 0,
+      "wall_s": 96,
+      "cost_usd": 0.3168235,
+      "turns": 9
+    },
+    {
+      "name": "amend-rule",
+      "passed": 11,
+      "failed": 0,
+      "wall_s": 174,
+      "cost_usd": 0.6783909999999999,
+      "turns": 31
+    }
+  ]
+}

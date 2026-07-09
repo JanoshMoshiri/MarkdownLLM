@@ -202,7 +202,7 @@ before the next run — `--add-dir` withheld is necessary but not sufficient. Th
 is a property of capability that will intensify, not a defect; see
 `withholding-is-not-isolation`.
 
-## The longitudinal floor test (sleeping-bag-longitudinal, built 2026-07-06, not yet run)
+## The longitudinal floor test (sleeping-bag-longitudinal, first run 2026-07-09)
 
 Every eval above is single-shot; the drift-resistance half of the thesis —
 committed structure keeps *later, memoryless* sessions coherent — had never
@@ -237,6 +237,56 @@ agent session's host-refreshed OAuth token does not propagate to that child (it
 as designed (the bare preamble deliberately omits the FAC method, and session 3
 amends a file the bare condition deletes) — do not read a bare cell as a
 control without redesigning it.
+
+### First multi-trial run (2026-07-09) — one valid arm, one contaminated
+
+Ran haiku ×5 then opus ×5, framework condition, from the operator's authenticated
+terminal. **The opus arm is void and the seed was corrupted mid-run** — read
+`isolation-must-contain-writes-not-just-reads` before trusting anything here.
+
+**What happened:** haiku t5's *perturb* agent wrote the fact-change to the
+**shared source seed** (`evals/seeds/sleeping-bag-fac/…/trip-aonach-ridge.md`)
+and committed it to the framework repo (`27409f4`) instead of editing its
+workspace. Every opus trial was seeded *after* that commit, so all five started
+from the already-perturbed 3300 m/R 4.2 inputs: opus's build-Aonach of −1 was
+*correct for the corrupted seed*, scored as a miss against the 2400 m-era
+expectation of 4, and its perturb was a no-op. The seed is reverted (`16b3b77`);
+the five opus results plus haiku t5 are quarantined under `results/excluded/`.
+
+**Valid data — haiku, four trials (t1–t4) seeded before the corruption, plus the
+2026-07-06 smoke.** Per-session, the story is clean:
+
+| trial | build | perturb | amend | chain figure (aonach) |
+|---|---|---|---|---|
+| haiku t1 | 17/22 | 10/11 | 9/11 | −3 ✓ full cascade |
+| haiku t2 | 17/22 | 9/11 | 9/11 | −3 ✓ full cascade |
+| haiku t3 | 17/22 | 10/11 | 9/11 | −3 ✓ full cascade |
+| haiku t4 | 17/22 | 9/11 | 8/11 | **3 ✗ cascade dropped** |
+
+**Honest reading.** Two layers separate cleanly:
+
+- **Within-session reasoning and the controls never drifted.** All four valid
+  trials got the summit-bivvy ceiling trap (ceil(0.5)=1) and all three low-camp
+  controls right, in every session — the memoryless later sessions stayed
+  coherent off committed state alone. Drift resistance, as far as the valid arm
+  goes, holds.
+- **The cross-session cascade is where drift lives, and it is not free.** The
+  Aonach figure is the only one that requires carrying an edit *across* sessions
+  (perturb changes the trip → the derived assessment must follow via the
+  `assesses` link → amend recomputes under the new rule). Haiku carried it in
+  3/4; t4 dropped it — perturb updated the *trip* (3300/4.2) but never cascaded
+  to the assessment, so amend recomputed off the stale build-era body (its
+  working literally reads "2400 m … pad R 2.8 → +4") and landed 3. A
+  coherent-but-wrong figure, faithfully propagated
+  ([[committed-state-carries-defects-as-faithfully-as-facts]]).
+- **The link convention is the standing haiku miss** (the constant 5/22 build
+  gap): every trial mis-keys `assesses`/`references` as top-level frontmatter
+  instead of `linked_things`, so all eight link assertions fail while the
+  semantic link is present (`mis-keyed-links-pass-the-floor-silently`).
+
+**Still owed:** a valid opus arm, re-run from the restored seed under real
+workspace isolation (outside the repo tree), and haiku re-run to n≥5 clean if a
+trial is lost to the same isolation fix. Report per-session, not just totals.
 
 ## Conventions
 
