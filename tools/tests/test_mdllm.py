@@ -693,6 +693,38 @@ def test_provenance_index_reverse_map(tmp_path):
     assert coverage == 1 and "## k" in body and "d (pinned @abc1234)" in body
 
 
+def test_provenance_unreachable_commit_with_input_present_is_warning(tmp_path, capsys):
+    # A pinned commit that is not reachable in this repo (e.g. history was
+    # rewritten, or the pin was never valid) must NOT hard-fail CI so long as the
+    # cited input is still in the corpus — the reasoning chain is intact, only the
+    # anchor is stale. Non-blocking Warning, exit 0, with a re-pin nudge. The
+    # message states the observable fact only — it must not assert a cause.
+    _git_repo(tmp_path)
+    write(tmp_path, "things/k.md", thing_text(GOOD.replace("alpha", "k")))
+    write(tmp_path, "things/d.md", thing_text(
+        "id: d\ntype: decision\nstatus: made\ncreated: 2026-06-01\n"
+        "informed_by:\n  - id: k\n    commit: deadbee"))
+    rc = mdllm.cmd_provenance(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "### Warnings" in out and "not reachable" in out and "re-pin" in out
+    # the tool must not diagnose a cause it cannot verify
+    assert "history rewritten" not in out and "history was rewritten" not in out
+
+
+def test_provenance_missing_commit_and_missing_input_is_error(tmp_path, capsys):
+    # But if the pinned commit is gone AND the cited input is absent from the
+    # corpus, the chain is genuinely broken — that stays a blocking Error.
+    _git_repo(tmp_path)
+    write(tmp_path, "things/d.md", thing_text(
+        "id: d\ntype: decision\nstatus: made\ncreated: 2026-06-01\n"
+        "informed_by:\n  - id: ghost\n    commit: deadbee"))
+    rc = mdllm.cmd_provenance(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert rc == 1 and "### Errors" in out and "chain is broken" in out
+    assert "history rewritten" not in out and "history was rewritten" not in out
+
+
 # ---------------------------------------------------------------- scaffold
 
 

@@ -8,11 +8,11 @@ decided_by: both
 confidence: high
 informed_by:
   - id: status-vocabulary-universal-vs-domain
-    commit: d4ac2f6
+    commit: e876b28
   - id: framework-retrospective-2026-06
-    commit: d4ac2f6
+    commit: e876b28
   - id: framework-v3-transformation-plan
-    commit: ed07a22
+    commit: 258fa67
 linked_things:
   - id: thing-specification
     relation: informs

@@ -1224,11 +1224,29 @@ def cmd_provenance(args) -> int:
                                 f"`informed_by[{i}]` must have `id` and `commit`"))
                 continue
             pid, sha = str(pin["id"]), str(pin["commit"])
-            if not commit_exists(sha):
-                findings.append(Finding(SEV_ERROR, name,
-                                f"pinned commit `{sha}` does not exist"))
-                continue
             src = by_id.get(pid)
+            if not commit_exists(sha):
+                # The pinned commit is not reachable in this repository. The tool
+                # cannot know *why* — the history it referenced may have been
+                # rewritten (rebase/squash/filter re-hashes every commit), or the
+                # pin may never have been a valid commit here — so it reports only
+                # the observable fact and never asserts a cause. Severity is
+                # decided by whether the reasoning chain still holds: if the cited
+                # input is present in the corpus the decision can still be traced,
+                # so this is a non-blocking Warning to re-pin; only when the input
+                # is *also* absent is the chain genuinely broken.
+                if src is not None:
+                    findings.append(Finding(SEV_WARNING, name,
+                                    f"pinned commit `{sha}` for `{pid}` is not "
+                                    f"reachable in this repository; the cited input "
+                                    f"is still in the corpus — re-pin to a current "
+                                    f"commit"))
+                else:
+                    findings.append(Finding(SEV_ERROR, name,
+                                    f"pinned commit `{sha}` is not reachable and "
+                                    f"input `{pid}` is not in the corpus — "
+                                    f"provenance chain is broken"))
+                continue
             if src is None and not exists_at(sha, pid):
                 findings.append(Finding(SEV_ERROR, name,
                                 f"pinned input `{pid}` not found (current corpus "
@@ -1268,6 +1286,7 @@ def cmd_provenance(args) -> int:
     if not findings:
         print("No provenance issues found.")
     for title, group in (("Errors", errors),
+                         ("Warnings", [x for x in findings if x.severity == SEV_WARNING]),
                          ("Info", [x for x in findings if x.severity == SEV_INFO])):
         if group:
             print(f"### {title}")
