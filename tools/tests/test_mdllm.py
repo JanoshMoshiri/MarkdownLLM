@@ -931,7 +931,7 @@ def test_coherence_tiers_warns_tier_entry_missing_from_catalog(tmp_path):
           "framework: F\nversion: 1.0\nfoundational_specs:\n  - thing.md\n")
     write(tmp_path, "thing.md", "# x\n")
     warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
-    assert any("in the TIERS map (tools/mdllm.py) but not in" in m for m in warns)
+    assert any("in the TIERS map (tools/markdownllm/repo.py) but not in" in m for m in warns)
     assert not any("`thing.md` is in the TIERS map" in m for m in warns)
 
 
