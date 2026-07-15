@@ -22,9 +22,8 @@ from .model import Finding, SEV_ERROR, SEV_INFO, SEV_WARNING, parse_frontmatter,
 from .repo import TIERS
 
 # The framework-map count check reads the file that registers the subparsers
-# (truth = the `sub.add_parser(` calls). Until the cli move lands that is the
-# entry shim itself.
-CLI_REGISTRY_FILE = Path(__file__).resolve().parents[1] / "mdllm.py"
+# (truth = the `sub.add_parser(` calls) — the CLI module beside this one.
+CLI_REGISTRY_FILE = Path(__file__).resolve().parent / "cli.py"
 
 def _changed_files_recent(root: Path, window: int) -> set[str] | None:
     """Repo-relative POSIX paths changed in the last `window` commits, or None
