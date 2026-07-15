@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 3.17.4
+version: 3.17.5
 applies_to: "**/*.md"
 framework_root: .
 git:

@@ -122,7 +122,7 @@ def coherence_findings(root: Path, window: int) -> list[Finding]:
             if name not in tier_files:
                 findings.append(Finding(SEV_WARNING, "TIERS",
                     f"foundational spec `{name}` has no entry in the TIERS map "
-                    f"(tools/mdllm.py) — tier routing drifted from the catalog"))
+                    f"(tools/markdownllm/repo.py) — tier routing drifted from the catalog"))
 
         # ...and the mirror (directional graph reads come in inbound/outbound
         # pairs): every TIERS entry must be in the catalog. A file routed by
@@ -132,7 +132,7 @@ def coherence_findings(root: Path, window: int) -> list[Finding]:
         for name in sorted(tier_files):
             if name not in specs:
                 findings.append(Finding(SEV_WARNING, "TIERS",
-                    f"`{name}` is in the TIERS map (tools/mdllm.py) but not in "
+                    f"`{name}` is in the TIERS map (tools/markdownllm/repo.py) but not in "
                     f".markdownllm foundational_specs — loading map drifted "
                     f"from the catalog"))
 

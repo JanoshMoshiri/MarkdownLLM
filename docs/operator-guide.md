@@ -153,9 +153,11 @@ surfaces, then one command to install the hook.
 
 ## The Toolbox
 
-Everything lives in one file: `python {framework_root}/tools/mdllm.py
-<subcommand> [path]`. Most of these run *for* you — via the pre-commit hook,
-CI, or the agent — but all of them are yours to invoke directly.
+Everything runs through one entry point: `python {framework_root}/tools/mdllm.py
+<subcommand> [path]` (the implementation lives in the `tools/markdownllm/`
+package beside it — one module per responsibility). Most of these run *for*
+you — via the pre-commit hook, CI, or the agent — but all of them are yours
+to invoke directly.
 
 | Command | What it does | When you'd type it yourself |
 |---|---|---|

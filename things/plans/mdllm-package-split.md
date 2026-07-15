@@ -1,7 +1,7 @@
 ---
 id: mdllm-package-split
 type: plan
-status: in-progress
+status: completed
 version: 1.0
 created: 2026-07-15
 priority: high
@@ -84,3 +84,24 @@ All 105 tests green unmodified · golden CLI diff clean · `validate .` +
 `coherence` clean · CHANGELOG entry + patch version bump · workflow-run in
 code-architect closed with every divergence traced · `refactoring-process`
 promoted draft→evolving on the strength of this run.
+
+## Outcome (2026-07-15 — completed)
+
+Executed in 20 moves over 11 commits (v3.17.5). `tools/mdllm.py` went from
+3,444 lines to a 70-line entry shim over 21 package modules (largest:
+validation.py at 446). Two shared-helper modules emerged that the plan had
+not named: `repo.py` (git sha, version sentinel, TIERS, version compare) and
+the `MDLLM_ENTRY` constant in `scaffold.py` pinning the shim path for
+installed hooks. The lateral-import rule generalised during the cut: `cmd_*`
+functions are never imported across modules; *library* functions may be
+(doctor, coherence, refresh, session all consume siblings' libraries).
+
+Divergences routed: **one route-1 regression** (a batch extraction slice
+deleted five earlier-inserted import blocks; 38 tests went red; restored) and
+**one route-2 revision recorded post-freeze** (two coherence warning strings
+naming `tools/mdllm.py` as TIERS' home — an accident of the old structure —
+updated to `tools/markdownllm/repo.py` after the final move, outside the
+characterization window, in the close-out commit). Three `Path(__file__)`
+traps (framework-map count check, install_hook's hook body, scaffold's
+fw_root) were caught at target-seam time and routed through
+`CLI_REGISTRY_FILE` / `MDLLM_ENTRY`.

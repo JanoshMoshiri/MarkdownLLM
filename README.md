@@ -123,7 +123,7 @@ For a domain in production use, the framework's own repository is the working ex
 
 ### The Deterministic Floor (`tools/mdllm.py`)
 
-Since v3.0, the framework pairs its specifications with a single-file CLI that guarantees everything mechanical, so the LLM spends its reliability on reasoning:
+Since v3.0, the framework pairs its specifications with a zero-install, stdlib-only CLI (one entry file, a package of single-responsibility modules behind it) that guarantees everything mechanical, so the LLM spends its reliability on reasoning:
 
 ```bash
 python tools/mdllm.py validate <domain>      # structure, references, schema — exit 1 on Errors
