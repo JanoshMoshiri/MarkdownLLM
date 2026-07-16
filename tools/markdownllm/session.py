@@ -73,6 +73,58 @@ def _orient_forward(domain: Path) -> list[str]:
     return lines
 
 
+def _verified_flips_recent(domain: Path) -> list[str]:
+    """`verified: true` flips since the last `session-end:` commit (fallback:
+    the last 15 commits) — the visibility leg of the quarantine flip
+    discipline (verified-flip-enforcement plan). A wrong or rogue flip cannot
+    hide when every flip is surfaced where the operator already looks.
+    Silent (empty list) when there are none."""
+    log = subprocess.run(["git", "log", "--format=%H%x1f%s", "-n", "200"],
+                         cwd=domain, capture_output=True, text=True)
+    if log.returncode != 0 or not log.stdout.strip():
+        return []
+    commits = [ln.split("\x1f", 1) for ln in log.stdout.splitlines() if ln]
+    base = None
+    for h, subj in commits[1:]:  # HEAD itself being a session-end still ends a session
+        if subj.startswith("session-end"):
+            base = h
+            break
+    if base is None:
+        base = commits[min(15, len(commits) - 1)][0] if len(commits) > 1 else None
+    if base is None:
+        return []
+    flips = subprocess.run(
+        ["git", "log", "--format=%h", "--name-only",
+         "-G", r"^verified: *[Tt]rue", f"{base}..HEAD"],
+        cwd=domain, capture_output=True, text=True)
+    if flips.returncode != 0:
+        return []
+    lines: list[str] = []
+    sha = None
+    seen: set[str] = set()
+    for ln in flips.stdout.splitlines():
+        ln = ln.strip()
+        if not ln:
+            continue
+        if "/" not in ln and " " not in ln and len(ln) in range(6, 13):
+            sha = ln
+            continue
+        if not ln.endswith(".md") or ln in seen:
+            continue
+        seen.add(ln)
+        f = domain / ln
+        if not f.is_file():
+            continue  # flipped then deleted/moved — git has the record
+        meta, _, _ = parse_frontmatter(f.read_text(encoding="utf-8"))
+        if not (meta and meta.get("verified") is True
+                and str(meta.get("origin")) == "external"):
+            continue
+        by = meta.get("verified_by")
+        by = by.strip() if isinstance(by, str) and by.strip() else "UNATTRIBUTED"
+        lines.append(f"    - `{meta.get('id') or ln}` @ {sha} (verified_by: {by})")
+    return lines
+
+
 def cmd_session_start(args) -> int:
     domain = Path(args.path).resolve()
     agents = domain / "AGENTS.md"
@@ -116,6 +168,12 @@ def cmd_session_start(args) -> int:
                 out.append(f"- **Version: in sync** (framework v{fv}).")
 
     out.append(f"- **Velocity:** {_velocity_signal(domain)}")
+
+    flips = _verified_flips_recent(domain)
+    if flips:
+        out.append(f"- **Verified flips since last session ({len(flips)}):** "
+                   f"external things marked human-verified — confirm each is real:")
+        out.extend(flips)
 
     if agents.is_file():
         _, drifted = domain_kernel_status(

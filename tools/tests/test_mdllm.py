@@ -1545,3 +1545,28 @@ def test_quarantine_ignores_non_external_and_unverified(tmp_path):
         "origin: external\nverified: false\n"))  # still quarantined — fine
     _git_commit(tmp_path, "seed")
     assert _quarantine(tmp_path) == []
+
+
+def test_session_start_surfaces_verified_flips(tmp_path, capsys):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_UNVERIFIED))
+    _git_commit(tmp_path, "import: ext-doc (quarantined)")
+    import subprocess as sp
+    sp.run(["git", "commit", "-q", "--allow-empty", "-m",
+            "session-end: previous session closes"], cwd=tmp_path, check=True)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ATTRIBUTED))
+    _git_commit(tmp_path, "verify: ext-doc (A Human)")
+    import argparse
+    mdllm.cmd_session_start(argparse.Namespace(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "Verified flips since last session (1)" in out
+    assert "`ext-doc`" in out and "verified_by: A Human" in out
+
+
+def test_session_start_quiet_without_flips(tmp_path, capsys):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_UNVERIFIED))
+    _git_commit(tmp_path, "import: ext-doc (still quarantined)")
+    import argparse
+    mdllm.cmd_session_start(argparse.Namespace(path=str(tmp_path)))
+    assert "Verified flips" not in capsys.readouterr().out
