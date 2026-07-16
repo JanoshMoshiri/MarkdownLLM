@@ -6,8 +6,12 @@ created: 2026-06-30
 session: 2026-06-30
 confidence: high
 origin: external
-verified: false
+verified: true
+verified_by: Janosh Moshiri
 source: code-architect
+source_domain: code-architect
+source_id: divergence-is-an-unrouted-decision
+source_commit: bd8fc48
 promoted_to: llm-driven-systems-manifesto
 tags: [primitive, drift, consistency, belief-revision, cross-domain]
 linked_things:
