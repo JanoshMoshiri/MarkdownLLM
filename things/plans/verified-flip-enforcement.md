@@ -1,7 +1,7 @@
 ---
 id: verified-flip-enforcement
 type: plan
-status: in-progress
+status: completed
 version: 1.0
 created: 2026-07-16
 priority: critical
@@ -99,3 +99,20 @@ All new self-tests green (105 + new) · framework + examples validate clean
 after remediation · `quarantine: strict` verified in a test corpus · the
 day-one positive healed with an attributed flip in git history · CHANGELOG
 records the check catching its own builder first.
+
+## Outcome (2026-07-16 — completed, v3.18.0)
+
+All exit criteria met. 115 floor self-tests (+10: eight quarantine, two
+session-start surfacing); strict escalation covered by test, not just prose.
+The day-one true positive fired exactly as predicted and was healed in the
+prescribed two-commit shape (re-quarantine `018edd5` → attributed
+re-verification `3546ff6`, `verified_by: Janosh Moshiri`, basis recorded in
+the commit message: the operator personally walked the import into manifesto
+v2.6). Bonus closure: the heal commit also pinned the import's reference
+triple (`source_domain`/`source_id`/`source_commit @ bd8fc48`), clearing the
+standing imports-check INCOMPLETE; the triple and `verified_by` joined
+CORE_FIELDS by the tool-reads-it discipline. The operative flip rule now
+rides thing.md's kernel block (Tier 0), so every session knows it without
+loading provenance.md. Remaining for the QMS domain (its own repo, its own
+plan): declare `options: {quarantine: strict}` in its `_schema.yaml` on next
+refresh — one line, and the flip becomes commit-blocking there.
