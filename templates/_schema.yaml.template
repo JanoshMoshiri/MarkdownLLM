@@ -14,6 +14,10 @@ options:
   # (x-read.thing.skill.md) with plain kebab-case ids, so the id↔filename
   # check is off. Flip to true if your domain's files all match their ids.
   id_filename_match: false
+  # Quarantine flip discipline (provenance.md): born-verified and
+  # unattributed-flip findings are Warnings by default. A regulated domain
+  # that needs the flip to BLOCK commits declares strict mode:
+  # quarantine: strict
 
 # Declare one entry per thing type. The placeholders below are commented out
 # so this file is valid YAML from the moment it is copied — uncomment and

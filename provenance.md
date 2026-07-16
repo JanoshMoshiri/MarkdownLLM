@@ -130,6 +130,29 @@ knowledge thing (pinned at commit) ──informed_by──▶ decision ──der
 until a human confirms its content (reconciliation, review, spot-check), which
 flips it to `verified: true` with a note of how.
 
+**The flip discipline (v3.18):** the flip itself is an auditable event, not an
+honour-system bit. The floor cannot verify *truth* (whether the human review
+was real — that is judgement); it verifies *procedure*, keyed to git:
+
+1. **No born-verified things.** A thing whose most recent `verified: true`
+   flip commit is its creation commit had no review window — verification and
+   content arrived in one keystroke. Commit external things unverified first;
+   flip in a separate commit. A historical offence heals the same way:
+   re-quarantine, then re-verify properly.
+2. **Every flip names its human.** `verified: true` requires `verified_by` —
+   ALCOA "attributable", mechanised. Deliberately forgeable: a false
+   attribution is a falsifiable record a named human can deny, which is a
+   categorically better failure mode than an anonymous bit.
+3. **Every flip is surfaced.** `mdllm session-start` lists the flips since the
+   last session-end commit where the operator already looks; a wrong or rogue
+   flip cannot hide.
+
+Checks 1–2 run in `validate` (and therefore in the pre-commit hook) at
+Warning severity by default; a domain that needs the flip to be *blocking*
+declares `options: {quarantine: strict}` in its `_schema.yaml`, which raises
+them to Error. A regulated domain opts in; a casual domain never meets the
+ceremony.
+
 > **No decision may pin an unverified external thing. No calculation, filing, or
 > generated output may rest on one.**
 
@@ -161,6 +184,9 @@ python {framework_root}/tools/mdllm.py provenance <domain-path>
 | Quarantine | No decision pins a thing with `origin: external` and `verified` not `true` | Error |
 | Freshness | A pinned input has changed in commits after the pin — decision may be stale | Info |
 | External unverified | `origin: external` things with `verified: false` older than 30 days | Info |
+| Born verified | The most recent `verified: true` flip commit is the thing's creation commit — no review window (`validate`, hook-enforced) | Warning (Error under `quarantine: strict`) |
+| Unattributed flip | `verified: true` without `verified_by` naming the human verifier (`validate`, hook-enforced) | Warning (Error under `quarantine: strict`) |
+| Flip visibility | `verified: true` flips since the last session-end commit are listed by `session-start` | surfaced, not scored |
 
 Freshness is **Info, not Error**: a decision made on yesterday's knowledge is not
 wrong — it is *dated*, and whether to re-decide is a judgement (the agent's, then
