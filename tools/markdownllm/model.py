@@ -62,8 +62,10 @@ CORE_FIELDS = {
     # triggers & workflow-run cursor
     "triggers", "current_stage", "stages",
     # provenance (provenance.md) — `verified_by` names the human verifier on a
-    # `verified: true` flip (ALCOA attributable; verified-flip-enforcement plan)
+    # `verified: true` flip (ALCOA attributable; verified-flip-enforcement plan);
+    # the source triple is the cross-domain import pin `imports-check` reads
     "informed_by", "origin", "verified", "verified_by",
+    "source_domain", "source_id", "source_commit",
     # insight-lifecycle disposition (session-memory.md) — the orphan check READS
     # `disposition: keep-active` to honour a deliberately-kept standing/parked
     # insight, so these are tool-read and belong in CORE (unlike promoted_to,
