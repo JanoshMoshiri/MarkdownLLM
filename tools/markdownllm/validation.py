@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import datetime as dt
 import re
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -387,6 +388,91 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
     return f
 
 
+def _git_stdout(root: Path, args: list[str]) -> str | None:
+    out = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True)
+    return out.stdout.strip() if out.returncode == 0 else None
+
+
+def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
+    """The verified flip as an auditable event (verified-flip-enforcement plan).
+
+    The floor cannot verify TRUTH (did a human really review?) — that is
+    judgement. It can verify PROCEDURE, because git is a same-builder event
+    stream: (1) a `verified: true` whose most recent flip commit IS the
+    thing's creation commit had no review window (born verified) — also fired
+    pre-commit for a working-tree thing not yet in HEAD; (2) a flip must name
+    its human via `verified_by` (ALCOA attributable — forgeable, but a false
+    attribution is a falsifiable record, categorically better than an
+    anonymous bit). Scope: `origin: external`, the quarantined class.
+
+    Severity: Warning by default; `options: {quarantine: strict}` in
+    _schema.yaml raises both to Error (the pre-commit hook then blocks).
+    Historical findings heal: re-quarantine and re-flip in a separate,
+    attributed commit — the newest flip then no longer matches creation.
+    """
+    strict = ((corpus.schema or {}).get("options") or {}).get("quarantine") == "strict"
+    sev = SEV_ERROR if strict else SEV_WARNING
+    out: list[Finding] = []
+    externals = [t for t in corpus.things
+                 if str(t.meta.get("origin")) == "external"
+                 and t.meta.get("verified") is True]
+    if not externals:
+        return out
+    toplevel = _git_stdout(root, ["rev-parse", "--show-toplevel"])
+    for t in externals:
+        name = t.id or t.path.name
+        vb = t.meta.get("verified_by")
+        if not (isinstance(vb, str) and vb.strip()):
+            out.append(Finding(sev, name,
+                       "`verified: true` without `verified_by` — the flip must "
+                       "name its human verifier (quarantine flip discipline; "
+                       "provenance.md)"))
+        if toplevel is None:
+            continue  # not a git repo — the git-keyed half skips, like provenance
+        try:
+            rel = t.path.resolve().relative_to(Path(toplevel).resolve()).as_posix()
+        except ValueError:
+            continue
+        in_head = subprocess.run(["git", "cat-file", "-e", f"HEAD:{rel}"],
+                                 cwd=root, capture_output=True).returncode == 0
+        if not in_head:
+            out.append(Finding(sev, name,
+                       "about to be born `verified: true` — commit it "
+                       "unverified first, then flip in a separate attributed "
+                       "commit (a same-commit flip has no review window)"))
+            continue
+        # If HEAD still holds verified != true, the flip is only pending in the
+        # working tree — a distinct commit from creation by construction.
+        head_text = _git_stdout(root, ["show", f"HEAD:{rel}"])
+        if head_text is not None:
+            head_meta, _, _ = parse_frontmatter(head_text)
+            if not (head_meta and head_meta.get("verified") is True):
+                continue
+        created = _git_stdout(root, ["log", "--diff-filter=A", "--format=%H",
+                                     "-1", "--", rel])
+        # Newest commit whose post-image carries verified: true among commits
+        # that touched such a line — the most recent flip (so a proper
+        # re-verification heals a historical born-verified finding).
+        flip = None
+        candidates = _git_stdout(root, ["log", "--format=%H",
+                                        "-G", r"^verified: *[Tt]rue", "--", rel])
+        for c in (candidates or "").splitlines():
+            shown = _git_stdout(root, ["show", f"{c}:{rel}"])
+            if shown is None:
+                continue
+            cmeta, _, _ = parse_frontmatter(shown)
+            if cmeta and cmeta.get("verified") is True:
+                flip = c
+                break
+        if created and flip and created == flip:
+            out.append(Finding(sev, name,
+                       f"born `verified: true` — the flip commit is the "
+                       f"creation commit ({created[:9]}); no review window "
+                       f"existed. Heal: re-quarantine, then re-verify in a "
+                       f"separate commit naming `verified_by`"))
+    return out
+
+
 def validate_corpus(root: Path) -> tuple[Corpus, list[Finding]]:
     corpus, findings = scan(root)
     for t in corpus.things:
@@ -414,9 +500,11 @@ def cmd_validate(args) -> int:
     reports: list[tuple[Path, Corpus, list[Finding]]] = []
     corpus, findings = validate_corpus(root)
     findings.extend(check_version_sync(root))
+    findings.extend(quarantine_findings(root, corpus))
     reports.append((root, corpus, findings))
     for sub in example_corpora(root):
         sub_corpus, sub_findings = validate_corpus(sub)
+        sub_findings.extend(quarantine_findings(sub, sub_corpus))
         reports.append((sub, sub_corpus, sub_findings))
 
     total_errors = 0

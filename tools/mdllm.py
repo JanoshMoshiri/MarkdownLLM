@@ -31,7 +31,7 @@ from markdownllm.model import (
 from markdownllm.validation import (
     valid_statuses_for, validate_level1, validate_level2, version_tuple,
     check_version_sync, validate_level3, validate_corpus, example_corpora,
-    cmd_validate,
+    quarantine_findings, cmd_validate,
 )
 from markdownllm.repo import git_short_sha, framework_version, _version_lt, TIERS
 from markdownllm.triggers import cmd_triggers

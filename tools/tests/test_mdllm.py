@@ -1424,3 +1424,124 @@ def test_mcp_serve_stdio_roundtrip(tmp_path):
     assert {t["name"] for t in by_id[2]["result"]["tools"]} == {"query_things", "get_deliverable"}
     payload = _json.loads(by_id[3]["result"]["content"][0]["text"])
     assert payload["reference_triple"]["source_id"] == "rent-statement-2026"
+
+
+# ------------------------------------------------- quarantine flip discipline
+# (verified-flip-enforcement plan: the verified flip is an auditable event —
+# born-verified and attribution are procedure checks keyed to git, never a
+# truth claim about whether the human review was real.)
+
+
+EXT_UNVERIFIED = """id: ext-doc
+type: reference
+status: not-started
+created: 2026-07-16
+origin: external
+verified: false
+"""
+
+EXT_VERIFIED_ATTRIBUTED = """id: ext-doc
+type: reference
+status: not-started
+created: 2026-07-16
+origin: external
+verified: true
+verified_by: A Human
+"""
+
+EXT_VERIFIED_ANON = """id: ext-doc
+type: reference
+status: not-started
+created: 2026-07-16
+origin: external
+verified: true
+"""
+
+
+def _quarantine(root):
+    corpus, _ = mdllm.scan(root)
+    return mdllm.quarantine_findings(root, corpus)
+
+
+def test_quarantine_born_verified_fires(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ATTRIBUTED))
+    _git_commit(tmp_path, "import: ext-doc, already flipped")
+    msgs = [f.message for f in _quarantine(tmp_path)]
+    assert any("born `verified: true`" in m for m in msgs)
+    assert all(f.severity == mdllm.SEV_WARNING for f in _quarantine(tmp_path))
+
+
+def test_quarantine_two_commit_flip_is_clean(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_UNVERIFIED))
+    _git_commit(tmp_path, "import: ext-doc (quarantined)")
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ATTRIBUTED))
+    _git_commit(tmp_path, "verify: ext-doc (A Human)")
+    assert _quarantine(tmp_path) == []
+
+
+def test_quarantine_heal_by_reverification(tmp_path):
+    # A historical born-verified finding disappears once the thing is
+    # re-quarantined and re-flipped in a separate attributed commit.
+    _git_repo(tmp_path)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ANON))
+    _git_commit(tmp_path, "import: born verified (the sin)")
+    assert any("born" in f.message for f in _quarantine(tmp_path))
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_UNVERIFIED))
+    _git_commit(tmp_path, "re-quarantine: ext-doc")
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ATTRIBUTED))
+    _git_commit(tmp_path, "verify: ext-doc (A Human)")
+    assert _quarantine(tmp_path) == []
+
+
+def test_quarantine_attribution_missing(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_UNVERIFIED))
+    _git_commit(tmp_path, "import")
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ANON))
+    _git_commit(tmp_path, "verify without attribution")
+    msgs = [f.message for f in _quarantine(tmp_path)]
+    assert len(msgs) == 1 and "verified_by" in msgs[0]
+
+
+def test_quarantine_strict_escalates_to_error(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\noptions:\n  quarantine: strict\n")
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ANON))
+    _git_commit(tmp_path, "import: born verified, anonymous")
+    sevs = {f.severity for f in _quarantine(tmp_path)}
+    assert sevs == {mdllm.SEV_ERROR}
+
+
+def test_quarantine_uncommitted_new_file_is_boundary_case(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "base")
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ATTRIBUTED))
+    msgs = [f.message for f in _quarantine(tmp_path)]
+    assert any("about to be born" in m for m in msgs)
+
+
+def test_quarantine_pending_flip_of_committed_thing_is_clean(tmp_path):
+    # HEAD holds verified: false; the working tree flips it — a distinct
+    # commit from creation by construction, so born-verified must not fire.
+    _git_repo(tmp_path)
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_UNVERIFIED))
+    _git_commit(tmp_path, "import")
+    write(tmp_path, "things/ext-doc.md", thing_text(EXT_VERIFIED_ATTRIBUTED))
+    assert _quarantine(tmp_path) == []
+
+
+def test_quarantine_ignores_non_external_and_unverified(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/own.md", thing_text(
+        "id: own\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"
+        "verified: true\n"))  # not origin: external — out of scope
+    write(tmp_path, "things/ext.md", thing_text(
+        "id: ext\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"
+        "origin: external\nverified: false\n"))  # still quarantined — fine
+    _git_commit(tmp_path, "seed")
+    assert _quarantine(tmp_path) == []
