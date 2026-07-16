@@ -6,7 +6,7 @@ created: 2026-06-30
 session: 2026-06-30
 confidence: high
 origin: external
-verified: true
+verified: false
 source: code-architect
 promoted_to: llm-driven-systems-manifesto
 tags: [primitive, drift, consistency, belief-revision, cross-domain]
