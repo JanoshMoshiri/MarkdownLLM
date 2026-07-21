@@ -423,8 +423,14 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
 
 
 def _git_stdout(root: Path, args: list[str]) -> str | None:
-    out = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True)
-    return out.stdout.strip() if out.returncode == 0 else None
+    # Decode git output as UTF-8 explicitly. Thing files are UTF-8; relying on
+    # the platform locale (cp1252 on Windows) makes the reader thread raise
+    # UnicodeDecodeError on any multibyte content, which subprocess swallows —
+    # leaving returncode 0 but stdout None, crashing the caller. errors="replace"
+    # keeps a decode edge from ever bricking validation.
+    out = subprocess.run(["git", *args], cwd=root, capture_output=True,
+                         text=True, encoding="utf-8", errors="replace")
+    return out.stdout.strip() if out.returncode == 0 and out.stdout is not None else None
 
 
 def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
