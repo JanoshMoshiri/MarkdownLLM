@@ -1570,3 +1570,91 @@ def test_session_start_quiet_without_flips(tmp_path, capsys):
     import argparse
     mdllm.cmd_session_start(argparse.Namespace(path=str(tmp_path)))
     assert "Verified flips" not in capsys.readouterr().out
+
+
+# ------------------------------------------- schema-declared terminal statuses
+
+
+def _terminal_corpus(tmp_path, type_block: str, status: str):
+    """One thing of type `doc`, with the domain's type declaration supplied."""
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\ntypes:\n" + type_block)
+    write(tmp_path, "things/d.md", thing_text(
+        f"id: d\ntype: doc\nstatus: {status}\ncreated: 2026-06-01"))
+    corpus, _ = scan(tmp_path)
+    return corpus
+
+
+def test_terminal_defaults_to_universal_set_when_undeclared():
+    # A domain that declares nothing behaves exactly as it did before the
+    # per-type field existed — this is the no-regression pin.
+    assert mdllm.terminal_statuses_for(None, "anything") == mdllm.TERMINAL_STATUSES
+    assert mdllm.terminal_statuses_for({"types": {"doc": {}}}, "doc") == mdllm.TERMINAL_STATUSES
+    assert mdllm.is_terminal(None, {"type": "doc", "status": "completed"}) is True
+    assert mdllm.is_terminal(None, {"type": "doc", "status": "approved-current"}) is False
+
+
+def test_terminal_declaration_replaces_rather_than_extends(tmp_path):
+    # `completed` is universally terminal, but this type never declared it —
+    # the declaration is authoritative, so it must NOT leak back in.
+    schema = {"types": {"doc": {"statuses": ["draft", "approved-current", "retired"],
+                                "terminal_statuses": ["approved-current", "retired"]}}}
+    assert mdllm.terminal_statuses_for(schema, "doc") == {"approved-current", "retired"}
+    assert mdllm.is_terminal(schema, {"type": "doc", "status": "approved-current"}) is True
+    assert mdllm.is_terminal(schema, {"type": "doc", "status": "draft"}) is False
+    assert mdllm.is_terminal(schema, {"type": "doc", "status": "completed"}) is False
+
+
+def test_terminal_declaration_ignores_values_outside_the_vocabulary(tmp_path):
+    schema = {"types": {"doc": {"statuses": ["draft", "retired"],
+                                "terminal_statuses": ["retired", "typo-status"]}}}
+    assert mdllm.terminal_statuses_for(schema, "doc") == {"retired"}
+
+
+def test_terminal_declaration_outside_vocabulary_is_reported(tmp_path):
+    corpus = _terminal_corpus(
+        tmp_path,
+        "  doc:\n    statuses: [draft, retired]\n    terminal_statuses: [retired, nope]\n",
+        "draft")
+    msgs = messages(mdllm.validate_level3(corpus), mdllm.SEV_WARNING)
+    assert any("terminal_statuses" in m and "nope" in m for m in msgs)
+
+
+def test_reserved_types_carry_tool_owned_terminal_statuses():
+    # A domain cannot redeclare a reserved type, so the tool owns which of its
+    # statuses mean settled — otherwise a `stable` skill counts as open work.
+    assert mdllm.terminal_statuses_for(None, "skill") == {"stable", "deprecated"}
+    assert mdllm.is_terminal(None, {"type": "skill", "status": "stable"}) is True
+    assert mdllm.is_terminal(None, {"type": "skill", "status": "draft"}) is False
+    assert mdllm.is_terminal(None, {"type": "conflict", "status": "resolved"}) is True
+    assert mdllm.is_terminal(None, {"type": "conflict", "status": "open"}) is False
+
+
+def test_reserved_type_terminal_declaration_is_ignored_and_reported(tmp_path):
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\ntypes:\n"
+          "  skill:\n    terminal_statuses: [draft]\n")
+    write(tmp_path, "things/s.md", thing_text(
+        "id: s\ntype: skill\nstatus: draft\ncreated: 2026-06-01"))
+    corpus, _ = scan(tmp_path)
+    # ignored: the tool's own set still governs
+    assert mdllm.is_terminal(corpus.schema, {"type": "skill", "status": "draft"}) is False
+    msgs = messages(mdllm.validate_level3(corpus), mdllm.SEV_WARNING)
+    assert any("framework-reserved" in m for m in msgs)
+
+
+def test_orientation_open_loops_respect_declared_terminal_statuses(tmp_path):
+    # The end-to-end reason this exists: a signed, in-force document is not a
+    # loop the next session has to close.
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\ntypes:\n"
+          "  doc:\n    statuses: [draft, approved-current, retired]\n"
+          "    terminal_statuses: [approved-current, retired]\n")
+    write(tmp_path, "things/live.md", thing_text(
+        "id: live\ntype: doc\nstatus: approved-current\ncreated: 2026-06-01"))
+    write(tmp_path, "things/wip.md", thing_text(
+        "id: wip\ntype: doc\nstatus: draft\ncreated: 2026-06-01"))
+    from markdownllm.session import _orient_forward
+    lines = "\n".join(_orient_forward(tmp_path))
+    assert "Open loops (1)" in lines
+    assert "`wip`" in lines and "`live`" not in lines

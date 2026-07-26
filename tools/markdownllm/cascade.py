@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .model import TERMINAL_STATUSES, Thing, scan
+from .model import Thing, is_terminal, scan
 
 
 def cmd_cascade(args) -> int:
@@ -50,7 +50,7 @@ def cmd_cascade(args) -> int:
         return 1
 
     tgt = by_id[target]
-    tgt_terminal = str(tgt.meta.get("status", "")) in TERMINAL_STATUSES
+    tgt_terminal = is_terminal(corpus.schema, tgt.meta)
 
     # Prerequisite map: prereqs(Y) = Y.dependencies ∪ {Z : Y ∈ Z.blocks}. Both
     # fields declare "Z must finish before Y"; reading only one would go blind
@@ -83,12 +83,12 @@ def cmd_cascade(args) -> int:
         y = by_id.get(cid)
         if y is None:
             continue  # dangling ref — validate owns that finding, not cascade
-        if str(y.meta.get("status", "")) in TERMINAL_STATUSES:
+        if is_terminal(corpus.schema, y.meta):
             continue  # already terminal; nothing left to unblock
         pres = prereqs(y)
         unmet = [p for p in pres if p != target
                  and (p not in by_id
-                      or str(by_id[p].meta.get("status", "")) not in TERMINAL_STATUSES)]
+                      or not is_terminal(corpus.schema, by_id[p].meta))]
         if not unmet:
             prio = str(y.meta.get("priority", "")).lower()
             flag = f"  [!] priority {prio}" if prio in ("critical", "high") else ""
@@ -107,7 +107,7 @@ def cmd_cascade(args) -> int:
                 if t.meta.get("parent") == parent and (t.id or t.path.name) != target]
         total = len(sibs) + 1  # the siblings plus the target itself
         done = sum(1 for t in sibs
-                   if str(t.meta.get("status", "")) in TERMINAL_STATUSES) + int(tgt_terminal)
+                   if is_terminal(corpus.schema, t.meta)) + int(tgt_terminal)
         verdict = "completion candidate" if done == total else "partial progress"
         parent_line = f"`{parent}` — {done}/{total} child(ren) terminal -> {verdict}"
 

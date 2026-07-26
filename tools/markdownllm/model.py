@@ -43,6 +43,87 @@ DEFAULT_STATUSES = ["not-started", "in-progress", "blocked", "paused", "complete
 TERMINAL_STATUSES = {"completed", "cancelled", "met", "reconciled", "closed", "filed",
                      "resolved", "dismissed", "deprecated", "abandoned"}
 
+# Terminal statuses for the framework-reserved types. The tool owns these
+# vocabularies (RESERVED_STATUSES above), so it owns which of their values
+# mean "settled" — a domain cannot redeclare a reserved type, and therefore
+# cannot fix these itself.
+RESERVED_TERMINAL = {
+    "specification": {"stable", "deprecated"},
+    "guide": {"stable", "deprecated"},
+    "manifesto": {"stable", "deprecated"},
+    "skill": {"stable", "deprecated"},
+    "prompt": {"stable", "deprecated"},
+    "workflow-definition": {"stable", "deprecated"},
+    "workflow-run": {"completed", "abandoned"},
+    "insight": {"promoted", "dismissed"},
+    "conflict": {"resolved"},
+    "retrospective": {"complete"},
+    "decision": {"made", "superseded"},
+    "index": {"live", "stale"},
+    "continuity-brief": {"live"},
+}
+
+
+def terminal_statuses_for(schema: dict | None, typ: str | None) -> set[str]:
+    """The statuses that mean "settled" for one type — not forward work.
+
+    "Settled" is wider than "finished": it covers both end-of-life states
+    (`superseded`, `retired`) and in-force steady states (a signed SOP at
+    `approved-current`, a `record-pointer` at `live`). Neither is a loop the
+    next session has to close, and counting them as such overstates the work
+    outstanding — badly, in domains whose vocabulary is mostly steady-state.
+
+    Resolution order:
+
+    0. `RESERVED_TERMINAL`, for framework-reserved types — the tool owns those
+       vocabularies, so a domain cannot override their settled set either.
+    1. A domain's own declaration, per type, in `_schema.yaml`:
+
+           types:
+             review:
+               statuses: [open, actioned, superseded]
+               terminal_statuses: [actioned, superseded]
+
+       A declaration REPLACES the universal set for that type rather than
+       adding to it — explicit beats implicit, and a domain that has thought
+       about its own lifecycle should not inherit surprises. Values outside
+       the type's own `statuses` are ignored here; `validate` reports them.
+    2. `TERMINAL_STATUSES`, the universal default.
+
+    A type that declares nothing behaves exactly as it did before this
+    existed, so no domain changes behaviour until it opts in.
+    """
+    typ = str(typ) if typ is not None else ""
+    # Reserved types first: a domain cannot redeclare their vocabulary, so it
+    # cannot redeclare which of their values are settled either. Checking the
+    # schema first would let a domain silently override the tool here.
+    if typ in RESERVED_TERMINAL:
+        return set(RESERVED_TERMINAL[typ])
+    if isinstance(schema, dict):
+        types = schema.get("types")
+        if isinstance(types, dict):
+            spec = types.get(typ)
+            if isinstance(spec, dict) and isinstance(spec.get("terminal_statuses"), list):
+                declared = {str(s) for s in spec["terminal_statuses"]}
+                vocab = spec.get("statuses")
+                if isinstance(vocab, list):
+                    declared &= {str(s) for s in vocab}
+                return declared
+    return set(TERMINAL_STATUSES)
+
+
+def is_terminal(schema: dict | None, meta: dict | None) -> bool:
+    """Has this thing reached a settled state for its own type?
+
+    Every status check that means "is this still forward work?" goes through
+    here, so the answer is consistent across orientation, triggers and
+    cascade — and so a domain only has to declare its lifecycle once.
+    """
+    if not isinstance(meta, dict):
+        return False
+    status = str(meta.get("status", ""))
+    return status in terminal_statuses_for(schema, meta.get("type"))
+
 # Universal frontmatter fields the floor itself reads and understands — the
 # built-in half of the field vocabulary (the CORE_FIELDS<->known_fields split
 # mirrors RESERVED_STATUSES<->_schema.yaml `types`: the tool owns the universal

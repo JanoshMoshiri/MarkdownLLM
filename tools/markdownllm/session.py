@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
-from .model import TERMINAL_STATUSES, parse_frontmatter, scan
+from .model import is_terminal, parse_frontmatter, scan
 from .validation import version_tuple
 
 def _velocity_signal(domain: Path) -> str:
@@ -58,7 +58,7 @@ def _orient_forward(domain: Path) -> list[str]:
         typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
         if typ == "conflict" and status == "open":
             conflicts.append(t.id)
-        elif typ not in _ORIENT_KNOWLEDGE_TYPES and status not in TERMINAL_STATUSES:
+        elif typ not in _ORIENT_KNOWLEDGE_TYPES and not is_terminal(corpus.schema, t.meta):
             loops.append((t.id, typ, status))
     lines: list[str] = []
     if conflicts:

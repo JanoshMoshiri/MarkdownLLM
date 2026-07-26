@@ -20,6 +20,7 @@ import yaml
 
 from .model import (
     RESERVED_STATUSES, DEFAULT_STATUSES, TERMINAL_STATUSES, CORE_FIELDS,
+    is_terminal, terminal_statuses_for,
     ID_RE, ISO_RE, SEV_ERROR, SEV_WARNING, SEV_INFO,
     Thing, Finding, Corpus, parse_frontmatter, scan,
 )
@@ -121,6 +122,14 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
     for t in corpus.things:
         name = t.id or t.path.name
         meta = t.meta
+        # NOTE: deliberately the universal set, not is_terminal(). "Settled"
+        # and "dead" are different questions. A signed SOP at
+        # `approved-current`, or an oversight view at `current`, is settled
+        # work AND a live referrer — an insight it links to has not fallen
+        # out of session memory. Only genuinely closed-out states
+        # (superseded, cancelled, dismissed...) stop a thing conferring
+        # liveness. Using the per-type set here made this check fire on five
+        # healthy insights the moment a domain declared its vocabulary.
         src_live = str(meta.get("status")) not in TERMINAL_STATUSES
         refs: list[tuple[str, str]] = []
         for entry in meta.get("linked_things") or []:
@@ -150,12 +159,12 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
         # terminal-status invariant: a finished thing cannot depend on unfinished
         # work (detect-conflicts rule #1, mechanised). Terminal deps (completed,
         # cancelled, met, ...) count as resolved; dangling deps are caught above.
-        if str(meta.get("status")) in TERMINAL_STATUSES:
+        if is_terminal(corpus.schema, meta):
             for dep in meta.get("dependencies") or []:
                 if not isinstance(dep, str):
                     continue
                 dt = ids.get(dep, [None])[0]
-                if dt and str(dt.meta.get("status")) not in TERMINAL_STATUSES:
+                if dt and not is_terminal(corpus.schema, dt.meta):
                     f.append(Finding(SEV_ERROR, name,
                              f"is `{meta.get('status')}` but dependency `{dep}` is "
                              f"`{dt.meta.get('status')}` (not terminal) — a finished "
@@ -344,6 +353,31 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
         return f
     declared_types = set(schema.get("types") or {}) | set(RESERVED_STATUSES)
     relations = schema.get("relations")
+
+    # `terminal_statuses` coherence: a declared terminal status that is not in
+    # its own type's `statuses` can never match, so the declaration silently
+    # does nothing — exactly the class of bug this field exists to end. Warning,
+    # like the rest of level 3, and the value is ignored at read time
+    # (terminal_statuses_for intersects with the vocabulary).
+    for typ, tdef in (schema.get("types") or {}).items():
+        if not isinstance(tdef, dict) or not isinstance(tdef.get("terminal_statuses"), list):
+            continue
+        vocab = tdef.get("statuses")
+        if not isinstance(vocab, list):
+            continue
+        stray = sorted({str(s) for s in tdef["terminal_statuses"]} - {str(s) for s in vocab})
+        if stray:
+            f.append(Finding(SEV_WARNING, "_schema.yaml",
+                             f"type `{typ}`: terminal_statuses {stray} not in its "
+                             f"`statuses` vocabulary — ignored"))
+    for typ in (schema.get("types") or {}):
+        if typ in RESERVED_STATUSES:
+            tdef = (schema.get("types") or {}).get(typ)
+            if isinstance(tdef, dict) and "terminal_statuses" in tdef:
+                f.append(Finding(SEV_WARNING, "_schema.yaml",
+                                 f"type `{typ}` is framework-reserved — its "
+                                 f"terminal_statuses are owned by the tool and this "
+                                 f"declaration is ignored"))
 
     # Field registration (opt-in, like `relations`): when a domain declares a
     # `known_fields` list, any top-level frontmatter key outside CORE_FIELDS ∪

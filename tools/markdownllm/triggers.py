@@ -12,7 +12,7 @@ import datetime as dt
 import subprocess
 from pathlib import Path
 
-from .model import ISO_RE, TERMINAL_STATUSES, scan
+from .model import ISO_RE, is_terminal, scan
 
 
 def cmd_triggers(args) -> int:
@@ -58,7 +58,7 @@ def cmd_triggers(args) -> int:
             if ttype == "time":
                 if cond == "due_date_passed":
                     due = as_date(meta.get("due_date"))
-                    if due and due < today and status not in TERMINAL_STATUSES:
+                    if due and due < today and not is_terminal(corpus.schema, meta):
                         hits.append(f"{name}: due_date {due} passed "
                                     f"({(today - due).days}d ago) -> {action}")
                 elif cond == "review_date_reached":
@@ -84,7 +84,7 @@ def cmd_triggers(args) -> int:
                 if cond == "subtasks_complete":
                     subs = [e.get("id") for e in meta.get("linked_things") or []
                             if isinstance(e, dict) and e.get("relation") == "subtask"]
-                    if subs and all(str(by_id[s].meta.get("status")) in TERMINAL_STATUSES
+                    if subs and all(is_terminal(corpus.schema, by_id[s].meta)
                                     for s in subs if s in by_id):
                         hits.append(f"{name}: all subtasks complete -> {action}")
                 elif cond == "blocked_duration":
@@ -107,7 +107,7 @@ def cmd_triggers(args) -> int:
     for t in corpus.things:
         meta, name = t.meta, t.id or t.path.name
         due = as_date(meta.get("due_date"))
-        if due and str(meta.get("status", "")) not in TERMINAL_STATUSES:
+        if due and not is_terminal(corpus.schema, meta):
             days = (due - today).days
             if days < 0 and not meta.get("triggers"):
                 hits.append(f"{name}: OVERDUE by {-days}d (due {due}, no trigger declared)")

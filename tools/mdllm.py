@@ -23,10 +23,12 @@ import sys
 # (tests), the importer already put tools/ on sys.path.
 
 from markdownllm.model import (
-    RESERVED_STATUSES, DEFAULT_STATUSES, TERMINAL_STATUSES, CORE_FIELDS,
+    RESERVED_STATUSES, DEFAULT_STATUSES, TERMINAL_STATUSES, RESERVED_TERMINAL,
+    CORE_FIELDS,
     DEFAULT_EXCLUDES, NON_THING_FILES, ID_RE, ISO_RE,
     SEV_ERROR, SEV_WARNING, SEV_INFO,
     Thing, Finding, Corpus, parse_frontmatter, load_schema, scan,
+    terminal_statuses_for, is_terminal,
 )
 from markdownllm.validation import (
     valid_statuses_for, validate_level1, validate_level2, version_tuple,
