@@ -8,9 +8,9 @@ decided_by: both
 confidence: high
 informed_by:
   - id: mcp-domain-server-design
-    commit: 573f6f5
+    commit: fcd1c11
   - id: cross-domain-handoff-is-verified-external-input
-    commit: 118f5de
+    commit: 2d4f6d4
 linked_things:
   - id: mcp-domain-server-design
     relation: informs

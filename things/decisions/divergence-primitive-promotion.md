@@ -9,7 +9,7 @@ confidence: high
 source: code-architect
 informed_by:
   - id: divergence-is-an-unrouted-decision
-    commit: 5911cce
+    commit: aae0712
 linked_things:
   - id: llm-driven-systems-manifesto
     relation: informs

@@ -6,12 +6,12 @@ created: 2026-07-14
 linked_things:
   - id: independent-review-2026-07-02-fable
     relation: extends
-    notes: "Seventh independent review; first to read all nine live domains from their committed HEADs alongside the framework. Covers v3.17.4 @ 404ea99."
+    notes: "Seventh independent review; first to read all nine live domains from their committed HEADs alongside the framework. Covers v3.17.4 @ c8dc778."
 ---
 
 # Independent Review — MarkdownLLM v3.17.4 + the Domain Fleet
 
-Full read from committed HEAD (`404ea99`): all foundational specs, kernel,
+Full read from committed HEAD (`c8dc778`): all foundational specs, kernel,
 AGENTS.md, `tools/mdllm.py` (3,425 lines) and its 103-test suite, evals
 (fixtures, seeds, results including excluded), all insights/plans/decisions/
 retrospectives, templates, adapters, docs, prior reviews — **and, for the

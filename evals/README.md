@@ -246,11 +246,11 @@ terminal. **The opus arm is void and the seed was corrupted mid-run** — read
 
 **What happened:** haiku t5's *perturb* agent wrote the fact-change to the
 **shared source seed** (`evals/seeds/sleeping-bag-fac/…/trip-aonach-ridge.md`)
-and committed it to the framework repo (`27409f4`) instead of editing its
+and committed it to the framework repo (`46493d4`) instead of editing its
 workspace. Every opus trial was seeded *after* that commit, so all five started
 from the already-perturbed 3300 m/R 4.2 inputs: opus's build-Aonach of −1 was
 *correct for the corrupted seed*, scored as a miss against the 2400 m-era
-expectation of 4, and its perturb was a no-op. The seed is reverted (`16b3b77`);
+expectation of 4, and its perturb was a no-op. The seed is reverted (`c060f21`);
 the five opus results plus haiku t5 are quarantined under `results/excluded/`.
 
 **Valid data — haiku, four trials (t1–t4) seeded before the corruption, plus the

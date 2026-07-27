@@ -13,20 +13,20 @@ framework_version: 3.17.4
 # Provenance Index (reverse) — framework
 
 ## cross-domain-handoff-is-verified-external-input
-- phase-3-run-domain-task-reverted (pinned @118f5de)
+- phase-3-run-domain-task-reverted (pinned @2d4f6d4)
 
 ## divergence-is-an-unrouted-decision
-- divergence-primitive-promotion (pinned @5911cce)
+- divergence-primitive-promotion (pinned @aae0712)
 
 ## framework-retrospective-2026-06
-- decision-status-vocabulary-domain-owned (pinned @e876b28)
+- decision-status-vocabulary-domain-owned (pinned @fa03c26)
 
 ## framework-v3-transformation-plan
-- decision-status-vocabulary-domain-owned (pinned @258fa67)
+- decision-status-vocabulary-domain-owned (pinned @da5d31d)
 
 ## mcp-domain-server-design
-- phase-3-run-domain-task-reverted (pinned @573f6f5)
+- phase-3-run-domain-task-reverted (pinned @fcd1c11)
 
 ## status-vocabulary-universal-vs-domain
-- decision-status-vocabulary-domain-owned (pinned @e876b28)
+- decision-status-vocabulary-domain-owned (pinned @fa03c26)
 

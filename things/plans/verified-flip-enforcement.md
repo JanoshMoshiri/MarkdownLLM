@@ -75,7 +75,7 @@ the review was real.
 
 `things/insights/divergence-is-an-unrouted-decision.md` — the framework's own
 MCP import from code-architect — was born verified (creation == flip ==
-`5911cce`, no `verified_by`). The check's first firing is against our own
+`aae0712`, no `verified_by`). The check's first firing is against our own
 corpus; remediation (a proper attributed re-verification) ships with this
 plan. The control's first catch is its own builder — recorded, not smoothed.
 
@@ -105,8 +105,8 @@ records the check catching its own builder first.
 All exit criteria met. 115 floor self-tests (+10: eight quarantine, two
 session-start surfacing); strict escalation covered by test, not just prose.
 The day-one true positive fired exactly as predicted and was healed in the
-prescribed two-commit shape (re-quarantine `018edd5` → attributed
-re-verification `3546ff6`, `verified_by: Janosh Moshiri`, basis recorded in
+prescribed two-commit shape (re-quarantine `77005ad` → attributed
+re-verification `11c7bcf`, `verified_by: Janosh Moshiri`, basis recorded in
 the commit message: the operator personally walked the import into manifesto
 v2.6). Bonus closure: the heal commit also pinned the import's reference
 triple (`source_domain`/`source_id`/`source_commit @ bd8fc48`), clearing the

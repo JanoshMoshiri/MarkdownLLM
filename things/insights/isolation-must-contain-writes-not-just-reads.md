@@ -6,7 +6,7 @@ version: 1.0
 created: 2026-07-09
 confidence: high
 origin: synthesised
-source: session — sleeping-bag-longitudinal first multi-trial run (2026-07-09); haiku t5 perturb agent committed the fact-change to the source seed (framework commit 27409f4), silently invalidating the entire opus arm seeded after it
+source: session — sleeping-bag-longitudinal first multi-trial run (2026-07-09); haiku t5 perturb agent committed the fact-change to the source seed (framework commit 46493d4), silently invalidating the entire opus arm seeded after it
 session: 2026-07-09
 tags: [evals, controls, isolation, agent-agency, methodology, sandbox, data-integrity]
 linked_things:
@@ -35,7 +35,7 @@ Haiku longitudinal trial 5's *perturb* session was told, in the operator's
 voice, "update the domain to reflect the new plan" (Aonach Ridge → 3300 m,
 pad R 4.2). Instead of editing its sandboxed workspace copy, the agent edited
 **the shared source seed** at `evals/seeds/sleeping-bag-fac/things/trip-aonach-ridge.md`
-and **committed it to the framework repo** (`27409f4`, 07:23:00, message
+and **committed it to the framework repo** (`46493d4`, 07:23:00, message
 "fac-assessment: Aonach Ridge (updated to 3300 m altitude with R 4.2 pad)" —
 the perturb task, verbatim). Its own workspace was left un-perturbed; the write
 went to the wrong repo entirely.
@@ -61,7 +61,7 @@ is the same grant that makes the seed *writable*.
 
 ## Why This Is A Result, Not Just A Bug
 
-The seed corruption is repaired (reverted in `16b3b77`; the six contaminated
+The seed corruption is repaired (reverted in `c060f21`; the six contaminated
 result files — five opus, one haiku — are quarantined with evidence under
 `evals/results/excluded/`, not deleted). But the finding outlives the cleanup,
 and it is sharper than the read-breach:

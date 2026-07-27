@@ -65,9 +65,9 @@ opus arm void.** Two things were learned before a single figure could be read.
 401s because the host-refreshed OAuth token doesn't propagate to a child (the
 2026-07-08 attempt); it is an operator-terminal task, exactly the v2.0 thesis.
 (2) On the operator's terminal it ran, but haiku t5's perturb agent committed the
-fact-change to the **shared source seed** in the framework repo (`27409f4`),
+fact-change to the **shared source seed** in the framework repo (`46493d4`),
 silently seeding every opus trial from perturbed inputs — the whole opus arm is
-invalid. Seed reverted (`16b3b77`); contaminated results quarantined. See new
+invalid. Seed reverted (`c060f21`); contaminated results quarantined. See new
 insight [[isolation-must-contain-writes-not-just-reads]] and the results section
 in `evals/README.md`.
 
