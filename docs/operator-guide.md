@@ -176,8 +176,49 @@ to invoke directly.
 | `install-hook [path]` | Installs the git pre-commit validation hook | Once per domain repo, at floor adoption |
 | `doctor [path]` | Probes the environment: prerequisites, hook *execution* and *body freshness* (is the installed hook current with `HOOK_BODY`?), framework version drift (downward + upstream); exit 1 = degraded mode | New machine, new harness, after a refresh, or "is the floor actually on here?" |
 | `scaffold <path>` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, hook, first commit | Creating a new domain — the mechanical half is one command |
+| `mcp-serve <domain>` | Serves the domain's exposed face (`exposed: true` things only) over MCP stdio — the cross-domain producing side | Wired into a consumer's `.mcp.json`; you rarely run it by hand |
+| `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
+| `estate-check <roots...>` | Batches `imports-check` over explicitly named consumer roots with a roll-up — ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
+| `boundary [path] [--history]` | Disclosure-boundary check of staged content/filenames/commit messages against the local gitignored `.boundary-terms` (absent ⇒ no-op) | Before any publication event, `--history` for a full-archive audit |
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
+
+## Running More Than One Domain
+
+Each domain stays a sealed repo that is comprehensible by reading only itself
+plus its quarantined external imports. When domains need each other's output,
+the connection runs through three pieces — all operator-wired, none automatic:
+
+- **The exposed face.** A producer opts individual things into its face with
+  `exposed: true`; `mdllm mcp-serve` serves exactly that set (content and
+  descriptive frontmatter — the internal relationship graph is stripped on
+  egress). Nothing crosses by default; publication is an authoring decision.
+- **The address book.** A consumer's `.mcp.json` `mcpServers` map names which
+  producers it may read and how to spawn them. You wire it by hand, per trust
+  zone. Discovery is never organic — a domain is reached because you listed
+  it.
+- **The membrane's direction.** Everything a consumer learns about a peer
+  crosses through the face — including "have you changed?". A producer never
+  learns who consumes it, keeps no consumer registry, and pushes nothing;
+  the consumer polls. Imports arrive `origin: external`, `verified: false`,
+  carrying the reference triple (`source_domain`/`source_id`/`source_commit`),
+  and nothing rests on them until you verify (`provenance.md`).
+
+The standing sync loop is then one command per consumer — `mdllm
+imports-check` — or one `mdllm estate-check <root> <root> ...` across the
+consumers you name. It reports both failure directions: **stale** (the source
+moved under your pin — re-read, re-verify, re-quarantine) and **diverged**
+(the pinned commit is current but the mirror's content differs from the face —
+someone edited the copy instead of the source; route it as an external
+inflection, `change-reconciliation.md`). The summary line always states its
+coverage: `0 stale` over zero checkable imports says so in words rather than
+reading as all-clear. A useful cadence: run it at session start in any
+consuming domain, and estate-wide after a working session in any producing
+one.
+
+`estate-check` is deliberately *batching, not an index*: roots are named per
+invocation, output is ephemeral and grouped per consumer, and no artifact
+maps producers to consumers — the isolation rules survive the convenience.
 
 ## What Is Still Yours
 

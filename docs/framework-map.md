@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.4
+version: 1.5
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -25,11 +25,12 @@ linked_things:
 # Framework Map — The Visual Architecture
 
 A scrollable codebase teaches you its shapes; a specification framework hides
-them in frontmatter. This map is the substitute for that intimacy: three views,
+them in frontmatter. This map is the substitute for that intimacy: four views,
 zooming in, each derived from the repo itself — the spec-to-spec edges from
 each file's `linked_things` frontmatter, the subcommand list from
-`mdllm --help`, the tier structure from `AGENTS.md`. When you are lost, start
-here, not in the prose.
+`mdllm --help`, the tier structure from `AGENTS.md`, the estate seam from
+`provenance.md`'s Cross-Domain Imports. When you are lost, start here, not in
+the prose.
 
 **The compressed mental model: one atom, six operative rules, everything else
 is layering.** The manifesto defines [thing.md](../thing.md); five operative specs
@@ -258,6 +259,46 @@ Notes on this view:
   hook *execution* (resolution is not verification), and framework-version
   drift for domains. Exit 1 means degraded mode — validate manually and say so.
 
+## View 4 — Two domains: the estate seam
+
+Views 1–3 are one domain deep. This is the only view with two: how a producer's
+curated face reaches a consumer's quarantined import, and how the consumer
+keeps that hand-off honest as both sides move. Every arrow that crosses the
+seam passes through the porch — including "have you changed?".
+
+```mermaid
+flowchart LR
+    subgraph A["domain A (producer)"]
+        EX["exposed things<br/>(exposed: true opt-in)"]
+        PORCH["porch — mdllm mcp-serve<br/>(curated read-only face)"]
+        EX --> PORCH
+    end
+    subgraph B["domain B (consumer)"]
+        AB["address book (.mcp.json)<br/>operator-wired trust zones"]
+        IMP["import — origin: external<br/>pins source_domain/id/commit"]
+        IC["mdllm imports-check<br/>fresh / stale / diverged / unreachable"]
+        CR["change-reconciliation<br/>receives external inflection"]
+        AB -. spawns .-> PORCH
+        PORCH -- "deliverable + triple" --> IMP
+        IMP --> IC
+        IC -. "freshness + content poll" .-> PORCH
+        IC -- "stale or diverged → re-quarantine" --> CR
+    end
+```
+
+Notes on this view:
+
+- Both sync directions are consumer-side reads: `stale` = the source moved
+  under the pin; `diverged` = the pin is current but the mirror's content no
+  longer matches the face (the loop was bypassed). The producer never learns
+  who consumes it.
+- `estate-check` is this view repeated per named consumer root and rolled up —
+  batching, never an index; nothing is discovered, persisted, or
+  reverse-mapped.
+- The full doctrine lives in `provenance.md` (Cross-Domain Imports),
+  `change-reconciliation.md` (External Inflections), and the design record
+  `docs/plans/mcp-domain-server.md`.
+
 ## Keeping This Map Honest
 
 This map is hand-drawn, and
@@ -269,6 +310,8 @@ over them:
 - **View 2:** each spec's `linked_things` frontmatter; the kernel coverage
   count in `kernel.md` frontmatter (`coverage: 6`).
 - **View 3:** `python tools/mdllm.py --help`.
+- **View 4:** `provenance.md` → Cross-Domain Imports (the states and the
+  membrane rule) and `mdllm imports-check --help` / `estate-check --help`.
 
 When a spec is added, removed, or rewired — or a subcommand lands — update the
 affected view in the same commit. If the map and the frontmatter disagree, the

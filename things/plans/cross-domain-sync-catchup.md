@@ -69,12 +69,12 @@ operator docs are silent on running more than one domain; the
 were possible; and until this plan, the `diverged` state did not exist at
 all.
 
-**Diagram export pointer (operator ask, 2026-07-27):** this mermaid source
-lives here until Phase 7 lands the estate view in `docs/framework-map.md`;
-from that point the map copy is canonical and this one is the plan-time
-record. Export beyond the map (README, operator-guide) only when a real
-second operator needs onboarding — the map is the framework's one home for
-views, and duplicating views is the map-drift class v3.17.1 exists to catch.
+**Diagram export pointer (operator ask, 2026-07-27):** Phase 7 landed this
+as `docs/framework-map.md` View 4 — the estate seam. **The map copy is now
+canonical**; the copy above is the plan-time record and is not maintained.
+Export beyond the map (README, operator-guide) only when a real second
+operator needs onboarding — the map is the framework's one home for views,
+and duplicating views is the map-drift class v3.17.1 exists to catch.
 
 ## Design decisions
 
@@ -121,5 +121,5 @@ views, and duplicating views is the map-drift class v3.17.1 exists to catch.
 | 4 | Sync: `diverged` detection through the face; `estate-check` multi-root batching; framework-map count; self-tests | done |
 | 5 | FW-3: triple + `exposed` into thing.md + provenance.md; kernel regen | done |
 | 6 | FW-4: change-reconciliation external-inflection edge + scope statement | done |
-| 7 | FW-5(1): operator-guide toolbox + "running more than one domain"; framework-map estate view (diagram graduates) | not-started |
+| 7 | FW-5(1): operator-guide toolbox + "running more than one domain"; framework-map estate view (diagram graduates) | done |
 | 8 | Close: CHANGELOG, version, sentinel trio, full validate/coherence/tests, outcome here | not-started |
