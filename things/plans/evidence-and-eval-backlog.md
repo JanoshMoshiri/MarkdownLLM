@@ -12,6 +12,9 @@ linked_things:
     notes: "Much of this is disclosable-proxy work — the real adoption lives in confidential domains"
   - id: withholding-is-not-isolation
     relation: implements
+  - id: isolation-must-contain-writes-not-just-reads
+    relation: implements
+    notes: "Its run-workspaces-outside-the-repo-tree requirement now binds the FRAMEWORK arm, not just bare — a hard prerequisite for the next multi-trial run"
   - id: structure-decides-figures-scale-decides-convention
     relation: references
   - id: operator-gated-work-is-scheduled-on-the-operators-calendar
