@@ -1481,6 +1481,25 @@ def test_imports_freshness_no_address_book_entry(tmp_path):
     assert rows["imported-spec"]["state"] == "no-address-book-entry"
 
 
+def test_imports_check_summary_states_coverage(tmp_path, capsys):
+    # "26 import(s); 0 stale." over zero possible comparisons is the count of
+    # comparisons never made rendered as assurance (estate audit FW-2). The
+    # summary must state coverage, and zero coverage must say so in words.
+    con = tmp_path / "condom"
+    con.mkdir()
+    for i in (1, 2):
+        write(con, f"things/imp{i}.md", thing_text(
+            f"id: imp-{i}\ntype: external-spec\nstatus: ingested\n"
+            f"created: 2026-06-02\norigin: external\nverified: false",
+            "# Import\n\nNo triple.\n"))
+    mdllm.cmd_imports_check(_ns(path=str(con)))
+    out = capsys.readouterr().out
+    assert "0 stale, 0 fresh" in out
+    assert "2 could not be checked" in out
+    assert "COVERAGE: 0/2" in out
+    assert "asserts nothing about freshness" in out
+
+
 def test_mcp_serve_stdio_roundtrip(tmp_path):
     # End-to-end transport: drive the real stdio JSON-RPC loop as a subprocess.
     import json as _json, subprocess as _sp

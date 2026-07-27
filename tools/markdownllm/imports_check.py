@@ -119,6 +119,20 @@ def cmd_imports_check(args) -> int:
             print(f"- NO-ROUTE   {r['id']}  ({r['source']})  no .mcp.json entry for source domain")
         else:
             print(f"- INCOMPLETE {r['id']}  {r.get('detail','')}")
-    stale = sum(1 for r in rows if r["state"] == "stale")
-    print(f"\n{len(rows)} import(s); {stale} stale. Freshness is advisory — disposition is yours.")
+    # The summary states COVERAGE, not just findings: "0 stale" over zero
+    # possible comparisons rendered identically to "everything is fresh", and
+    # in a regulated context that line is read as assurance (estate audit
+    # FW-2: a domain with 26 imports, all INCOMPLETE, reported "26 import(s);
+    # 0 stale."). The docstring's promise — never a silent fresh — belongs to
+    # the summary line too.
+    n = {s: sum(1 for r in rows if r["state"] == s)
+         for s in ("stale", "fresh", "withdrawn")}
+    checked = sum(n.values())
+    unchecked = len(rows) - checked
+    print(f"\n{len(rows)} import(s): {n['stale']} stale, {n['fresh']} fresh, "
+          f"{n['withdrawn']} withdrawn; {unchecked} could not be checked "
+          f"(incomplete/no-route/unreachable). COVERAGE: {checked}/{len(rows)}.")
+    if checked == 0:
+        print("Nothing was checkable — this report asserts nothing about freshness.")
+    print("Freshness is advisory — disposition is yours.")
     return 0

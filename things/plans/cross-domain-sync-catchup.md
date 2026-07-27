@@ -117,7 +117,7 @@ views, and duplicating views is the map-drift class v3.17.1 exists to catch.
 |---|---|---|
 | 1 | Plan (this thing) | done |
 | 2 | FW-1: triggers — free-text time conditions evaluated or loudly skipped; `date` alias; overdue-with-trigger unsuppressed; self-tests | done |
-| 3 | FW-2: imports-check coverage-honest summary; self-test | not-started |
+| 3 | FW-2: imports-check coverage-honest summary; self-test | done |
 | 4 | Sync: `diverged` detection through the face; `estate-check` multi-root batching; framework-map count; self-tests | not-started |
 | 5 | FW-3: triple + `exposed` into thing.md + provenance.md; kernel regen | not-started |
 | 6 | FW-4: change-reconciliation external-inflection edge + scope statement | not-started |
