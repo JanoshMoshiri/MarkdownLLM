@@ -120,6 +120,6 @@ views, and duplicating views is the map-drift class v3.17.1 exists to catch.
 | 3 | FW-2: imports-check coverage-honest summary; self-test | done |
 | 4 | Sync: `diverged` detection through the face; `estate-check` multi-root batching; framework-map count; self-tests | done |
 | 5 | FW-3: triple + `exposed` into thing.md + provenance.md; kernel regen | done |
-| 6 | FW-4: change-reconciliation external-inflection edge + scope statement | not-started |
+| 6 | FW-4: change-reconciliation external-inflection edge + scope statement | done |
 | 7 | FW-5(1): operator-guide toolbox + "running more than one domain"; framework-map estate view (diagram graduates) | not-started |
 | 8 | Close: CHANGELOG, version, sentinel trio, full validate/coherence/tests, outcome here | not-started |

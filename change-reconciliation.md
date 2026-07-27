@@ -25,6 +25,12 @@ linked_things:
     relation: implements
   - id: divergence-is-an-unrouted-decision
     relation: implements
+  - id: cross-domain-handoff-is-built-inbound-only
+    relation: implements
+    notes: "The re-opened quarantine it names as the cue is this spec's inbound external-inflection edge"
+  - id: mcp-domain-server-design
+    relation: complements
+    notes: "Its drift path terminates here: stale/diverged imports hand the human an external inflection"
   - id: llm-driven-systems-manifesto
     relation: implements
 ---
@@ -65,6 +71,31 @@ many dependents — but the decision that a change is consequential enough to
 reconcile belongs to the person defining the domain. Automating the trigger
 would substitute the agent's pattern-following for the expert's knowing, which
 inverts the framework's purpose.
+
+### External Inflections — The Inbound Edge
+
+An inflection does not have to originate inside the domain. When a
+cross-domain import drifts — `mdllm imports-check` reports it `stale` (the
+source moved under the pin) or `diverged` (the mirror no longer matches the
+face) — the domain's reasoning may now rest on ground that shifted *outside*
+it. That report is the mechanical signal; re-opening the quarantine
+(`verified: false`, `status: stale` — `provenance.md` → Cross-Domain Imports)
+and entering this pass on the import's dependents is an **external
+inflection**.
+
+The cue discipline is unchanged: `imports-check` is report-only, and the
+declaration that the drift is consequential enough to reconcile stays the
+driver's — exactly as above. The floor makes the drift impossible to not see;
+it never dispositions. What the external origin changes is only the *entry
+point*: the changed thing walked from is the import itself, and the affected
+set is its dependents inside this corpus.
+
+**Scope boundary, stated rather than implied:** the four beats run within a
+single corpus. The Assimilate indexes, the textual grep, and the Walk never
+cross the membrane — the outside world enters this spec only as a cue, already
+quarantined as an `origin: external` thing. Reconciling the *producer's*
+corpus is the producer's own pass, in its own repo, if its driver declares
+one.
 
 ## The Four Beats
 
@@ -259,7 +290,9 @@ the discipline cheap.
   "review everything."
 - **provenance.md** — the reverse-provenance index and the Freshness check are
   the Assimilate beat's mechanical inputs; a rule-change-as-decision is what
-  makes downstream staleness computable.
+  makes downstream staleness computable. Its Cross-Domain Imports section is
+  the inbound edge: a `stale` or `diverged` import re-opens the quarantine and
+  enters this pass as an external inflection (see *External Inflections*).
 - **derived-index.md** — the `relationships` index is the other Assimilate input;
   reconciliation is one of the reflexive behaviours indexes exist to make cheap.
 - **belief-revision.md** — the Seal beat records rule changes through the
