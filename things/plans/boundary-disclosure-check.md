@@ -1,7 +1,7 @@
 ---
 id: boundary-disclosure-check
 type: plan
-status: in-progress
+status: completed
 version: 1.0
 created: 2026-07-27
 priority: high

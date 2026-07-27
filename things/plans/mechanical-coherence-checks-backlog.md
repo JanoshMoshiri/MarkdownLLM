@@ -39,6 +39,14 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   by an explicit full-corpus pointer in `change-reconciliation.md` (an inflection walks
   every file, the insight corpus included) — same logic as retiring WORKLOG: delete the
   thing that needs policing, don't police it. See `judgement-checks-need-a-suppression-list-which-is-itself-drift`.
+- ~~Disclosure-boundary check~~ **— shipped as its own plan (v3.20.0,
+  `boundary-disclosure-check`).** Commit messages and staged content checked against a
+  LOCAL, never-committed terms file; `install-hook` grew the commit-msg hook that
+  pre-commit structurally cannot be. Passes this backlog's suppression-list gate for
+  the opposite reason the retired-vocab check failed it: the local file is not an
+  allow-list keeping a truth-check quiet — it *is* the check's entire subject,
+  operator-owned, and an omission fails open for that term only without ever
+  falsifying corpus state.
 - **Broken-body-reference check.** A prose body reference to a thing id / spec that
   no longer resolves — the literal-tier dark-region check the indexes miss. Unlike the
   reverted retired-vocab check this needs *no* suppression list: it is keyed to the live
