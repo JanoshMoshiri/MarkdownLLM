@@ -15,6 +15,12 @@ linked_things:
     relation: complements
   - id: belief-revision-specification
     relation: complements
+  - id: change-reconciliation-specification
+    relation: complements
+    notes: "A stale or diverged cross-domain import is the external-inflection cue entering its four beats"
+  - id: mcp-domain-server-design
+    relation: complements
+    notes: "The reference triple and imports-check defined normatively here; the design record stays there"
   - id: divergence-is-an-unrouted-decision
     relation: implements
   - id: llm-driven-systems-manifesto
@@ -167,6 +173,47 @@ point — capture everything), may reason *about* them ("this statement appears 
 show…"), and must *surface* unverified things blocking a decision rather than
 quietly using them.
 
+## Cross-Domain Imports — The Reference Triple
+
+A special case of `origin: external`: content imported from **another domain's
+exposed face** (served by `mdllm mcp-serve`; design record:
+`docs/plans/mcp-domain-server.md`). Such an import carries the **reference
+triple** in its frontmatter — the pin that makes the import sync-checkable:
+
+- `source_domain` — the producing domain, as named in the consumer's
+  `.mcp.json` address book (operator-wired, per trust zone)
+- `source_id` — the thing's id in the *producer's* id-space
+- `source_commit` — the producer-computed commit that last touched the exposed
+  thing at import time (per-thing, so unrelated source commits never fire it)
+
+Unlike an `informed_by` pin, which is domain-local ("the pinned commit exists
+in the domain repo"), the triple points *across the membrane* — so it is never
+resolved against local git. `mdllm imports-check` is the standing check: it
+re-reads the source's face **through MCP, never the source's git** (a freshness
+read is a horizontal cross-domain read and obeys the same membrane as content),
+and reports each import as one of:
+
+| State | Meaning |
+|---|---|
+| `fresh` | Pin matches the source's current per-thing commit, content matches the face |
+| `stale` | The source moved under the pin — mirror behind source |
+| `diverged` | Pin is current but the mirror's content no longer matches the face — source behind mirror: the loop was bypassed (mirror edited locally, or source changed without committing) |
+| `withdrawn` | The source no longer exposes the thing |
+| `unreachable` / `no-address-book-entry` / `incomplete` | The comparison could not be made — counted as unchecked coverage, **never as fresh** |
+
+**Re-quarantine-on-drift:** `stale` or `diverged` is the mechanical signal that
+the established hand-off is no longer honest. The disposition — re-read the
+source, flip `verified: false`, `status: stale`, and route the change through
+the consumer's dependents — is the agent's and the human's, entered as an
+**external inflection** under `change-reconciliation.md`. The floor detects;
+it never flips a domain's things itself.
+
+Framework version drift stays on the *vertical* axis (git, the sentinel);
+peer freshness is *horizontal* and crosses only through the face. Two-axis
+rule: vertical → git, horizontal → face. `mdllm estate-check <roots...>`
+batches the same per-consumer read over explicitly named roots — ephemeral,
+grouped per consumer, never a global index.
+
 ## Enforcement
 
 The mechanical parts of this spec are validated by the deterministic floor
@@ -204,6 +251,9 @@ follow from its inputs? is a verification credible? — remain the LLM's layer.
   regenerable, provenance-stamped, drift-checked by rebuild-and-diff.
 - **belief-revision.md** — superseding a decision follows the standard
   `supersedes`/`superseded-by` protocol.
+- **change-reconciliation.md** — a `stale` or `diverged` cross-domain import is
+  the mechanical signal for an **external inflection**; the routing of that cue
+  through the consumer's dependents is that spec's four beats.
 - **interface.md** — deliverables are projections of understanding; this spec
   makes the projection citable.
 - **`divergence-is-an-unrouted-decision`** — this spec is the **recorded-why

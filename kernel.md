@@ -3,11 +3,11 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-07-16
-generated: 2026-07-16T06:40:46
-generated_from: HEAD@11c7bcf
+created: 2026-07-28
+generated: 2026-07-28T00:10:52
+generated_from: HEAD@ba65fb5
 coverage: 6
-framework_version: 3.17.5
+framework_version: 3.20.1
 ---
 
 # Framework Operative Kernel
@@ -23,13 +23,13 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Required fields:** `id` (kebab-case, stable, unique), `type`, `status`, `created` (ISO 8601).
 
-**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Emergent fields: add only when they serve reasoning.
+**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; all three or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false, relational graph stripped on egress). Emergent fields: add only when they serve reasoning.
 
 **Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned.
 
 **Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 
-**Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`).
+**Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
 
 **Cohesion (one reason to change):** decompose when content serves a different audience, changes at a different rate, or is independently reusable (`instance-of`/`derived-from`/`template-for`/`applies-to` = split). Compose the inverse: one responsibility spread across several things → consolidate into the cohesive survivor and mark the rest `superseded-by` it. Merge duplication, never contradiction.
 

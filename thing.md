@@ -24,13 +24,13 @@ linked_things:
 
 **Required fields:** `id` (kebab-case, stable, unique), `type`, `status`, `created` (ISO 8601).
 
-**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Emergent fields: add only when they serve reasoning.
+**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; all three or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false, relational graph stripped on egress). Emergent fields: add only when they serve reasoning.
 
 **Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned.
 
 **Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 
-**Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`).
+**Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
 
 **Cohesion (one reason to change):** decompose when content serves a different audience, changes at a different rate, or is independently reusable (`instance-of`/`derived-from`/`template-for`/`applies-to` = split). Compose the inverse: one responsibility spread across several things → consolidate into the cohesive survivor and mark the rest `superseded-by` it. Merge duplication, never contradiction.
 
@@ -194,6 +194,19 @@ These aren't required, but they unlock richer reasoning from Claude:
 **verified** (boolean)
 - Only meaningful on `origin: external` things: whether a human has confirmed the ingested content (reconciliation, review, spot-check)
 - `false` on creation; flipped to `true` with a narrative note of how it was verified
+- The flip is an auditable event with its own discipline (separate commit, `verified_by` naming the human) — full rule: `provenance.md`
+
+**source_domain / source_id / source_commit** (strings — the cross-domain reference triple)
+- Present only on `origin: external` things imported from *another domain's exposed face* (`provenance.md` → Cross-Domain Imports; design record: `docs/plans/mcp-domain-server.md`)
+- `source_domain` — the producing domain, named as in the consumer's `.mcp.json` address book entry
+- `source_id` — the thing's id in the producer's id-space (foreign to this domain; never resolved locally)
+- `source_commit` — the producer-computed commit that last touched the exposed thing at import time: the pin `mdllm imports-check` compares against the source's current face
+- All three are required for the import to be sync-checkable; an import missing any part reports `INCOMPLETE` and counts as unchecked coverage, never as fresh
+
+**exposed** (boolean)
+- Opt-in marker joining this thing to the domain's exposed face, served by `mdllm mcp-serve`
+- Default false — nothing crosses the domain boundary unless its author opts it in (the semi-permeable membrane)
+- Exposure is publication: an exposed thing's content and descriptive frontmatter cross to any consumer the operator wires; its relational graph (`linked_things`, `dependencies`, `parent`, `triggers`, `informed_by`, `parties`) never does — those ids live in this domain's id-space and are stripped on egress
 
 #### Emergent Fields
 
