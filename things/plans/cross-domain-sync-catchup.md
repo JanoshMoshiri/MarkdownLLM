@@ -1,7 +1,7 @@
 ---
 id: cross-domain-sync-catchup
 type: plan
-status: in-progress
+status: completed
 version: 1.0
 created: 2026-07-27
 priority: critical
@@ -122,4 +122,22 @@ and duplicating views is the map-drift class v3.17.1 exists to catch.
 | 5 | FW-3: triple + `exposed` into thing.md + provenance.md; kernel regen | done |
 | 6 | FW-4: change-reconciliation external-inflection edge + scope statement | done |
 | 7 | FW-5(1): operator-guide toolbox + "running more than one domain"; framework-map estate view (diagram graduates) | done |
-| 8 | Close: CHANGELOG, version, sentinel trio, full validate/coherence/tests, outcome here | not-started |
+| 8 | Close: CHANGELOG, version, sentinel trio, full validate/coherence/tests, outcome here | done |
+
+## Outcome
+
+Shipped as v3.21.0, all eight phases, one session (2026-07-27/28). The felt
+desync direction — source behind mirror — is now mechanically visible:
+`imports-check` compares content through the face when pins agree and reports
+`DIVERGED`; `estate-check` batches the read over named roots with a roll-up
+and stays batching-never-an-index by construction. Reporting states coverage
+(`COVERAGE: n/m`, zero-coverage said in words). The trigger evaluator
+evaluates or loudly skips free-text time conditions, honours `type: date`,
+and no longer hides OVERDUE behind a declared trigger. The triple + `exposed`
+are normative in thing.md/provenance.md; change-reconciliation owns its
+inbound external-inflection edge; the operator docs and framework-map know
+estates exist (View 4 — the diagram's canonical home, per the export pointer
+above). Kernel regenerated; examples re-pinned at 3.21.0. 8 self-tests
+(143 total). FW-0 needed nothing (closed by the 2026-07-27 history rewrite +
+v3.20.0 boundary check); FW-5(2)'s original "hold for evidence" was
+overridden by the operator on felt evidence — the evidence had arrived.
