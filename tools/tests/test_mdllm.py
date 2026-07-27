@@ -1028,6 +1028,81 @@ def test_stale_trigger_reads_git_history_not_mtime(tmp_path, capsys):
     assert "revisit" in capsys.readouterr().out
 
 
+def test_free_text_time_condition_with_date_is_evaluated(tmp_path, capsys):
+    # A `type: time` trigger whose condition is free text naming an ISO date
+    # fell through every inner branch — and the unknown-type else is on TYPE,
+    # so it was never reported at all (estate audit FW-1: 8 of 28 triggers
+    # silently dropped, one 10 days past its date in a report reading "No
+    # trigger conditions currently true.").
+    import datetime as dt
+    soon = (dt.date.today() + dt.timedelta(days=10)).isoformat()
+    far = (dt.date.today() + dt.timedelta(days=90)).isoformat()
+    write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        "triggers:\n  - type: time\n    condition: review after 2026-01-15\n"
+        "    action: escalate\n"))
+    write(tmp_path, "things/b.md", thing_text(
+        f"id: b\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        f"triggers:\n  - type: time\n    condition: renew by {soon}\n"
+        f"    action: renew\n"))
+    write(tmp_path, "things/c.md", thing_text(
+        f"id: c\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        f"triggers:\n  - type: time\n    condition: archive on {far}\n"
+        f"    action: archive\n"))
+    write(tmp_path, "things/d.md", thing_text(
+        "id: d\ntype: task\nstatus: completed\ncreated: 2026-01-01\n"
+        "triggers:\n  - type: time\n    condition: review after 2026-01-15\n"
+        "    action: escalate\n"))
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "date 2026-01-15 reached" in out and "escalate" in out  # past, live
+    assert "fires in" in out and "renew" in out                    # within 30d
+    assert "archive" in out and "Horizon" in out                   # beyond 30d
+    assert out.count("escalate") == 1                              # d is settled
+
+
+def test_free_text_time_condition_without_date_is_skipped_loudly(tmp_path, capsys):
+    write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        "triggers:\n  - type: time\n    condition: when the audit closes\n"
+        "    action: surface\n"))
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "Not mechanically evaluable" in out
+    assert "names no parseable date" in out
+
+
+def test_date_type_is_alias_of_time(tmp_path, capsys):
+    # One character of drift from `time` must not kill the control.
+    write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        "due_date: 2026-02-01\n"
+        "triggers:\n  - type: date\n    condition: due_date_passed\n"
+        "    action: escalate\n"))
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "due_date 2026-02-01 passed" in out and "escalate" in out
+    assert "unrecognised trigger type" not in out
+
+
+def test_overdue_is_not_suppressed_by_a_declared_trigger(tmp_path, capsys):
+    # The deadline scan read `if days < 0 and not meta.get("triggers")` — so
+    # the more carefully authored thing (past due AND declaring a trigger the
+    # evaluator could not read) printed nothing at all (estate audit FW-1).
+    write(tmp_path, "things/a.md", thing_text(
+        "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        "due_date: 2026-02-01\n"
+        "triggers:\n  - type: time\n    condition: when the audit closes\n"
+        "    action: surface\n"))
+    write(tmp_path, "things/b.md", thing_text(
+        "id: b\ntype: task\nstatus: in-progress\ncreated: 2026-01-01\n"
+        "due_date: 2026-02-01\n"))
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "a: OVERDUE" in out                       # trigger no longer hides it
+    assert "b: OVERDUE" in out and "no trigger declared" in out
+
+
 # ---------------------------------------------------------------- domain kernel
 
 

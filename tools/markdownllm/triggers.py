@@ -9,10 +9,26 @@ date-bearing thing.
 from __future__ import annotations
 
 import datetime as dt
+import re
 import subprocess
 from pathlib import Path
 
 from .model import ISO_RE, is_terminal, scan
+
+_DATE_IN_TEXT = re.compile(r"(\d{4}-\d{2}-\d{2})")
+
+
+def _embedded_date(cond):
+    """First ISO date appearing anywhere in a free-text condition, or None."""
+    if not isinstance(cond, str):
+        return None
+    m = _DATE_IN_TEXT.search(cond)
+    if not m:
+        return None
+    try:
+        return dt.date.fromisoformat(m.group(1))
+    except ValueError:
+        return None
 
 
 def cmd_triggers(args) -> int:
@@ -22,6 +38,7 @@ def cmd_triggers(args) -> int:
     by_id = corpus.by_id()
     hits: list[str] = []
     skipped: list[str] = []
+    horizon: list[tuple[int, str]] = []
 
     def as_date(v):
         if isinstance(v, dt.datetime):
@@ -55,7 +72,10 @@ def cmd_triggers(args) -> int:
             if not isinstance(tr, dict):
                 continue
             ttype, cond, action = tr.get("type"), tr.get("condition"), tr.get("action")
-            if ttype == "time":
+            if ttype in ("time", "date"):
+                # `date` is accepted as an alias of `time` — domains write it
+                # naturally, and it is one character of drift away from a
+                # silently dead control (estate audit FW-1).
                 if cond == "due_date_passed":
                     due = as_date(meta.get("due_date"))
                     if due and due < today and not is_terminal(corpus.schema, meta):
@@ -71,6 +91,28 @@ def cmd_triggers(args) -> int:
                     if (today - last).days > int(thresh):
                         hits.append(f"{name}: unmodified {(today - last).days}d "
                                     f"(threshold {thresh}d) -> {action}")
+                else:
+                    # Free-text time condition. Recover a date if the condition
+                    # names one; otherwise say so instead of falling through
+                    # silently (the else below is on TYPE, so it never fires
+                    # here — the no-silent-default law, same bug class as the
+                    # `relationship` branch one screen down).
+                    d = _embedded_date(cond)
+                    if d is None:
+                        skipped.append(f"{name}: time condition {cond!r} names no "
+                                       f"parseable date - left to the agent")
+                    elif d <= today and not is_terminal(corpus.schema, meta):
+                        hits.append(f"{name}: time condition {cond!r} - date {d} "
+                                    f"reached ({(today - d).days}d ago) -> {action}")
+                    elif d <= today:
+                        pass  # fired, but the thing is already settled
+                    elif (d - today).days <= 30:
+                        hits.append(f"{name}: time condition {cond!r} - fires in "
+                                    f"{(d - today).days}d ({d}) -> {action}")
+                    else:
+                        horizon.append(((d - today).days,
+                                        f"{name}: time condition {cond!r} fires {d} "
+                                        f"({(d - today).days}d out)"))
             elif ttype == "dependency":
                 watch = tr.get("watch") or []
                 watch = watch if isinstance(watch, list) else [watch]
@@ -103,14 +145,16 @@ def cmd_triggers(args) -> int:
                                f"not evaluated")
 
     # Deadline scan: every non-terminal date-bearing thing, triggers or not.
-    horizon: list[tuple[int, str]] = []
+    # OVERDUE is never suppressed by a declared trigger — the more carefully
+    # authored thing must not get less warning (estate audit FW-1).
     for t in corpus.things:
         meta, name = t.meta, t.id or t.path.name
         due = as_date(meta.get("due_date"))
         if due and not is_terminal(corpus.schema, meta):
             days = (due - today).days
-            if days < 0 and not meta.get("triggers"):
-                hits.append(f"{name}: OVERDUE by {-days}d (due {due}, no trigger declared)")
+            if days < 0:
+                note = "" if meta.get("triggers") else ", no trigger declared"
+                hits.append(f"{name}: OVERDUE by {-days}d (due {due}{note})")
             elif 0 <= days <= 30:
                 hits.append(f"{name}: due in {days}d ({due})")
             elif days > 30:

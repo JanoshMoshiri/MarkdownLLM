@@ -53,6 +53,15 @@ triggers:
 - `due_date_passed` — The thing's `due_date` is in the past and status is not `completed` or `cancelled`
 - `review_date_reached` — The thing's `review_date` has arrived
 - `stale` — The thing hasn't been modified in longer than `threshold`
+- Any other condition string is **free text**. The evaluator (`mdllm triggers`)
+  still honours it mechanically where it can: if the text names an ISO date
+  (`2026-09-01`), that date is treated as the fire date — past dates on
+  unsettled things fire, dates within 30 days surface as upcoming, later dates
+  join the horizon. A free-text condition naming no parseable date is reported
+  as not mechanically evaluable — never silently dropped.
+- `type: date` is accepted as an alias of `type: time` — domains write it
+  naturally, and rejecting it silently would kill the control one character of
+  drift away from the supported spelling.
 
 ### Dependency-based
 
