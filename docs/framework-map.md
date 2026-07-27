@@ -68,7 +68,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>20 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>21 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -194,6 +194,7 @@ flowchart LR
         C18["cascade"]
         C19["mcp-serve"]
         C20["imports-check"]
+        C21["boundary"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -216,6 +217,7 @@ flowchart LR
         T18["write.thing.md<br/>post-completion cascade"]
         T19["mcp-domain-server.md<br/>exposed face — producing side"]
         T20["mcp-domain-server.md<br/>quarantined imports — consuming side"]
+        T21["local .boundary-terms<br/>disclosure boundary (never committed)"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -238,6 +240,7 @@ flowchart LR
     C18 -->|"gathers downstream for"| T18
     C19 -.->|"serves over MCP (stdio)"| T19
     C20 -->|"re-checks quarantine for"| T20
+    C21 -->|"blocks crossings of"| T21
 ```
 
 Notes on this view:

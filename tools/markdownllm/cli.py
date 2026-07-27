@@ -28,6 +28,10 @@ Subcommands:
   scaffold <path>      Deterministic domain birth: instantiated templates,
                        nested git repo, outer .gitignore isolation, hook,
                        first commit. The semantic half stays with the agent.
+  boundary [path]      Disclosure-boundary check: staged additions/filenames,
+                       --message FILE (commit-msg hook), or --history audit,
+                       against the LOCAL gitignored .boundary-terms file.
+                       Absent file => silent no-op (CI never enforces this).
   install-hook [path]  Install a git pre-commit hook running `validate`.
 
 Requires: Python 3.10+, PyYAML. tiktoken optional (tokens falls back to heuristic).
@@ -38,6 +42,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+from .boundary import cmd_boundary
 from .cascade import cmd_cascade
 from .coherence import cmd_coherence
 from .doctor import cmd_doctor
@@ -186,6 +191,17 @@ def build_cli() -> argparse.ArgumentParser:
                         "domain's external imports against their sources' exposed faces")
     ic.add_argument("path", nargs="?", default=".", help="the consumer domain")
     ic.set_defaults(fn=cmd_imports_check)
+
+    bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
+                        "additions, filenames, or a commit message against the "
+                        "LOCAL .boundary-terms file (gitignored; absent => no-op)")
+    bd.add_argument("path", nargs="?", default=".")
+    bd.add_argument("--message", metavar="FILE",
+                    help="scan a commit-message file (commit-msg hook mode)")
+    bd.add_argument("--history", action="store_true",
+                    help="full-archive audit: all revs and messages (console only)")
+    bd.add_argument("--quiet", action="store_true")
+    bd.set_defaults(fn=cmd_boundary)
 
     return p
 
