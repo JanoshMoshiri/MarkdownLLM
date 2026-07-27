@@ -49,7 +49,7 @@ from .doctor import cmd_doctor
 from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
 from .history import cmd_changelog, cmd_worklog
-from .imports_check import cmd_imports_check
+from .imports_check import cmd_estate_check, cmd_imports_check
 from .indexes import cmd_index
 from .kernel_gen import cmd_kernel
 from .mcp_server import cmd_mcp_serve
@@ -188,9 +188,16 @@ def build_cli() -> argparse.ArgumentParser:
     ms.set_defaults(fn=cmd_mcp_serve)
 
     ic = sub.add_parser("imports-check", help="re-quarantine-on-drift: check a "
-                        "domain's external imports against their sources' exposed faces")
+                        "domain's external imports against their sources' exposed faces "
+                        "(both directions: stale = source moved, diverged = mirror moved)")
     ic.add_argument("path", nargs="?", default=".", help="the consumer domain")
     ic.set_defaults(fn=cmd_imports_check)
+
+    ec = sub.add_parser("estate-check", help="operator-axis batch of imports-check "
+                        "over explicitly named consumer roots — ephemeral per-consumer "
+                        "reads, never an index (a domain cannot enumerate its consumers)")
+    ec.add_argument("paths", nargs="+", help="consumer domain roots, named explicitly")
+    ec.set_defaults(fn=cmd_estate_check)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
                         "additions, filenames, or a commit message against the "

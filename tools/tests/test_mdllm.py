@@ -1420,14 +1420,15 @@ def _git_short(root):
                   capture_output=True, text=True).stdout.strip()
 
 
-def _consumer_with_import(con, source_domain, source_id, pin, server_cfg):
+def _consumer_with_import(con, source_domain, source_id, pin, server_cfg,
+                          body="# Imported Spec\n\nQuarantined.\n"):
     import json
     write(con, ".mcp.json", json.dumps({"mcpServers": {source_domain: server_cfg}}))
     write(con, "things/imported.md", thing_text(
         f"id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
         f"origin: external\nverified: false\nsource_domain: {source_domain}\n"
         f"source_id: {source_id}\nsource_commit: {pin}",
-        "# Imported Spec\n\nQuarantined.\n"))
+        body))
 
 
 def test_imports_freshness_fresh_then_stale(tmp_path):
@@ -1443,7 +1444,8 @@ def test_imports_freshness_fresh_then_stale(tmp_path):
     con = tmp_path / "condom"
     con.mkdir()
     _consumer_with_import(con, "srcdom", "the-spec", pin,
-        {"command": sys.executable, "args": [str(Path(mdllm.__file__)), "mcp-serve", str(src)]})
+        {"command": sys.executable, "args": [str(Path(mdllm.__file__)), "mcp-serve", str(src)]},
+        body="# The Spec\n\nv1.\n")  # a faithful mirror — content matches the face
 
     # 1. FRESH — pin matches the source's current per-thing commit (read via the face)
     rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
@@ -1481,6 +1483,88 @@ def test_imports_freshness_no_address_book_entry(tmp_path):
     assert rows["imported-spec"]["state"] == "no-address-book-entry"
 
 
+def test_imports_freshness_diverged_when_mirror_edited(tmp_path):
+    # The second sync direction — source behind mirror. The pins agree, but
+    # the mirror's content no longer matches the face: the loop was bypassed
+    # (the felt estate failure: someone updated the copy in the consumer
+    # instead of the source). Detected consumer-side through the porch — no
+    # multi-root read, no source-git access, the membrane holds.
+    import subprocess as sp
+    src = tmp_path / "srcdom"
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+        "# The Spec\n\nv1.\n"))
+    sp.run(["git", "init", "-q"], cwd=src, check=True)
+    _git_commit(src, "create spec")
+    pin = _git_short(src)
+
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", pin,
+        {"command": sys.executable, "args": [str(Path(mdllm.__file__)), "mcp-serve", str(src)]})
+    # Faithful mirror first: body matches the face -> fresh.
+    write(con, "things/imported.md", thing_text(
+        f"id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        f"origin: external\nverified: false\nsource_domain: srcdom\n"
+        f"source_id: the-spec\nsource_commit: {pin}",
+        "# The Spec\n\nv1.\n"))
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "fresh"
+    # Edit the MIRROR, not the source: pin still current, content differs.
+    write(con, "things/imported.md", thing_text(
+        f"id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        f"origin: external\nverified: false\nsource_domain: srcdom\n"
+        f"source_id: the-spec\nsource_commit: {pin}",
+        "# The Spec\n\nv1 EDITED IN THE CONSUMER.\n"))
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "diverged"
+
+
+def test_estate_check_batches_named_roots_only(tmp_path, capsys):
+    # The estate view is batching over per-consumer reads: named roots in,
+    # per-consumer sections + a roll-up out. Nothing discovered, nothing
+    # persisted, no per-source reverse map.
+    import subprocess as sp
+    src = tmp_path / "srcdom"
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+        "# The Spec\n\nv1.\n"))
+    sp.run(["git", "init", "-q"], cwd=src, check=True)
+    _git_commit(src, "create spec")
+    pin = _git_short(src)
+
+    con_a = tmp_path / "con-a"
+    con_a.mkdir()
+    _consumer_with_import(con_a, "srcdom", "the-spec", pin,
+        {"command": sys.executable, "args": [str(Path(mdllm.__file__)), "mcp-serve", str(src)]})
+    write(con_a, "things/imported.md", thing_text(
+        f"id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        f"origin: external\nverified: false\nsource_domain: srcdom\n"
+        f"source_id: the-spec\nsource_commit: {pin}",
+        "# The Spec\n\nv1.\n"))
+    con_b = tmp_path / "con-b"
+    con_b.mkdir()  # no .mcp.json: its import has no route
+    write(con_b, "things/other.md", thing_text(
+        "id: other-import\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        "origin: external\nverified: false\nsource_domain: srcdom\n"
+        "source_id: the-spec\nsource_commit: deadbee",
+        "# Other\n\nX.\n"))
+    rc = mdllm.cmd_estate_check(_ns(paths=[str(con_a), str(con_b)]))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "### con-a" in out and "### con-b" in out       # per-consumer, not per-source
+    assert "fresh      imported-spec" in out
+    assert "NO-ROUTE   other-import" in out
+    assert "Estate roll-up" in out
+    assert "never an index" in out
+
+
+def test_estate_check_rejects_non_directory(tmp_path, capsys):
+    rc = mdllm.cmd_estate_check(_ns(paths=[str(tmp_path / "nope")]))
+    assert rc == 1
+    assert "not a directory" in capsys.readouterr().out
+
+
 def test_imports_check_summary_states_coverage(tmp_path, capsys):
     # "26 import(s); 0 stale." over zero possible comparisons is the count of
     # comparisons never made rendered as assurance (estate audit FW-2). The
@@ -1494,7 +1578,7 @@ def test_imports_check_summary_states_coverage(tmp_path, capsys):
             "# Import\n\nNo triple.\n"))
     mdllm.cmd_imports_check(_ns(path=str(con)))
     out = capsys.readouterr().out
-    assert "0 stale, 0 fresh" in out
+    assert "0 stale, 0 diverged, 0 fresh" in out
     assert "2 could not be checked" in out
     assert "COVERAGE: 0/2" in out
     assert "asserts nothing about freshness" in out

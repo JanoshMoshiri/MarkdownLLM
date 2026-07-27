@@ -72,7 +72,7 @@ from markdownllm.mcp_server import (
     mcp_get_deliverable, mcp_build_manifest, mcp_list_resources,
     mcp_read_resource, cmd_mcp_serve,
 )
-from markdownllm.imports_check import imports_freshness, cmd_imports_check
+from markdownllm.imports_check import imports_freshness, cmd_imports_check, cmd_estate_check
 from markdownllm.cli import build_cli, main
 
 if __name__ == "__main__":
