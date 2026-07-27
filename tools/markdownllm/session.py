@@ -125,6 +125,53 @@ def _verified_flips_recent(domain: Path) -> list[str]:
     return lines
 
 
+def _floor_status(root: Path) -> str | None:
+    """One line when the mechanical floor is absent or stale; None when healthy.
+
+    Why session-start and not just `doctor`: git hooks live in `.git/hooks/`,
+    which is NEVER cloned. A domain that is re-cloned (every fresh agent
+    session that clones rather than copies) silently loses its git-fs anchor
+    and orients perfectly cleanly the next session — the one command that
+    would say so, `doctor`, requires already suspecting it. Surfacing it at
+    orientation is what makes the domain aware of its own enforcement state.
+
+    Deliberately cheap — presence and body-freshness only, no `git hook run`
+    (that stays doctor's deep probe): this runs on every session start.
+    Imports are deferred because scaffold imports this module.
+    """
+    from .scaffold import COMMIT_MSG_HOOK_BODY, HOOK_BODY, MDLLM_ENTRY
+    import os
+
+    inside = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
+                            capture_output=True, text=True)
+    if inside.returncode != 0:
+        return None  # not a git repo — scaffold/doctor own that case
+    git_dir = (root / inside.stdout.strip()).resolve()
+    missing = [n for n in ("pre-commit", "commit-msg")
+               if not (git_dir / "hooks" / n).is_file()]
+    if missing:
+        return (f"- **Floor: NOT INSTALLED** — missing git {', '.join(missing)} "
+                f"hook(s). Mechanical validation is NOT enforced at the commit "
+                f"boundary (hooks live in .git/hooks and are never cloned). "
+                f"Run `mdllm install-hook .`")
+    try:
+        rel = Path(os.path.relpath(MDLLM_ENTRY, root)).as_posix()
+    except ValueError:
+        rel = MDLLM_ENTRY.as_posix()
+    stale = []
+    for name, body in (("pre-commit", HOOK_BODY),
+                       ("commit-msg", COMMIT_MSG_HOOK_BODY)):
+        installed = (git_dir / "hooks" / name).read_text(
+            encoding="utf-8").replace("\r\n", "\n").strip()
+        if installed != body.format(rel=rel).replace("\r\n", "\n").strip():
+            stale.append(name)
+    if stale:
+        return (f"- **Floor: STALE** — {', '.join(stale)} hook body predates the "
+                f"current framework; it may not run newer checks. Re-run "
+                f"`mdllm install-hook .`")
+    return None
+
+
 def cmd_session_start(args) -> int:
     domain = Path(args.path).resolve()
     agents = domain / "AGENTS.md"
@@ -166,6 +213,12 @@ def cmd_session_start(args) -> int:
                            f"→ `--seal`.")
             else:
                 out.append(f"- **Version: in sync** (framework v{fv}).")
+
+    # Enforcement state before content state: if the floor is not actually
+    # installed, everything below it is unenforced. Quiet when healthy.
+    floor = _floor_status(domain)
+    if floor:
+        out.append(floor)
 
     out.append(f"- **Velocity:** {_velocity_signal(domain)}")
 

@@ -1769,3 +1769,39 @@ def test_install_hook_writes_commit_msg_hook(tmp_path):
     assert msg_hook.is_file()
     body = msg_hook.read_text(encoding="utf-8")
     assert "boundary" in body and '--message "$1"' in body
+
+
+# ---------------------------------------------------------------------------
+# Floor presence at orientation. The real case: git hooks live in .git/hooks,
+# which is never cloned — a re-cloned domain silently loses its git-fs anchor
+# and orients clean. session-start surfaces it; doctor keeps the deep probe.
+
+
+def test_session_start_flags_missing_floor(tmp_path):
+    from markdownllm.session import _floor_status
+    _git_repo(tmp_path)
+    line = _floor_status(tmp_path)
+    assert line and "NOT INSTALLED" in line and "install-hook" in line
+
+
+def test_session_start_quiet_when_floor_installed(tmp_path):
+    from markdownllm.session import _floor_status
+    _git_repo(tmp_path)
+    mdllm.cmd_install_hook(_ns(path=str(tmp_path)))
+    assert _floor_status(tmp_path) is None
+
+
+def test_session_start_flags_stale_hook_body(tmp_path):
+    from markdownllm.session import _floor_status
+    _git_repo(tmp_path)
+    mdllm.cmd_install_hook(_ns(path=str(tmp_path)))
+    hook = tmp_path / ".git" / "hooks" / "pre-commit"
+    hook.write_text(hook.read_text(encoding="utf-8") + "# older body\n",
+                    encoding="utf-8", newline="\n")
+    line = _floor_status(tmp_path)
+    assert line and "STALE" in line and "pre-commit" in line
+
+
+def test_session_start_floor_check_skips_non_repo(tmp_path):
+    from markdownllm.session import _floor_status
+    assert _floor_status(tmp_path) is None
