@@ -40,6 +40,13 @@ if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
   echo "Install Python 3.10+ with PyYAML, or re-run install-hook from the framework root."
   exit 1
 fi
+# Disclosure boundary first: cheapest check, clearest message. Reads the LOCAL
+# gitignored .boundary-terms; absent (every fresh clone, all CI) => silent no-op.
+"$PY" "$MDLLM" boundary "$ROOT" --quiet || {{
+  echo ""
+  echo "mdllm: staged content crosses the disclosure boundary — commit blocked."
+  exit 1
+}}
 "$PY" "$MDLLM" validate "$ROOT" --quiet || {{
   echo ""
   echo "mdllm: validation Errors — commit blocked. Fix or run with --no-verify (discouraged)."
@@ -51,6 +58,28 @@ fi
 "$PY" "$MDLLM" coherence "$ROOT" --quiet || {{
   echo ""
   echo "mdllm: coherence Errors — a generated artifact (kernel/index) or the spec catalog is stale. Regenerate and re-commit, or --no-verify (discouraged)."
+  exit 1
+}}
+"""
+
+# The commit MESSAGE is a surface pre-commit structurally cannot see (git has
+# not collected it yet) — and it is where honour-system disclosure failures
+# actually live. Same portable preamble as HOOK_BODY; $1 is the message file.
+COMMIT_MSG_HOOK_BODY = """#!/bin/sh
+# mdllm commit-msg: disclosure-boundary check on the commit message
+# (boundary-disclosure-check plan). Local .boundary-terms only; absent => no-op.
+ROOT="$(git rev-parse --show-toplevel)"
+MDLLM="$ROOT/{rel}"
+PY=""
+for c in python3 python py; do
+  if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
+done
+if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
+  exit 0  # no floor available: the pre-commit hook already reported/blocked
+fi
+"$PY" "$MDLLM" boundary "$ROOT" --message "$1" --quiet || {{
+  echo ""
+  echo "mdllm: the commit MESSAGE crosses the disclosure boundary — commit blocked."
   exit 1
 }}
 """
@@ -88,17 +117,23 @@ def install_hook(root: Path) -> str:
     except ValueError:  # e.g. different drives on Windows — no relative path exists
         rel = mdllm.as_posix()
     hook.write_text(HOOK_BODY.format(rel=rel), encoding="utf-8", newline="\n")
-    try:
-        hook.chmod(hook.stat().st_mode | 0o111)
-    except OSError:
-        pass  # Windows: executability is not a file-mode concern
+    msg_hook = git_dir / "hooks" / "commit-msg"
+    msg_hook.write_text(COMMIT_MSG_HOOK_BODY.format(rel=rel),
+                        encoding="utf-8", newline="\n")
+    for h in (hook, msg_hook):
+        try:
+            h.chmod(h.stat().st_mode | 0o111)
+        except OSError:
+            pass  # Windows: executability is not a file-mode concern
     return rel
 
 
 def cmd_install_hook(args) -> int:
     root = Path(args.path).resolve()
     rel = install_hook(root)
-    print(f"installed {root / '.git' / 'hooks' / 'pre-commit'} (mdllm via {rel})")
+    hooks_dir = root / ".git" / "hooks"
+    print(f"installed {hooks_dir / 'pre-commit'} + {hooks_dir / 'commit-msg'} "
+          f"(mdllm via {rel})")
     return 0
 
 
