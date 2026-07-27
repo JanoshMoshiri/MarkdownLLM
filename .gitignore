@@ -15,3 +15,7 @@ __pycache__/
 
 # WORKLOG is an on-demand view of the commit stream (mdllm worklog), not a committed artifact
 WORKLOG.md
+
+# Local disclosure boundary (mdllm boundary) — the vocabulary never enters any
+# repo; the check itself errors if this file is ever tracked
+.boundary-terms

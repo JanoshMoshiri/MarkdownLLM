@@ -16,6 +16,7 @@ from pathlib import Path
 
 import yaml
 
+from .boundary import TERMS_FILE
 from .domain_kernel import apply_domain_kernel, build_domain_kernel_blocks
 from .model import ID_RE, parse_frontmatter
 
@@ -251,6 +252,25 @@ def cmd_scaffold(args) -> int:
     }, indent=2) + "\n", encoding="utf-8", newline="\n")
     written.append(".claude/settings.json")
 
+    # Disclosure boundary (boundary-disclosure-check plan): a domain is born
+    # with its own LOCAL terms file — per-repo boundaries; a domain's disclosure
+    # surface is its own — and a .gitignore that keeps it local BEFORE the
+    # `git add -A` first commit, so the vocabulary never enters any repo,
+    # including the domain's own.
+    bt_template = templates / "boundary-terms.template"
+    if bt_template.is_file():
+        (target / TERMS_FILE).write_text(
+            bt_template.read_text(encoding="utf-8"),
+            encoding="utf-8", newline="\n")
+        gi_d = target / ".gitignore"
+        gi_existing = gi_d.read_text(encoding="utf-8") if gi_d.is_file() else ""
+        if TERMS_FILE not in {ln.strip() for ln in gi_existing.splitlines()}:
+            gi_d.write_text(
+                gi_existing.rstrip("\n") + ("\n" if gi_existing else "")
+                + f"# local disclosure boundary — never committed\n{TERMS_FILE}\n",
+                encoding="utf-8", newline="\n")
+        written.append(f".gitignore (+ local {TERMS_FILE}, never committed)")
+
     # Isolation, in the hard hook's order: (1) domain repo exists,
     # (2)+(3) outer repo ignores the domain BEFORE any domain commit,
     # (4) domain's first commit. Step 5 (remote) stays with the human.
@@ -284,6 +304,25 @@ def cmd_scaffold(args) -> int:
                 broken.append(f"outer .gitignore updated but commit failed in "
                               f"{outer_root}: {commit.stderr.strip() or commit.stdout.strip()}")
         isolated_in = outer_root
+
+    # Private-by-default at birth: register the newborn's NAME in the framework
+    # root's own local terms file, so framework commits cannot mention it until
+    # the operator deletes the line — making publication an explicit decision
+    # rather than a default. Same invariant as the .gitignore step above: which
+    # domains exist is domain state, and it reaches the framework repo only as
+    # a local, uncommitted fact.
+    fw_terms = fw_root / TERMS_FILE
+    fw_existing = (fw_terms.read_text(encoding="utf-8")
+                   if fw_terms.is_file() else "")
+    fw_terms_present = {ln.split("==>")[0].strip().lower()
+                        for ln in fw_existing.splitlines()
+                        if ln.strip() and not ln.strip().startswith("#")}
+    if name.lower() not in fw_terms_present:
+        if not fw_existing and bt_template.is_file():
+            fw_existing = bt_template.read_text(encoding="utf-8")
+        fw_terms.write_text(
+            fw_existing.rstrip("\n") + ("\n" if fw_existing else "")
+            + f"{name}\n", encoding="utf-8", newline="\n")
 
     hook_via = install_hook(target)
     subprocess.run(["git", "add", "-A"], cwd=target, check=True)

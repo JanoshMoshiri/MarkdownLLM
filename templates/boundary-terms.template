@@ -1,0 +1,14 @@
+# .boundary-terms — this repo's disclosure boundary. LOCAL ONLY.
+#
+# Terms listed here must never cross into committed state: the floor blocks
+# any commit whose staged additions, filenames, or message contain one.
+# This file is gitignored and must never be committed — the check errors if
+# it is ever tracked. The tool ships the capability; the vocabulary is yours.
+#
+# One term per line. Case-insensitive literal substring match.
+# Optionally name the approved substitute after `==>` — the block message
+# will suggest it at the moment of violation:
+#
+#   [client-name] ==> the client
+#   [person-name] ==> the second operator
+#   [internal-identifier]
