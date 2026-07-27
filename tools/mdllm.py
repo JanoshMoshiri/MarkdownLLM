@@ -58,7 +58,14 @@ from markdownllm.domain_kernel import (
 )
 from markdownllm.session import _velocity_signal, _orient_forward, cmd_session_start
 from markdownllm.coherence import _changed_files_recent, coherence_findings, cmd_coherence
-from markdownllm.scaffold import HOOK_BODY, install_hook, cmd_install_hook, cmd_scaffold
+from markdownllm.scaffold import (
+    HOOK_BODY, COMMIT_MSG_HOOK_BODY, install_hook, cmd_install_hook,
+    cmd_scaffold,
+)
+from markdownllm.boundary import (
+    TERMS_FILE, load_terms, scan_text, self_guard, staged_findings,
+    history_findings, cmd_boundary,
+)
 from markdownllm.doctor import _upstream_sentinel_version, cmd_doctor
 from markdownllm.mcp_server import (
     mcp_domain_id, mcp_exposed_things, mcp_list_tools, mcp_query_things,

@@ -1658,3 +1658,114 @@ def test_orientation_open_loops_respect_declared_terminal_statuses(tmp_path):
     lines = "\n".join(_orient_forward(tmp_path))
     assert "Open loops (1)" in lines
     assert "`wip`" in lines and "`live`" not in lines
+
+
+# ---------------------------------------------------------------------------
+# Disclosure boundary (boundary-disclosure-check plan). The invariant under
+# test everywhere: capability without vocabulary — no terms file means silent
+# no-op (that IS the CI behaviour), and the terms file itself must never be
+# tracked. All fixture terms below are synthetic.
+
+
+def _boundary_repo(tmp_path, terms="secretco ==> the client\ncodename-x\n"):
+    _git_repo(tmp_path)
+    (tmp_path / ".gitignore").write_text(".boundary-terms\n", encoding="utf-8")
+    (tmp_path / ".boundary-terms").write_text(
+        "# synthetic fixture vocabulary\n" + terms, encoding="utf-8")
+
+
+def test_boundary_noop_without_terms_file(tmp_path, capsys):
+    _git_repo(tmp_path)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, quiet=False))
+    assert rc == 0 and "skipped" in capsys.readouterr().out
+
+
+def test_boundary_staged_addition_blocks_and_suggests(tmp_path, capsys):
+    import subprocess
+    _boundary_repo(tmp_path)
+    (tmp_path / "doc.md").write_text("work for SecretCo this week\n",
+                                     encoding="utf-8")
+    subprocess.run(["git", "add", "doc.md"], cwd=tmp_path, check=True)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, quiet=True))
+    out = capsys.readouterr().out
+    assert rc == 1 and "BLOCKED" in out and "the client" in out
+
+
+def test_boundary_staged_clean_passes(tmp_path, capsys):
+    import subprocess
+    _boundary_repo(tmp_path)
+    (tmp_path / "doc.md").write_text("work for the client this week\n",
+                                     encoding="utf-8")
+    subprocess.run(["git", "add", "doc.md"], cwd=tmp_path, check=True)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, quiet=True))
+    assert rc == 0
+
+
+def test_boundary_filename_match_blocks(tmp_path, capsys):
+    import subprocess
+    _boundary_repo(tmp_path)
+    (tmp_path / "codename-x-notes.md").write_text("clean body\n",
+                                                  encoding="utf-8")
+    subprocess.run(["git", "add", "codename-x-notes.md"], cwd=tmp_path,
+                   check=True)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, quiet=True))
+    assert rc == 1 and "filename" in capsys.readouterr().out
+
+
+def test_boundary_message_mode(tmp_path, capsys):
+    _boundary_repo(tmp_path)
+    msg = tmp_path / "COMMIT_EDITMSG"
+    msg.write_text("fix: adjust CODENAME-X rollout\n", encoding="utf-8")
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=str(msg),
+                                history=False, quiet=True))
+    assert rc == 1 and "commit message" in capsys.readouterr().out
+    msg.write_text("fix: adjust rollout\n", encoding="utf-8")
+    assert mdllm.cmd_boundary(_ns(path=str(tmp_path), message=str(msg),
+                                  history=False, quiet=True)) == 0
+
+
+def test_boundary_self_guard_blocks_tracked_terms_file(tmp_path, capsys):
+    import subprocess
+    _boundary_repo(tmp_path)
+    subprocess.run(["git", "add", "-f", ".boundary-terms"], cwd=tmp_path,
+                   check=True)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, quiet=True))
+    assert rc == 1 and "TRACKED" in capsys.readouterr().out
+
+
+def test_boundary_history_audit(tmp_path, capsys):
+    import subprocess
+    _boundary_repo(tmp_path)
+    (tmp_path / "old.md").write_text("SecretCo deliverable\n", encoding="utf-8")
+    subprocess.run(["git", "add", "old.md"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "notes on codename-x"],
+                   cwd=tmp_path, check=True)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=True, quiet=True))
+    out = capsys.readouterr().out
+    assert rc == 1
+    assert "commit " in out          # the message hit
+    assert "rev:path" in out          # the blob hit
+
+
+def test_boundary_parse_comments_and_blanks(tmp_path):
+    _boundary_repo(tmp_path, terms="\n# comment only\nplain-term\n"
+                                   "spaced ==> replacement here\n")
+    terms = mdllm.load_terms(tmp_path)
+    assert ("plain-term", None) in terms
+    assert ("spaced", "replacement here") in terms
+    assert len(terms) == 2
+
+
+def test_install_hook_writes_commit_msg_hook(tmp_path):
+    _git_repo(tmp_path)
+    mdllm.cmd_install_hook(_ns(path=str(tmp_path)))
+    msg_hook = tmp_path / ".git" / "hooks" / "commit-msg"
+    assert msg_hook.is_file()
+    body = msg_hook.read_text(encoding="utf-8")
+    assert "boundary" in body and '--message "$1"' in body
