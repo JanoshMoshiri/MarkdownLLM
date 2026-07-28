@@ -50,6 +50,7 @@ from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
 from .history import cmd_changelog, cmd_worklog
 from .imports_check import cmd_estate_check, cmd_imports_check
+from .sync import cmd_estate_sync
 from .indexes import cmd_index
 from .kernel_gen import cmd_kernel
 from .mcp_server import cmd_mcp_serve
@@ -198,6 +199,19 @@ def build_cli() -> argparse.ArgumentParser:
                         "reads, never an index (a domain cannot enumerate its consumers)")
     ec.add_argument("paths", nargs="+", help="consumer domain roots, named explicitly")
     ec.set_defaults(fn=cmd_estate_check)
+
+    es = sub.add_parser("estate-sync", help="sync before orienting: fetch + "
+                        "ff-only pull across the estate's repos (root + domain(s)/*); "
+                        "divergence reported, never resolved; never pushes; "
+                        "--status = publication debt from cached refs, no network")
+    es.add_argument("paths", nargs="*", help="root to discover under (default .), "
+                    "or several explicit repo paths")
+    es.add_argument("--status", action="store_true",
+                    help="no network: report unpushed/diverged/dirty repos only "
+                         "(the session-end publication-debt view)")
+    es.add_argument("--timeout", type=int, default=20,
+                    help="seconds per network call before degrading (default 20)")
+    es.set_defaults(fn=cmd_estate_sync)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
                         "additions, filenames, or a commit message against the "

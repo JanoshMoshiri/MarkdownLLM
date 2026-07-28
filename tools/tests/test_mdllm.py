@@ -1983,3 +1983,124 @@ def test_session_start_flags_stale_hook_body(tmp_path):
 def test_session_start_floor_check_skips_non_repo(tmp_path):
     from markdownllm.session import _floor_status
     assert _floor_status(tmp_path) is None
+
+
+# ---------------------------------------------------------------------------
+# estate-sync (sync.py) — the machine axis: ff-only transport, divergence
+# reported never resolved, discovery of repos (not membranes), publication debt
+# ---------------------------------------------------------------------------
+
+def _sync_git(cwd, *args):
+    import subprocess
+    return subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                           *args], cwd=cwd, capture_output=True, text=True)
+
+
+def _seed_pair(tmp_path, name="d"):
+    """A 'remote' repo and a clone of it — the two-machine estate in miniature."""
+    src = tmp_path / f"{name}-src"
+    src.mkdir()
+    _sync_git(src, "init", "-q")
+    (src / "a.txt").write_text("one\n", encoding="utf-8")
+    _sync_git(src, "add", "-A")
+    _sync_git(src, "commit", "-q", "-m", "c1")
+    clone = tmp_path / name
+    _sync_git(tmp_path, "clone", "-q", str(src), str(clone))
+    return src, clone
+
+
+def test_estate_sync_discovery_walks_root_and_domain_children(tmp_path):
+    from markdownllm.sync import discover_repos
+    _sync_git(tmp_path, "init", "-q")
+    (tmp_path / "domain").mkdir()
+    (tmp_path / "outside").mkdir()
+    src, _ = _seed_pair(tmp_path / "outside", "x")
+    clone = tmp_path / "domain" / "x"
+    _sync_git(tmp_path, "clone", "-q", str(src), str(clone))
+    (tmp_path / "domain" / "not-a-repo").mkdir()
+    repos = discover_repos(tmp_path)
+    assert repos == [tmp_path, clone]
+
+
+def test_estate_sync_fast_forwards_when_remote_ahead(tmp_path):
+    from markdownllm.sync import sync_repo
+    src, clone = _seed_pair(tmp_path)
+    (src / "a.txt").write_text("two\n", encoding="utf-8")
+    _sync_git(src, "commit", "-q", "-am", "c2")
+    res = sync_repo(clone)
+    assert res["state"] == "synced" and res["moved"] and "+1" in res["detail"]
+    assert (clone / "a.txt").read_text(encoding="utf-8") == "two\n"
+
+
+def test_estate_sync_reports_ahead_never_pushes(tmp_path):
+    from markdownllm.sync import sync_repo
+    src, clone = _seed_pair(tmp_path)
+    (clone / "b.txt").write_text("local\n", encoding="utf-8")
+    _sync_git(clone, "add", "-A")
+    _sync_git(clone, "commit", "-q", "-m", "local work")
+    res = sync_repo(clone)
+    assert res["state"] == "ahead" and "unpushed" in res["detail"]
+    # the remote must NOT have received the commit
+    log = _sync_git(src, "log", "--oneline")
+    assert "local work" not in log.stdout
+
+
+def test_estate_sync_divergence_reported_never_resolved(tmp_path):
+    from markdownllm.sync import sync_repo
+    src, clone = _seed_pair(tmp_path)
+    (src / "a.txt").write_text("remote2\n", encoding="utf-8")
+    _sync_git(src, "commit", "-q", "-am", "remote c2")
+    (clone / "b.txt").write_text("local\n", encoding="utf-8")
+    _sync_git(clone, "add", "-A")
+    _sync_git(clone, "commit", "-q", "-m", "local c2")
+    res = sync_repo(clone)
+    assert res["state"] == "diverged" and not res["moved"]
+    assert "+1 local / +1 remote" in res["detail"]
+    # no merge commit was created
+    log = _sync_git(clone, "log", "--oneline")
+    assert len(log.stdout.strip().splitlines()) == 2
+
+
+def test_estate_sync_dirty_tree_skips_pull(tmp_path):
+    from markdownllm.sync import sync_repo
+    src, clone = _seed_pair(tmp_path)
+    (src / "a.txt").write_text("remote2\n", encoding="utf-8")
+    _sync_git(src, "commit", "-q", "-am", "remote c2")
+    (clone / "a.txt").write_text("uncommitted local edit\n", encoding="utf-8")
+    res = sync_repo(clone)
+    assert res["state"] == "dirty" and not res["moved"]
+    # the uncommitted edit survives untouched
+    assert (clone / "a.txt").read_text(encoding="utf-8") == "uncommitted local edit\n"
+
+
+def test_estate_sync_local_only_repo_is_legitimate(tmp_path):
+    from markdownllm.sync import sync_repo
+    solo = tmp_path / "solo"
+    solo.mkdir()
+    _sync_git(solo, "init", "-q")
+    (solo / "a.txt").write_text("x\n", encoding="utf-8")
+    _sync_git(solo, "add", "-A")
+    _sync_git(solo, "commit", "-q", "-m", "c1")
+    res = sync_repo(solo)
+    assert res["state"] == "local-only"
+
+
+def test_estate_sync_status_mode_reports_debt_without_network(tmp_path, capsys):
+    import mdllm
+    src, clone = _seed_pair(tmp_path)
+    (clone / "b.txt").write_text("local\n", encoding="utf-8")
+    _sync_git(clone, "add", "-A")
+    _sync_git(clone, "commit", "-q", "-m", "unpublished")
+    rc = mdllm.cmd_estate_sync(_ns(paths=[str(clone)], status=True, timeout=20))
+    out = capsys.readouterr().out
+    assert rc == 0 and "Publication Debt" in out
+    assert "ahead" in out and "+1 (unpushed)" in out
+
+
+def test_estate_sync_in_progress_merge_is_skipped(tmp_path):
+    from markdownllm.sync import sync_repo
+    src, clone = _seed_pair(tmp_path)
+    gitdir = clone / ".git"
+    (gitdir / "MERGE_HEAD").write_text("0" * 40 + "\n", encoding="utf-8")
+    res = sync_repo(clone)
+    assert res["state"] == "in-operation" and not res["moved"]
