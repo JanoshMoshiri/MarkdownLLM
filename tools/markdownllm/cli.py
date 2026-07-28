@@ -77,8 +77,13 @@ def build_cli() -> argparse.ArgumentParser:
     v.add_argument("--quiet", action="store_true", help="only print on Errors")
     v.set_defaults(fn=cmd_validate)
 
-    t = sub.add_parser("triggers", help="evaluate trigger conditions")
+    t = sub.add_parser("triggers", help="evaluate trigger conditions; --estate "
+                       "sweeps every local clone with a roll-up (run after "
+                       "estate-sync)")
     t.add_argument("path", nargs="?", default=".")
+    t.add_argument("--estate", action="store_true",
+                   help="batch per-domain evaluation over the local clones the "
+                        "estate-sync walk finds — ephemeral, never an index")
     t.set_defaults(fn=cmd_triggers)
 
     i = sub.add_parser("index", help="check or rebuild derived indexes")

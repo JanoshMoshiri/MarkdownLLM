@@ -31,8 +31,38 @@ def _embedded_date(cond):
         return None
 
 
-def cmd_triggers(args) -> int:
-    root = Path(args.path).resolve()
+# Lazy membrane reads for `type: import` triggers — crossed at most once per
+# evaluation run, and only if such a trigger exists. Cleared at the start of
+# every evaluate() so each run reads live state.
+_MEMBRANE_CACHE: dict = {}
+
+
+def _import_states(root: Path) -> dict | None:
+    key = ("states", str(root))
+    if key not in _MEMBRANE_CACHE:
+        try:
+            from .imports_check import imports_freshness
+            _MEMBRANE_CACHE[key] = {r["id"]: r["state"]
+                                    for r in imports_freshness(root)}
+        except Exception:
+            _MEMBRANE_CACHE[key] = None
+    return _MEMBRANE_CACHE[key]
+
+
+def _porch_coverage(root: Path) -> list | None:
+    key = ("porch", str(root))
+    if key not in _MEMBRANE_CACHE:
+        try:
+            from .imports_check import face_coverage
+            _MEMBRANE_CACHE[key] = face_coverage(root)
+        except Exception:
+            _MEMBRANE_CACHE[key] = None
+    return _MEMBRANE_CACHE[key]
+
+
+def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]], list[str]]:
+    """One domain's trigger evaluation: (hits, horizon, skipped)."""
+    _MEMBRANE_CACHE.clear()
     corpus, _ = scan(root)
     today = dt.date.today()
     by_id = corpus.by_id()
@@ -140,6 +170,52 @@ def cmd_triggers(args) -> int:
                 skipped.append(f"{name}: `relationship` trigger "
                                f"(on: {tr.get('on', '?')}, watch: {tr.get('watch', '?')}) "
                                f"needs change history — left to the agent")
+            elif ttype == "import":
+                # Keyed to the state imports-check computes — a live,
+                # consumer-side face read (trigger-specification.md ->
+                # Import-based). Lazy: the membrane is crossed at most once
+                # per evaluation run, and only if an import trigger exists.
+                icond = tr.get("condition") or "state_is"
+                if icond == "state_is":
+                    states = _import_states(root)
+                    if states is None:
+                        skipped.append(f"{name}: import trigger — imports "
+                                       f"machinery unavailable, state unknown")
+                        continue
+                    watch = tr.get("watch") or list(states)
+                    watch = watch if isinstance(watch, list) else [watch]
+                    values = tr.get("value") or ["stale", "diverged", "withdrawn"]
+                    values = [str(v) for v in
+                              (values if isinstance(values, list) else [values])]
+                    unknown = [w for w in watch if w not in states]
+                    for w in unknown:
+                        skipped.append(f"{name}: import trigger watches `{w}` "
+                                       f"but no such import exists here")
+                    fired = {w: states[w] for w in watch
+                             if w in states and states[w] in values}
+                    for w, s in fired.items():
+                        hits.append(f"{name}: import `{w}` is {s} -> {action}")
+                elif icond == "porch_offers_unimported":
+                    cov = _porch_coverage(root)
+                    if cov is None:
+                        skipped.append(f"{name}: import trigger — face "
+                                       f"coverage unavailable")
+                        continue
+                    src_filter = tr.get("source")
+                    for c in cov:
+                        if src_filter and c["source"] != str(src_filter):
+                            continue
+                        if c["state"] == "unreachable":
+                            skipped.append(f"{name}: face `{c['source']}` "
+                                           f"unreachable — offering unknown")
+                        elif (c["offered"] or 0) > c["imported"]:
+                            hits.append(f"{name}: face `{c['source']}` offers "
+                                        f"{c['offered']}, imported "
+                                        f"{c['imported']} -> {action}")
+                else:
+                    skipped.append(f"{name}: import trigger condition "
+                                   f"{icond!r} is not one the floor knows "
+                                   f"(state_is, porch_offers_unimported)")
             else:
                 skipped.append(f"{name}: unrecognised trigger type `{ttype}` — "
                                f"not evaluated")
@@ -160,7 +236,10 @@ def cmd_triggers(args) -> int:
             elif days > 30:
                 horizon.append((days, f"{name}: due {due} ({days}d out)"))
 
-    print(f"## Trigger Evaluation — {root}  ({today})\n")
+    return hits, horizon, skipped
+
+
+def _print_evaluation(hits, horizon, skipped) -> None:
     if hits:
         for h in hits:
             print(f"- {h}")
@@ -174,4 +253,44 @@ def cmd_triggers(args) -> int:
         print("\n### Not mechanically evaluable")
         for s in skipped:
             print(f"- {s}")
+
+
+def cmd_triggers(args) -> int:
+    root = Path(args.path).resolve()
+    today = dt.date.today()
+
+    if getattr(args, "estate", False):
+        # Operator-axis batch over per-domain evaluations — the estate
+        # attention sweep. Roots come from the same local-clone walk
+        # estate-sync uses (repos-not-membranes: a filesystem fact, not an
+        # estate manifest). Ephemeral roll-up, never an index. Run after
+        # `estate-sync` — the sweep is only as honest as the clones are
+        # fresh (an-unpulled-checkout-orients-on-a-past-domain).
+        from .sync import discover_repos
+        repos = discover_repos(root)
+        if not repos:
+            print(f"triggers --estate: no local clones under {root}")
+            return 0
+        print(f"## Estate Trigger Sweep — {len(repos)} local clone(s) walked "
+              f"({today})\nA filesystem fact, not an estate manifest; "
+              f"sync before sweeping.\n")
+        total_hits = 0
+        rollup = []
+        for repo in repos:
+            hits, horizon, skipped = evaluate(repo)
+            rollup.append((repo.name, len(hits), len(skipped)))
+            total_hits += len(hits)
+            print(f"### {repo.name}")
+            _print_evaluation(hits, horizon, skipped)
+            print()
+        print("### Roll-up")
+        for name, nh, ns in rollup:
+            print(f"- {name}: {nh} fired, {ns} not mechanically evaluable")
+        print(f"\n{total_hits} trigger(s) fired across the walk. "
+              f"Ephemeral — never an index.")
+        return 0
+
+    hits, horizon, skipped = evaluate(root)
+    print(f"## Trigger Evaluation — {root}  ({today})\n")
+    _print_evaluation(hits, horizon, skipped)
     return 0

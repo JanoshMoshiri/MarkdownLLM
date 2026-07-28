@@ -2187,6 +2187,85 @@ def test_ingestion_without_source_system_stays_incomplete(tmp_path):
     assert rows[0]["state"] == "incomplete"
 
 
+def test_import_trigger_state_is_fires_on_stale(tmp_path, capsys):
+    # The fired-unseen class: the source moves under the pin, and the trigger
+    # vocabulary can finally name what imports-check computes.
+    src = _producer(tmp_path, n_things=1)
+    con = tmp_path / "condom"
+    _consumer_with_import(con, "srcdom", "spec-0", "aaa0000", _server_cfg(src),
+                          body="# Spec 0\n\nv1.\n")  # pin != real commit -> stale
+    write(con, "things/watcher.md", thing_text(
+        "id: watcher\ntype: note\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "triggers:\n  - type: import\n    condition: state_is\n"
+        "    watch: [imported-spec]\n    action: re_evaluate"))
+    rc = mdllm.cmd_triggers(_ns(path=str(con)))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "watcher: import `imported-spec` is stale" in out
+
+
+def test_import_trigger_porch_offers_unimported(tmp_path, capsys):
+    import json
+    src = _producer(tmp_path, n_things=3)
+    con = tmp_path / "condom"
+    write(con, ".mcp.json", json.dumps({"mcpServers": {"srcdom": _server_cfg(src)}}))
+    write(con, "things/watcher.md", thing_text(
+        "id: watcher\ntype: note\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "triggers:\n  - type: import\n    condition: porch_offers_unimported\n"
+        "    source: srcdom\n    action: surface"))
+    rc = mdllm.cmd_triggers(_ns(path=str(con)))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "watcher: face `srcdom` offers 3, imported 0" in out
+
+
+def test_import_trigger_unknown_watch_is_honest(tmp_path, capsys):
+    write(tmp_path, "things/watcher.md", thing_text(
+        "id: watcher\ntype: note\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "triggers:\n  - type: import\n    condition: state_is\n"
+        "    watch: [ghost-import]\n    action: surface"))
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "watches `ghost-import` but no such import exists" in out
+
+
+def test_import_trigger_fresh_import_stays_quiet(tmp_path, capsys):
+    src = _producer(tmp_path, n_things=1)
+    pin_src = src  # single-commit repo: per-thing pin == HEAD
+    import subprocess as sp
+    pin = sp.run(["git", "rev-parse", "--short", "HEAD"], cwd=pin_src,
+                 capture_output=True, text=True).stdout.strip()
+    con = tmp_path / "condom"
+    _consumer_with_import(con, "srcdom", "spec-0", pin, _server_cfg(src),
+                          body="# Spec 0\n\nv1.\n")
+    write(con, "things/watcher.md", thing_text(
+        "id: watcher\ntype: note\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "triggers:\n  - type: import\n    condition: state_is\n"
+        "    watch: [imported-spec]\n    action: re_evaluate"))
+    mdllm.cmd_triggers(_ns(path=str(con)))
+    out = capsys.readouterr().out
+    assert "import `imported-spec`" not in out
+    assert "No trigger conditions currently true." in out
+
+
+def test_triggers_estate_sweep_rolls_up(tmp_path, capsys, monkeypatch):
+    import subprocess as sp
+    monkeypatch.chdir(tmp_path)
+    sp.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    (tmp_path / "domain").mkdir()
+    dom = tmp_path / "domain" / "alpha"
+    write(dom, "things/overdue.md", thing_text(
+        "id: overdue-item\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "due_date: 2026-06-15"))
+    sp.run(["git", "init", "-q"], cwd=dom, check=True)
+    rc = mdllm.cmd_triggers(_ns(path=".", estate=True))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "Estate Trigger Sweep" in out and "not an estate manifest" in out
+    assert "### alpha" in out and "OVERDUE" in out
+    assert "### Roll-up" in out and "alpha: 1 fired" in out
+
+
 def test_estate_check_no_args_walks_local_clones(tmp_path, capsys, monkeypatch):
     # Discovery is repos-not-membranes: no args -> walk the same clone set
     # estate-sync walks, and say so in the header.
