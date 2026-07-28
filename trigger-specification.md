@@ -2,7 +2,7 @@
 id: trigger-specification
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-29
 linked_things:
   - id: thing-specification
@@ -11,6 +11,12 @@ linked_things:
     relation: complements
   - id: derived-index-specification
     relation: complements
+  - id: membrane-attention-cluster
+    relation: informed-by
+    notes: "The import trigger type and the dated chase-by pattern landed from this plan (Phase 4 of the estate's trigger-vocabulary-repair, framework-side)"
+  - id: provenance-specification
+    relation: references
+    notes: "Import triggers are keyed to the states imports-check computes; both conditions are consumer-side face reads"
 ---
 
 # Trigger Specification
@@ -25,7 +31,7 @@ The framework is pull-based — a human initiates a session, and the agent reaso
 
 ```yaml
 triggers:
-  - type: time|dependency|threshold|relationship
+  - type: time|dependency|threshold|relationship|import
     condition: [what to check]
     action: [what to do if true]
 ```
@@ -119,6 +125,72 @@ triggers:
 ```
 
 More general than dependency triggers — watches any relationship, not just blocking dependencies. Useful for propagating priority changes, detecting when a parent goal shifts, or noticing when related context changes.
+
+### Import-based
+
+Conditions keyed to the state `mdllm imports-check` computes for cross-domain
+imports (provenance.md → The Reference Triple). Before this type existed,
+domains wrote these as prose — *"fires when the source advances its
+`source_commit`"* — and the floor correctly declined to guess; one such
+trigger fired unseen for days. The vocabulary now names what the floor
+already knows.
+
+```yaml
+triggers:
+  - type: import
+    condition: state_is
+    watch: [upstream-architecture-spec]    # import ids in THIS domain; omit to watch all imports
+    value: [stale, diverged, withdrawn]    # a single state or a list; this trio is the default
+    action: re_evaluate
+  - type: import
+    condition: porch_offers_unimported
+    source: partner-qms                    # an address-book name; omit to watch every source
+    action: surface
+```
+
+- `state_is` fires while any watched import's current state matches `value`.
+  States are `imports-check`'s own: `stale`, `diverged`, `withdrawn`,
+  `unreachable`. Evaluation is a live face read — the same membrane crossing
+  `imports-check` makes; no history is needed because the state is current
+  fact, and idempotency (below) handles "still true."
+- `porch_offers_unimported` fires when a source's face offers things this
+  domain has not imported — the populated-porch case. Importing nothing
+  remains a legitimate disposition; the trigger exists for domains whose
+  *job* is to watch a face (a portfolio or oversight domain), where an
+  unnoticed newly-populated porch is a real miss.
+
+Both conditions are consumer-side reads through the face. Nothing here tells
+a producer who is watching (provenance.md → The Membrane's Direction Is a
+Ruling).
+
+## Human-Gated Waits: Date the Chase
+
+Some conditions genuinely cannot be mechanised: *"the sponsor rules on the
+three open definitions"*, *"the auditor session happens"*. No artifact
+appears in the repository when a person forms a view, so the honest form is
+prose the floor lists as not-mechanically-evaluable — and it **should not be
+forced** into a mechanical type it doesn't have.
+
+But an undated wait on another person is **invisible for exactly as long as
+it lasts** — nothing distinguishes *waiting, correctly* from *dropped three
+weeks ago*. The discipline: keep the prose trigger as authored, and add a
+second, dated trigger to the same thing — not *"did it happen"* but *"by
+this date, has it still not happened?"*:
+
+```yaml
+triggers:
+  - type: relationship          # the honest, unevaluable wait — kept
+    on: external_decision
+    condition: "the sponsor rules on the three open definitions"
+    action: re_evaluate
+  - type: time                  # its dated chase-by partner
+    condition: "2026-08-11 reached"
+    action: "Chase: if the ruling above has not landed, surface the wait itself"
+```
+
+The floor evaluates the date; the prose stays for the agent. A domain whose
+"Not mechanically evaluable" list contains only deliberate human-gated waits,
+each sitting beside a dated partner, has a trustworthy attention surface.
 
 ## Actions
 
