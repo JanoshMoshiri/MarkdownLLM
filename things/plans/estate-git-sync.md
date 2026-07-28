@@ -1,8 +1,8 @@
 ---
 id: estate-git-sync
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+version: 1.1
 created: 2026-07-28
 priority: high
 tags: [estate, git, sync, session-start, multi-machine, floor]
@@ -127,3 +127,26 @@ strictly better than today's silent staleness. None block.
 `an-unpushed-commit-is-invisible-to-the-estate` — commit-is-real has a scope
 qualifier the single-machine era never exposed: real-here vs real-everywhere.
 The publication-debt report is that qualifier made visible.
+
+## Outcome
+
+Shipped as v3.22.0, all six phases, one session (2026-07-28). The build
+followed the settled decisions without deviation. Proof points from the
+session itself:
+
+- **The felt gap, caught on contact:** the first live `estate-sync` run
+  fast-forwarded two genuinely stale local domains (+2 and +3 behind their
+  remotes from cloud sessions) — exactly the manual-fetch toil that motivated
+  the plan, found and closed by the tool's first execution.
+- **The floor defended the build twice while it was being built:** the
+  pre-commit hook blocked the git-workflow.md commit until the kernel was
+  regenerated with it, and the commit-msg boundary hook blocked a floor
+  commit whose message named private domains (rewritten with substitutions).
+- **`--status` proved honest at zero distance:** its first run reported the
+  only publication debt as this session's own unpushed framework commits.
+
+Wired on all three surfaces (Claude Code SessionStart adapter, AGENTS.md
+interpretation block, generated domain session-start kernel step 0 — domains
+inherit through the refresh channel). 8 self-tests (151 total), incl.
+never-pushes and no-merge-commit proofs. Deferred as designed: `git.autopush`
+per-domain config waits for a real collaborator (deploy-when-felt).
