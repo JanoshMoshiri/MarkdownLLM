@@ -178,7 +178,8 @@ to invoke directly.
 | `scaffold <path>` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, hook, first commit | Creating a new domain — the mechanical half is one command |
 | `mcp-serve <domain>` | Serves the domain's exposed face (`exposed: true` things only) over MCP stdio — the cross-domain producing side | Wired into a consumer's `.mcp.json`; you rarely run it by hand |
 | `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
-| `estate-check <roots...>` | Batches `imports-check` over explicitly named consumer roots with a roll-up — ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
+| `estate-check [roots...]` | Batches `imports-check` over consumer roots with a roll-up — named explicitly, or (no args) the local clones the `estate-sync` walk finds; ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
+| `triggers --estate` | The attention sweep: per-domain trigger evaluation over the same local-clone walk, with a roll-up (fired / not-evaluable per domain) | After `estate-sync`, when the question is "what needs doing across the estate?" |
 | `estate-sync [root]` | Fetch + ff-only pull across the estate's repos (root + `domain(s)/*`); divergence reported never resolved; never pushes; `--status` = publication debt from cached refs, no network | Session start (the adapter runs it before orientation); `--status` at session end |
 | `boundary [path] [--history]` | Disclosure-boundary check of staged content/filenames/commit messages against the local gitignored `.boundary-terms` (absent ⇒ no-op) | Before any publication event, `--history` for a full-archive audit |
 
@@ -217,9 +218,50 @@ reading as all-clear. A useful cadence: run it at session start in any
 consuming domain, and estate-wide after a working session in any producing
 one.
 
-`estate-check` is deliberately *batching, not an index*: roots are named per
-invocation, output is ephemeral and grouped per consumer, and no artifact
-maps producers to consumers — the isolation rules survive the convenience.
+`estate-check` is deliberately *batching, not an index*: output is ephemeral
+and grouped per consumer, and no artifact maps producers to consumers — the
+isolation rules survive the convenience. Roots are named per invocation, or
+discovered from the local clones on this machine — a filesystem fact, not an
+estate manifest (see The Machine Axis below). Each consumer's report now ends
+with **face coverage**: what every address-book source *offers* vs what this
+domain imported — because coverage counts pins that exist, a consumer that
+imported nothing used to score a perfect report over an unread face.
+Importing nothing may be correct; the line makes it a visible disposition
+instead of an invisible default.
+
+### The Direction of the Membrane Is a Ruling
+
+One question came up hard enough to write the answer into `provenance.md`:
+*shouldn't producers know their consumers, warn before withdrawing, push on
+publish?* **No — by ruling, not by omission.** A producer never learns who
+consumes it; publication is an honest commit to the face; delivery is the
+consumer's poll. This is the atomicity of the estate: a domain's audience is
+a fact held nowhere, so it can never be wrong, leak, or couple. The humane
+edge is etiquette: **deprecate on the face before withdrawing** — the pin
+moves, every consumer's next check shows the deprecation, then withdraw. And
+a work item shared across domains has **one owner**; everyone else imports
+it through the face, so completion arrives as `stale` at the next poll —
+cascade without a reverse map.
+
+### The Attention Loop
+
+Triggers can now watch the membrane: `type: import` fires on the state
+`imports-check` computes (`stale` / `diverged` / `withdrawn`) or when a face
+offers things you haven't imported — the trigger that once sat in prose and
+fired unseen is mechanically evaluable. Human-gated waits stay prose and gain
+a **dated chase-by** partner (`trigger-specification.md`), so waiting on a
+person is visible instead of silent. The estate-wide question — *what needs
+doing?* — is one loop at the estate root:
+
+```
+mdllm estate-sync .        # fresh clones first — the sweep is only as honest as the log
+mdllm triggers --estate    # per-domain evaluation, rolled up
+mdllm estate-check         # membrane freshness + face coverage, per consumer
+```
+
+Everything in the loop is ephemeral batching over reads any domain could
+make alone; nothing persists, nothing indexes, nothing tells a producer who
+was watching.
 
 ### The Machine Axis
 
