@@ -2,9 +2,12 @@
 id: provenance-specification
 type: specification
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-06-11
 linked_things:
+  - id: membrane-attention-cluster
+    relation: informed-by
+    notes: "The membrane-direction ruling, withdrawal etiquette, and ingestion triple landed from this plan"
   - id: thing-specification
     relation: extends
   - id: git-workflow-specification
@@ -210,9 +213,70 @@ it never flips a domain's things itself.
 
 Framework version drift stays on the *vertical* axis (git, the sentinel);
 peer freshness is *horizontal* and crosses only through the face. Two-axis
-rule: vertical → git, horizontal → face. `mdllm estate-check <roots...>`
-batches the same per-consumer read over explicitly named roots — ephemeral,
-grouped per consumer, never a global index.
+rule: vertical → git, horizontal → face. `mdllm estate-check [roots...]`
+batches the same per-consumer read — over explicitly named roots, or (no
+arguments) over the local clones the `estate-sync` walk discovers, a
+filesystem fact, not an estate manifest — ephemeral, grouped per consumer,
+never a global index.
+
+### The Membrane's Direction Is a Ruling, Not a Backlog
+
+Everything above is consumer-side, and that asymmetry is **by design and by
+operator ruling (2026-07-28)**: *a producer never learns who consumes it,
+keeps no consumer registry, and pushes nothing; the consumer polls.* Producer
+blindness is the atomicity guarantee — a domain's existence and its audience
+are facts held nowhere but where they already live. Consequences, so this is
+never re-litigated:
+
+- **Publication means committing honestly to your face. Delivery is the
+  consumer's poll.** "Changing an exposed thing is a publication event"
+  requires no subscriber list — the event is the commit; `imports-check` is
+  the delivery mechanism.
+- **No outbound address book** (`who_i_know` stays empty, permanently). Even
+  consumer-declared variants smuggle discovery back in, because the producer
+  must then learn which porches to ask.
+- **Withdrawal etiquette, not withdrawal machinery.** A producer cannot
+  pre-flight an un-expose against consumers it cannot know. The courteous
+  breaking change is **deprecate on the face first**: flip the thing's status
+  to a deprecated/superseded value *while still exposed* — the pin moves,
+  every consumer's next `imports-check` reports `stale`, and the re-read
+  shows the deprecation — then withdraw later. Withdrawal without a
+  deprecation period is legal but discourteous; the consumer's `withdrawn`
+  state is the after-the-fact safety net either way.
+- **No shared cross-domain work identity.** One domain owns a work item;
+  every other domain that tracks it imports it through the face with the
+  triple. Completion then surfaces at each consumer as `stale` at its next
+  check — cross-domain cascade without a reverse map. Two things in two
+  domains linked only by prose is the anti-pattern this replaces.
+
+### Ingestion Is Not Import — The Ingestion Triple
+
+`origin: external` covers two species that must not share a shape:
+
+- **Import** (domain → domain): the source is another domain's face; the
+  reference triple pins it; `imports-check` can re-poll it forever.
+- **Ingestion** (world → domain): the source is an external system — a
+  drive export, an email, a register spreadsheet — with **no face to poll**.
+  The comparison `imports-check` makes for imports is *permanently
+  impossible* here, and reporting these as could-not-be-checked misfiles a
+  design fact as a coverage failure.
+
+An ingested thing carries the **ingestion triple** instead:
+
+- `source_system` — the external system, named plainly (`google-drive`,
+  `companies-house`, `email`)
+- `source_ref` — the pointer into it (a file path, URL, message id)
+- `source_checked` — ISO date the mirror was last compared against the
+  source **by a human or a harness with access** — the staleness clock
+- `source_hash` *(optional)* — a hash of the ingested text at last check,
+  so the next check can diff instead of re-read
+
+`imports-check` reports these as `ingested` with the clock ("checked
+2026-07-21" / "no source_checked date") — a species with its own freshness
+discipline, not an unchecked import. The quarantine rule is unchanged:
+ingested things are born `verified: false` and flip only by attributed human
+commit. Re-checking is the operator's cadence to set; the floor's job is to
+make the clock's age visible, never to shrug.
 
 ## Enforcement
 

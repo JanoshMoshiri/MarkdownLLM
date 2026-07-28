@@ -155,7 +155,12 @@ def mcp_build_manifest(root: Path, corpus: Corpus, domain_id: str) -> dict:
                        "source_commit": _mcp_thing_commit(root, t)}
                       for t in things],
             "can_do": [tool["name"] for tool in mcp_list_tools()],
-            "who_i_know": []}  # outbound address book — a later phase
+            # Deliberately empty, permanently — operator ruling 2026-07-28:
+            # producer blindness is a boundary, not a backlog. A producer never
+            # learns who consumes it; publication is an honest commit to the
+            # face, delivery is the consumer's poll. Do not "finish" this.
+            # (provenance.md -> The Membrane's Direction Is a Ruling.)
+            "who_i_know": []}
 
 
 def mcp_list_resources(corpus: Corpus, domain_id: str) -> list[dict]:
