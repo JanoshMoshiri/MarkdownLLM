@@ -8,7 +8,7 @@ linked_things:
   - id: thing-specification
     relation: extends
   - id: estate-git-sync
-    relation: informed-by
+    relation: informs
     notes: "Hard hook 4 (session-start:estate-sync) and the sharpened network-call rule landed from this plan"
   - id: write-thing-specification
     relation: complements

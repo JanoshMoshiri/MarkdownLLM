@@ -12,7 +12,7 @@ linked_things:
   - id: derived-index-specification
     relation: complements
   - id: membrane-attention-cluster
-    relation: informed-by
+    relation: informs
     notes: "The import trigger type and the dated chase-by pattern landed from this plan (Phase 4 of the estate's trigger-vocabulary-repair, framework-side)"
   - id: provenance-specification
     relation: references

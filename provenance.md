@@ -6,7 +6,7 @@ version: 1.1
 created: 2026-06-11
 linked_things:
   - id: membrane-attention-cluster
-    relation: informed-by
+    relation: informs
     notes: "The membrane-direction ruling, withdrawal etiquette, and ingestion triple landed from this plan"
   - id: thing-specification
     relation: extends

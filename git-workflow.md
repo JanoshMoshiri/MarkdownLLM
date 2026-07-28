@@ -8,7 +8,7 @@ linked_things:
   - id: llm-driven-systems-manifesto
     relation: implements
   - id: estate-git-sync
-    relation: informed-by
+    relation: informs
     notes: "The Machine Axis section — sync-before-orient, ff-only inbound, publication debt — landed from this plan"
   - id: divergence-is-an-unrouted-decision
     relation: references
