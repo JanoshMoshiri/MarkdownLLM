@@ -72,6 +72,8 @@ This is where the reasoning lives — not just the data.
 
 ### On Startup
 
+> **[HARD HOOK: `session-start:estate-sync`]** Sync before orienting — orientation reads `git log`, and in a multi-machine estate committed state partly lives on the remote. Run `python tools/mdllm.py estate-sync .` (root + nested domain repos: fetch + ff-only pull, bounded, degrades offline to an advisory line) *before* reading velocity or evaluating triggers. Divergence and dirty trees are reported, never resolved; it never pushes. The Claude Code SessionStart adapter already runs it ahead of `session-start`; run it by hand in any harness without an adapter. Full spec: `orchestration.md` → Hard Hooks; `git-workflow.md` → The Machine Axis.
+
 **Determine session intent before loading specs.** Loading all framework specs eagerly costs tens of thousands of tokens — a large share of a model's working context before any work begins. Load only what the session needs. (`python tools/mdllm.py tokens` measures the current per-tier split; prose does not restate the figures — restated numbers have drifted three times.)
 
 **Tier 0 — Always load:**

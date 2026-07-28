@@ -15,7 +15,7 @@
   },
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "shell": "powershell", "command": "python \"$env:CLAUDE_PROJECT_DIR/tools/mdllm.py\" session-start ." } ] }
+      { "hooks": [ { "type": "command", "shell": "powershell", "command": "python \"$env:CLAUDE_PROJECT_DIR/tools/mdllm.py\" estate-sync .; python \"$env:CLAUDE_PROJECT_DIR/tools/mdllm.py\" session-start ." } ] }
     ],
     "PostToolUse": [
       { "matcher": "Write|Edit", "hooks": [ { "type": "command", "shell": "powershell", "command": "python \"$env:CLAUDE_PROJECT_DIR/tools/mdllm.py\" validate . --quiet" } ] }
