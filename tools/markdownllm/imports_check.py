@@ -128,6 +128,16 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
         m = t.meta
         sd, sid, pin = m.get("source_domain"), m.get("source_id"), m.get("source_commit")
         if not (sd and sid and pin):
+            if m.get("source_system") and not sd:
+                # The ingestion species (world -> domain): no face to poll, so
+                # the import comparison is permanently impossible BY DESIGN —
+                # report the staleness clock, never file it as a coverage
+                # failure (origin-external-conflates-ingestion-with-import).
+                checked = m.get("source_checked")
+                results.append({"id": t.id, "state": "ingested",
+                                "source": str(m.get("source_system")),
+                                "checked": str(checked) if checked else None})
+                continue
             results.append({"id": t.id, "state": "incomplete",
                             "detail": "missing source_domain/source_id/source_commit"})
             continue
@@ -160,7 +170,7 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
 
 def _render_rows(rows: list[dict]) -> None:
     order = {"stale": 0, "diverged": 1, "unreachable": 2, "withdrawn": 3,
-             "no-address-book-entry": 4, "incomplete": 5, "fresh": 6}
+             "no-address-book-entry": 4, "incomplete": 5, "fresh": 6, "ingested": 7}
     for r in sorted(rows, key=lambda r: order.get(r["state"], 9)):
         if r["state"] == "stale":
             print(f"- STALE      {r['id']}  ({r['source']})  pinned {r['pin']} -> now {r['current']}")
@@ -176,15 +186,22 @@ def _render_rows(rows: list[dict]) -> None:
             print(f"- WITHDRAWN  {r['id']}  ({r['source']})  source no longer exposes `{r['source'].split('/')[-1]}`")
         elif r["state"] == "no-address-book-entry":
             print(f"- NO-ROUTE   {r['id']}  ({r['source']})  no .mcp.json entry for source domain")
+        elif r["state"] == "ingested":
+            clock = (f"checked {r['checked']}" if r.get("checked")
+                     else "no source_checked date — clock missing")
+            print(f"- ingested   {r['id']}  ({r['source']})  {clock}")
         else:
             print(f"- INCOMPLETE {r['id']}  {r.get('detail','')}")
 
 
 def _counts(rows: list[dict]) -> dict:
     n = {s: sum(1 for r in rows if r["state"] == s)
-         for s in ("stale", "diverged", "fresh", "withdrawn")}
-    n["checked"] = sum(n.values())
-    n["unchecked"] = len(rows) - n["checked"]
+         for s in ("stale", "diverged", "fresh", "withdrawn", "ingested")}
+    n["checked"] = n["stale"] + n["diverged"] + n["fresh"] + n["withdrawn"]
+    # Ingested things are a different species with their own clock — they are
+    # neither checked (no membrane comparison exists) nor unchecked coverage
+    # (the comparison is impossible by design, not missed).
+    n["unchecked"] = len(rows) - n["checked"] - n["ingested"]
     return n
 
 
@@ -196,51 +213,149 @@ def _render_summary(rows: list[dict]) -> None:
     # 0 stale."). The docstring's promise — never a silent fresh — belongs to
     # the summary line too.
     n = _counts(rows)
+    membrane = len(rows) - n["ingested"]
     print(f"\n{len(rows)} import(s): {n['stale']} stale, {n['diverged']} diverged, "
           f"{n['fresh']} fresh, {n['withdrawn']} withdrawn; {n['unchecked']} could "
           f"not be checked (incomplete/no-route/unreachable). "
-          f"COVERAGE: {n['checked']}/{len(rows)}.")
-    if n["checked"] == 0:
+          f"COVERAGE: {n['checked']}/{membrane}.")
+    if n["ingested"]:
+        dates = sorted(r["checked"] for r in rows
+                       if r["state"] == "ingested" and r.get("checked"))
+        undated = sum(1 for r in rows
+                      if r["state"] == "ingested" and not r.get("checked"))
+        clock = f"oldest check {dates[0]}" if dates else "no check dates at all"
+        tail = f", {undated} undated" if undated and dates else ""
+        print(f"{n['ingested']} ingested (world→domain, no face to poll; {clock}{tail}) "
+              f"— re-checking is the operator's cadence.")
+    if n["checked"] == 0 and membrane:
         print("Nothing was checkable — this report asserts nothing about freshness.")
     print("Freshness is advisory — disposition is yours.")
+
+
+def face_coverage(consumer_root: Path) -> list[dict]:
+    """What every address-book source offers vs what this domain imported.
+
+    Closes the hole coverage cannot see: COVERAGE counts pins that exist, so
+    a consumer with an address-book entry and zero imports scores a perfect
+    report while an entire face goes unread. This is a consumer-side read of
+    the manifest the consumer already fetches — no new state anywhere, and
+    nothing tells a producer who is watching. Importing nothing stays a
+    legitimate disposition; the line is information, not a finding.
+    """
+    corpus, _ = scan(consumer_root)
+    book = _load_address_book(consumer_root)
+    imported: dict[str, int] = {}
+    for t in corpus.things:
+        if str(t.meta.get("origin")) == "external" and t.meta.get("source_domain"):
+            sd = str(t.meta["source_domain"])
+            imported[sd] = imported.get(sd, 0) + 1
+    out = []
+    for sd, cfg in sorted(book.items()):
+        if not isinstance(cfg, dict) or not cfg.get("command"):
+            continue
+        got = _mcp_client_read(cfg["command"], cfg.get("args", []),
+                               consumer_root, [f"manifest://{sd}"])
+        man = None
+        if got and f"manifest://{sd}" in got:
+            import json
+            try:
+                man = json.loads(got[f"manifest://{sd}"])
+            except Exception:
+                man = None
+        if man is None:
+            out.append({"source": sd, "state": "unreachable",
+                        "offered": None, "imported": imported.get(sd, 0)})
+        else:
+            out.append({"source": sd, "state": "ok",
+                        "offered": len(man.get("knows") or []),
+                        "imported": imported.get(sd, 0)})
+    return out
+
+
+def _render_face_coverage(cov: list[dict]) -> None:
+    if not cov:
+        return
+    print("\n### Face coverage (address book)")
+    for c in cov:
+        if c["state"] == "unreachable":
+            print(f"- {c['source']}: unreachable — offering unknown "
+                  f"({c['imported']} imported)")
+        elif c["offered"] and c["imported"] == 0:
+            print(f"- {c['source']}: offers {c['offered']}, imported 0 — "
+                  f"nothing pulled; a clean imports report over zero imports "
+                  f"asserts nothing about this face")
+        else:
+            print(f"- {c['source']}: offers {c['offered']}, imported {c['imported']}")
+    print("Importing nothing may be correct — disposition is yours.")
 
 
 def cmd_imports_check(args) -> int:
     root = Path(args.path).resolve()
     rows = imports_freshness(root)
-    if not rows:
+    cov = face_coverage(root)
+    if not rows and not cov:
         print(f"imports-check: no external imports in {root.name}")
         return 0
     print(f"## Imports Sync — {root.name}\n")
-    _render_rows(rows)
-    _render_summary(rows)
+    if rows:
+        _render_rows(rows)
+        _render_summary(rows)
+    else:
+        print("No external imports.")
+    _render_face_coverage(cov)
     return 0
 
 
 def cmd_estate_check(args) -> int:
     # Operator-axis batching over imports_freshness, and nothing more. The
-    # doctrine guardrails, by construction: roots are named explicitly per
-    # invocation (no discovery, no config file), output is stdout-only (no
+    # doctrine guardrails, by construction: output is stdout-only (no
     # persisted artifact to rot into a registry), and the report is grouped
     # per-consumer (never a per-source reverse map — a domain still cannot
     # enumerate its consumers). Every read here is a read that consumer could
     # make alone; batching adds convenience, not information.
-    roots = [Path(p).resolve() for p in args.paths]
+    #
+    # Roots: named explicitly per invocation, OR (no args) discovered by the
+    # same local-clone walk `estate-sync` uses. Discovery here is repos-not-
+    # membranes (the estate-git-sync precedent): enumerating checkouts on
+    # THIS machine is a filesystem fact, not an estate manifest — no artifact
+    # anywhere claims to be the estate, and a domain not cloned locally is
+    # genuinely absent from this machine's view. What stays forbidden is a
+    # persisted membership registry, not `ls`.
+    discovered = False
+    if args.paths:
+        roots = [Path(p).resolve() for p in args.paths]
+    else:
+        from .sync import discover_repos
+        roots = discover_repos(Path(".").resolve())
+        discovered = True
+        if not roots:
+            print("estate-check: no local clones found to walk")
+            return 0
     missing = [r for r in roots if not r.is_dir()]
     if missing:
         print("estate-check: not a directory: " + ", ".join(str(m) for m in missing))
         return 1
-    print(f"## Estate Sync — {len(roots)} consumer(s), named explicitly\n")
+    how = ("local clones walked — a filesystem fact, not an estate manifest"
+           if discovered else "named explicitly")
+    print(f"## Estate Sync — {len(roots)} consumer(s), {how}\n")
     per_consumer: list[tuple[str, list[dict]]] = []
     for root in roots:
         rows = imports_freshness(root)
+        cov = face_coverage(root)
         per_consumer.append((root.name, rows))
         print(f"### {root.name}")
-        if not rows:
+        if not rows and not cov:
             print("- no external imports\n")
             continue
-        _render_rows(rows)
-        _render_summary(rows)
+        if rows:
+            _render_rows(rows)
+            _render_summary(rows)
+        else:
+            print("- no external imports")
+        # The face-coverage read runs even — especially — when rows is empty:
+        # the hole it closes is precisely the consumer whose clean report was
+        # achieved by not importing.
+        _render_face_coverage(cov)
         print()
     total = [r for _, rows in per_consumer for r in rows]
     n = _counts(total)

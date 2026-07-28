@@ -2104,3 +2104,102 @@ def test_estate_sync_in_progress_merge_is_skipped(tmp_path):
     (gitdir / "MERGE_HEAD").write_text("0" * 40 + "\n", encoding="utf-8")
     res = sync_repo(clone)
     assert res["state"] == "in-operation" and not res["moved"]
+
+
+# ---------------------------------------------------------------------------
+# membrane attention cluster: face coverage, the ingested species,
+# estate-check clone-walk discovery, and type: import triggers
+# ---------------------------------------------------------------------------
+
+def _producer(tmp_path, name="srcdom", n_things=2):
+    import subprocess as sp
+    src = tmp_path / name
+    for i in range(n_things):
+        write(src, f"things/spec{i}.md", thing_text(
+            f"id: spec-{i}\ntype: deliverable\nstatus: approved\n"
+            f"created: 2026-06-01\nexposed: true",
+            f"# Spec {i}\n\nv1.\n"))
+    sp.run(["git", "init", "-q"], cwd=src, check=True)
+    _git_commit(src, "create specs")
+    return src
+
+
+def _server_cfg(src):
+    return {"command": sys.executable,
+            "args": [str(Path(mdllm.__file__)), "mcp-serve", str(src)]}
+
+
+def test_face_coverage_sees_the_unimported_face(tmp_path):
+    # The hole: an address-book entry with ZERO imports never got read at all,
+    # so the consumer scored a clean report over an unread face.
+    import json
+    src = _producer(tmp_path, n_things=3)
+    con = tmp_path / "condom"
+    write(con, ".mcp.json", json.dumps({"mcpServers": {"srcdom": _server_cfg(src)}}))
+    write(con, "things/own.md", thing_text(
+        "id: own-thing\ntype: note\nstatus: in-progress\ncreated: 2026-06-01"))
+    cov = mdllm.face_coverage(con)
+    assert len(cov) == 1
+    assert cov[0]["source"] == "srcdom" and cov[0]["state"] == "ok"
+    assert cov[0]["offered"] == 3 and cov[0]["imported"] == 0
+
+
+def test_face_coverage_counts_imports_and_unreachable(tmp_path):
+    import json
+    src = _producer(tmp_path, n_things=2)
+    con = tmp_path / "condom"
+    _consumer_with_import(con, "srcdom", "spec-0", "abc1234", _server_cfg(src))
+    # second book entry that cannot be spawned
+    book = json.loads((con / ".mcp.json").read_text(encoding="utf-8"))
+    book["mcpServers"]["ghost"] = {"command": "no-such-binary-xyz", "args": []}
+    (con / ".mcp.json").write_text(json.dumps(book), encoding="utf-8")
+    cov = {c["source"]: c for c in mdllm.face_coverage(con)}
+    assert cov["srcdom"]["offered"] == 2 and cov["srcdom"]["imported"] == 1
+    assert cov["ghost"]["state"] == "unreachable"
+
+
+def test_ingested_species_reports_clock_not_coverage_failure(tmp_path, capsys):
+    write(tmp_path, "things/register-mirror.md", thing_text(
+        "id: register-mirror\ntype: record\nstatus: ingested\ncreated: 2026-06-01\n"
+        "origin: external\nverified: false\nsource_system: google-drive\n"
+        "source_ref: /exports/register.xlsx\nsource_checked: 2026-07-21"))
+    write(tmp_path, "things/undated-mirror.md", thing_text(
+        "id: undated-mirror\ntype: record\nstatus: ingested\ncreated: 2026-06-01\n"
+        "origin: external\nverified: false\nsource_system: email"))
+    rows = {r["id"]: r for r in mdllm.imports_freshness(tmp_path)}
+    assert rows["register-mirror"]["state"] == "ingested"
+    assert rows["register-mirror"]["checked"] == "2026-07-21"
+    assert rows["undated-mirror"]["state"] == "ingested"
+    assert rows["undated-mirror"]["checked"] is None
+    rc = mdllm.cmd_imports_check(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "2 ingested" in out and "oldest check 2026-07-21" in out
+    assert "COVERAGE: 0/0" in out  # ingested never counts as unchecked membrane coverage
+    assert "1 undated" in out
+
+
+def test_ingestion_without_source_system_stays_incomplete(tmp_path):
+    write(tmp_path, "things/orphan.md", thing_text(
+        "id: orphan\ntype: record\nstatus: ingested\ncreated: 2026-06-01\n"
+        "origin: external\nverified: false"))
+    rows = mdllm.imports_freshness(tmp_path)
+    assert rows[0]["state"] == "incomplete"
+
+
+def test_estate_check_no_args_walks_local_clones(tmp_path, capsys, monkeypatch):
+    # Discovery is repos-not-membranes: no args -> walk the same clone set
+    # estate-sync walks, and say so in the header.
+    import subprocess as sp
+    monkeypatch.chdir(tmp_path)
+    sp.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    (tmp_path / "domain").mkdir()
+    dom = tmp_path / "domain" / "alpha"
+    write(dom, "things/own.md", thing_text(
+        "id: own-thing\ntype: note\nstatus: in-progress\ncreated: 2026-06-01"))
+    sp.run(["git", "init", "-q"], cwd=dom, check=True)
+    rc = mdllm.cmd_estate_check(_ns(paths=[]))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "local clones walked" in out and "not an estate manifest" in out
+    assert "alpha" in out

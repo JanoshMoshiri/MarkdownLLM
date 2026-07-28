@@ -195,9 +195,11 @@ def build_cli() -> argparse.ArgumentParser:
     ic.set_defaults(fn=cmd_imports_check)
 
     ec = sub.add_parser("estate-check", help="operator-axis batch of imports-check "
-                        "over explicitly named consumer roots — ephemeral per-consumer "
-                        "reads, never an index (a domain cannot enumerate its consumers)")
-    ec.add_argument("paths", nargs="+", help="consumer domain roots, named explicitly")
+                        "over consumer roots — named explicitly, or (no args) the "
+                        "local clones the estate-sync walk finds; ephemeral "
+                        "per-consumer reads, never an index")
+    ec.add_argument("paths", nargs="*", help="consumer domain roots; omit to walk "
+                    "local clones (a filesystem fact, not an estate manifest)")
     ec.set_defaults(fn=cmd_estate_check)
 
     es = sub.add_parser("estate-sync", help="sync before orienting: fetch + "
