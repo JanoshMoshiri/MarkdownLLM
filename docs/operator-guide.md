@@ -207,7 +207,8 @@ the connection runs through three pieces — all operator-wired, none automatic:
   and nothing rests on them until you verify (`provenance.md`).
 
 The standing sync loop is then one command per consumer — `mdllm
-imports-check` — or one `mdllm estate-check <root> <root> ...` across the
+imports-check` — or one `mdllm estate-check` (no args walks your local
+clones; name roots explicitly to scope it) across the
 consumers you name. It reports both failure directions: **stale** (the source
 moved under your pin — re-read, re-verify, re-quarantine) and **diverged**
 (the pinned commit is current but the mirror's content differs from the face —
