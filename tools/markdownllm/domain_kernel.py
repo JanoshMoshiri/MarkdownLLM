@@ -60,6 +60,13 @@ def _dk_session_start(domain: Path, meta: dict) -> str:
     return (
         "**Run this before responding to the user's first request — the live request "
         "will pull you toward itself; resist until these are done.**\n\n"
+        "0. **Estate sync** — `session-start:estate-sync` (anchor `interpretation`; "
+        "an adapter may have run it already). If this domain is worked from more "
+        "than one machine, run `python {framework_root}/tools/mdllm.py estate-sync .` "
+        "*before* anything below — orientation and velocity read `git log`, and the "
+        "log is only whole after the fetch. Fast-forwards are taken silently; "
+        "DIVERGED/dirty are reported for the operator, never resolved; offline "
+        "degrades to an advisory line. Never push.\n"
         "1. Load `{framework_root}/kernel.md` — the operative kernel (rules without "
         "rationale). The hard hooks it carries are always active.\n"
         "2. Read the **open loops (forward)** the orientation generates — non-terminal "
