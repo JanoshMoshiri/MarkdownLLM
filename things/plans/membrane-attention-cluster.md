@@ -1,8 +1,8 @@
 ---
 id: membrane-attention-cluster
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+version: 1.1
 created: 2026-07-28
 priority: high
 tags: [membrane, triggers, imports, attention, estate, ruling, floor]
@@ -110,6 +110,24 @@ the contract. Consequences:
 7. Seal v3.23.0 (CHANGELOG, sentinel trio, kernel, full suite, examples);
    record the Phase-1 ruling in the estate's trigger-vocabulary-repair plan
    so its domain-side phases can run.
+
+## Outcome
+
+Shipped as v3.23.0, all seven phases, one session (2026-07-28), directly after
+v3.22.0 in the same sitting. Live proof on first contact, again:
+
+- The **estate trigger sweep** rolled up twelve clones in one command: 6
+  fired triggers surfaced (three domains' worth), and the not-evaluable
+  counts per domain matched the estate plan's finding — those are the
+  conversions its domain-side phases now make against a floor that can
+  finally evaluate them.
+- **Face coverage named an unread populated face immediately**: a consumer's
+  report showed `offers 4, imported 0 — nothing pulled; a clean imports
+  report over zero imports asserts nothing about this face` — the exact hole
+  the independent review found, now impossible to hide behind a green line.
+- The estate roll-up's ~28 could-not-be-checked are the known pinning-pass
+  residue; the ingested tranche among them flips to `ingested`-with-clock as
+  soon as the owning domain adds its ingestion triples (domain-side work).
 
 ## Deliberately not done
 
