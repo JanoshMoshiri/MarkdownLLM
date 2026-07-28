@@ -179,6 +179,7 @@ to invoke directly.
 | `mcp-serve <domain>` | Serves the domain's exposed face (`exposed: true` things only) over MCP stdio — the cross-domain producing side | Wired into a consumer's `.mcp.json`; you rarely run it by hand |
 | `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
 | `estate-check <roots...>` | Batches `imports-check` over explicitly named consumer roots with a roll-up — ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
+| `estate-sync [root]` | Fetch + ff-only pull across the estate's repos (root + `domain(s)/*`); divergence reported never resolved; never pushes; `--status` = publication debt from cached refs, no network | Session start (the adapter runs it before orientation); `--status` at session end |
 | `boundary [path] [--history]` | Disclosure-boundary check of staged content/filenames/commit messages against the local gitignored `.boundary-terms` (absent ⇒ no-op) | Before any publication event, `--history` for a full-archive audit |
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
@@ -219,6 +220,32 @@ one.
 `estate-check` is deliberately *batching, not an index*: roots are named per
 invocation, output is ephemeral and grouped per consumer, and no artifact
 maps producers to consumers — the isolation rules survive the convenience.
+
+### The Machine Axis
+
+The membrane loop above syncs domains with *each other*. There is a second,
+plainer sync: the same domain worked from more than one machine — your local
+install and a cloud session today, collaborators tomorrow. Orientation reads
+`git log`, and in a multi-machine estate the log is only whole on the remote,
+so every session **syncs before it orients**: `mdllm estate-sync` walks the
+root and every nested domain repo, fetches, and takes fast-forwards silently
+(they are pure transport of state already committed elsewhere). Everything
+else is reported, never resolved: `DIVERGED (+a/+b)` means both machines
+committed since the last sync and the merge is *your* decision
+(`divergence-is-an-unrouted-decision`); `dirty` means a working tree it
+refused to touch; `offline` means it degraded gracefully and you are
+orienting from last-fetched state — the session never blocks on the network.
+
+The mirror runs at session end: `estate-sync --status` reports **publication
+debt** — commits that are real on this machine and invisible to the estate
+until you push. The push stays yours, deliberately (git-workflow.md); the
+report just means you no longer have to remember it. Note `estate-sync`
+*discovers* its repos where `estate-check` refuses to: the guardrail there
+protects relational information (a producer must never enumerate consumers),
+while a walk for `.git` directories reveals nothing `ls` doesn't — repos, not
+membranes. After a sync that moved anything, the tool suggests the
+`estate-check` you may owe: pulled source commits can flip a consumer's
+imports stale.
 
 ## What Is Still Yours
 
