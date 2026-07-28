@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: kernel
 created: 2026-07-28
-generated: 2026-07-28T00:10:52
-generated_from: HEAD@ba65fb5
+generated: 2026-07-28T11:35:42
+generated_from: HEAD@8ee3452
 coverage: 6
-framework_version: 3.20.1
+framework_version: 3.21.0
 ---
 
 # Framework Operative Kernel
@@ -61,7 +61,9 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 ## git-workflow.md
 
-**The commit is the moment state becomes real.** Working directory = draft; commit = publication. Triggers, orientation, and audit all read committed state only.
+**The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit all read committed state only.
+
+**Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. Never push, never auto-merge, never reset. Session end reports publication debt (`estate-sync --status`: unpushed commits per repo).
 
 **Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
 

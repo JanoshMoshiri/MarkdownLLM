@@ -2,11 +2,17 @@
 id: git-workflow-specification
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
     relation: implements
+  - id: estate-git-sync
+    relation: informed-by
+    notes: "The Machine Axis section — sync-before-orient, ff-only inbound, publication debt — landed from this plan"
+  - id: divergence-is-an-unrouted-decision
+    relation: references
+    notes: "The inbound rule: a non-fast-forward state is a decision owed, never a mechanism's merge"
   - id: thing-specification
     relation: complements
   - id: interface-specification
@@ -22,7 +28,9 @@ linked_things:
 # Git Workflow
 
 <!-- kernel -->
-**The commit is the moment state becomes real.** Working directory = draft; commit = publication. Triggers, orientation, and audit all read committed state only.
+**The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit all read committed state only.
+
+**Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. Never push, never auto-merge, never reset. Session end reports publication debt (`estate-sync --status`: unpushed commits per repo).
 
 **Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
 
@@ -204,6 +212,61 @@ This adds friction but gives the human approval over every commit. Useful for se
 - **Never force-push** — History is sacred in this framework
 - **Never amend published commits** — Once pushed, commits are immutable
 - **Never commit credentials, secrets, or sensitive data** — Things may contain personal or regulated information; the agent should be aware of what's being committed
+
+## The Machine Axis: One Corpus, Several Clones
+
+The commit is the moment state becomes real — **on the machine that made it**.
+The moment it becomes real *to the estate* is publication: the push that puts it
+on the remote, and the fetch that brings it into every other clone. A domain
+worked from two machines (local and cloud), or by two people, is one corpus
+whose event stream is only whole on the remote. This section extends
+commit-is-real across that axis; it invents nothing — git already solved
+distributed state, and the framework only has to decide *when* to read it and
+*who* resolves the one case git refuses to.
+
+### Sync Is Orientation, Not Transport Convenience
+
+Orientation reads committed state: velocity, triggers, verified flips, and the
+audit all read `git log`. If the local clone is behind the remote, orientation
+reads a stale event stream — silently. So a session in a multi-machine estate
+**syncs before it orients**: fetch, then fast-forward, then load the kernel and
+read velocity. This is what `mdllm estate-sync` mechanises and the
+`session-start:estate-sync` hard hook (orchestration.md) schedules.
+
+### The Inbound Rules
+
+- **Fast-forward only** (`git pull --ff-only`). A fast-forward is pure
+  transport of state that is already real elsewhere — safe to take silently.
+- **Divergence is reported, never resolved.** If both clones committed since
+  the last sync, the merge is a decision, not a mechanism
+  (`divergence-is-an-unrouted-decision`): the tool reports `DIVERGED (+a/+b)`
+  and the operator routes the resolution. Never auto-merge, never rebase
+  automatically, never reset — a force-pushed remote surfaces as divergence
+  too, and history stays sacred in both directions.
+- **Bounded and degrading.** Sync attempts are time-boxed and never prompt
+  (`GIT_TERMINAL_PROMPT=0`); offline or auth failure degrades to one advisory
+  line — "orienting from last-fetched state" — and the session proceeds. A
+  session start must never *require* the network (orchestration.md, the
+  upward version check's doctrine, which this sharpens rather than violates).
+- **A dirty working tree is never touched.** Fetch is always safe; the
+  fast-forward is skipped and reported. Session-end discipline (nothing left
+  uncommitted) makes this rare; the guard makes it harmless.
+
+### Publication Debt
+
+The push stays the human's deliberate act — nothing in this section changes
+"never push without explicit human instruction." What changes is visibility:
+an unpushed commit is real locally and **invisible to the estate**, and the
+other machine's next sync cannot find it. The session-end ritual therefore
+reports publication debt — `mdllm estate-sync --status` lists `ahead +n
+(unpushed)` per repo from cached tracking refs, no network — turning the push
+from something remembered into something surfaced. A harness may carry a
+standing per-session push instruction from the operator (the cloud bootstrap
+does); that *is* explicit human instruction, held at config level.
+
+When collaborators arrive, the same rules hold — a colleague's push appears at
+your next session start as `synced (+n)`, divergence stays a routed decision —
+with PR flow on shared repos per Multi-User Domains below.
 
 ## Git Log As Event Stream
 
