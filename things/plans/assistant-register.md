@@ -1,7 +1,7 @@
 ---
 id: assistant-register
 type: plan
-status: not-started
+status: in-progress
 version: 1.0
 created: 2026-07-28
 priority: high
@@ -149,3 +149,110 @@ restraint rule (a prompt should be tighter than the prose it replaces).
   register rule, or both?
 - Is one line of session-start output enough for a healthy quiet domain, or
   does an empty brief feel broken to a newcomer?
+
+## Phase 0 findings — first drive, 2026-08-01 (this repo + the live QMS domain)
+
+**The prototype worked; the register did not hold.** The emitter reshape did
+what the design asked (ranked attention, plain-language exceptions, silence
+when healthy — branch `phase0/assistant-register`, `--assistant`), and the
+drive surfaced two real defects (fired triggers filtered through the open-loop
+set; git subjects decoded with the locale codepage). But when the agent then
+*reported* the drive — same session, plan and register freshly read — the
+report itself violated the register: a derivation dump the operator read twice
+and could not digest. Asked to restate, the agent produced four labeled
+buckets, one plain sentence each, and it landed immediately. Same work, same
+model, same session; the only variable was response shape. The register's
+Phase 5 decay question arrived in Phase 0, with a lived instance on the
+register's own author-session.
+
+**Rule 5 gains its missing corollary.** "Show me why must always work" implies
+its inverse: *if the derivation is retrievable on demand, it is withheld by
+default.* The failed report handed over the whole chain unasked. Every fault
+in it follows from that one error.
+
+**The operator's frame, adopted:** the communication channel *is* the system's
+interface. Not a report about the system — the system, as far as the operator
+can see. A framework whose responses cannot be digested is a capable engine
+behind an unusable screen; the interface quality gates whether any of the
+rest matters. (Operator, 2026-08-01, verbatim intent: open a domain, ask
+questions, and every turn from session start to close comes back clean.)
+
+### Where the register predictably fails
+
+Decay is not uniform. It clusters at moments where the cheapest completion
+opposes the rule — name the moments and the unbounded-scope problem becomes
+a bounded list:
+
+1. **Reporting after substantial work** (lived, above): context is full of
+   derivation; serializing it is the path of least resistance.
+2. **Mixed findings**: bugs + design questions + status collapse into
+   chronology — order-of-discovery masquerading as order-of-importance.
+3. **Mid-session injections**: sync reports, hook output, harness reminders
+   hand the agent housekeeping text; paraphrasing it back is the t=0 anchor
+   problem recurring at t=n.
+4. **A small question after big work**: the answer arrives wrapped in
+   accumulated context instead of standing alone.
+5. **Human-decides under momentum**: the inverse failure — when everything
+   else is being compressed, the consequential call gets compressed too,
+   exactly where rule 4 demands expansion.
+
+### The counter-evidence was already in the repo
+
+The commit-message register has never decayed. `action: description of the
+domain state change` — written hundreds of times across this history without
+drift, by the same models that let the response register slip in one turn.
+The difference: it is a **named format with a fixed shape**, sitting at a
+mechanical boundary, practiced at every commit — not a style to be held but
+a form to be filled. Formats hold where styles decay, because conformance to
+a named shape is checkable, including by the agent against its own draft.
+
+### Options for holding it (the framework's own three anchors, again)
+
+- **Option B — name the shape (interpretation, format-strength). The spine.**
+  The response becomes a tiny named format, peer to the commit format:
+  *what changed → what needs you → what's next*; buckets, three or four at
+  most; one plain sentence each, in the operator's nouns; the single thing
+  that matters last; everything else held until asked. Specified in
+  interface.md beside the five rules — the rules say why, the format says how.
+- **Option C — stop duplicating the derivation channel (git-fs, already
+  built). What makes B cheap.** The framework already mandates the full
+  derivation into commit messages; git log is the event stream. The failed
+  report was largely a restatement of what its own commit already recorded.
+  Doctrine: if it is in the commit, reference it, never repeat it. The
+  response's job is only what needs the operator.
+- **Option A — re-anchor at the failure moment (harness-session). Optional
+  hardening.** The seed anchors turn one; the failure list above says where
+  anchors are missing. A harness adapter re-injects one register line at
+  report-shaped moments (e.g. post-commit). Per-harness, never the
+  difference between working and not — same status as every adapter.
+
+Recommendation carried to the operator: B as spine, C as doctrine, A as
+optional hardening — the anchor pattern the framework already trusts.
+
+### Scenario evidence (two lived, two played)
+
+- **S1 — report after substantial work** (lived, failed then recovered):
+  the drive report above. The recovered form is the B format, discovered
+  under correction before it was named.
+- **S2 — human-decides moment** (lived, held): the same session opened on a
+  DIVERGED repo; the response stated that a decision was owed, gave the one
+  command, and stopped. Rule 4 survives when the moment is discrete and
+  mechanical — the risk is momentum, not ignorance (failure moment 5).
+- **S3 — small question after big work** (played): "did the tests pass?" —
+  drift shape recaps the flake investigation; register shape: "Yes — 161.
+  One flaked once under load; passed isolated and on re-run." One sentence,
+  derivation on request.
+- **S4 — mid-session exception** (played): validation rejects a write —
+  drift shape narrates the debugging journey; register shape names the
+  exception and the ask: "The schema rejects `review_date` on this type —
+  extend the schema, or move the date? Your call either way."
+
+### Phase adjustments from the drive
+
+Phase 0 gains a second leg: a **working QMS session run under the B format
+end to end**, judged per-turn — does every turn, session start to close,
+answer *what needs you* in digestible shape? Tuning is expected; this is not
+a one-pass plan (operator, 2026-08-01). Phase 1's input shifts accordingly:
+interface.md carries the five rules (rule 5 with its corollary) **and the
+named format**, with the kernel block staying small; Phase 2 is unchanged;
+the failure-moment list is the checklist Phase 5 watches against.
