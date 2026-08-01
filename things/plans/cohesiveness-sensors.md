@@ -1,8 +1,8 @@
 ---
 id: cohesiveness-sensors
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-08-01
 priority: high
 tags: [cohesiveness, drift, floor, sensors, estate, self-describing, awareness]
@@ -106,10 +106,12 @@ The sweep's per-domain findings were delivered in-session; each repair is a
 routed divergence committed in the *owning* repo — this plan tracks only the
 classes. Order of felt-ness:
 
-- [ ] **Unblock the commit-blocked domain**: regenerate its domain-kernel
+- [x] **Unblock the commit-blocked domain**: regenerate its domain-kernel
       block and commit. Separately, route its one DIVERGED cross-domain
       import as an inflection — restore or revise, with the rationale
-      recorded, never silently re-pinned.
+      recorded, never silently re-pinned. *(Done 2026-08-01: kernel regen
+      unblocked it; the import was routed as restore — the mirror predated
+      the imports-check contract, no local semantic edits existed.)*
 - [ ] **The two stub-skill domains**: route each — fill from earned insights
       where sessions have run, or park the domain explicitly. Never fill
       from the birth-day description (the regulated deployment's lesson:
@@ -121,9 +123,13 @@ classes. Order of felt-ness:
 - [ ] **Status-vocabulary reconciliation** in the domain whose skills
       disagree with its schema on every type — a latent commit-blocker;
       revise the skills to the schema (the schema is the ruled surface).
-- [ ] **Inert relationship triggers** (16): the regulated deployment already
-      owns this as its trigger-vocabulary repair plan's final phase —
-      execute there, not here.
+- [ ] **Inert relationship triggers**: the regulated deployment already owns
+      this as its trigger-vocabulary repair plan's final phase — execute
+      there, not here. *(Materially reduced 2026-08-01: the YAML on-key fix
+      below revealed most were mangled-not-unfilled — filled `on:` fields
+      arrived as boolean keys — and the rest carry deliberate `condition:`
+      prose the agent judges. The floor now reads them correctly; what
+      remains there is conversion work, not repair.)*
 - [ ] **Route the aged `framework_promotion: candidate`** sitting 31 days
       unrouted in a meta domain (observation-is-a-distribution claim):
       accept into the framework or decline with rationale.
@@ -133,38 +139,38 @@ classes. Order of felt-ness:
 Each sensor names its same-builder source. Build in this order; each is
 independently shippable.
 
-- [ ] **Quarantine age** (`validate`, Info): `origin: external` +
+- [x] **Quarantine age** (`validate`, Info): `origin: external` +
       `verified: false` older than 30 days. Source: the thing's own
       frontmatter. Already specified in `provenance.md`.
-- [ ] **Retrospective age** (`validate`, Info): domain with commits in the
+- [x] **Retrospective age** (`validate`, Info): domain with commits in the
       last 60 days and no `type: retrospective` in 60+. Source: git log +
       corpus. Already specified in `retrospective.md`.
-- [ ] **Template residue** (`coherence`, Info): a `type: skill` thing whose
+- [x] **Template residue** (`coherence`, Info): a `type: skill` thing whose
       body retains literal placeholder tokens shipped in `templates/`
       (`[Name]`, `[List and briefly describe…]`, …). Source: the template
       set — same-builder by construction; no suppression list possible.
       The finding reads "scaffolded, never authored", not "bad skill".
-- [ ] **Incomplete trigger declarations** (`validate`, Warning): a
+- [x] **Incomplete trigger declarations** (`validate`, Warning): a
       `relationship` trigger with unfilled `on:`/`watch:` is structurally
       incomplete — a schema-shaped fact, not a judgement. `triggers` already
       computes this; today it is only visible to whoever runs the
       subcommand.
-- [ ] **Session-start evaluates triggers on the default path.** The
+- [x] **Session-start evaluates triggers on the default path.** The
       spec-mandated primary evaluation point, mechanically. Phase 0 of
       assistant-register proved the code path; this fold-in is evaluation
       only — rendering and register stay assistant-register's.
-- [ ] **Index anchor integrity** (`index check`): `generated_from` must
+- [x] **Index anchor integrity** (`index check`): `generated_from` must
       resolve; flag `framework_version` staleness on index things — the
       mirror of the check `coherence` already runs for examples. (The
       provenance index currently reports "in sync" over a dangling anchor.)
-- [ ] **Doctor truthfulness**: attribute a pre-commit exit 1 to the failing
+- [x] **Doctor truthfulness**: attribute a pre-commit exit 1 to the failing
       check's own report, never "hook failed to execute".
-- [ ] **Emitter hygiene**: the two remaining `subprocess` calls in
+- [x] **Emitter hygiene**: the two remaining `subprocess` calls in
       `session.py` gain explicit UTF-8; the phantom `--why` leaves the seed.
       Candidate (gate applies): a coherence guard that flags flags named in
       generated prose but absent from the CLI surface — if it needs an
       allow-list, drop it and rely on review.
-- [ ] **§Thing Types promoted to a generated block**: derived from
+- [x] **§Thing Types promoted to a generated block**: derived from
       `_schema.yaml` plus a usage census — repeated drift promotes a fact
       into the floor, and this fact drifted in five-plus domains. Fallback
       if the managed block proves over-mechanism: a coherence set-difference
@@ -175,30 +181,30 @@ independently shippable.
 Existing domains pick these up through refresh; that is the designed channel
 and Phase 2's sensors are what make the channel felt.
 
-- [ ] `scaffold` copies `templates/prompts/` — the kernel names four of them
+- [x] `scaffold` copies `templates/prompts/` — the kernel names four of them
       as session-start steps.
-- [ ] Scaffolded `.claude/settings.json` and the adapter example gain
+- [x] Scaffolded `.claude/settings.json` and the adapter example gain
       estate-sync ahead of session-start; `_FRAMEWORK_HARD_HOOKS` in the
       kernel generator gains hook 4.
-- [ ] Ingestion-triple fields (`source_system`, `source_ref`,
+- [x] Ingestion-triple fields (`source_system`, `source_ref`,
       `source_checked`, `source_hash`) enter CORE_FIELDS and the schema
       template's `known_fields`.
-- [ ] `domain-refresh.md` gains the explicit backfill step for pre-v3.20
+- [x] `domain-refresh.md` gains the explicit backfill step for pre-v3.20
       domains (boundary file, gitignore).
 
 ## Phase 4 — Spec reconciliation (prose catches up with shipped reality)
 
-- [ ] **`interface.md`** — 64 days stale, the oldest foundational spec; it
+- [x] **`interface.md`** — 64 days stale, the oldest foundational spec; it
       predates the porch entirely. Gains the membrane/face as an output
       route. The Response Register section stays assistant-register's; this
       plan only ends the file's silence about surfaces that shipped.
-- [ ] **Manifesto §Composability** still says the cross-domain hand-off is
+- [x] **Manifesto §Composability** still says the cross-domain hand-off is
       "foreseen but not yet specified" — it shipped (v3.22–v3.23). Revise
       with rationale; route 2, recorded.
-- [ ] **Operator-guide toolbox** — 4 of 23 subcommands undocumented.
+- [x] **Operator-guide toolbox** — 4 of 23 subcommands undocumented.
       Candidate mechanical check: extend the existing count check to
       per-command coverage (gate applies).
-- [ ] **`domain-specification-guide.md`** names the prune-or-park route for
+- [x] **`domain-specification-guide.md`** names the prune-or-park route for
       declared-but-never-used machinery — emergent detail cuts both ways,
       and the honest route for predicted structure is often to remove or
       explicitly park it, not to manufacture usage.
@@ -218,3 +224,39 @@ estate-wide propagation — and can start immediately after the unblock.
 Phase 3 rides the next scaffold and the refresh channel. Phase 4 lands with
 the next spec pass. Deploy-when-felt is satisfied throughout: every sensor
 maps to a divergence that actually occurred, this week, in this estate.
+
+## Build record — 2026-08-01 (v3.24.0)
+
+Phases 2–4 shipped in one sitting; Phase 1 holds its operator-paced items.
+Rulings made at build, recorded per the plan's own demand:
+
+- **§Thing Types: the generated block won.** A coherence set-difference
+  check would have parsed authored prose — judgement in mechanical clothing,
+  suppression pressure by construction. The `types` managed block derives
+  from `_schema.yaml` (same-builder), is opt-in via block markers, and
+  absent blocks skip — no forced drift on existing domains.
+- **The sensors' first catch was the floor itself.** The trigger-completeness
+  self-test exposed YAML 1.1 parsing a bare `on:` key as boolean `True`:
+  every dependency trigger in the estate was silently unfireable, and filled
+  relationship triggers were misreported as unfilled. Normalized once in
+  `parse_frontmatter`; the dependency evaluator gained its honest skip. The
+  sweep's "16 inert triggers" finding shrank accordingly — most were
+  mangled or deliberately prose-conditioned, not neglected.
+- **Trigger-completeness warning narrowed at build**: prose-`condition`
+  relationship triggers are a live, legitimate pattern (watching the world,
+  not a thing) — the Warning fires only when a declaration gives neither
+  the floor nor the agent anything. Quiet-when-healthy held over noisy-but-
+  thorough, per constraint 4.
+- **Prompt egress strips the graph**: delivering `templates/prompts/` into
+  newborn corpora dangled framework-space edges; the membrane's own rule
+  (relational graph stripped on egress) applied at birth, and `type: prompt`
+  joined the orphan exemptions (referenced by name, never by edge).
+- **All nine kernel-shaped estate domains regenerated in step** with the
+  hooks-block change — no domain left in the commit-blocked state the sweep
+  found; the stale-lock debt in one personal domain cleared in passing.
+- **Boundary collision surfaced (operator ruling owed):** the scaffold's
+  private-by-default step registers a newborn's name in the framework's
+  local terms file; one newborn's name collides with a long-published
+  example directory, so touching that example now blocks framework commits.
+  Its v3.24 re-pin is deferred (staleness Warning stands as the record)
+  until the operator rules: rename one, or drop the term knowingly.
