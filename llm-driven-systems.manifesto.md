@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: evolving
-version: 2.6
+version: 2.7
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
@@ -274,7 +274,7 @@ Git preserves all of it. You have a complete audit trail and history.
 
 **Portability.** Your data is just files. You can move it anywhere. Run it on any LLM. Integrate it with any tool that reads markdown and git.
 
-**Composability.** Multiple domains can coexist — they're all just files under one framework. Within a domain, things compose freely. *Across* domains, composition is deliberate, not implicit: domains are isolated, separate-id-space repos by design, so one domain consuming another's output is a verified hand-off (treated as external input — quarantined until confirmed, see `provenance.md`), not a raw cross-repo link. The full cross-domain hand-off mechanism is foreseen but not yet specified (sketch: `things/insights/cross-domain-handoff-is-verified-external-input.md`); until it ships, treat cross-domain references as an explicit import, not a promise the framework already keeps.
+**Composability.** Multiple domains can coexist — they're all just files under one framework. Within a domain, things compose freely. *Across* domains, composition is deliberate, not implicit: domains are isolated, separate-id-space repos by design, so one domain consuming another's output is a verified hand-off (treated as external input — quarantined until confirmed, see `provenance.md`), not a raw cross-repo link. The full mechanism shipped in v3.22–v3.23: a domain serves a *face* (`exposed: true` things, graph stripped on egress) over the porch (`mdllm mcp-serve`); the consumer mirrors, pins with the reference triple, and quarantines until a human flips; `mdllm imports-check` keeps every pin honest (`fresh`/`stale`/`diverged`/`withdrawn`). See `provenance.md` and `interface.md` → The Membrane.
 
 **Evolution.** You're not stuck with your initial design. The schema evolves. Fields emerge. Relationships change. Git preserves the history.
 

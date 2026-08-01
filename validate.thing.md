@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -27,7 +27,7 @@ linked_things:
 <!-- kernel -->
 **Mechanical validation is the tool's job:** `python {framework_root}/tools/mdllm.py validate <path>` — structure, references, schema conformance, index integrity. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
 
-**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as missing from the brief (promote/dismiss/list) · no retrospective in 60+ active days. Advisory tone ("I noticed…"), never blocking.
+**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as missing from the brief (promote/dismiss/list). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 <!-- /kernel -->

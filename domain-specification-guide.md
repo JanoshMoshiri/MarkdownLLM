@@ -537,6 +537,29 @@ linked_things:
 
 Thing types are domain-specific but follow `thing.md` patterns for metadata, relationships, and structure.
 
+### When Specification Outruns Usage: Prune or Park
+
+Emergent detail cuts both ways. The familiar drift is usage outrunning the
+spec (types in use the schema never declared); the quieter one is the
+inverse — types, pipelines, and trigger vocabularies specified in detail
+that no session ever exercised. "You don't predict what you'll need; you
+discover it through use" (manifesto) — a declared type with zero instances
+after weeks of real sessions is a *prediction that didn't land*, and the
+floor surfaces it (`mdllm coherence`: dead vocabulary).
+
+The honest routes are the divergence primitive's, and **manufacturing usage
+is not one of them**:
+
+- **Prune** — remove the unused declaration; the schema shrinks back to what
+  the domain actually is. Git keeps the history if it's ever wanted again.
+- **Park** — keep it deliberately, and say so: comment the type out in
+  `_schema.yaml` with an uncomment-on-first-instance note (a live pattern —
+  the schema stays quiet AND the intent is recorded), or record the
+  foreseen-not-deployed ruling where the next reader will meet it.
+
+Either way the divergence is routed; what must not happen is a schema that
+silently describes a domain that doesn't exist.
+
 ---
 
 ## Knowledge Management

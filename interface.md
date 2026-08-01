@@ -2,11 +2,14 @@
 id: interface-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
     relation: implements
+  - id: provenance-specification
+    relation: complements
+    notes: "v1.1: the membrane section — a served face is an output route whose consumer is another domain's agent; the hand-off mechanics (reference triple, quarantine, freshness) are provenance.md's"
   - id: thing-specification
     relation: complements
   - id: git-workflow-specification
@@ -179,6 +182,36 @@ In practice:
 - **CLI tools** — response printed to terminal; files written to disk
 - **Mobile apps** — response appears in conversation
 - **Notifications** — calendar entries, reminders, and alerts pushed to phone/OS
+
+## The Membrane: Another Domain as the Consumer
+
+Not every consumer of a domain's output is the human. Since v3.22.0 a domain
+can serve a **face** — the subset of its things marked `exposed: true` — and
+another domain's agent can consume across that boundary. This is an output
+route like the others: thin, replaceable, and carrying things rather than
+prose. What makes it different is that the consumer is itself a reasoning
+agent operating a separate id space, so the hand-off is **deliberate, never
+implicit**:
+
+- **Exposure is opt-in per thing** (`exposed: true`), and the relational
+  graph is stripped on egress — edges do not travel raw across id spaces
+  (`thing.md`).
+- **The porch** (`mdllm mcp-serve <domain>`) serves the face over MCP stdio;
+  a consumer wires it into its own `.mcp.json`.
+- **Consumption is an import**: the consumer mirrors the thing, pins it with
+  the reference triple (`source_domain`/`source_id`/`source_commit`), and
+  quarantines it (`origin: external`, `verified: false`) until a human flips
+  it — the same discipline as any external input (`provenance.md`).
+- **Freshness is checkable**: `mdllm imports-check` re-checks every pin and
+  mirror against the source's face (`fresh`/`stale`/`diverged`/`withdrawn`);
+  `estate-check` batches it across consumers.
+
+The direction of the membrane is a ruling, not a default — who consumes whom
+is recorded, and a face that offers things a wired consumer never imports is
+itself a surfaced fact (`porch_offers_unimported`,
+`trigger-specification.md`). The full mechanism lives in `provenance.md`
+(reference triple, re-quarantine-on-drift, ingestion vs import); this section
+exists so the spec that owns output routes names all of them.
 
 ## What This Is Not
 

@@ -165,10 +165,14 @@ to invoke directly.
 | `triggers [path]` | Evaluates time/dependency/threshold conditions, deadline horizon | "What needs attention?" without starting a full session |
 | `index [path] check\|rebuild` | Rebuild-and-diff derived indexes (`--signal triggers\|schema\|relationships`) | Suspected index drift; after bulk edits |
 | `provenance [path]` | Validates decision chains and the external-content quarantine | Auditing why-trails before relying on a decision |
+| `touchpoints <id> [path]` | The Assimilate beat: one thing's declared inbound set + literal body references — "what did I just put at risk?" | Before changing a load-bearing thing; during an inflection walk |
+| `cascade <id> [path]` | Mirror of touchpoints: the declared downstream set a completion unblocks — "what did I just unblock?" | After completing a thing with dependants |
 | `eval [path] --fixture <f>` | Asserts a fixture's contracted end state against committed domain state | Regression check after framework or skill changes |
 | `eval --run [--model M --trials N --bare --report]` | Seeds an isolated workspace, runs a headless agent, scores trials | Running the framework-vs-bare experiment |
 | `tokens [path]` | Measures spec token cost by loading tier | Checking session-cost impact after spec edits |
 | `kernel [--check]` | Regenerates `kernel.md` from spec kernel blocks; `--check` gates drift | Framework maintenance (CI runs `--check` for you) |
+| `domain-kernel [path] [--check]` | Regenerates the managed `<!-- generated:NAME -->` blocks in a domain's AGENTS.md (session-start, tier-routing, types, hooks, floor); `--check` gates drift | After a refresh, or when coherence reports a drifted block |
+| `session-start [path]` | Emits the mechanical session-start ritual: version check, floor state, velocity, open loops, verified flips, and trigger evaluation | The SessionStart adapter runs it for you; by hand when orienting without a harness |
 | `coherence [path]` | Dark-region checks: generated-artifact (kernel/index) freshness, `foundational_specs`↔filesystem, stale `stable` labels, dead vocabulary. Corpus-general; framework-only checks switch on at a `.markdownllm` root. Runs in the pre-commit hook | After adding/removing a spec; suspected drift between catalog and disk |
 | `changelog --since <tag>` | Drafts a CHANGELOG entry from the commit stream | Framework release prep |
 | `worklog [path] [--write]` | Prints an on-demand session-grouped view of the commit stream (sessions split on `session-end:` commits); `--write` saves a gitignored local snapshot | Reviewing recent session history — not a committed file (retired v3.17) |
