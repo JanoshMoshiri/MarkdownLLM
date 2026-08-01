@@ -228,6 +228,25 @@ def cmd_scaffold(args) -> int:
                 encoding="utf-8", newline="\n")
             written.append(f".github/prompts/{src.name}")
 
+    # Reasoning prompts (orchestration.md): the generated session-start block
+    # names `evaluate-triggers`, `surface-attention`, `session-orientation`,
+    # `domain-velocity` (and the rituals name more) — until v3.24.0 scaffold
+    # never delivered them, so every domain was born instructed to run prompts
+    # it did not have (2026-08-01 estate sweep). They are things (type: prompt)
+    # and land in the domain's own corpus.
+    if (templates / "prompts").is_dir():
+        pr_dir = target / "prompts"
+        pr_dir.mkdir(exist_ok=True)
+        for src in sorted((templates / "prompts").glob("*.md")):
+            text = instantiate(src.read_text(encoding="utf-8"))
+            # The relational graph is stripped on egress (thing.md, `exposed`):
+            # a prompt's linked_things point into the FRAMEWORK's id space and
+            # would dangle in the domain's separate corpus — same rule the
+            # membrane applies to every thing that crosses a boundary.
+            text = re.sub(r"(?m)^linked_things:\n(?:[ \t]+.*\n)+", "", text)
+            (pr_dir / src.name).write_text(text, encoding="utf-8", newline="\n")
+            written.append(f"prompts/{src.name}")
+
     # Adapter: write .claude/settings.json so a new domain is hardened out of the
     # box — SessionStart injects the ritual, PostToolUse runs the floor on write.
     # One Claude-format file serves Claude Code AND VS Code Copilot (agent mode).
@@ -239,8 +258,13 @@ def cmd_scaffold(args) -> int:
     settings.parent.mkdir(parents=True, exist_ok=True)
     settings.write_text(_json.dumps({
         "hooks": {
+            # estate-sync BEFORE session-start: orientation reads git log, and
+            # the log is only whole after the fetch (hard hook 4 — until
+            # v3.24.0 scaffolded domains were born without it).
             "SessionStart": [
                 {"hooks": [{"type": "command",
+                            "command": f"python {rel_fw}/tools/mdllm.py estate-sync ."},
+                           {"type": "command",
                             "command": f"python {rel_fw}/tools/mdllm.py session-start ."}]}
             ],
             "PostToolUse": [

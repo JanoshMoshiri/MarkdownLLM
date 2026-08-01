@@ -107,6 +107,15 @@ The refresh process reads these framework files in order:
    → Commit with message: refresh: absorbed framework v{version} changes
    → (operator step) if absorbing v3.15.0+, add the harness adapter hooks —
      see "Hardening: the harness adapter" below
+   → (backfill) a domain born before a scaffold artifact existed never
+     received it — refresh is where it catches up. Check and backfill:
+     · pre-v3.20.0 births: the disclosure boundary (.boundary-terms from
+       templates/boundary-terms.template, gitignored) and a domain .gitignore
+     · pre-v3.24.0 births: prompts/ (templates/prompts/ — the reasoning
+       prompts the generated session-start block names), the estate-sync
+       entry ahead of session-start in .claude/settings.json, and the
+       `types` managed block in AGENTS.md (templates/AGENTS.md.template
+       shows placement; `mdllm domain-kernel .` fills it)
 ```
 
 ### Hardening: The Harness Adapter (Operator, Optional)

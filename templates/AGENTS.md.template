@@ -55,10 +55,13 @@ _(managed by `mdllm domain-kernel` — do not hand-edit)_
 
 ## Thing Types in This Domain
 
-[The types this domain instantiates — authored]
+[What these types mean in this domain and why they exist — authored narrative;
+the list below is generated from `things/_schema.yaml`, the authority, so the
+kernel's type list can never drift from the schema]
 
-- `type: [type-name]` — [Description]
-- `type: [type-name]` — [Description]
+<!-- generated:types -->
+_(managed by `mdllm domain-kernel` — do not hand-edit)_
+<!-- /generated:types -->
 
 ## Skills Directory
 

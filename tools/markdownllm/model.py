@@ -147,6 +147,11 @@ CORE_FIELDS = {
     # the source triple is the cross-domain import pin `imports-check` reads
     "informed_by", "origin", "verified", "verified_by",
     "source_domain", "source_id", "source_commit",
+    # ingestion triple (provenance.md → Ingestion Is Not Import) — the
+    # outside-the-estate pin `imports-check` reports as `ingested` with the
+    # clock. Tool-read since v3.23.0; unregistered until v3.24.0, so a domain
+    # adopting the framework's own mandated fields was flagged for them.
+    "source_system", "source_ref", "source_checked", "source_hash",
     # insight-lifecycle disposition (session-memory.md) — the orphan check READS
     # `disposition: keep-active` to honour a deliberately-kept standing/parked
     # insight, so these are tool-read and belong in CORE (unlike promoted_to,

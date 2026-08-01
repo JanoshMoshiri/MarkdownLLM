@@ -288,10 +288,13 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
                          "circular dependency: " + " -> ".join(cycle)))
                 break
 
-    # orphans (Info)
+    # orphans (Info). `prompt` is exempt alongside the generated types: prompts
+    # are instruction things, referenced by NAME from kernel blocks and
+    # bindings, never by graph edge — and their linked_things are stripped on
+    # scaffold egress by design, so flagging them would fire on every newborn.
     for t in corpus.things:
         meta = t.meta
-        if str(meta.get("type")) in ("continuity-brief", "index"):
+        if str(meta.get("type")) in ("continuity-brief", "index", "prompt"):
             continue
         has_rel = bool(meta.get("linked_things") or meta.get("dependencies")
                        or meta.get("blocks") or meta.get("parent") or meta.get("triggers"))

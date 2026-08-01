@@ -17,11 +17,11 @@ import re
 import sys
 from pathlib import Path
 
-from .model import parse_frontmatter
+from .model import RESERVED_STATUSES, load_schema, parse_frontmatter
 from .repo import TIERS
 
 DOMAIN_KERNEL_BLOCKS = ("standing-truth", "session-start", "tier-routing",
-                        "hooks", "floor")
+                        "types", "hooks", "floor")
 
 _FRAMEWORK_HARD_HOOKS = (
     "- `post-write:commit` — commit every created/modified frontmatter `.md` to the "
@@ -29,6 +29,10 @@ _FRAMEWORK_HARD_HOOKS = (
     "pre-commit hook) + `interpretation` (the commit act itself).\n"
     "- `session-start:version-check` — performed in **Session Start** above. "
     "Anchor: `harness-session`.\n"
+    "- `session-start:estate-sync` — sync before orienting, performed in **Session "
+    "Start** step 0 above: fetch + ff-only pull, bounded; divergence and dirty trees "
+    "reported, never resolved; never pushes. Anchor: `harness-session` (an adapter "
+    "may run it; `interpretation` otherwise).\n"
     "- `pre-domain-scaffold:isolate` — new domains are born via `mdllm scaffold`. "
     "Anchor: `git-fs`.")
 
@@ -108,6 +112,40 @@ def _dk_tier_routing(domain: Path, meta: dict) -> str:
         "**Tier 2 — on demand:** " + t2_specs)
 
 
+def _dk_types(domain: Path, meta: dict) -> str:
+    """Generated from `things/_schema.yaml` — the schema is the authority on
+    the type vocabulary, and the 2026-08-01 estate sweep found the authored
+    §Thing Types list lagging it in most active domains (the harness-loaded
+    surface was the least-checked). Repeated drift promotes a fact into the
+    floor: the list is now derived, so it cannot disagree with the schema."""
+    try:
+        schema = load_schema(domain)
+    except Exception:
+        schema = None
+    types = (schema or {}).get("types") or {}
+    reserved = ", ".join(f"`{t}`" for t in sorted(RESERVED_STATUSES))
+    if not types:
+        return ("No domain types declared yet — `things/_schema.yaml` is the "
+                "authority when they land. Framework-reserved types are built "
+                "into the tool: " + reserved + ".")
+    lines = ["**Declared domain types** (from `things/_schema.yaml` — the "
+             "authority; regenerate on schema change):"]
+    for typ in sorted(types):
+        tdef = types[typ] if isinstance(types[typ], dict) else {}
+        statuses = tdef.get("statuses")
+        req = tdef.get("required_fields")
+        bits = []
+        if isinstance(statuses, list) and statuses:
+            bits.append("statuses: " + " / ".join(str(s) for s in statuses))
+        if isinstance(req, list) and req:
+            bits.append("required: " + ", ".join(str(r) for r in req))
+        lines.append(f"- `{typ}`" + (" — " + " · ".join(bits) if bits else ""))
+    lines.append("")
+    lines.append("Framework-reserved types (built into the tool, no declaration "
+                 "needed): " + reserved + ".")
+    return "\n".join(lines)
+
+
 def _dk_hooks(domain: Path, meta: dict) -> str:
     parts = ["**Framework hard hooks (always active by config; anchor decides "
              "enforcement):**\n" + _FRAMEWORK_HARD_HOOKS]
@@ -148,6 +186,7 @@ _DK_BUILDERS = {
     "standing-truth": _dk_standing_truth,
     "session-start": _dk_session_start,
     "tier-routing": _dk_tier_routing,
+    "types": _dk_types,
     "hooks": _dk_hooks,
     "floor": _dk_floor,
 }

@@ -748,7 +748,9 @@ def test_scaffold_birth_sequence(tmp_path, capsys):
         findings.extend(mdllm.validate_level1(t, corpus.schema))
     findings.extend(mdllm.validate_level2(corpus))
     findings.extend(mdllm.validate_level3(corpus))
-    assert findings == [] and len(corpus.things) == 4
+    # 4 skills + 8 reasoning prompts (delivered since v3.24.0 — the generated
+    # session-start block names them, so birth must include them)
+    assert findings == [] and len(corpus.things) == 12
 
 
 def test_scaffold_isolation_skips_when_blanket_rule_covers(tmp_path, capsys):
@@ -1292,8 +1294,11 @@ def test_scaffold_writes_hardened_adapter(tmp_path):
     mdllm.cmd_scaffold(_ns(path=str(target)))
     settings = json.loads((target / ".claude" / "settings.json").read_text(encoding="utf-8"))
     assert "SessionStart" in settings["hooks"] and "PostToolUse" in settings["hooks"]
-    cmd = settings["hooks"]["SessionStart"][0]["hooks"][0]["command"]
-    assert "session-start" in cmd and "tools/mdllm.py" in cmd
+    # estate-sync runs FIRST (hard hook 4 — orientation reads the log, and the
+    # log is only whole after the fetch), then session-start.
+    ss_cmds = [h["command"] for h in settings["hooks"]["SessionStart"][0]["hooks"]]
+    assert "estate-sync" in ss_cmds[0] and "tools/mdllm.py" in ss_cmds[0]
+    assert "session-start" in ss_cmds[1] and "tools/mdllm.py" in ss_cmds[1]
 
 
 def test_refresh_regenerates_domain_kernel(tmp_path):
