@@ -132,9 +132,17 @@ def is_terminal(schema: dict | None, meta: dict | None) -> bool:
 # provenance) or written onto a generated index/kernel thing. A domain's
 # `known_fields` in _schema.yaml extends this set; an in-use field in neither
 # is a typo or an unregistered field, which the field-registration check
-# (validate_level3) surfaces. Add to this set only when the tool learns to read
-# a new structural field — registering the framework's own emergent fields by
-# the same discipline domains follow.
+# (validate_level3) surfaces.
+#
+# Two admission criteria, and only two:
+#   1. The tool learns to read a new structural field.
+#   2. The FRAMEWORK ships the field into a domain as part of a reserved
+#      type's contract — a domain must never be made to register the
+#      framework's own vocabulary in its schema (that would be the framework
+#      reaching into domain schemas: coupling, and a per-domain edit for every
+#      framework change). The prompt contract below is this case.
+# Registering the framework's own emergent fields by the same discipline
+# domains follow.
 CORE_FIELDS = {
     # identity & lifecycle (level 1)
     "id", "type", "status", "created", "due_date", "review_date",
@@ -161,6 +169,11 @@ CORE_FIELDS = {
     "exposed",
     # generated-artifact frontmatter (index / kernel things)
     "index_of", "generated", "generated_from", "coverage", "framework_version",
+    # reserved `type: prompt` contract (orchestration.md) — read by the agent,
+    # not the tool, but SHIPPED by the framework into every domain that adopts
+    # the reasoning prompts (criterion 2 above). Unregistered until v3.24.0,
+    # which flagged a domain 24 times for the framework's own field names.
+    "inputs", "outputs", "bound_to",
 }
 
 DEFAULT_EXCLUDES = {".git", ".claude", "node_modules", "templates", "examples",

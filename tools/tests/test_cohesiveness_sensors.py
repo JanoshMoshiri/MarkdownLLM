@@ -359,3 +359,27 @@ framework_version: 1.0.0
     warnings = [f.message for f in found if f.severity == mdllm.SEV_WARNING]
     assert any("no longer resolves" in m for m in warnings)
     assert any("stamped at framework 1.0.0" in m for m in warnings)
+
+
+# ------------------------------------------------- framework-shipped vocabulary
+
+
+def test_shipped_prompt_fields_do_not_flag_a_domain(tmp_path):
+    # A domain that adopts the framework's reasoning prompts must not be
+    # flagged for the framework's own field names (CORE_FIELDS criterion 2).
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\nknown_fields:\n  - version\n")
+    write(tmp_path, "prompts/evaluate-triggers.md", thing_text("""\
+id: evaluate-triggers
+type: prompt
+status: stable
+version: 1.1
+created: 2026-06-01
+inputs:
+  - name: things-to-scan
+outputs:
+  - name: fired
+bound_to: session-start
+"""))
+    msgs = messages(all_findings(tmp_path), mdllm.SEV_WARNING)
+    assert not any("not in CORE_FIELDS" in m for m in msgs)
