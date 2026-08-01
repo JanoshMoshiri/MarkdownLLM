@@ -147,11 +147,27 @@ def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]], list[str]]:
                 watch = tr.get("watch") or []
                 watch = watch if isinstance(watch, list) else [watch]
                 value = tr.get("value")
-                if tr.get("on") == "status_changed_to" and value:
+                if tr.get("on") == "status_changed_to" and value and watch:
                     states = [str(by_id[w].meta.get("status")) for w in watch if w in by_id]
                     if states and all(s == str(value) for s in states):
                         hits.append(f"{name}: all watched ({', '.join(watch)}) are "
                                     f"`{value}` -> {action}")
+                else:
+                    # A dependency trigger outside the evaluable shape used to
+                    # fall through in silence — the no-silent-default law
+                    # violated by the evaluator itself (and masked for months
+                    # by the YAML `on:`-is-True key bug parse_frontmatter now
+                    # normalizes). Prose conditions route to the agent; a
+                    # shapeless declaration is named as such.
+                    if tr.get("condition"):
+                        skipped.append(f"{name}: dependency trigger with prose "
+                                       f"condition {tr.get('condition')!r} — "
+                                       f"left to the agent")
+                    else:
+                        skipped.append(f"{name}: dependency trigger not in the "
+                                       f"evaluable shape (`on: status_changed_to` "
+                                       f"+ `watch` + `value`) — never fires as "
+                                       f"declared")
             elif ttype == "threshold":
                 if cond == "subtasks_complete":
                     subs = [e.get("id") for e in meta.get("linked_things") or []

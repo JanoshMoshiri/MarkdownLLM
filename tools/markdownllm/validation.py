@@ -92,6 +92,31 @@ def validate_level1(t: Thing, schema: dict | None) -> list[Finding]:
                 if not isinstance(tr, dict) or "type" not in tr or "action" not in tr:
                     f.append(Finding(SEV_ERROR, name,
                              f"`triggers[{i}]` must have `type` and `action`"))
+                    continue
+                # Structural completeness (cohesiveness-sensors plan): a trigger
+                # that gives the floor nothing to evaluate AND the agent nothing
+                # to judge is declared but can never fire — for anyone. `watch`
+                # is the floor's substrate; `condition` prose is the agent's (a
+                # relationship trigger watching the world rather than a thing is
+                # a legitimate, observed pattern — it must stay quiet). Only the
+                # nothing-at-all case warns. Same-builder: these fields are
+                # exactly what triggers.py reads.
+                ttype = tr.get("type")
+                if (ttype == "relationship"
+                        and not tr.get("watch") and not tr.get("condition")):
+                    f.append(Finding(SEV_WARNING, name,
+                             f"`triggers[{i}]` is a `relationship` trigger with "
+                             f"neither `watch` nor `condition` — nothing for the "
+                             f"floor to evaluate or the agent to judge; it can "
+                             f"never fire. Fill one, or route it to another "
+                             f"species (trigger-specification.md)"))
+                elif (ttype == "dependency" and not tr.get("condition")
+                        and not (tr.get("watch") and tr.get("value"))):
+                    f.append(Finding(SEV_WARNING, name,
+                             f"`triggers[{i}]` is a `dependency` trigger without "
+                             f"`watch`/`value` — as declared it can never fire "
+                             f"(the evaluator needs both, with "
+                             f"`on: status_changed_to`)"))
 
     if not t.body.strip():
         f.append(Finding(SEV_WARNING, name, "empty markdown body"))
@@ -453,6 +478,32 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
     strict = ((corpus.schema or {}).get("options") or {}).get("quarantine") == "strict"
     sev = SEV_ERROR if strict else SEV_WARNING
     out: list[Finding] = []
+
+    # Quarantine age (provenance.md → Validation: "External unverified" — Info).
+    # An `origin: external` thing still unverified after 30 days is a divergence
+    # aging toward silent default: nothing may rest on it, yet nothing is
+    # resurfacing it either. Info, never raised by strict mode — the spec sets
+    # this row at Info; the operator's disposition (verify, or record why it
+    # stays quarantined) is the route. Same-builder: the thing's own frontmatter.
+    today = dt.date.today()
+    for t in corpus.things:
+        if str(t.meta.get("origin")) != "external" or t.meta.get("verified") is True:
+            continue
+        created = t.meta.get("created")
+        if isinstance(created, dt.datetime):
+            created = created.date()
+        elif isinstance(created, str) and ISO_RE.match(created):
+            created = dt.date.fromisoformat(created[:10])
+        if not isinstance(created, dt.date):
+            continue
+        age = (today - created).days
+        if age > 30:
+            out.append(Finding(SEV_INFO, t.id or t.path.name,
+                       f"`origin: external` and unverified for {age} days "
+                       f"(created {created}) — verify it, or record why it "
+                       f"stays quarantined (provenance.md: External "
+                       f"unverified >30d)"))
+
     externals = [t for t in corpus.things
                  if str(t.meta.get("origin")) == "external"
                  and t.meta.get("verified") is True]
@@ -513,6 +564,56 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
     return out
 
 
+def retrospective_findings(root: Path, corpus: Corpus) -> list[Finding]:
+    """retrospective.md → validate.thing.md: a domain with no retrospective in
+    over 60 days of active sessions is flagged as one Info observation.
+
+    "Active days" is read mechanically from the commit stream: the corpus must
+    be older than 60 days (young domains are silent) AND have committed to
+    `things/` within the last 60 (dormant domains are silent — a paused domain
+    owes no reflection). Both gates keep the check quiet-when-healthy: it fires
+    only where sessions are running and the reflection ritual is not
+    (a-check-that-always-fires-teaches-the-operator-to-ignore-it)."""
+    first = _git_stdout(root, ["log", "--reverse", "--format=%cs", "--", "things"])
+    if not first:
+        return []  # no git history over things/ — nothing to say
+    try:
+        born = dt.date.fromisoformat(first.splitlines()[0].strip())
+    except ValueError:
+        return []
+    today = dt.date.today()
+    if (today - born).days <= 60:
+        return []
+    recent = _git_stdout(root, ["rev-list", "--count", "--since=60.days",
+                                "HEAD", "--", "things"])
+    if not recent or not recent.isdigit() or int(recent) == 0:
+        return []
+    newest: dt.date | None = None
+    for t in corpus.things:
+        if str(t.meta.get("type")) != "retrospective":
+            continue
+        for fld in ("period_end", "created"):
+            v = t.meta.get(fld)
+            if isinstance(v, dt.datetime):
+                v = v.date()
+            elif isinstance(v, str) and ISO_RE.match(v):
+                v = dt.date.fromisoformat(v[:10])
+            if isinstance(v, dt.date):
+                newest = max(newest, v) if newest else v
+                break
+    if newest is None:
+        return [Finding(SEV_INFO, "retrospective-cadence",
+                f"no retrospective has ever been written — the domain has been "
+                f"active {(today - born).days} days (retrospective.md: monthly, "
+                f"or after a significant milestone)")]
+    if (today - newest).days > 60:
+        return [Finding(SEV_INFO, "retrospective-cadence",
+                f"no retrospective since {newest} ({(today - newest).days} days) "
+                f"with active sessions in the last 60 — the period's aggregate "
+                f"sweeps (conflict scan, schema coherence) have not run")]
+    return []
+
+
 def validate_corpus(root: Path) -> tuple[Corpus, list[Finding]]:
     corpus, findings = scan(root)
     for t in corpus.things:
@@ -541,8 +642,11 @@ def cmd_validate(args) -> int:
     corpus, findings = validate_corpus(root)
     findings.extend(check_version_sync(root))
     findings.extend(quarantine_findings(root, corpus))
+    findings.extend(retrospective_findings(root, corpus))
     reports.append((root, corpus, findings))
     for sub in example_corpora(root):
+        # Example corpora skip the retrospective-cadence check: they are
+        # teaching corpora with frozen dates, not domains running sessions.
         sub_corpus, sub_findings = validate_corpus(sub)
         sub_findings.extend(quarantine_findings(sub, sub_corpus))
         reports.append((sub, sub_corpus, sub_findings))

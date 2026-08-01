@@ -105,7 +105,8 @@ def _verified_flips_recent(domain: Path) -> list[str]:
     flips = subprocess.run(
         ["git", "log", "--format=%h", "--name-only",
          "-G", r"^verified: *[Tt]rue", f"{base}..HEAD"],
-        cwd=domain, capture_output=True, text=True)
+        cwd=domain, capture_output=True, text=True,
+        encoding="utf-8", errors="replace")
     if flips.returncode != 0:
         return []
     lines: list[str] = []
@@ -152,7 +153,8 @@ def _floor_status(root: Path) -> str | None:
     import os
 
     inside = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
-                            capture_output=True, text=True)
+                            capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
     if inside.returncode != 0:
         return None  # not a git repo — scaffold/doctor own that case
     git_dir = (root / inside.stdout.strip()).resolve()
@@ -196,7 +198,7 @@ Answer the operator's loop first — *what have I got, what's first, where do
 I go* — and answer it in their language. Report domain substance, never your
 own preparation. Say nothing where the domain is healthy. Expand, never
 smooth, where a human has to decide. Retain the derivation: "show me why"
-must always work (`mdllm session-start <path> --why`).
+must always work (`mdllm triggers <path>` carries the full evaluation).
 
 Before the first reply: load `kernel.md`; act on what is below. Do not
 narrate having done so."""
@@ -390,8 +392,9 @@ def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
         out.append(f"- {len(skipped)} trigger(s) the floor cannot evaluate — "
                    f"yours to judge.")
     out.append("")
-    out.append("_Ask for the derivation of anything here (`--why`), the horizon, "
-               "or the triggers left to judgment._")
+    out.append("_Ask for the derivation of anything here, the horizon, or the "
+               "triggers left to judgment (`mdllm triggers .` carries the full "
+               "evaluation)._")
     return out
 
 
@@ -412,7 +415,8 @@ def cmd_session_start(args) -> int:
            "The live request will pull you toward itself; do these first, then await intent:",
            "1. Load `kernel.md` (operative kernel).",
            "2. Act on the version + velocity (backward) and open-loops (forward) status below.",
-           "3. Evaluate triggers and surface what needs the user.", ""]
+           "3. Surface the fired triggers below to the user; judge the ones the "
+           "floor could not evaluate.", ""]
 
     fr = meta.get("framework_root")
     if (domain / ".markdownllm").is_file():
@@ -486,6 +490,29 @@ def cmd_session_start(args) -> int:
         return 0
 
     out.extend(_orient_forward(domain))
+
+    # Trigger evaluation, mechanically — session start is the primary
+    # evaluation point (trigger-specification.md); until v3.24.0 this emitter
+    # only *instructed* the agent to evaluate, so the most urgent thing in a
+    # domain could be absent from the one output the operator always reads
+    # (2026-08-01 estate sweep). Fired hits verbatim from the same evaluator
+    # `mdllm triggers` runs; horizon and not-evaluable compressed to counts —
+    # quiet when healthy, one line when not.
+    fired, horizon, skipped = _fired_by_thing(domain)
+    if fired:
+        out.append(f"- **Triggers fired ({sum(len(v) for v in fired.values())}):**")
+        for tid in sorted(fired):
+            for reason in fired[tid]:
+                out.append(f"    - `{tid}`: {reason}")
+    else:
+        out.append("- **Triggers:** none currently true.")
+    tail = []
+    if horizon:
+        tail.append(f"{len(horizon)} beyond the 30-day horizon")
+    if skipped:
+        tail.append(f"{len(skipped)} not mechanically evaluable — yours to judge")
+    if tail:
+        out.append(f"    ({'; '.join(tail)} — `mdllm triggers .` for the full evaluation)")
 
     print("\n".join(out))
     return 0

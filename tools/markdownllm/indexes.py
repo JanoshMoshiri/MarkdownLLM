@@ -8,9 +8,10 @@ the two surfaces agree on what "in sync" means.
 from __future__ import annotations
 
 import datetime as dt
+import subprocess
 from pathlib import Path
 
-from .model import Corpus, Finding, SEV_ERROR, parse_frontmatter, scan
+from .model import Corpus, Finding, SEV_ERROR, SEV_WARNING, parse_frontmatter, scan
 from .repo import framework_version, git_short_sha
 
 def build_index_body(corpus: Corpus, signal: str) -> tuple[str, int]:
@@ -84,10 +85,34 @@ INDEX_FILES = {"triggers": "triggers.md", "schema": "schema.md",
                "relationships": "relationships.md", "provenance": "provenance.md"}
 
 
+def _anchor_notes(root: Path, meta: dict, signal: str) -> list[str]:
+    """Integrity of a stored index's own generation stamp — content parity is
+    not the whole story. `generated_from` must still resolve (a history rewrite
+    kills the anchor while the body stays "in sync" — found live on the
+    framework's own provenance index, 2026-08-01), and `framework_version`
+    staleness means the index predates shapes the current floor writes.
+    Advisory: a rebuild re-pins both."""
+    notes: list[str] = []
+    gf = str(meta.get("generated_from", ""))
+    sha = gf.split("@", 1)[1].strip() if "@" in gf else ""
+    if sha:
+        ok = subprocess.run(["git", "cat-file", "-e", f"{sha}^{{commit}}"],
+                            cwd=root, capture_output=True).returncode == 0
+        if not ok:
+            notes.append(f"`generated_from` anchor `{gf}` no longer resolves "
+                         f"(history rewritten?) — rebuild to re-pin")
+    stamped, current = str(meta.get("framework_version", "")), framework_version(root)
+    if stamped and current and stamped != str(current):
+        notes.append(f"stamped at framework {stamped}, current is {current} — "
+                     f"rebuild to re-pin")
+    return notes
+
+
 def index_drift_findings(root: Path, corpus: Corpus) -> list[Finding]:
     """Drift Errors for every *deployed* derived index (one missing is not
-    drift — indexes are opt-in). Shares `build_index_body` and the body-vs-stored
-    comparison with `index check`, so coherence and the index command agree."""
+    drift — indexes are opt-in), plus advisory anchor-integrity Warnings.
+    Shares `build_index_body` and the body-vs-stored comparison with
+    `index check`, so coherence and the index command agree."""
     out: list[Finding] = []
     idx_dir = root / "things" / "_index"
     for signal, fname in INDEX_FILES.items():
@@ -95,11 +120,13 @@ def index_drift_findings(root: Path, corpus: Corpus) -> list[Finding]:
         if not path.exists():
             continue  # not deployed — opt-in, not a defect
         body, _ = build_index_body(corpus, signal)
-        _, ex_body, _ = parse_frontmatter(path.read_text(encoding="utf-8"))
+        meta, ex_body, _ = parse_frontmatter(path.read_text(encoding="utf-8"))
         if ex_body.strip().split("\n", 1)[-1].strip() != f"{body}".strip():
             out.append(Finding(SEV_ERROR, f"{signal}-index",
                        f"DRIFT — stored body differs from rebuild; run "
                        f"`mdllm index {root} rebuild --signal {signal}`"))
+        for note in _anchor_notes(root, meta or {}, signal):
+            out.append(Finding(SEV_WARNING, f"{signal}-index", note))
     return out
 
 
@@ -142,11 +169,13 @@ def cmd_index(args) -> int:
                 print(f"{signal}: no index at {path.relative_to(root)} — not deployed")
                 continue
             existing = path.read_text(encoding="utf-8")
-            _, ex_body, _ = parse_frontmatter(existing)
+            ex_meta, ex_body, _ = parse_frontmatter(existing)
             if ex_body.strip().split("\n", 1)[-1].strip() != (f"{body}").strip():
                 print(f"{signal}: DRIFT — stored body differs from rebuild; "
                       f"run `mdllm index {root} rebuild --signal {signal}`")
                 rc = 1
             else:
                 print(f"{signal}: in sync (coverage {coverage})")
+            for note in _anchor_notes(root, ex_meta or {}, signal):
+                print(f"{signal}: ANCHOR — {note}")
     return rc

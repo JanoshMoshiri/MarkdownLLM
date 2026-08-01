@@ -219,6 +219,18 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str, str | None]:
         return None, m.group(2), f"YAML parse error: {e}"
     if not isinstance(meta, dict):
         return None, m.group(2), "frontmatter is not a YAML mapping"
+    # YAML 1.1 parses a bare `on:` key as boolean True — so every trigger that
+    # filled its `on:` field arrived at the floor with the field apparently
+    # missing, and `tr.get("on")` readers silently saw None. Dependency
+    # triggers could therefore NEVER fire, and relationship triggers were
+    # reported as unfilled when they weren't (found 2026-08-01 by the
+    # cohesiveness sensors' own self-test). Normalize once, at the single
+    # entry point every reader shares.
+    trigs = meta.get("triggers")
+    if isinstance(trigs, list):
+        for tr in trigs:
+            if isinstance(tr, dict) and True in tr and "on" not in tr:
+                tr["on"] = tr.pop(True)
     return meta, m.group(2), None
 
 

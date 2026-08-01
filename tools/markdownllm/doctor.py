@@ -128,9 +128,22 @@ def cmd_doctor(args) -> int:
                                "(file present; make one commit to verify)")
             elif run.returncode == 0:
                 report("OK", "pre-commit hook EXECUTES (validation currently clean)")
-            elif run.returncode == 1 and "Validation" in (run.stdout or run.stderr or ""):
-                report("OK", "pre-commit hook EXECUTES (validation currently has Errors "
-                             "— it would block a commit, which is the point)")
+            elif run.returncode == 1 and "Traceback" not in (run.stderr or ""):
+                # Exit 1 without a crash is the hook DOING ITS JOB — one of its
+                # checks is blocking. Attribute the block to the failing check,
+                # never report it as an execution failure: the 2026-08-01 sweep
+                # found a domain whose drifted kernel block read as "hook failed
+                # to execute", sending the operator toward the environment when
+                # the remedy was one regen command.
+                combined = (run.stdout or "") + (run.stderr or "")
+                which = [n for n, marker in (("validate", "Validation Report"),
+                                             ("coherence", "Coherence Report"),
+                                             ("boundary", "boundary"))
+                         if marker in combined] or ["one of its checks"]
+                report("OK", f"pre-commit hook EXECUTES and is currently blocking "
+                             f"({' + '.join(which)} failing — it would stop a "
+                             f"commit, which is the point; run the named check "
+                             f"for the report)")
             else:
                 report("FAIL", f"pre-commit hook present but failed to execute "
                                f"(exit {run.returncode}) — resolution is not verification")

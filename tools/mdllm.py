@@ -33,10 +33,10 @@ from markdownllm.model import (
 from markdownllm.validation import (
     valid_statuses_for, validate_level1, validate_level2, version_tuple,
     check_version_sync, validate_level3, validate_corpus, example_corpora,
-    quarantine_findings, cmd_validate,
+    quarantine_findings, retrospective_findings, cmd_validate,
 )
 from markdownllm.repo import git_short_sha, framework_version, _version_lt, TIERS
-from markdownllm.triggers import cmd_triggers
+from markdownllm.triggers import evaluate, cmd_triggers
 from markdownllm.indexes import (
     INDEX_FILES, build_index_body, index_drift_findings, cmd_index,
 )

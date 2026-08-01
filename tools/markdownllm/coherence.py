@@ -47,6 +47,88 @@ def _changed_files_recent(root: Path, window: int) -> set[str] | None:
     return {ln.strip() for ln in out.stdout.splitlines() if ln.strip()}
 
 
+# Placeholder tokens the scaffold substitutes mechanically; anything else in
+# square brackets inside a template is authoring work left for the human.
+_SUBSTITUTED_TOKENS = {"[domain]", "[Domain]", "[Domain Name]", "[ISO-date]",
+                       "[domain-name]"}
+
+
+def _templates_dir(root: Path) -> Path | None:
+    """The framework templates directory this corpus was scaffolded from:
+    local at a framework root, else resolved through the domain's own
+    `framework_root` pointer. None (check skips, fails open) when neither
+    resolves — a corpus with no reachable templates has nothing to compare."""
+    if (root / ".markdownllm").is_file():
+        cand = root / "templates"
+        return cand if cand.is_dir() else None
+    agents = root / "AGENTS.md"
+    if not agents.is_file():
+        return None
+    meta, _, err = parse_frontmatter(agents.read_text(encoding="utf-8"))
+    fr = (meta or {}).get("framework_root") if not err else None
+    if not isinstance(fr, str) or not fr:
+        return None
+    cand = (root / fr / "templates").resolve()
+    return cand if cand.is_dir() else None
+
+
+def _placeholder_tokens(files: list[Path]) -> set[str]:
+    """Literal bracket placeholders shipped in the given template files —
+    same-builder by construction: the token set IS the template text, so the
+    check cannot disagree with what scaffold hands a newborn domain."""
+    tokens: set[str] = set()
+    for tpl in files:
+        try:
+            text = tpl.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for m in re.finditer(r"\[[^\[\]\n]{2,90}\]", text):
+            if m.group(0) not in _SUBSTITUTED_TOKENS:
+                tokens.add(m.group(0))
+    return tokens
+
+
+def _template_residue_findings(root: Path, corpus) -> list[Finding]:
+    """Unfilled-scaffold sensor (cohesiveness-sensors plan). A `type: skill`
+    thing whose body still carries the templates' own bracket placeholders was
+    scaffolded and never authored — the drift class the 2026-08-01 estate sweep
+    found running unflagged for weeks in live domains, invisible to validate
+    (structurally the stubs are valid things). Threshold ≥3 distinct tokens:
+    an authored skill that legitimately uses a bracket example (observed in the
+    wild) stays quiet; a verbatim template (11–30 tokens) cannot. Info — the
+    finding reads "never authored", not "bad skill"; filling it from earned
+    insights vs parking the domain is the operator's route."""
+    templates = _templates_dir(root)
+    if templates is None:
+        return []
+    out: list[Finding] = []
+    skill_tokens = _placeholder_tokens(
+        sorted(templates.glob("domain-*.skill.md.template")))
+    if skill_tokens:
+        for t in corpus.things:
+            if str(t.meta.get("type")) != "skill":
+                continue
+            found = sorted(tok for tok in skill_tokens if tok in t.body)
+            if len(found) >= 3:
+                sample = ", ".join(f"`{tok}`" for tok in found[:3])
+                out.append(Finding(SEV_INFO, t.id or t.path.name,
+                    f"retains {len(found)} template placeholder(s) ({sample}, …) "
+                    f"— scaffolded, never authored. Fill it from the domain's "
+                    f"earned insights, or park it deliberately"))
+    agents = root / "AGENTS.md"
+    agents_tpl = templates / "AGENTS.md.template"
+    if agents.is_file() and agents_tpl.is_file():
+        tokens = _placeholder_tokens([agents_tpl])
+        found = sorted(tok for tok in tokens
+                       if tok in agents.read_text(encoding="utf-8"))
+        if len(found) >= 3:
+            sample = ", ".join(f"`{tok}`" for tok in found[:3])
+            out.append(Finding(SEV_INFO, "AGENTS.md",
+                f"retains {len(found)} template placeholder(s) ({sample}, …) — "
+                f"the entry file was scaffolded and never authored"))
+    return out
+
+
 def coherence_findings(root: Path, window: int) -> list[Finding]:
     """Mechanical checks over the 'dark region' a hand-walk currently guards
     (AGENTS.md -> Walking the Dark Region). Corpus-general by design: the
@@ -81,6 +163,9 @@ def coherence_findings(root: Path, window: int) -> list[Finding]:
         for typ in sorted(declared - used):
             findings.append(Finding(SEV_INFO, "_schema.yaml",
                 f"declared type `{typ}` is used by no thing — dead vocabulary?"))
+
+    # --- general: template residue in skills / entry file (Info) ---------
+    findings.extend(_template_residue_findings(root, corpus))
 
     # --- general: derived-index drift (Error, deployed indexes only) -----
     findings.extend(index_drift_findings(root, corpus))
