@@ -254,9 +254,14 @@ Rulings made at build, recorded per the plan's own demand:
 - **All nine kernel-shaped estate domains regenerated in step** with the
   hooks-block change — no domain left in the commit-blocked state the sweep
   found; the stale-lock debt in one personal domain cleared in passing.
-- **Boundary collision surfaced (operator ruling owed):** the scaffold's
-  private-by-default step registers a newborn's name in the framework's
-  local terms file; one newborn's name collides with a long-published
-  example directory, so touching that example now blocks framework commits.
-  Its v3.24 re-pin is deferred (staleness Warning stands as the record)
-  until the operator rules: rename one, or drop the term knowingly.
+- **Boundary collision is a real class, and the floor cannot see it.** The
+  scaffold's private-by-default step registers a newborn domain's name in
+  the framework's local terms file; where that name also matches a path
+  already published here, touching that path blocks framework commits until
+  the operator rules. Hit once during this build, resolved by a rename. The
+  general lesson is sharper than the instance: the boundary tool checks the
+  *current* term list, so a term that has since changed leaves no mechanical
+  trace — the pre-publication audit stays a judgement call, and a commit
+  message describing why a term was lifted can disclose what the term was
+  protecting. Judgement, not mechanism (`a-ruling-triages-more-cheaply-
+  than-a-mechanism`).
