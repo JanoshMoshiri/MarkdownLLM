@@ -185,6 +185,39 @@ that declare nothing. Self-tests, including the quiet-when-healthy proof.
 regenerated; `framework-map` node and count; `CHANGELOG.md`; version 3.25.0 in
 `.markdownllm` and `AGENTS.md`.
 
+## Build record — 2026-08-02 (v3.25.0)
+
+- [x] **Phase 1 — the evaluator core.** `tools/markdownllm/calc.py`; `mdllm calc`
+      with three modes. 30 self-tests. Renaming to `evaluate_expression` was
+      forced by a live collision: the shim already re-exports `triggers.evaluate`,
+      and the second binding silently won — caught by three trigger tests going
+      red, which is what the shim's re-export surface is for.
+- [x] **Phase 2 — body tables.** Heading- and position-addressed, tolerant
+      column matching, boolean-subscript filters. Every aggregate now reports
+      its denominator: a filter that matched nothing produces a confident zero,
+      and the count is the only thing that exposes it. 15 self-tests.
+- [x] **Phase 3 — corpus selectors.** `things(...)` plus the quarantine law made
+      mechanical. First live run refused `amount` and named the seven things
+      using `net_amount` — the refuse-rather-than-shrink property, proved on
+      contact rather than in a fixture. 10 self-tests.
+- [x] **Phase 4 — the check.** `derivation_findings` in `validate_corpus`, so it
+      runs in the pre-commit hook. `computed` registered in `CORE_FIELDS`.
+      Quiet-when-healthy proved twice in tests and once across all thirteen
+      live domains (zero new findings). 7 self-tests.
+- [x] **Phase 5 — the write-up.** `docs/calculation-reference.md`; sections in
+      `thing.md`, `validate.thing.md`, `provenance.md`; kernel regenerated;
+      framework-map View 3 gains the node (23 → 24 subcommands); operator-guide
+      toolbox row; CHANGELOG; v3.25.0.
+
+241 tests pass; `validate`, `coherence` and `boundary` clean.
+
+**What the build itself surfaced:** the no-silent-default law has an arithmetic
+form that is sharper than its trigger form. A trigger that cannot be evaluated
+wastes attention; a *sum* that quietly shrinks its denominator produces a number
+that looks exactly like a right answer. Four separate refusals in this module
+exist for that one reason, and each of them is a place a reasonable
+implementation would have returned something.
+
 ## What closes this plan
 
 Phases 1–5 shipped, and the estate's money domains adopting `computed:` on
@@ -192,3 +225,9 @@ their next real ingestion. The downstream decision that staked itself on this
 tool earns its `high` confidence on the day the tool produces the totals for a
 real reconciled statement — that is the domain's event to record, not this
 plan's, and this plan does not tick it.
+
+**Status after the build: one item outstanding, deliberately.** The framework
+half is complete and released. Adoption is a domain-side event in a private
+repo, and the plan stays `in-progress` until it happens rather than closing on
+a capability nobody has used yet — `existence-is-not-currency` applies to the
+floor's own features. The first real statement ingestion closes it.

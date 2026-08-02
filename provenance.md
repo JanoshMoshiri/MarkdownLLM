@@ -176,6 +176,28 @@ point — capture everything), may reason *about* them ("this statement appears 
 show…"), and must *surface* unverified things blocking a decision rather than
 quietly using them.
 
+### The Calculation Half, Made Mechanical
+
+Since v3.25.0 the "no calculation" clause is arithmetic rather than prose.
+Declared derivations (`computed:`, thing.md) are evaluated by `mdllm calc`, and
+the rule binds in two different ways depending on where the inputs come from:
+
+- **Within the thing itself** — computing the totals of an unverified statement
+  is *allowed*, because that is precisely how a human comes to verify it.
+  Forbidding it would forbid the reconciliation the quarantine exists to
+  require. Every line of the report is stamped `UNVERIFIED` instead, so a
+  provisional figure cannot be lifted out of its context unseen.
+- **Across the corpus** — a `things(...)` selection **excludes** quarantined
+  things from the aggregate **and names each one**, citing this rule. Silent
+  exclusion would be the worse failure: a total that dropped its evidence
+  without saying so reads exactly like a total that had none to drop. A
+  `verified: true` external thing is included, which is what the flip is for.
+
+The same instinct governs two neighbouring exclusions: a thing is excluded from
+its own selection (a derivation must not draw on the figure it derives), and a
+selected thing lacking the field refuses with the ids rather than quietly
+returning a smaller denominator.
+
 ## Cross-Domain Imports — The Reference Triple
 
 A special case of `origin: external`: content imported from **another domain's

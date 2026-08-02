@@ -32,6 +32,8 @@ linked_things:
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
 
+**Derived figures:** a figure the domain *derives* declares how, in `computed: {field-path: expression}` — the floor evaluates it (`mdllm calc`) and re-checks it at every commit (`validate`: Warning, Error under `options: {computed: strict}`). The assertion stays in place; the derivation sits beside it. Never assert a total you could declare a derivation for — arithmetic is mechanical, and reasoning gets it wrong silently. Grammar: `docs/calculation-reference.md`.
+
 **Cohesion (one reason to change):** decompose when content serves a different audience, changes at a different rate, or is independently reusable (`instance-of`/`derived-from`/`template-for`/`applies-to` = split). Compose the inverse: one responsibility spread across several things → consolidate into the cohesive survivor and mark the rest `superseded-by` it. Merge duplication, never contradiction.
 
 **Loading:** L1 metadata only · L2 +relationships · L3 full body. Match depth to query; never load everything for a broad question.

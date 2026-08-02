@@ -29,6 +29,8 @@ linked_things:
 
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as missing from the brief (promote/dismiss/list). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 
+**Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; you transcribe and reason about the result, you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
+
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 <!-- /kernel -->
 

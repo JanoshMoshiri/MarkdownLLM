@@ -69,7 +69,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>23 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>24 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -198,6 +198,7 @@ flowchart LR
         C21["boundary"]
         C22["estate-check"]
         C23["estate-sync"]
+        C24["calc"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -223,6 +224,7 @@ flowchart LR
         T21["local .boundary-terms<br/>disclosure boundary (never committed)"]
         T22["mcp-domain-server.md<br/>estate batching — operator axis"]
         T23["git-workflow.md<br/>The Machine Axis — sync before orienting"]
+        T24["thing.md<br/>declared derivations — the floor does every sum"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -248,6 +250,7 @@ flowchart LR
     C21 -->|"blocks crossings of"| T21
     C22 -->|"batches imports-check for"| T22
     C23 -->|"fetch + ff-only pull for"| T23
+    C24 -->|"computes and re-checks"| T24
 ```
 
 Notes on this view:

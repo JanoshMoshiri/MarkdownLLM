@@ -3,11 +3,11 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-01
-generated: 2026-08-01T19:47:19
-generated_from: HEAD@7b7f04b
+created: 2026-08-02
+generated: 2026-08-02T18:59:55
+generated_from: HEAD@d727e3d
 coverage: 6
-framework_version: 3.24.0
+framework_version: 3.25.0
 ---
 
 # Framework Operative Kernel
@@ -30,6 +30,8 @@ the framework or when the kernel says to. Regenerate after any spec change.
 **Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
+
+**Derived figures:** a figure the domain *derives* declares how, in `computed: {field-path: expression}` — the floor evaluates it (`mdllm calc`) and re-checks it at every commit (`validate`: Warning, Error under `options: {computed: strict}`). The assertion stays in place; the derivation sits beside it. Never assert a total you could declare a derivation for — arithmetic is mechanical, and reasoning gets it wrong silently. Grammar: `docs/calculation-reference.md`.
 
 **Cohesion (one reason to change):** decompose when content serves a different audience, changes at a different rate, or is independently reusable (`instance-of`/`derived-from`/`template-for`/`applies-to` = split). Compose the inverse: one responsibility spread across several things → consolidate into the cohesive survivor and mark the rest `superseded-by` it. Merge duplication, never contradiction.
 
@@ -56,6 +58,8 @@ the framework or when the kernel says to. Regenerate after any spec change.
 **Mechanical validation is the tool's job:** `python {framework_root}/tools/mdllm.py validate <path>` — structure, references, schema conformance, index integrity. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
 
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as missing from the brief (promote/dismiss/list). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
+
+**Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; you transcribe and reason about the result, you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 

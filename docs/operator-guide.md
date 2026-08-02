@@ -186,6 +186,7 @@ to invoke directly.
 | `triggers --estate` | The attention sweep: per-domain trigger evaluation over the same local-clone walk, with a roll-up (fired / not-evaluable per domain) | After `estate-sync`, when the question is "what needs doing across the estate?" |
 | `estate-sync [root]` | Fetch + ff-only pull across the estate's repos (root + `domain(s)/*`); divergence reported never resolved; never pushes; `--status` = publication debt from cached refs, no network | Session start (the adapter runs it before orientation); `--status` at session end |
 | `boundary [path] [--history]` | Disclosure-boundary check of staged content/filenames/commit messages against the local gitignored `.boundary-terms` (absent ⇒ no-op) | Before any publication event, `--history` for a full-archive audit |
+| `calc [path] [--thing ID] [--expr E]` | Evaluates declared derivations (`computed:` blocks): sums a body table, a frontmatter list, or a field across selected things; reports, never writes; exit 1 on disagreement. `validate` re-checks the same blocks at every commit | Ingesting a statement or preparing a return — the tool does every sum; `--expr` for an ad-hoc pivot. Grammar: `docs/calculation-reference.md` |
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
 
