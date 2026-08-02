@@ -282,7 +282,10 @@ def test_calc_expr_in_a_things_context_is_the_pivot(tmp_path, capsys):
         "rows:\n  - amount: 10.00\n  - amount: 5.50\n"))
     rc = mdllm.cmd_calc(_ns(path=str(tmp_path), thing="statement-jan",
                             expr="sum(rows.amount)"))
-    assert rc == 0 and capsys.readouterr().out.strip() == "15.5"
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert out.splitlines()[0] == "15.5"
+    assert "sum over 2 value(s)" in out
 
 
 def test_calc_on_an_empty_corpus_explains_rather_than_reporting_nothing(tmp_path, capsys):
@@ -296,3 +299,133 @@ def test_calc_on_an_empty_corpus_explains_rather_than_reporting_nothing(tmp_path
 def test_calc_names_a_missing_thing(tmp_path, capsys):
     rc = mdllm.cmd_calc(_ns(path=str(tmp_path), thing="ghost", expr=None))
     assert rc == 1 and "no thing with id `ghost`" in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------- tables
+
+
+STATEMENT_BODY = """
+# Statement — January
+
+Narrative that is not a table.
+
+## Transactions
+
+| Date       | Description        | Category | Amount (£) |
+|------------|--------------------|----------|-----------:|
+| 2026-01-03 | ESSO FORECOURT     | Fuel     |      45.60 |
+| 2026-01-07 | TESCO STORES       | Food     |      82.10 |
+| 2026-01-19 | SHELL              | fuel     |      38.40 |
+| 2026-01-24 | RENT               | Housing  |   1,200.00 |
+| 2026-01-28 | REFUND             | Food     |    (12.50) |
+
+## Summary
+
+| Metric | Value |
+|--------|------:|
+| Rows   |     5 |
+"""
+
+
+def test_a_table_is_found_by_its_nearest_preceding_heading():
+    assert ev('sum(table("Transactions")["Amount (£)"])', {}, STATEMENT_BODY) \
+        == Decimal("1353.60")
+    assert ev('sum(table("Summary").Value)', {}, STATEMENT_BODY) == Decimal(5)
+
+
+def test_a_column_is_reachable_without_carrying_the_currency_symbol():
+    # `.Amount` reaches a header written `Amount (£)` — the expression should
+    # not have to reproduce the table's presentation.
+    assert ev('sum(table("Transactions").Amount)', {}, STATEMENT_BODY) \
+        == Decimal("1353.60")
+
+
+def test_a_table_is_findable_by_position_when_headings_do_not_serve():
+    assert ev('count(table(1).Category)', {}, STATEMENT_BODY) == Decimal(5)
+    assert ev('sum(table(2).Value)', {}, STATEMENT_BODY) == Decimal(5)
+
+
+def test_accounting_parentheses_and_thousands_separators_parse_in_cells():
+    assert ev('sum(table("Transactions").Amount[Category == "Food"])',
+              {}, STATEMENT_BODY) == Decimal("69.60")
+
+
+def test_a_filter_selects_one_column_by_another_case_insensitively():
+    # `Fuel` and `fuel` are the same category; a filter that disagreed would
+    # under-count without ever saying so.
+    assert ev('sum(table("Transactions").Amount[Category == "Fuel"])',
+              {}, STATEMENT_BODY) == Decimal("84.00")
+    assert ev('count(table("Transactions").Amount[Category == "Fuel"])',
+              {}, STATEMENT_BODY) == Decimal(2)
+
+
+def test_filters_join_with_and_or_and_compare_numerically():
+    b = STATEMENT_BODY
+    assert ev('count(table("Transactions").Amount[Amount > 100])', {}, b) == Decimal(1)
+    assert ev('count(table("Transactions").Amount'
+              '[Category == "Food" and Amount > 0])', {}, b) == Decimal(1)
+    assert ev('count(table("Transactions").Amount'
+              '[Category == "Fuel" or Category == "Housing"])', {}, b) == Decimal(3)
+    assert ev('count(table("Transactions").Amount[Category != "Food"])', {}, b) == Decimal(3)
+
+
+def test_a_filter_can_compare_a_row_against_a_declared_figure():
+    meta = {"limits": {"large": 100}}
+    assert ev('count(table("Transactions").Amount[Amount > limits.large])',
+              meta, STATEMENT_BODY) == Decimal(1)
+
+
+def test_a_missing_column_lists_the_columns_there_are():
+    with pytest.raises(mdllm.CalcError) as e:
+        ev('sum(table("Transactions").Credit)', {}, STATEMENT_BODY)
+    assert "no column `Credit`" in str(e.value) and "Category" in str(e.value)
+
+
+def test_a_heading_matching_several_tables_refuses_to_pick_one():
+    body = "## Spend\n\n| A |\n|---|\n| 1 |\n\n## Spend\n\n| A |\n|---|\n| 2 |\n"
+    with pytest.raises(mdllm.CalcError) as e:
+        ev('sum(table("Spend").A)', {}, body)
+    assert "matches 2 tables" in str(e.value)
+
+
+def test_a_missing_heading_lists_the_headings_there_are():
+    with pytest.raises(mdllm.CalcError) as e:
+        ev('sum(table("Invoices").Amount)', {}, STATEMENT_BODY)
+    assert "no table under a heading" in str(e.value) and "Transactions" in str(e.value)
+
+
+def test_a_body_with_no_table_says_so():
+    with pytest.raises(mdllm.CalcError) as e:
+        ev('sum(table(1).Amount)', {}, "# Just prose\n\nNo table here.\n")
+    assert "no markdown table" in str(e.value)
+
+
+def test_bold_cells_are_still_numbers():
+    body = "## T\n\n| Item | Net |\n|---|---:|\n| a | **£16.80** |\n| b | `3.20` |\n"
+    assert ev('sum(table("T").Net)', {}, body) == Decimal("20.00")
+
+
+def test_a_frontmatter_list_cannot_be_filtered_and_says_why():
+    with pytest.raises(mdllm.CalcError) as e:
+        ev('sum(rows.x[y == 1])', {"rows": [{"x": 1, "y": 1}]})
+    assert "not a table column" in str(e.value)
+
+
+def test_aggregates_report_the_denominator_they_ran_over():
+    # A confident zero from a filter that matched nothing is the hazard; the
+    # count travels with the figure.
+    c = ctx({}, STATEMENT_BODY)
+    mdllm.evaluate_expression('sum(table("Transactions").Amount[Category == "Nothing"])', c)
+    assert any("over 0 value(s)" in n for n in c.notes)
+
+
+def test_calc_prints_the_denominator_in_a_block_report(tmp_path, capsys):
+    write(tmp_path, "things/stmt.md", thing_text(
+        "id: statement-jan\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total_spend: 84.00\n"
+        "computed:\n  total_spend: 'sum(table(\"Transactions\").Amount[Category == \"Fuel\"])'",
+        STATEMENT_BODY))
+    rc = mdllm.cmd_calc(_ns(path=str(tmp_path), thing="statement-jan", expr=None))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "agrees" in out and "sum over 2 value(s)" in out

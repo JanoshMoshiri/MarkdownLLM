@@ -73,9 +73,15 @@ class Column:
     """An ordered set of values drawn from one source — a frontmatter list, a
     table column, a field across many things. Aggregates take these; scalars
     do not. `source` names where it came from, for error messages that point
-    at the corpus rather than at the expression."""
+    at the corpus rather than at the expression.
+
+    `owner`/`row_ids` are set when the column came from a table, so a filter
+    can evaluate a predicate against the *other* columns of the same rows.
+    """
     values: list
     source: str
+    owner: object | None = None
+    row_ids: list | None = None
 
     def __len__(self) -> int:
         return len(self.values)
@@ -198,6 +204,136 @@ def resolve_path(meta: dict, path: str):
     return cur
 
 
+# ---------------------------------------------------------------- tables
+
+
+@dataclass
+class Table:
+    """One markdown table from a thing's body.
+
+    Line-item detail belongs in the body, not in frontmatter and not as one
+    thing per row — a transaction has one identity and *zero* reasons to
+    change, so it is data, not a thing. That ruling is only safe if the floor
+    can do arithmetic over the body, which is what this is.
+    """
+    headers: list
+    rows: list
+    heading: str
+    index: int
+
+    @property
+    def source(self) -> str:
+        return f'table {self.index}' + (f' ("{self.heading}")' if self.heading else "")
+
+    def header_index(self, name: str) -> int:
+        """Match a column name to a header, tolerantly but never ambiguously.
+
+        Exact first, then case-insensitively, then ignoring everything that is
+        not alphanumeric — so `.Amount` reaches a header written `Amount (£)`
+        without the expression having to carry a currency symbol. Two matches
+        is an error, not a guess: picking one silently is how the wrong column
+        gets summed.
+        """
+        def norm(s):
+            return "".join(ch for ch in str(s).lower() if ch.isalnum())
+        for candidates in (
+            [i for i, h in enumerate(self.headers) if h == name],
+            [i for i, h in enumerate(self.headers) if h.lower() == str(name).lower()],
+            [i for i, h in enumerate(self.headers) if norm(h) == norm(name)],
+        ):
+            if len(candidates) == 1:
+                return candidates[0]
+            if len(candidates) > 1:
+                raise CalcError(
+                    f"`{name}` matches {len(candidates)} columns of "
+                    f"{self.source} — name it exactly")
+        raise CalcError(
+            f"{self.source} has no column `{name}` (columns: "
+            f"{', '.join(repr(h) for h in self.headers)})")
+
+    def column(self, name) -> Column:
+        i = self.header_index(name)
+        return Column([r[i] for r in self.rows],
+                      f"{self.source}.{self.headers[i]}",
+                      owner=self, row_ids=list(range(len(self.rows))))
+
+    def cell(self, row_id: int, name):
+        return self.rows[row_id][self.header_index(name)]
+
+
+# Emphasis is presentation; a bolded total is still a number. Stripped at the
+# edges only, so a value containing one of these is left intact.
+_CELL_TRIM = "*_` "
+
+
+def parse_tables(body: str) -> list:
+    """Every markdown table in a body, in order, each tagged with the nearest
+    preceding heading — which is how a derivation names one in prose terms
+    (`table("Transactions")`) rather than by counting."""
+    tables: list = []
+    heading = ""
+    lines = body.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i].strip()
+        if line.startswith("#"):
+            heading = line.lstrip("#").strip()
+            i += 1
+            continue
+        if line.startswith("|") and i + 1 < len(lines):
+            sep = lines[i + 1].strip()
+            cells = _split_row(sep)
+            if cells and all(set(c) <= set("-: ") and "-" in c for c in cells):
+                headers = _split_row(line)
+                rows = []
+                j = i + 2
+                while j < len(lines) and lines[j].strip().startswith("|"):
+                    r = _split_row(lines[j])
+                    # Pad or trim to the header width: a ragged row is the
+                    # table's problem, and dropping it silently would change
+                    # the denominator of every aggregate over it.
+                    if len(r) < len(headers):
+                        r = r + [""] * (len(headers) - len(r))
+                    rows.append(r[:len(headers)])
+                    j += 1
+                tables.append(Table(headers, rows, heading, len(tables) + 1))
+                i = j
+                continue
+        i += 1
+    return tables
+
+
+def _split_row(line: str) -> list:
+    s = line.strip()
+    if s.startswith("|"):
+        s = s[1:]
+    if s.endswith("|"):
+        s = s[:-1]
+    return [c.strip().strip(_CELL_TRIM).strip() for c in s.split("|")]
+
+
+def find_table(ctx: Context, selector) -> Table:
+    tables = parse_tables(ctx.body)
+    if not tables:
+        raise CalcError("this thing's body has no markdown table")
+    if isinstance(selector, Decimal):
+        n = int(selector)
+        if n < 1 or n > len(tables):
+            raise CalcError(
+                f"table({n}) — this body has {len(tables)} table(s)")
+        return tables[n - 1]
+    want = str(selector).strip().lower()
+    hits = [t for t in tables if want in t.heading.lower()]
+    if len(hits) == 1:
+        return hits[0]
+    if not hits:
+        raise CalcError(
+            f'no table under a heading matching "{selector}" (headings: '
+            f'{", ".join(repr(t.heading) for t in tables)})')
+    raise CalcError(
+        f'"{selector}" matches {len(hits)} tables — use table(n) by position')
+
+
 def set_path(meta: dict, path: str):
     """The asserted sibling of a derivation, or a sentinel when absent.
 
@@ -222,8 +358,20 @@ def _column(arg, fname: str) -> Column:
     raise CalcError(f"{fname}() takes a set of values, got a single value")
 
 
+def _note(ctx: Context, fname: str, c: Column) -> None:
+    """Record the denominator every aggregate ran over.
+
+    A total says nothing about how many values went into it, and a filter that
+    silently matched nothing produces a confident zero. The count travels with
+    the figure so the operator sees `sum over 2 value(s)` rather than having
+    to trust it.
+    """
+    ctx.notes.append(f"{fname} over {len(c)} value(s) from {c.source}")
+
+
 def _fn_sum(ctx: Context, col) -> Decimal:
     c = _column(col, "sum")
+    _note(ctx, "sum", c)
     total = Decimal(0)
     for i, v in enumerate(c.values):
         total += to_decimal(v, f"{c.source}[{i}]")
@@ -231,20 +379,27 @@ def _fn_sum(ctx: Context, col) -> Decimal:
 
 
 def _fn_count(ctx: Context, col) -> Decimal:
-    return Decimal(len(_column(col, "count")))
+    c = _column(col, "count")
+    _note(ctx, "count", c)
+    return Decimal(len(c))
 
 
 def _fn_avg(ctx: Context, col) -> Decimal:
     c = _column(col, "avg")
     if not c.values:
         raise CalcError("avg() over an empty set has no value")
-    return _fn_sum(ctx, c) / Decimal(len(c.values))
+    _note(ctx, "avg", c)
+    total = Decimal(0)
+    for i, v in enumerate(c.values):
+        total += to_decimal(v, f"{c.source}[{i}]")
+    return total / Decimal(len(c.values))
 
 
 def _fn_min(ctx: Context, col) -> Decimal:
     c = _column(col, "min")
     if not c.values:
         raise CalcError("min() over an empty set has no value")
+    _note(ctx, "min", c)
     return min(to_decimal(v, f"{c.source}[{i}]") for i, v in enumerate(c.values))
 
 
@@ -252,6 +407,7 @@ def _fn_max(ctx: Context, col) -> Decimal:
     c = _column(col, "max")
     if not c.values:
         raise CalcError("max() over an empty set has no value")
+    _note(ctx, "max", c)
     return max(to_decimal(v, f"{c.source}[{i}]") for i, v in enumerate(c.values))
 
 
@@ -326,7 +482,12 @@ def _eval_node(node: ast.AST, ctx: Context):
     if isinstance(node, (ast.Name, ast.Attribute)):
         path = _dotted(node)
         if path is None:
-            raise CalcError("unsupported reference")
+            # Not a frontmatter path — the base is an expression of its own,
+            # e.g. `table("Transactions").Amount`.
+            base = _eval_node(node.value, ctx)
+            if isinstance(base, Table):
+                return base.column(node.attr)
+            raise CalcError(f"cannot read `{node.attr}` from that value")
         v = resolve_path(ctx.meta, path)
         # A numeric scalar becomes Decimal here, at the boundary, so no float
         # ever travels further into the evaluator. Text stays text (filters
@@ -366,6 +527,11 @@ def _eval_node(node: ast.AST, ctx: Context):
         fname = node.func.id
         if node.keywords and fname not in ("things",):
             raise CalcError(f"{fname}() takes no keyword arguments")
+        if fname == "table":
+            args = [_eval_node(a, ctx) for a in node.args]
+            if len(args) != 1:
+                raise CalcError('table() takes one argument: a heading or a position')
+            return find_table(ctx, args[0])
         if fname in FUNCTIONS:
             args = [_eval_node(a, ctx) for a in node.args]
             fn = FUNCTIONS[fname]
@@ -377,7 +543,104 @@ def _eval_node(node: ast.AST, ctx: Context):
             f"unknown function `{fname}()` "
             f"(available: {', '.join(sorted(FUNCTIONS))})")
 
+    if isinstance(node, ast.Subscript):
+        base = _eval_node(node.value, ctx)
+        idx = node.slice
+        # Two distinct meanings, told apart by the *shape* of the index and
+        # never guessed: a string names a column, a comparison filters rows.
+        if isinstance(base, Table):
+            if isinstance(idx, ast.Constant) and isinstance(idx.value, str):
+                return base.column(idx.value)
+            raise CalcError('a table is subscripted by column name, e.g. '
+                            'table("T")["Amount (£)"]')
+        if isinstance(base, Column):
+            if isinstance(idx, (ast.Compare, ast.BoolOp)):
+                return _filter_column(base, idx, ctx)
+            raise CalcError("a set of values is subscripted by a condition, "
+                            'e.g. .Amount[Category == "Fuel"]')
+        raise CalcError("only a table or a set of values can be subscripted")
+
     raise CalcError(f"unsupported expression element `{type(node).__name__}`")
+
+
+# ---------------------------------------------------------------- filters
+
+
+_CMPS = {ast.Eq: "==", ast.NotEq: "!=", ast.Lt: "<",
+         ast.LtE: "<=", ast.Gt: ">", ast.GtE: ">="}
+
+
+def _filter_column(col: Column, pred: ast.AST, ctx: Context) -> Column:
+    """Keep the rows of a table column whose row satisfies a condition.
+
+    The predicate reads the *other* columns of the same row, which is the
+    whole point: `table("Transactions").Amount[Category == "Fuel"]` sums one
+    column selected by another. Only a table column can be filtered — a
+    frontmatter list has no sibling row to test.
+    """
+    if col.owner is None or col.row_ids is None:
+        raise CalcError(f"`{col.source}` is not a table column, so there are "
+                        f"no rows to filter")
+    keep_vals, keep_ids = [], []
+    for pos, rid in enumerate(col.row_ids):
+        if _eval_pred(pred, col.owner, rid, ctx):
+            keep_vals.append(col.values[pos])
+            keep_ids.append(rid)
+    return Column(keep_vals, f"{col.source} (filtered)",
+                  owner=col.owner, row_ids=keep_ids)
+
+
+def _eval_pred(node: ast.AST, table: Table, row_id: int, ctx: Context) -> bool:
+    if isinstance(node, ast.BoolOp):
+        results = [_eval_pred(v, table, row_id, ctx) for v in node.values]
+        return all(results) if isinstance(node.op, ast.And) else any(results)
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+        return not _eval_pred(node.operand, table, row_id, ctx)
+    if not isinstance(node, ast.Compare):
+        raise CalcError("a filter is a comparison, optionally joined by and/or")
+    if len(node.ops) != 1:
+        raise CalcError("chained comparisons are not evaluated — join them "
+                        "with `and` so each side is explicit")
+    op = type(node.ops[0])
+    if op not in _CMPS:
+        raise CalcError(f"unsupported comparison `{type(node.ops[0]).__name__}`")
+    left = _pred_operand(node.left, table, row_id, ctx)
+    right = _pred_operand(node.comparators[0], table, row_id, ctx)
+    return _compare(left, right, op, _CMPS[op])
+
+
+def _pred_operand(node: ast.AST, table: Table, row_id: int, ctx: Context):
+    """Inside a filter, a bare name is this row's cell in that column. Frontmatter
+    is still reachable by dotted path, so a row can be compared against a
+    figure the thing declares (`Amount > limits.large`)."""
+    if isinstance(node, ast.Name):
+        return table.cell(row_id, node.id)
+    if isinstance(node, ast.Constant):
+        if isinstance(node.value, str):
+            return node.value
+        if isinstance(node.value, (int, float)) and not isinstance(node.value, bool):
+            return to_decimal(node.value)
+        raise CalcError(f"{node.value!r} cannot appear in a filter")
+    return _eval_node(node, ctx)
+
+
+def _compare(left, right, op, symbol: str) -> bool:
+    try:
+        ln, rn = to_decimal(left), to_decimal(right)
+        numeric = True
+    except CalcError:
+        numeric = False
+    if numeric:
+        return {"==": ln == rn, "!=": ln != rn, "<": ln < rn,
+                "<=": ln <= rn, ">": ln > rn, ">=": ln >= rn}[symbol]
+    ls, rs = str(left).strip(), str(right).strip()
+    if symbol in ("==", "!="):
+        # Case-insensitive: a category typed `Fuel` in one row and `fuel` in
+        # the next is the same category, and a filter that quietly disagreed
+        # would under-count without ever saying so.
+        eq = ls.casefold() == rs.casefold()
+        return eq if symbol == "==" else not eq
+    raise CalcError(f"cannot order text: {ls!r} {symbol} {rs!r}")
 
 
 # ---------------------------------------------------------------- the block
@@ -394,6 +657,11 @@ class Derivation:
     error: str | None = None
     asserted_found: bool = False
     asserted: object = None
+    notes: list = None  # type: ignore[assignment]
+
+    def __post_init__(self):
+        if self.notes is None:
+            self.notes = []
 
     @property
     def agrees(self) -> bool | None:
@@ -417,6 +685,7 @@ def evaluate_block(thing_meta: dict, ctx: Context) -> list[Derivation]:
     out: list[Derivation] = []
     for target, expr in block.items():
         d = Derivation(target=str(target), expr=str(expr) if expr is not None else "")
+        ctx.notes.clear()  # each derivation reports its own denominators
         try:
             v = evaluate_expression(d.expr, ctx)
             if isinstance(v, Column):
@@ -426,6 +695,7 @@ def evaluate_block(thing_meta: dict, ctx: Context) -> list[Derivation]:
             d.value = v
         except CalcError as e:
             d.error = str(e)
+        d.notes = list(ctx.notes)
         d.asserted_found, d.asserted = set_path(thing_meta, d.target)
         out.append(d)
     return out
@@ -462,8 +732,8 @@ def _report(thing, ctx: Context, derivations: list[Derivation]) -> tuple[int, in
         else:
             line += "   (no asserted value — the derivation stands alone)"
         print(line)
-    for note in ctx.notes:
-        print(f"  note: {note}")
+        for note in d.notes:
+            print(f"    {note}")
     print()
     return bad, errs
 
