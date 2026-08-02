@@ -112,13 +112,16 @@ When updating a thing:
 
 **Ask the user for clarification when:**
 - The request is ambiguous and could mean multiple things
-- The change would have significant cascading effects
+- The change would have significant cascading effects on other things
+- The request conflicts with the domain's principles
 - You'd need to delete or cancel existing things
+- You don't have enough context from the thing files to be confident
 
 **Proceed without asking when:**
 - The intent is clear and the change is straightforward
 - You're creating something new with no conflicts
 - You're updating status based on explicit user input
+- The change is contained to one thing and domain patterns support it
 
 ## Post-Write Validation
 
@@ -140,16 +143,6 @@ After validated writes, commit with structured messages:
 - `batch: [description]` — Multiple related changes in one commit
 
 Each commit should represent one logical change to domain state.
-- The request conflicts with domain principles
-- Multiple interpretations exist
-- The impact on other things is significant
-- The user hasn't provided enough context
-
-**Proceed confidently when:**
-- The request clearly follows domain patterns
-- You have sufficient context from thing files
-- The update is contained to one thing
-- Domain reasoning patterns support the action
 
 ## Domain-Specific Decision Rules
 
