@@ -117,9 +117,19 @@ classes. Order of felt-ness:
       from the birth-day description (the regulated deployment's lesson:
       skills harvested from insights held; skills written from a stated
       scope reproduced the gap).
-- [ ] **Refresh debtors** (five domains, seen 3.14–3.17.5): refresh
-      adopt → seal; backfill pre-v3.20 artifacts (boundary file, gitignore)
-      where scaffold predates them.
+- [x] **Refresh debtors**: refresh adopt → seal; backfill pre-v3.20 artifacts
+      (boundary file, gitignore) where scaffold predates them. *(Done
+      2026-08-02: all twelve domains taken to v3.24.0, not just the five
+      debtors — the v3.24.0 birth-surface work made every domain a debtor.
+      Nine kernel-shaped domains also received the reasoning prompts, the
+      estate-sync adapter entry and the generated `types` block; the three
+      that opted out of managed blocks got the seal and pre-v3.20 backfill
+      only — delivering prompts they never referenced would manufacture
+      usage. Two stale schema indexes re-pinned. Whole estate published.
+      The pass surfaced a framework defect of its own: adopting the
+      framework's prompts flagged a domain 24× for the framework's own
+      field names, fixed by registering the reserved prompt contract in
+      CORE_FIELDS.)*
 - [ ] **Status-vocabulary reconciliation** in the domain whose skills
       disagree with its schema on every type — a latent commit-blocker;
       revise the skills to the schema (the schema is the ruled surface).
