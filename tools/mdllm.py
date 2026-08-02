@@ -40,6 +40,11 @@ from markdownllm.triggers import evaluate, cmd_triggers
 from markdownllm.indexes import (
     INDEX_FILES, build_index_body, index_drift_findings, cmd_index,
 )
+from markdownllm.calc import (
+    CalcError, Column, Context, Derivation,
+    to_decimal, fmt, values_equal, resolve_path, set_path,
+    evaluate_expression, evaluate_block, is_quarantined, context_for, cmd_calc,
+)
 from markdownllm.touchpoints import cmd_touchpoints
 from markdownllm.cascade import cmd_cascade
 from markdownllm.tokens import cmd_tokens

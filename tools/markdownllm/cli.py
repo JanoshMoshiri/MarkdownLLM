@@ -15,6 +15,10 @@ Subcommands:
   touchpoints <id> [path]  Assimilate beat (change-reconciliation): the declared
                        inbound set + literal references for one thing — "what did
                        I just put at risk?". Human-invoked, never hooked; live.
+  calc     [path] [--thing ID] [--expr E]  Evaluate declared derivations
+                       (`computed:` blocks): the floor does every sum, so a
+                       figure is computed rather than asserted. Reports, never
+                       writes. Exit 1 on disagreement or non-evaluability.
   cascade  <id> [path] Post-completion cascade (write.thing.md): the declared
                        downstream set a thing's completion unblocks — "what did I
                        just unblock?". Mirror of touchpoints; reports, never applies.
@@ -43,6 +47,7 @@ import argparse
 import sys
 
 from .boundary import cmd_boundary
+from .calc import cmd_calc
 from .cascade import cmd_cascade
 from .coherence import cmd_coherence
 from .doctor import cmd_doctor
@@ -103,6 +108,16 @@ def build_cli() -> argparse.ArgumentParser:
     cs.add_argument("id", help="the thing id that just reached a terminal status")
     cs.add_argument("path", nargs="?", default=".")
     cs.set_defaults(fn=cmd_cascade)
+
+    ca = sub.add_parser("calc", help="evaluate declared derivations (`computed:` "
+                                     "blocks) — the floor does every sum; reports, "
+                                     "never writes")
+    ca.add_argument("path", nargs="?", default=".")
+    ca.add_argument("--thing", metavar="ID", help="one thing's block, or the "
+                    "context an --expr is evaluated in")
+    ca.add_argument("--expr", metavar="E", help="an ad-hoc expression; with "
+                    "--thing it reads that thing, without one it is pure arithmetic")
+    ca.set_defaults(fn=cmd_calc)
 
     pv = sub.add_parser("provenance", help="validate provenance chains (provenance.md)")
     pv.add_argument("path", nargs="?", default=".")
