@@ -623,7 +623,47 @@ def validate_corpus(root: Path) -> tuple[Corpus, list[Finding]]:
         findings.extend(validate_level1(t, corpus.schema))
     findings.extend(validate_level2(corpus))
     findings.extend(validate_level3(corpus))
+    findings.extend(derivation_findings(corpus))
     return corpus, findings
+
+
+def derivation_findings(corpus: Corpus) -> list[Finding]:
+    """A figure must still agree with the derivation it declares (calc.py).
+
+    An asserted total drifts the moment a line item changes and the total does
+    not. Nothing could ever catch that, because nothing knew how the total was
+    reached. A `computed:` block says how, and this re-runs it at every commit.
+
+    Severity: Warning by default, `options: {computed: strict}` in
+    _schema.yaml raises disagreement to Error (the pre-commit hook then
+    blocks). Warning is the default deliberately — a filed return whose box is
+    arithmetically odd but is *what was actually filed* must stay recordable;
+    recorded truth outranks internal consistency, and only the domain knows
+    which of its figures are its own to reconcile.
+
+    Non-evaluability is always a Warning and never silent: an expression the
+    floor cannot run is a check the operator believes is running.
+
+    Quiet when healthy: a domain that declares no derivation gets no finding,
+    and one whose figures agree gets no finding either.
+    """
+    from .calc import context_for, evaluate_block, fmt
+
+    strict = ((corpus.schema or {}).get("options") or {}).get("computed") == "strict"
+    out: list[Finding] = []
+    for t in corpus.things:
+        if not isinstance(t.meta.get("computed"), dict):
+            continue
+        name = t.id or t.path.name
+        for d in evaluate_block(t.meta, context_for(t, corpus)):
+            if d.error is not None:
+                out.append(Finding(SEV_WARNING, name,
+                           f"`computed.{d.target}` is not evaluable: {d.error}"))
+            elif d.agrees is False:
+                out.append(Finding(SEV_ERROR if strict else SEV_WARNING, name,
+                           f"`{d.target}` is {fmt(d.asserted)} but its own "
+                           f"derivation `{d.expr}` computes {fmt(d.value)}"))
+    return out
 
 
 def example_corpora(root: Path) -> list[Path]:

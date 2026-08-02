@@ -150,6 +150,11 @@ CORE_FIELDS = {
     "linked_things", "dependencies", "blocks", "parent", "parties", "definition",
     # triggers & workflow-run cursor
     "triggers", "current_stage", "stages",
+    # declared derivations (calc.py) — how a figure in this thing was reached,
+    # evaluated by `mdllm calc` and re-checked by `validate`. Tool-read and
+    # framework-shipped, so a domain never registers it (criterion 2, the same
+    # ground as the ingestion triple and the prompt contract below).
+    "computed",
     # provenance (provenance.md) — `verified_by` names the human verifier on a
     # `verified: true` flip (ALCOA attributable; verified-flip-enforcement plan);
     # the source triple is the cross-domain import pin `imports-check` reads

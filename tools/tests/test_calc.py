@@ -546,3 +546,93 @@ def test_calc_surfaces_the_quarantine_exclusion_in_the_block_report(tmp_path, ca
     out = capsys.readouterr().out
     assert rc == 0 and "agrees" in out
     assert "EXCLUDED 1 unverified external" in out and "expense-d" in out
+
+
+# ---------------------------------------------------------------- the check
+
+
+def _findings(tmp_path):
+    corpus, _ = mdllm.scan(tmp_path)
+    return mdllm.derivation_findings(corpus)
+
+
+def test_validate_reports_a_figure_that_drifted_from_its_derivation(tmp_path):
+    write(tmp_path, "things/vat.md", thing_text(
+        "id: vat\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 69.00\n"
+        "purchases:\n  - net: 69.00\n  - net: 15.00\n"
+        "computed:\n  total: \"sum(purchases.net)\""))
+    f = _findings(tmp_path)
+    assert len(f) == 1 and f[0].severity == mdllm.SEV_WARNING
+    assert "is 69.0 but its own derivation" in f[0].message
+    assert "computes 84.0" in f[0].message
+
+
+def test_strict_mode_promotes_disagreement_to_an_error(tmp_path):
+    # Mirrors options.quarantine strict — nothing new invented for this.
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\noptions:\n  computed: strict\n"
+          "types:\n  note:\n    statuses: [in-progress]\n")
+    write(tmp_path, "things/vat.md", thing_text(
+        "id: vat\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 69.00\nrows:\n  - net: 84.00\n"
+        "computed:\n  total: \"sum(rows.net)\""))
+    f = _findings(tmp_path)
+    assert len(f) == 1 and f[0].severity == mdllm.SEV_ERROR
+
+
+def test_an_unevaluable_derivation_is_reported_never_silent(tmp_path):
+    write(tmp_path, "things/vat.md", thing_text(
+        "id: vat\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 69.00\n"
+        "computed:\n  total: \"sum(nowhere.net)\""))
+    f = _findings(tmp_path)
+    assert len(f) == 1 and f[0].severity == mdllm.SEV_WARNING
+    assert "not evaluable" in f[0].message and "unknown reference" in f[0].message
+
+
+def test_the_check_is_silent_when_the_figures_agree(tmp_path):
+    write(tmp_path, "things/vat.md", thing_text(
+        "id: vat\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 84.00\nrows:\n  - net: 69.00\n  - net: 15.00\n"
+        "computed:\n  total: \"sum(rows.net)\""))
+    assert _findings(tmp_path) == []
+
+
+def test_the_check_is_silent_on_a_domain_that_declares_nothing(tmp_path):
+    # No opt-in, no findings — a check that fires on healthy state teaches the
+    # operator to skim.
+    write(tmp_path, "things/plain.md", thing_text(
+        "id: plain\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 84.00"))
+    assert _findings(tmp_path) == []
+
+
+def test_computed_is_a_core_field_no_domain_has_to_register(tmp_path):
+    # The framework ships the field and the tool reads it; making a domain
+    # declare it in known_fields would be the framework reaching into domain
+    # schemas.
+    assert "computed" in mdllm.CORE_FIELDS
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\nknown_fields: [total, rows]\n"
+          "types:\n  note:\n    statuses: [in-progress]\n")
+    write(tmp_path, "things/vat.md", thing_text(
+        "id: vat\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 84.00\nrows:\n  - net: 84.00\n"
+        "computed:\n  total: \"sum(rows.net)\""))
+    corpus, _ = mdllm.scan(tmp_path)
+    msgs = " ".join(x.message for x in mdllm.validate_level3(corpus))
+    assert "computed" not in msgs
+
+
+def test_the_check_runs_inside_validate_and_reaches_the_exit_code(tmp_path, capsys):
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\noptions:\n  computed: strict\n"
+          "types:\n  note:\n    statuses: [in-progress]\n")
+    write(tmp_path, "things/vat.md", thing_text(
+        "id: vat\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 1.00\nrows:\n  - net: 84.00\n"
+        "computed:\n  total: \"sum(rows.net)\""))
+    rc = mdllm.cmd_validate(_ns(path=str(tmp_path), quiet=False))
+    out = capsys.readouterr().out
+    assert rc == 1 and "its own derivation" in out
