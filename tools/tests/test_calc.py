@@ -429,3 +429,120 @@ def test_calc_prints_the_denominator_in_a_block_report(tmp_path, capsys):
     out = capsys.readouterr().out
     assert rc == 0
     assert "agrees" in out and "sum over 2 value(s)" in out
+
+
+# ---------------------------------------------------------------- the corpus
+
+
+def _expense_corpus(tmp_path):
+    for n, (amount, tag, verified) in {
+        "expense-a": (45.60, "fy2025", None),
+        "expense-b": (82.10, "fy2025", None),
+        "expense-c": (10.00, "fy2026", None),
+    }.items():
+        write(tmp_path, f"things/{n}.md", thing_text(
+            f"id: {n}\ntype: expense-record\nstatus: in-progress\n"
+            f"created: 2026-08-02\namount: {amount}\ntags: [{tag}]"))
+    return tmp_path
+
+
+def _corpus_ctx(tmp_path, thing_id="period", meta=None):
+    corpus, _ = mdllm.scan(tmp_path)
+    return mdllm.Context(meta=meta or {}, body="", corpus=corpus, thing_id=thing_id)
+
+
+def test_things_aggregates_a_field_across_the_corpus(tmp_path):
+    c = _corpus_ctx(_expense_corpus(tmp_path))
+    total = mdllm.evaluate_expression(
+        'sum(things(type="expense-record").amount)', c)
+    assert total == Decimal("137.70")
+
+
+def test_things_selects_by_tag_membership(tmp_path):
+    c = _corpus_ctx(_expense_corpus(tmp_path))
+    assert mdllm.evaluate_expression(
+        'sum(things(type="expense-record", tag="fy2025").amount)', c) == Decimal("127.70")
+    assert mdllm.evaluate_expression(
+        'count(things(type="expense-record", tag="fy2026"))', c) == Decimal(1)
+
+
+def test_unverified_external_things_are_excluded_and_named(tmp_path):
+    # provenance.md: no calculation may rest on an unverified external thing.
+    # Excluded from the aggregate, never silently — the ids are in the notes.
+    _expense_corpus(tmp_path)
+    write(tmp_path, "things/expense-d.md", thing_text(
+        "id: expense-d\ntype: expense-record\nstatus: in-progress\n"
+        "created: 2026-08-02\namount: 999.99\ntags: [fy2025]\n"
+        "origin: external\nverified: false"))
+    c = _corpus_ctx(tmp_path)
+    total = mdllm.evaluate_expression('sum(things(type="expense-record").amount)', c)
+    assert total == Decimal("137.70")
+    note = " ".join(c.notes)
+    assert "EXCLUDED 1 unverified external" in note and "expense-d" in note
+    assert "provenance.md" in note
+
+
+def test_a_verified_external_thing_is_included(tmp_path):
+    _expense_corpus(tmp_path)
+    write(tmp_path, "things/expense-d.md", thing_text(
+        "id: expense-d\ntype: expense-record\nstatus: in-progress\n"
+        "created: 2026-08-02\namount: 2.30\ntags: [fy2025]\n"
+        "origin: external\nverified: true\nverified_by: a human"))
+    c = _corpus_ctx(tmp_path)
+    assert mdllm.evaluate_expression(
+        'sum(things(type="expense-record").amount)', c) == Decimal("140.00")
+
+
+def test_a_thing_is_excluded_from_its_own_selection(tmp_path):
+    # A derivation must not draw on its own asserted figure.
+    _expense_corpus(tmp_path)
+    c = _corpus_ctx(tmp_path, thing_id="expense-a")
+    total = mdllm.evaluate_expression('sum(things(type="expense-record").amount)', c)
+    assert total == Decimal("92.10")
+    assert any("expense-a" in n and "being calculated" in n for n in c.notes)
+
+
+def test_a_selected_thing_missing_the_field_refuses_rather_than_shrinking(tmp_path):
+    _expense_corpus(tmp_path)
+    write(tmp_path, "things/expense-e.md", thing_text(
+        "id: expense-e\ntype: expense-record\nstatus: in-progress\ncreated: 2026-08-02"))
+    c = _corpus_ctx(tmp_path)
+    with pytest.raises(mdllm.CalcError) as e:
+        mdllm.evaluate_expression('sum(things(type="expense-record").amount)', c)
+    assert "have no `amount`" in str(e.value) and "expense-e" in str(e.value)
+
+
+def test_things_without_criteria_refuses_to_select_the_whole_corpus(tmp_path):
+    c = _corpus_ctx(_expense_corpus(tmp_path))
+    with pytest.raises(mdllm.CalcError) as e:
+        mdllm.evaluate_expression("count(things())", c)
+    assert "name what you mean" in str(e.value)
+
+
+def test_things_needs_a_corpus_and_says_so():
+    with pytest.raises(mdllm.CalcError) as e:
+        ev('sum(things(type="x").amount)', {})
+    assert "needs a corpus" in str(e.value)
+
+
+def test_an_aggregate_other_than_count_over_a_selection_asks_for_a_field(tmp_path):
+    c = _corpus_ctx(_expense_corpus(tmp_path))
+    with pytest.raises(mdllm.CalcError) as e:
+        mdllm.evaluate_expression('sum(things(type="expense-record"))', c)
+    assert "needs a field of the selection" in str(e.value)
+
+
+def test_calc_surfaces_the_quarantine_exclusion_in_the_block_report(tmp_path, capsys):
+    _expense_corpus(tmp_path)
+    write(tmp_path, "things/expense-d.md", thing_text(
+        "id: expense-d\ntype: expense-record\nstatus: in-progress\n"
+        "created: 2026-08-02\namount: 999.99\ntags: [fy2025]\n"
+        "origin: external\nverified: false"))
+    write(tmp_path, "things/period.md", thing_text(
+        "id: period\ntype: period\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 137.70\n"
+        "computed:\n  total: 'sum(things(type=\"expense-record\").amount)'"))
+    rc = mdllm.cmd_calc(_ns(path=str(tmp_path), thing="period", expr=None))
+    out = capsys.readouterr().out
+    assert rc == 0 and "agrees" in out
+    assert "EXCLUDED 1 unverified external" in out and "expense-d" in out

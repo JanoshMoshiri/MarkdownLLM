@@ -204,6 +204,106 @@ def resolve_path(meta: dict, path: str):
     return cur
 
 
+# ---------------------------------------------------------------- the corpus
+
+
+@dataclass
+class ThingSet:
+    """Things selected from the corpus, and the ones deliberately left out.
+
+    `things(type="expense-record", tag="fy2025")` is how a period total draws
+    on the things that make it up rather than on a figure someone typed. The
+    excluded set is not a footnote: `provenance.md` rules that no calculation
+    may rest on an unverified external thing, so quarantined things are kept
+    out of every aggregate — and named individually, because a total that
+    silently dropped its evidence is worse than one that never ran.
+    """
+    things: list
+    selector: str
+    excluded: list  # (id, reason)
+
+    def __len__(self) -> int:
+        return len(self.things)
+
+    def column(self, field: str) -> Column:
+        vals, missing = [], []
+        for t in self.things:
+            if field in t.meta:
+                vals.append(t.meta[field])
+            else:
+                missing.append(t.id or t.path.name)
+        if missing:
+            # Never a smaller denominator by accident: a thing in the selected
+            # set that lacks the field changes what the total means.
+            shown = ", ".join(missing[:5]) + ("…" if len(missing) > 5 else "")
+            raise CalcError(
+                f"{len(missing)} of {len(self.things)} selected thing(s) have "
+                f"no `{field}`: {shown}")
+        return Column(vals, f"{self.selector}.{field}")
+
+
+def select_things(ctx: Context, criteria: dict) -> ThingSet:
+    """Select things by frontmatter equality, with `tag` matching membership.
+
+    Two things are always left out, both of them stated rather than silent:
+    the thing doing the calculating (a derivation must not include its own
+    asserted figure in the set it is derived from), and anything still in
+    external quarantine.
+    """
+    corpus = ctx.corpus
+    if corpus is None or not hasattr(corpus, "things"):
+        raise CalcError("things() needs a corpus — name a thing with --thing, "
+                        "or run calc over a domain path")
+    selector = "things(" + ", ".join(
+        f"{k}={fmt(v)!r}" if not isinstance(v, str) else f"{k}={v!r}"
+        for k, v in criteria.items()) + ")"
+
+    selected, excluded = [], []
+    for t in corpus.things:
+        if not _matches(t.meta, criteria):
+            continue
+        if (t.id or t.path.name) == ctx.thing_id:
+            excluded.append((t.id or t.path.name, "the thing being calculated"))
+            continue
+        if is_quarantined(t.meta):
+            excluded.append((t.id or t.path.name,
+                             "external, not yet verified"))
+            continue
+        selected.append(t)
+
+    quarantined = [i for i, r in excluded if r == "external, not yet verified"]
+    if quarantined:
+        ctx.notes.append(
+            f"EXCLUDED {len(quarantined)} unverified external thing(s) from "
+            f"{selector}: {', '.join(quarantined)} — provenance.md: no "
+            f"calculation may rest on an unverified external thing")
+    for i, r in excluded:
+        if i not in quarantined:
+            ctx.notes.append(f"excluded {i} — {r}")
+    return ThingSet(selected, selector, excluded)
+
+
+def _matches(meta: dict, criteria: dict) -> bool:
+    for key, want in criteria.items():
+        if key == "tag":
+            tags = meta.get("tags") or []
+            if not isinstance(tags, list):
+                return False
+            if not any(_scalar_eq(t, want) for t in tags):
+                return False
+            continue
+        if key not in meta or not _scalar_eq(meta[key], want):
+            return False
+    return True
+
+
+def _scalar_eq(a, b) -> bool:
+    try:
+        return to_decimal(a) == to_decimal(b)
+    except CalcError:
+        return str(a).strip().casefold() == str(b).strip().casefold()
+
+
 # ---------------------------------------------------------------- tables
 
 
@@ -355,6 +455,13 @@ def set_path(meta: dict, path: str):
 def _column(arg, fname: str) -> Column:
     if isinstance(arg, Column):
         return arg
+    if isinstance(arg, ThingSet):
+        # count(things(...)) is the natural question; the other aggregates
+        # need a field, and saying so beats summing a list of ids.
+        if fname != "count":
+            raise CalcError(f"{fname}() needs a field of the selection, "
+                            f"e.g. {fname}({arg.selector}.amount)")
+        return Column([t.id or t.path.name for t in arg.things], arg.selector)
     raise CalcError(f"{fname}() takes a set of values, got a single value")
 
 
@@ -487,6 +594,8 @@ def _eval_node(node: ast.AST, ctx: Context):
             base = _eval_node(node.value, ctx)
             if isinstance(base, Table):
                 return base.column(node.attr)
+            if isinstance(base, ThingSet):
+                return base.column(node.attr)
             raise CalcError(f"cannot read `{node.attr}` from that value")
         v = resolve_path(ctx.meta, path)
         # A numeric scalar becomes Decimal here, at the boundary, so no float
@@ -527,6 +636,19 @@ def _eval_node(node: ast.AST, ctx: Context):
         fname = node.func.id
         if node.keywords and fname not in ("things",):
             raise CalcError(f"{fname}() takes no keyword arguments")
+        if fname == "things":
+            if node.args:
+                raise CalcError("things() selects by named criteria only, "
+                                'e.g. things(type="expense-record", tag="fy2025")')
+            criteria = {}
+            for kw in node.keywords:
+                if kw.arg is None:
+                    raise CalcError("things() does not take **kwargs")
+                criteria[kw.arg] = _eval_node(kw.value, ctx)
+            if not criteria:
+                raise CalcError("things() with no criteria would select the "
+                                "whole corpus — name what you mean")
+            return select_things(ctx, criteria)
         if fname == "table":
             args = [_eval_node(a, ctx) for a in node.args]
             if len(args) != 1:
@@ -553,6 +675,11 @@ def _eval_node(node: ast.AST, ctx: Context):
                 return base.column(idx.value)
             raise CalcError('a table is subscripted by column name, e.g. '
                             'table("T")["Amount (£)"]')
+        if isinstance(base, ThingSet):
+            if isinstance(idx, ast.Constant) and isinstance(idx.value, str):
+                return base.column(idx.value)
+            raise CalcError('a selection is subscripted by field name, e.g. '
+                            'things(type="x")["amount"]')
         if isinstance(base, Column):
             if isinstance(idx, (ast.Compare, ast.BoolOp)):
                 return _filter_column(base, idx, ctx)
