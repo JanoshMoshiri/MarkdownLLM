@@ -383,3 +383,49 @@ bound_to: session-start
 """))
     msgs = messages(all_findings(tmp_path), mdllm.SEV_WARNING)
     assert not any("not in CORE_FIELDS" in m for m in msgs)
+
+
+def test_stable_thing_newly_added_is_not_flagged_as_churned(tmp_path):
+    # A `stable` thing that ARRIVED in the window was born, not churned —
+    # delivering framework-shipped stable things must not report as drift.
+    write(tmp_path, "things/a.md", thing_text("""\
+id: a
+type: task
+status: in-progress
+created: 2026-06-01
+"""))
+    _git(tmp_path, "init", "-q")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "create: a")
+    write(tmp_path, "prompts/p.md", thing_text("""\
+id: p
+type: prompt
+status: stable
+created: 2026-06-01
+"""))
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "backfill: p")
+    msgs = [f.message for f in mdllm.coherence_findings(tmp_path, 15)]
+    assert not any("marked `stable` but changed" in m for m in msgs)
+
+
+def test_stable_thing_actually_edited_is_still_flagged(tmp_path):
+    write(tmp_path, "things/s.md", thing_text("""\
+id: s
+type: prompt
+status: stable
+created: 2026-06-01
+"""))
+    _git(tmp_path, "init", "-q")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "create: s")
+    write(tmp_path, "things/s.md", thing_text("""\
+id: s
+type: prompt
+status: stable
+created: 2026-06-01
+""", body="# Title\n\nEdited body.\n"))
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "edit: s")
+    msgs = [f.message for f in mdllm.coherence_findings(tmp_path, 15)]
+    assert any("marked `stable` but changed" in m for m in msgs)

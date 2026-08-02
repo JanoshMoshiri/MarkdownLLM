@@ -26,10 +26,18 @@ from .repo import TIERS
 CLI_REGISTRY_FILE = Path(__file__).resolve().parent / "cli.py"
 
 def _changed_files_recent(root: Path, window: int) -> set[str] | None:
-    """Repo-relative POSIX paths changed in the last `window` commits, or None
+    """Repo-relative POSIX paths MODIFIED in the last `window` commits, or None
     if `root` is not inside a git repo (the check then skips, like provenance).
     Returns all tracked files when there are 0–1 commits (nothing to diff against
-    yet — and on the first commit there is no HEAD)."""
+    yet — and on the first commit there is no HEAD).
+
+    `--diff-filter=M` deliberately excludes additions: a thing that ARRIVED in
+    the window was never "stable, then changed" — it was born. Without the
+    filter, delivering framework-shipped `stable` things into a domain (the
+    v3.24.0 prompt backfill did exactly this, in nine domains at once) makes
+    every one of them report as freshly-churned for the next `window` commits
+    — a check firing on healthy state, which is the failure mode
+    `a-check-that-always-fires-teaches-the-operator-to-ignore-it` names."""
     cnt = subprocess.run(["git", "rev-list", "--count", "HEAD"], cwd=root,
                          capture_output=True, text=True)
     if cnt.returncode != 0:
@@ -39,7 +47,7 @@ def _changed_files_recent(root: Path, window: int) -> set[str] | None:
         out = subprocess.run(["git", "ls-files"], cwd=root,
                              capture_output=True, text=True)
     else:
-        out = subprocess.run(["git", "diff", "--name-only",
+        out = subprocess.run(["git", "diff", "--name-only", "--diff-filter=M",
                               f"HEAD~{min(window, n - 1)}", "HEAD"],
                              cwd=root, capture_output=True, text=True)
     if out.returncode != 0:
