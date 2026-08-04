@@ -294,16 +294,38 @@ def cmd_triggers(args) -> int:
         rollup = []
         for repo in repos:
             hits, horizon, skipped = evaluate(repo)
-            rollup.append((repo.name, len(hits), len(skipped)))
+            # Retrospective debt joins the sweep (estate-cadence-cluster
+            # Phase 2): per-domain the v3.24.0 sensor fires as scatter across
+            # thirteen validates; here it lands as one picture in the one
+            # sweep the operator's estate loop already reads. Quiet when
+            # healthy — the sensor's own young/dormant gates hold.
+            retro = ""
+            try:
+                from .model import scan as _scan
+                from .validation import retrospective_findings as _retro
+                _corpus, _ = _scan(repo)
+                rf = _retro(repo, _corpus)
+                if rf:
+                    retro = rf[0].message.split(" — ")[0].split(" (")[0]
+            except Exception:
+                pass
+            rollup.append((repo.name, len(hits), len(skipped), retro))
             total_hits += len(hits)
             print(f"### {repo.name}")
             _print_evaluation(hits, horizon, skipped)
             print()
         print("### Roll-up")
-        for name, nh, ns in rollup:
-            print(f"- {name}: {nh} fired, {ns} not mechanically evaluable")
-        print(f"\n{total_hits} trigger(s) fired across the walk. "
-              f"Ephemeral — never an index.")
+        overdue = 0
+        for name, nh, ns, retro in rollup:
+            line = f"- {name}: {nh} fired, {ns} not mechanically evaluable"
+            if retro:
+                line += f" — RETROSPECTIVE DEBT: {retro}"
+                overdue += 1
+            print(line)
+        tailbits = [f"{total_hits} trigger(s) fired across the walk"]
+        if overdue:
+            tailbits.append(f"{overdue} domain(s) owe a retrospective")
+        print(f"\n{'; '.join(tailbits)}. Ephemeral — never an index.")
         return 0
 
     hits, horizon, skipped = evaluate(root)

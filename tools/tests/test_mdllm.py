@@ -2488,3 +2488,81 @@ def test_install_hook_writes_post_commit_leg(tmp_path):
     body = post.read_text(encoding="utf-8")
     assert "autopush" in body and "exit 0" in body
     assert "--force" not in body  # structurally outside the vocabulary
+
+
+# ---------------------------------------------------------------------------
+# retrospective-cadence surfacing (session.py / triggers.py) — the v3.24.0
+# sensor gains the moment (session start) and the altitude (estate roll-up)
+# where it can be acted on (estate-cadence-cluster Phase 2)
+# ---------------------------------------------------------------------------
+
+def _dated_git(cwd, date, *args):
+    import os
+    import subprocess
+    env = os.environ.copy()
+    env["GIT_COMMITTER_DATE"] = date
+    env["GIT_AUTHOR_DATE"] = date
+    return subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                           *args], cwd=cwd, env=env, capture_output=True, text=True)
+
+
+def _seed_overdue_domain(root):
+    """A domain born 100 days ago, active this week, no retrospective ever."""
+    import datetime as dt
+    (root / "things").mkdir(parents=True, exist_ok=True)
+    _sync_git(root, "init", "-q")
+    old = (dt.date.today() - dt.timedelta(days=100)).isoformat() + "T12:00:00"
+    (root / "things" / "seed.md").write_text(
+        "---\nid: seed\ntype: note\nstatus: active\ncreated: 2026-04-01\n---\n# S\n",
+        encoding="utf-8")
+    _dated_git(root, old, "add", "-A")
+    _dated_git(root, old, "commit", "-q", "-m", "born")
+    (root / "things" / "recent.md").write_text(
+        "---\nid: recent\ntype: note\nstatus: active\ncreated: 2026-08-01\n---\n# R\n",
+        encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "recent work")
+    return root
+
+
+def test_session_start_surfaces_retrospective_debt(tmp_path, capsys):
+    from markdownllm.session import cmd_session_start
+    import argparse
+    root = _seed_overdue_domain(tmp_path / "dom")
+    cmd_session_start(argparse.Namespace(path=str(root), assistant=False))
+    out = capsys.readouterr().out
+    assert "Retrospective cadence" in out
+    assert "no retrospective has ever been written" in out
+
+
+def test_session_start_cadence_quiet_for_young_domain(tmp_path, capsys):
+    from markdownllm.session import cmd_session_start
+    import argparse
+    root = tmp_path / "young"
+    (root / "things").mkdir(parents=True)
+    _sync_git(root, "init", "-q")
+    (root / "things" / "seed.md").write_text(
+        "---\nid: seed\ntype: note\nstatus: active\ncreated: 2026-08-01\n---\n# S\n",
+        encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "born recently")
+    cmd_session_start(argparse.Namespace(path=str(root), assistant=False))
+    out = capsys.readouterr().out
+    assert "Retrospective cadence" not in out  # quiet when healthy
+
+
+def test_estate_sweep_rolls_up_retrospective_debt(tmp_path, capsys):
+    from markdownllm.triggers import cmd_triggers
+    import argparse
+    estate = tmp_path / "estate"
+    estate.mkdir()
+    _sync_git(estate, "init", "-q")
+    (estate / "x.txt").write_text("root\n", encoding="utf-8")
+    _sync_git(estate, "add", "-A")
+    _sync_git(estate, "commit", "-q", "-m", "root")
+    (estate / "domain").mkdir()
+    _seed_overdue_domain(estate / "domain" / "overdue")
+    cmd_triggers(argparse.Namespace(path=str(estate), estate=True))
+    out = capsys.readouterr().out
+    assert "RETROSPECTIVE DEBT" in out
+    assert "1 domain(s) owe a retrospective" in out

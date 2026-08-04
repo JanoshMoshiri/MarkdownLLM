@@ -514,5 +514,22 @@ def cmd_session_start(args) -> int:
     if tail:
         out.append(f"    ({'; '.join(tail)} — `mdllm triggers .` for the full evaluation)")
 
+    # Retrospective cadence at the moment it can be acted on (estate-cadence-
+    # cluster Phase 2): the v3.24.0 sensor fired only in `validate` — mid-commit,
+    # the moment of least receptivity — so the debt reached the operator through
+    # feel instead of the floor (change-reconciliation.md routes every missed
+    # cue to the retrospective; a net-beneath-the-net with no clock is down
+    # exactly when the cue-missing rate is highest). Same check, surfaced at
+    # t=0. Quiet when healthy — young and dormant domains stay silent.
+    try:
+        from .model import scan as _scan
+        from .validation import retrospective_findings as _retro
+        _corpus, _ = _scan(domain)
+        for f in _retro(domain, _corpus):
+            out.append(f"- **Retrospective cadence:** {f.message}")
+            exceptions.append(f"- This domain owes a retrospective: {f.message}")
+    except Exception:
+        pass  # advisory only — session start must never fail on it
+
     print("\n".join(out))
     return 0
