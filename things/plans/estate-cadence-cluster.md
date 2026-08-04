@@ -204,7 +204,7 @@ assessments. Formalising costs almost nothing because every part exists:
   genuinely cross-domain. Per-domain findings travel home through the
   porch as imports/briefs — the vantage never becomes everyone's editor.
 
-## Phase 4 — the cue question and the release walk (proposed 2026-08-04, awaiting ruling)
+## Phase 4 — the cue question and the release walk (accepted 2026-08-04, operator, voice)
 
 From the deep dive: the substrate's reconciliation channels are strongest
 exactly where they are mechanical (membrane: imports-check + quarantine;
@@ -258,9 +258,11 @@ as the corpus ages.
    whose subject is whether the provenance machinery works. Write that
    licence into the estate-retrospective's definition, or leave it as
    per-instance judgement?
-6. Does Phase 4 belong in this cluster, or split into its own plan? It
-   shares the cluster's cause (multi-domain velocity raised the
-   cue-missing rate) but not its cadence theme.
+6. ~~Does Phase 4 belong in this cluster, or split into its own plan?~~
+   Resolved 2026-08-04: accepted in place, in this cluster (operator,
+   voice — "this all sits very well, in everything"; the fractal reading
+   was the operator's own: the same primitive — floor surfaces, driver
+   decides — applied at commit, membrane, and epoch radius).
 
 ## Success criteria
 
