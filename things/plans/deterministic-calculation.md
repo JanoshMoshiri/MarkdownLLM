@@ -22,6 +22,15 @@ linked_things:
   - id: consequence-is-recoverable-only-in-retrospect
     relation: informs
     notes: "Why the floor reports and never writes: a computed figure landing in frontmatter unasked is a change whose consequence the agent cannot foresee. `calc` prints; the human and the agent decide what to transcribe."
+  - id: a-wrong-sum-is-indistinguishable-from-a-right-one
+    relation: references
+    notes: "Harvested from this build. The reason four separate refusals exist in calc.py rather than four convenient defaults — a figure is the one floor output carrying no evidence of its own derivation."
+  - id: a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist
+    relation: references
+    notes: "Harvested from this build. Why the design arrived already specified: the downstream decision named the missing tool and held its own confidence down until it existed, so this session executed rather than designed."
+  - id: a-flat-re-export-shim-is-an-uncollided-namespace
+    relation: references
+    notes: "Harvested from this build, from the `evaluate` collision in Phase 1. Not this plan's to fix — recorded here because this plan is where the collision was found and where the route is written down."
 ---
 
 # Deterministic Calculation — the floor does every sum
