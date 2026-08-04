@@ -55,7 +55,11 @@ known_fields:
   - version         # spec/manifesto/skill semantic version
   - session         # session number a thing was created in
   - confidence      # insight confidence (belief-revision)
-  - source          # provenance: where a claim came from
+  - source          # insight/decision enum: who surfaced it (human|agent|both|build|operator).
+                    # Ruled 2026-08-04 (framework-retrospective-2026-08a): domain provenance
+                    # uses the core source_domain, never this field; free-text session
+                    # descriptions belong in `session` + body. Pre-ruling free-text values
+                    # on eval-era insights stand as historical records.
   - tags            # free classification
   - domain          # domain a thing belongs to
   - period_start    # retrospective / measurement window

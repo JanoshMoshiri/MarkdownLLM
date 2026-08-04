@@ -6,7 +6,7 @@ created: 2026-06-30
 session: 2026-06-30
 decided_by: human
 confidence: high
-source: code-architect
+source_domain: code-architect
 informed_by:
   - id: divergence-is-an-unrouted-decision
     commit: aae0712

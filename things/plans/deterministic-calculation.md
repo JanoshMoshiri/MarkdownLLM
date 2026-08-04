@@ -235,6 +235,15 @@ tool earns its `high` confidence on the day the tool produces the totals for a
 real reconciled statement — that is the domain's event to record, not this
 plan's, and this plan does not tick it.
 
+**Partial evidence, 2026-08-04 (framework-retrospective-2026-08a):** the
+first real `computed:` adoption happened — six derivations declared on a
+filed micro-entity balance sheet in a money domain, `mdllm calc` verifying
+all six against the filed figures, the floor now re-checking them at every
+commit. Ruled (operator, voice): this is verification of an
+already-reconciled past, not the ingestion the closing condition names —
+the plan **holds**, and the estate's active statement-ingestion domain is
+expected to supply the closing event on its next drop.
+
 **Status after the build: one item outstanding, deliberately.** The framework
 half is complete and released. Adoption is a domain-side event in a private
 repo, and the plan stays `in-progress` until it happens rather than closing on

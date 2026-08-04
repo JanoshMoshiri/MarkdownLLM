@@ -8,7 +8,7 @@ confidence: high
 origin: external
 verified: true
 verified_by: Janosh Moshiri
-source: code-architect
+source_domain: code-architect
 source_domain: code-architect
 source_id: divergence-is-an-unrouted-decision
 source_commit: bd8fc48
