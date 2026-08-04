@@ -140,6 +140,45 @@ The retrospective is the only primitive that explicitly evaluates quality rather
 
 ---
 
+## The Estate Retrospective
+
+Where several domains form an estate around a vantage domain, the same
+primitive runs one radius further out — same type, same beats, wider subject
+(`estate-cadence-cluster` Phase 3; discovered in practice before it was
+named here, as a vantage domain's membrane assessment that had every property
+of a retrospective except the type declaration).
+
+- **It is a `type: retrospective` thing authored in the vantage domain**,
+  with the estate as its subject: the membrane's health, cross-domain
+  sequencing, drift between the domains' definitions and the estate's
+  practice. No new type, no new mechanism.
+- **The direct-read licence.** An estate retrospective may read sibling
+  local clones directly — commit hashes, dated tool output, frontmatter —
+  rather than through their porches, because *the membrane cannot be audited
+  through the membrane it is auditing*, and several of its proper subjects
+  (interior work, absent routes, absent config) are not importable at all.
+  This is the one standing exception to the vantage domain's
+  claims-rest-on-imported-triples rule, and it is scoped: every claim still
+  anchors to a commit hash, a dated tool output, or a dated attributed
+  statement, and the document declares itself a direct-read audit, not a
+  derived view.
+- **Cadence is a dated trigger in the vantage domain** — 30 days, against
+  the domain-level 60: the estate's coherence decays faster than any single
+  domain's because every inter-domain edge is a place definitions can drift
+  apart unwitnessed. The floor chases the date (`mdllm triggers`); the
+  operator judges whether the moment has earned the ritual. Human-gated
+  waits: date the chase.
+- **It consumes the layer below.** Domain retrospectives feed the estate
+  retrospective as session-end insights feed domain retrospectives — each
+  layer aggregates the layer beneath, completing the cadence symmetry
+  (session → domain epoch → estate epoch).
+- **It observes everywhere but rules only on what is genuinely
+  cross-domain.** Per-domain findings travel home through the porch as
+  imports or briefs; the calls it makes itself are the ones no single
+  domain could make. The vantage never becomes everyone's editor.
+
+---
+
 ## The Metacognitive Principle
 
 The framework can record indefinitely without improving. A commit log that grows forever is a log; a domain that learns from its own patterns is something more. The retrospective is what turns accumulated experience into improved reasoning — the difference between a domain that has *run for a year* and one that has *learned for a year*.
