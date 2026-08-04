@@ -297,6 +297,37 @@ v3.22.0 "push stays the human's deliberate act" line).
   (`premature-publish-manufactures-discipline-eroding-urgency` stands
   unrevised).
 
+### The Release Walk
+
+A framework release is the one publication that stays fully human — and it
+is also an **inflection by construction**: it changes definition surfaces
+that the whole estate reasons from. The release ritual therefore runs the
+four beats (change-reconciliation.md) on itself before the version is cut:
+
+1. **Assimilate.** For each spec, tool surface, or generator string the
+   release changes: `mdllm touchpoints <id>` for the declared edges, then
+   the textual tier **estate-wide over the local clones** — grep the
+   changed truth's phrasings across root and `domain(s)/*` (the
+   repos-not-membranes precedent licenses the read; the results are
+   ephemeral, never an index). Authored restatements in domain surfaces
+   are part of the walk-set; they are exactly the touchpoints the refresh
+   channel cannot reconcile mechanically.
+2. **Walk.** Each touchpoint: consistent / revise / contradiction. Derived
+   restatements (kernel blocks, generated sections) reconcile by
+   regeneration — one generator edit collapses its whole class
+   (`a-generated-surface-collapses-its-walk`). Authored restatements are
+   judged one by one.
+3. **Seal.** A doctrine change gets a `type: decision` that names what it
+   supersedes; the CHANGELOG entry **records the walked set** — surfaces
+   changed, touchpoints found, outcomes — so the next release inherits an
+   auditable trail instead of an organic habit.
+4. **Then publish.** The push to the public remote remains the deliberate
+   act (`autopush: false` on release surfaces); the walk is what earns it.
+
+When a walk keeps revisiting the same class of authored touchpoint, promote
+that restatement into derivation — the corpus should get cheaper to
+reconcile as it ages.
+
 ### Publication Debt
 
 An unpushed commit is real locally and **invisible to the estate**, and the
