@@ -111,6 +111,7 @@ This is where the reasoning lives — not just the data.
 | Human operator asking what changed / what the tools are / what the v3 experience is | `docs/operator-guide.md` |
 | Human newcomer's first session; onboarding a non-author operator | `docs/first-hour.md` |
 | Orienting in the framework structure; what links to what; spec graph navigation | `docs/framework-map.md` |
+| How publication, reconciliation and cadence interact — the three radii, diagrammed | `docs/estate-mechanics.md` |
 
 **Session cost:** the kernel's introduction cut Tier 0 to roughly a fifth of the pre-kernel Tier 0+1 load (the dated measurements live in CHANGELOG 3.2.0). Full-spec loads are per-file and on-demand. Measure with `python tools/mdllm.py tokens`; do not assert costs in prose.
 
