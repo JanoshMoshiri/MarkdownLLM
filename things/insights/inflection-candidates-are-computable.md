@@ -1,13 +1,14 @@
 ---
 id: inflection-candidates-are-computable
 type: insight
-status: active
+status: promoted
 version: 1.0
 created: 2026-08-04
 session: 2026-08-04
 source: both
 confidence: high
 origin: synthesised
+promoted_to: change-reconciliation-specification
 tags: [change-reconciliation, cue, inflection, floor, sensors, estate]
 linked_things:
   - id: change-reconciliation-specification

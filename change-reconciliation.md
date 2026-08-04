@@ -281,6 +281,16 @@ Inflection*). The spec mandates the discipline of running the pass at an
 inflection, not the existence of the tool; the tool is the affordance that makes
 the discipline cheap.
 
+Since v3.26.0 the floor also asks the **cue question** without answering it
+(`inflection-candidates-are-computable`): the pre-commit hook's `mdllm
+candidates` advisory names any staged *modified* thing that is reasoned-from —
+a definition-surface type, or fan-in at threshold — in one non-blocking line
+pointing at `touchpoints`. This refines rather than revises the division above:
+the cue *verdict* remains the driver's, and `touchpoints` remains
+invoked-never-hooked; what the floor now guarantees is that the question
+existed at the moment it arose. Saying no to a named question is a decision,
+where not being asked was drift. Fresh things stay silent — the premise stands.
+
 ## Relationship To Other Specs
 
 - **thing.md** — the unit being reconciled; `linked_things` edges are the

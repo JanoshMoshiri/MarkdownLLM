@@ -1,13 +1,14 @@
 ---
 id: a-generated-surface-collapses-its-walk
 type: insight
-status: active
+status: promoted
 version: 1.0
 created: 2026-08-04
 session: 2026-08-04
 source: both
 confidence: high
 origin: synthesised
+promoted_to: git-workflow-specification
 tags: [change-reconciliation, generated-surfaces, kernel-blocks, doctrine, walk-cost, estate]
 linked_things:
   - id: change-reconciliation-specification
