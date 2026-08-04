@@ -66,3 +66,4 @@ known_fields:
   - decided_by      # decision author/authority
   - promoted_to     # insight -> spec promotion target
   - priority        # plan/task priority
+  - completed       # ISO date a plan reached completed status (registered 2026-08-04, estate-cadence-cluster close — the field-registration sensor caught its own builder a third time)
