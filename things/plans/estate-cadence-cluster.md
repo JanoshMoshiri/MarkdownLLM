@@ -1,8 +1,9 @@
 ---
 id: estate-cadence-cluster
 type: plan
-status: in-progress
-version: 1.2
+status: completed
+version: 1.3
+completed: 2026-08-04
 created: 2026-08-04
 priority: high
 tags: [estate, autopush, publication, retrospective, cadence, vantage, multi-domain]
@@ -259,6 +260,22 @@ as the corpus ages.
    voice — "this all sits very well, in everything"; the fractal reading
    was the operator's own: the same primitive — floor surfaces, driver
    decides — applied at commit, membrane, and epoch radius).
+
+## Build record (2026-08-04, v3.26.0)
+
+Shipped in one release, all four phases plus the pre-flight. Success
+criteria verified live at rollout: thirteen domains sealed 3.26.0 and
+published themselves through their own post-commit hooks (twelve
+`published`, one silent local-only — correct); the publication-debt report
+shows exactly one line, the framework root's own +8, which is the release
+surface behaving as its opt-out declares; the cue advisory's first firing
+was the release commit itself, flagging the two modified definition
+surfaces the walk had already covered; the retrospective clock's first
+estate sweep flagged one genuinely overdue domain and silenced the young
+rest; and the first formal estate retrospective is chased by a dated
+trigger (2026-09-03) in the vantage domain. The walked set (~15
+touchpoints, 13 collapsed by one generator edit) is recorded in the
+CHANGELOG entry per the release-walk beat this plan itself introduced.
 
 ## Success criteria
 
