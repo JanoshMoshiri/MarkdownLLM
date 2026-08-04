@@ -2,7 +2,7 @@
 id: estate-cadence-cluster
 type: plan
 status: not-started
-version: 1.0
+version: 1.1
 created: 2026-08-04
 priority: high
 tags: [estate, autopush, publication, retrospective, cadence, vantage, multi-domain]
@@ -25,6 +25,15 @@ linked_things:
   - id: a-check-that-always-fires-teaches-the-operator-to-ignore-it
     relation: informs
     notes: "Phase 2's constraint: cadence debt must arrive quiet-when-healthy and rolled-up-when-loud, or it trains the operator to skim it exactly as the validate-time warning already has."
+  - id: change-reconciliation-specification
+    relation: implements
+    notes: "v1.1: the deep dive (2026-08-04) reframed this plan as that spec's missing half — Phases 2/3 are the net-beneath-the-net given a clock, Phase 4 is the cue question made mechanical. The build itself is an inflection and commits to running the four beats on itself."
+  - id: inflection-candidates-are-computable
+    relation: implements
+    notes: "Phase 4's first half is this insight built."
+  - id: a-generated-surface-collapses-its-walk
+    relation: references
+    notes: "Found by running this plan's own Assimilate beat; Phase 4's release-walk half exists because the authored share of the doctrine's ~15 restatements needs a walk, and the walk needs a beat in the release ritual."
 ---
 
 # Estate Cadence Cluster — publication becomes mechanical, retrospection gets a clock
@@ -113,6 +122,15 @@ estate-sync's fast-forwards, which are safe for exactly the same reason.
 - Bounded like estate-sync: `GIT_TERMINAL_PROMPT=0`, timeout, degrade to
   advisory. A push must never hang a session.
 
+**The serve-side advisory (v1.1, from the deep dive).** The consume side
+has a tool (`imports-check`); the serve side has only discipline — a
+change to an `exposed: true` thing has no mechanical voice, and autopush
+makes that silence faster-moving. Phase 1 therefore ships a companion
+sensor: when a commit modifies a thing carrying `exposed: true`, one
+advisory line — *this thing is on the porch; this change publishes*.
+Quiet otherwise. This converts autopush's sharpest risk into its own
+sensor, and closes the one membrane direction that had no eyes.
+
 **The publication-debt report inverts.** Under autopush, `estate-sync
 --status` stops being a to-do list and becomes an anomaly detector: any
 `ahead +n` now means something went wrong (offline session, rejected
@@ -138,6 +156,14 @@ outcome. The decision thing records why the protection the old line gave
 release surface.
 
 ## Phase 2 — retrospective cadence surfaces where it can be acted on
+
+**Why this is load-bearing, not hygiene (v1.1).** Change-reconciliation's
+robustness model routes every missed cue to the retrospective: "the same
+backward pass runs periodically — bound to the retrospective hook — as
+the net beneath the net." A cadence that exists only in operator memory
+means the net beneath the net is down exactly when the cue-missing rate
+is highest. This phase is that spec's dependency being paid, not a
+freestanding nicety.
 
 Zero new sensors. The v3.24.0 cadence check (60+ active days, young and
 dormant domains silent) gains two surfacing points:
@@ -178,6 +204,39 @@ assessments. Formalising costs almost nothing because every part exists:
   genuinely cross-domain. Per-domain findings travel home through the
   porch as imports/briefs — the vantage never becomes everyone's editor.
 
+## Phase 4 — the cue question and the release walk (proposed 2026-08-04, awaiting ruling)
+
+From the deep dive: the substrate's reconciliation channels are strongest
+exactly where they are mechanical (membrane: imports-check + quarantine;
+framework→domain generated blocks: regen) and weakest where the cue is
+purely human (domain-internal edits to reasoned-from things; the
+framework's own internal corpus, where the pass has never formally run).
+Two additions, both detection-only:
+
+1. **The cue-candidate advisory.** At commit, a *modified* (never added)
+   thing that is reasoned-from — inbound edges above a threshold, or a
+   definition-surface type — gets one line: fan-in count plus the
+   `mdllm touchpoints <id>` invocation. The cue verdict stays human;
+   the question stops being skippable. Saying no to a named question is
+   a decision, where not being asked was drift.
+   (`inflection-candidates-are-computable`.)
+
+2. **The release walk.** The framework release ritual gains an explicit
+   Assimilate/Walk beat: for the surfaces a release changes, run
+   `touchpoints`, run the textual tier **estate-wide over local clones**
+   (the repos-not-membranes precedent licenses the read), walk the
+   authored touchpoints, and let the CHANGELOG entry record the walked
+   set. The first live run of this beat — on this plan's own autopush
+   inflection — found ~15 restatements of the push doctrine across four
+   layers, 13 of which collapse to one generator string
+   (`a-generated-surface-collapses-its-walk`); the authored remainder is
+   the walk the release ritual currently has no slot for.
+
+Standing principle for both, and for the corpus generally: **prefer
+derived restatements over authored ones; promote a restatement into
+derivation when a walk revisits it twice.** The walk should get cheaper
+as the corpus ages.
+
 ## Decision points held for the pre-execution talk
 
 1. Phase 0 branch reconciliation: rename branches to `main`, or update
@@ -193,6 +252,15 @@ assessments. Formalising costs almost nothing because every part exists:
 4. Should the first formal estate retrospective be authored fresh, or is
    the membrane assessment retro-typed (its findings are three days old
    and partly acted on)?
+5. The estate retrospective's **direct-read licence**: the vantage's
+   membrane assessment proved you cannot audit the membrane through the
+   membrane — its provenance rule necessarily suspends for the document
+   whose subject is whether the provenance machinery works. Write that
+   licence into the estate-retrospective's definition, or leave it as
+   per-instance judgement?
+6. Does Phase 4 belong in this cluster, or split into its own plan? It
+   shares the cluster's cause (multi-domain velocity raised the
+   cue-missing rate) but not its cadence theme.
 
 ## Success criteria
 
