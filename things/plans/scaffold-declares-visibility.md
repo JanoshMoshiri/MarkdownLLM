@@ -2,7 +2,7 @@
 id: scaffold-declares-visibility
 type: plan
 status: not-started
-version: 1.0
+version: 1.1
 created: 2026-08-04
 priority: medium
 tags: [scaffold, boundary, disclosure, birth, visibility, floor]
@@ -65,8 +65,10 @@ because it is the design input this plan needs:
 
 - **Public repos genuinely need a disclosure vocabulary** — the framework root
   is public, and it is the one repo where the boundary is load-bearing.
-- **Externally-audited repos need one too** — a QMS domain may be read by an
-  auditor, which is a disclosure surface even though the repo is private.
+- ~~**Externally-audited repos need one too** — a QMS domain may be read by an
+  auditor, which is a disclosure surface even though the repo is private.~~
+  **Withdrawn same day — the premise was wrong.** See *An auditor is not a
+  disclosure surface* below.
 - **Private, single-party repos mostly do not** — several domains hold work
   that only ever reaches people already inside the confidence, and there is no
   boundary for a term to cross.
@@ -74,10 +76,33 @@ because it is the design input this plan needs:
 So the file's contents are not a constant: they are a function of who can see
 the repo, and nothing at birth has ever captured that.
 
-## The distinction this surfaced
+## An auditor is not a disclosure surface (operator, 2026-08-04)
 
-`.boundary-terms` is currently doing **two different jobs** under one name, and
-they have different scopes:
+The triage above originally counted an externally-audited repo as needing a
+disclosure vocabulary. The operator withdrew that on the same day, and the
+correction is worth more than the claim was:
+
+> **An auditor is an *authorised* reader.** Reviewing a QMS requires exactly
+> the identifiers a disclosure list would block — who signed a document, which
+> project it belongs to, which legal entity it concerns, which partner or
+> third party is involved. Blocking those terms in that repo would be blocking
+> the audit.
+
+The boundary governs **unauthorised** eyes. Visibility and authorisation are
+different axes, and conflating them produces protection aimed at people who
+are entitled to see. The regulated deployment therefore needs **no disclosure
+vocabulary today**, and its single-term file is correct rather than a gap.
+
+**What would change it:** the domain begins holding a genuinely different data
+class — patient-identifiable data and questionnaire responses are the named
+trigger — or it starts feeding a *disclosable package* whose readers are not
+the auditor (`boundary-disclosure-check` anticipated that second case). Either
+event earns the vocabulary; neither has happened.
+
+## The distinction this surfaced — and why it does not become structure
+
+`.boundary-terms` is doing **two different jobs** under one name, and they have
+different scopes:
 
 1. **Disclosure vocabulary** — names, clients, internal identifiers. Genuinely
    visibility-dependent; pointless in a private single-party repo.
@@ -87,23 +112,43 @@ they have different scopes:
 
 Conflating them is why the second job went unserved for eleven domains — it was
 riding in a file whose whole framing is "declare what must not leak", which
-reads as *not applicable* to a private repo. Whether these should separate (a
-scaffold-seeded universal block plus an operator-authored disclosure section)
-is the first design question this plan has to answer.
+reads as *not applicable* to a private repo.
 
-## Sketch (not a design — that is this plan's work)
+**The operator ruled against splitting the file (2026-08-04), and the reasoning
+holds.** Job 2 has a population of exactly one — the attribution trailer — and
+in the estate's whole history no other commit-hygiene term has ever been
+wanted: *"everything else has always been disclosure-scoped."* Building a
+structural separation for a category with one member is a mechanism where a
+ruling suffices, and the framework already knows which of those is cheaper.
 
-- Scaffold asks, or accepts as an argument, the new domain's **visibility**
-  (public / externally-audited / private).
-- The generated `.boundary-terms` is seeded accordingly: the universal commit-
-  hygiene block always, plus a prompt for disclosure vocabulary when visibility
-  implies one — rather than a stub that reads the same in every case.
-- Consider whether visibility belongs in the domain's AGENTS.md frontmatter as
-  a declared fact other surfaces can read, rather than living only in a local
-  gitignored file.
-- Consider what `doctor` should say at first run in a domain whose visibility
-  implies a vocabulary that is still empty — a birth-adjacent probe the
-  operator opts into, not a standing estate sensor.
+So the distinction stays **explanatory, not structural**. It is why the eleven
+skips happened; it is not a thing to build. One list stands, and the entire fix
+is that scaffold seeds the one line rather than leaving it to be noticed —
+which on its own would have prevented every skip.
+
+## What is actually left to build
+
+After both rulings, the substance is small — and that is the finding, not a
+disappointment. Most of what this plan started as was answered by reasoning
+rather than by code.
+
+**The one certain change.** Scaffold seeds the commit-hygiene block into every
+new `.boundary-terms`, unconditionally, no question asked and no visibility
+input required. One line in the template. It would have prevented all eleven
+skips on its own.
+
+**The parked consideration.** Whether birth should capture the domain's
+**visibility** at all — the operator raised it and asked that it not be
+forgotten, while noting it is a different session's work. Its value is now
+narrower than when this plan opened: only a genuinely public repo clearly needs
+a disclosure vocabulary, private repos do not, and audited repos do not either
+(authorised readers). Whether that leaves enough for scaffold to ask about is
+itself the open question. If visibility is captured, the further question is
+whether it belongs in AGENTS.md frontmatter as a declared fact other surfaces
+can read, rather than only in a local gitignored file.
+
+**Not to be built:** a file split (ruled against), and a running
+inertness sensor (ruled against on 2026-08-04, before either).
 
 ## Interim state
 
