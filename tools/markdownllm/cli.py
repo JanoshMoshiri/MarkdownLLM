@@ -55,7 +55,7 @@ from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
 from .history import cmd_changelog, cmd_worklog
 from .imports_check import cmd_estate_check, cmd_imports_check
-from .sync import cmd_estate_sync
+from .sync import cmd_autopush, cmd_estate_sync
 from .indexes import cmd_index
 from .kernel_gen import cmd_kernel
 from .mcp_server import cmd_mcp_serve
@@ -64,7 +64,7 @@ from .refresh import cmd_refresh
 from .scaffold import cmd_install_hook, cmd_scaffold
 from .session import cmd_session_start
 from .tokens import cmd_tokens
-from .touchpoints import cmd_touchpoints
+from .touchpoints import cmd_candidates, cmd_touchpoints
 from .triggers import cmd_triggers
 from .validation import cmd_validate
 
@@ -237,6 +237,22 @@ def build_cli() -> argparse.ArgumentParser:
     es.add_argument("--timeout", type=int, default=20,
                     help="seconds per network call before degrading (default 20)")
     es.set_defaults(fn=cmd_estate_sync)
+
+    ap_ = sub.add_parser("autopush", help="post-commit publication leg: push the "
+                         "current branch to its upstream unless AGENTS.md declares "
+                         "git.autopush: false (absence = on); bounded, never forces, "
+                         "rejection surfaced as DIVERGED never resolved; exit 0 always")
+    ap_.add_argument("path", nargs="?", default=".")
+    ap_.add_argument("--timeout", type=int, default=20,
+                     help="seconds before the push degrades to publication debt")
+    ap_.set_defaults(fn=cmd_autopush)
+
+    cd = sub.add_parser("candidates", help="pre-commit advisory: for staged "
+                        "MODIFIED things, surface the cue question (reasoned-from: "
+                        "definition surface or fan-in) and the serve-side notice "
+                        "(exposed => this change publishes); never blocks, exit 0 always")
+    cd.add_argument("path", nargs="?", default=".")
+    cd.set_defaults(fn=cmd_candidates)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
                         "additions, filenames, or a commit message against the "

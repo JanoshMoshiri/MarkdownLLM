@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-02
-generated: 2026-08-02T18:59:55
-generated_from: HEAD@d727e3d
+created: 2026-08-04
+generated: 2026-08-04T20:21:19
+generated_from: HEAD@614d1e2
 coverage: 6
 framework_version: 3.25.0
 ---
@@ -67,7 +67,9 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit all read committed state only.
 
-**Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. Never push, never auto-merge, never reset. Session end reports publication debt (`estate-sync --status`: unpushed commits per repo).
+**Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
+
+**Publication:** the autopush leg (post-commit hook) publishes each floor-validated commit unless the repo declares `git: autopush: false` — absence is ON; the per-domain declaration is the standing human instruction. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) opt out: a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under autopush, an anomaly report.
 
 **Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
 
@@ -78,7 +80,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 ## orchestration.md
 
 **Hard hooks — always active by config (enforcement depends on anchor — see below):**
-1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in.
+1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in and surfaces the change-reconciliation advisories (cue candidates, serve-side publication notices — advisory, never blocking). **The publication leg:** the post-commit hook then publishes the validated commit (`mdllm autopush`) unless the repo declares `git: autopush: false` (absence = on; release surfaces opt out). Bounded, never forces; a rejected push is divergence on the push side — surfaced, never resolved (`autopush-moves-the-deliberate-act`).
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — the check itself never requires the network); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 4. `session-start:estate-sync` — sync before orienting (orientation reads the log sync updates): `mdllm estate-sync` walks root + `domain(s)/*` repos — `git fetch` + `pull --ff-only`, bounded, `GIT_TERMINAL_PROMPT=0`, degrading offline to an advisory line. Reports per repo: synced/up-to-date/ahead-unpushed/DIVERGED/offline/dirty/local-only. Divergence and dirty trees reported, never resolved; never pushes, never merges. Session end: `estate-sync --status` reports publication debt (unpushed commits). A *required* network call at session start stays forbidden; this is a bounded attempt, not a gate.

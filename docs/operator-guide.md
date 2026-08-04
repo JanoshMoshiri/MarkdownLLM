@@ -285,9 +285,14 @@ refused to touch; `offline` means it degraded gracefully and you are
 orienting from last-fetched state — the session never blocks on the network.
 
 The mirror runs at session end: `estate-sync --status` reports **publication
-debt** — commits that are real on this machine and invisible to the estate
-until you push. The push stays yours, deliberately (git-workflow.md); the
-report just means you no longer have to remember it. Note `estate-sync`
+debt** — commits that are real on this machine and invisible to the estate.
+Under autopush (the default since v3.26.0: the post-commit hook publishes
+each floor-validated commit unless a repo declares `git: autopush: false`)
+this report is an **anomaly detector** — any line means an offline session,
+a rejected push awaiting your routing, or an opted-out repo holding work for
+its deliberate release. Where autopush is off, the push stays yours
+(git-workflow.md → The Outbound Rules); the report means you no longer have
+to remember it. Note `estate-sync`
 *discovers* its repos where `estate-check` refuses to: the guardrail there
 protects relational information (a producer must never enumerate consumers),
 while a walk for `.git` directories reveals nothing `ls` doesn't — repos, not

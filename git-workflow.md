@@ -30,7 +30,9 @@ linked_things:
 <!-- kernel -->
 **The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit all read committed state only.
 
-**Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. Never push, never auto-merge, never reset. Session end reports publication debt (`estate-sync --status`: unpushed commits per repo).
+**Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
+
+**Publication:** the autopush leg (post-commit hook) publishes each floor-validated commit unless the repo declares `git: autopush: false` — absence is ON; the per-domain declaration is the standing human instruction. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) opt out: a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under autopush, an anomaly report.
 
 **Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
 
@@ -208,8 +210,18 @@ This adds friction but gives the human approval over every commit. Useful for se
 
 ### What The Agent Should Not Do
 
-- **Never push without explicit human instruction** — Push is always a deliberate human action
-- **Never force-push** — History is sacred in this framework
+- **Never push outside the declared publication mechanism** — publication is
+  either the autopush leg acting on floor-validated commits (the per-repo
+  `git: autopush` declaration is the standing human instruction, and absence
+  means on), or — where a repo declares `autopush: false`, every release
+  surface included — an explicit human instruction per push. Never push a
+  repo that opted out; never push to *make* something true that reconciliation
+  hasn't finished making true. (Revised from "never push without explicit
+  human instruction" by `autopush-moves-the-deliberate-act`, 2026-08-04 — the
+  deliberate act moved from each push to the declaration and the routing of
+  non-clean outcomes.)
+- **Never force-push** — History is sacred in this framework, and `--force`
+  is structurally outside the autopush mechanism's vocabulary
 - **Never amend published commits** — Once pushed, commits are immutable
 - **Never commit credentials, secrets, or sensitive data** — Things may contain personal or regulated information; the agent should be aware of what's being committed
 
@@ -252,17 +264,48 @@ read velocity. This is what `mdllm estate-sync` mechanises and the
   fast-forward is skipped and reported. Session-end discipline (nothing left
   uncommitted) makes this rare; the guard makes it harmless.
 
+### The Outbound Rules: Autopush
+
+The mirror of the inbound rules, and the same argument in reverse: a push of
+a floor-validated commit is pure transport of state already real locally —
+safe to make mechanical. Once orientation reads the estate, an unpushed
+commit is state withheld from the thing that orients on it; holding
+publication back by default stopped being protection and became a lie the
+membrane tells (`autopush-moves-the-deliberate-act`, which supersedes the
+v3.22.0 "push stays the human's deliberate act" line).
+
+- **Default on, opt-out declared.** `git: autopush: false` in a repo's
+  AGENTS.md frontmatter opts out; anything else — including absence — is on.
+  The deliberate act moves up a level: from each push to the per-repo
+  declaration, made once, owned in config.
+- **Post-commit, post-floor.** The leg runs after the pre-commit floor has
+  validated the commit; it transports what the floor passed. It never
+  initiates a commit and never blocks one — a post-commit surface must not
+  fail the commit it follows.
+- **Rejection is divergence on the push side.** A rejected push means the
+  remote moved: an unrouted decision. Surfaced, never pull-rebase-retried,
+  never forced — `--force` is structurally outside the mechanism's
+  vocabulary. The commit stands as publication debt until the operator
+  routes it.
+- **Bounded and degrading.** Time-boxed, `GIT_TERMINAL_PROMPT=0`; offline or
+  auth failure degrades to one advisory line and the debt shows in
+  `estate-sync --status`.
+- **Release surfaces keep the human.** A repo whose push is a *release* —
+  consumed by outsiders, gated by judgement with no mechanical completeness
+  check (the framework root's public repo) — declares `autopush: false`:
+  the default-on rule applied honestly, as that repo's own opt-out
+  (`premature-publish-manufactures-discipline-eroding-urgency` stands
+  unrevised).
+
 ### Publication Debt
 
-The push stays the human's deliberate act — nothing in this section changes
-"never push without explicit human instruction." What changes is visibility:
-an unpushed commit is real locally and **invisible to the estate**, and the
-other machine's next sync cannot find it. The session-end ritual therefore
-reports publication debt — `mdllm estate-sync --status` lists `ahead +n
-(unpushed)` per repo from cached tracking refs, no network — turning the push
-from something remembered into something surfaced. A harness may carry a
-standing per-session push instruction from the operator (the cloud bootstrap
-does); that *is* explicit human instruction, held at config level.
+An unpushed commit is real locally and **invisible to the estate**, and the
+other machine's next sync cannot find it. The session-end ritual reports
+publication debt — `mdllm estate-sync --status` lists `ahead +n (unpushed)`
+per repo from cached tracking refs, no network. Under autopush the report
+inverts from a to-do list into an **anomaly detector**: any line means
+something went wrong (offline session, rejected push, an opted-out repo with
+work awaiting its deliberate release) — route it, don't just push it.
 
 When collaborators arrive, the same rules hold — a colleague's push appears at
 your next session start as `synced (+n)`, divergence stays a routed decision —

@@ -2287,3 +2287,204 @@ def test_estate_check_no_args_walks_local_clones(tmp_path, capsys, monkeypatch):
     assert rc == 0
     assert "local clones walked" in out and "not an estate manifest" in out
     assert "alpha" in out
+
+
+# ---------------------------------------------------------------------------
+# autopush (sync.py) — the publication leg: transport of committed state,
+# default-on opt-out, no --force ever, rejection surfaced never resolved
+# (estate-cadence-cluster Phase 1)
+# ---------------------------------------------------------------------------
+
+def _seed_bare_pair(tmp_path, name="d"):
+    """A bare 'remote' and a working clone — the push-side estate in miniature."""
+    bare = tmp_path / f"{name}-remote.git"
+    _sync_git(tmp_path, "init", "-q", "--bare", str(bare))
+    clone = tmp_path / name
+    _sync_git(tmp_path, "clone", "-q", str(bare), str(clone))
+    (clone / "a.txt").write_text("one\n", encoding="utf-8")
+    _sync_git(clone, "add", "-A")
+    _sync_git(clone, "commit", "-q", "-m", "c1")
+    _sync_git(clone, "push", "-q", "-u", "origin", "HEAD")
+    return bare, clone
+
+
+def test_autopush_publishes_committed_state(tmp_path):
+    from markdownllm.sync import autopush_repo
+    bare, clone = _seed_bare_pair(tmp_path)
+    (clone / "b.txt").write_text("two\n", encoding="utf-8")
+    _sync_git(clone, "add", "-A")
+    _sync_git(clone, "commit", "-q", "-m", "local work")
+    res = autopush_repo(clone)
+    assert res["state"] == "published"
+    log = _sync_git(tmp_path, "--git-dir", str(bare), "log", "--oneline")
+    assert "local work" in log.stdout
+
+
+def test_autopush_absence_of_config_is_on(tmp_path):
+    from markdownllm.sync import _autopush_enabled
+    bare, clone = _seed_bare_pair(tmp_path)
+    assert _autopush_enabled(clone) is True  # no AGENTS.md at all
+    (clone / "AGENTS.md").write_text(
+        "---\nname: X\ngit:\n  autocommit: true\n---\n# X\n", encoding="utf-8")
+    assert _autopush_enabled(clone) is True  # git block without the key
+
+
+def test_autopush_explicit_false_opts_out_and_pushes_nothing(tmp_path):
+    from markdownllm.sync import autopush_repo
+    bare, clone = _seed_bare_pair(tmp_path)
+    (clone / "AGENTS.md").write_text(
+        "---\nname: X\ngit:\n  autopush: false\n---\n# X\n", encoding="utf-8")
+    _sync_git(clone, "add", "-A")
+    _sync_git(clone, "commit", "-q", "-m", "opted out")
+    res = autopush_repo(clone)
+    assert res["state"] == "off"
+    log = _sync_git(tmp_path, "--git-dir", str(bare), "log", "--oneline")
+    assert "opted out" not in log.stdout
+
+
+def test_autopush_local_only_is_silent_state(tmp_path):
+    from markdownllm.sync import autopush_repo
+    repo = tmp_path / "solo"
+    repo.mkdir()
+    _sync_git(repo, "init", "-q")
+    (repo / "a.txt").write_text("x\n", encoding="utf-8")
+    _sync_git(repo, "add", "-A")
+    _sync_git(repo, "commit", "-q", "-m", "c1")
+    res = autopush_repo(repo)
+    assert res["state"] == "local-only"
+
+
+def test_autopush_rejection_is_surfaced_never_forced(tmp_path):
+    from markdownllm.sync import autopush_repo
+    bare, clone_a = _seed_bare_pair(tmp_path, "a")
+    clone_b = tmp_path / "b"
+    _sync_git(tmp_path, "clone", "-q", str(bare), str(clone_b))
+    # A advances the remote past B
+    (clone_a / "a.txt").write_text("from-a\n", encoding="utf-8")
+    _sync_git(clone_a, "commit", "-q", "-am", "a moves")
+    _sync_git(clone_a, "push", "-q")
+    # B commits without fetching — push must be rejected, remote must keep A's move
+    (clone_b / "a.txt").write_text("from-b\n", encoding="utf-8")
+    _sync_git(clone_b, "commit", "-q", "-am", "b diverges")
+    res = autopush_repo(clone_b)
+    assert res["state"] == "rejected"
+    assert "decision" in res["detail"]
+    log = _sync_git(tmp_path, "--git-dir", str(bare), "log", "--oneline")
+    assert "a moves" in log.stdout and "b diverges" not in log.stdout
+
+
+def test_autopush_cmd_always_exits_zero(tmp_path, capsys):
+    from markdownllm.sync import cmd_autopush
+    import argparse
+    bare, clone_a = _seed_bare_pair(tmp_path, "a")
+    clone_b = tmp_path / "b"
+    _sync_git(tmp_path, "clone", "-q", str(bare), str(clone_b))
+    (clone_a / "a.txt").write_text("from-a\n", encoding="utf-8")
+    _sync_git(clone_a, "commit", "-q", "-am", "a moves")
+    _sync_git(clone_a, "push", "-q")
+    (clone_b / "a.txt").write_text("from-b\n", encoding="utf-8")
+    _sync_git(clone_b, "commit", "-q", "-am", "b diverges")
+    args = argparse.Namespace(path=str(clone_b), timeout=20)
+    assert cmd_autopush(args) == 0  # a post-commit surface never fails the commit
+    out = capsys.readouterr().out
+    assert "REJECTED" in out
+
+
+# ---------------------------------------------------------------------------
+# candidates (touchpoints.py) — the cue question made mechanical:
+# modified + reasoned-from advises, additions stay silent, exposed publishes
+# (estate-cadence-cluster Phase 4; inflection-candidates-are-computable)
+# ---------------------------------------------------------------------------
+
+def _seed_candidates_repo(tmp_path):
+    root = tmp_path / "dom"
+    (root / "things").mkdir(parents=True)
+    _sync_git(root, "init", "-q")
+    (root / "things" / "spine.md").write_text(
+        "---\nid: spine\ntype: note\nstatus: active\ncreated: 2026-08-01\n---\n# S\n",
+        encoding="utf-8")
+    for i in range(3):
+        (root / "things" / f"leaf{i}.md").write_text(
+            "---\nid: leaf%d\ntype: note\nstatus: active\ncreated: 2026-08-01\n"
+            "linked_things:\n  - id: spine\n    relation: references\n---\n# L\n" % i,
+            encoding="utf-8")
+    (root / "things" / "porch.md").write_text(
+        "---\nid: porch-thing\ntype: note\nstatus: active\ncreated: 2026-08-01\n"
+        "exposed: true\n---\n# P\n", encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "seed")
+    return root
+
+
+def _run_candidates(root, capsys):
+    from markdownllm.touchpoints import cmd_candidates
+    import argparse
+    rc = cmd_candidates(argparse.Namespace(path=str(root)))
+    return rc, capsys.readouterr().out
+
+
+def test_candidates_modified_reasoned_from_thing_advises(tmp_path, capsys):
+    root = _seed_candidates_repo(tmp_path)
+    p = root / "things" / "spine.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\nrevised\n", encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0
+    assert "cue: `spine`" in out and "3 inbound" in out and "touchpoints spine" in out
+
+
+def test_candidates_added_thing_is_silent(tmp_path, capsys):
+    root = _seed_candidates_repo(tmp_path)
+    (root / "things" / "fresh.md").write_text(
+        "---\nid: fresh\ntype: specification\nstatus: draft\ncreated: 2026-08-04\n---\n# F\n",
+        encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0 and out == ""  # a fresh thing on a clean slate carries no risk
+
+
+def test_candidates_modified_leaf_is_silent(tmp_path, capsys):
+    root = _seed_candidates_repo(tmp_path)
+    p = root / "things" / "leaf0.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\ntweak\n", encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0 and out == ""  # leaf has no inbound edges; below threshold
+
+
+def test_candidates_modified_exposed_thing_says_it_publishes(tmp_path, capsys):
+    root = _seed_candidates_repo(tmp_path)
+    p = root / "things" / "porch.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\nedit\n", encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0
+    assert "porch: `porch-thing` is exposed" in out and "publishes" in out
+
+
+def test_candidates_definition_surface_advises_regardless_of_fanin(tmp_path, capsys):
+    root = _seed_candidates_repo(tmp_path)
+    skill = root / "things" / "askill.md"
+    skill.write_text(
+        "---\nid: a-skill\ntype: skill\nstatus: draft\ncreated: 2026-08-01\n---\n# K\n",
+        encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "add skill")
+    skill.write_text(skill.read_text(encoding="utf-8") + "\nrevised\n", encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0
+    assert "cue: `a-skill`" in out and "definition surface" in out
+
+
+def test_install_hook_writes_post_commit_leg(tmp_path):
+    from markdownllm.scaffold import install_hook
+    root = tmp_path / "r"
+    root.mkdir()
+    _sync_git(root, "init", "-q")
+    install_hook(root)
+    post = root / ".git" / "hooks" / "post-commit"
+    assert post.is_file()
+    body = post.read_text(encoding="utf-8")
+    assert "autopush" in body and "exit 0" in body
+    assert "--force" not in body  # structurally outside the vocabulary

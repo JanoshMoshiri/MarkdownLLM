@@ -61,6 +61,33 @@ fi
   echo "mdllm: coherence Errors — a generated artifact (kernel/index) or the spec catalog is stale. Regenerate and re-commit, or --no-verify (discouraged)."
   exit 1
 }}
+# Change-reconciliation advisories (estate-cadence-cluster Phase 1+4): the cue
+# question (modified thing that is reasoned-from) and the serve-side notice
+# (modified thing that is exposed). Advisory only — never blocks the commit.
+"$PY" "$MDLLM" candidates "$ROOT" || true
+"""
+
+# The publication leg (estate-cadence-cluster Phase 1): after a commit lands
+# and the floor has validated it, publish it — transport of already-committed,
+# already-validated state, the mirror of estate-sync's fast-forwards. Opt-out
+# per repo via `git: autopush: false` in AGENTS.md frontmatter; absence = on.
+# All outcome handling (rejected = DIVERGED surfaced never resolved, offline =
+# publication debt, no --force ever) lives in `mdllm autopush`; the hook only
+# invokes it and always exits 0 — a post-commit surface must never fail the
+# commit it follows.
+POST_COMMIT_HOOK_BODY = """#!/bin/sh
+# mdllm post-commit: autopush publication leg (estate-cadence-cluster Phase 1)
+ROOT="$(git rev-parse --show-toplevel)"
+MDLLM="$ROOT/{rel}"
+PY=""
+for c in python3 python py; do
+  if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
+done
+if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
+  exit 0  # no floor available: publication stays manual; estate-sync --status reports the debt
+fi
+"$PY" "$MDLLM" autopush "$ROOT" || true
+exit 0
 """
 
 # The commit MESSAGE is a surface pre-commit structurally cannot see (git has
@@ -121,7 +148,10 @@ def install_hook(root: Path) -> str:
     msg_hook = git_dir / "hooks" / "commit-msg"
     msg_hook.write_text(COMMIT_MSG_HOOK_BODY.format(rel=rel),
                         encoding="utf-8", newline="\n")
-    for h in (hook, msg_hook):
+    post_hook = git_dir / "hooks" / "post-commit"
+    post_hook.write_text(POST_COMMIT_HOOK_BODY.format(rel=rel),
+                         encoding="utf-8", newline="\n")
+    for h in (hook, msg_hook, post_hook):
         try:
             h.chmod(h.stat().st_mode | 0o111)
         except OSError:
@@ -134,7 +164,7 @@ def cmd_install_hook(args) -> int:
     rel = install_hook(root)
     hooks_dir = root / ".git" / "hooks"
     print(f"installed {hooks_dir / 'pre-commit'} + {hooks_dir / 'commit-msg'} "
-          f"(mdllm via {rel})")
+          f"+ {hooks_dir / 'post-commit'} (mdllm via {rel})")
     return 0
 
 

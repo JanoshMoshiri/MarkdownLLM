@@ -8,7 +8,10 @@ runs BEFORE orientation, and `cmd_session_start` stays read-only.
 Doctrine, by construction:
 - **ff-only.** A fast-forward is transport of state already real elsewhere.
   Anything else is `divergence-is-an-unrouted-decision`: reported, never
-  resolved. Never push, never merge, never reset.
+  resolved. The sync walk itself never pushes, never merges, never resets —
+  the push side is `autopush` below (post-commit hook), which is the same
+  transport argument run in reverse and under the same doctrine: bounded,
+  never forcing, divergence surfaced never resolved.
 - **Bounded, degrading, never blocking.** GIT_TERMINAL_PROMPT=0 + per-repo
   timeout; offline/auth failure degrades to an advisory state and the session
   proceeds. A REQUIRED network call at session start is forbidden; this is a
@@ -155,6 +158,94 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) ->
     return out
 
 
+def _autopush_enabled(repo: Path) -> bool:
+    """`git.autopush` from the repo's AGENTS.md frontmatter — absence is ON
+    (estate-cadence-cluster Phase 1, operator ruling 2026-08-04: the opt-out
+    set is the small one). Only an explicit `autopush: false` opts out; a
+    missing AGENTS.md, missing git block, or unparseable frontmatter all mean
+    the default applies."""
+    agents = repo / "AGENTS.md"
+    if not agents.is_file():
+        return True
+    try:
+        import re
+        import yaml
+        text = agents.read_text(encoding="utf-8", errors="replace")
+        m = re.match(r"^---\r?\n(.*?)\r?\n---", text, re.S)
+        if not m:
+            return True
+        fm = yaml.safe_load(m.group(1)) or {}
+        git_cfg = fm.get("git") or {}
+        return git_cfg.get("autopush") is not False
+    except Exception:
+        return True
+
+
+def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
+    """The post-commit publication leg: push the current branch to its
+    upstream — transport of already-committed, floor-validated state.
+
+    States: off / local-only / detached / unborn / no-upstream / published /
+    rejected / offline / auth-failed. Never forces (structurally: --force is
+    not in this function's vocabulary), never blocks (the caller exits 0
+    regardless), never resolves a rejection — a rejected push is DIVERGED on
+    the push side, an unrouted decision the operator routes."""
+    out = {"repo": repo, "state": "published", "detail": ""}
+    if not _autopush_enabled(repo):
+        out["state"] = "off"
+        return out
+    remotes = _git(repo, "remote")
+    if remotes is None or not remotes.stdout.strip():
+        out["state"] = "local-only"  # legitimate standing state; estate-sync reports it
+        return out
+    if (r := _git(repo, "rev-parse", "--verify", "-q", "HEAD")) is None or r.returncode != 0:
+        out["state"] = "unborn"
+        return out
+    br = _git(repo, "symbolic-ref", "-q", "--short", "HEAD")
+    if br is None or br.returncode != 0:
+        out["state"] = "detached"
+        return out
+    branch = br.stdout.strip()
+    upstream = _git(repo, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}")
+    if upstream is None or upstream.returncode != 0:
+        out["state"] = "no-upstream"
+        out["detail"] = (f"branch `{branch}` has no upstream — set one "
+                         f"(`git push -u origin {branch}`) or declare `git: autopush: false`")
+        return out
+    p = _git(repo, "push", "--porcelain", timeout=timeout)
+    if p is None:
+        out["state"] = "offline"
+        out["detail"] = "push timed out — commit stands as publication debt (`mdllm estate-sync --status`)"
+        return out
+    if p.returncode == 0:
+        out["detail"] = f"{branch} -> {upstream.stdout.strip()}"
+        return out
+    stderr = p.stderr.lower() + p.stdout.lower()
+    if "non-fast-forward" in stderr or "rejected" in stderr or "fetch first" in stderr:
+        out["state"] = "rejected"
+        out["detail"] = ("remote moved — DIVERGED on the push side: a decision is owed, "
+                         "not a merge. Commit stands as publication debt; never forced.")
+    else:
+        out["state"] = _classify_fetch_failure(p.stderr)
+        out["detail"] = "could not publish — commit stands as publication debt (`mdllm estate-sync --status`)"
+    return out
+
+
+def cmd_autopush(args) -> int:
+    """Hook entry: one advisory line at most, exit 0 always — a post-commit
+    surface must never fail the commit it follows."""
+    repo = Path(args.path).resolve()
+    res = autopush_repo(repo, timeout=args.timeout)
+    state = res["state"]
+    if state in ("off", "local-only", "unborn", "detached"):
+        return 0  # silent: opted out or nothing to transport; estate-sync owns the standing report
+    if state == "published":
+        print(f"autopush: published {res['detail']}")
+    else:
+        print(f"autopush: {state.upper()} — {res['detail']}")
+    return 0
+
+
 _LABEL = {
     "synced": "synced", "up-to-date": "up-to-date", "ahead": "ahead",
     "diverged": "DIVERGED", "dirty": "dirty", "local-only": "local-only",
@@ -193,7 +284,9 @@ def cmd_estate_sync(args) -> int:
     if args.status:
         if debt == 0:
             print("- nothing unpublished — the estate sees everything committed here")
-        print("\nPublication is yours: review `git log`, then push per repo when satisfied.")
+        print("\nUnder autopush (the default) every line above is an anomaly — route it, "
+              "don't just push it. Where `git: autopush: false`, publication stays yours: "
+              "review `git log`, then push per repo when satisfied.")
         return 0
 
     moved = [res["repo"] for res in results if res["moved"]]

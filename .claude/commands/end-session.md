@@ -19,10 +19,12 @@ when *you* judge the session worth it, never automatically. Follow
 5. Commit with a rich `session-end:` message — the commit *is* the backward record
    (no WORKLOG file; `mdllm worklog` prints an on-demand view of git when wanted).
 6. **Report publication debt:** run `python tools/mdllm.py estate-sync . --status`
-   and surface the result — every `ahead +n (unpushed)` repo is state the estate
-   cannot see until the operator pushes it. Never push yourself (git-workflow.md:
-   push is the human's deliberate act); the report turns the push from something
-   remembered into something surfaced.
+   and surface the result. Under autopush (the default) every `ahead +n
+   (unpushed)` line is an anomaly — an offline session, a rejected push owed a
+   routing decision, or an opted-out repo holding work for its deliberate
+   release. Route each line; never resolve a rejection by force, and never push
+   an opted-out repo yourself (git-workflow.md → The Outbound Rules;
+   `autopush-moves-the-deliberate-act`).
 
 If the session has no domain-relevant changes worth harvesting, say so and stop —
 not every session earns an insight.

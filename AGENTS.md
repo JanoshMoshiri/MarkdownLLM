@@ -7,6 +7,12 @@ framework_root: .
 git:
   autocommit: true
   branch: main
+  # The public repo is a RELEASE surface, not estate working state: pushing it
+  # is a version event gated by judgement (reconciliation, changelog, version)
+  # with no mechanical completeness gate. The default-on rule applied honestly
+  # is this opt-out (estate-cadence-cluster Phase 1;
+  # premature-publish-manufactures-discipline-eroding-urgency stands unrevised).
+  autopush: false
 ---
 
 # MarkdownLLM Framework Agent
