@@ -1,8 +1,8 @@
 ---
 id: estate-cadence-cluster
 type: plan
-status: not-started
-version: 1.1
+status: in-progress
+version: 1.2
 created: 2026-08-04
 priority: high
 tags: [estate, autopush, publication, retrospective, cadence, vantage, multi-domain]
@@ -76,8 +76,17 @@ invention: the primitive exists in practice; this plan describes it.
   voice). Reasoning: the opt-out set is the small one — most usage wants
   captured state published. Absence of config means on; a domain that
   must not push declares `git: autopush: false` and owns that declaration.
-- **Build the plan first, talk before executing** — this plan's
-  `not-started` status is that ruling recorded.
+- **Build the plan first, talk before executing** — honoured; the talk
+  happened 2026-08-04 and closed with "let's go ahead with the plan."
+- **Decision points 1-5 ruled 2026-08-04 (operator, voice: "I concur with
+  all your reads"):** (1) configs corrected to reality — the config's job
+  is to describe the branch that exists; (2) the push leg lives in the
+  hook body — a load-bearing mechanism must not depend on which harness
+  is present; (3) 60 active days for domain retrospectives, 30 for the
+  estate; (4) the first formal estate retrospective is authored fresh,
+  the membrane assessment keeping its provenance as the discovered
+  instance; (5) the direct-read licence is written into the
+  estate-retrospective's definition.
 
 ## Phase 0 — pre-flight: the branch truth
 
@@ -239,25 +248,12 @@ as the corpus ages.
 
 ## Decision points held for the pre-execution talk
 
-1. Phase 0 branch reconciliation: rename branches to `main`, or update
-   the six configs to say `master`? (The truth-telling fix differs from
-   the tidy fix.)
-2. Does the push leg live in the hook body (git-fs anchor, works
-   everywhere) or the harness adapter (interpretation anchor, richer
-   reporting)? The pull side chose the adapter; symmetry argues for the
-   same, but a hook-body leg would survive harness absence.
-3. Retrospective cadence number: is 60 active days right now that
-   domains are this active, or does the estate retrospective want its own
-   (shorter?) clock than domain retrospectives?
-4. Should the first formal estate retrospective be authored fresh, or is
-   the membrane assessment retro-typed (its findings are three days old
-   and partly acted on)?
-5. The estate retrospective's **direct-read licence**: the vantage's
-   membrane assessment proved you cannot audit the membrane through the
-   membrane — its provenance rule necessarily suspends for the document
-   whose subject is whether the provenance machinery works. Write that
-   licence into the estate-retrospective's definition, or leave it as
-   per-instance judgement?
+1. ~~Branch reconciliation~~ — ruled: configs to reality (see rulings).
+2. ~~Push-leg location~~ — ruled: hook body (see rulings).
+3. ~~Cadence numbers~~ — ruled: 60d domain / 30d estate (see rulings).
+4. ~~First estate retrospective~~ — ruled: authored fresh (see rulings).
+5. ~~Direct-read licence~~ — ruled: written into the definition (see
+   rulings).
 6. ~~Does Phase 4 belong in this cluster, or split into its own plan?~~
    Resolved 2026-08-04: accepted in place, in this cluster (operator,
    voice — "this all sits very well, in everything"; the fractal reading
