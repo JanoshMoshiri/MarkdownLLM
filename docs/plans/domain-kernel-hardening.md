@@ -1,5 +1,13 @@
 # Plan: Domain Kernel + Harness Hardening Foundation
 
+> **Archived — completed and shipped as v3.15.0** (disposition 2026-08-05,
+> substrate-currency-sweep). Kept as the historical execution record; the
+> mechanisms it built (domain kernel, session-start hardening, anchor-primary
+> taxonomy) are specified in `orchestration.md` and the CHANGELOG. Its prose
+> reflects its era: `continuity.md`, named below as live machinery, was retired
+> two releases later (v3.17) — current plans live in `things/plans/` as
+> `type: plan` things.
+
 > **Durable execution record.** This plan lives in-repo so it survives context
 > compaction. Progress is tracked in the table below; per-change commits are the
 > ledger of work done; `continuity.md` captures mid-phase position. After any

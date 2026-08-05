@@ -26,9 +26,17 @@ linked_things:
 
 # MCP Domain Server — Design Draft
 
-**Status: design draft, not yet built.** This is the artifact we build from; the
-deciding insight (`cross-domain-handoff-is-built-inbound-only`) is already pinned.
-We capture the *implementation* insight when it ships, not before.
+**Status: partially shipped; the rest is ruled, not pending.** (Disposition
+2026-08-05, substrate-currency-sweep.) The read face and consuming side shipped
+and grew beyond this draft — `mcp-serve`, `imports-check`, `estate-check` (v3.17
+→ v3.23); this document remains the design source framework-map View 3 cites for
+them. The **Phase 3 live-agent surface (`run_domain_task`) was built and then
+reverted in full** (v3.17.0): a live-agent invocation is a different risk class
+than the read face, and dormant execution code behind an opt-in flag is the
+honour-system control the floor exists to replace. The reference triple and
+`exposed` graduated from this draft into `thing.md`/`provenance.md` (v3.21);
+the membrane's direction became doctrine in `provenance.md` (v3.23). Read those
+specs for the current contract — this draft is kept for the design reasoning.
 
 ## What This Designs
 

@@ -71,7 +71,7 @@ exactly the classes the spec predicts:
 | 2 — End-session collapse | Patch the four stale surfaces (templates/commands, copilot-prompts, .github/prompts, templates/prompts/session-end-continuity.md) with the publication-debt step | ✅ done (prompt → v1.1, new §7 + output) |
 | 3 — README rewrite | Spec table from the catalog (23), CLI section gains the estate layer + publication story, figures re-measured (kernel 2,897), domain count stated generically | ✅ done |
 | 4 — first-hour walk | Newcomer path through estate-sync, boundary, autopush | ✅ done (v1.1 — three new footnotes, hook legs named) |
-| 5 — Dispositions | continuity-brief template teardown; two docs/plans legacies archived-in-place; retrospective-specification label confirmed | pending |
+| 5 — Dispositions | continuity-brief template deleted (type stays reserved-but-deprecated by design, thing.md:88); both docs/plans legacies carry archival banners; retrospective-specification confirmed `stable` (estate section named a discovered practice; contract unchanged) | ✅ done |
 | 6 — Judgement walks | Insight corpus (post-v3.17.1 actives vs retired machinery); four skill templates currency | pending |
 | 7 — Cue membership fix | `insight` + `decision` join DEFINITION_SURFACE_TYPES; self-tests; patch release | pending |
 
