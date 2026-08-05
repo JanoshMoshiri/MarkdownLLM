@@ -2477,6 +2477,28 @@ def test_candidates_definition_surface_advises_regardless_of_fanin(tmp_path, cap
     assert "cue: `a-skill`" in out and "definition surface" in out
 
 
+def test_candidates_modified_insight_advises_with_zero_fanin(tmp_path, capsys):
+    # v3.26.1 membership fix: an insight exists only to be reasoned from, so a
+    # modified insight cues with NO fan-in requirement (the felt gap: porch-bound
+    # insights edited with no cue). Same contract for `decision`.
+    root = _seed_candidates_repo(tmp_path)
+    for tid, typ in (("a-lesson", "insight"), ("a-ruling", "decision")):
+        f = root / "things" / f"{tid}.md"
+        f.write_text(
+            "---\nid: %s\ntype: %s\nstatus: active\ncreated: 2026-08-01\n---\n# T\n"
+            % (tid, typ), encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "add insight + decision")
+    for tid in ("a-lesson", "a-ruling"):
+        f = root / "things" / f"{tid}.md"
+        f.write_text(f.read_text(encoding="utf-8") + "\nrevised\n", encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0
+    assert "cue: `a-lesson`" in out and "definition surface" in out
+    assert "cue: `a-ruling`" in out
+
+
 def test_install_hook_writes_post_commit_leg(tmp_path):
     from markdownllm.scaffold import install_hook
     root = tmp_path / "r"

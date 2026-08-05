@@ -3,11 +3,11 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-04
-generated: 2026-08-04T20:36:51
-generated_from: HEAD@fa40ac5
+created: 2026-08-05
+generated: 2026-08-05T14:08:55
+generated_from: HEAD@e01c279
 coverage: 6
-framework_version: 3.26.0
+framework_version: 3.26.1
 ---
 
 # Provenance Index (reverse) — framework

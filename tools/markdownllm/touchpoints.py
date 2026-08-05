@@ -99,8 +99,13 @@ def cmd_touchpoints(args) -> int:
 
 # Types whose entire function is to be reasoned from — modification is a cue
 # candidate regardless of fan-in. Data things qualify by fan-in instead.
+# `insight` and `decision` joined at v3.26.1: both meet this set's own
+# criterion (an insight exists only to be reasoned from; a decision is
+# reasoned-from the moment anything cites it), and the operator felt the
+# gap live — porch-bound insights modified with no cue (substrate-currency-sweep).
 DEFINITION_SURFACE_TYPES = {"specification", "skill", "guide", "manifesto",
-                            "prompt", "workflow-definition"}
+                            "prompt", "workflow-definition", "insight",
+                            "decision"}
 FAN_IN_THRESHOLD = 3  # inbound edges at which an ordinary thing is "reasoned-from"
 
 
