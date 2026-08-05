@@ -33,7 +33,7 @@ Both are instances of work getting committed without all tracking surfaces being
 
 ## Why It Matters
 
-This is a recurring risk, not a one-off. Every time a spec is created or updated, there are potentially 3–4 surfaces to maintain: the spec itself, AGENTS.md inventory, CHANGELOG, and any related insight or WORKLOG entry. Missing one creates a silent inconsistency that can persist for days until someone does a full review.
+This is a recurring risk, not a one-off. Every time a spec is created or updated, there are potentially 3–4 surfaces to maintain: the spec itself, AGENTS.md inventory, CHANGELOG, and any related insight (a WORKLOG entry was a fourth surface when this was written — retired v3.17, the deletion being this insight's own lesson applied: one fewer surface to drift). Missing one creates a silent inconsistency that can persist for days until someone does a full review.
 
 A possible mitigation: validation (validate.thing.md) could include a check for orphaned specs — files at root matching `*.md` with YAML frontmatter that don't appear in AGENTS.md's spec inventory. This would have caught thing-lifecycle.md on day one.
 

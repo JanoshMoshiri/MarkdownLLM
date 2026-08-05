@@ -72,7 +72,7 @@ exactly the classes the spec predicts:
 | 3 — README rewrite | Spec table from the catalog (23), CLI section gains the estate layer + publication story, figures re-measured (kernel 2,897), domain count stated generically | ✅ done |
 | 4 — first-hour walk | Newcomer path through estate-sync, boundary, autopush | ✅ done (v1.1 — three new footnotes, hook legs named) |
 | 5 — Dispositions | continuity-brief template deleted (type stays reserved-but-deprecated by design, thing.md:88); both docs/plans legacies carry archival banners; retrospective-specification confirmed `stable` (estate section named a discovered practice; contract unchanged) | ✅ done |
-| 6 — Judgement walks | Insight corpus (post-v3.17.1 actives vs retired machinery); four skill templates currency | pending |
+| 6 — Judgement walks | Insight corpus: six flagged actives walked, one live-claim fixed (`tracking-artifacts` named WORKLOG as a live surface; now annotated — the insight's own lesson applied), five confirmed historical/annotated. Skill templates: all four walked — deliberately generic, references current; old dates are stability, not rot | ✅ done |
 | 7 — Cue membership fix | `insight` + `decision` join DEFINITION_SURFACE_TYPES; self-tests; patch release | pending |
 
 ## Success criteria
