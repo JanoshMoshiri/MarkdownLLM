@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-04
-generated: 2026-08-04T21:51:49
-generated_from: HEAD@37bca4a
-coverage: 137
+created: 2026-08-05
+generated: 2026-08-05T13:48:40
+generated_from: HEAD@65eaab5
+coverage: 139
 framework_version: 3.26.0
 ---
 
@@ -482,6 +482,11 @@ framework_version: 3.26.0
 - structure-decides-figures-scale-decides-convention --complements--> withholding-is-not-isolation
 - structure-decides-figures-scale-decides-convention --supports--> mis-keyed-links-pass-the-floor-silently
 - structure-decides-figures-scale-decides-convention --references--> llm-driven-systems-manifesto
+- substrate-currency-sweep --implements--> change-reconciliation-specification
+- substrate-currency-sweep --references--> a-generated-surface-collapses-its-walk
+- substrate-currency-sweep --implements--> inflection-candidates-are-computable
+- substrate-currency-sweep --references--> tracking-artifacts-can-drift-from-reality
+- substrate-currency-sweep --references--> estate-cadence-cluster
 - the-notation-changed-not-the-primitives --extends--> llm-driven-systems-manifesto
 - the-notation-changed-not-the-primitives --references--> thing-specification
 - the-notation-changed-not-the-primitives --references--> orchestration-specification
