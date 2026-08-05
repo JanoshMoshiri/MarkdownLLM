@@ -2,7 +2,7 @@
 id: write-thing-specification
 type: specification
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-13
 linked_things:
   - id: thing-specification
@@ -21,6 +21,8 @@ linked_things:
 
 <!-- kernel -->
 **Before writing:** read the domain's specification skill + thing.md (kernel suffices); load at the minimal tier the change needs. Ensure required fields (`id`, `type`, `status`, `created`); respect the domain schema — emergent fields only with clear purpose.
+
+**At creation, answer the exposure question** — *does another domain need to rest on this?* Three cheap answers at the moment of writing: **yes** → `exposed: true` (first checking no other domain already owns the fact — one owner, everyone else imports) · **no** — a real answer, not a deferral · **not yet** → say so in the body, with the condition that would change it. Retrofitted exposure arrives as a cliff no consumer absorbs; per-thing exposure arrives as a trickle.
 
 **After every change, cascade:** what else must update? Dependencies unblocked → status changes; new relationships → link both sides; reality changed → narrative updated. Then validate (the tool), then commit (`post-write:commit` hard hook), with a domain-state commit message.
 
@@ -58,6 +60,26 @@ The user is asking you to help manage their things within the domain. Your job i
 - Mark things with different statuses or priorities
 - Add new emergent metadata fields if they serve the reasoning
 - Archive or clean up things that no longer apply
+
+## The Exposure Question (At Creation)
+
+When you create a thing, answer *"does another domain need to rest on this?"*
+before the write closes — the moment of authoring is the one time this
+question is cheap (promoted 2026-08-05 from `exposure-is-an-authoring-time-call`,
+a consumer estate's insight, approved by its operator 2026-07-28):
+
+- **Yes** → set `exposed: true` now — after checking no other domain already
+  owns the fact (a cross-domain fact has one owner; everyone else imports it,
+  provenance.md → Cross-Domain Imports).
+- **No** → a real answer, not a deferral. Most things are internal; saying so
+  is the common, correct case.
+- **Not yet** → write that in the body, with the condition that would flip it
+  ("expose when the pilot closes"). A dated condition can carry a trigger.
+
+Why at creation: the evidence for the alternative is a porch going from 3
+exposed things to 50 in one retrofit sweep — a cliff no consumer read for
+days, past a trigger written for exactly that event. Per-thing exposure at
+authoring time arrives as a trickle a consumer's poll absorbs naturally.
 
 ## What You Should Consider Before Modifying
 

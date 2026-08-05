@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: kernel
 created: 2026-08-05
-generated: 2026-08-05T14:08:56
-generated_from: HEAD@e01c279
+generated: 2026-08-05T16:01:11
+generated_from: HEAD@181ce89
 coverage: 6
 framework_version: 3.26.1
 ---
@@ -48,6 +48,8 @@ the framework or when the kernel says to. Regenerate after any spec change.
 ## write.thing.md
 
 **Before writing:** read the domain's specification skill + thing.md (kernel suffices); load at the minimal tier the change needs. Ensure required fields (`id`, `type`, `status`, `created`); respect the domain schema — emergent fields only with clear purpose.
+
+**At creation, answer the exposure question** — *does another domain need to rest on this?* Three cheap answers at the moment of writing: **yes** → `exposed: true` (first checking no other domain already owns the fact — one owner, everyone else imports) · **no** — a real answer, not a deferral · **not yet** → say so in the body, with the condition that would change it. Retrofitted exposure arrives as a cliff no consumer absorbs; per-thing exposure arrives as a trickle.
 
 **After every change, cascade:** what else must update? Dependencies unblocked → status changes; new relationships → link both sides; reality changed → narrative updated. Then validate (the tool), then commit (`post-write:commit` hard hook), with a domain-state commit message.
 
