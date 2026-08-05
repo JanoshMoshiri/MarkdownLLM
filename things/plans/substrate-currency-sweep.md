@@ -1,8 +1,9 @@
 ---
 id: substrate-currency-sweep
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+version: 1.1
+completed: 2026-08-05
 created: 2026-08-05
 priority: high
 tags: [reconciliation, staleness, documentation, templates, cue-tuning, sweep]
@@ -73,15 +74,18 @@ exactly the classes the spec predicts:
 | 4 — first-hour walk | Newcomer path through estate-sync, boundary, autopush | ✅ done (v1.1 — three new footnotes, hook legs named) |
 | 5 — Dispositions | continuity-brief template deleted (type stays reserved-but-deprecated by design, thing.md:88); both docs/plans legacies carry archival banners; retrospective-specification confirmed `stable` (estate section named a discovered practice; contract unchanged) | ✅ done |
 | 6 — Judgement walks | Insight corpus: six flagged actives walked, one live-claim fixed (`tracking-artifacts` named WORKLOG as a live surface; now annotated — the insight's own lesson applied), five confirmed historical/annotated. Skill templates: all four walked — deliberately generic, references current; old dates are stability, not rot | ✅ done |
-| 7 — Cue membership fix | `insight` + `decision` join DEFINITION_SURFACE_TYPES; self-tests; patch release | pending |
+| 7 — Cue membership fix | `insight` + `decision` join DEFINITION_SURFACE_TYPES; self-tests; patch release | ✅ done (v3.26.1, 257 tests green) |
 
-## Success criteria
+## Success criteria — verified at close (2026-08-05)
 
-- Floor quiet: `validate` + `coherence` clean (the two example pins and the
-  map count Warning gone).
+- Floor quiet: `validate` clean across all corpora; `coherence` carries only
+  the self-aging retrospective-label Info (confirmed `stable`, ages out at 15
+  commits). ✅
 - Every surface the sweep flagged either corrected or carrying an explicit
-  disposition — nothing left implicitly stale.
+  disposition — nothing left implicitly stale. ✅
 - A modified `insight` or `decision` fires the pre-commit cue line with no
-  fan-in requirement, covered by a self-test.
-- All work committed at meaning boundaries; framework root stays unpushed
-  (release surface — publish remains the operator's deliberate act).
+  fan-in requirement — covered by
+  `test_candidates_modified_insight_advises_with_zero_fanin` (257 total green). ✅
+- All work committed at meaning boundaries (7 commits, one per phase-cluster);
+  framework root stays unpushed — release surface, publish remains the
+  operator's deliberate act. ✅
