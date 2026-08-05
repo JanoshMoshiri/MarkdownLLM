@@ -2,7 +2,7 @@
 id: session-end-continuity
 type: prompt
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-28
 inputs:
   - name: session-conversation
@@ -20,6 +20,8 @@ outputs:
     description: "type: conflict things created in things/conflicts/ (if contradictions found)"
   - name: updated-open-loops
     description: "Open-loop things created or moved to a terminal status this session"
+  - name: publication-debt-report
+    description: "The estate-sync --status roll-up — unpushed commits the estate cannot see, each line routed"
 bound_to:
   - hook: session-end
 linked_things:
@@ -128,6 +130,24 @@ the delimiter `mdllm worklog` groups sessions on. **Write a rich commit message:
 commit *is* the backward record now — there is no WORKLOG file to regenerate (retired
 in v3.17; `mdllm worklog` prints an on-demand view of the commit stream when you want
 it). History lives in git and nowhere else.
+
+### 7. Report Publication Debt
+
+The commit made the session's state real on this machine; publication makes it real
+to the estate — and under autopush (the default since v3.26) publication normally
+already happened at each commit. This step is the anomaly check, not the push:
+
+Run `python {framework_root}/tools/mdllm.py estate-sync . --status` (no network —
+cached refs) and surface every line. Any `ahead +n (unpushed)` is something to
+**route, not resolve**:
+- an offline session → the debt clears at the next connected commit;
+- a rejected push → divergence on the push side; surface it to the operator, never
+  resolve by force;
+- an opted-out repo (`git: autopush: false` — release surfaces) → holding work for
+  its deliberate publish is correct; name it so the operator can decide.
+
+Never push an opted-out repo yourself (git-workflow.md → The Outbound Rules;
+`autopush-moves-the-deliberate-act`).
 
 ## Extraction Heuristic
 
