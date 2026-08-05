@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-05
-generated: 2026-08-05T16:04:42
-generated_from: HEAD@5e17ea6
-coverage: 140
+generated: 2026-08-05T17:52:28
+generated_from: HEAD@fa699c0
+coverage: 144
 framework_version: 3.27.0
 ---
 
@@ -39,9 +39,11 @@ framework_version: 3.27.0
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --informs--> mechanical-coherence-checks-backlog
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --references--> llm-driven-systems-manifesto
+- a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - a-wrong-sum-is-indistinguishable-from-a-right-one --informs--> deterministic-calculation
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> divergence-is-an-unrouted-decision
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- adoption-reopens-birth-gaps --extends--> a-ruling-triages-more-cheaply-than-a-mechanism
 - agents-cannot-self-install-permission-bearing-hooks --informs--> hook-enforcement-has-three-anchors
 - agents-cannot-self-install-permission-bearing-hooks --supports--> consequence-is-recoverable-only-in-retrospect
 - agents-drop-mechanical-birth-steps-not-semantic-ones --supports--> hook-compliance-correlates-with-scope-not-awareness
@@ -270,6 +272,8 @@ framework_version: 3.27.0
 - framework-retrospective-2026-08a --references--> inflection-candidates-are-computable
 - framework-retrospective-2026-08a --references--> a-generated-surface-collapses-its-walk
 - framework-retrospective-2026-08a --supports--> a-true-primitive-is-discovered-not-authored
+- framework-upward-signal --implements--> shared-domain-failures-are-a-framework-signal-without-a-path
+- framework-upward-signal --references--> divergence-is-an-unrouted-decision
 - framework-v3-transformation-plan --references--> validate-thing-specification
 - framework-v3-transformation-plan --references--> session-memory-specification
 - framework-v3-transformation-plan --references--> derived-index-specification
@@ -464,6 +468,8 @@ framework_version: 3.27.0
 - session-start-loses-to-the-first-request --supports--> hook-enforcement-has-three-anchors
 - session-start-loses-to-the-first-request --supports--> agents-md-discovery-is-harness-dependent
 - session-start-loses-to-the-first-request --informs--> orchestration-specification
+- shared-domain-failures-are-a-framework-signal-without-a-path --references--> divergence-is-an-unrouted-decision
+- shared-domain-failures-are-a-framework-signal-without-a-path --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - source-behind-mirror-is-still-a-consumer-side-read --extends--> cross-domain-handoff-is-built-inbound-only
 - source-behind-mirror-is-still-a-consumer-side-read --informs--> mcp-domain-server-design
 - source-behind-mirror-is-still-a-consumer-side-read --informs--> cross-domain-sync-catchup
