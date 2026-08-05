@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-05
-generated: 2026-08-05T16:04:47
-generated_from: HEAD@5e17ea6
-coverage: 6
+generated: 2026-08-05T20:39:21
+generated_from: HEAD@e2d925e
+coverage: 8
 framework_version: 3.27.0
 ---
 
@@ -29,4 +29,10 @@ framework_version: 3.27.0
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
+
+## substrate-currency-sweep
+- cumulative-drift-is-invisible-to-per-change-walks (derived-from)
+
+## vantage-brief-cluster
+- asks-travel-as-exposed-things (derived-from)
 

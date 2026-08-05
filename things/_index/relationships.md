@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-05
-generated: 2026-08-05T17:52:28
-generated_from: HEAD@fa699c0
-coverage: 144
+generated: 2026-08-05T20:38:23
+generated_from: HEAD@e2d925e
+coverage: 146
 framework_version: 3.27.0
 ---
 
@@ -50,6 +50,8 @@ framework_version: 3.27.0
 - agents-drop-mechanical-birth-steps-not-semantic-ones --informs--> orchestration-specification
 - agents-md-discovery-is-harness-dependent --challenges--> framework-discovery-specification
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
+- asks-travel-as-exposed-things --supports--> provenance-specification
+- asks-travel-as-exposed-things --derived-from--> vantage-brief-cluster
 - assistant-register --extends--> interface-specification
 - assistant-register --implements--> tiered-loading-is-tiered-reading-applied-to-specs
 - assistant-register --informs--> hook-compliance-correlates-with-scope-not-awareness
@@ -139,6 +141,10 @@ framework_version: 3.27.0
 - cross-domain-sync-catchup --extends--> provenance-specification
 - cross-domain-sync-catchup --extends--> change-reconciliation-specification
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
+- cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
+- cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
+- cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality
+- cumulative-drift-is-invisible-to-per-change-walks --derived-from--> substrate-currency-sweep
 - decision-status-vocabulary-domain-owned --informs--> thing-specification
 - decision-status-vocabulary-domain-owned --informs--> validate-thing-specification
 - derived-index-is-attention-cache-not-search-layer --informs--> derived-index-specification

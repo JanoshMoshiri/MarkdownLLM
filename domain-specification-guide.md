@@ -276,7 +276,7 @@ git:
 2. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen`
 3. Load `{framework_root}/kernel.md` — the operative rules of the foundational specs (a small fraction of the full-spec cost; `mdllm tokens` measures the current split); load a full spec only when the kernel doesn't settle an ambiguity
 4. Load skills relevant to session intent: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
-5. Read the **orient** view (`mdllm session-start` emits it) — the open loops (non-terminal work things + open conflicts) carried from prior sessions. Forward state is the thing graph, not a hand-kept brief; `continuity.md` is retired (v3.17)
+5. Read the **orient** view (`mdllm session-start` emits it) — the open loops (non-terminal owned work + open conflicts; `origin: external` things file under a separate **Watched** line) carried from prior sessions. Forward state is the thing graph, not a hand-kept brief; `continuity.md` is retired (v3.17)
 6. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
 
 ### On User Request
@@ -568,7 +568,7 @@ The framework includes primitives that help domains accumulate understanding acr
 
 ### The Orient View — Forward State Is The Thing Graph
 
-There is no file to place or maintain. A domain's forward-looking state — open threads, pending work, unresolved conflicts — lives in the **thing graph**, and the generated **orient** view surfaces it: `mdllm session-start` emits the open loops (non-terminal work things + open conflicts) at session start. The hand-maintained `continuity.md` brief is retired (v3.17) — a singleton that drifted and conflated the corpus's two sides; forward state is now things, and the backward record is the commit stream (`mdllm worklog` views it on demand). Nothing to seed: a new domain has session memory from its first commit.
+There is no file to place or maintain. A domain's forward-looking state — open threads, pending work, unresolved conflicts — lives in the **thing graph**, and the generated **orient** view surfaces it: `mdllm session-start` emits the open loops (non-terminal owned work + open conflicts) at session start, with imported mirrors filed under a separate **Watched** line — a mirror's status is the source's state, not this domain's work. The hand-maintained `continuity.md` brief is retired (v3.17) — a singleton that drifted and conflated the corpus's two sides; forward state is now things, and the backward record is the commit stream (`mdllm worklog` views it on demand). Nothing to seed: a new domain has session memory from its first commit.
 
 ### `type: insight` — Preserved Ideas
 
