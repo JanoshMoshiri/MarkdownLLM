@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-05
-generated: 2026-08-05T14:08:53
-generated_from: HEAD@e01c279
-coverage: 139
+generated: 2026-08-05T15:54:04
+generated_from: HEAD@c341a63
+coverage: 140
 framework_version: 3.26.1
 ---
 
@@ -522,6 +522,9 @@ framework_version: 3.26.1
 - validate-thing-specification --validates--> provenance-specification
 - validate-thing-specification --implements--> divergence-is-an-unrouted-decision
 - validate-thing-specification --complements--> domain-specification-guide
+- vantage-brief-cluster --implements--> provenance-specification
+- vantage-brief-cluster --implements--> session-memory-specification
+- vantage-brief-cluster --references--> substrate-currency-sweep
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification
