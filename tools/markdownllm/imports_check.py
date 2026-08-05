@@ -170,6 +170,17 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
                 row["current"] = current
                 if not _pins_match(current, pin):
                     row["state"] = "stale"
+                    # Two stale species (v3.27.0): a source-side commit that
+                    # touched only what egress strips (triggers, relational
+                    # graph) moves the pin with NO crossable change — the full
+                    # re-quarantine ritual, which spends a human's attributed
+                    # flip, is owed only when the content actually moved.
+                    src_text = got.get(f"thing://{sd}/{sid}")
+                    if src_text is not None:
+                        same = (_norm_body(_face_body(src_text))
+                                == _norm_body(t.body))
+                        row["species"] = ("content identical" if same
+                                          else "content changed")
                 else:
                     src_text = got.get(f"thing://{sd}/{sid}")
                     if (src_text is not None
@@ -186,8 +197,12 @@ def _render_rows(rows: list[dict]) -> None:
              "no-address-book-entry": 4, "incomplete": 5, "fresh": 6, "ingested": 7}
     for r in sorted(rows, key=lambda r: order.get(r["state"], 9)):
         if r["state"] == "stale":
-            print(f"- STALE      {r['id']}  ({r['source']})  pinned {r['pin']} -> now {r['current']}")
-            print("             re-quarantine: re-read the source, then flip `verified: false`, `status: stale`")
+            sp = f"  ({r['species']})" if r.get("species") else ""
+            print(f"- STALE      {r['id']}  ({r['source']})  pinned {r['pin']} -> now {r['current']}{sp}")
+            if r.get("species") == "content identical":
+                print("             pin moved, nothing crossable changed: update `source_commit` to the current pin — re-quarantine not owed")
+            else:
+                print("             re-quarantine: re-read the source, then flip `verified: false`, `status: stale`")
         elif r["state"] == "diverged":
             print(f"- DIVERGED   {r['id']}  ({r['source']})  pin {r['pin']} is current but content differs")
             print("             the loop was bypassed: mirror edited locally, or source changed without committing — route as an inflection")

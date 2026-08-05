@@ -1464,6 +1464,39 @@ def test_imports_freshness_fresh_then_stale(tmp_path):
     rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
     assert rows["imported-spec"]["state"] == "stale"
     assert rows["imported-spec"]["current"] != pin
+    # body actually moved -> the species that owes the re-quarantine ritual
+    assert rows["imported-spec"]["species"] == "content changed"
+
+
+def test_imports_freshness_stale_species_content_identical(tmp_path):
+    # v3.27.0 (vantage-brief-cluster Ask 4): a source-side commit touching only
+    # what egress strips (a triggers: block) moves the pin with NO crossable
+    # change. The mirror is honest; only the pin lags. Re-quarantine — a
+    # human's attributed flip — is not owed; re-pinning is.
+    import subprocess as sp
+    src = tmp_path / "srcdom"
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+        "# The Spec\n\nv1.\n"))
+    sp.run(["git", "init", "-q"], cwd=src, check=True)
+    _git_commit(src, "create spec")
+    pin = _git_short(src)
+
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", pin,
+        {"command": sys.executable, "args": [str(Path(mdllm.__file__)), "mcp-serve", str(src)]},
+        body="# The Spec\n\nv1.\n")
+
+    # source gains a triggers: block — pin moves, face body does not
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true\n"
+        "triggers:\n  - type: time\n    condition: \"2026-12-01 reached\"\n    action: \"review\"",
+        "# The Spec\n\nv1.\n"))
+    _git_commit(src, "add trigger only")
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "stale"
+    assert rows["imported-spec"]["species"] == "content identical"
 
 
 def test_imports_freshness_unreachable_is_unknown(tmp_path):
