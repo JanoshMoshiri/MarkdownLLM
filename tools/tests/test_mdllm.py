@@ -1570,6 +1570,21 @@ def test_estate_check_rejects_non_directory(tmp_path, capsys):
     assert "not a directory" in capsys.readouterr().out
 
 
+def test_pins_match_survives_yaml_int_coercion():
+    # v3.27.0 (vantage-brief-cluster Ask 2): an unquoted all-digit short hash
+    # (`source_commit: 2399917`, ~1/16 of hashes) parses as int and false-flagged
+    # a healthy import STALE against its own pin. Two consumer domains hit it
+    # independently; CI flaked on it when three tests minted one all-digit hash.
+    from markdownllm.imports_check import _pins_match
+    assert _pins_match(2399917, "2399917")          # the felt case: int vs str
+    assert _pins_match("2399917", 2399917)          # either side may coerce
+    assert _pins_match("abc1234", "abc1234")
+    assert _pins_match(" abc1234 ", "abc1234")      # whitespace never a difference
+    assert not _pins_match("abc1234", "abc1235")
+    assert not _pins_match(None, "abc1234")         # absence is never a match
+    assert not _pins_match(2399917, None)
+
+
 def test_imports_check_summary_states_coverage(tmp_path, capsys):
     # "26 import(s); 0 stale." over zero possible comparisons is the count of
     # comparisons never made rendered as assurance (estate audit FW-2). The

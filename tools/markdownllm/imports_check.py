@@ -92,6 +92,19 @@ def _norm_body(s: str) -> str:
     return "\n".join(line.rstrip() for line in s.strip().splitlines())
 
 
+def _pins_match(a, b) -> bool:
+    """Compare two commit pins as strings, whatever YAML made of them.
+
+    An unquoted all-digit short hash (`source_commit: 2399917` — ~1 in 16 of
+    them) parses as `int`, and `int != str` false-reported a healthy import
+    STALE against its own pin, prescribing a re-quarantine that spends a
+    human's attributed flip on nothing. Two consumer domains hit it
+    independently and patched it locally by quoting; the framework's own CI
+    then flaked on it. Normalise here, at the single comparison seam (v3.27.0)."""
+    return (a is not None and b is not None
+            and str(a).strip() == str(b).strip())
+
+
 def imports_freshness(consumer_root: Path) -> list[dict]:
     import json
     corpus, _ = scan(consumer_root)
@@ -155,7 +168,7 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
                 row["state"] = "withdrawn"  # no longer exposed by the source
             else:
                 row["current"] = current
-                if current != pin:
+                if not _pins_match(current, pin):
                     row["state"] = "stale"
                 else:
                     src_text = got.get(f"thing://{sd}/{sid}")
