@@ -1,8 +1,9 @@
 ---
 id: vantage-brief-cluster
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+version: 1.1
+completed: 2026-08-05
 created: 2026-08-05
 priority: high
 tags: [membrane, imports, orientation, watched, provenance, cross-domain]
@@ -62,7 +63,7 @@ operator ruled: build asks 1–4; record the observation unbuilt.
 | 2 — The watched line (Ask 1) | `_orient_forward()` partitions non-terminal things by `origin: external` → `Open loops (n)` + `Watched (n)` as separate lines; exclusion not hiding; fired triggers on watched things re-enter attention | ✅ done |
 | 3 — Expose-at-creation (Ask 3) | `write.thing.md` v2.2 gains the authoring-time exposure question (yes / no / not-yet-with-condition); kernel block updated + regenerated | ✅ done |
 | 4 — Stale species (Ask 4) | pin moved + face body identical → `stale (content identical)` (re-pin, no re-quarantine); body differs → `stale (content changed)` (ritual stands); `estate-check` display follows via shared renderer | ✅ done |
-| 5 — Release v3.27.0 | CHANGELOG, three version sentinels, kernel + indexes regenerated, examples re-pinned, full suite green | in progress |
+| 5 — Release v3.27.0 | CHANGELOG, three version sentinels, kernel + indexes regenerated, examples re-pinned, full suite green | ✅ done (261 tests) |
 
 ## Ruled out of scope / recorded unbuilt
 
@@ -77,14 +78,20 @@ operator ruled: build asks 1–4; record the observation unbuilt.
   sweep must run with all its domains loaded — their constraint, noted, not
   ours to schedule.
 
-## Success criteria
+## Success criteria — verified at close (2026-08-05)
 
-- The three flaky imports tests pass deterministically; a regression test
-  pins an all-digit hash on purpose.
+- The three flaky imports tests pass deterministically;
+  `test_pins_match_survives_yaml_int_coercion` pins the all-digit case on
+  purpose. ✅
 - A consumer corpus with imported mirrors reports owned and watched counts
-  separately; the owned count matches hand-count.
-- `write.thing.md` (and its kernel block) carry the exposure question.
-- `stale (content identical)` and `stale (content changed)` appear in
-  `imports-check` and `estate-check` output, correctly discriminated by test.
-- Full suite green; validate + coherence clean; framework root left unpushed
-  for the operator's deliberate release.
+  separately (`test_orientation_watched_is_not_owned`); a fired trigger on a
+  watched thing still reaches attention
+  (`test_register_watched_fired_trigger_still_surfaces`). ✅
+- `write.thing.md` v2.2 and its kernel block carry the exposure question;
+  kernel regenerated (3,010 tokens). ✅
+- `stale (content identical)` vs `stale (content changed)` discriminated by
+  `test_imports_freshness_stale_species_content_identical` and the extended
+  fresh-then-stale test; estate-check follows via the shared renderer. ✅
+- 261 tests green; validate + coherence clean (one self-aging stable-label
+  Info, confirmed); framework root left unpushed for the operator's
+  deliberate release. ✅
