@@ -1858,6 +1858,43 @@ def test_orientation_open_loops_respect_declared_terminal_statuses(tmp_path):
     assert "`wip`" in lines and "`live`" not in lines
 
 
+def test_orientation_watched_is_not_owned(tmp_path):
+    # v3.27.0 (vantage-brief-cluster Ask 1): a mirror's status is the source's
+    # state restated — not a loop here. The estate measurement: landing 27
+    # imports doubled the reported open-loop count with zero new owned work.
+    # Exclusion, not hiding: watched things get their own line.
+    write(tmp_path, "things/mine.md", thing_text(
+        "id: mine\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    write(tmp_path, "things/mirror.md", thing_text(
+        "id: mirror\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "origin: external\nverified: false\nsource_domain: srcdom\n"
+        "source_id: the-task\nsource_commit: 'abc1234'"))
+    from markdownllm.session import _orient_forward
+    lines = "\n".join(_orient_forward(tmp_path))
+    assert "Open loops (1)" in lines and "`mine`" in lines
+    assert "Watched (1)" in lines and "`mirror`" in lines
+    # the mirror appears only under Watched, never in the owned listing
+    owned_block = lines.split("Watched")[0]
+    assert "`mirror`" not in owned_block
+
+
+def test_register_watched_fired_trigger_still_surfaces(tmp_path):
+    # The QMS lesson kept: excluding watched from the owned count must not
+    # silence its triggers — a fired `type: import`-style trigger re-enters
+    # the attention ranking by id.
+    write(tmp_path, "things/mirror.md", thing_text(
+        "id: mirror\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "origin: external\nverified: false\nsource_domain: srcdom\n"
+        "source_id: the-task\nsource_commit: 'abc1234'\n"
+        "triggers:\n  - type: time\n    condition: \"2026-01-01 reached\"\n"
+        "    action: \"chase\""))
+    from markdownllm.session import _render_assistant
+    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
+    assert "Watched: 1 external thing(s)" in out
+    assert "`mirror`" in out  # fired trigger put it in the attention section
+    assert "fired triggers (surfaced above)" in out
+
+
 # ---------------------------------------------------------------------------
 # Disclosure boundary (boundary-disclosure-check plan). The invariant under
 # test everywhere: capability without vocabulary — no terms file means silent

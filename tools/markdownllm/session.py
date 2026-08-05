@@ -61,13 +61,21 @@ def _orient_forward(domain: Path) -> list[str]:
         corpus, _ = scan(domain)
     except Exception:
         return []
-    conflicts, loops = [], []
+    conflicts, loops, watched = [], [], []
     for t in corpus.things:
         typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
         if typ == "conflict" and status == "open":
             conflicts.append(t.id)
         elif typ not in _ORIENT_KNOWLEDGE_TYPES and not is_terminal(corpus.schema, t.meta):
-            loops.append((t.id, typ, status))
+            # Watched, not owned (v3.27.0): a mirror's status is the SOURCE's
+            # state restated — this domain cannot advance, close, or edit it,
+            # so it is not a loop here. Exclusion, not hiding: it gets its own
+            # line. The distortion scaled with how well a domain consumed
+            # (58% -> 81% of the count in one estate's measured session).
+            if str(t.meta.get("origin")) == "external":
+                watched.append((t.id, typ, status))
+            else:
+                loops.append((t.id, typ, status))
     lines: list[str] = []
     if conflicts:
         lines.append("- **Open conflicts (%d):** %s — resolve or carry forward."
@@ -78,6 +86,14 @@ def _orient_forward(domain: Path) -> list[str]:
             lines.append(f"    - `{tid}` ({typ}, {status})")
         if len(loops) > 15:
             lines.append(f"    - …and {len(loops) - 15} more (`mdllm validate` lists all).")
+    if watched:
+        lines.append(f"- **Watched ({len(watched)}):** external things — the world's or a "
+                     f"source's state, not this domain's work (`mdllm imports-check` "
+                     f"reads their freshness) —")
+        for tid, typ, status in sorted(watched)[:8]:
+            lines.append(f"    - `{tid}` ({typ}, {status})")
+        if len(watched) > 8:
+            lines.append(f"    - …and {len(watched) - 8} more.")
     return lines
 
 
@@ -236,14 +252,18 @@ def _open_work(domain: Path):
         corpus, _ = scan(domain)
     except Exception:
         return [], [], {}, None
-    conflicts, loops = [], []
+    conflicts, loops, watched = [], [], []
     for t in corpus.things:
         typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
         if typ == "conflict" and status == "open":
             conflicts.append(t)
         elif typ not in _ORIENT_KNOWLEDGE_TYPES and not is_terminal(corpus.schema, t.meta):
-            loops.append(t)
-    return conflicts, loops, {t.id: t for t in corpus.things}, corpus.schema
+            # Watched-not-owned (v3.27.0): imported/ingested externals leave the
+            # owned set. A fired trigger on a watched thing still surfaces —
+            # the caller re-enters fired things by id, which is exactly how
+            # `type: import` triggers keep their voice.
+            (watched if str(t.meta.get("origin")) == "external" else loops).append(t)
+    return conflicts, loops, watched, {t.id: t for t in corpus.things}, corpus.schema
 
 
 def _as_date(v):
@@ -319,7 +339,7 @@ def _row_line(r: dict) -> str:
 def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
                       flips: list[str], velocity: str) -> list[str]:
     fired, horizon, skipped = _fired_by_thing(domain)
-    conflicts, loops, by_id, schema = _open_work(domain)
+    conflicts, loops, watched, by_id, schema = _open_work(domain)
 
     # A fired trigger must reach the operator whatever it is attached to. The
     # open-loop set is NOT the right filter: a trigger declared on a conflict,
@@ -357,6 +377,15 @@ def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
     if conflicts:
         out.append(f"## Unresolved conflicts ({len(conflicts)})")
         out.append("  " + " · ".join(f"`{c.id}`" for c in conflicts))
+        out.append("")
+
+    if watched:
+        # Count only, never a listing: watched things need no attention unless
+        # a trigger fires (those re-enter "Wants attention" via the fired path).
+        wf = [w for w in watched if w.id in fired]
+        out.append(f"Watched: {len(watched)} external thing(s) — sources' state, "
+                   f"not this domain's work; freshness via `mdllm imports-check`."
+                   + (f" {len(wf)} have fired triggers (surfaced above)." if wf else ""))
         out.append("")
 
     # Rule 4 — expand at human-decides moments. This is the one section that
