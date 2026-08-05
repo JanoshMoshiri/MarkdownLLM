@@ -67,7 +67,7 @@ exactly the classes the spec predicts:
 
 | Phase | Scope | Status |
 |---|---|---|
-| 1 — Mechanical | framework-map count + View 3 rows (`autopush`, `candidates`); `orchestration.md:240` residue; examples walk + re-pin to 3.26.0; installer prose (hook legs undersold) | pending |
+| 1 — Mechanical | framework-map count + View 3 rows (`autopush`, `candidates`); `orchestration.md:240` residue; examples walk + re-pin to 3.26.0 (no-op absorb: `computed` opt-in undeclared, autopush repo-level n/a, cue hook-side); installer prose (hook legs undersold) | ✅ done |
 | 2 — End-session collapse | Patch the four stale surfaces (templates/commands, copilot-prompts, .github/prompts, templates/prompts/session-end-continuity.md) with the publication-debt step | pending |
 | 3 — README rewrite | Spec table from the catalog (23), CLI section gains the estate layer + publication story, figures re-measured (kernel 2,897), domain count stated generically | pending |
 | 4 — first-hour walk | Newcomer path through estate-sync, boundary, autopush | pending |

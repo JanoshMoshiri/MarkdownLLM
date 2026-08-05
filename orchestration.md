@@ -237,7 +237,7 @@ This hook checks version drift in **two directions** along the same chain — *p
 
 **Why it's hard:** Orientation reads committed state, and in a multi-machine estate committed state partly lives on the remote. A session that orients without syncing reads a stale event stream *silently* — velocity, triggers, and verified-flip surfacing all quietly wrong. The worst outcome of a failed sync is orienting from stale state *and being told so*, which is strictly better than the alternative this hook replaces.
 
-**Why it never blocks:** the network-call rule above — a required network call at session start is forbidden; this hook is a bounded attempt that degrades to an advisory line and proceeds. It never pushes (git-workflow.md: push is the human's deliberate act) and never merges.
+**Why it never blocks:** the network-call rule above — a required network call at session start is forbidden; this hook is a bounded attempt that degrades to an advisory line and proceeds. It never pushes and never merges — publication is the post-commit autopush leg's job, not the sync walk's (git-workflow.md → The Outbound Rules; release surfaces keep the deliberate act).
 
 **What failure looks like:** Two machines each "up to date" in their own eyes, drifting for days; the eventual collision surfacing as a surprise merge conflict instead of a routine `DIVERGED` line at session start; a cloud session planning work the local machine already did.
 

@@ -9,7 +9,8 @@
 #   ./install.ps1
 #
 # It checks prerequisites, clones the framework if needed, installs PyYAML and
-# the deterministic-floor pre-commit hook, and verifies the result with
+# the deterministic-floor git hooks (validation, disclosure boundary,
+# publication leg), and verifies the result with
 # `mdllm doctor`. If git/Python are missing it offers to install them through
 # winget (with consent) and otherwise prints the command for you to run.
 # Pass -Yes to skip the prompt. Safe to re-run.
@@ -128,10 +129,10 @@ if (-not $gname -or -not $gmail) {
   Write-Host '       git config --global user.email "you@example.com"'
 }
 
-# --- 6. deterministic floor: pre-commit hook on the framework repo ---
-Say 'Installing the deterministic floor (pre-commit hook)'
+# --- 6. deterministic floor: git hooks on the framework repo ---
+Say 'Installing the deterministic floor (pre-commit + commit-msg + post-commit hooks)'
 RunPy 'tools/mdllm.py' 'install-hook' '.' | Out-Null
-if ($LASTEXITCODE -eq 0) { Ok 'hook installed' }
+if ($LASTEXITCODE -eq 0) { Ok 'hooks installed' }
 else { Warn "hook install reported a problem — see 'mdllm doctor .' output below." }
 
 # --- 7. Claude Code wrapper (non-destructive; harmless for other harnesses) ---

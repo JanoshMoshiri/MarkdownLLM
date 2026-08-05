@@ -69,7 +69,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>24 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>26 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -199,6 +199,8 @@ flowchart LR
         C22["estate-check"]
         C23["estate-sync"]
         C24["calc"]
+        C25["candidates"]
+        C26["autopush"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -225,6 +227,8 @@ flowchart LR
         T22["mcp-domain-server.md<br/>estate batching — operator axis"]
         T23["git-workflow.md<br/>The Machine Axis — sync before orienting"]
         T24["thing.md<br/>declared derivations — the floor does every sum"]
+        T25["change-reconciliation.md<br/>the cue question at the commit boundary"]
+        T26["git-workflow.md<br/>The Outbound Rules — publication leg"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -251,6 +255,8 @@ flowchart LR
     C22 -->|"batches imports-check for"| T22
     C23 -->|"fetch + ff-only pull for"| T23
     C24 -->|"computes and re-checks"| T24
+    C25 -->|"asks the cue for"| T25
+    C26 -.->|"publishes validated commits per"| T26
 ```
 
 Notes on this view:

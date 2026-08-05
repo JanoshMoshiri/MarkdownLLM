@@ -9,7 +9,8 @@
 #   ./install.sh
 #
 # It checks prerequisites, clones the framework if needed, installs PyYAML and
-# the deterministic-floor pre-commit hook, and verifies the result with
+# the deterministic-floor git hooks (validation, disclosure boundary,
+# publication leg), and verifies the result with
 # `mdllm doctor`. If git/Python are missing it offers to install them through
 # your OS package manager (with consent) and otherwise prints the command for
 # you to run. Pass -y / --yes to skip the prompt. Safe to re-run.
@@ -178,10 +179,10 @@ if [ -z "$(git config user.name  || true)" ] || [ -z "$(git config user.email ||
   echo '       git config --global user.email "you@example.com"'
 fi
 
-# --- 6. deterministic floor: pre-commit hook on the framework repo ---
-say "Installing the deterministic floor (pre-commit hook)"
+# --- 6. deterministic floor: git hooks on the framework repo ---
+say "Installing the deterministic floor (pre-commit + commit-msg + post-commit hooks)"
 if "$PY" tools/mdllm.py install-hook . >/dev/null; then
-  ok "hook installed"
+  ok "hooks installed"
 else
   warn "hook install reported a problem — see 'mdllm doctor .' output below."
 fi
