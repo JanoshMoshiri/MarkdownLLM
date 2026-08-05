@@ -58,11 +58,11 @@ operator ruled: build asks 1–4; record the observation unbuilt.
 
 | Phase | Scope | Status |
 |---|---|---|
-| 1 — Pin comparison honesty (Ask 2) | `imports_check` normalises both sides of every pin comparison to `str`; deterministic regression test with an unquoted all-digit pin; un-flakes CI | pending |
-| 2 — The watched line (Ask 1) | `_orient_forward()` partitions non-terminal things by `origin: external` → `Open loops (n)` + `Watched (n)` as separate lines; exclusion not hiding; trigger ranking reads owned loops only; tests | pending |
-| 3 — Expose-at-creation (Ask 3) | `write.thing.md` gains the authoring-time exposure question (yes / no / not-yet-with-condition); kernel block updated + regenerated | pending |
-| 4 — Stale species (Ask 4) | pin moved + face body identical → `stale (content identical)`; body differs → `stale (content changed)`; both retain pins; `estate-check` display follows; tests | pending |
-| 5 — Release v3.27.0 | CHANGELOG, three version sentinels, kernel + indexes regenerated, examples re-pinned, full suite green | pending |
+| 1 — Pin comparison honesty (Ask 2) | `imports_check` normalises both sides of every pin comparison to `str`; deterministic regression test with an unquoted all-digit pin; un-flakes CI | ✅ done |
+| 2 — The watched line (Ask 1) | `_orient_forward()` partitions non-terminal things by `origin: external` → `Open loops (n)` + `Watched (n)` as separate lines; exclusion not hiding; fired triggers on watched things re-enter attention | ✅ done |
+| 3 — Expose-at-creation (Ask 3) | `write.thing.md` v2.2 gains the authoring-time exposure question (yes / no / not-yet-with-condition); kernel block updated + regenerated | ✅ done |
+| 4 — Stale species (Ask 4) | pin moved + face body identical → `stale (content identical)` (re-pin, no re-quarantine); body differs → `stale (content changed)` (ritual stands); `estate-check` display follows via shared renderer | ✅ done |
+| 5 — Release v3.27.0 | CHANGELOG, three version sentinels, kernel + indexes regenerated, examples re-pinned, full suite green | in progress |
 
 ## Ruled out of scope / recorded unbuilt
 
