@@ -112,11 +112,17 @@ classes. Order of felt-ness:
       recorded, never silently re-pinned. *(Done 2026-08-01: kernel regen
       unblocked it; the import was routed as restore — the mirror predated
       the imports-check contract, no local semantic edits existed.)*
-- [ ] **The two stub-skill domains**: route each — fill from earned insights
-      where sessions have run, or park the domain explicitly. Never fill
-      from the birth-day description (the regulated deployment's lesson:
-      skills harvested from insights held; skills written from a stated
-      scope reproduced the gap).
+- [x] **The two stub-skill domains**: route each — fill from earned insights
+      where sessions have run, or park the domain explicitly. *(Half done
+      2026-08-02, half still owed: the meta domain PARKED its three stubs via
+      a decision thing with an unpark condition — held verbatim at the
+      2026-08-05 re-sweep. The personal pipeline domain's ruling was never
+      taken: its three skills remain verbatim templates under the
+      template-residue Info, 11 days on. That ruling is the operator's and
+      stays open — tracked here honestly rather than as an untouched box.
+      NOTE 2026-08-05: this box and the one below sat unticked for three days
+      after the work landed — the re-sweep caught the tracking drift;
+      `tracking-artifacts-can-drift-from-reality` applies to this plan too.)*
 - [x] **Refresh debtors**: refresh adopt → seal; backfill pre-v3.20 artifacts
       (boundary file, gitignore) where scaffold predates them. *(Done
       2026-08-02: all twelve domains taken to v3.24.0, not just the five
@@ -130,9 +136,15 @@ classes. Order of felt-ness:
       framework's prompts flagged a domain 24× for the framework's own
       field names, fixed by registering the reserved prompt contract in
       CORE_FIELDS.)*
-- [ ] **Status-vocabulary reconciliation** in the domain whose skills
+- [x] **Status-vocabulary reconciliation** in the domain whose skills
       disagree with its schema on every type — a latent commit-blocker;
       revise the skills to the schema (the schema is the ruled surface).
+      *(Done 2026-08-02: all six vocabularies reconciled, gates rewritten to
+      the leg model, dated snapshots replaced with graph pointers, skills
+      bumped 1.1. Held intact at the 2026-08-05 re-sweep — though that sweep
+      found the same stale claim surviving one layer deeper, in a deal
+      thing's own frontmatter: the reconcile walked skills and the entry
+      file, never `things/`.)*
 - [ ] **Inert relationship triggers**: the regulated deployment already owns
       this as its trigger-vocabulary repair plan's final phase — execute
       there, not here. *(Materially reduced 2026-08-01: the YAML on-key fix
@@ -140,9 +152,13 @@ classes. Order of felt-ness:
       arrived as boolean keys — and the rest carry deliberate `condition:`
       prose the agent judges. The floor now reads them correctly; what
       remains there is conversion work, not repair.)*
-- [ ] **Route the aged `framework_promotion: candidate`** sitting 31 days
-      unrouted in a meta domain (observation-is-a-distribution claim):
-      accept into the framework or decline with rationale.
+- [ ] **Route the aged `framework_promotion: candidate`** sitting unrouted
+      in a meta domain since 2026-07-01 (observation-is-a-distribution
+      claim): accept into the framework or decline with rationale. *(35 days
+      at the 2026-08-05 re-sweep, which added a blocking detail: the insight
+      is not `exposed: true`, so no membrane path exists for the framework
+      to import it even if accepted — the route is blocked at the domain end
+      first.)*
 
 ## Phase 2 — Floor sensors (tool-level; propagate estate-wide on ship)
 
