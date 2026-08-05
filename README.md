@@ -82,7 +82,9 @@ The two documents written for the operator rather than the agent, plus the visua
 |------|---------|
 | [first-hour.md](docs/first-hour.md) | A newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor |
 | [operator-guide.md](docs/operator-guide.md) | The steady state — what the tooling carries for you, recurring scenarios, what remains your job |
-| [framework-map.md](docs/framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping |
+| [framework-map.md](docs/framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping, the estate seam |
+| [estate-mechanics.md](docs/estate-mechanics.md) | Running more than one domain — the three radii of a change, sync and publication across repos |
+| [calculation-reference.md](docs/calculation-reference.md) | The `computed:` expression grammar — declared derivations the floor evaluates |
 
 ### Foundational Specifications (Agent-Consumed)
 
@@ -103,7 +105,14 @@ These are the specs the agent loads and reasons with:
 | [scalability-guide.md](scalability-guide.md) | Scaling from tens to thousands of things |
 | [session-memory.md](session-memory.md) | Session memory: `type: insight`, graph-keyed liveness, and the session-end extraction ritual. Forward state is the thing graph, surfaced by the generated **orient** view (`mdllm session-start` → "Open loops") — the hand-maintained `continuity.md` is retired (v3.17) |
 | [belief-revision.md](belief-revision.md) | Contradiction tracking: `type: conflict`, relation types, belief revision process |
-| [retrospective.md](retrospective.md) | Periodic quality reflection: `type: retrospective`, when to write, what it produces |
+| [retrospective.md](retrospective.md) | Periodic quality reflection: `type: retrospective`, when to write, what it produces — including the estate retrospective |
+| [change-reconciliation.md](change-reconciliation.md) | The blast radius of a consequential change — the cue question (asked mechanically at every commit), the Assimilate pass, the Walk |
+| [trigger-specification.md](trigger-specification.md) | Declared triggers: conditions the floor evaluates mechanically and conditions the agent judges |
+| [derived-index.md](derived-index.md) | Generated index things — precomputed attention caches, rebuilt never hand-edited |
+| [workflow-state.md](workflow-state.md) | Processes as things: `type: workflow-definition` and `type: workflow-run` |
+| [coordination-claim.md](coordination-claim.md) | Multi-agent coordination — claims over things so concurrent sessions don't collide |
+| [reasoning-lenses.md](reasoning-lenses.md) | Domain-declared reasoning lenses applied at read and write time |
+| [example-things.md](example-things.md) | Worked example instances the other specs reference |
 
 ### Philosophy
 
@@ -126,32 +135,35 @@ For a domain in production use, the framework's own repository is the working ex
 Since v3.0, the framework pairs its specifications with a zero-install, stdlib-only CLI (one entry file, a package of single-responsibility modules behind it) that guarantees everything mechanical, so the LLM spends its reliability on reasoning:
 
 ```bash
-python tools/mdllm.py validate <domain>      # structure, references, schema — exit 1 on Errors
-python tools/mdllm.py install-hook <domain>  # pre-commit hook: broken things cannot be committed
-python tools/mdllm.py doctor <domain>        # environment probe: hook executes? version drift? degraded mode?
-python tools/mdllm.py scaffold <new-domain>  # deterministic domain birth: templates, nested repo, isolation, hook
-python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + horizon
+python tools/mdllm.py validate <domain>      # structure, references, schema, declared derivations — exit 1 on Errors
+python tools/mdllm.py install-hook <domain>  # git hooks: pre-commit validation + cue, commit-msg boundary, post-commit publication
+python tools/mdllm.py doctor <domain>        # environment probe: hooks execute? version drift? degraded mode?
+python tools/mdllm.py scaffold <new-domain>  # deterministic domain birth: templates, nested repo, isolation, hooks
+python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + horizon; --estate rolls up every local domain
 python tools/mdllm.py provenance <domain>    # decision pins resolve; no output rests on unverified content
+python tools/mdllm.py calc <domain>          # declared derivations (`computed:`) — the floor does every sum
+python tools/mdllm.py estate-sync            # fetch + ff-only pull across the estate's repos; --status = publication debt
+python tools/mdllm.py imports-check <domain> # cross-domain imports re-checked against the source's face
 python tools/mdllm.py eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
 python tools/mdllm.py kernel                 # regenerate the operative kernel from spec blocks
 python tools/mdllm.py session-start <domain> # emit the startup ritual + orient view (open loops) for a SessionStart hook to inject at t=0
 ```
 
-Each domain declares its thing types and **its own status vocabularies** in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) (~2.1k tokens of operative rules) at session start instead of ~21k of full spec prose; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a `SessionStart` hook so the agent runs version-check + velocity and reads the generated **orient** view — the open loops (non-terminal work things + open conflicts) that replace the retired `continuity.md` — at t=0 rather than hoping it surfaces from a long entry file — `scaffold` writes this `.claude/settings.json` block for new domains (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
+That's the working core — `python tools/mdllm.py --help` lists the full 26-subcommand surface (coherence checks, blast-radius reads, the disclosure boundary, MCP serving, and more; [framework-map.md](docs/framework-map.md) View 3 maps each subcommand to the spec it mechanises). The commit boundary carries three legs: **pre-commit** validates and asks the change-reconciliation cue question, **commit-msg** enforces the local disclosure boundary, and **post-commit** publishes each floor-validated commit (`mdllm autopush`) unless the repo opts out — release surfaces do, so a public release stays a deliberate human act.
+
+Each domain declares its thing types, **its own status vocabularies**, and which of those statuses mean *settled* in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) (~2.9k tokens of operative rules) at session start instead of ~29k of full spec prose (`mdllm tokens` measures the live split); the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a `SessionStart` hook so the agent runs version-check + velocity and reads the generated **orient** view — the open loops (non-terminal work things + open conflicts) that replace the retired `continuity.md` — at t=0 rather than hoping it surfaces from a long entry file — `scaffold` writes this `.claude/settings.json` block for new domains (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
 
 ### Templates
 
 Starting structures the agent uses when scaffolding a new domain:
 
-- `templates/AGENTS.md.template`
-- `templates/[domain]-specification.skill.md.template`
-- `templates/[domain]-read.thing.skill.md.template`
-- `templates/[domain]-write.thing.skill.md.template`
-- `templates/[domain]-workflow.skill.md.template`
-- `templates/prompts/` — Orchestration prompt templates
-- `templates/insight.md.template` — `type: insight` things
-- `templates/conflict.md.template` — `type: conflict` things
-- `templates/retrospective.md.template` — `type: retrospective` things
+- `templates/AGENTS.md.template` — the domain entry file (operative sections regenerated by `mdllm domain-kernel`)
+- `templates/_schema.yaml.template` — the domain's normative schema
+- `templates/domain-{specification,read.thing,write.thing,workflow}.skill.md.template` — the four skills
+- `templates/prompts/` — orchestration prompt templates (session-end continuity, cascade, conflict/schema scans)
+- `templates/commands/` + `templates/copilot-prompts/` — the deliberate `end-session` / `retrospective` rituals as slash commands for Claude Code and Copilot
+- `templates/{insight,conflict,decision,retrospective,workflow-definition,workflow-run}.md.template` — reserved-type things
+- `templates/boundary-terms.template` — the local, never-committed disclosure boundary
 
 ---
 
@@ -207,7 +219,7 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 ### Vendor setup
 
 - **Claude Code** — the installer writes a `CLAUDE.md` wrapper (`@AGENTS.md`) for you. If you cloned by hand, add one at root containing `@AGENTS.md`.
-- **Optional hardening (Claude Code / Copilot in VS Code)** — copy the hooks block from [`adapters/claude-code.settings.example.json`](adapters/claude-code.settings.example.json) into `.claude/settings.json` to inject the session-start ritual and run `validate` after every write. One Claude-format file covers both harnesses. `scaffold` writes it for new domains; an existing domain adds it as a one-time operator paste — the agent can't, because the file carries permission rules. Opt-in: with no adapter the ritual still fires by interpretation.
+- **Optional hardening (Claude Code / Copilot in VS Code)** — copy the hooks block from [`adapters/claude-code.settings.example.json`](adapters/claude-code.settings.example.json) into `.claude/settings.json` to run `estate-sync` ahead of the session-start ritual, inject the ritual at t=0, and run `validate` after every write. One Claude-format file covers both harnesses. `scaffold` writes it for new domains; an existing domain adds it as a one-time operator paste — the agent can't, because the file carries permission rules. Opt-in: with no adapter the ritual still fires by interpretation.
 - **GitHub Copilot (VS Code)** — set `"chat.useAgentsMdFile": true` and `"chat.useNestedAgentsMdFiles": true`.
 - **Codex, Cursor, Windsurf, Gemini CLI** — no configuration; they auto-discover `AGENTS.md` at root.
 
@@ -253,7 +265,7 @@ Framework and domains version independently, and many domains can share one fram
 
 **Do I need to understand the specs to use this?** No. The agent understands the specs; you understand your domain. You'll absorb the patterns over time because you can read everything the agent produces — but you never need to study them upfront.
 
-**Is this production-ready?** The architecture is actively used — the framework develops itself as a domain, and one production domain (statutory company filings) runs on it. Specifications range from `draft` to `stable` (check frontmatter); `examples/` are small validated demonstrations, not production load. Your specific domain matures through use — that's by design.
+**Is this production-ready?** The architecture is actively used — the framework develops itself as a domain, and a private estate of over a dozen domains runs on it daily (regulated-compliance, finance, and life-operations domains among them, worked across multiple machines and consuming each other's published faces). Specifications range from `draft` to `stable` (check frontmatter); `examples/` are small validated demonstrations, not production load. Your specific domain matures through use — that's by design.
 
 ---
 

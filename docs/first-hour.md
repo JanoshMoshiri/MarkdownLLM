@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.0
+version: 1.1
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -36,9 +36,9 @@ time — and your agent builds it as a folder of markdown files with structured
 YAML headers, in its own git repository. From then on, the agent reads those
 files at the start of every session, reasons within the structure they
 declare, and updates them as your situation changes — git is the memory.
-A small Python tool (`tools/mdllm.py`) plus a git pre-commit hook mechanically
-blocks structurally broken changes, so the agent's reliability is spent on
-reasoning, not bookkeeping.
+A small Python tool (`tools/mdllm.py`) plus a set of git hooks mechanically
+blocks structurally broken changes at the commit boundary, so the agent's
+reliability is spent on reasoning, not bookkeeping.
 
 ## Minutes 0–10: Install, Then a Look Around
 
@@ -122,8 +122,10 @@ framework work.
 ## Minutes 45–55: Watch the Floor Catch Something
 
 The floor is already in place — the installer set it up for the framework, and
-`scaffold` installed the pre-commit hook inside your new domain. Prove it
-bites: open any thing in your domain, change its `status:` to `banana`, and run
+`scaffold` installed the git hooks inside your new domain (validation before
+each commit, a disclosure check on the commit message, publication after).
+Prove it bites: open any thing in your domain, change its `status:` to
+`banana`, and run
 
 ```
 python tools/mdllm.py validate <path-to-your-domain>
@@ -174,7 +176,21 @@ whole system; everything else is refinement.
   Older domains adopt it via a one-time operator paste when they refresh (see
   `domain-refresh.md`); the agent can't add it itself, because the file carries
   permission rules. With no adapter the ritual still runs by interpretation — the
-  hook only makes it reliable.
+  hook only makes it reliable. The first line you'll see each session is a sync
+  report (`estate-sync`): the ritual fetches what other machines committed
+  before orienting, and degrades to an advisory line when offline.
+- **Your domain publishes itself — once you give it somewhere to go.** A fresh
+  domain has no remote, so commits simply stay local. The moment you add one
+  (`git remote add origin …`), the post-commit hook publishes each validated
+  commit automatically (`mdllm autopush`). That default is deliberate — unpushed
+  work is invisible to your other machines — and per-repo opt-out
+  (`git: autopush: false` in `AGENTS.md`) exists for surfaces where publishing
+  should stay a considered act.
+- **Some words should never reach a commit.** `scaffold` gave your domain a
+  local `.boundary-terms` file (never committed, never cloned). List client
+  names or personal identifiers there and the commit-msg/pre-commit hooks block
+  any commit that would carry them — with no trace of the terms themselves in
+  the repository.
 - **If validation blocks a legitimate change**, the schema is wrong, not
   you: extend `things/_schema.yaml` with the agent rather than fighting the
   finding.
