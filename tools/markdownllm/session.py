@@ -256,7 +256,8 @@ def _where_you_left_off(domain: Path):
                        encoding="utf-8", errors="replace")
     if r.returncode != 0:
         return None
-    for line in r.stdout.splitlines():
+    lines = r.stdout.splitlines()
+    for line in lines:
         sha, _, tail = line.partition("|")
         when, _, subj = tail.partition("|")
         if subj.strip().split(":", 1)[0].strip().lower() not in _HANDOFF_PREFIXES:
@@ -285,8 +286,14 @@ def _where_you_left_off(domain: Path):
             overtaken = int(c.stdout.strip()) if c.returncode == 0 else 0
         except ValueError:
             overtaken = 0
-        return when.strip(), subj.strip(), body, sha[:9], overtaken
-    return None
+        return ("found", (when.strip(), subj.strip(), body, sha[:9], overtaken))
+    # Searched and found none — which is not the same as none existing. A
+    # domain whose handoffs use another word renders identically to one that
+    # never closed a session unless the search states itself (QMS porch,
+    # a-primitive-is-known-once-and-must-be-found-again-at-every-site: an
+    # assumed emptiness must name what it looked for; only an established
+    # one may stay silent).
+    return ("none", len(lines))
 
 
 def _days_past(reason: str) -> int | None:
@@ -435,8 +442,14 @@ def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
     # that means "what was I doing". Ranked attention answers "what's first" —
     # a different question, and it was answering it first.
     left_off = _where_you_left_off(domain)
-    if left_off:
-        when, subj, body, sha, overtaken = left_off
+    if left_off and left_off[0] == "none" and left_off[1]:
+        # One line, no heading: the absence of a handoff is not a section,
+        # but an assumed absence must state its search.
+        out.append(f"_No handoff found — searched the last {left_off[1]} commit "
+                   f"subjects for {' / '.join(_HANDOFF_PREFIXES)}._")
+        out.append("")
+    elif left_off and left_off[0] == "found":
+        when, subj, body, sha, overtaken = left_off[1]
         out.append("## Where you left off")
         out.append(f"Last session closed {when} — **{subj}**")
         if overtaken:

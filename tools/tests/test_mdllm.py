@@ -1939,6 +1939,21 @@ def test_register_handoff_overtaken_by_commits_is_flagged(tmp_path):
     assert out.index("have landed since") < out.index("## Also open")
 
 
+def test_register_absent_handoff_states_its_search(tmp_path):
+    # QMS porch, 2026-08-06 (a-primitive-is-known-once-...): "no handoff" and
+    # "handoff exists under a prefix the search doesn't know" rendered
+    # byte-identically. An assumed emptiness must name what it looked for.
+    _git_repo(tmp_path)
+    write(tmp_path, "things/mine.md", thing_text(
+        "id: mine\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    _commit_all(tmp_path, "eod: wrapped for the day")  # a handoff, unrecognised
+    from markdownllm.session import _render_assistant
+    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
+    assert "## Where you left off" not in out  # absence is a line, not a section
+    assert "No handoff found — searched the last 1 commit" in out
+    assert "session-end / handoff / close-session" in out
+
+
 def test_register_fresh_handoff_gains_no_staleness_line(tmp_path):
     # The insight's own trap, pinned deliberately: session-end at HEAD is the
     # one arrangement where the bug cannot appear — and where the fix must

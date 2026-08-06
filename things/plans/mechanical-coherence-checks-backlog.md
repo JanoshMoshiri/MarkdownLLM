@@ -55,6 +55,23 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
 - **install-hook self-test.** Have `install-hook` self-test its emitted script so a
   portability break is caught at install, not at first commit
   (`portability-claims-need-execution-tests`).
+- **The primitive sweep — null-result instance first.** Upstream ask from an
+  operating domain's porch (2026-08-06,
+  `a-primitive-is-known-once-and-must-be-found-again-at-every-site`): a named
+  primitive currently waits to be re-felt at every site it applies to — one
+  primitive was recorded in July and violated twice in the substrate's own
+  code by August, both caught by use, neither by review. The candidate
+  instrument takes a *stated primitive* as input (the currency sweep takes a
+  version) and returns candidate sites, not drift. For the null-result
+  primitive the question is mechanical enough to state: every function that
+  can return an empty or default result — does it distinguish "nothing found"
+  from "could not look"? Gate check before building: the general sweep is
+  judgement-shaped (which primitives? which sites count?) and may fail this
+  backlog's suppression-list test; the null-result instance may pass it as a
+  bounded static check. The two immediate sites the ask named were fixed at
+  the ask (2026-08-06: `_classify_fetch_failure` undiagnosed state,
+  `_where_you_left_off` stated search); the ask's dismissal condition is the
+  instrument, not the fixes.
 
 Build when felt — none blocks anything today; the payoff is automatic drift
 enforcement the day each fact drifts again.

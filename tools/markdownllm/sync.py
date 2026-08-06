@@ -72,10 +72,28 @@ def _counts(repo: Path) -> tuple[int, int] | None:
 
 
 def _classify_fetch_failure(stderr: str) -> str:
+    """Name the cause only where the evidence names it. The else branch used
+    to return `offline` — a definite cause for a failure it never diagnosed —
+    which read a proxy's 403 as a network outage (`a-403-is-not-an-outage`,
+    QMS porch 2026-08-06; the null-result primitive: never return the shape
+    of an answer to a question you could not answer). An undiagnosed failure
+    now says so, and carries its evidence in the detail at the call sites."""
     s = stderr.lower()
-    if "terminal prompts disabled" in s or "authentication" in s or "permission denied" in s:
+    if ("terminal prompts disabled" in s or "authentication" in s
+            or "permission denied" in s or "403" in s or "401" in s):
         return "auth-failed"
-    return "offline"
+    if ("could not resolve host" in s or "connection refused" in s
+            or "timed out" in s or "network is unreachable" in s
+            or "no route to host" in s):
+        return "offline"
+    return "fetch-failed"
+
+
+def _first_stderr_line(stderr: str) -> str:
+    for line in (stderr or "").splitlines():
+        if line.strip():
+            return line.strip()[:120]
+    return "no stderr"
 
 
 def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) -> dict:
@@ -83,7 +101,8 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) ->
 
     States: synced / up-to-date / ahead / diverged / dirty / local-only /
     no-upstream / detached / unborn / in-operation / offline / auth-failed /
-    pull-failed. Only 'synced' moves the tree; everything else reports.
+    fetch-failed / pull-failed. Only 'synced' moves the tree; everything else
+    reports.
     """
     out = {"repo": repo, "state": "up-to-date", "detail": "", "moved": False}
 
@@ -115,15 +134,18 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) ->
         elif f.returncode != 0:
             out["state"] = _classify_fetch_failure(f.stderr)
             out["detail"] = "orienting from last-fetched state"
+            if out["state"] == "fetch-failed":
+                out["detail"] = (f"undiagnosed ({_first_stderr_line(f.stderr)}) — "
+                                 f"orienting from last-fetched state")
 
     counts = _counts(repo)
     if counts is None:
-        if out["state"] in ("offline", "auth-failed"):
+        if out["state"] in ("offline", "auth-failed", "fetch-failed"):
             return out
         out["state"] = "no-upstream"
         return out
     ahead, behind = counts
-    cached = " (cached)" if out["state"] in ("offline", "auth-failed") else ""
+    cached = " (cached)" if out["state"] in ("offline", "auth-failed", "fetch-failed") else ""
     degraded = out["state"] if cached else None
 
     dirty = _git(repo, "status", "--porcelain")
@@ -228,6 +250,9 @@ def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
     else:
         out["state"] = _classify_fetch_failure(p.stderr)
         out["detail"] = "could not publish — commit stands as publication debt (`mdllm estate-sync --status`)"
+        if out["state"] == "fetch-failed":
+            out["detail"] = (f"undiagnosed ({_first_stderr_line(p.stderr)}) — "
+                             f"commit stands as publication debt (`mdllm estate-sync --status`)")
     return out
 
 
@@ -252,6 +277,7 @@ _LABEL = {
     "no-upstream": "no-upstream", "detached": "detached", "unborn": "unborn",
     "in-operation": "in-operation", "offline": "offline",
     "auth-failed": "auth-failed", "pull-failed": "pull-failed",
+    "fetch-failed": "fetch-failed",
 }
 
 
