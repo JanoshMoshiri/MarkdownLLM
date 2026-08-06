@@ -423,6 +423,41 @@ Name-before-identifier · headings carry the verdict · corrections are silent �
 compression is of the telling, never the substance. Second pass runs on the
 tuned seed.
 
+## Phase 0 findings — leg 3, 2026-08-06 (fresh session, tuned seed)
+
+**Substance passed again; the residue is two delivery defects, both named by
+the operator's recovery ask.** The orientation's content was right and the
+ranking analysis sound (the operator: "we're getting there") — but the first
+render still needed a plain-language restatement, and the operator's verdict
+is the sharpest possible spec: *the second output after my ask is what I want
+on the first.*
+
+1. **Two orderings at once, neither announced.** The report was ordered by
+   priority but surfaced in date-shaped headings, so the reader parsed it as
+   chronology and it broke. The recovered form: one ordering, stated (strict
+   date order), with the priority verdict extracted to a single line up front
+   ("if you only do one thing…"). Rule: priority stated as a line is legible;
+   priority encoded in the sequence is invisible.
+2. **Sentences that do not survive speech.** A compressed aphorism ("the
+   question is its terminal state, not its existence") reads well and hears
+   badly — and the operator *listens* to these responses. The recovered form:
+   "We know it exists. What we don't know is whether it's finished." Rule:
+   write for the ear — short declarative sentences that survive being spoken
+   once; a compressed aphorism is derivation, not delivery.
+
+**The compression guard lived a third time, in reverse:** the recovered
+version *restored* an item the first render had dropped (a backstop date) —
+on-request output was fuller and clearer at once.
+
+**The signature is now three-for-three:** correct shape reliably on request,
+never on first render. Each leg's recovery discovered a rule the seed then
+absorbed; each next leg failed *narrower*. That trajectory — substance →
+shape → ordering/audibility — is itself evidence the format-not-style thesis
+is right: every absorbed rule stuck, and the residue keeps shrinking.
+
+Seed absorbed both rules. Next pass judges whether the residue reaches zero;
+if it does, Phase 1 seals the format with all accumulated rules.
+
 ## Phase 0 findings — leg 2 second pass, 2026-08-06 (via the porch)
 
 The drive's second round arrived as the framework's own membrane working:
