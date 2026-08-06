@@ -36,6 +36,9 @@ relations:
   - validates      # mechanically or semantically checks the target
   - supports       # evidence in favour (insights; belief revision)
   - challenges     # evidence against (insights; belief revision)
+  - derived-from   # born from the target's work; the target is the evidence base
+                   # (registered 2026-08-06 on third independent use: two 2026-08-05
+                   # harvest insights and operating-is-programming all reached for it)
   # mechanical — fixed semantics, checked by mdllm validate / triggers
   - contradicts    # requires a type: conflict thing listing both parties
   - supersedes     # replaces the target's content

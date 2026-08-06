@@ -3,14 +3,17 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-05
-generated: 2026-08-05T20:39:21
-generated_from: HEAD@e2d925e
-coverage: 8
+created: 2026-08-06
+generated: 2026-08-06T22:37:17
+generated_from: HEAD@ac7bcf9
+coverage: 9
 framework_version: 3.27.0
 ---
 
 # Provenance Index (reverse) — framework
+
+## assistant-register
+- operating-is-programming (derived-from)
 
 ## cross-domain-handoff-is-verified-external-input
 - phase-3-run-domain-task-reverted (pinned @2d4f6d4)

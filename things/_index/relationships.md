@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-05
-generated: 2026-08-05T20:38:23
-generated_from: HEAD@e2d925e
-coverage: 146
+created: 2026-08-06
+generated: 2026-08-06T22:36:00
+generated_from: HEAD@ac7bcf9
+coverage: 149
 framework_version: 3.27.0
 ---
 
@@ -226,6 +226,9 @@ framework_version: 3.27.0
 - existence-is-not-currency --supports--> derived-index-is-attention-cache-not-search-layer
 - existence-is-not-currency --supports--> tracking-artifacts-can-drift-from-reality
 - existence-is-not-currency --informs--> hook-enforcement-has-three-anchors
+- expertise-is-an-output-not-a-prerequisite --supports--> provenance-specification
+- expertise-is-an-output-not-a-prerequisite --complements--> the-substrate-is-a-discipline-prosthesis
+- expertise-is-an-output-not-a-prerequisite --informs--> llm-driven-systems-manifesto
 - felt-deployment-lands-in-undisclosable-work --references--> llm-driven-systems-manifesto
 - felt-deployment-lands-in-undisclosable-work --complements--> structure-decides-figures-scale-decides-convention
 - first-2x2-measured-convention-following-not-reasoning --extends--> fixture-fixes-correct-bugs-not-difficulty
@@ -372,6 +375,10 @@ framework_version: 3.27.0
 - modeling-cognition-yields-a-learning-loop-not-a-coherence-loop --informs--> session-memory-specification
 - modeling-cognition-yields-a-learning-loop-not-a-coherence-loop --supports--> the-notation-changed-not-the-primitives
 - modeling-cognition-yields-a-learning-loop-not-a-coherence-loop --complements--> consequence-is-recoverable-only-in-retrospect
+- operating-is-programming --extends--> the-notation-changed-not-the-primitives
+- operating-is-programming --supports--> asks-travel-as-exposed-things
+- operating-is-programming --derived-from--> assistant-register
+- operating-is-programming --supports--> consequence-is-recoverable-only-in-retrospect
 - operative-rules-are-a-small-fraction-of-spec-prose --extends--> tiered-loading-is-tiered-reading-applied-to-specs
 - operative-rules-are-a-small-fraction-of-spec-prose --supports--> hook-compliance-correlates-with-scope-not-awareness
 - operator-gated-work-is-scheduled-on-the-operators-calendar --extends--> felt-deployment-lands-in-undisclosable-work
@@ -505,6 +512,9 @@ framework_version: 3.27.0
 - the-notation-changed-not-the-primitives --references--> git-workflow-specification
 - the-rough-true-account-is-generative-infrastructure --references--> llm-driven-systems-manifesto
 - the-rough-true-account-is-generative-infrastructure --complements--> belief-revision-specification
+- the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
+- the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
+- the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming
 - thing-lifecycle-specification --extends--> thing-specification
 - thing-lifecycle-specification --complements--> scalability-guide
 - thing-lifecycle-specification --informs--> read-thing-specification
