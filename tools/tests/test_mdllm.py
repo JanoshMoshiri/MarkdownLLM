@@ -1911,6 +1911,48 @@ def test_orientation_watched_is_not_owned(tmp_path):
     assert "`mirror`" not in owned_block
 
 
+def _commit_all(tmp_path, msg):
+    import subprocess
+    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "--no-verify", "-m", msg],
+                   cwd=tmp_path, check=True)
+
+
+def test_register_handoff_overtaken_by_commits_is_flagged(tmp_path):
+    # QMS porch, 2026-08-06 (orientation-presents-a-handoff-the-work-has-
+    # overtaken): harvest is deliberate, so sessions that commit without a
+    # session-end are the normal case — and the carried-forward list decays
+    # silently. The staleness must sit BESIDE the handoff, not in Backdrop.
+    _git_repo(tmp_path)
+    write(tmp_path, "things/mine.md", thing_text(
+        "id: mine\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    _commit_all(tmp_path, "session-end: the handoff\n\ncarried: upload the register")
+    write(tmp_path, "things/mine2.md", thing_text(
+        "id: mine2\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    _commit_all(tmp_path, "create: mine2")
+    from markdownllm.session import _render_assistant
+    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
+    assert "Where you left off" in out and "the handoff" in out
+    assert "carried: upload the register" in out  # body, not just subject
+    assert "1 commit(s) have landed since this handoff" in out
+    # staleness beside the handoff — before the ranking, not after it
+    assert out.index("have landed since") < out.index("## Also open")
+
+
+def test_register_fresh_handoff_gains_no_staleness_line(tmp_path):
+    # The insight's own trap, pinned deliberately: session-end at HEAD is the
+    # one arrangement where the bug cannot appear — and where the fix must
+    # stay silent (say nothing where the domain is healthy).
+    _git_repo(tmp_path)
+    write(tmp_path, "things/mine.md", thing_text(
+        "id: mine\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    _commit_all(tmp_path, "session-end: the handoff")
+    from markdownllm.session import _render_assistant
+    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
+    assert "Where you left off" in out
+    assert "have landed since" not in out
+
+
 def test_register_watched_fired_trigger_still_surfaces(tmp_path):
     # The QMS lesson kept: excluding watched from the owned count must not
     # silence its triggers — a fired `type: import`-style trigger re-enters

@@ -270,7 +270,22 @@ def _where_you_left_off(domain: Path):
         body = (b.stdout or "").strip() if b.returncode == 0 else ""
         if len(body) > 4000:
             body = body[:4000].rsplit("\n", 1)[0] + "\n…"
-        return when.strip(), subj.strip(), body, sha[:9]
+        # A handoff is a snapshot; the work is continuous. Harvest is
+        # deliberate by design, so sessions that commit without a session-end
+        # are the normal case — and their commits overtake the carried-forward
+        # list silently (QMS porch, 2026-08-06: a three-item list presented as
+        # the state of play, one third already done). The emitter holds both
+        # facts; it must compare them, and say what it did not check. All
+        # commits count, not just things/: config and tool work overtake a
+        # plan the same way.
+        c = subprocess.run(["git", "rev-list", "--count", f"{sha}..HEAD"],
+                           cwd=domain, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        try:
+            overtaken = int(c.stdout.strip()) if c.returncode == 0 else 0
+        except ValueError:
+            overtaken = 0
+        return when.strip(), subj.strip(), body, sha[:9], overtaken
     return None
 
 
@@ -421,9 +436,18 @@ def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
     # a different question, and it was answering it first.
     left_off = _where_you_left_off(domain)
     if left_off:
-        when, subj, body, sha = left_off
+        when, subj, body, sha, overtaken = left_off
         out.append("## Where you left off")
         out.append(f"Last session closed {when} — **{subj}**")
+        if overtaken:
+            # Beside the handoff, never forty lines away in Backdrop: the
+            # staleness and the snapshot must be read together or the snapshot
+            # is read as current. Silent at zero — a fresh handoff gains
+            # nothing (say nothing where the domain is healthy).
+            out.append("")
+            out.append(f"**{overtaken} commit(s) have landed since this "
+                       f"handoff was written — treat its carried-forward "
+                       f"list as unverified; the log knows more.**")
         if body:
             out.append("")
             out.append(body)

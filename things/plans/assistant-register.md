@@ -422,3 +422,38 @@ decides whether they are one thing or two.
 Name-before-identifier · headings carry the verdict · corrections are silent ·
 compression is of the telling, never the substance. Second pass runs on the
 tuned seed.
+
+## Phase 0 findings — leg 2 second pass, 2026-08-06 (via the porch)
+
+The drive's second round arrived as the framework's own membrane working:
+the operating domain exposed a full defect report against the fresh
+`Where you left off` block (`orientation-presents-a-handoff-the-work-has-
+overtaken`, on its porch) — observed on a fresh clone, reproduced with
+evidence, cheapest-sufficient fix proposed, wrong fix explicitly ruled out.
+Same-day round trip, second lived instance of asks-travel-as-exposed-things.
+
+**The defect:** the handoff block presented a session-end snapshot as the
+state of play. Harvest is deliberate by design, so sessions that commit
+without harvesting are the *normal* case — and their commits overtake the
+carried-forward list silently. The emitter computed both the handoff commit
+and last-worked, and never compared them; the contradicting fact sat forty
+lines away in Backdrop.
+
+**The class, swept:** the defect family is *orientation asserting what it
+never checked*. Swept every section of the assistant rendering for stored
+claims presented as current: the handoff was the only stored-narrative
+element — every other section computes its claim live at render, or (like
+Watched) explicitly names what it does not know. One instance, not a family;
+the class is closed by this fix plus the sweep, not by vigilance.
+
+**Fix, as the report proposed:** state the distance — commits landed since
+the handoff, rendered beside it (never in Backdrop), silent at zero. Two
+calls made here: all commits count, not just `things/` (config and tool work
+overtake a plan the same way), and one fixed wording at any count rather
+than threshold-graded language (a graded scale is a judgment the floor does
+not have; "unverified" is true at one commit and at twenty). Deliberate
+harvest untouched, as the report itself insisted.
+
+**Regression pinned both ways:** overtaken-handoff flagged, and session-end
+at HEAD stays silent — the report noted a natural fixture would only ever
+build the second arrangement, which is exactly why both are now pinned.
