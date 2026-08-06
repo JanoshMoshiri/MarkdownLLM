@@ -233,6 +233,47 @@ Before the first reply: load `kernel.md`; act on what is below. Do not
 narrate having done so."""
 
 
+_HANDOFF_PREFIXES = ("session-end", "handoff", "close-session")
+
+
+def _where_you_left_off(domain: Path):
+    """The last session's handoff, uncut.
+
+    Carried-forward work lives in the session-end commit subject — the
+    framework's own doctrine puts the handoff in the event stream rather than
+    in a thing, so there is no `continuity-brief` to read. The velocity line
+    truncates that subject to 110 chars to keep orientation short, which
+    deletes exactly the answer to the most likely question at session start:
+    *what was I in the middle of?* (Leg 2: the operator's unfinished plan work
+    was the one thing they had to ask for.) Compression is of the telling,
+    never of the substance — so the handoff is surfaced separately and whole,
+    and shaping it is the agent's job, not the emitter's.
+    """
+    if not (domain / "things").is_dir():
+        return None
+    r = subprocess.run(["git", "log", "-40", "--format=%H|%cr|%s"],
+                       cwd=domain, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    if r.returncode != 0:
+        return None
+    for line in r.stdout.splitlines():
+        sha, _, tail = line.partition("|")
+        when, _, subj = tail.partition("|")
+        if subj.strip().split(":", 1)[0].strip().lower() not in _HANDOFF_PREFIXES:
+            continue
+        # Subject alone is not the handoff. Domains that write a short subject
+        # carry the carried-forward work in the body — reading only `%s` would
+        # have reproduced the very omission this exists to fix.
+        b = subprocess.run(["git", "log", "-1", "--format=%b", sha],
+                           cwd=domain, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        body = (b.stdout or "").strip() if b.returncode == 0 else ""
+        if len(body) > 4000:
+            body = body[:4000].rsplit("\n", 1)[0] + "\n…"
+        return when.strip(), subj.strip(), body, sha[:9]
+    return None
+
+
 def _days_past(reason: str) -> int | None:
     """How stale a fired trigger is, read out of the floor's own phrasing.
     None when the reason names no elapsed time (fires-in-future, or a
@@ -375,16 +416,41 @@ def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
 
     out = [f"# {domain.name} — session start", "", _REGISTER_SEED, ""]
 
+    # The operator's loop starts at "what have I got", and for anyone returning
+    # that means "what was I doing". Ranked attention answers "what's first" —
+    # a different question, and it was answering it first.
+    left_off = _where_you_left_off(domain)
+    if left_off:
+        when, subj, body, sha = left_off
+        out.append("## Where you left off")
+        out.append(f"Last session closed {when} — **{subj}**")
+        if body:
+            out.append("")
+            out.append(body)
+        out.append("")
+        out.append(f"_Carried-forward work lives here, not in the ranking "
+                   f"below. Full handoff: `git show {sha} --no-patch`._")
+        out.append("")
+
     if attention:
         out.append("## Wants attention")
         out += [_row_line(r) for r in attention]
         out.append("")
 
     if rest:
+        # Grouped by the domain's own status vocabulary, never a flat list:
+        # "what am I in the middle of" and "what have I not begun" are
+        # different questions, and a row of bare ids answered neither. No
+        # semantics invented here — whatever the domain declared is what shows.
         out.append(f"## Also open ({len(rest)})")
-        out.append("  " + " · ".join(f"`{r['id']}`" for r in rest[:15]))
-        if len(rest) > 15:
-            out.append(f"  …and {len(rest) - 15} more.")
+        by_status: dict[str, list[str]] = {}
+        for r in rest:
+            by_status.setdefault(r["status"], []).append(r["id"])
+        for status in sorted(by_status, key=lambda s: (s in ("not-started", ""), s)):
+            ids = by_status[status]
+            shown = " · ".join(f"`{i}`" for i in ids[:12])
+            more = f" …and {len(ids) - 12} more." if len(ids) > 12 else ""
+            out.append(f"- **{status or 'unstated'}** ({len(ids)}): {shown}{more}")
         out.append("")
 
     if conflicts:

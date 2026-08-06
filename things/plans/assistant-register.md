@@ -349,6 +349,50 @@ it. Without this, the format is one step from a register that reads
 beautifully and omits the thing that mattered — the failure mode that would
 discredit the whole plan.
 
+### The omission — the guard was already being violated, by the emitter
+
+Asked what had gone missing, the operator named one thing without hesitation:
+**the work they had left in a plan.** They had to ask for it — *didn't we have
+a plan about something?* Traced, it was not a response-format failure at all.
+Three compounding causes, all in the emitter:
+
+1. **The handoff was truncated by design.** Carried-forward work lives in the
+   session-end commit — the framework's own doctrine puts the handoff in the
+   event stream, and there is no `continuity-brief` in practice. The assistant
+   renderer cut that subject to 110 chars, with a comment justifying it:
+   *answers none of the operator's four questions*. It answers the first one.
+   Brevity deleted the handoff and left a rationale in its place.
+2. **The detail was in the body, not the subject.** The first fix read `%s`
+   and would have reproduced the omission — domains that write a short
+   session-end subject carry the whole carried-forward list in `%b`.
+3. **Underway was indistinguishable from untouched.** Anything without a
+   fired trigger or a near due date fell into a flat row of bare ids. A plan
+   mid-execution and a plan never begun rendered identically, because the
+   ranking knows only *waiting*, never *underway*.
+
+**The generalisation, and it is the sharpest thing the drive produced:** the
+orientation ranks by **maturity of waiting** and has no concept of **work in
+motion**. Everything mechanically legible about urgency is a date or a
+trigger; a half-finished plan emits neither. So the artefact most certain to
+be asked about at session start was the one the emitter was least able to see.
+
+This is also the operator's guard arriving as a lived instance, one turn after
+it was adopted — and arriving from the direction nobody was watching. The
+compression that dropped it was not the agent's prose. It was the tool's, and
+it had been there since the prototype was written.
+
+Fixed behind the flag: a **Where you left off** section carrying the last
+handoff's subject *and* body (capped, with the command to read it whole),
+placed before the ranking because the operator's loop opens at *what have I
+got*; and **Also open** grouped by the domain's own status vocabulary, so
+underway and unstarted stop rendering alike. No semantics invented — whatever
+the domain declared is what shows.
+
+**Phase note:** this is Phase 2 work (reshape the emitter) surfacing inside
+Phase 0. Taken now rather than deferred, because leaving it would have run
+the next pass with a known hole and produced evidence about a format that was
+not the thing failing.
+
 ### What held, and should not be touched
 
 - **Batched decisions before writing.** Four discrete calls surfaced together,
