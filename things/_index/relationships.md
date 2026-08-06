@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-06
-generated: 2026-08-06T22:36:00
-generated_from: HEAD@ac7bcf9
-coverage: 149
+generated: 2026-08-06T22:43:15
+generated_from: HEAD@604dfc4
+coverage: 150
 framework_version: 3.27.0
 ---
 
@@ -337,6 +337,9 @@ framework_version: 3.27.0
 - llm-driven-systems-manifesto --informs--> scalability-guide
 - llm-driven-systems-manifesto --informs--> domain-specification-guide
 - llm-driven-systems-manifesto --references--> divergence-is-an-unrouted-decision
+- llm-driven-systems-manifesto --references--> operating-is-programming
+- llm-driven-systems-manifesto --references--> the-substrate-is-a-discipline-prosthesis
+- llm-driven-systems-manifesto --references--> expertise-is-an-output-not-a-prerequisite
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> session-memory-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> orchestration-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --references--> git-workflow-specification
@@ -379,6 +382,9 @@ framework_version: 3.27.0
 - operating-is-programming --supports--> asks-travel-as-exposed-things
 - operating-is-programming --derived-from--> assistant-register
 - operating-is-programming --supports--> consequence-is-recoverable-only-in-retrospect
+- operating-scope-promotion --informs--> llm-driven-systems-manifesto
+- operating-scope-promotion --references--> divergence-primitive-promotion
+- operating-scope-promotion --references--> assistant-register
 - operative-rules-are-a-small-fraction-of-spec-prose --extends--> tiered-loading-is-tiered-reading-applied-to-specs
 - operative-rules-are-a-small-fraction-of-spec-prose --supports--> hook-compliance-correlates-with-scope-not-awareness
 - operator-gated-work-is-scheduled-on-the-operators-calendar --extends--> felt-deployment-lands-in-undisclosable-work

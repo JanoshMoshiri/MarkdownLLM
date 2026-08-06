@@ -18,6 +18,8 @@ But you hold the vision. You define what the domain is, shape the orchestration,
 
 Neither works without the other. An agent without structure produces inconsistent, unreliable output; a human without an agent has to maintain all that structural discipline by hand. Together — with the framework as the shared language — you get something fluid but structured, growing but consistent, definition-driven but never rigid.
 
+Two things follow from that partnership, and they set the scope. **Operating the system is programming it**: the definitions are written in the language you already speak, so friction stated in conversation becomes validated, committed instruction — no translator, no role change, and the floor between your words and the durable state is what keeps that honest. And **no expertise is required at the door**: what the framework asks of its human is authority — standing to say "this is true in my domain" — which everyone holds absolutely over their own affairs. The same unchanged primitives run a regulated quality system and a personal spending tracker; the discipline the diligent bring to record-keeping is exactly what the floor supplies on behalf of everyone who finds it tedious. Expertise isn't the entry fee — it's what the domain accumulates as you use it.
+
 ---
 
 ## The Framework Is a Domain

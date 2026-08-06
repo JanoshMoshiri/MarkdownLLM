@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: evolving
-version: 2.7
+version: 2.8
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
@@ -12,6 +12,15 @@ linked_things:
   - id: divergence-is-an-unrouted-decision
     relation: references
     notes: "v2.6 names the divergence-routing primitive beneath change-reconciliation, belief-revision, provenance, and validate; this insight is its canonical articulation"
+  - id: operating-is-programming
+    relation: references
+    notes: "v2.8 names the second collapse — use and programming are no longer separate acts; this insight is its canonical articulation and carries the evidence"
+  - id: the-substrate-is-a-discipline-prosthesis
+    relation: references
+    notes: "v2.8 widens the thesis's scope note — the floor disciplines both processors; this insight is its canonical articulation"
+  - id: expertise-is-an-output-not-a-prerequisite
+    relation: references
+    notes: "v2.8 states the operator requirement as authority, never credentials; this insight is its canonical articulation"
 ---
 
 # LLM-Driven Systems Manifesto
@@ -47,6 +56,14 @@ This is why the old discipline still governs the new medium. Clean Architecture 
 
 See `the-notation-changed-not-the-primitives` for the canonical articulation.
 
+### The Second Collapse: Operation Is Programming
+
+The continuity above says the artifact is still a program. What the notation change does to the *people around* the artifact took longer to see: every previous notation forced programming and use apart. The user speaks in their own nouns; the program is written in another language; so a translator — the programmer — must sit between them, and friction travels the long way round: felt, reported, translated, coded, deployed. Because this notation *is* the language the operator already speaks, the split collapses. Friction stated in the working channel is source: it routes to a surface — a seed, a spec, an insight, an ask exposed on a domain's porch — where the floor validates it, a commit makes it durable, and the next session runs the changed program. **The operator programs the system by operating it** — in their own words, at the moment the friction is felt, without ever changing roles.
+
+This is why every prior attempt at end-user programming fell short where this does not: they lowered the notation toward the user and hit a ceiling; this raised the reader to the notation the user already speaks, so there is no ceiling to hit — when the current definitions are outgrown, they are extended *in the same notation, in the same conversation*. The escape hatch points inward. And the collapse is only trustworthy because the floor stands between the utterance and the durable program — an unvalidated conversational change is just drift with a good story. The routing, and the floor beneath it, are precisely the framework's job.
+
+See `operating-is-programming` for the canonical articulation and its evidence.
+
 ## The Thesis
 
 Strip the framework to one sentence: **treat the language model as a reasoning processor, and build a loosely-coupled, modular software engine around it — so that a non-deterministic processor yields a system that is consistent, auditable, and resistant to drift.**
@@ -54,6 +71,8 @@ Strip the framework to one sentence: **treat the language model as a reasoning p
 The goal is not to make the model deterministic. It cannot be, and pretending otherwise is the mistake. The goal is to surround a non-deterministic processor with the structures that make *any* software system maintainable, extensible, and long-lived — clear boundaries, modular units, explicit state, version control, enforced invariants — so that the **system** holds the properties the **processor** cannot guarantee alone.
 
 This is a synthesis, not a trade-off. The model brings what software never had: reasoning over ambiguity, weighing context, revising its own understanding. Software engineering brings what a model alone never has: consistency across time, an audit trail, integrity that does not depend on the processor *remembering* to be careful, and mechanisms that catch drift before it compounds — preventing it where the failure is mechanical, surfacing it for correction where the failure is semantic. The bet is that these combine — reasoning *and* engineering discipline at once — and that the whole is worth more than either part.
+
+A scope note the thesis's own words already permit: "integrity that does not depend on the processor remembering to be careful" never specified *which* processor. The floor disciplines the human by exactly the mechanism it disciplines the model — records kept, provenance held, state persisted without anyone remembering to maintain it. For the professional whose field already practices records discipline, the substrate is a recognition of their own profession's demands; for the everyday operator who finds sustained record-keeping too tedious to maintain, the discipline is not a barrier the substrate demands but *the product it delivers*. One floor, two processors, the same prosthesis — and its best-served user is the person every prior tool quietly abandoned, because for them the discipline is not overhead on the value; it is the value. See `the-substrate-is-a-discipline-prosthesis` for the canonical articulation.
 
 There is a reason the processor cannot hold these properties alone, and it is not a shortfall that scale will cure: a language model predicts the next move — the next token, the next action — but never its *consequence*. Consequence is recoverable only in retrospect, by reasoning back over moves already made; it cannot be forecast forward the way the next token can. Asking the model to "consider the consequences" does not lift this — it can reason about them, it cannot foresee them. So the foresight a trustworthy system needs has to be supplied by the structure around the processor, considered ahead of time and etched in, not awaited from the processor in the moment. See `consequence-is-recoverable-only-in-retrospect` for the canonical articulation.
 
@@ -143,6 +162,8 @@ Discovery is also what makes the system grow without friction. When you add a ne
 
 This is the quiet foundation beneath everything else: a set of file conventions that mean an agent can enter any MarkdownLLM domain and immediately understand what it is, how it works, and how to help.
 
+The same law binds the other direction, and deserves stating symmetrically: **the framework must teach the operator the way it teaches the agent** — through discovery, in the channel, at the moment of relevance, in the operator's own nouns. The agent's entry point is AGENTS.md; the operator's entry point is the orientation the session opens with. An operator cannot ask for what they don't know exists, so the conversational surface carries its own affordances — what can be asked arrives beside what was found, exceptions arrive with their remedy attached, and depth is revealed on demand rather than up front. The manual is the conversation.
+
 ### The System as Collaborator
 
 This partnership runs deeper than discovery. Working within a domain is not a single transaction — it is an accretive process. You don't have to hand the system a complete, finished input. You give it an initial set of data, and the reasoning at the center works from that. As you go, you add more: a new constraint, a fresh consideration, an answer to a question that just came up. The agent pulls together what was already in the domain, what you've just added, and the workflow you're following, and carries the work forward toward an output.
@@ -182,6 +203,12 @@ Examples:
 - **Research:** Papers, findings, hypotheses, experiments. Claude synthesizes across your research, identifies patterns, suggests next directions.
 
 The pattern is the same: define your domain in definition files, structure your data as atomic units with metadata and narrative, use git for persistence, invoke the LLM to reason and update.
+
+### The Operator: Authority, Not Credentials
+
+And the operator this pattern asks for is not a professional. Read what the floor actually demands of its human: quarantine requires that *a human confirms*, and the flip names a person — never a credential. The requirement is **authority**: standing to say "this is true in my domain." For a regulated quality system that standing happens to require a profession; for a person's own spending, household, or plans it is automatic and absolute — no professional on earth knows which of your transactions was a gift and which was a mistake. The everyday operator is not a degraded case of the expert operator; they are the purest case of what the substrate requires.
+
+Expertise, meanwhile, runs the other direction. Classic expert systems encoded an expert's knowledge so non-experts could consult it — expertise in, answers out. Here the operator brings authority and intent, the substrate brings discipline, and **expertise accumulates in the domain as a product of use**: insights with dispositions, decisions with rationale, the graph of what was learned and why it still holds. A domain, after enough use, knows things about its subject no professional knows and no generic tool could — it becomes the only expert on its subject in existence. The same primitives, unchanged and unsimplified, run the regulated system and the spending tracker; what differs is only the definition, which is data, not code. The app category dissolves into descriptions — and *definition-driven* turns out to have been the right name all along, with "expert" describing what the domain becomes, not what the operator must be. See `expertise-is-an-output-not-a-prerequisite` for the canonical articulation.
 
 ## Core Principles
 
