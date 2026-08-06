@@ -256,3 +256,45 @@ a one-pass plan (operator, 2026-08-01). Phase 1's input shifts accordingly:
 interface.md carries the five rules (rule 5 with its corollary) **and the
 named format**, with the kernel block staying small; Phase 2 is unchanged;
 the failure-moment list is the checklist Phase 5 watches against.
+
+## Leg 2 — drive card (prepared 2026-08-06, framework root)
+
+Leg 2 runs in the live QMS domain, in an operator session opened for real
+work. Preparing it surfaced one defect and closed one gap.
+
+**The defect: the drive could not have driven anything.** QMS's
+`.claude/settings.json` binds `SessionStart` to `mdllm session-start .` with
+no `--assistant`. Every QMS session to date — including the one leg 2 was
+about to run in — received the *legacy status dump*, not the prototype. A
+Phase 0 prototype behind a flag is reachable only where something passes the
+flag, and nothing did. Generalises past this plan: **an opt-in prototype is
+un-driven by default, and "we tested it" is the claim most likely to be
+false about it.** Candidate insight if leg 2 confirms the shape.
+
+**The gap closed: the seed carried the rules but not the format.** The Phase 0
+finding was that *styles decay where named shapes hold* — yet `_REGISTER_SEED`
+emitted only the five rules, which is a style. Driving leg 2 on that seed
+would have re-run leg 1 and reproduced leg 1's failure. The seed now carries
+Option B (the named shape: *what changed → what needs you → what's next*,
+three or four buckets, one plain sentence each, the ask last) and Option C as
+doctrine (if a commit records it, reference it, never restate it), with rule
+4's override stated as the one part that gets longer. Still Phase 0: prototype
+text behind the flag, no spec change, no inflection declared.
+
+**To run the drive:**
+
+- Mid-session re-anchor (no config change):
+  `python ../../tools/mdllm.py session-start . --assistant`
+- For subsequent sessions, add `--assistant` to the QMS `SessionStart` hook.
+  Operator's repo, operator's call — deliberately not changed from here.
+
+**What to log per turn** (the answer to open question 3 and to Phase 5's decay
+question comes from this log or from nowhere):
+
+1. Which failure moment was in play, if any — the numbered list above (report
+   after big work · mixed findings · mid-session injection · small question
+   after big work · human-decides under momentum).
+2. Did the turn fill the shape, or narrate? One word.
+3. Did you want more than you got? If yes, *what* — grounds (D2) or the full
+   working (D3)? This is `response-depth-control`'s evidence, gathered free.
+4. Would you have set a dial, or just asked? Open question 3 lives here.

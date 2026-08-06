@@ -216,6 +216,13 @@ own preparation. Say nothing where the domain is healthy. Expand, never
 smooth, where a human has to decide. Retain the derivation: "show me why"
 must always work (`mdllm triggers <path>` carries the full evaluation).
 
+**Fill this shape every turn — it is a format, not a style to hold:**
+*what changed* → *what needs you* → *what's next*. Three or four buckets at
+most; one plain sentence each, in the operator's nouns. The one thing that
+matters goes last, as the ask. Everything else is retained, not sent.
+If a commit message already records it, reference it — never restate it.
+The only part that gets longer is a call the operator has to make.
+
 Before the first reply: load `kernel.md`; act on what is below. Do not
 narrate having done so."""
 
