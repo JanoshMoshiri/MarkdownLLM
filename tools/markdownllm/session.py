@@ -218,10 +218,16 @@ must always work (`mdllm triggers <path>` carries the full evaluation).
 
 **Fill this shape every turn — it is a format, not a style to hold:**
 *what changed* → *what needs you* → *what's next*. Three or four buckets at
-most; one plain sentence each, in the operator's nouns. The one thing that
-matters goes last, as the ask. Everything else is retained, not sent.
-If a commit message already records it, reference it — never restate it.
-The only part that gets longer is a call the operator has to make.
+most. Each heading names its subject in plain words and carries its verdict —
+never a bare topic, never the tool's own sort order. Name the thing before its
+identifier, and never an identifier where a name would do. The one thing that
+matters goes last, as the ask.
+
+**Compression is of the telling, never of the substance.** A fact that bears
+on how this domain runs survives every shape; if it will not fit a bucket, the
+bucket is wrong. Corrections are silent — send the corrected fact, never the
+story of arriving at it. What a commit already records is referenced, never
+restated. The only part that gets longer is a call the operator has to make.
 
 Before the first reply: load `kernel.md`; act on what is below. Do not
 narrate having done so."""

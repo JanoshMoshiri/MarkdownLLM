@@ -195,6 +195,11 @@ a bounded list:
 5. **Human-decides under momentum**: the inverse failure — when everything
    else is being compressed, the consequential call gets compressed too,
    exactly where rule 4 demands expansion.
+6. **Self-correction mid-response** (added from leg 2): the agent catches its
+   own error and narrates the catch. The operator needs the corrected fact;
+   the arrival at it is derivation, and shipping it spends the operator's
+   attention on the agent's process at the exact moment they are re-reading
+   to find out what is true.
 
 ### The counter-evidence was already in the repo
 
@@ -298,3 +303,78 @@ question comes from this log or from nowhere):
 3. Did you want more than you got? If yes, *what* — grounds (D2) or the full
    working (D3)? This is `response-depth-control`'s evidence, gathered free.
 4. Would you have set a dial, or just asked? Open question 3 lives here.
+
+## Phase 0 findings — leg 2, 2026-08-06 (a live operating domain)
+
+All specifics below are abstracted to shape. The drive ran in a private
+domain; nothing identifying it, its people, or its documents belongs in this
+repo (framework-privacy-boundary).
+
+**Verdict: the shape holds; the delivery needed tuning.** Operator, on the
+drive: the orientation did its job and read as *domain-operation oriented*
+rather than as machinery. This is the first leg to pass on substance. What
+failed was legibility, and it failed the same way leg 1 did.
+
+**The lived correction.** Mid-session the operator asked, once, for plain
+English — verbatim intent: *stop going from one reference to one date to
+another*. The reply that followed was immediately right: headings that named
+a subject in plain words and carried a verdict, short causal sentences, and a
+genuine close naming the one item decaying fastest. Same session, same model,
+same facts; the only variable was again response shape.
+
+### The three delivery defects, named
+
+1. **An identifier stood in for a noun.** "In the operator's nouns" was read
+   as *the domain's filing codes*. The operator thinks in the subject; the
+   register was answering in the index key. The recovered reply proved the
+   point by naming three controls in plain words where the failed one had
+   listed five identifiers — same facts, one of them readable. Rule: name the
+   thing before its identifier; never an identifier where a name would do.
+2. **The buckets were borrowed from the tool.** Headings echoed the emitter's
+   own ranking (overdue / due-within-N-days). That is how the floor *sorts*,
+   not how the operator *decides* — failure moment 3 arriving at t=0 rather
+   than mid-session, because the orientation output is itself the injection
+   being paraphrased. The recovered headings each named a subject and carried
+   its verdict before the body was read. Rule: headings carry the verdict,
+   never a bare topic and never the tool's sort order.
+3. **Self-correction was narrated three times.** New failure moment 6 above.
+
+### The guard the format was missing
+
+Operator's constraint, adopted: **things important to domain operation must
+not be tidied away by the shape.** Compression applies to the telling, never
+to the substance — a fact bearing on how the domain runs survives every
+shape, and a bucket it will not fit is a wrong bucket, not a reason to drop
+it. Without this, the format is one step from a register that reads
+beautifully and omits the thing that mattered — the failure mode that would
+discredit the whole plan.
+
+### What held, and should not be touched
+
+- **Batched decisions before writing.** Four discrete calls surfaced together,
+  each with its finding attached, before any file was changed. Rule 4 working
+  as designed, and a pattern worth naming in Phase 1.
+- **Rule 4 on a security exposure.** A credential exposed in the transcript
+  was surfaced plainly with the only real remedy, and kept short. Third lived
+  confirmation that rule 4 survives when the moment is discrete (S2, S4).
+
+### The pattern this plan is circling — candidate insight
+
+Twice now, across two legs: the correct shape is produced **reliably on
+request and never once unprompted**. Leg 1 — dense report, operator asks,
+four clean buckets. Leg 2 — dense report, operator asks, verdict-carrying
+headings. A behaviour a model performs on demand but never by default is a
+**format gap, not a capability gap**: nothing needs teaching, something needs
+*naming*. This is the strongest available argument for Option B over any
+amount of rule prose, and it generalises past the response register to every
+interpretation-anchored rule the framework holds.
+
+Pairs with the leg-2 preparation finding (an opt-in prototype is un-driven by
+default). Both are candidate insights; neither is harvested yet — Phase 1
+decides whether they are one thing or two.
+
+### Seed changes made (still Phase 0, still behind the flag)
+
+Name-before-identifier · headings carry the verdict · corrections are silent ·
+compression is of the telling, never the substance. Second pass runs on the
+tuned seed.
