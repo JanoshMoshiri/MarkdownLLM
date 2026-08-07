@@ -458,6 +458,26 @@ is right: every absorbed rule stuck, and the residue keeps shrinking.
 Seed absorbed both rules. Next pass judges whether the residue reaches zero;
 if it does, Phase 1 seals the format with all accumulated rules.
 
+## Phase 0 findings — leg 7, 2026-08-07 (skill aligned; the operator closes the loop)
+
+**Clean first render; the operator's verdict: "this is a lot better — let's
+leave it there."** With the bootstrap skill aligned to the sharing contract,
+the competing program at t=0 is gone and the render shows it: no housekeeping
+preamble, the floor's rendering presented as-is, judgment layer in bullets,
+one act per line, ask last. The judgment layer produced things no rule asked
+for — working-day arithmetic against the coming dates, a cross-act
+connection (two cheap deferred acts as one lesson pointing opposite ways),
+and the restraint call (leave a dated item on its date because pulling it
+forward would re-open settled ownership).
+
+**The tuning loop is closed by operator decision.** Residual nits stay on
+the Phase 5 watch list, not in the seed: "Kernel loaded" narration (one
+line, persists), and whatever the next weeks of real use surface. Phase 0's
+exit condition — consistency across renders with one program at the anchor —
+is now measurable; the seal (Phase 1) waits for the operator to call it
+after a few more ordinary sessions, with the off-switch design question and
+the setup-skill sharing contract both queued for the spec when it comes.
+
 ## Phase 0 findings — leg 6, 2026-08-07 (two renders, same seed, opposite outcomes)
 
 **The pivot's first render passed clean; the second regressed wholesale —
