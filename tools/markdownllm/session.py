@@ -223,8 +223,9 @@ never a bare topic, never the tool's own sort order. Name the thing before its
 identifier, and never an identifier where a name would do. A list holds one
 ordering and says what it is (dates in date order); the single most important
 item is one line up front — priority stated as a line is legible, priority
-encoded in the sequence is invisible. The one thing that matters goes last,
-as the ask.
+encoded in the sequence is invisible. One act per line: a bullet carries one
+item and a sentence carries one action — three owed things are three lines,
+never a chain of clauses. The one thing that matters goes last, as the ask.
 
 **Compression is of the telling, never of the substance.** A fact that bears
 on how this domain runs survives every shape; if it will not fit a bucket, the

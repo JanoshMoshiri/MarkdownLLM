@@ -458,6 +458,39 @@ is right: every absorbed rule stuck, and the residue keeps shrinking.
 Seed absorbed both rules. Next pass judges whether the residue reaches zero;
 if it does, Phase 1 seals the format with all accumulated rules.
 
+## Phase 0 findings — leg 4, 2026-08-07 (fresh session, thrice-tuned seed)
+
+**The absorbed rules held; the residue narrowed to one defect: packing
+density.** Ordering was chronological, stated, and date-anchored; sentences
+survived the ear; headings carried verdicts. What failed: a single bullet
+chaining three owed actions through commas and em-dashes — the operator's
+ask, verbatim intent: *one bullet point for each item; one sentence packed
+with a lot of things needs unpacking.* The recovery gave each act its own
+line with the action leading, and it landed.
+
+Rule absorbed: **the unit of a list is the act, not the sentence.** A bullet
+carries one item; a sentence carries one action; three owed things are three
+lines, never a chain of clauses.
+
+Two observations for Phase 1, not acted on here:
+
+1. **The recovery also violated silence-when-healthy** (it opened with a
+   Status block of healthy facts) and the operator did not object — because
+   "give me all of that again, unpacked" legitimately asks for everything.
+   Rule 2 governs the *default* render; a requested full restatement is a
+   different speech act. Phase 1 should say so rather than leave the rules
+   appearing to conflict.
+2. **The seed is approaching its own over-specification line.** Four legs of
+   absorbed rules now sit in three paragraphs; the plan's own
+   `operative-rules-are-a-small-fraction` link warns exactly here. Phase 1's
+   job is consolidation into the named format, not accretion — several rules
+   are one rule (name-before-id, verdict headings, one-act-per-line are all
+   "the unit of delivery is the operator's next decision, rendered whole").
+
+Trajectory across four legs: substance → shape → ordering/audibility →
+density. Every absorbed rule has held in the leg after its absorption;
+each leg's residue is strictly smaller. The loop converges.
+
 ## Phase 0 findings — leg 2 second pass, 2026-08-06 (via the porch)
 
 The drive's second round arrived as the framework's own membrane working:
