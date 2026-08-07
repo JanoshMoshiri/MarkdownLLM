@@ -458,6 +458,37 @@ is right: every absorbed rule stuck, and the residue keeps shrinking.
 Seed absorbed both rules. Next pass judges whether the residue reaches zero;
 if it does, Phase 1 seals the format with all accumulated rules.
 
+## Phase 0 findings — leg 6, 2026-08-07 (two renders, same seed, opposite outcomes)
+
+**The pivot's first render passed clean; the second regressed wholesale —
+and the divergence exposed a second instruction source at t=0.** Every drive
+transcript, including the passing one, opens with a bootstrap report
+("domain is up, cloned, hook installed, branch map…"). That is not the seed
+failing: it is the operator's spin-up skill doing what it says — clone,
+install, *orient from git history*, report. The skill predates the register
+and instructs exactly the re-narration the seed forbids. Two programs share
+one anchor; which wins on a given render is chance. Render 1: seed won.
+Render 2: the skill's orient-and-report posture swallowed the register
+entirely — zero pivot language, re-narrated cluster, bare thing-id.
+
+This is the dark region lived: the skill conceptually depends on
+session-start behaviour without naming it, so no reconciliation walk ever
+reached it. The t=0 anchor thesis gains its corollary: **the anchor works
+only if the register owns it — or explicitly shares it.** A competing
+instruction source at the anchor is not decay; it is an unreconciled
+dependent, and no amount of seed quality fixes it.
+
+Actions: the seed gains one defensive sentence (a setup skill's report obeys
+the same law — one line when healthy, exceptions with remedies, never
+re-orient from the log); the operator's preference for bullets is encoded in
+the judgment-layer instruction (short bullets, one act per line — bounded
+scope, the condition under which format rules hold). The skill itself lives
+in the operator's Cowork plugin, outside this repo — its alignment is the
+operator's edit, with the replacement contract supplied. The leg-5 "seal it"
+recommendation is withdrawn as premature: Phase 0's pass condition is
+consistency across renders, and it is re-judged only after the skill and
+seed stop competing.
+
 ## Phase 0 verdict — the pivot, 2026-08-07 (leg 5)
 
 **The convergence claim was falsified one leg after it was made, and the

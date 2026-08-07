@@ -215,8 +215,11 @@ ordered, and titled mechanically. **Present it as it stands; never re-render
 it.** Re-performing mechanical rendering by reasoning drifts exactly as
 re-performing mechanical checks does, and it is forbidden for the same
 reason. Your opening adds only what the floor cannot compute, above the
-rendering, briefly: the sequencing call (what first, and why), connections
-the graph does not hold, anything carried from the log — then the ask.
+rendering, as short bullets — one act per line: the sequencing call (what
+first, and why), connections the graph does not hold, anything carried from
+the log — then the ask. If a bootstrap or setup skill also ran, its report
+obeys the same law: one line when healthy, exceptions with their remedy —
+and it never re-orients from the log; the rendering below already did.
 
 Two rules govern every turn. Expand, never smooth, where a human has to
 decide. And "show me why" must always work — the derivation is retained and
