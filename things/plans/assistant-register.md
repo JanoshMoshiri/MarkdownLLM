@@ -458,6 +458,48 @@ is right: every absorbed rule stuck, and the residue keeps shrinking.
 Seed absorbed both rules. Next pass judges whether the residue reaches zero;
 if it does, Phase 1 seals the format with all accumulated rules.
 
+## Phase 0 verdict — the pivot, 2026-08-07 (leg 5)
+
+**The convergence claim was falsified one leg after it was made, and the
+operator called it before the evidence arrived** ("I've done this type of
+stuff before — we shouldn't keep changing the shape of the seed"). Leg 5's
+first render regressed one-act-per-line the day after its absorption,
+mis-stated a count (said six, listed seven), and used a bare id where four
+legs of rules demanded a name. Seed tuning raises the batting average; it
+never reaches 1.0 — `hook-compliance-correlates-with-scope-not-awareness`,
+lived on this plan's own drives.
+
+**The split that decided the pivot.** Every leg-5 failure was the model
+*re-narrating what the floor had already rendered* — the ranked list, the
+counts, the ids. Every unqualified success was judgment the floor cannot
+compute — the carried PSQI sentence, the initial-lands-Monday nuance, the
+two-option close — and that class never regressed in any leg. The failures
+and the successes partition perfectly along one line: mechanical rendering
+vs judgment.
+
+**The rule, extended one word from the kernel's own law:** never re-perform
+mechanical checks by reasoning — and never re-perform mechanical *rendering*
+by reasoning either. Re-narration is the drift surface; remove the surface,
+not the drift.
+
+**The pivot, made:**
+
+- The seed shrinks to the division: present the floor's rendering as it
+  stands; add above it only what the floor cannot compute (sequencing,
+  cross-thing connections, what the log carries), then the ask. Rules 4 and
+  5 survive verbatim. The turn-shape format survives only for the one
+  surface the floor cannot render — the agent's reports of its own session
+  work — where scope is naturally bounded to the turn, the condition under
+  which rules demonstrably hold (the commit-message precedent).
+- The emitter absorbs name-before-identifier as a property: rows lead with
+  the thing's own H1 (`_title_of`), id retained for addressability. The rule
+  that failed as prose becomes structure that cannot fail.
+
+**Why the four legs were not waste:** they mapped, empirically, which rules
+belong to the emitter (every mechanical one — ordering, counts, names,
+density) and which to the model (exactly two: expand-at-decides, and the
+bounded turn-report format). Phase 1 seals that division, not the rule list.
+
 ## Phase 0 findings — leg 4, 2026-08-07 (fresh session, thrice-tuned seed)
 
 **The absorbed rules held; the residue narrowed to one defect: packing

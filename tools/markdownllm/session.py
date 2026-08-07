@@ -210,33 +210,23 @@ def _floor_status(root: Path) -> str | None:
 _PRIORITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
 _REGISTER_SEED = """\
-Answer the operator's loop first — *what have I got, what's first, where do
-I go* — and answer it in their language. Report domain substance, never your
-own preparation. Say nothing where the domain is healthy. Expand, never
-smooth, where a human has to decide. Retain the derivation: "show me why"
-must always work (`mdllm triggers <path>` carries the full evaluation).
+Everything below is the floor's rendering of this domain — computed, counted,
+ordered, and titled mechanically. **Present it as it stands; never re-render
+it.** Re-performing mechanical rendering by reasoning drifts exactly as
+re-performing mechanical checks does, and it is forbidden for the same
+reason. Your opening adds only what the floor cannot compute, above the
+rendering, briefly: the sequencing call (what first, and why), connections
+the graph does not hold, anything carried from the log — then the ask.
 
-**Fill this shape every turn — it is a format, not a style to hold:**
-*what changed* → *what needs you* → *what's next*. Three or four buckets at
-most. Each heading names its subject in plain words and carries its verdict —
-never a bare topic, never the tool's own sort order. Name the thing before its
-identifier, and never an identifier where a name would do. A list holds one
-ordering and says what it is (dates in date order); the single most important
-item is one line up front — priority stated as a line is legible, priority
-encoded in the sequence is invisible. One act per line: a bullet carries one
-item and a sentence carries one action — three owed things are three lines,
-never a chain of clauses. The one thing that matters goes last, as the ask.
+Two rules govern every turn. Expand, never smooth, where a human has to
+decide. And "show me why" must always work — the derivation is retained and
+sent only on request (`mdllm triggers <path>` carries the full evaluation).
 
-**Compression is of the telling, never of the substance.** A fact that bears
-on how this domain runs survives every shape; if it will not fit a bucket, the
-bucket is wrong. Write for the ear: short declarative sentences that survive
-being spoken once — a compressed aphorism is derivation, not delivery.
-Corrections are silent — send the corrected fact, never the story of arriving
-at it. What a commit already records is referenced, never restated. The only
-part that gets longer is a call the operator has to make.
+For your own reports of this session's work — the one surface the floor
+cannot render — fill the shape: *what changed → what needs you → what's
+next*, one act per line, in the operator's nouns, the ask last.
 
-Before the first reply: load `kernel.md`; act on what is below. Do not
-narrate having done so."""
+Before the first reply: load `kernel.md`. Do not narrate having done so."""
 
 
 _HANDOFF_PREFIXES = ("session-end", "handoff", "close-session")
@@ -300,6 +290,21 @@ def _where_you_left_off(domain: Path):
     # assumed emptiness must name what it looked for; only an established
     # one may stay silent).
     return ("none", len(lines))
+
+
+def _title_of(thing) -> str | None:
+    """The thing's own H1, mechanically — name-before-identifier as a floor
+    property rather than a rule the agent must hold (leg-5 pivot: the agent
+    re-rendering ids into names was a drift surface; the floor titling its
+    own rows removes it)."""
+    for line in (thing.body or "").splitlines():
+        s = line.strip()
+        if s.startswith("# "):
+            t = s[2:].strip()
+            return t or None
+        if s and not s.startswith("#"):
+            break  # body opens with prose, not a heading — no title to lift
+    return None
 
 
 def _days_past(reason: str) -> int | None:
@@ -379,6 +384,7 @@ def _rank_open(loops, fired: dict[str, list[str]], schema=None):
         rows.append({
             "id": tid, "type": str(t.meta.get("type")),
             "status": str(t.meta.get("status")), "settled": settled,
+            "title": _title_of(t),
             "reasons": reasons, "matured": matured,
             "due": due, "due_days": due_days, "priority": prio,
             "key": (0 if reasons else 1,
@@ -415,6 +421,10 @@ def _row_line(r: dict) -> str:
         # finished work is the most invisible kind there is.
         bits.append(f"{r['status']}, but the wait is still live")
     tail = " — " + " · ".join(bits) if bits else f" — {r['status']}"
+    # Name before identifier, as a floor property: the row leads with the
+    # thing's own H1 where it has one; the id stays for addressability.
+    if r.get("title"):
+        return f"- **{r['title']}** (`{r['id']}`){tail}"
     return f"- `{r['id']}`{tail}"
 
 

@@ -1939,6 +1939,18 @@ def test_register_handoff_overtaken_by_commits_is_flagged(tmp_path):
     assert out.index("have landed since") < out.index("## Also open")
 
 
+def test_register_rows_lead_with_the_things_own_title(tmp_path):
+    # Leg-5 pivot: name-before-identifier as a floor property, not a prose
+    # rule — the row leads with the thing's H1; the id stays addressable.
+    write(tmp_path, "things/batch.md", thing_text(
+        "id: batch\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "due_date: 2026-06-15",
+        body="# The document batch send\n\nBody.\n"))
+    from markdownllm.session import _render_assistant
+    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
+    assert "- **The document batch send** (`batch`)" in out
+
+
 def test_register_absent_handoff_states_its_search(tmp_path):
     # QMS porch, 2026-08-06 (a-primitive-is-known-once-...): "no handoff" and
     # "handoff exists under a prefix the search doesn't know" rendered
