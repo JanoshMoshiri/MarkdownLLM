@@ -73,5 +73,26 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   `_where_you_left_off` stated search); the ask's dismissal condition is the
   instrument, not the fixes.
 
+- **Skills-directory-vs-artifacts check (added 2026-08-08, three instances in
+  one day).** A domain kernel's Skills Directory claiming "unfilled stubs — the
+  framework defaults apply" while all four skill files sit authored at
+  `stable v2.0` — found in two domains of the regulated deployment, plus a
+  third whose directory carried scaffold-generic one-liners against authored
+  skills. Load-bearing in the worst direction: a session trusting the kernel
+  rationally *skips* the files carrying the domain's conventions, which is
+  behaviourally indistinguishable from the harness breach the estate just
+  rectified (and the QMS domain hit the inverse — kernel advertising authored
+  skills over byte-identical templates — on 31/07). The mechanical shape is
+  same-builder and needs no suppression list: a skill file byte-identical to
+  its shipped template (or still carrying the template's placeholder
+  description) is *mechanically* a stub; a kernel section saying "unfilled"
+  over non-template skills, or authored-sounding descriptions over template
+  bodies, is checkable drift either way. Candidate home: `mdllm coherence`,
+  domain scope. Fired-when-found instances: engineering `4a3fea4`, overview
+  and development same-day commits; also add the check to `imports-check`'s
+  cousin question — the INCOMPLETE bucket conflating *unpinnable by design*
+  with *defectively unpinned* (cowork-integrity-estate-sweep Phase 10 residue)
+  belongs in this backlog under the same same-builder gate.
+
 Build when felt — none blocks anything today; the payoff is automatic drift
 enforcement the day each fact drifts again.
