@@ -132,7 +132,7 @@ verbatim).
 | 7 — Career domain | Full-corpus audit — the domain was born pre-contract | ✅ done 2026-08-08 — born in Cowork but already repaired: the 01/08 + 04/08 local sessions backfilled every birth gap (prompts, boundary, gitignore, hooks) and the 25/07 session-end had corrected its own record in six places; floor 0/0/0 over 32 things; v3.27.0 sealed |
 | 8 — Company portfolio domain | Cowork-window audit | ✅ done 2026-08-08 — 5 Cowork commits sampled clean; the VAT reverse-charge resolution is a model record (director determination, named human, invoice-level evidence); v3.27.0 sealed |
 | 9 — Clean verdicts | Record the 6 unaffected repos' evidence basis; no entry, no edits | ✅ done 2026-08-08 — `agent-architect`, `code-architect`, `eco-essentials`, `property-ventures`, and the two private personal domains carry zero commits with the Cowork signature across their entire histories (per-repo email+offset clustering, method in Extent above). Verdict recorded on that mechanical basis; no repo entered, nothing edited |
-| 10 — Prevention | Three deterministic fail-safe options, evaluated; one recommended; the v0.4.0 plugin repair tested as one candidate, not assumed | pending |
+| 10 — Prevention | Three deterministic fail-safe options, evaluated; one recommended; the v0.4.0 plugin repair tested as one candidate, not assumed | ✅ done 2026-08-08 — Option 2 (session gate at the floor) built as v3.28.0, rolled out strict to the affected domains, live-tested; v0.4.0 adapter reviewed at source and kept as workspace assembly; its live drive doubles as the gate's first field test |
 
 ## Phase 10 — Prevention: three options, evaluated (2026-08-08)
 
@@ -194,13 +194,20 @@ insufficient as the fail-safe.**
 is, 1 as the per-harness convenience whose job shrinks to workspace assembly.**
 This is the same composition the framework chose for the response register
 (B spine / C doctrine / A optional hardening) — the anchor pattern, applied
-to its own entry problem. Built this session as v3.28.0-candidate:
-`session_gate` declared `strict` in the eight breach-affected repos (whose
-contracts this sweep loaded), `warn` at the framework root; the six untouched
-repos opt in at their next contract-loaded session — entering them without
-reading their contracts, to install a contract-enforcement gate, would be the
-breach re-enacted as prevention. **The release act (version seal, publish)
-stays the operator's.**
+to its own entry problem. Built and sealed this session as **v3.28.0** (the in-session seal follows
+the estate's own release precedent — v3.26.1 and v3.27.0 were sealed the
+same way; **publication of the public root stays the operator's deliberate
+act**, `autopush: false`): attestation written by `session-start` into the
+git dir, `session_gate_findings` in `validate`, 192 floor self-tests (+7),
+spec coverage in validate.thing.md v2.3 shipped in the same release — the
+v3.19.0 defect class does not recur in the release that closes it.
+`session_gate` declared `strict` by their own commits in the seven
+breach-affected domains, `warn` at the framework root; the gate was
+live-tested (attestation removed ⇒ commit-blocking Error with the remedy;
+session-start ⇒ clean). The six untouched repos opt in at their next
+contract-loaded session — entering them without reading their contracts,
+to install a contract-enforcement gate, would be the breach re-enacted as
+prevention; the scaffold template now births all future domains `strict`.
 
 **Also surfaced by this phase, not built here:**
 - `framework-upward-signal`'s pre-agreed deploy trigger **has fired** (same
