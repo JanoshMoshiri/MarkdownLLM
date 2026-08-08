@@ -123,7 +123,7 @@ verbatim).
 | Phase | Scope | Status |
 |---|---|---|
 | 0 — Extent scan | Signature discriminator verified; 14 repos clustered; extent table above | ✅ done 2026-08-08 |
-| 1 — Framework root | Audit cd2e0f7 (v3.19.0) + 8385654 (assistant-register creation); floor run | in progress |
+| 1 — Framework root | Audit cd2e0f7 (v3.19.0) + 8385654 (assistant-register creation); floor run | ✅ done 2026-08-08 — one defect: `terminal_statuses` shipped in the floor with zero spec coverage; fixed (thing.md v2.17 + kernel). `assistant-register` clean — re-audited implicitly by seven contract-following legs since creation. Floor green |
 | 2 — QMS domain | Agent-executable slices of its `cowork-session-integrity-extent-review` | pending |
 | 3 — Overview domain | Historical Cowork-window audit (today's writes already corrected) | pending |
 | 4 — Engineering domain | Execute its `pre-cowork-slip-domain-audit` | pending |
