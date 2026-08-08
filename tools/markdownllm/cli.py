@@ -217,6 +217,11 @@ def build_cli() -> argparse.ArgumentParser:
     ms.add_argument("--port", type=int, default=8765, help="HTTP port (default 8765)")
     ms.add_argument("--host", default="127.0.0.1",
                     help="HTTP bind host — loopback only; non-loopback is refused")
+    ms.add_argument("--token", nargs="?", const="auto", default=None,
+                    help="gate every HTTP request behind `Authorization: Bearer "
+                         "<token>`; with no value, a per-run token is generated "
+                         "and printed to stderr — the probe control for "
+                         "tunnelled cross-machine reads (dies with the process)")
     ms.set_defaults(fn=cmd_mcp_serve)
 
     ic = sub.add_parser("imports-check", help="re-quarantine-on-drift: check a "

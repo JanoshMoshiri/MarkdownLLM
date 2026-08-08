@@ -330,11 +330,25 @@ publishes a *face it authored about itself*, never its raw interior.
   dormant-capability-behind-a-flag is exactly what the Phase 3 revert ruled
   out. Origin-carrying (browser-borne) requests are checked against loopback
   origins — the DNS-rebinding defence the Streamable HTTP spec requires.
+- **Phase 5, probe control — landed (2026-08-08).** `--token` gates every
+  HTTP request behind `Authorization: Bearer <token>`; with no value a
+  per-run token is minted and printed once to stderr. This is the
+  cross-machine *probe* control — the operator carries the token from the
+  serving machine to the consuming session themselves, so possession IS the
+  authorization, and it dies with the process (never the long-lived API key
+  the doctrine bans). The consumer's `url` address-book entry carries it as
+  a `headers` map (the `.mcp.json` convention). Scope stated plainly: this
+  authorizes *the operator's own trust zone stretched over a tunnel* (e.g.
+  a loopback-bound porch behind an ephemeral cloudflared URL), not
+  other-party consumers.
 - **Phase 5, authorization leg (OAuth 2.1) — pending.** This, not the
   transport, is now the external-agent gate: a remote agent connecting over
   the wire, after which the MCP integration can be claimed publicly. The
   transport swap is done; going public is an auth-config swap on top of it,
-  exactly as guardrail 2 planned.
+  exactly as guardrail 2 planned. Hand-rolling an authorization server in
+  the floor's stdlib style is the wrong build — when this is felt, lean on
+  an external AS; the porch's job stays resource-server-side token
+  validation.
 - **Phase 4 (prompts)** pending.
 
 **Why MCP, not git, for the freshness read (decided):** the framework version-check

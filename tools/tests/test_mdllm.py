@@ -1817,6 +1817,62 @@ def test_imports_freshness_over_http(tmp_path):
         server.shutdown(); server.server_close()
 
 
+def test_mcp_serve_http_token_gate(tmp_path):
+    # The probe control: with a token set, possession is the authorization —
+    # no header 401, wrong token 401, right token 200. Per-run by design.
+    import threading
+    _mcp_domain(tmp_path)
+    server = mdllm.mcp_http_server(tmp_path, tmp_path.name, "127.0.0.1", 0,
+                                   token="probe-secret")
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    endpoint = f"http://127.0.0.1:{server.server_address[1]}/mcp"
+    init = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
+    try:
+        code, _ = _http_post(endpoint, init)
+        assert code == 401
+        code, _ = _http_post(endpoint, init,
+                             headers={"Authorization": "Bearer wrong"})
+        assert code == 401
+        code, body = _http_post(endpoint, init,
+                                headers={"Authorization": "Bearer probe-secret"})
+        assert code == 200 and "result" in body
+    finally:
+        server.shutdown(); server.server_close()
+
+
+def test_imports_freshness_over_http_with_token(tmp_path):
+    # The full probe shape: a token-gated porch read through a url entry whose
+    # `headers` carry the bearer token (the .mcp.json convention).
+    import subprocess as sp, threading
+    src = tmp_path / "srcdom"
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+        "# The Spec\n\nv1.\n"))
+    sp.run(["git", "init", "-q"], cwd=src, check=True)
+    _git_commit(src, "create spec")
+    pin = _git_short(src)
+
+    server = mdllm.mcp_http_server(src, "srcdom", "127.0.0.1", 0, token="probe-secret")
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    endpoint = f"http://127.0.0.1:{server.server_address[1]}/mcp"
+    try:
+        con = tmp_path / "condom"
+        con.mkdir()
+        _consumer_with_import(con, "srcdom", "the-spec", pin,
+                              {"url": endpoint,
+                               "headers": {"Authorization": "Bearer probe-secret"}},
+                              body="# The Spec\n\nv1.\n")
+        rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+        assert rows["imported-spec"]["state"] == "fresh"
+        # without the token the read is refused -> honest "unreachable"
+        _consumer_with_import(con, "srcdom", "the-spec", pin,
+                              {"url": endpoint}, body="# The Spec\n\nv1.\n")
+        rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+        assert rows["imported-spec"]["state"] == "unreachable"
+    finally:
+        server.shutdown(); server.server_close()
+
+
 def test_imports_freshness_http_unreachable_is_unknown(tmp_path):
     # A dead endpoint is "sync state unknown" — never a silent fresh.
     con = tmp_path / "condom"

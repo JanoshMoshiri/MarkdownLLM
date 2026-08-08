@@ -79,7 +79,8 @@ def _mcp_client_read(command: str, args: list, cwd: Path, uris: list[str],
     return got
 
 
-def _mcp_http_read(url: str, uris: list[str], timeout: int = 30) -> dict | None:
+def _mcp_http_read(url: str, uris: list[str], timeout: int = 30,
+                   headers: dict | None = None) -> dict | None:
     # The same face read over Streamable HTTP: one POST per JSON-RPC message
     # (batching left the MCP spec), Accept covering both response shapes the
     # spec allows. A failed initialize is None — "sync state unknown", never a
@@ -96,7 +97,8 @@ def _mcp_http_read(url: str, uris: list[str], timeout: int = 30) -> dict | None:
         req = urllib.request.Request(
             url, data=json.dumps(msg).encode(), method="POST",
             headers={"Content-Type": "application/json",
-                     "Accept": "application/json, text/event-stream"})
+                     "Accept": "application/json, text/event-stream",
+                     **(headers or {})})
         if session["id"]:
             req.add_header("Mcp-Session-Id", session["id"])
         with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -136,7 +138,9 @@ def _mcp_face_read(cfg: dict, cwd: Path, uris: list[str]) -> dict | None:
     # One consumer-side read, either transport — the membrane semantics
     # (unreachable = unknown, per-URI misses tolerated) are identical.
     if cfg.get("url"):
-        return _mcp_http_read(cfg["url"], uris)
+        # `headers` rides the entry (the ecosystem's .mcp.json convention) —
+        # how a tunnelled probe carries its per-run bearer token.
+        return _mcp_http_read(cfg["url"], uris, headers=cfg.get("headers"))
     return _mcp_client_read(cfg["command"], cfg.get("args", []), cwd, uris)
 
 

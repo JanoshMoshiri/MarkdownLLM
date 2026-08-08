@@ -285,12 +285,21 @@ def _origin_allowed(origin: str | None) -> bool:
     return mcp_host_is_loopback(urlsplit(origin).hostname or "")
 
 
-def mcp_http_server(root: Path, domain_id: str, host: str, port: int, log=None):
+def mcp_http_server(root: Path, domain_id: str, host: str, port: int, log=None,
+                    token: str | None = None):
     """Build (not run) the Streamable HTTP transport: one endpoint (`/mcp`),
     POST carries a JSON-RPC message, the reply is `application/json`.
     Stateless by design — no sessions, no server-initiated stream (GET is
     405), every request re-reads the repo. Returned unstarted so tests can
-    drive it on an ephemeral port; `cmd_mcp_serve` runs it forever."""
+    drive it on an ephemeral port; `cmd_mcp_serve` runs it forever.
+
+    `token` gates every request behind `Authorization: Bearer <token>` —
+    the probe control for tunnelled cross-machine reads: per-run (dies with
+    the process, so never the long-lived API key the doctrine bans), held
+    only by the operator who started the server. Possession of the token IS
+    being the operator; OAuth 2.1 remains the gate for other-party
+    consumers."""
+    import hmac
     import json
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -304,16 +313,27 @@ def mcp_http_server(root: Path, domain_id: str, host: str, port: int, log=None):
         def log_message(self, fmt, *args):  # route http.server chatter to our log
             log(f"http {self.address_string()} {fmt % args}")
 
-        def _send(self, code: int, body: bytes = b"") -> None:
+        def _send(self, code: int, body: bytes = b"", extra: dict | None = None) -> None:
             self.send_response(code)
             if body:
                 self.send_header("Content-Type", "application/json")
+            for k, v in (extra or {}).items():
+                self.send_header(k, v)
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             if body:
                 self.wfile.write(body)
 
+        def _authorized(self) -> bool:
+            if not token:
+                return True
+            got = self.headers.get("Authorization", "")
+            return got.startswith("Bearer ") and hmac.compare_digest(got[7:].strip(), token)
+
         def do_POST(self):
+            if not self._authorized():
+                return self._send(401, b'{"error":"missing or wrong bearer token"}',
+                                  extra={"WWW-Authenticate": "Bearer"})
             if self.path.rstrip("/") != "/mcp":
                 return self._send(404, b'{"error":"the MCP endpoint is /mcp"}')
             if not _origin_allowed(self.headers.get("Origin")):
@@ -358,12 +378,19 @@ def cmd_mcp_serve(args) -> int:
             sys.exit(f"mdllm: refusing to bind non-loopback host {host!r} — "
                      "the HTTP porch is loopback-only until the OAuth 2.1 "
                      "authorization leg exists (docs/plans/mcp-domain-server.md, Phase 5)")
-        server = mcp_http_server(root, domain_id, host, int(getattr(args, "port", 8765)), log)
+        token = getattr(args, "token", None)
+        if token == "auto":
+            import secrets
+            token = secrets.token_urlsafe(32)
+            log(f"bearer token (per-run; dies with this process): {token}")
+        server = mcp_http_server(root, domain_id, host, int(getattr(args, "port", 8765)),
+                                 log, token=token)
         corpus, _ = scan(root)
         bound = server.server_address
         log(f"serving {len(mcp_exposed_things(corpus))} exposed thing(s) over "
             f"Streamable HTTP at http://{bound[0]}:{bound[1]}/mcp "
-            f"(MCP {MCP_PROTOCOL_VERSION}; loopback-only; re-read per request)")
+            f"(MCP {MCP_PROTOCOL_VERSION}; loopback-only; re-read per request; "
+            f"{'bearer-token gated' if token else 'no token — loopback trust'})")
         try:
             server.serve_forever()
         except KeyboardInterrupt:
