@@ -134,6 +134,84 @@ verbatim).
 | 9 — Clean verdicts | Record the 6 unaffected repos' evidence basis; no entry, no edits | ✅ done 2026-08-08 — `agent-architect`, `code-architect`, `eco-essentials`, `property-ventures`, and the two private personal domains carry zero commits with the Cowork signature across their entire histories (per-repo email+offset clustering, method in Extent above). Verdict recorded on that mechanical basis; no repo entered, nothing edited |
 | 10 — Prevention | Three deterministic fail-safe options, evaluated; one recommended; the v0.4.0 plugin repair tested as one candidate, not assumed | pending |
 
+## Phase 10 — Prevention: three options, evaluated (2026-08-08)
+
+The requirement, in the operator's words: a **deterministic** fail-safe, built
+for the general case — Cowork is not the last harness that will need an
+adapter. The evaluation frame is the framework's own anchor taxonomy
+(orchestration.md): `interpretation` < `harness-session` < `git-fs`, with the
+standing doctrine that **adapters stay optional — never the difference between
+working and not**. The estate evidence gathered by phases 1–9 is the test
+every option must pass: in every breached session, the interpretation-anchored
+controls vanished silently while every git-fs control held.
+
+**Option 1 — the hardened adapter (v0.4.0 bootstrap), tested and trusted.**
+Reviewed this session at source. It is a real improvement: bootstrap performs
+estate-sync/doctor/session-start mechanically, prints a HANDOFF CONTRACT and
+branch map, orders Tier-0 reading before the first write, and states plainly
+that Cowork cannot fire the domain's own adapters. But its Step 2b names
+itself: *"the gate with no backstop… nothing enforces this step."* It raises
+the probability the contract loads; it cannot make the failure loud. And
+adopted alone it inverts the adapter doctrine — the adapter becomes exactly
+the difference between working and not. **Verdict: keep, as the Cowork
+workspace-assembly layer; not the fail-safe.** Its live test remains owed and
+is now cheap: the next Cowork session either passes the Option-2 gate or is
+stopped by it — the gate is the test harness.
+
+**Option 2 — the session gate at the floor (git-fs). The fail-safe.**
+`mdllm session-start` — the command whose output *is* the contract entering
+context — records a per-clone attestation in `.git/` (timestamp + HEAD;
+uncommittable by construction). `mdllm validate`, which every pre-commit hook
+already runs, gains a check: a domain whose schema declares
+`options: {session_gate: warn|strict}` requires a fresh attestation before
+any commit — absent or stale ⇒ Warning (`warn`) or commit-blocking Error
+(`strict`), with the remedy in the message (*run
+`python {framework_root}/tools/mdllm.py session-start .`*). Properties that
+decide the evaluation: **harness-agnostic** (any future harness meets the
+same wall — no adapter required, satisfying the doctrine); **deterministic**
+(the failure mode of "contract never loaded" becomes "cannot commit", which
+is loud in precisely the place every breached session stayed green);
+**self-remedying** (the block names the one command, and that command emits
+the contract); **honest about its limit** (it proves the contract was
+*emitted into the session*, not that it was heeded — the residual is the
+register/seed problem `assistant-register` already works, a categorically
+smaller failure class than "never saw it"). Costs: one tool change + tests;
+a per-domain schema declaration; a staleness window (24h) that long-lived
+local clones must refresh with one command.
+
+**Option 3 — inject, don't instruct (emission as the entry surface).**
+Make the terminal act of any bootstrap the *printing of the contract itself*
+(AGENTS.md + kernel) into the transcript, so reading has happened before
+acting can start — the t=0 anchor evidence from `assistant-register` legs
+1–7 shows injected seed text out-competes instructions to go read. Real, and
+partially shipped already (v0.4.0 prints the handoff contract; session-start
+emits the seed). But it is still interpretation-anchored — a competing
+program at the anchor can swallow it (leg 6, lived) — and multi-domain
+sessions pay its token weight per domain. **Verdict: correct as doctrine,
+insufficient as the fail-safe.**
+
+**Decision: Option 2 as the spine, 3 as what session-start's emission already
+is, 1 as the per-harness convenience whose job shrinks to workspace assembly.**
+This is the same composition the framework chose for the response register
+(B spine / C doctrine / A optional hardening) — the anchor pattern, applied
+to its own entry problem. Built this session as v3.28.0-candidate:
+`session_gate` declared `strict` in the eight breach-affected repos (whose
+contracts this sweep loaded), `warn` at the framework root; the six untouched
+repos opt in at their next contract-loaded session — entering them without
+reading their contracts, to install a contract-enforcement gate, would be the
+breach re-enacted as prevention. **The release act (version seal, publish)
+stays the operator's.**
+
+**Also surfaced by this phase, not built here:**
+- `framework-upward-signal`'s pre-agreed deploy trigger **has fired** (same
+  defect class, three domains, one day). Un-parking it is the operator's
+  scheduled decision; this sweep is itself evidence for the plan's premise.
+- `imports-check`'s `INCOMPLETE` bucket conflates *unpinnable by design*
+  (Drive/document-sourced, no git face) with *defectively unpinned* — the gap
+  the 08/08 misreading walked through. Candidate: a declared
+  `source: document`-class marker so coverage lines read honestly. Belongs
+  with `mechanical-coherence-checks-backlog`.
+
 ## What would close this
 
 Every affected repo either rectified under its own agent's contract or
