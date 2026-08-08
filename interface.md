@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -196,8 +196,11 @@ implicit**:
 - **Exposure is opt-in per thing** (`exposed: true`), and the relational
   graph is stripped on egress — edges do not travel raw across id spaces
   (`thing.md`).
-- **The porch** (`mdllm mcp-serve <domain>`) serves the face over MCP stdio;
-  a consumer wires it into its own `.mcp.json`.
+- **The porch** (`mdllm mcp-serve <domain>`) serves the face over MCP —
+  stdio (the consumer spawns the server) or Streamable HTTP (`--http`,
+  loopback-bound until an authorization leg exists); a consumer wires either
+  into its own `.mcp.json` (a `command` or a `url` entry). Same face, same
+  membrane — the transport is the only difference.
 - **Consumption is an import**: the consumer mirrors the thing, pins it with
   the reference triple (`source_domain`/`source_id`/`source_commit`), and
   quarantines it (`origin: external`, `verified: false`) until a human flips

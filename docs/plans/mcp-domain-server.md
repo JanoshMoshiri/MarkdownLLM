@@ -78,7 +78,7 @@ something the protocol hands you.
 
 ```
 mdllm mcp-serve <domain-path>            # stdio (default) — local
-mdllm mcp-serve <domain-path> --http [--port N]   # Streamable HTTP — later
+mdllm mcp-serve <domain-path> --http [--port N]   # Streamable HTTP — landed 2026-08-08, loopback-only
 ```
 
 A **thin adapter over the existing floor + repo.** The server holds no LLM of its
@@ -314,9 +314,28 @@ publishes a *face it authored about itself*, never its raw interior.
   separate A2A peer layer** with its own threat model, never bolted onto the read
   face. Re-open only when a second real consumer pair exists *and* it earns its own
   project.
-- **Phase 4 (prompts), 5 (Streamable HTTP + OAuth 2.1)** pending — Phase 5 is the
-  external-agent test: a remote agent connecting to a domain over the wire, after
-  which the MCP integration can be claimed publicly.
+- **Phase 5, transport leg — landed (2026-08-08).** `mdllm mcp-serve <domain>
+  --http [--port N]` serves the identical face over Streamable HTTP: one
+  dispatcher shared with stdio (`mcp_make_dispatcher` — error mapping cannot
+  drift between pipes), one endpoint (`POST /mcp`, JSON-RPC in,
+  `application/json` out, notifications 202, GET 405 — poll-only, git is the
+  state), re-scan per request (a long-lived porch serves the repo as it
+  stands, never as it stood at bind time — design guardrail 3 made
+  mechanical). The consumer side crossed with it: the `.mcp.json` address
+  book accepts `url` entries alongside `command`, and `imports-check` /
+  `estate-check` read a served face over the wire with unchanged membrane
+  semantics (unreachable = unknown, never a silent fresh). **Loopback-bound
+  by refusal, not by warning:** a non-loopback `--host` exits with the reason
+  — a routable porch without OAuth 2.1 would be an honour-system control, and
+  dormant-capability-behind-a-flag is exactly what the Phase 3 revert ruled
+  out. Origin-carrying (browser-borne) requests are checked against loopback
+  origins — the DNS-rebinding defence the Streamable HTTP spec requires.
+- **Phase 5, authorization leg (OAuth 2.1) — pending.** This, not the
+  transport, is now the external-agent gate: a remote agent connecting over
+  the wire, after which the MCP integration can be claimed publicly. The
+  transport swap is done; going public is an auth-config swap on top of it,
+  exactly as guardrail 2 planned.
+- **Phase 4 (prompts)** pending.
 
 **Why MCP, not git, for the freshness read (decided):** the framework version-check
 reads git (`.markdownllm`) because that's the **vertical/substrate** axis — public
