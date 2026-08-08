@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-06
-generated: 2026-08-06T22:43:15
-generated_from: HEAD@604dfc4
-coverage: 150
+created: 2026-08-08
+generated: 2026-08-08T11:34:10
+generated_from: HEAD@687aa3d
+coverage: 151
 framework_version: 3.27.0
 ---
 
@@ -119,6 +119,8 @@ framework_version: 3.27.0
 - coordination-claim-specification --extends--> thing-specification
 - coordination-claim-specification --complements--> git-workflow-specification
 - coordination-claim-specification --complements--> workflow-state-specification
+- cowork-integrity-estate-sweep --references--> framework-upward-signal
+- cowork-integrity-estate-sweep --references--> pretooluse-action-boundary-gate
 - cross-domain-handoff-is-built-inbound-only --extends--> cross-domain-handoff-is-verified-external-input
 - cross-domain-handoff-is-built-inbound-only --supports--> directional-graph-reads-come-in-inbound-outbound-pairs
 - cross-domain-handoff-is-built-inbound-only --supports--> mechanism-pairs-come-from-two-reflection-axes
