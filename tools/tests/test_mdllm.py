@@ -1657,6 +1657,176 @@ def test_mcp_serve_stdio_roundtrip(tmp_path):
     assert payload["reference_triple"]["source_id"] == "rent-statement-2026"
 
 
+# ------------------------------------- mcp-serve --http (Phase 5 transport leg)
+
+
+def _http_face(root, domain_id=None):
+    # Run the Streamable HTTP porch on an ephemeral loopback port; the caller
+    # gets (server, endpoint) and owns shutdown.
+    import threading
+    server = mdllm.mcp_http_server(root, domain_id or root.name, "127.0.0.1", 0)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server, f"http://127.0.0.1:{server.server_address[1]}/mcp"
+
+
+def _http_post(endpoint, msg, headers=None):
+    import json as _json, urllib.request
+    req = urllib.request.Request(
+        endpoint, data=_json.dumps(msg).encode(), method="POST",
+        headers={"Content-Type": "application/json",
+                 "Accept": "application/json, text/event-stream", **(headers or {})})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            raw = r.read().decode()
+            return r.status, (_json.loads(raw) if raw.strip() else None)
+    except urllib.error.HTTPError as e:
+        return e.code, None
+
+
+def test_mcp_serve_http_roundtrip(tmp_path):
+    # The transport swap the stdio loop promised: same dispatcher, same face,
+    # different pipe. JSON-RPC over POST /mcp, responses as application/json.
+    import json as _json
+    _mcp_domain(tmp_path)
+    server, endpoint = _http_face(tmp_path)
+    try:
+        code, init = _http_post(endpoint, {"jsonrpc": "2.0", "id": 1,
+                                           "method": "initialize", "params": {}})
+        assert code == 200
+        assert init["result"]["serverInfo"]["name"] == "mdllm-domain:" + tmp_path.name
+        # a notification is accepted with 202 and no body
+        code, body = _http_post(endpoint, {"jsonrpc": "2.0",
+                                           "method": "notifications/initialized"})
+        assert code == 202 and body is None
+        # the face is identical to stdio's: manifest + provenance-stamped fetch
+        code, man = _http_post(endpoint, {"jsonrpc": "2.0", "id": 2,
+                                          "method": "resources/read",
+                                          "params": {"uri": f"manifest://{tmp_path.name}"}})
+        assert code == 200
+        man_doc = _json.loads(man["result"]["contents"][0]["text"])
+        assert [k["id"] for k in man_doc["knows"]] == ["rent-statement-2026"]
+        code, d = _http_post(endpoint, {"jsonrpc": "2.0", "id": 3,
+                                        "method": "tools/call",
+                                        "params": {"name": "get_deliverable",
+                                                   "arguments": {"id": "rent-statement-2026"}}})
+        payload = _json.loads(d["result"]["content"][0]["text"])
+        assert payload["reference_triple"]["source_id"] == "rent-statement-2026"
+        # the membrane holds across this pipe too
+        code, miss = _http_post(endpoint, {"jsonrpc": "2.0", "id": 4,
+                                           "method": "resources/read",
+                                           "params": {"uri": f"thing://{tmp_path.name}/internal-note"}})
+        assert code == 200 and "error" in miss
+    finally:
+        server.shutdown(); server.server_close()
+
+
+def test_mcp_serve_http_guards(tmp_path):
+    # DNS-rebinding defence: browser-borne (Origin-carrying) requests must be
+    # loopback-origin; GET has no stream to offer; the endpoint is /mcp.
+    import urllib.request
+    _mcp_domain(tmp_path)
+    server, endpoint = _http_face(tmp_path)
+    try:
+        code, _ = _http_post(endpoint, {"jsonrpc": "2.0", "id": 1,
+                                        "method": "initialize", "params": {}},
+                             headers={"Origin": "http://evil.example"})
+        assert code == 403
+        code, _ = _http_post(endpoint, {"jsonrpc": "2.0", "id": 1,
+                                        "method": "initialize", "params": {}},
+                             headers={"Origin": "http://localhost:3000"})
+        assert code == 200
+        try:
+            with urllib.request.urlopen(endpoint, timeout=10) as r:
+                code = r.status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 405
+        code, _ = _http_post(endpoint.replace("/mcp", "/nope"),
+                             {"jsonrpc": "2.0", "id": 1, "method": "initialize"})
+        assert code == 404
+    finally:
+        server.shutdown(); server.server_close()
+
+
+def test_mcp_serve_http_rescans_per_request(tmp_path):
+    # Stateless server, git is the state: a long-lived HTTP porch must serve
+    # the repo as it stands, not as it stood at bind time.
+    _mcp_domain(tmp_path)
+    server, endpoint = _http_face(tmp_path)
+    try:
+        uri = f"thing://{tmp_path.name}/rent-statement-2026"
+        _, r1 = _http_post(endpoint, {"jsonrpc": "2.0", "id": 1,
+                                      "method": "resources/read", "params": {"uri": uri}})
+        assert "12000" in r1["result"]["contents"][0]["text"]
+        write(tmp_path, "things/income/rent.md", thing_text(
+            "id: rent-statement-2026\ntype: deliverable\nstatus: completed\n"
+            "created: 2026-06-01\nexposed: true",
+            "# Rent Statement 2026\n\nTotal income: 99999 REVISED.\n"))
+        _, r2 = _http_post(endpoint, {"jsonrpc": "2.0", "id": 2,
+                                      "method": "resources/read", "params": {"uri": uri}})
+        assert "99999 REVISED" in r2["result"]["contents"][0]["text"]
+    finally:
+        server.shutdown(); server.server_close()
+
+
+def test_mcp_http_loopback_only():
+    # The refusal is the control: no routable bind until the OAuth 2.1 leg.
+    assert mdllm.mcp_host_is_loopback("127.0.0.1")
+    assert mdllm.mcp_host_is_loopback("localhost")
+    assert mdllm.mcp_host_is_loopback("::1")
+    assert mdllm.mcp_host_is_loopback("127.0.0.53")
+    assert not mdllm.mcp_host_is_loopback("0.0.0.0")
+    assert not mdllm.mcp_host_is_loopback("192.168.1.10")
+    assert not mdllm.mcp_host_is_loopback("example.com")
+    assert not mdllm.mcp_host_is_loopback("")
+
+
+def test_imports_freshness_over_http(tmp_path):
+    # Domain-to-domain over the wire: the consumer's address book carries a
+    # `url` entry; the whole fresh -> stale membrane read works unchanged.
+    import subprocess as sp
+    src = tmp_path / "srcdom"
+    write(src, "things/spec.md", thing_text(
+        "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+        "# The Spec\n\nv1.\n"))
+    sp.run(["git", "init", "-q"], cwd=src, check=True)
+    _git_commit(src, "create spec")
+    pin = _git_short(src)
+
+    server, endpoint = _http_face(src, "srcdom")
+    try:
+        con = tmp_path / "condom"
+        con.mkdir()
+        _consumer_with_import(con, "srcdom", "the-spec", pin,
+                              {"url": endpoint}, body="# The Spec\n\nv1.\n")
+        rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+        assert rows["imported-spec"]["state"] == "fresh"
+
+        write(src, "things/spec.md", thing_text(
+            "id: the-spec\ntype: deliverable\nstatus: approved\ncreated: 2026-06-01\nexposed: true",
+            "# The Spec\n\nv2 CHANGED.\n"))
+        _git_commit(src, "revise spec")
+        rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+        assert rows["imported-spec"]["state"] == "stale"
+        assert rows["imported-spec"]["species"] == "content changed"
+
+        # face coverage reads the manifest through the same url entry
+        cov = {c["source"]: c for c in mdllm.face_coverage(con)}
+        assert cov["srcdom"]["state"] == "ok" and cov["srcdom"]["offered"] == 1
+    finally:
+        server.shutdown(); server.server_close()
+
+
+def test_imports_freshness_http_unreachable_is_unknown(tmp_path):
+    # A dead endpoint is "sync state unknown" — never a silent fresh.
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", "abc1234",
+                          {"url": "http://127.0.0.1:9/mcp"})  # port 9: discard
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "unreachable"
+
+
 # ------------------------------------------------- quarantine flip discipline
 # (verified-flip-enforcement plan: the verified flip is an auditable event —
 # born-verified and attribution are procedure checks keyed to git, never a

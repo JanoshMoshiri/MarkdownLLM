@@ -77,7 +77,8 @@ from markdownllm.doctor import _upstream_sentinel_version, cmd_doctor
 from markdownllm.mcp_server import (
     mcp_domain_id, mcp_exposed_things, mcp_list_tools, mcp_query_things,
     mcp_get_deliverable, mcp_build_manifest, mcp_list_resources,
-    mcp_read_resource, cmd_mcp_serve,
+    mcp_read_resource, mcp_make_dispatcher, mcp_http_server,
+    mcp_host_is_loopback, cmd_mcp_serve,
 )
 from markdownllm.imports_check import (
     imports_freshness, face_coverage, cmd_imports_check, cmd_estate_check,

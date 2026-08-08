@@ -207,8 +207,16 @@ def build_cli() -> argparse.ArgumentParser:
     # Hook body is portable since v3.4.1: root/interpreter resolved at run time.
 
     ms = sub.add_parser("mcp-serve", help="serve a domain's exposed face over MCP "
-                        "(stdio) — the cross-domain producing side (Phase 1: read-only)")
+                        "— the cross-domain producing side (read-only). Default "
+                        "transport is stdio (the client spawns the server); --http "
+                        "serves the same face over Streamable HTTP, loopback-only "
+                        "(public exposure waits for the OAuth 2.1 leg)")
     ms.add_argument("path", help="path to the domain directory to serve")
+    ms.add_argument("--http", action="store_true",
+                    help="serve over Streamable HTTP instead of stdio (endpoint /mcp)")
+    ms.add_argument("--port", type=int, default=8765, help="HTTP port (default 8765)")
+    ms.add_argument("--host", default="127.0.0.1",
+                    help="HTTP bind host — loopback only; non-loopback is refused")
     ms.set_defaults(fn=cmd_mcp_serve)
 
     ic = sub.add_parser("imports-check", help="re-quarantine-on-drift: check a "

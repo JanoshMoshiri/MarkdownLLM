@@ -29,7 +29,9 @@ from .model import scan
 
 def _load_address_book(consumer_root: Path) -> dict:
     # The consumer's `.mcp.json` mcpServers map IS the address book — operator-
-    # wired, per trust zone. name -> {command, args}.
+    # wired, per trust zone. Two entry forms, mirroring MCP's two transports:
+    # name -> {command, args} (stdio: spawn the source's server) or
+    # name -> {url} (Streamable HTTP: POST to a served porch).
     import json
     p = consumer_root / ".mcp.json"
     if not p.is_file():
@@ -75,6 +77,67 @@ def _mcp_client_read(command: str, args: list, cwd: Path, uris: list[str],
             except Exception:
                 pass
     return got
+
+
+def _mcp_http_read(url: str, uris: list[str], timeout: int = 30) -> dict | None:
+    # The same face read over Streamable HTTP: one POST per JSON-RPC message
+    # (batching left the MCP spec), Accept covering both response shapes the
+    # spec allows. A failed initialize is None — "sync state unknown", never a
+    # silent fresh; a failed single read just leaves that URI absent, exactly
+    # like an error response on stdio.
+    import json
+    import urllib.request
+    from urllib.parse import urlsplit
+    if urlsplit(url).scheme not in ("http", "https"):
+        return None
+    session = {"id": None}
+
+    def post(msg: dict) -> dict | None:
+        req = urllib.request.Request(
+            url, data=json.dumps(msg).encode(), method="POST",
+            headers={"Content-Type": "application/json",
+                     "Accept": "application/json, text/event-stream"})
+        if session["id"]:
+            req.add_header("Mcp-Session-Id", session["id"])
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            sid = r.headers.get("Mcp-Session-Id")
+            if sid:
+                session["id"] = sid
+            ctype = r.headers.get("Content-Type", "")
+            raw = r.read().decode("utf-8", "replace")
+        if "text/event-stream" in ctype:  # SSE-wrapped response: last data frame
+            frames = [ln[5:].strip() for ln in raw.splitlines() if ln.startswith("data:")]
+            raw = frames[-1] if frames else ""
+        return json.loads(raw) if raw.strip() else None
+
+    try:
+        init = post({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
+        if not init or "result" not in init:
+            return None
+    except Exception:
+        return None
+    got: dict[str, str] = {}
+    for i, uri in enumerate(uris, start=2):
+        try:
+            resp = post({"jsonrpc": "2.0", "id": i, "method": "resources/read",
+                         "params": {"uri": uri}})
+            if resp and "result" in resp:
+                got[uri] = resp["result"]["contents"][0]["text"]
+        except Exception:
+            pass
+    return got
+
+
+def _addressed(cfg) -> bool:
+    return bool(isinstance(cfg, dict) and (cfg.get("command") or cfg.get("url")))
+
+
+def _mcp_face_read(cfg: dict, cwd: Path, uris: list[str]) -> dict | None:
+    # One consumer-side read, either transport — the membrane semantics
+    # (unreachable = unknown, per-URI misses tolerated) are identical.
+    if cfg.get("url"):
+        return _mcp_http_read(cfg["url"], uris)
+    return _mcp_client_read(cfg["command"], cfg.get("args", []), cwd, uris)
 
 
 def _face_body(rendered: str) -> str:
@@ -123,11 +186,11 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
     faces: dict[str, tuple[str, tuple[dict, dict] | None]] = {}
     for sd, sids in by_source.items():
         cfg = book.get(sd)
-        if not cfg or not cfg.get("command"):
+        if not _addressed(cfg):
             faces[sd] = ("no-address", None)
             continue
         uris = [f"manifest://{sd}"] + [f"thing://{sd}/{sid}" for sid in sids]
-        got = _mcp_client_read(cfg["command"], cfg.get("args", []), consumer_root, uris)
+        got = _mcp_face_read(cfg, consumer_root, uris)
         man = None
         if got and f"manifest://{sd}" in got:
             try:
@@ -279,10 +342,9 @@ def face_coverage(consumer_root: Path) -> list[dict]:
             imported[sd] = imported.get(sd, 0) + 1
     out = []
     for sd, cfg in sorted(book.items()):
-        if not isinstance(cfg, dict) or not cfg.get("command"):
+        if not _addressed(cfg):
             continue
-        got = _mcp_client_read(cfg["command"], cfg.get("args", []),
-                               consumer_root, [f"manifest://{sd}"])
+        got = _mcp_face_read(cfg, consumer_root, [f"manifest://{sd}"])
         man = None
         if got and f"manifest://{sd}" in got:
             import json

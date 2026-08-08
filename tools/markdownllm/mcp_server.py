@@ -1,10 +1,17 @@
 """The cross-domain producing side, on MCP (docs/plans/mcp-domain-server.md).
 
 Phase 1: the read-only face over stdio. The SEMANTIC helpers (manifest/list/
-read/query/deliverable) reuse the floor's own `scan()`; the TRANSPORT (a
-minimal JSON-RPC stdio loop) is thin and replaceable — swapping stdio for
-Streamable HTTP later touches only the loop. Pure stdlib, like the rest of
-the floor — the `mcp` SDK is not a dependency.
+read/query/deliverable) reuse the floor's own `scan()`; the TRANSPORT is thin
+and replaceable — one dispatcher, two pipes.
+
+Phase 5 (transport leg): the same face over Streamable HTTP (`--http`) — the
+promised transport swap, touching only the loop. Loopback-bound only: a
+loopback port is the same trust zone as a spawned subprocess (the operator's
+own machine), so the floor's authorization stance is unchanged. Binding a
+routable interface is REFUSED, not flagged — public exposure arrives with
+OAuth 2.1 (the 2025-11-25 spec's authorization model), never with an
+honour-system `--host 0.0.0.0`. Pure stdlib, like the rest of the floor —
+the `mcp` SDK is not a dependency.
 """
 
 from __future__ import annotations
@@ -188,22 +195,16 @@ def mcp_read_resource(root: Path, corpus: Corpus, domain_id: str, uri: str) -> d
     return None
 
 
-def cmd_mcp_serve(args) -> int:
+def mcp_make_dispatcher(root: Path, domain_id: str, corpus_provider):
+    """One method dispatcher, any transport. `corpus_provider` decides the
+    read's currency: stdio scans once (a client spawn IS a fresh read),
+    HTTP scans per request (the server is stateless; git is the state —
+    every read computed from the repo as it stands, per design guardrail 3)."""
+
     import json
-    root = Path(args.path).resolve()
-    if not root.is_dir():
-        sys.exit(f"mdllm: not a directory: {root}")
-    corpus, _ = scan(root)
-    domain_id = mcp_domain_id(root)
-
-    def log(msg: str) -> None:
-        print(f"mcp-serve[{domain_id}]: {msg}", file=sys.stderr, flush=True)
-
-    def emit(obj: dict) -> None:  # transport: one JSON-RPC message per line on stdout
-        sys.stdout.write(json.dumps(obj, default=str) + "\n")
-        sys.stdout.flush()
 
     def handle(method: str, params: dict):
+        corpus = corpus_provider()
         if method.startswith("notifications/"):
             return None  # client-side lifecycle notice — nothing to answer
         if method == "initialize":
@@ -237,6 +238,148 @@ def cmd_mcp_serve(args) -> int:
             return {"content": [{"type": "text", "text": f"unknown tool: {name!r}"}], "isError": True}
         raise _RpcError(-32601, f"method not found: {method}")
 
+    return handle
+
+
+def _dispatch_message(handle, msg: dict, log) -> dict | None:
+    """Run one already-parsed JSON-RPC message through the dispatcher.
+    Returns the response object, or None when nothing is owed (notifications,
+    frames that aren't requests). Shared by both transports so error mapping
+    cannot drift between them."""
+    method, mid = msg.get("method"), msg.get("id")
+    if method is None:  # a response or unknown frame — not ours to answer
+        return None
+    try:
+        result = handle(method, msg.get("params") or {})
+        if mid is None:  # notifications (no id) get no reply
+            return None
+        return {"jsonrpc": "2.0", "id": mid, "result": result}
+    except _RpcError as e:
+        if mid is None:
+            return None
+        return {"jsonrpc": "2.0", "id": mid, "error": {"code": e.code, "message": e.message}}
+    except Exception as e:  # noqa: BLE001 — transport must not die on one bad call
+        log(f"error handling {method}: {e}")
+        if mid is None:
+            return None
+        return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32603, "message": str(e)}}
+
+
+# ------------------------------------------------------------- transports
+
+_LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
+
+
+def mcp_host_is_loopback(host: str) -> bool:
+    h = (host or "").strip().lower().strip("[]")
+    return h in _LOOPBACK_HOSTS or h.startswith("127.")
+
+
+def _origin_allowed(origin: str | None) -> bool:
+    # DNS-rebinding defence (Streamable HTTP spec): a browser-borne request
+    # carries an Origin, and only loopback origins may speak to a loopback
+    # porch. Non-browser clients send none — that is the normal MCP case.
+    if not origin:
+        return True
+    from urllib.parse import urlsplit
+    return mcp_host_is_loopback(urlsplit(origin).hostname or "")
+
+
+def mcp_http_server(root: Path, domain_id: str, host: str, port: int, log=None):
+    """Build (not run) the Streamable HTTP transport: one endpoint (`/mcp`),
+    POST carries a JSON-RPC message, the reply is `application/json`.
+    Stateless by design — no sessions, no server-initiated stream (GET is
+    405), every request re-reads the repo. Returned unstarted so tests can
+    drive it on an ephemeral port; `cmd_mcp_serve` runs it forever."""
+    import json
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    log = log or (lambda msg: print(f"mcp-serve[{domain_id}]: {msg}",
+                                    file=sys.stderr, flush=True))
+    handle = mcp_make_dispatcher(root, domain_id, lambda: scan(root)[0])
+
+    class _Handler(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"
+
+        def log_message(self, fmt, *args):  # route http.server chatter to our log
+            log(f"http {self.address_string()} {fmt % args}")
+
+        def _send(self, code: int, body: bytes = b"") -> None:
+            self.send_response(code)
+            if body:
+                self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            if body:
+                self.wfile.write(body)
+
+        def do_POST(self):
+            if self.path.rstrip("/") != "/mcp":
+                return self._send(404, b'{"error":"the MCP endpoint is /mcp"}')
+            if not _origin_allowed(self.headers.get("Origin")):
+                return self._send(403, b'{"error":"origin not allowed: loopback origins only"}')
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                msg = json.loads(self.rfile.read(length))
+                if not isinstance(msg, dict):
+                    raise ValueError("one JSON-RPC message per POST (batching left the spec)")
+            except Exception as e:  # noqa: BLE001
+                return self._send(400, json.dumps({"error": f"bad request: {e}"}).encode())
+            resp = _dispatch_message(handle, msg, log)
+            if resp is None:  # notification / non-request frame — accepted, no body
+                return self._send(202)
+            self._send(200, json.dumps(resp, default=str).encode())
+
+        def do_GET(self):
+            # No server-initiated stream: the porch is poll-only, state is git.
+            self._send(405, b'{"error":"no server stream; POST JSON-RPC to /mcp"}')
+
+        do_DELETE = do_GET  # no sessions to terminate either
+
+    return ThreadingHTTPServer((host, port), _Handler)
+
+
+def cmd_mcp_serve(args) -> int:
+    import json
+    root = Path(args.path).resolve()
+    if not root.is_dir():
+        sys.exit(f"mdllm: not a directory: {root}")
+    domain_id = mcp_domain_id(root)
+
+    def log(msg: str) -> None:
+        print(f"mcp-serve[{domain_id}]: {msg}", file=sys.stderr, flush=True)
+
+    if getattr(args, "http", False):
+        host = getattr(args, "host", "127.0.0.1") or "127.0.0.1"
+        if not mcp_host_is_loopback(host):
+            # Refused, not warned: a routable porch without OAuth 2.1 is the
+            # honour-system control the floor exists to replace. The public
+            # leg arrives as auth + transport together, or not at all.
+            sys.exit(f"mdllm: refusing to bind non-loopback host {host!r} — "
+                     "the HTTP porch is loopback-only until the OAuth 2.1 "
+                     "authorization leg exists (docs/plans/mcp-domain-server.md, Phase 5)")
+        server = mcp_http_server(root, domain_id, host, int(getattr(args, "port", 8765)), log)
+        corpus, _ = scan(root)
+        bound = server.server_address
+        log(f"serving {len(mcp_exposed_things(corpus))} exposed thing(s) over "
+            f"Streamable HTTP at http://{bound[0]}:{bound[1]}/mcp "
+            f"(MCP {MCP_PROTOCOL_VERSION}; loopback-only; re-read per request)")
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            log("stopped")
+        finally:
+            server.server_close()
+        return 0
+
+    # stdio (default): the client spawns us; scan once — the spawn is the read.
+    corpus, _ = scan(root)
+    handle = mcp_make_dispatcher(root, domain_id, lambda: corpus)
+
+    def emit(obj: dict) -> None:  # transport: one JSON-RPC message per line on stdout
+        sys.stdout.write(json.dumps(obj, default=str) + "\n")
+        sys.stdout.flush()
+
     log(f"serving {len(mcp_exposed_things(corpus))} exposed thing(s) over stdio "
         f"(MCP {MCP_PROTOCOL_VERSION})")
     for line in sys.stdin:
@@ -248,18 +391,7 @@ def cmd_mcp_serve(args) -> int:
         except json.JSONDecodeError:
             log("dropped non-JSON line")
             continue
-        method, mid = msg.get("method"), msg.get("id")
-        if method is None:  # a response or unknown frame — not ours to answer
-            continue
-        try:
-            result = handle(method, msg.get("params") or {})
-            if mid is not None:  # notifications (no id) get no reply
-                emit({"jsonrpc": "2.0", "id": mid, "result": result})
-        except _RpcError as e:
-            if mid is not None:
-                emit({"jsonrpc": "2.0", "id": mid, "error": {"code": e.code, "message": e.message}})
-        except Exception as e:  # noqa: BLE001 — transport must not die on one bad call
-            log(f"error handling {method}: {e}")
-            if mid is not None:
-                emit({"jsonrpc": "2.0", "id": mid, "error": {"code": -32603, "message": str(e)}})
+        resp = _dispatch_message(handle, msg, log)
+        if resp is not None:
+            emit(resp)
     return 0
