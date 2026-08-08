@@ -1,8 +1,9 @@
 ---
 id: cowork-integrity-estate-sweep
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+completed: 2026-08-08
+version: 1.1
 created: 2026-08-08
 priority: critical
 tags: [integrity, cowork, harness, adapters, estate, audit, sweep]
@@ -226,3 +227,33 @@ carrying a recorded disposition; the six clean repos' verdicts recorded with
 their evidence basis; a prevention recommendation accepted or rejected by the
 operator; and the operator's open decisions listed above surfaced in one
 place — taken by him, not by this sweep.
+
+## Closed — 2026-08-08, same day
+
+All ten phases done and every close condition met. The prevention
+recommendation was **accepted by the operator in session** (his framing:
+guards paid for by anomalies, never the healthy path — endorsed with the
+warn/strict split as built). The v3.28.0 gate then survived its first two
+field contacts the same evening: a CI run caught the birth-commit edge
+(fixed, exempt-by-principle, pinned both ways in tests), and two grilled
+sessions in the layered harness produced verifiable compliance ledgers —
+Tier 0 held under the gate in both; interpretation residue varied between
+them (see `an-honest-ledger-replicates-full-compliance-does-not`).
+
+A verification pass the operator ordered over this sweep's own graded
+contract reads found and fixed a third defect class: three domain kernels
+underclaiming their authored skills ("unfilled stubs") — the instruction to
+skip, written into the entry surface itself. Recorded mechanically in
+`mechanical-coherence-checks-backlog`.
+
+**The operator's residual items live where they belong, not here:** the QMS
+disclosure decision (in that domain's extent-review plan, characterisation
+ready), the overview re-flips and view re-derivations, ratification of a
+session's `warn` adoption in a personal domain, per-domain retrospectives
+folded into each domain's next session, the estate retrospective (standing
+plan in the overview domain), and the un-park call on
+`framework-upward-signal` (trigger fired). Hardening is deliberately
+stopped: the pre-agreed re-open condition is the next same-class miss in a
+layered-harness session, and it re-opens through
+`pretooluse-action-boundary-gate` or mechanical skill emission — evidence
+first, mechanism second.

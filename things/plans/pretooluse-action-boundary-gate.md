@@ -14,6 +14,12 @@ linked_things:
     relation: extends
   - id: hard-hooks-require-observable-agent-caused-triggers
     relation: references
+  - id: a-layered-harness-is-a-co-author-not-a-substrate
+    relation: references
+    notes: "Bears directly on this plan's un-park decision: in a layered harness the PreToolUse anchor may itself belong to the platform layer, so the gate's enforcement story must be argued per-harness, not assumed. Standing evidence for why the commit-boundary gate (v3.28.0) was built first."
+  - id: an-honest-ledger-replicates-full-compliance-does-not
+    relation: references
+    notes: "The re-open evidence this plan waits on: if interpretation-layer variance persists across further sessions, the next rightward move is either this gate or mechanical skill emission — the two candidates named at the sweep's close."
 ---
 
 # PreToolUse Action-Boundary Gate

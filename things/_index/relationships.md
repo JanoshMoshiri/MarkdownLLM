@@ -4,14 +4,16 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-08
-generated: 2026-08-08T11:34:10
-generated_from: HEAD@687aa3d
-coverage: 151
-framework_version: 3.27.0
+generated: 2026-08-08T16:36:27
+generated_from: HEAD@1531ff1
+coverage: 154
+framework_version: 3.28.0
 ---
 
 # Relationships Index — framework
 
+- a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> cowork-integrity-estate-sweep
+- a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> mechanical-coherence-checks-backlog
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --supports--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --references--> boundary-disclosure-check
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-built-inbound-only
@@ -27,6 +29,8 @@ framework_version: 3.27.0
 - a-generated-surface-collapses-its-walk --complements--> change-reconciliation-specification
 - a-generated-surface-collapses-its-walk --complements--> inflection-candidates-are-computable
 - a-generated-surface-collapses-its-walk --references--> cohesiveness-sensors
+- a-layered-harness-is-a-co-author-not-a-substrate --informs--> cowork-integrity-estate-sweep
+- a-layered-harness-is-a-co-author-not-a-substrate --supports--> assistant-register
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --extends--> a-true-primitive-is-discovered-not-authored
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --supports--> source-behind-mirror-is-still-a-consumer-side-read
@@ -49,6 +53,8 @@ framework_version: 3.27.0
 - agents-drop-mechanical-birth-steps-not-semantic-ones --supports--> hook-compliance-correlates-with-scope-not-awareness
 - agents-drop-mechanical-birth-steps-not-semantic-ones --informs--> orchestration-specification
 - agents-md-discovery-is-harness-dependent --challenges--> framework-discovery-specification
+- an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
+- an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
 - asks-travel-as-exposed-things --supports--> provenance-specification
 - asks-travel-as-exposed-things --derived-from--> vantage-brief-cluster
@@ -361,6 +367,7 @@ framework_version: 3.27.0
 - mechanical-coherence-checks-backlog --implements--> repeated-drift-promotes-a-fact-into-the-floor
 - mechanical-coherence-checks-backlog --implements--> prose-references-are-mechanically-checkable
 - mechanical-coherence-checks-backlog --references--> judgement-checks-need-a-suppression-list-which-is-itself-drift
+- mechanical-coherence-checks-backlog --references--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - mechanism-pairs-come-from-two-reflection-axes --supports--> directional-graph-reads-come-in-inbound-outbound-pairs
 - mechanism-pairs-come-from-two-reflection-axes --supports--> composition-is-the-inverse-of-decomposition
 - mechanism-pairs-come-from-two-reflection-axes --informs--> change-reconciliation-specification
@@ -426,6 +433,8 @@ framework_version: 3.27.0
 - pretooluse-action-boundary-gate --implements--> consequence-is-recoverable-only-in-retrospect
 - pretooluse-action-boundary-gate --extends--> orchestration-specification
 - pretooluse-action-boundary-gate --references--> hard-hooks-require-observable-agent-caused-triggers
+- pretooluse-action-boundary-gate --references--> a-layered-harness-is-a-co-author-not-a-substrate
+- pretooluse-action-boundary-gate --references--> an-honest-ledger-replicates-full-compliance-does-not
 - prose-references-are-mechanically-checkable --challenges--> mechanical-assimilation-is-blind-to-prose-dependencies
 - prose-references-are-mechanically-checkable --supports--> existence-is-not-currency
 - prose-references-are-mechanically-checkable --supports--> mis-keyed-links-pass-the-floor-silently

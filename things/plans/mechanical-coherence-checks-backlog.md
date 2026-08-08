@@ -15,6 +15,9 @@ linked_things:
   - id: judgement-checks-need-a-suppression-list-which-is-itself-drift
     relation: references
     notes: "The gate for what belongs here: keep checks keyed to a same-builder source (count, broken-body-ref); reject ones that need a suppression list (the reverted retired-vocab check)."
+  - id: a-check-run-where-it-cannot-see-mints-a-false-finding
+    relation: references
+    notes: "The reading-discipline half of this backlog's null-result and INCOMPLETE-conflation items: tool-side fixes live here, but the environment question before the content question stays the reader's."
 ---
 
 # Mechanical Coherence Checks Backlog
