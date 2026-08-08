@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.16
+version: 2.17
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -26,7 +26,7 @@ linked_things:
 
 **Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; all three or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false, relational graph stripped on egress). Emergent fields: add only when they serve reasoning.
 
-**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned.
+**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned. A type may also declare `terminal_statuses` — which of its own statuses mean *settled*; the declaration replaces the universal terminal set for that type, and every forward-work check (orientation, triggers, cascade) reads it through one `is_terminal`. Not declarable on reserved types (the tool owns their settled sets).
 
 **Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
 
@@ -112,6 +112,20 @@ These fields must be present in every thing to do:
   `continuity-brief` uses `live`; `index` uses `live`, `stale`;
   `workflow-definition` uses `draft`, `evolving`, `stable`, `deprecated`;
   `workflow-run` uses `active`, `paused`, `completed`, `abandoned`
+- **A type may declare which of its statuses mean *settled*** — the optional
+  per-type `terminal_statuses` list in `_schema.yaml`, alongside `statuses`
+  (v3.19.0). A domain whose lifecycle is mostly steady-state needs this so
+  finished-or-in-force things (a signed document at `approved-current`, a
+  pointer at `live`) stop counting as forward work. A declaration *replaces*
+  the universal terminal set (`completed`, `cancelled`, `resolved`, …) for
+  that type — explicit beats implicit; values outside the type's own
+  vocabulary are ignored and reported at Warning, as is a declaration on a
+  framework-reserved type (the tool owns the reserved types' settled sets).
+  Every check that asks "is this still forward work?" — orientation's
+  open-loop count, `triggers`' overdue and `subtasks_complete` scans,
+  `cascade`'s unblock and roll-up passes — routes through one
+  `is_terminal(schema, meta)`, so the domain declares its lifecycle once and
+  all agree. A type that declares nothing behaves exactly as before.
 - Updated by the agent as work progresses
 
 **created** (ISO 8601 date)
