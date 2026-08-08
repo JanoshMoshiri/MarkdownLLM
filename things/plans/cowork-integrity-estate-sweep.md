@@ -124,8 +124,8 @@ verbatim).
 |---|---|---|
 | 0 — Extent scan | Signature discriminator verified; 14 repos clustered; extent table above | ✅ done 2026-08-08 |
 | 1 — Framework root | Audit cd2e0f7 (v3.19.0) + 8385654 (assistant-register creation); floor run | ✅ done 2026-08-08 — one defect: `terminal_statuses` shipped in the floor with zero spec coverage; fixed (thing.md v2.17 + kernel). `assistant-register` clean — re-audited implicitly by seven contract-following legs since creation. Floor green |
-| 2 — QMS domain | Agent-executable slices of its `cowork-session-integrity-extent-review` | pending |
-| 3 — Overview domain | Historical Cowork-window audit (today's writes already corrected) | pending |
+| 2 — QMS domain | Agent-executable slices of its `cowork-session-integrity-extent-review` | ✅ done 2026-08-08 — gap dated (13–15 sessions from 07-23); the breach-discovery session's own imports conflict was the one record found reading differently (claimed 0/101 pinned; truth 77/101, control working) — amended with full-estate re-check; 2 stale imports re-adopted + re-quarantined; import darkness aged at 11 days; `decided_by` absence shown NOT harness-correlated; disclosure decision surfaced for the operator, untaken |
+| 3 — Overview domain | Historical Cowork-window audit (today's writes already corrected) | ✅ done 2026-08-08 — consume porch 13/50 stale (content changed), all re-adopted, coverage 50/50 fresh; two re-quarantined copies owe an attributed re-flip; view re-derivation flagged, not performed; earlier Cowork commits sampled conformant (the 07-28 session ran flips attributably — the contract sometimes held by interpretation; the harness never guaranteed it) |
 | 4 — Engineering domain | Execute its `pre-cowork-slip-domain-audit` | pending |
 | 5 — PROM domain | Cowork-window audit | pending |
 | 6 — Development domain | Cowork-window audit | pending |
