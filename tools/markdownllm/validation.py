@@ -679,12 +679,64 @@ def example_corpora(root: Path) -> list[Path]:
                   if d.is_dir() and (d / "AGENTS.md").exists())
 
 
+SESSION_GATE_WINDOW_HOURS = 24
+
+
+def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
+    """The session gate (cowork-integrity-estate-sweep Phase 10). A domain may
+    declare `options: {session_gate: warn|strict}` in its schema: committing
+    then requires a fresh session-start attestation for this clone
+    (`<git-dir>/mdllm-attest`, written by `mdllm session-start`, uncommittable
+    by construction). The gate exists because every breached Cowork session
+    kept a green floor: the only controls it could skip were the ones that
+    left no evidence, and a skipped interpretation-anchored control looks
+    identical to a performed one. This check makes a contract-less session
+    loud at its first write instead of silent for a month, in every harness,
+    with no adapter required. Deliberately smaller claim than it may read as:
+    the attestation proves the Tier-0 contract was *emitted into this clone's
+    session*, not that it was heeded — the heeding residue belongs to the
+    register work, and is a categorically smaller failure class than
+    never-saw-it. Severity: Warning under `warn`, commit-blocking Error under
+    `strict`. Anchor: git-fs (runs in the pre-commit hook via validate)."""
+    mode = ((corpus.schema or {}).get("options") or {}).get("session_gate")
+    if mode not in ("warn", "strict"):
+        return []
+    sev = SEV_ERROR if mode == "strict" else SEV_WARNING
+    remedy = ("run `python {framework_root}/tools/mdllm.py session-start .` in "
+              "this clone — it emits the Tier-0 contract and records the "
+              "attestation — then commit")
+    gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
+                        capture_output=True, text=True)
+    if gd.returncode != 0 or not gd.stdout.strip():
+        return []  # not a git repo: nothing will commit, the gate has no boundary to hold
+    attest = (root / gd.stdout.strip()).resolve() / "mdllm-attest"
+    if not attest.is_file():
+        return [Finding(sev, "_session-gate",
+                        "session gate: no session-start attestation exists for "
+                        "this clone — the Tier-0 contract has never been emitted "
+                        "here; " + remedy)]
+    try:
+        stamp = attest.read_text(encoding="utf-8").split()[0]
+        age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(stamp)
+    except Exception:
+        return [Finding(sev, "_session-gate",
+                        "session gate: attestation unreadable — " + remedy)]
+    if age > dt.timedelta(hours=SESSION_GATE_WINDOW_HOURS):
+        hrs = int(age.total_seconds() // 3600)
+        return [Finding(sev, "_session-gate",
+                        f"session gate: attestation is {hrs}h old (window "
+                        f"{SESSION_GATE_WINDOW_HOURS}h) — this session opened on "
+                        "yesterday's contract; " + remedy)]
+    return []
+
+
 def cmd_validate(args) -> int:
     root = Path(args.path).resolve()
     reports: list[tuple[Path, Corpus, list[Finding]]] = []
     corpus, findings = validate_corpus(root)
     findings.extend(check_version_sync(root))
     findings.extend(quarantine_findings(root, corpus))
+    findings.extend(session_gate_findings(root, corpus))
     findings.extend(retrospective_findings(root, corpus))
     reports.append((root, corpus, findings))
     for sub in example_corpora(root):

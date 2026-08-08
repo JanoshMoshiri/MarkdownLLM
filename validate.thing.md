@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 2.2
+version: 2.3
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -30,6 +30,8 @@ linked_things:
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as missing from the brief (promote/dismiss/list). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 
 **Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; you transcribe and reason about the result, you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
+
+**The session gate** (opt-in): a domain declaring `options: {session_gate: warn|strict}` requires a fresh `mdllm session-start` attestation for the clone before any commit — absent or >24h old fires Warning (`warn`) or a commit-blocking Error (`strict`), with the remedy named. It proves the Tier-0 contract was *emitted into the session*, not that it was heeded; its job is making a contract-less session loud at the first write, in any harness, with no adapter.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 <!-- /kernel -->

@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: kernel
 created: 2026-08-08
-generated: 2026-08-08T11:36:08
-generated_from: HEAD@77c9c62
+generated: 2026-08-08T12:17:13
+generated_from: HEAD@eeb5e0a
 coverage: 6
-framework_version: 3.27.0
+framework_version: 3.28.0
 ---
 
 # Framework Operative Kernel
@@ -62,6 +62,8 @@ the framework or when the kernel says to. Regenerate after any spec change.
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as missing from the brief (promote/dismiss/list). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 
 **Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; you transcribe and reason about the result, you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
+
+**The session gate** (opt-in): a domain declaring `options: {session_gate: warn|strict}` requires a fresh `mdllm session-start` attestation for the clone before any commit — absent or >24h old fires Warning (`warn`) or a commit-blocking Error (`strict`), with the remedy named. It proves the Tier-0 contract was *emitted into the session*, not that it was heeded; its job is making a contract-less session loud at the first write, in any harness, with no adapter.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 

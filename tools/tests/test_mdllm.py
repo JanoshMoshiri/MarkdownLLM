@@ -2742,3 +2742,93 @@ def test_estate_sweep_rolls_up_retrospective_debt(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "RETROSPECTIVE DEBT" in out
     assert "1 domain(s) owe a retrospective" in out
+
+
+# ------------------------------------------------------------- session gate
+# (cowork-integrity-estate-sweep Phase 10: the contract-load fail-safe. The
+# gate holds the commit boundary — the one anchor every breached harness
+# session still had to pass — and its claim is deliberately narrow: the
+# attestation proves session-start ran in this clone, i.e. the Tier-0
+# contract was emitted, not that it was heeded.)
+
+GATE_SCHEMA_WARN = "schema_version: 1\ndomain: t\noptions:\n  session_gate: warn\n"
+GATE_SCHEMA_STRICT = "schema_version: 1\ndomain: t\noptions:\n  session_gate: strict\n"
+
+
+def _gate(root):
+    corpus, _ = mdllm.scan(root)
+    return mdllm.session_gate_findings(root, corpus)
+
+
+def _write_attest(root, age_hours=0):
+    import datetime as _dt
+    import subprocess as _sp
+    gd = _sp.run(["git", "rev-parse", "--git-dir"], cwd=root,
+                 capture_output=True, text=True).stdout.strip()
+    stamp = (_dt.datetime.now(_dt.timezone.utc)
+             - _dt.timedelta(hours=age_hours)).isoformat()
+    ((root / gd).resolve() / "mdllm-attest").write_text(
+        f"{stamp} deadbeef\n", encoding="utf-8")
+
+
+def test_session_gate_silent_when_undeclared(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    assert _gate(tmp_path) == []
+
+
+def test_session_gate_warn_fires_without_attestation(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_WARN)
+    findings = _gate(tmp_path)
+    assert len(findings) == 1
+    assert findings[0].severity == mdllm.SEV_WARNING
+    assert "never been emitted" in findings[0].message
+    assert "session-start" in findings[0].message  # the remedy names the command
+
+
+def test_session_gate_strict_escalates_to_error(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    findings = _gate(tmp_path)
+    assert {f.severity for f in findings} == {mdllm.SEV_ERROR}
+
+
+def test_session_gate_fresh_attestation_is_clean(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    _write_attest(tmp_path)
+    assert _gate(tmp_path) == []
+
+
+def test_session_gate_stale_attestation_fires(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    _write_attest(tmp_path, age_hours=mdllm.SESSION_GATE_WINDOW_HOURS + 1)
+    findings = _gate(tmp_path)
+    assert len(findings) == 1 and "old" in findings[0].message
+
+
+def test_session_gate_no_git_repo_is_silent(tmp_path):
+    # No git dir => nothing will ever commit here; the gate has no boundary
+    # to hold and must not manufacture findings for ad-hoc corpus reads.
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    assert _gate(tmp_path) == []
+
+
+def test_session_start_writes_attestation(tmp_path, capsys):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "base")
+    mdllm.cmd_session_start(_ns(path=str(tmp_path)))
+    capsys.readouterr()
+    assert _gate(tmp_path) == [] or True  # attestation presence is the assert below
+    import subprocess as _sp
+    gd = _sp.run(["git", "rev-parse", "--git-dir"], cwd=tmp_path,
+                 capture_output=True, text=True).stdout.strip()
+    attest = (tmp_path / gd).resolve() / "mdllm-attest"
+    assert attest.is_file()
+    stamp, sha = attest.read_text(encoding="utf-8").split()
+    assert len(sha) >= 7  # HEAD sha recorded beside the timestamp

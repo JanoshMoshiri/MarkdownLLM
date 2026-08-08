@@ -18,6 +18,12 @@ options:
   # unattributed-flip findings are Warnings by default. A regulated domain
   # that needs the flip to BLOCK commits declares strict mode:
   # quarantine: strict
+  # The session gate (validate.thing.md): a commit in this clone requires a
+  # fresh `mdllm session-start` attestation — the mechanical proxy for the
+  # Tier-0 contract having been emitted into the session. Born strict so a
+  # harness that skips the contract is stopped at its first write; relax to
+  # `warn` (advisory) or delete the line only as a deliberate decision.
+  session_gate: strict
 
 # Declare one entry per thing type. The placeholders below are commented out
 # so this file is valid YAML from the moment it is copied — uncomment and

@@ -34,6 +34,7 @@ from markdownllm.validation import (
     valid_statuses_for, validate_level1, validate_level2, version_tuple,
     check_version_sync, validate_level3, validate_corpus, example_corpora,
     quarantine_findings, retrospective_findings, derivation_findings,
+    session_gate_findings, SESSION_GATE_WINDOW_HOURS,
     cmd_validate,
 )
 from markdownllm.repo import git_short_sha, framework_version, _version_lt, TIERS

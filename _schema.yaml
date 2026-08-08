@@ -11,6 +11,11 @@ options:
   # -specification (thing-specification) — an established convention; links and
   # history depend on the ids. Domain things (things/**) do match filenames.
   id_filename_match: false
+  # The session gate (validate.thing.md, v3.28.0): advisory at the framework
+  # root — a commit without a fresh `mdllm session-start` attestation warns
+  # rather than blocks, because release and CI flows legitimately commit here
+  # outside a domain session. The regulated domains declare strict.
+  session_gate: warn
 
 types:
   plan:

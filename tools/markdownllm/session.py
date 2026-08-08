@@ -695,5 +695,26 @@ def cmd_session_start(args) -> int:
     except Exception:
         pass  # advisory only — session start must never fail on it
 
+    # Session-gate attestation (cowork-integrity-estate-sweep Phase 10):
+    # running session-start IS the mechanical proxy for the Tier-0 contract
+    # entering the session — this command's output is the contract's operative
+    # surface. Record the fact per-clone, inside the git dir so it is
+    # uncommittable by construction; `mdllm validate` enforces freshness where
+    # the domain's schema declares `options: {session_gate: warn|strict}`.
+    # Best-effort: orientation must never fail on it, and the gate reports
+    # absence itself.
+    try:
+        gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=domain,
+                            capture_output=True, text=True)
+        if gd.returncode == 0 and gd.stdout.strip():
+            head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=domain,
+                                  capture_output=True, text=True)
+            sha = head.stdout.strip() if head.returncode == 0 else "unknown"
+            stamp = dt.datetime.now(dt.timezone.utc).isoformat()
+            ((domain / gd.stdout.strip()).resolve() / "mdllm-attest").write_text(
+                f"{stamp} {sha}\n", encoding="utf-8")
+    except Exception:
+        pass
+
     print("\n".join(out))
     return 0
