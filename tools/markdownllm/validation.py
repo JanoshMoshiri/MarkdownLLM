@@ -709,6 +709,15 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
                         capture_output=True, text=True)
     if gd.returncode != 0 or not gd.stdout.strip():
         return []  # not a git repo: nothing will commit, the gate has no boundary to hold
+    head = subprocess.run(["git", "rev-parse", "--verify", "HEAD"], cwd=root,
+                          capture_output=True, text=True)
+    if head.returncode != 0:
+        # Unborn HEAD: this is the BIRTH commit — the contract files are being
+        # created in it, so there was nothing to have read before it. The gate
+        # holds every commit after the first (scaffold's own first commit runs
+        # under the hook it just installed; blocking birth would be the gate
+        # eating its own scaffolding — caught by CI on 2026-08-08, same day).
+        return []
     attest = (root / gd.stdout.strip()).resolve() / "mdllm-attest"
     if not attest.is_file():
         return [Finding(sev, "_session-gate",

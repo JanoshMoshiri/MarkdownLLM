@@ -404,6 +404,10 @@ def cmd_scaffold(args) -> int:
     print("  - skills/: fill the four skill bodies with the domain's reasoning")
     print("  - things/: create the first real things")
     print("  - a remote, if the domain should have one")
+    print("  - run `mdllm session-start .` before your next commit: this domain "
+          "is born with `session_gate: strict` (v3.28.0), so from the second "
+          "commit on, the floor requires a fresh session-start attestation — "
+          "the birth commit you just saw was the only exempt one")
     print("  - hardened out of the box: .claude/settings.json fires session-start + "
           "post-write validation automatically (Claude Code / VS Code Copilot agent "
           "mode), and /end-session + /retrospective are installed. Delete .claude/ to "

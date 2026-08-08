@@ -2780,6 +2780,9 @@ def test_session_gate_silent_when_undeclared(tmp_path):
 
 def test_session_gate_warn_fires_without_attestation(tmp_path):
     _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "birth")
     write(tmp_path, "_schema.yaml", GATE_SCHEMA_WARN)
     findings = _gate(tmp_path)
     assert len(findings) == 1
@@ -2790,6 +2793,9 @@ def test_session_gate_warn_fires_without_attestation(tmp_path):
 
 def test_session_gate_strict_escalates_to_error(tmp_path):
     _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "birth")
     write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
     findings = _gate(tmp_path)
     assert {f.severity for f in findings} == {mdllm.SEV_ERROR}
@@ -2797,6 +2803,9 @@ def test_session_gate_strict_escalates_to_error(tmp_path):
 
 def test_session_gate_fresh_attestation_is_clean(tmp_path):
     _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "birth")
     write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
     _write_attest(tmp_path)
     assert _gate(tmp_path) == []
@@ -2804,6 +2813,9 @@ def test_session_gate_fresh_attestation_is_clean(tmp_path):
 
 def test_session_gate_stale_attestation_fires(tmp_path):
     _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "birth")
     write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
     _write_attest(tmp_path, age_hours=mdllm.SESSION_GATE_WINDOW_HOURS + 1)
     findings = _gate(tmp_path)
@@ -2832,3 +2844,24 @@ def test_session_start_writes_attestation(tmp_path, capsys):
     assert attest.is_file()
     stamp, sha = attest.read_text(encoding="utf-8").split()
     assert len(sha) >= 7  # HEAD sha recorded beside the timestamp
+
+
+def test_session_gate_silent_on_unborn_head(tmp_path):
+    # The birth commit: repo exists, HEAD does not. The contract files are
+    # being created in this very commit, so there was nothing to have read —
+    # the gate holds from the second commit onward. Regression for the CI
+    # failure where scaffold's first commit was blocked by the strict gate
+    # its own template had just declared.
+    _git_repo(tmp_path)
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    assert _gate(tmp_path) == []
+
+
+def test_session_gate_holds_from_second_commit(tmp_path):
+    # ...and the exemption dies with the first commit: same repo, one commit
+    # in history, still no attestation -> strict Error.
+    _git_repo(tmp_path)
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    _git_commit(tmp_path, "birth")
+    findings = _gate(tmp_path)
+    assert {f.severity for f in findings} == {mdllm.SEV_ERROR}
