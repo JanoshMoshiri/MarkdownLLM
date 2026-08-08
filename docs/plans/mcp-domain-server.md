@@ -341,6 +341,25 @@ publishes a *face it authored about itself*, never its raw interior.
   authorizes *the operator's own trust zone stretched over a tunnel* (e.g.
   a loopback-bound porch behind an ephemeral cloudflared URL), not
   other-party consumers.
+- **Phase 5, probe record (2026-08-08).** The cross-machine probe ran as
+  designed on the operator side and was blocked on the consumer side by the
+  consumer's harness, not by anything here. Proven to the public edge:
+  loopback porch + per-run token + cloudflared quick tunnel; authorized
+  JSON-RPC reads served through the tunnel, tokenless requests 401'd *at
+  the porch* (the tunnel adds no trust). Blocked: an Anthropic Cowork VM's
+  egress is a default-deny proxy allowlist (anthropic.com, package
+  registries, GitHub, private ranges) — the CONNECT was refused before any
+  packet left the VM, and the VM agent verified the deny is
+  provider-agnostic (any tunnel host or VPS hits the same 403). So the
+  external-agent test remains open for reasons outside the porch: it needs
+  a consumer environment whose egress can reach an operator-chosen host.
+  **Noted, not adopted:** the VM agent's suggestion of a git-backed face
+  (GitHub *is* on the allowlist, and the reference triple is already
+  git-shaped) — it collides head-on with the decided two-axis rule
+  (horizontal reads cross through the face, never the source's git). If
+  VM-resident consumers become a real consumer class, that tension earns
+  its own decision; it does not get swapped in quietly because one proxy
+  allowed one host.
 - **Phase 5, authorization leg (OAuth 2.1) — pending.** This, not the
   transport, is now the external-agent gate: a remote agent connecting over
   the wire, after which the MCP integration can be claimed publicly. The
