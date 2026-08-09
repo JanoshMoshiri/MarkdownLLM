@@ -60,13 +60,23 @@ def _porch_coverage(root: Path) -> list | None:
     return _MEMBRANE_CACHE[key]
 
 
-def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]], list[str]]:
-    """One domain's trigger evaluation: (hits, horizon, skipped)."""
+def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]],
+                                  list[tuple[int, str]], list[str]]:
+    """One domain's trigger evaluation: (fired, upcoming, horizon, skipped).
+
+    `fired` holds only conditions that are TRUE NOW (a date reached, a
+    dependency satisfied, a threshold crossed). `upcoming` holds conditions
+    maturing within 30 days — look-aheads, deliberately a separate bucket:
+    v3.29.0 and earlier mixed both into one `hits` list that session-start
+    labelled "Triggers fired", so a quiet domain with a busy fortnight ahead
+    read as a domain under pressure (2026-08-08 field evidence, two domains).
+    `horizon` is beyond 30 days; `skipped` is not-mechanically-evaluable."""
     _MEMBRANE_CACHE.clear()
     corpus, _ = scan(root)
     today = dt.date.today()
     by_id = corpus.by_id()
     hits: list[str] = []
+    upcoming: list[tuple[int, str]] = []
     skipped: list[str] = []
     horizon: list[tuple[int, str]] = []
 
@@ -137,8 +147,9 @@ def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]], list[str]]:
                     elif d <= today:
                         pass  # fired, but the thing is already settled
                     elif (d - today).days <= 30:
-                        hits.append(f"{name}: time condition {cond!r} - fires in "
-                                    f"{(d - today).days}d ({d}) -> {action}")
+                        upcoming.append(((d - today).days,
+                                         f"{name}: time condition {cond!r} - fires in "
+                                         f"{(d - today).days}d ({d}) -> {action}"))
                     else:
                         horizon.append(((d - today).days,
                                         f"{name}: time condition {cond!r} fires {d} "
@@ -248,19 +259,23 @@ def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]], list[str]]:
                 note = "" if meta.get("triggers") else ", no trigger declared"
                 hits.append(f"{name}: OVERDUE by {-days}d (due {due}{note})")
             elif 0 <= days <= 30:
-                hits.append(f"{name}: due in {days}d ({due})")
+                upcoming.append((days, f"{name}: due in {days}d ({due})"))
             elif days > 30:
                 horizon.append((days, f"{name}: due {due} ({days}d out)"))
 
-    return hits, horizon, skipped
+    return hits, upcoming, horizon, skipped
 
 
-def _print_evaluation(hits, horizon, skipped) -> None:
+def _print_evaluation(hits, upcoming, horizon, skipped) -> None:
     if hits:
         for h in hits:
             print(f"- {h}")
     else:
         print("No trigger conditions currently true.")
+    if upcoming:
+        print("\n### Upcoming (within 30 days — not yet fired)")
+        for _, line in sorted(upcoming):
+            print(f"- {line}")
     if horizon:
         print("\n### Horizon (beyond 30 days)")
         for _, line in sorted(horizon):
@@ -293,7 +308,7 @@ def cmd_triggers(args) -> int:
         total_hits = 0
         rollup = []
         for repo in repos:
-            hits, horizon, skipped = evaluate(repo)
+            hits, upcoming, horizon, skipped = evaluate(repo)
             # Retrospective debt joins the sweep (estate-cadence-cluster
             # Phase 2): per-domain the v3.24.0 sensor fires as scatter across
             # thirteen validates; here it lands as one picture in the one
@@ -309,15 +324,16 @@ def cmd_triggers(args) -> int:
                     retro = rf[0].message.split(" — ")[0].split(" (")[0]
             except Exception:
                 pass
-            rollup.append((repo.name, len(hits), len(skipped), retro))
+            rollup.append((repo.name, len(hits), len(upcoming), len(skipped), retro))
             total_hits += len(hits)
             print(f"### {repo.name}")
-            _print_evaluation(hits, horizon, skipped)
+            _print_evaluation(hits, upcoming, horizon, skipped)
             print()
         print("### Roll-up")
         overdue = 0
-        for name, nh, ns, retro in rollup:
-            line = f"- {name}: {nh} fired, {ns} not mechanically evaluable"
+        for name, nh, nu, ns, retro in rollup:
+            line = (f"- {name}: {nh} fired, {nu} upcoming (≤30d), "
+                    f"{ns} not mechanically evaluable")
             if retro:
                 line += f" — RETROSPECTIVE DEBT: {retro}"
                 overdue += 1
@@ -328,7 +344,7 @@ def cmd_triggers(args) -> int:
         print(f"\n{'; '.join(tailbits)}. Ephemeral — never an index.")
         return 0
 
-    hits, horizon, skipped = evaluate(root)
+    hits, upcoming, horizon, skipped = evaluate(root)
     print(f"## Trigger Evaluation — {root}  ({today})\n")
-    _print_evaluation(hits, horizon, skipped)
+    _print_evaluation(hits, upcoming, horizon, skipped)
     return 0

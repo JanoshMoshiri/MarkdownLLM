@@ -1058,7 +1058,12 @@ def test_free_text_time_condition_with_date_is_evaluated(tmp_path, capsys):
     mdllm.cmd_triggers(_ns(path=str(tmp_path)))
     out = capsys.readouterr().out
     assert "date 2026-01-15 reached" in out and "escalate" in out  # past, live
+    # Within-30d look-aheads land in their own Upcoming section, never among
+    # the fired lines — the fired/upcoming split (substrate reconciliation,
+    # 2026-08-09; the v3.29.0 conflation read a quiet domain as pressured).
+    assert "Upcoming (within 30 days — not yet fired)" in out
     assert "fires in" in out and "renew" in out                    # within 30d
+    assert out.index("renew by") > out.index("Upcoming")           # in that section
     assert "archive" in out and "Horizon" in out                   # beyond 30d
     assert out.count("escalate") == 1                              # d is settled
 

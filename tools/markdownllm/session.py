@@ -320,21 +320,24 @@ def _days_past(reason: str) -> int | None:
 
 def _fired_by_thing(domain: Path):
     """{thing_id: [condition, ...]} for every trigger the floor evaluated as
-    fired. The floor already computes this; session-start simply stopped
-    asking — which is why the most urgent thing in a domain could be absent
-    from the one output the operator always reads."""
+    fired, plus the upcoming/horizon/skipped buckets. The floor already
+    computes this; session-start simply stopped asking — which is why the
+    most urgent thing in a domain could be absent from the one output the
+    operator always reads. `upcoming` (≤30d look-aheads) is carried
+    SEPARATELY and must never be folded into `fired` — the v3.29.0 conflation
+    made a quiet domain read as a domain under pressure."""
     try:
         from .triggers import evaluate
-        hits, horizon, skipped = evaluate(domain)
+        hits, upcoming, horizon, skipped = evaluate(domain)
     except Exception:
-        return {}, [], []
+        return {}, [], [], []
     fired: dict[str, list[str]] = {}
     for h in hits:
         tid, _, rest = h.partition(": ")
         # Drop the `-> action` tail: the action is the *derivation*, retrievable
         # via --why. The line here says what matured, not what to do about it.
         fired.setdefault(tid.strip(), []).append(rest.split(" -> ")[0].strip())
-    return fired, horizon, skipped
+    return fired, upcoming, horizon, skipped
 
 
 def _open_work(domain: Path):
@@ -433,7 +436,7 @@ def _row_line(r: dict) -> str:
 
 def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
                       flips: list[str], velocity: str) -> list[str]:
-    fired, horizon, skipped = _fired_by_thing(domain)
+    fired, upcoming, horizon, skipped = _fired_by_thing(domain)
     conflicts, loops, watched, by_id, schema = _open_work(domain)
 
     # A fired trigger must reach the operator whatever it is attached to. The
@@ -550,6 +553,9 @@ def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
             subj = subj[:110].rsplit(" ", 1)[0] + "…"
         v = f"Last worked {when}: \"{subj}\" · {n} commit(s) in 30d."
     out.append(f"- {v}")
+    if upcoming:
+        out.append(f"- {len(upcoming)} condition(s) maturing within 30 days — "
+                   f"upcoming, not fired.")
     if horizon:
         out.append(f"- {len(horizon)} item(s) beyond the 30-day horizon.")
     if skipped:
@@ -662,7 +668,7 @@ def cmd_session_start(args) -> int:
     # (2026-08-01 estate sweep). Fired hits verbatim from the same evaluator
     # `mdllm triggers` runs; horizon and not-evaluable compressed to counts —
     # quiet when healthy, one line when not.
-    fired, horizon, skipped = _fired_by_thing(domain)
+    fired, upcoming, horizon, skipped = _fired_by_thing(domain)
     if fired:
         out.append(f"- **Triggers fired ({sum(len(v) for v in fired.values())}):**")
         for tid in sorted(fired):
@@ -670,6 +676,15 @@ def cmd_session_start(args) -> int:
                 out.append(f"    - `{tid}`: {reason}")
     else:
         out.append("- **Triggers:** none currently true.")
+    if upcoming:
+        # Look-aheads are a separate bucket by construction — labelling them
+        # "fired" is how a quiet domain reads as a domain under pressure
+        # (2026-08-08 field evidence; the fix is the label, not the listing).
+        out.append(f"- **Upcoming (within 30d — not yet fired) "
+                   f"({len(upcoming)}):**")
+        for _, line in sorted(upcoming):
+            tid, _, rest = line.partition(": ")
+            out.append(f"    - `{tid.strip()}`: {rest.split(' -> ')[0].strip()}")
     tail = []
     if horizon:
         tail.append(f"{len(horizon)} beyond the 30-day horizon")
