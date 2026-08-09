@@ -3018,7 +3018,12 @@ def test_session_gate_warn_fires_without_attestation(tmp_path):
     findings = _gate(tmp_path)
     assert len(findings) == 1
     assert findings[0].severity == mdllm.SEV_WARNING
-    assert "never been emitted" in findings[0].message
+    # The no-attestation message names BOTH readings — fresh-clone ordering
+    # and a contract-less working clone — because the floor cannot tell them
+    # apart (substrate reconciliation C2, 2026-08-09; the old wording accused
+    # every fresh clone of a skip and taught operators to discount the gate).
+    assert "no session-start attestation" in findings[0].message
+    assert "mid-flight" in findings[0].message
     assert "session-start" in findings[0].message  # the remedy names the command
 
 

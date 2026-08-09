@@ -7,6 +7,7 @@ here, and is anything stale?".
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -136,14 +137,34 @@ def cmd_doctor(args) -> int:
                 # to execute", sending the operator toward the environment when
                 # the remedy was one regen command.
                 combined = (run.stdout or "") + (run.stderr or "")
-                which = [n for n, marker in (("validate", "Validation Report"),
-                                             ("coherence", "Coherence Report"),
-                                             ("boundary", "boundary"))
-                         if marker in combined] or ["one of its checks"]
-                report("OK", f"pre-commit hook EXECUTES and is currently blocking "
-                             f"({' + '.join(which)} failing — it would stop a "
-                             f"commit, which is the point; run the named check "
-                             f"for the report)")
+                # Setup-ordering, not a failure: on a fresh gated clone the
+                # session-start attestation cannot exist before session-start
+                # has run, so a doctor run before it always finds the gate
+                # blocking. Reporting that as "validate failing" is the
+                # cry-wolf shape — the one line an operator must never
+                # discount, firing spuriously at every clone (substrate
+                # sweep C2, 2026-08-09; field-verified on a 200-thing corpus
+                # that validated clean moments later). Attribute it as
+                # ordering when the gate is the ONLY error standing.
+                gate_only = (
+                    "session gate: no session-start attestation" in combined
+                    and sum(int(n) for n in
+                            re.findall(r"- Errors: (\d+)", combined)) == 1)
+                if gate_only:
+                    report("OK", "pre-commit hook EXECUTES; commit gated pending "
+                                 "a session-start attestation for this clone "
+                                 "(setup ordering, not a validation failure — "
+                                 "run `mdllm session-start .`, then re-run "
+                                 "doctor)")
+                else:
+                    which = [n for n, marker in (("validate", "Validation Report"),
+                                                 ("coherence", "Coherence Report"),
+                                                 ("boundary", "boundary"))
+                             if marker in combined] or ["one of its checks"]
+                    report("OK", f"pre-commit hook EXECUTES and is currently blocking "
+                                 f"({' + '.join(which)} failing — it would stop a "
+                                 f"commit, which is the point; run the named check "
+                                 f"for the report)")
             else:
                 report("FAIL", f"pre-commit hook present but failed to execute "
                                f"(exit {run.returncode}) — resolution is not verification")

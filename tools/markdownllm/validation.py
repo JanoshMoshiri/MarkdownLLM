@@ -720,10 +720,19 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
         return []
     attest = (root / gd.stdout.strip()).resolve() / "mdllm-attest"
     if not attest.is_file():
+        # Two different findings share this branch and the message names both:
+        # a fresh clone whose setup has not yet reached session-start (ordering
+        # — the attestation CANNOT exist yet), and a clone that has been
+        # working without ever emitting the contract (the breach the gate was
+        # built from). The floor cannot tell them apart — only the operator's
+        # knowledge of where setup stands can — so the severity holds and the
+        # wording refuses to accuse setup of a skip (substrate sweep C2).
         return [Finding(sev, "_session-gate",
                         "session gate: no session-start attestation exists for "
-                        "this clone — the Tier-0 contract has never been emitted "
-                        "here; " + remedy)]
+                        "this clone — either setup is mid-flight (fresh clone, "
+                        "session-start not yet run: ordering, not a skip) or "
+                        "this clone has been working without the Tier-0 "
+                        "contract; " + remedy)]
     try:
         stamp = attest.read_text(encoding="utf-8").split()[0]
         age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(stamp)
