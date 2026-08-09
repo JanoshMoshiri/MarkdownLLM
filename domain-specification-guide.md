@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.9
+version: 2.10
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -246,7 +246,18 @@ Your `AGENTS.md` is where you design how the agent behaves within your domain. T
 
 These are *your* design decisions. The agent operates within whatever you define here. As you use the domain and learn what works, you'll refine these decisions — tightening constraints that are too loose, relaxing ones that are too rigid, adding workflows you didn't anticipate.
 
-**Template structure (starting point — adapt to your needs):**
+**The canonical file shape is [`templates/AGENTS.md.template`](templates/AGENTS.md.template)** —
+a slim *domain kernel* whose operative sections are **generated managed
+blocks**, not authored prose. `mdllm scaffold` instantiates it at birth;
+`mdllm domain-kernel .` (re)generates the blocks after any framework refresh;
+the pre-commit coherence check fails on drift, so the operative sections
+cannot silently disagree with the framework. *(An earlier revision of this
+guide carried a full hand-written AGENTS.md template here — a fifth competing
+startup sequence, which drifted twice on the hard-hook enumeration alone. It
+was retired in the 2026-08-09 substrate reconciliation: the operative
+sequence has exactly one source, the generator.)*
+
+What you **author** is the identity around the blocks:
 
 ```markdown
 ---
@@ -255,7 +266,7 @@ description: What this domain does
 version: 1.0
 applies_to: "**/*.md"
 framework_root: ../..
-framework_version_seen: [copy the version field from {framework_root}/.markdownllm]
+framework_version_seen: [copy from {framework_root}/.markdownllm]
 git:
   autocommit: true
   branch: main
@@ -264,93 +275,44 @@ git:
 # [Domain Name] Agent
 
 ## What This System Does
-[1-2 sentences describing the vision and capability]
+[1-2 sentences — the vision and primary capability. Yours.]
 
-## Framework Principles
-[Reference to MarkdownLLM principles applied to this domain]
+<!-- generated:standing-truth --> … <!-- /generated:standing-truth -->
 
-## How This Agent Works
+## Session Start
+<!-- generated:session-start --> … <!-- /generated:session-start -->
 
-### On Startup
-1. Resolve `framework_root` from frontmatter to locate the MarkdownLLM framework root
-2. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen`
-3. Load `{framework_root}/kernel.md` — the operative rules of the foundational specs (a small fraction of the full-spec cost; `mdllm tokens` measures the current split); load a full spec only when the kernel doesn't settle an ambiguity
-4. Load skills relevant to session intent: [domain]-specification.skill.md, [domain]-read.thing.skill.md, [domain]-write.thing.skill.md, [domain]-workflow.skill.md
-5. Read the **orient** view (`mdllm session-start` emits it) — the open loops (non-terminal owned work + open conflicts; `origin: external` things file under a separate **Watched** line) carried from prior sessions. Forward state is the thing graph, not a hand-kept brief; `continuity.md` is retired (v3.17)
-6. Evaluate triggers — scan things for time-based, dependency, or threshold triggers since last session
+## Loading — Tiers
+<!-- generated:tier-routing --> … <!-- /generated:tier-routing -->
 
-### On User Request
-1. **Clarify intent:** What operation? (read, write, analyze, etc.)
-2. **Load relevant skill:** Match to appropriate skill
-3. **Load context:** Load relevant things from ./things/ directory
-4. **Execute:** Follow skill guidance while maintaining consistency
-5. **Validate:** After writes, invoke validation (structural, referential, domain-specific)
-6. **Autocommit:** If `git.autocommit: true`, stage + commit with structured message
+## Hooks
+<!-- generated:hooks --> … <!-- /generated:hooks -->
 
-### On Output
-1. Validate thing files if changes were made
-2. **Autocommit** (if enabled): stage changed files + commit with structured `action: description` message
-3. Report what changed and why
-4. Evaluate triggers (post-write)
-5. **Session end:** Explicitly invoke the `session-end-continuity` bound prompt — extract insights, disposition the standing insights, check for conflicts, and manage open-loop things (no `continuity.md` to update — orient reads the thing graph). This is a bound prompt, not a hard hook: "the session is ending" is not an observable, agent-caused event, so it never fires automatically — the agent or human must invoke it. There are exactly three hard hooks (`post-write:commit`, `pre-domain-scaffold:isolate`, `session-start:version-check`); see `orchestration.md`. Full spec: `session-memory.md` and `belief-revision.md`.
+## Framework Principles Applied to This Domain
+[How the core principles apply here — authored]
 
-## Skills Directory
-
-All reusable capabilities stored as skill files:
-
-- **[domain]-specification.skill.md** — Philosophy and principles
-- **[domain]-read.thing.skill.md** — Read and analyze things
-- **[domain]-write.thing.skill.md** — Create and update things
-- **[domain]-workflow.skill.md** — Process orchestration
-
-## Foundational Specifications
-
-- **thing.md** — Atomic unit specification
-- **validate.thing.md** — Validation skill
-- **git-workflow.md** — Commit conventions
-- **interface.md** — I/O layer
+## Thing Types in This Domain
+[What the types mean and why — authored narrative; the list itself is
+generated from things/_schema.yaml, the authority]
+<!-- generated:types --> … <!-- /generated:types -->
 
 ## Triggers (Domain-Specific)
+[Declarative attention conditions — authored]
 
-### Time-Based
-- [When time-based conditions should fire]
-
-### Dependency
-- [When dependency changes should alert]
-
-### Threshold
-- [When limits are exceeded]
-
-## Usage Pattern
-
-User Request
-  ↓
-Load this AGENTS.md (auto-discovered)
-  ↓
-Evaluate triggers (session start)
-  ↓
-Load relevant skill from ./skills/
-  ↓
-Load relevant things from ./things/
-  ↓
-Execute with consistency checks
-  ↓
-Validate changes
-  ↓
-Commit with structured message
-  ↓
-Evaluate triggers (post-write)
-  ↓
-Report changes
-
-## Validation Checklist
-
-- [ ] Relevant skill loaded for this operation
-- [ ] thing.md patterns followed (id, type, status, created present)
-- [ ] linked_things references valid (targets exist)
-- [ ] Framework principles maintained
-- [ ] Commit message follows `action: description` convention
+## The Deterministic Floor
+<!-- generated:floor --> … <!-- /generated:floor -->
 ```
+
+The generated blocks carry the operative machinery: the **Session Start
+ritual** (estate-sync → kernel → orient → version check → the four
+session-start prompts → await intent), the **loading tiers**, the **hard
+hooks** (enumerated in `orchestration.md` and carried by the kernel — do not
+restate their count in authored prose; restated counts have drifted twice in
+this guide's own history), the schema-derived **type list**, and the **floor**
+statement. The session-end ritual (`session-end-continuity`) is a *bound
+prompt you invoke deliberately* — never a hard hook, because "the session is
+ending" is not an observable, agent-caused event. Full spec:
+`session-memory.md` and `belief-revision.md`.
 
 ---
 
@@ -824,8 +786,8 @@ Two knowledge primitives also matter at scaffold time:
 - [ ] **Understand** — Read `llm-driven-systems.manifesto.md` and `thing.md`
 - [ ] **Plan** — Answer: What problem? What atomic units? What workflows?
 - [ ] **Clone framework** — Clone the MarkdownLLM repository
-- [ ] **Create domain folder** — Create your domain inside `domains/` and initialise a git repo
-- [ ] **Scaffold domain** — From the framework workspace, tell the framework agent to build your domain (AGENTS.md, skills, example things)
+- [ ] **Scaffold domain** — `python tools/mdllm.py scaffold domains/my-domain`. Never hand-create the directory or its git repo — birth is mechanical (this checklist once said "create the folder and initialise a git repo", contradicting Step 1 above; hand-rolled births drop steps)
+- [ ] **Fill the semantic half** — Tell the framework agent to complete AGENTS.md's authored sections, declare types in `_schema.yaml`, and write the skill bodies
 - [ ] **Open domain workspace** — Open the domain folder as its own workspace — the domain agent takes over from here
 - [ ] **Nothing to set up for session memory** — forward state is the thing graph (surfaced by the `mdllm session-start` orient view) and the backward record is the commit stream; `continuity.md` and `WORKLOG.md` are retired (v3.17)
 - [ ] **Understand thing.md** — The atomic unit specification (including triggers) — do NOT copy it into your domain

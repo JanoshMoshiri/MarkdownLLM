@@ -2,7 +2,7 @@
 id: framework-discovery-specification
 type: specification
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-19
 linked_things:
   - id: domain-specification-guide
@@ -85,11 +85,20 @@ When a domain agent loads, its startup sequence becomes:
 1. Read own `AGENTS.md` frontmatter
 2. Resolve `framework_root` to an absolute path
 3. Verify framework root exists (check for the `.markdownllm` sentinel)
-4. Version check (`session-start:version-check` hard hook): compare the sentinel's `version` against `framework_version_seen` in the domain frontmatter
-5. Load `{framework_root}/kernel.md` — the generated operative kernel. Do **not** eagerly load the full foundational specs; load a full spec only when the kernel doesn't settle an ambiguity (see the tier tables in AGENTS.md and `templates/AGENTS.md.template`)
-6. Load domain skills from `./skills/` relevant to session intent
-7. Read the orient view (`mdllm session-start` emits the open loops), then domain things from `./things/` as the session requires
-8. Evaluate triggers
+4. **Estate sync** (`session-start:estate-sync` hard hook) — sync before
+   orienting: orientation reads `git log`, and the log is only whole after
+   the fetch (`mdllm estate-sync .`; bounded, ff-only, degrades offline)
+5. Version check (`session-start:version-check` hard hook): compare the sentinel's `version` against `framework_version_seen` in the domain frontmatter
+6. Load `{framework_root}/kernel.md` — the generated operative kernel. Do **not** eagerly load the full foundational specs; load a full spec only when the kernel doesn't settle an ambiguity (see the tier tables in AGENTS.md and `templates/AGENTS.md.template`)
+7. Load domain skills per the tier-routing block (the specification and write skills are required reading before any write — kernel, `write.thing`)
+8. Read the orient view (`mdllm session-start` emits the open loops), then domain things from `./things/` as the session requires
+9. Evaluate triggers and run the session-start prompts
+
+**In a scaffolded domain this sequence is not remembered — it is read.** The
+generated Session Start block in the domain's AGENTS.md
+(`mdllm domain-kernel`) carries the canonical, always-current form of these
+steps; this list is the discovery-time summary, and on any disagreement the
+generated block wins.
 
 If `framework_root` is missing from frontmatter, the agent should:
 1. Look for a `.markdownllm` marker file by walking up the directory tree

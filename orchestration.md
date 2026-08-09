@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.11
+version: 1.12
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -107,7 +107,7 @@ drift later, so a skipped hook degrades gracefully rather than corrupting.
 | `post-write:commit` (the commit act) | interpretation | the agent (git hook validates *if* a commit happens) | **Severe** — work stranded in the working dir |
 | `pre-domain-scaffold:isolate` | git/fs | ⚙️ `mdllm scaffold` | Moderate — repo pollution, needs cleanup |
 | `session-start:version-check` | harness-session | interpretation | Low — stale version; validation catches breaks later |
-| `session-start`, `session-end` | harness-session | interpretation | Low — orientation/worklog regenerable from git |
+| `session-start`, `session-end` | harness-session | interpretation | **Moderate** — the state is regenerable from git, but the session *acts on the misread live*: two 2026-08-08 field incidents (an orientation the operator could not follow; a write made without the workflow skill's authorisation step) trace to skipped session-start steps |
 | `post-write` | git/fs (file write) | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
 | `post-commit` | git/fs | interpretation (no bindings) | Low |
 | `on-create`, `on-status-change`, `on-error`, `retrospective` | interpretation (semantic) | interpretation — no mechanical detector possible | Moderate — downstream not cascaded |
@@ -527,9 +527,27 @@ bindings:
 
 ### Binding Scope
 
-Bindings are domain-level declarations. Each domain defines its own bindings based on what structured reasoning it needs. There are no framework-level bindings that domains inherit — orchestration is entirely opt-in.
+Bindings are domain-level declarations. Each domain defines its own bindings
+based on what structured reasoning it needs — with one deliberate exception.
 
-A domain's bindings live in its workflow skill or AGENTS.md. They can attach to:
+**One set of bindings arrives with the domain rather than being authored in
+it.** The generated Session Start block (`mdllm domain-kernel`) binds the four
+session-start prompts — `session-orientation`, `domain-velocity`,
+`evaluate-triggers`, `surface-attention` — as numbered steps in every
+scaffolded domain's AGENTS.md, and `mdllm scaffold` delivers the prompt files
+into the domain's own `prompts/`. These are **framework-installed standing
+bindings**: derived, regenerated on refresh, revisable only by editing the
+generator — or by opting out of the managed blocks entirely, since a domain
+whose AGENTS.md carries no managed blocks inherits nothing and still boots by
+interpretation. *(This supersedes the earlier claim that no framework-level
+bindings are inherited — the generated block is exactly such a binding, and
+describing it as opt-in left agents free to read the session-start steps as
+optional. Substrate reconciliation, 2026-08-09.)*
+
+Everything beyond that set is opt-in and authored: domain hook points,
+additional prompts, `when:` conditions, session-end and retrospective
+bindings. A domain's bindings live in its workflow skill or AGENTS.md. They
+can attach to:
 - **Framework hook points** (session-start, post-write, pre-commit, etc.) — these moments exist in every domain
 - **Domain hook points** — custom moments defined by the domain's workflow
 
@@ -620,7 +638,13 @@ Read the prompt's reasoning template and ask: "Is this a checklist a competent p
 
 ### Quantity Guidance
 
-The framework provides 6 prompt templates (in `templates/prompts/`) as starting points. A domain that adopts orchestration should typically use 2–5 prompts for its unique reasoning patterns. If a domain has more than 10 prompts, that's a signal to review whether some should be consolidated or left implicit.
+The framework ships its prompt templates in `templates/prompts/` (the set is
+the directory's contents — counts restated in prose have drifted; the four
+session-start prompts among them are delivered to every scaffolded domain and
+bound by the generated Session Start block). A domain that adopts
+orchestration beyond that should typically add 2–5 prompts for its unique
+reasoning patterns. If a domain has more than 10 prompts, that's a signal to
+review whether some should be consolidated or left implicit.
 
 ## File Organization
 
@@ -650,4 +674,10 @@ framework-root/
             └── format-expert-questions.md
 ```
 
-Prompts are things. They live in the domain's `prompts/` directory, have frontmatter, have IDs, and can be linked to other things. They follow the same structural rules as everything else in the framework. The framework's `templates/prompts/` provides starting points — domains copy and adapt what they need rather than inheriting a mandatory set.
+Prompts are things. They live in the domain's `prompts/` directory, have
+frontmatter, have IDs, and can be linked to other things. They follow the same
+structural rules as everything else in the framework. `mdllm scaffold`
+delivers the framework's `templates/prompts/` set into every new domain's
+`prompts/` (the four session-start prompts are bound by the generated Session
+Start block — standing, not optional); beyond that delivered set, domains
+copy, adapt, and author what they need.

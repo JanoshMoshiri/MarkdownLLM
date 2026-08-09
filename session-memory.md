@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.2
+version: 1.3
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -27,7 +27,11 @@ This document defines how the framework preserves **generative knowledge** — t
 
 The framework already handles **resolved knowledge** well: a decision becomes a thing, a spec gets committed, a task gets status-tracked. But generative knowledge — the reasoning behind a decision, competing perspectives, open questions raised but deferred — disappears when a session ends. Without explicit preservation, every session starts cold.
 
-This specification defines two primitives and one mandatory ritual to close that gap.
+This specification defines two primitives and one deliberate ritual to close
+that gap — deliberate meaning *explicitly invoked* at session close, by the
+operator or by the agent recognising the session is ending; it is a bound
+prompt, never an automatic hook ("the session is ending" is not an
+observable, agent-caused event).
 
 ---
 

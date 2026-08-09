@@ -2,7 +2,7 @@
 id: domain-refresh-specification
 type: specification
 status: evolving
-version: 1.3
+version: 1.4
 created: 2026-05-19
 linked_things:
   - id: framework-discovery-specification
@@ -83,12 +83,10 @@ The refresh process reads these framework files in order:
    → Understand current framework direction and recent decisions
 
 4. Scan foundational specs for version changes:
-   → thing.md (version field in frontmatter)
-   → git-workflow.md
-   → interface.md
-   → validate.thing.md
-   → read.thing.md
-   → write.thing.md
+   → the specs named in {framework_root}/.markdownllm `foundational_specs`
+     (the sentinel is the catalog — orchestration.md included; a list
+     hand-maintained here drifted, omitting the spec that carries the
+     hard hooks)
    → Any NEW specs not previously known
 
 5. Compare against domain's current understanding:
@@ -103,6 +101,10 @@ The refresh process reads these framework files in order:
 
 7. If authorised, update domain files:
    → Update domain AGENTS.md to reference new framework capabilities
+   → Run `python {framework_root}/tools/mdllm.py domain-kernel .` — the
+     absorbed version may have changed the generated managed blocks, and
+     the domain's own pre-commit coherence check flags drift until the
+     regen is committed
    → Update domain skills to use new patterns
    → Commit with message: refresh: absorbed framework v{version} changes
    → (operator step) if absorbing v3.15.0+, add the harness adapter hooks —
@@ -198,18 +200,13 @@ The domain's `[domain]-workflow.skill.md` should include a **Refresh** workflow 
 
 ### Integration Point: Domain AGENTS.md
 
-The domain AGENTS.md startup sequence (step 2 in the template) should include refresh awareness:
-
-```markdown
-### On Startup
-1. Resolve `framework_root` from frontmatter
-2. Load foundational specs from framework root
-3. **Check framework version against `framework_version_seen`** (downward leg)
-4. **If newer: surface to user that refresh is available**
-5. **Check the local framework against its cached upstream** (upward leg) — if behind, surface one advisory, non-blocking line
-6. Load domain skills
-7. Evaluate triggers
-```
+In a scaffolded domain, refresh awareness is already part of the **generated
+Session Start block** (`mdllm domain-kernel`) — step 3 of that block is the
+version check, and the block is the canonical startup sequence (this spec no
+longer carries its own competing enumeration; the 2026-08-09 substrate
+reconciliation retired four such restatements). The upward leg — local
+framework vs its cached upstream — is one advisory, non-blocking line, and
+`mdllm doctor` is its deliberate fetch-and-recheck home.
 
 ## Upstream Propagation (The Upward Leg)
 
