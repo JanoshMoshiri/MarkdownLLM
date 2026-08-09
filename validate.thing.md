@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 2.3
+version: 2.4
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -107,7 +107,10 @@ universal workflow values (`not-started`, `in-progress`, `blocked`, `paused`,
 `completed`, `cancelled`) are the *default* — they apply, at Warning severity,
 only when no schema declares a vocabulary for the type.
 
-Framework-reserved types keep fixed vocabularies that domains cannot redefine:
+Framework-reserved types keep fixed vocabularies that domains cannot redefine
+(the tool's `RESERVED_STATUSES` is the authority; this table restates it and
+lagged it once — three types missing for two releases — so on any
+disagreement, the tool wins):
 
 | Type | Statuses |
 |---|---|
@@ -116,6 +119,9 @@ Framework-reserved types keep fixed vocabularies that domains cannot redefine:
 | `continuity-brief` | `live` |
 | `conflict` | `open`, `resolved` |
 | `retrospective` | `draft`, `complete` |
+| `decision` | `made`, `superseded` |
+| `workflow-definition` | `draft`, `evolving`, `stable`, `deprecated` |
+| `workflow-run` | `active`, `paused`, `completed`, `abandoned` |
 | `index` | `live`, `stale` |
 
 ### Severity Semantics (unchanged)

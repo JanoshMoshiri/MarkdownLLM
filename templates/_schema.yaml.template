@@ -4,8 +4,9 @@
 # `mdllm validate` enforces exactly what is declared here.
 #
 # Framework-reserved types (insight, conflict, retrospective, continuity-brief,
-# decision, index, specification, guide, manifesto, skill, prompt) are built
-# into the tool — do NOT redeclare them.
+# decision, workflow-definition, workflow-run, index, specification, guide,
+# manifesto, skill, prompt) are built into the tool — do NOT redeclare them
+# (RESERVED_STATUSES in the tool is the authority on this set).
 schema_version: 1
 domain: [domain-name]
 

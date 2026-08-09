@@ -2,7 +2,9 @@
 # Read by tools/mdllm.py. Declares the types, status vocabularies, and relation
 # vocabulary this domain permits. Framework-reserved types (specification, guide,
 # manifesto, skill, prompt, insight, conflict, retrospective, continuity-brief,
-# index) are built into the tool and need no declaration here.
+# decision, workflow-definition, workflow-run, index) are built into the tool
+# and need no declaration here — RESERVED_STATUSES in the tool is the authority;
+# this comment lagged it by three types until the 2026-08-09 reconciliation.
 schema_version: 1
 domain: framework
 

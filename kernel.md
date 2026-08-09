@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-08
-generated: 2026-08-08T22:41:43
-generated_from: HEAD@6707d08
+created: 2026-08-09
+generated: 2026-08-09T10:07:56
+generated_from: HEAD@cfd5435
 coverage: 6
 framework_version: 3.29.0
 ---
@@ -27,7 +27,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned. A type may also declare `terminal_statuses` — which of its own statuses mean *settled*; the declaration replaces the universal terminal set for that type, and every forward-work check (orientation, triggers, cascade) reads it through one `is_terminal`. Not declarable on reserved types (the tool owns their settled sets).
 
-**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Generated: `index`.
+**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Domain-usable with fixed vocabulary: `skill`/`prompt` (lifecycle statuses, tool-owned). Generated: `index`. The tool's `RESERVED_STATUSES` is the authority on this set — restated lists have lagged it on three surfaces at once.
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
 
