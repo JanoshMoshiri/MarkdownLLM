@@ -2,7 +2,7 @@
 id: domain-velocity
 type: prompt
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-06-08
 inputs:
   - name: git-log-things
@@ -10,7 +10,7 @@ inputs:
   - name: current-date
     description: "Today's date, for computing how long things have been untouched"
   - name: active-things-summary
-    description: "Metadata of things with status not in {completed, cancelled} — to cross-reference against commit recency"
+    description: "Metadata of things at a non-terminal status (per the type's terminal_statuses, or the universal defaults) — to cross-reference against commit recency"
 outputs:
   - name: velocity-summary
     description: "3–5 observations about domain movement: what is stalling, what is moving, what is untouched"

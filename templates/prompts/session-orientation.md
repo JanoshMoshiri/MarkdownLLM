@@ -2,13 +2,13 @@
 id: session-orientation
 type: prompt
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-20
 inputs:
   - name: git-log-since-last-session
     description: "Commits made since the agent was last active"
   - name: active-things-summary
-    description: "Metadata of all things with status not in {completed, cancelled, archived}"
+    description: "Metadata of all things at a non-terminal status (per the type's terminal_statuses declaration, or the universal defaults where none — never a hardcoded status set: a domain's approved-current is as settled as completed)"
   - name: current-date
     description: "Today's date for temporal context"
 outputs:

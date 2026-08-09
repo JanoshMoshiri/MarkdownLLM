@@ -88,7 +88,7 @@ If the proposed change is a status change:
 
 If the proposed change involves priority:
 
-- **Elevating priority without adjusting capacity** → Warn if `in_progress_count` is already at threshold. Something else may need to deprioritize.
+- **Elevating priority without adjusting capacity** → Warn if the domain already carries an unusually large in-progress set. Something else may need to deprioritize.
 - **Lowering priority of something with approaching due date** → Warn. The user may be procrastinating or may have a good reason.
 
 ### 3. Lens Conflicts

@@ -105,15 +105,34 @@ def _dk_tier_routing(domain: Path, meta: dict) -> str:
     t2 = TIERS["Tier 2 (on demand)"]
     skills = (sorted(p.name for p in (domain / "skills").glob("*.skill.md"))
               if (domain / "skills").is_dir() else [])
+    # prompts/ is routed here for the same reason skills are: a reading list
+    # derived from this block is the only reading list a handoff can honestly
+    # carry, and until 2026-08-09 the prompts were delivered (scaffold) and
+    # named (Session Start) but routed nowhere — so every derived list
+    # omitted them, invisibly (substrate sweep B1; field evidence 2026-08-08:
+    # a bootstrap handoff inherited the omission and four session-start steps
+    # ran without their instructions).
+    prompts = (sorted(p.name for p in (domain / "prompts").glob("*.md"))
+               if (domain / "prompts").is_dir() else [])
     t1_specs = " · ".join(f"`{{framework_root}}/{n}`" for n in t1)
     skills_line = (" · ".join(f"`skills/{s}`" for s in skills)
                    if skills else "_(none yet)_")
+    prompts_line = (" · ".join(f"`prompts/{p}`" for p in prompts)
+                    if prompts else
+                    "_(none on disk — `mdllm scaffold` delivers them; a domain "
+                    "born earlier backfills per domain-refresh.md)_")
     t2_specs = " · ".join(f"`{{framework_root}}/{n}`" for n in t2)
     return (
         "**Tier 0 — always:** `AGENTS.md` (this file) · `{framework_root}/kernel.md`\n\n"
         "**Tier 1 — load a full spec only when the kernel doesn't settle it:** "
         + t1_specs + "\n\n"
-        "**Domain skills — load those relevant to session intent:** " + skills_line + "\n\n"
+        "**Domain skills — the specification and write skills are required "
+        "reading before any write (kernel, `write.thing` — not discretionary); "
+        "load the read and workflow skills per session intent:** "
+        + skills_line + "\n\n"
+        "**Domain prompts — the Session Start block above names when each "
+        "runs; any reading list derived from this file must carry them:** "
+        + prompts_line + "\n\n"
         "**Tier 2 — on demand:** " + t2_specs)
 
 

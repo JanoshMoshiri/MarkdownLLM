@@ -2,7 +2,7 @@
 id: evaluate-triggers
 type: prompt
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-20
 inputs:
   - name: trigger-index
@@ -34,6 +34,22 @@ linked_things:
 
 Scan things for trigger conditions that are currently true. This is the framework's proactive attention system — it ensures the agent notices what needs noticing without the user asking.
 
+## The Floor Evaluates; You Judge
+
+`mdllm triggers` (and the session-start orient view) performs the mechanical
+evaluation — never re-perform its date arithmetic or state reads by
+reasoning. Its output keeps four buckets apart, and so must your report:
+
+- **Fired** — the condition is true NOW. This is the only bucket that is
+  pressure.
+- **Upcoming (≤30d)** — a look-ahead, *not* fired. Reporting look-aheads as a
+  fired backlog manufactures strain in a quiet domain (2026-08-08 field
+  evidence — the reason the buckets are mechanically separate).
+- **Horizon (>30d)** — visible, not actionable.
+- **Not mechanically evaluable** — prose conditions left to your judgment;
+  these, plus the proportional-response reasoning below, are what this prompt
+  is for.
+
 ## Choosing The Scan Substrate
 
 **If the domain maintains a `triggers` index** (`things/_index/triggers.md`), scan the
@@ -58,9 +74,9 @@ Check against `current-date`:
 
 | Condition | True When |
 |-----------|-----------|
-| `due_date_passed` | `due_date` < today AND status ∉ {completed, cancelled} |
+| `due_date_passed` | `due_date` < today AND status is non-terminal (the type's `terminal_statuses`, or the universal defaults where none declared) |
 | `review_date_reached` | `review_date` ≤ today |
-| `stale` | Last modification > `threshold` days ago AND status ∉ {completed, cancelled, paused} |
+| `stale` | Last commit touching the thing > `threshold` days ago AND status is non-terminal |
 
 ### Dependency-Based Triggers
 
@@ -78,9 +94,22 @@ Check against accumulated state:
 
 | Condition | True When |
 |-----------|-----------|
-| `subtasks_complete` | Count of completed subtasks / total subtasks ≥ threshold |
-| `blocked_duration` | Thing has been `blocked` for > threshold duration |
-| `in_progress_count` | System-wide count of `in-progress` things > threshold |
+| `subtasks_complete` | Count of terminal-status subtasks / total subtasks ≥ threshold |
+| `blocked_duration` | Thing has been `blocked` for > threshold duration (needs status history — the floor routes this to you) |
+
+*(`in_progress_count` was removed from the trigger vocabulary in
+trigger-specification v1.2 — no domain ever used it. This template restated
+it for two releases after removal; the spec is the authority.)*
+
+### Import-Based Triggers
+
+Keyed to the state `mdllm imports-check` computes for cross-domain imports
+(trigger-specification v1.3):
+
+| Condition | True When |
+|-----------|-----------|
+| `state_is` | Any watched import's current state matches `value` (default trio: `stale`, `diverged`, `withdrawn`) — a live face read the floor performs |
+| `porch_offers_unimported` | A source's face offers things this domain has not imported |
 
 ### Relationship-Based Triggers
 

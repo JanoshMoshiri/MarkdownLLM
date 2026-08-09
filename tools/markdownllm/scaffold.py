@@ -228,16 +228,6 @@ def cmd_scaffold(args) -> int:
             instantiate(t.read_text(encoding="utf-8")), encoding="utf-8", newline="\n")
         written.append(f"skills/{out_name}")
 
-    # Fill the domain-kernel managed blocks now that skills exist, so the entry
-    # file is born in sync — otherwise the pre-commit coherence check would flag
-    # the template's placeholder blocks as drift and block the first commit.
-    ag = target / "AGENTS.md"
-    ag_text = ag.read_text(encoding="utf-8")
-    ag_meta, _, _ = parse_frontmatter(ag_text)
-    ag_filled, _, _ = apply_domain_kernel(
-        ag_text, build_domain_kernel_blocks(target, ag_meta or {}))
-    ag.write_text(ag_filled, encoding="utf-8", newline="\n")
-
     # Deliberate-ritual slash commands (inert until the operator invokes them) —
     # Claude Code `.claude/commands/` and Copilot `.github/prompts/`. The
     # auto-firing SessionStart/PostToolUse adapter stays opt-in (hint printed below).
@@ -276,6 +266,18 @@ def cmd_scaffold(args) -> int:
             text = re.sub(r"(?m)^linked_things:\n(?:[ \t]+.*\n)+", "", text)
             (pr_dir / src.name).write_text(text, encoding="utf-8", newline="\n")
             written.append(f"prompts/{src.name}")
+
+    # Fill the domain-kernel managed blocks now that skills AND prompts exist,
+    # so the entry file is born in sync — the tier-routing block routes both
+    # from the filesystem, and filling it before prompts/ landed would make
+    # the birth commit drift against its own fresh build (the pre-commit
+    # coherence check would rightly block it).
+    ag = target / "AGENTS.md"
+    ag_text = ag.read_text(encoding="utf-8")
+    ag_meta, _, _ = parse_frontmatter(ag_text)
+    ag_filled, _, _ = apply_domain_kernel(
+        ag_text, build_domain_kernel_blocks(target, ag_meta or {}))
+    ag.write_text(ag_filled, encoding="utf-8", newline="\n")
 
     # Adapter: write .claude/settings.json so a new domain is hardened out of the
     # box — SessionStart injects the ritual, PostToolUse runs the floor on write.

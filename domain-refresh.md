@@ -118,6 +118,11 @@ The refresh process reads these framework files in order:
        entry ahead of session-start in .claude/settings.json, and the
        `types` managed block in AGENTS.md (templates/AGENTS.md.template
        shows placement; `mdllm domain-kernel .` fills it)
+     · pre-v3.30.0 births: the prompt templates changed (fired/upcoming
+       split, import triggers, terminal-status wording — the substrate
+       reconciliation) — diff the domain's prompts/ against
+       templates/prompts/ and re-adopt; the tier-routing managed block now
+       routes prompts/, so the domain-kernel regen above is not optional
 ```
 
 ### Hardening: The Harness Adapter (Operator, Optional)
