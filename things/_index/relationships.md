@@ -3,11 +3,11 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-08
-generated: 2026-08-08T22:41:55
-generated_from: HEAD@6707d08
-coverage: 154
-framework_version: 3.29.0
+created: 2026-08-09
+generated: 2026-08-09T10:18:56
+generated_from: HEAD@69a638d
+coverage: 155
+framework_version: 3.30.0
 ---
 
 # Relationships Index — framework
@@ -523,6 +523,10 @@ framework_version: 3.29.0
 - substrate-currency-sweep --implements--> inflection-candidates-are-computable
 - substrate-currency-sweep --references--> tracking-artifacts-can-drift-from-reality
 - substrate-currency-sweep --references--> estate-cadence-cluster
+- substrate-reconciliation-2026-08-09 --informs--> orchestration-specification
+- substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
+- substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
+- substrate-reconciliation-2026-08-09 --references--> autopush-moves-the-deliberate-act
 - the-notation-changed-not-the-primitives --extends--> llm-driven-systems-manifesto
 - the-notation-changed-not-the-primitives --references--> thing-specification
 - the-notation-changed-not-the-primitives --references--> orchestration-specification

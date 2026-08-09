@@ -4,7 +4,7 @@ description: Reference patterns for encoding compliance as verifiable reasoning 
 version: 3.0
 applies_to: "**/*.md"
 framework_root: ../..
-framework_version_seen: 3.29.0
+framework_version_seen: 3.30.0
 ---
 
 # Compliance Patterns Library Agent
@@ -39,11 +39,18 @@ This is a reference library for domain builders creating systems that operate un
 ## How This Agent Works
 
 ### On Startup
-1. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen` above
-2. Load `{framework_root}/kernel.md` — the framework's operative rules; load a full spec only when the kernel doesn't settle an ambiguity
-3. Read the orient view — `python {framework_root}/tools/mdllm.py session-start .` emits the open loops (non-terminal work things + open conflicts) carried from prior sessions; forward state is the thing graph, not a hand-kept brief
-4. Load skills relevant to session intent: compliance-patterns-specification.skill.md, compliance-patterns-read.thing.skill.md, compliance-patterns-write.thing.skill.md, compliance-patterns-workflow.skill.md
-5. Evaluate triggers — check for patterns referencing outdated regulations or unlinked anti-patterns
+
+> A domain born via `mdllm scaffold` carries this sequence as a **generated
+> managed block** (`mdllm domain-kernel`) — always current, drift-checked at
+> commit. This example predates the managed blocks and states the sequence by
+> hand; on any disagreement, the generated form wins.
+
+1. Estate sync (`session-start:estate-sync` hard hook) — sync before orienting: `python {framework_root}/tools/mdllm.py estate-sync .` (bounded, ff-only, degrades offline)
+2. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen` above
+3. Load `{framework_root}/kernel.md` — the framework's operative rules; load a full spec only when the kernel doesn't settle an ambiguity
+4. Read the orient view — `python {framework_root}/tools/mdllm.py session-start .` emits the open loops (non-terminal work things + open conflicts) carried from prior sessions; forward state is the thing graph, not a hand-kept brief
+5. Load skills — the specification and write skills are required reading before any write (kernel, `write.thing`); the read and workflow skills per session intent: compliance-patterns-specification.skill.md, compliance-patterns-read.thing.skill.md, compliance-patterns-write.thing.skill.md, compliance-patterns-workflow.skill.md
+6. Evaluate triggers — check for patterns referencing outdated regulations or unlinked anti-patterns
 
 ### On User Request
 1. **Clarify intent** — Are they studying patterns, creating their own domain, or auditing compliance?
