@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: 1.3
+version: 1.4
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -173,30 +173,38 @@ reprioritize: Q2 realignment — 5 things updated
 
 ## Who Commits
 
-### The Recommended Pattern: Agent Commits Locally, Human Pushes
+### The Pattern: Agent Commits Locally, the Declaration Decides Publication
 
-The agent commits freely to the local repository after each meaningful state change. The human reviews commits before pushing to the remote.
+The agent commits freely to the local repository after each meaningful state
+change. The pre-commit floor validates every commit on the way in; the
+post-commit **autopush leg** then publishes each floor-validated commit —
+unless the repo declares `git: autopush: false` in its AGENTS.md frontmatter
+(absence means on; full rules in *The Outbound Rules: Autopush* below).
 
 **Why this works:**
 
 - **Granular history** — Each state change is a separate commit with a meaningful message
 - **No friction** — The agent doesn't pause for human approval on every change
-- **Review before publish** — You can scan `git log` before pushing, revert anything you disagree with
+- **The floor gates, not diligence** — the pre-commit hook validates what
+  enters history; autopush transports only what the floor passed
 - **Rollback capability** — Individual commits can be reverted without affecting others
-- **Push is the deliberate gate** — Pushing to remote is the human saying "I'm satisfied with these changes"
+- **The deliberate act lives in the declaration** — the per-repo `autopush`
+  setting is the standing human instruction, made once and owned in config;
+  what stays per-event is *routing non-clean outcomes* (a rejected push, an
+  offline session), which surface as publication debt and are never resolved
+  by force (`autopush-moves-the-deliberate-act`, 2026-08-04, which supersedes
+  the earlier "push is always the human's deliberate act" doctrine)
 
-**In practice (VS Code + Copilot):**
+**In practice:**
 
 1. You ask the agent to update things
-2. The agent modifies files and commits with structured messages
-3. You continue working — more changes, more commits
-4. At session end (or whenever you choose), you review the commits: `git log --oneline -10`
-5. If everything looks good, push: `git push`
-6. If something is wrong, revert the specific commit: `git revert <hash>`
-
-**In practice (CLI tools):**
-
-Same pattern. The agent commits. You push when ready.
+2. The agent modifies files and commits with structured messages; the floor
+   validates at the commit boundary; autopush publishes each validated commit
+3. If something is wrong, revert the specific commit: `git revert <hash>` —
+   history is append-only in both directions, so the correction is itself a
+   published commit
+4. On an opted-out repo (`autopush: false` — release surfaces), you review
+   and push deliberately: `git log --oneline -10`, then `git push`
 
 ### Alternative: Agent Stages, Human Commits
 
@@ -469,7 +477,12 @@ The write skill should be aware of commit points. After modifying things, the ag
 
 ### With validate.thing.md
 
-Validation can run as a pre-commit check. Before the agent commits, it validates the things being committed. If errors exist, the commit is held until they're resolved. Warnings are noted in the commit message body.
+Validation **is** the pre-commit boundary: the git pre-commit hook
+(`mdllm install-hook`) runs full mechanical validation and blocks any commit
+carrying Errors — the floor is the hook, not the agent's diligence. The agent
+also runs `mdllm validate` after writes so findings are fixed in the same
+operation rather than discovered at the commit boundary. Warnings are noted
+in the commit message body.
 
 ### With Triggers (thing.md)
 
@@ -477,11 +490,11 @@ Triggers evaluate against committed state. A dependency trigger watching for `st
 
 ### With interface.md
 
-The push action is an output route decision. When and how you push to remote depends on your interface:
-
-- VS Code: push via source control panel or terminal
-- CLI: `git push` when ready
-- Automated: a scheduled push (if your domain warrants it)
+Publication is not an interface decision — the autopush leg runs the same way
+under every harness, keyed to the repo's declaration, not to the route you
+happen to be working through. What the interface still carries is the
+*deliberate* push on opted-out repos (release surfaces): VS Code's source
+control panel, `git push` in a terminal — whichever route you're in.
 
 ### With `mdllm worklog`
 
@@ -495,11 +508,11 @@ record is git itself, and the narrative lives in the commit messages.
 
 | Concern | Answer |
 |---------|--------|
-| When is state "real"? | At commit time |
+| When is state "real"? | At commit time — on this machine; publication makes it real to the estate |
 | When to commit? | After each meaningful state change (creation, status transition, write session, session end) |
 | What do commit messages say? | Domain state changes, not file modifications |
-| Who commits? | Agent commits locally; human pushes to remote |
-| Who pushes? | Always the human, always deliberate |
+| Who commits? | Agent commits locally; the floor validates at the boundary |
+| Who pushes? | The autopush leg, mechanically, per the repo's standing declaration (`git: autopush` — absence is on); release surfaces opt out and keep the human's deliberate push |
 | How does history help? | Git log is the event stream; triggers evaluate against it; session orientation reads it |
 | What about branching? | `main` only for now; branching for exploration and collaboration later |
 | What about rollback? | Revert specific commits; granular commits make this surgical, not destructive |
@@ -601,13 +614,20 @@ Re-validate
 git add + git commit
 ```
 
-#### Autocommit Does NOT Push
+#### Autocommit and the Publication Leg
 
-The safety boundary remains: **autocommit commits locally only**. Push is still a deliberate human action. This preserves:
+**Autocommit itself never pushes** — it ends at the commit. Publication is a
+separate, post-commit concern: the **autopush leg** (see *The Outbound Rules*)
+publishes each floor-validated commit unless the repo declares
+`git: autopush: false`. The two compose but stay distinct:
 
-- The ability to review before publishing
-- The ability to revert locally without affecting remotes
-- The human gate for shared repositories
+- Autocommit decides *when state becomes real locally* (at meaning boundaries)
+- Autopush decides *when real state reaches the estate* (each validated
+  commit, per the repo's standing declaration)
+- An opted-out repo (release surfaces) keeps the human gate: autocommit runs,
+  publication waits for the deliberate push
+- Rejection, offline, and divergence are surfaced as publication debt — never
+  forced, never silently retried
 
 #### Framework-Level Autocommit
 
