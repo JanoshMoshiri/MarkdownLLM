@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-10
-generated: 2026-08-10T19:44:59
-generated_from: HEAD@897c2f1
-coverage: 155
+created: 2026-08-11
+generated: 2026-08-11T00:23:08
+generated_from: HEAD@9e8df26
+coverage: 157
 framework_version: 3.30.1
 ---
 
@@ -99,6 +99,9 @@ framework_version: 3.30.1
 - change-safety-is-defense-in-depth --supports--> mechanical-assimilation-is-blind-to-prose-dependencies
 - change-safety-is-defense-in-depth --supports--> consistency-is-maintained-at-change-not-by-sweeping
 - change-safety-is-defense-in-depth --supports--> retrospective-specification
+- coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks
+- coherence-is-a-maintained-rate-not-a-state --supports--> repeated-drift-promotes-a-fact-into-the-floor
+- coherence-is-a-maintained-rate-not-a-state --supports--> hook-enforcement-has-three-anchors
 - cohesiveness-sensors --implements--> divergence-is-an-unrouted-decision
 - cohesiveness-sensors --complements--> mechanical-coherence-checks-backlog
 - cohesiveness-sensors --references--> judgement-checks-need-a-suppression-list-which-is-itself-drift
@@ -237,6 +240,10 @@ framework_version: 3.30.1
 - expertise-is-an-output-not-a-prerequisite --supports--> provenance-specification
 - expertise-is-an-output-not-a-prerequisite --complements--> the-substrate-is-a-discipline-prosthesis
 - expertise-is-an-output-not-a-prerequisite --informs--> llm-driven-systems-manifesto
+- external-review-response-2026-08-10 --references--> mechanical-coherence-checks-backlog
+- external-review-response-2026-08-10 --references--> coherence-is-a-maintained-rate-not-a-state
+- external-review-response-2026-08-10 --references--> hook-enforcement-has-three-anchors
+- external-review-response-2026-08-10 --references--> repeated-drift-promotes-a-fact-into-the-floor
 - felt-deployment-lands-in-undisclosable-work --references--> llm-driven-systems-manifesto
 - felt-deployment-lands-in-undisclosable-work --complements--> structure-decides-figures-scale-decides-convention
 - first-2x2-measured-convention-following-not-reasoning --extends--> fixture-fixes-correct-bugs-not-difficulty
