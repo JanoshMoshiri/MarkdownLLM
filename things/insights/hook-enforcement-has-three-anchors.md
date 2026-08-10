@@ -2,7 +2,7 @@
 id: hook-enforcement-has-three-anchors
 type: insight
 status: promoted
-version: 1.1
+version: 1.2
 created: 2026-06-19
 session: 2026-06-19
 source: both
@@ -59,6 +59,20 @@ tool.**
 - **It surfaces dead weight.** A prompt that re-performs a mechanically-enforced
   (git/filesystem) check is redundant by construction — this is what flagged
   `validate-before-commit` and `worklog-update` for removal (2026-06-19).
+
+## External Corroboration (2026-08-11)
+
+The 2025–26 literature independently confirms the gradient this insight names
+(external claims, cited in `reviews/REVIEW-external-2026-08-10.md`, unverified
+until the operator confirms): instruction-following success decays roughly
+exponentially with the number of instructions in context, and long-horizon
+procedural execution degrades as context grows ("context rot"). Any control
+anchored on "the model remembers" therefore decays by the processor's nature,
+not by lapse — and the estate evidence matches: in every breached session the
+interpretation-anchored controls vanished silently while every git-fs control
+held. Hardening is not a preference; it is a migration direction dictated by
+the processor's measured failure mode. No named equivalent of the three-anchor
+taxonomy was found in the field.
 
 ## Context
 
