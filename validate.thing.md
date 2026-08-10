@@ -164,7 +164,7 @@ semantic checks for them:
 | Reasoning template scope | Focused on one reasoning task? Prompts should be tighter than skills | Info |
 | Duplication | Template overlaps another prompt or skill prose | Warning |
 | Quantity | More than ~10 domain prompts signals over-specification | Info |
-| Binding integrity | `bound_to` hooks match hook points declared in `orchestration.md` or the domain workflow skill | Error |
+| Binding integrity | `bound_to` hooks match hook points declared in `orchestration.md` or the domain workflow skill | Warning (advisory — this is a Layer-2 agent check; the floor reads `bound_to` nowhere, and a severity that "blocks commit" cannot be assigned to a check nothing blocks on. A review-loop finding: this row said Error for two releases against the same table's own "semantic findings are advisory") |
 
 *(v2.0 removed the input/output chain-consistency check between prompts — it was
 type-checking for an event system with no runtime, and no domain ever used it.)*

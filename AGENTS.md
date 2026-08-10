@@ -172,6 +172,7 @@ The framework defines itself through these interconnected specifications:
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
 - **docs/operator-guide.md** — Human-facing: what working in a domain feels like since v3, the mdllm toolbox with scenarios, and what remains the operator's job. The specs are agent-first; this is the human's walkthrough. (`type: guide`, `status: draft`)
 - **docs/first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: evolving`)
+- **docs/estate-mechanics.md** — Human-facing: how publication, reconciliation and cadence interact at three radii (inside a domain, between domains, at the substrate), diagrammed. (`type: guide`, `status: evolving` — born frontmatter-less; a review-loop finding made it a thing, ending its no-special-cases exemption)
 - **docs/framework-map.md** — Visual architecture map (Mermaid): the five-band elevation, the spec-layer dependency graph, and the mdllm subcommand → spec mapping. Derived from frontmatter links, `mdllm --help`, and the tier table; the frontmatter wins on disagreement. (`type: guide`, `status: draft`)
 
 ### Deferred (Spec When Foreseeable, Deploy When Felt)
@@ -212,6 +213,13 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 - `type: workflow-definition` — A reusable process skeleton with stages as data and the transitions allowed between them (framework-reserved)
 - `type: workflow-run` — One live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative (framework-reserved)
 - `type: plan` — A phased, multi-session work plan for evolving the framework; uses workflow statuses; phase checkboxes updated as work lands (domain-specific to the framework domain)
+- `type: artifact` — A committed record artifact with its own lifecycle (the independent review records in `reviews/`); statuses evolving/stable/deprecated (domain-specific to the framework domain)
+
+*(This list restates `_schema.yaml` + the tool's reserved set and has lagged
+them — a review-loop finding caught `artifact` missing here while seven
+committed things carried it. On any disagreement the schema and
+`RESERVED_STATUSES` win; scaffolded domains derive this list mechanically,
+and deriving it here is on `mechanical-coherence-checks-backlog`.)*
 
 ## Key Innovations
 

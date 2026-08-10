@@ -31,7 +31,7 @@ linked_things:
 
 A **derived index** is a regenerable file that aggregates one signal across all the things in a domain, so the agent can evaluate that signal at session start without loading every thing. It is the framework's mechanism for making *reflexive* behaviour — the agent reasoning *about* the domain rather than *within* it — cheap enough to run routinely.
 
-The four reflexive behaviours the framework wants are all the same shape:
+Of the five reflexive behaviours the framework wants, four are the same shape:
 
 | Behaviour | Signal aggregated | Index |
 |---|---|---|

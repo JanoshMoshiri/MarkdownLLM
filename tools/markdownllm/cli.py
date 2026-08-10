@@ -4,7 +4,10 @@ Mechanical validation and maintenance for MarkdownLLM domains. The division of
 labour (validate.thing.md): this tool guarantees the mechanical checks
 (structural, referential, schema); the LLM keeps the semantic ones.
 
-Subcommands:
+Core subcommands (curated — the FULL set is the usage line below; every
+subcommand carries its own --help. This list stopped claiming completeness
+after a review-loop finding caught it describing 12 of 26 under an
+unqualified heading — a hand list drifts; argparse does not):
   validate [path]      Levels 1-3 mechanical validation. Exit 1 on Errors.
                        Example domains under <path>/examples/ are validated
                        as their own corpora in the same run.

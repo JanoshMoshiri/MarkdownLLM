@@ -55,7 +55,7 @@ that was always genuinely yours: judgment.
 | Remember which status values are legitimate for which thing type | `things/_schema.yaml` declares them; the validator enforces exactly what the domain declared |
 | Re-check by hand that a thing marked done didn't still hang on unfinished prerequisites | `mdllm validate` blocks a terminal-status thing that still depends on unfinished work — completing on top of an open prerequisite is an Error at the commit boundary (v3.15.0); if the edge was never really a prerequisite, model it as `linked_things` instead |
 | Notice when a derived index no longer matched the things | `mdllm index check` rebuilds and diffs; index drift is detectable, and CI checks it on every push |
-| Mentally track deadlines and re-raise them to the agent | `mdllm triggers` evaluates time/dependency/threshold conditions mechanically; the scheduled-triggers adapter surfaces them even with no session open |
+| Mentally track deadlines and re-raise them to the agent | `mdllm triggers` evaluates time/dependency/threshold/import conditions mechanically; the scheduled-triggers adapter surfaces them even with no session open |
 | Wonder whether the framework had moved on since the domain was scaffolded | The `session-start:version-check` hard hook compares the version sentinel against the domain's `framework_version_seen` every session — and since v3.4.0 the sentinel itself is drift-proofed (it had silently stalled once; that class of failure is now an Error the framework's own hook blocks) |
 | Reconstruct *why* a judgment call was made months ago | `type: decision` things pin their inputs to exact commits (`informed_by`); `mdllm provenance` enforces the chain |
 | Worry that a workflow that worked last quarter silently regressed | Eval fixtures assert the contracted end state against committed domain state — a regression net you can run any time |
@@ -162,10 +162,12 @@ to invoke directly.
 | Command | What it does | When you'd type it yourself |
 |---|---|---|
 | `validate [path]` | Levels 1–3 mechanical validation; exit 1 on Errors | Sanity-checking a domain's whole corpus on demand |
-| `triggers [path]` | Evaluates time/dependency/threshold conditions, deadline horizon | "What needs attention?" without starting a full session |
+| `triggers [path]` | Evaluates time/dependency/threshold/import conditions, deadline horizon (import = live face reads via imports-check) | "What needs attention?" without starting a full session |
 | `index [path] check\|rebuild` | Rebuild-and-diff derived indexes (`--signal triggers\|schema\|relationships\|provenance`) | Suspected index drift; after bulk edits |
 | `provenance [path]` | Validates decision chains and the external-content quarantine | Auditing why-trails before relying on a decision |
 | `touchpoints <id> [path]` | The Assimilate beat: one thing's declared inbound set + literal body references — "what did I just put at risk?" | Before changing a load-bearing thing; during an inflection walk |
+| `autopush [path]` | The post-commit publication leg: pushes the validated commit per the repo's standing declaration (absence = on); bounded, never forces | Run by the post-commit hook — invoke by hand only when diagnosing publication debt |
+| `candidates [path]` | The cue advisory's derivation: which things are reconciliation cue candidates and why | When a pre-commit cue line surprises you |
 | `cascade <id> [path]` | Mirror of touchpoints: the declared downstream set a completion unblocks — "what did I just unblock?" | After completing a thing with dependants |
 | `eval [path] --fixture <f>` | Asserts a fixture's contracted end state against committed domain state | Regression check after framework or skill changes |
 | `eval --run [--model M --trials N --bare --report]` | Seeds an isolated workspace, runs a headless agent, scores trials | Running the framework-vs-bare experiment |

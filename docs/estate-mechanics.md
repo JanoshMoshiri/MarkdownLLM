@@ -1,3 +1,11 @@
+---
+id: estate-mechanics-guide
+type: guide
+status: evolving
+version: 1.1
+created: 2026-08-04
+---
+
 # Estate Mechanics — publication, reconciliation and cadence at three radii
 
 How state flows and stays coherent after v3.26.0, told at the three levels

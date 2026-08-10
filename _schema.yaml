@@ -22,7 +22,8 @@ options:
 types:
   plan:
     statuses: [not-started, in-progress, blocked, paused, completed, cancelled]
-  artifact: # WORKLOG, REVIEWLOG — generated running records
+  artifact: # committed record artifacts with a lifecycle — today the reviews/ records
+            # (the original examples, WORKLOG/REVIEWLOG, retired at v3.17)
     statuses: [evolving, stable, deprecated]
 
 # Declared relation vocabulary (validated at Warning severity).

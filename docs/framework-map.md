@@ -57,10 +57,10 @@ flowchart TD
         AGENTS["AGENTS.md<br/>entry point — auto-discovered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
-    subgraph specs ["specification layer — 27 spec things"]
+    subgraph specs ["specification layer — 29 spec things"]
         MANIFESTO["manifesto<br/>the why"]
         THING["thing.md<br/>+ core operative specs"]
-        EXT["extensions<br/>+ guides — 20 specs"]
+        EXT["extensions<br/>+ guides — 22 specs"]
     end
     subgraph memory ["domain memory — things/"]
         INSIGHTS["insights"]
@@ -318,7 +318,12 @@ This map is hand-drawn, and
 Its sources of truth are mechanical — check against them, do not trust the map
 over them:
 
-- **View 1:** the root file listing and `AGENTS.md` tier structure.
+- **View 1:** the root file listing and `AGENTS.md` tier structure. The
+  spec-thing count is a mechanical fact — every `.md` under root and `docs/`
+  whose frontmatter `type` is specification/guide/manifesto (29 at last count:
+  22 + 6 + 1, including `docs/plans/mcp-domain-server.md` and the
+  formerly frontmatter-less `docs/estate-mechanics.md`) — recount before
+  restating; a review-loop finding caught this label two behind reality.
 - **View 2:** each spec's `linked_things` frontmatter; the kernel coverage
   count in `kernel.md` frontmatter (`coverage: 6`).
 - **View 3:** `python tools/mdllm.py --help`.
