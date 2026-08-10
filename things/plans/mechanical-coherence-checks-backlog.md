@@ -2,9 +2,9 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: not-started
-version: 1.0
+version: 1.1
 created: 2026-06-27
-priority: low
+priority: high
 tags: [coherence, floor, drift, tooling, backlog]
 linked_things:
   - id: repeated-drift-promotes-a-fact-into-the-floor
@@ -97,5 +97,29 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   with *defectively unpinned* (cowork-integrity-estate-sweep Phase 10 residue)
   belongs in this backlog under the same same-builder gate.
 
-Build when felt — none blocks anything today; the payoff is automatic drift
-enforcement the day each fact drifts again.
+- **Review-9 survivor promotions (added 2026-08-11, priority driver).** Every
+  one of the ninth review's seven survivors was a hand-restated mirror of a
+  same-builder fact — the trigger-type count, the reserved set, the
+  index-signal count, the `CORE_FIELDS` admission criterion. Each passes this
+  backlog's gate for the same reason the framework-map count did: keyed to a
+  tool constant, no suppression list, cannot disagree with truth. Promote each
+  into `mdllm coherence` so the *next* drift of the same fact is caught at the
+  commit boundary instead of by a cold read. The external assessment's verdict
+  (`reviews/REVIEW-external-2026-08-10.md`, R1): this class produced the entire
+  survivor list; the restatement is the unit of future drift.
+
+- **Perimeter currency check (added 2026-08-11).** A releases-behind signal for
+  the surfaces outside every individual blast radius — README, `docs/first-hour.md`,
+  `examples/`, `CONTRIBUTING.md`: compare each surface's version pins / stated
+  facts' last reconciliation against the tool's current version and fire an
+  Info at release time. Same-builder (the version is the tool's own), no
+  suppression list. This is `cumulative-drift-is-invisible-to-per-change-walks`'s
+  razor executed: the perimeter is protected by an interval, and the interval
+  becomes mechanical (R2 of the same review).
+
+Build when felt — and as of 2026-08-11 the same-builder items above *are* felt:
+the operator named the v3.30.x defect lump as the felt evidence commissioning
+the external review, which lifts this hold for the review-9 promotions and the
+perimeter currency check (`external-review-response-2026-08-10`). The remaining
+items keep the original hold; the payoff is automatic drift enforcement the day
+each fact drifts again.
