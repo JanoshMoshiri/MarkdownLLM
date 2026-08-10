@@ -574,22 +574,27 @@ def test_field_registration_flags_unregistered_field(tmp_path):
     # Declaring `known_fields` activates the gate. CORE_FIELDS (status/created/
     # linked_things), the declared field (owner), and a per-type required_field
     # (period) all pass; the mis-keyed `relations` (the silent-loss bug) and an
-    # undeclared `tags` are flagged at Warning — never Error.
+    # undeclared `colour` are flagged at Warning — never Error. `tags` is NOT
+    # flagged: thing.md's Recommended vocabulary (priority/tags/confidence/
+    # version) joined CORE_FIELDS at the ninth review — a domain must never be
+    # made to register the framework's own vocabulary (this test's previous
+    # revision used `tags` as its flaggable example, encoding the defect).
     write(tmp_path, "_schema.yaml",
           "types:\n  task:\n    statuses: [in-progress]\n    required_fields: [period]\n"
           "known_fields:\n  - owner\n")
     write(tmp_path, "things/a.md", thing_text(
         "id: a\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
-        "period: q1\nowner: jm\ntags: [x]\n"
+        "period: q1\nowner: jm\ntags: [x]\ncolour: red\n"
         "relations:\n  - id: b\n    relation: informs"))   # mis-keyed linked_things
     findings = all_findings(tmp_path)
     warns = messages(findings, mdllm.SEV_WARNING)
     assert any("field `relations` not in CORE_FIELDS" in m for m in warns)
-    assert any("field `tags` not in CORE_FIELDS" in m for m in warns)
-    # the legitimate fields are not flagged
+    assert any("field `colour` not in CORE_FIELDS" in m for m in warns)
+    # the legitimate fields are not flagged — including framework vocabulary
     assert not any("field `owner`" in m for m in warns)
     assert not any("field `period`" in m for m in warns)
     assert not any("field `status`" in m for m in warns)
+    assert not any("field `tags`" in m for m in warns)
     # and it is strictly advisory — no field Error
     assert not any("CORE_FIELDS" in m for m in messages(findings, mdllm.SEV_ERROR))
 

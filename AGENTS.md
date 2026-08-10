@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 3.30.0
+version: 3.30.1
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -132,7 +132,7 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 
 1. If modifying specifications: validate consistency across linked specs
 2. If creating new specs: follow thing.md patterns (frontmatter + narrative body)
-3. If adding or removing a spec, run `mdllm coherence` — it now mechanically checks the catalog slice of the dark region (`.markdownllm` `foundational_specs` ↔ files on disk, the `TIERS` map in `tools/mdllm.py` ↔ the catalog, and `kernel.md` drift), and it runs in the pre-commit hook so a stale generated artifact blocks the commit. Then walk the **prose-only residue** the tool cannot read (see `change-reconciliation.md` → Walking the Dark Region): the Tier 2 routing table and the spec catalog in this file, and `docs/framework-map.md` (View 1 counts + View 2 node). `mdllm kernel` regen is now caught by coherence rather than left to memory.
+3. If adding or removing a spec, run `mdllm coherence` — it now mechanically checks the catalog slice of the dark region (`.markdownllm` `foundational_specs` ↔ files on disk, the `TIERS` map in `tools/markdownllm/repo.py` ↔ the catalog, and `kernel.md` drift), and it runs in the pre-commit hook so a stale generated artifact blocks the commit. Then walk the **prose-only residue** the tool cannot read (see `change-reconciliation.md` → Walking the Dark Region): the Tier 2 routing table and the spec catalog in this file, and `docs/framework-map.md` (View 1 counts + View 2 node). `mdllm kernel` regen is now caught by coherence rather than left to memory.
 4. Commit with a structured message following git-workflow.md conventions (the commit is the backward record)
 
 ## Framework Specifications (Things)

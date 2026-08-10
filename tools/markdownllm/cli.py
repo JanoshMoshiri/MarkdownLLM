@@ -1,8 +1,8 @@
 """mdllm — the MarkdownLLM deterministic floor.
 
 Mechanical validation and maintenance for MarkdownLLM domains. The division of
-labour (validate.thing.md v2.0): this tool guarantees the mechanical checks
-(structural, referential, schema); the LLM keeps the semantic ones (Level 4).
+labour (validate.thing.md): this tool guarantees the mechanical checks
+(structural, referential, schema); the LLM keeps the semantic ones.
 
 Subcommands:
   validate [path]      Levels 1-3 mechanical validation. Exit 1 on Errors.
@@ -11,7 +11,7 @@ Subcommands:
   triggers [path]      Evaluate time/dependency/threshold trigger conditions;
                        relationship triggers (and blocked_duration) are listed
                        as not mechanically evaluable — left to the agent.
-  index    [path] check|rebuild [--signal triggers|schema|relationships]
+  index    [path] check|rebuild [--signal triggers|schema|relationships|provenance]
   touchpoints <id> [path]  Assimilate beat (change-reconciliation): the declared
                        inbound set + literal references for one thing — "what did
                        I just put at risk?". Human-invoked, never hooked; live.

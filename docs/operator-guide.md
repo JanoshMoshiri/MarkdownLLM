@@ -163,7 +163,7 @@ to invoke directly.
 |---|---|---|
 | `validate [path]` | Levels 1–3 mechanical validation; exit 1 on Errors | Sanity-checking a domain's whole corpus on demand |
 | `triggers [path]` | Evaluates time/dependency/threshold conditions, deadline horizon | "What needs attention?" without starting a full session |
-| `index [path] check\|rebuild` | Rebuild-and-diff derived indexes (`--signal triggers\|schema\|relationships`) | Suspected index drift; after bulk edits |
+| `index [path] check\|rebuild` | Rebuild-and-diff derived indexes (`--signal triggers\|schema\|relationships\|provenance`) | Suspected index drift; after bulk edits |
 | `provenance [path]` | Validates decision chains and the external-content quarantine | Auditing why-trails before relying on a decision |
 | `touchpoints <id> [path]` | The Assimilate beat: one thing's declared inbound set + literal body references — "what did I just put at risk?" | Before changing a load-bearing thing; during an inflection walk |
 | `cascade <id> [path]` | Mirror of touchpoints: the declared downstream set a completion unblocks — "what did I just unblock?" | After completing a thing with dependants |
@@ -307,8 +307,8 @@ deliberately you:
 
 - **Semantic validation.** A VAT figure that is plausible, well-formed,
   correctly statused, and *wrong* passes every mechanical check. Whether a
-  thing makes sense remains the agent's Level 4 reasoning and, finally, your
-  review.
+  thing makes sense remains the agent's semantic-layer reasoning and, finally,
+  your review.
 - **Schema design.** The validator enforces whatever the schema says; saying
   the right thing is a domain-knowledge decision only you can confirm.
 - **Authorising refresh adoptions.** Domains never silently self-modify on

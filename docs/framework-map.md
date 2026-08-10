@@ -249,7 +249,7 @@ flowchart LR
     C16 -.->|"generates"| T16
     C17 -.->|"emits ritual for"| T17
     C18 -->|"gathers downstream for"| T18
-    C19 -.->|"serves over MCP (stdio)"| T19
+    C19 -.->|"serves over MCP (stdio or --http)"| T19
     C20 -->|"re-checks quarantine for"| T20
     C21 -->|"blocks crossings of"| T21
     C22 -->|"batches imports-check for"| T22

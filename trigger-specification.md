@@ -2,7 +2,7 @@
 id: trigger-specification
 type: specification
 status: stable
-version: 1.3
+version: 1.4
 created: 2026-05-29
 linked_things:
   - id: thing-specification
@@ -56,7 +56,7 @@ triggers:
     action: surface
 ```
 
-- `due_date_passed` — The thing's `due_date` is in the past and status is not `completed` or `cancelled`
+- `due_date_passed` — The thing's `due_date` is in the past and its status is non-terminal (the type's `terminal_statuses` where declared, else the universal defaults — thing.md's `is_terminal`; a domain's `approved-current` is as settled as `completed`)
 - `review_date_reached` — The thing's `review_date` has arrived
 - `stale` — The thing hasn't been modified in longer than `threshold`
 - Any other condition string is **free text**. The evaluator (`mdllm triggers`)
@@ -102,7 +102,7 @@ triggers:
     action: escalate
 ```
 
-- `subtasks_complete` — All linked things with relation `subtask` have status `completed`
+- `subtasks_complete` — All linked things with relation `subtask` are at a terminal status (`is_terminal` — the type's declared settled set, not literally `completed`)
 - `blocked_duration` — The thing has been in `blocked` status longer than `threshold`
 
 *(v1.2 removed the speculative `in_progress_count` condition and `warn_overload` action — no domain ever used them. Per "spec when foreseeable, deploy when felt": they return if a domain feels the need.)*

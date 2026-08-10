@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.18
+version: 2.19
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -94,7 +94,7 @@ These fields must be present in every thing to do:
   - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, `provenance.md`, and `workflow-state.md` for full specifications.
 - Three types are **framework-internal**: `specification`, `guide`, and `manifesto`. These are used by the framework's own spec files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
 - Two types are **framework-defined and domain-usable with a fixed vocabulary**: `skill` (a domain's four skill files) and `prompt` (the reasoning prompts in `prompts/`). They carry the same lifecycle vocabulary as the internal types, built into the tool; domains use them freely but cannot redeclare their statuses. (Classified explicitly in the 2026-08-09 substrate reconciliation — they previously carried a fixed vocabulary without belonging to any named category.)
-- One type is **framework-generated**: `index`. An index thing is a regenerable cache that aggregates one signal (triggers, relationships, schema fields) across a domain's things, living in `things/_index/`. It is produced by the agent, not authored by hand, and uses status `live`/`stale`. The things are always the source of truth; the index is a derived copy. Full specification: `derived-index.md`.
+- One type is **framework-generated**: `index`. An index thing is a regenerable cache that aggregates one signal (triggers, relationships, schema fields, provenance) across a domain's things, living in `things/_index/`. It is produced by the agent, not authored by hand, and uses status `live`/`stale`. The things are always the source of truth; the index is a derived copy. Full specification: `derived-index.md` (the signal set is the tool's — `mdllm index` — not this list).
 
 **status** (string)
 - Current state of this thing
@@ -244,7 +244,7 @@ Don't predefined these. Let them emerge as you use the system and Claude suggest
 
 #### Triggers (Optional)
 
-Triggers are declarative attention signals — metadata telling the agent "when you're next active, check whether this condition is true, and surface it." They are not code; the LLM decides how to respond. Four types: `time`, `dependency`, `threshold`, `relationship`. Full specification including all condition values, action values, and evaluation semantics: see `trigger-specification.md`.
+Triggers are declarative attention signals — metadata telling the agent "when you're next active, check whether this condition is true, and surface it." They are not code; the LLM decides how to respond. The type and condition vocabulary is owned by `trigger-specification.md` — full specification including all types, condition values, action values, and evaluation semantics there, never restated here (this paragraph carried "four types" for three releases after `type: import` made it five; a count stated at the authority cannot lag).
 
 ### Markdown Body
 

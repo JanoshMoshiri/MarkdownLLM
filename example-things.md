@@ -2,7 +2,7 @@
 id: example-things-specification
 type: specification
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-05-29
 linked_things:
   - id: thing-specification
@@ -15,7 +15,7 @@ linked_things:
 
 ## What This Specifies
 
-This document defines `type: example` — the framework mechanism for building pattern libraries and teaching LLMs domain-specific reasoning inductively. All other framework-reserved types (`insight`, `continuity-brief`, `conflict`, `retrospective`) have their own dedicated specs; this spec gives `type: example` the same treatment.
+This document defines `type: example` — the framework mechanism for building pattern libraries and teaching LLMs domain-specific reasoning inductively. Unlike the framework-reserved types (the tool's `RESERVED_STATUSES` owns that set — thing.md routes to it; several carry dedicated specs in session-memory.md, belief-revision.md, provenance.md, workflow-state.md, and retrospective.md), `example` is **not** tool-reserved: a domain that uses it declares it in `things/_schema.yaml` like any domain type, and may adapt its status vocabulary. This spec is the pattern's reference treatment, not a reservation.
 
 ## Structure of an Example Thing
 

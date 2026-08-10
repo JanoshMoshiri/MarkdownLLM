@@ -2,7 +2,7 @@
 id: derived-index-specification
 type: specification
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-06-08
 linked_things:
   - id: thing-specification
@@ -38,9 +38,15 @@ The four reflexive behaviours the framework wants are all the same shape:
 | Systematic trigger evaluation | Every active trigger across all things | `triggers` index |
 | Schema coherence review | Every domain-specific frontmatter field in use | `schema` registry |
 | Systematic conflict scanning | Every declared edge — `linked_things` plus the structural pointers `definition`/`parent` | `relationships` index |
+| Diff-driven regeneration | Every decision's pinned inputs, reversed — "what rests on this thing?" | `provenance` index (a standard derived index; its semantics live in `provenance.md`) |
 | Domain velocity | *(none — reads git directly)* | no index needed |
 
-The first three are instances of one primitive defined here. The fourth — velocity — is deliberately *not* an index: it reads `git log` (already ground truth), so caching it would add a drift surface for no benefit. See `git-workflow.md` → Git Log As Domain Telemetry.
+The first four are instances of one primitive defined here (the signal set is
+the tool's — `mdllm index` — and this table follows it; a ninth-review finding
+caught this spec not knowing its own fourth index for five releases). The
+fifth — velocity — is deliberately *not* an index: it reads `git log` (already
+ground truth), so caching it would add a drift surface for no benefit. See
+`git-workflow.md` → Git Log As Domain Telemetry.
 
 The `relationships` index aggregates **every declared edge, wherever it lives** — not only `linked_things` relations but the singular structural pointers that earn their own field (`parent`, `definition`, modelled on `parent`). A declared edge in a structural field is no less declared than one in `linked_things`; omitting it would leave a reverse read over the index blind to a parent's children and a definition's runs, which is exactly the recall the change-reconciliation Assimilate beat depends on. The rule is general: any future singular load-bearing pointer added to the schema must also be emitted here, or it becomes an unwalked declared edge. See `structural-pointers-need-reverse-edge-indexing`.
 
@@ -58,7 +64,7 @@ Index files are things with `type: index`. They are framework-internal, generate
 
 - **Status:** index things use `status: live` (current and regenerated) or `status: stale` (known to lag the things — a transitional state validation may set). They do not use workflow or lifecycle statuses.
 - **Location:** `things/_index/` within the domain. The leading underscore keeps generated indexes visually and lexically separate from authored things, and lets read operations skip the directory during ordinary thing scans.
-- **One per signal per domain.** A domain has at most one `triggers` index, one `schema` registry, one `relationships` index.
+- **One per signal per domain.** A domain has at most one index per signal (`triggers`, `schema`, `relationships`, `provenance`).
 
 ## Anatomy
 

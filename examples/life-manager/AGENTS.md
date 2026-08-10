@@ -4,7 +4,7 @@ description: A system for managing your life and work as interconnected things u
 version: 3.0
 applies_to: "**/*.md"
 framework_root: ../..
-framework_version_seen: 3.30.0
+framework_version_seen: 3.30.1
 ---
 
 # Life Manager Agent

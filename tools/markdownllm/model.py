@@ -179,6 +179,11 @@ CORE_FIELDS = {
     # the reasoning prompts (criterion 2 above). Unregistered until v3.24.0,
     # which flagged a domain 24 times for the framework's own field names.
     "inputs", "outputs", "bound_to",
+    # thing.md's Recommended vocabulary (criterion 2 again — "a domain must
+    # never be made to register the framework's own vocabulary"). Unadmitted
+    # until the ninth review (2026-08-09) caught the framework root itself
+    # forced to register them in its own _schema.yaml.
+    "priority", "tags", "confidence", "version",
 }
 
 DEFAULT_EXCLUDES = {".git", ".claude", "node_modules", "templates", "examples",
