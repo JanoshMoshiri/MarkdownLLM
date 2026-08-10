@@ -195,7 +195,7 @@ Referenced things updated accordingly
 Conflict thing status: resolved (kept as audit trail)
 ```
 
-Resolved conflict things are **not deleted**. They are part of the domain's intellectual history — the record of what was contested and how it was settled. They may be eligible for disposition to semi-active storage (see `thing-lifecycle.md`) once resolved and aged.
+Resolved conflict things are **not deleted**. They are part of the domain's intellectual history — the record of what was contested and how it was settled. They may be eligible for disposition to semi-active storage (see `thing-lifecycle.md` — noting that spec is deliberately un-cataloged until reconciled with the live tool, per the AGENTS.md catalog; treat its disposition mechanics as directional, not operative) once resolved and aged.
 
 ---
 

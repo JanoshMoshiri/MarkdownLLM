@@ -2,7 +2,7 @@
 id: write-thing-specification
 type: specification
 status: stable
-version: 2.2
+version: 2.3
 created: 2026-05-13
 linked_things:
   - id: thing-specification
@@ -20,7 +20,7 @@ linked_things:
 # Write Thing
 
 <!-- kernel -->
-**Before writing:** read the domain's specification skill + thing.md (kernel suffices); load at the minimal tier the change needs. Ensure required fields (`id`, `type`, `status`, `created`); respect the domain schema — emergent fields only with clear purpose.
+**Before writing:** read the domain's specification skill + its write skill + thing.md (kernel suffices for thing.md); load at the minimal tier the change needs. The write skill is where a domain keeps its boundary tests and commit rules — a write made without it passed one domain's audience boundary untested (2026-08-08). Ensure required fields (`id`, `type`, `status`, `created`); respect the domain schema — emergent fields only with clear purpose.
 
 **At creation, answer the exposure question** — *does another domain need to rest on this?* Three cheap answers at the moment of writing: **yes** → `exposed: true` (first checking no other domain already owns the fact — one owner, everyone else imports) · **no** — a real answer, not a deferral · **not yet** → say so in the body, with the condition that would change it. Retrofitted exposure arrives as a cliff no consumer absorbs; per-thing exposure arrives as a trickle.
 

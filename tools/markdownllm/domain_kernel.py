@@ -31,7 +31,8 @@ _FRAMEWORK_HARD_HOOKS = (
     "`git: autopush: false` — absence is on; rejection is divergence surfaced, never "
     "forced (`autopush-moves-the-deliberate-act`).\n"
     "- `session-start:version-check` — performed in **Session Start** above. "
-    "Anchor: `harness-session`.\n"
+    "Anchor: `interpretation` by default, hardened to `harness-session` where "
+    "an adapter binds it.\n"
     # Anchor label below matches orchestration.md (the authority): interpretation
     # by default, hardened to harness-session only where an adapter binds it.
     # A tenth-review finding caught this string saying `harness-session` while

@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-10
-generated: 2026-08-10T21:31:06
-generated_from: HEAD@0c3dc3d
+created: 2026-08-11
+generated: 2026-08-11T00:46:50
+generated_from: HEAD@738c891
 coverage: 6
 framework_version: 3.30.1
 ---
@@ -47,7 +47,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 ## write.thing.md
 
-**Before writing:** read the domain's specification skill + thing.md (kernel suffices); load at the minimal tier the change needs. Ensure required fields (`id`, `type`, `status`, `created`); respect the domain schema — emergent fields only with clear purpose.
+**Before writing:** read the domain's specification skill + its write skill + thing.md (kernel suffices for thing.md); load at the minimal tier the change needs. The write skill is where a domain keeps its boundary tests and commit rules — a write made without it passed one domain's audience boundary untested (2026-08-08). Ensure required fields (`id`, `type`, `status`, `created`); respect the domain schema — emergent fields only with clear purpose.
 
 **At creation, answer the exposure question** — *does another domain need to rest on this?* Three cheap answers at the moment of writing: **yes** → `exposed: true` (first checking no other domain already owns the fact — one owner, everyone else imports) · **no** — a real answer, not a deferral · **not yet** → say so in the body, with the condition that would change it. Retrofitted exposure arrives as a cliff no consumer absorbs; per-thing exposure arrives as a trickle.
 

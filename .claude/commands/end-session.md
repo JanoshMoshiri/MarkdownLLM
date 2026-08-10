@@ -27,4 +27,5 @@ when *you* judge the session worth it, never automatically. Follow
    `autopush-moves-the-deliberate-act`).
 
 If the session has no domain-relevant changes worth harvesting, say so and stop —
-not every session earns an insight.
+not every session earns an insight (publication debt still gets reported: step 6
+reads git, not the session).

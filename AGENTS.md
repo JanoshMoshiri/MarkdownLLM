@@ -58,11 +58,11 @@ status: draft|evolving|stable|deprecated|[domain-declared vocabulary]   # reserv
 version: 1.0
 created: YYYY-MM-DD
 tags: [tag1, tag2]
-priority: high|medium|low          # optional
+priority: low|medium|high|critical  # optional — thing.md owns this enum; this line once said high|medium|low while the kernel said four values, and a session held both
 dependencies: [other-thing-id]     # optional; hard prerequisites — things that must FINISH first (floor-enforced: a terminal thing may not depend on unfinished work); for soft association use linked_things
 linked_things:
   - id: related-thing-id
-    relation: informs|implements|extends|complements|references|documents
+    relation: informs|implements|extends|complements|references|documents|subtask|related|[thing.md's decomposition + reserved sets]   # not a closed enum: thing.md owns the vocabulary — incl. instance-of/derived-from/template-for/applies-to and the reserved supersedes/superseded-by/contradicts (floor-enforced semantics); the domain schema may extend
 # Plus any domain-specific fields — schema grows with domain needs
 ---
 

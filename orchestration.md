@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.12
+version: 1.13
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -106,18 +106,24 @@ drift later, so a skipped hook degrades gracefully rather than corrupting.
 | `pre-commit` validation | git/fs | ⚙️ git hook (mechanical) | **Can't** — commit is blocked |
 | `post-write:commit` (the commit act) | interpretation | the agent (git hook validates *if* a commit happens) | **Severe** — work stranded in the working dir |
 | `pre-domain-scaffold:isolate` | git/fs | ⚙️ `mdllm scaffold` | Moderate — repo pollution, needs cleanup |
-| `session-start:version-check` | harness-session | interpretation | Low — stale version; validation catches breaks later |
+| `session-start:version-check` | interpretation → harness-session (adapter) | interpretation | Low — stale version; validation catches breaks later |
+| `session-start:estate-sync` | interpretation → harness-session (adapter) | interpretation (adapters bind it where installed) | Moderate — orientation reads a stale log; an unpulled checkout orients on a past domain |
 | `session-start`, `session-end` | harness-session | interpretation | **Moderate** — the state is regenerable from git, but the session *acts on the misread live*: two 2026-08-08 field incidents (an orientation the operator could not follow; a write made without the workflow skill's authorisation step) trace to skipped session-start steps |
 | `post-write` | git/fs (file write) | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
-| `post-commit` | git/fs | interpretation (no bindings) | Low |
+| `post-commit` | git/fs | ⚙️ git hook (mechanical — `mdllm autopush`, the publication leg; v3.26.0) | Low — publication debt, surfaced by `estate-sync --status` |
 | `on-create`, `on-status-change`, `on-error`, `retrospective` | interpretation (semantic) | interpretation — no mechanical detector possible | Moderate — downstream not cascaded |
 | reasoning prompts (`cascade-completion`, `evaluate-triggers`, `surface-attention`, `detect-conflicts`, `session-orientation`, `domain-velocity`, `review-schema-coherence`, `session-end-continuity`) | interpretation | interpretation — they *are* reasoning | Low–Moderate |
 
 Two consequences fall out:
 
-1. **Only `pre-commit` validation is mechanically enforced today**, and it is the
-   one hook with unrecoverable consequence. The floor is correctly sized — it
-   guards exactly what must never be wrong, and nothing more.
+1. **Three git hooks are mechanically enforced today** (`mdllm install-hook`):
+   `pre-commit` validation + coherence (blocks), the `commit-msg` disclosure
+   boundary (blocks), and `post-commit` autopush (publishes, never blocks). The
+   two blocking legs are the ones with unrecoverable consequence — the floor
+   still guards exactly what must never be wrong, and the publication leg only
+   transports what the blocking legs passed. *(This consequence said "only
+   pre-commit" for four releases after the other two legs landed — a
+   review-loop finding; the table above is the census, and it was wrong too.)*
 2. **Adapters touch only the session-lifecycle rows**, the lowest-consequence rows
    in the table. Keeping adapters optional is not a compromise — it is what keeps
    MarkdownLLM a portable *substrate* rather than a harness-specific tool. The
@@ -192,7 +198,7 @@ These four hard hooks are part of every agent's operating contract with the fram
 
 **When it fires:** At the start of every session where the agent has `framework_root` declared in its AGENTS.md frontmatter.
 
-**Anchor:** `harness-session` — enforced only where a per-harness adapter binds the session-start lifecycle event; otherwise it falls back to `interpretation`. This is the framework's prime case of a `hard` hook whose anchor is *not* mechanically enforced: "hard" makes it always-active by config, but nothing forces it to fire. It is the canonical hardening target (see `adapters/`).
+**Anchor:** `interpretation` by default; hardened to `harness-session` where a per-harness adapter binds the session-start lifecycle event — the same rule as its sibling `estate-sync` hook, stated the same way (a review-loop finding caught the two session-start hooks carrying inverted default labels with no distinguishing principle; the principle is now uniform: an unadapted session-start hook's operative anchor IS interpretation, and `harness-session` names what an adapter provides, never a default). This remains the framework's prime case of a `hard` hook whose anchor is not mechanically enforced, and the canonical hardening target (see `adapters/`).
 
 This hook checks version drift in **two directions** along the same chain — *published source → local framework → domain*. The downward leg keeps a domain current with the framework copy it inhabits; the upward leg tells the operator when that framework copy is itself behind its published source.
 
