@@ -1,9 +1,13 @@
-"""Trigger evaluation — time, dependency, and threshold conditions.
+"""Trigger evaluation — time, dependency, threshold, and import conditions.
 
 Relationship triggers and `blocked_duration` need change history the floor
 does not keep; they are reported as not-mechanically-evaluable rather than
-silently skipped. Includes the deadline horizon scan over every non-terminal
-date-bearing thing.
+silently skipped. Import triggers key on the state imports-check computes —
+a live face read, crossed lazily at most once per run. Includes the deadline
+horizon scan over every non-terminal date-bearing thing. (The tenth review
+caught this docstring and the CLI help claiming three families while the
+code below evaluates four — an agent reading --help would re-derive import
+states by reasoning, duplicating a floor check.)
 """
 
 from __future__ import annotations

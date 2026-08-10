@@ -32,10 +32,15 @@ _FRAMEWORK_HARD_HOOKS = (
     "forced (`autopush-moves-the-deliberate-act`).\n"
     "- `session-start:version-check` — performed in **Session Start** above. "
     "Anchor: `harness-session`.\n"
+    # Anchor label below matches orchestration.md (the authority): interpretation
+    # by default, hardened to harness-session only where an adapter binds it.
+    # A tenth-review finding caught this string saying `harness-session` while
+    # the same file's Session Start step 0 said `interpretation` — two blocks of
+    # the one file every domain boots from disagreeing on the primary axis.
     "- `session-start:estate-sync` — sync before orienting, performed in **Session "
     "Start** step 0 above: fetch + ff-only pull, bounded; divergence and dirty trees "
-    "reported, never resolved; never pushes. Anchor: `harness-session` (an adapter "
-    "may run it; `interpretation` otherwise).\n"
+    "reported, never resolved; never pushes. Anchor: `interpretation` by default, "
+    "hardened to `harness-session` where an adapter binds it.\n"
     "- `pre-domain-scaffold:isolate` — new domains are born via `mdllm scaffold`. "
     "Anchor: `git-fs`.")
 

@@ -54,12 +54,12 @@ Every thing — regardless of domain or type — shares this YAML frontmatter st
 ---
 id: unique-kebab-case-identifier
 type: specification|skill|guide|manifesto|[domain-specific-type]
-status: draft|evolving|stable|deprecated
+status: draft|evolving|stable|deprecated|[domain-declared vocabulary]   # reserved types use the fixed sets; domain types use the domain's _schema.yaml declaration (default not-started/in-progress/... where undeclared) — never coerce a domain thing into lifecycle statuses
 version: 1.0
 created: YYYY-MM-DD
 tags: [tag1, tag2]
 priority: high|medium|low          # optional
-dependencies: [other-thing-id]     # optional; things that must exist first
+dependencies: [other-thing-id]     # optional; hard prerequisites — things that must FINISH first (floor-enforced: a terminal thing may not depend on unfinished work); for soft association use linked_things
 linked_things:
   - id: related-thing-id
     relation: informs|implements|extends|complements|references|documents
@@ -104,6 +104,8 @@ This is where the reasoning lives — not just the data.
 | Significantly changing a rule, workflow, or thing the domain reasons from; reconciling a change across its dependents | `change-reconciliation.md` |
 | Periodic quality reflection | `retrospective.md` |
 | Creating things with triggers or evaluating trigger conditions | `trigger-specification.md` |
+| Building a pattern library; teaching by worked examples (`type: example`) | `example-things.md` |
+| Applying or defining multi-lens reasoning; surfacing lens conflicts | `reasoning-lenses.md` |
 | Reflexive behaviour at scale; trigger/schema/relationship indexes; index drift | `derived-index.md` |
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 | Multi-stage, multi-session process instances; workflow run-state; stage cursors | `workflow-state.md` |
@@ -140,7 +142,7 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 The framework defines itself through these interconnected specifications:
 
 ### Foundational
-- **llm-driven-systems.manifesto.md** — Philosophy, paradigm shift, core principles. The "why." (`type: manifesto`, `status: stable`)
+- **llm-driven-systems.manifesto.md** — Philosophy, paradigm shift, core principles. The "why." (`type: manifesto`, `status: evolving`)
 - **thing.md** — The atomic unit specification: schema definition, field reference, cohesion and decomposition principle. (`type: specification`, `status: evolving`)
 
 ### Operational
@@ -148,9 +150,9 @@ The framework defines itself through these interconnected specifications:
 - **write.thing.md** — How LLMs create, update, and manage things. (`type: specification`, `status: stable`)
 - **validate.thing.md** — How to validate thing integrity (structural, referential, semantic). (`type: specification`, `status: stable`)
 - **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: stable`)
-- **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: stable`)
+- **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: evolving`)
 - **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: evolving`)
-- **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things (kept live by the thing graph) and the generated **orient** view of open loops that replaces the retired `continuity.md`. Defines the session-end extraction ritual (invoked via the `session-end-continuity` bound prompt — explicit, not automatic). (`type: specification`, `status: stable`)
+- **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things (kept live by the thing graph) and the generated **orient** view of open loops that replaces the retired `continuity.md`. Defines the session-end extraction ritual (invoked via the `session-end-continuity` bound prompt — explicit, not automatic). (`type: specification`, `status: evolving`)
 - **belief-revision.md** — How the framework handles contradictions between things: `type: conflict`, `relation: supersedes`/`contradicts`, and the belief revision process. (`type: specification`, `status: stable`)
 - **retrospective.md** — Periodic domain quality reflection: `type: retrospective`, when to write one, and how it produces insights, surfaces latent conflicts, and improves reasoning over time. (`type: specification`, `status: stable`)
 - **framework-discovery.md** — How domain agents locate the framework root and foundational specs. (`type: specification`, `status: stable`)
@@ -169,7 +171,7 @@ The framework defines itself through these interconnected specifications:
 - **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
 - **docs/operator-guide.md** — Human-facing: what working in a domain feels like since v3, the mdllm toolbox with scenarios, and what remains the operator's job. The specs are agent-first; this is the human's walkthrough. (`type: guide`, `status: draft`)
-- **docs/first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: draft`)
+- **docs/first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: evolving`)
 - **docs/framework-map.md** — Visual architecture map (Mermaid): the five-band elevation, the spec-layer dependency graph, and the mdllm subcommand → spec mapping. Derived from frontmatter links, `mdllm --help`, and the tier table; the frontmatter wins on disagreement. (`type: guide`, `status: draft`)
 
 ### Deferred (Spec When Foreseeable, Deploy When Felt)

@@ -61,16 +61,18 @@ relations:
 # write-cascade that introduces it — the judgment that it belongs is the point;
 # never auto-sync. Bootstrap/audit the in-use set with
 # `mdllm index . rebuild --signal schema`.
+# (version / confidence / tags / priority left this list at v3.30.1: they are
+# thing.md's Recommended vocabulary, admitted to the tool's CORE_FIELDS by the
+# ninth review — a domain must never be made to register the framework's own
+# vocabulary, and this file restating them was the pattern its own header
+# disclaims.)
 known_fields:
-  - version         # spec/manifesto/skill semantic version
   - session         # session number a thing was created in
-  - confidence      # insight confidence (belief-revision)
   - source          # insight/decision enum: who surfaced it (human|agent|both|build|operator).
                     # Ruled 2026-08-04 (framework-retrospective-2026-08a): domain provenance
                     # uses the core source_domain, never this field; free-text session
                     # descriptions belong in `session` + body. Pre-ruling free-text values
                     # on eval-era insights stand as historical records.
-  - tags            # free classification
   - domain          # domain a thing belongs to
   - period_start    # retrospective / measurement window
   - period_end
@@ -79,5 +81,4 @@ known_fields:
   - resolved_by     # conflict resolver (decision id)
   - decided_by      # decision author/authority
   - promoted_to     # insight -> spec promotion target
-  - priority        # plan/task priority
   - completed       # ISO date a plan reached completed status (registered 2026-08-04, estate-cadence-cluster close — the field-registration sensor caught its own builder a third time)

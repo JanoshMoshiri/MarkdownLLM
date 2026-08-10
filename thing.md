@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.19
+version: 2.20
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -28,7 +28,7 @@ linked_things:
 
 **Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned. A type may also declare `terminal_statuses` — which of its own statuses mean *settled*; the declaration replaces the universal terminal set for that type, and every forward-work check (orientation, triggers, cascade) reads it through one `is_terminal`. Not declarable on reserved types (the tool owns their settled sets).
 
-**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `specification`/`guide`/`manifesto`. Domain-usable with fixed vocabulary: `skill`/`prompt` (lifecycle statuses, tool-owned). Generated: `index`. The tool's `RESERVED_STATUSES` is the authority on this set — restated lists have lagged it on three surfaces at once.
+**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `guide`/`manifesto`. `specification`: framework specs + a domain's scaffold-delivered specification skill, nothing else. Domain-usable with fixed vocabulary: `skill` (read/write/workflow skills)/`prompt` (lifecycle statuses, tool-owned). Generated: `index`. The tool's `RESERVED_STATUSES` is the authority on this set — restated lists have lagged it on three surfaces at once.
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
 
@@ -92,8 +92,9 @@ These fields must be present in every thing to do:
   - `workflow-definition` — a reusable process skeleton with its stages expressed as data and the transitions allowed between them
   - `workflow-run` — one live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative
   - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, `provenance.md`, and `workflow-state.md` for full specifications.
-- Three types are **framework-internal**: `specification`, `guide`, and `manifesto`. These are used by the framework's own spec files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
-- Two types are **framework-defined and domain-usable with a fixed vocabulary**: `skill` (a domain's four skill files) and `prompt` (the reasoning prompts in `prompts/`). They carry the same lifecycle vocabulary as the internal types, built into the tool; domains use them freely but cannot redeclare their statuses. (Classified explicitly in the 2026-08-09 substrate reconciliation — they previously carried a fixed vocabulary without belonging to any named category.)
+- Two types are **framework-internal**: `guide` and `manifesto`. These are used by the framework's own files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
+- `specification` is framework-defined with the same lifecycle vocabulary and has exactly **two legitimate homes**: the framework's own spec files, and a domain's *specification skill* — the one scaffold-delivered file that states why the domain exists (`templates/domain-specification.skill.md.template` types it `specification`, and every scaffolded domain carries it that way). Any other domain use is misuse. *(The tenth review caught v2.18's "framework-internal only" claim contradicting the scaffold's own delivery — the classification followed neither the template nor the estate; this one follows both.)*
+- Two types are **framework-defined and domain-usable with a fixed vocabulary**: `skill` (a domain's read, write, and workflow skills — the specification skill is `type: specification`, above) and `prompt` (the reasoning prompts in `prompts/`). They carry the same lifecycle vocabulary, built into the tool; domains use them freely but cannot redeclare their statuses.
 - One type is **framework-generated**: `index`. An index thing is a regenerable cache that aggregates one signal (triggers, relationships, schema fields, provenance) across a domain's things, living in `things/_index/`. It is produced by the agent, not authored by hand, and uses status `live`/`stale`. The things are always the source of truth; the index is a derived copy. Full specification: `derived-index.md` (the signal set is the tool's — `mdllm index` — not this list).
 
 **status** (string)

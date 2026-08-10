@@ -8,7 +8,8 @@ Subcommands:
   validate [path]      Levels 1-3 mechanical validation. Exit 1 on Errors.
                        Example domains under <path>/examples/ are validated
                        as their own corpora in the same run.
-  triggers [path]      Evaluate time/dependency/threshold trigger conditions;
+  triggers [path]      Evaluate time/dependency/threshold/import trigger
+                       conditions (import = live face reads via imports-check);
                        relationship triggers (and blocked_duration) are listed
                        as not mechanically evaluable — left to the agent.
   index    [path] check|rebuild [--signal triggers|schema|relationships|provenance]
