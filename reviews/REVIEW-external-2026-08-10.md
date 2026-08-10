@@ -1,5 +1,12 @@
 # External Assessment — 2026-08-10 (literature-grounded, post-v3.30.1)
 
+**Numbering note (added 2026-08-11):** this record claims no ordinal. A
+concurrent defect-hunting review loop (round-1 at `4f7fcd5`, sealing its own
+record at loop termination) has independent claim to "tenth." Review numbering
+is a restated fact with no single owner — the exact class this assessment is
+about — so the ordinal is deferred to the operator; this file's identity is its
+date and kind: the external positioning read.
+
 **Reviewer:** external assessment session (Fable, commissioned by the operator with
 the question "is the vision realistic, or am I a dreamer?" after the v3.30.x
 defect wave). Different in kind from reviews 1–9: not a defect hunt but a

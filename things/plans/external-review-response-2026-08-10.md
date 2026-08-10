@@ -78,3 +78,8 @@ extending it is the operator's voice, routed here, not performed.
 - [ ] R3 routed by the operator (cadence home chosen, or consciously declined)
 - [ ] R4 re-judged after the R1 promotions ship
 - [ ] Manifesto Standing-on-Shoulders extension written or consciously declined
+- [ ] Review-ordinal collision resolved by the operator: a concurrent review
+      loop (round-1, `4f7fcd5`) and this assessment both landed 2026-08-10 with
+      implicit claim to "tenth"; the loop's seal and this record need one
+      numbering authority (candidate fix: reviews stop carrying ordinals and
+      are identified by date + kind — an ordinal is a hand-restated count)
