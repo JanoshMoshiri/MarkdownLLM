@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T12:15:02
-generated_from: HEAD@6c28ed2
-coverage: 165
+generated: 2026-08-11T12:18:08
+generated_from: HEAD@06fab20
+coverage: 166
 framework_version: 3.31.0
 ---
 
@@ -267,6 +267,7 @@ framework_version: 3.31.0
 - external-review-response-2026-08-10 --references--> coherence-is-a-maintained-rate-not-a-state
 - external-review-response-2026-08-10 --references--> hook-enforcement-has-three-anchors
 - external-review-response-2026-08-10 --references--> an-adversarial-review-loop-converges-on-its-own-fix-residue
+- external-review-response-2026-08-10 --references--> inbound-edges-decide-which-plan-survives-consolidation
 - felt-deployment-lands-in-undisclosable-work --references--> llm-driven-systems-manifesto
 - felt-deployment-lands-in-undisclosable-work --complements--> structure-decides-figures-scale-decides-convention
 - first-2x2-measured-convention-following-not-reasoning --extends--> fixture-fixes-correct-bugs-not-difficulty
@@ -343,6 +344,9 @@ framework_version: 3.31.0
 - hook-enforcement-has-three-anchors --informs--> orchestration-specification
 - hook-enforcement-has-three-anchors --supports--> agents-md-discovery-is-harness-dependent
 - hook-enforcement-has-three-anchors --supports--> portability-claims-need-execution-tests
+- inbound-edges-decide-which-plan-survives-consolidation --references--> external-review-response-2026-08-10
+- inbound-edges-decide-which-plan-survives-consolidation --references--> coherence-mechanism-build
+- inbound-edges-decide-which-plan-survives-consolidation --supports--> divergence-is-an-unrouted-decision
 - independent-review-2026-06-11-fable --complements--> framework-retrospective-2026-06
 - independent-review-2026-06-11-fable --informs--> agents-md-discovery-is-harness-dependent
 - independent-review-2026-06-12-fable --extends--> independent-review-2026-06-11-fable

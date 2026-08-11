@@ -7,7 +7,6 @@ created: 2026-08-10
 origin: external
 verified: true
 verified_by: Janosh Moshiri
-verified_date: 2026-08-11
 linked_things:
   - id: external-review-response-2026-08-10
     relation: informs

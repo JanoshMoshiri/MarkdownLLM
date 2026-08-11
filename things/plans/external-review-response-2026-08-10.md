@@ -22,6 +22,9 @@ linked_things:
   - id: an-adversarial-review-loop-converges-on-its-own-fix-residue
     relation: references
     notes: "The loop's measured result supplied R3's dose–response evidence and superseded this plan's build sequencing"
+  - id: inbound-edges-decide-which-plan-survives-consolidation
+    relation: references
+    notes: "This plan is that insight's instance — shrunk to residue rather than retired, because coherence-mechanism-build delegates R3/R4 to it by name"
 ---
 
 # External Review Response — Residue
@@ -60,6 +63,16 @@ ingredient a general "review" does not reproduce. **Still open and the
 operator's:** where the ritual lives — `retrospective.md`'s cadence doctrine, a
 standing note in `reviews/` practice, or consciously declined as prose the
 operator reliably performs.
+
+*Scope note for whoever settles it:* the `reviews/` corpus now holds two
+distinct instruments, and the cadence decision should not conflate them. The
+**defect read** (reviews 1–9, the loop) hunts internal contradictions against
+the corpus and yields fixes; its measured cadence is one blind read per
+substantial release. The **positioning read** (`external-review-2026-08-10`)
+tests the framework's claims against outside literature and yields doctrine,
+not fixes — it produced two insights and no contradictions. Different question,
+different yield, and almost certainly a much longer interval: it earns its cost
+when the thesis is challenged or at a major version boundary, not per release.
 
 **R4 — walk attestation, held.** A session-gate-shaped Warning for
 definition-surface commits carrying no recorded walk. The hold stands and its
