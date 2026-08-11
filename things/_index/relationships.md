@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T08:31:20
-generated_from: HEAD@905c914
-coverage: 160
+generated: 2026-08-11T11:15:25
+generated_from: HEAD@3e1a25d
+coverage: 161
 framework_version: 3.31.0
 ---
 
@@ -579,6 +579,14 @@ framework_version: 3.31.0
 - vantage-brief-cluster --implements--> provenance-specification
 - vantage-brief-cluster --implements--> session-memory-specification
 - vantage-brief-cluster --references--> substrate-currency-sweep
+- vendor-harness-adapter-foundation --implements--> orchestration-specification
+- vendor-harness-adapter-foundation --extends--> framework-discovery-specification
+- vendor-harness-adapter-foundation --extends--> domain-refresh-specification
+- vendor-harness-adapter-foundation --implements--> hook-enforcement-has-three-anchors
+- vendor-harness-adapter-foundation --implements--> portability-claims-need-execution-tests
+- vendor-harness-adapter-foundation --references--> agents-cannot-self-install-permission-bearing-hooks
+- vendor-harness-adapter-foundation --references--> a-layered-harness-is-a-co-author-not-a-substrate
+- vendor-harness-adapter-foundation --implements--> relative-path-hooks-break-in-nested-domain-repos
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification
