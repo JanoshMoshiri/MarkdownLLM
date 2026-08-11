@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -31,6 +31,9 @@ linked_things:
   - id: relative-path-hooks-break-in-nested-domain-repos
     relation: implements
     notes: "Makes stable root and runtime resolution a shared port rather than a per-adapter path convention."
+  - id: codex-port-challenge-2026-08-11
+    relation: references
+    notes: "Phase 2B evidence: official Codex constraints, accepted port corrections, managed-shell runtime failures, and the Phase 6 checklist."
 ---
 
 # Vendor Harness Adapter Foundation
@@ -43,13 +46,32 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** the Claude Code agent owns Phase A, Phases
-0–1, and the Claude portions of Phase 2. The Codex agent owns the Phase 2 port
-challenge and the final handoff acceptance, then Phases 3–5. Claude pauses
-before the Phase 2 port challenge, resumes only after Codex returns the port
-constraints, and stops again after extracting Claude. No inference from phase
+**Current execution boundary:** Phase 2B is complete. The Claude Code agent
+next owns the reopened Phase 1 acceptance defects and Phase 2C extraction.
+The Codex agent stops until both are committed, then owns the final handoff
+acceptance and, only if that gate passes, Phases 3–5. No inference from phase
 order is permitted; the ownership and stop conditions below are part of the
 plan.
+
+## Amendment record — v1.5 (2026-08-11, Codex Phase 2B)
+
+The Codex agent challenged the draft ports against the official Codex hooks
+shape, in memory only, and created no project `.codex/` state. The render /
+inspect / later-probe / later-merge separation survived, with six corrections
+recorded in `evidence/codex-port-challenge-2026-08-11.md`: immutable complete
+lifecycle bindings, a host-independent render context, pure reusable
+rendering, renderer-derived inspection currency, explicit invalid/unreadable
+facts, and truthful lifecycle-only capability claims. Phase 2B is closed and
+returned to Claude for extraction.
+
+The handoff audit also reopened Phase 1 acceptance. The POSIX hook resolver
+uses external `dirname`, which is absent in the Codex managed Git-hook shell;
+the PowerShell candidates are not all dependency-probed; and runtime-probe
+does not yet return the required command-executed fact. These are shared
+runtime defects and are explicitly returned to Claude's Phase 1 slice rather
+than bypassed in a Codex adapter. The Phase 0 evidence count was corrected to
+the live 11 standard settings + one local settings + one absent shape, and its
+two text-normalising golden assertions were strengthened.
 
 ## Amendment record — v1.4 (2026-08-11)
 
@@ -485,17 +507,20 @@ meets in the first minute, before any adapter exists to fail.
 
 ### Phase 1 — Repair the shared runtime port (implementer: Claude Code agent; acceptance: Codex agent)
 
-- [x] Give root and nested-domain launchers one runtime-resolution service.
+- [ ] Give root and nested-domain launchers one runtime-resolution service.
   Resolve both the domain-local environment and the framework-root environment
-  derived from the CLI path.
-- [x] Keep PowerShell and POSIX entry paths behaviourally equivalent; avoid
+  derived from the CLI path. **[v1.5 acceptance reopening:]** the implementation
+  exists, but its emitted POSIX resolver cannot derive the framework root in
+  the Codex managed Git-hook shell because `dirname` is unavailable.
+- [ ] Keep PowerShell and POSIX entry paths behaviourally equivalent; avoid
   absolute installation paths and vendor cache paths.
-- [x] Make `install-hook` execution-test the emitted pre-commit hook where Git
+- [ ] Make `install-hook` execution-test the emitted pre-commit hook where Git
   supports it. Return/test a vendor-neutral runtime probe result that
   distinguishes interpreter-found, dependency-loaded, and command-executed;
   preserve the current doctor presentation until Phase 3 settles the
-  user-facing diagnostic vocabulary.
-- [x] **[v1.2]** Fix the resolution defect in the *emitted hook body*, not only
+  user-facing diagnostic vocabulary. **[v1.5:]** execution-testing exists, but
+  runtime-probe still lacks the command-executed fact.
+- [ ] **[v1.2]** Fix the resolution defect in the *emitted hook body*, not only
   in doctor's report: add the framework-root environment (derived from the
   `$MDLLM` path, which is the only place that knows where the framework is) to
   the candidate list, and strengthen the candidate probe from `import sys` to
@@ -504,7 +529,9 @@ meets in the first minute, before any adapter exists to fail.
   cause that is not the cause.
 - [x] Add a reproducible directly-opened nested-domain runtime/commit probe.
   The Codex agent executes it in the managed shell during Phase 2B and again
-  at final acceptance; Claude does not self-certify that environment.
+  at final acceptance; Claude does not self-certify that environment. **[v1.5:]
+  the probe now reproduces the shared resolver failure; its existence is
+  complete, its acceptance result is not.**
 
 **Gate [v1.4]:** in the Claude-side environment, the framework and a nested
 domain both execute validation and a real pre-commit through the same
@@ -528,18 +555,22 @@ but no production Claude path has moved.
 
 #### Phase 2B — Challenge the port shape (owner: Codex agent)
 
-- [ ] Test the draft against current official Codex lifecycle semantics with a
+- [x] Test the draft against current official Codex lifecycle semantics with a
   non-installed probe or temporary renderer; create no project `.codex/`
   state and do not ship an adapter.
-- [ ] Record the official Codex hook documentation date and the live-harness
+- [x] Record the official Codex hook documentation date and the live-harness
   checklist used by the challenge; do not encode undocumented assumptions.
-- [ ] Return only constraints evidenced by the second vendor shape. Each
+- [x] Return only constraints evidenced by the second vendor shape. Each
   constraint that changes a port survives as a committed contract test or
   evidence record; discard incidental spike code.
-- [ ] Stop and return the accepted port contract to the Claude Code agent.
+- [x] Stop and return the accepted port contract to the Claude Code agent.
 
 **Gate:** the port can express both vendor shapes without importing either
 adapter schema into the application contract.
+
+**Outcome [v1.5]:** passed. The accepted constraints and official evidence are
+in `evidence/codex-port-challenge-2026-08-11.md`. This does not pass the
+reopened Phase 1 gate or the final A/0–2 handoff gate.
 
 #### Phase 2C — Extract Claude without changing Claude (owner: Claude Code agent)
 

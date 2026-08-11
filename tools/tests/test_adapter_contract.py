@@ -80,9 +80,9 @@ def _rel_fw(target: Path) -> str:
 
 def test_scaffold_settings_matches_golden(tmp_path):
     target = _scaffold(tmp_path)
-    golden = (FIXTURES / "claude_golden" / "settings.json.golden").read_text(
-        encoding="utf-8").replace("{rel_fw}", _rel_fw(target))
-    emitted = (target / ".claude" / "settings.json").read_text(encoding="utf-8")
+    golden = (FIXTURES / "claude_golden" / "settings.json.golden").read_bytes()
+    golden = golden.replace(b"{rel_fw}", _rel_fw(target).encode("utf-8"))
+    emitted = (target / ".claude" / "settings.json").read_bytes()
     assert emitted == golden, "Claude adapter bytes changed — Phase 2C regression"
 
 
@@ -102,9 +102,10 @@ def test_scaffold_completion_guidance_frozen(tmp_path, capsys):
     _scaffold(tmp_path)
     out = capsys.readouterr().out
     golden = (FIXTURES / "claude_golden" / "scaffold-guidance.golden").read_text(
-        encoding="utf-8").strip()
-    # The guidance is printed wrapped; compare whitespace-normalised.
-    assert " ".join(golden.split()) in " ".join(out.split())
+        encoding="utf-8").rstrip("\r\n")
+    emitted = next(line for line in out.splitlines()
+                   if "hardened out of the box:" in line)
+    assert emitted == golden
 
 
 # --------------------------------------------------------- 2. estate shapes

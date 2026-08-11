@@ -27,13 +27,16 @@ was not part of the contract being preserved.
 | `.claude/commands/*.md` | copies of `templates/commands/*` | `test_scaffold_commands_are_template_copies` (template is the golden) |
 | Scaffold completion guidance | `scaffold.py` stdout | `claude_golden/scaffold-guidance.golden` + test |
 | Doctor's adapter reading | `doctor.py` (`SessionStart` key presence) | `test_doctor_current_reading_of_each_shape` — pins the *present* presence-as-capability behaviour until Phase 3 replaces the vocabulary |
-| Estate configuration shapes | the live estate (operator-owned) | `tools/tests/fixtures/estate_shapes/*` — hooks-only ×9, permissions-only ×1, permissions-plus-hooks ×1, extended-startup ×1, plus absence |
+| Estate configuration shapes | the live estate (operator-owned) | `tools/tests/fixtures/estate_shapes/*` — representative hooks-only, permissions-only, permissions-plus-hooks, extended-startup, and absent shapes |
 | Lifecycle intents | application contract | `LIFECYCLE_INTENTS` in `test_adapter_contract.py` — session-start = (estate-sync, session-start) ordered; post-write = (validate,) advisory |
 | Example adapter | `adapters/claude-code.settings.example.json` | unchanged by this plan until Phase 7 reconciliation |
 
-Estate snapshot date: 2026-08-11, 12 of 13 domain repos carrying
-`.claude/settings.json` (shape distribution above, structure inspected, no
-content copied). Existing files are estate state, not generated cache.
+Estate snapshot date: 2026-08-11. Eleven of 13 domain repos carry
+`.claude/settings.json`, one carries `.claude/settings.local.json`, and one has
+neither. Across both filenames the structure is hooks-only ×8,
+permissions-only ×2, permissions-plus-hooks ×1, extended-startup ×1, and
+absence ×1 (structure inspected, no content copied). Existing files are estate
+state, not generated cache.
 
 ## Claude ordering guarantee (the fact the port must not generalise away)
 

@@ -34,28 +34,85 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from types import MappingProxyType
+from typing import Literal, Mapping, Protocol, runtime_checkable
 
-# The application contract: ordered framework acts per lifecycle moment.
+DOMAIN_ROOT_ARG = "{domain_root}"
+
+
+@dataclass(frozen=True)
+class LifecycleStep:
+    """One deterministic-floor invocation in an ordered lifecycle binding.
+
+    ``argv`` is inward-owned command data, not a shell string.  Adapters map
+    ``DOMAIN_ROOT_ARG`` to their stable repository-root expression and encode
+    the result for their own shell/config format.
+    """
+
+    operation: str
+    argv: tuple[str, ...] = (DOMAIN_ROOT_ARG,)
+
+
+@dataclass(frozen=True)
+class LifecycleBinding:
+    """Vendor-neutral policy for one lifecycle moment.
+
+    Tuple order is authoritative. ``delivery`` tells an adapter whether the
+    result belongs in startup context or post-action feedback. ``failure`` is
+    deliberately non-enforcing: harness hooks surface failures, while the Git
+    pre-commit hook remains the complete enforcement boundary.
+    """
+
+    moment: str
+    steps: tuple[LifecycleStep, ...]
+    delivery: Literal["context", "feedback"]
+    failure: Literal["surface-and-continue"] = "surface-and-continue"
+
+
+# The application contract: complete ordered invocations per lifecycle moment.
 # session-start's ordering is semantic — orientation reads the git log, and
 # the log is only whole after the fetch. post-write is advisory feedback; the
 # git pre-commit hook remains the complete enforcement boundary and is NOT a
 # harness intent (it is git-fs anchored, adapter-independent).
-LIFECYCLE_INTENTS: dict[str, tuple[str, ...]] = {
-    "session-start": ("estate-sync", "session-start"),
-    "post-write": ("validate",),
-}
+LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
+    LifecycleBinding(
+        moment="session-start",
+        steps=(LifecycleStep("estate-sync"), LifecycleStep("session-start")),
+        delivery="context",
+    ),
+    LifecycleBinding(
+        moment="post-write",
+        steps=(LifecycleStep("validate", (DOMAIN_ROOT_ARG, "--quiet")),),
+        delivery="feedback",
+    ),
+)
+
+# Phase 0 froze this compact view. Keep it as a derived, immutable compatibility
+# surface; the bindings above own arguments and delivery semantics.
+LIFECYCLE_INTENTS: Mapping[str, tuple[str, ...]] = MappingProxyType({
+    binding.moment: tuple(step.operation for step in binding.steps)
+    for binding in LIFECYCLE_BINDINGS
+})
 
 
 @dataclass(frozen=True)
 class HarnessContext:
-    """Everything a renderer may know about the domain being projected.
-    Mechanical facts only — no domain semantics, no vendor schema."""
-    domain_root: Path
-    framework_root_rel: str          # POSIX-style relative path to the framework
-    platform: str = "any"            # informational; renderers must stay portable
-    intents: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: dict(LIFECYCLE_INTENTS))
+    """Pure mechanical input to a projection — no host or vendor state.
+
+    ``framework_root_rel`` is POSIX-style and relative to the domain Git root.
+    A renderer must emit every target-platform variant it supports regardless
+    of the host doing the rendering; absolute paths and host inspection do not
+    belong in this context.
+    """
+
+    framework_root_rel: str
+    bindings: tuple[LifecycleBinding, ...] = LIFECYCLE_BINDINGS
+
+    def binding(self, moment: str) -> LifecycleBinding:
+        for item in self.bindings:
+            if item.moment == moment:
+                return item
+        raise KeyError(moment)
 
 
 @dataclass(frozen=True)
@@ -63,9 +120,8 @@ class AdapterCapabilities:
     """What one adapter implements. Unsupported is data, never an exception —
     Liskov: every adapter answers the same questions honestly."""
     harness: str                     # e.g. "claude-code" — display identity only
-    lifecycle_events: tuple[str, ...] = ()   # intents it can bind mechanically
-    shortcuts: bool = False          # deliberate-ritual projections (commands)
-    notes: str = ""                  # honest caveats, e.g. ordering mechanism
+    lifecycle_moments: tuple[str, ...] = ()  # inward moments it binds mechanically
+    notes: str = ""                  # display only; never a diagnostic status
 
 
 @dataclass(frozen=True)
@@ -74,9 +130,26 @@ class ManagedFragment:
     `current` compares against what the SAME adapter's renderer would emit
     now — currency is derived from the renderer, never hand-maintained."""
     path: str                        # repo-relative artifact path
-    present: bool
-    current: bool | None = None      # None = present but not comparable
+    present: bool                    # managed fragment is present
+    artifact_present: bool = True    # containing config artifact exists
+    readable: bool | None = None     # None when artifact is absent
+    valid: bool | None = None        # None when absent or unreadable
+    current: bool | None = None      # None when fragment absent/unreadable/invalid
     intents_realised: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    issues: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.artifact_present and (self.present or any(
+                value is not None for value in
+                (self.readable, self.valid, self.current))):
+            raise ValueError("an absent artifact has no fragment or file facts")
+        if not self.present and self.current is not None:
+            raise ValueError("an absent managed fragment has no currency")
+        if self.readable is False and any(
+                value is not None for value in (self.valid, self.current)):
+            raise ValueError("an unreadable fragment has no validity/currency")
+        if self.valid is False and self.current is not None:
+            raise ValueError("an invalid fragment has no currency")
 
 
 @dataclass(frozen=True)
@@ -92,14 +165,18 @@ class InspectionReport:
     #                                          fragments, e.g. an extra flag on
     #                                          a startup command — reported,
     #                                          never normalised
+    findings: tuple[str, ...] = ()           # cross-fragment ambiguity/warnings
 
 
 @runtime_checkable
 class RenderPort(Protocol):
-    """Produce NEW-project managed artifacts from a context. Returns
-    repo-relative path -> exact bytes; writing them is the caller's act.
-    Never called against a directory that already has adapter artifacts —
-    that is inspection (here) or merge (Phase 5)."""
+    """Purely project managed artifacts from a context.
+
+    Returns repo-relative path -> exact bytes; it never reads or writes the
+    filesystem. The same projection is therefore safe to call for a new
+    project or to derive desired bytes for currency/merge comparison. Writing
+    or merging them is a separate caller's act.
+    """
 
     def capabilities(self) -> AdapterCapabilities: ...
 
@@ -109,9 +186,12 @@ class RenderPort(Protocol):
 @runtime_checkable
 class InspectPort(Protocol):
     """Parse existing artifacts without changing them. Must succeed (with an
-    honest report) on every estate shape: absent, standard, composite,
-    locally extended, invalid."""
+    honest report) on every expected estate shape: absent, unreadable,
+    malformed, schema-invalid, standard, composite, and locally extended.
+    ``context`` lets inspection derive currency from the same renderer instead
+    of maintaining a second expected fragment."""
 
     def capabilities(self) -> AdapterCapabilities: ...
 
-    def inspect(self, domain_root: Path) -> InspectionReport: ...
+    def inspect(self, domain_root: Path,
+                context: HarnessContext) -> InspectionReport: ...
