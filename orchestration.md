@@ -109,7 +109,7 @@ drift later, so a skipped hook degrades gracefully rather than corrupting.
 | `session-start:version-check` | interpretation → harness-session (adapter) | interpretation | Low — stale version; validation catches breaks later |
 | `session-start:estate-sync` | interpretation → harness-session (adapter) | interpretation (adapters bind it where installed) | Moderate — orientation reads a stale log; an unpulled checkout orients on a past domain |
 | `session-start`, `session-end` | harness-session | interpretation | **Moderate** — the state is regenerable from git, but the session *acts on the misread live*: two 2026-08-08 field incidents (an orientation the operator could not follow; a write made without the workflow skill's authorisation step) trace to skipped session-start steps |
-| `post-write` | git/fs (file write) | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
+| `post-write` | interpretation (act) — git-fs is only the pre-commit drift net | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
 | `post-commit` | git/fs | ⚙️ git hook (mechanical — `mdllm autopush`, the publication leg; v3.26.0) | Low — publication debt, surfaced by `estate-sync --status` |
 | `on-create`, `on-status-change`, `on-error`, `retrospective` | interpretation (semantic) | interpretation — no mechanical detector possible | Moderate — downstream not cascaded |
 | reasoning prompts (`cascade-completion`, `evaluate-triggers`, `surface-attention`, `detect-conflicts`, `session-orientation`, `domain-velocity`, `review-schema-coherence`, `session-end-continuity`) | interpretation | interpretation — they *are* reasoning | Low–Moderate |

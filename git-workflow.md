@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: 1.4
+version: 1.5
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -28,7 +28,7 @@ linked_things:
 # Git Workflow
 
 <!-- kernel -->
-**The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit all read committed state only.
+**The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit are *defined over* committed state — the evaluators read the tree as it stands, and the `post-write:commit` invariant is what makes tree and HEAD coincide; a fired trigger on a dirty tree evidences a discipline breach, not committed state.
 
 **Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
 
@@ -147,7 +147,7 @@ Commit messages in this framework are not about files — they're about domain s
 | `cancel` | Thing cancelled | `cancel: legacy-migration — no longer needed` |
 | `archive` | Thing archived or moved | `archive: q1 completed projects` |
 | `validate` | Validation fixes applied | `validate: fixed 3 broken links` |
-| `session-end` | Uncommitted changes at session close | `session-end: changes from session 2 (19 May)` |
+| `session-end` | The session-end ritual's closing commit — harvest, dispositions, open-loop updates; the delimiter `mdllm worklog` groups sessions on and the window `session-start`'s flip-surfacing reads from. Stray uncommitted changes found at close are swept into it and named — finding them is a `post-write:commit` breach worth noting, not the row's definition (this row defined session-end as the anomaly case for ten releases while every other surface and the tool treated it as the routine closer — a review-loop finding) | `session-end: 2026-08-09 — the substrate reconciliation sealed and rolled out` |
 | `framework` | Changes to skills, agent, or framework files | `framework: update write.thing.md — add trigger evaluation` |
 
 ### Multi-Thing Commits
@@ -486,7 +486,7 @@ in the commit message body.
 
 ### With Triggers (thing.md)
 
-Triggers evaluate against committed state. A dependency trigger watching for `status: completed` doesn't fire on a file save — it fires when the commit containing that status change is made. This means commit discipline directly affects trigger reliability.
+Triggers are *defined over* committed state — but the evaluator (`mdllm triggers`) reads frontmatter from the working tree as it stands, uncommitted included; it is the `post-write:commit` invariant, not the tool, that makes tree and HEAD coincide. A dependency trigger watching for `status: completed` therefore *can* fire on an uncommitted status change if the invariant was breached — treat a fired trigger on a dirty tree as evidence of the breach, never as proof of committed state. Commit discipline directly affects trigger reliability; the guarantee is the discipline's, and stating it as the tool's mechanics was a ten-release misclaim (review-loop finding).
 
 ### With interface.md
 
