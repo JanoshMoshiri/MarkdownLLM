@@ -63,17 +63,24 @@ def test_probe_resolves_only_on_dependency(tmp_path):
     assert result["resolved"] is not None  # the suite's own env proves it
 
 
-def test_probe_reports_command_executed_as_its_own_fact(tmp_path):
+def test_probe_reports_command_executed_as_its_own_fact(tmp_path, monkeypatch):
     # 2B acceptance finding: importing the dependency proves the environment,
     # not that the floor CLI runs. The probe must execute the real entry under
     # the resolved interpreter and report that as a third, unpromoted fact.
+    # Candidates are injected at the declared boundary (v1.6 return item 4):
+    # the suite's own interpreter is the one floor-capable candidate every
+    # harness running these tests is guaranteed to have — the test must not
+    # borrow a PyYAML-capable PATH interpreter from the authoring harness.
+    monkeypatch.setattr(runtime, "interpreter_candidates",
+                        lambda root, fw: [sys.executable])
     result = runtime.probe(tmp_path, Path(mdllm.__file__), dependency="yaml")
+    assert result["resolved"] == sys.executable
     assert result["command_executed"] is True
     # A resolved interpreter with a broken entry is executed=False, not True:
     broken = tmp_path / "not-mdllm.py"
     broken.write_text("import sys\nsys.exit(3)\n", encoding="utf-8")
     result = runtime.probe(tmp_path, broken, dependency="yaml")
-    assert result["resolved"] is not None
+    assert result["resolved"] == sys.executable
     assert result["command_executed"] is False
 
 
@@ -110,10 +117,18 @@ def test_every_hook_body_carries_the_shared_fragment_once():
 
 
 def test_powershell_entry_probes_the_dependency():
+    # Every candidate branch is pinned (v1.6 return item 4): the launcher has
+    # exactly three execution paths — repository venv, PATH python/python3
+    # loop, and the py -3 fallback — and each must probe the dependency
+    # before executing the entry. A fourth unprobed branch fails the count.
     ps1 = (Path(mdllm.__file__).resolve().parent / "mdllm.ps1").read_text(
         encoding="utf-8")
-    assert "'import yaml'" in ps1
+    assert ps1.count("-c 'import yaml'") == 3
     assert "'import sys'" not in ps1
+    probes = [ln for ln in ps1.splitlines() if "-c 'import yaml'" in ln]
+    assert any("$venvPython" in ln for ln in probes)      # venv branch
+    assert any("$command.Source" in ln for ln in probes)  # PATH loop
+    assert any("-3" in ln for ln in probes)               # py launcher
 
 
 # ---------------------------------------------- nested-domain hook execution

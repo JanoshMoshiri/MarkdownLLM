@@ -16,7 +16,9 @@ import yaml
 
 from .adapters import get as get_adapter, names as adapter_names
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
-from .harness_ports import HarnessContext
+from .harness_ports import (
+    DiagnosticPresentationPort, HarnessContext, InspectPort,
+)
 from .model import parse_frontmatter
 from .repo import _version_lt
 from .scaffold import HOOK_BODY, MDLLM_ENTRY
@@ -235,17 +237,34 @@ def cmd_doctor(args) -> int:
                            f"run `mdllm domain-kernel .` and commit")
         else:
             report("OK", f"domain-kernel in sync ({len(present)} blocks)")
-        # Harness adapter advisory: the adapter owns its config format AND its
-        # presentation line (pinned until Phase 3 settles the diagnostic
-        # vocabulary); doctor only relays. Extensions are surfaced, never
-        # flattened. framework_root_rel is presentation-irrelevant here — the
-        # inspect currency check needs A context, and doctor reports
+        # Harness adapter advisory — neutral diagnostic logic over declared
+        # ports only (v1.6): the install decision and extension surfacing are
+        # doctor's; the vendor wording is adapter DATA via
+        # DiagnosticPresentationPort. An adapter offering neither port is
+        # skipped — absence of a capability is a valid answer, not a crash.
+        # framework_root_rel is presentation-irrelevant here: the inspect
+        # currency check needs A context, and doctor reports
         # installed/extended, not per-path currency, until Phase 3.
         rel_ctx = HarnessContext(
             framework_root_rel=str((ameta or {}).get("framework_root", "..")))
         for harness in adapter_names():
-            status, text = get_adapter(harness).doctor_line(root, rel_ctx)
-            report(status, text)
+            a = get_adapter(harness)
+            if not (isinstance(a, InspectPort)
+                    and isinstance(a, DiagnosticPresentationPort)):
+                continue
+            insp = a.inspect(root, rel_ctx)
+            frag = insp.fragments[0] if insp.fragments else None
+            installed = bool(frag and frag.present
+                             and "session-start" in frag.intents_realised)
+            words = a.diagnostic_presentation()
+            if installed:
+                text = words.installed
+                if insp.extensions:
+                    text += (f" — locally extended: {len(insp.extensions)} "
+                             f"deviation(s) preserved")
+                report("OK", text)
+            else:
+                report("--", words.absent)
 
     print(f"## Doctor Report — {root}\n")
     print("\n".join(lines))

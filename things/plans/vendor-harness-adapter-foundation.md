@@ -633,18 +633,18 @@ gate above must pass before Phase 3.
 **Final Codex acceptance [v1.6]: failed. Claude owns these return items before
 the next handoff:**
 
-- [ ] Declare every service-facing dependency as a narrow port (including
+- [x] Declare every service-facing dependency as a narrow port (including
   shortcut projection and scaffold presentation), and make doctor consume a
   neutral diagnostic contract instead of a vendor-owned `doctor_line`; do not
   make Codex imitate undocumented Claude methods.
-- [ ] Strengthen architecture fitness with a minimal registered adapter that
+- [x] Strengthen architecture fitness with a minimal registered adapter that
   implements only the declared contracts and is exercised through both
   scaffold and doctor.
-- [ ] Correct Claude inspection so token-prefix mutations, extra commands in a
+- [x] Correct Claude inspection so token-prefix mutations, extra commands in a
   managed group, duplicate matching groups, and operator-only hook events are
   reported respectively as stale/extended/ambiguous/managed-fragment-absent,
   never current.
-- [ ] Add the four currency/discovery regression cases and rerun the byte
+- [x] Add the four currency/discovery regression cases and rerun the byte
   golden, composite read-only, architecture, focused handoff, and full suites.
 
 ### Phase 3 — Build truthful harness diagnostics (owner: Codex agent)

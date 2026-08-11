@@ -109,3 +109,83 @@ def test_every_registered_adapter_satisfies_the_ports():
         assert isinstance(a, RenderPort) and isinstance(a, InspectPort)
         caps = a.capabilities()
         assert caps.harness == name
+
+
+# ---------------------------------------------------- port-only fake adapter
+# v1.6 return item 2: a minimal adapter implementing ONLY the declared
+# Render/Inspect contracts, registered and driven through the REAL scaffold
+# and doctor. If either service calls one undeclared method, this crashes —
+# the gate that would have caught the shortcut/guidance/doctor_line leak.
+
+
+class _PortOnlyAdapter:
+    name = "port-only-fake"
+
+    def capabilities(self):
+        from markdownllm.harness_ports import AdapterCapabilities
+        return AdapterCapabilities(harness=self.name)
+
+    def render(self, context):
+        return {}  # renders no managed artifacts — a valid, honest answer
+
+    def inspect(self, domain_root, context):
+        from markdownllm.harness_ports import (
+            InspectionReport, ManagedFragment)
+        return InspectionReport(
+            harness=self.name,
+            fragments=(ManagedFragment(
+                path="port-only.cfg", present=False,
+                artifact_present=False),))
+
+
+def _ns(**kw):
+    import argparse
+    return argparse.Namespace(**kw)
+
+
+def _git_repo(p: Path) -> None:
+    import os
+    import subprocess
+    for k in ("GIT_AUTHOR_NAME", "GIT_COMMITTER_NAME"):
+        os.environ.setdefault(k, "floor-tests")
+    for k in ("GIT_AUTHOR_EMAIL", "GIT_COMMITTER_EMAIL"):
+        os.environ.setdefault(k, "floor-tests@local")
+    subprocess.run(["git", "init", "-q"], cwd=p, check=True)
+    subprocess.run(["git", "config", "user.email", "t@t"], cwd=p, check=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=p, check=True)
+
+
+def test_port_only_adapter_survives_scaffold_and_doctor(tmp_path, capsys,
+                                                        monkeypatch):
+    import mdllm
+    from markdownllm import adapters
+    fake = _PortOnlyAdapter()
+    adapters.register(fake)
+    try:
+        # Doctor: iterates every registered adapter over a real domain dir.
+        # The fake offers no DiagnosticPresentationPort — skipped, no crash,
+        # and the default adapter's line still appears.
+        d = tmp_path / "doctor-target"
+        d.mkdir()
+        _git_repo(d)
+        (d / "AGENTS.md").write_text("---\nname: D\n---\n\n# D\n",
+                                     encoding="utf-8")
+        mdllm.cmd_doctor(_ns(path=str(d)))
+        out = capsys.readouterr().out
+        assert "no SessionStart adapter" in out  # default adapter unaffected
+        assert "port-only-fake" not in out       # fake silently capability-less
+
+        # Scaffold: the fake as DEFAULT harness end-to-end. Renders nothing,
+        # projects no shortcuts, prints no guidance — and the birth sequence
+        # still completes, because every capability call is isinstance-gated.
+        monkeypatch.setattr(adapters, "DEFAULT_HARNESS", fake.name)
+        _git_repo(tmp_path)
+        target = tmp_path / "port-only-birth"
+        rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+        out = capsys.readouterr().out
+        assert rc == 0
+        assert not (target / ".claude").exists()
+        assert not (target / ".github").exists()
+        assert "hardened out of the box" not in out
+    finally:
+        adapters.unregister(fake.name)

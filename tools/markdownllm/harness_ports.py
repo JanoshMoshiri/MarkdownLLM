@@ -196,3 +196,44 @@ class InspectPort(Protocol):
 
     def inspect(self, domain_root: Path,
                 context: HarnessContext) -> InspectionReport: ...
+
+
+# --------------------------------------------------------------------------
+# Service-facing ports (v1.6 return item 1). Every method a shared service
+# calls on an adapter is declared here — an adapter that implements only
+# Render/Inspect must pass through scaffold and doctor untouched, never crash
+# them. Services test each port with isinstance and skip what an adapter does
+# not offer; absence is a valid answer, not an error (Interface Segregation).
+
+
+@runtime_checkable
+class ShortcutPort(Protocol):
+    """Deliberate-ritual shortcut projections — inert files the operator
+    invokes by hand, a separate concern from lifecycle hooks. The adapter
+    owns only WHERE each template belongs; the caller owns placeholder
+    substitution and writing."""
+
+    def shortcut_sources(self, templates_root: Path) -> Mapping[str, Path]: ...
+
+
+@runtime_checkable
+class ScaffoldNoticePort(Protocol):
+    """One adapter-owned line for scaffold's completion output. Display data
+    only — never consulted for any decision."""
+
+    def scaffold_guidance(self) -> str: ...
+
+
+@dataclass(frozen=True)
+class DiagnosticPresentation:
+    """Adapter-supplied display strings for the shared doctor advisory —
+    data, not behaviour. The install decision, extension surfacing, and
+    status glyphs are doctor's neutral logic; only the vendor wording lives
+    in the adapter. Pinned until Phase 3 settles the diagnostic vocabulary."""
+    installed: str
+    absent: str
+
+
+@runtime_checkable
+class DiagnosticPresentationPort(Protocol):
+    def diagnostic_presentation(self) -> DiagnosticPresentation: ...

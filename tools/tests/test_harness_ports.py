@@ -94,6 +94,75 @@ def test_inspect_extended_startup_reports_not_flattens(tmp_path):
     assert any("--assistant" in e for e in r.extensions)
 
 
+def _mutated_standard(tmp_path, mutate):
+    import json as _json
+    src = _json.loads((FIXTURES / "estate_shapes" / "hooks-only.json")
+                      .read_text(encoding="utf-8"))
+    mutate(src)
+    dst = tmp_path / ".claude" / "settings.json"
+    dst.parent.mkdir(parents=True)
+    dst.write_text(_json.dumps(src, indent=2) + "\n", encoding="utf-8")
+    return ClaudeCodeAdapter().inspect(
+        tmp_path, hp.HarnessContext(framework_root_rel="../.."))
+
+
+# v1.6 return item 3 — the four false-current/discovery regression cases.
+
+
+def test_inspect_token_prefix_mutation_is_stale(tmp_path):
+    # `--quiet` -> `--quietly` shares a prefix but is a DIFFERENT token: a
+    # divergence, never an extension. Extensions exist only across a space.
+    def mutate(src):
+        g = src["hooks"]["PostToolUse"][0]["hooks"][0]
+        g["command"] = g["command"].replace("--quiet", "--quietly")
+    r = _mutated_standard(tmp_path, mutate)
+    frag = r.fragments[0]
+    assert frag.present and frag.current is False and frag.issues
+    assert not any("--quietly" in e for e in r.extensions)
+
+
+def test_inspect_extra_command_in_managed_group_is_stale(tmp_path):
+    # An appended command INSIDE the managed group changes what the managed
+    # moment does — exact hook counts, not zip-truncation.
+    def mutate(src):
+        src["hooks"]["PostToolUse"][0]["hooks"].append(
+            {"type": "command", "command": "python ../../tools/mdllm.py "
+                                           "coherence . --quiet"})
+    r = _mutated_standard(tmp_path, mutate)
+    frag = r.fragments[0]
+    assert frag.present and frag.current is False
+    assert any("count diverges" in i for i in frag.issues)
+
+
+def test_inspect_duplicate_managed_matcher_is_ambiguous(tmp_path):
+    # A second group repeating the managed matcher must be a finding, and the
+    # FIRST group's inspection must survive — never a silent overwrite.
+    def mutate(src):
+        src["hooks"]["PostToolUse"].append(
+            {"matcher": "Write|Edit",
+             "hooks": [{"type": "command", "command": "echo shadowed"}]})
+    r = _mutated_standard(tmp_path, mutate)
+    frag = r.fragments[0]
+    assert frag.present
+    assert frag.intents_realised["post-write"] == ("validate",)  # first wins
+    assert any("ambiguous" in f for f in r.findings)
+    assert frag.current is False  # ambiguity is not a current state
+
+
+def test_inspect_operator_only_hooks_have_no_managed_fragment(tmp_path):
+    # A config whose hooks are ALL operator-owned events carries no managed
+    # fragment: present must be False, not bool(hooks).
+    def mutate(src):
+        src["hooks"] = {"PreToolUse": [
+            {"matcher": "Bash", "hooks": [
+                {"type": "command", "command": "echo operator"}]}]}
+    r = _mutated_standard(tmp_path, mutate)
+    frag = r.fragments[0]
+    assert frag.artifact_present and frag.valid
+    assert frag.present is False and frag.current is None
+    assert any("PreToolUse" in e for e in r.extensions)
+
+
 def test_inspect_wrong_framework_path_is_stale(tmp_path):
     # 2C constraint closing a draft gap: a config whose commands point at a
     # DIFFERENT framework path realises the same operations but is NOT

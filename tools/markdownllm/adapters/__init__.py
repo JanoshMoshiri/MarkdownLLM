@@ -34,3 +34,16 @@ def get(name: str):
 
 def names() -> tuple[str, ...]:
     return tuple(sorted(_REGISTRY))
+
+
+def register(adapter) -> None:
+    """Add an adapter to the registry. The entry point for future harnesses —
+    and for the architecture fitness gate's port-only fake, which proves the
+    shared services never call beyond the declared contracts."""
+    _REGISTRY[adapter.name] = adapter
+
+
+def unregister(name: str) -> None:
+    """Remove a registered adapter (test teardown; never used in production
+    flow — an installed harness is removed by not registering it)."""
+    _REGISTRY.pop(name, None)

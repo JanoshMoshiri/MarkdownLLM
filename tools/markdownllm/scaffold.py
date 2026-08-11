@@ -16,9 +16,11 @@ from pathlib import Path
 
 import yaml
 
-from .adapters import DEFAULT_HARNESS, get as get_adapter
+from . import adapters as harness_adapters
 from .boundary import TERMS_FILE
-from .harness_ports import HarnessContext
+from .harness_ports import (
+    HarnessContext, RenderPort, ScaffoldNoticePort, ShortcutPort,
+)
 from .runtime import SH_RESOLVE, execution_test_hook
 from .domain_kernel import apply_domain_kernel, build_domain_kernel_blocks
 from .model import ID_RE, parse_frontmatter
@@ -235,13 +237,16 @@ def cmd_scaffold(args) -> int:
     # them). WHERE each file belongs is the adapter's knowledge; the placeholder
     # substitution and the writes stay here with every other template. The
     # auto-firing lifecycle adapter stays opt-in (hint printed below).
-    adapter = get_adapter(DEFAULT_HARNESS)
-    for relpath, src in adapter.shortcut_sources(templates).items():
-        dst = target / relpath
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        dst.write_text(instantiate(src.read_text(encoding="utf-8")),
-                       encoding="utf-8", newline="\n")
-        written.append(relpath)
+    # Every adapter capability is a declared port, tested with isinstance —
+    # an adapter without shortcuts simply projects none (v1.6).
+    adapter = harness_adapters.get(harness_adapters.DEFAULT_HARNESS)
+    if isinstance(adapter, ShortcutPort):
+        for relpath, src in adapter.shortcut_sources(templates).items():
+            dst = target / relpath
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_text(instantiate(src.read_text(encoding="utf-8")),
+                           encoding="utf-8", newline="\n")
+            written.append(relpath)
 
     # Reasoning prompts (orchestration.md): the generated session-start block
     # names `evaluate-triggers`, `surface-attention`, `session-orientation`,
@@ -282,11 +287,12 @@ def cmd_scaffold(args) -> int:
     # Scaffold writes directly (it runs as the tool, not through a
     # permissions-gated editor).
     ctx = HarnessContext(framework_root_rel=rel_fw)
-    for relpath, data in adapter.render(ctx).items():
-        dst = target / relpath
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        dst.write_bytes(data)
-        written.append(relpath)
+    if isinstance(adapter, RenderPort):
+        for relpath, data in adapter.render(ctx).items():
+            dst = target / relpath
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(data)
+            written.append(relpath)
 
     # Disclosure boundary (boundary-disclosure-check plan): a domain is born
     # with its own LOCAL terms file — per-repo boundaries; a domain's disclosure
@@ -390,7 +396,8 @@ def cmd_scaffold(args) -> int:
           "is born with `session_gate: strict` (v3.28.0), so from the second "
           "commit on, the floor requires a fresh session-start attestation — "
           "the birth commit you just saw was the only exempt one")
-    print(adapter.scaffold_guidance())
+    if isinstance(adapter, ScaffoldNoticePort):
+        print(adapter.scaffold_guidance())
     if broken:
         print("\nBIRTH SEQUENCE INCOMPLETE — the isolation invariant did not "
               "fully hold; fix the FAIL lines before using the domain.")

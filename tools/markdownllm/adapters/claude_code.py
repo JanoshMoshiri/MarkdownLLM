@@ -35,8 +35,8 @@ import json
 from pathlib import Path
 
 from ..harness_ports import (
-    DOMAIN_ROOT_ARG, AdapterCapabilities, HarnessContext, InspectionReport,
-    ManagedFragment,
+    DOMAIN_ROOT_ARG, AdapterCapabilities, DiagnosticPresentation,
+    HarnessContext, InspectionReport, ManagedFragment,
 )
 
 SETTINGS_PATH = ".claude/settings.json"
@@ -112,22 +112,14 @@ class ClaudeCodeAdapter:
                 "to interpretation-only — the domain kernel still drives "
                 "both.")
 
-    def doctor_line(self, domain_root: Path,
-                    ctx: HarnessContext) -> tuple[str, str]:
-        """(status, text) for doctor's advisory report — current presentation
-        preserved; extensions surfaced rather than flattened."""
-        report = self.inspect(domain_root, ctx)
-        frag = report.fragments[0]
-        installed = frag.present and "session-start" in frag.intents_realised
-        if not installed:
-            return ("--", "no SessionStart adapter — session-start runs by "
-                          "interpretation (opt-in: "
-                          "adapters/claude-code.settings.example.json)")
-        text = "SessionStart adapter installed (.claude/settings.json)"
-        if report.extensions:
-            text += (f" — locally extended: {len(report.extensions)} "
-                     f"deviation(s) preserved")
-        return ("OK", text)
+    def diagnostic_presentation(self) -> DiagnosticPresentation:
+        """Display strings only (DiagnosticPresentationPort) — the install
+        decision and extension surfacing are doctor's neutral logic."""
+        return DiagnosticPresentation(
+            installed="SessionStart adapter installed (.claude/settings.json)",
+            absent="no SessionStart adapter — session-start runs by "
+                   "interpretation (opt-in: "
+                   "adapters/claude-code.settings.example.json)")
 
     # ----------------------------------------------------------- inspection
 
@@ -159,61 +151,74 @@ class ClaudeCodeAdapter:
                 path=SETTINGS_PATH, present=False, readable=True,
                 valid=False, issues=(str(exc),)))
 
+    def _compare_group(self, moment: str, actual_hooks: list,
+                       wanted_hooks: list, extensions: list[str],
+                       issues: list[str]) -> tuple[str, ...]:
+        """Compare one managed hook group against the renderer's desired form.
+        Extensions are TOKEN-BOUNDARY-safe: an added argument extends the
+        managed command only across a space — `--quiet` mutating into
+        `--quietly` is a divergence, never an extension (v1.6 return item 3).
+        Managed hook counts are exact: a missing or appended command inside
+        the managed group is a divergence, not silently ignored."""
+        acts = []
+        for actual, want in zip(actual_hooks, wanted_hooks):
+            cmd, want_cmd = actual.get("command", ""), want["command"]
+            if cmd == want_cmd:
+                pass
+            elif cmd.startswith(want_cmd + " "):
+                extensions.append(
+                    f"{moment} command carries {cmd[len(want_cmd):].strip()}")
+            else:
+                issues.append(f"{moment} command diverges from the managed "
+                              f"form: {cmd!r}")
+            acts.append(cmd.split("tools/mdllm.py ", 1)[1].split()[0]
+                        if "tools/mdllm.py " in cmd else (cmd.split() or [cmd])[0])
+        if len(actual_hooks) != len(wanted_hooks):
+            issues.append(f"{moment} hook count diverges from the managed "
+                          f"form ({len(actual_hooks)} vs "
+                          f"{len(wanted_hooks)})")
+        return tuple(acts)
+
     def _inspect_valid(self, cfg: dict, hooks: dict,
                        ctx: HarnessContext) -> InspectionReport:
         desired = json.loads(self.render(ctx)[SETTINGS_PATH].decode("utf-8"))
         realised: dict[str, tuple[str, ...]] = {}
         extensions: list[str] = []
         issues: list[str] = []
+        findings: list[str] = []
 
-        # session-start: the FIRST SessionStart group is the managed one.
+        # session-start: the FIRST SessionStart group is the managed one;
+        # extra sibling groups are operator-owned (2B-accepted semantics).
         ss = hooks.get("SessionStart") or []
         if ss:
             wanted = desired["hooks"]["SessionStart"][0]["hooks"]
-            acts = []
-            for actual, want in zip(ss[0]["hooks"], wanted):
-                cmd, want_cmd = actual["command"], want["command"]
-                if cmd == want_cmd:
-                    pass
-                elif cmd.startswith(want_cmd):
-                    extra = cmd[len(want_cmd):].strip()
-                    extensions.append(f"session-start command carries {extra}")
-                else:
-                    issues.append(
-                        "session-start command diverges from the managed "
-                        f"form: {cmd!r}")
-                acts.append(cmd.split("tools/mdllm.py ", 1)[1].split()[0]
-                            if "tools/mdllm.py " in cmd else cmd.split()[0])
-            if len(ss[0]["hooks"]) != len(wanted):
-                issues.append("session-start hook count diverges from the "
-                              "managed form")
-            realised["session-start"] = tuple(acts)
+            realised["session-start"] = self._compare_group(
+                "session-start", ss[0]["hooks"], wanted, extensions, issues)
             for _ in ss[1:]:
                 extensions.append(
                     "additional SessionStart hook group is operator-owned")
 
-        # post-write: the group with the managed matcher.
+        # post-write: the FIRST group with the managed matcher is managed;
+        # a SECOND group repeating the managed matcher is ambiguity — a
+        # finding, never a silent overwrite (v1.6 return item 3).
         want_pw = desired["hooks"]["PostToolUse"][0]
+        managed_pw_seen = False
         for g in hooks.get("PostToolUse") or []:
             if g.get("matcher") != want_pw["matcher"]:
                 extensions.append(
                     f"PostToolUse group with matcher {g.get('matcher')!r} "
                     "is operator-owned")
                 continue
-            acts = []
-            for actual, want in zip(g["hooks"], want_pw["hooks"]):
-                cmd, want_cmd = actual["command"], want["command"]
-                if cmd != want_cmd and not cmd.startswith(want_cmd):
-                    issues.append(
-                        f"post-write command diverges from the managed "
-                        f"form: {cmd!r}")
-                elif cmd != want_cmd:
-                    extensions.append(
-                        f"post-write command carries "
-                        f"{cmd[len(want_cmd):].strip()}")
-                acts.append(cmd.split("tools/mdllm.py ", 1)[1].split()[0]
-                            if "tools/mdllm.py " in cmd else cmd.split()[0])
-            realised["post-write"] = tuple(acts)
+            if managed_pw_seen:
+                findings.append(
+                    "ambiguous: duplicate PostToolUse group repeats the "
+                    f"managed matcher {want_pw['matcher']!r} — first group "
+                    "treated as managed, this one not inspected")
+                continue
+            managed_pw_seen = True
+            realised["post-write"] = self._compare_group(
+                "post-write", g["hooks"], want_pw["hooks"],
+                extensions, issues)
 
         for event in sorted(hooks):
             if event not in _DELIVERY_EVENT.values():
@@ -223,10 +228,13 @@ class ClaudeCodeAdapter:
         operator_owned = tuple(
             f"top-level key {k!r} is operator-owned"
             for k in sorted(cfg) if k != "hooks")
-        present = bool(hooks)
+        # A managed fragment is PRESENT only when a managed moment was
+        # genuinely located — an artifact carrying only operator-owned hook
+        # events has no managed fragment (v1.6 return item 3).
+        present = bool(realised)
         expected = {b.moment: tuple(s.operation for s in b.steps)
                     for b in ctx.bindings}
-        current = ((realised == expected and not issues)
+        current = ((realised == expected and not issues and not findings)
                    if present else None)
         return self._report(
             ManagedFragment(
@@ -234,14 +242,17 @@ class ClaudeCodeAdapter:
                 valid=True, current=current, intents_realised=realised,
                 issues=tuple(issues)),
             operator_owned=operator_owned,
-            extensions=tuple(extensions))
+            extensions=tuple(extensions),
+            findings=tuple(findings))
 
     def _report(self, fragment: ManagedFragment,
                 operator_owned: tuple[str, ...] = (),
-                extensions: tuple[str, ...] = ()) -> InspectionReport:
+                extensions: tuple[str, ...] = (),
+                findings: tuple[str, ...] = ()) -> InspectionReport:
         return InspectionReport(
             harness=self.name, fragments=(fragment,),
-            operator_owned=operator_owned, extensions=extensions)
+            operator_owned=operator_owned, extensions=extensions,
+            findings=findings)
 
 
 CLAUDE_CODE = ClaudeCodeAdapter()
