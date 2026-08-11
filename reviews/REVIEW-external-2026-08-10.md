@@ -1,3 +1,23 @@
+---
+id: external-review-2026-08-10
+type: artifact
+status: stable
+version: 1.1
+created: 2026-08-10
+origin: external
+verified: false
+linked_things:
+  - id: external-review-response-2026-08-10
+    relation: informs
+    notes: "The routing plan this record's five recommendations produced; R3/R4/R5 remain owned there"
+  - id: coherence-is-a-maintained-rate-not-a-state
+    relation: informs
+    notes: "Finding F4 promoted to its own insight — this record is its evidence base"
+  - id: hook-enforcement-has-three-anchors
+    relation: informs
+    notes: "Finding F1 lands as the external-corroboration note on that insight"
+---
+
 # External Assessment — 2026-08-10 (literature-grounded, post-v3.30.1)
 
 **Numbering note (added 2026-08-11):** this record claims no ordinal. A

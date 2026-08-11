@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T12:06:56
-generated_from: HEAD@03f5e67
-coverage: 164
+generated: 2026-08-11T12:13:00
+generated_from: HEAD@7f815d9
+coverage: 165
 framework_version: 3.31.0
 ---
 
@@ -259,6 +259,9 @@ framework_version: 3.31.0
 - expertise-is-an-output-not-a-prerequisite --supports--> provenance-specification
 - expertise-is-an-output-not-a-prerequisite --complements--> the-substrate-is-a-discipline-prosthesis
 - expertise-is-an-output-not-a-prerequisite --informs--> llm-driven-systems-manifesto
+- external-review-2026-08-10 --informs--> external-review-response-2026-08-10
+- external-review-2026-08-10 --informs--> coherence-is-a-maintained-rate-not-a-state
+- external-review-2026-08-10 --informs--> hook-enforcement-has-three-anchors
 - external-review-response-2026-08-10 --references--> coherence-mechanism-build
 - external-review-response-2026-08-10 --references--> mechanical-coherence-checks-backlog
 - external-review-response-2026-08-10 --references--> coherence-is-a-maintained-rate-not-a-state
