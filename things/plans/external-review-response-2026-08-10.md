@@ -67,12 +67,73 @@ Shoulders" section predates the canon findings (Parnas, Naur, Lehman, Weinberg
 all confirmed as independent rediscoveries) and the field positioning (F3) —
 extending it is the operator's voice, routed here, not performed.
 
+## Execution Sequence
+
+**Everything below is staged behind the live review loop.** Operator decision,
+2026-08-11: wait until the loop is done. The reason is not caution — it is that
+the loop *is generating this plan's input*. Every round it walks turns up more
+hand-restated enumerations (round 2: four; round 4: five siblings), and round 2
+and round 4 both name this backlog as where the derivation belongs. Building the
+checks against a half-harvested census would mean building them twice, on a
+corpus still moving under the build.
+
+**Phase 0 — hold (now).** No spec edits, no tool edits, no estate regen from
+this thread. The loop owns the working tree. This plan and its review record are
+the only surfaces this thread writes, and the loop touches neither.
+
+**Phase 1 — the loop goes dry and seals.** Its terminating record settles the
+review-numbering question for both threads (see the ordinal item below). Nothing
+here starts before that seal.
+
+**Phase 2 — harvest the census.** Compile every hand-restated fact fixed across
+review 9 and every loop round into one candidate list, each with its authority
+(the tool constant, schema key, or registry that *owns* the fact). This is the
+build spec for Phase 3, and it is read-only work over git history — no
+judgement, just enumeration. Known candidates already visible: trigger-family
+count (3 surfaces), reserved-type set (5 surfaces), index-signal count (5),
+thing-type list vs `_schema.yaml` (2 rounds running), hard-hook count,
+subcommand counts (2 surfaces), priority/relation enums, extension-spec count,
+`install-hook` hook count, `CORE_FIELDS` re-registration.
+
+**Phase 3 — build, in preference order.** The census will be long, and the
+instinct to write one check per entry is wrong — a check is itself a surface
+that can drift (`a-generated-surface-collapses-its-walk`). Three instruments,
+strictly preferred in this order:
+
+1. **Delete the restatement, name the authority.** Cheapest and permanent — the
+   fact stops existing twice. This is what review 9's own fixes chose ("count
+   removed; authority named") and it needs no tooling at all.
+2. **Generate it.** For lists inside managed blocks (domain kernel, hooks
+   block), derive from the authority so the walk collapses to one string.
+3. **Check it.** Last resort, for prose that must state the fact in its own
+   voice. One generalized enumeration-vs-authority check keyed to a
+   phrase→authority registry, *not* a dozen bespoke ones.
+
+Each check ships with a self-test (the suite is at 282 and is the pattern), one
+commit per check, and must pass the backlog's standing gate: same-builder
+source, no suppression list.
+
+**Phase 4 — R2 perimeter currency**, then **re-judge R4** against the reduced
+load. **Phase 5 — R3 and the manifesto extension**, both operator voice.
+
+**Method note for R3.** The instrument to institutionalize is specifically the
+one that worked: a *zero-context* read — review 9's cold subagent found in nine
+minutes what the author's walk could not see at all, and the loop's round 4
+caught its own sealer for the same reason. Whatever cadence home R3 lands in,
+the mechanism it schedules should be the blind read, not a general "review".
+
 ## Done when
 
 - [x] Review filed (`reviews/REVIEW-external-2026-08-10.md`)
 - [x] Backlog reprioritized, R1 + R2 items added
 - [x] Rate-not-state insight created
 - [x] Anchors insight corroboration note added
+- [x] Execution sequence staged behind the live loop (operator decision,
+      2026-08-11: wait until the loop is done)
+- [ ] Loop seals — Phase 1 gate for everything below
+- [ ] Census harvested (Phase 2)
+- [ ] R1 built via the preference order: name-the-authority → generate → check
+- [ ] R2 perimeter currency check built
 - [ ] Operator verifies the review's external claims (quarantine flip on the
       literature findings — or notes which are taken on trust)
 - [ ] R3 routed by the operator (cadence home chosen, or consciously declined)
