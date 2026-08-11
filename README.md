@@ -198,10 +198,25 @@ irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1
 
 You need an LLM tool with file-system access, plus `git` and Python 3.10+ — the installer offers to install the latter two if they're missing. Prefer to do it by hand? `git clone` the repo and `pip install pyyaml`.
 
-On Windows or a managed agent shell where `python` is not on `PATH`, use
-`./tools/mdllm.ps1 <command>` after creating a local `.venv` with PyYAML. The
-wrapper prefers that repository-local environment, so `./tools/mdllm.ps1 doctor .` is
-equivalent to `python tools/mdllm.py doctor .` without changing the machine-wide Python installation.
+### Codex desktop runtime adapter (verified 2026-08-11)
+
+This adapter was added and tested in the Codex desktop harness — specifically,
+not as an untested generalisation. Its PowerShell command shell had no `python`
+on `PATH`; its bundled Python was 3.12 but did not include PyYAML. A
+repository-local, gitignored `.venv` with PyYAML makes the deterministic floor
+available without changing the machine-wide Python installation:
+
+```powershell
+./tools/mdllm.ps1 doctor .
+./tools/mdllm.ps1 estate-sync .
+./tools/mdllm.ps1 validate .
+```
+
+`tools/mdllm.ps1` prefers that local environment and generated Git hooks do
+too. The evidence is a successful `doctor`, a clean validation/coherence pass,
+and a real commit through the refreshed pre-commit hook (commit `4e1ad73`).
+Treat this as a measured Codex-desktop compatibility result; other managed
+shells still need their own execution test.
 
 Then open the folder in your LLM tool, let it discover `AGENTS.md`, and tell it what you want:
 
@@ -217,6 +232,7 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 
 | Tool | Discovery | Status |
 |------|-----------|--------|
+| Codex desktop | AGENTS.md auto-load | Verified 2026-08-11: the local-Python adapter and deterministic Git floor executed in this harness; no lifecycle adapter yet |
 | Claude Code | CLAUDE.md → AGENTS.md | Verified in use (the framework's own development and evals run on it) |
 | Codex (VS Code) | AGENTS.md auto-load | Exercised on a real project; not yet eval-measured |
 | GitHub Copilot, Codex CLI, Cursor, Windsurf, Gemini CLI | AGENTS.md auto-load | Designed for; not yet exercised |

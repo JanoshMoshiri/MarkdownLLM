@@ -2,7 +2,7 @@
 id: portability-claims-need-execution-tests
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-11
 session: 2026-06-11
 source: both
@@ -45,6 +45,16 @@ portable. The very next environment falsified the claim — the fix had
 upgraded the hook from *resolution by hardcoding* to *resolution by lookup*,
 but verification still stopped short of execution.
 
+3. **Codex desktop harness (2026-08-11):** its PowerShell shell had no
+   `python` on PATH, while its bundled Python 3.12 lacked PyYAML. The generic
+   candidate chain therefore found neither a usable interpreter nor the
+   dependency the floor needs. The repair is deliberately a Codex-harness
+   adapter, not a universal runtime claim: a gitignored repository `.venv`,
+   `tools/mdllm.ps1` as its entry point, and generated hooks that prefer
+   `.venv/Scripts/python.exe` (or `.venv/bin/python` on POSIX). `mdllm doctor`,
+   validation, coherence, and the real pre-commit hook all executed through
+   it; commit `4e1ad73` is the audit record.
+
 ## Why It Matters
 
 - This is the same epistemic rule the framework already applies elsewhere,
@@ -61,6 +71,9 @@ but verification still stopped short of execution.
   the script it just emitted once (exit status only) and reporting
   floor-unavailable immediately, instead of leaving the discovery to the
   first blocked commit.
+- A Codex-desktop success is evidence for that exact adapter and environment,
+  not evidence that every desktop or managed shell supplies the same Python
+  contract. The compatibility table must preserve that scope.
 
 ## Context
 
