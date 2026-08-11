@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ../../tools/mdllm.py estate-sync ."
+          },
+          {
+            "type": "command",
+            "command": "python ../../tools/mdllm.py session-start ."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ../../tools/mdllm.py validate . --quiet"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(python ../../tools/mdllm.py:*)"
+    ]
+  }
+}

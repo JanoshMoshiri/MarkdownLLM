@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T12:18:08
-generated_from: HEAD@06fab20
-coverage: 166
+generated: 2026-08-11T17:05:28
+generated_from: HEAD@26e6917
+coverage: 167
 framework_version: 3.31.0
 ---
 
@@ -111,6 +111,8 @@ framework_version: 3.31.0
 - change-safety-is-defense-in-depth --supports--> mechanical-assimilation-is-blind-to-prose-dependencies
 - change-safety-is-defense-in-depth --supports--> consistency-is-maintained-at-change-not-by-sweeping
 - change-safety-is-defense-in-depth --supports--> retrospective-specification
+- claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
+- claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
 - coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks
 - coherence-is-a-maintained-rate-not-a-state --supports--> repeated-drift-promotes-a-fact-into-the-floor
 - coherence-is-a-maintained-rate-not-a-state --supports--> hook-enforcement-has-three-anchors

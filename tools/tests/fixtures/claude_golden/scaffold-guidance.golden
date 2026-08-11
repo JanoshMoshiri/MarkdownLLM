@@ -1,0 +1,1 @@
+  - hardened out of the box: .claude/settings.json fires session-start + post-write validation automatically (Claude Code / VS Code Copilot agent mode), and /end-session + /retrospective are installed. Delete .claude/ to fall back to interpretation-only — the domain kernel still drives both.

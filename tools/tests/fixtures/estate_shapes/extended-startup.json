@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ../../tools/mdllm.py estate-sync ."
+          },
+          {
+            "type": "command",
+            "command": "python ../../tools/mdllm.py session-start . --assistant"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ../../tools/mdllm.py validate . --quiet"
+          }
+        ]
+      }
+    ]
+  }
+}
