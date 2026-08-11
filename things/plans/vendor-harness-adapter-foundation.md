@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: not-started
-version: 1.0
+version: 1.1
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -42,6 +42,11 @@ semantics into a vendor layer.
 This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
+
+**Current execution boundary:** the Claude Code agent owns Phases 0–2 and must
+stop at the cross-harness handoff gate. The Codex agent owns Phases 3–5 only
+after accepting that handoff. No inference from phase order is permitted; the
+ownership and stop conditions below are part of the plan.
 
 ## Assessment verdict
 
@@ -251,9 +256,81 @@ Claude safety is a release gate, not a hope:
 7. Any shared runtime or Git-hook change runs the existing Claude/Windows and
    POSIX hook suite before release.
 
+## Ownership and cross-harness handoff gate
+
+Ownership here means responsibility for implementing and evidencing a work
+package. It does not make either vendor the owner of shared substrate policy.
+The inward lifecycle contract remains vendor-neutral and both agents review it
+from their own harness side.
+
+### Claude Code agent — extraction work package
+
+The Claude Code agent owns **Phases 0–2 only**:
+
+- freeze the current Claude artifacts and behaviour;
+- implement the shared runtime work needed by the extraction;
+- extract Claude behind the inward-owned adapter ports without changing its
+  emitted bytes or live behaviour;
+- add the architecture fitness test and Claude regression evidence;
+- commit the completed work package and stop.
+
+The Claude Code agent is explicitly **not authorised** by this work package to
+create `.codex/`, model Codex events, implement vendor diagnostics, add Codex
+scaffold flags, or continue into Phase 3. It must not design the inward
+contract as a generalisation of Claude's JSON shape; the lifecycle intents in
+this plan are the contract.
+
+### Hard stop — Codex acceptance before any Codex build
+
+No Phase 3 or Phase 4 work may begin until the Codex agent independently
+accepts the Phase 0–2 handoff. Acceptance requires all of the following:
+
+1. Claude golden fixtures remain byte-identical and the existing Claude suite
+   passes.
+2. Vendor-neutral lifecycle, scaffold, diagnostic, and runtime modules contain
+   no Claude config paths, environment variables, permission structures, or
+   vendor event-schema assumptions. A mechanical architecture test enforces
+   the allowed boundary: Claude vocabulary may appear only in the Claude
+   adapter, its fixtures/tests, and explicitly vendor-specific documentation.
+3. The Codex agent can explain and implement the ports without importing,
+   calling, subclassing, or parsing the Claude adapter.
+4. Framework-root and directly opened nested-domain runtime/commit probes pass
+   in the Codex managed shell, or any failure is routed back as shared-runtime
+   work rather than patched inside the future Codex adapter.
+5. The Codex review finds no least-common-denominator abstraction or hidden
+   Claude ordering assumption in the application contract.
+
+A failed condition returns the work to the Claude extraction package (or the
+shared runtime slice). It must never be bypassed with a Codex-side workaround.
+
+### Codex agent — diagnostic and Codex work package
+
+After accepting the handoff, the Codex agent owns **Phases 3–5**:
+
+- build the vendor-neutral diagnostic against the accepted ports;
+- implement the Codex adapter independently from official Codex contracts;
+- add explicit adapter install and scaffold selection;
+- preserve every Claude golden and merge-safety test while changing shared
+  orchestration surfaces;
+- commit the completed work package and stop before rollout.
+
+The Codex agent may change shared interfaces only when Codex evidence exposes
+a real missing abstraction. Such a change reopens the Claude regression gate;
+it is not permission to edit Claude output for convenience.
+
+### Shared verification and operator ownership
+
+- In Phase 6, the Claude Code agent owns the live Claude execution record and
+  the Codex agent owns the live Codex execution record. Neither agent can
+  self-certify the other harness.
+- In Phase 7, the Codex agent leads reconciliation after both execution records
+  pass; the Claude Code agent reviews Claude-facing instructions and fixtures.
+- Phase 8 belongs to the operator. Harness defaults, estate migration, and
+  publication are product decisions, not adapter-agent decisions.
+
 ## Phased plan
 
-### Phase 0 — Freeze the contract and evidence
+### Phase 0 — Freeze the contract and evidence (owner: Claude Code agent)
 
 - [ ] Record golden Claude scaffold artifacts and current CLI behaviour.
 - [ ] Add estate-shape fixtures: hooks-only config, permissions-only config,
@@ -265,7 +342,7 @@ Claude safety is a release gate, not a hope:
 
 **Gate:** the baseline suite passes without changing a generated byte.
 
-### Phase 1 — Repair the shared runtime port
+### Phase 1 — Repair the shared runtime port (implementer: Claude Code agent; acceptance: Codex agent)
 
 - [ ] Give root and nested-domain launchers one runtime-resolution service.
   Resolve both the domain-local environment and the framework-root environment
@@ -281,7 +358,7 @@ Claude safety is a release gate, not a hope:
 **Gate:** the framework and a nested domain both execute validation and a real
 pre-commit through the same checked-in resolution policy.
 
-### Phase 2 — Extract Claude without changing Claude
+### Phase 2 — Extract Claude without changing Claude (owner: Claude Code agent; acceptance: Codex agent)
 
 - [ ] Introduce the adapter ports/registry and move the inline Claude scaffold
   projection behind a Claude adapter.
@@ -293,9 +370,10 @@ pre-commit through the same checked-in resolution policy.
   do not conflate it with lifecycle hooks.
 
 **Gate:** golden files are byte-identical, all existing tests pass, and an
-existing composite Claude settings file round-trips without loss.
+existing composite Claude settings file round-trips without loss. The Claude
+agent then stops; the cross-harness handoff gate above must pass before Phase 3.
 
-### Phase 3 — Build truthful harness diagnostics
+### Phase 3 — Build truthful harness diagnostics (owner: Codex agent)
 
 - [ ] Add `doctor --harness` capability reports with the five independent
   dimensions above.
@@ -308,7 +386,7 @@ existing composite Claude settings file round-trips without loss.
 **Gate:** fixtures prove that present-but-invalid, present-but-untrusted,
 runnable-but-untested, extended, and verified cannot be conflated.
 
-### Phase 4 — Add the Codex adapter
+### Phase 4 — Add the Codex adapter (owner: Codex agent)
 
 - [ ] Render a project `.codex/hooks.json` with one sequential SessionStart
   handler, file-edit PostToolUse validation, stable root resolution, bounded
@@ -322,7 +400,7 @@ runnable-but-untested, extended, and verified cannot be conflated.
 
 **Gate:** adapter unit/integration tests pass without touching Claude fixtures.
 
-### Phase 5 — Expose explicit install and scaffold selection
+### Phase 5 — Expose explicit install and scaffold selection (owner: Codex agent)
 
 - [ ] Add an explicit human-invoked adapter install/refresh command that shows
   the owned diff and refuses ambiguous merges.
@@ -337,7 +415,7 @@ runnable-but-untested, extended, and verified cannot be conflated.
 **Gate:** two scaffolds selected for different harnesses differ only in their
 outer adapter artifacts and both validate cleanly.
 
-### Phase 6 — Execute in real harnesses
+### Phase 6 — Execute in real harnesses (split ownership by harness)
 
 - [ ] Claude non-regression: scaffold, open, observe SessionStart ordering,
   edit a thing, observe PostToolUse feedback, and commit through the floor.
@@ -351,7 +429,7 @@ outer adapter artifacts and both validate cleanly.
 **Gate:** Claude remains verified and Codex is verified on the specifically
 tested surfaces, with no wider claim.
 
-### Phase 7 — Reconcile every public surface
+### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
 - [ ] Update orchestration, discovery, refresh, operator guide, first-hour,
   domain guide, README compatibility table, scaffold output, and adapter
@@ -366,7 +444,7 @@ tested surfaces, with no wider claim.
 **Gate:** validate, coherence, kernel freshness where applicable, the full
 suite, and the Claude/Codex execution records all pass.
 
-### Phase 8 — Rollout and migration decision
+### Phase 8 — Rollout and migration decision (owner: operator)
 
 - [ ] Decide, with the operator, whether future scaffolds retain Claude as the
   compatibility default, require explicit harness selection, or emit more than
