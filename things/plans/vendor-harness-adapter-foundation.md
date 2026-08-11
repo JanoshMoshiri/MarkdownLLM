@@ -1,8 +1,8 @@
 ---
 id: vendor-harness-adapter-foundation
 type: plan
-status: not-started
-version: 1.3
+status: in-progress
+version: 1.4
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -50,6 +50,19 @@ before the Phase 2 port challenge, resumes only after Codex returns the port
 constraints, and stops again after extracting Claude. No inference from phase
 order is permitted; the ownership and stop conditions below are part of the
 plan.
+
+## Amendment record — v1.4 (2026-08-11)
+
+Two v1.3 defects fixed before execution began; no scope change.
+
+1. **Phase 1's gate is closable by its own owner again.** v1.3 handed the
+   nested-domain managed-shell probe to Codex ("Claude does not self-certify
+   that environment") while Phase 1's gate still demanded nested-domain
+   execution — so Phase 1 could not close until 2B, inverting the phase
+   order. The gate now names the environment: Claude certifies its own
+   harness against the live estate's nested domains; the same probe run in
+   the Codex managed shell belongs to 2B and final acceptance.
+2. Restored the blank line before Phase 1's gate (rendering defect).
 
 ## Amendment record — v1.3 (2026-08-11, Codex cold read)
 
@@ -492,9 +505,12 @@ meets in the first minute, before any adapter exists to fail.
 - [ ] Add a reproducible directly-opened nested-domain runtime/commit probe.
   The Codex agent executes it in the managed shell during Phase 2B and again
   at final acceptance; Claude does not self-certify that environment.
-**Gate:** the framework and a nested domain both execute validation and a real
-pre-commit through the same checked-in resolution policy, including on an
-interpreter that resolves but lacks the dependency. Runtime facts are
+
+**Gate [v1.4]:** in the Claude-side environment, the framework and a nested
+domain both execute validation and a real pre-commit through the same
+checked-in resolution policy, including on an interpreter that resolves but
+lacks the dependency. The identical probe run in the Codex managed shell is
+2B/acceptance evidence, not a Phase 1 closure condition. Runtime facts are
 available to Phase 3 without Phase 1 freezing their presentation vocabulary.
 
 ### Phase 2 — Cross-harness port design, then Claude extraction **[v1.3]**
