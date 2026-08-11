@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -180,8 +180,9 @@ to invoke directly.
 | `worklog [path] [--write]` | Prints an on-demand session-grouped view of the commit stream (sessions split on `session-end:` commits); `--write` saves a gitignored local snapshot | Reviewing recent session history — not a committed file (retired v3.17) |
 | `refresh <domain> [--seal]` | Floor-only domain refresh: reports the version delta + unseen CHANGELOG entries; `--seal` bumps `framework_version_seen` after adoption | Bringing a stale domain current with the framework |
 | `install-hook [path]` | Installs the three mdllm git hooks: pre-commit (boundary + validate + coherence, blocking), commit-msg (disclosure boundary, blocking), post-commit (autopush — on a repo with a remote and no `autopush: false`, commits PUBLISH from then on) | Once per domain repo, at floor adoption |
-| `doctor [path]` | Probes the environment: prerequisites, hook *execution* and *body freshness* (is the installed hook current with `HOOK_BODY`?), framework version drift (downward + upstream); exit 1 = degraded mode | New machine, new harness, after a refresh, or "is the floor actually on here?" |
-| `scaffold <path>` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, hook, first commit | Creating a new domain — the mechanical half is one command |
+| `doctor [path] [--harness claude\|codex\|all]` | Probes the floor and, when selected, reports adapter support, project configuration, currency, trust, runtime, and real-event execution independently; static config or a runnable command never counts as an executed lifecycle event | New machine, new harness, after a refresh, or "is the floor actually on here?" |
+| `adapter-install [path] --harness <name> [--dry-run]` | Preflights a project-local adapter, shows every decision and exact owned diff, then creates or safely merges only the selected adapter surface; ambiguity is refused | Run with `--dry-run` first for an existing domain; rerun without it only after deciding to change that project's harness configuration |
+| `scaffold <path> [--harness claude\|codex\|all\|none]` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, Git hook, first commit, and only the selected outer harness projection. Omitting the flag preserves the Claude compatibility default | Creating a new domain — the mechanical half is one command, while `none` proves the substrate does not depend on an adapter |
 | `mcp-serve <domain> [--http --port N --token]` | Serves the domain's exposed face (`exposed: true` things only) over MCP — stdio by default, Streamable HTTP with `--http` (loopback-only; non-loopback binds refused until the OAuth 2.1 leg). `--token` mints a per-run bearer token for tunnelled cross-machine probes | Wired into a consumer's `.mcp.json` (stdio: `command`; HTTP: `url` + optional `headers` carrying the token); stdio you rarely run by hand, `--http` you run when a porch should outlive its callers |
 | `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
 | `estate-check [roots...]` | Batches `imports-check` over consumer roots with a roll-up — named explicitly, or (no args) the local clones the `estate-sync` walk finds; ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
@@ -191,6 +192,33 @@ to invoke directly.
 | `calc [path] [--thing ID] [--expr E]` | Evaluates declared derivations (`computed:` blocks): sums a body table, a frontmatter list, or a field across selected things; reports, never writes; exit 1 on disagreement. `validate` re-checks the same blocks at every commit | Ingesting a statement or preparing a return — the tool does every sum; `--expr` for an ad-hoc pivot. Grammar: `docs/calculation-reference.md` |
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
+
+### Project harness adapters
+
+Adapters harden the portable lifecycle; they are not the substrate. A domain
+without one still operates through `AGENTS.md` interpretation and the Git
+floor. For an existing project, inspect before writing:
+
+```powershell
+./tools/mdllm.ps1 doctor . --harness codex
+./tools/mdllm.ps1 adapter-install . --harness codex --dry-run
+```
+
+The Codex project adapter is implemented and unit/integration tested, while
+its live Phase 6 acceptance remains deliberately open. Installing the reviewed
+diff is an operator action; after installation, complete the project-trust
+flow and inspect the exact active commands through Codex's
+[`/hooks` UI](https://learn.chatgpt.com/docs/hooks).
+`doctor` reports execution as `untested` until a matching real lifecycle event
+records evidence. No live `.codex` configuration was installed in the
+framework repository during implementation, and the installer never mutates
+user-global Codex configuration.
+
+The shared runtime underneath adapters has separately been exercised in the
+Codex desktop managed shell at the framework root and from a directly opened
+nested domain, including a real nested-repository commit through the Git
+floor. That runtime evidence must not be relabelled as Codex lifecycle or
+trust evidence.
 
 ## Running More Than One Domain
 

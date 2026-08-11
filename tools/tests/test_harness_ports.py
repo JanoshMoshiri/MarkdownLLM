@@ -134,6 +134,43 @@ def test_inspect_extra_command_in_managed_group_is_stale(tmp_path):
     assert any("count diverges" in i for i in frag.issues)
 
 
+def test_inspect_changed_managed_hook_fields_are_stale(tmp_path):
+    # Currency covers the complete renderer-owned entry.  Keeping the command
+    # while changing its hook type cannot be accepted as an executable floor.
+    def mutate(src):
+        hook = src["hooks"]["PostToolUse"][0]["hooks"][0]
+        hook["type"] = "prompt"
+        hook["timeout"] = 30
+    r = _mutated_standard(tmp_path, mutate)
+    frag = r.fragments[0]
+    assert frag.present and frag.current is False
+    assert any("managed hook fields diverge" in i for i in frag.issues)
+
+
+def test_inspect_duplicate_json_keys_are_invalid_not_current(tmp_path):
+    adapter = ClaudeCodeAdapter()
+    ctx = hp.HarnessContext(framework_root_rel="../..")
+    settings_path = ".claude/settings.json"
+    desired = json.loads(
+        adapter.render(ctx)[settings_path].decode("utf-8"))
+    path = tmp_path / settings_path
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        '{"hooks": {}, "hooks": '
+        + json.dumps(desired["hooks"])
+        + '}\n',
+        encoding="utf-8",
+    )
+
+    report = adapter.inspect(tmp_path, ctx)
+    fragment = report.fragments[0]
+    assert fragment.artifact_present and fragment.readable is True
+    assert fragment.valid is False
+    assert fragment.present is False and fragment.current is None
+    assert any("duplicate JSON key 'hooks'" in issue
+               for issue in fragment.issues)
+
+
 def test_inspect_duplicate_managed_matcher_is_ambiguous(tmp_path):
     # A second group repeating the managed matcher must be a finding, and the
     # FIRST group's inspection must survive — never a silent overwrite.

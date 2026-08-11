@@ -17,6 +17,7 @@ from pathlib import Path
 import yaml
 
 from . import adapters as harness_adapters
+from .adapter_install import portable_artifact_parts
 from .boundary import TERMS_FILE
 from .harness_ports import (
     HarnessContext, RenderPort, ScaffoldNoticePort, ShortcutPort,
@@ -202,7 +203,83 @@ def cmd_scaffold(args) -> int:
     try:
         rel_fw = Path(os.path.relpath(fw_root, target)).as_posix()
     except ValueError:
-        rel_fw = fw_root.as_posix()
+        sys.exit("mdllm: framework and target have no relative path; refusing "
+                 "to embed an absolute machine-specific adapter command")
+
+    # Resolve the complete outer projection before creating the target.  This
+    # makes an unknown selection or a cross-adapter path collision a true
+    # preflight failure rather than a half-scaffolded domain.
+    selected_names = harness_adapters.selection(
+        getattr(args, "harness", None))
+    selected_adapters = tuple(harness_adapters.get(n) for n in selected_names)
+    ctx = HarnessContext(framework_root_rel=rel_fw)
+    adapter_shortcuts: list[tuple[str, Path]] = []
+    adapter_artifacts: list[tuple[str, bytes]] = []
+    projected: dict[tuple[str, ...], tuple[str, bool]] = {}
+
+    def claim_projection(
+            relpath: str, owner: str, *, directory: bool = False) -> str:
+        """Reserve a portable target path before scaffold creates anything.
+
+        The projection is case-folded and separator-normalised even off
+        Windows.  A scaffold committed on one platform must not contain two
+        paths which become the same path when cloned on another.  Core
+        directories reserve their whole namespace from adapter output.
+        """
+        if not isinstance(relpath, str):
+            sys.exit(f"mdllm: {owner!r} projected non-string path {relpath!r}")
+        try:
+            # Scaffold accepts either separator spelling as adapter input but
+            # reserves and writes one POSIX projection.  That lets a Windows-
+            # shaped path collide visibly with its portable spelling instead
+            # of becoming a second file after clone.
+            parts = portable_artifact_parts(relpath.replace("\\", "/"))
+        except ValueError:
+            sys.exit(f"mdllm: {owner!r} projected unsafe path {relpath!r}")
+        key = tuple(part.casefold() for part in parts)
+        for previous_key, (previous_owner, previous_directory) in projected.items():
+            same = key == previous_key
+            within_previous = (previous_directory
+                               and key[:len(previous_key)] == previous_key)
+            owns_previous_parent = (directory
+                                    and previous_key[:len(key)] == key)
+            # Two file projections also cannot stand in an ancestor relation:
+            # the first would need to be both a file and a directory.
+            file_prefix = (not directory and not previous_directory
+                           and (key[:len(previous_key)] == previous_key
+                                or previous_key[:len(key)] == key))
+            if same or within_previous or owns_previous_parent or file_prefix:
+                sys.exit(
+                    f"mdllm: adapter projection collision at {relpath!r}: "
+                    f"{previous_owner} and {owner}")
+        projected[key] = (owner, directory)
+        return "/".join(parts)
+
+    # Reserve every path the harness-neutral scaffold owns before asking an
+    # adapter for its projection.  Directory reservations cover all generated
+    # skills/prompts and the git metadata namespace, including paths added to
+    # those core sets by future template evolution.
+    for core_path in ("things", "skills", ".git"):
+        claim_projection(core_path, "scaffold:core", directory=True)
+    if (templates / "prompts").is_dir():
+        claim_projection("prompts", "scaffold:core", directory=True)
+    for core_path in ("AGENTS.md",):
+        claim_projection(core_path, "scaffold:core")
+    boundary_template = templates / "boundary-terms.template"
+    if boundary_template.is_file():
+        claim_projection(TERMS_FILE, "scaffold:core")
+        claim_projection(".gitignore", "scaffold:core")
+
+    for adapter in selected_adapters:
+        if isinstance(adapter, ShortcutPort):
+            for relpath, src in adapter.shortcut_sources(templates).items():
+                normalised = claim_projection(
+                    relpath, f"{adapter.name}:shortcuts")
+                adapter_shortcuts.append((normalised, src))
+        if isinstance(adapter, RenderPort):
+            for relpath, data in adapter.render(ctx).items():
+                normalised = claim_projection(relpath, f"{adapter.name}:render")
+                adapter_artifacts.append((normalised, data))
 
     def instantiate(text: str) -> str:
         text = (text.replace("[domain]", name)
@@ -239,14 +316,12 @@ def cmd_scaffold(args) -> int:
     # auto-firing lifecycle adapter stays opt-in (hint printed below).
     # Every adapter capability is a declared port, tested with isinstance —
     # an adapter without shortcuts simply projects none (v1.6).
-    adapter = harness_adapters.get(harness_adapters.DEFAULT_HARNESS)
-    if isinstance(adapter, ShortcutPort):
-        for relpath, src in adapter.shortcut_sources(templates).items():
-            dst = target / relpath
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            dst.write_text(instantiate(src.read_text(encoding="utf-8")),
-                           encoding="utf-8", newline="\n")
-            written.append(relpath)
+    for relpath, src in adapter_shortcuts:
+        dst = target / relpath
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(instantiate(src.read_text(encoding="utf-8")),
+                       encoding="utf-8", newline="\n")
+        written.append(relpath)
 
     # Reasoning prompts (orchestration.md): the generated session-start block
     # names `evaluate-triggers`, `surface-attention`, `session-orientation`,
@@ -286,20 +361,18 @@ def cmd_scaffold(args) -> int:
     # delete the artifacts and the domain kernel drives both by interpretation.
     # Scaffold writes directly (it runs as the tool, not through a
     # permissions-gated editor).
-    ctx = HarnessContext(framework_root_rel=rel_fw)
-    if isinstance(adapter, RenderPort):
-        for relpath, data in adapter.render(ctx).items():
-            dst = target / relpath
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            dst.write_bytes(data)
-            written.append(relpath)
+    for relpath, data in adapter_artifacts:
+        dst = target / relpath
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(data)
+        written.append(relpath)
 
     # Disclosure boundary (boundary-disclosure-check plan): a domain is born
     # with its own LOCAL terms file — per-repo boundaries; a domain's disclosure
     # surface is its own — and a .gitignore that keeps it local BEFORE the
     # `git add -A` first commit, so the vocabulary never enters any repo,
     # including the domain's own.
-    bt_template = templates / "boundary-terms.template"
+    bt_template = boundary_template
     if bt_template.is_file():
         (target / TERMS_FILE).write_text(
             bt_template.read_text(encoding="utf-8"),
@@ -396,8 +469,9 @@ def cmd_scaffold(args) -> int:
           "is born with `session_gate: strict` (v3.28.0), so from the second "
           "commit on, the floor requires a fresh session-start attestation — "
           "the birth commit you just saw was the only exempt one")
-    if isinstance(adapter, ScaffoldNoticePort):
-        print(adapter.scaffold_guidance())
+    for adapter in selected_adapters:
+        if isinstance(adapter, ScaffoldNoticePort):
+            print(adapter.scaffold_guidance())
     if broken:
         print("\nBIRTH SEQUENCE INCOMPLETE — the isolation invariant did not "
               "fully hold; fix the FAIL lines before using the domain.")

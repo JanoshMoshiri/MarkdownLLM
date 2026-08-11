@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.5
+version: 1.6
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -69,7 +69,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>27 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>29 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -203,6 +203,8 @@ flowchart LR
         C25["candidates"]
         C26["autopush"]
         C27["runtime-probe"]
+        C28["adapter-install"]
+        C29["harness-event<br/>(internal)"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -232,6 +234,8 @@ flowchart LR
         T25["change-reconciliation.md<br/>the cue question at the commit boundary"]
         T26["git-workflow.md<br/>The Outbound Rules — publication leg"]
         T27["floor availability itself — per-candidate runtime facts"]
+        T28["orchestration.md<br/>project-local harness adapter boundary"]
+        T29["orchestration.md<br/>ordered lifecycle bindings"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -261,6 +265,8 @@ flowchart LR
     C25 -->|"asks the cue for"| T25
     C26 -.->|"publishes validated commits per"| T26
     C27 -->|"probes interpreter/dependency/command for"| T27
+    C28 -.->|"preflights and applies the selected"| T28
+    C29 -->|"dispatches one adapter event through"| T29
 ```
 
 Notes on this view:
@@ -273,7 +279,14 @@ Notes on this view:
   commit boundary so the guarantee survives agents that forget to run it.
 - `doctor` is the floor checking it can exist here at all: prerequisites,
   hook *execution* (resolution is not verification), and framework-version
-  drift for domains. Exit 1 means degraded mode — validate manually and say so.
+  drift for domains. With `--harness`, support, configuration, currency,
+  trust, runtime, and real-event execution remain independent facts. Exit 1
+  means degraded mode — validate manually and say so.
+- `adapter-install` is the explicit project mutation boundary: it shows the
+  selected adapter's owned diff, safely merges only that surface, and refuses
+  ambiguity. `harness-event` is its internal execution counterpart; a real
+  lifecycle hook calls it to run ordered bindings and record hash-bound
+  execution evidence. Neither makes an adapter part of the portable core.
 
 ## View 4 — Two domains: the estate seam
 

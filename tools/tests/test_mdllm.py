@@ -606,6 +606,7 @@ def test_scan_skips_non_things_and_excluded_dirs(tmp_path):
     write(tmp_path, "README.md", thing_text(GOOD))          # NON_THING_FILES
     write(tmp_path, "notes.md", "# free-form notes\n")       # no frontmatter
     write(tmp_path, "templates/t.md", thing_text(GOOD))      # excluded dir
+    write(tmp_path, ".codex/project-note.md", thing_text(GOOD))  # adapter state
     write(tmp_path, "things/alpha.md", thing_text(GOOD))
     corpus, _ = scan(tmp_path)
     assert [t.id for t in corpus.things] == ["alpha"]

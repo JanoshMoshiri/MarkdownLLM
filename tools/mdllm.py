@@ -73,6 +73,16 @@ from markdownllm.runtime import (
     FLOOR_DEPENDENCY, SH_RESOLVE, interpreter_candidates, probe_candidate,
     probe, git_supports_hook_run, execution_test_hook, cmd_runtime_probe,
 )
+from markdownllm.adapter_install import (
+    AdapterInstallTarget, ArtifactDecision, InstallPlan, ApplyResult,
+    InstallRefused, InstallStateChanged, AtomicInstallError,
+    WholeArtifactPolicy, TopLevelJsonFragmentPolicy,
+    target_for_adapter, preflight_install, apply_install,
+    cmd_adapter_install,
+)
+from markdownllm.lifecycle_runner import (
+    StepExecution, LifecycleExecution, execute_lifecycle, cmd_harness_event,
+)
 from markdownllm.boundary import (
     TERMS_FILE, load_terms, scan_text, self_guard, staged_findings,
     history_findings, cmd_boundary,

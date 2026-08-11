@@ -186,7 +186,7 @@ CORE_FIELDS = {
     "priority", "tags", "confidence", "version",
 }
 
-DEFAULT_EXCLUDES = {".git", ".claude", "node_modules", "templates", "examples",
+DEFAULT_EXCLUDES = {".git", ".claude", ".codex", "node_modules", "templates", "examples",
                     "domain", "domains", "tools", "adapters", "evals", "outputs",
                     "deliverables"}
 NON_THING_FILES = {"AGENTS.md", "CLAUDE.md", "README.md", "CONTRIBUTING.md",

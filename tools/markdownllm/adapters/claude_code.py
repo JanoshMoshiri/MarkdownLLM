@@ -34,10 +34,28 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from ..adapter_install import TopLevelJsonFragmentPolicy
+from ..harness_diagnostics import AdapterProbe, managed_definition_hash
 from ..harness_ports import (
     DOMAIN_ROOT_ARG, AdapterCapabilities, DiagnosticPresentation,
     HarnessContext, InspectionReport, ManagedFragment,
 )
+
+
+def _unique_json_object(pairs):
+    """Reject duplicate keys instead of accepting json.loads' last value.
+
+    Duplicate settings keys have no single operator-owned meaning.  Treating
+    the last ``hooks`` member as authoritative could certify ambiguous bytes
+    as the current managed fragment, while another JSON consumer selects a
+    different occurrence.
+    """
+    out = {}
+    for key, value in pairs:
+        if key in out:
+            raise ValueError(f"duplicate JSON key {key!r}")
+        out[key] = value
+    return out
 
 SETTINGS_PATH = ".claude/settings.json"
 
@@ -59,6 +77,44 @@ class ClaudeCodeAdapter:
             lifecycle_moments=("session-start", "post-write"),
             notes="one settings file also serves VS Code Copilot agent mode; "
                   "ordering via a single sequential hook group")
+
+    def install_policies(self):
+        """Own only the top-level hooks member in composite settings."""
+        return {SETTINGS_PATH: TopLevelJsonFragmentPolicy("hooks")}
+
+    def probe(self, domain_root: Path,
+              context: HarnessContext) -> AdapterProbe:
+        """Return only facts static Claude project config can establish."""
+        desired = json.loads(
+            self.render(context)[SETTINGS_PATH].decode("utf-8"))
+        hashes: dict[str, str] = {}
+        for binding in context.bindings:
+            event = _DELIVERY_EVENT[binding.delivery]
+            group = desired["hooks"][event][0]
+            semantic_binding = {
+                "moment": binding.moment,
+                "delivery": binding.delivery,
+                "failure": binding.failure,
+                "steps": [
+                    {"operation": step.operation, "argv": list(step.argv)}
+                    for step in binding.steps
+                ],
+            }
+            hashes[binding.moment] = managed_definition_hash({
+                "binding": json.dumps(
+                    semantic_binding, sort_keys=True, separators=(",", ":")),
+                "managed-group": json.dumps(
+                    group, sort_keys=True, separators=(",", ":")),
+            })
+        return AdapterProbe(
+            trust="not-applicable",
+            definition_hashes=hashes,
+            ownership=(
+                "the adapter owns only the managed lifecycle hook groups",
+                "permissions, unrelated settings, and local extensions remain "
+                "operator-owned",
+            ),
+        )
 
     # ------------------------------------------------------------- rendering
 
@@ -136,7 +192,7 @@ class ClaudeCodeAdapter:
                 path=SETTINGS_PATH, present=False, readable=False,
                 issues=(type(exc).__name__,)))
         try:
-            cfg = json.loads(raw)
+            cfg = json.loads(raw, object_pairs_hook=_unique_json_object)
             if not isinstance(cfg, dict):
                 raise ValueError("top level is not an object")
             hooks = cfg.get("hooks", {})
@@ -163,6 +219,17 @@ class ClaudeCodeAdapter:
         acts = []
         for actual, want in zip(actual_hooks, wanted_hooks):
             cmd, want_cmd = actual.get("command", ""), want["command"]
+            # The renderer owns the complete managed hook entry, not only its
+            # command string.  A retained command under a different hook type
+            # (or with an unrecognised managed field) is not the same hook and
+            # must never be certified current.  Command-tail extensions remain
+            # the one explicit local-extension seam below.
+            actual_shape = {k: v for k, v in actual.items() if k != "command"}
+            wanted_shape = {k: v for k, v in want.items() if k != "command"}
+            if actual_shape != wanted_shape:
+                issues.append(
+                    f"{moment} managed hook fields diverge from the managed "
+                    f"form: {actual_shape!r} vs {wanted_shape!r}")
             if cmd == want_cmd:
                 pass
             elif cmd.startswith(want_cmd + " "):

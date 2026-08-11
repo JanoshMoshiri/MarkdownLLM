@@ -15,11 +15,18 @@ it is a Phase 8 product decision, not architecture cleanup.
 from __future__ import annotations
 
 from .claude_code import CLAUDE_CODE
+from .codex import CODEX
 
 DEFAULT_HARNESS = "claude-code"
 
+# CLI spelling is an interface concern, not another registry entry.  Keep one
+# canonical adapter identity so diagnostics, attestations, and install plans
+# cannot split between ``claude`` and ``claude-code``.
+ALIASES = {"claude": "claude-code"}
+
 _REGISTRY = {
     CLAUDE_CODE.name: CLAUDE_CODE,
+    CODEX.name: CODEX,
 }
 
 
@@ -34,6 +41,32 @@ def get(name: str):
 
 def names() -> tuple[str, ...]:
     return tuple(sorted(_REGISTRY))
+
+
+def canonical_name(name: str) -> str:
+    return ALIASES.get(name, name)
+
+
+def selection(value: str | None) -> tuple[str, ...]:
+    """Resolve a CLI selection without embedding vendor branches in callers.
+
+    No value preserves the compatibility default. ``all`` is deterministic;
+    ``none`` is an honest empty projection. Unknown names fail before a caller
+    creates or mutates anything.
+    """
+    if value is None:
+        value = DEFAULT_HARNESS
+    if value == "none":
+        return ()
+    if value == "all":
+        return names()
+    name = canonical_name(value)
+    get(name)  # validate now, before any service writes
+    return (name,)
+
+
+def selection_choices() -> tuple[str, ...]:
+    return tuple(sorted(set(names()) | set(ALIASES) | {"all", "none"}))
 
 
 def register(adapter) -> None:

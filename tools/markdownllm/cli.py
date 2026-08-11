@@ -53,7 +53,9 @@ from __future__ import annotations
 import argparse
 import sys
 
+from .adapters import names as adapter_names, selection_choices
 from .boundary import cmd_boundary
+from .adapter_install import cmd_adapter_install
 from .calc import cmd_calc
 from .cascade import cmd_cascade
 from .coherence import cmd_coherence
@@ -61,6 +63,7 @@ from .doctor import cmd_doctor
 from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
 from .history import cmd_changelog, cmd_worklog
+from .harness_ports import LIFECYCLE_BINDINGS
 from .imports_check import cmd_estate_check, cmd_imports_check
 from .sync import cmd_autopush, cmd_estate_sync
 from .indexes import cmd_index
@@ -70,6 +73,7 @@ from .provenance import cmd_provenance
 from .refresh import cmd_refresh
 from .scaffold import cmd_install_hook, cmd_scaffold
 from .runtime import cmd_runtime_probe
+from .lifecycle_runner import cmd_harness_event
 from .session import cmd_session_start
 from .tokens import cmd_tokens
 from .touchpoints import cmd_candidates, cmd_touchpoints
@@ -201,13 +205,31 @@ def build_cli() -> argparse.ArgumentParser:
     d = sub.add_parser("doctor", help="probe the environment: floor prerequisites, "
                                       "hook execution, framework version drift")
     d.add_argument("path", nargs="?", default=".")
+    d.add_argument("--harness", choices=tuple(
+        choice for choice in selection_choices() if choice != "none"),
+                   help="show explicit adapter facts for one harness or all")
     d.set_defaults(fn=cmd_doctor)
 
     sc = sub.add_parser("scaffold", help="deterministic domain birth: templates, "
                                          "nested repo, .gitignore isolation, hook, "
                                          "first commit")
     sc.add_argument("path", help="folder to create (its name becomes the domain name)")
+    sc.add_argument("--harness", choices=selection_choices(),
+                    help="outer adapter projection: one harness, all, or none; "
+                         "omitting preserves the compatibility default")
     sc.set_defaults(fn=cmd_scaffold)
+
+    ai = sub.add_parser(
+        "adapter-install",
+        help="show and safely apply a project-local harness adapter diff")
+    ai.add_argument("path", nargs="?", default=".")
+    ai.add_argument("--harness", required=True,
+                    choices=tuple(choice for choice in selection_choices()
+                                  if choice != "none"),
+                    help="one registered harness or all selected adapters")
+    ai.add_argument("--dry-run", action="store_true",
+                    help="show decisions and owned diff without writing")
+    ai.set_defaults(fn=cmd_adapter_install)
 
     h = sub.add_parser("install-hook", help="install the three mdllm git hooks (pre-commit, commit-msg, post-commit) and execution-test pre-commit where git supports it")
     h.add_argument("path", nargs="?", default=".")
@@ -222,6 +244,17 @@ def build_cli() -> argparse.ArgumentParser:
                              "opened nested domain)")
     rp.add_argument("path", nargs="?", default=".")
     rp.set_defaults(fn=cmd_runtime_probe)
+
+    he = sub.add_parser(
+        "harness-event",
+        help="internal project-hook dispatch for one ordered lifecycle binding")
+    he.add_argument("harness", choices=adapter_names())
+    he.add_argument("moment", choices=tuple(
+        binding.moment for binding in LIFECYCLE_BINDINGS))
+    he.add_argument("path", help="Git repository root supplied by the hook")
+    he.add_argument("definition_hash",
+                    help="renderer-embedded managed-definition fingerprint")
+    he.set_defaults(fn=cmd_harness_event)
 
     ms = sub.add_parser("mcp-serve", help="serve a domain's exposed face over MCP "
                         "— the cross-domain producing side (read-only). Default "

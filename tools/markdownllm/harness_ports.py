@@ -237,3 +237,17 @@ class DiagnosticPresentation:
 @runtime_checkable
 class DiagnosticPresentationPort(Protocol):
     def diagnostic_presentation(self) -> DiagnosticPresentation: ...
+
+
+@runtime_checkable
+class LifecycleOutputPort(Protocol):
+    """Translate one neutral lifecycle execution into harness stdout.
+
+    The application service owns step execution and evidence; the adapter
+    owns only the event-specific output envelope.  In particular, a harness
+    whose post-action stdout is ignored can serialize its documented feedback
+    channel without teaching the neutral runner that vendor schema.
+    """
+
+    def format_lifecycle_output(
+            self, moment: str, text: str, passed: bool) -> str: ...

@@ -10,17 +10,20 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+import os
 from pathlib import Path
 
 import yaml
 
-from .adapters import get as get_adapter, names as adapter_names
+from . import adapters as harness_adapters
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
+from .harness_diagnostics import CapabilityDiagnostic, diagnose_harness
 from .harness_ports import (
     DiagnosticPresentationPort, HarnessContext, InspectPort,
 )
 from .model import parse_frontmatter
 from .repo import _version_lt
+from .runtime import probe as runtime_probe
 from .scaffold import HOOK_BODY, MDLLM_ENTRY
 
 def _upstream_sentinel_version(root: Path):
@@ -115,7 +118,6 @@ def cmd_doctor(args) -> int:
             # `coherence` missing). Compare the copy against what install-hook
             # would write now. Advisory, not fatal: the hook still runs
             # `validate`, so the floor is active — just not current.
-            import os
             try:
                 rel = Path(os.path.relpath(MDLLM_ENTRY, root)).as_posix()
             except ValueError:
@@ -237,34 +239,126 @@ def cmd_doctor(args) -> int:
                            f"run `mdllm domain-kernel .` and commit")
         else:
             report("OK", f"domain-kernel in sync ({len(present)} blocks)")
-        # Harness adapter advisory — neutral diagnostic logic over declared
-        # ports only (v1.6): the install decision and extension surfacing are
-        # doctor's; the vendor wording is adapter DATA via
-        # DiagnosticPresentationPort. An adapter offering neither port is
-        # skipped — absence of a capability is a valid answer, not a crash.
-        # framework_root_rel is presentation-irrelevant here: the inspect
-        # currency check needs A context, and doctor reports
-        # installed/extended, not per-path currency, until Phase 3.
-        rel_ctx = HarnessContext(
-            framework_root_rel=str((ameta or {}).get("framework_root", "..")))
-        for harness in adapter_names():
-            a = get_adapter(harness)
-            if not (isinstance(a, InspectPort)
-                    and isinstance(a, DiagnosticPresentationPort)):
-                continue
-            insp = a.inspect(root, rel_ctx)
-            frag = insp.fragments[0] if insp.fragments else None
-            installed = bool(frag and frag.present
-                             and "session-start" in frag.intents_realised)
-            words = a.diagnostic_presentation()
-            if installed:
-                text = words.installed
-                if insp.extensions:
-                    text += (f" — locally extended: {len(insp.extensions)} "
-                             f"deviation(s) preserved")
-                report("OK", text)
-            else:
-                report("--", words.absent)
+        # Harness adapter advisory.  The no-option path preserves the compact
+        # compatibility line and inspects present project artifacts (falling
+        # back to the configured default when none exist).  An explicit
+        # --harness request prints the independent Phase-3 facts; none of them
+        # changes the Git-floor verdict below.
+        try:
+            rel_fw = Path(os.path.relpath(
+                MDLLM_ENTRY.parents[1], root)).as_posix()
+        except ValueError:
+            rel_fw = "."  # diagnosis stays read-only; runtime reports truth
+        rel_ctx = HarnessContext(framework_root_rel=rel_fw)
+        requested = getattr(args, "harness", None)
+
+        if requested is None:
+            present: list[str] = []
+            inspections = {}
+            for harness in harness_adapters.names():
+                adapter = harness_adapters.get(harness)
+                if not isinstance(adapter, InspectPort):
+                    continue
+                inspection = adapter.inspect(root, rel_ctx)
+                inspections[harness] = inspection
+                if any(fragment.artifact_present
+                       for fragment in inspection.fragments):
+                    present.append(harness)
+            selected = tuple(present) or (harness_adapters.DEFAULT_HARNESS,)
+            for harness in selected:
+                adapter = harness_adapters.get(harness)
+                if not (isinstance(adapter, InspectPort)
+                        and isinstance(adapter, DiagnosticPresentationPort)):
+                    report("--", f"{harness} project adapter detected — run "
+                           f"`mdllm doctor . --harness {harness}` for facts")
+                    continue
+                inspection = inspections.get(harness) or adapter.inspect(
+                    root, rel_ctx)
+                fragment = (inspection.fragments[0]
+                            if inspection.fragments else None)
+                installed = bool(
+                    fragment and fragment.present
+                    and "session-start" in fragment.intents_realised)
+                words = adapter.diagnostic_presentation()
+                if installed:
+                    text = words.installed
+                    if inspection.extensions:
+                        text += (f" — locally extended: "
+                                 f"{len(inspection.extensions)} deviation(s) "
+                                 "preserved")
+                    report("OK", text)
+                else:
+                    report("--", words.absent)
+        else:
+            runtime_result = runtime_probe(root, MDLLM_ENTRY)
+
+            def fact_status(fact: CapabilityDiagnostic) -> str:
+                if (fact.configuration in ("invalid", "ambiguous")
+                        or fact.currency == "stale"
+                        or fact.runtime.state in (
+                            "unresolved", "dependency-missing", "command-failed")
+                        or fact.execution.state == "failed"):
+                    return "WARN"
+                if (fact.configuration == "present"
+                        and fact.currency == "current"
+                        and fact.runtime.state == "command-runs"
+                        and fact.execution.state == "passed"
+                        and fact.trust in (
+                            "not-applicable", "trusted", "managed")):
+                    return "OK"
+                return "--"
+
+            for harness in harness_adapters.selection(requested):
+                adapter = harness_adapters.get(harness)
+                diagnostic = diagnose_harness(
+                    adapter, root, rel_ctx, runtime_result=runtime_result)
+                for fact in diagnostic.capabilities:
+                    report(
+                        fact_status(fact),
+                        f"harness {diagnostic.harness}/{fact.capability}: "
+                        f"support={fact.support}; "
+                        f"configuration={fact.configuration}; "
+                        f"currency={fact.currency}; trust={fact.trust}; "
+                        f"runtime={fact.runtime.state}; "
+                        f"execution={fact.execution.state}")
+                    for extension in fact.extensions:
+                        report("--", f"extension preserved: {extension}")
+                    for finding in fact.findings:
+                        report("WARN", f"adapter finding: {finding}")
+                    if fact.trust_detail:
+                        report("--", f"trust detail: {fact.trust_detail}")
+                    if fact.runtime.resolved:
+                        report("--", f"runtime resolved: "
+                               f"{fact.runtime.resolved}")
+                    if fact.runtime.detail:
+                        report("--", f"runtime detail: {fact.runtime.detail}")
+                    evidence = "; ".join(part for part in (
+                        (f"source={fact.execution.source}"
+                         if fact.execution.source else ""),
+                        (f"observed_at={fact.execution.attested_at}"
+                         if fact.execution.attested_at else ""),
+                        ("definition_current="
+                         f"{str(fact.execution.definition_current).lower()}"
+                         if fact.execution.definition_current is not None
+                         else ""),
+                    ) if part)
+                    if evidence:
+                        report("--", f"execution evidence: {evidence}")
+                    if fact.execution.detail:
+                        report("--", f"execution detail: "
+                               f"{fact.execution.detail}")
+                remediations = tuple(dict.fromkeys(
+                    remedy for fact in diagnostic.capabilities
+                    for remedy in fact.remediations))
+                for remedy in remediations:
+                    report("--", f"remedy: {remedy}")
+                for operator_owned in tuple(dict.fromkeys(
+                        diagnostic.operator_owned)):
+                    report("--", f"operator-owned: {operator_owned}")
+                for ownership in tuple(dict.fromkeys(
+                        owner for fact in diagnostic.capabilities
+                        for owner in fact.ownership)):
+                    report("--", f"ownership: {ownership}")
 
     print(f"## Doctor Report — {root}\n")
     print("\n".join(lines))

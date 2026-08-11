@@ -13,11 +13,10 @@ front (markdownllm/adapters/__init__.py) is the one aggregation point where
 adapters are known by name — importing IT from a neutral module is the
 sanctioned seam; importing a vendor module directly is not.
 
-Known, documented exception: model.py's corpus-exclusion data (.claude in
-DEFAULT_EXCLUDES, CLAUDE.md in NON_THING_FILES) is vendor paths as scan
-configuration. Phase 4 adds .codex there; whether that data moves behind the
-registry is a Phase 4 design question, so model.py is deliberately outside
-this gate's scope for now rather than silently passed.
+Known, documented exception: model.py's corpus-exclusion data (.claude and
+.codex in DEFAULT_EXCLUDES, CLAUDE.md in NON_THING_FILES) contains vendor paths
+as scan configuration rather than executable adapter policy. model.py remains
+deliberately outside this lexical gate rather than being silently passed.
 
 Run: python -m pytest tools/tests/test_architecture_fitness.py -q
 """
@@ -34,7 +33,8 @@ PKG = Path(__file__).resolve().parents[1] / "markdownllm"
 
 NEUTRAL_MODULES = [
     "harness_ports.py", "runtime.py", "scaffold.py", "doctor.py",
-    "cli.py", "session.py",
+    "cli.py", "session.py", "harness_diagnostics.py",
+    "lifecycle_runner.py", "adapter_install.py",
 ]
 
 # Vendor vocabulary that must not appear in neutral CODE (case-insensitive).
@@ -112,10 +112,10 @@ def test_every_registered_adapter_satisfies_the_ports():
 
 
 # ---------------------------------------------------- port-only fake adapter
-# v1.6 return item 2: a minimal adapter implementing ONLY the declared
-# Render/Inspect contracts, registered and driven through the REAL scaffold
-# and doctor. If either service calls one undeclared method, this crashes —
-# the gate that would have caught the shortcut/guidance/doctor_line leak.
+# v1.6 return item 2: a second adapter implementing ONLY declared contracts,
+# registered and driven through the REAL scaffold and doctor. If either
+# service calls one undeclared method, this crashes — the gate that would have
+# caught the shortcut/guidance/doctor_line leak.
 
 
 class _PortOnlyAdapter:
@@ -136,6 +136,18 @@ class _PortOnlyAdapter:
             fragments=(ManagedFragment(
                 path="port-only.cfg", present=False,
                 artifact_present=False),))
+
+    def shortcut_sources(self, templates_root):
+        return {"port-only.txt": templates_root / "AGENTS.md.template"}
+
+    def scaffold_guidance(self):
+        return "port-only-fake scaffold guidance"
+
+    def diagnostic_presentation(self):
+        from markdownllm.harness_ports import DiagnosticPresentation
+        return DiagnosticPresentation(
+            installed="port-only-fake installed",
+            absent="port-only-fake absent")
 
 
 def _ns(**kw):
@@ -162,9 +174,9 @@ def test_port_only_adapter_survives_scaffold_and_doctor(tmp_path, capsys,
     fake = _PortOnlyAdapter()
     adapters.register(fake)
     try:
-        # Doctor: iterates every registered adapter over a real domain dir.
-        # The fake offers no DiagnosticPresentationPort — skipped, no crash,
-        # and the default adapter's line still appears.
+        monkeypatch.setattr(adapters, "DEFAULT_HARNESS", fake.name)
+        # Doctor: the fake opts into the declared presentation port and must
+        # be exercised, rather than merely skipped as capability-less.
         d = tmp_path / "doctor-target"
         d.mkdir()
         _git_repo(d)
@@ -172,13 +184,10 @@ def test_port_only_adapter_survives_scaffold_and_doctor(tmp_path, capsys,
                                      encoding="utf-8")
         mdllm.cmd_doctor(_ns(path=str(d)))
         out = capsys.readouterr().out
-        assert "no SessionStart adapter" in out  # default adapter unaffected
-        assert "port-only-fake" not in out       # fake silently capability-less
+        assert "port-only-fake absent" in out
 
-        # Scaffold: the fake as DEFAULT harness end-to-end. Renders nothing,
-        # projects no shortcuts, prints no guidance — and the birth sequence
-        # still completes, because every capability call is isinstance-gated.
-        monkeypatch.setattr(adapters, "DEFAULT_HARNESS", fake.name)
+        # Scaffold: the fake as DEFAULT harness end-to-end. Every optional
+        # capability is reached exclusively through its declared port.
         _git_repo(tmp_path)
         target = tmp_path / "port-only-birth"
         rc = mdllm.cmd_scaffold(_ns(path=str(target)))
@@ -187,5 +196,7 @@ def test_port_only_adapter_survives_scaffold_and_doctor(tmp_path, capsys,
         assert not (target / ".claude").exists()
         assert not (target / ".github").exists()
         assert "hardened out of the box" not in out
+        assert (target / "port-only.txt").is_file()
+        assert "port-only-fake scaffold guidance" in out
     finally:
         adapters.unregister(fake.name)

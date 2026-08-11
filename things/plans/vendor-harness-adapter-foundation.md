@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.6
+version: 1.8
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -49,15 +49,60 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** Claude commits `cce3b70` (Phase 1 repair) and
-`6996309` (Phase 2C extraction) were returned for final Codex acceptance. The
-shared runtime now passes real framework-root and directly opened domain-repo
-probes in the Codex managed shell, but the final handoff gate failed on the
-explicit adapter boundary, Claude inspection currency, and one PATH-dependent
-runtime acceptance fixture. The Claude Code agent owns the unchecked v1.6
-return items below. The Codex agent stops before Phases 3–5 until those items
-are committed and the complete gate is rerun. No inference from phase order is
-permitted; the ownership and stop conditions below are part of the plan.
+**Current execution boundary:** the complete Phase A/0–2 handoff remains
+accepted, and the Codex-owned Phases 3–5 are now implemented. The neutral
+diagnostic, real-event attestation path, project-local Codex adapter, explicit
+install/refresh boundary, and selectable scaffold projections pass their
+focused gates and the 438-test full suite in the Codex managed shell. The work
+stops before Phase 6: no live project `.codex/` state, trust decision, or estate
+adapter migration was performed. The framework root's tracked
+`.claude/settings.json` is a pre-existing legacy PowerShell projection and is
+truthfully reported stale by the new inspector; it was not rewritten by this
+Codex package and must be dispositioned in the Claude-owned live record.
+
+## Amendment record — v1.8 (2026-08-12, Codex Phases 3–5 complete)
+
+The diagnostic vocabulary is now settled at its consumer as six independent
+facts: support, configuration, currency, trust, runtime, and execution;
+extensions, findings, ownership, and evidence provenance remain explicit
+detail rather than being collapsed into one "active" verdict. Static runtime
+success leaves execution untested. Real events write clone-local,
+definition-hash-bound attestations, and changed definitions invalidate old
+evidence.
+
+The Codex adapter renders only the project `.codex/hooks.json` surface, keeps
+SessionStart ordering inside one handler, translates advisory failures through
+Codex's structured context channel, and emits cwd-independent POSIX and Windows
+commands. The Windows path is tested through both PowerShell 7 and the stock
+Windows PowerShell fallback. Trust and exact-hook review remain operator facts;
+the implementation neither reads nor mutates global Codex state.
+
+The explicit install service preflights every selected adapter before writing,
+preserves bytes outside a clearly owned composite fragment, and refuses
+invalid, duplicate, alternate-source, stale, or ambiguous state. A cold audit
+expanded that boundary around duplicate JSON keys, concurrent mutation and
+rollback, portable path collisions, scaffold/core collisions, formatter
+attestation order, diagnostic provenance, and shell injection. Those cases now
+have regressions. The final focused adapter/launcher gate passed 67 tests and
+the authoritative full run passed 438 tests; its temporary repositories lived
+outside the framework Git worktree so non-repository fixtures retained their
+intended topology. A separate cold replay accepted every returned blocker and
+found no remaining defect. Framework validation then checked 190 things across
+the three corpora with zero findings; coherence retained only the pre-existing
+informational note about the recently changed stable scalability guide.
+
+## Amendment record — v1.7 (2026-08-11, final handoff accepted)
+
+Claude's v1.6 return package repaired the shared runtime, declared every
+service-facing port, and closed the named inspector cases. The Codex cold-read
+gate additionally varied a renderer-owned hook field while preserving its
+command; the old comparison certified `type: prompt` as current. Currency now
+compares the complete managed entry, with command-tail arguments as the sole
+explicit extension seam. The architecture fake now opts into and is asserted
+through every declared doctor/scaffold presentation port. With 45 focused
+tests passing after those corrections, the no-workaround gate is closed and
+ownership advances explicitly to the Codex diagnostic, adapter, and install
+work package.
 
 ## Amendment record — v1.6 (2026-08-11, final Codex handoff audit)
 
@@ -322,15 +367,19 @@ This applies SOLID directly:
 
 ### Diagnostic model
 
-For each capability, `mdllm doctor` reports independent dimensions:
+For each capability, `mdllm doctor` reports independent facts:
 
 | Dimension | Example values |
 |---|---|
 | Support | supported / unsupported / unknown |
-| Configuration | absent / present-current / present-stale / invalid / extended |
+| Configuration | not-applicable / absent / present / invalid / ambiguous / unknown |
+| Currency | not-applicable / current / stale / unknown |
 | Trust | not-applicable / unknown / review-required / trusted / managed |
-| Runtime | unresolved / command-runs / dependency-missing |
-| Execution | untested / passed / failed, with timestamp or attestation source |
+| Runtime | not-applicable / unknown / unresolved / dependency-missing / command-failed / command-runs |
+| Execution | not-applicable / untested / passed / failed, with timestamp and attestation source where available |
+
+Extensions, findings, ownership boundaries, remediation, and evidence detail
+are reported alongside these facts. They do not silently alter another fact.
 
 The existing floor verdict remains independent. A missing adapter can be
 reported alongside `FLOOR ACTIVE`; an installed-but-untrusted Codex hook is not
@@ -572,7 +621,7 @@ available to Phase 3 without Phase 1 freezing their presentation vocabulary.
 directly-opened domain, fresh nested-hook, and masked-PATH probes. The remaining
 acceptance defect is the fixture rather than the resolver:
 
-- [ ] **Claude return item:** make
+- [x] **Claude return item:** make
   `test_probe_reports_command_executed_as_its_own_fact` supply a controlled
   floor-capable candidate after moving the entry, rather than assuming the
   target harness PATH contains Python with PyYAML. Pin dependency probing on
@@ -630,8 +679,8 @@ existing composite Claude settings file is inspected without mutation or
 normalisation. The Claude agent then stops; the final cross-harness handoff
 gate above must pass before Phase 3.
 
-**Final Codex acceptance [v1.6]: failed. Claude owns these return items before
-the next handoff:**
+**Final Codex acceptance [v1.7]: passed. The v1.6 return items were committed
+by Claude and the final Codex semantic probe corrections are recorded above:**
 
 - [x] Declare every service-facing dependency as a narrow port (including
   shortcut projection and scaffold presentation), and make doctor consume a
@@ -649,56 +698,74 @@ the next handoff:**
 
 ### Phase 3 — Build truthful harness diagnostics (owner: Codex agent)
 
-- [ ] Add `doctor --harness` capability reports with the five independent
+- [x] Add `doctor --harness` capability reports with the six independent
   dimensions above. **[v1.2]** This phase now *settles* that vocabulary as well
   as consuming it — the dimension table above is the design intent, and Phase 3
   owns the final names and value sets because it is the first code that has to
   be honest in them.
-- [ ] Derive managed-fragment currency from the same adapter renderer used to
+- [x] Derive managed-fragment currency from the same adapter renderer used to
   create it; compare semantically where formatting is operator-owned.
-- [ ] Add execution attestations/probes without claiming that a static probe
+- [x] Add execution attestations/probes without claiming that a static probe
   fired a real session event.
-- [ ] Report remediation commands and ownership boundaries; never auto-fix.
+- [x] Report remediation commands and ownership boundaries; never auto-fix.
 
 **Gate:** fixtures prove that present-but-invalid, present-but-untrusted,
 runnable-but-untested, extended, and verified cannot be conflated.
 
+**Outcome [v1.8]: passed.** The diagnostic tests exercise each independent
+state, hash-bound current and stale attestations, provenance, and unknown trust.
+
 ### Phase 4 — Add the Codex adapter (owner: Codex agent)
 
-- [ ] Render a project `.codex/hooks.json` with one sequential SessionStart
+- [x] Render a project `.codex/hooks.json` with one sequential SessionStart
   handler, file-edit PostToolUse validation, stable root resolution, bounded
   output, and Windows/POSIX commands.
-- [ ] Inspect config, project trust, hook-review state where observable, runtime
+- [x] Inspect config, project trust, hook-review state where observable, runtime
   resolution, and managed-fragment currency. Report `unknown` where Codex does
   not expose a stable machine-readable fact.
-- [ ] Exclude `.codex` from thing-corpus scanning just as `.claude` is excluded.
-- [ ] Add schema, rendering, merge, cwd/subdirectory, compaction-source, output
+- [x] Exclude `.codex` from thing-corpus scanning just as `.claude` is excluded.
+- [x] Add schema, rendering, merge, cwd/subdirectory, compaction-source, output
   limit, and failure-path tests.
 
 **Gate:** adapter unit/integration tests pass without touching Claude fixtures.
 
+**Outcome [v1.8]: passed.** The official-contract shape is implemented and
+tested without installing a live project layer; Phase 6 alone can promote it
+from designed-for to verified-on.
+
 ### Phase 5 — Expose explicit install and scaffold selection (owner: Codex agent)
 
-- [ ] Add an explicit human-invoked adapter install/refresh command that shows
+- [x] Add an explicit human-invoked adapter install/refresh command that shows
   the owned diff and refuses ambiguous merges.
-- [ ] **[v1.2]** Land the merge tests deferred from the Claude non-regression
+- [x] **[v1.2]** Land the merge tests deferred from the Claude non-regression
   boundary: existing `permissions` survive byte-for-byte, a locally extended
   SessionStart command is untouched, and an ambiguous fragment produces a diff
   and a refusal. Both surviving cases exist in the live estate; the refusal
   case needs a fixture. These belong here because this command is the first
   code that can merge anything.
-- [ ] Add repeatable scaffold selection such as `--harness claude`,
+- [x] Add repeatable scaffold selection such as `--harness claude`,
   `--harness codex`, `--harness all`, and `--harness none` while preserving the
   no-flag behaviour during this compatibility release.
-- [ ] Keep AGENTS.md, skills, prompts, schema, and Git hooks identical across
+- [x] Keep AGENTS.md, skills, prompts, schema, and Git hooks identical across
   harness selections; only outer projections vary.
-- [ ] Do not decide a new default as part of the refactor. A default change is
+- [x] Do not decide a new default as part of the refactor. A default change is
   a versioned product decision after live evidence, not architecture cleanup.
 
 **Gate:** two scaffolds selected for different harnesses differ only in their
 outer adapter artifacts and both validate cleanly.
 
+**Outcome [v1.8]: passed.** No-flag scaffolding remains byte-compatible with
+Claude, while `claude`, `codex`, `all`, and `none` vary only their outer
+projections; composite installation is lossless or safely refused.
+
 ### Phase 6 — Execute in real harnesses (split ownership by harness)
+
+The framework root currently carries a tracked legacy Claude projection
+(`shell: powershell`, combined SessionStart command) that predates the current
+renderer and is reported stale. The Claude live record must distinguish that
+operator-owned estate state from a fresh-scaffold non-regression result and
+explicitly decide whether to refresh it; Phases 3–5 deliberately left it
+byte-for-byte untouched.
 
 - [ ] Claude non-regression: scaffold, open, observe SessionStart ordering,
   edit a thing, observe PostToolUse feedback, and commit through the floor.
