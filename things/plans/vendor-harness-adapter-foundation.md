@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: not-started
-version: 1.1
+version: 1.2
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -43,10 +43,32 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** the Claude Code agent owns Phases 0–2 and must
-stop at the cross-harness handoff gate. The Codex agent owns Phases 3–5 only
-after accepting that handoff. No inference from phase order is permitted; the
-ownership and stop conditions below are part of the plan.
+**Current execution boundary:** the Claude Code agent owns Phase A and
+Phases 0–2, and must stop at the cross-harness handoff gate. The Codex agent
+owns Phases 3–5 only after accepting that handoff. No inference from phase
+order is permitted; the ownership and stop conditions below are part of the
+plan.
+
+## Amendment record — v1.2 (2026-08-11)
+
+v1.1 was reviewed from the Claude Code side against the live tree. The
+diagnosis held on every claim checked; six amendments follow, and each is
+marked **[v1.2]** at its point of use so the Codex agent can diff intent
+without re-reading the whole plan.
+
+1. **Two coupling surfaces were missing from the map** — vendor vocabulary in
+   the Tier-1 specs, and the eval harness. Both are now rows in the assessment
+   table. The first becomes Phase A; the second is held outside.
+2. **Phase A added** — the spec vocabulary sweep, an independent slice that
+   needs no port, no adapter, and no handoff.
+3. **A throwaway Codex renderer spike enters Phase 1**, so the ports are shaped
+   against two real vendor shapes rather than extracted from Claude alone.
+4. **The merge-test requirement gets a phase home** (Phase 5, not the Claude
+   package), because scaffold cannot reach the merge path at all.
+5. **Phase 0 no longer freezes the diagnostic vocabulary** — that contract
+   belongs to the phase that has to satisfy it.
+6. **Defect 3 is restated more exactly**; the pre-commit hook body, not only
+   doctor, is where the runtime fix lands.
 
 ## Assessment verdict
 
@@ -65,6 +87,8 @@ The coupling that does exist is concentrated in delivery and diagnostics:
 | Surface | Coupling | Assessment |
 |---|---:|---|
 | Domain policy and state | Low | AGENTS/kernel/skills/things contain the operative program; no Claude API or storage dependency. |
+| Tier-1 spec vocabulary **[v1.2]** | Medium — prose only | *Dependency* is low; *address* is not. `thing.md` names Claude 12 times meaning "the reasoning agent" ("the minimal information Claude needs to parse", "helps Claude prioritize", "Claude will understand it"); `scalability-guide.md` 16 times; `examples/life-manager/skills/*` 13. A Codex session reading the canonical spec is addressed as another vendor. Generated `kernel.md` and `templates/` are already clean, so the fix is prose-layer and cannot regress a scaffold. |
+| Eval harness **[v1.2]** | High, and out of scope | `tools/markdownllm/evals.py` resolves and shells the Claude CLI (`_resolve_claude_cli`, `claude -p --model`, hard exit when absent). Framework-development infrastructure, not domain runtime — but until it is named, "the substrate is vendor-agnostic" is false for `mdllm eval`. Held outside this plan, explicitly. |
 | Orchestration contract | Low–medium | The three-anchor model is vendor-neutral, but several explanations and deployment instructions name Claude as the only realised harness adapter. |
 | Git floor and lifecycle CLI | Low | Validation, `estate-sync`, and `session-start` are reusable application services. Their interpreter/runtime resolution is not yet seamless from a directly opened nested domain in the Codex managed shell. |
 | Scaffold | High | `scaffold.py` constructs `.claude/settings.json` inline, unconditionally creates Claude command files, and prints Claude-specific completion guidance. There is no adapter port. |
@@ -86,6 +110,16 @@ Three defects fall out of that map:
    virtual environment under the domain Git root. In the current Codex shell,
    the usable environment is at the framework root. A Codex hook alone cannot
    repair the Git floor; the shared runtime port must be fixed first.
+
+   **[v1.2] Stated exactly, from `HOOK_BODY` in `tools/markdownllm/scaffold.py`:**
+   the candidate list is `$ROOT/.venv/...` where `ROOT` is the *domain* Git root,
+   while `$MDLLM` is `$ROOT/{rel}` resolving *upward* to the framework. The
+   framework-root environment is therefore unreachable by construction, not by
+   accident of the current shell. Compounding it, the candidate probe is
+   `"$c" -c "import sys"` — that proves an interpreter exists, not that PyYAML
+   loads, so a bare `python3` passes the probe and then fails at `import yaml`,
+   blocking the commit with a message that names neither cause. The fix belongs
+   in the emitted hook body, not only in doctor's reporting.
 
 These are adapter-foundation problems, not reasons to alter the substrate or
 the domains.
@@ -245,7 +279,13 @@ Claude safety is a release gate, not a hope:
    that phase.
 3. Add merge tests proving existing `permissions` survive and an extended
    SessionStart command remains untouched. The live estate contains both
-   cases.
+   cases. **[v1.2] This requirement is gated in Phase 5, not in the Claude
+   extraction package.** Scaffold cannot reach the merge path — it exits on a
+   non-empty target — so merge only ever executes through the Phase 5
+   install/refresh command, and a merge test written in Phase 2 would have no
+   subject. What Phase 2 owes instead is the weaker, achievable property: an
+   existing composite settings file *round-trips* through inspect → render
+   without loss of permissions or local extensions.
 4. Keep the existing Claude tests and add semantic execution tests; do not
    replace concrete assertions with generic adapter-only mocks.
 5. A Codex renderer or probe failure must not prevent the Claude adapter from
@@ -265,8 +305,10 @@ from their own harness side.
 
 ### Claude Code agent — extraction work package
 
-The Claude Code agent owns **Phases 0–2 only**:
+The Claude Code agent owns **Phase A and Phases 0–2 only**:
 
+- **[v1.2]** sweep vendor address out of the Tier-1 specs and example skills
+  (Phase A) — independent of everything below, and of any adapter;
 - freeze the current Claude artifacts and behaviour;
 - implement the shared runtime work needed by the extraction;
 - extract Claude behind the inward-owned adapter ports without changing its
@@ -298,7 +340,13 @@ accepts the Phase 0–2 handoff. Acceptance requires all of the following:
    in the Codex managed shell, or any failure is routed back as shared-runtime
    work rather than patched inside the future Codex adapter.
 5. The Codex review finds no least-common-denominator abstraction or hidden
-   Claude ordering assumption in the application contract.
+   Claude ordering assumption in the application contract. **[v1.2]** This
+   condition previously carried the whole weight of a hazard created by
+   sequencing: ports extracted from one vendor, reviewed for one-vendor bias
+   afterwards. The Phase 1 Codex renderer spike moves most of that weight
+   forward into design, where it is cheaper. The condition stays — a spike is
+   evidence, not a second implementation — but it should now be a confirmation
+   rather than a discovery.
 
 A failed condition returns the work to the Claude extraction package (or the
 shared runtime slice). It must never be bypassed with a Codex-side workaround.
@@ -330,13 +378,45 @@ it is not permission to edit Claude output for convenience.
 
 ## Phased plan
 
+### Phase A — Sweep vendor address out of the specs **[v1.2]** (owner: Claude Code agent)
+
+Independent of every other phase. It touches no adapter, no port, no tool
+control flow, and blocks on no handoff — it can run first, last, or alongside,
+and it is the only slice here that changes the substrate rather than its outer
+edge.
+
+- [ ] Replace "Claude" with the agent-neutral term wherever the Tier-1 specs
+  mean *the reasoning agent* — `thing.md`, `scalability-guide.md`, and the
+  worked example skills under `examples/`. Preserve every mention that names
+  Claude Code as a *specific harness* with a real vendor fact attached; those
+  are true statements, not leakage.
+- [ ] Settle one term first and use it everywhere. The specs already alternate
+  between "the agent", "Claude", and passive voice; the sweep is worthless if
+  it installs a third variant.
+- [ ] Regenerate `kernel.md` and confirm the operative blocks are unchanged in
+  meaning. The generated kernel is already vendor-clean, which bounds the blast
+  radius: if a kernel block changes, the sweep has edited rules, not address.
+- [ ] Leave `templates/` alone — verified clean, so scaffolded domains are not
+  inheriting the vocabulary and no estate migration is implied.
+
+**Gate:** validate and the full suite pass; `kernel.md` regenerates with no
+semantic diff; no domain repo requires any change.
+
+**Why it is first-class rather than a Phase 7 docs chore:** every other phase
+in this plan makes the *outer edge* vendor-neutral while the canonical inner
+specs still address one vendor by name. That is the coupling a Codex operator
+meets in the first minute, before any adapter exists to fail.
+
 ### Phase 0 — Freeze the contract and evidence (owner: Claude Code agent)
 
 - [ ] Record golden Claude scaffold artifacts and current CLI behaviour.
 - [ ] Add estate-shape fixtures: hooks-only config, permissions-only config,
   permissions-plus-hooks, no settings, and a locally extended startup command.
-- [ ] Define the minimal lifecycle intents and diagnostic dimensions in tests
-  before creating adapter classes.
+- [ ] Define the minimal lifecycle intents in tests before creating adapter
+  classes. **[v1.2] The diagnostic dimensions move to Phase 3** — freezing a
+  five-dimension vocabulary here would commit the only agent who never builds
+  its consumer to a contract the consumer must live inside. Phase 0 freezes
+  what exists and is about to move: Claude's bytes and behaviour.
 - [ ] Record current Codex hook documentation date and a live-harness test
   checklist; do not encode undocumented assumptions.
 
@@ -352,11 +432,28 @@ it is not permission to edit Claude output for convenience.
 - [ ] Make `install-hook` execution-test the emitted pre-commit hook where Git
   supports it, and teach doctor to distinguish interpreter-found from
   dependency-loaded and command-executed.
+- [ ] **[v1.2]** Fix the resolution defect in the *emitted hook body*, not only
+  in doctor's report: add the framework-root environment (derived from the
+  `$MDLLM` path, which is the only place that knows where the framework is) to
+  the candidate list, and strengthen the candidate probe from `import sys` to
+  one that proves the dependency actually loads. A hook that selects an
+  interpreter which cannot import PyYAML blocks the commit while reporting a
+  cause that is not the cause.
 - [ ] Test a directly opened nested domain in the Codex managed shell before
   relying on lifecycle hooks.
+- [ ] **[v1.2] Spike a throwaway Codex renderer — not committed as an adapter,
+  not installed, not `.codex/` on disk.** Its only job is to make a second
+  vendor shape visible while the ports are still soft. The plan already found
+  one shape mismatch from documentation alone (Claude's single hook group
+  versus Codex's concurrent per-event hooks); one such find before any code
+  exists is evidence that a one-sided extraction will mis-fit, and the spike is
+  how that is discovered in design rather than at the acceptance gate. Delete
+  it at the end of the phase; what survives is the port shape it forced.
 
 **Gate:** the framework and a nested domain both execute validation and a real
-pre-commit through the same checked-in resolution policy.
+pre-commit through the same checked-in resolution policy, including on an
+interpreter that resolves but lacks the dependency. The spike leaves no
+artifact.
 
 ### Phase 2 — Extract Claude without changing Claude (owner: Claude Code agent; acceptance: Codex agent)
 
@@ -376,7 +473,10 @@ agent then stops; the cross-harness handoff gate above must pass before Phase 3.
 ### Phase 3 — Build truthful harness diagnostics (owner: Codex agent)
 
 - [ ] Add `doctor --harness` capability reports with the five independent
-  dimensions above.
+  dimensions above. **[v1.2]** This phase now *settles* that vocabulary as well
+  as consuming it — the dimension table above is the design intent, and Phase 3
+  owns the final names and value sets because it is the first code that has to
+  be honest in them.
 - [ ] Derive managed-fragment currency from the same adapter renderer used to
   create it; compare semantically where formatting is operator-owned.
 - [ ] Add execution attestations/probes without claiming that a static probe
@@ -404,6 +504,12 @@ runnable-but-untested, extended, and verified cannot be conflated.
 
 - [ ] Add an explicit human-invoked adapter install/refresh command that shows
   the owned diff and refuses ambiguous merges.
+- [ ] **[v1.2]** Land the merge tests deferred from the Claude non-regression
+  boundary: existing `permissions` survive byte-for-byte, a locally extended
+  SessionStart command is untouched, and an ambiguous fragment produces a diff
+  and a refusal. Both surviving cases exist in the live estate; the refusal
+  case needs a fixture. These belong here because this command is the first
+  code that can merge anything.
 - [ ] Add repeatable scaffold selection such as `--harness claude`,
   `--harness codex`, `--harness all`, and `--harness none` while preserving the
   no-flag behaviour during this compatibility release.
@@ -433,7 +539,9 @@ tested surfaces, with no wider claim.
 
 - [ ] Update orchestration, discovery, refresh, operator guide, first-hour,
   domain guide, README compatibility table, scaffold output, and adapter
-  examples from the same settled capability vocabulary.
+  examples from the same settled capability vocabulary. **[v1.2]** Phase A has
+  already swept the Tier-1 specs and example skills; this phase must not
+  re-open them for address, only for capability claims that the build changed.
 - [ ] Replace “the adapter” where it means Claude with a generic rule plus
   named vendor projections. Preserve vendor-specific instructions where the
   distinction is real.
@@ -459,6 +567,8 @@ suite, and the Claude/Codex execution records all pass.
 This plan is complete only when:
 
 - Claude scaffold output and live lifecycle behaviour have not regressed;
+- **[v1.2]** the canonical specs address *the agent*, not a vendor, so a Codex
+  operator reading `thing.md` is not being spoken to as a Claude user;
 - a new Codex-selected domain can be opened directly and run startup,
   post-write feedback, validation, and commit through a resolved runtime;
 - the substrate and every domain remain usable with no harness adapter;
@@ -480,6 +590,14 @@ This plan is complete only when:
   managed-policy decision; diagnostics may observe and explain it only.
 - Automating the semantic session-end continuity ritual. It remains a
   deliberate reasoning act, not a short cleanup hook.
+- **[v1.2] Making `mdllm eval` vendor-neutral.** `tools/markdownllm/evals.py`
+  shells the Claude CLI directly and exits when it is absent. That is real
+  coupling, deliberately kept: evals are how *this framework* is developed and
+  measured, not something a domain runs, and a second eval backend would need
+  its own scoring evidence before any comparison across harnesses meant
+  anything. It is named here so that "the substrate is vendor-agnostic" is not
+  read as covering it — the honest claim is that the substrate is
+  vendor-agnostic and its development harness is not.
 - Claiming Cursor, Windsurf, Gemini, Codex CLI, or any other surface verified
   because Claude or Codex desktop passed. Each claim needs its own execution
   evidence.
