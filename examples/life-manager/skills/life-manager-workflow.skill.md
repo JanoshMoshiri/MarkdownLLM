@@ -46,7 +46,7 @@ Deciding what you're actually going to do right now vs. later.
 - Link to calendar and notification systems
 
 ### Phase 4: Execute
-Doing the work. Claude supports you with status updates, blockers, insights.
+Doing the work. The agent supports you with status updates, blockers, insights.
 
 - Update thing narrative as you work
 - Mark related tasks complete as you finish them

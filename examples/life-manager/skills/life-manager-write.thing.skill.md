@@ -56,7 +56,7 @@ The user is asking you to help manage their life and work. Your job is to:
 - **Dependencies** — If you're marking something complete, are other things now unblocked?
 - **Relationships** — If you're creating a new thing, does it need to link to existing things?
 - **Scope** — Is this thing appropriately scoped? Should it be split or combined with something else?
-- **Context** — Is the narrative body clear enough for future Claude (or the user) to understand what this is?
+- **Context** — Is the narrative body clear enough for a future agent (or the user) to understand what this is?
 - **Vocabulary** — Statuses and relations come from `_schema.yaml`; if a legitimate change needs a value that isn't declared, extend the schema with the human rather than improvising
 
 ## Thing Types and How to Create Them

@@ -67,7 +67,7 @@ Every thing file follows this pattern:
 
 ### YAML Metadata
 
-The metadata is the structural layer. It provides the minimal information Claude needs to parse and understand relationships.
+The metadata is the structural layer. It provides the minimal information the agent needs to parse and understand relationships.
 
 #### Required Core Fields
 
@@ -82,7 +82,7 @@ These fields must be present in every thing to do:
 **type** (string)
 - What kind of thing this is
 - Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
-- Helps Claude understand scope and context
+- Helps the agent understand scope and context
 - Seven types are **framework-reserved** and have fixed semantics regardless of domain:
   - `insight` — an emerging idea or held view from a session, preserved for future context
   - `continuity-brief` — **retired (v3.17), reserved-but-deprecated**: was the domain's forward-looking session brief, now superseded by the generated orient view (open-loop things); kept reserved only so domains mid-transition still validate
@@ -137,11 +137,11 @@ These fields must be present in every thing to do:
 
 #### Recommended Fields
 
-These aren't required, but they unlock richer reasoning from Claude:
+These aren't required, but they unlock richer reasoning from the agent:
 
 **due_date** (ISO 8601 date)
 - When this thing should be done
-- Helps Claude prioritize and understand urgency
+- Helps the agent prioritize and understand urgency
 - Can be in future or past (if overdue)
 
 **priority** (string)
@@ -152,7 +152,7 @@ These aren't required, but they unlock richer reasoning from Claude:
 **tags** (array of strings)
 - Categorical labels relevant to your domain
 - Examples depend on domain: `urgent`, `research`, `reviewed`, `published`, `draft`, `[category]`
-- Helps Claude search and filter contextually
+- Helps the agent search and filter contextually
 - Can be as specific or general as needed
 
 **parent** (string - id reference)
@@ -163,7 +163,7 @@ These aren't required, but they unlock richer reasoning from Claude:
 **linked_things** (array of objects)
 - Relationships to other things
 - Structure: `{ id: "thing-id", relation: "[type]", notes: "optional context" }`
-- Allows Claude to traverse the graph of your life
+- Allows the agent to traverse the graph of your life
 - Common relation values: `subtask`, `related`, `informs`, `implements`, `extends`, `references`, `complements`, `documents`
 - Keep the vocabulary small: declare it in `_schema.yaml`, prefer the forward direction over inverse pairs (the link lives on the dependent thing), and don't duplicate the `dependencies`/`blocks` fields as relations
 - Decomposition relation values — signal that two things should be structurally separate (see **Thing Cohesion and Decomposition**):
@@ -179,7 +179,7 @@ These aren't required, but they unlock richer reasoning from Claude:
 **dependencies** (array of strings - ids)
 - List of things that must be done before this — a **hard prerequisite**, not a
   soft association
-- Helps Claude understand sequencing
+- Helps the agent understand sequencing
 - Can be empty
 - The floor enforces the prerequisite reading: a thing in a terminal status may
   not depend on unfinished work (terminal dependencies — completed, cancelled,
@@ -192,7 +192,7 @@ These aren't required, but they unlock richer reasoning from Claude:
 **blocks** (array of strings - ids)
 - List of things this blocks from starting
 - Inverse of dependencies
-- Helps Claude understand impact
+- Helps the agent understand impact
 
 **confidence** (string)
 - How certain the domain is that the content of this thing is correct
@@ -244,7 +244,7 @@ Examples that might emerge:
 - `season`: quarterly/monthly/weekly context
 - `context_switch_cost`: how disruptive is it to start/stop this
 
-Don't predefined these. Let them emerge as you use the system and Claude suggests them.
+Don't predefined these. Let them emerge as you use the system and the agent suggests them.
 
 #### Triggers (Optional)
 
@@ -262,7 +262,7 @@ The body should include:
 - **Blockers:** What's preventing progress, if anything
 - **Notes:** Context, learnings, considerations
 
-The structure of the body is flexible. Use headers, lists, prose, whatever makes sense. Claude will understand it.
+The structure of the body is flexible. Use headers, lists, prose, whatever makes sense. The agent will understand it.
 
 ## How To Create A Thing
 
@@ -295,7 +295,7 @@ Classic chocolate chip cookies. Good for gatherings or just a snack.
 
 ## Evolution And Growth
 
-Start simple. As you work with a thing, it will naturally gain detail. Claude will suggest new metadata fields. The body will expand with learnings and context. This is expected and good.
+Start simple. As you work with a thing, it will naturally gain detail. The agent will suggest new metadata fields. The body will expand with learnings and context. This is expected and good.
 
 A thing might start as:
 ```
@@ -476,7 +476,7 @@ The same thing file can be loaded at three granularities: metadata only (broad l
 
 ## Why This Structure Works
 
-- **Parseable:** The YAML is reliable for Claude to extract structure
+- **Parseable:** The YAML is reliable for the agent to extract structure
 - **Flexible:** New fields can be added without breaking anything
 - **Composable:** Every thing relates the same way, enabling graphs and trees
 - **Narrative:** The body keeps the human reasoning and context intact

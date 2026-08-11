@@ -21,7 +21,7 @@ linked_things:
 
 # Scalability Guide
 
-When you start with this framework, everything is simple: you have a few things, Claude reads them all, reasons holistically, and responds. But as your system grows—from dozens to hundreds to thousands of things—you need a strategy for keeping that reasoning efficient.
+When you start with this framework, everything is simple: you have a few things, the agent reads them all, reasons holistically, and responds. But as your system grows—from dozens to hundreds to thousands of things—you need a strategy for keeping that reasoning efficient.
 
 This guide explores the philosophy and practice of scaling this framework to handle complex systems without losing the elegance that makes it powerful.
 
@@ -29,19 +29,19 @@ This guide explores the philosophy and practice of scaling this framework to han
 
 ### Scenario: You Have 50 Things
 
-Claude loads all 50 thing files. Reads metadata and narratives. Responds to "What should I focus on?" in a couple seconds. All good.
+The agent loads all 50 thing files. Reads metadata and narratives. Responds to "What should I focus on?" in a couple seconds. All good.
 
 ### Scenario: You Have 200 Things
 
-Claude loads all 200 files. Takes longer. Starts using more tokens. For "What should I focus on?" it takes 10-20 seconds. Productivity tools are getting expensive.
+The agent loads all 200 files. Takes longer. Starts using more tokens. For "What should I focus on?" it takes 10-20 seconds. Productivity tools are getting expensive.
 
 ### Scenario: You Have 500 Things
 
-Loading everything feels slow. Each query costs real money. You're asking Claude broad questions like "prioritize my work" and it's loading the full narrative of all 500 things. You feel the friction.
+Loading everything feels slow. Each query costs real money. You're asking the agent broad questions like "prioritize my work" and it's loading the full narrative of all 500 things. You feel the friction.
 
 ### Scenario: You Have 1000+ Things
 
-This breaks. It's expensive, slow, and inefficient. Claude needs to search or index rather than load everything holistically.
+This breaks. It's expensive, slow, and inefficient. The agent needs to search or index rather than load everything holistically.
 
 **The root problem:** Treating all information as equally important, all the time.
 
@@ -76,10 +76,10 @@ Or: "Show me my health goals" → Load things tagged `health`
 Or: "What's my situation with project X?" → Load project X and its linked things
 
 **Implementation:**
-- Prompts guide Claude to ask: "What domain/time/theme should I focus on?"
+- Prompts guide the agent to ask: "What domain/time/theme should I focus on?"
 - User specifies context
-- Claude loads only the relevant subset at the appropriate level
-- Claude processes that subset holistically
+- The agent loads only the relevant subset at the appropriate level
+- The agent processes that subset holistically
 
 **Pros:**
 - Works immediately with no new tooling
@@ -94,7 +94,7 @@ Or: "What's my situation with project X?" → Load project X and its linked thin
 
 ### Approach 2: Incremental Summarization (Medium Scale)
 
-**The idea:** Things that have been "settled" or "completed" get pre-summarized. Claude uses summaries for overview, then drills into detail.
+**The idea:** Things that have been "settled" or "completed" get pre-summarized. The agent uses summaries for overview, then drills into detail.
 
 **Example:**
 
@@ -123,13 +123,13 @@ created: 2026-05-17
 - 2 people now available for Q2 initiatives
 ```
 
-**How Claude uses it:**
+**How the agent uses it:**
 - Load "What happened in Q1?" → Load 1 summary file instead of 3 detailed project files
 - Load "Tell me about completed projects" → Load summary, then drill into full project files if needed
 - Load "What resources are available?" → Summaries answer the question; no need to read full things
 
 **Implementation:**
-- Create summary things manually or ask Claude to generate them
+- Create summary things manually or ask the agent to generate them
 - Summaries live in the same repo alongside regular things
 - Prompts recognize `type: summary` and treat it specially
 
@@ -174,21 +174,21 @@ created: 2026-05-17
 ```
 User: "I'm feeling overwhelmed. What should I focus on?"
 
-Claude:
+Agent:
 1. Load Level 1 (all things, metadata only)
 2. Analyze: "You have 23 in-progress, 8 blocked, 15 urgent"
 3. Return: "Your system is overloaded. Let's focus on unblocking the 8 blockers first."
 
 User: "Which blockers are easiest to solve?"
 
-Claude:
+Agent:
 1. Load Level 2 for the 8 blocked things and their dependencies
 2. Trace back: "5 are blocked on decisions, 2 on external approval, 1 on technical blocker"
 3. Return: "The decision blockers are quickest if you can decide. Want me to show you those decisions?"
 
 User: "Yes, show me the decisions"
 
-Claude:
+Agent:
 1. Load Level 3 for those 5 specific things
 2. Read full narrative to understand the decision context
 3. Present the decisions with full context
@@ -252,7 +252,7 @@ You'll know it's time to scale when:
 
 1. **Slowness** — Queries that used to be instant take 15-30 seconds
 2. **Cost** — Each broad query is noticeably expensive
-3. **Frustration** — You're asking Claude to load things you don't actually need
+3. **Frustration** — You're asking the agent to load things you don't actually need
 4. **Patterns** — You start wanting summaries or snapshots for historical reference
 5. **Complexity** — You have multiple domains and queries often ask across them
 
@@ -287,7 +287,7 @@ The system doesn't force you to scale. You scale when the benefit is obvious and
 
 **Scale through abstraction, not through search or indexing.**
 
-Don't build database functionality. Don't add query languages. Load at the right level of abstraction, let Claude's natural reasoning do the work, and let summaries emerge as your system grows.
+Don't build database functionality. Don't add query languages. Load at the right level of abstraction, let the agent's natural reasoning do the work, and let summaries emerge as your system grows.
 
 *Caveat — derived indexes are not the indexing this forbids.* This principle rules out an opaque query layer the agent reasons over instead of the data. A derived index (`derived-index.md`) is a transparent, regenerable map *back to* the data that only directs attention; the agent still reasons over the actual things. See the "Scaling Reflexive Behaviour" section above for the full reconciliation.
 

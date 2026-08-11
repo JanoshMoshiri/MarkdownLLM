@@ -26,34 +26,34 @@ Traditional apps separate concerns: input happens through UI, processing happens
 
 This system inverts that model entirely.
 
-**Processing:** Claude (or any capable LLM) becomes your reasoning engine. The agent understands context, makes sense of complexity, handles ambiguity, reasons about priorities and dependencies. This is not rule-based logic—it's semantic understanding.
+**Processing:** A capable LLM agent becomes your reasoning engine. The agent understands context, makes sense of complexity, handles ambiguity, reasons about priorities and dependencies. This is not rule-based logic—it's semantic understanding.
 
 **Interface:** Your phone is pure interface and notification hub. You talk to your agent. You receive reminders and calendar updates. The phone is how you interact and how you get notified.
 
-**Storage:** Git repository with markdown files is your persistent state. Not because it's clever, but because it's durable, versioned, human-readable to Claude, and completely vendor-agnostic. Your life data lives in markdown. The LLM reads it, reasons about it, updates it.
+**Storage:** Git repository with markdown files is your persistent state. Not because it's clever, but because it's durable, versioned, readable by human and agent alike, and completely vendor-agnostic. Your life data lives in markdown. The LLM reads it, reasons about it, updates it.
 
 ## The Paradigm Shift
 
-You stop thinking about "how do I build this app" and start thinking about "how do I structure my data so Claude can understand and reason about it."
+You stop thinking about "how do I build this app" and start thinking about "how do I structure my data so the agent can understand and reason about it."
 
-The complexity doesn't disappear—it just moves. Instead of writing conditional logic and integration code, you're defining how Claude should think about your life. Instead of predefined schemas, you let structure emerge based on what your life actually needs.
+The complexity doesn't disappear—it just moves. Instead of writing conditional logic and integration code, you're defining how the agent should think about your life. Instead of predefined schemas, you let structure emerge based on what your life actually needs.
 
 ## How It Works
 
 1. Your life exists as a collection of "things" in a git repository
 2. Each thing is a markdown file with YAML metadata and narrative body
-3. When you need help, you talk to Claude (via your phone, via any interface)
-4. Claude reads the relevant things, understands the structure and context
-5. Claude reasons about what you're asking, what matters, what's next
-6. Claude updates your thing files, creates reminders, updates your calendar
+3. When you need help, you talk to the agent (via your phone, via any interface)
+4. The agent reads the relevant things, understands the structure and context
+5. The agent reasons about what you're asking, what matters, what's next
+6. The agent updates your thing files, creates reminders, updates your calendar
 7. Your phone notifies you of changes and reminders
-8. You talk to Claude again with new information or requests
+8. You talk to the agent again with new information or requests
 
-The loop is: you → Claude → your data → Claude → you
+The loop is: you → the agent → your data → the agent → you
 
 ## Why This Works
 
-Claude doesn't need rigid schemas. It understands semi-structured data, can infer relationships, can reason about context. Your metadata defines enough structure for reliable parsing. Your narrative provides enough context for true understanding.
+The agent doesn't need rigid schemas. It understands semi-structured data, can infer relationships, can reason about context. Your metadata defines enough structure for reliable parsing. Your narrative provides enough context for true understanding.
 
 You're not fighting an app's architecture. You're partnering with an intelligence that understands your life as you describe it.
 
@@ -63,7 +63,7 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 
 **Minimal Core, Emergent Detail:** You start with minimal required metadata. As your life becomes more complex, new fields emerge naturally. Your schema grows with your needs, not ahead of them.
 
-**LLM-Centric Structure:** The metadata and body are optimized for Claude to parse and reason with, not for you to read. Claude is the primary consumer. Readability for humans is secondary.
+**LLM-Centric Structure:** The metadata and body are optimized for the agent to parse and reason with, not for you to read. The agent is the primary consumer. Readability for humans is secondary.
 
 **Vendor Agnostic:** Uses standard conventions (AGENTS.md, .skill.md files, YAML frontmatter) so any LLM—Claude, Copilot, any other agent—can understand and operate within the system.
 
