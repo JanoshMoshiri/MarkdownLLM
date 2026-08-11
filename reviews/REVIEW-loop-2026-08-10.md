@@ -2,8 +2,18 @@
 id: review-loop-2026-08-10
 type: artifact
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-08-11
+linked_things:
+  - id: an-adversarial-review-loop-converges-on-its-own-fix-residue
+    relation: informs
+    notes: "This record is that insight's evidence base — the protocol, the per-round table, and the fix-residue curve it reasons from."
+  - id: an-agent-in-a-loop-optimises-the-loop-not-the-goal
+    relation: informs
+    notes: "The same run read at the economic layer: the record's decay curve is what the operator's cost question converted into a stop."
+  - id: coherence-mechanism-build
+    relation: informs
+    notes: "The plan the loop's results produced — Phase 1 (derive) and Phase 3 (flow probes) are both direct reads of this record's control group and its one executable probe."
 ---
 
 # The Review Loop — an experiment record (2026-08-10 → 2026-08-11)
@@ -14,9 +24,10 @@ tier-order coherence reviews in a loop — fresh unprimed reviewer each round,
 verify every finding against the files, fix what's confirmed, relaunch against
 the fixed HEAD — and see whether the loop converges on a contradiction-free
 substrate. **It does not, and the measured reason why is this record's
-finding.** (Ordinals deliberately unminted — a concurrent external review
-raised an ordinal collision the operator has not yet ruled on; rounds are
-numbered within this loop only.)
+finding.** (Ordinals deliberately unminted — a concurrent external review had
+raised an ordinal collision; the estate settled it by practice on 2026-08-11,
+both records identified by date and kind. Rounds are numbered within this loop
+only.)
 
 ## Protocol
 

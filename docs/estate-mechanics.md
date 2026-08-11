@@ -2,8 +2,18 @@
 id: estate-mechanics-guide
 type: guide
 status: evolving
-version: 1.1
+version: 1.2
 created: 2026-08-04
+linked_things:
+  - id: git-workflow-specification
+    relation: documents
+    notes: "The publication radius: autopush, estate-sync, divergence surfaced never resolved — this guide is their operator-facing picture."
+  - id: change-reconciliation-specification
+    relation: documents
+    notes: "The reconciliation radius: the four beats and the blast radius of a change, diagrammed at the three levels an operator works at."
+  - id: retrospective-specification
+    relation: documents
+    notes: "The cadence radius: the 60-day domain clock and the 30-day estate clock this guide states side by side."
 ---
 
 # Estate Mechanics — publication, reconciliation and cadence at three radii

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T12:05:29
-generated_from: HEAD@9a79f17
-coverage: 163
+generated: 2026-08-11T12:06:56
+generated_from: HEAD@03f5e67
+coverage: 164
 framework_version: 3.31.0
 ---
 
@@ -61,6 +61,10 @@ framework_version: 3.31.0
 - an-adversarial-review-loop-converges-on-its-own-fix-residue --informs--> external-review-response-2026-08-10
 - an-adversarial-review-loop-converges-on-its-own-fix-residue --supports--> repeated-drift-promotes-a-fact-into-the-floor
 - an-adversarial-review-loop-converges-on-its-own-fix-residue --supports--> coherence-is-a-maintained-rate-not-a-state
+- an-agent-in-a-loop-optimises-the-loop-not-the-goal --complements--> an-adversarial-review-loop-converges-on-its-own-fix-residue
+- an-agent-in-a-loop-optimises-the-loop-not-the-goal --supports--> consequence-is-recoverable-only-in-retrospect
+- an-agent-in-a-loop-optimises-the-loop-not-the-goal --complements--> operator-gated-work-is-scheduled-on-the-operators-calendar
+- an-agent-in-a-loop-optimises-the-loop-not-the-goal --informs--> coherence-mechanism-build
 - an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
 - an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
@@ -239,6 +243,9 @@ framework_version: 3.31.0
 - estate-git-sync --extends--> git-workflow-specification
 - estate-git-sync --extends--> orchestration-specification
 - estate-git-sync --references--> operator-gated-work-is-scheduled-on-the-operators-calendar
+- estate-mechanics-guide --documents--> git-workflow-specification
+- estate-mechanics-guide --documents--> change-reconciliation-specification
+- estate-mechanics-guide --documents--> retrospective-specification
 - evidence-and-eval-backlog --references--> felt-deployment-lands-in-undisclosable-work
 - evidence-and-eval-backlog --implements--> withholding-is-not-isolation
 - evidence-and-eval-backlog --implements--> isolation-must-contain-writes-not-just-reads
@@ -494,6 +501,9 @@ framework_version: 3.31.0
 - retrospective-specification --complements--> derived-index-specification
 - retrospective-specification --complements--> change-reconciliation-specification
 - retrospective-specification --implements--> llm-driven-systems-manifesto
+- review-loop-2026-08-10 --informs--> an-adversarial-review-loop-converges-on-its-own-fix-residue
+- review-loop-2026-08-10 --informs--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- review-loop-2026-08-10 --informs--> coherence-mechanism-build
 - review-remediation-v3-17 --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - review-remediation-v3-17 --implements--> a-crossing-thing-carries-its-producers-private-graph
 - review-remediation-v3-17 --implements--> directional-graph-reads-come-in-inbound-outbound-pairs
