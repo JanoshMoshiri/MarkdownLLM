@@ -1,10 +1,9 @@
 """Phase 2A of vendor-harness-adapter-foundation: the draft ports vs the freeze.
 
-The implementations in THIS FILE are draft evidence, not production code —
-they exist to prove the port signatures in markdownllm/harness_ports.py can
-express the frozen Claude behaviour without importing any vendor schema into
-the contract. Production scaffold/doctor still run their inline Claude paths;
-moving them onto the ports is Phase 2C, after the Codex-owned 2B challenge.
+Phase 2C update: the 2A draft implementations collapsed into the production
+adapter (markdownllm/adapters/claude_code.py) — these tests now pin the
+production renderer and inspector through the same port assertions the draft
+had to satisfy, so the challenge evidence became the regression net.
 
 What is proven here:
 - the context object carries ENOUGH to reproduce the golden Claude bytes
@@ -40,40 +39,15 @@ def test_lifecycle_intents_match_the_phase0_freeze():
 # ------------------------------------------- draft renderer (test-local only)
 
 
-class _DraftClaudeRenderer:
-    """2B challenge evidence: the Claude settings artifact derived from the
-    intent data through the port signature — no pasted JSON."""
+from markdownllm.adapters.claude_code import ClaudeCodeAdapter  # noqa: E402
 
-    def capabilities(self) -> hp.AdapterCapabilities:
-        return hp.AdapterCapabilities(
-            harness="claude-code",
-            lifecycle_moments=("session-start", "post-write"),
-            notes="ordering via a single sequential hook group")
-
-    def render(self, ctx: hp.HarnessContext) -> dict[str, bytes]:
-        rel = ctx.framework_root_rel
-        mdllm = f"python {rel}/tools/mdllm.py"
-
-        def command(step: hp.LifecycleStep) -> dict[str, str]:
-            argv = ["." if arg == hp.DOMAIN_ROOT_ARG else arg
-                    for arg in step.argv]
-            return {"type": "command", "command":
-                    " ".join((mdllm, step.operation, *argv))}
-
-        ss = [command(step) for step in ctx.binding("session-start").steps]
-        pw = [command(step) for step in ctx.binding("post-write").steps]
-        settings = {
-            "hooks": {
-                "SessionStart": [{"hooks": ss}],
-                "PostToolUse": [{"matcher": "Write|Edit", "hooks": pw}],
-            }
-        }
-        return {".claude/settings.json":
-                (json.dumps(settings, indent=2) + "\n").encode("utf-8")}
+# Phase 2C collapsed the 2A/2B draft implementations into the production
+# adapter; these tests now pin the production classes directly, so currency
+# derives from the one real renderer (no expected-command duplicate).
 
 
-def test_draft_renderer_reproduces_the_golden_bytes(tmp_path):
-    renderer = _DraftClaudeRenderer()
+def test_production_renderer_reproduces_the_golden_bytes(tmp_path):
+    renderer = ClaudeCodeAdapter()
     assert isinstance(renderer, hp.RenderPort)
     ctx = hp.HarnessContext(framework_root_rel="../..")
     out = renderer.render(ctx)
@@ -86,101 +60,13 @@ def test_draft_renderer_reproduces_the_golden_bytes(tmp_path):
 # ------------------------------------------ draft inspector (test-local only)
 
 
-class _DraftClaudeInspector:
-    """2B challenge evidence: every estate shape reported read-only, local
-    extensions surfaced rather than normalised."""
-
-    def capabilities(self) -> hp.AdapterCapabilities:
-        return _DraftClaudeRenderer().capabilities()
-
-    def inspect(self, domain_root: Path,
-                context: hp.HarnessContext) -> hp.InspectionReport:
-        path = domain_root / ".claude" / "settings.json"
-        if not path.exists():
-            return hp.InspectionReport(
-                harness="claude-code",
-                fragments=(hp.ManagedFragment(
-                    path=".claude/settings.json", present=False,
-                    artifact_present=False),))
-        try:
-            raw = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeError) as exc:
-            return hp.InspectionReport(
-                harness="claude-code",
-                fragments=(hp.ManagedFragment(
-                    path=".claude/settings.json", present=False,
-                    readable=False, issues=(type(exc).__name__,)),))
-        try:
-            cfg = json.loads(raw)
-            if not isinstance(cfg, dict):
-                raise ValueError("top level is not an object")
-            hooks = cfg.get("hooks", {})
-            if hooks is None:
-                hooks = {}
-            if not isinstance(hooks, dict):
-                raise ValueError("hooks is not an object")
-        except (json.JSONDecodeError, ValueError) as exc:
-            return hp.InspectionReport(
-                harness="claude-code",
-                fragments=(hp.ManagedFragment(
-                    path=".claude/settings.json", present=False,
-                    readable=True, valid=False, issues=(str(exc),)),))
-
-        expected = json.loads(
-            _DraftClaudeRenderer().render(context)[
-                ".claude/settings.json"].decode("utf-8"))
-        realised: dict[str, tuple[str, ...]] = {}
-        extensions: list[str] = []
-        try:
-            ss = hooks.get("SessionStart") or []
-            expected_ss = expected["hooks"]["SessionStart"][0]["hooks"]
-            if ss:
-                acts = []
-                for actual, wanted in zip(ss[0]["hooks"], expected_ss):
-                    command = actual["command"]
-                    wanted_command = wanted["command"]
-                    if command.startswith(wanted_command):
-                        extra = command[len(wanted_command):].strip()
-                        if extra:
-                            extensions.append(
-                                f"session-start command carries {extra}")
-                    tail = command.split("tools/mdllm.py ", 1)[1]
-                    acts.append(tail.split()[0])
-                realised["session-start"] = tuple(acts)
-            for g in hooks.get("PostToolUse") or []:
-                if g.get("matcher") == "Write|Edit":
-                    realised["post-write"] = tuple(
-                        h["command"].split("tools/mdllm.py ", 1)[1].split()[0]
-                        for h in g["hooks"])
-        except (KeyError, IndexError, TypeError, AttributeError, ValueError) as exc:
-            return hp.InspectionReport(
-                harness="claude-code",
-                fragments=(hp.ManagedFragment(
-                    path=".claude/settings.json", present=False,
-                    readable=True, valid=False, issues=(str(exc),)),))
-
-        operator_owned = tuple(
-            f"top-level key {k!r} is operator-owned"
-            for k in sorted(cfg) if k != "hooks")
-        required_present = realised == dict(hp.LIFECYCLE_INTENTS)
-        return hp.InspectionReport(
-            harness="claude-code",
-            fragments=(hp.ManagedFragment(
-                path=".claude/settings.json", present=bool(hooks),
-                readable=True, valid=True,
-                current=required_present if hooks else None,
-                intents_realised=realised),),
-            operator_owned=operator_owned,
-            extensions=tuple(extensions))
-
-
 def _inspect_shape(tmp_path, shape):
     if shape is not None:
         dst = tmp_path / ".claude" / "settings.json"
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_bytes(
             (FIXTURES / "estate_shapes" / f"{shape}.json").read_bytes())
-    inspector = _DraftClaudeInspector()
+    inspector = ClaudeCodeAdapter()
     assert isinstance(inspector, hp.InspectPort)
     before = (hashlib.sha256(dst.read_bytes()).hexdigest()
               if shape is not None else None)
@@ -208,6 +94,28 @@ def test_inspect_extended_startup_reports_not_flattens(tmp_path):
     assert any("--assistant" in e for e in r.extensions)
 
 
+def test_inspect_wrong_framework_path_is_stale(tmp_path):
+    # 2C constraint closing a draft gap: a config whose commands point at a
+    # DIFFERENT framework path realises the same operations but is NOT
+    # current — currency comes from the renderer's exact managed form.
+    import json as _json
+    src = _json.loads((FIXTURES / "estate_shapes" / "hooks-only.json")
+                      .read_text(encoding="utf-8"))
+    for group in src["hooks"]["SessionStart"] + src["hooks"]["PostToolUse"]:
+        for h in group["hooks"]:
+            h["command"] = h["command"].replace("../../tools/mdllm.py",
+                                                "../../../elsewhere/mdllm.py")
+    dst = tmp_path / ".claude" / "settings.json"
+    dst.parent.mkdir(parents=True)
+    dst.write_text(_json.dumps(src, indent=2) + "\n", encoding="utf-8")
+    r = ClaudeCodeAdapter().inspect(
+        tmp_path, hp.HarnessContext(framework_root_rel="../.."))
+    frag = r.fragments[0]
+    assert frag.present and frag.valid
+    assert frag.current is False
+    assert frag.issues
+
+
 def test_inspect_composite_preserves_operator_content(tmp_path):
     r = _inspect_shape(tmp_path, "permissions-plus-hooks")
     assert r.fragments[0].present
@@ -229,7 +137,7 @@ def test_inspect_malformed_returns_invalid_report(tmp_path):
     dst = tmp_path / ".claude" / "settings.json"
     dst.parent.mkdir(parents=True)
     dst.write_text("{not-json", encoding="utf-8")
-    r = _DraftClaudeInspector().inspect(
+    r = ClaudeCodeAdapter().inspect(
         tmp_path, hp.HarnessContext(framework_root_rel="../.."))
     frag = r.fragments[0]
     assert frag.artifact_present and not frag.present
@@ -241,7 +149,7 @@ def test_inspect_schema_invalid_returns_invalid_report(tmp_path):
     dst = tmp_path / ".claude" / "settings.json"
     dst.parent.mkdir(parents=True)
     dst.write_text('{"hooks": []}', encoding="utf-8")
-    r = _DraftClaudeInspector().inspect(
+    r = ClaudeCodeAdapter().inspect(
         tmp_path, hp.HarnessContext(framework_root_rel="../.."))
     frag = r.fragments[0]
     assert frag.artifact_present and not frag.present
@@ -261,7 +169,7 @@ def test_inspect_unreadable_returns_unreadable_report(tmp_path, monkeypatch):
         return original(path, *args, **kwargs)
 
     monkeypatch.setattr(Path, "read_text", denied)
-    r = _DraftClaudeInspector().inspect(
+    r = ClaudeCodeAdapter().inspect(
         tmp_path, hp.HarnessContext(framework_root_rel="../.."))
     frag = r.fragments[0]
     assert frag.artifact_present and not frag.present
@@ -286,8 +194,8 @@ def test_lifecycle_bindings_own_arguments_delivery_and_order():
 def test_render_context_is_immutable_and_host_independent():
     first = hp.HarnessContext(framework_root_rel="../..")
     second = hp.HarnessContext(framework_root_rel="../..")
-    assert _DraftClaudeRenderer().render(first) == \
-        _DraftClaudeRenderer().render(second)
+    assert ClaudeCodeAdapter().render(first) == \
+        ClaudeCodeAdapter().render(second)
     try:
         first.framework_root_rel = "C:/machine-specific"
         raise AssertionError("frozen render context accepted mutation")

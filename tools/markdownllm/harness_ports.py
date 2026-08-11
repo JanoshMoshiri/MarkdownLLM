@@ -1,10 +1,11 @@
-"""DRAFT adapter ports — Phase 2A of vendor-harness-adapter-foundation.
+"""Adapter ports — the inward application contract of
+vendor-harness-adapter-foundation.
 
-Status: proposed, not consumed. No production code imports this module yet;
-scaffold and doctor still carry their inline Claude paths deliberately. The
-Codex-owned Phase 2B challenge reviews these signatures against the second
-vendor's real lifecycle shape; extraction onto them (and the registry) is
-Phase 2C, only after the challenge returns.
+Status: accepted and consumed. Drafted in Phase 2A, challenged and corrected
+against the official Codex lifecycle shape in the Codex-owned Phase 2B
+(evidence/codex-port-challenge-2026-08-11.md), and consumed by the adapter
+registry (markdownllm/adapters/) since the Phase 2C extraction. Scaffold and
+doctor speak to these ports; vendor config shapes live only in the adapters.
 
 Design constraints these types encode (plan: "Narrow adapter ports"):
 

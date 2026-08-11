@@ -14,7 +14,9 @@ from pathlib import Path
 
 import yaml
 
+from .adapters import get as get_adapter, names as adapter_names
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
+from .harness_ports import HarnessContext
 from .model import parse_frontmatter
 from .repo import _version_lt
 from .scaffold import HOOK_BODY, MDLLM_ENTRY
@@ -221,7 +223,6 @@ def cmd_doctor(args) -> int:
     # domain-kernel freshness + harness adapter (advisory; existence != currency)
     agents_p = root / "AGENTS.md"
     if agents_p.is_file():
-        import json
         atext = agents_p.read_text(encoding="utf-8")
         ameta, _, _ = parse_frontmatter(atext)
         present, drifted = domain_kernel_status(
@@ -234,18 +235,17 @@ def cmd_doctor(args) -> int:
                            f"run `mdllm domain-kernel .` and commit")
         else:
             report("OK", f"domain-kernel in sync ({len(present)} blocks)")
-        has_ss = False
-        settings = root / ".claude" / "settings.json"
-        if settings.is_file():
-            try:
-                has_ss = "SessionStart" in (json.loads(
-                    settings.read_text(encoding="utf-8")).get("hooks") or {})
-            except (ValueError, OSError):
-                has_ss = False
-        report("OK" if has_ss else "--",
-               "SessionStart adapter installed (.claude/settings.json)" if has_ss
-               else "no SessionStart adapter — session-start runs by interpretation "
-                    "(opt-in: adapters/claude-code.settings.example.json)")
+        # Harness adapter advisory: the adapter owns its config format AND its
+        # presentation line (pinned until Phase 3 settles the diagnostic
+        # vocabulary); doctor only relays. Extensions are surfaced, never
+        # flattened. framework_root_rel is presentation-irrelevant here — the
+        # inspect currency check needs A context, and doctor reports
+        # installed/extended, not per-path currency, until Phase 3.
+        rel_ctx = HarnessContext(
+            framework_root_rel=str((ameta or {}).get("framework_root", "..")))
+        for harness in adapter_names():
+            status, text = get_adapter(harness).doctor_line(root, rel_ctx)
+            report(status, text)
 
     print(f"## Doctor Report — {root}\n")
     print("\n".join(lines))

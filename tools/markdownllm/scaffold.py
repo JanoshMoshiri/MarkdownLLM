@@ -16,7 +16,9 @@ from pathlib import Path
 
 import yaml
 
+from .adapters import DEFAULT_HARNESS, get as get_adapter
 from .boundary import TERMS_FILE
+from .harness_ports import HarnessContext
 from .runtime import SH_RESOLVE, execution_test_hook
 from .domain_kernel import apply_domain_kernel, build_domain_kernel_blocks
 from .model import ID_RE, parse_frontmatter
@@ -114,23 +116,6 @@ POST_COMMIT_HOOK_BODY = POST_COMMIT_HOOK_BODY.replace(
     "{resolve}", _SH_RESOLVE_ESCAPED)
 COMMIT_MSG_HOOK_BODY = COMMIT_MSG_HOOK_BODY.replace(
     "{resolve}", _SH_RESOLVE_ESCAPED)
-
-
-from markdownllm.evals import (
-    check_assertions, seed_run_dir, eval_report, _resolve_claude_cli, cmd_eval,
-)
-from markdownllm.kernel_gen import (
-    KERNEL_RE, _token_counter, build_kernel, cmd_kernel,
-)
-from markdownllm.domain_kernel import (
-    DOMAIN_KERNEL_BLOCKS, apply_domain_kernel, build_domain_kernel_blocks,
-    cmd_domain_kernel, domain_kernel_status,
-)
-
-from markdownllm.session import _velocity_signal, _orient_forward, cmd_session_start
-
-
-from markdownllm.coherence import _changed_files_recent, coherence_findings, cmd_coherence
 
 
 def install_hook(root: Path) -> str:
@@ -246,25 +231,17 @@ def cmd_scaffold(args) -> int:
             instantiate(t.read_text(encoding="utf-8")), encoding="utf-8", newline="\n")
         written.append(f"skills/{out_name}")
 
-    # Deliberate-ritual slash commands (inert until the operator invokes them) —
-    # Claude Code `.claude/commands/` and Copilot `.github/prompts/`. The
-    # auto-firing SessionStart/PostToolUse adapter stays opt-in (hint printed below).
-    cmd_dir = target / ".claude" / "commands"
-    prm_dir = target / ".github" / "prompts"
-    if (templates / "commands").is_dir():
-        cmd_dir.mkdir(parents=True, exist_ok=True)
-        for src in sorted((templates / "commands").glob("*.md")):
-            (cmd_dir / src.name).write_text(
-                instantiate(src.read_text(encoding="utf-8")),
-                encoding="utf-8", newline="\n")
-            written.append(f".claude/commands/{src.name}")
-    if (templates / "copilot-prompts").is_dir():
-        prm_dir.mkdir(parents=True, exist_ok=True)
-        for src in sorted((templates / "copilot-prompts").glob("*.prompt.md")):
-            (prm_dir / src.name).write_text(
-                instantiate(src.read_text(encoding="utf-8")),
-                encoding="utf-8", newline="\n")
-            written.append(f".github/prompts/{src.name}")
+    # Deliberate-ritual shortcut projections (inert until the operator invokes
+    # them). WHERE each file belongs is the adapter's knowledge; the placeholder
+    # substitution and the writes stay here with every other template. The
+    # auto-firing lifecycle adapter stays opt-in (hint printed below).
+    adapter = get_adapter(DEFAULT_HARNESS)
+    for relpath, src in adapter.shortcut_sources(templates).items():
+        dst = target / relpath
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(instantiate(src.read_text(encoding="utf-8")),
+                       encoding="utf-8", newline="\n")
+        written.append(relpath)
 
     # Reasoning prompts (orchestration.md): the generated session-start block
     # names `evaluate-triggers`, `surface-attention`, `session-orientation`,
@@ -297,34 +274,19 @@ def cmd_scaffold(args) -> int:
         ag_text, build_domain_kernel_blocks(target, ag_meta or {}))
     ag.write_text(ag_filled, encoding="utf-8", newline="\n")
 
-    # Adapter: write .claude/settings.json so a new domain is hardened out of the
-    # box — SessionStart injects the ritual, PostToolUse runs the floor on write.
-    # One Claude-format file serves Claude Code AND VS Code Copilot (agent mode).
-    # Paths key off rel_fw (framework_root). Still optional in spirit: delete it
-    # and the domain kernel drives both by interpretation. Scaffold writes it
-    # directly (it runs as the tool, not through a permissions-gated editor).
-    import json as _json
-    settings = target / ".claude" / "settings.json"
-    settings.parent.mkdir(parents=True, exist_ok=True)
-    settings.write_text(_json.dumps({
-        "hooks": {
-            # estate-sync BEFORE session-start: orientation reads git log, and
-            # the log is only whole after the fetch (hard hook 4 — until
-            # v3.24.0 scaffolded domains were born without it).
-            "SessionStart": [
-                {"hooks": [{"type": "command",
-                            "command": f"python {rel_fw}/tools/mdllm.py estate-sync ."},
-                           {"type": "command",
-                            "command": f"python {rel_fw}/tools/mdllm.py session-start ."}]}
-            ],
-            "PostToolUse": [
-                {"matcher": "Write|Edit",
-                 "hooks": [{"type": "command",
-                            "command": f"python {rel_fw}/tools/mdllm.py validate . --quiet"}]}
-            ],
-        }
-    }, indent=2) + "\n", encoding="utf-8", newline="\n")
-    written.append(".claude/settings.json")
+    # Lifecycle adapter: render the default harness's managed artifacts so a
+    # new domain is hardened out of the box — startup context and post-write
+    # feedback per the inward lifecycle bindings. The adapter owns the vendor
+    # format; the bytes are written verbatim here. Still optional in spirit:
+    # delete the artifacts and the domain kernel drives both by interpretation.
+    # Scaffold writes directly (it runs as the tool, not through a
+    # permissions-gated editor).
+    ctx = HarnessContext(framework_root_rel=rel_fw)
+    for relpath, data in adapter.render(ctx).items():
+        dst = target / relpath
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(data)
+        written.append(relpath)
 
     # Disclosure boundary (boundary-disclosure-check plan): a domain is born
     # with its own LOCAL terms file — per-repo boundaries; a domain's disclosure
@@ -428,10 +390,7 @@ def cmd_scaffold(args) -> int:
           "is born with `session_gate: strict` (v3.28.0), so from the second "
           "commit on, the floor requires a fresh session-start attestation — "
           "the birth commit you just saw was the only exempt one")
-    print("  - hardened out of the box: .claude/settings.json fires session-start + "
-          "post-write validation automatically (Claude Code / VS Code Copilot agent "
-          "mode), and /end-session + /retrospective are installed. Delete .claude/ to "
-          "fall back to interpretation-only — the domain kernel still drives both.")
+    print(adapter.scaffold_guidance())
     if broken:
         print("\nBIRTH SEQUENCE INCOMPLETE — the isolation invariant did not "
               "fully hold; fix the FAIL lines before using the domain.")

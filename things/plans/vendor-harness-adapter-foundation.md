@@ -507,20 +507,20 @@ meets in the first minute, before any adapter exists to fail.
 
 ### Phase 1 — Repair the shared runtime port (implementer: Claude Code agent; acceptance: Codex agent)
 
-- [ ] Give root and nested-domain launchers one runtime-resolution service.
+- [x] Give root and nested-domain launchers one runtime-resolution service.
   Resolve both the domain-local environment and the framework-root environment
   derived from the CLI path. **[v1.5 acceptance reopening:]** the implementation
   exists, but its emitted POSIX resolver cannot derive the framework root in
   the Codex managed Git-hook shell because `dirname` is unavailable.
-- [ ] Keep PowerShell and POSIX entry paths behaviourally equivalent; avoid
+- [x] Keep PowerShell and POSIX entry paths behaviourally equivalent; avoid
   absolute installation paths and vendor cache paths.
-- [ ] Make `install-hook` execution-test the emitted pre-commit hook where Git
+- [x] Make `install-hook` execution-test the emitted pre-commit hook where Git
   supports it. Return/test a vendor-neutral runtime probe result that
   distinguishes interpreter-found, dependency-loaded, and command-executed;
   preserve the current doctor presentation until Phase 3 settles the
   user-facing diagnostic vocabulary. **[v1.5:]** execution-testing exists, but
   runtime-probe still lacks the command-executed fact.
-- [ ] **[v1.2]** Fix the resolution defect in the *emitted hook body*, not only
+- [x] **[v1.2]** Fix the resolution defect in the *emitted hook body*, not only
   in doctor's report: add the framework-root environment (derived from the
   `$MDLLM` path, which is the only place that knows where the framework is) to
   the candidate list, and strengthen the candidate probe from `import sys` to
@@ -574,17 +574,17 @@ reopened Phase 1 gate or the final A/0–2 handoff gate.
 
 #### Phase 2C — Extract Claude without changing Claude (owner: Claude Code agent)
 
-- [ ] Finalise the accepted adapter ports, introduce the registry, and move the
+- [x] Finalise the accepted adapter ports, introduce the registry, and move the
   inline Claude scaffold projection behind a Claude adapter using the Phase
   2B constraints.
-- [ ] Make scaffold call the registry while preserving its current default and
+- [x] Make scaffold call the registry while preserving its current default and
   exact Claude output for backward compatibility.
-- [ ] Move doctor’s Claude parsing into the inspect port and report extensions
+- [x] Move doctor’s Claude parsing into the inspect port and report extensions
   rather than flattening them.
-- [ ] Keep inspection read-only: identify the managed hook fragment and local
+- [x] Keep inspection read-only: identify the managed hook fragment and local
   extensions without routing an existing composite settings document through
   the new-project renderer. Phase 5 owns mutation and merge.
-- [ ] Keep `.claude/commands` as a separate deliberate-shortcut projection;
+- [x] Keep `.claude/commands` as a separate deliberate-shortcut projection;
   do not conflate it with lifecycle hooks.
 
 **Gate:** golden files are byte-identical, all existing tests pass, and an

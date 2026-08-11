@@ -166,7 +166,7 @@ def build_cli() -> argparse.ArgumentParser:
 
     ss = sub.add_parser("session-start",
                         help="emit the session-start ritual (version + velocity) for a "
-                             "harness SessionStart hook to inject")
+                             "harness startup hook to inject")
     ss.add_argument("path", nargs="?", default=".")
     ss.add_argument("--assistant", action="store_true",
                     help="PHASE 0 PROTOTYPE (assistant-register plan): "
