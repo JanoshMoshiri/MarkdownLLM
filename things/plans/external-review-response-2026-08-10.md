@@ -73,10 +73,9 @@ seed (`a-check-that-always-fires-teaches-the-operator-to-ignore-it`).
 on `hook-enforcement-has-three-anchors`. Open, and owned nowhere else: the
 manifesto's "Standing On Shoulders" section predates the canon findings
 (Parnas, Naur, Lehman, Weinberg each confirmed as independent rediscoveries)
-and the field positioning — extending it is the operator's voice. Also open:
-the review's external literature claims remain `verified: false` by their own
-declaration; they inform no decision here, but the flip (or an explicit
-"taken on trust") is the operator's.
+and the field positioning — extending it is the operator's voice. *Closed 2026-08-11:* the
+review's external literature claims are verified — the operator checked the
+sources and the flip is committed with attribution.
 
 ## Done when
 
@@ -87,7 +86,9 @@ declaration; they inform no decision here, but the flip (or an explicit
 - [ ] R3 cadence home chosen, or consciously declined
 - [ ] R4 re-judged after the backlog's checks land
 - [ ] Manifesto Standing-on-Shoulders extension written, or consciously declined
-- [ ] Literature claims verified, or explicitly taken on trust
+- [x] Literature claims verified (2026-08-11, `verified_by: Janosh Moshiri` —
+      the flip committed separately from the declaration, per the quarantine
+      rule; canon citations confirmed at claim level, not page level)
 
-When these four close, this plan completes — there is nothing else holding it
-open.
+When the remaining three close, this plan completes — there is nothing else
+holding it open.
