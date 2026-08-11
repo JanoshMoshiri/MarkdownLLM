@@ -57,7 +57,7 @@ Everything before the commit is working state — files on disk, modifications i
 
 This distinction matters because:
 
-- **Triggers evaluate against committed state** — A dependency trigger watching for `status: completed` fires based on what's been committed, not what's in the working directory
+- **Triggers are defined over committed state** — the evaluator reads the working tree as it stands; the `post-write:commit` invariant is what makes tree and HEAD coincide (see §With trigger-specification.md — the tool does not consult HEAD, and a fired trigger on a dirty tree evidences a breach, not committed state)
 - **Session orientation reads committed history** — When the agent loads at session start, it looks at what commits have happened since last session to understand what changed
 - **Audit trails require commits** — A change that was never committed never happened, from the system's perspective
 - **Rollback operates on commits** — If the agent makes a bad change, you can revert the specific commit that introduced it
@@ -112,10 +112,23 @@ validate: fixed 2 broken links, added missing status field to task-budget
 
 **At session end**
 
-Safety net — the backstop, not the invariant. The `post-write:commit` hard hook is the invariant: every write is committed before the response completes, so in a compliant session there is nothing left to commit here. This check exists for when the invariant was breached anyway — a hook that couldn't fire in the harness, an interrupted session, a missed write. Finding uncommitted changes at session end is a signal worth noting, not routine.
+Two distinct things happen here, and for ten releases this section described only the second:
+
+1. **The session-end ritual's closing commit** — the routine act. A harvested
+   session closes with a `session-end:` commit carrying the harvest,
+   dispositions, and open-loop updates (session-memory.md Step 6). This is the
+   delimiter `mdllm worklog` groups sessions on and the window
+   `session-start`'s flip-surfacing reads from — it is *expected*, not an
+   anomaly.
+2. **The uncommitted-changes sweep** — the safety net inside that commit. The
+   `post-write:commit` hard hook is the invariant, so a compliant session has
+   nothing stray left; anything found anyway (a hook that couldn't fire, an
+   interrupted session, a missed write) is swept into the closing commit and
+   *named* — finding stray changes is the breach signal worth noting, never
+   the definition of `session-end:`.
 
 ```
-session-end: uncommitted changes from session 2 (19 May 2026)
+session-end: 2026-08-09 — harvest sealed; swept one stray edit to X (post-write breach, noted)
 ```
 
 ### The Rule

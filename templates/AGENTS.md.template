@@ -12,7 +12,10 @@ git:
 # hard_hooks:
 #   - hook: post-write
 #     action: "If the written thing has triggers, update things/_index/triggers.md in the same commit"
-#     anchor: git-fs
+#     anchor: interpretation  # the act's real anchor — label the act, not its
+#                             # pre-commit safety net (kernel: a git-fs label on
+#                             # an interpretation act licenses skipping work the
+#                             # machine does not do)
 ---
 
 # [Domain Name] Agent

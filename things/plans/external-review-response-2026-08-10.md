@@ -53,6 +53,16 @@ practice. Ceremony cost is the operator's call — the framework's restraint rul
 (don't bind what prose handles reliably) cuts both ways here, because "prose
 handles it reliably" is exactly what the record disputes.
 
+*Evidence amendment (2026-08-11):* the eight-round review loop
+(`reviews/REVIEW-loop-2026-08-10.md`;
+`an-adversarial-review-loop-converges-on-its-own-fix-residue`) supplies R3's
+missing dose–response data: finds decayed 6→7→6→6→7→4→3→3 with severity
+falling faster than count, and by round 8 every finding was residue of the
+loop's own fixes. The measured shape of the ritual: **one cold read after a
+substantial release** (rounds 1–3 were worth their cost; nothing after round
+3 was), never a loop. The where-it-lives decision remains open and the
+operator's.
+
 **R4 — Walk attestation → spec'd, held.** A session-gate-shaped Warning for
 definition-surface commits carrying no recorded walk. Held until R1 lands:
 promoting the restatements out of prose removes most of what the walk was

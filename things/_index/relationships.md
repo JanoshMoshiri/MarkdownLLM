@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T00:23:08
-generated_from: HEAD@9e8df26
-coverage: 157
-framework_version: 3.30.1
+generated: 2026-08-11T08:31:20
+generated_from: HEAD@905c914
+coverage: 160
+framework_version: 3.31.0
 ---
 
 # Relationships Index — framework
@@ -53,6 +53,10 @@ framework_version: 3.30.1
 - agents-drop-mechanical-birth-steps-not-semantic-ones --supports--> hook-compliance-correlates-with-scope-not-awareness
 - agents-drop-mechanical-birth-steps-not-semantic-ones --informs--> orchestration-specification
 - agents-md-discovery-is-harness-dependent --challenges--> framework-discovery-specification
+- an-adversarial-review-loop-converges-on-its-own-fix-residue --informs--> mechanical-coherence-checks-backlog
+- an-adversarial-review-loop-converges-on-its-own-fix-residue --informs--> external-review-response-2026-08-10
+- an-adversarial-review-loop-converges-on-its-own-fix-residue --supports--> repeated-drift-promotes-a-fact-into-the-floor
+- an-adversarial-review-loop-converges-on-its-own-fix-residue --supports--> coherence-is-a-maintained-rate-not-a-state
 - an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
 - an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
