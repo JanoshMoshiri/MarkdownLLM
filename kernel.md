@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: kernel
 created: 2026-08-11
-generated: 2026-08-11T07:35:04
-generated_from: HEAD@85cd846
+generated: 2026-08-11T07:52:46
+generated_from: HEAD@82409bf
 coverage: 6
 framework_version: 3.30.1
 ---
@@ -93,6 +93,6 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...], anchor?}` in AGENTS.md or workflow skill; declaration order = execution order; `anchor` defaults to `interpretation`).
 
-**Domain hard hooks:** `hard_hooks: [{hook, action, anchor?}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write` (anchor `git-fs`).
+**Domain hard hooks:** `hard_hooks: [{hook, action, anchor?}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write` (the maintenance *act* is `interpretation` — nothing mechanical fires on a file write; the `git-fs` part is the pre-commit drift check that catches a stale index at the boundary. Label the act, not its net: a `git-fs` label on an interpretation act licenses skipping work the machine does not do).
 
 **Restraint:** a prompt is a checklist, not a procedure manual; >10 domain prompts = over-specification; don't bind what narrative prose already handles reliably.

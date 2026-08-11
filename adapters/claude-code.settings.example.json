@@ -1,6 +1,6 @@
 {
   "_comment": "Optional harness adapter for Claude Code AND Copilot in VS Code (agent mode) — VS Code Copilot reads .claude/settings.json directly, so this one file hardens both. Merge the hooks block into the domain's .claude/settings.json. Opt-in: with no adapter, the AGENTS.md domain kernel still drives these by interpretation (the floor). The command paths assume framework_root: ../.. (domain two levels under the framework) and the hook's cwd is the domain root — adjust ../../tools/mdllm.py to your framework_root if it differs.",
-  "_anchors": "SessionStart hardens session-start:estate-sync + session-start:version-check (anchor harness-session) — estate-sync runs FIRST: orientation reads git log, and the log is only whole after the fetch. PostToolUse hardens post-write validation (anchor git-fs). Neither replaces the interpretation floor.",
+  "_anchors": "SessionStart hardens session-start:estate-sync + session-start:version-check (anchor harness-session) — estate-sync runs FIRST: orientation reads git log, and the log is only whole after the fetch. PostToolUse hardens post-write validation (an interpretation act hardened toward harness-session — the git-fs part is only the pre-commit drift net). Neither replaces the interpretation floor.",
   "hooks": {
     "SessionStart": [
       {

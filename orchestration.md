@@ -43,7 +43,7 @@ linked_things:
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...], anchor?}` in AGENTS.md or workflow skill; declaration order = execution order; `anchor` defaults to `interpretation`).
 
-**Domain hard hooks:** `hard_hooks: [{hook, action, anchor?}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write` (anchor `git-fs`).
+**Domain hard hooks:** `hard_hooks: [{hook, action, anchor?}]` in domain AGENTS.md — e.g. derived-index maintenance on `post-write` (the maintenance *act* is `interpretation` — nothing mechanical fires on a file write; the `git-fs` part is the pre-commit drift check that catches a stale index at the boundary. Label the act, not its net: a `git-fs` label on an interpretation act licenses skipping work the machine does not do).
 
 **Restraint:** a prompt is a checklist, not a procedure manual; >10 domain prompts = over-specification; don't bind what narrative prose already handles reliably.
 <!-- /kernel -->
@@ -327,7 +327,7 @@ interpretation).
 | `session-end` | Before the session closes | All modified things, uncommitted changes | `interpretation` → `harness-session` (adapter) |
 | `pre-commit` | After changes are staged, before `git commit` | Staged files, changed thing metadata | `git-fs` |
 | `post-commit` | After a successful commit | Commit message, changed thing IDs, diffs | `git-fs` |
-| `post-write` | After any thing is modified (before commit) | Modified thing, its linked_things, triggers | `git-fs` |
+| `post-write` | After any thing is modified (before commit) | Modified thing, its linked_things, triggers | `interpretation` (act) — the pre-commit drift check is the `git-fs` net beneath it; a `PostToolUse` adapter hardens toward `harness-session` |
 | `on-create` | After a new thing is created | New thing, potential parent/linked things | `interpretation` |
 | `on-status-change` | After a thing's status field changes | Thing, old status, new status, downstream | `interpretation` |
 | `on-error` | When validation or reasoning encounters a conflict | Error context, affected things | `interpretation` |
@@ -435,7 +435,7 @@ These are prompts that ship with the framework and apply to any domain:
 - **session-orientation** — At session start, summarize what's changed since last session
 - **surface-attention** — Determine which things need user attention and in what priority order
 - **detect-conflicts** — Check if a proposed change conflicts with existing state (lens conflicts, dependency violations)
-- **session-end-continuity** — At session end, extract insights, disposition the standing insights, check for contradictions, manage open-loop things, and close with a rich `session-end:` commit (the backward record is git; `mdllm worklog` is an on-demand view, not a committed file)
+- **session-end-continuity** — At session end, extract insights, disposition the standing insights, check for contradictions, manage open-loop things, commit with a rich `session-end:` message (the backward record is git; `mdllm worklog` is an on-demand view, not a committed file), then report publication debt (`estate-sync --status` — after the commit, never elided from this summary: two summaries ended at the commit while every operative surface carried the debt step)
 - **domain-velocity** — At session start, read git history as telemetry to surface stalled, churning, or untouched work the current-state snapshot can't see
 - **review-schema-coherence** — At retrospective, audit the domain's emergent frontmatter vocabulary (via the schema registry) for fields that have drifted apart in name but converged in meaning
 
