@@ -443,20 +443,20 @@ a final handoff requirement; it cannot be left until after Codex development.
 It is the only slice here that changes the substrate's address rather than its
 outer edge.
 
-- [ ] Replace "Claude" with the settled agent-neutral term wherever framework
+- [x] Replace "Claude" with the settled agent-neutral term wherever framework
   prose means *the reasoning agent*: the Tier-1 `thing.md` specification, the
   Tier-2 `scalability-guide.md`, and the worked example skills under
   `examples/life-manager/`. Preserve every mention that names Claude Code as a
   *specific harness* with a real vendor fact attached; those are true
   statements, not leakage. Generate the execution list with search; do not
   maintain an occurrence count in prose.
-- [ ] Settle one term first and use it everywhere. The specs already alternate
+- [x] Settle one term first and use it everywhere. The specs already alternate
   between "the agent", "Claude", and passive voice; the sweep is worthless if
   it installs a third variant.
-- [ ] Regenerate `kernel.md` and confirm the operative blocks are unchanged in
+- [x] Regenerate `kernel.md` and confirm the operative blocks are unchanged in
   meaning. The generated kernel is already vendor-clean, which bounds the blast
   radius: if a kernel block changes, the sweep has edited rules, not address.
-- [ ] Leave `templates/` alone — verified clean, so scaffolded domains are not
+- [x] Leave `templates/` alone — verified clean, so scaffolded domains are not
   inheriting the vocabulary and no estate migration is implied.
 
 **Gate:** validate and the full suite pass; `kernel.md` regenerates with no
@@ -469,15 +469,15 @@ meets in the first minute, before any adapter exists to fail.
 
 ### Phase 0 — Freeze the contract and evidence (owner: Claude Code agent)
 
-- [ ] Record golden Claude scaffold artifacts and current CLI behaviour.
-- [ ] Add estate-shape fixtures: hooks-only config, permissions-only config,
+- [x] Record golden Claude scaffold artifacts and current CLI behaviour.
+- [x] Add estate-shape fixtures: hooks-only config, permissions-only config,
   permissions-plus-hooks, no settings, and a locally extended startup command.
-- [ ] Define the minimal lifecycle intents in tests before creating adapter
+- [x] Define the minimal lifecycle intents in tests before creating adapter
   classes. **[v1.2] The diagnostic dimensions move to Phase 3** — freezing a
   five-dimension vocabulary here would commit the only agent who never builds
   its consumer to a contract the consumer must live inside. Phase 0 freezes
   what exists and is about to move: Claude's bytes and behaviour.
-- [ ] Record the current Claude adapter/schema evidence and a Claude live-test
+- [x] Record the current Claude adapter/schema evidence and a Claude live-test
   checklist; do not encode undocumented assumptions. Codex contract evidence
   belongs to the Codex-owned Phase 2B.
 
@@ -485,24 +485,24 @@ meets in the first minute, before any adapter exists to fail.
 
 ### Phase 1 — Repair the shared runtime port (implementer: Claude Code agent; acceptance: Codex agent)
 
-- [ ] Give root and nested-domain launchers one runtime-resolution service.
+- [x] Give root and nested-domain launchers one runtime-resolution service.
   Resolve both the domain-local environment and the framework-root environment
   derived from the CLI path.
-- [ ] Keep PowerShell and POSIX entry paths behaviourally equivalent; avoid
+- [x] Keep PowerShell and POSIX entry paths behaviourally equivalent; avoid
   absolute installation paths and vendor cache paths.
-- [ ] Make `install-hook` execution-test the emitted pre-commit hook where Git
+- [x] Make `install-hook` execution-test the emitted pre-commit hook where Git
   supports it. Return/test a vendor-neutral runtime probe result that
   distinguishes interpreter-found, dependency-loaded, and command-executed;
   preserve the current doctor presentation until Phase 3 settles the
   user-facing diagnostic vocabulary.
-- [ ] **[v1.2]** Fix the resolution defect in the *emitted hook body*, not only
+- [x] **[v1.2]** Fix the resolution defect in the *emitted hook body*, not only
   in doctor's report: add the framework-root environment (derived from the
   `$MDLLM` path, which is the only place that knows where the framework is) to
   the candidate list, and strengthen the candidate probe from `import sys` to
   one that proves the dependency actually loads. A hook that selects an
   interpreter which cannot import PyYAML blocks the commit while reporting a
   cause that is not the cause.
-- [ ] Add a reproducible directly-opened nested-domain runtime/commit probe.
+- [x] Add a reproducible directly-opened nested-domain runtime/commit probe.
   The Codex agent executes it in the managed shell during Phase 2B and again
   at final acceptance; Claude does not self-certify that environment.
 
@@ -517,11 +517,11 @@ available to Phase 3 without Phase 1 freezing their presentation vocabulary.
 
 #### Phase 2A — Draft the ports without moving Claude (owner: Claude Code agent)
 
-- [ ] Introduce the smallest draft port types needed by the lifecycle intents,
+- [x] Introduce the smallest draft port types needed by the lifecycle intents,
   but leave the live scaffold and doctor Claude paths in place.
-- [ ] Express current Claude rendering and inspection expectations as golden
+- [x] Express current Claude rendering and inspection expectations as golden
   and read-only contract tests, not as generic port assumptions.
-- [ ] Commit the draft and pause. Do not create or model Codex artifacts.
+- [x] Commit the draft and pause. Do not create or model Codex artifacts.
 
 **Gate:** the proposed ports compile/test against the frozen Claude evidence,
 but no production Claude path has moved.
