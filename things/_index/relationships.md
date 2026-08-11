@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T21:43:58
-generated_from: HEAD@6996309
-coverage: 169
+generated: 2026-08-11T21:57:33
+generated_from: HEAD@51a88a3
+coverage: 170
 framework_version: 3.31.0
 ---
 
@@ -362,6 +362,10 @@ framework_version: 3.31.0
 - independent-review-2026-07-02-fable --extends--> independent-review-2026-06-15-cowork
 - independent-review-2026-07-02b-cowork-fable --extends--> independent-review-2026-07-02-fable
 - independent-review-2026-07-14-fable --extends--> independent-review-2026-07-02-fable
+- independent-review-2026-08-11-codex --challenges--> llm-driven-systems-manifesto
+- independent-review-2026-08-11-codex --challenges--> hook-enforcement-has-three-anchors
+- independent-review-2026-08-11-codex --supports--> portability-claims-need-execution-tests
+- independent-review-2026-08-11-codex --informs--> vendor-harness-adapter-foundation
 - inflection-candidates-are-computable --complements--> change-reconciliation-specification
 - inflection-candidates-are-computable --informs--> estate-cadence-cluster
 - inflection-candidates-are-computable --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
