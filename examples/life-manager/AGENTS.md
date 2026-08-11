@@ -32,9 +32,9 @@ This system transforms how you manage your life by inverting the traditional app
 > hand; on any disagreement, the generated form wins.
 
 1. Estate sync (`session-start:estate-sync` hard hook) — sync before orienting: `python {framework_root}/tools/mdllm.py estate-sync .` (bounded, ff-only, degrades offline; orientation reads the log the sync updates)
-2. Version check (`session-start:version-check` hard hook): compare `{framework_root}/.markdownllm` version against `framework_version_seen` above
-3. Load `{framework_root}/kernel.md` — the framework's operative rules; load a full spec only when the kernel doesn't settle an ambiguity
-4. Read the orient view — `python {framework_root}/tools/mdllm.py session-start .` emits the open loops (non-terminal work things + open conflicts) carried from prior sessions; forward state is the thing graph, not a hand-kept brief
+2. Load `{framework_root}/kernel.md` — the framework's operative rules; load a full spec only when the kernel doesn't settle an ambiguity
+3. Read the orient view — `python {framework_root}/tools/mdllm.py session-start .` emits the open loops (non-terminal work things + open conflicts) carried from prior sessions; forward state is the thing graph, not a hand-kept brief
+4. Version check (`session-start:version-check` hard hook, anchor `interpretation` by default): compare `{framework_root}/.markdownllm` version against `framework_version_seen` above
 5. Load skills — the specification and write skills are required reading before any write (kernel, `write.thing`); the read and workflow skills per session intent: life-manager-specification.skill.md, life-manager-read.thing.skill.md, life-manager-write.thing.skill.md, life-manager-workflow.skill.md
 6. Evaluate triggers — the floor evaluates (`mdllm triggers`; fired vs upcoming kept apart); judge the conditions it routes to you
 

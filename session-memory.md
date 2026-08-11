@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.3
+version: 1.4
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -219,6 +219,19 @@ Commit all new insight things, new conflict things, and the open-loop updates wi
 rich `session-end:` message following `git-workflow.md` conventions. The commit **is**
 the backward record — there is no `continuity.md` or `WORKLOG.md` to update; `mdllm
 worklog` prints an on-demand, uncommitted view of the commit stream when wanted.
+
+### Step 7: Report Publication Debt
+
+Run `mdllm estate-sync . --status` and surface the result. Under autopush (the
+default) every `ahead +n (unpushed)` line is an anomaly — an offline session, a
+rejected push owed a routing decision, or an opted-out repo holding work for
+its deliberate release. Route each line; never resolve a rejection by force,
+and never push an opted-out repo yourself (`git-workflow.md` → The Outbound
+Rules). This step reads git, not the session — it runs even when nothing was
+harvested. *(A review-loop finding: every other session-end surface — the
+git-workflow kernel, orchestration's hook 4, the bound prompt's declared
+outputs, the command template — carried this step while the owning spec's
+ritual stopped one step early.)*
 
 ---
 

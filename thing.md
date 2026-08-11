@@ -237,7 +237,10 @@ Examples that might emerge:
 - `progress`: percentage, subtask counts, checkboxes
 - `resources`: list of tools, documents, or people needed
 - `decision_point`: if blocked on a decision, what decision
-- `review_date`: when to revisit and reassess
+- `effort_estimate`: hours a piece of work is expected to cost
+  *(`review_date` sat in this emergent list for ten releases while the floor
+  mechanically evaluated `review_date_reached` — it is CORE vocabulary, not a
+  might-emerge example; a review-loop finding moved it out)*
 - `season`: quarterly/monthly/weekly context
 - `context_switch_cost`: how disruptive is it to start/stop this
 

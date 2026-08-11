@@ -153,8 +153,9 @@ flowchart TD
 Notes on this view:
 
 - **The navigation rule:** when lost, start at `thing.md` and follow one
-  `extends` edge outward. Every extension spec's first frontmatter relation is
-  `extends: thing-specification` (exception: `reasoning-lenses` carries no
+  `extends` edge outward. Every extension spec carries an
+  `extends: thing-specification` relation, usually first (exceptions:
+  `provenance` leads with its cluster edge; `reasoning-lenses` carries no
   outbound links — read/write reference it rather than it extending the atom,
   but it lives in the same band).
 - The guides column never defines semantics — it only points back inward. You

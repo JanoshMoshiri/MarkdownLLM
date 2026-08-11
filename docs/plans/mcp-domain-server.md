@@ -289,7 +289,7 @@ publishes a *face it authored about itself*, never its raw interior.
   source's **exposed face via MCP** (a minimal stdio client, spawning the source
   server through the `.mcp.json` address book) — **never the source's git**: a
   freshness read is a horizontal cross-domain read and obeys the same membrane as
-  content. States: `fresh` / `stale` / `withdrawn` / `unreachable` / `no-address` /
+  content. States: `fresh` / `stale` / `diverged` / `withdrawn` / `unreachable` / `no-address` /
   `incomplete`. **Report-only** — detection is mechanical, the re-quarantine (flip to
   `verified:false` / `status:stale`) is the agent's disposition; the floor never
   mutates a domain's things. **Offline = `unreachable` ("freshness unknown"), never a
