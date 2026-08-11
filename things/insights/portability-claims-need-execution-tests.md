@@ -2,7 +2,7 @@
 id: portability-claims-need-execution-tests
 type: insight
 status: active
-version: 1.1
+version: 1.2
 created: 2026-06-11
 session: 2026-06-11
 source: both
@@ -53,7 +53,16 @@ but verification still stopped short of execution.
    `tools/mdllm.ps1` as its entry point, and generated hooks that prefer
    `.venv/Scripts/python.exe` (or `.venv/bin/python` on POSIX). `mdllm doctor`,
    validation, coherence, and the real pre-commit hook all executed through
-   it; commit `4e1ad73` is the audit record.
+   it at the framework root; commit `4e1ad73` is the audit record. That
+   evidence did not exercise the nested-domain fallback branch.
+
+4. **Codex managed Git-hook shell, nested-domain branch (2026-08-11):** the
+   Phase 1 resolver did execute candidates, but first derived the framework
+   root with external `dirname`. This shell's hook PATH does not contain
+   `dirname`. A root commit still passed because the root-local venv was found
+   before the broken framework fallback mattered; a directly opened domain
+   with no local venv failed. The execution test had exercised *a successful
+   branch*, not the branch supporting the portability claim.
 
 ## Why It Matters
 
@@ -67,6 +76,13 @@ but verification still stopped short of execution.
   new environment should attempt a real commit through the hook before
   relying on `post-write:commit` — a hook that cannot run degrades the floor
   silently, and the hard hook's guarantee with it.
+- **Exercise the claimed fallback, not merely the resolver.** A candidate
+  chain can pass through an earlier branch while a later branch is unusable.
+  Portability evidence must remove or disable earlier candidates, run with the
+  target shell's real command set, and force the exact fallback under claim.
+  Shell syntax portability also includes utility availability: an external
+  `dirname`, `realpath`, or similar command is a dependency even when `/bin/sh`
+  itself exists.
 - Candidate mechanical follow-up: `install-hook` could self-test by running
   the script it just emitted once (exit status only) and reporting
   floor-unavailable immediately, instead of leaving the discovery to the
