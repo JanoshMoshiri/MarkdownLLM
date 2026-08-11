@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T11:53:42
-generated_from: HEAD@446fd03
-coverage: 162
+generated: 2026-08-11T12:05:29
+generated_from: HEAD@9a79f17
+coverage: 163
 framework_version: 3.31.0
 ---
 
@@ -16,6 +16,10 @@ framework_version: 3.31.0
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> mechanical-coherence-checks-backlog
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --supports--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --references--> boundary-disclosure-check
+- a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --extends--> shared-domain-failures-are-a-framework-signal-without-a-path
+- a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> asks-travel-as-exposed-things
+- a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> substrate-reconciliation-2026-08-09
+- a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --complements--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-built-inbound-only
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-verified-external-input
 - a-crossing-thing-carries-its-producers-private-graph --informs--> provenance-specification
@@ -248,10 +252,11 @@ framework_version: 3.31.0
 - expertise-is-an-output-not-a-prerequisite --supports--> provenance-specification
 - expertise-is-an-output-not-a-prerequisite --complements--> the-substrate-is-a-discipline-prosthesis
 - expertise-is-an-output-not-a-prerequisite --informs--> llm-driven-systems-manifesto
+- external-review-response-2026-08-10 --references--> coherence-mechanism-build
 - external-review-response-2026-08-10 --references--> mechanical-coherence-checks-backlog
 - external-review-response-2026-08-10 --references--> coherence-is-a-maintained-rate-not-a-state
 - external-review-response-2026-08-10 --references--> hook-enforcement-has-three-anchors
-- external-review-response-2026-08-10 --references--> repeated-drift-promotes-a-fact-into-the-floor
+- external-review-response-2026-08-10 --references--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - felt-deployment-lands-in-undisclosable-work --references--> llm-driven-systems-manifesto
 - felt-deployment-lands-in-undisclosable-work --complements--> structure-decides-figures-scale-decides-convention
 - first-2x2-measured-convention-following-not-reasoning --extends--> fixture-fixes-correct-bugs-not-difficulty
