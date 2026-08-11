@@ -216,6 +216,7 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 - `type: workflow-run` — One live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative (framework-reserved)
 - `type: plan` — A phased, multi-session work plan for evolving the framework; uses workflow statuses; phase checkboxes updated as work lands (domain-specific to the framework domain)
 - `type: artifact` — A committed record artifact with its own lifecycle (the independent review records in `reviews/`); statuses evolving/stable/deprecated (domain-specific to the framework domain)
+- `type: prompt` — One focused reasoning task bound to a hook point; the eight reasoning prompts in `templates/prompts/` (framework-defined, domain-usable, fixed lifecycle vocabulary)
 
 *(This list restates `_schema.yaml` + the tool's reserved set and has lagged
 them — a review-loop finding caught `artifact` missing here while seven

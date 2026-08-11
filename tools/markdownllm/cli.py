@@ -40,7 +40,10 @@ unqualified heading — a hand list drifts; argparse does not):
                        --message FILE (commit-msg hook), or --history audit,
                        against the LOCAL gitignored .boundary-terms file.
                        Absent file => silent no-op (CI never enforces this).
-  install-hook [path]  Install a git pre-commit hook running `validate`.
+  install-hook [path]  Install the three mdllm git hooks: pre-commit
+                       (boundary + validate + coherence, blocking), commit-msg
+                       (disclosure boundary, blocking), post-commit (autopush
+                       publication leg, never blocking).
 
 Requires: Python 3.10+, PyYAML. tiktoken optional (tokens falls back to heuristic).
 """
@@ -205,7 +208,7 @@ def build_cli() -> argparse.ArgumentParser:
     sc.add_argument("path", help="folder to create (its name becomes the domain name)")
     sc.set_defaults(fn=cmd_scaffold)
 
-    h = sub.add_parser("install-hook", help="install git pre-commit validation hook")
+    h = sub.add_parser("install-hook", help="install the three mdllm git hooks (pre-commit, commit-msg, post-commit)")
     h.add_argument("path", nargs="?", default=".")
     h.set_defaults(fn=cmd_install_hook)
     # Hook body is portable since v3.4.1: root/interpreter resolved at run time.

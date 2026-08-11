@@ -1,9 +1,11 @@
 # Normative domain schema — life-manager example domain.
 # Read by tools/mdllm.py (the deterministic floor). Declares the thing types,
 # status vocabularies, and relation vocabulary this domain permits.
-# Framework-reserved types (skill, decision, insight, conflict, retrospective,
-# continuity-brief, index, specification, guide, manifesto, prompt) are built
-# into the tool and are not redeclared here.
+# Framework-reserved types are built into the tool and are not redeclared here —
+# RESERVED_STATUSES in the tool is the authority on the set (13 types, including
+# workflow-definition and workflow-run, both instantiated in this very corpus;
+# an enumerated copy of the list here lagged the tool by two types while the
+# corpus used both — a review-loop finding).
 schema_version: 1
 domain: life-manager
 

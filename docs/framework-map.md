@@ -36,7 +36,7 @@ the prose.
 is layering.** The manifesto defines [thing.md](../thing.md); five operative specs
 say what may be done to the atom; those six are distilled into
 [kernel.md](../kernel.md) so a session starts on a small fraction of the
-full-spec load (`mdllm tokens` measures it — never assert); nine extension
+full-spec load (`mdllm tokens` measures it — never assert); twelve extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
 paper layer made mechanical, each subcommand mechanising a piece of it (mostly

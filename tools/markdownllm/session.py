@@ -2,11 +2,12 @@
 
 The mechanical half of the session-start ritual, printed to stdout for a
 harness SessionStart hook to inject (Claude Code; Copilot agent mode). This is
-the HARDENING for the `session-start:version-check` hook whose anchor is
-`harness-session`: a weak (or distracted) model receives the ritual at t=0
-instead of having to recall it from a buried entry file. Optional — the
-AGENTS.md prose stays the interpretation floor where no adapter is installed.
-Read-only; safe on every session.
+the HARDENING that moves the `session-start:version-check` hook's anchor from
+its `interpretation` default to `harness-session` where an adapter binds it: a
+weak (or distracted) model receives the ritual at t=0 instead of having to
+recall it from a buried entry file. Optional — the AGENTS.md prose stays the
+interpretation floor where no adapter is installed. Read-only; safe on every
+session.
 """
 
 from __future__ import annotations

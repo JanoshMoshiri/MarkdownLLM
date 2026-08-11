@@ -321,10 +321,10 @@ entry file; `git-fs` fires on a real git/filesystem event; `harness-session` fir
 if a per-harness adapter binds the lifecycle event (otherwise it falls back to
 interpretation).
 
-| Hook Point | When It Fires | Available Context | Anchor (default) |
+| Hook Point | When It Fires | Available Context | Operative Anchor (→ hardened) |
 |------------|---------------|-------------------|------------------|
-| `session-start` | Agent loads and discovers AGENTS.md | All things, git log since last session | `harness-session` |
-| `session-end` | Before the session closes | All modified things, uncommitted changes | `harness-session` |
+| `session-start` | Agent loads and discovers AGENTS.md | All things, git log since last session | `interpretation` → `harness-session` (adapter) |
+| `session-end` | Before the session closes | All modified things, uncommitted changes | `interpretation` → `harness-session` (adapter) |
 | `pre-commit` | After changes are staged, before `git commit` | Staged files, changed thing metadata | `git-fs` |
 | `post-commit` | After a successful commit | Commit message, changed thing IDs, diffs | `git-fs` |
 | `post-write` | After any thing is modified (before commit) | Modified thing, its linked_things, triggers | `git-fs` |
