@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T11:15:25
-generated_from: HEAD@3e1a25d
-coverage: 161
+generated: 2026-08-11T11:53:42
+generated_from: HEAD@446fd03
+coverage: 162
 framework_version: 3.31.0
 ---
 
@@ -106,6 +106,10 @@ framework_version: 3.31.0
 - coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks
 - coherence-is-a-maintained-rate-not-a-state --supports--> repeated-drift-promotes-a-fact-into-the-floor
 - coherence-is-a-maintained-rate-not-a-state --supports--> hook-enforcement-has-three-anchors
+- coherence-mechanism-build --implements--> an-adversarial-review-loop-converges-on-its-own-fix-residue
+- coherence-mechanism-build --references--> mechanical-coherence-checks-backlog
+- coherence-mechanism-build --references--> external-review-response-2026-08-10
+- coherence-mechanism-build --implements--> coherence-is-a-maintained-rate-not-a-state
 - cohesiveness-sensors --implements--> divergence-is-an-unrouted-decision
 - cohesiveness-sensors --complements--> mechanical-coherence-checks-backlog
 - cohesiveness-sensors --references--> judgement-checks-need-a-suppression-list-which-is-itself-drift
