@@ -17,6 +17,7 @@ from pathlib import Path
 import yaml
 
 from .boundary import TERMS_FILE
+from .runtime import SH_RESOLVE, execution_test_hook
 from .domain_kernel import apply_domain_kernel, build_domain_kernel_blocks
 from .model import ID_RE, parse_frontmatter
 
@@ -29,20 +30,13 @@ HOOK_BODY = """#!/bin/sh
 # checked out or mounted (Windows, WSL, CI, sandboxed agent harnesses).
 ROOT="$(git rev-parse --show-toplevel)"
 MDLLM="$ROOT/{rel}"
-# Candidates are executed, not just resolved: on Windows, the Microsoft Store
-# ships alias stubs named python/python3 that command -v happily finds but
-# that only print an install hint and exit nonzero.
-PY=""
-# Prefer a repository-local environment when it exists. This keeps the
-# deterministic floor available in managed shells (including Codex) whose
-# bundled Python is deliberately absent from PATH or has no third-party
-# packages. The two paths cover POSIX and Windows virtual environments.
-for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" python3 python py; do
-  if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
-done
+# Interpreter resolution (one owner: markdownllm/runtime.py — the comment
+# there explains the candidate order and why the probe imports the floor's
+# real dependency rather than just proving an interpreter exists).
+{resolve}
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
-  echo "mdllm: validation floor unavailable (python or $MDLLM not found) — commit blocked."
-  echo "Install Python 3.10+ with PyYAML, or re-run install-hook from the framework root."
+  echo "mdllm: validation floor unavailable (no interpreter with PyYAML, or $MDLLM not found) — commit blocked."
+  echo "Run \\`mdllm runtime-probe .\\` (or \\`python <framework>/tools/mdllm.py runtime-probe .\\`) for a per-candidate report."
   exit 1
 fi
 # Disclosure boundary first: cheapest check, clearest message. Reads the LOCAL
@@ -83,10 +77,7 @@ POST_COMMIT_HOOK_BODY = """#!/bin/sh
 # mdllm post-commit: autopush publication leg (estate-cadence-cluster Phase 1)
 ROOT="$(git rev-parse --show-toplevel)"
 MDLLM="$ROOT/{rel}"
-PY=""
-for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" python3 python py; do
-  if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
-done
+{resolve}
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
   exit 0  # no floor available: publication stays manual; estate-sync --status reports the debt
 fi
@@ -102,10 +93,7 @@ COMMIT_MSG_HOOK_BODY = """#!/bin/sh
 # (boundary-disclosure-check plan). Local .boundary-terms only; absent => no-op.
 ROOT="$(git rev-parse --show-toplevel)"
 MDLLM="$ROOT/{rel}"
-PY=""
-for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" python3 python py; do
-  if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
-done
+{resolve}
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
   exit 0  # no floor available: the pre-commit hook already reported/blocked
 fi
@@ -115,6 +103,13 @@ fi
   exit 1
 }}
 """
+
+# Interpreter resolution has ONE owner (runtime.py); substituted here once so
+# every consumer — install_hook's writes, doctor's currency comparison — sees
+# the same final bytes. Only {rel} remains for per-repo formatting.
+HOOK_BODY = HOOK_BODY.replace("{resolve}", SH_RESOLVE)
+POST_COMMIT_HOOK_BODY = POST_COMMIT_HOOK_BODY.replace("{resolve}", SH_RESOLVE)
+COMMIT_MSG_HOOK_BODY = COMMIT_MSG_HOOK_BODY.replace("{resolve}", SH_RESOLVE)
 
 
 from markdownllm.evals import (
@@ -169,7 +164,22 @@ def cmd_install_hook(args) -> int:
     hooks_dir = root / ".git" / "hooks"
     print(f"installed {hooks_dir / 'pre-commit'} + {hooks_dir / 'commit-msg'} "
           f"+ {hooks_dir / 'post-commit'} (mdllm via {rel})")
-    return 0
+    # Execution-test the hook we just wrote (vendor-harness-adapter-foundation
+    # Phase 1): installed is a weaker fact than runs. Where git cannot fire it
+    # (`git hook run` < 2.36), report untested rather than implying success.
+    result = execution_test_hook(root)
+    if not result["supported"]:
+        print("execution test: UNTESTED — this git predates `git hook run` "
+              "(2.36); the hook will first fire at the next real commit")
+        return 0
+    if result["passed"]:
+        print("execution test: pre-commit ran and passed")
+        return 0
+    print("execution test: pre-commit ran and FAILED — the floor is wired but "
+          "blocking; its output follows:")
+    if result.get("detail"):
+        print(result["detail"])
+    return 1
 
 
 def cmd_scaffold(args) -> int:

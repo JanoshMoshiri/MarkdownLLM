@@ -28,7 +28,11 @@ if (Test-Path -LiteralPath $venvPython) {
 foreach ($name in 'python', 'python3') {
     $command = Get-Command $name -ErrorAction SilentlyContinue
     if (-not $command) { continue }
-    & $command.Source -c 'import sys' 2>$null
+    # Probe the floor's real dependency, not just interpreter presence — a
+    # bare python without PyYAML passes an interpreter-only probe and then
+    # crashes the CLI with a traceback naming neither cause (runtime.py owns
+    # this rule).
+    & $command.Source -c 'import yaml' 2>$null
     if ($LASTEXITCODE -ne 0) { continue }
     & $command.Source $entry @MdllmArguments
     exit $LASTEXITCODE
@@ -40,4 +44,4 @@ if ($launcher) {
     exit $LASTEXITCODE
 }
 
-Write-Error 'mdllm: Python 3.10+ was not found. Create .venv with PyYAML or install Python.'
+Write-Error 'mdllm: no interpreter with PyYAML was found. Create .venv with PyYAML or install Python 3.10+; `python tools/mdllm.py runtime-probe .` reports each candidate once any python is available.'

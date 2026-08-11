@@ -69,6 +69,7 @@ from .mcp_server import cmd_mcp_serve
 from .provenance import cmd_provenance
 from .refresh import cmd_refresh
 from .scaffold import cmd_install_hook, cmd_scaffold
+from .runtime import cmd_runtime_probe
 from .session import cmd_session_start
 from .tokens import cmd_tokens
 from .touchpoints import cmd_candidates, cmd_touchpoints
@@ -208,10 +209,19 @@ def build_cli() -> argparse.ArgumentParser:
     sc.add_argument("path", help="folder to create (its name becomes the domain name)")
     sc.set_defaults(fn=cmd_scaffold)
 
-    h = sub.add_parser("install-hook", help="install the three mdllm git hooks (pre-commit, commit-msg, post-commit)")
+    h = sub.add_parser("install-hook", help="install the three mdllm git hooks (pre-commit, commit-msg, post-commit) and execution-test pre-commit where git supports it")
     h.add_argument("path", nargs="?", default=".")
     h.set_defaults(fn=cmd_install_hook)
     # Hook body is portable since v3.4.1: root/interpreter resolved at run time.
+
+    rp = sub.add_parser("runtime-probe",
+                        help="report, per interpreter candidate, whether it "
+                             "exists and whether the floor's dependency loads "
+                             "— the reproducible runtime check for any "
+                             "harness's shell (framework root or a directly "
+                             "opened nested domain)")
+    rp.add_argument("path", nargs="?", default=".")
+    rp.set_defaults(fn=cmd_runtime_probe)
 
     ms = sub.add_parser("mcp-serve", help="serve a domain's exposed face over MCP "
                         "— the cross-domain producing side (read-only). Default "

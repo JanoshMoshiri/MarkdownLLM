@@ -69,6 +69,10 @@ from markdownllm.scaffold import (
     HOOK_BODY, COMMIT_MSG_HOOK_BODY, install_hook, cmd_install_hook,
     cmd_scaffold,
 )
+from markdownllm.runtime import (
+    FLOOR_DEPENDENCY, SH_RESOLVE, interpreter_candidates, probe_candidate,
+    probe, git_supports_hook_run, execution_test_hook, cmd_runtime_probe,
+)
 from markdownllm.boundary import (
     TERMS_FILE, load_terms, scan_text, self_guard, staged_findings,
     history_findings, cmd_boundary,
