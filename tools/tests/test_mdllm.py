@@ -742,7 +742,9 @@ def test_scaffold_birth_sequence(tmp_path, capsys):
     # isolation: outer repo ignores the domain, committed before domain work
     assert "client-x/" in (tmp_path / ".gitignore").read_text(encoding="utf-8")
     assert (target / ".git").exists()
-    assert (target / ".git" / "hooks" / "pre-commit").is_file()
+    hook = target / ".git" / "hooks" / "pre-commit"
+    assert hook.is_file()
+    assert '.venv/Scripts/python.exe' in hook.read_text(encoding="utf-8")
     # mechanical placeholders substituted; semantic ones intact
     agents = (target / "AGENTS.md").read_text(encoding="utf-8")
     assert "framework_version_seen: " in agents and "[relative path" not in agents

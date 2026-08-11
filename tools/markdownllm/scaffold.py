@@ -33,7 +33,11 @@ MDLLM="$ROOT/{rel}"
 # ships alias stubs named python/python3 that command -v happily finds but
 # that only print an install hint and exit nonzero.
 PY=""
-for c in python3 python py; do
+# Prefer a repository-local environment when it exists. This keeps the
+# deterministic floor available in managed shells (including Codex) whose
+# bundled Python is deliberately absent from PATH or has no third-party
+# packages. The two paths cover POSIX and Windows virtual environments.
+for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" python3 python py; do
   if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
 done
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
@@ -80,7 +84,7 @@ POST_COMMIT_HOOK_BODY = """#!/bin/sh
 ROOT="$(git rev-parse --show-toplevel)"
 MDLLM="$ROOT/{rel}"
 PY=""
-for c in python3 python py; do
+for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" python3 python py; do
   if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
 done
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
@@ -99,7 +103,7 @@ COMMIT_MSG_HOOK_BODY = """#!/bin/sh
 ROOT="$(git rev-parse --show-toplevel)"
 MDLLM="$ROOT/{rel}"
 PY=""
-for c in python3 python py; do
+for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" python3 python py; do
   if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
 done
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then

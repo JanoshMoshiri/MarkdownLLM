@@ -198,6 +198,11 @@ irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1
 
 You need an LLM tool with file-system access, plus `git` and Python 3.10+ — the installer offers to install the latter two if they're missing. Prefer to do it by hand? `git clone` the repo and `pip install pyyaml`.
 
+On Windows or a managed agent shell where `python` is not on `PATH`, use
+`./tools/mdllm.ps1 <command>` after creating a local `.venv` with PyYAML. The
+wrapper prefers that repository-local environment, so `./tools/mdllm.ps1 doctor .` is
+equivalent to `python tools/mdllm.py doctor .` without changing the machine-wide Python installation.
+
 Then open the folder in your LLM tool, let it discover `AGENTS.md`, and tell it what you want:
 
 > "I want a domain for tracking architectural decisions across our microservices — each decision capturing the context, options considered, decision made, and consequences."
