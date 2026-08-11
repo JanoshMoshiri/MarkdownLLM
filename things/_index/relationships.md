@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-11
-generated: 2026-08-11T18:30:33
-generated_from: HEAD@cabb559
-coverage: 168
+generated: 2026-08-11T21:43:58
+generated_from: HEAD@6996309
+coverage: 169
 framework_version: 3.31.0
 ---
 
@@ -113,6 +113,8 @@ framework_version: 3.31.0
 - change-safety-is-defense-in-depth --supports--> retrospective-specification
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
+- codex-final-handoff-audit-2026-08-11 --documents--> vendor-harness-adapter-foundation
+- codex-final-handoff-audit-2026-08-11 --implements--> portability-claims-need-execution-tests
 - codex-port-challenge-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-port-challenge-2026-08-11 --implements--> portability-claims-need-execution-tests
 - coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks
@@ -618,6 +620,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> a-layered-harness-is-a-co-author-not-a-substrate
 - vendor-harness-adapter-foundation --implements--> relative-path-hooks-break-in-nested-domain-repos
 - vendor-harness-adapter-foundation --references--> codex-port-challenge-2026-08-11
+- vendor-harness-adapter-foundation --references--> codex-final-handoff-audit-2026-08-11
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification

@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -34,6 +34,9 @@ linked_things:
   - id: codex-port-challenge-2026-08-11
     relation: references
     notes: "Phase 2B evidence: official Codex constraints, accepted port corrections, managed-shell runtime failures, and the Phase 6 checklist."
+  - id: codex-final-handoff-audit-2026-08-11
+    relation: references
+    notes: "Final A/0–2 acceptance evidence: the shared runtime passes real Codex-shell probes, while incomplete service-facing ports and unsafe Claude currency inspection return Phase 2C for correction."
 ---
 
 # Vendor Harness Adapter Foundation
@@ -46,12 +49,37 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** Phase 2B is complete. The Claude Code agent
-next owns the reopened Phase 1 acceptance defects and Phase 2C extraction.
-The Codex agent stops until both are committed, then owns the final handoff
-acceptance and, only if that gate passes, Phases 3–5. No inference from phase
-order is permitted; the ownership and stop conditions below are part of the
-plan.
+**Current execution boundary:** Claude commits `cce3b70` (Phase 1 repair) and
+`6996309` (Phase 2C extraction) were returned for final Codex acceptance. The
+shared runtime now passes real framework-root and directly opened domain-repo
+probes in the Codex managed shell, but the final handoff gate failed on the
+explicit adapter boundary, Claude inspection currency, and one PATH-dependent
+runtime acceptance fixture. The Claude Code agent owns the unchecked v1.6
+return items below. The Codex agent stops before Phases 3–5 until those items
+are committed and the complete gate is rerun. No inference from phase order is
+permitted; the ownership and stop conditions below are part of the plan.
+
+## Amendment record — v1.6 (2026-08-11, final Codex handoff audit)
+
+The shared runtime implementation is accepted on behaviour: the framework
+root resolved its repository venv and executed the floor; a fresh nested repo
+with no domain venv installed and executed the real pre-commit hook; and a
+directly opened live nested domain resolved the same framework runtime. The
+old `dirname` dependency is gone, every PowerShell candidate is dependency
+probed, and `command_executed` is independently reported.
+
+The complete handoff is nevertheless rejected. Neutral scaffold and doctor
+code call three Claude-concrete methods that no accepted port declares, while
+the architecture gate checks only `RenderPort` and `InspectPort`. A second
+adapter can therefore satisfy every declared protocol and still crash both
+shared consumers. Claude inspection also admits false-current and
+under-reported shapes: token-prefix mutations, extra or duplicate managed
+PostToolUse handlers, and an operator-only hook event. Finally, the new
+`command_executed` test moves its entry outside the framework runtime and then
+assumes PATH supplies PyYAML; it passes in Claude's environment but fails in
+the target Codex shell. Exact evidence and the return boundary are recorded in
+`evidence/codex-final-handoff-audit-2026-08-11.md`. No project `.codex/` state
+was created and Phases 3–5 did not begin.
 
 ## Amendment record — v1.5 (2026-08-11, Codex Phase 2B)
 
@@ -540,6 +568,16 @@ lacks the dependency. The identical probe run in the Codex managed shell is
 2B/acceptance evidence, not a Phase 1 closure condition. Runtime facts are
 available to Phase 3 without Phase 1 freezing their presentation vocabulary.
 
+**Final Codex acceptance [v1.6]:** the implementation passes the real root,
+directly-opened domain, fresh nested-hook, and masked-PATH probes. The remaining
+acceptance defect is the fixture rather than the resolver:
+
+- [ ] **Claude return item:** make
+  `test_probe_reports_command_executed_as_its_own_fact` supply a controlled
+  floor-capable candidate after moving the entry, rather than assuming the
+  target harness PATH contains Python with PyYAML. Pin dependency probing on
+  every PowerShell candidate branch in the same correction.
+
 ### Phase 2 — Cross-harness port design, then Claude extraction **[v1.3]**
 
 #### Phase 2A — Draft the ports without moving Claude (owner: Claude Code agent)
@@ -591,6 +629,23 @@ reopened Phase 1 gate or the final A/0–2 handoff gate.
 existing composite Claude settings file is inspected without mutation or
 normalisation. The Claude agent then stops; the final cross-harness handoff
 gate above must pass before Phase 3.
+
+**Final Codex acceptance [v1.6]: failed. Claude owns these return items before
+the next handoff:**
+
+- [ ] Declare every service-facing dependency as a narrow port (including
+  shortcut projection and scaffold presentation), and make doctor consume a
+  neutral diagnostic contract instead of a vendor-owned `doctor_line`; do not
+  make Codex imitate undocumented Claude methods.
+- [ ] Strengthen architecture fitness with a minimal registered adapter that
+  implements only the declared contracts and is exercised through both
+  scaffold and doctor.
+- [ ] Correct Claude inspection so token-prefix mutations, extra commands in a
+  managed group, duplicate matching groups, and operator-only hook events are
+  reported respectively as stale/extended/ambiguous/managed-fragment-absent,
+  never current.
+- [ ] Add the four currency/discovery regression cases and rerun the byte
+  golden, composite read-only, architecture, focused handoff, and full suites.
 
 ### Phase 3 — Build truthful harness diagnostics (owner: Codex agent)
 
