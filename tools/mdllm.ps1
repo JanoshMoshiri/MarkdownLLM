@@ -21,8 +21,14 @@ $root = Split-Path -Parent $PSScriptRoot
 $entry = Join-Path $PSScriptRoot 'mdllm.py'
 $venvPython = Join-Path $root '.venv\Scripts\python.exe'
 if (Test-Path -LiteralPath $venvPython) {
-    & $venvPython $entry @MdllmArguments
-    exit $LASTEXITCODE
+    # Same policy as the emitted POSIX resolver (runtime.py): a candidate is
+    # usable only if the floor's dependency loads — an incomplete venv must
+    # fall through, not crash the CLI.
+    & $venvPython -c 'import yaml' 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        & $venvPython $entry @MdllmArguments
+        exit $LASTEXITCODE
+    }
 }
 
 foreach ($name in 'python', 'python3') {
@@ -40,8 +46,11 @@ foreach ($name in 'python', 'python3') {
 
 $launcher = Get-Command py -ErrorAction SilentlyContinue
 if ($launcher) {
-    & $launcher.Source -3 $entry @MdllmArguments
-    exit $LASTEXITCODE
+    & $launcher.Source -3 -c 'import yaml' 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        & $launcher.Source -3 $entry @MdllmArguments
+        exit $LASTEXITCODE
+    }
 }
 
 Write-Error 'mdllm: no interpreter with PyYAML was found. Create .venv with PyYAML or install Python 3.10+; `python tools/mdllm.py runtime-probe .` reports each candidate once any python is available.'

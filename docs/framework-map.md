@@ -69,7 +69,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>26 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>27 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -202,6 +202,7 @@ flowchart LR
         C24["calc"]
         C25["candidates"]
         C26["autopush"]
+        C27["runtime-probe"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -230,6 +231,7 @@ flowchart LR
         T24["thing.md<br/>declared derivations — the floor does every sum"]
         T25["change-reconciliation.md<br/>the cue question at the commit boundary"]
         T26["git-workflow.md<br/>The Outbound Rules — publication leg"]
+        T27["floor availability itself — per-candidate runtime facts"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -258,6 +260,7 @@ flowchart LR
     C24 -->|"computes and re-checks"| T24
     C25 -->|"asks the cue for"| T25
     C26 -.->|"publishes validated commits per"| T26
+    C27 -->|"probes interpreter/dependency/command for"| T27
 ```
 
 Notes on this view:

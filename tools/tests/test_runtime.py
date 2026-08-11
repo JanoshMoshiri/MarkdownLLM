@@ -58,8 +58,23 @@ def test_probe_resolves_only_on_dependency(tmp_path):
     result = runtime.probe(tmp_path, Path(mdllm.__file__),
                            dependency="zzz_module_that_does_not_exist")
     assert result["resolved"] is None
+    assert result["command_executed"] is None  # unresolved => untested, never False
     result = runtime.probe(tmp_path, Path(mdllm.__file__), dependency="yaml")
     assert result["resolved"] is not None  # the suite's own env proves it
+
+
+def test_probe_reports_command_executed_as_its_own_fact(tmp_path):
+    # 2B acceptance finding: importing the dependency proves the environment,
+    # not that the floor CLI runs. The probe must execute the real entry under
+    # the resolved interpreter and report that as a third, unpromoted fact.
+    result = runtime.probe(tmp_path, Path(mdllm.__file__), dependency="yaml")
+    assert result["command_executed"] is True
+    # A resolved interpreter with a broken entry is executed=False, not True:
+    broken = tmp_path / "not-mdllm.py"
+    broken.write_text("import sys\nsys.exit(3)\n", encoding="utf-8")
+    result = runtime.probe(tmp_path, broken, dependency="yaml")
+    assert result["resolved"] is not None
+    assert result["command_executed"] is False
 
 
 def test_candidate_order_matches_the_sh_fragment(tmp_path):
@@ -85,10 +100,13 @@ def test_candidate_order_matches_the_sh_fragment(tmp_path):
 def test_every_hook_body_carries_the_shared_fragment_once():
     for body in (mdllm.HOOK_BODY, scaffold_mod.POST_COMMIT_HOOK_BODY,
                  mdllm.COMMIT_MSG_HOOK_BODY):
-        assert body.count(runtime.SH_RESOLVE) == 1
-        assert "import yaml" in body          # dependency probe
-        assert '-c "import sys"' not in body  # the defective probe is gone
-        assert '"$FW/.venv' in body           # framework env reachable
+        emitted = body.format(rel="../../tools/mdllm.py")
+        assert emitted.count(runtime.SH_RESOLVE) == 1
+        assert "import yaml" in emitted          # dependency probe
+        assert '-c "import sys"' not in emitted  # the defective probe is gone
+        assert '"$FW/.venv' in emitted           # framework env reachable
+        assert "dirname" not in emitted          # 2B: managed Git-hook shells
+        #                                          lack the external utility set
 
 
 def test_powershell_entry_probes_the_dependency():
@@ -110,7 +128,8 @@ def test_nested_domain_hook_derives_framework_env(tmp_path):
     assert rc == 0  # the birth commit itself already ran the new pre-commit
     hook = (target / ".git" / "hooks" / "pre-commit").read_text(encoding="utf-8")
     assert runtime.SH_RESOLVE in hook
-    assert 'FW="$(dirname "$(dirname "$MDLLM")")"' in hook
+    assert 'FW="${MDLLM%/*/*}"' in hook  # parameter expansion, no dirname
+    assert "dirname" not in hook
 
 
 def test_install_hook_execution_tests_the_real_hook(tmp_path, capsys):
@@ -127,6 +146,43 @@ def test_install_hook_execution_tests_the_real_hook(tmp_path, capsys):
         assert rc == 0 and "execution test: pre-commit ran and passed" in out
     else:
         assert rc == 0 and "UNTESTED" in out
+
+
+def test_hook_passes_when_no_path_python_works(tmp_path):
+    # 2B acceptance finding: a PATH interpreter can mask framework-venv
+    # selection. Here every PATH python is a failing stub, the domain has no
+    # venv of its own, and the hook must still pass — which only the
+    # framework-root environment (derived in-shell from $MDLLM, no dirname)
+    # can explain.
+    import pytest
+    fw_venv = [p for p in (Path(mdllm.__file__).resolve().parent.parent
+                           / ".venv" / "Scripts" / "python.exe",
+                           Path(mdllm.__file__).resolve().parent.parent
+                           / ".venv" / "bin" / "python") if p.is_file()]
+    if not fw_venv:
+        pytest.skip("no framework-root venv on this machine")
+    if not runtime.git_supports_hook_run(Path.cwd()):
+        pytest.skip("git predates `git hook run`")
+    _git_repo(tmp_path)
+    target = tmp_path / "fw-venv-selection-check"
+    mdllm.cmd_scaffold(_ns(path=str(target)))
+    mdllm.cmd_session_start(_ns(path=str(target), assistant=False))
+    assert not (target / ".venv").exists()
+    stubs = tmp_path / "failing-pythons"
+    stubs.mkdir()
+    for name in ("python", "python3", "py"):
+        stub = stubs / name
+        stub.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8", newline="\n")
+        try:
+            stub.chmod(stub.stat().st_mode | 0o111)
+        except OSError:
+            pass
+    env = dict(os.environ)
+    env["PATH"] = str(stubs) + os.pathsep + env.get("PATH", "")
+    r = subprocess.run(["git", "hook", "run", "pre-commit"], cwd=target,
+                       env=env, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    assert r.returncode == 0, (r.stderr or r.stdout)
 
 
 def test_install_hook_reports_a_blocking_floor_honestly(tmp_path, capsys):

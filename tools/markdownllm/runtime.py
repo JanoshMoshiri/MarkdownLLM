@@ -40,7 +40,11 @@ FLOOR_DEPENDENCY = "yaml"
 # Candidate order: domain-local environment first (a domain that manages its
 # own venv wins), then the framework-root environment derived from MDLLM,
 # then PATH interpreters. POSIX and Windows venv layouts are both covered.
-SH_RESOLVE = """FW="$(dirname "$(dirname "$MDLLM")")"
+# The framework root comes from parameter expansion, NOT dirname: managed
+# Git-hook shells (Codex, Phase 2B finding) run without the external utility
+# set on PATH, and $MDLLM always ends tools/mdllm.py, so stripping the last
+# two path components is exact and needs no subprocess at all.
+SH_RESOLVE = """FW="${MDLLM%/*/*}"
 PY=""
 for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" \\
          "$FW/.venv/bin/python" "$FW/.venv/Scripts/python.exe" \\
@@ -83,15 +87,27 @@ def probe_candidate(candidate: str, dependency: str = FLOOR_DEPENDENCY) -> dict:
 def probe(root: Path, mdllm_entry: Path,
           dependency: str = FLOOR_DEPENDENCY) -> dict:
     """Probe every candidate; `resolved` is the first with the dependency
-    loaded — the same selection the emitted hooks make."""
+    loaded — the same selection the emitted hooks make. The resolved
+    candidate is then made to EXECUTE the floor command itself
+    (`command_executed`): importing the dependency proves the environment,
+    not that the CLI's own import graph and entry run under that interpreter
+    (Phase 2B acceptance finding — three facts, none promoted into another)."""
     fw_root = mdllm_entry.resolve().parent.parent
     facts = [probe_candidate(c, dependency)
              for c in interpreter_candidates(root, fw_root)]
     resolved = next((f["candidate"] for f in facts if f["dependency_loaded"]),
                     None)
+    command_executed = None
+    if resolved is not None:
+        try:
+            r = subprocess.run([resolved, str(mdllm_entry), "--help"],
+                               capture_output=True, timeout=120)
+            command_executed = r.returncode == 0
+        except (OSError, subprocess.TimeoutExpired):
+            command_executed = False
     return {"root": str(root), "framework_root": str(fw_root),
             "dependency": dependency, "candidates": facts,
-            "resolved": resolved}
+            "resolved": resolved, "command_executed": command_executed}
 
 
 def git_supports_hook_run(cwd: Path) -> bool:
@@ -139,7 +155,13 @@ def cmd_runtime_probe(args) -> int:
         print(f"  {state}  {f['candidate']}")
     if result["resolved"]:
         print(f"\nresolved: {result['resolved']}")
-        return 0
+        if result["command_executed"]:
+            print("command-executed: OK — the floor CLI ran under the "
+                  "resolved interpreter")
+            return 0
+        print("command-executed: FAILED — the dependency loads but the floor "
+              "CLI did not run; the environment is only partially usable")
+        return 1
     print("\nresolved: NONE — the floor cannot run here. Install Python 3.10+ "
           f"with {result['dependency']!r}, or create a .venv at the framework "
           "root or this repo's root.")

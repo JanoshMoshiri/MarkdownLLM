@@ -106,10 +106,14 @@ fi
 
 # Interpreter resolution has ONE owner (runtime.py); substituted here once so
 # every consumer — install_hook's writes, doctor's currency comparison — sees
-# the same final bytes. Only {rel} remains for per-repo formatting.
-HOOK_BODY = HOOK_BODY.replace("{resolve}", SH_RESOLVE)
-POST_COMMIT_HOOK_BODY = POST_COMMIT_HOOK_BODY.replace("{resolve}", SH_RESOLVE)
-COMMIT_MSG_HOOK_BODY = COMMIT_MSG_HOOK_BODY.replace("{resolve}", SH_RESOLVE)
+# the same final bytes. Only {rel} remains for per-repo formatting, so the
+# fragment's shell braces (${MDLLM%/*/*}) are doubled to survive .format().
+_SH_RESOLVE_ESCAPED = SH_RESOLVE.replace("{", "{{").replace("}", "}}")
+HOOK_BODY = HOOK_BODY.replace("{resolve}", _SH_RESOLVE_ESCAPED)
+POST_COMMIT_HOOK_BODY = POST_COMMIT_HOOK_BODY.replace(
+    "{resolve}", _SH_RESOLVE_ESCAPED)
+COMMIT_MSG_HOOK_BODY = COMMIT_MSG_HOOK_BODY.replace(
+    "{resolve}", _SH_RESOLVE_ESCAPED)
 
 
 from markdownllm.evals import (
