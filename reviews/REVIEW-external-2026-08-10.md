@@ -2,10 +2,12 @@
 id: external-review-2026-08-10
 type: artifact
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-08-10
 origin: external
-verified: false
+verified: true
+verified_by: Janosh Moshiri
+verified_date: 2026-08-11
 linked_things:
   - id: external-review-response-2026-08-10
     relation: informs
@@ -38,8 +40,15 @@ literature (sources below).
 **Method:** repo evidence compiled by an independent read of `reviews/`,
 `things/insights/`, `things/plans/`, and the v3.30.x commits; external claims
 from published papers and industry surveys. External claims are exactly that —
-external — and carry this file's provenance: unverified until the operator
-confirms them against the cited sources.
+external — and carried this file's provenance as unverified until confirmed
+against the cited sources.
+
+**Provenance (flipped 2026-08-11):** the operator checked the cited sources and
+confirmed them legitimate; `verified: true`, `verified_by: Janosh Moshiri`. The
+classical-canon citations (Parnas & Clements, Naur, Lehman, Weinberg) were
+given from the reviewer's knowledge rather than fetched, and are confirmed at
+the level of their claims, not page-level quotation — noted here so the
+distinction survives the flip.
 
 ## Verdict
 
