@@ -2,7 +2,7 @@
 id: portability-claims-need-execution-tests
 type: insight
 status: active
-version: 1.2
+version: 1.3
 created: 2026-06-11
 session: 2026-06-11
 source: both
@@ -64,6 +64,15 @@ but verification still stopped short of execution.
    with no local venv failed. The execution test had exercised *a successful
    branch*, not the branch supporting the portability claim.
 
+5. **The cross-harness test fixture itself (2026-08-11):** the repaired
+   resolver passed real framework-root, directly-opened-domain, fresh-hook,
+   and masked-PATH probes in Codex. Its new `command_executed` unit test still
+   failed there because it moved the entry under a temporary root and then
+   silently relied on PATH to supply another PyYAML-capable interpreter.
+   Claude's environment satisfied that undeclared fixture dependency; Codex's
+   did not. The failing test was evidence about the test harness, not a failure
+   of the production fallback it purported to isolate.
+
 ## Why It Matters
 
 - This is the same epistemic rule the framework already applies elsewhere,
@@ -83,6 +92,11 @@ but verification still stopped short of execution.
   Shell syntax portability also includes utility availability: an external
   `dirname`, `realpath`, or similar command is a dependency even when `/bin/sh`
   itself exists.
+- **An execution test has its own runtime contract.** If the fixture needs a
+  floor-capable candidate after relocating the subject, it must construct or
+  inject that candidate explicitly. Borrowing PATH from the authoring harness
+  turns a supposedly cross-harness test into an accidental measurement of the
+  machine running it.
 - Candidate mechanical follow-up: `install-hook` could self-test by running
   the script it just emitted once (exit status only) and reporting
   floor-unavailable immediately, instead of leaving the discovery to the
