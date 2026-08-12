@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.9
+version: 1.10
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -62,6 +62,39 @@ not yet accepted or ownerless product state, and must be rerendered and
 explicitly dispositioned after Phase 5R. No nested domain adapter migration is
 authorised. The framework root's tracked `.claude/settings.json` and every live
 domain projection remain untouched until the repair and migration gates pass.
+
+## Claude acceptance amendments — v1.10 (2026-08-12)
+
+Claude's independent review accepted the v1.9 architecture and identified four
+facts that must be explicit before 5R.0 freezes the launch seam. The follow-up
+contract audit accepted all four in substance, with two factual corrections:
+
+1. **Claude's Windows shell is documented.** A command hook with `args` uses
+   shell-free exec form. Shell form uses `sh -c` on macOS/Linux and Git Bash on
+   Windows, falling back to PowerShell when Git Bash is unavailable. An explicit
+   `"shell": "powershell"` is supported on Windows and selects PowerShell 7
+   with Windows PowerShell 5.1 fallback. The root's field is therefore valid;
+   its combined command remains a Windows-specific legacy projection rather
+   than the portable current form.
+2. **Current command-hook defaults are 600 seconds, not 60.** That correction
+   does not weaken the budgeting requirement. Both renderers must declare the
+   same explicit 120-second envelope, and the neutral launch/application work
+   must fit hierarchically inside it without borrowing a later required step's
+   reserve.
+3. **The Codex source is official and has a canonical Developers address.**
+   [`developers.openai.com/codex/hooks`](https://developers.openai.com/codex/hooks)
+   currently redirects to the official Learn page. Repository citations use
+   the Developers address so the provenance is immediately recognisable; the
+   documented `/hooks` surface remains CLI-specific.
+4. **5R.2 and Phase 6 prove different things.** Direct execution of a rendered
+   handler is renderer/launch acceptance and earns only `designed-for`.
+   Automatic dispatch by the real product, correlated with its transcript and
+   hash-bound attestation, is reserved for Phase 6 and alone earns
+   `verified-on`.
+
+These amendments add tests and acceptance boundaries, not another abstraction.
+If 5R.0 execution shows that exec form or the existing launch specification is
+insufficient, the port is settled from that evidence before implementation.
 
 ## Amendment record — v1.9 (2026-08-12, live gate reopened)
 
@@ -519,7 +552,7 @@ The first Codex adapter should be deliberately small and project-local:
 
 Current official Codex documentation is the external contract to verify again
 at implementation time: [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-and [hooks](https://learn.chatgpt.com/docs/hooks). The live execution phase,
+and [hooks](https://developers.openai.com/codex/hooks). The live execution phase,
 not the documentation alone, earns the compatibility claim.
 
 ## Claude non-regression boundary
@@ -646,8 +679,8 @@ packages, without broadening either agent into the other's vendor surface:
 
 | Package | Implementing owner | Required independent acceptance |
 |---|---|---|
-| 5R.0 failing probes and launch-seam prototype | Codex/shared | Claude reviews portability against its project-root/runtime needs |
-| 5R.1 neutral launch, runner injection, diagnostics | Codex/shared | Claude regression suite and real shell matrix |
+| 5R.0 failing probes and launch-seam prototype | Codex/shared | Claude reruns the same committed red PowerShell 5.1 reproduction and reviews the documented shell/exec matrix |
+| 5R.1 neutral launch, runner injection, diagnostics | Codex/shared | Claude reruns that unchanged reproduction green plus its regression suite on the handoff commit |
 | 5R.2 Claude projection, output envelope, legacy definitions | Claude | Codex reviews inward ports, cwd stability, and ownership |
 | 5R.3 generic refresh service | Codex/shared | Claude owns exact Claude legacy forms; both review byte preservation |
 | 5R.4 Codex rerender and test-state disposition | Codex | operator selects root ownership; Claude suite remains green |
@@ -912,10 +945,23 @@ still changing.
   writes to stderr, and exits non-zero under Windows PowerShell 5.1. Exercise
   both the Codex `commandWindows` path and `tools/mdllm.ps1`; do not depend on
   whether the host happens to expose a Microsoft Store alias.
+- [ ] Author that PowerShell 5.1 reproduction once as an environment-independent
+  committed fixture. Codex records old-red under native `powershell.exe` 5.1;
+  before Gate 5R.0, Claude reruns the exact fixture unchanged and records
+  `$PSVersionTable.PSVersion`, repository commit, command, and red result.
+  PowerShell 7 compatibility mode and a Codex-only invocation are not substitutes.
 - [ ] Pin the current Claude contract fact that matching handlers run in
   parallel. Replace every production comment/test assertion that a matcher
   group's handler array is sequential with an assertion over **one handler**
   and the neutral runner's ordered steps.
+- [ ] Pin Claude's documented execution forms before choosing syntax: shell-free
+  `command` + `args`; default shell form on POSIX; Windows Git Bash plus its
+  PowerShell fallback; and explicit `shell: powershell` with `pwsh` plus native
+  PowerShell 5.1 fallback. Use an inert handler to record executable/version,
+  argv boundaries, cwd, `${CLAUDE_PROJECT_DIR}`, stdin receipt, source, exit
+  status, timestamps, config hash, and the Claude debug transcript. Include
+  project/framework paths containing spaces. The selected portable form must be
+  executed by real Claude Code on every supported platform/dialect it claims.
 - [ ] Prototype the neutral launch seam before freezing a new port. It must run
   the same `harness-event <harness> <moment> <root> <definition-hash>` intent
   from a repository subdirectory on POSIX, PowerShell 7, and Windows
@@ -928,9 +974,11 @@ still changing.
   A custom `git hook run` name is not assumed portable—older supported Git
   versions reject unknown event names.
 
-**Gate 5R.0:** the failing probes fail on the old implementation, the proposed
-launch seam passes on all three shells, and the resulting contract contains no
-Claude or Codex schema vocabulary.
+**Gate 5R.0:** the failing probes fail on the old implementation in both agents'
+native PowerShell 5.1 records, the proposed launch seam passes on all three
+shells, the chosen Claude execution form is pinned from real dispatch rather
+than schema inspection, and the resulting inward contract contains no Claude
+or Codex schema vocabulary.
 
 #### Phase 5R.1 — Repair shared launch/runtime infrastructure (Codex owner)
 
@@ -947,6 +995,29 @@ Claude or Codex schema vocabulary.
   depend on the port; it must not resolve or import a concrete adapter itself.
 - [ ] Preserve one total lifecycle deadline, bounded labelled output,
   surface-and-continue behavior, and format-before-success-attestation.
+- [ ] Render an explicit **120-second handler timeout** in Claude and Codex;
+  never inherit a vendor default. Enforce this hierarchy as policy and include
+  every value in the managed-definition hash:
+
+  ```text
+  launch resolution             <= 10s
+  neutral lifecycle application <= 105s
+  format / evidence / exit       >= 5s
+                                  -----
+                                  <= 120s
+
+  SessionStart application: estate-sync <= 75s; session-start <= 25s;
+                            runner overhead <= 5s
+  PostToolUse application:  validate <= 100s; runner overhead <= 5s
+  ```
+
+  An earlier step cannot borrow a later required step's allocation. A timed-out
+  or degraded `estate-sync` must still leave the reserved orientation budget.
+- [ ] Give `estate-sync` a 75-second global deadline in addition to its per-Git
+  call ceiling. Clamp each child call to the remaining global budget; after
+  exhaustion, continue the estate walk from cached/local state and label every
+  unattempted remote honestly as budget-exhausted. Do not pull after a degraded
+  fetch, and leave no child Git/interpreter process behind.
 - [ ] Extend doctor with independent launch currency/runtime facts. A current
   vendor artifact with absent or stale launch infrastructure is configured but
   not runnable; static launch success still leaves execution untested.
@@ -957,7 +1028,11 @@ Claude or Codex schema vocabulary.
 Git-hook tests pass on POSIX, PowerShell 7, and Windows PowerShell 5.1. A
 port-only fake can traverse the real command path without importing a vendor.
 The installed Git hook is also exercised through Windows Git's shell; a native
-shell emulation does not stand in for that boundary.
+shell emulation does not stand in for that boundary. Tests prove the timeout
+arithmetic, later-step reservation, global estate deadline, healthy and stalled
+remote paths, hash invalidation, and child-process cleanup. Claude then reruns
+the exact committed PowerShell 5.1 reproduction green plus its regression suite
+on the handoff commit; only then may 5R.2 begin.
 
 #### Phase 5R.2 — Version the Claude projection (Claude owner; Codex acceptance)
 
@@ -982,16 +1057,24 @@ shell emulation does not stand in for that boundary.
   current golden. Update the inspector so `current`, `known-legacy`,
   `extended`, and `ambiguous` are distinguishable without treating legacy as
   current.
-- [ ] Prove a fresh Claude-selected scaffold in a real Claude Code session:
-  ordered SessionStart output, PostToolUse success and controlled failure,
-  current hash-bound attestations, and a commit through the Git floor.
-- [ ] Repeat the corrected fresh-scaffold launch on Windows and POSIX before
-  authorising any domain migration. Shell-emulated unit tests remain
-  designed-for evidence for an OS that was not actually used.
+- [ ] Prove renderer acceptance without claiming automatic harness dispatch: a
+  fresh Claude scaffold matches the current golden, inspects `current`, and has
+  exactly one managed handler per lifecycle moment. Execute each emitted handler
+  directly from a moved cwd on native Windows and POSIX; prove ordered steps,
+  output translation, bounded advisory failure, definition-hash invalidation,
+  and attestation mechanics.
+- [ ] Label every direct handler or `harness-event` execution as a **launch
+  probe**. Any resulting clone-local attestation is test state and inadmissible
+  as Phase 6 evidence. Do not promote any compatibility surface to
+  `verified-on` during 5R.2.
+- [ ] If Claude discovers a missing neutral abstraction while implementing its
+  projection, return it to 5R.1 under Codex/shared ownership. Claude does not
+  alter neutral ports opportunistically inside the vendor package.
 
-**Gate 5R.2:** Claude's owner supplies the live record; Codex independently
-accepts the neutral-boundary, cwd, byte-ownership, and deterministic tests.
-Neither agent self-certifies the other's harness.
+**Gate 5R.2:** Claude supplies the implementation and deterministic/native-shell
+renderer record; Codex independently accepts the neutral boundary, cwd
+stability, byte ownership, and tests. The result is a release-candidate,
+`designed-for` renderer—not a verified harness.
 
 #### Phase 5R.3 — Add explicit recognised-legacy migration (Codex service owner; Claude definitions owner)
 
@@ -1050,6 +1133,10 @@ and every ambiguous case proves zero writes by hash.
   and trust to `/hooks` in the CLI; the Desktop chat command palette observed
   on 2026-08-12 did not expose that command. Do not claim Desktop trust review
   from a CLI-only flow or from config presence.
+- [ ] If any commit after Claude's 5R.1 acceptance changes launch, runtime, or
+  lifecycle-runner code, Claude reruns the exact PowerShell 5.1 reproduction on
+  final 5R.4 HEAD. A final-HEAD run may satisfy both gates only when no
+  intervening relevant change occurred.
 
 **Gate 5R.4 / release back into Phase 6:** the full suite passes in both the
 Codex managed shell and Claude's shell; validation and coherence are clean;
@@ -1068,10 +1155,20 @@ operator-owned estate state from a fresh-scaffold non-regression result and
 explicitly decide whether to refresh it; Phases 3–5 deliberately left it
 byte-for-byte untouched.
 
+Phase 6 is the only phase that earns `verified-on`. Unlike 5R.2's direct launch
+probes, these runs must be automatically dispatched by the named product and
+correlated with its own transcript/debug output. The records include exact
+harness version, OS/platform, repository commit, project-config SHA-256, managed
+definition hash, source event, timestamps, and observed outcome.
+
 - [ ] Claude non-regression: from the Phase 5R current renderer, scaffold, open,
   observe SessionStart ordering, make a valid edit, observe quiet PostToolUse,
   make a controlled invalid edit, observe advisory feedback, repair it, and
   commit through the floor.
+- [ ] Claude framework root: only after an operator-approved recognised-legacy
+  refresh, repeat the automatic lifecycle record at root. If the operator does
+  not approve that refresh, record root as legacy/unverified and scope the
+  Claude verified-on claim to the fresh scaffold; do not reuse the 5R.2 probe.
 - [ ] Codex framework root: trust the project layer through the documented
   product-specific human flow, start/resume/compact, observe injection, make
   valid/invalid/repaired edits, validate, and commit.
@@ -1142,6 +1239,9 @@ This plan is complete only when:
 - existing permission rules and local hook extensions survive or cause a safe
   refusal;
 - runtime launch policy has one neutral owner and both adapters consume it;
+- both renderers declare the same explicit handler envelope, every inner budget
+  fits beneath it with later-step reservation, and degraded estate sync cannot
+  suppress orientation or leave child processes behind;
 - exact legacy forms are refreshable only through an explicit reviewed diff,
   while unknown stale or extended forms remain zero-write refusals;
 - adding a third harness requires a new adapter, tests, and docs—not edits to

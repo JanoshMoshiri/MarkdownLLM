@@ -213,7 +213,7 @@ state awaiting rerender and an explicit ownership decision, not accepted
 configuration.
 
 Installing the corrected reviewed diff remains an operator action. The
-[official Codex hook documentation](https://learn.chatgpt.com/docs/hooks) names
+[official Codex hook documentation](https://developers.openai.com/codex/hooks) names
 `/hooks` as a **CLI** inspection/trust command; it was not available in the
 observed Desktop chat command palette, so Desktop and CLI trust evidence must
 not be conflated. `doctor` reports execution as `untested` until a real
