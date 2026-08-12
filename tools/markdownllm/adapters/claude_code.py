@@ -14,10 +14,11 @@ Byte-compatibility is a release gate, not an aspiration: `render()` must
 reproduce `tools/tests/fixtures/claude_golden/settings.json.golden` exactly
 (Phase 0 freeze), derived from the bindings — never pasted.
 
-Claude's ordering mechanism (the fact the ports must not generalise away):
-the ordered session-start policy is expressed as ONE hook group whose
-commands run sequentially. A harness that launches matching hooks
-concurrently needs a different mechanism for the same intent.
+Current Claude launches all matching command handlers in parallel.  The frozen
+two-handler SessionStart bytes below are therefore a legacy migration input,
+not proof that the inward ordered lifecycle was realised.  The Phase 5R
+projection replaces them with one managed handler entering the neutral runner;
+until then scaffold/install remains held at the reopened gate.
 
 Inspection semantics (accepted at the Phase 2B challenge):
 - currency derives from THIS adapter's renderer — no second expected list;
@@ -76,7 +77,7 @@ class ClaudeCodeAdapter:
             harness=self.name,
             lifecycle_moments=("session-start", "post-write"),
             notes="one settings file also serves VS Code Copilot agent mode; "
-                  "ordering via a single sequential hook group")
+                  "legacy lifecycle bytes await one-handler migration")
 
     def install_policies(self):
         """Own only the top-level hooks member in composite settings."""
@@ -131,7 +132,8 @@ class ClaudeCodeAdapter:
                         "command": self._command(ctx, s.operation, s.argv)}
                        for s in binding.steps]
             if binding.delivery == "context":
-                # Claude's ordering guarantee: one group, sequential commands.
+                # Frozen legacy-v1 shape only. Claude runs these matching
+                # handlers in parallel; Phase 5R.2 replaces this projection.
                 hooks.setdefault("SessionStart", []).append({"hooks": entries})
             else:
                 hooks.setdefault("PostToolUse", []).append(

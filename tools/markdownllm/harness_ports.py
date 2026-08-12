@@ -12,9 +12,9 @@ Design constraints these types encode (plan: "Narrow adapter ports"):
 - **The lifecycle contract is inward-owned and vendor-neutral.** Intents name
   framework acts (estate-sync, session-start, validate) and ordering; they
   never name a vendor event, config key, or file format. How a harness
-  guarantees the ordering is its adapter's problem — Claude uses one
-  sequential hook group; a harness that fires matching hooks concurrently
-  needs a different mechanism for the same intent.
+  guarantees the ordering is its adapter's problem. A handler array is not an
+  ordering primitive: adapters for concurrently launched handlers must enter
+  the neutral ordered runner through one managed handler.
 - **Small interfaces, not a harness god-object.** Render produces new-project
   artifacts; Inspect reads existing ones without changing them; capabilities
   are data, so an adapter that cannot honour one is a report, not an

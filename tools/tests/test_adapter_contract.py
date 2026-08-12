@@ -12,8 +12,8 @@ Three freezes, defined BEFORE any adapter class exists:
    here so the Phase 2C inspect-port move cannot silently change it.
 3. **Lifecycle intents** — the application contract as data. The intents name
    framework acts, never vendor events; how a harness guarantees the ordering
-   is its adapter's problem. The scaffolded Claude settings are asserted to
-   *realise* these intents, which is the seam the Phase 2A ports must honour.
+   is its adapter's problem. The legacy Claude settings preserve the command
+   list but do not realise its order because matching handlers run in parallel.
 
 Run: python -m pytest tools/tests/test_adapter_contract.py -q
 """
@@ -169,20 +169,18 @@ def test_extended_startup_shape_carries_local_extension():
 # ------------------------------------------------------ 3. lifecycle intents
 
 
-def _intents_realised_by(settings: dict) -> dict:
-    """Map a Claude-format settings dict back to framework lifecycle intents.
+def _legacy_command_lists_in(settings: dict) -> dict:
+    """Map legacy Claude settings back to their unordered command lists.
 
     This is deliberately the ONLY place a test knows the Claude JSON shape;
-    the assertion layer below speaks intent vocabulary. When the Phase 2A
-    ports exist, this translation moves into the Claude adapter and this
-    helper collapses to a call into it.
+    it is byte/operation migration evidence, not an ordering proof. Current
+    Claude runs matching handlers in parallel, including handlers in one group.
     """
     realised: dict = {}
     hooks = settings.get("hooks") or {}
     ss_groups = hooks.get("SessionStart") or []
     if ss_groups:
-        # One group, sequential commands — Claude's ordering guarantee.
-        assert len(ss_groups) == 1, "ordering relies on a single hook group"
+        assert len(ss_groups) == 1, "legacy-v1 shape has one matcher group"
         acts = []
         for h in ss_groups[0]["hooks"]:
             cmd = h["command"]
@@ -197,14 +195,15 @@ def _intents_realised_by(settings: dict) -> dict:
     return realised
 
 
-def test_scaffolded_settings_realise_the_lifecycle_intents(tmp_path):
+def test_scaffolded_legacy_settings_preserve_the_lifecycle_command_lists(
+        tmp_path):
     target = _scaffold(tmp_path)
     settings = json.loads((target / ".claude" / "settings.json")
                           .read_text(encoding="utf-8"))
-    assert _intents_realised_by(settings) == LIFECYCLE_INTENTS
+    assert _legacy_command_lists_in(settings) == LIFECYCLE_INTENTS
 
 
-def test_estate_standard_shape_realises_the_lifecycle_intents():
+def test_estate_standard_legacy_shape_preserves_lifecycle_command_lists():
     cfg = json.loads((FIXTURES / "estate_shapes" / "hooks-only.json")
                      .read_text(encoding="utf-8"))
-    assert _intents_realised_by(cfg) == LIFECYCLE_INTENTS
+    assert _legacy_command_lists_in(cfg) == LIFECYCLE_INTENTS
