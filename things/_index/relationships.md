@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-11
-generated: 2026-08-11T21:57:33
-generated_from: HEAD@51a88a3
-coverage: 170
+created: 2026-08-12
+generated: 2026-08-12T23:10:20
+generated_from: HEAD@214967a
+coverage: 171
 framework_version: 3.31.0
 ---
 
@@ -113,6 +113,8 @@ framework_version: 3.31.0
 - change-safety-is-defense-in-depth --supports--> retrospective-specification
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
+- claude-phase5r0-red-acceptance-2026-08-12 --documents--> vendor-harness-adapter-foundation
+- claude-phase5r0-red-acceptance-2026-08-12 --implements--> portability-claims-need-execution-tests
 - codex-final-handoff-audit-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-final-handoff-audit-2026-08-11 --implements--> portability-claims-need-execution-tests
 - codex-port-challenge-2026-08-11 --documents--> vendor-harness-adapter-foundation
