@@ -941,7 +941,7 @@ still changing.
 
 #### Phase 5R.0 — Freeze the failures and choose the launch seam (Codex owner; Claude review)
 
-- [ ] Add deterministic reproductions for a PATH candidate which exists,
+- [x] Add deterministic reproductions for a PATH candidate which exists,
   writes to stderr, and exits non-zero under Windows PowerShell 5.1. Exercise
   both the Codex `commandWindows` path and `tools/mdllm.ps1`; do not depend on
   whether the host happens to expose a Microsoft Store alias.
@@ -973,6 +973,18 @@ still changing.
   floor without hijacking a native hook event or overwriting operator config.
   A custom `git hook run` name is not assumed portable—older supported Git
   versions reject unknown event names.
+
+**5R.0 execution record (Codex, in progress):** commit `8123812` owns the
+single shared `stderr-python.cmd` / `floor-python.cmd` fixture and exercises it
+through both entry paths. On native Windows PowerShell `5.1.26100.9168` at
+pre-fix commit `ba49102`, the exact focused pytest command recorded two expected
+failures: `tools/mdllm.ps1` terminated at the first stderr-writing `python`
+probe with `NativeCommandError`, and Codex `commandWindows` surfaced the outer
+“no floor-capable Python” fallback instead of continuing to its framework
+runner. Commit `f64480c` withdraws the false sequential-handler claim while
+retaining legacy bytes as migration data; its contract/port suite is 28/28.
+Claude's unchanged native-PS5 rerun, real-dispatch shell matrix, and launch-seam
+selection remain open, so Gate 5R.0 has not passed and Phase 5R.1 has not begun.
 
 **Gate 5R.0:** the failing probes fail on the old implementation in both agents'
 native PowerShell 5.1 records, the proposed launch seam passes on all three
