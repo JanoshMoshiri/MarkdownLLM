@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.1
+version: 1.2
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -169,16 +169,15 @@ whole system; everything else is refinement.
   `python tools/mdllm.py doctor <path>` checks all of this mechanically —
   including whether the hook actually *executes*, not just exists — and
   tells you which mode you're in.
-- **The session-start ritual is hardened for you.** A scaffolded domain ships a
-  `.claude/settings.json` that injects the agent's startup ritual (load kernel,
-  version-check, velocity) the moment a session opens — so it can't be silently
-  skipped. One Claude-format file covers Claude Code and Copilot in VS Code.
-  Older domains adopt it via a one-time operator paste when they refresh (see
-  `domain-refresh.md`); the agent can't add it itself, because the file carries
-  permission rules. With no adapter the ritual still runs by interpretation — the
-  hook only makes it reliable. The first line you'll see each session is a sync
-  report (`estate-sync`): the ritual fetches what other machines committed
-  before orienting, and degrades to an advisory line when offline.
+- **Session-start hardening is being corrected.** The portable ritual still
+  runs by `AGENTS.md` interpretation and the Git floor remains intact, but the
+  historical scaffolded `.claude/settings.json` is now a recognised legacy
+  projection. Current Claude launches matching handlers in parallel, so its
+  two-handler form does not prove `estate-sync` runs before orientation; a
+  Phase 5R repair will replace it with one handler entering the neutral ordered
+  runner. Do not paste, install, or refresh that legacy form while the gate is
+  open. Existing project permissions and settings remain untouched, and
+  Copilot lifecycle compatibility is tracked as a separate unverified claim.
 - **Your domain publishes itself — once you give it somewhere to go.** A fresh
   domain has no remote, so commits simply stay local. The moment you add one
   (`git remote add origin …`), the post-commit hook publishes each validated

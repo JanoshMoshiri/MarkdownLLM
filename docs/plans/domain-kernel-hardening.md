@@ -8,6 +8,14 @@
 > two releases later (v3.17) — current plans live in `things/plans/` as
 > `type: plan` things.
 
+> **2026-08-12 contract erratum.** This remains a historical execution record,
+> but its claim that one Claude-format lifecycle adapter covers both Claude Code
+> and VS Code Copilot is no longer a current compatibility claim. Current
+> Claude Code runs matching handlers in parallel, invalidating the old
+> two-handler ordering interpretation; Copilot also requires its own contract
+> and execution evidence. The corrective work is owned by
+> `things/plans/vendor-harness-adapter-foundation.md` Phase 5R.
+
 > **Durable execution record.** This plan lives in-repo so it survives context
 > compaction. Progress is tracked in the table below; per-change commits are the
 > ledger of work done; `continuity.md` captures mid-phase position. After any

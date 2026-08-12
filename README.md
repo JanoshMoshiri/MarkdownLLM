@@ -199,9 +199,9 @@ irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1
 
 You need an LLM tool with file-system access, plus `git` and Python 3.10+ — the installer offers to install the latter two if they're missing. Prefer to do it by hand? `git clone` the repo and `pip install pyyaml`.
 
-### Codex support: shared runtime verified; project adapter awaits live acceptance
+### Codex support: shared runtime verified; project adapter repair gate open
 
-The vendor-neutral adapter boundary and project-local Codex renderer are now
+The vendor-neutral adapter boundary and project-local Codex renderer are
 implemented and covered by unit and integration tests. The renderer produces
 `.codex/hooks.json` lifecycle bindings for ordered SessionStart work and
 PostToolUse validation; `doctor --harness codex` reports support,
@@ -209,13 +209,20 @@ configuration, currency, trust, runtime, and real-event execution as separate
 facts. Static inspection and a runnable command never promote execution to
 verified.
 
-That is **designed-for evidence, not a completed Codex rollout**. Phase 6 still
-has to install the project layer deliberately, complete Codex's human trust
-flow, inspect the exact active commands through `/hooks` as described by the
-[official Codex hooks contract](https://learn.chatgpt.com/docs/hooks), and
-observe real framework-root and nested domain lifecycle events. No live `.codex`
-configuration was installed in this repository while Phases 3–5 were built.
-The boundary and live checklist remain in
+That is **designed-for evidence, not a completed Codex rollout**. A 2026-08-12
+live preflight reopened a repair gate before Phase 6: the PowerShell 5.1
+fallback must continue past stderr-writing failed Python candidates, and both
+vendor projections must consume one shared launch policy. The preflight created
+an untracked framework-root `.codex/hooks.json`; it is held as test state, not
+accepted project configuration, and must not be committed before rerender and
+an explicit ownership decision.
+
+After that repair, Phase 6 still has to install/review the corrected project
+layer and observe real framework-root and directly opened domain lifecycle events.
+Official documentation assigns exact hook review and trust to `/hooks` in the
+**Codex CLI**; the Desktop chat command palette observed during this preflight
+did not expose that command, so the plan does not pretend a CLI review happened
+inside Desktop. The boundary and execution checklist remain in
 [`vendor-harness-adapter-foundation`](things/plans/vendor-harness-adapter-foundation.md).
 
 Use the read-only paths before authorising a project write:
@@ -225,8 +232,10 @@ Use the read-only paths before authorising a project write:
 ./tools/mdllm.ps1 adapter-install . --harness codex --dry-run
 ```
 
-If the owned diff is correct, the operator may run the same `adapter-install`
-command without `--dry-run`, then approve project trust and review `/hooks`.
+Do not apply that diff while the repair gate is open. Once Phase 5R passes, the
+operator may rerun the dry-run against the current renderer, apply the reviewed
+diff, and complete the product-specific trust flow on a surface that actually
+supports it.
 The installer owns only MarkdownLLM's project lifecycle groups; it does not
 modify user-global Codex configuration. Ambiguous or unsafe existing state is
 refused rather than overwritten.
@@ -272,8 +281,8 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 
 | Tool | Discovery | Status |
 |------|-----------|--------|
-| Codex desktop | AGENTS.md auto-load | Root + directly opened nested domain runtime/Git floor verified 2026-08-11; project lifecycle adapter implemented and tested, but Phase 6 live hook/trust verification remains ([plan](things/plans/vendor-harness-adapter-foundation.md)) |
-| Claude Code | CLAUDE.md → AGENTS.md | Verified in use (the framework's own development and evals run on it) |
+| Codex desktop | AGENTS.md auto-load | Root + directly opened nested domain runtime/Git floor verified 2026-08-11; project lifecycle adapter implemented, with Phase 5R runtime/launch repair and Phase 6 live dispatch/trust verification still open ([plan](things/plans/vendor-harness-adapter-foundation.md)) |
+| Claude Code | CLAUDE.md → AGENTS.md | Core framework use verified; the project lifecycle projection is held at Phase 5R because its legacy two-handler ordering assumption is invalid under the current hooks contract |
 | Codex (VS Code) | AGENTS.md auto-load | Exercised on a real project; not yet eval-measured |
 | GitHub Copilot, Codex CLI, Cursor, Windsurf, Gemini CLI | AGENTS.md auto-load | Designed for; not yet exercised |
 
@@ -281,10 +290,10 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 
 ### Vendor setup
 
-- **Claude Code** — the installer writes a `CLAUDE.md` wrapper (`@AGENTS.md`) for you. If you cloned by hand, add one at root containing `@AGENTS.md`. The existing Claude lifecycle projection remains the compatibility default; `adapter-install . --harness claude --dry-run` shows its owned project diff before any explicit update.
-- **Optional lifecycle hardening** — `scaffold <path> --harness claude|codex|all|none` selects the project adapter(s) for a new domain (`claude-code` is also accepted as the canonical Claude name). Omitting the flag keeps the historical Claude default; `none` leaves the portable `AGENTS.md` interpretation path plus Git floor. For an existing domain, run `adapter-install . --harness <name> --dry-run`, inspect the owned diff, then rerun without `--dry-run` only if the project change is intended.
+- **Claude Code** — the installer writes a `CLAUDE.md` wrapper (`@AGENTS.md`) for you. If you cloned by hand, add one at root containing `@AGENTS.md`. Claude remains the compatibility default, but its existing two-handler lifecycle projection is now a recognised legacy form: current Claude launches matching handlers in parallel, so do not install or refresh it until Phase 5R replaces it with one handler entering the neutral ordered runner. Existing domain settings remain untouched.
+- **Optional lifecycle hardening** — `scaffold <path> --harness claude|codex|all|none` selects the project adapter(s) for a new domain (`claude-code` is also accepted as the canonical Claude name). Omitting the flag still selects the historical Claude default; until Phase 5R closes, use `none` for a new production domain or treat adapter output as test-only. `none` leaves the portable `AGENTS.md` interpretation path plus Git floor. Existing projects may run `doctor` and `adapter-install --dry-run`, but should not apply or refresh an adapter during the repair gate.
 - **GitHub Copilot (VS Code)** — set `"chat.useAgentsMdFile": true` and `"chat.useNestedAgentsMdFiles": true`.
-- **Codex** — auto-discovers `AGENTS.md`. The project adapter is implemented but has not yet completed Phase 6 live verification: after an operator installs its reviewed diff, project trust and the exact active hook definitions must be reviewed through Codex's [`/hooks` UI](https://learn.chatgpt.com/docs/hooks). `doctor . --harness codex` remains `execution: untested` until a matching real event records evidence; no project `.codex` layer was installed in this repository during implementation.
+- **Codex** — auto-discovers `AGENTS.md`. The project adapter is implemented, but Phase 5R repair precedes Phase 6 live verification. The [official hook documentation](https://learn.chatgpt.com/docs/hooks) names `/hooks` as a **CLI** review/trust surface; do not assume it is a Desktop chat command. `doctor . --harness codex` remains `execution: untested` until a matching real event and harness-owned transcript correlate. A preflight-created root `.codex/hooks.json` is currently untracked test state awaiting rerender and an explicit ownership decision.
 - **Cursor, Windsurf, Gemini CLI** — no configuration; they auto-discover `AGENTS.md` at root.
 
 ### Deployment: the nested-repository model

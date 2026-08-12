@@ -2,7 +2,7 @@
 id: portability-claims-need-execution-tests
 type: insight
 status: active
-version: 1.3
+version: 1.4
 created: 2026-06-11
 session: 2026-06-11
 source: both
@@ -73,6 +73,16 @@ but verification still stopped short of execution.
    did not. The failing test was evidence about the test harness, not a failure
    of the production fallback it purported to isolate.
 
+6. **Claude adapter byte freeze versus lifecycle semantics (2026-08-12):** the
+   extraction correctly proved that the new adapter emitted exactly the old
+   `.claude/settings.json` bytes. The frozen shape contained two matching
+   SessionStart handlers and the test named their array order “sequential.” A
+   current contract review established that Claude launches matching handlers
+   in parallel. Byte equality therefore proved faithful extraction of a legacy
+   artifact, not preservation of the intended `estate-sync → session-start`
+   behavior. A contract fixture needs a semantic execution test in addition to
+   a golden byte test.
+
 ## Why It Matters
 
 - This is the same epistemic rule the framework already applies elsewhere,
@@ -97,6 +107,10 @@ but verification still stopped short of execution.
   inject that candidate explicitly. Borrowing PATH from the authoring harness
   turns a supposedly cross-harness test into an accidental measurement of the
   machine running it.
+- **A golden is evidence of identity, not consequence.** Preserve it when
+  extracting or migrating an artifact, but separately exercise the vendor's
+  current scheduling, cwd, output, and trust semantics. A test name or comment
+  cannot promote serialized order into runtime order.
 - Candidate mechanical follow-up: `install-hook` could self-test by running
   the script it just emitted once (exit status only) and reporting
   floor-unavailable immediately, instead of leaving the discovery to the

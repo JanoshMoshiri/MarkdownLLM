@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.8
+version: 1.9
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -50,15 +50,103 @@ configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
 **Current execution boundary:** the complete Phase A/0–2 handoff remains
-accepted, and the Codex-owned Phases 3–5 are now implemented. The neutral
-diagnostic, real-event attestation path, project-local Codex adapter, explicit
-install/refresh boundary, and selectable scaffold projections pass their
-focused gates and the 438-test full suite in the Codex managed shell. The work
-stops before Phase 6: no live project `.codex/` state, trust decision, or estate
-adapter migration was performed. The framework root's tracked
-`.claude/settings.json` is a pre-existing legacy PowerShell projection and is
-truthfully reported stale by the new inspector; it was not rewritten by this
-Codex package and must be dispositioned in the Claude-owned live record.
+accepted, and the Codex-owned Phases 3–5 remain landed, but their live
+acceptance is reopened at **Phase 5R** before Phase 6 may continue. Two
+execution probes disproved assumptions that the 438-test gate did not
+deterministically exercise: a stderr-writing Python candidate terminates the
+Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
+handlers in parallel, so the scaffolded two-handler SessionStart form does not
+guarantee `estate-sync` before `session-start`. A Phase 6 preflight also created
+an untracked framework-root `.codex/hooks.json`; it is deliberate test state,
+not yet accepted or ownerless product state, and must be rerendered and
+explicitly dispositioned after Phase 5R. No nested domain adapter migration is
+authorised. The framework root's tracked `.claude/settings.json` and every live
+domain projection remain untouched until the repair and migration gates pass.
+
+## Amendment record — v1.9 (2026-08-12, live gate reopened)
+
+The operator declared the live findings consequential and requested a proper
+replan. The change-reconciliation pass found that the inward lifecycle intent
+is sound; the defects sit at three outward/infrastructure seams:
+
+1. **Runtime launch is not yet one owned capability.** The POSIX resolver is
+   shared, but Windows candidate probing is repeated in `mdllm.ps1` and the
+   Codex renderer, and both can terminate on a failed native probe under
+   Windows PowerShell 5.1. Candidate discovery, dependency probing, CLI
+   dispatch, timeout, and advisory failure are one neutral launch concern.
+   Adapters may encode that concern into vendor schema; they must not invent
+   another resolution policy.
+2. **The Claude projection preserved bytes, not behaviour.** The Phase 2
+   extraction correctly froze the then-current artifact, but current official
+   Claude Code documentation says all matching handlers run in parallel and
+   handlers run from the current directory. Two handlers in one matcher group
+   therefore neither prove ordering nor cwd stability. The frozen bytes remain
+   historical/legacy evidence; they are no longer the desired renderer.
+3. **Install is safe but refresh is not yet modelled.** The generic service can
+   create, merge an absent fragment, preserve a current extension, or refuse.
+   It cannot distinguish an exact known legacy managed fragment from an
+   arbitrary stale one, so it cannot safely propose an operator-approved
+   migration while byte-preserving permissions and unrelated settings.
+
+The corrective architecture is explicit:
+
+```text
+LifecycleBinding (policy: steps, order, delivery, failure)
+                         |
+                lifecycle application service
+                         |
+       neutral launch service + runtime resolver + attestation
+                    /                         \
+       Claude schema/output              Codex schema/output
+                    \                         /
+             read-only inspection + migration proposals
+                         |
+           generic preflight / atomic apply service
+```
+
+The **neutral launch service** owns how an already-declared binding reaches the
+resolved framework CLI. It must expose immutable launch data or builders that
+both adapters consume, work from a moved session cwd, and preserve the existing
+three runtime facts. Claude owns only event/matcher/config and Claude output
+envelopes; Codex owns only its event/matcher/config, POSIX/Windows fields,
+context bounds, and Codex output envelopes. The CLI composition root resolves
+an adapter and injects its output port into the lifecycle service; neutral
+execution code must not require knowledge of a concrete adapter or registry.
+
+Known legacy migration becomes a separate, opt-in state transition rather than
+weakening the existing refusal rule. An adapter may identify exact historical
+managed definitions as data. The generic service owns byte-span replacement,
+preflight, atomicity, concurrent-state recheck, and refusal. No adapter may
+round-trip or rewrite the composite document itself.
+
+Official contract evidence for this amendment was rechecked on 2026-08-12
+against the current [Claude Code hooks reference](https://code.claude.com/docs/en/hooks)
+and [Git hook command reference](https://git-scm.com/docs/git-hook). A launcher
+mechanism is not accepted merely because it looks portable: the first Phase 5R
+gate must execute the proposed invocation on POSIX, PowerShell 7, and Windows
+PowerShell 5.1 before its interface is frozen.
+
+### Remaining coupling disposition
+
+The coupling audit separates release blockers from debt so Phase 5R neither
+papers over a Claude assumption nor expands into an unbounded rewrite.
+
+| Seam | Disposition | Owner / gate |
+|---|---|---|
+| two-handler Claude ordering, direct CLI calls, no Claude output port | remove now; one handler must enter the neutral runner | Claude owner, 5R.2 |
+| duplicated runtime candidates and PowerShell probe behavior | remove now; executable plus prefix arguments is one neutral candidate value | Codex/shared owner, 5R.1 |
+| cwd-relative Claude project path | remove now at the Claude edge using its documented project-root surface | Claude owner, 5R.2 |
+| stale-vs-known-legacy ambiguity | remove now with exact legacy data and explicit generic refresh | split ownership, 5R.3 |
+| Claude Code lifecycle plus GitHub Copilot prompt shortcuts in one concrete adapter | preserve compatibility, but name it as an adapter bundle or split capability projections before claiming a general vendor registry | Phase 7/8; not a 5R blocker |
+| registry requires Render and Inspect from every entry | either declare it specifically as the lifecycle-project-adapter registry or make capabilities optional before onboarding a non-lifecycle diagnostic vendor | architecture debt; gate before third adapter |
+| `.claude`, `.codex`, and `CLAUDE.md` exclusions named in the corpus model | replace eventually with an adapter-independent infrastructure-ignore rule; do not import vendor adapters into the domain model | separate model cleanup |
+| `mdllm eval --run` launches `claude -p` | keep in the separately owned multi-backend eval scope; lifecycle portability must not be restated as all-tooling portability | existing explicit boundary |
+| Claude remains the no-flag scaffold default | retain until the operator's Phase 8 product-policy decision | operator, not an architecture repair |
+
+Legitimate edge details stay vendor-specific: file schema, event names,
+matchers, project-root syntax, shell encoding, feedback envelopes, trust/review
+semantics, shortcuts, and vendor goldens. Moving those inward would be coupling,
+not decoupling.
 
 ## Amendment record — v1.8 (2026-08-12, Codex Phases 3–5 complete)
 
@@ -270,9 +358,12 @@ The build must satisfy all of these simultaneously:
 1. **Vendor-neutral core.** Lifecycle policy names framework intents such as
    synchronise estate, orient session, and validate after a write. It never
    names a vendor event or config format.
-2. **Claude remains behaviourally stable.** The first refactor produces the
-   same scaffolded Claude artifacts and preserves all current tests before any
-   Codex artifact is introduced.
+2. **Claude remains behaviourally stable.** The first extraction preserved the
+   historical scaffold bytes before any Codex artifact was introduced. A
+   later correction may version a new managed form only after the old bytes
+   become an explicit legacy fixture, ordering/cwd/runtime are execution-tested,
+   and a safe operator-gated migration path exists. Byte preservation is an
+   extraction gate, not permission to preserve disproved behaviour forever.
 3. **Adapters remain optional hardening.** Removing `.claude/` or `.codex/`
    must leave AGENTS.md interpretation and the Git floor intact.
 4. **Existing domains are never silently migrated.** Adapter installation or
@@ -298,6 +389,17 @@ The build must satisfy all of these simultaneously:
     in `prompts/` and domain skills stay in `skills/`. Vendor-native shortcuts
     are separate optional projections only where the harness has a proven
     equivalent.
+11. **One inward runtime-launch policy.** Candidate order, dependency probes,
+    framework CLI dispatch, time budget, and advisory failure semantics are
+    neutral application/runtime concerns. Vendor adapters encode the launch;
+    they do not fork its policy.
+12. **Legacy is data, not a guess.** A stale artifact is migratable only when
+    its managed fragment exactly matches an adapter-declared historical form.
+    Unknown stale state, duplicate candidates, and local changes remain
+    refusals. Migration is explicit and diff-first.
+13. **Configuration and clone-local execution infrastructure are separate.** A
+    current project adapter plus an absent/stale launch mechanism is reported
+    as configured-but-not-runnable, never promoted to current execution.
 
 ## Target architecture
 
@@ -325,12 +427,13 @@ Begin with only the lifecycle intents already felt in production:
 - deliberate session-end and retrospective prompts remain human-invoked;
 - Git pre-commit remains the enforcement boundary.
 
-The ordering belongs to the application contract. How a harness guarantees
-that ordering belongs to its adapter. This distinction matters immediately:
-Claude's current configuration expresses the two startup commands in one hook
-group, while Codex launches multiple matching command hooks for the same event
-concurrently. Codex therefore needs one sequential handler; copying the Claude
-JSON shape would silently break the contract.
+The ordering belongs to the application contract. A vendor event schema does
+not earn that ordering merely by placing two handlers in one group. Current
+Claude Code and Codex contracts both permit matching handlers to run
+concurrently. Each lifecycle moment therefore renders **one matching handler**
+which invokes the neutral lifecycle application service once; that service
+executes the inward `steps` tuple serially. The adapter owns event matching and
+output translation, not the ordered loop.
 
 ### Narrow adapter ports
 
@@ -342,9 +445,17 @@ Use small interfaces rather than a single harness god-object:
   config shape, managed-fragment currency, and local extensions.
 - **Probe port** — execute safe commands and consume lifecycle attestations;
   it may report untested when the harness event cannot be fired mechanically.
+- **Lifecycle output port** — translate one neutral execution result into the
+  harness's documented context/feedback envelope.
+- **Launch service** — turn a binding invocation into a runtime-resolved,
+  cwd-stable call to the lifecycle service. It is shared infrastructure, not a
+  vendor port, and returns renderable data rather than writing config.
 - **Install/merge service** — owns filesystem mutation policy independently of
   vendor schema; creates new files, merges a clearly owned fragment, or stops
   on ambiguity.
+- **Legacy-definition port** — optional adapter data naming exact historical
+  managed forms. The mutation service, not the adapter, locates and replaces
+  their owned byte span after explicit refresh authorisation.
 
 Each adapter declares only the capabilities it implements. Unsupported
 capabilities are data, not exceptions. Scaffold and doctor depend on these
@@ -419,7 +530,10 @@ Claude safety is a release gate, not a hope:
    files, and scaffold messages as golden fixtures before extraction.
 2. Extract a Claude adapter whose first output is byte-for-byte identical.
    No event, matcher, command order, path, permission, or default changes in
-   that phase.
+   that phase. **[v1.9 correction:]** this historical gate passed, but live
+   contract review later disproved the preserved ordering assumption. The old
+   golden now freezes a recognised legacy form; a new current golden is earned
+   only by Phase 5R execution tests.
 3. Add merge tests proving existing `permissions` survive and an extended
    SessionStart command remains untouched. The live estate contains both
    cases. **[v1.3] This requirement is gated in Phase 5, not in the Claude
@@ -447,9 +561,10 @@ package. It does not make either vendor the owner of shared substrate policy.
 The inward lifecycle contract remains vendor-neutral and both agents review it
 from their own harness side.
 
-### Claude Code agent — extraction work package
+### Claude Code agent — historical extraction work package (through v1.8)
 
-The Claude Code agent owns **Phase A, Phases 0–1, and Phase 2A/2C only**:
+For the original extraction handoff, the Claude Code agent owned **Phase A,
+Phases 0–1, and Phase 2A/2C only**:
 
 - **[v1.3]** sweep vendor address out of the canonical framework prose and
   example skills (Phase A), independently of the adapter implementation;
@@ -462,7 +577,8 @@ The Claude Code agent owns **Phase A, Phases 0–1, and Phase 2A/2C only**:
 - add the architecture fitness test and Claude regression evidence;
 - commit the completed work package and stop.
 
-The Claude Code agent is explicitly **not authorised** by this work package to
+Under that historical work package the Claude Code agent was explicitly **not
+authorised** to
 create `.codex/`, model Codex events, implement vendor diagnostics, add Codex
 scaffold flags, or continue into Phase 3. It must not design the inward
 contract as a generalisation of Claude's JSON shape; the lifecycle intents in
@@ -507,9 +623,10 @@ following:
 A failed condition returns the work to the Claude extraction package (or the
 shared runtime slice). It must never be bypassed with a Codex-side workaround.
 
-### Codex agent — diagnostic and Codex work package
+### Codex agent — historical diagnostic and Codex work package (through v1.8)
 
-After accepting the final handoff, the Codex agent owns **Phases 3–5**:
+After accepting the original final handoff, the Codex agent owned **Phases
+3–5**:
 
 - build the vendor-neutral diagnostic against the accepted ports;
 - implement the Codex adapter independently from official Codex contracts;
@@ -521,6 +638,23 @@ After accepting the final handoff, the Codex agent owns **Phases 3–5**:
 The Codex agent may change shared interfaces only when Codex evidence exposes
 a real missing abstraction. Such a change reopens the Claude regression gate;
 it is not permission to edit Claude output for convenience.
+
+### v1.9 corrective ownership — Phase 5R
+
+The live gate supersedes the historical “only” boundaries for the named repair
+packages, without broadening either agent into the other's vendor surface:
+
+| Package | Implementing owner | Required independent acceptance |
+|---|---|---|
+| 5R.0 failing probes and launch-seam prototype | Codex/shared | Claude reviews portability against its project-root/runtime needs |
+| 5R.1 neutral launch, runner injection, diagnostics | Codex/shared | Claude regression suite and real shell matrix |
+| 5R.2 Claude projection, output envelope, legacy definitions | Claude | Codex reviews inward ports, cwd stability, and ownership |
+| 5R.3 generic refresh service | Codex/shared | Claude owns exact Claude legacy forms; both review byte preservation |
+| 5R.4 Codex rerender and test-state disposition | Codex | operator selects root ownership; Claude suite remains green |
+
+Neither implementation owner may self-certify the other harness. The operator
+alone authorises root writes, project trust, domain migration, default changes,
+and publication.
 
 ### Shared verification and operator ownership
 
@@ -758,26 +892,211 @@ outer adapter artifacts and both validate cleanly.
 Claude, while `claude`, `codex`, `all`, and `none` vary only their outer
 projections; composite installation is lossless or safely refused.
 
+### Phase 5R — Reopen runtime, ordering, and refresh before live acceptance **[v1.9]**
+
+This is a corrective gate, not a rollback of the neutral lifecycle contract.
+Phases 3–5 supplied the right separation and exposed the defects honestly; the
+live probes now provide the evidence needed to finish the launch and migration
+ports. Phase 6 is blocked until every 5R gate below passes.
+
+Execution is deliberately serial at the gates even where coding can be
+parallel: freeze the failing probes → select the launch seam → repair shared
+runtime/runner → version the Claude projection → add recognised-legacy refresh
+→ rerender Codex → run the complete deterministic matrix → enter live harness
+tests. No root projection is refreshed while its recogniser or new renderer is
+still changing.
+
+#### Phase 5R.0 — Freeze the failures and choose the launch seam (Codex owner; Claude review)
+
+- [ ] Add deterministic reproductions for a PATH candidate which exists,
+  writes to stderr, and exits non-zero under Windows PowerShell 5.1. Exercise
+  both the Codex `commandWindows` path and `tools/mdllm.ps1`; do not depend on
+  whether the host happens to expose a Microsoft Store alias.
+- [ ] Pin the current Claude contract fact that matching handlers run in
+  parallel. Replace every production comment/test assertion that a matcher
+  group's handler array is sequential with an assertion over **one handler**
+  and the neutral runner's ordered steps.
+- [ ] Prototype the neutral launch seam before freezing a new port. It must run
+  the same `harness-event <harness> <moment> <root> <definition-hash>` intent
+  from a repository subdirectory on POSIX, PowerShell 7, and Windows
+  PowerShell 5.1; use no absolute installation path, user-global config, PATH
+  Python assumption, or vendor cache path.
+- [ ] Decide the smallest mechanism from execution evidence. Preferred order:
+  an immutable shared launch specification consumed by both adapters; a
+  clone-local Git dispatcher only if its invocation works on the supported Git
+  floor without hijacking a native hook event or overwriting operator config.
+  A custom `git hook run` name is not assumed portable—older supported Git
+  versions reject unknown event names.
+
+**Gate 5R.0:** the failing probes fail on the old implementation, the proposed
+launch seam passes on all three shells, and the resulting contract contains no
+Claude or Codex schema vocabulary.
+
+#### Phase 5R.1 — Repair shared launch/runtime infrastructure (Codex owner)
+
+- [ ] Make every PowerShell candidate probe exception-safe: a failed native
+  process is one negative candidate fact and resolution continues. Preserve
+  `$ErrorActionPreference = 'Stop'` around real control-flow errors.
+- [ ] Put candidate order, PyYAML probing, framework-root derivation, and the
+  lifecycle CLI invocation behind one neutral owner. Cross-language fragments
+  may have different encodings, but parity tests must prove the same candidate
+  order and outcome semantics. Represent each candidate as executable plus
+  immutable prefix arguments so `py -3` is not a string-shaped special case.
+- [ ] Make the lifecycle application service receive the selected identity and
+  `LifecycleOutputPort` from the CLI composition root. The neutral service may
+  depend on the port; it must not resolve or import a concrete adapter itself.
+- [ ] Preserve one total lifecycle deadline, bounded labelled output,
+  surface-and-continue behavior, and format-before-success-attestation.
+- [ ] Extend doctor with independent launch currency/runtime facts. A current
+  vendor artifact with absent or stale launch infrastructure is configured but
+  not runnable; static launch success still leaves execution untested.
+- [ ] Keep Git pre-commit as the only enforcement boundary. A harness launch
+  failure must be visible but must not become a second commit policy.
+
+**Gate 5R.1:** focused runtime, lifecycle-runner, diagnostic, architecture, and
+Git-hook tests pass on POSIX, PowerShell 7, and Windows PowerShell 5.1. A
+port-only fake can traverse the real command path without importing a vendor.
+The installed Git hook is also exercised through Windows Git's shell; a native
+shell emulation does not stand in for that boundary.
+
+#### Phase 5R.2 — Version the Claude projection (Claude owner; Codex acceptance)
+
+- [ ] Implement `LifecycleOutputPort` for Claude Code. SessionStart returns
+  concise model context; successful PostToolUse is quiet; failed PostToolUse
+  uses Claude's documented feedback/error behavior without enforcing the tool
+  action.
+- [ ] Render one SessionStart handler and one PostToolUse handler. Each invokes
+  the neutral lifecycle service once with a definition hash derived from the
+  full binding, launch definition, and owned vendor fields.
+- [ ] Anchor the launch to Claude's documented project-root surface and prove
+  it after the session cwd moves. Do not retain `python ../../tools/mdllm.py`
+  or copy the framework root's PowerShell-only workaround into the portable
+  renderer.
+- [ ] Inspect Claude's real project approval/trust behavior and report it as an
+  independent fact. Do not preserve `trust=not-applicable` merely because the
+  first adapter did not model the surface.
+- [ ] Keep `LIFECYCLE_BINDINGS`, domain policy, matcher intent, scaffold default,
+  shortcuts, and Git-floor behavior unchanged. Only the projection mechanism
+  changes.
+- [ ] Preserve the v1.8 Claude golden as `legacy-v1`; add a separately named
+  current golden. Update the inspector so `current`, `known-legacy`,
+  `extended`, and `ambiguous` are distinguishable without treating legacy as
+  current.
+- [ ] Prove a fresh Claude-selected scaffold in a real Claude Code session:
+  ordered SessionStart output, PostToolUse success and controlled failure,
+  current hash-bound attestations, and a commit through the Git floor.
+- [ ] Repeat the corrected fresh-scaffold launch on Windows and POSIX before
+  authorising any domain migration. Shell-emulated unit tests remain
+  designed-for evidence for an OS that was not actually used.
+
+**Gate 5R.2:** Claude's owner supplies the live record; Codex independently
+accepts the neutral-boundary, cwd, byte-ownership, and deterministic tests.
+Neither agent self-certifies the other's harness.
+
+#### Phase 5R.3 — Add explicit recognised-legacy migration (Codex service owner; Claude definitions owner)
+
+The migration state machine is closed and ordered:
+
+| Observed state | Default install | Explicit refresh | Ownership result |
+|---|---|---|---|
+| artifact absent | create after reviewed diff | same | adapter owns the new managed fragment |
+| managed fragment current | no-op | no-op | formatting and admitted extensions remain untouched |
+| exact adapter-declared legacy fragment | report migration available; write nothing | replace only the owned byte span after reviewed diff | permissions and unrelated settings byte-identical |
+| current fragment with admitted local extension | no-op | no-op unless a separate extension-aware migration is designed | operator extension wins |
+| legacy fragment with any local extension | refuse | refuse | no inference over mixed ownership |
+| unknown stale, duplicate, malformed, unreadable, or ambiguous | refuse | refuse | operator resolves the ambiguity |
+
+- [ ] Add an optional narrow legacy-definition port carrying immutable IDs and
+  exact semantic forms. It supplies recognition data, never filesystem writes.
+- [ ] Extend the generic mutation service with an explicit refresh action/flag.
+  The service owns JSON span replacement, unified diff, all-target preflight,
+  concurrent-state recheck, atomic apply, and rollback.
+- [ ] Recognise the old standard two-handler scaffold form and the exact tracked
+  framework-root combined PowerShell form separately. Do not generalise from
+  resemblance. The live `--assistant` extension remains a mandatory refusal.
+- [ ] Test permissions-only insertion, permissions-plus-known-legacy refresh,
+  root permissions preservation, unrelated hook groups, formatting, duplicate
+  keys, malformed JSON, unknown commands, local extensions, all-selected
+  atomicity, and concurrent mutation.
+- [ ] Inspect project-local `.claude/settings.local.json` as a read-only
+  effective-configuration source. Never mutate it. A competing hook definition
+  in that overlay makes inspection and refresh ambiguous and therefore refuses
+  with zero writes.
+- [ ] Keep every existing domain opt-in. Doctor may show the recognised legacy
+  ID and exact refresh command; no refresh runs during framework upgrade,
+  doctor, scaffold, session start, or estate sync.
+
+**Gate 5R.3:** old/current golden fixtures and every representative estate
+shape have an explicit expected state; safe cases preserve all non-owned bytes,
+and every ambiguous case proves zero writes by hash.
+
+#### Phase 5R.4 — Reconcile Codex projection and live test state (Codex owner)
+
+- [ ] Make the Codex renderer consume the same neutral launch definition rather
+  than retaining a private Windows candidate policy. Preserve Codex-specific
+  POSIX/Windows fields, matchers, time/context limits, trust boundary, and JSON
+  feedback envelope.
+- [ ] Rerender the framework root's untracked `.codex/hooks.json` only through
+  reviewed `adapter-install --dry-run` and explicit apply after all earlier 5R
+  gates pass. An old definition hash must invalidate any old attestation.
+- [ ] Present the operator with the ownership decision: track the corrected
+  root project projection as self-hosted framework state (recommended), ignore
+  it deliberately as clone-local state, or remove it. Do not leave it
+  untracked and undocumented.
+- [ ] Rerun the complete scaffold matrix (`default`, `claude`, `codex`, `all`,
+  `none`) and prove that only adapter projection files differ.
+- [ ] Recheck the Codex trust contract against the exact product surface used
+  for the live test. Official documentation currently assigns hook inspection
+  and trust to `/hooks` in the CLI; the Desktop chat command palette observed
+  on 2026-08-12 did not expose that command. Do not claim Desktop trust review
+  from a CLI-only flow or from config presence.
+
+**Gate 5R.4 / release back into Phase 6:** the full suite passes in both the
+Codex managed shell and Claude's shell; validation and coherence are clean;
+the current plan, README status, operator guide, Claude baseline erratum, and
+first-hour guide, archived domain-kernel plan erratum, adapter example, scaffold
+guidance golden, session module commentary, and architecture tests describe the
+same current/legacy boundary. Production comments and tests no longer encode
+the false sequential-handler premise. No domain has been migrated.
+
 ### Phase 6 — Execute in real harnesses (split ownership by harness)
 
-The framework root currently carries a tracked legacy Claude projection
+Phase 6 resumes only after Phase 5R. The framework root currently carries a tracked legacy Claude projection
 (`shell: powershell`, combined SessionStart command) that predates the current
 renderer and is reported stale. The Claude live record must distinguish that
 operator-owned estate state from a fresh-scaffold non-regression result and
 explicitly decide whether to refresh it; Phases 3–5 deliberately left it
 byte-for-byte untouched.
 
-- [ ] Claude non-regression: scaffold, open, observe SessionStart ordering,
-  edit a thing, observe PostToolUse feedback, and commit through the floor.
+- [ ] Claude non-regression: from the Phase 5R current renderer, scaffold, open,
+  observe SessionStart ordering, make a valid edit, observe quiet PostToolUse,
+  make a controlled invalid edit, observe advisory feedback, repair it, and
+  commit through the floor.
 - [ ] Codex framework root: trust the project layer through the documented
-  human flow, start/resume/compact, observe injection, edit, validate, commit.
+  product-specific human flow, start/resume/compact, observe injection, make
+  valid/invalid/repaired edits, validate, and commit.
 - [ ] Codex nested domain: open the domain as its own workspace and repeat the
   lifecycle and Git-floor probes.
+- [ ] In a disposable repo for each harness, remove the optional project
+  adapter and prove AGENTS interpretation plus the Git floor remain sufficient.
 - [ ] Record exact harness/version/platform evidence and failures. A passing
-  unit test earns designed-for; only these runs earn verified-on.
+  unit test earns designed-for; only these runs earn verified-on. Include the
+  project configuration SHA-256 and repository commit for every record.
+- [ ] For every live event, capture the harness-owned transcript/debug record
+  and correlate its time window with the new hash-bound attestation. Directly
+  running `harness-event` can mint the same record and is therefore a runtime
+  probe, not proof that the harness dispatched it.
+- [ ] Either carry the normalized SessionStart source
+  (`startup|resume|clear|compact`) into evidence, or narrow the claim to the
+  generic SessionStart events actually distinguishable by the record. Never
+  infer four verified triggers from one undifferentiated attestation.
+- [ ] Split Claude Code lifecycle evidence from VS Code Copilot compatibility.
+  Shared `.claude/settings.json` bytes or shortcut projections do not make a
+  live Claude run evidence for Copilot; report Copilot separately as untested
+  until its own contract and execution record exist.
 
-**Gate:** Claude remains verified and Codex is verified on the specifically
-tested surfaces, with no wider claim.
+**Gate:** the corrected Claude lifecycle projection and Codex are verified on
+the specifically tested surfaces, with no wider claim.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
@@ -810,7 +1129,9 @@ suite, and the Claude/Codex execution records all pass.
 
 This plan is complete only when:
 
-- Claude scaffold output and live lifecycle behaviour have not regressed;
+- the corrected Claude lifecycle is verified, historical bytes remain explicit
+  migration fixtures, and existing Claude project state was not silently
+  changed;
 - **[v1.2]** the canonical specs address *the agent*, not a vendor, so a Codex
   operator reading `thing.md` is not being spoken to as a Claude user;
 - a new Codex-selected domain can be opened directly and run startup,
@@ -820,9 +1141,14 @@ This plan is complete only when:
   currency without collapsing them;
 - existing permission rules and local hook extensions survive or cause a safe
   refusal;
+- runtime launch policy has one neutral owner and both adapters consume it;
+- exact legacy forms are refreshable only through an explicit reviewed diff,
+  while unknown stale or extended forms remain zero-write refusals;
 - adding a third harness requires a new adapter, tests, and docs—not edits to
   domain policy, scaffold control flow, or doctor control flow;
 - compatibility claims name the exact harness and evidence that earned them.
+- Claude Code and VS Code Copilot lifecycle claims remain separate unless each
+  has its own inspected contract and execution record;
 - **[v1.3]** compatibility claims distinguish the vendor-neutral deterministic
   eval assertion path from the Claude-specific optional live-runner backend;
   live eval portability is either implemented or routed to its own owned plan

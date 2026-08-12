@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -204,21 +204,37 @@ floor. For an existing project, inspect before writing:
 ./tools/mdllm.ps1 adapter-install . --harness codex --dry-run
 ```
 
-The Codex project adapter is implemented and unit/integration tested, while
-its live Phase 6 acceptance remains deliberately open. Installing the reviewed
-diff is an operator action; after installation, complete the project-trust
-flow and inspect the exact active commands through Codex's
-[`/hooks` UI](https://learn.chatgpt.com/docs/hooks).
-`doctor` reports execution as `untested` until a matching real lifecycle event
-records evidence. No live `.codex` configuration was installed in the
-framework repository during implementation, and the installer never mutates
-user-global Codex configuration.
+The Codex project adapter is implemented and unit/integration tested, while a
+Phase 5R repair gate now precedes its live Phase 6 acceptance. A live preflight
+found a PowerShell 5.1 candidate-probe failure and exposed duplicated launch
+policy; do not apply an adapter diff until the corrected renderer passes that
+gate. The preflight-created framework-root `.codex/hooks.json` is untracked test
+state awaiting rerender and an explicit ownership decision, not accepted
+configuration.
+
+Installing the corrected reviewed diff remains an operator action. The
+[official Codex hook documentation](https://learn.chatgpt.com/docs/hooks) names
+`/hooks` as a **CLI** inspection/trust command; it was not available in the
+observed Desktop chat command palette, so Desktop and CLI trust evidence must
+not be conflated. `doctor` reports execution as `untested` until a real
+lifecycle event is correlated with harness-owned transcript evidence and a
+fresh definition-hash-bound record. The installer never mutates user-global
+Codex configuration.
 
 The shared runtime underneath adapters has separately been exercised in the
 Codex desktop managed shell at the framework root and from a directly opened
 nested domain, including a real nested-repository commit through the Git
 floor. That runtime evidence must not be relabelled as Codex lifecycle or
 trust evidence.
+
+Claude Code's core framework path remains proven in use, but its generated
+project lifecycle form is also inside Phase 5R. The historical projection puts
+two SessionStart handlers in one matching group; the current Claude contract
+runs matching handlers in parallel, so those bytes are now a legacy migration
+input rather than the desired renderer. Existing `.claude/settings.json` and
+`.claude/settings.local.json` files are not silently rewritten. A future
+explicit refresh must show its diff, preserve permissions and unrelated groups
+byte-for-byte, and refuse locally extended or ambiguous managed hooks.
 
 ## Running More Than One Domain
 
