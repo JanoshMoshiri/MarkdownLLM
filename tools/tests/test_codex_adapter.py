@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -144,10 +145,21 @@ def test_windows_runner_exit_is_surfaced_but_hook_still_returns_zero(
     # payload.  This proves stock Windows PowerShell can enter the same body.
     fallback = windows.replace(
         "where.exe pwsh.exe", "where.exe mdllm-no-such-host.exe", 1)
+    fixture_dir = Path(__file__).parent / "fixtures" / "powershell"
+    candidate_dir = tmp_path / "candidate-bin"
+    candidate_dir.mkdir()
+    # Codex's declared PATH order is python3 then python.  The same committed
+    # failed-candidate fixture is therefore exposed as python3 here; unlike the
+    # shared runner test, no good successor is needed because the framework
+    # runner is the intended fallback.
+    shutil.copy2(fixture_dir / "stderr-python.cmd",
+                 candidate_dir / "python3.cmd")
+    env = dict(os.environ)
+    env["PATH"] = str(candidate_dir) + os.pathsep + env.get("PATH", "")
 
     completed = subprocess.run(
         fallback, shell=True, cwd=tmp_path,
-        capture_output=True, text=True, timeout=60)
+        env=env, capture_output=True, text=True, timeout=60)
 
     assert completed.returncode == 0
     assert "hookSpecificOutput" in completed.stdout

@@ -10,6 +10,7 @@ Run: python -m pytest tools/tests/test_runtime.py -q
 """
 
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -129,6 +130,56 @@ def test_powershell_entry_probes_the_dependency():
     assert any("$venvPython" in ln for ln in probes)      # venv branch
     assert any("$command.Source" in ln for ln in probes)  # PATH loop
     assert any("-3" in ln for ln in probes)               # py launcher
+
+
+def test_powershell_51_continues_after_stderr_writing_path_candidate(
+        tmp_path):
+    """The shared launcher must treat a failed native probe as one candidate.
+
+    Windows PowerShell 5.1 turns native stderr into a terminating
+    ``RemoteException`` while ``ErrorActionPreference`` is ``Stop``.  The
+    committed command fixtures make that behavior independent of Microsoft
+    Store aliases or the author's PATH: ``python`` is the known-bad first
+    candidate and ``python3`` is the known-good successor.
+    """
+    powershell = shutil.which("powershell.exe")
+    if powershell is None:
+        import pytest
+        pytest.skip("native Windows PowerShell 5.1 is required")
+
+    fixture_dir = Path(__file__).parent / "fixtures" / "powershell"
+    candidate_dir = tmp_path / "candidate-bin"
+    candidate_dir.mkdir()
+    shutil.copy2(fixture_dir / "stderr-python.cmd",
+                 candidate_dir / "python.cmd")
+    shutil.copy2(fixture_dir / "floor-python.cmd",
+                 candidate_dir / "python3.cmd")
+
+    tool_dir = tmp_path / "framework" / "tools"
+    tool_dir.mkdir(parents=True)
+    shutil.copy2(Path(mdllm.__file__).resolve().with_name("mdllm.ps1"),
+                 tool_dir / "mdllm.ps1")
+    (tool_dir / "mdllm.py").write_text(
+        "raise SystemExit('fixture candidate owns execution')\n",
+        encoding="utf-8")
+    env = dict(os.environ)
+    env["PATH"] = str(candidate_dir) + os.pathsep + env.get("PATH", "")
+
+    completed = subprocess.run(
+        [powershell, "-NoLogo", "-NoProfile", "-NonInteractive",
+         "-ExecutionPolicy", "Bypass", "-File",
+         str(tool_dir / "mdllm.ps1"), "runtime-probe", "."],
+        env=env, capture_output=True, text=True, timeout=30,
+        encoding="utf-8", errors="replace")
+
+    version = subprocess.run(
+        [powershell, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command",
+         "$PSVersionTable.PSVersion.ToString()"],
+        capture_output=True, text=True, timeout=10,
+        encoding="utf-8", errors="replace")
+    assert version.stdout.strip().startswith("5.1"), version.stdout
+    assert completed.returncode == 0, completed.stderr or completed.stdout
+    assert "MDLLM deterministic floor candidate executed" in completed.stdout
 
 
 # ---------------------------------------------- nested-domain hook execution
