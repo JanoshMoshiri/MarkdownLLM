@@ -236,6 +236,11 @@ def build_cli() -> argparse.ArgumentParser:
 
     h = sub.add_parser("install-hook", help="install the three mdllm git hooks (pre-commit, commit-msg, post-commit) and execution-test pre-commit where git supports it")
     h.add_argument("path", nargs="?", default=".")
+    h.add_argument("--no-test", action="store_true",
+                   help="skip the execution test (it fires a real pre-commit, "
+                        "i.e. a full validate — minutes on a large domain, and "
+                        "long enough to trip a harness tool timeout). The hook "
+                        "is then installed but unproven, and says so.")
     h.set_defaults(fn=cmd_install_hook)
     # Hook body is portable since v3.4.1: root/interpreter resolved at run time.
 

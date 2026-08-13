@@ -3137,6 +3137,103 @@ def test_session_start_writes_attestation(tmp_path, capsys):
     assert len(sha) >= 7  # HEAD sha recorded beside the timestamp
 
 
+def test_session_start_assistant_rendering_also_attests(tmp_path, capsys):
+    """The harness-bound path must satisfy the gate it exists to satisfy.
+
+    The scaffolded SessionStart hook runs `session-start . --assistant`. That
+    rendering returned before the attestation write, so under
+    `session_gate: strict` every hook-opened session began with a
+    commit-blocking Error — the gate firing against the one integration that
+    emits its contract mechanically (field report 2026-08-13). The
+    attestation attests to EMISSION, not to a rendering format.
+    """
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "base")
+    import subprocess as _sp
+    gd = _sp.run(["git", "rev-parse", "--git-dir"], cwd=tmp_path,
+                 capture_output=True, text=True).stdout.strip()
+    attest = (tmp_path / gd).resolve() / "mdllm-attest"
+    assert not attest.exists()
+
+    mdllm.cmd_session_start(_ns(path=str(tmp_path), assistant=True))
+    capsys.readouterr()
+
+    assert attest.is_file(), "--assistant emitted the contract but did not attest"
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    assert _gate(tmp_path) == [], "a freshly attested clone must clear the gate"
+
+
+def test_retrospective_debt_reaches_the_assistant_exceptions(tmp_path, capsys,
+                                                             monkeypatch):
+    """Cadence debt must reach BOTH renderings, not only the plain one.
+
+    The check appended to `exceptions` after the assistant branch had already
+    been handed that list, so a domain owing a retrospective was never told so
+    in the assistant block (field report 2026-08-13). Invisible in the field
+    only because that domain happened to be current.
+    """
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "base")
+
+    from markdownllm import validation as _validation
+
+    class _Finding:
+        message = "last retrospective was 40 days ago (cadence 30d)"
+
+    monkeypatch.setattr(_validation, "retrospective_findings",
+                        lambda domain, corpus: [_Finding()])
+
+    mdllm.cmd_session_start(_ns(path=str(tmp_path), assistant=True))
+    assistant_out = capsys.readouterr().out
+    assert "owes a retrospective" in assistant_out
+    assert "40 days ago" in assistant_out
+
+    # And the plain rendering keeps emitting it at its own position.
+    mdllm.cmd_session_start(_ns(path=str(tmp_path)))
+    plain_out = capsys.readouterr().out
+    assert "Retrospective cadence:" in plain_out
+
+
+def test_install_hook_no_test_skips_the_full_validate(tmp_path, capsys):
+    """`--no-test` must skip the execution test and downgrade the claim.
+
+    The execution test fires a real pre-commit — a full validate, minutes on a
+    large domain, long enough to trip a harness tool timeout and read as a
+    hang. Skipping is opt-in and must never report the hook as proven.
+    """
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+
+    rc = mdllm.cmd_install_hook(_ns(path=str(tmp_path), no_test=True))
+    out = capsys.readouterr().out
+
+    assert rc == 0
+    assert "SKIPPED" in out and "unproven" in out
+    assert "ran and passed" not in out, "skipping must not claim execution"
+    assert (tmp_path / ".git" / "hooks" / "pre-commit").is_file()
+
+
+def test_assistant_rendering_names_an_openable_kernel(tmp_path, capsys):
+    """The kernel lives in the framework root, so a bare name is unopenable."""
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "base")
+
+    mdllm.cmd_session_start(_ns(path=str(tmp_path), assistant=True))
+    out = capsys.readouterr().out
+
+    line = next(l for l in out.splitlines() if "Before the first reply" in l)
+    reference = line.split("load `")[1].split("`")[0]
+    assert reference != "kernel.md", "a bare name resolves inside the domain"
+    assert (tmp_path / reference).resolve().is_file()
+
+
 def test_session_gate_silent_on_unborn_head(tmp_path):
     # The birth commit: repo exists, HEAD does not. The contract files are
     # being created in this very commit, so there was nothing to have read —

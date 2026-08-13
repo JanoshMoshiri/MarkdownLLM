@@ -210,6 +210,23 @@ def _floor_status(root: Path) -> str | None:
 
 _PRIORITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
+
+def _kernel_reference(domain: Path) -> str:
+    """The path a reader in `domain` can actually open to reach the kernel.
+
+    The kernel is framework state, so a domain-relative `kernel.md` resolves
+    to a file that does not exist. AGENTS.md already says
+    `{framework_root}/kernel.md`; this renders the same fact resolved.
+    """
+    from .scaffold import MDLLM_ENTRY
+    import os
+
+    kernel = MDLLM_ENTRY.resolve().parents[1] / "kernel.md"
+    try:
+        return Path(os.path.relpath(kernel, domain.resolve())).as_posix()
+    except ValueError:            # different drive — no relative path exists
+        return kernel.as_posix()
+
 _REGISTER_SEED = """\
 Everything below is the floor's rendering of this domain — computed, counted,
 ordered, and titled mechanically. **Present it as it stands; never re-render
@@ -230,7 +247,40 @@ For your own reports of this session's work — the one surface the floor
 cannot render — fill the shape: *what changed → what needs you → what's
 next*, one act per line, in the operator's nouns, the ask last.
 
-Before the first reply: load `kernel.md`. Do not narrate having done so."""
+Before the first reply: load `{kernel}`. Do not narrate having done so."""
+
+
+def _record_session_attestation(domain: Path) -> None:
+    """Record that the Tier-0 contract entered this session, per clone.
+
+    Running session-start IS the mechanical proxy for the contract entering
+    the session — this command's output is the contract's operative surface.
+    Stored inside the git dir so it is uncommittable by construction;
+    `mdllm validate` enforces freshness where the domain declares
+    `options: {session_gate: warn|strict}`.
+
+    **Every emitting path must call this.** The attestation attests to
+    *emission*, not to a rendering format, so the assistant rendering earns it
+    exactly as the plain one does. Attesting on only one path made the gate
+    fire against the harness integration that satisfies its own intent — a
+    session opened by the scaffolded hook (`--assistant`) could never clear
+    the gate it was designed to satisfy (field report 2026-08-13).
+
+    Best-effort: orientation must never fail on it, and the gate reports
+    absence itself.
+    """
+    try:
+        gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=domain,
+                            capture_output=True, text=True)
+        if gd.returncode == 0 and gd.stdout.strip():
+            head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=domain,
+                                  capture_output=True, text=True)
+            sha = head.stdout.strip() if head.returncode == 0 else "unknown"
+            stamp = dt.datetime.now(dt.timezone.utc).isoformat()
+            ((domain / gd.stdout.strip()).resolve() / "mdllm-attest").write_text(
+                f"{stamp} {sha}\n", encoding="utf-8")
+    except Exception:
+        pass
 
 
 _HANDOFF_PREFIXES = ("session-end", "handoff", "close-session")
@@ -459,7 +509,12 @@ def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
     rest = [r for r in rows if r["id"] not in att_ids]
     conflicts = [c for c in conflicts if c.id not in att_ids]
 
-    out = [f"# {domain.name} — session start", "", _REGISTER_SEED, ""]
+    # The kernel lives in the FRAMEWORK root, not the domain: a bare
+    # `kernel.md` sends the first read into the domain, where no such file
+    # exists (field report 2026-08-13). Emit the path the reader can actually
+    # open — relative where that is meaningful, absolute otherwise.
+    out = [f"# {domain.name} — session start", "",
+           _REGISTER_SEED.format(kernel=_kernel_reference(domain)), ""]
 
     # The operator's loop starts at "what have I got", and for anyone returning
     # that means "what was I doing". Ranked attention answers "what's first" —
@@ -656,7 +711,25 @@ def cmd_session_start(args) -> int:
                               f"longer match the framework ({', '.join(drifted)}). "
                               f"Run `mdllm domain-kernel .` and commit.")
 
+    # Retrospective cadence is computed HERE, above the rendering branch,
+    # because `exceptions` is passed into the assistant rendering below and is
+    # complete at that moment. Appending a finding after the branch could only
+    # ever reach the plain rendering, so a domain owing a retrospective was
+    # never told so in the assistant block's exceptions section (field report
+    # 2026-08-13). The plain rendering still emits it at its original position.
+    retrospective_due: list[str] = []
+    try:
+        from .model import scan as _scan
+        from .validation import retrospective_findings as _retro
+        _corpus, _ = _scan(domain)
+        retrospective_due = [f.message for f in _retro(domain, _corpus)]
+    except Exception:
+        retrospective_due = []  # advisory only — session start never fails on it
+    for message in retrospective_due:
+        exceptions.append(f"- This domain owes a retrospective: {message}")
+
     if assistant:
+        _record_session_attestation(domain)
         print("\n".join(_render_assistant(domain, meta, exceptions, flips, velocity)))
         return 0
 
@@ -701,36 +774,10 @@ def cmd_session_start(args) -> int:
     # cue to the retrospective; a net-beneath-the-net with no clock is down
     # exactly when the cue-missing rate is highest). Same check, surfaced at
     # t=0. Quiet when healthy — young and dormant domains stay silent.
-    try:
-        from .model import scan as _scan
-        from .validation import retrospective_findings as _retro
-        _corpus, _ = _scan(domain)
-        for f in _retro(domain, _corpus):
-            out.append(f"- **Retrospective cadence:** {f.message}")
-            exceptions.append(f"- This domain owes a retrospective: {f.message}")
-    except Exception:
-        pass  # advisory only — session start must never fail on it
+    for message in retrospective_due:
+        out.append(f"- **Retrospective cadence:** {message}")
 
-    # Session-gate attestation (cowork-integrity-estate-sweep Phase 10):
-    # running session-start IS the mechanical proxy for the Tier-0 contract
-    # entering the session — this command's output is the contract's operative
-    # surface. Record the fact per-clone, inside the git dir so it is
-    # uncommittable by construction; `mdllm validate` enforces freshness where
-    # the domain's schema declares `options: {session_gate: warn|strict}`.
-    # Best-effort: orientation must never fail on it, and the gate reports
-    # absence itself.
-    try:
-        gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=domain,
-                            capture_output=True, text=True)
-        if gd.returncode == 0 and gd.stdout.strip():
-            head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=domain,
-                                  capture_output=True, text=True)
-            sha = head.stdout.strip() if head.returncode == 0 else "unknown"
-            stamp = dt.datetime.now(dt.timezone.utc).isoformat()
-            ((domain / gd.stdout.strip()).resolve() / "mdllm-attest").write_text(
-                f"{stamp} {sha}\n", encoding="utf-8")
-    except Exception:
-        pass
+    _record_session_attestation(domain)
 
     print("\n".join(out))
     return 0

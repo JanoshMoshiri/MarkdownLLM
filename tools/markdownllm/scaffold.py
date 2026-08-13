@@ -156,6 +156,15 @@ def cmd_install_hook(args) -> int:
     hooks_dir = root / ".git" / "hooks"
     print(f"installed {hooks_dir / 'pre-commit'} + {hooks_dir / 'commit-msg'} "
           f"+ {hooks_dir / 'post-commit'} (mdllm via {rel})")
+    # The execution test fires a real pre-commit, which is a full validate.
+    # On a large domain that is minutes, and chaining it in a harness silently
+    # blew a 120s tool timeout and read as a hang (field report 2026-08-13).
+    # Skipping is opt-in and downgrades the claim honestly: installed is a
+    # weaker fact than runs, and the report must say which one it has.
+    if getattr(args, "no_test", False):
+        print("execution test: SKIPPED (--no-test) — the hook is installed but "
+              "unproven; it will first fire at the next real commit")
+        return 0
     # Execution-test the hook we just wrote (vendor-harness-adapter-foundation
     # Phase 1): installed is a weaker fact than runs. Where git cannot fire it
     # (`git hook run` < 2.36), report untested rather than implying success.
