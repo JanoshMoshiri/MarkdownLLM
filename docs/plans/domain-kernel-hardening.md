@@ -13,8 +13,10 @@
 > and VS Code Copilot is no longer a current compatibility claim. Current
 > Claude Code runs matching handlers in parallel, invalidating the old
 > two-handler ordering interpretation; Copilot also requires its own contract
-> and execution evidence. The corrective work is owned by
-> `things/plans/vendor-harness-adapter-foundation.md` Phase 5R.
+> and execution evidence. Phase 5R of
+> `things/plans/vendor-harness-adapter-foundation.md` replaced the current
+> projection with one handler entering the ordered neutral runner while
+> retaining the old bytes only as explicit legacy migration data.
 
 > **Durable execution record.** This plan lives in-repo so it survives context
 > compaction. Progress is tracked in the table below; per-change commits are the

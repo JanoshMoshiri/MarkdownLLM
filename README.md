@@ -200,7 +200,7 @@ irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1
 
 You need an LLM tool with file-system access, plus `git` and Python 3.10+ — the installer offers to install the latter two if they're missing. Prefer to do it by hand? `git clone` the repo and `pip install pyyaml`.
 
-### Codex support: shared runtime verified; final reconciliation still open
+### Codex support: current tracked projection; live verification still open
 
 The vendor-neutral adapter boundary and project-local Codex renderer are
 implemented and covered by unit and integration tests. The renderer produces
@@ -214,12 +214,11 @@ That is **designed-for evidence, not a completed Codex rollout**. Phase 5R.1
 closed the shared Windows/POSIX launch defects and Phase 5R.2 replaced Claude's
 parallel legacy projection with one ordered neutral-runner handler. Recognised
 legacy Claude fragments can now be refreshed only through the explicit,
-reviewed `--refresh-legacy` path; extensions and ambiguity still refuse. The
-remaining 5R.4 work reconciles the Codex projection before Phase 6. The
-preflight created
-an untracked framework-root `.codex/hooks.json`; it is held as test state, not
-accepted project configuration, and must not be committed before rerender and
-an explicit ownership decision.
+reviewed `--refresh-legacy` path; extensions and ambiguity still refuse. Phase
+5R.4 used that same generic path to refresh both recognised root legacy forms
+atomically. The framework now tracks current `.claude/settings.json` and
+`.codex/hooks.json` projections as deliberate self-hosted state; no nested
+domain was migrated.
 
 After that repair, Phase 6 still has to install/review the corrected project
 layer and observe real framework-root and directly opened domain lifecycle events.
@@ -286,7 +285,7 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 | Tool | Discovery | Status |
 |------|-----------|--------|
 | Codex desktop | AGENTS.md auto-load | Root + directly opened nested domain runtime/Git floor verified 2026-08-11; project lifecycle adapter implemented, with Phase 5R runtime/launch repair and Phase 6 live dispatch/trust verification still open ([plan](things/plans/vendor-harness-adapter-foundation.md)) |
-| Claude Code | CLAUDE.md → AGENTS.md | Core framework use verified; the project lifecycle projection is held at Phase 5R because its legacy two-handler ordering assumption is invalid under the current hooks contract |
+| Claude Code | CLAUDE.md → AGENTS.md | Core framework use verified; current one-handler project projection is designed-for and awaits Phase 6 automatic-dispatch evidence |
 | Codex (VS Code) | AGENTS.md auto-load | Exercised on a real project; not yet eval-measured |
 | GitHub Copilot, Codex CLI, Cursor, Windsurf, Gemini CLI | AGENTS.md auto-load | Designed for; not yet exercised |
 
@@ -294,10 +293,10 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 
 ### Vendor setup
 
-- **Claude Code** — the installer writes a `CLAUDE.md` wrapper (`@AGENTS.md`) for you. If you cloned by hand, add one at root containing `@AGENTS.md`. Claude remains the compatibility default, but its existing two-handler lifecycle projection is now a recognised legacy form: current Claude launches matching handlers in parallel, so do not install or refresh it until Phase 5R replaces it with one handler entering the neutral ordered runner. Existing domain settings remain untouched.
+- **Claude Code** — the installer writes a `CLAUDE.md` wrapper (`@AGENTS.md`) for you. If you cloned by hand, add one at root containing `@AGENTS.md`. Claude remains the compatibility default. New projections use one handler entering the neutral ordered runner; the historical two-handler form is recognised legacy data and refreshes only through the explicit reviewed path. Existing domain settings remain untouched unless their operator chooses that migration.
 - **Optional lifecycle hardening** — `scaffold <path> --harness claude|codex|all|none` selects the project adapter(s) for a new domain (`claude-code` is also accepted as the canonical Claude name). Omitting the flag still selects the historical Claude default. `none` leaves the portable `AGENTS.md` interpretation path plus Git floor. Existing projects inspect with `doctor` and review `adapter-install --dry-run`; an exact reported legacy fragment additionally requires `--refresh-legacy`, while extensions and ambiguity remain operator-resolved refusals.
 - **GitHub Copilot (VS Code)** — set `"chat.useAgentsMdFile": true` and `"chat.useNestedAgentsMdFiles": true`.
-- **Codex** — auto-discovers `AGENTS.md`. The project adapter is implemented; 5R.4 reconciliation still precedes Phase 6 live verification. The [official Codex hook documentation](https://developers.openai.com/codex/hooks) names `/hooks` as a **CLI** review/trust surface; do not assume it is a Desktop chat command. `doctor . --harness codex` remains `execution: untested` until a matching real event and harness-owned transcript correlate. The root `.codex/hooks.json` is deliberately untracked stale test state; the operator decided it will be rerendered through the reviewed installer and tracked at 5R.4.
+- **Codex** — auto-discovers `AGENTS.md`. The project adapter is implemented and the root tracks its current rendered `.codex/hooks.json`; Phase 6 still owns live verification. The [official Codex hook documentation](https://developers.openai.com/codex/hooks) names `/hooks` as a **CLI** review/trust surface; do not assume it is a Desktop chat command. `doctor . --harness codex` remains `execution: untested` until a matching real event and harness-owned transcript correlate.
 - **Cursor, Windsurf, Gemini CLI** — no configuration; they auto-discover `AGENTS.md` at root.
 
 ### Deployment: the nested-repository model

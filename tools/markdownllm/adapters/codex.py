@@ -45,6 +45,7 @@ from ..harness_diagnostics import (
 )
 from ..runtime import SH_RESOLVE
 from ..adapter_install import (
+    LegacyDefinition,
     NestedJsonArrayGroupsPolicy,
     load_unique_json,
 )
@@ -56,6 +57,8 @@ _WRITE_MATCHER = "Edit|Write"
 _CONTEXT_LIMIT = 2500
 _DESCRIPTION = "MarkdownLLM project lifecycle hardening"
 _NON_SEMANTIC_HANDLER_EXTENSIONS = {"statusMessage"}
+_LEGACY_ROOT_V1 = Path(__file__).with_name("legacy") / \
+    "codex-hooks-root-v1.json"
 
 _EVENT_BY_MOMENT = {
     "session-start": "SessionStart",
@@ -92,6 +95,30 @@ class CodexAdapter:
             container_member="hooks",
             owned_array_members=tuple(_EVENT_BY_MOMENT.values()),
         )}
+
+    def legacy_definitions(
+            self, context: HarnessContext) -> tuple[LegacyDefinition, ...]:
+        """Return the one exact pre-5R root projection as recognition data.
+
+        The historical Windows command is deliberately frozen as data rather
+        than reimplemented beside the shared launcher.  Only the framework
+        root ever received this preflight artifact, so nested contexts do not
+        acquire a speculative migration path.
+        """
+        if (context.framework_root_rel.rstrip("/") or ".") != ".":
+            return ()
+        historical = load_unique_json(_LEGACY_ROOT_V1.read_bytes())
+        if not isinstance(historical, dict) or not isinstance(
+                historical.get("hooks"), dict):
+            raise ValueError("Codex root legacy definition is invalid")
+        owned = (json.dumps(
+            {"hooks": historical["hooks"]}, separators=(",", ":"))
+            + "\n").encode("utf-8")
+        return (LegacyDefinition(
+            legacy_id="legacy-root-v1",
+            path=HOOKS_PATH,
+            owned_fragment=owned,
+        ),)
 
     # ------------------------------------------------------------- rendering
 
@@ -533,9 +560,18 @@ class CodexAdapter:
         }
         current = ((realised == expected and not issues and not findings)
                    if present else None)
+        legacy_id = None
+        if present and current is False and not extensions and not findings:
+            for definition in self.legacy_definitions(context):
+                legacy = load_unique_json(definition.owned_fragment)
+                if (isinstance(legacy, dict)
+                        and hooks == legacy.get("hooks")):
+                    legacy_id = definition.legacy_id
+                    break
         fragment = ManagedFragment(
             path=HOOKS_PATH, present=present, readable=True, valid=True,
-            current=current, intents_realised=realised,
+            current=current, legacy_id=legacy_id,
+            intents_realised=realised,
             issues=tuple(issues),
         )
         return (fragment, tuple(operator_owned), tuple(extensions),

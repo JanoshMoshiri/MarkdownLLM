@@ -169,15 +169,13 @@ whole system; everything else is refinement.
   `python tools/mdllm.py doctor <path>` checks all of this mechanically —
   including whether the hook actually *executes*, not just exists — and
   tells you which mode you're in.
-- **Session-start hardening is being corrected.** The portable ritual still
-  runs by `AGENTS.md` interpretation and the Git floor remains intact, but the
-  historical scaffolded `.claude/settings.json` is now a recognised legacy
-  projection. Current Claude launches matching handlers in parallel, so its
-  two-handler form does not prove `estate-sync` runs before orientation; a
-  Phase 5R repair will replace it with one handler entering the neutral ordered
-  runner. Do not paste, install, or refresh that legacy form while the gate is
-  open. Existing project permissions and settings remain untouched, and
-  Copilot lifecycle compatibility is tracked as a separate unverified claim.
+- **Session-start hardening uses one ordered handler.** Current Claude launches
+  matching handlers in parallel, so the historical two-handler projection is
+  retained only as recognised migration data. New scaffolds emit one handler
+  entering the neutral ordered runner. Existing project permissions and
+  settings remain untouched unless their operator reviews and explicitly runs
+  `adapter-install --refresh-legacy`; extensions and ambiguity still refuse.
+  Copilot lifecycle compatibility remains a separate unverified claim.
 - **Your domain publishes itself — once you give it somewhere to go.** A fresh
   domain has no remote, so commits simply stay local. The moment you add one
   (`git remote add origin …`), the post-commit hook publishes each validated

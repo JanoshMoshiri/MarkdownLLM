@@ -581,6 +581,79 @@ class NestedJsonArrayGroupsPolicy:
     container_member: str
     owned_array_members: tuple[str, ...]
 
+    def refresh_legacy(
+        self,
+        *,
+        path: str,
+        before: bytes,
+        desired: bytes,
+        inspection: InspectionReport,
+        definition: LegacyDefinition,
+    ) -> PolicyDecision:
+        """Replace only exact declared legacy arrays below the container.
+
+        Each owned event array is one independently located JSON value span.
+        Top-level metadata, unrelated event arrays, whitespace, and every
+        other source byte remain outside the replacement boundary.  The
+        inspector must first establish an unextended, unambiguous legacy ID;
+        this policy then independently rechecks the installed values against
+        the adapter's immutable historical definition before proposing bytes.
+        """
+        fragment = _matching_fragment(inspection, path)
+        if fragment is None:
+            return PolicyDecision(
+                "refuse", desired,
+                "inspection did not identify exactly one owned fragment")
+        if inspection.findings:
+            return PolicyDecision(
+                "refuse", desired,
+                "inspection is ambiguous: " + "; ".join(inspection.findings))
+        if (inspection.extensions or fragment.readable is not True
+                or fragment.valid is not True
+                or fragment.current is not False
+                or fragment.legacy_id != definition.legacy_id):
+            return PolicyDecision(
+                "refuse", desired,
+                "recognised legacy state is extended, ambiguous, or changed")
+        try:
+            existing = load_unique_json(before)
+            legacy = load_unique_json(definition.owned_fragment)
+            wanted = load_unique_json(desired)
+            if not all(isinstance(value, dict)
+                       for value in (existing, legacy, wanted)):
+                raise ValueError("composite JSON is not an object")
+            legacy_container = legacy.get(self.container_member)
+            wanted_container = wanted.get(self.container_member)
+            existing_container = existing.get(self.container_member)
+            if not all(isinstance(value, dict) for value in (
+                    legacy_container, wanted_container, existing_container)):
+                raise ValueError(
+                    f"{self.container_member!r} is not an object")
+            if set(legacy_container) != set(self.owned_array_members):
+                raise ValueError(
+                    "legacy definition arrays do not match the policy schema")
+            if set(wanted_container) != set(self.owned_array_members):
+                raise ValueError(
+                    "renderer-owned arrays do not match the policy schema")
+            for member in self.owned_array_members:
+                if existing_container.get(member) != legacy_container[member]:
+                    raise ValueError(
+                        f"installed {member!r} array no longer matches the "
+                        "exact legacy definition")
+
+            refreshed = before
+            for member in self.owned_array_members:
+                refreshed = replace_json_value(
+                    refreshed, (self.container_member, member),
+                    desired, (self.container_member, member))
+            load_unique_json(refreshed)
+        except (KeyError, ValueError) as exc:
+            return PolicyDecision(
+                "refuse", desired, f"safe legacy refresh is unavailable: {exc}")
+        return PolicyDecision(
+            "refresh", refreshed,
+            f"replace exact {definition.legacy_id!r} managed arrays")
+
     def decide(
         self,
         *,

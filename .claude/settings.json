@@ -15,10 +15,27 @@
   },
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "shell": "powershell", "command": "python \"$env:CLAUDE_PROJECT_DIR/tools/mdllm.py\" estate-sync .; python \"$env:CLAUDE_PROJECT_DIR/tools/mdllm.py\" session-start ." } ] }
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ROOT=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}\"\nMDLLM=\"$ROOT/\"'./tools/mdllm.py'\nFW=\"${MDLLM%/*/*}\"\nPY=\"\"\nPY_PREFIX=\"\"\nMDLLM_LAUNCH_DEADLINE=\"\"\nMDLLM_DATE=\"\"\nMDLLM_TIMEOUT=\"\"\nif [ -x /usr/bin/date ] && [ -x /usr/bin/timeout ]; then\n  MDLLM_DATE=/usr/bin/date\n  MDLLM_TIMEOUT=/usr/bin/timeout\nelif timeout --version >/dev/null 2>&1 && date +%s >/dev/null 2>&1; then\n  MDLLM_DATE=date\n  MDLLM_TIMEOUT=timeout\nfi\nif [ -n \"$MDLLM_DATE\" ] && [ -n \"$MDLLM_TIMEOUT\" ]; then\n  MDLLM_LAUNCH_DEADLINE=$(( $(\"$MDLLM_DATE\" +%s) + 10 ))\nfi\nmdllm_probe() {\n  [ -n \"$MDLLM_LAUNCH_DEADLINE\" ] || return 1\n  mdllm_remaining=$(( MDLLM_LAUNCH_DEADLINE - $(\"$MDLLM_DATE\" +%s) ))\n  [ \"$mdllm_remaining\" -gt 0 ] || return 1\n  \"$MDLLM_TIMEOUT\" \"$mdllm_remaining\" \"$@\" -c \"import yaml\" >/dev/null 2>&1\n}\nMDLLM_WINDOWS_SH=\"${MSYSTEM:-}\"\nif [ -z \"$PY\" ] && mdllm_probe \"$ROOT/.venv/bin/python\"; then\n  PY=\"$ROOT/.venv/bin/python\"\nfi\nif [ -z \"$PY\" ] && [ -n \"$MDLLM_WINDOWS_SH\" ] && mdllm_probe \"$ROOT/.venv/Scripts/python.exe\"; then\n  PY=\"$ROOT/.venv/Scripts/python.exe\"\nfi\nif [ -z \"$PY\" ] && mdllm_probe \"$FW/.venv/bin/python\"; then\n  PY=\"$FW/.venv/bin/python\"\nfi\nif [ -z \"$PY\" ] && [ -n \"$MDLLM_WINDOWS_SH\" ] && mdllm_probe \"$FW/.venv/Scripts/python.exe\"; then\n  PY=\"$FW/.venv/Scripts/python.exe\"\nfi\nif [ -z \"$PY\" ] && mdllm_probe python3; then\n  PY=\"python3\"\nfi\nif [ -z \"$PY\" ] && mdllm_probe python; then\n  PY=\"python\"\nfi\nif [ -z \"$PY\" ] && [ -n \"$MDLLM_WINDOWS_SH\" ] && mdllm_probe py \"-3\"; then\n  PY=\"py\"\n  PY_PREFIX=\"-3\"\nfi\nmdllm_python() {\n  if [ -n \"$PY_PREFIX\" ]; then\n    \"$PY\" \"$PY_PREFIX\" \"$@\"\n  else\n    \"$PY\" \"$@\"\n  fi\n}\nif [ -z \"$PY\" ] || [ ! -f \"$MDLLM\" ]; then\n  printf '%s\\n' '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"MarkdownLLM session-start could not run: no floor-capable Python or mdllm.py was found.\"}}'\nelse\n  mdllm_python \"$MDLLM\" harness-event claude-code session-start \"$ROOT\" 'sha256:f3f23bf371eab27620c24166734c287ff4f4b750d03378a9c6abf8a4986f17cc'\nfi\nexit 0",
+            "timeout": 120
+          }
+        ]
+      }
     ],
     "PostToolUse": [
-      { "matcher": "Write|Edit", "hooks": [ { "type": "command", "shell": "powershell", "command": "python \"$env:CLAUDE_PROJECT_DIR/tools/mdllm.py\" validate . --quiet" } ] }
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ROOT=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}\"\nMDLLM=\"$ROOT/\"'./tools/mdllm.py'\nFW=\"${MDLLM%/*/*}\"\nPY=\"\"\nPY_PREFIX=\"\"\nMDLLM_LAUNCH_DEADLINE=\"\"\nMDLLM_DATE=\"\"\nMDLLM_TIMEOUT=\"\"\nif [ -x /usr/bin/date ] && [ -x /usr/bin/timeout ]; then\n  MDLLM_DATE=/usr/bin/date\n  MDLLM_TIMEOUT=/usr/bin/timeout\nelif timeout --version >/dev/null 2>&1 && date +%s >/dev/null 2>&1; then\n  MDLLM_DATE=date\n  MDLLM_TIMEOUT=timeout\nfi\nif [ -n \"$MDLLM_DATE\" ] && [ -n \"$MDLLM_TIMEOUT\" ]; then\n  MDLLM_LAUNCH_DEADLINE=$(( $(\"$MDLLM_DATE\" +%s) + 10 ))\nfi\nmdllm_probe() {\n  [ -n \"$MDLLM_LAUNCH_DEADLINE\" ] || return 1\n  mdllm_remaining=$(( MDLLM_LAUNCH_DEADLINE - $(\"$MDLLM_DATE\" +%s) ))\n  [ \"$mdllm_remaining\" -gt 0 ] || return 1\n  \"$MDLLM_TIMEOUT\" \"$mdllm_remaining\" \"$@\" -c \"import yaml\" >/dev/null 2>&1\n}\nMDLLM_WINDOWS_SH=\"${MSYSTEM:-}\"\nif [ -z \"$PY\" ] && mdllm_probe \"$ROOT/.venv/bin/python\"; then\n  PY=\"$ROOT/.venv/bin/python\"\nfi\nif [ -z \"$PY\" ] && [ -n \"$MDLLM_WINDOWS_SH\" ] && mdllm_probe \"$ROOT/.venv/Scripts/python.exe\"; then\n  PY=\"$ROOT/.venv/Scripts/python.exe\"\nfi\nif [ -z \"$PY\" ] && mdllm_probe \"$FW/.venv/bin/python\"; then\n  PY=\"$FW/.venv/bin/python\"\nfi\nif [ -z \"$PY\" ] && [ -n \"$MDLLM_WINDOWS_SH\" ] && mdllm_probe \"$FW/.venv/Scripts/python.exe\"; then\n  PY=\"$FW/.venv/Scripts/python.exe\"\nfi\nif [ -z \"$PY\" ] && mdllm_probe python3; then\n  PY=\"python3\"\nfi\nif [ -z \"$PY\" ] && mdllm_probe python; then\n  PY=\"python\"\nfi\nif [ -z \"$PY\" ] && [ -n \"$MDLLM_WINDOWS_SH\" ] && mdllm_probe py \"-3\"; then\n  PY=\"py\"\n  PY_PREFIX=\"-3\"\nfi\nmdllm_python() {\n  if [ -n \"$PY_PREFIX\" ]; then\n    \"$PY\" \"$PY_PREFIX\" \"$@\"\n  else\n    \"$PY\" \"$@\"\n  fi\n}\nif [ -z \"$PY\" ] || [ ! -f \"$MDLLM\" ]; then\n  printf '%s\\n' '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"MarkdownLLM post-write could not run: no floor-capable Python or mdllm.py was found.\"}}'\nelse\n  mdllm_python \"$MDLLM\" harness-event claude-code post-write \"$ROOT\" 'sha256:5efe7a0ad25bd13ed3803626b1b8bc3beeca46b6c4bafeb17cca006a12ad9041'\nfi\nexit 0",
+            "timeout": 120
+          }
+        ]
+      }
     ]
   }
 }

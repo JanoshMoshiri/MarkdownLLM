@@ -178,8 +178,16 @@ def test_legacy_extension_refuses_even_under_explicit_refresh(tmp_path):
 
 def test_exact_root_powershell_legacy_is_separately_refreshable(tmp_path):
     context = HarnessContext(framework_root_rel=".")
-    before = (Path(__file__).resolve().parents[2] / ".claude" /
-              "settings.json").read_bytes()
+    definition = next(
+        item for item in CLAUDE_CODE.legacy_definitions(context)
+        if item.legacy_id == "legacy-root-powershell-v1")
+    # Historical recognition data must stay immutable after the real root is
+    # migrated. Build the composite fixture from the adapter declaration,
+    # never from today's live .claude/settings.json.
+    before = json.dumps({
+        "permissions": {"allow": ["Read"]},
+        "hooks": json.loads(definition.owned_fragment)["hooks"],
+    }, separators=(",", ":")).encode("utf-8")
     path = _settings_path(tmp_path)
     path.parent.mkdir(parents=True)
     path.write_bytes(before)
@@ -437,6 +445,67 @@ def test_codex_stale_and_duplicate_managed_json_are_refused(tmp_path):
     assert duplicate_plan.refused
     assert "duplicate JSON key" in duplicate_plan.decisions[0].reason
     assert path.read_bytes() == duplicate
+
+
+def test_codex_root_legacy_refresh_replaces_only_owned_event_arrays(tmp_path):
+    context = HarnessContext(framework_root_rel=".")
+    definition = CODEX.legacy_definitions(context)[0]
+    legacy_hooks = json.loads(definition.owned_fragment)["hooks"]
+    before = (
+        b'{\n  "operator-note" : { "spacing" : "must stay" },\n'
+        b'  "hooks" : '
+        + json.dumps(legacy_hooks, separators=(",", ":")).encode("utf-8")
+        + b',\n  "tail" : [ 1, 2, 3 ]\n}\n'
+    )
+    path = tmp_path / CODEX_HOOKS_PATH
+    path.parent.mkdir(parents=True)
+    path.write_bytes(before)
+
+    plain = preflight_install(
+        tmp_path, [target_for_adapter(CODEX, context)])
+    assert plain.refused and plain.decisions[0].action == "refuse"
+    with pytest.raises(InstallRefused):
+        apply_install(plain)
+    assert path.read_bytes() == before
+
+    plan = preflight_install(
+        tmp_path, [target_for_adapter(CODEX, context)],
+        refresh_legacy=True)
+
+    assert not plan.refused
+    decision = plan.decisions[0]
+    assert decision.action == "refresh"
+    assert decision.after is not None
+    assert b'"operator-note" : { "spacing" : "must stay" }' in decision.after
+    assert b'"tail" : [ 1, 2, 3 ]' in decision.after
+    assert definition.owned_fragment != decision.after
+    apply_install(plan)
+    assert CODEX.inspect(tmp_path, context).fragments[0].current is True
+
+
+def test_codex_root_legacy_extension_withholds_id_and_refuses_refresh(
+        tmp_path):
+    context = HarnessContext(framework_root_rel=".")
+    legacy = json.loads(
+        CODEX.legacy_definitions(context)[0].owned_fragment)
+    legacy["hooks"]["Stop"] = [{
+        "hooks": [{"type": "command", "command": "echo operator"}],
+    }]
+    before = (json.dumps(legacy, indent=2) + "\n").encode("utf-8")
+    path = tmp_path / CODEX_HOOKS_PATH
+    path.parent.mkdir(parents=True)
+    path.write_bytes(before)
+
+    report = CODEX.inspect(tmp_path, context)
+    assert report.fragments[0].legacy_id is None
+    assert report.extensions
+    plan = preflight_install(
+        tmp_path, [target_for_adapter(CODEX, context)],
+        refresh_legacy=True)
+    assert plan.refused
+    with pytest.raises(InstallRefused):
+        apply_install(plan)
+    assert path.read_bytes() == before
 
 
 class _OtherAdapter:

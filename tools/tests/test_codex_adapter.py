@@ -7,6 +7,7 @@ tests never install or create a live repository ``.codex`` layer.
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import os
 import shutil
@@ -22,7 +23,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from markdownllm.adapters.codex import (  # noqa: E402
     CODEX, CONFIG_PATH, HOOKS_PATH,
 )
-from markdownllm.adapter_install import InstallPolicyPort  # noqa: E402
+from markdownllm.adapter_install import (  # noqa: E402
+    InstallPolicyPort,
+    LegacyDefinitionPort,
+)
 from markdownllm.harness_ports import (  # noqa: E402
     HarnessContext, InspectPort, LifecycleOutputPort, RenderPort,
 )
@@ -30,6 +34,7 @@ from markdownllm.harness_diagnostics import ProbePort  # noqa: E402
 
 
 CTX = HarnessContext(framework_root_rel="../framework")
+ROOT_CTX = HarnessContext(framework_root_rel=".")
 
 
 def _rendered() -> dict:
@@ -61,8 +66,39 @@ def test_codex_adapter_satisfies_its_declared_service_ports():
     assert isinstance(CODEX, ProbePort)
     assert isinstance(CODEX, LifecycleOutputPort)
     assert isinstance(CODEX, InstallPolicyPort)
+    assert isinstance(CODEX, LegacyDefinitionPort)
     assert CODEX.capabilities().lifecycle_moments == (
         "session-start", "post-write")
+
+
+def test_root_legacy_definition_is_frozen_and_root_scoped():
+    definitions = CODEX.legacy_definitions(ROOT_CTX)
+
+    assert len(definitions) == 1
+    assert definitions[0].legacy_id == "legacy-root-v1"
+    assert definitions[0].path == HOOKS_PATH
+    assert len(definitions[0].owned_fragment) == 14328
+    assert hashlib.sha256(definitions[0].owned_fragment).hexdigest() == \
+        "9f590fc9483ef0463d52ad32cd6c2624ba2e95b1a7621b4dd68a964ed641da53"
+    assert CODEX.legacy_definitions(CTX) == ()
+
+
+def test_inspect_names_only_the_exact_unextended_root_legacy(tmp_path):
+    legacy = CODEX.legacy_definitions(ROOT_CTX)[0].owned_fragment
+    path = tmp_path / HOOKS_PATH
+    path.parent.mkdir(parents=True)
+    path.write_bytes(legacy)
+
+    exact = _fragment(CODEX.inspect(tmp_path, ROOT_CTX), HOOKS_PATH)
+    assert exact.current is False
+    assert exact.legacy_id == "legacy-root-v1"
+
+    changed = legacy.replace(b'"timeout":120', b'"timeout":119', 1)
+    assert changed != legacy
+    path.write_bytes(changed)
+    mutated = _fragment(CODEX.inspect(tmp_path, ROOT_CTX), HOOKS_PATH)
+    assert mutated.current is False
+    assert mutated.legacy_id is None
 
 
 def test_render_is_pure_deterministic_and_project_local(tmp_path):

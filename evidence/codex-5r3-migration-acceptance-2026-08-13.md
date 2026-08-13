@@ -1,7 +1,7 @@
 ---
 id: codex-5r3-migration-acceptance-2026-08-13
 type: artifact
-status: evolving
+status: stable
 created: 2026-08-13
 tags: [harness, adapters, migration, ownership, atomicity, phase-5r]
 linked_things:
@@ -13,8 +13,8 @@ linked_things:
 # Codex Phase 5R.3 migration acceptance
 
 Phase 5R.3 adds an explicit migration use case without weakening ordinary
-adapter installation. This record is `evolving` until Claude independently
-accepts implementation commit `460bb5a`.
+adapter installation. Claude independently accepted implementation commit
+`460bb5a` at Gate 5R.3 (`f7adeb4`), stabilising this record.
 
 ## Boundary
 

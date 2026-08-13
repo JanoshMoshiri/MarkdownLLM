@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.14
+version: 1.15
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -52,19 +52,16 @@ accepts the boundary and phase order.
 **Current execution boundary:** the complete Phase A/0–2 handoff remains
 accepted, and the Codex-owned Phases 3–5 remain landed, but their live
 acceptance is reopened at **Phase 5R** before Phase 6 may continue. Gates
-5R.0–5R.2 are accepted; Codex has implemented Phase 5R.3 and now hands its
-generic recognised-legacy migration boundary to Claude for independent
-acceptance before 5R.4 begins. Two
+5R.0–5R.3 are accepted. Codex has implemented Phase 5R.4, atomically refreshed
+the recognised framework-root Claude and Codex projections, and now hands the
+final gate to Claude for independent suite and boundary acceptance. Two
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
 Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
 handlers in parallel, so the scaffolded two-handler SessionStart form does not
-guarantee `estate-sync` before `session-start`. A Phase 6 preflight also created
-an untracked framework-root `.codex/hooks.json`; it is deliberate test state,
-not yet accepted or ownerless product state, and must be rerendered and
-explicitly dispositioned after Phase 5R. No nested domain adapter migration is
-authorised. The framework root's tracked `.claude/settings.json` and every live
-domain projection remain untouched until the repair and migration gates pass.
+guarantee `estate-sync` before `session-start`. The framework root now tracks
+both current project projections after reviewed `--refresh-legacy` dry-run and
+atomic apply. No nested domain adapter migration is authorised or performed.
 
 ## Claude acceptance amendments — v1.10 (2026-08-12)
 
@@ -1209,25 +1206,25 @@ matrix against the implementation commit.
 
 #### Phase 5R.4 — Reconcile Codex projection and live test state (Codex owner)
 
-- [ ] Make the Codex renderer consume the same neutral launch definition rather
+- [x] Make the Codex renderer consume the same neutral launch definition rather
   than retaining a private Windows candidate policy. Preserve Codex-specific
   POSIX/Windows fields, matchers, time/context limits, trust boundary, and JSON
   feedback envelope.
-- [ ] Rerender the framework root's untracked `.codex/hooks.json` only through
+- [x] Rerender the framework root's untracked `.codex/hooks.json` only through
   reviewed `adapter-install --dry-run` and explicit apply after all earlier 5R
   gates pass. An old definition hash must invalidate any old attestation.
-- [ ] Present the operator with the ownership decision: track the corrected
+- [x] Present the operator with the ownership decision: track the corrected
   root project projection as self-hosted framework state (recommended), ignore
   it deliberately as clone-local state, or remove it. Do not leave it
   untracked and undocumented.
-- [ ] Rerun the complete scaffold matrix (`default`, `claude`, `codex`, `all`,
+- [x] Rerun the complete scaffold matrix (`default`, `claude`, `codex`, `all`,
   `none`) and prove that only adapter projection files differ.
-- [ ] Recheck the Codex trust contract against the exact product surface used
+- [x] Recheck the Codex trust contract against the exact product surface used
   for the live test. Official documentation currently assigns hook inspection
   and trust to `/hooks` in the CLI; the Desktop chat command palette observed
   on 2026-08-12 did not expose that command. Do not claim Desktop trust review
   from a CLI-only flow or from config presence.
-- [ ] If any commit after Claude's 5R.1 acceptance changes launch, runtime, or
+- [x] If any commit after Claude's 5R.1 acceptance changes launch, runtime, or
   lifecycle-runner code, Claude reruns the exact PowerShell 5.1 reproduction on
   final 5R.4 HEAD. A final-HEAD run may satisfy both gates only when no
   intervening relevant change occurred.
@@ -1242,12 +1239,11 @@ the false sequential-handler premise. No domain has been migrated.
 
 ### Phase 6 — Execute in real harnesses (split ownership by harness)
 
-Phase 6 resumes only after Phase 5R. The framework root currently carries a tracked legacy Claude projection
-(`shell: powershell`, combined SessionStart command) that predates the current
-renderer and is reported stale. The Claude live record must distinguish that
-operator-owned estate state from a fresh-scaffold non-regression result and
-explicitly decide whether to refresh it; Phases 3–5 deliberately left it
-byte-for-byte untouched.
+Phase 6 resumes only after Phase 5R. The framework root now carries tracked,
+current Claude and Codex project projections. Their recognised legacy forms
+were refreshed atomically at 5R.4; old hash-bound attestations are stale and do
+not count as current execution evidence. No nested domain projection was
+migrated.
 
 Phase 6 is the only phase that earns `verified-on`. Unlike 5R.2's direct launch
 probes, these runs must be automatically dispatched by the named product and

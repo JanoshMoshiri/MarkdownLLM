@@ -205,12 +205,11 @@ floor. For an existing project, inspect before writing:
 ```
 
 The Codex project adapter is implemented and unit/integration tested. Phase
-5R.1 closed the shared launch defects and 5R.2 replaced Claude's parallel
-legacy projection with the ordered neutral runner; 5R.4 still reconciles the
-Codex projection before live Phase 6 acceptance. The framework-root
-`.codex/hooks.json` is deliberately untracked stale test state. The operator
-decided it will be rerendered through reviewed dry-run/apply and tracked at
-5R.4, not committed in its present form.
+5R.1 closed the shared launch defects, 5R.2 replaced Claude's parallel legacy
+projection with the ordered neutral runner, and 5R.4 refreshed both root
+adapters atomically through the reviewed recognised-legacy path. The framework
+root now tracks current `.claude/settings.json` and `.codex/hooks.json` as
+self-hosted project state. Nested domains were not migrated.
 
 Installing the corrected reviewed diff remains an operator action. The
 [official Codex hook documentation](https://developers.openai.com/codex/hooks) names
