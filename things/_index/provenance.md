@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-11
-generated: 2026-08-11T21:44:08
-generated_from: HEAD@6996309
-coverage: 17
+created: 2026-08-13
+generated: 2026-08-13T04:55:43
+generated_from: HEAD@3d0aef7
+coverage: 18
 framework_version: 3.31.0
 ---
 
@@ -14,6 +14,9 @@ framework_version: 3.31.0
 
 ## assistant-register
 - operating-is-programming (derived-from)
+
+## claude-phase5r0-red-acceptance-2026-08-12
+- claude-phase5r0-matrix-completion-2026-08-13 (derived-from)
 
 ## cross-domain-handoff-is-verified-external-input
 - phase-3-run-domain-task-reverted (pinned @2d4f6d4)
