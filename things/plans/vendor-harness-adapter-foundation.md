@@ -1013,20 +1013,20 @@ Codex schema vocabulary. Phase 5R.1 may begin.
 
 #### Phase 5R.1 — Repair shared launch/runtime infrastructure (Codex owner)
 
-- [ ] Make every PowerShell candidate probe exception-safe: a failed native
+- [x] Make every PowerShell candidate probe exception-safe: a failed native
   process is one negative candidate fact and resolution continues. Preserve
   `$ErrorActionPreference = 'Stop'` around real control-flow errors.
-- [ ] Put candidate order, PyYAML probing, framework-root derivation, and the
+- [x] Put candidate order, PyYAML probing, framework-root derivation, and the
   lifecycle CLI invocation behind one neutral owner. Cross-language fragments
   may have different encodings, but parity tests must prove the same candidate
   order and outcome semantics. Represent each candidate as executable plus
   immutable prefix arguments so `py -3` is not a string-shaped special case.
-- [ ] Make the lifecycle application service receive the selected identity and
+- [x] Make the lifecycle application service receive the selected identity and
   `LifecycleOutputPort` from the CLI composition root. The neutral service may
   depend on the port; it must not resolve or import a concrete adapter itself.
-- [ ] Preserve one total lifecycle deadline, bounded labelled output,
+- [x] Preserve one total lifecycle deadline, bounded labelled output,
   surface-and-continue behavior, and format-before-success-attestation.
-- [ ] Render an explicit **120-second handler timeout** in Claude and Codex;
+- [x] Render an explicit **120-second handler timeout** in Claude and Codex;
   never inherit a vendor default. Enforce this hierarchy as policy and include
   every value in the managed-definition hash:
 
@@ -1044,15 +1044,15 @@ Codex schema vocabulary. Phase 5R.1 may begin.
 
   An earlier step cannot borrow a later required step's allocation. A timed-out
   or degraded `estate-sync` must still leave the reserved orientation budget.
-- [ ] Give `estate-sync` a 75-second global deadline in addition to its per-Git
+- [x] Give `estate-sync` a 75-second global deadline in addition to its per-Git
   call ceiling. Clamp each child call to the remaining global budget; after
   exhaustion, continue the estate walk from cached/local state and label every
   unattempted remote honestly as budget-exhausted. Do not pull after a degraded
   fetch, and leave no child Git/interpreter process behind.
-- [ ] Extend doctor with independent launch currency/runtime facts. A current
+- [x] Extend doctor with independent launch currency/runtime facts. A current
   vendor artifact with absent or stale launch infrastructure is configured but
   not runnable; static launch success still leaves execution untested.
-- [ ] Keep Git pre-commit as the only enforcement boundary. A harness launch
+- [x] Keep Git pre-commit as the only enforcement boundary. A harness launch
   failure must be visible but must not become a second commit policy.
 
 **Gate 5R.1:** focused runtime, lifecycle-runner, diagnostic, architecture, and
@@ -1064,6 +1064,22 @@ arithmetic, later-step reservation, global estate deadline, healthy and stalled
 remote paths, hash invalidation, and child-process cleanup. Claude then reruns
 the exact committed PowerShell 5.1 reproduction green plus its regression suite
 on the handoff commit; only then may 5R.2 begin.
+
+**5R.1 implementation handoff (Codex, `82f2cfc`):** `27b0723` centralised
+executable-plus-prefix candidates and turned the independently accepted native
+PS5 reds green. Shared lifecycle/estate/diagnostic changes landed concurrently
+with Claude's POSIX evidence at `6572fb7`: the code keeps the selected output
+port at the composition root, hashes the 120/105/5 and 75/25/100 budgets,
+reserves later steps, bounds the estate walk globally, and reports independent
+launch facts. `59d023b` excludes Windows interop candidates from native POSIX.
+`82f2cfc` gives `mdllm.ps1` and Codex one shared Windows resolver with a total
+10-second stopwatch and timed-out-probe termination; the sh encoding enforces
+the same ceiling through the verified Git-Bash/POSIX timeout surface. Windows
+Git-hook execution is covered. Codex's complete Windows suite is 442/442;
+validation is 174+6+14 clean and coherence has only the pre-existing
+`claude-adapter-baseline` stable-label Info. Claude's unchanged native-PS5 green
+rerun and final-handoff regression/POSIX acceptance remain open, so Gate 5R.1
+has not yet passed.
 
 #### Phase 5R.2 — Version the Claude projection (Claude owner; Codex acceptance)
 
