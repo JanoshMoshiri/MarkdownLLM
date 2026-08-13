@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.12
+version: 1.13
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -1099,38 +1099,38 @@ Claude Code inside the Linux host, so the narrowed surface in
 
 #### Phase 5R.2 — Version the Claude projection (Claude owner; Codex acceptance)
 
-- [ ] Implement `LifecycleOutputPort` for Claude Code. SessionStart returns
+- [x] Implement `LifecycleOutputPort` for Claude Code. SessionStart returns
   concise model context; successful PostToolUse is quiet; failed PostToolUse
   uses Claude's documented feedback/error behavior without enforcing the tool
   action.
-- [ ] Render one SessionStart handler and one PostToolUse handler. Each invokes
+- [x] Render one SessionStart handler and one PostToolUse handler. Each invokes
   the neutral lifecycle service once with a definition hash derived from the
   full binding, launch definition, and owned vendor fields.
-- [ ] Anchor the launch to Claude's documented project-root surface and prove
+- [x] Anchor the launch to Claude's documented project-root surface and prove
   it after the session cwd moves. Do not retain `python ../../tools/mdllm.py`
   or copy the framework root's PowerShell-only workaround into the portable
   renderer.
-- [ ] Inspect Claude's real project approval/trust behavior and report it as an
+- [x] Inspect Claude's real project approval/trust behavior and report it as an
   independent fact. Do not preserve `trust=not-applicable` merely because the
   first adapter did not model the surface.
-- [ ] Keep `LIFECYCLE_BINDINGS`, domain policy, matcher intent, scaffold default,
+- [x] Keep `LIFECYCLE_BINDINGS`, domain policy, matcher intent, scaffold default,
   shortcuts, and Git-floor behavior unchanged. Only the projection mechanism
   changes.
-- [ ] Preserve the v1.8 Claude golden as `legacy-v1`; add a separately named
+- [x] Preserve the v1.8 Claude golden as `legacy-v1`; add a separately named
   current golden. Update the inspector so `current`, `known-legacy`,
   `extended`, and `ambiguous` are distinguishable without treating legacy as
   current.
-- [ ] Prove renderer acceptance without claiming automatic harness dispatch: a
+- [x] Prove renderer acceptance without claiming automatic harness dispatch: a
   fresh Claude scaffold matches the current golden, inspects `current`, and has
   exactly one managed handler per lifecycle moment. Execute each emitted handler
   directly from a moved cwd on native Windows and POSIX; prove ordered steps,
   output translation, bounded advisory failure, definition-hash invalidation,
   and attestation mechanics.
-- [ ] Label every direct handler or `harness-event` execution as a **launch
+- [x] Label every direct handler or `harness-event` execution as a **launch
   probe**. Any resulting clone-local attestation is test state and inadmissible
   as Phase 6 evidence. Do not promote any compatibility surface to
   `verified-on` during 5R.2.
-- [ ] If Claude discovers a missing neutral abstraction while implementing its
+- [x] If Claude discovers a missing neutral abstraction while implementing its
   projection, return it to 5R.1 under Codex/shared ownership. Claude does not
   alter neutral ports opportunistically inside the vendor package.
 
@@ -1138,6 +1138,18 @@ Claude Code inside the Linux host, so the narrowed surface in
 renderer record; Codex independently accepts the neutral boundary, cwd
 stability, byte ownership, and tests. The result is a release-candidate,
 `designed-for` renderer—not a verified harness.
+
+**Accepted 2026-08-13 at `a1bccee`.** Codex cold-read the renderer, inspector,
+goldens, output port, evidence record, and operator decisions, then exercised
+the actual scaffold/doctor/install seams (61 focused tests passed). The current
+projection enters the neutral runner once per moment, carries no private
+candidate policy, and keeps Claude schema and output envelopes at the edge.
+`ManagedFragment.legacy_id` is accepted as recognition data with a strict
+non-current invariant; it grants no mutation authority. A broad CLI test first
+failed only because an in-repository pytest temporary root inherited the
+framework's real stale-floor finding; the exact test passed from an external
+temporary root, confirming fixture location rather than 5R.2 behavior. Gate
+5R.2 is green and Phase 5R.3 may begin.
 
 #### Phase 5R.3 — Add explicit recognised-legacy migration (Codex service owner; Claude definitions owner)
 
