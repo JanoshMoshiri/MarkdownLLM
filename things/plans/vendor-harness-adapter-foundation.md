@@ -1190,7 +1190,7 @@ The migration state machine is closed and ordered:
 shape have an explicit expected state; safe cases preserve all non-owned bytes,
 and every ambiguous case proves zero writes by hash.
 
-**Codex implementation handoff — 2026-08-13.** The application boundary now
+**Codex implementation handoff — 2026-08-13 at `460bb5a`.** The application boundary now
 defines immutable `LegacyDefinition` data plus the optional
 `LegacyDefinitionPort`; ordinary install remains unchanged and conservative,
 while `--refresh-legacy` separately authorises only an inspection-named exact

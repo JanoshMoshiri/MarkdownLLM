@@ -14,7 +14,7 @@ linked_things:
 
 Phase 5R.3 adds an explicit migration use case without weakening ordinary
 adapter installation. This record is `evolving` until Claude independently
-accepts the handed-off commit.
+accepts implementation commit `460bb5a`.
 
 ## Boundary
 
