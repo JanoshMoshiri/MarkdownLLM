@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T09:11:01
-generated_from: HEAD@7549b97
-coverage: 177
+generated: 2026-08-13T09:28:21
+generated_from: HEAD@ba96d73
+coverage: 178
 framework_version: 3.31.0
 ---
 
@@ -111,6 +111,9 @@ framework_version: 3.31.0
 - change-safety-is-defense-in-depth --supports--> mechanical-assimilation-is-blind-to-prose-dependencies
 - change-safety-is-defense-in-depth --supports--> consistency-is-maintained-at-change-not-by-sweeping
 - change-safety-is-defense-in-depth --supports--> retrospective-specification
+- claude-5r2-renderer-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
+- claude-5r2-renderer-acceptance-2026-08-13 --derived-from--> claude-phase5r0-matrix-completion-2026-08-13
+- claude-5r2-renderer-acceptance-2026-08-13 --implements--> code-architect-governs-substrate-code
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
 - claude-gate-5r1-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation

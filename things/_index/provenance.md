@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-13
-generated: 2026-08-13T08:01:40
-generated_from: HEAD@72744f4
+generated: 2026-08-13T09:28:27
+generated_from: HEAD@ba96d73
 coverage: 20
 framework_version: 3.31.0
 ---
@@ -16,6 +16,7 @@ framework_version: 3.31.0
 - operating-is-programming (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
+- claude-5r2-renderer-acceptance-2026-08-13 (derived-from)
 - claude-platform-surface-narrowed (derived-from)
 
 ## claude-phase5r0-red-acceptance-2026-08-12
