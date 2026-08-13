@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T13:13:06
-generated_from: HEAD@42877f3
-coverage: 186
+generated: 2026-08-13T14:01:24
+generated_from: HEAD@f7acffd
+coverage: 188
 framework_version: 3.31.0
 ---
 
@@ -308,6 +308,8 @@ framework_version: 3.31.0
 - external-review-response-2026-08-10 --references--> inbound-edges-decide-which-plan-survives-consolidation
 - felt-deployment-lands-in-undisclosable-work --references--> llm-driven-systems-manifesto
 - felt-deployment-lands-in-undisclosable-work --complements--> structure-decides-figures-scale-decides-convention
+- field-report-2026-08-13-domain-session --supports--> the-harness-bound-path-is-the-least-tested-path
+- field-report-2026-08-13-domain-session --supports--> portability-claims-need-execution-tests
 - first-2x2-measured-convention-following-not-reasoning --extends--> fixture-fixes-correct-bugs-not-difficulty
 - first-2x2-measured-convention-following-not-reasoning --supports--> hook-compliance-correlates-with-scope-not-awareness
 - first-2x2-measured-convention-following-not-reasoning --superseded-by--> structure-decides-figures-scale-decides-convention
@@ -624,6 +626,9 @@ framework_version: 3.31.0
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
 - substrate-reconciliation-2026-08-09 --references--> autopush-moves-the-deliberate-act
+- the-harness-bound-path-is-the-least-tested-path --supports--> portability-claims-need-execution-tests
+- the-harness-bound-path-is-the-least-tested-path --derived-from--> field-report-2026-08-13-domain-session
+- the-harness-bound-path-is-the-least-tested-path --derived-from--> claude-gate-5r4-acceptance-2026-08-13
 - the-notation-changed-not-the-primitives --extends--> llm-driven-systems-manifesto
 - the-notation-changed-not-the-primitives --references--> thing-specification
 - the-notation-changed-not-the-primitives --references--> orchestration-specification

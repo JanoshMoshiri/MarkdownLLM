@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-13
-generated: 2026-08-13T13:13:11
-generated_from: HEAD@42877f3
-coverage: 21
+generated: 2026-08-13T14:01:37
+generated_from: HEAD@f7acffd
+coverage: 23
 framework_version: 3.31.0
 ---
 
@@ -17,6 +17,9 @@ framework_version: 3.31.0
 
 ## claude-gate-5r3-acceptance-2026-08-13
 - claude-gate-5r4-acceptance-2026-08-13 (derived-from)
+
+## claude-gate-5r4-acceptance-2026-08-13
+- the-harness-bound-path-is-the-least-tested-path (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
 - claude-5r2-renderer-acceptance-2026-08-13 (derived-from)
@@ -37,6 +40,9 @@ framework_version: 3.31.0
 
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
+
+## field-report-2026-08-13-domain-session
+- the-harness-bound-path-is-the-least-tested-path (derived-from)
 
 ## framework-retrospective-2026-06
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
