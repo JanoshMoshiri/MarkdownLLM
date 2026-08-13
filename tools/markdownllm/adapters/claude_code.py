@@ -38,9 +38,10 @@ from pathlib import Path
 from ..adapter_install import TopLevelJsonFragmentPolicy
 from ..harness_diagnostics import AdapterProbe, managed_definition_hash
 from ..harness_ports import (
-    DOMAIN_ROOT_ARG, AdapterCapabilities, DiagnosticPresentation,
-    HarnessContext, InspectionReport, ManagedFragment,
+    HANDLER_TIMEOUT_SECONDS, AdapterCapabilities, DiagnosticPresentation,
+    HarnessContext, InspectionReport, LifecycleBinding, ManagedFragment,
 )
+from ..runtime import SH_RESOLVE
 
 
 def _unique_json_object(pairs):
@@ -63,7 +64,22 @@ SETTINGS_PATH = ".claude/settings.json"
 # Inward delivery semantics -> Claude event vocabulary. Lives here and only
 # here; a neutral module never names these.
 _DELIVERY_EVENT = {"context": "SessionStart", "feedback": "PostToolUse"}
+_DELIVERY_EVENT_BY_MOMENT = {
+    "session-start": "SessionStart",
+    "post-write": "PostToolUse",
+}
 _FEEDBACK_MATCHER = "Write|Edit"
+_HASH_PLACEHOLDER = "<managed-definition-hash>"
+
+
+def _shell_single_quote(value: str) -> str:
+    """Single-quote one literal for the POSIX hook command.
+
+    Every byte the render context supplies stays literal: `$`, backticks,
+    quotes and command substitutions inside a legal path must never become
+    shell syntax.
+    """
+    return "'" + value.replace("'", "'\"'\"'") + "'"
 
 
 class ClaudeCodeAdapter:
@@ -83,37 +99,58 @@ class ClaudeCodeAdapter:
         """Own only the top-level hooks member in composite settings."""
         return {SETTINGS_PATH: TopLevelJsonFragmentPolicy("hooks")}
 
-    def probe(self, domain_root: Path,
-              context: HarnessContext) -> AdapterProbe:
-        """Return only facts static Claude project config can establish."""
-        desired = json.loads(
-            self.render(context)[SETTINGS_PATH].decode("utf-8"))
-        hashes: dict[str, str] = {}
-        for binding in context.bindings:
-            event = _DELIVERY_EVENT[binding.delivery]
-            group = desired["hooks"][event][0]
-            semantic_binding = {
+    def _definition_hash(self, context: HarnessContext,
+                         binding: LifecycleBinding) -> str:
+        """Hash the complete owned definition with a stable hash placeholder.
+
+        The literal attestation hash is excluded from its own input, so an
+        already-installed handler keeps its old literal and cannot mint
+        current evidence once the renderer evolves.
+        """
+        event = _DELIVERY_EVENT[binding.delivery]
+        group: dict = {"hooks": [
+            self._handler(context, binding.moment, _HASH_PLACEHOLDER)]}
+        if binding.delivery != "context":
+            group = {"matcher": _FEEDBACK_MATCHER, "hooks": group["hooks"]}
+        return managed_definition_hash({
+            "artifact": SETTINGS_PATH,
+            "binding": json.dumps({
                 "moment": binding.moment,
                 "delivery": binding.delivery,
                 "failure": binding.failure,
-                "steps": [
-                    {"operation": step.operation, "argv": list(step.argv)}
-                    for step in binding.steps
-                ],
-                "step_timeouts": [step.timeout_seconds
-                                  for step in binding.steps],
+                "steps": [{
+                    "operation": step.operation,
+                    "argv": list(step.argv),
+                    "timeout_seconds": step.timeout_seconds,
+                } for step in binding.steps],
                 "total_timeout_seconds": binding.total_timeout_seconds,
                 "runner_reserve_seconds": binding.runner_reserve_seconds,
-            }
-            hashes[binding.moment] = managed_definition_hash({
-                "binding": json.dumps(
-                    semantic_binding, sort_keys=True, separators=(",", ":")),
-                "managed-group": json.dumps(
-                    group, sort_keys=True, separators=(",", ":")),
-            })
+            }, sort_keys=True, separators=(",", ":")),
+            "event": event,
+            "group": json.dumps(group, sort_keys=True, separators=(",", ":")),
+        })
+
+    def probe(self, domain_root: Path,
+              context: HarnessContext) -> AdapterProbe:
+        """Return only facts static Claude project config can establish.
+
+        Trust is a real Claude surface, not an absent one: project-level hook
+        configuration is reviewed and approved by the human through Claude's
+        own trust flow, and no stable machine-readable API exposes that
+        decision. It is therefore reported `unknown` — the honest answer —
+        rather than `not-applicable`, which the first adapter asserted only
+        because it did not model the surface at all.
+        """
+        del domain_root  # No stable machine-readable project-trust API.
         return AdapterProbe(
-            trust="not-applicable",
-            definition_hashes=hashes,
+            trust="unknown",
+            definition_hashes={
+                binding.moment: self._definition_hash(context, binding)
+                for binding in context.bindings
+            },
+            trust_detail=(
+                "Claude project hook review and approval are human-observed; "
+                "configuration bytes never establish that decision"),
             ownership=(
                 "the adapter owns only the managed lifecycle hook groups",
                 "permissions, unrelated settings, and local extensions remain "
@@ -121,27 +158,91 @@ class ClaudeCodeAdapter:
             ),
         )
 
+    # -------------------------------------------------------- lifecycle output
+
+    def format_lifecycle_output(self, moment: str, text: str,
+                                passed: bool) -> str:
+        """Translate one neutral execution into Claude's hook output channel.
+
+        SessionStart always returns model-visible context. A passing
+        post-write is quiet: silence is the correct feedback when nothing is
+        wrong, and it keeps the model's context free of routine noise. A
+        failing post-write returns context only — never a blocking decision —
+        because the Git pre-commit hook is the whole enforcement boundary and
+        a harness hook must stay advisory (`surface-and-continue`).
+        """
+        if moment == "post-write" and passed:
+            return ""
+        try:
+            event = _DELIVERY_EVENT_BY_MOMENT[moment]
+        except KeyError as exc:
+            raise ValueError(
+                f"unsupported Claude lifecycle moment: {moment}") from exc
+        return json.dumps({
+            "hookSpecificOutput": {
+                "hookEventName": event,
+                "additionalContext": text,
+            },
+        }, separators=(",", ":"))
+
     # ------------------------------------------------------------- rendering
 
-    def _command(self, ctx: HarnessContext, operation: str,
-                 argv: tuple[str, ...]) -> str:
-        args = " ".join("." if a == DOMAIN_ROOT_ARG else a for a in argv)
-        return (f"python {ctx.framework_root_rel}/tools/mdllm.py "
-                f"{operation} {args}")
+    def _command(self, ctx: HarnessContext, moment: str,
+                 definition_hash: str) -> str:
+        """One sh command entering the neutral ordered runner exactly once.
+
+        Shell form in sh dialect is the portable carrier established by live
+        dispatch (2026-08-13): POSIX runs these bytes natively, and on Windows
+        Claude self-locates Git Bash even when PATH carries no Git entry, so
+        the PowerShell branch is not reachable where Git for Windows exists.
+
+        Root resolution prefers Claude's documented `$CLAUDE_PROJECT_DIR`
+        because a hook's cwd is not guaranteed to be the project root — the
+        exact defect that forced the framework root's own 2026-07-01 fix —
+        and falls back to Git so the command still works if the variable is
+        ever absent. Ordering is the runner's job, not this schema's: Claude
+        launches matching handlers in parallel, so one handler is the only
+        construction that can honour an ordered binding.
+        """
+        rel = ctx.framework_root_rel.rstrip("/") or "."
+        mdllm = '"$ROOT/"' + _shell_single_quote(f"{rel}/tools/mdllm.py")
+        unavailable = self.format_lifecycle_output(
+            moment,
+            f"MarkdownLLM {moment} could not run: no floor-capable Python "
+            "or mdllm.py was found.",
+            False,
+        )
+        return (
+            'ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}"\n'
+            f"MDLLM={mdllm}\n"
+            f"{SH_RESOLVE}\n"
+            'if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then\n'
+            f"  printf '%s\\n' {_shell_single_quote(unavailable)}\n"
+            "else\n"
+            f'  mdllm_python "$MDLLM" harness-event {self.name} {moment} '
+            f'"$ROOT" {_shell_single_quote(definition_hash)}\n'
+            "fi\n"
+            "exit 0"
+        )
+
+    def _handler(self, ctx: HarnessContext, moment: str,
+                 definition_hash: str) -> dict:
+        return {
+            "type": "command",
+            "command": self._command(ctx, moment, definition_hash),
+            "timeout": HANDLER_TIMEOUT_SECONDS,
+        }
 
     def render(self, ctx: HarnessContext) -> dict[str, bytes]:
         hooks: dict = {}
         for binding in ctx.bindings:
-            entries = [{"type": "command",
-                        "command": self._command(ctx, s.operation, s.argv)}
-                       for s in binding.steps]
-            if binding.delivery == "context":
-                # Frozen legacy-v1 shape only. Claude runs these matching
-                # handlers in parallel; Phase 5R.2 replaces this projection.
-                hooks.setdefault("SessionStart", []).append({"hooks": entries})
-            else:
-                hooks.setdefault("PostToolUse", []).append(
-                    {"matcher": _FEEDBACK_MATCHER, "hooks": entries})
+            event = _DELIVERY_EVENT[binding.delivery]
+            handler = self._handler(
+                ctx, binding.moment, self._definition_hash(ctx, binding))
+            group: dict = {"hooks": [handler]}
+            if binding.delivery != "context":
+                group = {"matcher": _FEEDBACK_MATCHER, "hooks": [handler]}
+            hooks.setdefault(event, []).append(group)
         payload = json.dumps({"hooks": hooks}, indent=2) + "\n"
         return {SETTINGS_PATH: payload.encode("utf-8")}
 
@@ -213,9 +314,27 @@ class ClaudeCodeAdapter:
                 path=SETTINGS_PATH, present=False, readable=True,
                 valid=False, issues=(str(exc),)))
 
+    def _realised_operations(self, command: str, moment: str,
+                             ctx: HarnessContext) -> tuple[str, ...]:
+        """What one installed handler actually realises.
+
+        A current handler delegates the whole ordered binding to the neutral
+        runner, so it realises every step of that moment — the runner owns
+        the loop. A legacy handler names one floor operation directly, and
+        that single operation is all it realises. Anything else is reported
+        as its own leading token rather than silently mapped onto an intent.
+        """
+        if f"harness-event {self.name} {moment} " in command:
+            return tuple(step.operation
+                         for step in ctx.binding(moment).steps)
+        if "tools/mdllm.py " in command:
+            return (command.split("tools/mdllm.py ", 1)[1].split()[0],)
+        return ((command.split() or [command])[0],)
+
     def _compare_group(self, moment: str, actual_hooks: list,
                        wanted_hooks: list, extensions: list[str],
-                       issues: list[str]) -> tuple[str, ...]:
+                       issues: list[str],
+                       ctx: HarnessContext) -> tuple[str, ...]:
         """Compare one managed hook group against the renderer's desired form.
         Extensions are TOKEN-BOUNDARY-safe: an added argument extends the
         managed command only across a space — `--quiet` mutating into
@@ -244,13 +363,52 @@ class ClaudeCodeAdapter:
             else:
                 issues.append(f"{moment} command diverges from the managed "
                               f"form: {cmd!r}")
-            acts.append(cmd.split("tools/mdllm.py ", 1)[1].split()[0]
-                        if "tools/mdllm.py " in cmd else (cmd.split() or [cmd])[0])
+            acts.extend(self._realised_operations(cmd, moment, ctx))
         if len(actual_hooks) != len(wanted_hooks):
             issues.append(f"{moment} hook count diverges from the managed "
                           f"form ({len(actual_hooks)} vs "
                           f"{len(wanted_hooks)})")
         return tuple(acts)
+
+    def _legacy_match(self, hooks: dict,
+                      ctx: HarnessContext) -> tuple[bool, tuple[str, ...]]:
+        """Match the exact pre-5R.2 form, and report any local command tails.
+
+        Returns ``(matched, tails)``. `legacy-v1` is the historical
+        projection: two parallel SessionStart handlers calling the floor CLI
+        directly, which never guaranteed the ordered binding.
+
+        Matching is by exact command shape so unknown staleness stays
+        unknown — a refusal, never a guess. A tail (the live estate's
+        ``--assistant``) still matches the legacy *base*, but is returned
+        separately: the caller must withhold recognition over mixed
+        ownership while keeping the operator's edit visible rather than
+        flattening it into silence.
+        """
+        rel = ctx.framework_root_rel.rstrip("/") or "."
+        prefix = f"python {rel}/tools/mdllm.py "
+        expected = {
+            "SessionStart": [f"{prefix}{step.operation} ."
+                             for step in ctx.binding("session-start").steps],
+            "PostToolUse": [f"{prefix}validate . --quiet"],
+        }
+        tails: list[str] = []
+        for event, commands in expected.items():
+            handlers = (hooks.get(event) or [{}])[0].get("hooks") or []
+            if len(handlers) != len(commands):
+                return False, ()
+            for handler, want in zip(handlers, commands):
+                if set(handler) - {"type", "command"}:
+                    return False, ()
+                command = handler.get("command", "")
+                if command == want:
+                    continue
+                if command.startswith(want + " "):
+                    tails.append(f"legacy-v1 {event} command carries "
+                                 f"{command[len(want):].strip()}")
+                    continue
+                return False, ()
+        return True, tuple(tails)
 
     def _inspect_valid(self, cfg: dict, hooks: dict,
                        ctx: HarnessContext) -> InspectionReport:
@@ -266,7 +424,8 @@ class ClaudeCodeAdapter:
         if ss:
             wanted = desired["hooks"]["SessionStart"][0]["hooks"]
             realised["session-start"] = self._compare_group(
-                "session-start", ss[0]["hooks"], wanted, extensions, issues)
+                "session-start", ss[0]["hooks"], wanted, extensions, issues,
+                ctx)
             for _ in ss[1:]:
                 extensions.append(
                     "additional SessionStart hook group is operator-owned")
@@ -291,7 +450,7 @@ class ClaudeCodeAdapter:
             managed_pw_seen = True
             realised["post-write"] = self._compare_group(
                 "post-write", g["hooks"], want_pw["hooks"],
-                extensions, issues)
+                extensions, issues, ctx)
 
         for event in sorted(hooks):
             if event not in _DELIVERY_EVENT.values():
@@ -309,11 +468,20 @@ class ClaudeCodeAdapter:
                     for b in ctx.bindings}
         current = ((realised == expected and not issues and not findings)
                    if present else None)
+        # A recognised legacy form is named only when it is genuinely NOT
+        # current and carries no local extension: mixed ownership must stay
+        # unknown so it remains a refusal rather than an inference.
+        legacy_id = None
+        if present and current is False:
+            matched, tails = self._legacy_match(hooks, ctx)
+            extensions.extend(tails)
+            if matched and not tails and not extensions and not findings:
+                legacy_id = "legacy-v1"
         return self._report(
             ManagedFragment(
                 path=SETTINGS_PATH, present=present, readable=True,
-                valid=True, current=current, intents_realised=realised,
-                issues=tuple(issues)),
+                valid=True, current=current, legacy_id=legacy_id,
+                intents_realised=realised, issues=tuple(issues)),
             operator_owned=operator_owned,
             extensions=tuple(extensions),
             findings=tuple(findings))

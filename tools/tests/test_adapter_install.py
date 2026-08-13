@@ -116,20 +116,31 @@ def test_permissions_only_merge_preserves_every_existing_byte(tmp_path):
 
 @pytest.mark.parametrize("shape", ["hooks-only", "permissions-plus-hooks",
                                     "extended-startup"])
-def test_current_and_locally_extended_artifacts_are_hash_stable_noops(
+def test_legacy_and_locally_extended_artifacts_refuse_without_writing(
         tmp_path, shape):
+    """Every live estate shape is now legacy — and a refusal writes nothing.
+
+    Before 5R.2 these shapes were current, so a normal install was a no-op.
+    They are now the recognised historical form (or that form plus a local
+    extension), which under the migration contract reports availability and
+    writes nothing: a legacy fragment is replaced only by an explicit,
+    reviewed refresh, never as a side effect of a plain install.
+
+    The safety invariant is unchanged and is what this test still guards:
+    the artifact's hash must be byte-identical afterwards.
+    """
     before = _put_shape(tmp_path, shape)
     before_hash = _sha(before)
 
     plan = preflight_install(tmp_path, [_claude_target()])
 
-    assert not plan.refused
-    assert plan.decisions[0].action == "no-op"
-    assert plan.owned_diff() == ""
-    result = apply_install(plan)
-    assert result.written == ()
-    assert result.unchanged == (SETTINGS_PATH,)
-    assert _sha(_settings_path(tmp_path).read_bytes()) == before_hash
+    assert plan.refused, "legacy state must never be silently overwritten"
+    # The refusal is enforced at apply time, not merely advertised at
+    # preflight: applying a refused plan raises, and writes nothing.
+    with pytest.raises(install_module.InstallRefused):
+        apply_install(plan)
+    assert _sha(_settings_path(tmp_path).read_bytes()) == before_hash, \
+        "a refusal must leave the operator's bytes untouched"
 
 
 def test_invalid_artifact_refuses_with_diff_and_no_write(tmp_path):

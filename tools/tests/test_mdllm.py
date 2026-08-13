@@ -1307,11 +1307,18 @@ def test_scaffold_writes_hardened_adapter(tmp_path):
     mdllm.cmd_scaffold(_ns(path=str(target)))
     settings = json.loads((target / ".claude" / "settings.json").read_text(encoding="utf-8"))
     assert "SessionStart" in settings["hooks"] and "PostToolUse" in settings["hooks"]
-    # estate-sync runs FIRST (hard hook 4 — orientation reads the log, and the
-    # log is only whole after the fetch), then session-start.
-    ss_cmds = [h["command"] for h in settings["hooks"]["SessionStart"][0]["hooks"]]
-    assert "estate-sync" in ss_cmds[0] and "tools/mdllm.py" in ss_cmds[0]
-    assert "session-start" in ss_cmds[1] and "tools/mdllm.py" in ss_cmds[1]
+    # estate-sync still runs FIRST (hard hook 4 — orientation reads the log,
+    # and the log is only whole after the fetch), but the ordering now lives
+    # in the neutral runner: Claude launches matching handlers in parallel,
+    # so a two-handler list never guaranteed it. One handler delegates the
+    # whole ordered binding.
+    handlers = settings["hooks"]["SessionStart"][0]["hooks"]
+    assert len(handlers) == 1
+    assert "harness-event claude-code session-start " in handlers[0]["command"]
+    assert "tools/mdllm.py" in handlers[0]["command"]
+    from markdownllm.harness_ports import LIFECYCLE_INTENTS
+    assert list(LIFECYCLE_INTENTS["session-start"]) == [
+        "estate-sync", "session-start"]
 
 
 def test_refresh_regenerates_domain_kernel(tmp_path):

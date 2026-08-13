@@ -145,6 +145,12 @@ class ManagedFragment:
     readable: bool | None = None     # None when artifact is absent
     valid: bool | None = None        # None when absent or unreadable
     current: bool | None = None      # None when fragment absent/unreadable/invalid
+    # A non-current fragment that exactly matches an adapter-declared
+    # historical form. Recognition data only: it makes `known-legacy`
+    # distinguishable from arbitrary staleness so a later, explicitly
+    # authorised refresh can act on certainty rather than resemblance.
+    # Unknown staleness leaves this None and stays a refusal.
+    legacy_id: str | None = None
     intents_realised: dict[str, tuple[str, ...]] = field(default_factory=dict)
     issues: tuple[str, ...] = ()
 
@@ -160,6 +166,9 @@ class ManagedFragment:
             raise ValueError("an unreadable fragment has no validity/currency")
         if self.valid is False and self.current is not None:
             raise ValueError("an invalid fragment has no currency")
+        if self.legacy_id is not None and self.current is not False:
+            raise ValueError(
+                "a recognised legacy fragment is by definition not current")
 
 
 @dataclass(frozen=True)

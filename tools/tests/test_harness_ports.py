@@ -53,6 +53,10 @@ def test_production_renderer_reproduces_the_golden_bytes(tmp_path):
     out = renderer.render(ctx)
     golden = (FIXTURES / "claude_golden" / "settings.json.golden").read_text(
         encoding="utf-8").replace("{rel_fw}", "../..")
+    for binding in ctx.bindings:
+        token = "{hash_" + binding.moment.replace("-", "_") + "}"
+        golden = golden.replace(
+            token, renderer._definition_hash(ctx, binding))
     assert out[".claude/settings.json"].decode("utf-8") == golden, \
         "the context object does not carry enough to derive the golden bytes"
 
@@ -78,19 +82,35 @@ def _inspect_shape(tmp_path, shape):
     return report
 
 
-def test_inspect_standard_shape(tmp_path):
+def test_inspect_standard_shape_is_recognised_legacy_not_current(tmp_path):
+    """The live estate's scaffolded shape is legacy-v1, and says so.
+
+    Before 5R.2 this fixture was the current form. It is now exactly the
+    recognised historical one: two parallel SessionStart handlers calling
+    the floor CLI directly, which never guaranteed the ordered binding.
+    Reporting it `current` would certify disproved behaviour; reporting it
+    merely stale would lose the certainty a later, explicitly authorised
+    migration needs.
+    """
     r = _inspect_shape(tmp_path, "hooks-only")
     frag = r.fragments[0]
-    assert frag.present and frag.readable and frag.valid and frag.current
-    assert frag.intents_realised == hp.LIFECYCLE_INTENTS
+    assert frag.present and frag.readable and frag.valid
+    assert frag.current is False
+    assert frag.legacy_id == "legacy-v1"
     assert not r.extensions and not r.operator_owned
 
 
 def test_inspect_extended_startup_reports_not_flattens(tmp_path):
+    """Legacy bytes PLUS a local extension is mixed ownership: no legacy id.
+
+    The extension is still reported rather than flattened, but recognition
+    is withheld — inferring a migration over an operator's own edit is the
+    one thing the refusal rule exists to prevent.
+    """
     r = _inspect_shape(tmp_path, "extended-startup")
     frag = r.fragments[0]
-    assert frag.present and frag.current
-    assert frag.intents_realised == hp.LIFECYCLE_INTENTS  # intent still met
+    assert frag.present and frag.current is False
+    assert frag.legacy_id is None, "mixed ownership must not be recognised"
     assert any("--assistant" in e for e in r.extensions)
 
 

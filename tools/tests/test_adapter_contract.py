@@ -79,11 +79,49 @@ def _rel_fw(target: Path) -> str:
 
 
 def test_scaffold_settings_matches_golden(tmp_path):
+    """The current golden freezes the projection's SHAPE.
+
+    The definition hash is derived from the framework-relative path, so it
+    cannot be a literal in a path-generic fixture. Substituting it from the
+    adapter's own `_definition_hash` asserts the invariant that matters: an
+    installed handler carries exactly the hash its renderer would produce,
+    so an outdated handler can never mint current attestation evidence.
+    """
+    from markdownllm.adapters.claude_code import CLAUDE_CODE
+    from markdownllm.harness_ports import HarnessContext
+
     target = _scaffold(tmp_path)
+    rel_fw = _rel_fw(target)
     golden = (FIXTURES / "claude_golden" / "settings.json.golden").read_bytes()
-    golden = golden.replace(b"{rel_fw}", _rel_fw(target).encode("utf-8"))
+    golden = golden.replace(b"{rel_fw}", rel_fw.encode("utf-8"))
+    context = HarnessContext(framework_root_rel=rel_fw)
+    for binding in context.bindings:
+        token = ("{hash_" + binding.moment.replace("-", "_") + "}").encode()
+        digest = CLAUDE_CODE._definition_hash(context, binding)
+        assert token in golden, f"golden lost its {binding.moment} hash slot"
+        golden = golden.replace(token, digest.encode("utf-8"))
     emitted = (target / ".claude" / "settings.json").read_bytes()
-    assert emitted == golden, "Claude adapter bytes changed — Phase 2C regression"
+    assert emitted == golden, "Claude adapter bytes changed unexpectedly"
+
+
+def test_legacy_v1_golden_is_frozen_migration_input():
+    """The pre-5R.2 projection stays byte-immutable as recognition data.
+
+    It is no longer the desired renderer output: Claude runs matching
+    handlers in parallel, so its two SessionStart handlers never guaranteed
+    the ordered binding. Phase 5R.3 recognises exactly these bytes to offer
+    an operator-approved migration, which is only sound while they cannot
+    drift.
+    """
+    legacy = (FIXTURES / "claude_golden" /
+              "settings.json.legacy-v1.golden").read_text(encoding="utf-8")
+    session = legacy.split('"SessionStart"')[1].split('"PostToolUse"')[0]
+    assert session.count('"type": "command"') == 2, \
+        "legacy-v1 is the TWO-handler shape; that is what makes it legacy"
+    assert "{rel_fw}/tools/mdllm.py estate-sync ." in legacy
+    assert "{rel_fw}/tools/mdllm.py session-start ." in legacy
+    assert "harness-event" not in legacy, \
+        "legacy-v1 predates the neutral runner; it calls the CLI directly"
 
 
 def test_scaffold_commands_are_template_copies(tmp_path):
@@ -195,12 +233,30 @@ def _legacy_command_lists_in(settings: dict) -> dict:
     return realised
 
 
-def test_scaffolded_legacy_settings_preserve_the_lifecycle_command_lists(
+def test_scaffolded_settings_delegate_each_moment_to_the_neutral_runner(
         tmp_path):
+    """A fresh scaffold emits ONE handler per moment, entering the runner.
+
+    Claude launches matching handlers in parallel, so a per-step handler
+    list cannot express an ordered binding at all. The ordering now lives
+    where it always belonged — the application service — and the vendor
+    schema carries a single delegating handler with an explicit timeout.
+    """
     target = _scaffold(tmp_path)
     settings = json.loads((target / ".claude" / "settings.json")
                           .read_text(encoding="utf-8"))
-    assert _legacy_command_lists_in(settings) == LIFECYCLE_INTENTS
+    for event, moment in (("SessionStart", "session-start"),
+                          ("PostToolUse", "post-write")):
+        groups = settings["hooks"][event]
+        assert len(groups) == 1
+        handlers = groups[0]["hooks"]
+        assert len(handlers) == 1, f"{event} must not fan out into handlers"
+        command = handlers[0]["command"]
+        assert f"harness-event claude-code {moment} " in command
+        assert handlers[0]["timeout"] == 120, "never inherit a vendor default"
+        # The ordered steps are the runner's business, not the schema's.
+        for operation in LIFECYCLE_INTENTS[moment]:
+            assert f"mdllm.py {operation} " not in command
 
 
 def test_estate_standard_legacy_shape_preserves_lifecycle_command_lists():
