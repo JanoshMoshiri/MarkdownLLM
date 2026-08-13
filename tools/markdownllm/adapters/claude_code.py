@@ -100,6 +100,10 @@ class ClaudeCodeAdapter:
                     {"operation": step.operation, "argv": list(step.argv)}
                     for step in binding.steps
                 ],
+                "step_timeouts": [step.timeout_seconds
+                                  for step in binding.steps],
+                "total_timeout_seconds": binding.total_timeout_seconds,
+                "runner_reserve_seconds": binding.runner_reserve_seconds,
             }
             hashes[binding.moment] = managed_definition_hash({
                 "binding": json.dumps(

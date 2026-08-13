@@ -319,6 +319,8 @@ def cmd_doctor(args) -> int:
                         f"support={fact.support}; "
                         f"configuration={fact.configuration}; "
                         f"currency={fact.currency}; trust={fact.trust}; "
+                        f"launch-currency={fact.launch_currency}; "
+                        f"launch-runtime={fact.launch_runtime.state}; "
                         f"runtime={fact.runtime.state}; "
                         f"execution={fact.execution.state}")
                     for extension in fact.extensions:

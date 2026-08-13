@@ -70,7 +70,8 @@ from markdownllm.scaffold import (
     cmd_scaffold,
 )
 from markdownllm.runtime import (
-    FLOOR_DEPENDENCY, SH_RESOLVE, interpreter_candidates, probe_candidate,
+    FLOOR_DEPENDENCY, SH_RESOLVE, InterpreterCandidate,
+    powershell_candidate_records, interpreter_candidates, probe_candidate,
     probe, git_supports_hook_run, execution_test_hook, cmd_runtime_probe,
 )
 from markdownllm.adapter_install import (
@@ -81,7 +82,8 @@ from markdownllm.adapter_install import (
     cmd_adapter_install,
 )
 from markdownllm.lifecycle_runner import (
-    StepExecution, LifecycleExecution, execute_lifecycle, cmd_harness_event,
+    StepExecution, LifecycleExecution, execute_lifecycle,
+    dispatch_lifecycle_event, cmd_harness_event,
 )
 from markdownllm.boundary import (
     TERMS_FILE, load_terms, scan_text, self_guard, staged_findings,

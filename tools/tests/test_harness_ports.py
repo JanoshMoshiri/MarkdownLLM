@@ -288,11 +288,15 @@ def test_lifecycle_bindings_own_arguments_delivery_and_order():
     assert tuple(step.operation for step in start.steps) == \
         ("estate-sync", "session-start")
     assert all(step.argv == (hp.DOMAIN_ROOT_ARG,) for step in start.steps)
+    assert tuple(step.timeout_seconds for step in start.steps) == (75, 25)
+    assert start.total_timeout_seconds == 105
+    assert start.runner_reserve_seconds == 5
     assert start.delivery == "context"
 
     write = hp.HarnessContext("../..").binding("post-write")
     assert write.steps == (hp.LifecycleStep(
-        "validate", (hp.DOMAIN_ROOT_ARG, "--quiet")),)
+        "validate", (hp.DOMAIN_ROOT_ARG, "--quiet"),
+        timeout_seconds=100),)
     assert write.delivery == "feedback"
     assert start.failure == write.failure == "surface-and-continue"
 

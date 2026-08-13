@@ -126,7 +126,7 @@ def test_os_error_is_surfaced_and_later_steps_still_run(tmp_path, monkeypatch):
 
 def test_total_budget_reserves_outer_hook_time_and_labels_unrun_steps(
         tmp_path, monkeypatch):
-    clock = iter((0.0, 1.0, 106.0))
+    clock = iter((0.0, 0.0, 101.0))
     calls = []
     monkeypatch.setattr(lr.time, "monotonic", lambda: next(clock))
 
@@ -138,14 +138,15 @@ def test_total_budget_reserves_outer_hook_time_and_labels_unrun_steps(
 
     result = lr.execute_lifecycle(
         tmp_path,
-        _binding(LifecycleStep("first"), LifecycleStep("after-budget")),
-        timeout_per_step=115, total_timeout=105,
+        _binding(LifecycleStep("first", timeout_seconds=75),
+                 LifecycleStep("after-budget", timeout_seconds=25)),
+        total_timeout=105,
     )
 
     assert [call[0][2] for call in calls] == ["first"]
-    assert calls[0][1]["timeout"] == 104.0
+    assert calls[0][1]["timeout"] == 75.0
     assert tuple(step.returncode for step in result.steps) == (0, 124)
-    assert "total timeout of 105s exhausted" in result.steps[1].stderr
+    assert "application budget of 100s exhausted" in result.steps[1].stderr
     assert result.text.startswith("[steps: first=0, after-budget=124]\n")
     assert result.passed is False
 
@@ -240,7 +241,6 @@ def test_dispatch_attests_exact_hash_and_formats_through_adapter_port(
     adapter = _OutputAdapter()
     recorded = []
     execution = _execution()
-    monkeypatch.setattr(lr, "get_adapter", lambda name: adapter)
     monkeypatch.setattr(
         lr, "execute_lifecycle",
         lambda root, binding: execution,
@@ -250,7 +250,10 @@ def test_dispatch_attests_exact_hash_and_formats_through_adapter_port(
         lambda *args, **kwargs: recorded.append((args, kwargs)),
     )
 
-    result = lr.cmd_harness_event(_args(path=str(tmp_path)))
+    result = lr.dispatch_lifecycle_event(
+        tmp_path, HarnessContext(".").binding("session-start"),
+        harness="fake-harness",
+        definition_hash="sha256:pinned-definition", output_port=adapter)
 
     assert result == 0
     assert recorded == [( (
@@ -269,7 +272,6 @@ def test_dispatch_attests_exact_hash_and_formats_through_adapter_port(
 def test_failed_lifecycle_is_attested_and_advisory(tmp_path, monkeypatch):
     adapter = _OutputAdapter()
     recorded = []
-    monkeypatch.setattr(lr, "get_adapter", lambda name: adapter)
     monkeypatch.setattr(
         lr, "execute_lifecycle",
         lambda root, binding: _execution(passed=False),
@@ -279,7 +281,10 @@ def test_failed_lifecycle_is_attested_and_advisory(tmp_path, monkeypatch):
         lambda *args, **kwargs: recorded.append((args, kwargs)),
     )
 
-    assert lr.cmd_harness_event(_args(path=str(tmp_path))) == 0
+    assert lr.dispatch_lifecycle_event(
+        tmp_path, HarnessContext(".").binding("session-start"),
+        harness="fake-harness", definition_hash="sha256:pinned-definition",
+        output_port=adapter) == 0
     assert recorded[0][1]["outcome"] == "failed"
     assert adapter.calls[0][2] is False
 
@@ -288,7 +293,6 @@ def test_dispatch_uses_declared_output_port_without_hidden_name_dependency(
         tmp_path, monkeypatch):
     adapter = _FormatOnlyAdapter()
     recorded = []
-    monkeypatch.setattr(lr, "get_adapter", lambda name: adapter)
     monkeypatch.setattr(
         lr, "execute_lifecycle",
         lambda root, binding: _execution(),
@@ -298,7 +302,10 @@ def test_dispatch_uses_declared_output_port_without_hidden_name_dependency(
         lambda *args, **kwargs: recorded.append((args, kwargs)),
     )
 
-    assert lr.cmd_harness_event(_args(path=str(tmp_path))) == 0
+    assert lr.dispatch_lifecycle_event(
+        tmp_path, HarnessContext(".").binding("session-start"),
+        harness="fake-harness", definition_hash="sha256:pinned-definition",
+        output_port=adapter) == 0
     assert recorded[0][0][1] == "fake-harness"
     assert recorded[0][1]["source"] == "fake-harness-project-hook"
 
@@ -309,7 +316,6 @@ def test_attestation_failure_is_bounded_attributable_and_advisory(
     prefix = "[steps: estate-sync=0, session-start=0]\n"
     long_text = prefix + "x" * (2200 - len(prefix))
     assert len(long_text) == 2200
-    monkeypatch.setattr(lr, "get_adapter", lambda name: adapter)
     monkeypatch.setattr(
         lr, "execute_lifecycle",
         lambda root, binding: _execution(text=long_text),
@@ -320,7 +326,10 @@ def test_attestation_failure_is_bounded_attributable_and_advisory(
 
     monkeypatch.setattr(lr, "record_execution_attestation", unavailable)
 
-    assert lr.cmd_harness_event(_args(path=str(tmp_path))) == 0
+    assert lr.dispatch_lifecycle_event(
+        tmp_path, HarnessContext(".").binding("session-start"),
+        harness="fake-harness", definition_hash="sha256:pinned-definition",
+        output_port=adapter) == 0
     # The first pure formatting pass precedes evidence.  Evidence failure then
     # produces one final envelope containing the advisory failure.
     _, text, passed = adapter.calls[-1]
@@ -334,7 +343,6 @@ def test_adapter_translation_bug_is_surfaced_without_enforcement(
         tmp_path, monkeypatch, capsys):
     adapter = _OutputAdapter(raises=True)
     recorded = []
-    monkeypatch.setattr(lr, "get_adapter", lambda name: adapter)
     monkeypatch.setattr(
         lr, "execute_lifecycle",
         lambda root, binding: _execution(),
@@ -343,7 +351,10 @@ def test_adapter_translation_bug_is_surfaced_without_enforcement(
                         lambda *args, **kwargs:
                         recorded.append((args, kwargs)))
 
-    assert lr.cmd_harness_event(_args(path=str(tmp_path))) == 0
+    assert lr.dispatch_lifecycle_event(
+        tmp_path, HarnessContext(".").binding("session-start"),
+        harness="fake-harness", definition_hash="sha256:pinned-definition",
+        output_port=adapter) == 0
     output = capsys.readouterr().out
     assert "lifecycle output translation failed" in output
     assert "RuntimeError: cannot encode output" in output
@@ -351,11 +362,11 @@ def test_adapter_translation_bug_is_surfaced_without_enforcement(
     assert "output-format=RuntimeError" in recorded[0][1]["detail"]
 
 
-def test_dispatch_rejects_adapter_without_lifecycle_output_port(
-        monkeypatch, capsys):
-    monkeypatch.setattr(lr, "get_adapter", lambda name: object())
-
-    assert lr.cmd_harness_event(_args()) == 2
+def test_dispatch_rejects_adapter_without_lifecycle_output_port(capsys):
+    assert lr.dispatch_lifecycle_event(
+        Path("."), HarnessContext(".").binding("session-start"),
+        harness="fake-harness", definition_hash="sha256:pinned-definition",
+        output_port=object()) == 2
     assert "has no lifecycle output port" in capsys.readouterr().out
 
 

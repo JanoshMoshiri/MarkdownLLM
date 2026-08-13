@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T04:59:40
-generated_from: HEAD@e2bee78
-coverage: 173
+generated: 2026-08-13T05:42:49
+generated_from: HEAD@27b0723
+coverage: 174
 framework_version: 3.31.0
 ---
 
@@ -478,6 +478,9 @@ framework_version: 3.31.0
 - portability-claims-need-execution-tests --supports--> agents-md-discovery-is-harness-dependent
 - portability-claims-need-execution-tests --informs--> orchestration-specification
 - portability-claims-need-execution-tests --supports--> tracking-artifacts-can-drift-from-reality
+- posix-floor-record-2026-08-13 --documents--> vendor-harness-adapter-foundation
+- posix-floor-record-2026-08-13 --references--> claude-platform-surface-narrowed
+- posix-floor-record-2026-08-13 --implements--> portability-claims-need-execution-tests
 - premature-publish-manufactures-discipline-eroding-urgency --references--> change-reconciliation-specification
 - premature-publish-manufactures-discipline-eroding-urgency --complements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - premature-publish-manufactures-discipline-eroding-urgency --supports--> the-rough-true-account-is-generative-infrastructure

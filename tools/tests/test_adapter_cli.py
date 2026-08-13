@@ -79,6 +79,8 @@ def test_doctor_codex_reports_independent_facts_without_promoting_runtime(
         assert "configuration=absent" in line
         assert "currency=not-applicable" in line
         assert "trust=unknown" in line
+        assert "launch-currency=not-applicable" in line
+        assert "launch-runtime=command-runs" in line
         assert "runtime=command-runs" in line
         assert "execution=untested" in line
     assert "execution=passed" not in output

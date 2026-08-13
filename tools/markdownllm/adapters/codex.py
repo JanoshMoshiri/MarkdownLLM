@@ -33,6 +33,7 @@ except ImportError:  # pragma: no cover - exercised only on Python 3.10
 
 from ..harness_ports import (
     AdapterCapabilities,
+    HANDLER_TIMEOUT_SECONDS,
     HarnessContext,
     InspectionReport,
     LifecycleBinding,
@@ -52,7 +53,6 @@ HOOKS_PATH = ".codex/hooks.json"
 CONFIG_PATH = ".codex/config.toml"
 _SESSION_MATCHER = "startup|resume|clear|compact"
 _WRITE_MATCHER = "Edit|Write"
-_TIMEOUT_SECONDS = 120
 _CONTEXT_LIMIT = 2500
 _DESCRIPTION = "MarkdownLLM project lifecycle hardening"
 _NON_SEMANTIC_HANDLER_EXTENSIONS = {"statusMessage"}
@@ -254,7 +254,7 @@ class CodexAdapter:
                 context, moment, definition_hash),
             "commandWindows": self._event_windows(
                 context, moment, definition_hash),
-            "timeout": _TIMEOUT_SECONDS,
+            "timeout": HANDLER_TIMEOUT_SECONDS,
             "additionalContextLimit": _CONTEXT_LIMIT,
         }
 
@@ -280,9 +280,12 @@ class CodexAdapter:
                 "steps": [{
                     "operation": step.operation,
                     "argv": list(step.argv),
+                    "timeout_seconds": step.timeout_seconds,
                 } for step in binding.steps],
                 "delivery": binding.delivery,
                 "failure": binding.failure,
+                "total_timeout_seconds": binding.total_timeout_seconds,
+                "runner_reserve_seconds": binding.runner_reserve_seconds,
             }, sort_keys=True, separators=(",", ":")),
             "description": _DESCRIPTION,
             "event": event,

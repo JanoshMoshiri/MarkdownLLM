@@ -28,9 +28,11 @@ from __future__ import annotations
 
 import os
 import subprocess
+import time
 from pathlib import Path
 
 DEFAULT_TIMEOUT = 20  # seconds per network call; a hook that can hang a session start is worse than none
+ESTATE_GLOBAL_TIMEOUT = 75
 
 
 def _git(repo: Path, *args: str, timeout: int = DEFAULT_TIMEOUT):
@@ -96,13 +98,14 @@ def _first_stderr_line(stderr: str) -> str:
     return "no stderr"
 
 
-def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) -> dict:
+def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
+              deadline: float | None = None) -> dict:
     """One repo's sync outcome: {'repo', 'state', 'detail', 'moved'}.
 
     States: synced / up-to-date / ahead / diverged / dirty / local-only /
     no-upstream / detached / unborn / in-operation / offline / auth-failed /
-    fetch-failed / pull-failed. Only 'synced' moves the tree; everything else
-    reports.
+    fetch-failed / pull-failed / budget-exhausted. Only 'synced' moves the
+    tree; everything else reports.
     """
     out = {"repo": repo, "state": "up-to-date", "detail": "", "moved": False}
 
@@ -127,11 +130,26 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) ->
         return out
 
     if fetch:
-        f = _git(repo, "fetch", "--quiet", timeout=timeout)
-        if f is None:
-            out["state"] = "offline"
-            out["detail"] = "fetch timed out — orienting from last-fetched state"
-        elif f.returncode != 0:
+        remaining = ((deadline - time.monotonic())
+                     if deadline is not None else float(timeout))
+        if remaining <= 0:
+            f = None
+            out["state"] = "budget-exhausted"
+            out["detail"] = ("global estate deadline exhausted before fetch "
+                             "— orienting from last-fetched state")
+        else:
+            f = _git(repo, "fetch", "--quiet",
+                     timeout=min(float(timeout), remaining))
+        if f is None and out["state"] != "budget-exhausted":
+            if deadline is not None and time.monotonic() >= deadline:
+                out["state"] = "budget-exhausted"
+                out["detail"] = ("global estate deadline exhausted during "
+                                 "fetch — orienting from last-fetched state")
+            else:
+                out["state"] = "offline"
+                out["detail"] = ("fetch timed out — orienting from "
+                                 "last-fetched state")
+        elif f is not None and f.returncode != 0:
             out["state"] = _classify_fetch_failure(f.stderr)
             out["detail"] = "orienting from last-fetched state"
             if out["state"] == "fetch-failed":
@@ -140,12 +158,14 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) ->
 
     counts = _counts(repo)
     if counts is None:
-        if out["state"] in ("offline", "auth-failed", "fetch-failed"):
+        if out["state"] in (
+                "offline", "auth-failed", "fetch-failed", "budget-exhausted"):
             return out
         out["state"] = "no-upstream"
         return out
     ahead, behind = counts
-    cached = " (cached)" if out["state"] in ("offline", "auth-failed", "fetch-failed") else ""
+    cached = " (cached)" if out["state"] in (
+        "offline", "auth-failed", "fetch-failed", "budget-exhausted") else ""
     degraded = out["state"] if cached else None
 
     dirty = _git(repo, "status", "--porcelain")
@@ -159,14 +179,26 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT) ->
             out["state"] = "dirty"
             out["detail"] = f"+{behind} remote{cached} — pull skipped, working tree not clean"
         elif degraded:
-            out["detail"] = f"+{behind} remote (cached) — pull skipped, fetch failed"
+            reason = ("global estate deadline exhausted"
+                      if degraded == "budget-exhausted" else "fetch failed")
+            out["detail"] = (f"+{behind} remote (cached) — pull skipped, "
+                             f"{reason}")
         else:
-            p = _git(repo, "pull", "--ff-only", "--quiet", timeout=timeout)
+            remaining = ((deadline - time.monotonic())
+                         if deadline is not None else float(timeout))
+            if remaining <= 0:
+                p = None
+                out["state"] = "budget-exhausted"
+                out["detail"] = (f"+{behind} remote (cached) — pull skipped, "
+                                 "global estate deadline exhausted")
+            else:
+                p = _git(repo, "pull", "--ff-only", "--quiet",
+                         timeout=min(float(timeout), remaining))
             if p is not None and p.returncode == 0:
                 out["state"] = "synced"
                 out["detail"] = f"+{behind}"
                 out["moved"] = True
-            else:
+            elif out["state"] != "budget-exhausted":
                 out["state"] = "pull-failed"
                 err = (p.stderr.strip().splitlines() or ["?"])[-1] if p else "timeout"
                 out["detail"] = err
@@ -278,6 +310,7 @@ _LABEL = {
     "in-operation": "in-operation", "offline": "offline",
     "auth-failed": "auth-failed", "pull-failed": "pull-failed",
     "fetch-failed": "fetch-failed",
+    "budget-exhausted": "budget-exhausted",
 }
 
 
@@ -294,7 +327,9 @@ def cmd_estate_sync(args) -> int:
     fetch = not args.status
     title = "Publication Debt" if args.status else "Estate Sync"
     print(f"## {title} — {root.name} ({len(repos)} repo(s))\n")
-    results = [sync_repo(r, fetch=fetch, timeout=args.timeout) for r in repos]
+    deadline = (time.monotonic() + ESTATE_GLOBAL_TIMEOUT) if fetch else None
+    results = [sync_repo(r, fetch=fetch, timeout=args.timeout,
+                         deadline=deadline) for r in repos]
     debt = 0
     for res in results:
         name = res["repo"].name

@@ -39,6 +39,10 @@ from types import MappingProxyType
 from typing import Literal, Mapping, Protocol, runtime_checkable
 
 DOMAIN_ROOT_ARG = "{domain_root}"
+HANDLER_TIMEOUT_SECONDS = 120
+LAUNCH_RESOLUTION_SECONDS = 10
+LIFECYCLE_APPLICATION_SECONDS = 105
+LIFECYCLE_RUNNER_RESERVE_SECONDS = 5
 
 
 @dataclass(frozen=True)
@@ -52,6 +56,7 @@ class LifecycleStep:
 
     operation: str
     argv: tuple[str, ...] = (DOMAIN_ROOT_ARG,)
+    timeout_seconds: int = 50
 
 
 @dataclass(frozen=True)
@@ -68,6 +73,8 @@ class LifecycleBinding:
     steps: tuple[LifecycleStep, ...]
     delivery: Literal["context", "feedback"]
     failure: Literal["surface-and-continue"] = "surface-and-continue"
+    total_timeout_seconds: int = LIFECYCLE_APPLICATION_SECONDS
+    runner_reserve_seconds: int = LIFECYCLE_RUNNER_RESERVE_SECONDS
 
 
 # The application contract: complete ordered invocations per lifecycle moment.
@@ -78,12 +85,14 @@ class LifecycleBinding:
 LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
     LifecycleBinding(
         moment="session-start",
-        steps=(LifecycleStep("estate-sync"), LifecycleStep("session-start")),
+        steps=(LifecycleStep("estate-sync", timeout_seconds=75),
+               LifecycleStep("session-start", timeout_seconds=25)),
         delivery="context",
     ),
     LifecycleBinding(
         moment="post-write",
-        steps=(LifecycleStep("validate", (DOMAIN_ROOT_ARG, "--quiet")),),
+        steps=(LifecycleStep(
+            "validate", (DOMAIN_ROOT_ARG, "--quiet"), timeout_seconds=100),),
         delivery="feedback",
     ),
 )

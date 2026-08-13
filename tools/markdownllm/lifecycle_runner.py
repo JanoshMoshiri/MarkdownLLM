@@ -18,7 +18,6 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from .adapters import get as get_adapter
 from .harness_diagnostics import record_execution_attestation
 from .harness_ports import (
     DOMAIN_ROOT_ARG,
@@ -71,23 +70,30 @@ def execute_lifecycle(
         root: Path, binding: LifecycleBinding, *,
         mdllm_entry: Path = MDLLM_ENTRY,
         interpreter: str | None = None,
-        timeout_per_step: int = 115,
-        total_timeout: int = 105,
+        timeout_per_step: int | None = None,
+        total_timeout: int | None = None,
         output_limit: int = 2200) -> LifecycleExecution:
     """Run every step in declared order and retain bounded, labelled output."""
 
     if output_limit < 0:
         raise ValueError("output limit must be non-negative")
-    if timeout_per_step <= 0:
+    if timeout_per_step is not None and timeout_per_step <= 0:
         raise ValueError("step timeout must be positive")
-    if total_timeout <= 0:
+    total = (binding.total_timeout_seconds if total_timeout is None
+             else total_timeout)
+    if total <= 0:
         raise ValueError("total timeout must be positive")
+    if binding.runner_reserve_seconds < 0:
+        raise ValueError("runner reserve must be non-negative")
+    application_budget = total - binding.runner_reserve_seconds
+    if application_budget <= 0:
+        raise ValueError("runner reserve must leave application time")
     root = Path(root).resolve()
     python = interpreter or sys.executable
     results: list[StepExecution] = []
     chunks: list[str] = []
-    deadline = time.monotonic() + total_timeout
-    for step in binding.steps:
+    deadline = time.monotonic() + application_budget
+    for index, step in enumerate(binding.steps):
         argv = tuple(str(root) if item == DOMAIN_ROOT_ARG else item
                      for item in step.argv)
         command = [python, str(mdllm_entry), step.operation, *argv]
@@ -95,12 +101,26 @@ def execute_lifecycle(
         if remaining <= 0:
             result = StepExecution(
                 operation=step.operation, argv=argv, returncode=124,
-                stderr=f"lifecycle total timeout of {total_timeout}s exhausted")
+                stderr=f"lifecycle application budget of "
+                       f"{application_budget}s exhausted")
             results.append(result)
             chunks.append(f"[{step.operation}: exit {result.returncode}]\n"
                           f"{result.stderr}")
             continue
-        step_timeout = min(float(timeout_per_step), remaining)
+        later_required = sum(
+            float(timeout_per_step or later.timeout_seconds)
+            for later in binding.steps[index + 1:])
+        available = remaining - later_required
+        if available <= 0:
+            result = StepExecution(
+                operation=step.operation, argv=argv, returncode=124,
+                stderr="lifecycle budget reserved for later required steps")
+            results.append(result)
+            chunks.append(f"[{step.operation}: exit {result.returncode}]\n"
+                          f"{result.stderr}")
+            continue
+        step_timeout = min(
+            float(timeout_per_step or step.timeout_seconds), available)
         try:
             run = subprocess.run(
                 command, cwd=root, capture_output=True, text=True,
@@ -134,18 +154,14 @@ def execute_lifecycle(
         passed=all(step.returncode == 0 for step in results))
 
 
-def cmd_harness_event(args) -> int:
-    """Internal project-hook entry point; always advisory after dispatch."""
-
-    root = Path(args.path).resolve()
-    adapter = get_adapter(args.harness)
+def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
+                             harness: str, definition_hash: str,
+                             output_port: LifecycleOutputPort) -> int:
+    """Application service: execute, format, and attest one selected event."""
+    root = Path(root).resolve()
+    adapter = output_port
     if not isinstance(adapter, LifecycleOutputPort):
-        print(f"mdllm: harness {args.harness!r} has no lifecycle output port")
-        return 2
-    try:
-        binding = HarnessContext(".").binding(args.moment)
-    except KeyError:
-        print(f"mdllm: unknown lifecycle moment {args.moment!r}")
+        print(f"mdllm: harness {harness!r} has no lifecycle output port")
         return 2
 
     execution = execute_lifecycle(root, binding)
@@ -167,10 +183,10 @@ def cmd_harness_event(args) -> int:
         detail += f", output-format={type(exc).__name__}"
     try:
         record_execution_attestation(
-            root, args.harness, binding.moment, args.definition_hash,
+            root, harness, binding.moment, definition_hash,
             outcome=("passed" if execution.passed and format_error is None
                      else "failed"),
-            source=f"{args.harness}-project-hook", detail=detail)
+            source=f"{harness}-project-hook", detail=detail)
     except (OSError, ValueError) as exc:
         # Evidence failure is itself surfaced, but never turns an advisory
         # harness hook into a second enforcement boundary.
@@ -192,3 +208,21 @@ def cmd_harness_event(args) -> int:
     if rendered:
         print(rendered)
     return 0
+
+
+def cmd_harness_event(args) -> int:
+    """CLI composition root for the advisory lifecycle application service."""
+    from .adapters import get as get_adapter
+
+    adapter = get_adapter(args.harness)
+    if not isinstance(adapter, LifecycleOutputPort):
+        print(f"mdllm: harness {args.harness!r} has no lifecycle output port")
+        return 2
+    try:
+        binding = HarnessContext(".").binding(args.moment)
+    except KeyError:
+        print(f"mdllm: unknown lifecycle moment {args.moment!r}")
+        return 2
+    return dispatch_lifecycle_event(
+        Path(args.path), binding, harness=args.harness,
+        definition_hash=args.definition_hash, output_port=adapter)

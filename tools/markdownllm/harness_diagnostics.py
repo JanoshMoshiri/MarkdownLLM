@@ -129,6 +129,8 @@ class CapabilityDiagnostic:
     currency: CurrencyState
     trust: TrustState
     trust_detail: str
+    launch_currency: CurrencyState
+    launch_runtime: RuntimeFact
     runtime: RuntimeFact
     execution: ExecutionFact
     extensions: tuple[str, ...] = ()
@@ -431,9 +433,18 @@ def diagnose_harness(
         if supported:
             trust = probe.trust
             rt = shared_runtime
+            launch_currency: CurrencyState = (
+                "current" if configuration == "present" and
+                currency == "current" else
+                "stale" if configuration == "present" and
+                currency == "stale" else
+                "not-applicable" if configuration == "absent" else "unknown")
+            launch_runtime = rt
         else:
             trust = "not-applicable"
             rt = RuntimeFact("not-applicable")
+            launch_currency = "not-applicable"
+            launch_runtime = RuntimeFact("not-applicable")
 
         expected_hash = probe.definition_hashes.get(capability)
         if not supported:
@@ -464,6 +475,8 @@ def diagnose_harness(
             currency=currency,
             trust=trust,
             trust_detail=(probe.trust_detail if supported else ""),
+            launch_currency=launch_currency,
+            launch_runtime=launch_runtime,
             runtime=rt,
             execution=execution,
             extensions=extensions,

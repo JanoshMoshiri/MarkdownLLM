@@ -2504,6 +2504,46 @@ def test_estate_sync_in_progress_merge_is_skipped(tmp_path):
     assert res["state"] == "in-operation" and not res["moved"]
 
 
+def test_estate_sync_global_deadline_skips_remote_and_reads_cached_state(
+        tmp_path, monkeypatch):
+    from markdownllm import sync as sync_mod
+    src, clone = _seed_pair(tmp_path)
+    calls = []
+    original = sync_mod._git
+
+    def observed(repo, *args, **kwargs):
+        calls.append(args)
+        return original(repo, *args, **kwargs)
+
+    monkeypatch.setattr(sync_mod, "_git", observed)
+    res = sync_mod.sync_repo(
+        clone, deadline=sync_mod.time.monotonic() - 1)
+
+    assert res["state"] == "budget-exhausted"
+    assert "last-fetched state" in res["detail"]
+    assert not any(args and args[0] in ("fetch", "pull") for args in calls)
+
+
+def test_estate_sync_clamps_fetch_to_remaining_global_budget(
+        tmp_path, monkeypatch):
+    from markdownllm import sync as sync_mod
+    _, clone = _seed_pair(tmp_path)
+    observed = []
+    original = sync_mod._git
+
+    def timed(repo, *args, **kwargs):
+        if args and args[0] == "fetch":
+            observed.append(kwargs["timeout"])
+        return original(repo, *args, **kwargs)
+
+    monkeypatch.setattr(sync_mod, "_git", timed)
+    sync_mod.sync_repo(
+        clone, timeout=20, deadline=sync_mod.time.monotonic() + 2)
+
+    assert len(observed) == 1
+    assert 0 < observed[0] <= 2
+
+
 # ---------------------------------------------------------------------------
 # membrane attention cluster: face coverage, the ingested species,
 # estate-check clone-walk discovery, and type: import triggers
