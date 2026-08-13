@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T09:45:43
-generated_from: HEAD@a1bccee
-coverage: 180
+generated: 2026-08-13T10:06:37
+generated_from: HEAD@6b91a65
+coverage: 181
 framework_version: 3.31.0
 ---
 
@@ -348,6 +348,8 @@ framework_version: 3.31.0
 - framework-retrospective-2026-08a --references--> inflection-candidates-are-computable
 - framework-retrospective-2026-08a --references--> a-generated-surface-collapses-its-walk
 - framework-retrospective-2026-08a --supports--> a-true-primitive-is-discovered-not-authored
+- framework-root-tracks-both-adapters --informs--> vendor-harness-adapter-foundation
+- framework-root-tracks-both-adapters --references--> code-architect-governs-substrate-code
 - framework-upward-signal --implements--> shared-domain-failures-are-a-framework-signal-without-a-path
 - framework-upward-signal --references--> divergence-is-an-unrouted-decision
 - framework-v3-transformation-plan --references--> validate-thing-specification
