@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T10:06:37
-generated_from: HEAD@6b91a65
-coverage: 181
+generated: 2026-08-13T10:44:32
+generated_from: HEAD@01a892a
+coverage: 182
 framework_version: 3.31.0
 ---
 
@@ -519,6 +519,15 @@ framework_version: 3.31.0
 - provenance-specification --complements--> mcp-domain-server-design
 - provenance-specification --implements--> divergence-is-an-unrouted-decision
 - provenance-specification --implements--> llm-driven-systems-manifesto
+- public-docs-face-build --implements--> public-docs-face-is-derived-not-restated
+- public-docs-face-build --implements--> every-reader-class-needs-its-own-kernel
+- public-docs-face-build --implements--> derived-transport-is-not-derived-content
+- public-docs-face-build --references--> a-generated-surface-collapses-its-walk
+- public-docs-face-build --references--> vendor-harness-adapter-foundation
+- public-docs-face-build --references--> coherence-mechanism-build
+- public-docs-face-build --references--> mechanical-coherence-checks-backlog
+- public-docs-face-build --references--> evidence-and-eval-backlog
+- public-docs-face-build --references--> scaffold-declares-visibility
 - public-docs-face-is-derived-not-restated --informs--> scaffold-declares-visibility
 - public-docs-face-is-derived-not-restated --informs--> a-generated-surface-collapses-its-walk
 - public-docs-face-is-derived-not-restated --informs--> premature-publish-manufactures-discipline-eroding-urgency

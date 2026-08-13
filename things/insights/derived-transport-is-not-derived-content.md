@@ -8,8 +8,6 @@ session: 2026-08-13
 source: both
 confidence: high
 origin: synthesised
-disposition: keep-active
-disposition_reason: "Parked deliberately. The follow-on generation work (--help into the toolbox table, frontmatter into the spec graph, evidence records into a verified-versus-designed-for page) is not a plan thing yet, and the docs surface is held by a concurrent session. Attach both insights to that plan when it is written."
 tags: [derivation, publication, drift, membrane, documentation, restatement]
 linked_things:
   - id: public-docs-face-is-derived-not-restated
