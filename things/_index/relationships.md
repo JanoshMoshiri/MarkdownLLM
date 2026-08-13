@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T15:16:19
-generated_from: HEAD@04ebce4
-coverage: 189
+generated: 2026-08-13T16:00:55
+generated_from: HEAD@d59f7af
+coverage: 190
 framework_version: 3.31.0
 ---
 
@@ -125,6 +125,9 @@ framework_version: 3.31.0
 - claude-gate-5r4-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-gate-5r4-acceptance-2026-08-13 --implements--> framework-root-tracks-both-adapters
 - claude-gate-5r4-acceptance-2026-08-13 --derived-from--> claude-gate-5r3-acceptance-2026-08-13
+- claude-gate-5r5-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
+- claude-gate-5r5-acceptance-2026-08-13 --derived-from--> claude-gate-5r4-acceptance-2026-08-13
+- claude-gate-5r5-acceptance-2026-08-13 --supports--> the-harness-bound-path-is-the-least-tested-path
 - claude-phase5r0-matrix-completion-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-phase5r0-matrix-completion-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
 - claude-phase5r0-matrix-completion-2026-08-13 --implements--> portability-claims-need-execution-tests

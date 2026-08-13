@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-13
-generated: 2026-08-13T14:01:37
-generated_from: HEAD@f7acffd
+generated: 2026-08-13T16:00:59
+generated_from: HEAD@d59f7af
 coverage: 23
 framework_version: 3.31.0
 ---
@@ -19,6 +19,7 @@ framework_version: 3.31.0
 - claude-gate-5r4-acceptance-2026-08-13 (derived-from)
 
 ## claude-gate-5r4-acceptance-2026-08-13
+- claude-gate-5r5-acceptance-2026-08-13 (derived-from)
 - the-harness-bound-path-is-the-least-tested-path (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
