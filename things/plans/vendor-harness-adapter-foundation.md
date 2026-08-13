@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.11
+version: 1.12
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -1077,9 +1077,25 @@ launch facts. `59d023b` excludes Windows interop candidates from native POSIX.
 the same ceiling through the verified Git-Bash/POSIX timeout surface. Windows
 Git-hook execution is covered. Codex's complete Windows suite is 442/442;
 validation is 174+6+14 clean and coherence has only the pre-existing
-`claude-adapter-baseline` stable-label Info. Claude's unchanged native-PS5 green
-rerun and final-handoff regression/POSIX acceptance remain open, so Gate 5R.1
-has not yet passed.
+`claude-adapter-baseline` stable-label Info.
+
+**Gate 5R.1 — accepted 2026-08-13** (`claude-gate-5r1-acceptance-2026-08-13`,
+at handoff commit `72744f4`): the two independently accepted red fixtures run
+green unchanged; the complete suite passes on Windows (442) and on native
+Linux (439 + 3 honest Windows-host skips); the installed Git hook exits 0
+through Windows Git's real `sh.exe` rather than a PowerShell emulation of it;
+and vendor schema vocabulary appears only inside the two adapters, with
+`dispatch_lifecycle_event` receiving its output port by injection and adapter
+resolution confined to the CLI composition root. The WSL-interop defect
+reported in `posix-floor-record-2026-08-13` is closed — Windows-only tests now
+skip on host identity rather than executable presence, so a Linux run can no
+longer launch Windows PowerShell across the boundary and report it as POSIX
+evidence. No neutral port was altered and no missing abstraction was found, so
+nothing returns to Codex. Claude-owned Phase 5R.2 may begin. Carried forward
+unchanged: live Claude runs require a re-authenticated Claude Code CLI, and a
+POSIX live-dispatch record additionally requires natively installed Node and
+Claude Code inside the Linux host, so the narrowed surface in
+`claude-platform-surface-narrowed` still stands.
 
 #### Phase 5R.2 — Version the Claude projection (Claude owner; Codex acceptance)
 
