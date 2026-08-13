@@ -42,7 +42,7 @@ from ..harness_diagnostics import (
     AdapterProbe,
     managed_definition_hash,
 )
-from ..runtime import SH_RESOLVE
+from ..runtime import SH_RESOLVE, powershell_candidate_records
 from ..adapter_install import (
     NestedJsonArrayGroupsPolicy,
     load_unique_json,
@@ -156,7 +156,7 @@ class CodexAdapter:
             'if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then\n'
             f"  printf '%s\\n' {_shell_single_quote(unavailable)}\n"
             "else\n"
-            f'  "$PY" "$MDLLM" harness-event codex {moment} "$ROOT" '
+            f'  mdllm_python "$MDLLM" harness-event codex {moment} "$ROOT" '
             f'{_shell_single_quote(definition_hash)}\n'
             "fi\n"
             "exit 0"
@@ -191,26 +191,25 @@ class CodexAdapter:
             f"$entry = Join-Path $root {entry_rel}; "
             f"$runner = Join-Path $root {runner_rel}; "
             "$fw = Split-Path -Parent (Split-Path -Parent $entry); "
-            "$candidates = @("
-            "(Join-Path $root '.venv\\bin\\python'), "
-            "(Join-Path $root '.venv\\Scripts\\python.exe'), "
-            "(Join-Path $fw '.venv\\bin\\python'), "
-            "(Join-Path $fw '.venv\\Scripts\\python.exe'), "
-            "'python3', 'python', 'py'); "
-            "$python = $null; "
+            f"$candidates = {powershell_candidate_records()}; "
+            "$python = $null; $pythonPrefix = @(); "
             "foreach ($candidate in $candidates) { "
             "$resolved = $null; "
-            "if (Test-Path -LiteralPath $candidate) { "
-            "$resolved = $candidate "
+            "if (Test-Path -LiteralPath $candidate.Executable) { "
+            "$resolved = $candidate.Executable "
             "} else { "
-            "$found = Get-Command $candidate -ErrorAction SilentlyContinue; "
+            "$found = Get-Command $candidate.Executable "
+            "-ErrorAction SilentlyContinue; "
             "if ($found) { $resolved = $found.Source } }; "
             "if (-not $resolved) { continue }; "
-            "& $resolved -c 'import yaml' *> $null; "
-            "if ($LASTEXITCODE -eq 0) { $python = $resolved; break } }; "
+            "try { & $resolved @($candidate.PrefixArguments) "
+            "-c 'import yaml' *> $null } "
+            "catch { continue }; "
+            "if ($LASTEXITCODE -eq 0) { $python = $resolved; "
+            "$pythonPrefix = @($candidate.PrefixArguments); break } }; "
             "$executable = $null; $launchPrefix = @(); "
             "if ($python -and (Test-Path -LiteralPath $entry)) { "
-            "$executable = $python; $launchPrefix = @($entry) "
+            "$executable = $python; $launchPrefix = @($pythonPrefix) + @($entry) "
             "} elseif (Test-Path -LiteralPath $runner) { "
             # The repository runner calls exit.  Keep it in a child host so
             # its status can never bypass this hook's surface-and-continue

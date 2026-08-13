@@ -73,7 +73,8 @@ def test_probe_reports_command_executed_as_its_own_fact(tmp_path, monkeypatch):
     # harness running these tests is guaranteed to have — the test must not
     # borrow a PyYAML-capable PATH interpreter from the authoring harness.
     monkeypatch.setattr(runtime, "interpreter_candidates",
-                        lambda root, fw: [sys.executable])
+                        lambda root, fw: [
+                            runtime.InterpreterCandidate(sys.executable)])
     result = runtime.probe(tmp_path, Path(mdllm.__file__), dependency="yaml")
     assert result["resolved"] == sys.executable
     assert result["command_executed"] is True
@@ -91,9 +92,11 @@ def test_candidate_order_matches_the_sh_fragment(tmp_path):
     fw = Path(mdllm.__file__).resolve().parent
     cands = runtime.interpreter_candidates(tmp_path, fw)
     tails = [".venv/bin/python", ".venv/Scripts/python.exe"]
-    assert [Path(c).as_posix().rsplit("/.venv/")[-1] for c in cands[:4]] == \
+    assert [Path(c.executable).as_posix().rsplit("/.venv/")[-1]
+            for c in cands[:4]] == \
         ["bin/python", "Scripts/python.exe"] * 2
-    assert cands[4:] == ["python3", "python", "py"]
+    assert [(c.executable, c.prefix_args) for c in cands[4:]] == [
+        ("python3", ()), ("python", ()), ("py", ("-3",))]
     frag = runtime.SH_RESOLVE
     order = [frag.index(f'"$ROOT/{t}"') for t in tails]
     order += [frag.index(f'"$FW/{t}"') for t in tails]
@@ -124,12 +127,12 @@ def test_powershell_entry_probes_the_dependency():
     # before executing the entry. A fourth unprobed branch fails the count.
     ps1 = (Path(mdllm.__file__).resolve().parent / "mdllm.ps1").read_text(
         encoding="utf-8")
-    assert ps1.count("-c 'import yaml'") == 3
+    assert ps1.count("-c 'import yaml'") == 1
     assert "'import sys'" not in ps1
-    probes = [ln for ln in ps1.splitlines() if "-c 'import yaml'" in ln]
-    assert any("$venvPython" in ln for ln in probes)      # venv branch
-    assert any("$command.Source" in ln for ln in probes)  # PATH loop
-    assert any("-3" in ln for ln in probes)               # py launcher
+    assert "function Test-FloorPython" in ps1
+    assert "-Executable $venvPython" in ps1
+    assert "-Executable $command.Source" in ps1
+    assert "-Executable $launcher.Source -PrefixArguments @('-3')" in ps1
 
 
 def test_powershell_51_continues_after_stderr_writing_path_candidate(

@@ -46,12 +46,12 @@ if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
 fi
 # Disclosure boundary first: cheapest check, clearest message. Reads the LOCAL
 # gitignored .boundary-terms; absent (every fresh clone, all CI) => silent no-op.
-"$PY" "$MDLLM" boundary "$ROOT" --quiet || {{
+mdllm_python "$MDLLM" boundary "$ROOT" --quiet || {{
   echo ""
   echo "mdllm: staged content crosses the disclosure boundary — commit blocked."
   exit 1
 }}
-"$PY" "$MDLLM" validate "$ROOT" --quiet || {{
+mdllm_python "$MDLLM" validate "$ROOT" --quiet || {{
   echo ""
   echo "mdllm: validation Errors — commit blocked. Fix or run with --no-verify (discouraged)."
   exit 1
@@ -59,7 +59,7 @@ fi
 # Coherence: generated-artifact freshness (kernel/index drift) + spec-catalog
 # integrity. Self-scoping — at a domain root (no .markdownllm) only the general
 # checks run, so the same hook is correct in the framework and in every domain.
-"$PY" "$MDLLM" coherence "$ROOT" --quiet || {{
+mdllm_python "$MDLLM" coherence "$ROOT" --quiet || {{
   echo ""
   echo "mdllm: coherence Errors — a generated artifact (kernel/index) or the spec catalog is stale. Regenerate and re-commit, or --no-verify (discouraged)."
   exit 1
@@ -67,7 +67,7 @@ fi
 # Change-reconciliation advisories (estate-cadence-cluster Phase 1+4): the cue
 # question (modified thing that is reasoned-from) and the serve-side notice
 # (modified thing that is exposed). Advisory only — never blocks the commit.
-"$PY" "$MDLLM" candidates "$ROOT" || true
+mdllm_python "$MDLLM" candidates "$ROOT" || true
 """
 
 # The publication leg (estate-cadence-cluster Phase 1): after a commit lands
@@ -86,7 +86,7 @@ MDLLM="$ROOT/{rel}"
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
   exit 0  # no floor available: publication stays manual; estate-sync --status reports the debt
 fi
-"$PY" "$MDLLM" autopush "$ROOT" || true
+mdllm_python "$MDLLM" autopush "$ROOT" || true
 exit 0
 """
 
@@ -102,7 +102,7 @@ MDLLM="$ROOT/{rel}"
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
   exit 0  # no floor available: the pre-commit hook already reported/blocked
 fi
-"$PY" "$MDLLM" boundary "$ROOT" --message "$1" --quiet || {{
+mdllm_python "$MDLLM" boundary "$ROOT" --message "$1" --quiet || {{
   echo ""
   echo "mdllm: the commit MESSAGE crosses the disclosure boundary — commit blocked."
   exit 1

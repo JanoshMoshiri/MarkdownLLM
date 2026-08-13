@@ -29,6 +29,7 @@ harness config; presentation vocabulary belongs to Phase 3.
 from __future__ import annotations
 
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 
 # The dependency that makes an interpreter *usable* by the floor, not merely
@@ -44,37 +45,111 @@ FLOOR_DEPENDENCY = "yaml"
 # Git-hook shells (Codex, Phase 2B finding) run without the external utility
 # set on PATH, and $MDLLM always ends tools/mdllm.py, so stripping the last
 # two path components is exact and needs no subprocess at all.
-SH_RESOLVE = """FW="${MDLLM%/*/*}"
-PY=""
-for c in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" \\
-         "$FW/.venv/bin/python" "$FW/.venv/Scripts/python.exe" \\
-         python3 python py; do
-  if "$c" -c "import yaml" >/dev/null 2>&1; then PY="$c"; break; fi
-done"""
+@dataclass(frozen=True)
+class InterpreterCandidate:
+    """One candidate as executable plus immutable prefix arguments."""
+
+    executable: str
+    prefix_args: tuple[str, ...] = ()
+
+    def command(self, *args: str) -> list[str]:
+        return [self.executable, *self.prefix_args, *args]
 
 
-def interpreter_candidates(root: Path, fw_root: Path) -> list[str]:
+_RELATIVE_CANDIDATES: tuple[tuple[str, str], ...] = (
+    ("root", ".venv/bin/python"),
+    ("root", ".venv/Scripts/python.exe"),
+    ("framework", ".venv/bin/python"),
+    ("framework", ".venv/Scripts/python.exe"),
+)
+_PATH_CANDIDATES: tuple[InterpreterCandidate, ...] = (
+    InterpreterCandidate("python3"),
+    InterpreterCandidate("python"),
+    InterpreterCandidate("py", ("-3",)),
+)
+
+
+def _render_sh_resolve() -> str:
+    """Encode the neutral candidate policy for an sh-compatible edge."""
+    lines = ['FW="${MDLLM%/*/*}"', 'PY=""', 'PY_PREFIX=""']
+    specs: list[tuple[str, tuple[str, ...]]] = []
+    for anchor, suffix in _RELATIVE_CANDIDATES:
+        base = "$ROOT" if anchor == "root" else "$FW"
+        specs.append((f"{base}/{suffix}", ()))
+    specs.extend((candidate.executable, candidate.prefix_args)
+                 for candidate in _PATH_CANDIDATES)
+    for executable, prefix in specs:
+        quoted = f'"{executable}"' if executable.startswith("$") else executable
+        prefix_text = " ".join(f'"{arg}"' for arg in prefix)
+        command = " ".join(part for part in
+                           (quoted, prefix_text, '-c "import yaml"') if part)
+        lines.append(f'if [ -z "$PY" ] && {command} >/dev/null 2>&1; then')
+        lines.append(f'  PY="{executable}"')
+        if prefix:
+            lines.append(f'  PY_PREFIX="{prefix[0]}"')
+        lines.append("fi")
+    lines.extend((
+        "mdllm_python() {",
+        '  if [ -n "$PY_PREFIX" ]; then',
+        '    "$PY" "$PY_PREFIX" "$@"',
+        "  else",
+        '    "$PY" "$@"',
+        "  fi",
+        "}",
+    ))
+    return "\n".join(lines)
+
+
+SH_RESOLVE = _render_sh_resolve()
+
+
+def powershell_candidate_records(root: str = "$root",
+                                 framework: str = "$fw") -> str:
+    """Encode the same policy as PowerShell object records.
+
+    ``root`` and ``framework`` are trusted variable expressions supplied by
+    the outer renderer, never paths interpolated from project configuration.
+    """
+    records = []
+    bases = {"root": root, "framework": framework}
+    for anchor, suffix in _RELATIVE_CANDIDATES:
+        windows_suffix = suffix.replace("/", "\\")
+        records.append(
+            "@{ Executable = (Join-Path " + bases[anchor] + " '" +
+            windows_suffix + "'); PrefixArguments = @() }")
+    for candidate in _PATH_CANDIDATES:
+        prefix = ", ".join("'" + arg.replace("'", "''") + "'"
+                           for arg in candidate.prefix_args)
+        records.append(
+            "@{ Executable = '" + candidate.executable +
+            "'; PrefixArguments = @(" + prefix + ") }")
+    return "@(" + ", ".join(records) + ")"
+
+
+def interpreter_candidates(root: Path, fw_root: Path) \
+        -> list[InterpreterCandidate]:
     """The candidate list, in exactly the sh fragment's order."""
-    return [
-        str(root / ".venv" / "bin" / "python"),
-        str(root / ".venv" / "Scripts" / "python.exe"),
-        str(fw_root / ".venv" / "bin" / "python"),
-        str(fw_root / ".venv" / "Scripts" / "python.exe"),
-        "python3", "python", "py",
-    ]
+    bases = {"root": root, "framework": fw_root}
+    relative = [InterpreterCandidate(str(bases[anchor] / Path(suffix)))
+                for anchor, suffix in _RELATIVE_CANDIDATES]
+    return [*relative, *_PATH_CANDIDATES]
 
 
-def probe_candidate(candidate: str, dependency: str = FLOOR_DEPENDENCY) -> dict:
+def probe_candidate(candidate: str | InterpreterCandidate,
+                    dependency: str = FLOOR_DEPENDENCY) -> dict:
     """Two independent facts about one candidate, never conflated:
     interpreter_found (it executes code at all) and dependency_loaded (the
     floor's dependency imports). A Store stub fails both; a bare python
     fails only the second — the case the old probe reported wrongly."""
-    fact = {"candidate": candidate,
+    invocation = (candidate if isinstance(candidate, InterpreterCandidate)
+                  else InterpreterCandidate(candidate))
+    fact = {"candidate": invocation.executable,
+            "prefix_args": list(invocation.prefix_args),
             "interpreter_found": False, "dependency_loaded": False}
     for flag, code in (("interpreter_found", "import sys"),
                        ("dependency_loaded", f"import {dependency}")):
         try:
-            r = subprocess.run([candidate, "-c", code],
+            r = subprocess.run(invocation.command("-c", code),
                                capture_output=True, timeout=30)
             fact[flag] = r.returncode == 0
         except (OSError, subprocess.TimeoutExpired):
@@ -93,14 +168,15 @@ def probe(root: Path, mdllm_entry: Path,
     not that the CLI's own import graph and entry run under that interpreter
     (Phase 2B acceptance finding — three facts, none promoted into another)."""
     fw_root = mdllm_entry.resolve().parent.parent
-    facts = [probe_candidate(c, dependency)
-             for c in interpreter_candidates(root, fw_root)]
-    resolved = next((f["candidate"] for f in facts if f["dependency_loaded"]),
-                    None)
+    candidates = interpreter_candidates(root, fw_root)
+    facts = [probe_candidate(c, dependency) for c in candidates]
+    selected = next((candidate for candidate, fact in zip(candidates, facts)
+        if fact["dependency_loaded"]), None)
+    resolved = selected.executable if selected else None
     command_executed = None
     if resolved is not None:
         try:
-            r = subprocess.run([resolved, str(mdllm_entry), "--help"],
+            r = subprocess.run(selected.command(str(mdllm_entry), "--help"),
                                capture_output=True, timeout=120)
             command_executed = r.returncode == 0
         except (OSError, subprocess.TimeoutExpired):

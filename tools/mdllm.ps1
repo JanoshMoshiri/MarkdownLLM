@@ -19,13 +19,30 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $entry = Join-Path $PSScriptRoot 'mdllm.py'
+
+function Test-FloorPython {
+    param(
+        [Parameter(Mandatory = $true)][string]$Executable,
+        [string[]]$PrefixArguments = @()
+    )
+    try {
+        & $Executable @PrefixArguments -c 'import yaml' 2>$null
+        return $LASTEXITCODE -eq 0
+    }
+    catch {
+        # Windows PowerShell 5.1 promotes native stderr to RemoteException
+        # under ErrorActionPreference=Stop. That is one failed candidate fact,
+        # not a reason to terminate resolution.
+        return $false
+    }
+}
+
 $venvPython = Join-Path $root '.venv\Scripts\python.exe'
 if (Test-Path -LiteralPath $venvPython) {
     # Same policy as the emitted POSIX resolver (runtime.py): a candidate is
     # usable only if the floor's dependency loads — an incomplete venv must
     # fall through, not crash the CLI.
-    & $venvPython -c 'import yaml' 2>$null
-    if ($LASTEXITCODE -eq 0) {
+    if (Test-FloorPython -Executable $venvPython) {
         & $venvPython $entry @MdllmArguments
         exit $LASTEXITCODE
     }
@@ -38,16 +55,14 @@ foreach ($name in 'python', 'python3') {
     # bare python without PyYAML passes an interpreter-only probe and then
     # crashes the CLI with a traceback naming neither cause (runtime.py owns
     # this rule).
-    & $command.Source -c 'import yaml' 2>$null
-    if ($LASTEXITCODE -ne 0) { continue }
+    if (-not (Test-FloorPython -Executable $command.Source)) { continue }
     & $command.Source $entry @MdllmArguments
     exit $LASTEXITCODE
 }
 
 $launcher = Get-Command py -ErrorAction SilentlyContinue
 if ($launcher) {
-    & $launcher.Source -3 -c 'import yaml' 2>$null
-    if ($LASTEXITCODE -eq 0) {
+    if (Test-FloorPython -Executable $launcher.Source -PrefixArguments @('-3')) {
         & $launcher.Source -3 $entry @MdllmArguments
         exit $LASTEXITCODE
     }
