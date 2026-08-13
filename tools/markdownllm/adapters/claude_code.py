@@ -35,7 +35,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..adapter_install import TopLevelJsonFragmentPolicy
+from ..adapter_install import LegacyDefinition, TopLevelJsonFragmentPolicy
 from ..harness_diagnostics import AdapterProbe, managed_definition_hash
 from ..harness_ports import (
     HANDLER_TIMEOUT_SECONDS, AdapterCapabilities, DiagnosticPresentation,
@@ -60,6 +60,7 @@ def _unique_json_object(pairs):
     return out
 
 SETTINGS_PATH = ".claude/settings.json"
+LOCAL_SETTINGS_PATH = ".claude/settings.local.json"
 
 # Inward delivery semantics -> Claude event vocabulary. Lives here and only
 # here; a neutral module never names these.
@@ -70,6 +71,11 @@ _DELIVERY_EVENT_BY_MOMENT = {
 }
 _FEEDBACK_MATCHER = "Write|Edit"
 _HASH_PLACEHOLDER = "<managed-definition-hash>"
+_ROOT_POWERSHELL_SESSION = (
+    'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" estate-sync .; '
+    'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" session-start .')
+_ROOT_POWERSHELL_POST_WRITE = (
+    'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" validate . --quiet')
 
 
 def _shell_single_quote(value: str) -> str:
@@ -98,6 +104,57 @@ class ClaudeCodeAdapter:
     def install_policies(self):
         """Own only the top-level hooks member in composite settings."""
         return {SETTINGS_PATH: TopLevelJsonFragmentPolicy("hooks")}
+
+    def _legacy_hooks(self, context: HarnessContext) -> dict[str, object]:
+        rel = context.framework_root_rel.rstrip("/") or "."
+        prefix = f"python {rel}/tools/mdllm.py "
+        return {
+            "SessionStart": [{"hooks": [
+                {"type": "command", "command":
+                 f"{prefix}{step.operation} ."}
+                for step in context.binding("session-start").steps
+            ]}],
+            "PostToolUse": [{
+                "matcher": _FEEDBACK_MATCHER,
+                "hooks": [{"type": "command", "command":
+                           f"{prefix}validate . --quiet"}],
+            }],
+        }
+
+    def _root_powershell_legacy_hooks(self) -> dict[str, object]:
+        return {
+            "SessionStart": [{"hooks": [{
+                "type": "command", "shell": "powershell",
+                "command": _ROOT_POWERSHELL_SESSION,
+            }]}],
+            "PostToolUse": [{
+                "matcher": _FEEDBACK_MATCHER,
+                "hooks": [{
+                    "type": "command", "shell": "powershell",
+                    "command": _ROOT_POWERSHELL_POST_WRITE,
+                }],
+            }],
+        }
+
+    def legacy_definitions(
+            self, context: HarnessContext) -> tuple[LegacyDefinition, ...]:
+        """Exact historical managed fragments; recognition data only."""
+        definitions = [LegacyDefinition(
+            legacy_id="legacy-v1",
+            path=SETTINGS_PATH,
+            owned_fragment=(json.dumps(
+                {"hooks": self._legacy_hooks(context)},
+                separators=(",", ":")) + "\n").encode("utf-8"),
+        )]
+        if (context.framework_root_rel.rstrip("/") or ".") == ".":
+            definitions.append(LegacyDefinition(
+                legacy_id="legacy-root-powershell-v1",
+                path=SETTINGS_PATH,
+                owned_fragment=(json.dumps(
+                    {"hooks": self._root_powershell_legacy_hooks()},
+                    separators=(",", ":")) + "\n").encode("utf-8"),
+            ))
+        return tuple(definitions)
 
     def _definition_hash(self, context: HarnessContext,
                          binding: LifecycleBinding) -> str:
@@ -288,6 +345,39 @@ class ClaudeCodeAdapter:
 
     def inspect(self, domain_root: Path,
                 ctx: HarnessContext) -> InspectionReport:
+        primary = self._inspect_primary(domain_root, ctx)
+        overlay = domain_root / ".claude" / "settings.local.json"
+        if not overlay.exists():
+            return primary
+        findings = list(primary.findings)
+        operator_owned = list(primary.operator_owned)
+        try:
+            raw = overlay.read_text(encoding="utf-8")
+            cfg = json.loads(raw, object_pairs_hook=_unique_json_object)
+            if not isinstance(cfg, dict):
+                raise ValueError("top level is not an object")
+            hooks = cfg.get("hooks")
+            if hooks not in (None, {}):
+                findings.append(
+                    "ambiguous: project-local .claude/settings.local.json "
+                    "also defines hooks; the overlay is read-only and must "
+                    "be resolved by the operator")
+            else:
+                operator_owned.append(
+                    ".claude/settings.local.json is operator-owned and "
+                    "contains no competing hooks")
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError,
+                TypeError) as exc:
+            findings.append(
+                "ambiguous: project-local .claude/settings.local.json "
+                f"cannot be safely inspected: {type(exc).__name__}: {exc}")
+        return InspectionReport(
+            harness=primary.harness, fragments=primary.fragments,
+            operator_owned=tuple(operator_owned),
+            extensions=primary.extensions, findings=tuple(findings))
+
+    def _inspect_primary(self, domain_root: Path,
+                         ctx: HarnessContext) -> InspectionReport:
         path = domain_root / ".claude" / "settings.json"
         if not path.exists():
             return self._report(ManagedFragment(
@@ -370,45 +460,52 @@ class ClaudeCodeAdapter:
                           f"{len(wanted_hooks)})")
         return tuple(acts)
 
-    def _legacy_match(self, hooks: dict,
-                      ctx: HarnessContext) -> tuple[bool, tuple[str, ...]]:
-        """Match the exact pre-5R.2 form, and report any local command tails.
+    def _legacy_match(self, hooks: dict, ctx: HarnessContext
+                      ) -> tuple[str | None, tuple[str, ...]]:
+        """Name one exact legacy definition, or expose command-tail mixing."""
 
-        Returns ``(matched, tails)``. `legacy-v1` is the historical
-        projection: two parallel SessionStart handlers calling the floor CLI
-        directly, which never guaranteed the ordered binding.
+        def compare(actual, wanted, trail: tuple[str, ...]) -> tuple[bool, list[str]]:
+            if isinstance(wanted, dict):
+                if not isinstance(actual, dict) or set(actual) != set(wanted):
+                    return False, []
+                tails: list[str] = []
+                for key in wanted:
+                    if (key == "command" and isinstance(wanted[key], str)
+                            and isinstance(actual[key], str)
+                            and actual[key].startswith(wanted[key] + " ")):
+                        tails.append(
+                            f"{'/'.join(trail)} command carries "
+                            f"{actual[key][len(wanted[key]):].strip()}")
+                        continue
+                    matched, nested = compare(
+                        actual[key], wanted[key], trail + (str(key),))
+                    if not matched:
+                        return False, []
+                    tails.extend(nested)
+                return True, tails
+            if isinstance(wanted, list):
+                if not isinstance(actual, list) or len(actual) != len(wanted):
+                    return False, []
+                tails: list[str] = []
+                for index, (actual_item, wanted_item) in enumerate(
+                        zip(actual, wanted)):
+                    matched, nested = compare(
+                        actual_item, wanted_item, trail + (str(index),))
+                    if not matched:
+                        return False, []
+                    tails.extend(nested)
+                return True, tails
+            return actual == wanted, []
 
-        Matching is by exact command shape so unknown staleness stays
-        unknown — a refusal, never a guess. A tail (the live estate's
-        ``--assistant``) still matches the legacy *base*, but is returned
-        separately: the caller must withhold recognition over mixed
-        ownership while keeping the operator's edit visible rather than
-        flattening it into silence.
-        """
-        rel = ctx.framework_root_rel.rstrip("/") or "."
-        prefix = f"python {rel}/tools/mdllm.py "
-        expected = {
-            "SessionStart": [f"{prefix}{step.operation} ."
-                             for step in ctx.binding("session-start").steps],
-            "PostToolUse": [f"{prefix}validate . --quiet"],
-        }
-        tails: list[str] = []
-        for event, commands in expected.items():
-            handlers = (hooks.get(event) or [{}])[0].get("hooks") or []
-            if len(handlers) != len(commands):
-                return False, ()
-            for handler, want in zip(handlers, commands):
-                if set(handler) - {"type", "command"}:
-                    return False, ()
-                command = handler.get("command", "")
-                if command == want:
-                    continue
-                if command.startswith(want + " "):
-                    tails.append(f"legacy-v1 {event} command carries "
-                                 f"{command[len(want):].strip()}")
-                    continue
-                return False, ()
-        return True, tuple(tails)
+        for definition in self.legacy_definitions(ctx):
+            payload = json.loads(definition.owned_fragment)
+            wanted = payload["hooks"]
+            if hooks == wanted:
+                return definition.legacy_id, ()
+            matched, tails = compare(hooks, wanted, (definition.legacy_id,))
+            if matched and tails:
+                return None, tuple(tails)
+        return None, ()
 
     def _inspect_valid(self, cfg: dict, hooks: dict,
                        ctx: HarnessContext) -> InspectionReport:
@@ -473,10 +570,10 @@ class ClaudeCodeAdapter:
         # unknown so it remains a refusal rather than an inference.
         legacy_id = None
         if present and current is False:
-            matched, tails = self._legacy_match(hooks, ctx)
+            matched_id, tails = self._legacy_match(hooks, ctx)
             extensions.extend(tails)
-            if matched and not tails and not extensions and not findings:
-                legacy_id = "legacy-v1"
+            if matched_id and not tails and not extensions and not findings:
+                legacy_id = matched_id
         return self._report(
             ManagedFragment(
                 path=SETTINGS_PATH, present=present, readable=True,

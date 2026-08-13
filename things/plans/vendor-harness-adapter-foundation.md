@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.13
+version: 1.14
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -51,8 +51,10 @@ accepts the boundary and phase order.
 
 **Current execution boundary:** the complete Phase A/0–2 handoff remains
 accepted, and the Codex-owned Phases 3–5 remain landed, but their live
-acceptance is reopened at **Phase 5R** before Phase 6 may continue. Gate 5R.0
-is accepted at `a0c0cf4`/`d9333ce`; Codex now owns Phase 5R.1. Two
+acceptance is reopened at **Phase 5R** before Phase 6 may continue. Gates
+5R.0–5R.2 are accepted; Codex has implemented Phase 5R.3 and now hands its
+generic recognised-legacy migration boundary to Claude for independent
+acceptance before 5R.4 begins. Two
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
 Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
@@ -1164,29 +1166,46 @@ The migration state machine is closed and ordered:
 | legacy fragment with any local extension | refuse | refuse | no inference over mixed ownership |
 | unknown stale, duplicate, malformed, unreadable, or ambiguous | refuse | refuse | operator resolves the ambiguity |
 
-- [ ] Add an optional narrow legacy-definition port carrying immutable IDs and
+- [x] Add an optional narrow legacy-definition port carrying immutable IDs and
   exact semantic forms. It supplies recognition data, never filesystem writes.
-- [ ] Extend the generic mutation service with an explicit refresh action/flag.
+- [x] Extend the generic mutation service with an explicit refresh action/flag.
   The service owns JSON span replacement, unified diff, all-target preflight,
   concurrent-state recheck, atomic apply, and rollback.
-- [ ] Recognise the old standard two-handler scaffold form and the exact tracked
+- [x] Recognise the old standard two-handler scaffold form and the exact tracked
   framework-root combined PowerShell form separately. Do not generalise from
   resemblance. The live `--assistant` extension remains a mandatory refusal.
-- [ ] Test permissions-only insertion, permissions-plus-known-legacy refresh,
+- [x] Test permissions-only insertion, permissions-plus-known-legacy refresh,
   root permissions preservation, unrelated hook groups, formatting, duplicate
   keys, malformed JSON, unknown commands, local extensions, all-selected
   atomicity, and concurrent mutation.
-- [ ] Inspect project-local `.claude/settings.local.json` as a read-only
+- [x] Inspect project-local `.claude/settings.local.json` as a read-only
   effective-configuration source. Never mutate it. A competing hook definition
   in that overlay makes inspection and refresh ambiguous and therefore refuses
   with zero writes.
-- [ ] Keep every existing domain opt-in. Doctor may show the recognised legacy
+- [x] Keep every existing domain opt-in. Doctor may show the recognised legacy
   ID and exact refresh command; no refresh runs during framework upgrade,
   doctor, scaffold, session start, or estate sync.
 
 **Gate 5R.3:** old/current golden fixtures and every representative estate
 shape have an explicit expected state; safe cases preserve all non-owned bytes,
 and every ambiguous case proves zero writes by hash.
+
+**Codex implementation handoff — 2026-08-13.** The application boundary now
+defines immutable `LegacyDefinition` data plus the optional
+`LegacyDefinitionPort`; ordinary install remains unchanged and conservative,
+while `--refresh-legacy` separately authorises only an inspection-named exact
+form. `TopLevelJsonFragmentPolicy` rechecks the declared legacy semantics and
+replaces only the `hooks` value span with renderer-owned bytes inside the
+existing all-target atomic transaction. Claude declares `legacy-v1` and the
+root-only `legacy-root-powershell-v1`; the live `--assistant` tail withholds an
+ID. `.claude/settings.local.json` is read-only and competing hooks make the
+whole operation ambiguous. The full suite passes 452 tests. A live read-only
+estate pass classified the root as the root-specific legacy, nine domains as
+standard legacy, one as extended/refused, one permissions-only artifact as no
+managed fragment, and two absent primary artifacts; no estate configuration
+was written. Evidence: `codex-5r3-migration-acceptance-2026-08-13`. Phase 5R.3
+remains at its cross-harness acceptance boundary until Claude cold-runs the
+matrix against the implementation commit.
 
 #### Phase 5R.4 — Reconcile Codex projection and live test state (Codex owner)
 

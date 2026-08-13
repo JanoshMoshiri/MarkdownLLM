@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T10:44:32
-generated_from: HEAD@01a892a
-coverage: 182
+generated: 2026-08-13T10:58:28
+generated_from: HEAD@86aada2
+coverage: 183
 framework_version: 3.31.0
 ---
 
@@ -127,6 +127,7 @@ framework_version: 3.31.0
 - claude-platform-surface-narrowed --informs--> vendor-harness-adapter-foundation
 - claude-platform-surface-narrowed --derived-from--> claude-phase5r0-matrix-completion-2026-08-13
 - code-architect-governs-substrate-code --informs--> vendor-harness-adapter-foundation
+- codex-5r3-migration-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - codex-final-handoff-audit-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-final-handoff-audit-2026-08-11 --implements--> portability-claims-need-execution-tests
 - codex-port-challenge-2026-08-11 --documents--> vendor-harness-adapter-foundation

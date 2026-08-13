@@ -20,6 +20,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from markdownllm import cli  # noqa: E402
 import markdownllm.doctor as doctor_module  # noqa: E402
 from markdownllm.adapters.codex import CODEX, HOOKS_PATH  # noqa: E402
+from markdownllm.adapters.claude_code import (  # noqa: E402
+    CLAUDE_CODE, SETTINGS_PATH,
+)
 from markdownllm.harness_ports import HarnessContext  # noqa: E402
 from markdownllm.harness_diagnostics import (  # noqa: E402
     record_execution_attestation,
@@ -43,6 +46,38 @@ def _write_hooks(root: Path, raw: bytes) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(raw)
     return path
+
+
+def test_claude_legacy_refresh_requires_explicit_flag_and_reviewed_diff(
+        tmp_path, capsys):
+    context = _context_for(tmp_path)
+    legacy = CLAUDE_CODE.legacy_definitions(context)[0]
+    path = tmp_path / SETTINGS_PATH
+    path.parent.mkdir(parents=True)
+    path.write_bytes(legacy.owned_fragment)
+    before = path.read_bytes()
+
+    assert _run_cli([
+        "adapter-install", str(tmp_path), "--harness", "claude-code",
+    ]) == 1
+    assert path.read_bytes() == before
+    assert "recognised legacy" in capsys.readouterr().out
+
+    assert _run_cli([
+        "adapter-install", str(tmp_path), "--harness", "claude-code",
+        "--refresh-legacy", "--dry-run",
+    ]) == 0
+    dry = capsys.readouterr().out
+    assert "REFRESH" in dry
+    assert "DRY RUN" in dry
+    assert path.read_bytes() == before
+
+    assert _run_cli([
+        "adapter-install", str(tmp_path), "--harness", "claude-code",
+        "--refresh-legacy",
+    ]) == 0
+    assert path.read_bytes() != before
+    assert CLAUDE_CODE.inspect(tmp_path, context).fragments[0].current is True
 
 
 def test_doctor_codex_reports_independent_facts_without_promoting_runtime(

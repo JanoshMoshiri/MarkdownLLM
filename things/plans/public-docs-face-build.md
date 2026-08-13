@@ -2,7 +2,7 @@
 id: public-docs-face-build
 type: plan
 status: not-started
-version: 1.0
+version: 1.1
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -43,6 +43,27 @@ face lives and *what principle* governs it. It built nothing, by design: the
 surface decision cost nothing and claimed nothing, while the content had to wait
 on evidence. This plan is the residue — the build, and the half of "derived" the
 ruling did not reach.
+
+## Held (operator, 2026-08-13) — release condition named
+
+Execution is held on the operator's call, taken the day this plan was written.
+The reason is contention, not doubt: `docs/operator-guide.md`,
+`docs/framework-map.md`, and `README.md` were all mid-edit by the Codex agent
+while it landed `--refresh-legacy`, and inserting generated blocks into files
+another agent is actively rewriting buys a merge conflict in a
+twenty-eight-row table.
+
+**Release condition:** the adapter work reaches a quiet point — those three
+files committed and the working tree clean of them. Phase 1 needs no other
+gate.
+
+**What may proceed under the hold, if it is lifted piecemeal:** the generator
+itself is a new module (`docs_blocks.py`, shaped like `kernel_gen.py`, whose
+`build_kernel` is shared by `kernel` and `coherence` so the two cannot disagree
+about the artifact). It contends with nothing. Both the CLI registration
+(`cli.py` is contended) and the block insertion wait regardless. Substrate code
+here falls under [[code-architect-governs-substrate-code]], so that domain's
+skills are read before the module is written, not retrofitted after.
 
 The framing that makes the phases fall out is
 [[derived-transport-is-not-derived-content]]. Pages-from-`docs/` satisfies
@@ -88,14 +109,26 @@ drift-gated the way `kernel --check` gates its predecessor. The map's own
 already names each view's mechanical source, and it exists because the map has
 drifted against them before.
 
-**Why this precedes vendor Phase 7, and why that matters now.** Phase 7 will
-reconcile capability claims across these same files. If the toolbox is still
-twenty-eight authored rows when it arrives, Phase 7 pays twenty-eight walk
-steps; if it is a generated block, it pays one
-([[a-generated-surface-collapses-its-walk]]). The saving expires the moment
-Phase 7 starts, which is what makes this phase time-sensitive rather than
-merely worthwhile. Codex holds 5R.3/5R.4 and Phase 6 sits between, so the
-runway is real but finite.
+**Why this is urgent — corrected at v1.1, by observation.** This plan first
+argued the saving was a race against vendor Phase 7: reconcile the toolbox
+before Phase 7 arrives, and Phase 7 pays one walk step instead of
+twenty-eight. **That framing was too tidy and the same day disproved it.**
+
+Capability claims do not wait for a reconciliation phase. They reconcile
+*continuously, per flag*, because a flag ships with its documentation — which
+is correct behaviour, not a process breach. The live instance: on 2026-08-13
+the Codex agent added `--refresh-legacy` and the one change required **four
+hand-restatements** — the argparse help in `cli.py`, the `adapter-install` row
+of the operator-guide toolbox, the README's CLI listing, and the
+`adapter-install` note under framework-map View 3. Three of the four are
+derivable from the first.
+
+So the cost is not a cliff at Phase 7; it is a **per-flag tax already being
+paid**, and every CLI change until Phase 1 lands pays it again
+([[a-generated-surface-collapses-its-walk]] — restatement count is
+reconciliation cost, metered here in real time). That is a stronger argument
+than the original, and it is evidence rather than projection: the framework
+watched its own thesis cost it four edits where one would have done.
 
 ## Phase 2 — Stand up the build *(owned here; the switch is operator-gated)*
 

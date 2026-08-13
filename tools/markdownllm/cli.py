@@ -229,6 +229,9 @@ def build_cli() -> argparse.ArgumentParser:
                     help="one registered harness or all selected adapters")
     ai.add_argument("--dry-run", action="store_true",
                     help="show decisions and owned diff without writing")
+    ai.add_argument(
+        "--refresh-legacy", action="store_true",
+        help="replace only an exact adapter-declared legacy managed fragment")
     ai.set_defaults(fn=cmd_adapter_install)
 
     h = sub.add_parser("install-hook", help="install the three mdllm git hooks (pre-commit, commit-msg, post-commit) and execution-test pre-commit where git supports it")

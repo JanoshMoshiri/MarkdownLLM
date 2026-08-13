@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.2
+version: 1.3
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -181,7 +181,7 @@ to invoke directly.
 | `refresh <domain> [--seal]` | Floor-only domain refresh: reports the version delta + unseen CHANGELOG entries; `--seal` bumps `framework_version_seen` after adoption | Bringing a stale domain current with the framework |
 | `install-hook [path]` | Installs the three mdllm git hooks: pre-commit (boundary + validate + coherence, blocking), commit-msg (disclosure boundary, blocking), post-commit (autopush — on a repo with a remote and no `autopush: false`, commits PUBLISH from then on) | Once per domain repo, at floor adoption |
 | `doctor [path] [--harness claude\|codex\|all]` | Probes the floor and, when selected, reports adapter support, project configuration, currency, trust, runtime, and real-event execution independently; static config or a runnable command never counts as an executed lifecycle event | New machine, new harness, after a refresh, or "is the floor actually on here?" |
-| `adapter-install [path] --harness <name> [--dry-run]` | Preflights a project-local adapter, shows every decision and exact owned diff, then creates or safely merges only the selected adapter surface; ambiguity is refused | Run with `--dry-run` first for an existing domain; rerun without it only after deciding to change that project's harness configuration |
+| `adapter-install [path] --harness <name> [--dry-run] [--refresh-legacy]` | Preflights a project-local adapter, shows every decision and exact owned diff, then creates or safely merges only the selected adapter surface. `--refresh-legacy` can replace only an exact adapter-declared historical managed span; extensions and ambiguity still refuse | Run with `--dry-run` first. Use `--refresh-legacy` only when doctor names a legacy ID, then rerun without `--dry-run` only after reviewing that exact diff |
 | `scaffold <path> [--harness claude\|codex\|all\|none]` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, Git hook, first commit, and only the selected outer harness projection. Omitting the flag preserves the Claude compatibility default | Creating a new domain — the mechanical half is one command, while `none` proves the substrate does not depend on an adapter |
 | `mcp-serve <domain> [--http --port N --token]` | Serves the domain's exposed face (`exposed: true` things only) over MCP — stdio by default, Streamable HTTP with `--http` (loopback-only; non-loopback binds refused until the OAuth 2.1 leg). `--token` mints a per-run bearer token for tunnelled cross-machine probes | Wired into a consumer's `.mcp.json` (stdio: `command`; HTTP: `url` + optional `headers` carrying the token); stdio you rarely run by hand, `--http` you run when a porch should outlive its callers |
 | `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
@@ -204,13 +204,13 @@ floor. For an existing project, inspect before writing:
 ./tools/mdllm.ps1 adapter-install . --harness codex --dry-run
 ```
 
-The Codex project adapter is implemented and unit/integration tested, while a
-Phase 5R repair gate now precedes its live Phase 6 acceptance. A live preflight
-found a PowerShell 5.1 candidate-probe failure and exposed duplicated launch
-policy; do not apply an adapter diff until the corrected renderer passes that
-gate. The preflight-created framework-root `.codex/hooks.json` is untracked test
-state awaiting rerender and an explicit ownership decision, not accepted
-configuration.
+The Codex project adapter is implemented and unit/integration tested. Phase
+5R.1 closed the shared launch defects and 5R.2 replaced Claude's parallel
+legacy projection with the ordered neutral runner; 5R.4 still reconciles the
+Codex projection before live Phase 6 acceptance. The framework-root
+`.codex/hooks.json` is deliberately untracked stale test state. The operator
+decided it will be rerendered through reviewed dry-run/apply and tracked at
+5R.4, not committed in its present form.
 
 Installing the corrected reviewed diff remains an operator action. The
 [official Codex hook documentation](https://developers.openai.com/codex/hooks) names
@@ -227,14 +227,14 @@ nested domain, including a real nested-repository commit through the Git
 floor. That runtime evidence must not be relabelled as Codex lifecycle or
 trust evidence.
 
-Claude Code's core framework path remains proven in use, but its generated
-project lifecycle form is also inside Phase 5R. The historical projection puts
-two SessionStart handlers in one matching group; the current Claude contract
-runs matching handlers in parallel, so those bytes are now a legacy migration
-input rather than the desired renderer. Existing `.claude/settings.json` and
-`.claude/settings.local.json` files are not silently rewritten. A future
-explicit refresh must show its diff, preserve permissions and unrelated groups
-byte-for-byte, and refuse locally extended or ambiguous managed hooks.
+Claude Code's core framework path remains proven in use. Its current projection
+uses one handler per lifecycle moment and enters the ordered neutral runner.
+The historical two-handler form is recognised as `legacy-v1`; doctor names the
+ID and the exact `--refresh-legacy --dry-run` command. Refresh replaces only
+the owned `hooks` value span, preserving permissions and every unrelated byte.
+Existing `.claude/settings.local.json` remains read-only; competing overlay
+hooks, local command tails, malformed JSON, duplicates, and unknown stale
+forms all refuse with zero writes.
 
 ## Running More Than One Domain
 

@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.6
+version: 1.7
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -335,7 +335,10 @@ Notes on this view:
   means degraded mode — validate manually and say so.
 - `adapter-install` is the explicit project mutation boundary: it shows the
   selected adapter's owned diff, safely merges only that surface, and refuses
-  ambiguity. `harness-event` is its internal execution counterpart; a real
+  ambiguity. Its optional `--refresh-legacy` path accepts only an exact
+  adapter-declared legacy ID and replaces only the policy-owned byte span;
+  ordinary install never silently migrates history. `harness-event` is its
+  internal execution counterpart; a real
   lifecycle hook calls it to run ordered bindings and record hash-bound
   execution evidence. Neither makes an adapter part of the portable core.
 

@@ -56,12 +56,8 @@ def _put_shape(root: Path, shape: str) -> bytes:
     return raw
 
 
-def _claude_target() -> AdapterInstallTarget:
-    return AdapterInstallTarget(
-        CLAUDE_CODE,
-        CTX,
-        policies={SETTINGS_PATH: TopLevelJsonFragmentPolicy("hooks")},
-    )
+def _claude_target(context: HarnessContext = CTX) -> AdapterInstallTarget:
+    return target_for_adapter(CLAUDE_CODE, context)
 
 
 def _codex_target() -> AdapterInstallTarget:
@@ -141,6 +137,140 @@ def test_legacy_and_locally_extended_artifacts_refuse_without_writing(
         apply_install(plan)
     assert _sha(_settings_path(tmp_path).read_bytes()) == before_hash, \
         "a refusal must leave the operator's bytes untouched"
+
+
+def test_explicit_legacy_refresh_replaces_only_owned_hooks_value(tmp_path):
+    before = _put_shape(tmp_path, "permissions-plus-hooks")
+    text = before.decode("utf-8")
+    span = install_module._json_span_at_path(text, ("hooks",))
+    prefix = before[:span.start]
+    suffix = before[span.end:]
+
+    plan = preflight_install(
+        tmp_path, [_claude_target()], refresh_legacy=True)
+
+    assert not plan.refused
+    decision = plan.decisions[0]
+    assert decision.action == "refresh"
+    assert decision.after is not None
+    assert decision.after.startswith(prefix)
+    assert decision.after.endswith(suffix)
+    assert json.loads(decision.after)["permissions"] == \
+        json.loads(before)["permissions"]
+
+    apply_install(plan)
+    assert _settings_path(tmp_path).read_bytes() == decision.after
+    assert CLAUDE_CODE.inspect(tmp_path, CTX).fragments[0].current is True
+
+
+def test_legacy_extension_refuses_even_under_explicit_refresh(tmp_path):
+    before = _put_shape(tmp_path, "extended-startup")
+
+    plan = preflight_install(
+        tmp_path, [_claude_target()], refresh_legacy=True)
+
+    assert plan.refused
+    assert plan.decisions[0].action == "refuse"
+    with pytest.raises(InstallRefused):
+        apply_install(plan)
+    assert _settings_path(tmp_path).read_bytes() == before
+
+
+def test_exact_root_powershell_legacy_is_separately_refreshable(tmp_path):
+    context = HarnessContext(framework_root_rel=".")
+    before = (Path(__file__).resolve().parents[2] / ".claude" /
+              "settings.json").read_bytes()
+    path = _settings_path(tmp_path)
+    path.parent.mkdir(parents=True)
+    path.write_bytes(before)
+
+    report = CLAUDE_CODE.inspect(tmp_path, context)
+    assert report.fragments[0].legacy_id == "legacy-root-powershell-v1"
+    plan = preflight_install(
+        tmp_path, [_claude_target(context)], refresh_legacy=True)
+
+    assert not plan.refused
+    assert plan.decisions[0].action == "refresh"
+    assert json.loads(plan.decisions[0].after)["permissions"] == \
+        json.loads(before)["permissions"]
+
+
+def test_local_overlay_with_hooks_refuses_refresh_without_touching_either_file(
+        tmp_path):
+    primary = _put_shape(tmp_path, "hooks-only")
+    overlay = tmp_path / ".claude" / "settings.local.json"
+    overlay_bytes = b'{"hooks":{"SessionStart":[]},"operator":true}\n'
+    overlay.write_bytes(overlay_bytes)
+
+    plan = preflight_install(
+        tmp_path, [_claude_target()], refresh_legacy=True)
+
+    assert plan.refused
+    assert "settings.local.json" in plan.decisions[0].reason
+    with pytest.raises(InstallRefused):
+        apply_install(plan)
+    assert _settings_path(tmp_path).read_bytes() == primary
+    assert overlay.read_bytes() == overlay_bytes
+
+
+def test_non_hook_local_overlay_remains_read_only_during_refresh(tmp_path):
+    _put_shape(tmp_path, "hooks-only")
+    overlay = tmp_path / ".claude" / "settings.local.json"
+    overlay_bytes = b'{ "permissions" : { "allow" : ["Read"] } }\n'
+    overlay.write_bytes(overlay_bytes)
+
+    plan = preflight_install(
+        tmp_path, [_claude_target()], refresh_legacy=True)
+
+    assert not plan.refused
+    apply_install(plan)
+    assert overlay.read_bytes() == overlay_bytes
+
+
+def test_explicit_refresh_keeps_current_fragment_as_noop(tmp_path):
+    path = _settings_path(tmp_path)
+    path.parent.mkdir(parents=True)
+    current = CLAUDE_CODE.render(CTX)[SETTINGS_PATH]
+    path.write_bytes(current)
+
+    plan = preflight_install(
+        tmp_path, [_claude_target()], refresh_legacy=True)
+
+    assert not plan.refused
+    assert plan.decisions[0].action == "no-op"
+    assert apply_install(plan).unchanged == (SETTINGS_PATH,)
+    assert path.read_bytes() == current
+
+
+def test_refresh_refusal_blocks_other_selected_create(tmp_path):
+    before = _put_shape(tmp_path, "extended-startup")
+    other = _OtherAdapter()
+
+    plan = preflight_install(
+        tmp_path,
+        [AdapterInstallTarget(other, CTX), _claude_target()],
+        refresh_legacy=True,
+    )
+
+    assert [decision.action for decision in plan.decisions] == [
+        "create", "refuse"]
+    with pytest.raises(InstallRefused):
+        apply_install(plan)
+    assert not (tmp_path / ".other").exists()
+    assert _settings_path(tmp_path).read_bytes() == before
+
+
+def test_legacy_refresh_detects_concurrent_mutation_before_write(tmp_path):
+    before = _put_shape(tmp_path, "hooks-only")
+    plan = preflight_install(
+        tmp_path, [_claude_target()], refresh_legacy=True)
+    concurrent = before + b" "
+    _settings_path(tmp_path).write_bytes(concurrent)
+
+    with pytest.raises(InstallStateChanged):
+        apply_install(plan)
+
+    assert _settings_path(tmp_path).read_bytes() == concurrent
 
 
 def test_invalid_artifact_refuses_with_diff_and_no_write(tmp_path):

@@ -127,6 +127,7 @@ class CapabilityDiagnostic:
     support: SupportState
     configuration: ConfigurationState
     currency: CurrencyState
+    legacy_id: str | None
     trust: TrustState
     trust_detail: str
     launch_currency: CurrencyState
@@ -340,18 +341,18 @@ def runtime_fact(result: Mapping[str, object] | None) -> RuntimeFact:
 def _configuration_fact(report: InspectionReport, capability: str,
                         supported: bool) -> tuple[
                             ConfigurationState, CurrencyState,
-                            tuple[str, ...], tuple[str, ...]]:
+                            str | None, tuple[str, ...], tuple[str, ...]]:
     if not supported:
-        return "not-applicable", "not-applicable", (), ()
+        return "not-applicable", "not-applicable", None, (), ()
     fragments = report.fragments
     if not fragments:
-        return "unknown", "unknown", report.extensions, report.findings
+        return "unknown", "unknown", None, report.extensions, report.findings
 
     # An unreadable or structurally invalid active artifact cannot be called
     # absent: bytes exist, but their lifecycle meaning is not safely known.
     if any(f.artifact_present and
            (f.readable is False or f.valid is False) for f in fragments):
-        return "invalid", "unknown", report.extensions, report.findings
+        return "invalid", "unknown", None, report.extensions, report.findings
 
     # Inspect reports carry cross-fragment warnings/findings rather than a
     # second hidden ambiguity flag.  Treating a finding as ambiguous is the
@@ -360,16 +361,18 @@ def _configuration_fact(report: InspectionReport, capability: str,
     realised = [f for f in fragments
                 if capability in f.intents_realised]
     if report.findings or len(realised) > 1:
-        return "ambiguous", "unknown", report.extensions, report.findings
+        return "ambiguous", "unknown", None, report.extensions, report.findings
 
     if not realised:
         if all(not f.artifact_present for f in fragments):
-            return "absent", "not-applicable", report.extensions, report.findings
+            return ("absent", "not-applicable", None,
+                    report.extensions, report.findings)
         # Artifacts may be wholly operator-owned; the managed capability is
         # still absent, not installed by mere file presence.
         if all(f.readable is not None for f in fragments):
-            return "absent", "not-applicable", report.extensions, report.findings
-        return "unknown", "unknown", report.extensions, report.findings
+            return ("absent", "not-applicable", None,
+                    report.extensions, report.findings)
+        return "unknown", "unknown", None, report.extensions, report.findings
 
     fragment = realised[0]
     if fragment.current is True:
@@ -378,16 +381,24 @@ def _configuration_fact(report: InspectionReport, capability: str,
         currency = "stale"
     else:
         currency = "unknown"
-    return "present", currency, report.extensions, report.findings
+    return ("present", currency, fragment.legacy_id,
+            report.extensions, report.findings)
 
 
 def _default_remediations(harness: str, capability: str,
                           configuration: ConfigurationState,
                           currency: CurrencyState,
+                          legacy_id: str | None,
                           runtime: RuntimeFact,
                           execution: ExecutionFact) -> tuple[str, ...]:
     out: list[str] = []
-    if configuration in ("absent", "invalid", "ambiguous") or currency == "stale":
+    if legacy_id:
+        out.append(
+            f"review `mdllm adapter-install . --harness {harness} "
+            "--refresh-legacy --dry-run`; apply without `--dry-run` only "
+            f"after reviewing the exact {legacy_id!r} owned diff"
+        )
+    elif configuration in ("absent", "invalid", "ambiguous") or currency == "stale":
         out.append(
             f"review `mdllm adapter-install . --harness {harness}`; the command "
             "must show its owned diff and may refuse ambiguity"
@@ -428,8 +439,8 @@ def diagnose_harness(
     for capability in wanted:
         supported = capability in caps.lifecycle_moments
         support: SupportState = "supported" if supported else "unsupported"
-        configuration, currency, extensions, findings = _configuration_fact(
-            inspection, capability, supported)
+        configuration, currency, legacy_id, extensions, findings = (
+            _configuration_fact(inspection, capability, supported))
         if supported:
             trust = probe.trust
             rt = shared_runtime
@@ -466,13 +477,15 @@ def diagnose_harness(
                 root, caps.harness, capability, expected_hash)
 
         remediation = list(_default_remediations(
-            caps.harness, capability, configuration, currency, rt, execution))
+            caps.harness, capability, configuration, currency, legacy_id,
+            rt, execution))
         remediation.extend(probe.remediations)
         diagnostics.append(CapabilityDiagnostic(
             capability=capability,
             support=support,
             configuration=configuration,
             currency=currency,
+            legacy_id=legacy_id,
             trust=trust,
             trust_detail=(probe.trust_detail if supported else ""),
             launch_currency=launch_currency,

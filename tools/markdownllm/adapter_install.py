@@ -39,7 +39,7 @@ from typing import Literal, Mapping, Protocol, runtime_checkable
 from .harness_ports import HarnessContext, InspectionReport, ManagedFragment
 
 
-InstallAction = Literal["create", "merge", "no-op", "refuse"]
+InstallAction = Literal["create", "merge", "refresh", "no-op", "refuse"]
 
 
 class InstallRefused(RuntimeError):
@@ -79,6 +79,47 @@ class InstallPolicyPort(Protocol):
     """Adapter-owned schema policy for its rendered artifact paths."""
 
     def install_policies(self) -> Mapping[str, MergePolicy]: ...
+
+
+@dataclass(frozen=True)
+class LegacyDefinition:
+    """One immutable adapter-declared historical managed fragment.
+
+    ``owned_fragment`` is intentionally opaque to the application service.
+    The schema-aware mutation policy interprets and rechecks it before any
+    byte replacement.  Recognition grants no write authority by itself.
+    """
+
+    legacy_id: str
+    path: str
+    owned_fragment: bytes
+
+    def __post_init__(self) -> None:
+        if not self.legacy_id or not self.path or not self.owned_fragment:
+            raise ValueError("legacy definitions require id, path, and bytes")
+
+
+@runtime_checkable
+class LegacyDefinitionPort(Protocol):
+    """Adapter-owned recognition data for explicitly authorised refresh."""
+
+    def legacy_definitions(
+            self, context: HarnessContext) -> tuple[LegacyDefinition, ...]: ...
+
+
+@runtime_checkable
+class LegacyRefreshPolicy(Protocol):
+    """Optional schema policy capable of replacing one exact legacy span."""
+
+    def refresh_legacy(
+        self,
+        *,
+        path: str,
+        before: bytes,
+        desired: bytes,
+        inspection: InspectionReport,
+        definition: LegacyDefinition,
+    ) -> PolicyDecision: ...
 
 
 def _matching_fragment(
@@ -129,6 +170,13 @@ class WholeArtifactPolicy:
         desired: bytes,
         inspection: InspectionReport,
     ) -> PolicyDecision:
+        fragment = _matching_fragment(inspection, path)
+        if (fragment is not None and fragment.legacy_id
+                and not inspection.findings and not inspection.extensions):
+            return PolicyDecision(
+                "refuse", desired,
+                f"recognised legacy fragment {fragment.legacy_id!r}; "
+                "review an explicit --refresh-legacy diff")
         unsafe = _inspection_refusal(inspection, path)
         if unsafe:
             return PolicyDecision("refuse", desired, unsafe)
@@ -316,6 +364,26 @@ def append_json_array_value(
     return (text[:close] + prefix + encoded + text[close:]).encode("utf-8")
 
 
+def replace_json_value(
+        raw: bytes, value_path: tuple[str, ...], replacement_raw: bytes,
+        replacement_path: tuple[str, ...]) -> bytes:
+    """Replace exactly one JSON value span, preserving every outside byte.
+
+    Both documents are duplicate-aware parsed before spans are located.  The
+    replacement bytes come directly from the renderer rather than a fresh
+    serialisation, so the adapter remains the sole owner of managed format.
+    """
+    load_unique_json(raw)
+    load_unique_json(replacement_raw)
+    text = raw.decode("utf-8")
+    replacement_text = replacement_raw.decode("utf-8")
+    current = _json_span_at_path(text, value_path)
+    wanted = _json_span_at_path(replacement_text, replacement_path)
+    return (text[:current.start]
+            + replacement_text[wanted.start:wanted.end]
+            + text[current.end:]).encode("utf-8")
+
+
 def _top_level_member_bytes(desired: bytes, member: str) -> bytes:
     """Extract one renderer-formatted member without inventing its bytes."""
     data = _load_unique_json(desired)
@@ -376,6 +444,58 @@ class TopLevelJsonFragmentPolicy:
 
     member: str
 
+    def refresh_legacy(
+        self,
+        *,
+        path: str,
+        before: bytes,
+        desired: bytes,
+        inspection: InspectionReport,
+        definition: LegacyDefinition,
+    ) -> PolicyDecision:
+        """Replace only an exact declared legacy member value."""
+        fragment = _matching_fragment(inspection, path)
+        if fragment is None:
+            return PolicyDecision(
+                "refuse", desired,
+                "inspection did not identify exactly one owned fragment")
+        if inspection.findings:
+            return PolicyDecision(
+                "refuse", desired,
+                "inspection is ambiguous: " + "; ".join(inspection.findings))
+        if (inspection.extensions or fragment.readable is not True
+                or fragment.valid is not True
+                or fragment.current is not False
+                or fragment.legacy_id != definition.legacy_id):
+            return PolicyDecision(
+                "refuse", desired,
+                "recognised legacy state is extended, ambiguous, or changed")
+        try:
+            existing = load_unique_json(before)
+            legacy = load_unique_json(definition.owned_fragment)
+            wanted = load_unique_json(desired)
+            if not isinstance(existing, dict) or not isinstance(legacy, dict):
+                raise ValueError("legacy composite JSON is not an object")
+            if set(legacy) != {self.member}:
+                raise ValueError(
+                    f"legacy definition must own only {self.member!r}")
+            if not isinstance(wanted, dict) or set(wanted) != {self.member}:
+                raise ValueError(
+                    f"renderer must own only {self.member!r}")
+            if existing.get(self.member) != legacy[self.member]:
+                raise ValueError(
+                    "installed managed fragment no longer matches the exact "
+                    "legacy definition")
+            refreshed = replace_json_value(
+                before, (self.member,), desired, (self.member,))
+            load_unique_json(refreshed)
+        except ValueError as exc:
+            return PolicyDecision(
+                "refuse", desired, f"safe legacy refresh is unavailable: {exc}")
+        return PolicyDecision(
+            "refresh", refreshed,
+            f"replace exact {definition.legacy_id!r} managed fragment")
+
     def decide(
         self,
         *,
@@ -384,6 +504,13 @@ class TopLevelJsonFragmentPolicy:
         desired: bytes,
         inspection: InspectionReport,
     ) -> PolicyDecision:
+        fragment = _matching_fragment(inspection, path)
+        if (fragment is not None and fragment.legacy_id
+                and not inspection.findings and not inspection.extensions):
+            return PolicyDecision(
+                "refuse", desired,
+                f"recognised legacy fragment {fragment.legacy_id!r}; "
+                "review an explicit --refresh-legacy diff")
         unsafe = _inspection_refusal(inspection, path)
         if unsafe:
             return PolicyDecision("refuse", desired, unsafe)
@@ -559,6 +686,7 @@ class AdapterInstallTarget:
     adapter: object
     context: HarnessContext
     policies: Mapping[str, MergePolicy] = field(default_factory=dict)
+    legacy_definitions: tuple[LegacyDefinition, ...] = ()
     default_policy: MergePolicy = field(default_factory=WholeArtifactPolicy)
 
 
@@ -567,7 +695,11 @@ def target_for_adapter(adapter: object,
     """Compose a target through the optional schema-policy port."""
     policies = (adapter.install_policies()
                 if isinstance(adapter, InstallPolicyPort) else {})
-    return AdapterInstallTarget(adapter, context, policies=policies)
+    definitions = (adapter.legacy_definitions(context)
+                   if isinstance(adapter, LegacyDefinitionPort) else ())
+    return AdapterInstallTarget(
+        adapter, context, policies=policies,
+        legacy_definitions=definitions)
 
 
 @dataclass(frozen=True)
@@ -581,7 +713,7 @@ class ArtifactDecision:
 
     @property
     def changes_bytes(self) -> bool:
-        return (self.action in ("create", "merge")
+        return (self.action in ("create", "merge", "refresh")
                 and self.after is not None and self.after != self.before)
 
     def unified_diff(self) -> str:
@@ -612,7 +744,7 @@ class InstallPlan:
         """Exact byte changes this plan could apply after a clean preflight."""
         return "".join(
             decision.unified_diff() for decision in self.decisions
-            if decision.action in ("create", "merge"))
+            if decision.action in ("create", "merge", "refresh"))
 
     def refusal_diff(self) -> str:
         """Renderer comparison for refused state; never an apply candidate."""
@@ -688,6 +820,8 @@ def _read_existing(path: Path) -> bytes | None:
 def preflight_install(
         domain_root: Path,
         targets: tuple[AdapterInstallTarget, ...] | list[AdapterInstallTarget],
+        *,
+        refresh_legacy: bool = False,
         ) -> InstallPlan:
     """Read every selected adapter and decide the entire operation first."""
     root = Path(domain_root).resolve()
@@ -697,6 +831,13 @@ def preflight_install(
     for target in targets:
         adapter = target.adapter
         harness = str(getattr(adapter, "name", type(adapter).__name__))
+        definition_keys = [
+            (definition.path, definition.legacy_id)
+            for definition in target.legacy_definitions]
+        if len(definition_keys) != len(set(definition_keys)):
+            findings.append(
+                f"{harness}: duplicate legacy definition id/path pair")
+            continue
         try:
             rendered = adapter.render(target.context)
             inspection = adapter.inspect(root, target.context)
@@ -718,9 +859,36 @@ def preflight_install(
                 path = _artifact_path(root, relpath)
                 before = _read_existing(path)
                 policy = target.policies.get(relpath, target.default_policy)
-                outcome = policy.decide(
-                    path=relpath, before=before, desired=desired,
-                    inspection=inspection)
+                fragment = _matching_fragment(inspection, relpath)
+                legacy_id = (fragment.legacy_id
+                             if fragment is not None else None)
+                if refresh_legacy and legacy_id is not None:
+                    matches = [definition
+                               for definition in target.legacy_definitions
+                               if definition.path == relpath
+                               and definition.legacy_id == legacy_id]
+                    if len(matches) != 1:
+                        outcome = PolicyDecision(
+                            "refuse", desired,
+                            "inspection named a legacy form not supplied "
+                            "exactly once by the adapter")
+                    elif not isinstance(policy, LegacyRefreshPolicy):
+                        outcome = PolicyDecision(
+                            "refuse", desired,
+                            "artifact policy does not support legacy refresh")
+                    elif before is None:
+                        outcome = PolicyDecision(
+                            "refuse", desired,
+                            "inspection and filesystem disagree about legacy "
+                            "artifact presence")
+                    else:
+                        outcome = policy.refresh_legacy(
+                            path=relpath, before=before, desired=desired,
+                            inspection=inspection, definition=matches[0])
+                else:
+                    outcome = policy.decide(
+                        path=relpath, before=before, desired=desired,
+                        inspection=inspection)
                 decisions.append(ArtifactDecision(
                     harness=harness, path=relpath, action=outcome.action,
                     reason=outcome.reason, before=before, after=outcome.after))
@@ -915,7 +1083,9 @@ def cmd_adapter_install(args) -> int:
     selected = adapters.selection(args.harness)
     targets = tuple(target_for_adapter(adapters.get(name), context)
                     for name in selected)
-    plan = preflight_install(root, targets)
+    plan = preflight_install(
+        root, targets,
+        refresh_legacy=getattr(args, "refresh_legacy", False))
 
     print(f"## Adapter Install — {root}\n")
     for decision in plan.decisions:
