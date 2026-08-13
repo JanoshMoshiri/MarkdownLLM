@@ -138,8 +138,8 @@ def test_total_budget_reserves_outer_hook_time_and_labels_unrun_steps(
 
     result = lr.execute_lifecycle(
         tmp_path,
-        _binding(LifecycleStep("first", timeout_seconds=75),
-                 LifecycleStep("after-budget", timeout_seconds=25)),
+        _binding(LifecycleStep("first", protected_seconds=75),
+                 LifecycleStep("after-budget", protected_seconds=25)),
         total_timeout=105,
     )
 
@@ -149,6 +149,29 @@ def test_total_budget_reserves_outer_hook_time_and_labels_unrun_steps(
     assert "application budget of 100s exhausted" in result.steps[1].stderr
     assert result.text.startswith("[steps: first=0, after-budget=124]\n")
     assert result.passed is False
+
+
+def test_later_step_inherits_unused_earlier_budget_without_stealing_its_floor(
+        tmp_path, monkeypatch):
+    clock = iter((0.0, 0.0, 60.0))
+    calls = []
+    monkeypatch.setattr(lr.time, "monotonic", lambda: next(clock))
+
+    def fake_run(command, **kwargs):
+        calls.append((command[2], kwargs["timeout"]))
+        return _completed(command)
+
+    monkeypatch.setattr(lr.subprocess, "run", fake_run)
+
+    result = lr.execute_lifecycle(
+        tmp_path,
+        _binding(LifecycleStep("estate-sync", protected_seconds=75),
+                 LifecycleStep("session-start", protected_seconds=25)),
+        total_timeout=105,
+    )
+
+    assert calls == [("estate-sync", 75.0), ("session-start", 40.0)]
+    assert result.passed is True
 
 
 def test_output_limit_is_strict_and_keeps_every_step_attributable(

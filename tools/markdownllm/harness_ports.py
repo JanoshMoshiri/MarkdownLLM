@@ -52,11 +52,20 @@ class LifecycleStep:
     ``argv`` is inward-owned command data, not a shell string.  Adapters map
     ``DOMAIN_ROOT_ARG`` to their stable repository-root expression and encode
     the result for their own shell/config format.
+
+    ``protected_seconds`` is the minimum application budget that preceding
+    steps must leave for this step.  It is deliberately not a hard per-step
+    timeout: once this step becomes current it may consume unused budget from
+    earlier steps, while the binding's total deadline remains absolute.
     """
 
     operation: str
     argv: tuple[str, ...] = (DOMAIN_ROOT_ARG,)
-    timeout_seconds: int = 50
+    protected_seconds: int = 50
+
+    def __post_init__(self) -> None:
+        if self.protected_seconds <= 0:
+            raise ValueError("protected step budget must be positive")
 
 
 @dataclass(frozen=True)
@@ -76,6 +85,21 @@ class LifecycleBinding:
     total_timeout_seconds: int = LIFECYCLE_APPLICATION_SECONDS
     runner_reserve_seconds: int = LIFECYCLE_RUNNER_RESERVE_SECONDS
 
+    def __post_init__(self) -> None:
+        if not self.steps:
+            raise ValueError("a lifecycle binding requires at least one step")
+        if self.total_timeout_seconds <= 0:
+            raise ValueError("total lifecycle budget must be positive")
+        if self.runner_reserve_seconds < 0:
+            raise ValueError("runner reserve must be non-negative")
+        application = self.total_timeout_seconds - self.runner_reserve_seconds
+        if application <= 0:
+            raise ValueError("runner reserve must leave application time")
+        protected = sum(step.protected_seconds for step in self.steps)
+        if protected > application:
+            raise ValueError(
+                "protected step budgets exceed lifecycle application budget")
+
 
 # The application contract: complete ordered invocations per lifecycle moment.
 # session-start's ordering is semantic — orientation reads the git log, and
@@ -85,14 +109,14 @@ class LifecycleBinding:
 LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
     LifecycleBinding(
         moment="session-start",
-        steps=(LifecycleStep("estate-sync", timeout_seconds=75),
-               LifecycleStep("session-start", timeout_seconds=25)),
+        steps=(LifecycleStep("estate-sync", protected_seconds=75),
+               LifecycleStep("session-start", protected_seconds=25)),
         delivery="context",
     ),
     LifecycleBinding(
         moment="post-write",
         steps=(LifecycleStep(
-            "validate", (DOMAIN_ROOT_ARG, "--quiet"), timeout_seconds=100),),
+            "validate", (DOMAIN_ROOT_ARG, "--quiet"), protected_seconds=100),),
         delivery="feedback",
     ),
 )

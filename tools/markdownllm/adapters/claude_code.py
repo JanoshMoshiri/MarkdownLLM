@@ -76,6 +76,8 @@ _ROOT_POWERSHELL_SESSION = (
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" session-start .')
 _ROOT_POWERSHELL_POST_WRITE = (
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" validate . --quiet')
+_LEGACY_ROOT_FIXED_STEP_V1 = Path(__file__).with_name("legacy") / \
+    "claude-hooks-root-fixed-step-v1.json"
 
 
 def _shell_single_quote(value: str) -> str:
@@ -154,6 +156,20 @@ class ClaudeCodeAdapter:
                     {"hooks": self._root_powershell_legacy_hooks()},
                     separators=(",", ":")) + "\n").encode("utf-8"),
             ))
+            historical = json.loads(
+                _LEGACY_ROOT_FIXED_STEP_V1.read_text(encoding="utf-8"),
+                object_pairs_hook=_unique_json_object)
+            if not isinstance(historical, dict) or not isinstance(
+                    historical.get("hooks"), dict):
+                raise ValueError(
+                    "Claude fixed-step legacy definition is invalid")
+            definitions.append(LegacyDefinition(
+                legacy_id="legacy-root-fixed-step-v1",
+                path=SETTINGS_PATH,
+                owned_fragment=(json.dumps(
+                    {"hooks": historical["hooks"]},
+                    separators=(",", ":")) + "\n").encode("utf-8"),
+            ))
         return tuple(definitions)
 
     def _definition_hash(self, context: HarnessContext,
@@ -178,7 +194,7 @@ class ClaudeCodeAdapter:
                 "steps": [{
                     "operation": step.operation,
                     "argv": list(step.argv),
-                    "timeout_seconds": step.timeout_seconds,
+                    "protected_seconds": step.protected_seconds,
                 } for step in binding.steps],
                 "total_timeout_seconds": binding.total_timeout_seconds,
                 "runner_reserve_seconds": binding.runner_reserve_seconds,

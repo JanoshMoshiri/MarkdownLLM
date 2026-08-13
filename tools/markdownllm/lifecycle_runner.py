@@ -108,7 +108,7 @@ def execute_lifecycle(
                           f"{result.stderr}")
             continue
         later_required = sum(
-            float(timeout_per_step or later.timeout_seconds)
+            float(timeout_per_step or later.protected_seconds)
             for later in binding.steps[index + 1:])
         available = remaining - later_required
         if available <= 0:
@@ -119,8 +119,12 @@ def execute_lifecycle(
             chunks.append(f"[{step.operation}: exit {result.returncode}]\n"
                           f"{result.stderr}")
             continue
-        step_timeout = min(
-            float(timeout_per_step or step.timeout_seconds), available)
+        # Default execution lets the current step inherit budget unused by
+        # earlier steps.  Only later steps' protected allocations are held
+        # back.  ``timeout_per_step`` remains an explicit diagnostic/test cap,
+        # not the production allocation policy.
+        step_timeout = (min(float(timeout_per_step), available)
+                        if timeout_per_step is not None else available)
         try:
             run = subprocess.run(
                 command, cwd=root, capture_output=True, text=True,

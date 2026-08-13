@@ -203,6 +203,38 @@ def test_exact_root_powershell_legacy_is_separately_refreshable(tmp_path):
         json.loads(before)["permissions"]
 
 
+def test_exact_root_fixed_step_claude_projection_is_refreshable(tmp_path):
+    context = HarnessContext(framework_root_rel=".")
+    definition = next(
+        item for item in CLAUDE_CODE.legacy_definitions(context)
+        if item.legacy_id == "legacy-root-fixed-step-v1")
+    legacy_hooks = json.loads(definition.owned_fragment)["hooks"]
+    before = (
+        b'{\n  "permissions" : { "allow" : ["Read"] },\n'
+        b'  "hooks" : '
+        + json.dumps(legacy_hooks, separators=(",", ":")).encode("utf-8")
+        + b',\n  "operator-note" : "keep bytes"\n}\n'
+    )
+    path = _settings_path(tmp_path)
+    path.parent.mkdir(parents=True)
+    path.write_bytes(before)
+
+    report = CLAUDE_CODE.inspect(tmp_path, context)
+    assert report.fragments[0].legacy_id == "legacy-root-fixed-step-v1"
+    plain = preflight_install(tmp_path, [_claude_target(context)])
+    assert plain.refused
+
+    plan = preflight_install(
+        tmp_path, [_claude_target(context)], refresh_legacy=True)
+    assert not plan.refused
+    assert plan.decisions[0].action == "refresh"
+    assert b'"permissions" : { "allow" : ["Read"] }' in \
+        plan.decisions[0].after
+    assert b'"operator-note" : "keep bytes"' in plan.decisions[0].after
+    apply_install(plan)
+    assert CLAUDE_CODE.inspect(tmp_path, context).fragments[0].current is True
+
+
 def test_local_overlay_with_hooks_refuses_refresh_without_touching_either_file(
         tmp_path):
     primary = _put_shape(tmp_path, "hooks-only")
@@ -447,9 +479,15 @@ def test_codex_stale_and_duplicate_managed_json_are_refused(tmp_path):
     assert path.read_bytes() == duplicate
 
 
-def test_codex_root_legacy_refresh_replaces_only_owned_event_arrays(tmp_path):
+@pytest.mark.parametrize("legacy_id", [
+    "legacy-root-v1", "legacy-root-fixed-step-v1",
+])
+def test_codex_root_legacy_refresh_replaces_only_owned_event_arrays(
+        tmp_path, legacy_id):
     context = HarnessContext(framework_root_rel=".")
-    definition = CODEX.legacy_definitions(context)[0]
+    definition = next(
+        item for item in CODEX.legacy_definitions(context)
+        if item.legacy_id == legacy_id)
     legacy_hooks = json.loads(definition.owned_fragment)["hooks"]
     before = (
         b'{\n  "operator-note" : { "spacing" : "must stay" },\n'

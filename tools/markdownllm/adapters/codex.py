@@ -59,6 +59,8 @@ _DESCRIPTION = "MarkdownLLM project lifecycle hardening"
 _NON_SEMANTIC_HANDLER_EXTENSIONS = {"statusMessage"}
 _LEGACY_ROOT_V1 = Path(__file__).with_name("legacy") / \
     "codex-hooks-root-v1.json"
+_LEGACY_ROOT_FIXED_STEP_V1 = Path(__file__).with_name("legacy") / \
+    "codex-hooks-root-fixed-step-v1.json"
 
 _EVENT_BY_MOMENT = {
     "session-start": "SessionStart",
@@ -107,18 +109,24 @@ class CodexAdapter:
         """
         if (context.framework_root_rel.rstrip("/") or ".") != ".":
             return ()
-        historical = load_unique_json(_LEGACY_ROOT_V1.read_bytes())
-        if not isinstance(historical, dict) or not isinstance(
-                historical.get("hooks"), dict):
-            raise ValueError("Codex root legacy definition is invalid")
-        owned = (json.dumps(
-            {"hooks": historical["hooks"]}, separators=(",", ":"))
-            + "\n").encode("utf-8")
-        return (LegacyDefinition(
-            legacy_id="legacy-root-v1",
-            path=HOOKS_PATH,
-            owned_fragment=owned,
-        ),)
+        definitions = []
+        for legacy_id, path in (
+                ("legacy-root-v1", _LEGACY_ROOT_V1),
+                ("legacy-root-fixed-step-v1",
+                 _LEGACY_ROOT_FIXED_STEP_V1)):
+            historical = load_unique_json(path.read_bytes())
+            if not isinstance(historical, dict) or not isinstance(
+                    historical.get("hooks"), dict):
+                raise ValueError("Codex root legacy definition is invalid")
+            owned = (json.dumps(
+                {"hooks": historical["hooks"]}, separators=(",", ":"))
+                + "\n").encode("utf-8")
+            definitions.append(LegacyDefinition(
+                legacy_id=legacy_id,
+                path=HOOKS_PATH,
+                owned_fragment=owned,
+            ))
+        return tuple(definitions)
 
     # ------------------------------------------------------------- rendering
 
@@ -300,7 +308,7 @@ class CodexAdapter:
                 "steps": [{
                     "operation": step.operation,
                     "argv": list(step.argv),
-                    "timeout_seconds": step.timeout_seconds,
+                    "protected_seconds": step.protected_seconds,
                 } for step in binding.steps],
                 "delivery": binding.delivery,
                 "failure": binding.failure,

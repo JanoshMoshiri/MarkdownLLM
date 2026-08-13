@@ -74,12 +74,17 @@ def test_codex_adapter_satisfies_its_declared_service_ports():
 def test_root_legacy_definition_is_frozen_and_root_scoped():
     definitions = CODEX.legacy_definitions(ROOT_CTX)
 
-    assert len(definitions) == 1
-    assert definitions[0].legacy_id == "legacy-root-v1"
-    assert definitions[0].path == HOOKS_PATH
-    assert len(definitions[0].owned_fragment) == 14328
-    assert hashlib.sha256(definitions[0].owned_fragment).hexdigest() == \
-        "9f590fc9483ef0463d52ad32cd6c2624ba2e95b1a7621b4dd68a964ed641da53"
+    assert [item.legacy_id for item in definitions] == [
+        "legacy-root-v1", "legacy-root-fixed-step-v1"]
+    assert all(item.path == HOOKS_PATH for item in definitions)
+    assert [(len(item.owned_fragment),
+             hashlib.sha256(item.owned_fragment).hexdigest())
+            for item in definitions] == [
+        (14328,
+         "9f590fc9483ef0463d52ad32cd6c2624ba2e95b1a7621b4dd68a964ed641da53"),
+        (15508,
+         "7e17affd756a09e6a96d67e01b8ef7d2d72e2499071d21c9c1851b72bb580df0"),
+    ]
     assert CODEX.legacy_definitions(CTX) == ()
 
 
@@ -99,6 +104,20 @@ def test_inspect_names_only_the_exact_unextended_root_legacy(tmp_path):
     mutated = _fragment(CODEX.inspect(tmp_path, ROOT_CTX), HOOKS_PATH)
     assert mutated.current is False
     assert mutated.legacy_id is None
+
+
+def test_inspect_names_pre_budget_root_as_exact_legacy(tmp_path):
+    definition = next(
+        item for item in CODEX.legacy_definitions(ROOT_CTX)
+        if item.legacy_id == "legacy-root-fixed-step-v1")
+    path = tmp_path / HOOKS_PATH
+    path.parent.mkdir(parents=True)
+    path.write_bytes(definition.owned_fragment)
+
+    fragment = _fragment(CODEX.inspect(tmp_path, ROOT_CTX), HOOKS_PATH)
+
+    assert fragment.current is False
+    assert fragment.legacy_id == "legacy-root-fixed-step-v1"
 
 
 def test_render_is_pure_deterministic_and_project_local(tmp_path):

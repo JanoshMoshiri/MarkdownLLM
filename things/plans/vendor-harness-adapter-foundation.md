@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.15
+version: 1.16
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -52,9 +52,12 @@ accepts the boundary and phase order.
 **Current execution boundary:** the complete Phase A/0–2 handoff remains
 accepted, and the Codex-owned Phases 3–5 remain landed, but their live
 acceptance is reopened at **Phase 5R** before Phase 6 may continue. Gates
-5R.0–5R.3 are accepted. Codex has implemented Phase 5R.4, atomically refreshed
-the recognised framework-root Claude and Codex projections, and now hands the
-final gate to Claude for independent suite and boundary acceptance. Two
+5R.0–5R.3 are accepted, and Claude accepted the 5R.4 reconciliation mechanism
+at `db4a5dd`. Its real framework-root run then returned one shared lifecycle
+budget defect, so **Phase 5R.5 is now the execution boundary and Phase 6
+remains blocked**. Codex has implemented the neutral correction, atomically
+refreshed both tracked root projections again, and hands the final 5R.5 gate
+to Claude for real-dispatch acceptance. Two earlier
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
 Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
@@ -1229,7 +1232,7 @@ matrix against the implementation commit.
   final 5R.4 HEAD. A final-HEAD run may satisfy both gates only when no
   intervening relevant change occurred.
 
-**Gate 5R.4 / release back into Phase 6:** the full suite passes in both the
+**Gate 5R.4 — mechanism accepted; 5R.5 holds release:** the full suite passes in both the
 Codex managed shell and Claude's shell; validation and coherence are clean;
 the current plan, README status, operator guide, Claude baseline erratum, and
 first-hour guide, archived domain-kernel plan erratum, adapter example, scaffold
@@ -1237,9 +1240,64 @@ guidance golden, session module commentary, and architecture tests describe the
 same current/legacy boundary. Production comments and tests no longer encode
 the false sequential-handler premise. No domain has been migrated.
 
+**5R.4 disposition — accepted mechanism, execution defect returned
+(`db4a5dd`):** Claude independently accepted the atomic reconciliation,
+operator-byte preservation, evidence invalidation, tracked Codex state,
+scaffold matrix, and clean nested estate. A real automatic root SessionStart
+then measured `estate-sync` at 59.8 seconds and `session-start` at 36.1 seconds.
+The runner gave orientation a hard 25-second ceiling, returned
+`session-start=124`, and quietly omitted version, velocity, open loops, and
+triggers. This does not reopen adapter ownership or 5R.4 migration safety; it
+returns the inward allocation policy accepted at 5R.1.
+
+#### Phase 5R.5 — Correct lifecycle budget allocation (Codex/shared owner;
+Claude acceptance)
+
+- [x] Replace guessed hard per-step ceilings with inward-owned protected
+  allocations. Each step declares the minimum application time that preceding
+  steps must leave for it; once current, it inherits unused earlier time.
+- [x] Preserve the absolute 120/105/5 hierarchy. `estate-sync` still cannot
+  consume orientation's protected 25 seconds, and orientation may use the
+  remaining balance without exceeding the total application deadline.
+- [x] Reject empty bindings, non-positive protected allocations, and protected
+  totals larger than the application budget before any subprocess executes.
+- [x] Include the renamed allocation semantics in both adapters' managed
+  definition hashes. Prior fixed-step artifacts and attestations must become
+  stale rather than being certified under changed behavior.
+- [x] Freeze the exact 5R.4 root projections as separately named recognition
+  data, review one atomic `--refresh-legacy` diff, and refresh both tracked root
+  artifacts without changing Claude permissions or unrelated Codex bytes.
+- [x] Run focused port, runner, adapter, migration, diagnostic, scaffold, and
+  architecture tests plus the complete suite; validate and coherence remain
+  clean.
+- [ ] Claude reruns the exact native PowerShell 5.1 reproduction because the
+  neutral lifecycle runner changed, then opens a real automatic root session.
+  Acceptance asserts `estate-sync=0` and `session-start=0`, the emitted
+  orientation content (version, velocity, open loops, and triggers), and the
+  fresh session-gate attestation side effect. Exit zero or a harness execution
+  attestation alone is insufficient.
+
+**Gate 5R.5 / release into Phase 6:** Codex supplies the neutral implementation,
+immutable pre-repair recognition inputs, atomic root refresh, and deterministic
+test record. Claude independently accepts the final commit with the unchanged
+PowerShell fixture, full suite, and real root-dispatch side effects. The
+corrected projection remains `designed-for` until Phase 6 records the complete
+versioned/correlated harness evidence.
+
+**5R.5 implementation handoff (Codex, 2026-08-13):** the inward contract now
+names `protected_seconds`, the runner forwards unused earlier budget while
+preserving every later allocation, and both adapter hashes carry the semantic
+change. Exact pre-repair root projections are immutable recognition inputs;
+the reviewed all-selected refresh changed only definition-hash literals and
+left Claude permissions/operator bytes intact. Focused gate: 173/173. Complete
+external-basetemp suite: 465/465. Evidence:
+`lifecycle-budget-allocation-acceptance-2026-08-13`. No nested domain was
+migrated. Claude's PowerShell 5.1 and automatic-root side-effect acceptance
+remain deliberately unchecked.
+
 ### Phase 6 — Execute in real harnesses (split ownership by harness)
 
-Phase 6 resumes only after Phase 5R. The framework root now carries tracked,
+Phase 6 resumes only after Phase 5R.5. The framework root then carries tracked,
 current Claude and Codex project projections. Their recognised legacy forms
 were refreshed atomically at 5R.4; old hash-bound attestations are stale and do
 not count as current execution evidence. No nested domain projection was
@@ -1273,6 +1331,11 @@ definition hash, source event, timestamps, and observed outcome.
   and correlate its time window with the new hash-bound attestation. Directly
   running `harness-event` can mint the same record and is therefore a runtime
   probe, not proof that the harness dispatched it.
+- [ ] Assert every contract-bearing side effect, not only command completion:
+  SessionStart evidence includes the emitted orientation content and a fresh
+  clone-local session-gate attestation; post-write evidence includes the
+  expected validation result and envelope/silence behavior. Exit zero and a
+  generic hook-success record do not establish these effects.
 - [ ] Either carry the normalized SessionStart source
   (`startup|resume|clear|compact`) into evidence, or narrow the claim to the
   generic SessionStart events actually distinguishable by the record. Never

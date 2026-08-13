@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T14:01:24
-generated_from: HEAD@f7acffd
-coverage: 188
+generated: 2026-08-13T15:16:19
+generated_from: HEAD@04ebce4
+coverage: 189
 framework_version: 3.31.0
 ---
 
@@ -418,6 +418,7 @@ framework_version: 3.31.0
 - judgement-checks-need-a-suppression-list-which-is-itself-drift --complements--> existence-is-not-currency
 - judgement-checks-need-a-suppression-list-which-is-itself-drift --informs--> change-reconciliation-specification
 - judgement-checks-need-a-suppression-list-which-is-itself-drift --complements--> repeated-drift-promotes-a-fact-into-the-floor
+- lifecycle-budget-allocation-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - live-agent-handoff-is-for-new-output-not-known-implementation --supports--> cross-domain-handoff-is-built-inbound-only
 - live-agent-handoff-is-for-new-output-not-known-implementation --supports--> cross-domain-handoff-is-verified-external-input
 - live-agent-handoff-is-for-new-output-not-known-implementation --informs--> interface-specification
