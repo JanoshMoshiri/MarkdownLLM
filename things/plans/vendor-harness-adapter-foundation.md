@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.10
+version: 1.11
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -51,7 +51,8 @@ accepts the boundary and phase order.
 
 **Current execution boundary:** the complete Phase A/0–2 handoff remains
 accepted, and the Codex-owned Phases 3–5 remain landed, but their live
-acceptance is reopened at **Phase 5R** before Phase 6 may continue. Two
+acceptance is reopened at **Phase 5R** before Phase 6 may continue. Gate 5R.0
+is accepted at `a0c0cf4`/`d9333ce`; Codex now owns Phase 5R.1. Two
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
 Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
@@ -954,7 +955,7 @@ still changing.
   parallel. Replace every production comment/test assertion that a matcher
   group's handler array is sequential with an assertion over **one handler**
   and the neutral runner's ordered steps.
-- [ ] Pin Claude's documented execution forms before choosing syntax: shell-free
+- [x] Pin Claude's documented execution forms before choosing syntax: shell-free
   `command` + `args`; default shell form on POSIX; Windows Git Bash plus its
   PowerShell fallback; and explicit `shell: powershell` with `pwsh` plus native
   PowerShell 5.1 fallback. Use an inert handler to record executable/version,
@@ -962,12 +963,12 @@ still changing.
   status, timestamps, config hash, and the Claude debug transcript. Include
   project/framework paths containing spaces. The selected portable form must be
   executed by real Claude Code on every supported platform/dialect it claims.
-- [ ] Prototype the neutral launch seam before freezing a new port. It must run
+- [x] Prototype the neutral launch seam before freezing a new port. It must run
   the same `harness-event <harness> <moment> <root> <definition-hash>` intent
   from a repository subdirectory on POSIX, PowerShell 7, and Windows
   PowerShell 5.1; use no absolute installation path, user-global config, PATH
   Python assumption, or vendor cache path.
-- [ ] Decide the smallest mechanism from execution evidence. Preferred order:
+- [x] Decide the smallest mechanism from execution evidence. Preferred order:
   an immutable shared launch specification consumed by both adapters; a
   clone-local Git dispatcher only if its invocation works on the supported Git
   floor without hijacking a native hook event or overwriting operator config.
@@ -998,11 +999,17 @@ parallel-contract items. POSIX dispatch, exec-form `args`, and the Windows
 no-Git-Bash PowerShell fallback remain explicitly unobserved; the execution-form
 matrix and launch-seam items therefore remain open.
 
-**Gate 5R.0:** the failing probes fail on the old implementation in both agents'
-native PowerShell 5.1 records, the proposed launch seam passes on all three
-shells, the chosen Claude execution form is pinned from real dispatch rather
-than schema inspection, and the resulting inward contract contains no Claude
-or Codex schema vocabulary.
+**Gate 5R.0 — accepted 2026-08-13:** the failing probes failed on the old
+implementation in both agents' native PowerShell 5.1 records. Real Claude Code
+dispatch pinned shell and exec semantics, proved matching handlers parallel,
+and selected sh shell form as the only carrier capable of relative interpreter
+discovery plus one lifecycle invocation. Decision
+`claude-platform-surface-narrowed` scopes `verified-on` to Windows with Git for
+Windows; POSIX consumes the same sh form as `designed-for` until the committed
+cross-platform probe earns promotion, and the no-Bash PowerShell fallback is
+outside the claim. The chosen inward mechanism is one immutable, vendor-neutral
+launch specification with edge-specific encodings; it contains no Claude or
+Codex schema vocabulary. Phase 5R.1 may begin.
 
 #### Phase 5R.1 — Repair shared launch/runtime infrastructure (Codex owner)
 
