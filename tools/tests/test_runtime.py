@@ -108,6 +108,9 @@ def test_candidate_order_matches_the_sh_fragment(tmp_path):
     assert order == sorted(order)
     assert frag.index("$ROOT/.venv") < frag.index("$FW/.venv") < \
         frag.index("python3")
+    assert "MDLLM_LAUNCH_DEADLINE" in frag
+    assert "/usr/bin/timeout" in frag
+    assert '"$MDLLM_TIMEOUT" "$mdllm_remaining"' in frag
 
 
 # ------------------------------------------------------- single-owner bodies
@@ -132,12 +135,15 @@ def test_powershell_entry_probes_the_dependency():
     # before executing the entry. A fourth unprobed branch fails the count.
     ps1 = (Path(mdllm.__file__).resolve().parent / "mdllm.ps1").read_text(
         encoding="utf-8")
-    assert ps1.count("-c 'import yaml'") == 1
+    resolver = (Path(mdllm.__file__).resolve().parent /
+                "resolve-runtime.ps1").read_text(encoding="utf-8")
+    assert "Resolve-MdllmPython" in ps1
+    assert "-TimeoutSeconds 10" in ps1
+    assert resolver.count("'import yaml'") == 1
     assert "'import sys'" not in ps1
-    assert "function Test-FloorPython" in ps1
-    assert "-Executable $venvPython" in ps1
-    assert "-Executable $command.Source" in ps1
-    assert "-Executable $launcher.Source -PrefixArguments @('-3')" in ps1
+    assert "[System.Diagnostics.Stopwatch]" in resolver
+    assert "WaitForExit($remaining)" in resolver
+    assert "PrefixArguments = @('-3')" in resolver
 
 
 def test_powershell_51_continues_after_stderr_writing_path_candidate(
@@ -170,6 +176,8 @@ def test_powershell_51_continues_after_stderr_writing_path_candidate(
     tool_dir.mkdir(parents=True)
     shutil.copy2(Path(mdllm.__file__).resolve().with_name("mdllm.ps1"),
                  tool_dir / "mdllm.ps1")
+    shutil.copy2(Path(mdllm.__file__).resolve().with_name(
+        "resolve-runtime.ps1"), tool_dir / "resolve-runtime.ps1")
     (tool_dir / "mdllm.py").write_text(
         "raise SystemExit('fixture candidate owns execution')\n",
         encoding="utf-8")
@@ -191,6 +199,46 @@ def test_powershell_51_continues_after_stderr_writing_path_candidate(
     assert version.stdout.strip().startswith("5.1"), version.stdout
     assert completed.returncode == 0, completed.stderr or completed.stdout
     assert "MDLLM deterministic floor candidate executed" in completed.stdout
+
+
+def test_powershell_resolver_enforces_total_deadline_and_kills_probe(
+        tmp_path):
+    if os.name != "nt":
+        import pytest
+        pytest.skip("native Windows host is required")
+    powershell = shutil.which("powershell.exe")
+    if powershell is None:
+        import pytest
+        pytest.skip("native Windows PowerShell 5.1 is required")
+
+    marker = tmp_path / "orphan-finished.txt"
+    env = dict(os.environ)
+    resolver = Path(mdllm.__file__).resolve().with_name("resolve-runtime.ps1")
+    stalled = ("Start-Sleep -Seconds 20; "
+               f"Set-Content -LiteralPath '{str(marker).replace("'", "''")}' "
+               "-Value orphan")
+    stalled_ps = stalled.replace("'", "''")
+    command = (
+        f". '{str(resolver).replace("'", "''")}'; "
+        "$w=[Diagnostics.Stopwatch]::StartNew(); "
+        "$c=[PSCustomObject]@{Executable='powershell.exe'; "
+        "PrefixArguments=@('-NoProfile','-Command','" + stalled_ps + "')}; "
+        "$r=Test-MdllmFloorCandidate -Candidate $c -Stopwatch $w "
+        "-TimeoutMilliseconds 1000; "
+        "Write-Output ($w.Elapsed.TotalSeconds); "
+        "if($r){exit 8}"
+    )
+    completed = subprocess.run(
+        [powershell, "-NoLogo", "-NoProfile", "-NonInteractive",
+         "-ExecutionPolicy", "Bypass", "-Command", command],
+        env=env, capture_output=True, text=True, timeout=10,
+        encoding="utf-8", errors="replace")
+
+    assert completed.returncode == 0, completed.stderr
+    assert float(completed.stdout.strip().splitlines()[-1]) < 3
+    import time
+    time.sleep(2)
+    assert not marker.exists(), "timed-out probe left a child process running"
 
 
 # ---------------------------------------------- nested-domain hook execution

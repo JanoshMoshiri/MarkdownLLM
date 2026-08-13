@@ -33,6 +33,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from .harness_ports import LAUNCH_RESOLUTION_SECONDS
+
 # The dependency that makes an interpreter *usable* by the floor, not merely
 # present. One name, probed everywhere the floor may run.
 FLOOR_DEPENDENCY = "yaml"
@@ -72,24 +74,49 @@ _PATH_CANDIDATES: tuple[tuple[InterpreterCandidate, str], ...] = (
 
 def _render_sh_resolve() -> str:
     """Encode the neutral candidate policy for an sh-compatible edge."""
-    lines = ['FW="${MDLLM%/*/*}"', 'PY=""', 'PY_PREFIX=""']
+    lines = [
+        'FW="${MDLLM%/*/*}"', 'PY=""', 'PY_PREFIX=""',
+        'MDLLM_LAUNCH_DEADLINE=""', 'MDLLM_DATE=""', 'MDLLM_TIMEOUT=""',
+        'if [ -x /usr/bin/date ] && [ -x /usr/bin/timeout ]; then',
+        '  MDLLM_DATE=/usr/bin/date',
+        '  MDLLM_TIMEOUT=/usr/bin/timeout',
+        'elif timeout --version >/dev/null 2>&1 && '
+        'date +%s >/dev/null 2>&1; then',
+        '  MDLLM_DATE=date',
+        '  MDLLM_TIMEOUT=timeout',
+        'fi',
+        'if [ -n "$MDLLM_DATE" ] && [ -n "$MDLLM_TIMEOUT" ]; then',
+        f'  MDLLM_LAUNCH_DEADLINE=$(( $("$MDLLM_DATE" +%s) + '
+        f'{LAUNCH_RESOLUTION_SECONDS} ))',
+        'fi',
+        'mdllm_probe() {',
+        '  [ -n "$MDLLM_LAUNCH_DEADLINE" ] || return 1',
+        '  mdllm_remaining=$(( MDLLM_LAUNCH_DEADLINE - '
+        '$("$MDLLM_DATE" +%s) ))',
+        '  [ "$mdllm_remaining" -gt 0 ] || return 1',
+        '  "$MDLLM_TIMEOUT" "$mdllm_remaining" "$@" -c "import yaml" '
+        '>/dev/null 2>&1',
+        '}',
+    ]
     specs: list[tuple[str, tuple[str, ...], str]] = []
     for anchor, suffix, platform in _RELATIVE_CANDIDATES:
         base = "$ROOT" if anchor == "root" else "$FW"
         specs.append((f"{base}/{suffix}", (), platform))
     specs.extend((candidate.executable, candidate.prefix_args, platform)
                  for candidate, platform in _PATH_CANDIDATES)
-    lines.append('MDLLM_WINDOWS_SH="${OS:-}"')
+    # MSYSTEM is the positive Git-for-Windows shell signal observed by the
+    # live Claude dispatch probe. Unlike inherited COMSPEC/Windows PATH
+    # entries, it is absent in native WSL/POSIX shells.
+    lines.append('MDLLM_WINDOWS_SH="${MSYSTEM:-}"')
     for executable, prefix, platform in specs:
         quoted = f'"{executable}"' if executable.startswith("$") else executable
         prefix_text = " ".join(f'"{arg}"' for arg in prefix)
         command = " ".join(part for part in
-                           (quoted, prefix_text, '-c "import yaml"') if part)
-        platform_guard = ('[ "$MDLLM_WINDOWS_SH" = "Windows_NT" ] && '
+                           ('mdllm_probe', quoted, prefix_text) if part)
+        platform_guard = ('[ -n "$MDLLM_WINDOWS_SH" ] && '
                           if platform == "windows" else "")
         lines.append(
-            f'if [ -z "$PY" ] && {platform_guard}{command} '
-            '>/dev/null 2>&1; then')
+            f'if [ -z "$PY" ] && {platform_guard}{command}; then')
         lines.append(f'  PY="{executable}"')
         if prefix:
             lines.append(f'  PY_PREFIX="{prefix[0]}"')
@@ -107,29 +134,6 @@ def _render_sh_resolve() -> str:
 
 
 SH_RESOLVE = _render_sh_resolve()
-
-
-def powershell_candidate_records(root: str = "$root",
-                                 framework: str = "$fw") -> str:
-    """Encode the same policy as PowerShell object records.
-
-    ``root`` and ``framework`` are trusted variable expressions supplied by
-    the outer renderer, never paths interpolated from project configuration.
-    """
-    records = []
-    bases = {"root": root, "framework": framework}
-    for anchor, suffix, _platform in _RELATIVE_CANDIDATES:
-        windows_suffix = suffix.replace("/", "\\")
-        records.append(
-            "@{ Executable = (Join-Path " + bases[anchor] + " '" +
-            windows_suffix + "'); PrefixArguments = @() }")
-    for candidate, _platform in _PATH_CANDIDATES:
-        prefix = ", ".join("'" + arg.replace("'", "''") + "'"
-                           for arg in candidate.prefix_args)
-        records.append(
-            "@{ Executable = '" + candidate.executable +
-            "'; PrefixArguments = @(" + prefix + ") }")
-    return "@(" + ", ".join(records) + ")"
 
 
 def interpreter_candidates(root: Path, fw_root: Path) \

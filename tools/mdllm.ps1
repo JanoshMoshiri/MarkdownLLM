@@ -20,50 +20,13 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $entry = Join-Path $PSScriptRoot 'mdllm.py'
 
-function Test-FloorPython {
-    param(
-        [Parameter(Mandatory = $true)][string]$Executable,
-        [string[]]$PrefixArguments = @()
-    )
-    try {
-        & $Executable @PrefixArguments -c 'import yaml' 2>$null
-        return $LASTEXITCODE -eq 0
-    }
-    catch {
-        # Windows PowerShell 5.1 promotes native stderr to RemoteException
-        # under ErrorActionPreference=Stop. That is one failed candidate fact,
-        # not a reason to terminate resolution.
-        return $false
-    }
-}
-
-$venvPython = Join-Path $root '.venv\Scripts\python.exe'
-if (Test-Path -LiteralPath $venvPython) {
-    # Same policy as the emitted POSIX resolver (runtime.py): a candidate is
-    # usable only if the floor's dependency loads — an incomplete venv must
-    # fall through, not crash the CLI.
-    if (Test-FloorPython -Executable $venvPython) {
-        & $venvPython $entry @MdllmArguments
-        exit $LASTEXITCODE
-    }
-}
-
-foreach ($name in 'python', 'python3') {
-    $command = Get-Command $name -ErrorAction SilentlyContinue
-    if (-not $command) { continue }
-    # Probe the floor's real dependency, not just interpreter presence — a
-    # bare python without PyYAML passes an interpreter-only probe and then
-    # crashes the CLI with a traceback naming neither cause (runtime.py owns
-    # this rule).
-    if (-not (Test-FloorPython -Executable $command.Source)) { continue }
-    & $command.Source $entry @MdllmArguments
-    exit $LASTEXITCODE
-}
-
-$launcher = Get-Command py -ErrorAction SilentlyContinue
-if ($launcher) {
-    if (Test-FloorPython -Executable $launcher.Source -PrefixArguments @('-3')) {
-        & $launcher.Source -3 $entry @MdllmArguments
+$resolver = Join-Path $PSScriptRoot 'resolve-runtime.ps1'
+if (Test-Path -LiteralPath $resolver) {
+    . $resolver
+    $launch = Resolve-MdllmPython -Root $root -FrameworkRoot $root `
+        -TimeoutSeconds 10
+    if ($launch) {
+        & $launch.Executable @($launch.PrefixArguments) $entry @MdllmArguments
         exit $LASTEXITCODE
     }
 }

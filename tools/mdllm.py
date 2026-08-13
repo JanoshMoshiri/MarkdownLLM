@@ -71,7 +71,7 @@ from markdownllm.scaffold import (
 )
 from markdownllm.runtime import (
     FLOOR_DEPENDENCY, SH_RESOLVE, InterpreterCandidate,
-    powershell_candidate_records, interpreter_candidates, probe_candidate,
+    interpreter_candidates, probe_candidate,
     probe, git_supports_hook_run, execution_test_hook, cmd_runtime_probe,
 )
 from markdownllm.adapter_install import (

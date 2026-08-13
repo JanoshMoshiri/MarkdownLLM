@@ -139,6 +139,9 @@ def test_windows_runner_exit_is_surfaced_but_hook_still_returns_zero(
     framework = tmp_path / "fixture-framework" / "tools"
     framework.mkdir(parents=True)
     (framework / "mdllm.ps1").write_text("exit 23\n", encoding="utf-8")
+    shutil.copy2(
+        Path(__file__).resolve().parents[1] / "resolve-runtime.ps1",
+        framework / "resolve-runtime.ps1")
     context = HarnessContext(framework_root_rel="fixture-framework")
     windows = json.loads(CODEX.render(context)[HOOKS_PATH])["hooks"][
         "PostToolUse"][0]["hooks"][0]["commandWindows"]
@@ -166,11 +169,9 @@ def test_windows_runner_exit_is_surfaced_but_hook_still_returns_zero(
     assert completed.returncode == 0
     assert "hookSpecificOutput" in completed.stdout
     assert "non-zero status" in completed.stdout
-    for candidate in (
-            ".venv\\bin\\python", ".venv\\Scripts\\python.exe",
-            "'python3'", "'python'", "'py'"):
-        assert candidate in payload
-    assert "$launchPrefix = @('-NoProfile', '-File', $runner)" in payload
+    assert "Resolve-MdllmPython" in payload
+    assert "-TimeoutSeconds 10" in payload
+    assert "'-ExecutionPolicy', 'Bypass', '-File', $runner" in payload
     assert "$executable = $hostExecutable" in payload
     assert "$PSNativeCommandUseErrorActionPreference = $false" in payload
     assert payload.count("harness-event codex post-write") == 1

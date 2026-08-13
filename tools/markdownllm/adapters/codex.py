@@ -43,7 +43,7 @@ from ..harness_diagnostics import (
     AdapterProbe,
     managed_definition_hash,
 )
-from ..runtime import SH_RESOLVE, powershell_candidate_records
+from ..runtime import SH_RESOLVE
 from ..adapter_install import (
     NestedJsonArrayGroupsPolicy,
     load_unique_json,
@@ -191,31 +191,22 @@ class CodexAdapter:
             f"$entry = Join-Path $root {entry_rel}; "
             f"$runner = Join-Path $root {runner_rel}; "
             "$fw = Split-Path -Parent (Split-Path -Parent $entry); "
-            f"$candidates = {powershell_candidate_records()}; "
-            "$python = $null; $pythonPrefix = @(); "
-            "foreach ($candidate in $candidates) { "
-            "$resolved = $null; "
-            "if (Test-Path -LiteralPath $candidate.Executable) { "
-            "$resolved = $candidate.Executable "
-            "} else { "
-            "$found = Get-Command $candidate.Executable "
-            "-ErrorAction SilentlyContinue; "
-            "if ($found) { $resolved = $found.Source } }; "
-            "if (-not $resolved) { continue }; "
-            "try { & $resolved @($candidate.PrefixArguments) "
-            "-c 'import yaml' *> $null } "
-            "catch { continue }; "
-            "if ($LASTEXITCODE -eq 0) { $python = $resolved; "
-            "$pythonPrefix = @($candidate.PrefixArguments); break } }; "
+            "$resolver = Join-Path $fw 'tools\\resolve-runtime.ps1'; "
+            "$launch = $null; "
+            "if (Test-Path -LiteralPath $resolver) { . $resolver; "
+            "$launch = Resolve-MdllmPython -Root $root "
+            "-FrameworkRoot $fw -TimeoutSeconds 10 }; "
             "$executable = $null; $launchPrefix = @(); "
-            "if ($python -and (Test-Path -LiteralPath $entry)) { "
-            "$executable = $python; $launchPrefix = @($pythonPrefix) + @($entry) "
+            "if ($launch -and (Test-Path -LiteralPath $entry)) { "
+            "$executable = $launch.Executable; "
+            "$launchPrefix = @($launch.PrefixArguments) + @($entry) "
             "} elseif (Test-Path -LiteralPath $runner) { "
             # The repository runner calls exit.  Keep it in a child host so
             # its status can never bypass this hook's surface-and-continue
             # finally block.
             "$executable = $hostExecutable; "
-            "$launchPrefix = @('-NoProfile', '-File', $runner) }; "
+            "$launchPrefix = @('-NoProfile', '-ExecutionPolicy', 'Bypass', "
+            "'-File', $runner) }; "
             "if ($executable) { "
             f"& $executable @launchPrefix harness-event codex {moment} "
             f"$root {_ps_quote(definition_hash)}; "
@@ -240,8 +231,10 @@ class CodexAdapter:
             '&where.exe pwsh.exe >nul 2>nul'
             '&if errorlevel 1 ('
             'powershell.exe -NoLogo -NoProfile -NonInteractive '
+            '-ExecutionPolicy Bypass '
             '-EncodedCommand !_MDLLM_HOOK!) else ('
             'pwsh.exe -NoLogo -NoProfile -NonInteractive '
+            '-ExecutionPolicy Bypass '
             '-EncodedCommand !_MDLLM_HOOK!)'
             '&exit /b 0"'
         )
