@@ -945,12 +945,12 @@ still changing.
   writes to stderr, and exits non-zero under Windows PowerShell 5.1. Exercise
   both the Codex `commandWindows` path and `tools/mdllm.ps1`; do not depend on
   whether the host happens to expose a Microsoft Store alias.
-- [ ] Author that PowerShell 5.1 reproduction once as an environment-independent
+- [x] Author that PowerShell 5.1 reproduction once as an environment-independent
   committed fixture. Codex records old-red under native `powershell.exe` 5.1;
   before Gate 5R.0, Claude reruns the exact fixture unchanged and records
   `$PSVersionTable.PSVersion`, repository commit, command, and red result.
   PowerShell 7 compatibility mode and a Codex-only invocation are not substitutes.
-- [ ] Pin the current Claude contract fact that matching handlers run in
+- [x] Pin the current Claude contract fact that matching handlers run in
   parallel. Replace every production comment/test assertion that a matcher
   group's handler array is sequential with an assertion over **one handler**
   and the neutral runner's ordered steps.
@@ -985,6 +985,18 @@ runner. Commit `f64480c` withdraws the false sequential-handler claim while
 retaining legacy bytes as migration data; its contract/port suite is 28/28.
 Claude's unchanged native-PS5 rerun, real-dispatch shell matrix, and launch-seam
 selection remain open, so Gate 5R.0 has not passed and Phase 5R.1 has not begun.
+
+**Claude acceptance return (`a47e897`, 2026-08-12):** Claude reran the exact
+committed fixture at `214967a` under native PowerShell `5.1.26100.9168` and
+recorded the same two intended failures. Real Claude Code CLI `2.1.173`
+dispatch on Windows then proved the default shell form enters Git Bash,
+preserves a spaced `${CLAUDE_PROJECT_DIR}` and quoted argument boundary,
+receives the lifecycle JSON on stdin, and launches two matching handlers in
+parallel—the second-declared handler started first. Transcript attachments and
+probe output share the harness session id. This closes the independent-red and
+parallel-contract items. POSIX dispatch, exec-form `args`, and the Windows
+no-Git-Bash PowerShell fallback remain explicitly unobserved; the execution-form
+matrix and launch-seam items therefore remain open.
 
 **Gate 5R.0:** the failing probes fail on the old implementation in both agents'
 native PowerShell 5.1 records, the proposed launch seam passes on all three
