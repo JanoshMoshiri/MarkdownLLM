@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T12:30:54
-generated_from: HEAD@f7adeb4
-coverage: 185
+generated: 2026-08-13T13:13:06
+generated_from: HEAD@42877f3
+coverage: 186
 framework_version: 3.31.0
 ---
 
@@ -122,6 +122,9 @@ framework_version: 3.31.0
 - claude-gate-5r3-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-gate-5r3-acceptance-2026-08-13 --references--> codex-5r3-migration-acceptance-2026-08-13
 - claude-gate-5r3-acceptance-2026-08-13 --references--> framework-root-tracks-both-adapters
+- claude-gate-5r4-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
+- claude-gate-5r4-acceptance-2026-08-13 --implements--> framework-root-tracks-both-adapters
+- claude-gate-5r4-acceptance-2026-08-13 --derived-from--> claude-gate-5r3-acceptance-2026-08-13
 - claude-phase5r0-matrix-completion-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-phase5r0-matrix-completion-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
 - claude-phase5r0-matrix-completion-2026-08-13 --implements--> portability-claims-need-execution-tests

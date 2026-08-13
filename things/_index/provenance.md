@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-13
-generated: 2026-08-13T11:27:27
-generated_from: HEAD@72821d0
-coverage: 20
+generated: 2026-08-13T13:13:11
+generated_from: HEAD@42877f3
+coverage: 21
 framework_version: 3.31.0
 ---
 
@@ -14,6 +14,9 @@ framework_version: 3.31.0
 
 ## assistant-register
 - operating-is-programming (derived-from)
+
+## claude-gate-5r3-acceptance-2026-08-13
+- claude-gate-5r4-acceptance-2026-08-13 (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
 - claude-5r2-renderer-acceptance-2026-08-13 (derived-from)
