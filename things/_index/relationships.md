@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T08:42:13
-generated_from: HEAD@8f92ad9
-coverage: 176
+generated: 2026-08-13T09:11:01
+generated_from: HEAD@7549b97
+coverage: 177
 framework_version: 3.31.0
 ---
 
@@ -506,6 +506,10 @@ framework_version: 3.31.0
 - provenance-specification --complements--> mcp-domain-server-design
 - provenance-specification --implements--> divergence-is-an-unrouted-decision
 - provenance-specification --implements--> llm-driven-systems-manifesto
+- public-docs-face-is-derived-not-restated --informs--> scaffold-declares-visibility
+- public-docs-face-is-derived-not-restated --informs--> a-generated-surface-collapses-its-walk
+- public-docs-face-is-derived-not-restated --informs--> premature-publish-manufactures-discipline-eroding-urgency
+- public-docs-face-is-derived-not-restated --references--> vendor-harness-adapter-foundation
 - read-thing-specification --extends--> thing-specification
 - read-thing-specification --complements--> write-thing-specification
 - read-thing-specification --references--> reasoning-lenses-specification
