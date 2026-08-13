@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T09:28:21
-generated_from: HEAD@ba96d73
-coverage: 178
+generated: 2026-08-13T09:45:43
+generated_from: HEAD@a1bccee
+coverage: 180
 framework_version: 3.31.0
 ---
 
@@ -206,6 +206,10 @@ framework_version: 3.31.0
 - derived-index-specification --implements--> tracking-artifacts-can-drift-from-reality
 - derived-index-specification --implements--> structural-pointers-need-reverse-edge-indexing
 - derived-index-specification --implements--> llm-driven-systems-manifesto
+- derived-transport-is-not-derived-content --informs--> public-docs-face-is-derived-not-restated
+- derived-transport-is-not-derived-content --informs--> a-generated-surface-collapses-its-walk
+- derived-transport-is-not-derived-content --complements--> every-reader-class-needs-its-own-kernel
+- derived-transport-is-not-derived-content --references--> provenance-specification
 - deterministic-calculation --implements--> a-true-primitive-is-discovered-not-authored
 - deterministic-calculation --informs--> repeated-drift-promotes-a-fact-into-the-floor
 - deterministic-calculation --informs--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -266,6 +270,10 @@ framework_version: 3.31.0
 - estate-mechanics-guide --documents--> git-workflow-specification
 - estate-mechanics-guide --documents--> change-reconciliation-specification
 - estate-mechanics-guide --documents--> retrospective-specification
+- every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated
+- every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
+- every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose
+- every-reader-class-needs-its-own-kernel --supports--> a-true-primitive-is-discovered-not-authored
 - evidence-and-eval-backlog --references--> felt-deployment-lands-in-undisclosable-work
 - evidence-and-eval-backlog --implements--> withholding-is-not-isolation
 - evidence-and-eval-backlog --implements--> isolation-must-contain-writes-not-just-reads
