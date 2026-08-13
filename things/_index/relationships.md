@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-13
-generated: 2026-08-13T05:42:49
-generated_from: HEAD@27b0723
-coverage: 174
+generated: 2026-08-13T08:01:32
+generated_from: HEAD@72744f4
+coverage: 175
 framework_version: 3.31.0
 ---
 
@@ -113,6 +113,9 @@ framework_version: 3.31.0
 - change-safety-is-defense-in-depth --supports--> retrospective-specification
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
+- claude-gate-5r1-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
+- claude-gate-5r1-acceptance-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
+- claude-gate-5r1-acceptance-2026-08-13 --derived-from--> posix-floor-record-2026-08-13
 - claude-phase5r0-matrix-completion-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-phase5r0-matrix-completion-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
 - claude-phase5r0-matrix-completion-2026-08-13 --implements--> portability-claims-need-execution-tests

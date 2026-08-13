@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-13
-generated: 2026-08-13T05:42:52
-generated_from: HEAD@27b0723
-coverage: 19
+generated: 2026-08-13T08:01:40
+generated_from: HEAD@72744f4
+coverage: 20
 framework_version: 3.31.0
 ---
 
@@ -19,6 +19,7 @@ framework_version: 3.31.0
 - claude-platform-surface-narrowed (derived-from)
 
 ## claude-phase5r0-red-acceptance-2026-08-12
+- claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - claude-phase5r0-matrix-completion-2026-08-13 (derived-from)
 
 ## cross-domain-handoff-is-verified-external-input
@@ -50,6 +51,9 @@ framework_version: 3.31.0
 
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## posix-floor-record-2026-08-13
+- claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
