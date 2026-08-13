@@ -131,6 +131,8 @@ def test_posix_framework_path_is_shell_literal_not_executable_syntax(
 
 def test_windows_runner_exit_is_surfaced_but_hook_still_returns_zero(
         tmp_path):
+    if os.name != "nt":
+        pytest.skip("native Windows host is required")
     if shutil.which("cmd.exe") is None or shutil.which("powershell.exe") is None:
         pytest.skip("stock Windows command hosts are required")
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)

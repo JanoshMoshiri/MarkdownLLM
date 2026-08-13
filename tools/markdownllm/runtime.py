@@ -29,6 +29,7 @@ harness config; presentation vocabulary belongs to Phase 3.
 from __future__ import annotations
 
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -56,34 +57,39 @@ class InterpreterCandidate:
         return [self.executable, *self.prefix_args, *args]
 
 
-_RELATIVE_CANDIDATES: tuple[tuple[str, str], ...] = (
-    ("root", ".venv/bin/python"),
-    ("root", ".venv/Scripts/python.exe"),
-    ("framework", ".venv/bin/python"),
-    ("framework", ".venv/Scripts/python.exe"),
+_RELATIVE_CANDIDATES: tuple[tuple[str, str, str], ...] = (
+    ("root", ".venv/bin/python", "posix"),
+    ("root", ".venv/Scripts/python.exe", "windows"),
+    ("framework", ".venv/bin/python", "posix"),
+    ("framework", ".venv/Scripts/python.exe", "windows"),
 )
-_PATH_CANDIDATES: tuple[InterpreterCandidate, ...] = (
-    InterpreterCandidate("python3"),
-    InterpreterCandidate("python"),
-    InterpreterCandidate("py", ("-3",)),
+_PATH_CANDIDATES: tuple[tuple[InterpreterCandidate, str], ...] = (
+    (InterpreterCandidate("python3"), "any"),
+    (InterpreterCandidate("python"), "any"),
+    (InterpreterCandidate("py", ("-3",)), "windows"),
 )
 
 
 def _render_sh_resolve() -> str:
     """Encode the neutral candidate policy for an sh-compatible edge."""
     lines = ['FW="${MDLLM%/*/*}"', 'PY=""', 'PY_PREFIX=""']
-    specs: list[tuple[str, tuple[str, ...]]] = []
-    for anchor, suffix in _RELATIVE_CANDIDATES:
+    specs: list[tuple[str, tuple[str, ...], str]] = []
+    for anchor, suffix, platform in _RELATIVE_CANDIDATES:
         base = "$ROOT" if anchor == "root" else "$FW"
-        specs.append((f"{base}/{suffix}", ()))
-    specs.extend((candidate.executable, candidate.prefix_args)
-                 for candidate in _PATH_CANDIDATES)
-    for executable, prefix in specs:
+        specs.append((f"{base}/{suffix}", (), platform))
+    specs.extend((candidate.executable, candidate.prefix_args, platform)
+                 for candidate, platform in _PATH_CANDIDATES)
+    lines.append('MDLLM_WINDOWS_SH="${OS:-}"')
+    for executable, prefix, platform in specs:
         quoted = f'"{executable}"' if executable.startswith("$") else executable
         prefix_text = " ".join(f'"{arg}"' for arg in prefix)
         command = " ".join(part for part in
                            (quoted, prefix_text, '-c "import yaml"') if part)
-        lines.append(f'if [ -z "$PY" ] && {command} >/dev/null 2>&1; then')
+        platform_guard = ('[ "$MDLLM_WINDOWS_SH" = "Windows_NT" ] && '
+                          if platform == "windows" else "")
+        lines.append(
+            f'if [ -z "$PY" ] && {platform_guard}{command} '
+            '>/dev/null 2>&1; then')
         lines.append(f'  PY="{executable}"')
         if prefix:
             lines.append(f'  PY_PREFIX="{prefix[0]}"')
@@ -112,12 +118,12 @@ def powershell_candidate_records(root: str = "$root",
     """
     records = []
     bases = {"root": root, "framework": framework}
-    for anchor, suffix in _RELATIVE_CANDIDATES:
+    for anchor, suffix, _platform in _RELATIVE_CANDIDATES:
         windows_suffix = suffix.replace("/", "\\")
         records.append(
             "@{ Executable = (Join-Path " + bases[anchor] + " '" +
             windows_suffix + "'); PrefixArguments = @() }")
-    for candidate in _PATH_CANDIDATES:
+    for candidate, _platform in _PATH_CANDIDATES:
         prefix = ", ".join("'" + arg.replace("'", "''") + "'"
                            for arg in candidate.prefix_args)
         records.append(
@@ -130,9 +136,13 @@ def interpreter_candidates(root: Path, fw_root: Path) \
         -> list[InterpreterCandidate]:
     """The candidate list, in exactly the sh fragment's order."""
     bases = {"root": root, "framework": fw_root}
+    windows = sys.platform == "win32"
     relative = [InterpreterCandidate(str(bases[anchor] / Path(suffix)))
-                for anchor, suffix in _RELATIVE_CANDIDATES]
-    return [*relative, *_PATH_CANDIDATES]
+                for anchor, suffix, platform in _RELATIVE_CANDIDATES
+                if platform != "windows" or windows]
+    path_candidates = [candidate for candidate, platform in _PATH_CANDIDATES
+                       if platform != "windows" or windows]
+    return [*relative, *path_candidates]
 
 
 def probe_candidate(candidate: str | InterpreterCandidate,

@@ -92,11 +92,16 @@ def test_candidate_order_matches_the_sh_fragment(tmp_path):
     fw = Path(mdllm.__file__).resolve().parent
     cands = runtime.interpreter_candidates(tmp_path, fw)
     tails = [".venv/bin/python", ".venv/Scripts/python.exe"]
+    expected_paths = (["bin/python", "Scripts/python.exe"] * 2
+                      if sys.platform == "win32" else ["bin/python"] * 2)
     assert [Path(c.executable).as_posix().rsplit("/.venv/")[-1]
-            for c in cands[:4]] == \
-        ["bin/python", "Scripts/python.exe"] * 2
-    assert [(c.executable, c.prefix_args) for c in cands[4:]] == [
+            for c in cands[:len(expected_paths)]] == expected_paths
+    expected_path_names = ([
         ("python3", ()), ("python", ()), ("py", ("-3",))]
+        if sys.platform == "win32" else [
+            ("python3", ()), ("python", ())])
+    assert [(c.executable, c.prefix_args)
+            for c in cands[len(expected_paths):]] == expected_path_names
     frag = runtime.SH_RESOLVE
     order = [frag.index(f'"$ROOT/{t}"') for t in tails]
     order += [frag.index(f'"$FW/{t}"') for t in tails]
@@ -145,6 +150,9 @@ def test_powershell_51_continues_after_stderr_writing_path_candidate(
     Store aliases or the author's PATH: ``python`` is the known-bad first
     candidate and ``python3`` is the known-good successor.
     """
+    if os.name != "nt":
+        import pytest
+        pytest.skip("native Windows host is required")
     powershell = shutil.which("powershell.exe")
     if powershell is None:
         import pytest
