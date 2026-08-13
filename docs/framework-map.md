@@ -53,6 +53,23 @@ real at the commit boundary.
 
 ```mermaid
 flowchart TD
+    accTitle: View 1 - the five bands of the framework, read top-down as a session's life
+    accDescr {
+        Five stacked bands. The entry band, tier 0, holds AGENTS.md as the
+        auto-discovered entry point and kernel.md as a generated digest. Below
+        it the specification layer holds 29 spec things: the manifesto for the
+        why, thing.md with the core operative specs, and 22 extension and guide
+        specs. Below that, domain memory in the things directory holds insights,
+        decisions, conflicts, retrospectives and plans. Below that, the
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 29
+        mechanical subcommands and a git pre-commit hook that blocks invalid
+        commits. At the base, git is the state machine, event stream and audit
+        trail. The edges run as follows. AGENTS.md loads the kernel and routes
+        to the specs. The specs distil back up into the kernel via mdllm
+        kernel, which is why that one edge points upward. The specs instantiate
+        domain memory. The CLI installs the hook. The floor validates memory,
+        specs and things alike, and commits at meaning boundaries into git.
+    }
     subgraph entry ["entry — tier 0"]
         AGENTS["AGENTS.md<br/>entry point — auto-discovered"]
         KERNEL["kernel.md<br/>generated digest"]
@@ -106,6 +123,25 @@ to roughly a fifth of its pre-kernel cost (dated figures: CHANGELOG 3.2.0).
 
 ```mermaid
 flowchart TD
+    accTitle: View 2 - the spec layer, showing what defines what
+    accDescr {
+        Everything centres on thing.md, the atomic unit. The manifesto defines
+        it. Around it sits the operative core, the six specs that mdllm kernel
+        distils into tier 0: git-workflow.md the state machine and thing.md
+        complement each other, orchestration.md for hooks and bindings
+        integrates with it, and read.thing.md analyses without modifying,
+        write.thing.md creates and cascades, and validate.thing.md covers the
+        semantic layer only - all three operating on it. A band of extension
+        specs each extends thing.md: trigger-specification, derived-index,
+        provenance, change-reconciliation, workflow-state, coordination-claim,
+        session-memory, belief-revision, retrospective, example-things,
+        reasoning-lenses and thing-lifecycle. A separate band of guides and the
+        domain bridge - domain-specification-guide, scalability-guide,
+        operator-guide, framework-discovery, domain-refresh, interface,
+        first-hour and framework-map - applies to the core rather than defining
+        any semantics. The navigation rule: when lost, start at thing.md and
+        follow one extends edge outward.
+    }
     MAN["the manifesto<br/>llm-driven-systems — the why"]
     subgraph core ["operative core — kernel tier 0"]
         GITW["git-workflow.md<br/>state machine"]
@@ -175,6 +211,21 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 
 ```mermaid
 flowchart LR
+    accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
+    accDescr {
+        A left column of 29 mdllm subcommands, each with a single edge to the
+        spec surface it serves in the right column. The tool is a mapping, not
+        a monolith. Solid edges enforce or measure a spec, and dashed edges
+        generate an artifact. Enforcing or measuring: validate, triggers,
+        index, provenance, eval, tokens, doctor, scaffold, refresh, coherence,
+        touchpoints, cascade, imports-check, boundary, estate-check,
+        estate-sync, calc, candidates, and the harness-event dispatcher.
+        Generating: kernel, changelog, install-hook, worklog, domain-kernel,
+        session-start, mcp-serve, autopush and adapter-install. The division of
+        labour is the point - the floor owns mechanical validation, structural,
+        referential and schema, while the agent owns semantic validation only.
+        Never re-perform a mechanical check by reasoning.
+    }
     subgraph cli ["mdllm subcommand"]
         C1["validate"]
         C2["triggers"]
@@ -297,6 +348,21 @@ seam passes through the porch — including "have you changed?".
 
 ```mermaid
 flowchart LR
+    accTitle: View 4 - the estate seam between a producer domain and a consumer domain
+    accDescr {
+        Two domains side by side, and every arrow crossing between them passes
+        through the porch - including the question have you changed. In domain
+        A, the producer, things opted in with exposed true feed the porch, a
+        curated read-only face served by mdllm mcp-serve. In domain B, the
+        consumer, an address book in .mcp.json holds operator-wired trust zones
+        and spawns the producer's porch. The porch hands over a deliverable
+        plus the reference triple, which becomes an import marked origin
+        external, pinning source domain, id and commit. That import is checked
+        by mdllm imports-check, which reports fresh, stale, diverged or
+        unreachable, and which polls the porch for freshness and content. A
+        stale or diverged result re-quarantines the import and routes it into
+        change-reconciliation as an external inflection.
+    }
     subgraph A["domain A (producer)"]
         EX["exposed things<br/>(exposed: true opt-in)"]
         PORCH["porch — mdllm mcp-serve<br/>(curated read-only face)"]

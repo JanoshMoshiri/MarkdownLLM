@@ -43,6 +43,19 @@ reason this plan exists.
 
 ```mermaid
 flowchart LR
+    accTitle: Plan-time record of the cross-domain sync loop - superseded by framework-map View 4
+    accDescr {
+        A plan-time snapshot, not maintained. The canonical copy is View 4 of
+        docs/framework-map.md. Two domains. In domain A, the producer, things
+        marked exposed true feed the porch, a curated read-only face served by
+        mdllm mcp-serve. In domain B, the consumer, an address book in
+        .mcp.json holds operator-wired trust zones and spawns that porch. The
+        porch hands a deliverable plus the reference triple to an import marked
+        origin external, pinning source domain, id and commit. mdllm
+        imports-check then reports fresh, stale, diverged or unreachable,
+        polling the porch for freshness and content, and routes a stale or
+        diverged result back into change-reconciliation as re-quarantine.
+    }
     subgraph A["domain A (producer)"]
         EX["exposed things<br/>(exposed: true opt-in)"]
         PORCH["porch — mdllm mcp-serve<br/>(curated read-only face)"]

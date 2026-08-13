@@ -43,6 +43,21 @@ happens by itself.
 
 ```mermaid
 flowchart TD
+    accTitle: The life of one commit inside a single domain
+    accDescr {
+        A left-to-right sequence with two rails. Writing or modifying a thing
+        enters the pre-commit floor, which blocks on three gates in order:
+        boundary for disclosure terms, validate for structure, schema and
+        references, then coherence for generated artifacts. Next come two
+        advisories that never block: the cue question asking whether the change
+        is modified and reasoned-from, and the porch notice that an exposed
+        thing publishes. The commit then lands, post-commit autopush transports
+        it with one of four outcomes - published, silent, debt or REJECTED - and
+        it reaches the remote. Branching off the mechanical rail, the cue
+        advisory feeds a human verdict: no proceeds, yes declares an inflection
+        which runs the four beats Cue, Assimilate, Walk, Seal. A REJECTED push
+        is divergence on the push side, routed by the operator and never forced.
+    }
     W["Write or modify a thing<br/><i>a fresh thing asks no questions</i>"]
     subgraph FLOOR["Pre-commit — the floor (blocks)"]
         B["boundary — disclosure terms"] --> V["validate — structure · schema · refs"]
@@ -82,6 +97,18 @@ drift detection is real-time-honest.
 
 ```mermaid
 flowchart LR
+    accTitle: The membrane between a producer domain and a consumer domain
+    accDescr {
+        Left to right, three zones. In the producer domain, an authoring-time
+        human call sets exposed to true, which raises a serve advisory saying
+        this change publishes, then the commit is floor-validated and autopushed.
+        That reaches the middle zone, the remote face. In the consumer domain,
+        estate-sync fetches fast-forward-only at session start, imports-check
+        compares against pins and reports stale or DIVERGED, imports land in
+        quarantine marked origin external and verified false, and only a named
+        human flips verified in its own commit. Transport is accelerated but
+        trust is not: the producer never learns who pulls.
+    }
     subgraph PROD["Producer domain"]
         E["expose: true<br/><i>authoring-time human call</i>"] --> SA["serve advisory<br/><i>'this change publishes'</i>"]
         SA --> PC["commit — floor validates"] --> PA["autopush"]
@@ -112,6 +139,22 @@ definition surfaces every domain reasons from.
 
 ```mermaid
 flowchart TD
+    accTitle: How a change to the framework root becomes a release
+    accDescr {
+        Top to bottom. The framework root is a release surface declaring git
+        autopush false, so a spec or tool change there is an inflection by
+        construction. It runs three beats in sequence. First Assimilate, using
+        touchpoints plus an estate-wide grep. Then Walk, where generated
+        surfaces reconcile by regeneration - thirteen domain kernels from one
+        string - and authored surfaces are judged one by one. Then Seal, which
+        writes a decision thing and records the walked set in the CHANGELOG. Only then
+        does a human publish, because the walk earns the push. Publication
+        flows into distribution - refresh, seal, domain-kernel regen and hooks -
+        which reaches the domains, whose kernel blocks regenerate from one
+        source. Each domain then carries two cadence clocks: a 60-day domain
+        clock checked at session start and by the estate sweep, and a 30-day
+        estate clock held as a dated trigger in the vantage domain.
+    }
     RT["Framework root — release surface<br/><i>git: autopush: false</i>"]
     CH["A spec or tool change —<br/>an inflection by construction"]
     A["Assimilate<br/><i>touchpoints + estate-wide grep</i>"] --> WK["Walk<br/><i>generated → regen (13 for 1)<br/>authored → judged</i>"]
@@ -148,6 +191,15 @@ misses falls to the net beneath.
 
 ```mermaid
 flowchart TD
+    accTitle: The four radii nesting as safety nets
+    accDescr {
+        A single chain of four stages, each catching what the one before it
+        missed. An unwalked change at the commit radius surfaces as drift at
+        the membrane radius, reported as stale or DIVERGED. What drift cannot
+        see falls to the epoch radius and its retrospective clocks. Epochs in
+        turn feed the release radius, where the walk resets the substrate. One
+        split repeated at every radius: detection mechanical, judgement human.
+    }
     C1["Commit radius —<br/>an unwalked change"] -->|"surfaces as drift"| M1["Membrane radius —<br/>stale / DIVERGED"]
     M1 -->|"what drift can't see"| E1["Epoch radius —<br/>the retrospective clocks"]
     E1 -->|"epochs feed"| R1["Release radius —<br/>the walk resets the substrate"]
