@@ -17,6 +17,16 @@ linked_things:
 
 # Claude platform surface: verified-on narrows to Windows + Git for Windows
 
+> **Narrowing lifted for Linux, 2026-08-14 — the trigger below fired as
+> written.** `posix-live-dispatch-record-2026-08-14` supplies the real POSIX
+> dispatch record: native Linux Claude Code, hooks launched under `sh`,
+> parallel handlers confirmed, and a full lifecycle on a scaffolded domain
+> (ordered session-start, quiet pass, advisory failure, floor commit).
+> **Linux is verified-on.** No amendment was required — promotion happened
+> by evidence, exactly as this decision specified. macOS remains
+> designed-for: reported working in practice by a second operator, but with
+> no recorded execution evidence.
+
 The operator resolved the Gate 5R.0 remainder (2026-08-13): do not block
 Phase 5R.1 on a POSIX execution record.
 
