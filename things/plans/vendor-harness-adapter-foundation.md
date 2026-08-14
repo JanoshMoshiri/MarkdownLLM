@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.17
+version: 1.18
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -54,10 +54,12 @@ accepted Gate 5R.5 at `ea4ea12`: the unchanged PowerShell 5.1 reproduction
 passed and a real automatic framework-root session emitted both successful
 steps, all four orientation elements, a fresh session-gate attestation, and
 current-definition evidence. **Phase 6 is active with independent Claude and
-Codex lanes.** Claude owns POSIX live dispatch and its remaining harness
-evidence. Codex owns automatic framework-root execution, one explicitly
-selected nested-domain migration/execution record, and the Codex adapterless
-fallback record. Neither lane blocks the other; their evidence joins only at
+Codex lanes.** Claude has now completed native Linux lifecycle dispatch at
+`3254a99`; its remaining root/non-startup evidence stays independent. Codex
+Desktop build `26.803.10989.0` injected AGENTS instructions but did not dispatch
+the current project SessionStart hook in a fresh framework-root task, so that
+surface is recorded narrowly as unverified and the positive root/nested lane
+moves to Codex CLI. Neither lane blocks the other; their evidence joins only at
 the Phase 6 gate. Two earlier
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
@@ -1318,7 +1320,7 @@ correlated with its own transcript/debug output. The records include exact
 harness version, OS/platform, repository commit, project-config SHA-256, managed
 definition hash, source event, timestamps, and observed outcome.
 
-- [ ] Claude non-regression: from the Phase 5R current renderer, scaffold, open,
+- [x] Claude non-regression: from the Phase 5R current renderer, scaffold, open,
   observe SessionStart ordering, make a valid edit, observe quiet PostToolUse,
   make a controlled invalid edit, observe advisory feedback, repair it, and
   commit through the floor.
@@ -1326,10 +1328,16 @@ definition hash, source event, timestamps, and observed outcome.
   refresh, repeat the automatic lifecycle record at root. If the operator does
   not approve that refresh, record root as legacy/unverified and scope the
   Claude verified-on claim to the fresh scaffold; do not reuse the 5R.2 probe.
-- [ ] Codex framework root: trust the project layer through the documented
+- [x] Codex Desktop framework-root observation: on Windows build
+  `26.803.10989.0`, open a fresh task with the current tracked project layer and
+  distinguish automatic dispatch from AGENTS interpretation. AGENTS was
+  injected, but no SessionStart lifecycle context or Codex attestation appeared;
+  doctor remained `execution=untested`. This is a surface-specific negative
+  record, not a universal Desktop-support claim.
+- [ ] Codex CLI framework root: trust the project layer through the documented
   product-specific human flow, start/resume/compact, observe injection, make
   valid/invalid/repaired edits, validate, and commit.
-- [ ] Codex nested domain: open the domain as its own workspace and repeat the
+- [ ] Codex CLI nested domain: open the domain as its own workspace and repeat the
   lifecycle and Git-floor probes.
 - [ ] In a disposable repo for each harness, remove the optional project
   adapter and prove AGENTS interpretation plus the Git floor remain sufficient.

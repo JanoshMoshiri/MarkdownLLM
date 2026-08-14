@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-14
-generated: 2026-08-14T01:12:56
-generated_from: HEAD@efdacfe
-coverage: 191
+generated: 2026-08-14T01:25:10
+generated_from: HEAD@3254a99
+coverage: 192
 framework_version: 3.31.0
 ---
 
@@ -140,6 +140,8 @@ framework_version: 3.31.0
 - codex-5r4-root-reconciliation-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - codex-5r4-root-reconciliation-2026-08-13 --implements--> framework-root-tracks-both-adapters
 - codex-5r4-root-reconciliation-2026-08-13 --extends--> codex-5r3-migration-acceptance-2026-08-13
+- codex-desktop-session-start-negative-2026-08-14 --documents--> vendor-harness-adapter-foundation
+- codex-desktop-session-start-negative-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - codex-final-handoff-audit-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-final-handoff-audit-2026-08-11 --implements--> portability-claims-need-execution-tests
 - codex-port-challenge-2026-08-11 --documents--> vendor-harness-adapter-foundation
