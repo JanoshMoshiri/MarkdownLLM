@@ -4,6 +4,9 @@ type: artifact
 status: stable
 created: 2026-08-14
 tags: [codex, codex-cli, windows, phase-6, execution-evidence, git-floor]
+linked_things:
+  - id: vendor-harness-adapter-foundation
+    relation: documents
 ---
 
 # Codex CLI Live Dispatch — 2026-08-14
@@ -35,6 +38,19 @@ detail=estate-sync=0, session-start=0
 definition_hash=sha256:758054d6fae6f79165d9f4f09a156c4f76f3410b53b0408121f9e9bf20fa95fb
 ```
 
+The separately controlled session
+`01a001b6-5cf5-77c1-818e-54b8a7e357a3` was then resumed through
+`codex exec resume`. Its persisted Codex JSONL transcript (SHA-256
+`8775223911f21b018dd77d06a99ea370e335d86e76f3031607f4f7db773b26f2`)
+records the complete lifecycle context as a developer message at
+`2026-08-14T19:21:42.776Z`, before the resume-test user message at
+`19:21:42.794Z`. The corresponding attestation was written at
+`19:21:42.542363+00:00`; both steps returned zero and the injected context
+contained version, velocity, 13 open loops, and the no-triggers result. This
+correlates automatic dispatch with a real resume invocation. The managed
+attestation still records only generic `session-start`, so it does not claim a
+normalized `resume` source field that the evidence format does not carry.
+
 For the PostToolUse probe, the first `apply_patch` deliberately created this
 artifact without `created`. Codex CLI then injected the hook output into the
 agent turn:
@@ -65,5 +81,6 @@ was run manually.
 ## Scope
 
 This verifies Codex CLI on this Windows framework-root surface only. It does
-not claim the nested-domain, Desktop, POSIX, `resume`, `clear`, or `compact`
-surfaces.
+not claim the nested-domain, Desktop, POSIX, `clear`, or `compact` surfaces.
+Startup and resume were observed; compact remains a TUI-only live probe and was
+not simulated through a direct lifecycle invocation.
