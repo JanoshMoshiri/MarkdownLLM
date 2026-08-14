@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-14
-generated: 2026-08-14T01:12:59
-generated_from: HEAD@efdacfe
-coverage: 23
+generated: 2026-08-14T22:24:59
+generated_from: HEAD@edddff8
+coverage: 24
 framework_version: 3.31.0
 ---
 
@@ -21,6 +21,9 @@ framework_version: 3.31.0
 ## claude-gate-5r4-acceptance-2026-08-13
 - claude-gate-5r5-acceptance-2026-08-13 (derived-from)
 - the-harness-bound-path-is-the-least-tested-path (derived-from)
+
+## claude-gate-5r5-acceptance-2026-08-13
+- lifecycle-output-truncation-2026-08-14 (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
 - claude-5r2-renderer-acceptance-2026-08-13 (derived-from)
@@ -43,6 +46,7 @@ framework_version: 3.31.0
 - operating-scope-promotion (pinned @604dfc4)
 
 ## field-report-2026-08-13-domain-session
+- assistant-register-does-not-graduate (derived-from)
 - the-harness-bound-path-is-the-least-tested-path (derived-from)
 
 ## framework-retrospective-2026-06

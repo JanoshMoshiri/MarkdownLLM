@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-14
-generated: 2026-08-14T20:49:18
-generated_from: HEAD@4d57cec
-coverage: 193
+generated: 2026-08-14T22:24:48
+generated_from: HEAD@edddff8
+coverage: 195
 framework_version: 3.31.0
 ---
 
@@ -75,6 +75,8 @@ framework_version: 3.31.0
 - assistant-register --informs--> hook-compliance-correlates-with-scope-not-awareness
 - assistant-register --informs--> consequence-is-recoverable-only-in-retrospect
 - assistant-register --references--> operative-rules-are-a-small-fraction-of-spec-prose
+- assistant-register-does-not-graduate --informs--> assistant-register
+- assistant-register-does-not-graduate --derived-from--> field-report-2026-08-13-domain-session
 - autopush-moves-the-deliberate-act --implements--> estate-cadence-cluster
 - autopush-moves-the-deliberate-act --informs--> git-workflow-specification
 - autopush-moves-the-deliberate-act --references--> premature-publish-manufactures-discipline-eroding-urgency
@@ -425,6 +427,9 @@ framework_version: 3.31.0
 - judgement-checks-need-a-suppression-list-which-is-itself-drift --informs--> change-reconciliation-specification
 - judgement-checks-need-a-suppression-list-which-is-itself-drift --complements--> repeated-drift-promotes-a-fact-into-the-floor
 - lifecycle-budget-allocation-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
+- lifecycle-output-truncation-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
+- lifecycle-output-truncation-2026-08-14 --documents--> vendor-harness-adapter-foundation
+- lifecycle-output-truncation-2026-08-14 --derived-from--> claude-gate-5r5-acceptance-2026-08-13
 - live-agent-handoff-is-for-new-output-not-known-implementation --supports--> cross-domain-handoff-is-built-inbound-only
 - live-agent-handoff-is-for-new-output-not-known-implementation --supports--> cross-domain-handoff-is-verified-external-input
 - live-agent-handoff-is-for-new-output-not-known-implementation --informs--> interface-specification

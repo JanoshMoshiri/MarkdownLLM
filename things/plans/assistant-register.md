@@ -1,8 +1,8 @@
 ---
 id: assistant-register
 type: plan
-status: in-progress
-version: 1.0
+status: cancelled
+version: 1.1
 created: 2026-07-28
 priority: high
 tags: [interface, register, orientation, session-start, onboarding, operator-experience]
@@ -25,6 +25,18 @@ linked_things:
 ---
 
 # Assistant Register — the response is an output type, and it has been unspecified
+
+> **Cancelled 2026-08-14 at Phase 0's own exit question.** The test drive
+> ran, and the answer was *no*: see [[assistant-register-does-not-graduate]].
+> A second vendor supplied the control the drive had lacked — Codex produced
+> the wanted output without the register, so its apparent value was
+> confounded with Claude's verbosity. And the delivery mechanism was
+> structurally wrong regardless: a per-domain hook flag imposes one vendor's
+> rendering on every agent that opens the domain. Phases 1–5 do not run.
+> Residual: remove the `--assistant` prototype from `session.py`.
+>
+> The register's *content* is not what failed — the finding below stands, and
+> a future rendering change belongs in the one shared emitter, not a flag.
 
 ## The finding
 
