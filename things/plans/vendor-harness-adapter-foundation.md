@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.16
+version: 1.17
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -49,15 +49,16 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** the complete Phase A/0–2 handoff remains
-accepted, and the Codex-owned Phases 3–5 remain landed, but their live
-acceptance is reopened at **Phase 5R** before Phase 6 may continue. Gates
-5R.0–5R.3 are accepted, and Claude accepted the 5R.4 reconciliation mechanism
-at `db4a5dd`. Its real framework-root run then returned one shared lifecycle
-budget defect, so **Phase 5R.5 is now the execution boundary and Phase 6
-remains blocked**. Codex has implemented the neutral correction, atomically
-refreshed both tracked root projections again, and hands the final 5R.5 gate
-to Claude for real-dispatch acceptance. Two earlier
+**Current execution boundary:** Phase 5R is complete. Claude independently
+accepted Gate 5R.5 at `ea4ea12`: the unchanged PowerShell 5.1 reproduction
+passed and a real automatic framework-root session emitted both successful
+steps, all four orientation elements, a fresh session-gate attestation, and
+current-definition evidence. **Phase 6 is active with independent Claude and
+Codex lanes.** Claude owns POSIX live dispatch and its remaining harness
+evidence. Codex owns automatic framework-root execution, one explicitly
+selected nested-domain migration/execution record, and the Codex adapterless
+fallback record. Neither lane blocks the other; their evidence joins only at
+the Phase 6 gate. Two earlier
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
 Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
@@ -1270,7 +1271,7 @@ Claude acceptance)
 - [x] Run focused port, runner, adapter, migration, diagnostic, scaffold, and
   architecture tests plus the complete suite; validate and coherence remain
   clean.
-- [ ] Claude reruns the exact native PowerShell 5.1 reproduction because the
+- [x] Claude reruns the exact native PowerShell 5.1 reproduction because the
   neutral lifecycle runner changed, then opens a real automatic root session.
   Acceptance asserts `estate-sync=0` and `session-start=0`, the emitted
   orientation content (version, velocity, open loops, and triggers), and the
@@ -1283,6 +1284,14 @@ test record. Claude independently accepts the final commit with the unchanged
 PowerShell fixture, full suite, and real root-dispatch side effects. The
 corrected projection remains `designed-for` until Phase 6 records the complete
 versioned/correlated harness evidence.
+
+**Gate 5R.5 — accepted 2026-08-13 at `ea4ea12`:** Claude Code CLI 2.1.229 on
+Windows 11 reran the unchanged native PowerShell 5.1 fixtures green and fired
+a real automatic root SessionStart. Both steps returned zero; version,
+velocity, open loops, and triggers were emitted; the clone-local session-gate
+attestation refreshed; and the correlated harness attestation reported
+`definition_current=true`. Evidence:
+`claude-gate-5r5-acceptance-2026-08-13`. Phase 6 is released.
 
 **5R.5 implementation handoff (Codex, 2026-08-13):** the inward contract now
 names `protected_seconds`, the runner forwards unused earlier budget while
@@ -1297,7 +1306,7 @@ remain deliberately unchecked.
 
 ### Phase 6 — Execute in real harnesses (split ownership by harness)
 
-Phase 6 resumes only after Phase 5R.5. The framework root then carries tracked,
+Phase 6 is active after accepted Gate 5R.5. The framework root carries tracked,
 current Claude and Codex project projections. Their recognised legacy forms
 were refreshed atomically at 5R.4; old hash-bound attestations are stale and do
 not count as current execution evidence. No nested domain projection was
