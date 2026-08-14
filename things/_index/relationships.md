@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-13
-generated: 2026-08-13T16:00:55
-generated_from: HEAD@d59f7af
-coverage: 190
+created: 2026-08-14
+generated: 2026-08-14T01:12:56
+generated_from: HEAD@efdacfe
+coverage: 191
 framework_version: 3.31.0
 ---
 
@@ -514,6 +514,9 @@ framework_version: 3.31.0
 - posix-floor-record-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - posix-floor-record-2026-08-13 --references--> claude-platform-surface-narrowed
 - posix-floor-record-2026-08-13 --implements--> portability-claims-need-execution-tests
+- posix-live-dispatch-record-2026-08-14 --implements--> claude-platform-surface-narrowed
+- posix-live-dispatch-record-2026-08-14 --derived-from--> posix-floor-record-2026-08-13
+- posix-live-dispatch-record-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - premature-publish-manufactures-discipline-eroding-urgency --references--> change-reconciliation-specification
 - premature-publish-manufactures-discipline-eroding-urgency --complements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - premature-publish-manufactures-discipline-eroding-urgency --supports--> the-rough-true-account-is-generative-infrastructure

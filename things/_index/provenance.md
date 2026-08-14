@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-13
-generated: 2026-08-13T16:00:59
-generated_from: HEAD@d59f7af
+created: 2026-08-14
+generated: 2026-08-14T01:12:59
+generated_from: HEAD@efdacfe
 coverage: 23
 framework_version: 3.31.0
 ---
@@ -65,6 +65,7 @@ framework_version: 3.31.0
 
 ## posix-floor-record-2026-08-13
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
+- posix-live-dispatch-record-2026-08-14 (derived-from)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
