@@ -263,7 +263,7 @@ def test_install_hook_execution_tests_the_real_hook(tmp_path, capsys):
     mdllm.cmd_scaffold(_ns(path=str(target)))
     # Scaffolded domains are born session_gate: strict — the execution test
     # runs the REAL floor, so satisfy the ritual first, as an operator would.
-    mdllm.cmd_session_start(_ns(path=str(target), assistant=False))
+    mdllm.cmd_session_start(_ns(path=str(target)))
     capsys.readouterr()
     rc = mdllm.cmd_install_hook(_ns(path=str(target)))
     out = capsys.readouterr().out
@@ -291,7 +291,7 @@ def test_hook_passes_when_no_path_python_works(tmp_path):
     _git_repo(tmp_path)
     target = tmp_path / "fw-venv-selection-check"
     mdllm.cmd_scaffold(_ns(path=str(target)))
-    mdllm.cmd_session_start(_ns(path=str(target), assistant=False))
+    mdllm.cmd_session_start(_ns(path=str(target)))
     assert not (target / ".venv").exists()
     stubs = tmp_path / "failing-pythons"
     stubs.mkdir()

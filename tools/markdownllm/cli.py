@@ -172,9 +172,6 @@ def build_cli() -> argparse.ArgumentParser:
                         help="emit the session-start ritual (version + velocity) for a "
                              "harness startup hook to inject")
     ss.add_argument("path", nargs="?", default=".")
-    ss.add_argument("--assistant", action="store_true",
-                    help="PHASE 0 PROTOTYPE (assistant-register plan): "
-                         "assistant-shaped orientation instead of the status dump")
     ss.set_defaults(fn=cmd_session_start)
 
     co = sub.add_parser("coherence", help="dark-region checks: generated-artifact "

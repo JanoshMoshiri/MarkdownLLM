@@ -57,7 +57,7 @@ def _scaffold(parent: Path, harness_marker=Ellipsis) -> Path:
     # New domains intentionally gate their second commit onward; establish
     # the clone-local Tier-0 attestation before asserting clean validation.
     assert mdllm.cmd_session_start(argparse.Namespace(
-        path=str(target), assistant=False)) == 0
+        path=str(target))) == 0
     assert mdllm.cmd_validate(argparse.Namespace(
         path=str(target), quiet=True)) == 0
     return target

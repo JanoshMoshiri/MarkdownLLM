@@ -200,23 +200,16 @@ def _floor_status(root: Path) -> str | None:
     return None
 
 
-# --------------------------------------------------------------------------
-# PHASE 0 PROTOTYPE — assistant-register plan. Lives behind `--assistant` for
-# the test drive ONLY; if the register survives Phase 0 this becomes the single
-# default rendering (a `--brief` variant was rejected in the plan: two
-# renderings drift). Nothing below fakes judgment the floor lacks — it orders
-# by what the mechanics honestly know and hands sequencing to the agent.
-# --------------------------------------------------------------------------
 
-_PRIORITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
 
 def _kernel_reference(domain: Path) -> str:
     """The path a reader in `domain` can actually open to reach the kernel.
 
     The kernel is framework state, so a domain-relative `kernel.md` resolves
-    to a file that does not exist. AGENTS.md already says
-    `{framework_root}/kernel.md`; this renders the same fact resolved.
+    to a file that does not exist and the first read fails (field report
+    2026-08-13). AGENTS.md already says `{framework_root}/kernel.md`; this
+    renders the same fact resolved.
     """
     from .scaffold import MDLLM_ENTRY
     import os
@@ -226,28 +219,6 @@ def _kernel_reference(domain: Path) -> str:
         return Path(os.path.relpath(kernel, domain.resolve())).as_posix()
     except ValueError:            # different drive — no relative path exists
         return kernel.as_posix()
-
-_REGISTER_SEED = """\
-Everything below is the floor's rendering of this domain — computed, counted,
-ordered, and titled mechanically. **Present it as it stands; never re-render
-it.** Re-performing mechanical rendering by reasoning drifts exactly as
-re-performing mechanical checks does, and it is forbidden for the same
-reason. Your opening adds only what the floor cannot compute, above the
-rendering, as short bullets — one act per line: the sequencing call (what
-first, and why), connections the graph does not hold, anything carried from
-the log — then the ask. If a bootstrap or setup skill also ran, its report
-obeys the same law: one line when healthy, exceptions with their remedy —
-and it never re-orients from the log; the rendering below already did.
-
-Two rules govern every turn. Expand, never smooth, where a human has to
-decide. And "show me why" must always work — the derivation is retained and
-sent only on request (`mdllm triggers <path>` carries the full evaluation).
-
-For your own reports of this session's work — the one surface the floor
-cannot render — fill the shape: *what changed → what needs you → what's
-next*, one act per line, in the operator's nouns, the ask last.
-
-Before the first reply: load `{kernel}`. Do not narrate having done so."""
 
 
 def _record_session_attestation(domain: Path) -> None:
@@ -260,11 +231,11 @@ def _record_session_attestation(domain: Path) -> None:
     `options: {session_gate: warn|strict}`.
 
     **Every emitting path must call this.** The attestation attests to
-    *emission*, not to a rendering format, so the assistant rendering earns it
-    exactly as the plain one does. Attesting on only one path made the gate
-    fire against the harness integration that satisfies its own intent — a
-    session opened by the scaffolded hook (`--assistant`) could never clear
-    the gate it was designed to satisfy (field report 2026-08-13).
+    *emission*, not to a rendering format. When a second rendering existed and
+    only one path attested, the gate fired against the harness integration
+    that satisfies its own intent — a hook-opened session could never clear
+    the gate it was designed to satisfy (field report 2026-08-13). One
+    rendering remains today; the rule outlives it.
 
     Best-effort: orientation must never fail on it, and the gate reports
     absence itself.
@@ -283,90 +254,12 @@ def _record_session_attestation(domain: Path) -> None:
         pass
 
 
-_HANDOFF_PREFIXES = ("session-end", "handoff", "close-session")
 
 
-def _where_you_left_off(domain: Path):
-    """The last session's handoff, uncut.
-
-    Carried-forward work lives in the session-end commit subject — the
-    framework's own doctrine puts the handoff in the event stream rather than
-    in a thing, so there is no `continuity-brief` to read. The velocity line
-    truncates that subject to 110 chars to keep orientation short, which
-    deletes exactly the answer to the most likely question at session start:
-    *what was I in the middle of?* (Leg 2: the operator's unfinished plan work
-    was the one thing they had to ask for.) Compression is of the telling,
-    never of the substance — so the handoff is surfaced separately and whole,
-    and shaping it is the agent's job, not the emitter's.
-    """
-    if not (domain / "things").is_dir():
-        return None
-    r = subprocess.run(["git", "log", "-40", "--format=%H|%cr|%s"],
-                       cwd=domain, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace")
-    if r.returncode != 0:
-        return None
-    lines = r.stdout.splitlines()
-    for line in lines:
-        sha, _, tail = line.partition("|")
-        when, _, subj = tail.partition("|")
-        if subj.strip().split(":", 1)[0].strip().lower() not in _HANDOFF_PREFIXES:
-            continue
-        # Subject alone is not the handoff. Domains that write a short subject
-        # carry the carried-forward work in the body — reading only `%s` would
-        # have reproduced the very omission this exists to fix.
-        b = subprocess.run(["git", "log", "-1", "--format=%b", sha],
-                           cwd=domain, capture_output=True, text=True,
-                           encoding="utf-8", errors="replace")
-        body = (b.stdout or "").strip() if b.returncode == 0 else ""
-        if len(body) > 4000:
-            body = body[:4000].rsplit("\n", 1)[0] + "\n…"
-        # A handoff is a snapshot; the work is continuous. Harvest is
-        # deliberate by design, so sessions that commit without a session-end
-        # are the normal case — and their commits overtake the carried-forward
-        # list silently (QMS porch, 2026-08-06: a three-item list presented as
-        # the state of play, one third already done). The emitter holds both
-        # facts; it must compare them, and say what it did not check. All
-        # commits count, not just things/: config and tool work overtake a
-        # plan the same way.
-        c = subprocess.run(["git", "rev-list", "--count", f"{sha}..HEAD"],
-                           cwd=domain, capture_output=True, text=True,
-                           encoding="utf-8", errors="replace")
-        try:
-            overtaken = int(c.stdout.strip()) if c.returncode == 0 else 0
-        except ValueError:
-            overtaken = 0
-        return ("found", (when.strip(), subj.strip(), body, sha[:9], overtaken))
-    # Searched and found none — which is not the same as none existing. A
-    # domain whose handoffs use another word renders identically to one that
-    # never closed a session unless the search states itself (QMS porch,
-    # a-primitive-is-known-once-and-must-be-found-again-at-every-site: an
-    # assumed emptiness must name what it looked for; only an established
-    # one may stay silent).
-    return ("none", len(lines))
 
 
-def _title_of(thing) -> str | None:
-    """The thing's own H1, mechanically — name-before-identifier as a floor
-    property rather than a rule the agent must hold (leg-5 pivot: the agent
-    re-rendering ids into names was a drift surface; the floor titling its
-    own rows removes it)."""
-    for line in (thing.body or "").splitlines():
-        s = line.strip()
-        if s.startswith("# "):
-            t = s[2:].strip()
-            return t or None
-        if s and not s.startswith("#"):
-            break  # body opens with prose, not a heading — no title to lift
-    return None
 
 
-def _days_past(reason: str) -> int | None:
-    """How stale a fired trigger is, read out of the floor's own phrasing.
-    None when the reason names no elapsed time (fires-in-future, or a
-    condition with no date at all)."""
-    m = re.search(r"OVERDUE by (\d+)d", reason) or re.search(r"\((\d+)d ago\)", reason)
-    return int(m.group(1)) if m else None
 
 
 def _fired_by_thing(domain: Path):
@@ -391,237 +284,14 @@ def _fired_by_thing(domain: Path):
     return fired, upcoming, horizon, skipped
 
 
-def _open_work(domain: Path):
-    try:
-        corpus, _ = scan(domain)
-    except Exception:
-        return [], [], {}, None
-    conflicts, loops, watched = [], [], []
-    for t in corpus.things:
-        typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
-        if typ == "conflict" and status == "open":
-            conflicts.append(t)
-        elif typ not in _ORIENT_KNOWLEDGE_TYPES and not is_terminal(corpus.schema, t.meta):
-            # Watched-not-owned (v3.27.0): imported/ingested externals leave the
-            # owned set. A fired trigger on a watched thing still surfaces —
-            # the caller re-enters fired things by id, which is exactly how
-            # `type: import` triggers keep their voice.
-            (watched if str(t.meta.get("origin")) == "external" else loops).append(t)
-    return conflicts, loops, watched, {t.id: t for t in corpus.things}, corpus.schema
 
 
-def _as_date(v):
-    if isinstance(v, dt.date):
-        return v
-    try:
-        return dt.date.fromisoformat(str(v)[:10])
-    except Exception:
-        return None
 
 
-def _rank_open(loops, fired: dict[str, list[str]], schema=None):
-    """Mechanical ordering only: fired triggers (most-matured first), then
-    due-date proximity, then priority, alphabetical as the final tiebreak.
-    Genuine sequencing is the agent's — this just refuses to make the
-    operator find the overdue item themselves."""
-    today = dt.date.today()
-    rows = []
-    for t in loops:
-        tid = t.id
-        reasons = fired.get(tid, [])
-        matured = max([d for d in (_days_past(r) for r in reasons) if d is not None],
-                      default=None)
-        due = _as_date(t.meta.get("due_date"))
-        due_days = (due - today).days if due else None
-        prio = str(t.meta.get("priority", "")).lower()
-        try:
-            settled = bool(schema is not None and is_terminal(schema, t.meta))
-        except Exception:
-            settled = False
-        rows.append({
-            "id": tid, "type": str(t.meta.get("type")),
-            "status": str(t.meta.get("status")), "settled": settled,
-            "title": _title_of(t),
-            "reasons": reasons, "matured": matured,
-            "due": due, "due_days": due_days, "priority": prio,
-            "key": (0 if reasons else 1,
-                    -(matured if matured is not None else 0),
-                    due_days if due_days is not None else 10 ** 6,
-                    _PRIORITY_RANK.get(prio, 9),
-                    tid),
-        })
-    rows.sort(key=lambda r: r["key"])
-    return rows
 
 
-def _row_line(r: dict) -> str:
-    """One open item, with the mechanical grounds for its position stated —
-    never a recommendation, always a fact the operator can check."""
-    bits = []
-    if r["due_days"] is not None and r["due_days"] < 0:
-        bits.append(f"**overdue {-r['due_days']}d** (due {r['due']})")
-    elif r["due_days"] is not None and r["due_days"] <= 30:
-        bits.append(f"due in {r['due_days']}d ({r['due']})")
-    if r["reasons"]:
-        n = len(r["reasons"])
-        if r["matured"] is not None:
-            bits.append(f"{n} trigger{'s' if n > 1 else ''} matured "
-                        f"(oldest {r['matured']}d ago)")
-        else:
-            bits.append(f"{n} trigger{'s' if n > 1 else ''} fired")
-    if r["priority"] in ("high", "critical") and not r["reasons"]:
-        bits.append(f"{r['priority']} priority")
-    if r["type"] == "conflict":
-        bits.append("open conflict")
-    elif r["settled"]:
-        # The thing is closed but its trigger is not — a wait left behind by
-        # finished work is the most invisible kind there is.
-        bits.append(f"{r['status']}, but the wait is still live")
-    tail = " — " + " · ".join(bits) if bits else f" — {r['status']}"
-    # Name before identifier, as a floor property: the row leads with the
-    # thing's own H1 where it has one; the id stays for addressability.
-    if r.get("title"):
-        return f"- **{r['title']}** (`{r['id']}`){tail}"
-    return f"- `{r['id']}`{tail}"
 
 
-def _render_assistant(domain: Path, meta: dict, exceptions: list[str],
-                      flips: list[str], velocity: str) -> list[str]:
-    fired, upcoming, horizon, skipped = _fired_by_thing(domain)
-    conflicts, loops, watched, by_id, schema = _open_work(domain)
-
-    # A fired trigger must reach the operator whatever it is attached to. The
-    # open-loop set is NOT the right filter: a trigger declared on a conflict,
-    # or on a plan that closed while leaving a wait behind, is exactly the kind
-    # the domain most needs surfaced — and filtering by open-loop membership
-    # silently swallowed both. (Phase 0, QMS drive: two such triggers vanished.)
-    ranked_things = list(loops)
-    seen = {t.id for t in loops}
-    for tid in fired:
-        if tid not in seen and tid in by_id:
-            ranked_things.append(by_id[tid])
-            seen.add(tid)
-
-    rows = _rank_open(ranked_things, fired, schema)
-    attention = [r for r in rows if r["reasons"] or
-                 (r["due_days"] is not None and r["due_days"] <= 30)]
-    att_ids = {r["id"] for r in attention}
-    rest = [r for r in rows if r["id"] not in att_ids]
-    conflicts = [c for c in conflicts if c.id not in att_ids]
-
-    # The kernel lives in the FRAMEWORK root, not the domain: a bare
-    # `kernel.md` sends the first read into the domain, where no such file
-    # exists (field report 2026-08-13). Emit the path the reader can actually
-    # open — relative where that is meaningful, absolute otherwise.
-    out = [f"# {domain.name} — session start", "",
-           _REGISTER_SEED.format(kernel=_kernel_reference(domain)), ""]
-
-    # The operator's loop starts at "what have I got", and for anyone returning
-    # that means "what was I doing". Ranked attention answers "what's first" —
-    # a different question, and it was answering it first.
-    left_off = _where_you_left_off(domain)
-    if left_off and left_off[0] == "none" and left_off[1]:
-        # One line, no heading: the absence of a handoff is not a section,
-        # but an assumed absence must state its search.
-        out.append(f"_No handoff found — searched the last {left_off[1]} commit "
-                   f"subjects for {' / '.join(_HANDOFF_PREFIXES)}._")
-        out.append("")
-    elif left_off and left_off[0] == "found":
-        when, subj, body, sha, overtaken = left_off[1]
-        out.append("## Where you left off")
-        out.append(f"Last session closed {when} — **{subj}**")
-        if overtaken:
-            # Beside the handoff, never forty lines away in Backdrop: the
-            # staleness and the snapshot must be read together or the snapshot
-            # is read as current. Silent at zero — a fresh handoff gains
-            # nothing (say nothing where the domain is healthy).
-            out.append("")
-            out.append(f"**{overtaken} commit(s) have landed since this "
-                       f"handoff was written — treat its carried-forward "
-                       f"list as unverified; the log knows more.**")
-        if body:
-            out.append("")
-            out.append(body)
-        out.append("")
-        out.append(f"_Carried-forward work lives here, not in the ranking "
-                   f"below. Full handoff: `git show {sha} --no-patch`._")
-        out.append("")
-
-    if attention:
-        out.append("## Wants attention")
-        out += [_row_line(r) for r in attention]
-        out.append("")
-
-    if rest:
-        # Grouped by the domain's own status vocabulary, never a flat list:
-        # "what am I in the middle of" and "what have I not begun" are
-        # different questions, and a row of bare ids answered neither. No
-        # semantics invented here — whatever the domain declared is what shows.
-        out.append(f"## Also open ({len(rest)})")
-        by_status: dict[str, list[str]] = {}
-        for r in rest:
-            by_status.setdefault(r["status"], []).append(r["id"])
-        for status in sorted(by_status, key=lambda s: (s in ("not-started", ""), s)):
-            ids = by_status[status]
-            shown = " · ".join(f"`{i}`" for i in ids[:12])
-            more = f" …and {len(ids) - 12} more." if len(ids) > 12 else ""
-            out.append(f"- **{status or 'unstated'}** ({len(ids)}): {shown}{more}")
-        out.append("")
-
-    if conflicts:
-        out.append(f"## Unresolved conflicts ({len(conflicts)})")
-        out.append("  " + " · ".join(f"`{c.id}`" for c in conflicts))
-        out.append("")
-
-    if watched:
-        # Count only, never a listing: watched things need no attention unless
-        # a trigger fires (those re-enter "Wants attention" via the fired path).
-        wf = [w for w in watched if w.id in fired]
-        out.append(f"Watched: {len(watched)} external thing(s) — sources' state, "
-                   f"not this domain's work; freshness via `mdllm imports-check`."
-                   + (f" {len(wf)} have fired triggers (surfaced above)." if wf else ""))
-        out.append("")
-
-    # Rule 4 — expand at human-decides moments. This is the one section that
-    # gets LONGER, not shorter: a wrong flip is unrecoverable in retrospect,
-    # and smooth prose here would buy assent exactly where deliberation is owed.
-    if flips:
-        out.append(f"## Needs your confirmation ({len(flips)})")
-        out.append("External things were marked human-verified since the last "
-                   "session. Each one now carries decisions. Confirm each is real:")
-        out += flips
-        out.append("")
-
-    if exceptions:
-        out.append("## Not working as it should")
-        out += exceptions
-        out.append("")
-
-    out.append("## Backdrop")
-    # The full subject line of a session-end commit runs to hundreds of words.
-    # Verbatim, it is the single largest block in the orientation and answers
-    # none of the operator's four questions; the log is one command away.
-    v = velocity
-    m = re.match(r'last `things/` change (.+?) \("(.*)"\); (\d+|\?) commit', v, re.S)
-    if m:
-        when, subj, n = m.group(1), " ".join(m.group(2).split()), m.group(3)
-        if len(subj) > 110:
-            subj = subj[:110].rsplit(" ", 1)[0] + "…"
-        v = f"Last worked {when}: \"{subj}\" · {n} commit(s) in 30d."
-    out.append(f"- {v}")
-    if upcoming:
-        out.append(f"- {len(upcoming)} condition(s) maturing within 30 days — "
-                   f"upcoming, not fired.")
-    if horizon:
-        out.append(f"- {len(horizon)} item(s) beyond the 30-day horizon.")
-    if skipped:
-        out.append(f"- {len(skipped)} trigger(s) the floor cannot evaluate — "
-                   f"yours to judge.")
-    out.append("")
-    out.append("_Ask for the derivation of anything here, the horizon, or the "
-               "triggers left to judgment (`mdllm triggers .` carries the full "
-               "evaluation)._")
-    return out
 
 
 def cmd_session_start(args) -> int:
@@ -632,14 +302,9 @@ def cmd_session_start(args) -> int:
         meta, _, _ = parse_frontmatter(agents.read_text(encoding="utf-8"))
         meta = meta or {}
 
-    assistant = getattr(args, "assistant", False)
-    # Exceptions accumulate separately from the legacy line-stream so the
-    # assistant renderer can group them under one plain-language heading.
-    exceptions: list[str] = []
-
     out = ["# MarkdownLLM — Session Start (run before the user's first request)", "",
            "The live request will pull you toward itself; do these first, then await intent:",
-           "1. Load `kernel.md` (operative kernel).",
+           f"1. Load `{_kernel_reference(domain)}` (operative kernel).",
            "2. Act on the version + velocity (backward) and open-loops (forward) status below.",
            "3. Surface the fired triggers below to the user; judge the ones the "
            "floor could not evaluate.", ""]
@@ -665,16 +330,10 @@ def cmd_session_start(args) -> int:
             if not seen:
                 out.append(f"- **Version: STALE** — framework v{fv}; domain has no "
                            f"`framework_version_seen`. Run `mdllm refresh .` and adopt.")
-                exceptions.append(f"- This domain has never recorded which framework "
-                                  f"version it was built against (now v{fv}). "
-                                  f"Run `mdllm refresh .` and adopt.")
             elif version_tuple(seen) != version_tuple(fv):
                 out.append(f"- **Version: MISMATCH** — framework v{fv}; domain last saw "
                            f"v{seen}. Validate the domain, then `mdllm refresh .` → adopt "
                            f"→ `--seal`.")
-                exceptions.append(f"- The framework moved on (v{seen} → v{fv}) and this "
-                                  f"domain hasn't caught up. Validate it, then "
-                                  f"`mdllm refresh .` → adopt → `--seal`.")
             else:
                 out.append(f"- **Version: in sync** (framework v{fv}).")
 
@@ -683,13 +342,6 @@ def cmd_session_start(args) -> int:
     floor = _floor_status(domain)
     if floor:
         out.append(floor)
-        if "NOT INSTALLED" in floor:
-            exceptions.append("- Safety checks aren't switched on in this copy of the "
-                              "domain, so nothing is stopping a bad commit. "
-                              "Run `mdllm install-hook .`")
-        else:
-            exceptions.append("- The safety checks in this copy are an old version and "
-                              "may miss newer problems. Run `mdllm install-hook .`")
 
     velocity = _velocity_signal(domain)
     out.append(f"- **Velocity:** {velocity}")
@@ -707,16 +359,9 @@ def cmd_session_start(args) -> int:
         if drifted:
             out.append(f"- **Domain kernel: DRIFT** in {', '.join(drifted)} — run "
                        f"`mdllm domain-kernel .` and commit.")
-            exceptions.append(f"- The rules copied into this domain's AGENTS.md no "
-                              f"longer match the framework ({', '.join(drifted)}). "
-                              f"Run `mdllm domain-kernel .` and commit.")
 
-    # Retrospective cadence is computed HERE, above the rendering branch,
-    # because `exceptions` is passed into the assistant rendering below and is
-    # complete at that moment. Appending a finding after the branch could only
-    # ever reach the plain rendering, so a domain owing a retrospective was
-    # never told so in the assistant block's exceptions section (field report
-    # 2026-08-13). The plain rendering still emits it at its original position.
+    # Retrospective cadence, computed once and emitted below at its own
+    # position.
     retrospective_due: list[str] = []
     try:
         from .model import scan as _scan
@@ -725,13 +370,6 @@ def cmd_session_start(args) -> int:
         retrospective_due = [f.message for f in _retro(domain, _corpus)]
     except Exception:
         retrospective_due = []  # advisory only — session start never fails on it
-    for message in retrospective_due:
-        exceptions.append(f"- This domain owes a retrospective: {message}")
-
-    if assistant:
-        _record_session_attestation(domain)
-        print("\n".join(_render_assistant(domain, meta, exceptions, flips, velocity)))
-        return 0
 
     out.extend(_orient_forward(domain))
 

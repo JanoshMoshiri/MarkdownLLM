@@ -2164,83 +2164,14 @@ def _commit_all(tmp_path, msg):
                    cwd=tmp_path, check=True)
 
 
-def test_register_handoff_overtaken_by_commits_is_flagged(tmp_path):
-    # QMS porch, 2026-08-06 (orientation-presents-a-handoff-the-work-has-
-    # overtaken): harvest is deliberate, so sessions that commit without a
-    # session-end are the normal case — and the carried-forward list decays
-    # silently. The staleness must sit BESIDE the handoff, not in Backdrop.
-    _git_repo(tmp_path)
-    write(tmp_path, "things/mine.md", thing_text(
-        "id: mine\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
-    _commit_all(tmp_path, "session-end: the handoff\n\ncarried: upload the register")
-    write(tmp_path, "things/mine2.md", thing_text(
-        "id: mine2\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
-    _commit_all(tmp_path, "create: mine2")
-    from markdownllm.session import _render_assistant
-    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
-    assert "Where you left off" in out and "the handoff" in out
-    assert "carried: upload the register" in out  # body, not just subject
-    assert "1 commit(s) have landed since this handoff" in out
-    # staleness beside the handoff — before the ranking, not after it
-    assert out.index("have landed since") < out.index("## Also open")
 
 
-def test_register_rows_lead_with_the_things_own_title(tmp_path):
-    # Leg-5 pivot: name-before-identifier as a floor property, not a prose
-    # rule — the row leads with the thing's H1; the id stays addressable.
-    write(tmp_path, "things/batch.md", thing_text(
-        "id: batch\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
-        "due_date: 2026-06-15",
-        body="# The document batch send\n\nBody.\n"))
-    from markdownllm.session import _render_assistant
-    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
-    assert "- **The document batch send** (`batch`)" in out
 
 
-def test_register_absent_handoff_states_its_search(tmp_path):
-    # QMS porch, 2026-08-06 (a-primitive-is-known-once-...): "no handoff" and
-    # "handoff exists under a prefix the search doesn't know" rendered
-    # byte-identically. An assumed emptiness must name what it looked for.
-    _git_repo(tmp_path)
-    write(tmp_path, "things/mine.md", thing_text(
-        "id: mine\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
-    _commit_all(tmp_path, "eod: wrapped for the day")  # a handoff, unrecognised
-    from markdownllm.session import _render_assistant
-    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
-    assert "## Where you left off" not in out  # absence is a line, not a section
-    assert "No handoff found — searched the last 1 commit" in out
-    assert "session-end / handoff / close-session" in out
 
 
-def test_register_fresh_handoff_gains_no_staleness_line(tmp_path):
-    # The insight's own trap, pinned deliberately: session-end at HEAD is the
-    # one arrangement where the bug cannot appear — and where the fix must
-    # stay silent (say nothing where the domain is healthy).
-    _git_repo(tmp_path)
-    write(tmp_path, "things/mine.md", thing_text(
-        "id: mine\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
-    _commit_all(tmp_path, "session-end: the handoff")
-    from markdownllm.session import _render_assistant
-    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
-    assert "Where you left off" in out
-    assert "have landed since" not in out
 
 
-def test_register_watched_fired_trigger_still_surfaces(tmp_path):
-    # The QMS lesson kept: excluding watched from the owned count must not
-    # silence its triggers — a fired `type: import`-style trigger re-enters
-    # the attention ranking by id.
-    write(tmp_path, "things/mirror.md", thing_text(
-        "id: mirror\ntype: task\nstatus: in-progress\ncreated: 2026-06-01\n"
-        "origin: external\nverified: false\nsource_domain: srcdom\n"
-        "source_id: the-task\nsource_commit: 'abc1234'\n"
-        "triggers:\n  - type: time\n    condition: \"2026-01-01 reached\"\n"
-        "    action: \"chase\""))
-    from markdownllm.session import _render_assistant
-    out = "\n".join(_render_assistant(tmp_path, {}, [], [], "velocity"))
-    assert "Watched: 1 external thing(s)" in out
-    assert "`mirror`" in out  # fired trigger put it in the attention section
-    assert "fired triggers (surfaced above)" in out
 
 
 # ---------------------------------------------------------------------------
@@ -2991,7 +2922,7 @@ def test_session_start_surfaces_retrospective_debt(tmp_path, capsys):
     from markdownllm.session import cmd_session_start
     import argparse
     root = _seed_overdue_domain(tmp_path / "dom")
-    cmd_session_start(argparse.Namespace(path=str(root), assistant=False))
+    cmd_session_start(argparse.Namespace(path=str(root)))
     out = capsys.readouterr().out
     assert "Retrospective cadence" in out
     assert "no retrospective has ever been written" in out
@@ -3008,7 +2939,7 @@ def test_session_start_cadence_quiet_for_young_domain(tmp_path, capsys):
         encoding="utf-8")
     _sync_git(root, "add", "-A")
     _sync_git(root, "commit", "-q", "-m", "born recently")
-    cmd_session_start(argparse.Namespace(path=str(root), assistant=False))
+    cmd_session_start(argparse.Namespace(path=str(root)))
     out = capsys.readouterr().out
     assert "Retrospective cadence" not in out  # quiet when healthy
 
@@ -3137,15 +3068,17 @@ def test_session_start_writes_attestation(tmp_path, capsys):
     assert len(sha) >= 7  # HEAD sha recorded beside the timestamp
 
 
-def test_session_start_assistant_rendering_also_attests(tmp_path, capsys):
-    """The harness-bound path must satisfy the gate it exists to satisfy.
+def test_session_start_attests_and_the_clone_then_clears_the_gate(tmp_path,
+                                                                  capsys):
+    """Emitting the contract must satisfy the gate that demands it.
 
-    The scaffolded SessionStart hook runs `session-start . --assistant`. That
-    rendering returned before the attestation write, so under
-    `session_gate: strict` every hook-opened session began with a
-    commit-blocking Error — the gate firing against the one integration that
-    emits its contract mechanically (field report 2026-08-13). The
-    attestation attests to EMISSION, not to a rendering format.
+    Under `session_gate: strict` a hook-opened session once began with a
+    commit-blocking Error, because the rendering the scaffolded hook used
+    returned before the attestation write — the gate firing against the one
+    integration that emits its contract mechanically (field report
+    2026-08-13). The attestation attests to EMISSION, so every emitting path
+    must record it. Only one rendering survives today; the rule does not
+    depend on that.
     """
     _git_repo(tmp_path)
     write(tmp_path, "things/base.md", thing_text(
@@ -3157,22 +3090,21 @@ def test_session_start_assistant_rendering_also_attests(tmp_path, capsys):
     attest = (tmp_path / gd).resolve() / "mdllm-attest"
     assert not attest.exists()
 
-    mdllm.cmd_session_start(_ns(path=str(tmp_path), assistant=True))
+    mdllm.cmd_session_start(_ns(path=str(tmp_path)))
     capsys.readouterr()
 
-    assert attest.is_file(), "--assistant emitted the contract but did not attest"
+    assert attest.is_file(), "session-start emitted the contract but did not attest"
     write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
     assert _gate(tmp_path) == [], "a freshly attested clone must clear the gate"
 
 
-def test_retrospective_debt_reaches_the_assistant_exceptions(tmp_path, capsys,
-                                                             monkeypatch):
-    """Cadence debt must reach BOTH renderings, not only the plain one.
+def test_retrospective_debt_is_surfaced_at_session_start(tmp_path, capsys,
+                                                         monkeypatch):
+    """A domain owing a retrospective must be told so at t=0.
 
-    The check appended to `exceptions` after the assistant branch had already
-    been handed that list, so a domain owing a retrospective was never told so
-    in the assistant block (field report 2026-08-13). Invisible in the field
-    only because that domain happened to be current.
+    The cadence check reached only one of two renderings while both existed
+    (field report 2026-08-13); it was invisible in the field only because
+    that domain happened to be current.
     """
     _git_repo(tmp_path)
     write(tmp_path, "things/base.md", thing_text(
@@ -3187,15 +3119,11 @@ def test_retrospective_debt_reaches_the_assistant_exceptions(tmp_path, capsys,
     monkeypatch.setattr(_validation, "retrospective_findings",
                         lambda domain, corpus: [_Finding()])
 
-    mdllm.cmd_session_start(_ns(path=str(tmp_path), assistant=True))
-    assistant_out = capsys.readouterr().out
-    assert "owes a retrospective" in assistant_out
-    assert "40 days ago" in assistant_out
-
-    # And the plain rendering keeps emitting it at its own position.
     mdllm.cmd_session_start(_ns(path=str(tmp_path)))
-    plain_out = capsys.readouterr().out
-    assert "Retrospective cadence:" in plain_out
+    out = capsys.readouterr().out
+
+    assert "Retrospective cadence:" in out
+    assert "40 days ago" in out
 
 
 def test_install_hook_no_test_skips_the_full_validate(tmp_path, capsys):
@@ -3218,18 +3146,24 @@ def test_install_hook_no_test_skips_the_full_validate(tmp_path, capsys):
     assert (tmp_path / ".git" / "hooks" / "pre-commit").is_file()
 
 
-def test_assistant_rendering_names_an_openable_kernel(tmp_path, capsys):
-    """The kernel lives in the framework root, so a bare name is unopenable."""
+def test_session_start_names_an_openable_kernel(tmp_path, capsys):
+    """The kernel lives in the framework root, so a bare name is unopenable.
+
+    From inside a domain, `kernel.md` resolves to a file that does not exist
+    and the first read fails (field report 2026-08-13). Regression guard:
+    this defect was originally fixed only in a second rendering, so removing
+    that rendering would have silently restored it here.
+    """
     _git_repo(tmp_path)
     write(tmp_path, "things/base.md", thing_text(
         "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
     _git_commit(tmp_path, "base")
 
-    mdllm.cmd_session_start(_ns(path=str(tmp_path), assistant=True))
+    mdllm.cmd_session_start(_ns(path=str(tmp_path)))
     out = capsys.readouterr().out
 
-    line = next(l for l in out.splitlines() if "Before the first reply" in l)
-    reference = line.split("load `")[1].split("`")[0]
+    line = next(l for l in out.splitlines() if "operative kernel" in l)
+    reference = line.split("Load `")[1].split("`")[0]
     assert reference != "kernel.md", "a bare name resolves inside the domain"
     assert (tmp_path / reference).resolve().is_file()
 
