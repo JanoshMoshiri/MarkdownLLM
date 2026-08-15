@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-14
-generated: 2026-08-14T22:24:48
-generated_from: HEAD@edddff8
-coverage: 195
+created: 2026-08-15
+generated: 2026-08-15T19:00:46
+generated_from: HEAD@371692d
+coverage: 196
 framework_version: 3.31.0
 ---
 
@@ -288,6 +288,9 @@ framework_version: 3.31.0
 - estate-mechanics-guide --documents--> git-workflow-specification
 - estate-mechanics-guide --documents--> change-reconciliation-specification
 - estate-mechanics-guide --documents--> retrospective-specification
+- estate-migration-record-2026-08-14 --documents--> vendor-harness-adapter-foundation
+- estate-migration-record-2026-08-14 --derived-from--> claude-gate-5r3-acceptance-2026-08-13
+- estate-migration-record-2026-08-14 --implements--> assistant-register-does-not-graduate
 - every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated
 - every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
 - every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose

@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-14
-generated: 2026-08-14T22:24:59
-generated_from: HEAD@edddff8
+created: 2026-08-15
+generated: 2026-08-15T19:00:49
+generated_from: HEAD@371692d
 coverage: 24
 framework_version: 3.31.0
 ---
@@ -17,6 +17,7 @@ framework_version: 3.31.0
 
 ## claude-gate-5r3-acceptance-2026-08-13
 - claude-gate-5r4-acceptance-2026-08-13 (derived-from)
+- estate-migration-record-2026-08-14 (derived-from)
 
 ## claude-gate-5r4-acceptance-2026-08-13
 - claude-gate-5r5-acceptance-2026-08-13 (derived-from)
