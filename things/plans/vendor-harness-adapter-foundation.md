@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.18
+version: 1.19
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -53,21 +53,27 @@ accepts the boundary and phase order.
 accepted Gate 5R.5 at `ea4ea12`: the unchanged PowerShell 5.1 reproduction
 passed and a real automatic framework-root session emitted both successful
 steps, all four orientation elements, a fresh session-gate attestation, and
-current-definition evidence. **Phase 6 is active with independent Claude and
-Codex lanes.** Claude has now completed native Linux lifecycle dispatch at
-`3254a99`; its remaining root/non-startup evidence stays independent. Codex
-Desktop build `26.803.10989.0` injected AGENTS instructions but did not dispatch
-the current project SessionStart hook in a fresh framework-root task, so that
-surface is recorded narrowly as unverified and the positive root/nested lane
-moves to Codex CLI. Neither lane blocks the other; their evidence joins only at
-the Phase 6 gate. Two earlier
+current-definition evidence. **Phase 6R is now the shared execution boundary
+before the remaining Phase 6 Codex evidence.** Estate rollout exposed that the
+neutral runner's 2,200-character global tail slice silently drops version,
+velocity, and open-loop orientation on large domains even when both lifecycle
+steps succeed. The fix must allocate bounded output structurally without
+declaring today's quiet content permanently disposable; both adapter hashes
+must carry the corrected semantics before prior attestations can count again.
+Claude has completed native Linux lifecycle dispatch at `3254a99`, and all 13
+nested domains are migrated to the one-handler projection and sealed to
+v3.31.0. Codex Desktop build `26.803.10989.0` injected AGENTS instructions but
+did not dispatch the current project SessionStart hook in a fresh
+framework-root task, while Codex CLI has established positive automatic root
+startup evidence. Remaining root-source and nested Codex evidence resumes only
+after Gate 6R. Neither harness may reuse pre-correction attestations. Two earlier
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
 Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
 handlers in parallel, so the scaffolded two-handler SessionStart form does not
-guarantee `estate-sync` before `session-start`. The framework root now tracks
-both current project projections after reviewed `--refresh-legacy` dry-run and
-atomic apply. No nested domain adapter migration is authorised or performed.
+guarantee `estate-sync` before `session-start`. The framework root and nested
+estate now carry both adapters where selected; publication remains the
+operator's act.
 
 ## Claude acceptance amendments — v1.10 (2026-08-12)
 
@@ -1305,6 +1311,51 @@ external-basetemp suite: 465/465. Evidence:
 `lifecycle-budget-allocation-acceptance-2026-08-13`. No nested domain was
 migrated. Claude's PowerShell 5.1 and automatic-root side-effect acceptance
 remain deliberately unchecked.
+
+### Phase 6R — Correct lifecycle output allocation (Codex/shared owner;
+Claude acceptance)
+
+The estate migration found a second resource boundary after the time-budget
+correction: the runner bounds all model-visible lifecycle text to 2,200
+characters by retaining one global tail. On large domains the hook succeeds
+and attests, but version, velocity, and open loops disappear. Raising or
+removing the bound is not portable because Codex has a separately declared
+context envelope; reversing the slice merely trades triggers for the earlier
+sections.
+
+- [ ] Add an inward-owned total output envelope and per-step protected
+  character allocations, parallel to the accepted time-allocation contract.
+  A preceding step may use unclaimed output capacity but cannot erase a later
+  step's protected representation.
+- [ ] Compact within a step by neutral text structure, not by named domain
+  fields or a hard-coded list of disposable content. Every structural section
+  remains represented; omitted detail is explicit and the full operation stays
+  available through its normal command.
+- [ ] Keep the model-visible output within the existing 2,200-character runner
+  ceiling and the Codex adapter's separately declared 2,500-character context
+  envelope. Preserve step attribution and failure labels even at tiny limits.
+- [ ] Include the complete output-allocation semantics in both managed
+  definition hashes. Prior 5R.5 projections become exact recognised legacy
+  inputs; prior attestations become stale rather than certifying changed
+  behaviour.
+- [ ] Review one atomic root refresh and the selected estate refreshes through
+  `--dry-run` before apply. Preserve operator-owned bytes, refuse extensions or
+  ambiguity, and leave QMS or any changed tree untouched until its owner clears
+  the discrepancy.
+- [ ] Add deterministic regressions using a report larger than the envelope.
+  Assert the bounded result still represents estate state plus version,
+  velocity, open loops, and triggers; do not accept exit zero or a generic
+  attestation as a substitute.
+- [ ] Run focused architecture/port/runner/adapter/install/scaffold tests, the
+  complete external-basetemp suite, validate, and coherence. Then obtain
+  independent Claude acceptance of the same final commit and a real large-domain
+  SessionStart side-effect record.
+
+**Gate 6R:** Codex supplies the neutral implementation, recognised-legacy
+migration inputs, reviewed refresh evidence, and deterministic record. Claude
+accepts the final commit and proves a real automatic large-domain session
+contains every orientation section under the bound. Only then do remaining
+Phase 6 Codex source/nested runs resume.
 
 ### Phase 6 — Execute in real harnesses (split ownership by harness)
 
