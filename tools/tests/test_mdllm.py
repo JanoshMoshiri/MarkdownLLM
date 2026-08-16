@@ -5,11 +5,20 @@ silently changes what "valid" means for every domain. These tests pin the
 behaviour of each mechanical check. Run: python -m pytest tools/tests -q
 """
 
+import datetime as _dt
 import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+# Fixtures that age must be dated RELATIVE to the run, never literally.
+# Several floor sensors key on elapsed time — quarantine fires an Info at
+# >30 days unverified — so a hardcoded `created` turns any "no findings"
+# assertion into a time bomb: green in review, red in CI weeks later with a
+# diff that implicates the code rather than the fixture. One did exactly
+# that on 2026-08-16, thirty-one days after the date it was written with.
+RECENT = (_dt.date.today() - _dt.timedelta(days=1)).isoformat()
 
 import mdllm  # noqa: E402
 
@@ -1909,27 +1918,27 @@ def test_imports_freshness_http_unreachable_is_unknown(tmp_path):
 # truth claim about whether the human review was real.)
 
 
-EXT_UNVERIFIED = """id: ext-doc
+EXT_UNVERIFIED = f"""id: ext-doc
 type: reference
 status: not-started
-created: 2026-07-16
+created: {RECENT}
 origin: external
 verified: false
 """
 
-EXT_VERIFIED_ATTRIBUTED = """id: ext-doc
+EXT_VERIFIED_ATTRIBUTED = f"""id: ext-doc
 type: reference
 status: not-started
-created: 2026-07-16
+created: {RECENT}
 origin: external
 verified: true
 verified_by: A Human
 """
 
-EXT_VERIFIED_ANON = """id: ext-doc
+EXT_VERIFIED_ANON = f"""id: ext-doc
 type: reference
 status: not-started
-created: 2026-07-16
+created: {RECENT}
 origin: external
 verified: true
 """
@@ -2017,8 +2026,11 @@ def test_quarantine_ignores_non_external_and_unverified(tmp_path):
     write(tmp_path, "things/own.md", thing_text(
         "id: own\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"
         "verified: true\n"))  # not origin: external — out of scope
+    # RECENT, not a literal: an external thing older than 30 days legitimately
+    # earns the quarantine-age Info, which is a different check from the ones
+    # under test here.
     write(tmp_path, "things/ext.md", thing_text(
-        "id: ext\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"
+        f"id: ext\ntype: note\nstatus: not-started\ncreated: {RECENT}\n"
         "origin: external\nverified: false\n"))  # still quarantined — fine
     _git_commit(tmp_path, "seed")
     assert _quarantine(tmp_path) == []
