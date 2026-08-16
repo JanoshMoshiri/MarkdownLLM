@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-16
-generated: 2026-08-16T12:58:24
-generated_from: HEAD@d14abc8
-coverage: 201
+generated: 2026-08-16T18:43:35
+generated_from: HEAD@de035d3
+coverage: 203
 framework_version: 3.31.0
 ---
 
@@ -119,6 +119,10 @@ framework_version: 3.31.0
 - claude-5r2-renderer-acceptance-2026-08-13 --implements--> code-architect-governs-substrate-code
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
+- claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> interface-specification
+- claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> vendor-harness-adapter-foundation
+- claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> framework-discovery-specification
+- claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> claude-phase6-no-adapter-and-root-2026-08-16
 - claude-gate-5r1-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-gate-5r1-acceptance-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
 - claude-gate-5r1-acceptance-2026-08-13 --derived-from--> posix-floor-record-2026-08-13
@@ -139,6 +143,11 @@ framework_version: 3.31.0
 - claude-phase5r0-matrix-completion-2026-08-13 --implements--> portability-claims-need-execution-tests
 - claude-phase5r0-red-acceptance-2026-08-12 --documents--> vendor-harness-adapter-foundation
 - claude-phase5r0-red-acceptance-2026-08-12 --implements--> portability-claims-need-execution-tests
+- claude-phase6-no-adapter-and-root-2026-08-16 --documents--> vendor-harness-adapter-foundation
+- claude-phase6-no-adapter-and-root-2026-08-16 --complements--> codex-phase6-post-6r-acceptance-2026-08-16
+- claude-phase6-no-adapter-and-root-2026-08-16 --extends--> claude-gate-6r-acceptance-2026-08-16
+- claude-phase6-no-adapter-and-root-2026-08-16 --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
+- claude-phase6-no-adapter-and-root-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
 - claude-platform-surface-narrowed --informs--> vendor-harness-adapter-foundation
 - claude-platform-surface-narrowed --derived-from--> claude-phase5r0-matrix-completion-2026-08-13
 - code-architect-governs-substrate-code --informs--> vendor-harness-adapter-foundation
@@ -712,6 +721,8 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --implements--> relative-path-hooks-break-in-nested-domain-repos
 - vendor-harness-adapter-foundation --references--> codex-port-challenge-2026-08-11
 - vendor-harness-adapter-foundation --references--> codex-final-handoff-audit-2026-08-11
+- vendor-harness-adapter-foundation --references--> claude-phase6-no-adapter-and-root-2026-08-16
+- vendor-harness-adapter-foundation --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification

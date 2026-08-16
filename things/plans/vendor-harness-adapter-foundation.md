@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.20
+version: 1.21
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -40,6 +40,12 @@ linked_things:
   - id: codex-final-handoff-audit-2026-08-11
     relation: references
     notes: "Final A/0–2 acceptance evidence: the shared runtime passes real Codex-shell probes, while incomplete service-facing ports and unsafe Claude currency inspection return Phase 2C for correction."
+  - id: claude-phase6-no-adapter-and-root-2026-08-16
+    relation: references
+    notes: "Phase 6 Claude evidence: automatic framework-root SessionStart/PostToolUse after the Gate 6R refresh, and the disposable no-adapter floor proof whose interpretation leg did not close."
+  - id: claude-entry-surface-unprovisioned-for-no-adapter-domains
+    relation: references
+    notes: "The open finding that blocks the Claude adapter-optionality leg: no scaffold mode writes the CLAUDE.md wrapper that carries Claude's automatic entry route."
 ---
 
 # Vendor Harness Adapter Foundation
@@ -61,7 +67,14 @@ independently accepted by Claude on 2026-08-16 at `b82061f`
 (`evidence/claude-gate-6r-acceptance-2026-08-16.md`). **The post-6R Codex
 root, directly opened nested-domain, PostToolUse and no-adapter records are
 complete on Windows CLI 0.147.0
-(`evidence/codex-phase6-post-6r-acceptance-2026-08-16.md`).** Estate rollout had
+(`evidence/codex-phase6-post-6r-acceptance-2026-08-16.md`). The matching Claude
+framework-root record is complete on Claude Code 2.1.229
+(`evidence/claude-phase6-no-adapter-and-root-2026-08-16.md`), and the Claude
+disposable no-adapter run closed its session-gate and Git-floor legs. Its
+interpretation leg did not close: no scaffold mode writes the `CLAUDE.md`
+wrapper that carries Claude's documented automatic entry route, so a
+`--harness none` domain has no automatic Claude entry surface at all
+(`claude-entry-surface-unprovisioned-for-no-adapter-domains`, open).** Estate rollout had
 exposed that the neutral runner's 2,200-character global tail slice silently
 dropped version, velocity, and open-loop orientation on large domains even
 when both lifecycle steps succeeded. The correction allocates bounded output
@@ -1404,10 +1417,20 @@ definition hash, source event, timestamps, and observed outcome.
   observe SessionStart ordering, make a valid edit, observe quiet PostToolUse,
   make a controlled invalid edit, observe advisory feedback, repair it, and
   commit through the floor.
-- [ ] Claude framework root: only after an operator-approved recognised-legacy
+- [x] Claude framework root: only after an operator-approved recognised-legacy
   refresh, repeat the automatic lifecycle record at root. If the operator does
   not approve that refresh, record root as legacy/unverified and scope the
   Claude verified-on claim to the fresh scaffold; do not reuse the 5R.2 probe.
+  **Complete 2026-08-16** on the operator-approved Gate 6R root artifacts
+  (`currency=current`, `legacy-id=none`, so neither legacy nor a reused probe).
+  Claude Code 2.1.229 dispatched `SessionStart:startup` automatically at
+  `17:25:28.237Z`; the attestation landed 34 ms away at `17:25:28.203365+00:00`
+  with `definition_current=true`. Emitted context 2015/2200 characters carrying
+  both step labels, both return codes, estate state, Version, Velocity, Open
+  loops, Triggers, and explicit elision. Automatic `PostToolUse:Write` on an
+  invalid frontmatter thing returned 602 advisory characters naming the missing
+  field without blocking the write; the repair ran quiet and moved the
+  attestation to `validate=0`.
 - [x] Codex Desktop framework-root observation: on Windows build
   `26.803.10989.0`, open a fresh task with the current tracked project layer and
   distinguish automatic dispatch from AGENTS interpretation. AGENTS was
@@ -1427,14 +1450,39 @@ definition hash, source event, timestamps, and observed outcome.
   session start can establish the strict gate, a valid commit passes the Git
   floor, and an invalid commit is blocked.
 - [ ] Repeat the disposable no-adapter proof in Claude Code. This remains
-  Claude-owned; Codex does not self-certify another harness.
-- [ ] Record exact harness/version/platform evidence and failures. A passing
+  Claude-owned; Codex does not self-certify another harness. **Run 2026-08-16;
+  three of four legs closed, the fourth is a finding rather than a pass.** In an
+  out-of-estate `--harness none` scaffold with `.claude`, `.codex`,
+  `.git/mdllm-harness-attest` and `CLAUDE.md` all absent: a commit attempted
+  before any ritual was blocked by the strict session gate; the
+  interpretation-prescribed `session-start`, resolved through the relative
+  `framework_root` in the scaffolded `AGENTS.md`, established the attestation; a
+  valid commit passed the Git floor; a thing omitting `created` was blocked and
+  its repair passed. No harness attestation was ever minted. **The interpretation
+  leg did not close.** Claude's documented automatic entry route is
+  `CLAUDE.md → AGENTS.md`, and no scaffold mode writes that wrapper — verified by
+  comparing `--harness none` and `--harness claude` scaffolds — so the leg's
+  precondition is absent by construction, and at this framework root (also
+  wrapper-less) the transcript shows `AGENTS.md` was never auto-loaded. Tracked
+  as `claude-entry-surface-unprovisioned-for-no-adapter-domains` (open). A live
+  Claude Code session was not opened in the disposable repo: the CLI on this host
+  failed authentication before any model turn, and that failure is recorded
+  separately from the structural finding, which does not rest on it.
+- [x] Record exact harness/version/platform evidence and failures. A passing
   unit test earns designed-for; only these runs earn verified-on. Include the
   project configuration SHA-256 and repository commit for every record.
-- [ ] For every live event, capture the harness-owned transcript/debug record
+  Both harness records carry version, OS build, repository HEAD, project-config
+  SHA-256 and managed definition hashes, and both record their failures: Codex
+  Desktop's negative task-start surface and the in-repository basetemp fixture
+  error; Claude's CLI authentication failure and the unprovisioned entry
+  surface.
+- [x] For every live event, capture the harness-owned transcript/debug record
   and correlate its time window with the new hash-bound attestation. Directly
   running `harness-event` can mint the same record and is therefore a runtime
-  probe, not proof that the harness dispatched it.
+  probe, not proof that the harness dispatched it. Codex correlates by
+  transcript id and JSONL SHA-256; Claude correlates by session transcript
+  record and a 34 ms SessionStart window, with the PostToolUse pair correlated
+  the same way.
 - [x] Assert every Codex contract-bearing side effect, not only command completion:
   SessionStart evidence includes the emitted orientation content and a fresh
   clone-local session-gate attestation; post-write evidence includes the
@@ -1443,7 +1491,11 @@ definition hash, source event, timestamps, and observed outcome.
 - [x] Either carry the normalized SessionStart source
   (`startup|resume|clear|compact`) into evidence, or narrow the claim to the
   generic SessionStart events actually distinguishable by the record. Never
-  infer four verified triggers from one undifferentiated attestation.
+  infer four verified triggers from one undifferentiated attestation. The two
+  harnesses settle this differently and both are recorded as they are: Codex's
+  attestation does not carry the source, so its claim stays generic; Claude's
+  transcript names the hook `SessionStart:startup`, so `startup` is claimed and
+  `resume`, `clear` and `compact` remain unobserved.
 - [x] Split Claude Code lifecycle evidence from VS Code Copilot compatibility.
   Shared `.claude/settings.json` bytes or shortcut projections do not make a
   live Claude run evidence for Copilot; report Copilot separately as untested
@@ -1451,6 +1503,36 @@ definition hash, source event, timestamps, and observed outcome.
 
 **Gate:** the corrected Claude lifecycle projection and Codex are verified on
 the specifically tested surfaces, with no wider claim.
+
+**Gate 6 — returned 2026-08-16: lifecycle verified on both harnesses; adapter
+optionality closed for Codex and open for Claude.**
+
+What the gate asks for is met on its own terms. Both projections were
+automatically dispatched by their named products at the framework root, with
+hash-bound attestations correlated to harness-owned transcripts, contract-bearing
+side effects asserted rather than exit codes, and no claim wider than the tested
+surface: Codex CLI 0.147.0 and Claude Code 2.1.229, both on Windows 11 Pro
+10.0.26200, against the Gate 6R current definitions. Codex additionally holds a
+directly opened nested-domain record and a negative Desktop record; Claude
+additionally holds the Gate 6R large-domain record.
+
+One leg does not close, and it is not a lifecycle-adapter defect. Attempting the
+Claude half of the adapter-optionality proof surfaced that Claude's documented
+automatic entry route runs through a `CLAUDE.md` wrapper that **no scaffold mode
+writes**. The floor half of that proof passes — strict gate, valid commit,
+blocked invalid commit — but "interpretation remains automatic" cannot be
+asserted for a `--harness none` domain on this harness, because as scaffolded
+there is no automatic entry surface to survive the adapter's removal. That
+contradicts requirement 3 and a completion criterion, so it is recorded as an
+open conflict with three resolution paths rather than resolved inside this
+phase; the scaffold-behaviour options are product decisions.
+
+Phase 7 may proceed on the lifecycle vocabulary, since nothing it reconciles
+depends on the open leg. The completion criterion *"the substrate and every
+domain remain usable with no harness adapter"* stays unmet for Claude until
+`claude-entry-surface-unprovisioned-for-no-adapter-domains` is closed and the
+disposable proof is rerun in a live Claude Code session. Publication remains the
+operator's act.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
