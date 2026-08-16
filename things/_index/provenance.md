@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-15
-generated: 2026-08-15T19:00:49
-generated_from: HEAD@371692d
-coverage: 24
+created: 2026-08-16
+generated: 2026-08-16T11:25:19
+generated_from: HEAD@b82061f
+coverage: 25
 framework_version: 3.31.0
 ---
 
@@ -58,6 +58,9 @@ framework_version: 3.31.0
 
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## lifecycle-output-truncation-2026-08-14
+- claude-gate-6r-acceptance-2026-08-16 (derived-from)
 
 ## mcp-domain-server-design
 - phase-3-run-domain-task-reverted (pinned @fcd1c11)

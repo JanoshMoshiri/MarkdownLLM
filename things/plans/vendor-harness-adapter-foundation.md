@@ -53,13 +53,17 @@ accepts the boundary and phase order.
 accepted Gate 5R.5 at `ea4ea12`: the unchanged PowerShell 5.1 reproduction
 passed and a real automatic framework-root session emitted both successful
 steps, all four orientation elements, a fresh session-gate attestation, and
-current-definition evidence. **Phase 6R is now the shared execution boundary
-before the remaining Phase 6 Codex evidence.** Estate rollout exposed that the
-neutral runner's 2,200-character global tail slice silently drops version,
-velocity, and open-loop orientation on large domains even when both lifecycle
-steps succeed. The fix must allocate bounded output structurally without
-declaring today's quiet content permanently disposable; both adapter hashes
-must carry the corrected semantics before prior attestations can count again.
+current-definition evidence. **Phase 6R is complete and Gate 6R was
+independently accepted by Claude on 2026-08-16 at `b82061f`
+(`evidence/claude-gate-6r-acceptance-2026-08-16.md`); the remaining Phase 6
+Codex source and nested-domain evidence is released.** Estate rollout had
+exposed that the neutral runner's 2,200-character global tail slice silently
+dropped version, velocity, and open-loop orientation on large domains even
+when both lifecycle steps succeeded. The correction allocates bounded output
+structurally — per-step protected character shares, Markdown-structural
+sections, fair-shared limits, and both edges retained with elision marked —
+so no content is declared permanently disposable, and both adapter hashes
+carry the corrected semantics, so pre-correction attestations do not count.
 Claude has completed native Linux lifecycle dispatch at `3254a99`, and all 13
 nested domains are migrated to the one-handler projection and sealed to
 v3.31.0. Codex Desktop build `26.803.10989.0` injected AGENTS instructions but
@@ -1346,10 +1350,18 @@ sections.
   Assert the bounded result still represents estate state plus version,
   velocity, open loops, and triggers; do not accept exit zero or a generic
   attestation as a substitute.
-- [ ] Run focused architecture/port/runner/adapter/install/scaffold tests, the
+- [x] Run focused architecture/port/runner/adapter/install/scaffold tests, the
   complete external-basetemp suite, validate, and coherence. Then obtain
   independent Claude acceptance of the same final commit and a real large-domain
   SessionStart side-effect record.
+  **Accepted 2026-08-16** at `b82061f` —
+  `evidence/claude-gate-6r-acceptance-2026-08-16.md`: focused 128, complete 465
+  (external basetemp), validate 197 clean, coherence clean, `git diff --check`
+  clean; a fresh automatic SessionStart on the largest migrated domain emitted
+  2042/2200 characters carrying both step labels and return codes, estate state,
+  Version, Velocity, Open loops and Triggers, with elision marked explicitly and
+  `definition_current=true`, `execution=passed`; root and all 13 domains
+  re-derived current/no-op with every artifact hashed byte-identical.
 
 Codex implementation evidence through 2026-08-16: the focused boundary suite is
 128 passed and the complete suite is 465 passed; the root and all 13 domains
@@ -1359,11 +1371,12 @@ the final checkbox is the post-commit validation/coherence seal and independent
 Claude automatic-dispatch acceptance; it is not inferred from deterministic
 tests or direct runner execution.
 
-**Gate 6R:** Codex supplies the neutral implementation, recognised-legacy
-migration inputs, reviewed refresh evidence, and deterministic record. Claude
-accepts the final commit and proves a real automatic large-domain session
-contains every orientation section under the bound. Only then do remaining
-Phase 6 Codex source/nested runs resume.
+**Gate 6R — ACCEPTED 2026-08-16.** Codex supplied the neutral implementation,
+recognised-legacy migration inputs, reviewed refresh evidence, and
+deterministic record. Claude independently accepted the final commit and
+proved a real automatic large-domain session contains every orientation
+section under the bound. **The remaining Phase 6 Codex source/nested runs are
+released.**
 
 ### Phase 6 — Execute in real harnesses (split ownership by harness)
 
