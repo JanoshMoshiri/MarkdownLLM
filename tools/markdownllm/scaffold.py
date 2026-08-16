@@ -272,7 +272,13 @@ def cmd_scaffold(args) -> int:
         claim_projection(core_path, "scaffold:core", directory=True)
     if (templates / "prompts").is_dir():
         claim_projection("prompts", "scaffold:core", directory=True)
-    for core_path in ("AGENTS.md",):
+    # Entry pointers are core, not adapter projection: they are reserved here
+    # so an adapter cannot claim one, and they are written in every selection.
+    entry_dir = templates / "entry"
+    entry_pointers = (sorted(entry_dir.glob("*.template"))
+                      if entry_dir.is_dir() else [])
+    for core_path in ("AGENTS.md",
+                      *(p.stem for p in entry_pointers)):
         claim_projection(core_path, "scaffold:core")
     boundary_template = templates / "boundary-terms.template"
     if boundary_template.is_file():
@@ -307,6 +313,18 @@ def cmd_scaffold(args) -> int:
         instantiate((templates / "AGENTS.md.template").read_text(encoding="utf-8")),
         encoding="utf-8", newline="\n")
     written.append("AGENTS.md")
+    # A domain has ONE entry file. Some harnesses auto-load a differently named
+    # one instead, and a domain they cannot see is a domain that does not run —
+    # so every selection, `none` included, is born with the pointers that route
+    # those harnesses back to AGENTS.md. This is the entry surface, not adapter
+    # hardening: the pointer costs a few bytes when it is redundant, and costs
+    # the whole domain when it is missing (2026-08-16 Phase 6 finding). WHICH
+    # pointers exist is data in templates/entry/ — never a vendor name here.
+    for src in entry_pointers:
+        (target / src.stem).write_text(
+            instantiate(src.read_text(encoding="utf-8")),
+            encoding="utf-8", newline="\n")
+        written.append(src.stem)
     (target / "things" / "_schema.yaml").write_text(
         (templates / "_schema.yaml.template").read_text(encoding="utf-8")
         .replace("[domain-name]", name),

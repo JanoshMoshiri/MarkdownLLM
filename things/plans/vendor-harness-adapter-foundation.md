@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.21
+version: 1.22
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -1468,6 +1468,15 @@ definition hash, source event, timestamps, and observed outcome.
   Claude Code session was not opened in the disposable repo: the CLI on this host
   failed authentication before any model turn, and that failure is recorded
   separately from the structural finding, which does not rest on it.
+  **Provisioning corrected the same day (operator decision: always install the
+  pointer).** `templates/entry/` now owns the entry pointers and scaffold writes
+  them in every selection including `none`, reserved as core so no adapter can
+  claim one, with the vendor name living in template data rather than neutral
+  code — architecture fitness and the scaffold matrix stay green. What remains
+  for this leg is one observation, not a build: open a live Claude Code session
+  in a fresh `--harness none` domain and confirm the pointer makes `AGENTS.md`
+  auto-load. Two probe domains are prepared for exactly that comparison — one
+  with the pointer, one with it removed.
 - [x] Record exact harness/version/platform evidence and failures. A passing
   unit test earns designed-for; only these runs earn verified-on. Include the
   project configuration SHA-256 and repository commit for every record.
@@ -1494,8 +1503,9 @@ definition hash, source event, timestamps, and observed outcome.
   infer four verified triggers from one undifferentiated attestation. The two
   harnesses settle this differently and both are recorded as they are: Codex's
   attestation does not carry the source, so its claim stays generic; Claude's
-  transcript names the hook `SessionStart:startup`, so `startup` is claimed and
-  `resume`, `clear` and `compact` remain unobserved.
+  transcript names the hook, and `SessionStart:startup` (`17:25:28.237Z`) and
+  `SessionStart:resume` (`22:33:12.833Z`, 2042/2200 characters, every section
+  present) are both observed. `clear` and `compact` remain unobserved.
 - [x] Split Claude Code lifecycle evidence from VS Code Copilot compatibility.
   Shared `.claude/settings.json` bytes or shortcut projections do not make a
   live Claude run evidence for Copilot; report Copilot separately as untested
@@ -1533,6 +1543,15 @@ domain remain usable with no harness adapter"* stays unmet for Claude until
 `claude-entry-surface-unprovisioned-for-no-adapter-domains` is closed and the
 disposable proof is rerun in a live Claude Code session. Publication remains the
 operator's act.
+
+**Gate 6 addendum — 2026-08-16, same day.** The operator chose the provisioning
+fix rather than a narrowed claim, and it is built: every scaffold is now born
+with its entry pointers. The gate's open leg therefore narrows from *"the
+substrate cannot support this on Claude"* to *"one live session has not yet been
+watched"*. Existing domains are deliberately untouched — requirement 4 forbids a
+silent estate migration, and nine domains plus this framework root predate the
+fix. The root received a pointer as a deliberate, reversible operator-authorised
+write; the domains have not.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 

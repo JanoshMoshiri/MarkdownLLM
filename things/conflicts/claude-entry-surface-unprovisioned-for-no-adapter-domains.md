@@ -73,7 +73,30 @@ what "Automatic" claims, and it is not what the Codex degradation record
 proved on its side. This blocks an honest Claude equivalent of the Phase 6
 adapter-optionality leg.
 
-## Resolution paths (not yet chosen — operator's call)
+## Chosen path — option 1, decided by the operator 2026-08-16
+
+> "You'd expect any prerequisite files to be generated even if redundant,
+> because you don't know what vendor the person's gonna use."
+
+The alternative considered and rejected was detecting the harness and emitting
+`CLAUDE.md` *instead of* `AGENTS.md` — rejected because it makes domains
+non-interchangeable between harnesses, which is the property the whole entry
+surface exists to hold.
+
+**Implemented the same day.** `templates/entry/` now holds the entry pointers
+and `scaffold` writes every one of them in every selection, `none` included.
+The pointer is core surface, reserved against adapter projection, and carries
+no content of its own — it routes to `AGENTS.md` and says so. Which pointers
+exist is data in the template directory, never a vendor name in neutral code,
+so the architecture fitness gate still passes.
+
+**Left open deliberately.** The provisioning contradiction is gone, but that
+the pointer actually causes the entry file to auto-load has not yet been
+observed in a live session — the CLI on this host cannot authenticate. This
+conflict flips to resolved when that observation exists, and not before: a fix
+believed to work is the thing this framework refuses to call verified.
+
+## Resolution paths (option 1 chosen; the others recorded as considered)
 
 1. **Provision the wrapper in scaffold**, in every harness mode including
    `none`, since it is an entry-surface projection rather than adapter

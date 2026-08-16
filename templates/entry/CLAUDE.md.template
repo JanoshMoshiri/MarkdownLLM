@@ -1,0 +1,10 @@
+# [Domain Name] — harness entry pointer
+
+`AGENTS.md` is this domain's single entry file. This pointer exists only so a
+harness that auto-loads `CLAUDE.md` reaches it. It holds no content of its own,
+and it stays correct precisely because it stays empty — everything the domain
+says, it says once, in `AGENTS.md`.
+
+Delete it if your harness reads `AGENTS.md` directly; nothing depends on it.
+
+@AGENTS.md

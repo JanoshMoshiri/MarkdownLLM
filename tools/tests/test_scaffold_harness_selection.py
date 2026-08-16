@@ -99,6 +99,30 @@ def test_scaffold_selection_changes_only_outer_projection(tmp_path):
     assert not (targets["none"] / ".github").exists()
 
 
+def test_entry_pointers_are_born_in_every_selection(tmp_path):
+    """Phase 6 finding: a harness that auto-loads a differently named entry
+    file found nothing in a `--harness none` domain, so removing the adapter
+    removed the only automatic route in. Entry pointers are core surface —
+    present in every selection, routing back to the one entry file, holding no
+    content of their own."""
+    pointers = sorted(
+        p.stem for p in (_FRAMEWORK_ROOT / "templates" / "entry")
+        .glob("*.template"))
+    assert pointers, "templates/entry must declare at least one entry pointer"
+
+    for marker in (Ellipsis, "claude", "codex", "all", "none"):
+        label = "default" if marker is Ellipsis else marker
+        target = _scaffold(tmp_path / f"entry-{label}", marker)
+        for pointer in pointers:
+            body = (target / pointer).read_text(encoding="utf-8")
+            assert "@AGENTS.md" in body, (
+                f"{pointer} must route to the entry file in {label}")
+            # It points; it does not restate. Anything the domain says twice
+            # is a second thing to keep in sync.
+            assert "framework_root" not in body
+            assert "Session Start" not in body
+
+
 def test_unknown_selection_refuses_before_target_creation(tmp_path):
     _git_repo(tmp_path)
     target = tmp_path / "unknown-selection"

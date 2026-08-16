@@ -79,10 +79,28 @@ Content assertions against the emitted text, not against the exit code:
 | `execution=passed` | PASS |
 
 **Claude's transcript names the normalized source.** The hook record is
-`SessionStart:startup`, not an undifferentiated event. This record therefore
-claims `startup` specifically — and still claims nothing about `resume`,
-`clear`, or `compact`, which were not fired. This is a genuine asymmetry with
-the Codex record, whose attestation schema does not carry the source at all.
+`SessionStart:startup`, not an undifferentiated event. This is a genuine
+asymmetry with the Codex record, whose attestation schema does not carry the
+source at all.
+
+### A second source, observed the same day
+
+Later that evening the same session was resumed, and the hook fired again on
+its own as `SessionStart:resume` — `2026-08-16T22:33:12.833Z`, attestation 30 ms
+away at `22:33:12.803813+00:00`, same definition hash, `estate-sync=0,
+session-start=0`. Emitted context **2042 / 2200 characters**, again carrying
+both step labels and return codes, estate state, Version, Velocity, Open loops,
+Triggers, and explicit elision — plus an Open conflicts section that had not
+existed at startup, because the finding recorded below had become a live thing
+in between. Orientation surfaced it without being asked to.
+
+`startup` and `resume` are therefore both observed on this surface. `clear` and
+`compact` remain unobserved and unclaimed.
+
+**What the resume does *not* establish.** Claude Code replays a resumed
+session's context rather than re-reading project memory, so a resume cannot
+test whether an entry pointer is auto-loaded. That question needs a fresh
+session, and it is the one thing still outstanding below.
 
 ## Framework root — automatic PostToolUse
 
@@ -161,6 +179,28 @@ That is recorded as a finding, not as an executed negative — see *Failures*
 below for what was actually attempted. The finding is carried forward as
 `claude-entry-surface-unprovisioned-for-no-adapter-domains`.
 
+## What was done about it, the same day
+
+The operator chose to provision the pointer rather than narrow the claim, on
+the grounds that scaffold cannot know which harness will be opened and a
+redundant three-line file costs nothing next to an undiscoverable domain. The
+alternative — detect the harness and emit `CLAUDE.md` *instead of* `AGENTS.md` —
+was rejected for destroying interchangeability between harnesses.
+
+`templates/entry/` now holds the entry pointers and scaffold writes every one
+of them in every selection, `none` included, reserved as core so no adapter can
+claim the filename. The vendor name lives in the template's filename, not in
+neutral code, so the architecture fitness gate still passes; adding a pointer
+for a future harness is a file, not a code change. The framework root — which
+had none, and whose missing pointer is what made this session blind to its own
+`AGENTS.md` — received the same pointer the installers write.
+
+Nine existing domains still lack it and were deliberately left alone:
+requirement 4 forbids a silent estate migration.
+
+This closes the *provisioning* half. It does not close the leg: that the
+pointer causes the entry file to auto-load has still not been watched happen.
+
 ## Failures and limits, recorded
 
 - **A live Claude Code session was not opened in the disposable repository.**
@@ -178,7 +218,8 @@ below for what was actually attempted. The finding is carried forward as
   the product reads `AGENTS.md` natively elsewhere.
 - macOS and POSIX remain `designed-for` for the Claude projection; nothing here
   changes `claude-platform-surface-narrowed`.
-- `resume`, `clear` and `compact` SessionStart sources remain unobserved.
+- `clear` and `compact` SessionStart sources remain unobserved (`startup` and
+  `resume` are both recorded above).
 - GitHub Copilot remains separately untested; shared `.claude` bytes are not
   Copilot evidence.
 - No estate configuration was written. The framework root's own artifacts were
