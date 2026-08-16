@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-16
-generated: 2026-08-16T11:25:13
-generated_from: HEAD@b82061f
-coverage: 198
+generated: 2026-08-16T12:05:26
+generated_from: HEAD@a22aaa5
+coverage: 200
 framework_version: 3.31.0
 ---
 
@@ -35,6 +35,7 @@ framework_version: 3.31.0
 - a-generated-surface-collapses-its-walk --references--> cohesiveness-sensors
 - a-layered-harness-is-a-co-author-not-a-substrate --informs--> cowork-integrity-estate-sweep
 - a-layered-harness-is-a-co-author-not-a-substrate --supports--> assistant-register
+- a-literal-date-in-a-fixture-is-a-clock-the-suite-does-not-control --complements--> portability-claims-need-execution-tests
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --extends--> a-true-primitive-is-discovered-not-authored
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --supports--> source-behind-mirror-is-still-a-consumer-side-read
@@ -545,6 +546,9 @@ framework_version: 3.31.0
 - prose-references-are-mechanically-checkable --challenges--> mechanical-assimilation-is-blind-to-prose-dependencies
 - prose-references-are-mechanically-checkable --supports--> existence-is-not-currency
 - prose-references-are-mechanically-checkable --supports--> mis-keyed-links-pass-the-floor-silently
+- protecting-one-budget-displaces-the-failure-into-the-other --complements--> the-harness-bound-path-is-the-least-tested-path
+- protecting-one-budget-displaces-the-failure-into-the-other --derived-from--> lifecycle-output-truncation-2026-08-14
+- protecting-one-budget-displaces-the-failure-into-the-other --derived-from--> claude-gate-6r-acceptance-2026-08-16
 - provenance-specification --informs--> membrane-attention-cluster
 - provenance-specification --extends--> thing-specification
 - provenance-specification --complements--> git-workflow-specification
@@ -699,6 +703,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --extends--> domain-refresh-specification
 - vendor-harness-adapter-foundation --implements--> hook-enforcement-has-three-anchors
 - vendor-harness-adapter-foundation --implements--> portability-claims-need-execution-tests
+- vendor-harness-adapter-foundation --references--> protecting-one-budget-displaces-the-failure-into-the-other
 - vendor-harness-adapter-foundation --references--> agents-cannot-self-install-permission-bearing-hooks
 - vendor-harness-adapter-foundation --references--> a-layered-harness-is-a-co-author-not-a-substrate
 - vendor-harness-adapter-foundation --implements--> relative-path-hooks-break-in-nested-domain-repos

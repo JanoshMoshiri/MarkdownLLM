@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-16
-generated: 2026-08-16T11:25:19
-generated_from: HEAD@b82061f
-coverage: 25
+generated: 2026-08-16T12:05:29
+generated_from: HEAD@a22aaa5
+coverage: 26
 framework_version: 3.31.0
 ---
 
@@ -25,6 +25,9 @@ framework_version: 3.31.0
 
 ## claude-gate-5r5-acceptance-2026-08-13
 - lifecycle-output-truncation-2026-08-14 (derived-from)
+
+## claude-gate-6r-acceptance-2026-08-16
+- protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
 - claude-5r2-renderer-acceptance-2026-08-13 (derived-from)
@@ -61,6 +64,7 @@ framework_version: 3.31.0
 
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
+- protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
 
 ## mcp-domain-server-design
 - phase-3-run-domain-task-reverted (pinned @fcd1c11)

@@ -22,6 +22,9 @@ linked_things:
   - id: portability-claims-need-execution-tests
     relation: implements
     notes: "Requires a real lifecycle and commit probe before any harness is reported as verified."
+  - id: protecting-one-budget-displaces-the-failure-into-the-other
+    relation: references
+    notes: "Earned by this plan: Gate 5R.5 protected orientation's time budget and the same truncation reappeared in the character budget at Gate 6R. Both bounds are now allocated per step."
   - id: agents-cannot-self-install-permission-bearing-hooks
     relation: references
     notes: "Preserves the human/tool gate around automatic powers and operator-owned configuration."
