@@ -43,6 +43,8 @@ HANDLER_TIMEOUT_SECONDS = 120
 LAUNCH_RESOLUTION_SECONDS = 10
 LIFECYCLE_APPLICATION_SECONDS = 105
 LIFECYCLE_RUNNER_RESERVE_SECONDS = 5
+LIFECYCLE_OUTPUT_CHARACTERS = 2200
+LIFECYCLE_OUTPUT_RESERVE_CHARACTERS = 200
 
 
 @dataclass(frozen=True)
@@ -53,19 +55,23 @@ class LifecycleStep:
     ``DOMAIN_ROOT_ARG`` to their stable repository-root expression and encode
     the result for their own shell/config format.
 
-    ``protected_seconds`` is the minimum application budget that preceding
-    steps must leave for this step.  It is deliberately not a hard per-step
-    timeout: once this step becomes current it may consume unused budget from
-    earlier steps, while the binding's total deadline remains absolute.
+    ``protected_seconds`` and ``protected_characters`` are the minimum time
+    and model-visible output budgets that preceding steps must leave for this
+    step.  Neither is a hard per-step ceiling: the current step may inherit
+    capacity unused by earlier steps, while the binding's total envelopes
+    remain absolute.
     """
 
     operation: str
     argv: tuple[str, ...] = (DOMAIN_ROOT_ARG,)
     protected_seconds: int = 50
+    protected_characters: int = 900
 
     def __post_init__(self) -> None:
         if self.protected_seconds <= 0:
             raise ValueError("protected step budget must be positive")
+        if self.protected_characters <= 0:
+            raise ValueError("protected step output budget must be positive")
 
 
 @dataclass(frozen=True)
@@ -84,6 +90,8 @@ class LifecycleBinding:
     failure: Literal["surface-and-continue"] = "surface-and-continue"
     total_timeout_seconds: int = LIFECYCLE_APPLICATION_SECONDS
     runner_reserve_seconds: int = LIFECYCLE_RUNNER_RESERVE_SECONDS
+    output_limit_characters: int = LIFECYCLE_OUTPUT_CHARACTERS
+    output_reserve_characters: int = LIFECYCLE_OUTPUT_RESERVE_CHARACTERS
 
     def __post_init__(self) -> None:
         if not self.steps:
@@ -99,6 +107,19 @@ class LifecycleBinding:
         if protected > application:
             raise ValueError(
                 "protected step budgets exceed lifecycle application budget")
+        if self.output_limit_characters <= 0:
+            raise ValueError("total lifecycle output budget must be positive")
+        if self.output_reserve_characters < 0:
+            raise ValueError("output reserve must be non-negative")
+        output = (self.output_limit_characters
+                  - self.output_reserve_characters)
+        if output <= 0:
+            raise ValueError("output reserve must leave model-visible output")
+        protected_output = sum(
+            step.protected_characters for step in self.steps)
+        if protected_output > output:
+            raise ValueError(
+                "protected step output budgets exceed lifecycle output budget")
 
 
 # The application contract: complete ordered invocations per lifecycle moment.
@@ -109,14 +130,19 @@ class LifecycleBinding:
 LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
     LifecycleBinding(
         moment="session-start",
-        steps=(LifecycleStep("estate-sync", protected_seconds=75),
-               LifecycleStep("session-start", protected_seconds=25)),
+        steps=(LifecycleStep(
+                   "estate-sync", protected_seconds=75,
+                   protected_characters=450),
+               LifecycleStep(
+                   "session-start", protected_seconds=25,
+                   protected_characters=1450)),
         delivery="context",
     ),
     LifecycleBinding(
         moment="post-write",
         steps=(LifecycleStep(
-            "validate", (DOMAIN_ROOT_ARG, "--quiet"), protected_seconds=100),),
+            "validate", (DOMAIN_ROOT_ARG, "--quiet"), protected_seconds=100,
+            protected_characters=1900),),
         delivery="feedback",
     ),
 )

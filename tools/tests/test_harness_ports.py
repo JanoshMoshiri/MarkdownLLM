@@ -311,14 +311,18 @@ def test_lifecycle_bindings_own_arguments_delivery_and_order():
         ("estate-sync", "session-start")
     assert all(step.argv == (hp.DOMAIN_ROOT_ARG,) for step in start.steps)
     assert tuple(step.protected_seconds for step in start.steps) == (75, 25)
+    assert tuple(step.protected_characters for step in start.steps) == \
+        (450, 1450)
     assert start.total_timeout_seconds == 105
     assert start.runner_reserve_seconds == 5
+    assert start.output_limit_characters == 2200
+    assert start.output_reserve_characters == 200
     assert start.delivery == "context"
 
     write = hp.HarnessContext("../..").binding("post-write")
     assert write.steps == (hp.LifecycleStep(
         "validate", (hp.DOMAIN_ROOT_ARG, "--quiet"),
-        protected_seconds=100),)
+        protected_seconds=100, protected_characters=1900),)
     assert write.delivery == "feedback"
     assert start.failure == write.failure == "surface-and-continue"
 
@@ -334,6 +338,15 @@ def test_protected_step_budgets_must_fit_inside_application_deadline():
 
     with pytest.raises(ValueError, match="protected step budget"):
         hp.LifecycleStep("zero", protected_seconds=0)
+    with pytest.raises(ValueError, match="protected step output budget"):
+        hp.LifecycleStep("zero", protected_characters=0)
+    with pytest.raises(ValueError, match="protected step output budgets exceed"):
+        hp.LifecycleBinding(
+            moment="too-large",
+            steps=(hp.LifecycleStep("one", protected_characters=1100),
+                   hp.LifecycleStep("two", protected_characters=1000)),
+            delivery="context",
+        )
 
 
 def test_render_context_is_immutable_and_host_independent():

@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-15
-generated: 2026-08-15T19:00:46
-generated_from: HEAD@371692d
-coverage: 196
+created: 2026-08-16
+generated: 2026-08-16T09:47:21
+generated_from: HEAD@8cc0579
+coverage: 197
 framework_version: 3.31.0
 ---
 
@@ -430,6 +430,9 @@ framework_version: 3.31.0
 - judgement-checks-need-a-suppression-list-which-is-itself-drift --informs--> change-reconciliation-specification
 - judgement-checks-need-a-suppression-list-which-is-itself-drift --complements--> repeated-drift-promotes-a-fact-into-the-floor
 - lifecycle-budget-allocation-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
+- lifecycle-output-allocation-acceptance-2026-08-16 --implements--> lifecycle-output-truncation-2026-08-14
+- lifecycle-output-allocation-acceptance-2026-08-16 --documents--> vendor-harness-adapter-foundation
+- lifecycle-output-allocation-acceptance-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
 - lifecycle-output-truncation-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - lifecycle-output-truncation-2026-08-14 --documents--> vendor-harness-adapter-foundation
 - lifecycle-output-truncation-2026-08-14 --derived-from--> claude-gate-5r5-acceptance-2026-08-13

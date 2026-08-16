@@ -12,6 +12,7 @@ complete enforcement boundary.
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 import time
@@ -45,25 +46,166 @@ class LifecycleExecution:
     passed: bool
 
 
+_TRUNCATION_MARKER = "\n[truncated]\n"
+
+
 def _bounded(text: str, limit: int) -> str:
+    """Bound one indivisible section while retaining both of its edges."""
     if limit < 0:
         raise ValueError("output limit must be non-negative")
     if len(text) <= limit:
         return text
-    marker = "[earlier lifecycle output truncated]\n"
-    if limit <= len(marker):
-        return marker[:limit]
-    return marker + text[-(limit - len(marker)):]
+    if limit <= len(_TRUNCATION_MARKER):
+        return _TRUNCATION_MARKER[:limit]
+    retained = limit - len(_TRUNCATION_MARKER)
+    head = (retained + 1) // 2
+    tail = retained - head
+    return text[:head] + _TRUNCATION_MARKER + (text[-tail:] if tail else "")
 
 
-def _labelled(steps, body: str, limit: int) -> str:
+def _structural_sections(text: str) -> tuple[str, ...]:
+    """Split Markdown-like command output without understanding its meaning.
+
+    Headings, blank-delimited paragraphs, labelled runner blocks, and
+    top-level emphasized list headings are structural boundaries.  Nested list
+    items remain attached to their heading.  Plain consecutive list items
+    remain one section, so an estate listing is represented as a list rather
+    than fourteen unrelated semantic priorities.
+    """
+    sections: list[str] = []
+    current: list[str] = []
+
+    def flush() -> None:
+        if current:
+            sections.append("\n".join(current))
+            current.clear()
+
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            flush()
+            continue
+        top_level = line == line.lstrip()
+        structural_start = top_level and (
+            line.startswith("#")
+            or line.startswith("[")
+            or bool(re.match(r"^[-*+] \*\*[^*]+\*\*", line))
+        )
+        if structural_start:
+            flush()
+        current.append(line)
+    flush()
+    return tuple(sections) or ((text,) if text else ())
+
+
+def _fair_limits(lengths: tuple[int, ...], available: int) -> tuple[int, ...]:
+    """Share a strict character budget without assigning semantic priority."""
+    if available <= 0 or not lengths:
+        return tuple(0 for _ in lengths)
+    limits = [0] * len(lengths)
+    active = set(range(len(lengths)))
+    remaining = available
+    while active and remaining:
+        share, extra = divmod(remaining, len(active))
+        if share == 0:
+            for index in sorted(active)[:extra]:
+                limits[index] += 1
+            break
+        consumed = 0
+        completed: list[int] = []
+        for position, index in enumerate(sorted(active)):
+            grant = share + (1 if position < extra else 0)
+            need = lengths[index] - limits[index]
+            used = min(grant, need)
+            limits[index] += used
+            consumed += used
+            if limits[index] >= lengths[index]:
+                completed.append(index)
+        remaining -= consumed
+        active.difference_update(completed)
+        if consumed == 0:
+            break
+    return tuple(limits)
+
+
+def _bounded_structurally(text: str, limit: int) -> str:
+    """Keep every structural section represented inside one strict bound."""
+    if limit < 0:
+        raise ValueError("output limit must be non-negative")
+    if len(text) <= limit:
+        return text
+    sections = _structural_sections(text)
+    if len(sections) <= 1:
+        return _bounded(text, limit)
+    separator_size = 2 * (len(sections) - 1)
+    if separator_size >= limit:
+        return _bounded(text, limit)
+    limits = _fair_limits(
+        tuple(len(section) for section in sections), limit - separator_size)
+    return "\n\n".join(
+        _bounded(section, section_limit)
+        for section, section_limit in zip(sections, limits))
+
+
+def _scaled_protections(protections: tuple[int, ...], available: int) \
+        -> tuple[int, ...]:
+    total = sum(protections)
+    if total <= available:
+        return protections
+    if available <= 0:
+        return tuple(0 for _ in protections)
+    raw = [available * value / total for value in protections]
+    scaled = [int(value) for value in raw]
+    for index in sorted(
+            range(len(raw)), key=lambda item: raw[item] - scaled[item],
+            reverse=True)[:available - sum(scaled)]:
+        scaled[index] += 1
+    return tuple(scaled)
+
+
+def _labelled(steps, bodies: tuple[str, ...] | str, limit: int,
+              binding: LifecycleBinding | None = None) -> str:
+    """Render bounded labelled output, reserving every declared later share."""
     if limit < 0:
         raise ValueError("output limit must be non-negative")
     summary = "[steps: " + ", ".join(
         f"{item.operation}={item.returncode}" for item in steps) + "]\n"
     if len(summary) >= limit:
         return summary[:limit]
-    return summary + _bounded(body, limit - len(summary))
+    if isinstance(bodies, str) or binding is None:
+        return summary + _bounded_structurally(
+            bodies if isinstance(bodies, str) else "\n\n".join(bodies),
+            limit - len(summary))
+
+    separator_size = 2 * max(0, len(bodies) - 1)
+    available = max(0, limit - len(summary) - separator_size)
+    declared_application = (binding.output_limit_characters
+                            - binding.output_reserve_characters)
+    # A diagnostic/test override scales the declared application share rather
+    # than deleting the runner's label reserve. Production uses the exact
+    # binding limit, leaving the declared reserve for summary, labels, and
+    # truncation markers.
+    scaled_application = (
+        declared_application * limit // binding.output_limit_characters)
+    available = min(available, scaled_application)
+    protections = _scaled_protections(
+        tuple(step.protected_characters for step in binding.steps), available)
+    rendered: list[str] = []
+    remaining = available
+    for index, (result, body) in enumerate(zip(steps, bodies)):
+        later_required = sum(protections[index + 1:])
+        step_limit = max(0, remaining - later_required)
+        label = f"[{result.operation}: exit {result.returncode}]"
+        if step_limit <= len(label):
+            block = label[:step_limit]
+        elif body:
+            block = label + "\n" + _bounded_structurally(
+                body, step_limit - len(label) - 1)
+        else:
+            block = label
+        rendered.append(block)
+        remaining -= len(block)
+    return summary + "\n\n".join(rendered)
 
 
 def execute_lifecycle(
@@ -72,9 +214,11 @@ def execute_lifecycle(
         interpreter: str | None = None,
         timeout_per_step: int | None = None,
         total_timeout: int | None = None,
-        output_limit: int = 2200) -> LifecycleExecution:
+        output_limit: int | None = None) -> LifecycleExecution:
     """Run every step in declared order and retain bounded, labelled output."""
 
+    output_limit = (binding.output_limit_characters
+                    if output_limit is None else output_limit)
     if output_limit < 0:
         raise ValueError("output limit must be non-negative")
     if timeout_per_step is not None and timeout_per_step <= 0:
@@ -104,8 +248,7 @@ def execute_lifecycle(
                 stderr=f"lifecycle application budget of "
                        f"{application_budget}s exhausted")
             results.append(result)
-            chunks.append(f"[{step.operation}: exit {result.returncode}]\n"
-                          f"{result.stderr}")
+            chunks.append(result.stderr)
             continue
         later_required = sum(
             float(timeout_per_step or later.protected_seconds)
@@ -116,8 +259,7 @@ def execute_lifecycle(
                 operation=step.operation, argv=argv, returncode=124,
                 stderr="lifecycle budget reserved for later required steps")
             results.append(result)
-            chunks.append(f"[{step.operation}: exit {result.returncode}]\n"
-                          f"{result.stderr}")
+            chunks.append(result.stderr)
             continue
         # Default execution lets the current step inherit budget unused by
         # earlier steps.  Only later steps' protected allocations are held
@@ -149,10 +291,10 @@ def execute_lifecycle(
         results.append(result)
         body = "\n".join(part.rstrip() for part in
                          (result.stdout, result.stderr) if part.rstrip())
-        chunks.append(f"[{step.operation}: exit {result.returncode}]"
-                      + (f"\n{body}" if body else ""))
+        chunks.append(body)
 
-    text = _labelled(results, "\n\n".join(chunks), output_limit)
+    text = _labelled(
+        results, tuple(chunks), output_limit, binding=binding)
     return LifecycleExecution(
         moment=binding.moment, steps=tuple(results), text=text,
         passed=all(step.returncode == 0 for step in results))

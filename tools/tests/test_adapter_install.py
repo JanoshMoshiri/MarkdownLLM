@@ -235,6 +235,46 @@ def test_exact_root_fixed_step_claude_projection_is_refreshable(tmp_path):
     assert CLAUDE_CODE.inspect(tmp_path, context).fragments[0].current is True
 
 
+def test_output_tail_legacy_refreshes_both_nested_adapters_atomically(
+        tmp_path):
+    claude_legacy = next(
+        item for item in CLAUDE_CODE.legacy_definitions(CTX)
+        if item.legacy_id == "legacy-output-tail-v1")
+    codex_legacy = next(
+        item for item in CODEX.legacy_definitions(CTX)
+        if item.legacy_id == "legacy-output-tail-v1")
+    claude_hooks = json.loads(claude_legacy.owned_fragment)["hooks"]
+    codex_hooks = json.loads(codex_legacy.owned_fragment)["hooks"]
+    claude_before = (
+        b'{\n  "permissions" : { "allow" : ["Read"] },\n'
+        b'  "hooks" : '
+        + json.dumps(claude_hooks, separators=(",", ":")).encode("utf-8")
+        + b'\n}\n')
+    codex_before = (
+        b'{\n  "operator-note" : "preserve",\n  "hooks" : '
+        + json.dumps(codex_hooks, separators=(",", ":")).encode("utf-8")
+        + b'\n}\n')
+    claude_path = tmp_path / SETTINGS_PATH
+    codex_path = tmp_path / CODEX_HOOKS_PATH
+    claude_path.parent.mkdir(parents=True)
+    codex_path.parent.mkdir(parents=True)
+    claude_path.write_bytes(claude_before)
+    codex_path.write_bytes(codex_before)
+
+    plan = preflight_install(
+        tmp_path, [_claude_target(), _codex_target()], refresh_legacy=True)
+
+    assert not plan.refused
+    assert [decision.action for decision in plan.decisions] == [
+        "refresh", "refresh"]
+    apply_install(plan)
+    assert b'"permissions" : { "allow" : ["Read"] }' in \
+        claude_path.read_bytes()
+    assert b'"operator-note" : "preserve"' in codex_path.read_bytes()
+    assert CLAUDE_CODE.inspect(tmp_path, CTX).fragments[0].current is True
+    assert CODEX.inspect(tmp_path, CTX).fragments[0].current is True
+
+
 def test_local_overlay_with_hooks_refuses_refresh_without_touching_either_file(
         tmp_path):
     primary = _put_shape(tmp_path, "hooks-only")
@@ -481,6 +521,7 @@ def test_codex_stale_and_duplicate_managed_json_are_refused(tmp_path):
 
 @pytest.mark.parametrize("legacy_id", [
     "legacy-root-v1", "legacy-root-fixed-step-v1",
+    "legacy-output-tail-v1",
 ])
 def test_codex_root_legacy_refresh_replaces_only_owned_event_arrays(
         tmp_path, legacy_id):

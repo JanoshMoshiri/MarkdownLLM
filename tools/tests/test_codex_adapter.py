@@ -75,7 +75,8 @@ def test_root_legacy_definition_is_frozen_and_root_scoped():
     definitions = CODEX.legacy_definitions(ROOT_CTX)
 
     assert [item.legacy_id for item in definitions] == [
-        "legacy-root-v1", "legacy-root-fixed-step-v1"]
+        "legacy-root-v1", "legacy-root-fixed-step-v1",
+        "legacy-output-tail-v1"]
     assert all(item.path == HOOKS_PATH for item in definitions)
     assert [(len(item.owned_fragment),
              hashlib.sha256(item.owned_fragment).hexdigest())
@@ -84,8 +85,16 @@ def test_root_legacy_definition_is_frozen_and_root_scoped():
          "9f590fc9483ef0463d52ad32cd6c2624ba2e95b1a7621b4dd68a964ed641da53"),
         (15508,
          "7e17affd756a09e6a96d67e01b8ef7d2d72e2499071d21c9c1851b72bb580df0"),
+        (15508,
+         "4c229fca8a71ed7a528268867823505bc9d0f1ebc131cf0d7bc27e1c61618aa3"),
     ]
-    assert CODEX.legacy_definitions(CTX) == ()
+    nested = CODEX.legacy_definitions(CTX)
+    assert [item.legacy_id for item in nested] == ["legacy-output-tail-v1"]
+    assert [(len(item.owned_fragment),
+             hashlib.sha256(item.owned_fragment).hexdigest())
+            for item in nested] == [
+        (15646,
+         "fa36d164c1190fd3e33ed20fea0a15c9beaaa149353fd57b8011f4a7ef5bfcf9")]
 
 
 def test_inspect_names_only_the_exact_unextended_root_legacy(tmp_path):

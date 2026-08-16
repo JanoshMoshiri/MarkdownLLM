@@ -18,6 +18,7 @@ Three freezes, defined BEFORE any adapter class exists:
 Run: python -m pytest tools/tests/test_adapter_contract.py -q
 """
 
+import hashlib
 import json
 import os
 import subprocess
@@ -122,6 +123,27 @@ def test_legacy_v1_golden_is_frozen_migration_input():
     assert "{rel_fw}/tools/mdllm.py session-start ." in legacy
     assert "harness-event" not in legacy, \
         "legacy-v1 predates the neutral runner; it calls the CLI directly"
+
+
+def test_output_tail_legacy_projection_is_frozen_migration_input():
+    """The 5R.5 tail-allocation projection is exact recognition data."""
+    from markdownllm.adapters.claude_code import CLAUDE_CODE
+    from markdownllm.harness_ports import HarnessContext
+
+    expected = {
+        ".": (4549,
+              "b7af154f3f2c46db65901deea6c757a64576e056277a8c96b00d953bc6055489"),
+        "../..": (4557,
+                 "d673dfbf4d6cab47e7e7a1702b241f87bc5b6cbac5638c5ff7b1d487959bc14e"),
+    }
+    for framework_root_rel, frozen in expected.items():
+        definitions = CLAUDE_CODE.legacy_definitions(
+            HarnessContext(framework_root_rel=framework_root_rel))
+        projection = next(
+            item.owned_fragment for item in definitions
+            if item.legacy_id == "legacy-output-tail-v1")
+        assert (len(projection), hashlib.sha256(projection).hexdigest()) \
+            == frozen
 
 
 def test_scaffold_commands_are_template_copies(tmp_path):

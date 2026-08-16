@@ -141,6 +141,24 @@ class ClaudeCodeAdapter:
     def legacy_definitions(
             self, context: HarnessContext) -> tuple[LegacyDefinition, ...]:
         """Exact historical managed fragments; recognition data only."""
+        output_tail_hooks: dict = {}
+        for binding in context.bindings:
+            event = _DELIVERY_EVENT[binding.delivery]
+            handler = self._handler(
+                context, binding.moment,
+                self._definition_hash(
+                    context, binding, include_output=False))
+            group: dict = {"hooks": [handler]}
+            if binding.delivery != "context":
+                group = {"matcher": _FEEDBACK_MATCHER, "hooks": [handler]}
+            output_tail_hooks.setdefault(event, []).append(group)
+        output_tail_definition = LegacyDefinition(
+            legacy_id="legacy-output-tail-v1",
+            path=SETTINGS_PATH,
+            owned_fragment=(json.dumps(
+                {"hooks": output_tail_hooks}, separators=(",", ":"))
+                + "\n").encode("utf-8"),
+        )
         definitions = [LegacyDefinition(
             legacy_id="legacy-v1",
             path=SETTINGS_PATH,
@@ -170,10 +188,12 @@ class ClaudeCodeAdapter:
                     {"hooks": historical["hooks"]},
                     separators=(",", ":")) + "\n").encode("utf-8"),
             ))
+        definitions.append(output_tail_definition)
         return tuple(definitions)
 
     def _definition_hash(self, context: HarnessContext,
-                         binding: LifecycleBinding) -> str:
+                         binding: LifecycleBinding, *,
+                         include_output: bool = True) -> str:
         """Hash the complete owned definition with a stable hash placeholder.
 
         The literal attestation hash is excluded from its own input, so an
@@ -185,20 +205,30 @@ class ClaudeCodeAdapter:
             self._handler(context, binding.moment, _HASH_PLACEHOLDER)]}
         if binding.delivery != "context":
             group = {"matcher": _FEEDBACK_MATCHER, "hooks": group["hooks"]}
+        binding_payload = {
+            "moment": binding.moment,
+            "delivery": binding.delivery,
+            "failure": binding.failure,
+            "steps": [{
+                "operation": step.operation,
+                "argv": list(step.argv),
+                "protected_seconds": step.protected_seconds,
+                **({"protected_characters": step.protected_characters}
+                   if include_output else {}),
+            } for step in binding.steps],
+            "total_timeout_seconds": binding.total_timeout_seconds,
+            "runner_reserve_seconds": binding.runner_reserve_seconds,
+        }
+        if include_output:
+            binding_payload.update({
+                "output_limit_characters": binding.output_limit_characters,
+                "output_reserve_characters":
+                    binding.output_reserve_characters,
+            })
         return managed_definition_hash({
             "artifact": SETTINGS_PATH,
-            "binding": json.dumps({
-                "moment": binding.moment,
-                "delivery": binding.delivery,
-                "failure": binding.failure,
-                "steps": [{
-                    "operation": step.operation,
-                    "argv": list(step.argv),
-                    "protected_seconds": step.protected_seconds,
-                } for step in binding.steps],
-                "total_timeout_seconds": binding.total_timeout_seconds,
-                "runner_reserve_seconds": binding.runner_reserve_seconds,
-            }, sort_keys=True, separators=(",", ":")),
+            "binding": json.dumps(
+                binding_payload, sort_keys=True, separators=(",", ":")),
             "event": event,
             "group": json.dumps(group, sort_keys=True, separators=(",", ":")),
         })

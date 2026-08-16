@@ -100,16 +100,34 @@ class CodexAdapter:
 
     def legacy_definitions(
             self, context: HarnessContext) -> tuple[LegacyDefinition, ...]:
-        """Return the one exact pre-5R root projection as recognition data.
+        """Return exact historical projections as recognition data.
 
         The historical Windows command is deliberately frozen as data rather
         than reimplemented beside the shared launcher.  Only the framework
         root ever received this preflight artifact, so nested contexts do not
         acquire a speculative migration path.
         """
-        if (context.framework_root_rel.rstrip("/") or ".") != ".":
-            return ()
+        output_tail_hooks = {
+            event: [{
+                "matcher": (_SESSION_MATCHER if moment == "session-start"
+                            else _WRITE_MATCHER),
+                "hooks": [self._handler(
+                    context, moment,
+                    self._definition_hash(
+                        context, moment, include_output=False))],
+            }]
+            for moment, event in _EVENT_BY_MOMENT.items()
+        }
+        output_tail_definition = LegacyDefinition(
+            legacy_id="legacy-output-tail-v1",
+            path=HOOKS_PATH,
+            owned_fragment=(json.dumps(
+                {"hooks": output_tail_hooks}, separators=(",", ":"))
+                + "\n").encode("utf-8"),
+        )
         definitions = []
+        if (context.framework_root_rel.rstrip("/") or ".") != ".":
+            return (output_tail_definition,)
         for legacy_id, path in (
                 ("legacy-root-v1", _LEGACY_ROOT_V1),
                 ("legacy-root-fixed-step-v1",
@@ -126,6 +144,7 @@ class CodexAdapter:
                 path=HOOKS_PATH,
                 owned_fragment=owned,
             ))
+        definitions.append(output_tail_definition)
         return tuple(definitions)
 
     # ------------------------------------------------------------- rendering
@@ -286,7 +305,8 @@ class CodexAdapter:
             "additionalContextLimit": _CONTEXT_LIMIT,
         }
 
-    def _definition_hash(self, context: HarnessContext, moment: str) -> str:
+    def _definition_hash(self, context: HarnessContext, moment: str, *,
+                         include_output: bool = True) -> str:
         """Hash the complete owned definition with a stable hash placeholder.
 
         The literal attestation hash is intentionally excluded from its own
@@ -301,20 +321,30 @@ class CodexAdapter:
             "hooks": [self._handler(
                 context, moment, "<managed-definition-hash>")],
         }
+        binding_payload = {
+            "moment": binding.moment,
+            "steps": [{
+                "operation": step.operation,
+                "argv": list(step.argv),
+                "protected_seconds": step.protected_seconds,
+                **({"protected_characters": step.protected_characters}
+                   if include_output else {}),
+            } for step in binding.steps],
+            "delivery": binding.delivery,
+            "failure": binding.failure,
+            "total_timeout_seconds": binding.total_timeout_seconds,
+            "runner_reserve_seconds": binding.runner_reserve_seconds,
+        }
+        if include_output:
+            binding_payload.update({
+                "output_limit_characters": binding.output_limit_characters,
+                "output_reserve_characters":
+                    binding.output_reserve_characters,
+            })
         return managed_definition_hash({
             "artifact": HOOKS_PATH,
-            "binding": json.dumps({
-                "moment": binding.moment,
-                "steps": [{
-                    "operation": step.operation,
-                    "argv": list(step.argv),
-                    "protected_seconds": step.protected_seconds,
-                } for step in binding.steps],
-                "delivery": binding.delivery,
-                "failure": binding.failure,
-                "total_timeout_seconds": binding.total_timeout_seconds,
-                "runner_reserve_seconds": binding.runner_reserve_seconds,
-            }, sort_keys=True, separators=(",", ":")),
+            "binding": json.dumps(
+                binding_payload, sort_keys=True, separators=(",", ":")),
             "description": _DESCRIPTION,
             "event": event,
             "group": json.dumps(group, sort_keys=True, separators=(",", ":")),

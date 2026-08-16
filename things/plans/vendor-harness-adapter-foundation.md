@@ -1323,26 +1323,26 @@ removing the bound is not portable because Codex has a separately declared
 context envelope; reversing the slice merely trades triggers for the earlier
 sections.
 
-- [ ] Add an inward-owned total output envelope and per-step protected
+- [x] Add an inward-owned total output envelope and per-step protected
   character allocations, parallel to the accepted time-allocation contract.
   A preceding step may use unclaimed output capacity but cannot erase a later
   step's protected representation.
-- [ ] Compact within a step by neutral text structure, not by named domain
+- [x] Compact within a step by neutral text structure, not by named domain
   fields or a hard-coded list of disposable content. Every structural section
   remains represented; omitted detail is explicit and the full operation stays
   available through its normal command.
-- [ ] Keep the model-visible output within the existing 2,200-character runner
+- [x] Keep the model-visible output within the existing 2,200-character runner
   ceiling and the Codex adapter's separately declared 2,500-character context
   envelope. Preserve step attribution and failure labels even at tiny limits.
-- [ ] Include the complete output-allocation semantics in both managed
+- [x] Include the complete output-allocation semantics in both managed
   definition hashes. Prior 5R.5 projections become exact recognised legacy
   inputs; prior attestations become stale rather than certifying changed
   behaviour.
-- [ ] Review one atomic root refresh and the selected estate refreshes through
+- [x] Review one atomic root refresh and the selected estate refreshes through
   `--dry-run` before apply. Preserve operator-owned bytes, refuse extensions or
   ambiguity, and leave QMS or any changed tree untouched until its owner clears
   the discrepancy.
-- [ ] Add deterministic regressions using a report larger than the envelope.
+- [x] Add deterministic regressions using a report larger than the envelope.
   Assert the bounded result still represents estate state plus version,
   velocity, open loops, and triggers; do not accept exit zero or a generic
   attestation as a substitute.
@@ -1350,6 +1350,14 @@ sections.
   complete external-basetemp suite, validate, and coherence. Then obtain
   independent Claude acceptance of the same final commit and a real large-domain
   SessionStart side-effect record.
+
+Codex implementation evidence through 2026-08-16: the focused boundary suite is
+128 passed and the complete suite is 465 passed; the root and all 13 domains
+were exact-legacy refreshed and re-preflight as current/no-op. Three untracked
+operator-local Claude overlays remained byte-identical. The remaining part of
+the final checkbox is the post-commit validation/coherence seal and independent
+Claude automatic-dispatch acceptance; it is not inferred from deterministic
+tests or direct runner execution.
 
 **Gate 6R:** Codex supplies the neutral implementation, recognised-legacy
 migration inputs, reviewed refresh evidence, and deterministic record. Claude

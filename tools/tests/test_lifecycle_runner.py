@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -18,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from markdownllm import lifecycle_runner as lr  # noqa: E402
 from markdownllm.adapters.codex import CODEX  # noqa: E402
+from markdownllm.adapters.claude_code import CLAUDE_CODE  # noqa: E402
 from markdownllm.cli import build_cli  # noqa: E402
 from markdownllm.harness_ports import (  # noqa: E402
     DOMAIN_ROOT_ARG,
@@ -192,6 +194,49 @@ def test_output_limit_is_strict_and_keeps_every_step_attributable(
     assert result.text.startswith("[steps: first=0, second=0]\n")
     assert "first=0" in result.text and "second=0" in result.text
     assert "truncated" in result.text
+
+
+def test_large_orientation_keeps_every_structural_section_and_later_share(
+        tmp_path, monkeypatch):
+    estate = (
+        "## Estate Sync — 14 repositories\n\n"
+        + "\n".join(f"- repository-{index}: up-to-date" for index in range(13))
+        + "\n- repository-14: DIVERGED — operator attention required\n\n"
+        + "This listing remains available from mdllm estate-sync.")
+    orientation = "\n".join((
+        "# Session Start",
+        "",
+        "- **Version:** framework and domain are in sync. " + "v" * 500,
+        "- **Velocity:** recent committed movement is visible. " + "m" * 500,
+        "- **Open loops (20):** forward work remains.\n"
+        + "    - " + "open-loop-detail " * 80,
+        "- **Triggers fired (13):** operator attention is required.\n"
+        + "    - " + "trigger-detail " * 100,
+    ))
+
+    def fake_run(command, **kwargs):
+        return _completed(
+            command, stdout=(estate if command[2] == "estate-sync"
+                             else orientation))
+
+    monkeypatch.setattr(lr.subprocess, "run", fake_run)
+    binding = HarnessContext(".").binding("session-start")
+    result = lr.execute_lifecycle(tmp_path, binding)
+
+    assert len(result.text) <= binding.output_limit_characters == 2200
+    assert "[estate-sync: exit 0]" in result.text
+    assert "[session-start: exit 0]" in result.text
+    assert "DIVERGED" in result.text
+    for heading in ("**Version:**", "**Velocity:**", "**Open loops (20):**",
+                    "**Triggers fired (13):**"):
+        assert heading in result.text
+    assert "[truncated]" in result.text
+    assert len(CODEX.format_lifecycle_output(
+        "session-start", result.text, True)) <= 2500
+    # Presentation is bounded; execution evidence retains the complete raw
+    # output so compaction never reclassifies omitted text as disposable.
+    assert result.steps[0].stdout == estate
+    assert result.steps[1].stdout == orientation
 
 
 @pytest.mark.parametrize("limit", [0, 1, 8, 31])
@@ -421,3 +466,25 @@ def test_definition_hash_changes_with_inward_binding_semantics():
         Path("unused"), changed).definition_hashes["session-start"]
 
     assert original_hash != changed_hash
+
+
+def test_definition_hash_changes_with_output_allocation_semantics():
+    standard = HarnessContext("../framework")
+    start = standard.binding("session-start")
+    changed_start = replace(
+        start,
+        steps=(start.steps[0], replace(
+            start.steps[1], protected_characters=
+            start.steps[1].protected_characters + 1)),
+    )
+    changed = HarnessContext(
+        "../framework",
+        bindings=(changed_start, standard.binding("post-write")),
+    )
+
+    for adapter in (CODEX, CLAUDE_CODE):
+        original = adapter.probe(
+            Path("unused"), standard).definition_hashes["session-start"]
+        revised = adapter.probe(
+            Path("unused"), changed).definition_hashes["session-start"]
+        assert revised != original
