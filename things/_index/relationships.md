@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-16
-generated: 2026-08-16T12:05:26
-generated_from: HEAD@a22aaa5
-coverage: 200
+generated: 2026-08-16T12:58:24
+generated_from: HEAD@d14abc8
+coverage: 201
 framework_version: 3.31.0
 ---
 
@@ -151,6 +151,9 @@ framework_version: 3.31.0
 - codex-desktop-session-start-negative-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - codex-final-handoff-audit-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-final-handoff-audit-2026-08-11 --implements--> portability-claims-need-execution-tests
+- codex-phase6-post-6r-acceptance-2026-08-16 --documents--> vendor-harness-adapter-foundation
+- codex-phase6-post-6r-acceptance-2026-08-16 --extends--> codex-cli-live-dispatch-2026-08-14
+- codex-phase6-post-6r-acceptance-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
 - codex-port-challenge-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-port-challenge-2026-08-11 --implements--> portability-claims-need-execution-tests
 - coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks

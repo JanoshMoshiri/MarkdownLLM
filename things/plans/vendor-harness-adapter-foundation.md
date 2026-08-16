@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.19
+version: 1.20
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -58,8 +58,10 @@ passed and a real automatic framework-root session emitted both successful
 steps, all four orientation elements, a fresh session-gate attestation, and
 current-definition evidence. **Phase 6R is complete and Gate 6R was
 independently accepted by Claude on 2026-08-16 at `b82061f`
-(`evidence/claude-gate-6r-acceptance-2026-08-16.md`); the remaining Phase 6
-Codex source and nested-domain evidence is released.** Estate rollout had
+(`evidence/claude-gate-6r-acceptance-2026-08-16.md`). **The post-6R Codex
+root, directly opened nested-domain, PostToolUse and no-adapter records are
+complete on Windows CLI 0.147.0
+(`evidence/codex-phase6-post-6r-acceptance-2026-08-16.md`).** Estate rollout had
 exposed that the neutral runner's 2,200-character global tail slice silently
 dropped version, velocity, and open-loop orientation on large domains even
 when both lifecycle steps succeeded. The correction allocates bounded output
@@ -71,9 +73,11 @@ Claude has completed native Linux lifecycle dispatch at `3254a99`, and all 13
 nested domains are migrated to the one-handler projection and sealed to
 v3.31.0. Codex Desktop build `26.803.10989.0` injected AGENTS instructions but
 did not dispatch the current project SessionStart hook in a fresh
-framework-root task, while Codex CLI has established positive automatic root
-startup evidence. Remaining root-source and nested Codex evidence resumes only
-after Gate 6R. Neither harness may reuse pre-correction attestations. Two earlier
+framework-root task, while Codex CLI has now established positive automatic
+generic SessionStart evidence at root and in a directly opened nested domain.
+The current attestation does not preserve the normalized source, so no
+individual `resume`, `clear`, or `compact` claim is made. Neither harness may
+reuse pre-correction attestations. Two earlier
 execution probes disproved assumptions that the 438-test gate did not
 deterministically exercise: a stderr-writing Python candidate terminates the
 Windows PowerShell 5.1 resolver, and current Claude Code runs matching hook
@@ -1386,8 +1390,9 @@ released.**
 Phase 6 is active after accepted Gate 5R.5. The framework root carries tracked,
 current Claude and Codex project projections. Their recognised legacy forms
 were refreshed atomically at 5R.4; old hash-bound attestations are stale and do
-not count as current execution evidence. No nested domain projection was
-migrated.
+not count as current execution evidence. At Phase 6 opening no nested domain
+projection had been migrated; the later estate migration record moved all 13
+domains to the one-handler projection before this post-6R Codex record.
 
 Phase 6 is the only phase that earns `verified-on`. Unlike 5R.2's direct launch
 probes, these runs must be automatically dispatched by the named product and
@@ -1409,13 +1414,20 @@ definition hash, source event, timestamps, and observed outcome.
   injected, but no SessionStart lifecycle context or Codex attestation appeared;
   doctor remained `execution=untested`. This is a surface-specific negative
   record, not a universal Desktop-support claim.
-- [ ] Codex CLI framework root: trust the project layer through the documented
-  product-specific human flow, start/resume/compact, observe injection, make
-  valid/invalid/repaired edits, validate, and commit.
-- [ ] Codex CLI nested domain: open the domain as its own workspace and repeat the
-  lifecycle and Git-floor probes.
-- [ ] In a disposable repo for each harness, remove the optional project
-  adapter and prove AGENTS interpretation plus the Git floor remain sufficient.
+- [x] Codex CLI framework root: trust the project layer through the documented
+  product-specific human flow, observe automatic generic SessionStart
+  injection, make invalid/repaired edits, and commit this evidence through the
+  floor. Source normalization is not stored, so this claims generic
+  SessionStart only — not separate `resume`, `clear`, or `compact` coverage.
+- [x] Codex CLI nested domain: open the domain as its own workspace and repeat
+  automatic SessionStart, invalid/repaired PostToolUse, current-definition
+  diagnostics, and the Git-floor probe.
+- [x] In a disposable no-adapter repo, prove the Codex degradation path:
+  AGENTS interpretation remains automatic, the interpretation-prescribed
+  session start can establish the strict gate, a valid commit passes the Git
+  floor, and an invalid commit is blocked.
+- [ ] Repeat the disposable no-adapter proof in Claude Code. This remains
+  Claude-owned; Codex does not self-certify another harness.
 - [ ] Record exact harness/version/platform evidence and failures. A passing
   unit test earns designed-for; only these runs earn verified-on. Include the
   project configuration SHA-256 and repository commit for every record.
@@ -1423,16 +1435,16 @@ definition hash, source event, timestamps, and observed outcome.
   and correlate its time window with the new hash-bound attestation. Directly
   running `harness-event` can mint the same record and is therefore a runtime
   probe, not proof that the harness dispatched it.
-- [ ] Assert every contract-bearing side effect, not only command completion:
+- [x] Assert every Codex contract-bearing side effect, not only command completion:
   SessionStart evidence includes the emitted orientation content and a fresh
   clone-local session-gate attestation; post-write evidence includes the
   expected validation result and envelope/silence behavior. Exit zero and a
   generic hook-success record do not establish these effects.
-- [ ] Either carry the normalized SessionStart source
+- [x] Either carry the normalized SessionStart source
   (`startup|resume|clear|compact`) into evidence, or narrow the claim to the
   generic SessionStart events actually distinguishable by the record. Never
   infer four verified triggers from one undifferentiated attestation.
-- [ ] Split Claude Code lifecycle evidence from VS Code Copilot compatibility.
+- [x] Split Claude Code lifecycle evidence from VS Code Copilot compatibility.
   Shared `.claude/settings.json` bytes or shortcut projections do not make a
   live Claude run evidence for Copilot; report Copilot separately as untested
   until its own contract and execution record exist.
