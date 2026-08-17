@@ -46,6 +46,12 @@ linked_things:
   - id: claude-entry-surface-unprovisioned-for-no-adapter-domains
     relation: references
     notes: "The open finding that blocks the Claude adapter-optionality leg: no scaffold mode writes the CLAUDE.md wrapper that carries Claude's automatic entry route."
+  - id: a-missing-contract-degrades-to-semantic-drift-not-breakage
+    relation: references
+    notes: "Earned by that finding: nine domains ran without their entry file and still validated clean, so the failure mode is drift that passes the floor — which is why no backward audit was run."
+  - id: a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
+    relation: references
+    notes: "Earned by this plan's alternating cross-harness review rounds; it is the reason the acceptance gates are seat-swapped rather than same-hand."
 ---
 
 # Vendor Harness Adapter Foundation

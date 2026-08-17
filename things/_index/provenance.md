@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-17
-generated: 2026-08-17T10:06:40
-generated_from: HEAD@7d9ac7f
-coverage: 27
+generated: 2026-08-17T11:51:43
+generated_from: HEAD@9d19d7a
+coverage: 28
 framework_version: 3.31.0
 ---
 
@@ -14,6 +14,9 @@ framework_version: 3.31.0
 
 ## assistant-register
 - operating-is-programming (derived-from)
+
+## claude-entry-surface-unprovisioned-for-no-adapter-domains
+- a-missing-contract-degrades-to-semantic-drift-not-breakage (derived-from)
 
 ## claude-gate-5r3-acceptance-2026-08-13
 - claude-gate-5r4-acceptance-2026-08-13 (derived-from)

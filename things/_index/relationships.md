@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-17
-generated: 2026-08-17T10:05:28
-generated_from: HEAD@7d9ac7f
-coverage: 207
+generated: 2026-08-17T11:51:15
+generated_from: HEAD@9d19d7a
+coverage: 209
 framework_version: 3.31.0
 ---
 
@@ -20,6 +20,8 @@ framework_version: 3.31.0
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> mechanical-coherence-checks-backlog
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --supports--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --references--> boundary-disclosure-check
+- a-cleanup-is-scoped-by-lifecycle-not-by-location --extends--> consequence-is-recoverable-only-in-retrospect
+- a-cleanup-is-scoped-by-lifecycle-not-by-location --references--> claude-phase6-no-adapter-and-root-2026-08-16
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --extends--> shared-domain-failures-are-a-framework-signal-without-a-path
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> asks-travel-as-exposed-things
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> substrate-reconciliation-2026-08-09
@@ -44,6 +46,9 @@ framework_version: 3.31.0
 - a-layered-harness-is-a-co-author-not-a-substrate --informs--> cowork-integrity-estate-sweep
 - a-layered-harness-is-a-co-author-not-a-substrate --supports--> assistant-register
 - a-literal-date-in-a-fixture-is-a-clock-the-suite-does-not-control --complements--> portability-claims-need-execution-tests
+- a-missing-contract-degrades-to-semantic-drift-not-breakage --derived-from--> claude-entry-surface-unprovisioned-for-no-adapter-domains
+- a-missing-contract-degrades-to-semantic-drift-not-breakage --complements--> mis-keyed-links-pass-the-floor-silently
+- a-missing-contract-degrades-to-semantic-drift-not-breakage --supports--> the-harness-bound-path-is-the-least-tested-path
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --extends--> a-true-primitive-is-discovered-not-authored
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --supports--> source-behind-mirror-is-still-a-consumer-side-read
@@ -739,6 +744,8 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> codex-final-handoff-audit-2026-08-11
 - vendor-harness-adapter-foundation --references--> claude-phase6-no-adapter-and-root-2026-08-16
 - vendor-harness-adapter-foundation --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
+- vendor-harness-adapter-foundation --references--> a-missing-contract-degrades-to-semantic-drift-not-breakage
+- vendor-harness-adapter-foundation --references--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification
