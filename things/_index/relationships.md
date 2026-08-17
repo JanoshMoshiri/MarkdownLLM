@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-17
-generated: 2026-08-17T17:14:58
-generated_from: HEAD@71bb683
-coverage: 212
+generated: 2026-08-17T20:12:01
+generated_from: HEAD@5ec0a58
+coverage: 213
 framework_version: 3.31.0
 ---
 
@@ -164,6 +164,10 @@ framework_version: 3.31.0
 - claude-gate-6r-acceptance-2026-08-16 --documents--> vendor-harness-adapter-foundation
 - claude-gate-6r-acceptance-2026-08-16 --derived-from--> lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
+- claude-no-adapter-entry-probe-2026-08-17 --documents--> vendor-harness-adapter-foundation
+- claude-no-adapter-entry-probe-2026-08-17 --extends--> claude-phase6-no-adapter-and-root-2026-08-16
+- claude-no-adapter-entry-probe-2026-08-17 --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
+- claude-no-adapter-entry-probe-2026-08-17 --complements--> claude-domain-entry-pointer-observation-2026-08-17
 - claude-phase5r0-matrix-completion-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-phase5r0-matrix-completion-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
 - claude-phase5r0-matrix-completion-2026-08-13 --implements--> portability-claims-need-execution-tests
@@ -755,6 +759,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> claude-phase6-no-adapter-and-root-2026-08-16
 - vendor-harness-adapter-foundation --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - vendor-harness-adapter-foundation --references--> claude-domain-entry-pointer-observation-2026-08-17
+- vendor-harness-adapter-foundation --references--> claude-no-adapter-entry-probe-2026-08-17
 - vendor-harness-adapter-foundation --references--> a-missing-contract-degrades-to-semantic-drift-not-breakage
 - vendor-harness-adapter-foundation --references--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable

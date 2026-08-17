@@ -49,6 +49,9 @@ linked_things:
   - id: claude-domain-entry-pointer-observation-2026-08-17
     relation: references
     notes: "Relayed domain-position evidence: the QMS pointer auto-loaded its entry file at t=0, and the framework root's pointer was inherited unexpanded — the finding that made the root wrapper route both of its positions and constrained the remaining probe design to out-of-estate."
+  - id: claude-no-adapter-entry-probe-2026-08-17
+    relation: references
+    notes: "First-hand differential closure of the Phase 6 Claude no-adapter leg: pointer present → entry file in context at t=0; pointer removed → no automatic entry surface; all four floor legs re-closed in the same out-of-estate fixture."
   - id: a-missing-contract-degrades-to-semantic-drift-not-breakage
     relation: references
     notes: "Earned by that finding: nine domains ran without their entry file and still validated clean, so the failure mode is drift that passes the floor — which is why no backward audit was run."
@@ -1458,9 +1461,17 @@ definition hash, source event, timestamps, and observed outcome.
   AGENTS interpretation remains automatic, the interpretation-prescribed
   session start can establish the strict gate, a valid commit passes the Git
   floor, and an invalid commit is blocked.
-- [ ] Repeat the disposable no-adapter proof in Claude Code. This remains
-  Claude-owned; Codex does not self-certify another harness. **Run 2026-08-16;
-  three of four legs closed, the fourth is a finding rather than a pass.** In an
+- [x] Repeat the disposable no-adapter proof in Claude Code. This remains
+  Claude-owned; Codex does not self-certify another harness. **Closed
+  2026-08-17, first-hand and differential**
+  (`claude-no-adapter-entry-probe-2026-08-17`): a fresh out-of-estate
+  `--harness none` pair on CLI 2.1.233, identical except the entry pointer —
+  the pointer-bearing probe had `AGENTS.md` in model context before any tool
+  call (session `12637da3`), the pointer-removed control had no project file
+  at all (session `6c3302d5`, the executed negative). All four floor legs
+  re-closed in the same fixture; no harness attestation ever minted. The
+  2026-08-16 run had left this leg as a finding rather than a pass: **Run
+  2026-08-16; three of four legs closed, the fourth was a finding.** In an
   out-of-estate `--harness none` scaffold with `.claude`, `.codex`,
   `.git/mdllm-harness-attest` and `CLAUDE.md` all absent: a commit attempted
   before any ritual was blocked by the strict session gate; the
@@ -1579,6 +1590,16 @@ external-import gate staying unapproved. The root wrapper now routes both of
 its read positions, with a drift test holding its three writing surfaces
 identical. The leg's bar is unchanged: first-hand, fresh `--harness none`
 scaffold, re-scaffolded out-of-estate per the constraint above.
+
+**Gate 6 addendum — 2026-08-17, later the same day: the open leg is run and
+closed.** The no-adapter proof now exists at first-hand grade, differentially
+(`claude-no-adapter-entry-probe-2026-08-17`): pointer present → entry file in
+context at t=0; pointer removed → the product itself reports no project file
+in context. The completion criterion *"the substrate and every domain remain
+usable with no harness adapter"* is now evidenced for Claude on the tested
+surface; what remains open is the conflict's disposition, which is the
+operator's, and Phases 7–8. Probe fixtures are retained on disk pending
+operator review.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
