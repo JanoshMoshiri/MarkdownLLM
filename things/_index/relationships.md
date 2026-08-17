@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-17
-generated: 2026-08-17T11:51:15
-generated_from: HEAD@9d19d7a
-coverage: 209
+generated: 2026-08-17T12:26:51
+generated_from: HEAD@b9422ad
+coverage: 211
 framework_version: 3.31.0
 ---
 
@@ -82,6 +82,9 @@ framework_version: 3.31.0
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --supports--> consequence-is-recoverable-only-in-retrospect
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --complements--> operator-gated-work-is-scheduled-on-the-operators-calendar
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --informs--> coherence-mechanism-build
+- an-environments-reachable-set-is-not-an-architecture --complements--> a-layered-harness-is-a-co-author-not-a-substrate
+- an-environments-reachable-set-is-not-an-architecture --informs--> mcp-domain-server-design
+- an-environments-reachable-set-is-not-an-architecture --extends--> portability-claims-need-execution-tests
 - an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
 - an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
@@ -716,6 +719,9 @@ framework_version: 3.31.0
 - tracking-artifacts-can-drift-from-reality --references--> thing-lifecycle-specification
 - tracking-artifacts-can-drift-from-reality --informs--> validate-thing-specification
 - tracking-artifacts-can-drift-from-reality --informs--> framework-map
+- transport-follows-corpus-holdability-not-distance --informs--> mcp-domain-server-design
+- transport-follows-corpus-holdability-not-distance --complements--> an-environments-reachable-set-is-not-an-architecture
+- transport-follows-corpus-holdability-not-distance --extends--> cross-domain-handoff-is-verified-external-input
 - trigger-specification --extends--> thing-specification
 - trigger-specification --complements--> orchestration-specification
 - trigger-specification --complements--> derived-index-specification
