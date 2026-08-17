@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-16
-generated: 2026-08-16T18:43:35
-generated_from: HEAD@de035d3
-coverage: 26
+created: 2026-08-17
+generated: 2026-08-17T10:06:40
+generated_from: HEAD@7d9ac7f
+coverage: 27
 framework_version: 3.31.0
 ---
 
@@ -96,4 +96,8 @@ framework_version: 3.31.0
 
 ## vantage-brief-cluster
 - asks-travel-as-exposed-things (derived-from)
+
+## vendor-harness-adapter-foundation
+- a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it (derived-from)
+- an-interface-is-what-its-consumers-call-not-what-it-declares (derived-from)
 

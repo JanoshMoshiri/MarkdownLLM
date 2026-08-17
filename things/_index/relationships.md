@@ -4,14 +4,18 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-17
-generated: 2026-08-17T09:46:46
-generated_from: HEAD@ae5b5bf
-coverage: 205
+generated: 2026-08-17T10:05:28
+generated_from: HEAD@7d9ac7f
+coverage: 207
 framework_version: 3.31.0
 ---
 
 # Relationships Index — framework
 
+- a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it --derived-from--> vendor-harness-adapter-foundation
+- a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it --complements--> an-adversarial-review-loop-converges-on-its-own-fix-residue
+- a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it --supports--> an-interface-is-what-its-consumers-call-not-what-it-declares
+- a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it --complements--> portability-claims-need-execution-tests
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> cowork-integrity-estate-sweep
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> mechanical-coherence-checks-backlog
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --supports--> judgement-checks-need-a-suppression-list-which-is-itself-drift
@@ -76,6 +80,9 @@ framework_version: 3.31.0
 - an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
 - an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
+- an-interface-is-what-its-consumers-call-not-what-it-declares --derived-from--> vendor-harness-adapter-foundation
+- an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
+- an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> portability-claims-need-execution-tests
 - asks-travel-as-exposed-things --supports--> provenance-specification
 - asks-travel-as-exposed-things --derived-from--> vantage-brief-cluster
 - assistant-register --extends--> interface-specification

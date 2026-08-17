@@ -103,6 +103,18 @@ observed in a live session — the CLI on this host cannot authenticate. This
 conflict flips to resolved when that observation exists, and not before: a fix
 believed to work is the thing this framework refuses to call verified.
 
+**2026-08-17 partial observation — the mechanism works at the framework
+root.** A live authenticated Claude Code session on this host (this clone,
+framework root as workspace) received the checked-in `CLAUDE.md` pointer as
+project instructions at t=0, with its `@AGENTS.md` import expanded inline —
+the full entry file was in model context before any tool call. That is the
+pointer→entry-file auto-load this conflict waits on, observed for the root's
+pointer. What remains for the flip is the same observation in a *scaffolded
+domain opened directly as its own workspace* — the estate's thirteen pointers
+use the same filename and import mechanism, but same-mechanism is an
+inference, and the Phase 6 leg exists precisely to replace that inference
+with a run.
+
 ## Resolution paths (option 1 chosen; the others recorded as considered)
 
 1. **Provision the wrapper in scaffold**, in every harness mode including
