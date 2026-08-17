@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-17
-generated: 2026-08-17T20:12:01
-generated_from: HEAD@5ec0a58
-coverage: 213
+generated: 2026-08-17T20:38:52
+generated_from: HEAD@e1dc925
+coverage: 214
 framework_version: 3.31.0
 ---
 
@@ -88,6 +88,9 @@ framework_version: 3.31.0
 - an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
 - an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
+- an-injected-file-arrives-without-its-frontmatter --derived-from--> claude-no-adapter-entry-probe-2026-08-17
+- an-injected-file-arrives-without-its-frontmatter --informs--> interface-specification
+- an-injected-file-arrives-without-its-frontmatter --informs--> framework-discovery-specification
 - an-interface-is-what-its-consumers-call-not-what-it-declares --derived-from--> vendor-harness-adapter-foundation
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> portability-claims-need-execution-tests
@@ -149,6 +152,7 @@ framework_version: 3.31.0
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> vendor-harness-adapter-foundation
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> framework-discovery-specification
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> claude-phase6-no-adapter-and-root-2026-08-16
+- claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> claude-no-adapter-entry-probe-2026-08-17
 - claude-gate-5r1-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-gate-5r1-acceptance-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
 - claude-gate-5r1-acceptance-2026-08-13 --derived-from--> posix-floor-record-2026-08-13

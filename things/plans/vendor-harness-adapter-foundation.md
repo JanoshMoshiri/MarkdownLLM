@@ -1538,8 +1538,10 @@ definition hash, source event, timestamps, and observed outcome.
 **Gate:** the corrected Claude lifecycle projection and Codex are verified on
 the specifically tested surfaces, with no wider claim.
 
-**Gate 6 — returned 2026-08-16: lifecycle verified on both harnesses; adapter
-optionality closed for Codex and open for Claude.**
+**Gate 6 — ACCEPTED 2026-08-17: lifecycle verified on both harnesses; adapter
+optionality closed for both.** The verdict below is the 2026-08-16 return,
+kept verbatim as the record of what was open and why; the 2026-08-17 addenda
+at the end of this section close it.
 
 What the gate asks for is met on its own terms. Both projections were
 automatically dispatched by their named products at the framework root, with
@@ -1566,7 +1568,8 @@ depends on the open leg. The completion criterion *"the substrate and every
 domain remain usable with no harness adapter"* stays unmet for Claude until
 `claude-entry-surface-unprovisioned-for-no-adapter-domains` is closed and the
 disposable proof is rerun in a live Claude Code session. Publication remains the
-operator's act.
+operator's act. **[Both conditions met 2026-08-17 — see the addenda below;
+this paragraph stands as the record of the bar that was set.]**
 
 **Gate 6 addendum — 2026-08-16, same day.** The operator chose the provisioning
 fix rather than a narrowed claim, and it is built: every scaffold is now born
@@ -1600,6 +1603,15 @@ usable with no harness adapter"* is now evidenced for Claude on the tested
 surface; what remains open is the conflict's disposition, which is the
 operator's, and Phases 7–8. Probe fixtures are retained on disk pending
 operator review.
+
+**Gate 6 CLOSED — 2026-08-17, operator's acceptance.** The operator reviewed
+the differential record and closed the leg: the conflict is `resolved`
+(`both-valid` — the entry pointer is core surface, not adapter surface, and
+once it sits on that side of the line both positions are simply true), and
+the probe fixtures were deleted after capture. Gate 6 is accepted for both
+harnesses with no claim wider than the tested surfaces: Codex CLI 0.147.0 and
+Claude Code CLI 2.1.233 / 2.1.229, Windows 11 Pro 10.0.26200. Phase 7 owns
+the public-surface reconciliation; Phase 8 remains the operator's.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 

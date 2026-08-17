@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-17
-generated: 2026-08-17T11:51:43
-generated_from: HEAD@9d19d7a
-coverage: 28
+generated: 2026-08-17T20:39:23
+generated_from: HEAD@e1dc925
+coverage: 29
 framework_version: 3.31.0
 ---
 
@@ -31,6 +31,9 @@ framework_version: 3.31.0
 
 ## claude-gate-6r-acceptance-2026-08-16
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
+
+## claude-no-adapter-entry-probe-2026-08-17
+- an-injected-file-arrives-without-its-frontmatter (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
 - claude-5r2-renderer-acceptance-2026-08-13 (derived-from)

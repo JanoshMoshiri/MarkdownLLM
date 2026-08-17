@@ -285,7 +285,7 @@ The framework relies only on the cross-vendor `AGENTS.md` convention plus plain 
 | Tool | Discovery | Status |
 |------|-----------|--------|
 | Codex desktop | AGENTS.md auto-load | Root + directly opened nested domain runtime/Git floor verified 2026-08-11; project lifecycle adapter implemented, with Phase 5R runtime/launch repair and Phase 6 live dispatch/trust verification still open ([plan](things/plans/vendor-harness-adapter-foundation.md)) |
-| Claude Code | CLAUDE.md → AGENTS.md (scaffolded in every harness selection) | Core framework use verified; automatic framework-root SessionStart/PostToolUse dispatch verified 2026-08-16 on 2.1.229/Windows ([evidence](evidence/claude-phase6-no-adapter-and-root-2026-08-16.md)). The no-adapter entry pointer is provisioned but its auto-load is not yet observed live |
+| Claude Code | CLAUDE.md → AGENTS.md (scaffolded in every harness selection) | Core framework use verified; automatic framework-root SessionStart/PostToolUse dispatch verified 2026-08-16 on 2.1.229/Windows ([evidence](evidence/claude-phase6-no-adapter-and-root-2026-08-16.md)). Adapter-optionality verified 2026-08-17 on CLI 2.1.233: in a differential `--harness none` probe pair the entry pointer delivered `AGENTS.md` at t=0 and its removal left no automatic surface, with all four floor legs adapter-free ([evidence](evidence/claude-no-adapter-entry-probe-2026-08-17.md)) |
 | Codex (VS Code) | AGENTS.md auto-load | Exercised on a real project; not yet eval-measured |
 | GitHub Copilot, Codex CLI, Cursor, Windsurf, Gemini CLI | AGENTS.md auto-load | Designed for; not yet exercised |
 
