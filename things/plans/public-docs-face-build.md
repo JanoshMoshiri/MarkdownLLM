@@ -60,6 +60,21 @@ twenty-eight-row table.
 files committed and the working tree clean of them. Phase 1 needs no other
 gate.
 
+**Widened by the operator, 2026-08-17 — read this before acting on the line
+above.** Closing the session that produced the ruling, the operator stated the
+documentation thread is picked up *"in a new session once we've finished all
+the phases, and we're at a place where we're ready to work on the
+documentation."* That is a **broader** gate than the contention one: not the
+first quiet point in the adapter files, but the completion of
+[[vendor-harness-adapter-foundation]]'s phases. The contention condition
+remains true and necessary — it is simply no longer sufficient. A session that
+finds the three files quiet should **not** start Phase 1 on that basis alone.
+
+The reason is the ruling's own: content waits on evidence. Phase 1 derives the
+toolbox and map views, and Phase 7 owns every harness capability claim that
+flows through them — deriving a surface mid-rewrite is the wasted work this
+plan already declines to do for the compatibility table.
+
 **What may proceed under the hold, if it is lifted piecemeal:** the generator
 itself is a new module (`docs_blocks.py`, shaped like `kernel_gen.py`, whose
 `build_kernel` is shared by `kernel` and `coherence` so the two cannot disagree
