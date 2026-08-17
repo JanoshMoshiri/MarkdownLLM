@@ -115,16 +115,59 @@ mechanic.
   constraint: the pointer-removed control must sit **out of the estate
   directory tree**, or the inherited root pointer contaminates exactly the
   surface being measured.
-- **The corrected wrapper's live behaviour is unobserved.** The operator
-  intends a fresh domain session as the re-test. Pass condition: the
-  inherited root pointer arrives carrying its routing, the agent does not
-  reach for the root `AGENTS.md`, and when asked what loaded first it answers
-  from the file itself with no discrepancy left to flag. (The pre-fix session
-  did *not* load both entry files — the failure mode was an unrouted stray,
-  not a double load — so t=0 will look nearly identical; the difference is
-  the routing and the agent's account of it.)
+- ~~The corrected wrapper's live behaviour is unobserved.~~ **Observed the
+  same day — see the re-test below.**
 - **Whether Codex's native `AGENTS.md` discovery walks above a domain's git
   root is unverified.** If it does, it has no import gate to stop the root
   entry file loading; that question belongs to the Codex seat.
 - The conflict's disposition is deliberately unchanged: the operator holds
   the call on whether a relayed observation meets its flip condition.
+
+## Re-test after the correction — 2026-08-17 (relayed)
+
+A second QMS session was opened after `09200dd`. The loading behaviour is
+**unchanged, as predicted**: root pointer first (unexpanded), domain pointer,
+domain `AGENTS.md` in full — all before the first tool call, with the
+SessionStart hook output and the user message behind them. The correction was
+never expected to change *what loads*; the external-import gate already
+produced the right outcome. What it changed is whether the receiving agent can
+account for it.
+
+| | Pre-fix session | Post-fix session |
+|---|---|---|
+| Root `AGENTS.md` in context | no | no |
+| Domain `AGENTS.md` in context at t=0 | yes | yes |
+| Agent's account of the root's absence | *"either the declaration is wrong or the load is"* — flagged as an unresolved discrepancy, surfaced only because the operator asked | *"the routing rule in the root pointer held: nested workspace, root's entry file stayed out"* — read as correct and intended |
+| Residual discrepancy for the operator | one | none |
+
+That is the delta the correction targeted, and the phrase *"the routing rule
+in the root pointer"* can only refer to text that did not exist before
+`09200dd`. **Attribution wobble, recorded:** the same account credited commit
+`30c5a35`, which is not in the framework repository — it is a domain-repo
+commit, so the agent named the domain's own pointer rather than the framework
+wrapper it had just read. The observation stands; the citation was wrong.
+
+### One structural fact the re-test settled
+
+Asked whether `AGENTS.md` was *first* in context, the answer is **no, and it
+cannot be**: the harness system prompt precedes the whole memory block, and
+within that block ordering is filesystem-root-down by documented behaviour
+("content is ordered from the filesystem root down to your working
+directory"), so a nested domain's entry file necessarily lands after the
+pointers above it. The in-session agent inferred this from observation and
+hedged it; the documentation confirms it. This is not a defect and there is no
+mechanism that would change it — the two pointers ahead of the entry file
+total under a kilobyte, and the framework's claim is that the entry file is in
+context at workspace open, which holds. Worth stating plainly so no future
+session re-opens it as a gap: **the pointer controls presence, never
+position.**
+
+### What the re-test still does not establish
+
+Both sessions ran in an **adapter-carrying** domain whose SessionStart hook
+also fires, so neither is evidence for the no-adapter leg — with the adapter
+present, the entry surface was never the only automatic route in. The
+expanded-inherited case (an operator approving the external-import dialog,
+after which the root's entry file *would* reach a domain session) remains
+untested by construction; the wrapper's second bullet is written for it, and
+its value there is reasoned, not observed.
