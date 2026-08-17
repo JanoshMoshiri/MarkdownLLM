@@ -99,8 +99,15 @@ but a boundary future entry-surface design should know.
 - The sessions are product-dispatched memory injection, not hook dispatch —
   there is no adapter here, which is the point. Harness-owned transcripts for
   both session ids live under the product's project store.
-- Probe fixtures are **retained on disk pending operator review** — cleanup
-  is deliberately not part of this record. Commit hashes above resolve until
-  the probes are deleted; the session ids and this record survive them.
-- The conflict's disposition remains the operator's; this record supplies
-  its flip-condition observation at first-hand grade but changes no status.
+- **Fixtures disposed 2026-08-17 after operator review.** Before deletion both
+  repositories were confirmed to have clean worktrees, no remotes, and logs
+  matching the hashes quoted above exactly — nothing unrecorded, nothing
+  published. The probe commit hashes are therefore **no longer resolvable in
+  any repository**, the same convention the Codex and 2026-08-16 Claude
+  records follow for their own fixtures. What survives them: this record, and
+  the two harness-owned session transcripts (`12637da3`, `6c3302d5`) in the
+  product's project store.
+- **The conflict was closed on this evidence**, by the operator, the same day:
+  `resolution: both-valid` — the entry pointer is core surface rather than
+  adapter surface, and once it sits on that side of the line, adapter
+  optionality and Claude's wrapper route are both true at once.
