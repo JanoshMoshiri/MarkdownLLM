@@ -1548,10 +1548,12 @@ operator's act.
 fix rather than a narrowed claim, and it is built: every scaffold is now born
 with its entry pointers. The gate's open leg therefore narrows from *"the
 substrate cannot support this on Claude"* to *"one live session has not yet been
-watched"*. Existing domains are deliberately untouched — requirement 4 forbids a
-silent estate migration, and nine domains plus this framework root predate the
-fix. The root received a pointer as a deliberate, reversible operator-authorised
-write; the domains have not.
+watched"*. The framework root and, on the operator's explicit instruction, all
+thirteen domains now carry a tracked entry pointer — an authorised migration,
+which is what requirement 4 distinguishes from a silent one. The four
+pre-existing pointers turned out to carry prose rather than an import, and
+`eco-essentials` had ignored the file outright since `89b1e49`; both were
+corrected additively, preserving operator text.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 

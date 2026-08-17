@@ -90,6 +90,13 @@ no content of its own — it routes to `AGENTS.md` and says so. Which pointers
 exist is data in the template directory, never a vendor name in neutral code,
 so the architecture fitness gate still passes.
 
+**The estate followed, by explicit instruction.** All thirteen domains now
+carry a tracked pointer that imports the entry file. The sweep found that the
+four domains which already had one carried prose rather than an import, and
+that `eco-essentials` had ignored the file since a session concluded it was
+redundant duplication — the same reasoning this conflict overturns. Both were
+corrected without discarding operator text.
+
 **Left open deliberately.** The provisioning contradiction is gone, but that
 the pointer actually causes the entry file to auto-load has not yet been
 observed in a live session — the CLI on this host cannot authenticate. This

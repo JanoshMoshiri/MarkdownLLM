@@ -195,8 +195,20 @@ for a future harness is a file, not a code change. The framework root — which
 had none, and whose missing pointer is what made this session blind to its own
 `AGENTS.md` — received the same pointer the installers write.
 
-Nine existing domains still lack it and were deliberately left alone:
-requirement 4 forbids a silent estate migration.
+**The estate was then swept, on the operator's explicit instruction** — which is
+what requirement 4 actually forbids doing *silently*, not what it forbids doing.
+All thirteen domains now carry a tracked pointer that imports the entry file.
+Two things the sweep exposed:
+
+- The four domains that already had a `CLAUDE.md` carried **prose only** — "read
+  `AGENTS.md` first" — which instructs the agent rather than inlining the file.
+  Better than nothing, and it is why those four were never blind, but weaker
+  than the import. Their existing text was kept and the import appended.
+- `eco-essentials` had `CLAUDE.md` in `.gitignore`, added by commit `89b1e49`
+  ("consolidate CLAUDE.md into AGENTS.md, untrack ignored files") — a past
+  session reasoning that the pointer was redundant duplication. That is exactly
+  the belief this finding overturns, so the ignore was removed and the reversal
+  named in the commit.
 
 This closes the *provisioning* half. It does not close the leg: that the
 pointer causes the entry file to auto-load has still not been watched happen.
