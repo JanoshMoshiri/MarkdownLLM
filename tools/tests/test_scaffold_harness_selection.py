@@ -123,6 +123,40 @@ def test_entry_pointers_are_born_in_every_selection(tmp_path):
             assert "Session Start" not in body
 
 
+def _installer_wrapper_body(installer: str, opener: str, closer: str) -> str:
+    """Extract the CLAUDE.md wrapper body an installer writes."""
+    text = (_FRAMEWORK_ROOT / installer).read_text(encoding="utf-8")
+    section = text.split("# --- 7. Claude Code wrapper", 1)[1]
+    return section.split(opener, 1)[1].split(closer, 1)[0]
+
+
+def test_root_wrapper_routes_both_positions_and_no_surface_drifts():
+    """The root CLAUDE.md is read from two positions: as the framework
+    workspace's own entry pointer, and inherited into every nested-domain
+    session by the harness's documented ancestor walk (observed live
+    2026-08-17: the QMS session received it unexpanded as item 1). The
+    wrapper must route both positions, and the three surfaces that write it —
+    the tracked root file and both installer heredocs — must not drift; a
+    restated wording is a walk step per restatement, forever."""
+    root = (_FRAMEWORK_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+    surfaces = {
+        "CLAUDE.md": root,
+        "install.sh": _installer_wrapper_body(
+            "install.sh", "<<'EOF'\n", "\nEOF\n"),
+        "install.ps1": _installer_wrapper_body(
+            "install.ps1", "@'\n", "\n'@"),
+    }
+    for name, body in surfaces.items():
+        assert body.strip() == root.strip(), (
+            f"{name} wrapper drifted from the tracked root CLAUDE.md")
+        # The two positions, routed explicitly — the inherited case must not
+        # depend on the external-import gate staying unapproved.
+        assert "Your workspace is this directory" in body, name
+        assert "inherited from a parent directory" in body, name
+        assert "Do not read or follow the framework" in body, name
+        assert "@AGENTS.md" in body, name
+
+
 def test_unknown_selection_refuses_before_target_creation(tmp_path):
     _git_repo(tmp_path)
     target = tmp_path / "unknown-selection"

@@ -2,7 +2,7 @@
 id: estate-mechanics-guide
 type: guide
 status: evolving
-version: 1.2
+version: 1.3
 created: 2026-08-04
 linked_things:
   - id: git-workflow-specification
@@ -173,6 +173,22 @@ reconciled thirteen domain kernels in the v3.26.0 walk — while a truth
 *restated by hand* costs a judged walk step per restatement, forever.
 Restatement count **is** reconciliation cost; promote a restatement into
 derivation when a walk revisits it twice.
+
+### The root pointer's second position
+
+One more substrate↔domain interaction, observed live on 2026-08-17: Claude
+Code loads `CLAUDE.md` files from every directory *above* the workspace,
+root-down, so a session opened in a nested domain inherits the framework
+root's entry pointer alongside its own. The two then behave differently by
+documented harness rule: the domain pointer's `@AGENTS.md` resolves inside
+the workspace and expands, while the inherited root pointer's resolves
+*outside* it and is gated as an external import — delivered as literal
+text, its target unloaded. That outcome is the right one (a domain session
+must not inherit the framework's own entry file), but until 2026-08-17 it
+held only by the gate staying unapproved. The wrapper now routes both of
+its positions explicitly, and a drift test holds the wording identical
+across the tracked root file and both installers. Domain pointers need no
+equivalent — nothing nests beneath a domain.
 
 ---
 
