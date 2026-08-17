@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-17
-generated: 2026-08-17T12:26:51
-generated_from: HEAD@b9422ad
-coverage: 211
+generated: 2026-08-17T17:14:58
+generated_from: HEAD@71bb683
+coverage: 212
 framework_version: 3.31.0
 ---
 
@@ -141,6 +141,10 @@ framework_version: 3.31.0
 - claude-5r2-renderer-acceptance-2026-08-13 --implements--> code-architect-governs-substrate-code
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
+- claude-domain-entry-pointer-observation-2026-08-17 --documents--> vendor-harness-adapter-foundation
+- claude-domain-entry-pointer-observation-2026-08-17 --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
+- claude-domain-entry-pointer-observation-2026-08-17 --extends--> claude-phase6-no-adapter-and-root-2026-08-16
+- claude-domain-entry-pointer-observation-2026-08-17 --supports--> a-missing-contract-degrades-to-semantic-drift-not-breakage
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> interface-specification
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> vendor-harness-adapter-foundation
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> framework-discovery-specification
@@ -750,6 +754,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> codex-final-handoff-audit-2026-08-11
 - vendor-harness-adapter-foundation --references--> claude-phase6-no-adapter-and-root-2026-08-16
 - vendor-harness-adapter-foundation --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
+- vendor-harness-adapter-foundation --references--> claude-domain-entry-pointer-observation-2026-08-17
 - vendor-harness-adapter-foundation --references--> a-missing-contract-degrades-to-semantic-drift-not-breakage
 - vendor-harness-adapter-foundation --references--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable

@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.22
+version: 1.23
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -46,6 +46,9 @@ linked_things:
   - id: claude-entry-surface-unprovisioned-for-no-adapter-domains
     relation: references
     notes: "The open finding that blocks the Claude adapter-optionality leg: no scaffold mode writes the CLAUDE.md wrapper that carries Claude's automatic entry route."
+  - id: claude-domain-entry-pointer-observation-2026-08-17
+    relation: references
+    notes: "Relayed domain-position evidence: the QMS pointer auto-loaded its entry file at t=0, and the framework root's pointer was inherited unexpanded — the finding that made the root wrapper route both of its positions and constrained the remaining probe design to out-of-estate."
   - id: a-missing-contract-degrades-to-semantic-drift-not-breakage
     relation: references
     notes: "Earned by that finding: nine domains ran without their entry file and still validated clean, so the failure mode is drift that passes the floor — which is why no backward audit was run."
@@ -1481,8 +1484,12 @@ definition hash, source event, timestamps, and observed outcome.
   code — architecture fitness and the scaffold matrix stay green. What remains
   for this leg is one observation, not a build: open a live Claude Code session
   in a fresh `--harness none` domain and confirm the pointer makes `AGENTS.md`
-  auto-load. Two probe domains are prepared for exactly that comparison — one
-  with the pointer, one with it removed.
+  auto-load. The probe pair prepared for that comparison no longer exists on
+  disk (estate, Projects and temp scratchpads searched 2026-08-17); it must be
+  re-scaffolded **out of the estate directory tree**, because the 2026-08-17
+  domain observation showed nested-domain sessions inherit the framework
+  root's `CLAUDE.md` from the parent directory — a nested pointer-removed
+  control would still receive an entry pointer it is supposed to lack.
 - [x] Record exact harness/version/platform evidence and failures. A passing
   unit test earns designed-for; only these runs earn verified-on. Include the
   project configuration SHA-256 and repository commit for every record.
@@ -1560,6 +1567,18 @@ which is what requirement 4 distinguishes from a silent one. The four
 pre-existing pointers turned out to carry prose rather than an import, and
 `eco-essentials` had ignored the file outright since `89b1e49`; both were
 corrected additively, preserving operator text.
+
+**Gate 6 addendum — 2026-08-17.** The pointer→entry-file auto-load is now
+observed in domain position: a live QMS session, opened directly as its own
+workspace, received the domain pointer with `@AGENTS.md` expanded at t=0
+(operator-relayed — `claude-domain-entry-pointer-observation-2026-08-17`).
+The same relay surfaced a second finding: the framework root's `CLAUDE.md` is
+inherited into nested-domain sessions by the harness's documented ancestor
+walk, its import unexpanded — the right outcome, but held only by the
+external-import gate staying unapproved. The root wrapper now routes both of
+its read positions, with a drift test holding its three writing surfaces
+identical. The leg's bar is unchanged: first-hand, fresh `--harness none`
+scaffold, re-scaffolded out-of-estate per the constraint above.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
