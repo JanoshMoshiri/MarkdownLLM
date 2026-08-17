@@ -213,6 +213,26 @@ Two things the sweep exposed:
 This closes the *provisioning* half. It does not close the leg: that the
 pointer causes the entry file to auto-load has still not been watched happen.
 
+### Verification of the fix
+
+| Check | Result |
+|---|---|
+| Focused suite (scaffold selection + architecture fitness) | **20 passed** |
+| Complete suite, external basetemp | **466 passed** (465 before, plus the new entry-pointer test) |
+| `validate .` | 203 things + 6 + 14 across the two example corpora, 0 errors / 0 warnings / 0 info |
+| `coherence .` | no issues found |
+| `git diff --check` | clean |
+| Estate after the sweep | 13/13 domains carry a tracked pointer that imports; 12 published through their own autopush, one has no remote and stayed local |
+
+One failure worth recording rather than hiding: the first complete run reported
+2 failed / 464 passed, both `FileNotFoundError` on ~230-character paths. The
+cause was the basetemp, not the change — it sat inside an already deeply nested
+session scratchpad and the scaffold fixtures crossed Windows' 260-character
+limit. Rerunning from a short path cleared both without touching a test, which
+is the same discipline the Codex record applied to the mirror-image error
+(basetemp *inside* the repository, inheriting the parent Git floor): correct the
+environment, never edit production to make the error disappear.
+
 ## Failures and limits, recorded
 
 - **A live Claude Code session was not opened in the disposable repository.**
@@ -234,5 +254,12 @@ pointer causes the entry file to auto-load has still not been watched happen.
   `resume` are both recorded above).
 - GitHub Copilot remains separately untested; shared `.claude` bytes are not
   Copilot evidence.
-- No estate configuration was written. The framework root's own artifacts were
-  read and hashed, never modified.
+- The disposable fixtures were deleted after capture, so the commit hashes
+  quoted above are no longer resolvable in any repository — the same convention
+  the Codex record follows for its own fixture. The harness-owned session
+  transcripts do survive under the harness's project store, including the
+  failed-authentication probe cited above.
+- The framework root's adapter artifacts were read and hashed, never modified.
+  The estate sweep that followed wrote one pointer file per domain and, in one
+  case, removed a `.gitignore` line; no adapter, permission or settings byte was
+  touched anywhere.
