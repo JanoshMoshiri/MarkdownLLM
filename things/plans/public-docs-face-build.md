@@ -19,6 +19,9 @@ linked_things:
   - id: a-generated-surface-collapses-its-walk
     relation: references
     notes: "Supplies the sequencing argument for Phase 1: deriving the toolbox before the vendor plan's Phase 7 turns 28 walk steps into one."
+  - id: a-shared-worktree-merges-authorship-at-the-index
+    relation: references
+    notes: "Names the mechanism behind this plan's hold. The contention that stopped Phase 1 was the shared git index, not the file overlap — and this plan's own hold notice is the instance that insight was harvested from."
   - id: vendor-harness-adapter-foundation
     relation: references
     notes: "Its Phase 7 owns every harness *capability claim* in the docs. This plan owns how the docs are built and where their words come from. Neither may edit the other's fact."

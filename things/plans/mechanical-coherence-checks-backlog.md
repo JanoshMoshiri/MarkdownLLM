@@ -2,7 +2,7 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: not-started
-version: 1.1
+version: 1.2
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -15,6 +15,9 @@ linked_things:
   - id: judgement-checks-need-a-suppression-list-which-is-itself-drift
     relation: references
     notes: "The gate for what belongs here: keep checks keyed to a same-builder source (count, broken-body-ref); reject ones that need a suppression list (the reverted retired-vocab check)."
+  - id: a-control-that-must-stay-local-has-no-floor
+    relation: implements
+    notes: "The boundary-term evidence check below is that insight's escape route made concrete: the floor cannot own a list that must never be committed, but it can own an invariant over it."
   - id: a-check-run-where-it-cannot-see-mints-a-false-finding
     relation: references
     notes: "The reading-discipline half of this backlog's null-result and INCOMPLETE-conflation items: tool-side fixes live here, but the environment question before the content question stays the reader's."
@@ -116,6 +119,25 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   suppression list. This is `cumulative-drift-is-invisible-to-per-change-walks`'s
   razor executed: the perimeter is protected by an interval, and the interval
   becomes mechanical (R2 of the same review).
+
+- **Boundary-term evidence check (added 2026-08-17, felt — second regression).**
+  A `.boundary-terms` entry that appears in the repository's **own tracked
+  content** is not a private identifier: either it is noise, or it is a leak
+  already committed. Both outcomes are actionable, which is what makes this a
+  check rather than a warning. Same-builder (the corpus is the tool's own), and
+  it needs no suppression list — the property that sank the retired-vocabulary
+  check — because it reads the local file *in place* and never copies, commits,
+  or prints a term. Felt twice: the synthetic test vocabulary was removed
+  2026-07-28 for making `boundary --history` permanently red, returned by
+  2026-08-13 with a wider set of the same class, and an audit that day returned
+  hundreds of hits of which every one was framework test vocabulary. The
+  blocking path was simultaneously primed to falsely refuse commits touching
+  `tools/tests/`. Reasoning and the escape route — why the usual
+  state-once-and-derive promotion is unavailable for content that must never be
+  committed, and why an *invariant over* the list is available instead — in
+  `a-control-that-must-stay-local-has-no-floor`. Candidate home: `mdllm
+  boundary` (a `--audit-terms` leg) rather than `coherence`, since the terms
+  file is boundary's own subject and absent-file-is-a-no-op already lives there.
 
 Build when felt — and as of 2026-08-11 the same-builder items above *are* felt:
 the operator named the v3.30.x defect lump as the felt evidence commissioning

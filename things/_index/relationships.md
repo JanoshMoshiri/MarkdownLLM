@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-16
-generated: 2026-08-16T23:38:18
-generated_from: HEAD@6951107
-coverage: 203
+created: 2026-08-17
+generated: 2026-08-17T09:46:46
+generated_from: HEAD@ae5b5bf
+coverage: 205
 framework_version: 3.31.0
 ---
 
@@ -20,6 +20,10 @@ framework_version: 3.31.0
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> asks-travel-as-exposed-things
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> substrate-reconciliation-2026-08-09
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --complements--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- a-control-that-must-stay-local-has-no-floor --supports--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- a-control-that-must-stay-local-has-no-floor --challenges--> repeated-drift-promotes-a-fact-into-the-floor
+- a-control-that-must-stay-local-has-no-floor --references--> boundary-disclosure-check
+- a-control-that-must-stay-local-has-no-floor --references--> scaffold-declares-visibility
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-built-inbound-only
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-verified-external-input
 - a-crossing-thing-carries-its-producers-private-graph --informs--> provenance-specification
@@ -46,6 +50,9 @@ framework_version: 3.31.0
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --complements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --complements--> existence-is-not-currency
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --informs--> mechanical-coherence-checks-backlog
+- a-shared-worktree-merges-authorship-at-the-index --challenges--> coordination-claim-specification
+- a-shared-worktree-merges-authorship-at-the-index --references--> git-workflow-specification
+- a-shared-worktree-merges-authorship-at-the-index --complements--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --references--> llm-driven-systems-manifesto
 - a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -481,6 +488,7 @@ framework_version: 3.31.0
 - mechanical-coherence-checks-backlog --implements--> repeated-drift-promotes-a-fact-into-the-floor
 - mechanical-coherence-checks-backlog --implements--> prose-references-are-mechanically-checkable
 - mechanical-coherence-checks-backlog --references--> judgement-checks-need-a-suppression-list-which-is-itself-drift
+- mechanical-coherence-checks-backlog --implements--> a-control-that-must-stay-local-has-no-floor
 - mechanical-coherence-checks-backlog --references--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - mechanism-pairs-come-from-two-reflection-axes --supports--> directional-graph-reads-come-in-inbound-outbound-pairs
 - mechanism-pairs-come-from-two-reflection-axes --supports--> composition-is-the-inverse-of-decomposition
@@ -575,6 +583,7 @@ framework_version: 3.31.0
 - public-docs-face-build --implements--> every-reader-class-needs-its-own-kernel
 - public-docs-face-build --implements--> derived-transport-is-not-derived-content
 - public-docs-face-build --references--> a-generated-surface-collapses-its-walk
+- public-docs-face-build --references--> a-shared-worktree-merges-authorship-at-the-index
 - public-docs-face-build --references--> vendor-harness-adapter-foundation
 - public-docs-face-build --references--> coherence-mechanism-build
 - public-docs-face-build --references--> mechanical-coherence-checks-backlog
