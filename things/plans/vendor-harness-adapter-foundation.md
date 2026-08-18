@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.26
+version: 1.27
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -141,10 +141,31 @@ Gate 7.0 lands before the wider Phase 7 prose sweep because the operator cannot
 use active domains reliably until manual invocation and automatic lifecycle
 dispatch agree. Its acceptance is deliberately behavioural: a fresh nested
 fixture whose visible bare Python lacks PyYAML must still run the relevant
-manual CLI route through the framework environment, generated domain guidance
-must name that route before its first command, and QMS must be refreshed and
+manual CLI route through the framework environment, entry guidance must name
+that route before the generated block's first command, and QMS must be refreshed and
 observed in a new Codex task. The QMS change is one requested domain migration;
 all other existing domains remain a Phase 8 offer, never a batch rewrite.
+
+### Migration-boundary correction — v1.27
+
+The first Gate 7.0 assimilation found that changing the shared managed-block
+builder would make every existing domain's current AGENTS.md drift immediately
+against `mdllm domain-kernel --check`. That would turn one requested QMS repair
+into a forced estate migration and could block unrelated domain commits before
+Phase 8 offered the change. Gate 7.0 therefore adds the launch contract to
+authored entry prose before the managed Session Start block, instantiates the
+relative framework path into that body for new scaffolds, and adds the same
+authored contract to QMS only. It explicitly reinterprets legacy bare-Python
+instructions in managed blocks and copied prompts. The canonical managed-block
+bytes remain unchanged at this gate; replacing their vocabulary belongs to the
+versioned Phase 7/8 migration decision.
+
+The same audit found a smaller implementation mismatch inside the accepted
+manual launcher: `mdllm.ps1` passed the framework root as both the invocation
+root and framework root, so it could not prefer a directly opened domain's own
+`.venv` as the neutral candidate policy requires. Gate 7.0 restores that
+ordering by deriving the nearest repository root from the caller's working
+directory, with the framework environment still the next candidate.
 
 ## Claude acceptance amendments — v1.10 (2026-08-12)
 
@@ -1650,28 +1671,36 @@ the public-surface reconciliation; Phase 8 remains the operator's.
 
 ### Gate 7.0 — Manual CLI parity in managed domains (blocking)
 
-- [ ] Define one prose-level `mdllm <command>` launch vocabulary before the
-  generated domain kernel's first command: Windows PowerShell / Codex managed
-  shells expand it to `{framework_root}/tools/mdllm.ps1`; environments whose
-  selected Python can import PyYAML may invoke `mdllm.py` directly. Keep
-  `mdllm.py` as the one entry file; do not present an arbitrary visible or
-  harness-bundled Python as the project runtime.
-- [ ] Use that vocabulary consistently for generated Session Start, version
-  validation, deterministic-floor, scaffold, and refresh instructions. Add a
-  same-builder test so future generated guidance cannot regress to a bare
-  Python-only route.
+- [ ] Define one prose-level `mdllm <command>` launch vocabulary in authored
+  entry prose before the generated domain kernel's first command: Windows
+  PowerShell / Codex managed shells expand it to
+  `{framework_root}/tools/mdllm.ps1`; environments whose selected Python can
+  import PyYAML may invoke `mdllm.py` directly. Keep `mdllm.py` as the one entry
+  file; do not present an arbitrary visible or harness-bundled Python as the
+  project runtime. Reinterpret older bare-Python and `mdllm` notation through
+  this route rather than changing the managed-block builder and staling the
+  estate at this gate.
+- [ ] Instantiate the relative `framework_root` value into that authored body
+  so the contract survives harness injection without frontmatter. Carry the
+  same route into the shared operative kernel, session-gate remedy, scaffold
+  template, and refresh instruction. Add a scaffold/same-builder test proving
+  regeneration preserves the contract outside managed blocks.
+- [ ] Make the PowerShell launcher pass the nearest caller repository root and
+  the framework root as distinct resolver inputs, so manual invocation keeps
+  the neutral domain-venv → framework-venv → PATH candidate order.
 - [ ] Add a Windows nested-domain execution test in which the PATH `python`
   exists without PyYAML while the framework `.venv` is floor-capable. Invoke
   the documented manual route and prove real `session-start` and validation
   complete from the domain working directory.
-- [ ] Refresh QMS only, preserving its authored domain content and current
-  adapter bytes. Record its pre/post domain-kernel state and leave the other
-  twelve domains untouched pending the Phase 8 offer.
+- [ ] Refresh QMS only by adding the authored launch contract, preserving its
+  managed blocks, other authored domain content, and current adapter bytes.
+  Record its pre/post domain-kernel state and leave the other twelve domains
+  untouched pending the Phase 8 offer.
 - [ ] Open a fresh Codex QMS task after the deterministic gate. Automatic
   startup and an operator-requested manual rerun must both succeed; capture the
   exact Codex surface/build and do not infer wider execution support.
 
-**Gate:** generated guidance and the actual nested Windows launch agree; the
+**Gate:** entry guidance and the actual nested Windows launch agree; the
 focused runtime/domain-kernel tests, validate, coherence, and QMS's manual live
 rerun pass. Until then, Phase 7's wider public-surface sweep is blocked.
 
