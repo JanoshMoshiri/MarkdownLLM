@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -52,12 +52,41 @@ An input route is any channel through which a human can communicate intent to th
 | Route | How It Works | Discovery |
 |-------|-------------|-----------|
 | **VS Code + GitHub Copilot** | AGENTS.md auto-discovered at workspace root. Chat or voice input via editor. | Automatic |
-| **Claude Code (CLI)** | CLAUDE.md at root references AGENTS.md. Terminal-based interaction. | Automatic |
+| **Claude Code (CLI + desktop)** | `CLAUDE.md` entry pointer imports `AGENTS.md` (`@AGENTS.md`). Core scaffold surface — born with every domain in every `--harness` selection, `none` included. | Automatic — verified 2026-08-17 |
 | **OpenAI Codex CLI** | AGENTS.md auto-discovered. Terminal-based interaction. | Automatic |
 | **Cursor / Windsurf** | AGENTS.md auto-discovered at workspace root. Editor-based chat. | Automatic |
 | **Gemini CLI** | AGENTS.md auto-discovered. Terminal-based interaction. | Automatic |
 | **Mobile chat apps** | Feed AGENTS.md + context to any LLM API via mobile client (Claude iOS, ChatGPT, etc.) | Manual context |
 | **Voice-to-text + any route** | OS-level speech recognition (Windows Speech, macOS Dictation, etc.) feeds text into any of the above routes. | Transparent |
+
+### The entry pointer (harnesses that auto-load a differently named file)
+
+Most routes read `AGENTS.md` directly. A harness that auto-loads a different
+filename reaches it through an **entry pointer**: a small file of that name
+whose import inlines `AGENTS.md`. Three facts about pointers, each earned by
+execution evidence rather than design intent:
+
+- **They are core surface, not adapter output.** `templates/entry/` owns them,
+  `scaffold` writes every one of them in every harness selection including
+  `none`, and no adapter may claim the filename. This is what keeps a domain
+  interchangeable between harnesses — and it is load-bearing: in the
+  differential no-adapter probe, the pointer-bearing domain had its entry file
+  in model context before any tool call, and the pointer-removed control had
+  no automatic entry surface at all
+  (`claude-no-adapter-entry-probe-2026-08-17`, resolving
+  `claude-entry-surface-unprovisioned-for-no-adapter-domains`).
+- **A pointer controls presence, never position.** The entry file arrives in
+  context at session open, behind the harness's own system prompt and any
+  ancestor files — ordering is the harness's, root-down. On Claude Code
+  specifically, nested-domain sessions also inherit the *framework root's*
+  pointer from the parent directory; the root wrapper therefore routes both of
+  its read positions explicitly, and a drift test holds its wording identical
+  across the tracked file and both installers.
+- **Injection delivers the body only.** YAML frontmatter is stripped on the
+  way in (`an-injected-file-arrives-without-its-frontmatter`), so anything an
+  agent must know *before its first tool call* belongs in the entry file's
+  prose. Frontmatter reaches the agent when it reads the file with a tool —
+  which the Tier-0 ritual does regardless.
 
 ### The Pattern
 
