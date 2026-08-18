@@ -41,7 +41,7 @@ NEUTRAL_MODULES = [
 FORBIDDEN = [
     ".claude", ".codex", ".github", "sessionstart", "posttooluse",
     "settings.json", "hooks.json", "commandwindows", "copilot",
-    "claude", "codex",
+    "claude", "codex", "cowork",
 ]
 
 

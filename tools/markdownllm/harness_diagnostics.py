@@ -430,6 +430,13 @@ def diagnose_harness(
     root = domain_root.resolve()
     caps = adapter.capabilities()
     inspection = adapter.inspect(root, context)
+    # An adapter whose renderer emits no project artifacts binds elsewhere —
+    # an estate-level, run-time surface (an account-level bundle, say) rather
+    # than per-domain configuration. Its project configuration is then
+    # *not-applicable*, never "absent": absent prescribes installing
+    # something the harness has no place for. Derived from the renderer,
+    # the same single source currency already derives from.
+    renders_project_artifacts = bool(adapter.render(context))
     probe = (adapter.probe(root, context)
              if isinstance(adapter, ProbePort) else AdapterProbe())
     wanted = moments or tuple(binding.moment for binding in context.bindings)
@@ -439,8 +446,15 @@ def diagnose_harness(
     for capability in wanted:
         supported = capability in caps.lifecycle_moments
         support: SupportState = "supported" if supported else "unsupported"
-        configuration, currency, legacy_id, extensions, findings = (
-            _configuration_fact(inspection, capability, supported))
+        if supported and not renders_project_artifacts:
+            configuration: ConfigurationState = "not-applicable"
+            currency: CurrencyState = "not-applicable"
+            legacy_id = None
+            extensions = inspection.extensions
+            findings = inspection.findings
+        else:
+            configuration, currency, legacy_id, extensions, findings = (
+                _configuration_fact(inspection, capability, supported))
         if supported:
             trust = probe.trust
             rt = shared_runtime
@@ -449,7 +463,8 @@ def diagnose_harness(
                 currency == "current" else
                 "stale" if configuration == "present" and
                 currency == "stale" else
-                "not-applicable" if configuration == "absent" else "unknown")
+                "not-applicable" if configuration in ("absent", "not-applicable")
+                else "unknown")
             launch_runtime = rt
         else:
             trust = "not-applicable"
@@ -460,6 +475,19 @@ def diagnose_harness(
         expected_hash = probe.definition_hashes.get(capability)
         if not supported:
             execution = ExecutionFact("not-applicable")
+        elif not renders_project_artifacts:
+            # Run-time-bound adapter: there is no project configuration whose
+            # currency could gate the evidence. The attestation a real run
+            # records (against the adapter's probe-supplied fingerprint) is
+            # the only inspectable execution fact.
+            if expected_hash:
+                execution = read_execution_attestation(
+                    root, caps.harness, capability, expected_hash)
+            else:
+                execution = ExecutionFact(
+                    "untested",
+                    detail="adapter supplied no current definition fingerprint",
+                )
         elif configuration != "present" or currency != "current":
             # Even a matching leftover file cannot verify a definition which
             # inspection says is absent, invalid, ambiguous, or stale now.

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from .claude_code import CLAUDE_CODE
 from .codex import CODEX
+from .cowork import COWORK
 
 DEFAULT_HARNESS = "claude-code"
 
@@ -27,6 +28,7 @@ ALIASES = {"claude": "claude-code"}
 _REGISTRY = {
     CLAUDE_CODE.name: CLAUDE_CODE,
     CODEX.name: CODEX,
+    COWORK.name: COWORK,
 }
 
 

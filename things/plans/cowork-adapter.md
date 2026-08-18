@@ -1,8 +1,8 @@
 ---
 id: cowork-adapter
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-08-18
 priority: high
 tags: [harness, adapters, cowork, bootstrap, discovery, contract-emission, publication, estate, clean-architecture]
@@ -146,21 +146,39 @@ and framework coexist.
 
 ## Phases
 
-### Phase 0 — Port fit and registration
+### Phase 0 — Port fit and registration ✅ (2026-08-18)
 
-- [ ] Register `cowork` in `tools/markdownllm/adapters/` with honest
+- [x] Register `cowork` in `tools/markdownllm/adapters/` with honest
   `AdapterCapabilities`: which lifecycle moments it binds (session-start
   at bootstrap, per invoking session), which it cannot (post-write
   feedback — writes stay unvalidated until commit; stated, not hidden).
-- [ ] Decide and record the port stretches: bundle-as-render-target and
+- [x] Decide and record the port stretches: bundle-as-render-target and
   run-time currency, as data on the existing ports — no new god-object,
   no conditional in neutral modules.
-- [ ] `doctor --harness cowork` reports support and the run-time-binding
+- [x] `doctor --harness cowork` reports support and the run-time-binding
   caveat; scaffold declares the honest answer (no per-domain artifact to
   render).
 
 **Gate:** registry tests green; the architecture fitness gate's
 port-only fake still proves neutral modules call nothing vendor-shaped.
+
+**Closed 2026-08-18.** The port stretch landed smaller than anticipated
+and as data: `diagnose_harness` now derives a *not-applicable* project
+configuration from the renderer itself — an adapter whose `render()`
+emits no artifacts binds elsewhere, so diagnostics stop prescribing
+`adapter-install` toward a harness with no place for it, and execution
+evidence comes only from a run-time attestation against a
+probe-supplied fingerprint (Phase 3's to supply; `untested` until then).
+`cowork` joined the fitness gate's forbidden vendor vocabulary — neutral
+modules cannot name it; everything reaches it through the registry.
+Live `doctor --harness cowork` on the example domain reports exactly the
+designed line. Focused suites: 9 new cowork tests + 150
+adapter-adjacent, all green; full suite 481 passed with one failure
+(`test_scaffold_birth_sequence`) mechanically attributed to the
+concurrent session's in-flight template/test edits (their diff removes
+the exact wording HEAD's assertion expects), touching no file this
+phase owns — the full-suite gate re-runs on a settled tree, per the
+foundation plan's own Phase 7 precedent.
 
 ### Phase 1 — Contract emission (floor primitive, harness-agnostic)
 
