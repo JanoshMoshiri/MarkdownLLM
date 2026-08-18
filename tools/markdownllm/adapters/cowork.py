@@ -101,7 +101,10 @@ class CoworkAdapter:
         base = templates_root / BUNDLE_TEMPLATES_DIR
         for name in _MECHANISM_TEMPLATES:
             digest.update(name.encode("utf-8"))
-            digest.update((base / name).read_bytes())
+            # Line-ending-normalized: a Windows checkout must stamp the
+            # same mechanism a Linux VM recomputes, or every cross-platform
+            # build would read as STALE.
+            digest.update((base / name).read_bytes().replace(b"\r\n", b"\n"))
         return digest.hexdigest()
 
     def bundle(self, templates_root: Path,
@@ -121,7 +124,10 @@ class CoworkAdapter:
             text = (base / template).read_text(encoding="utf-8")
             for key, value in substitutions.items():
                 text = text.replace(key, value)
-            return text.encode("utf-8")
+            # LF always: bootstrap.sh runs under bash on Linux, where a
+            # CRLF shebang is "bad interpreter"; the rest follow for
+            # deterministic bytes regardless of build platform.
+            return text.replace("\r\n", "\n").encode("utf-8")
 
         config_env = (
             "# markdownllm-bootstrap configuration — DERIVED from the local "

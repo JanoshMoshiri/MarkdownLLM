@@ -267,6 +267,25 @@ def test_bundle_renders_complete_and_hash_stamped(tmp_path):
     assert "GIT_NAME=Build Test" in env
 
 
+def test_rendered_bytes_are_lf_only_and_hash_is_eol_stable(tmp_path):
+    """bootstrap.sh runs under bash on Linux — CRLF is 'bad interpreter'.
+    And the mechanism hash must not depend on checkout line endings, or a
+    Windows-built stamp false-STALEs against a Linux VM's recomputation."""
+    rendered = COWORK.bundle(TEMPLATES, {"FRAMEWORK_VERSION": "1"})
+    for rel, content in rendered.items():
+        assert b"\r" not in content, rel
+
+    # Same templates with CRLF endings hash identically.
+    crlf_root = tmp_path / "templates"
+    src = TEMPLATES / "cowork-bundle"
+    dst = crlf_root / "cowork-bundle"
+    dst.mkdir(parents=True)
+    for f in src.iterdir():
+        data = f.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+        (dst / f.name).write_bytes(data)
+    assert COWORK.bundle_hash(crlf_root) == COWORK.bundle_hash(TEMPLATES)
+
+
 def test_bundle_hash_is_config_independent():
     a = COWORK.bundle(TEMPLATES, {"DOMAINS": "x/y",
                                   "FRAMEWORK_VERSION": "1"})
