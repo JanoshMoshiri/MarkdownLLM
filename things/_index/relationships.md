@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T10:56:28
-generated_from: HEAD@1afe283
-coverage: 218
+generated: 2026-08-18T12:37:56
+generated_from: HEAD@5bf22fe
+coverage: 219
 framework_version: 3.31.0
 ---
 
@@ -238,6 +238,16 @@ framework_version: 3.31.0
 - coordination-claim-specification --extends--> thing-specification
 - coordination-claim-specification --complements--> git-workflow-specification
 - coordination-claim-specification --complements--> workflow-state-specification
+- cowork-adapter --extends--> vendor-harness-adapter-foundation
+- cowork-adapter --extends--> cowork-integrity-estate-sweep
+- cowork-adapter --extends--> framework-discovery-specification
+- cowork-adapter --implements--> agents-md-discovery-is-harness-dependent
+- cowork-adapter --implements--> a-layered-harness-is-a-co-author-not-a-substrate
+- cowork-adapter --references--> a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it
+- cowork-adapter --references--> an-environments-reachable-set-is-not-an-architecture
+- cowork-adapter --references--> installation-is-not-activation
+- cowork-adapter --implements--> hook-enforcement-has-three-anchors
+- cowork-adapter --implements--> portability-claims-need-execution-tests
 - cowork-integrity-estate-sweep --references--> framework-upward-signal
 - cowork-integrity-estate-sweep --references--> pretooluse-action-boundary-gate
 - cross-domain-handoff-is-built-inbound-only --extends--> cross-domain-handoff-is-verified-external-input
