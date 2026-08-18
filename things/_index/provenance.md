@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-18
-generated: 2026-08-18T15:47:47
-generated_from: HEAD@56d1bbe
-coverage: 29
+generated: 2026-08-18T17:47:38
+generated_from: HEAD@f87a9b9
+coverage: 30
 framework_version: 3.32.0
 ---
 
@@ -42,6 +42,9 @@ framework_version: 3.32.0
 ## claude-phase5r0-red-acceptance-2026-08-12
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - claude-phase5r0-matrix-completion-2026-08-13 (derived-from)
+
+## cowork-adapter
+- a-consuming-environments-gate-is-a-build-time-constraint (derived-from)
 
 ## cross-domain-handoff-is-verified-external-input
 - phase-3-run-domain-task-reverted (pinned @2d4f6d4)

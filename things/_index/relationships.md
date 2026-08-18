@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T15:47:37
-generated_from: HEAD@56d1bbe
-coverage: 221
+generated: 2026-08-18T17:47:31
+generated_from: HEAD@f87a9b9
+coverage: 224
 framework_version: 3.32.0
 ---
 
@@ -26,10 +26,20 @@ framework_version: 3.32.0
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> asks-travel-as-exposed-things
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --informs--> substrate-reconciliation-2026-08-09
 - a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it --complements--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- a-consuming-environments-gate-is-a-build-time-constraint --derived-from--> cowork-adapter
+- a-consuming-environments-gate-is-a-build-time-constraint --complements--> an-environments-reachable-set-is-not-an-architecture
+- a-consuming-environments-gate-is-a-build-time-constraint --extends--> portability-claims-need-execution-tests
+- a-consuming-environments-gate-is-a-build-time-constraint --supports--> the-harness-bound-path-is-the-least-tested-path
+- a-consuming-environments-gate-is-a-build-time-constraint --complements--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - a-control-that-must-stay-local-has-no-floor --supports--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - a-control-that-must-stay-local-has-no-floor --challenges--> repeated-drift-promotes-a-fact-into-the-floor
 - a-control-that-must-stay-local-has-no-floor --references--> boundary-disclosure-check
 - a-control-that-must-stay-local-has-no-floor --references--> scaffold-declares-visibility
+- a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --challenges--> cowork-integrity-estate-sweep
+- a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --extends--> hook-enforcement-has-three-anchors
+- a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --complements--> existence-is-not-currency
+- a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --supports--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
+- a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --complements--> a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-built-inbound-only
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-verified-external-input
 - a-crossing-thing-carries-its-producers-private-graph --informs--> provenance-specification
@@ -253,6 +263,8 @@ framework_version: 3.32.0
 - cowork-adapter --references--> installation-is-not-activation
 - cowork-adapter --implements--> hook-enforcement-has-three-anchors
 - cowork-adapter --implements--> portability-claims-need-execution-tests
+- cowork-adapter --implements--> a-consuming-environments-gate-is-a-build-time-constraint
+- cowork-adapter --implements--> a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment
 - cowork-integrity-estate-sweep --references--> framework-upward-signal
 - cowork-integrity-estate-sweep --references--> pretooluse-action-boundary-gate
 - cross-domain-handoff-is-built-inbound-only --extends--> cross-domain-handoff-is-verified-external-input
@@ -735,6 +747,13 @@ framework_version: 3.32.0
 - the-notation-changed-not-the-primitives --references--> thing-specification
 - the-notation-changed-not-the-primitives --references--> orchestration-specification
 - the-notation-changed-not-the-primitives --references--> git-workflow-specification
+- the-operating-layer-has-no-quality-loop --extends--> cumulative-drift-is-invisible-to-per-change-walks
+- the-operating-layer-has-no-quality-loop --extends--> coherence-is-a-maintained-rate-not-a-state
+- the-operating-layer-has-no-quality-loop --references--> mechanical-coherence-checks-backlog
+- the-operating-layer-has-no-quality-loop --informs--> retrospective-specification
+- the-operating-layer-has-no-quality-loop --references--> session-memory-specification
+- the-operating-layer-has-no-quality-loop --references--> workflow-run-is-the-decomposition-principle-applied-to-processes
+- the-operating-layer-has-no-quality-loop --references--> reflexive-behaviors-are-indexes-plus-prompts
 - the-rough-true-account-is-generative-infrastructure --references--> llm-driven-systems-manifesto
 - the-rough-true-account-is-generative-infrastructure --complements--> belief-revision-specification
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
