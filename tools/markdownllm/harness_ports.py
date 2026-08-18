@@ -275,6 +275,33 @@ class InspectPort(Protocol):
 
 
 @runtime_checkable
+class BundlePort(Protocol):
+    """Estate-level distribution bundle for a run-time-bound harness.
+
+    Some harnesses bind through no project artifact at all: an
+    account-level bundle assembles the workspace at session run time
+    (cowork-adapter plan, "a third adapter class"). This port renders
+    that bundle from framework-owned templates. The adapter owns the
+    content and its canonical mechanism hash; the caller owns gathering
+    the estate config, writing bytes, and keeping the output private —
+    a rendered bundle names the operator's repositories, so it must
+    never enter the framework repo.
+
+    ``bundle_hash`` is the run-time currency anchor: it hashes the
+    MECHANISM (the templates), not the operator config, so an installed
+    bundle can ask the framework it just cloned "is my mechanism still
+    what you would render?" and report drift honestly.
+    """
+
+    def capabilities(self) -> AdapterCapabilities: ...
+
+    def bundle(self, templates_root: Path,
+               config: Mapping[str, str]) -> dict[str, bytes]: ...
+
+    def bundle_hash(self, templates_root: Path) -> str: ...
+
+
+@runtime_checkable
 class ShortcutPort(Protocol):
     """Deliberate-ritual shortcut projections — inert files the operator
     invokes by hand, a separate concern from lifecycle hooks. The adapter

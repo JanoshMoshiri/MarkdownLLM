@@ -35,6 +35,7 @@ NEUTRAL_MODULES = [
     "harness_ports.py", "runtime.py", "scaffold.py", "doctor.py",
     "cli.py", "session.py", "harness_diagnostics.py",
     "lifecycle_runner.py", "adapter_install.py",
+    "assemble.py", "publish.py", "bundle_service.py",
 ]
 
 # Vendor vocabulary that must not appear in neutral CODE (case-insensitive).

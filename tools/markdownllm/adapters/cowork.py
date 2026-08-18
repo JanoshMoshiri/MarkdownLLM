@@ -32,10 +32,25 @@ fitness gate).
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
+from typing import Mapping
 
 from ..harness_ports import (
     AdapterCapabilities, HarnessContext, InspectionReport,
+)
+
+BUNDLE_TEMPLATES_DIR = "cowork-bundle"
+PLUGIN_NAME = "markdownllm-bootstrap"
+
+# The MECHANISM: the templates whose rendered forms decide how a session
+# behaves. Hashed for run-time currency — operator config (config.env) is
+# deliberately outside the hash, so retargeting the estate never reads as
+# mechanism drift, and a mechanism change always does.
+_MECHANISM_TEMPLATES = (
+    "SKILL.md.template",
+    "SESSION.md.template",
+    "bootstrap.sh.template",
 )
 
 
@@ -72,6 +87,66 @@ class CoworkAdapter:
     def scaffold_guidance(self) -> str:
         return ("Cowork: no per-domain artifact — sessions bind through the "
                 "account-level bundle at run time (plan: cowork-adapter)")
+
+    # -- BundlePort --------------------------------------------------------
+    def bundle_hash(self, templates_root: Path) -> str:
+        """The canonical mechanism hash — run-time currency's anchor.
+
+        Hashes the RAW template bytes (placeholders included, config
+        excluded), so the framework can answer "what would I render now?"
+        without knowing any operator's estate, and a built bundle can
+        carry the answer it was built against.
+        """
+        digest = hashlib.sha256()
+        base = templates_root / BUNDLE_TEMPLATES_DIR
+        for name in _MECHANISM_TEMPLATES:
+            digest.update(name.encode("utf-8"))
+            digest.update((base / name).read_bytes())
+        return digest.hexdigest()
+
+    def bundle(self, templates_root: Path,
+               config: Mapping[str, str]) -> dict[str, bytes]:
+        """Render the account-level plugin bundle. Pure: path → bytes;
+        the caller (bundle_service) writes, and keeps the output private —
+        the rendered config.env names the operator's repositories."""
+        base = templates_root / BUNDLE_TEMPLATES_DIR
+        mechanism = self.bundle_hash(templates_root)
+        substitutions = {
+            "{framework_version}": config.get("FRAMEWORK_VERSION", "unknown"),
+            "{bundle_hash}": mechanism,
+            "{git_name}": config.get("GIT_NAME", ""),
+        }
+
+        def render(template: str) -> bytes:
+            text = (base / template).read_text(encoding="utf-8")
+            for key, value in substitutions.items():
+                text = text.replace(key, value)
+            return text.encode("utf-8")
+
+        config_env = (
+            "# markdownllm-bootstrap configuration — DERIVED from the local "
+            "estate by\n"
+            f"# `mdllm bundle --harness {self.name}` (framework "
+            f"v{config.get('FRAMEWORK_VERSION', 'unknown')}). Edit freely; "
+            "rebuild to re-derive.\n"
+            f"FRAMEWORK_REPO={config.get('FRAMEWORK_REPO', '')}\n"
+            f"GIT_NAME={config.get('GIT_NAME', '')}\n"
+            f"GIT_EMAIL={config.get('GIT_EMAIL', '')}\n"
+            f"DOMAINS={config.get('DOMAINS', '')}\n"
+        ).encode("utf-8")
+
+        skill = f"{PLUGIN_NAME}/skills/spin-up-domain"
+        return {
+            f"{PLUGIN_NAME}/.claude-plugin/plugin.json":
+                render("plugin.json.template"),
+            f"{PLUGIN_NAME}/README.md": render("README.md.template"),
+            f"{skill}/SKILL.md": render("SKILL.md.template"),
+            f"{skill}/bootstrap.sh": render("bootstrap.sh.template"),
+            f"{skill}/references/SESSION.md": render("SESSION.md.template"),
+            f"{skill}/references/config.env": config_env,
+            f"{skill}/references/config.env.example":
+                (base / "config.env.example").read_bytes(),
+        }
 
 
 COWORK = CoworkAdapter()

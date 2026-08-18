@@ -273,6 +273,37 @@ observable duties end-to-end; the two porch insights' dismissal
 conditions are met (derived list consumed; handoff derived, not
 authored).
 
+**Closed 2026-08-18** (except the checkbox ticks below reflect what
+shipped — the ProbePort execution fingerprint deliberately waits for
+Phase 5's live run, keeping doctor's `untested` truthful until a real
+event exists to attest). Split landed as two neutral services plus the
+vendor bundle:
+
+- `mdllm assemble` (`assemble.py`, neutral): the post-clone half of ANY
+  bootstrap — config-driven clones (flat KEY=VALUE config, deliberately
+  never sourced), remote-HEAD branch resolution refusing to guess, floor
+  hooks, identity, credential leak check, then per domain: sync →
+  `session-start --contract` (the emitted contract in the transcript) →
+  full triggers → imports COVERAGE → BRANCH MAP → honest handoff naming
+  mechanical vs interpretation duties, with publication mode stated per
+  credential mode. 12 tests over file:// remotes with two different
+  non-main default branches in one assembly.
+- `mdllm bundle --harness <h>` (`bundle_service.py`, neutral +
+  `BundlePort`): estate config DERIVED from local clones' remotes
+  (skips reported, never silent), identity from git config, rendered
+  through the adapter's templates; output lands gitignored
+  (`.bundle-build/`) because a rendered config names private repos.
+- The cowork bundle templates (`templates/cowork-bundle/`, public,
+  placeholder-only): thin bootstrap (credential intake → framework
+  clone → PyYAML probe → run-time currency check → hand off to
+  assemble), SKILL.md and SESSION.md rewritten against the floor
+  guards; push.sh/default-branch.sh retired — the bundle ships no bash
+  guards. Mechanism hash = sha256 of the raw mechanism templates
+  (config excluded), stamped at build, re-checked by the bootstrap
+  against the freshly cloned framework: drift degrades honestly and
+  names the rebuild command. All three new modules added to the fitness
+  gate's neutral list.
+
 ### Phase 4 — Local transport
 
 - [ ] Mode detection (configured local estate path exists and is the

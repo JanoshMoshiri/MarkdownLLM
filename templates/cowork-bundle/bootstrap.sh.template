@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# markdownllm-bootstrap — the thin transport layer of the Cowork adapter.
+#
+#   Usage:  bash bootstrap.sh <github_pat> [domain-filter ...]
+#           (or set GH_PAT in the environment)
+#
+# Rendered by `mdllm bundle --harness cowork` from framework-owned templates
+# (framework v{framework_version}, mechanism {bundle_hash}). Do not edit the
+# rendered copy — change the templates and rebuild.
+#
+# This script does ONLY what must precede the framework existing here:
+# credential intake, the framework clone, a PyYAML probe, and a run-time
+# currency check. Everything after — domain clones, branch resolution, floor
+# hooks, identity, the ordered lifecycle with Tier-0 contract emission, the
+# branch map and the handoff — is `mdllm assemble`: floor-owned, tested
+# Python, versioned with the framework it just cloned.
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+PAT="${1:-${GH_PAT:-}}"
+if [ -z "$PAT" ]; then
+  echo "ERROR: no GitHub PAT provided. Usage: bash bootstrap.sh <github_pat> [domain-filter ...]" >&2
+  exit 1
+fi
+# If the PAT came in as $1, drop it so remaining args are domain filters.
+if [ "${1:-}" = "$PAT" ]; then shift; fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG="${SCRIPT_DIR}/references/config.env"
+if [ ! -f "$CONFIG" ]; then
+  echo "ERROR: config not found at ${CONFIG} (copy config.env.example to config.env)" >&2
+  exit 1
+fi
+
+# Flat KEY=VALUE parse — deliberately not `source`: no arrays, no code
+# execution from config, and the same format `mdllm assemble` reads.
+FRAMEWORK_REPO="$(grep -E '^FRAMEWORK_REPO=' "$CONFIG" | head -1 | cut -d= -f2- | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
+if [ -z "$FRAMEWORK_REPO" ]; then
+  echo "ERROR: FRAMEWORK_REPO missing from config.env" >&2
+  exit 1
+fi
+
+WORK="${HOME}/mdllm-run"
+AUTH="Authorization: Basic $(printf 'x-access-token:%s' "$PAT" | base64 | tr -d '\n')"
+redact() { sed -E 's/github_pat_[A-Za-z0-9_]+/[REDACTED]/g'; }
+
+echo "==> workspace: ${WORK}"
+rm -rf "$WORK"; mkdir -p "$WORK"; cd "$WORK"
+
+FW_NAME="$(basename "$FRAMEWORK_REPO")"
+echo "==> framework: ${FRAMEWORK_REPO}"
+git -c http.extraheader="$AUTH" clone --quiet \
+  "https://github.com/${FRAMEWORK_REPO}.git" 2>&1 | redact
+cd "$FW_NAME"
+
+# The deterministic floor needs PyYAML.
+python3 -c "import yaml" 2>/dev/null || \
+  pip install pyyaml --break-system-packages --quiet 2>&1 | tail -1 || true
+
+# Run-time currency: is this bundle's mechanism still what the framework
+# would render now? The comparison runs at the first moment bundle and
+# framework coexist — the binding moment of a run-time-bound adapter.
+# Drift degrades honestly rather than failing: every command below is the
+# cloned framework's own floor, current by construction.
+STAMPED="{bundle_hash}"
+EXPECTED="$(python3 tools/mdllm.py bundle --harness cowork --hash 2>/dev/null || echo unknown)"
+if [ "$EXPECTED" != "$STAMPED" ]; then
+  echo "!! BUNDLE STALE: this bundle's mechanism is ${STAMPED:0:12}..., but the"
+  echo "   framework it just cloned would render ${EXPECTED:0:12}... today."
+  echo "   Rebuild + reinstall from your local estate:"
+  echo "     python tools/mdllm.py bundle --harness cowork"
+  echo "   Continuing — the assembly below runs the cloned framework's current floor."
+fi
+
+# Hand off to the floor. GH_PAT is process-scoped: never written to disk,
+# never in git config; assemble redacts it from every output line.
+GH_PAT="$PAT" python3 tools/mdllm.py assemble --config "$CONFIG" "$@"

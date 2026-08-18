@@ -1,0 +1,91 @@
+# Session Operating Contract
+
+The rules of engagement for working a MarkdownLLM domain inside an
+ephemeral Cowork session. They exist because the compute is disposable and
+only published commits survive. Domain-agnostic; the targets live in
+`config.env`. (Cowork adapter, framework v{framework_version}, mechanism
+{bundle_hash} — rendered from framework templates, do not hand-edit.)
+
+## The environment
+
+An isolated cloud container: compute reclaimable the moment the session
+idles, disk session-scoped. Nothing here is durable until **published** to
+the remote. Treat every commit as at-risk until its publication succeeds.
+
+## Which controls are real in this harness
+
+The kernel's rule is that **anchor decides enforcement**. Know which is
+which before trusting any of them:
+
+| Control | Anchor | Here |
+| --- | --- | --- |
+| pre-commit `validate` + `coherence` | `git-fs` | **Works.** Installed by assembly. The control that will stop you. |
+| `mdllm publish` branch + ff guards | `git-fs` | **Works.** Refuses guessed branches, never creates one, verifies the remote tip. |
+| post-commit `autopush` | `git-fs` | **Fails, loudly, by design.** No credentials in git config. Publication is your explicit step. |
+| Tier-0 contract into context | emitted by assembly | **Ran once, at assembly.** `session-start --contract` printed the kernel + each domain's AGENTS.md into the transcript; the attestation records it. |
+| domain `.claude/settings.json` hooks | `harness-session` | **Never fire here.** The repo was cloned after session start; `doctor` saying "installed" means the file exists, not that anything runs it. Writes are NOT validated as you make them — the pre-commit floor at commit time is the first check that sees them. |
+| everything the HANDOFF lists as yours | `interpretation` | **Only as real as your compliance.** Skipping it is silent — which is why the handoff prints it. |
+
+## Publication discipline — the core rule
+
+**Publish immediately after every commit. Always. Automatically.** The
+user has standing pre-approval for publishing their own committed work.
+
+```bash
+GH_PAT="<PAT>" python3 tools/mdllm.py publish domains/<name>
+```
+
+- The branch is READ (recorded at assembly from each remote's own HEAD).
+  Never type a branch name — not in publish, not in `checkout -b`, not in
+  `merge`, not as a PR base. A guessed name does not reliably error: it
+  can create a stray remote branch, report success, and make the work
+  invisible to everyone including the next session.
+- A branch name is per-repo, never per-session. Domains loaded together
+  can differ.
+- A non-zero exit is a STOP: read the message. Never `--force`, never a
+  different branch name to make an error go away. A rejected publication
+  is divergence, and routing it is the user's decision.
+- If resolution failed at assembly (the branch map said so), settle it
+  with the user first, then record it:
+  `git -C domains/<name> config mdllm.defaultbranch <branch>`.
+- Working branches, when a domain's contract calls for one, are cut from
+  the resolved default; the name comes from the user or the domain's
+  convention, never invented.
+- Subagents inherit nothing: hand them the exact publish command.
+
+## Credential handling
+
+- The user pastes a fine-grained PAT each session (Contents read/write on
+  the configured repos). Unavoidable until the harness ships a GitHub
+  connector.
+- It travels only as a process-scoped environment variable into commands
+  that supply it through a command-scoped header (`bootstrap.sh`,
+  `mdllm assemble`, `mdllm publish`) and redact it from output. Never
+  write it to a file, never echo it, never put it in a URL or git config.
+- It also lands in the session transcript when pasted, and the transcript
+  outlives the container — so the real kill switch is **revoking the PAT
+  on GitHub** at session end. Remind the user.
+
+## Commit attribution
+
+- Author every commit as `GIT_NAME <GIT_EMAIL>` from `config.env`
+  (assembly sets this per domain).
+- No AI co-author trailer. "Unverified" on GitHub means unsigned, not
+  fake — signing would need the user's private key, which does not belong
+  in this container. Expected and accepted.
+
+## Floor discipline
+
+- The pre-commit floor (`validate` + `coherence`) is the mechanical
+  guarantee. Never `--no-verify`. If a commit is blocked, fix the cause;
+  the message names the remedy.
+- Mechanical checks belong to the tool; your validation duty is semantic
+  (the emitted kernel carries the split).
+
+## Human-decides boundary
+
+Some domains make determinations that belong to a human — regulated,
+compliance, financial, or otherwise consequential. Prepare figures,
+surface contradictions, draft records; irreversible or already-published
+acts are the user's call. Record their determination attributably; do not
+decide for them.

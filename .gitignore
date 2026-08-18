@@ -20,3 +20,7 @@ WORKLOG.md
 # Local disclosure boundary (mdllm boundary) — the vocabulary never enters any
 # repo; the check itself errors if this file is ever tracked
 .boundary-terms
+
+# Built harness bundles (mdllm bundle) are PRIVATE: the rendered config
+# names the operator's repositories. Templates are tracked; builds never are.
+.bundle-build/

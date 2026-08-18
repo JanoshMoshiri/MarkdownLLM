@@ -1,0 +1,16 @@
+{
+  "name": "markdownllm-bootstrap",
+  "version": "{framework_version}",
+  "description": "The Cowork adapter for MarkdownLLM estates. Assembles the workspace in an ephemeral session (framework + the domains you name), emits each domain's Tier-0 contract into the transcript before work starts, installs the deterministic floor, resolves every repo's real default branch from its remote, and closes each commit with guarded publication. Rendered from framework-owned templates ({bundle_hash}); the bootstrap re-checks that mechanism hash against the framework it clones, so a stale bundle says so.",
+  "author": {
+    "name": "{git_name}"
+  },
+  "keywords": [
+    "markdownllm",
+    "bootstrap",
+    "git",
+    "domain",
+    "cowork",
+    "adapter"
+  ]
+}

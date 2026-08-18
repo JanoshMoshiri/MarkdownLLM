@@ -65,6 +65,8 @@ from .evals import cmd_eval
 from .history import cmd_changelog, cmd_worklog
 from .harness_ports import LIFECYCLE_BINDINGS
 from .imports_check import cmd_estate_check, cmd_imports_check
+from .assemble import cmd_assemble
+from .bundle_service import cmd_bundle
 from .publish import cmd_publish
 from .sync import cmd_autopush, cmd_estate_sync
 from .indexes import cmd_index
@@ -318,6 +320,41 @@ def build_cli() -> argparse.ArgumentParser:
     es.add_argument("--timeout", type=int, default=20,
                     help="seconds per network call before degrading (default 20)")
     es.set_defaults(fn=cmd_estate_sync)
+
+    asm = sub.add_parser("assemble", help="config-driven estate assembly for an "
+                         "environment that started without one: clone the "
+                         "configured domains, resolve real default branches "
+                         "(never guessing), install floor hooks, set identity, "
+                         "leak-check, then per domain run sync + session-start "
+                         "--contract (the Tier-0 contract enters the "
+                         "transcript) + full triggers + imports coverage; "
+                         "closes with the BRANCH MAP and an honest handoff. "
+                         "Credentials: ambient, or GH_PAT/MDLLM_GIT_TOKEN "
+                         "command-scoped")
+    asm.add_argument("--config", required=True,
+                     help="flat KEY=VALUE file: GIT_NAME, GIT_EMAIL, DOMAINS "
+                          "(whitespace-separated owner/repo or URLs)")
+    asm.add_argument("filters", nargs="*",
+                     help="assemble only domains matching these terms "
+                          "(case-insensitive substring); none = all")
+    asm.add_argument("--root", default=".",
+                     help="workspace root holding domains/ (default .)")
+    asm.set_defaults(fn=cmd_assemble)
+
+    bd = sub.add_parser("bundle", help="render a harness's estate-level "
+                        "distribution bundle from framework-owned templates — "
+                        "config derived from the local estate's remotes and "
+                        "git identity; output is PRIVATE (names your repos) "
+                        "and lands in a gitignored build directory")
+    bd.add_argument("--harness", required=True, choices=tuple(
+        sorted(adapter_names())),
+        help="a registered harness implementing the bundle port")
+    bd.add_argument("--out", default=None,
+                    help="output directory (default .bundle-build/<harness>/)")
+    bd.add_argument("--hash", action="store_true",
+                    help="print the canonical mechanism hash only (run-time "
+                         "currency: a built bundle compares its stamp to this)")
+    bd.set_defaults(fn=cmd_bundle)
 
     pb = sub.add_parser("publish", help="guarded publication: push the current "
                         "commit to the repo's REAL default branch — branch READ "

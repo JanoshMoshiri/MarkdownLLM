@@ -1,0 +1,57 @@
+# MarkdownLLM Bootstrap — the Cowork adapter
+
+Reconstructs and operates any MarkdownLLM domain from a fresh, ephemeral
+Cowork session. Rendered from framework-owned templates by
+`mdllm bundle --harness cowork` (framework v{framework_version},
+mechanism {bundle_hash}) — this bundle is a *projection* of the
+framework, not an authored sibling: rebuild it from your estate rather
+than editing it.
+
+## What it does
+
+Invoke it ("spin up my domain"), paste a short-lived GitHub token when
+asked, and the bootstrap:
+
+1. Clones the framework named in `config.env`.
+2. Checks its own mechanism hash against what that framework would render
+   today — a stale bundle says so and continues on the framework's
+   current floor.
+3. Hands off to `mdllm assemble`, which clones the domains you named (or
+   all configured ones), resolves each repo's **real default branch** from
+   its remote's own HEAD (refusing to guess), installs the deterministic
+   floor pre-commit hook, sets your commit identity, verifies no
+   credential leaked into any git config, and then — per domain — syncs,
+   **emits the Tier-0 contract into the transcript** (`session-start
+   --contract`: the operative kernel, the domain's AGENTS.md, and a
+   reading list derived from the filesystem at that moment), prints the
+   full trigger evaluation and the imports COVERAGE line, and closes with
+   the BRANCH MAP and an honest handoff.
+4. During work, every commit is followed by `mdllm publish` — the guarded
+   publication that reads the recorded branch, refuses to create remote
+   branches, pushes fast-forward only, and verifies the remote tip.
+
+## Configuration
+
+Everything operator-specific is in
+`skills/spin-up-domain/references/config.env` — **derived from your local
+estate** at build time (repo remotes + git identity), editable by hand,
+and private: this file names your repositories, so the built bundle never
+enters the framework repo.
+
+```
+FRAMEWORK_REPO=OWNER/MarkdownLLM
+GIT_NAME=Your Name
+GIT_EMAIL=you@example.com
+DOMAINS=OWNER/domain-a OWNER/domain-b
+```
+
+## Rebuilding
+
+From your local estate (the framework clone that nests your domains):
+
+```
+python tools/mdllm.py bundle --harness cowork
+```
+
+The output lands in `.bundle-build/cowork/` (gitignored). Zip the
+`markdownllm-bootstrap/` folder and install it in Cowork.
