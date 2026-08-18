@@ -248,24 +248,24 @@ load-bearing stray-branch non-creation proof (`mian` with faked local
 corroboration → refusal, origin untouched) and the non-ff refusal that
 names never-force. Fitness gate green.
 
-### Phase 3 — The bundle as a projection
+### Phase 3 — The bundle as a projection ✅ (2026-08-18)
 
-- [ ] Bundle contents (`SKILL.md`, `SESSION.md`, bootstrap, config)
+- [x] Bundle contents (`SKILL.md`, `SESSION.md`, bootstrap, config)
   become framework-owned templates rendered by a build command; the
   build derives the domain list from the local estate's remotes and
   instantiates operator identity — authored-at-build becomes
   derived-at-build. The built bundle is private output (gitignored
   path), the templates are public and name no private repo.
-- [ ] The rendered bootstrap shrinks per design rule 3: token intake →
+- [x] The rendered bootstrap shrinks per design rule 3: token intake →
   framework clone → runtime probe → hand off to the floor's ordered
   lifecycle (estate-sync, session-start, contract emission per selected
   domain) → branch map → handoff residue (the interpretation duties,
   printed as such).
-- [ ] Currency at run time: the bundle carries its definition hash; the
+- [x] Currency at run time: the bundle carries its definition hash; the
   bootstrap compares it against what the freshly-cloned framework's
   renderer would emit now, and reports drift honestly with the remedy
   (rebuild + reinstall) — degradation, not failure.
-- [ ] Domain selection, PAT handling, and redaction preserved from
+- [x] Domain selection, PAT handling, and redaction preserved from
   v0.4.0 behaviour, now under test.
 
 **Gate:** a bundle built from a clean checkout reproduces v0.4.0's
@@ -303,6 +303,22 @@ vendor bundle:
   against the freshly cloned framework: drift degrades honestly and
   names the rebuild command. All three new modules added to the fitness
   gate's neutral list.
+
+**Full-suite gate met on the settled tree, 2026-08-18: 515 passed, 0
+failed** (the one earlier failure belonged to the concurrent session's
+then-uncommitted work and closed with its commit). The real bundle was
+built from the live estate the same day — 12 domains derived, one
+local-only repo skipped with a note, LF-only bytes, mechanism
+`c060e2b5…` — zipped and handed to the operator for installation.
+One operator decision surfaced by derivation: the bundle authors
+commits with this machine's git identity (the noreply email), where
+v0.4.0's authored config used the company address — `config.env` is
+editable if the old attribution is wanted; note the estate sweep's
+Cowork-signature discriminator shifts either way.
+
+**Next:** the operator installs the bundle and runs the live remote
+leg — Phase 5's first evidence record. Phase 4 (local transport) and
+the ProbePort execution fingerprint follow it.
 
 ### Phase 4 — Local transport
 
