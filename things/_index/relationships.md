@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T07:42:30
-generated_from: HEAD@9eb0522
-coverage: 214
+generated: 2026-08-18T08:52:41
+generated_from: HEAD@be33b3a
+coverage: 216
 framework_version: 3.31.0
 ---
 
@@ -59,6 +59,9 @@ framework_version: 3.31.0
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --complements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --complements--> existence-is-not-currency
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --informs--> mechanical-coherence-checks-backlog
+- a-session-harvest-must-read-the-commit-stream --informs--> session-memory-specification
+- a-session-harvest-must-read-the-commit-stream --complements--> long-running-tasks-lack-pre-compaction-checkpoint
+- a-session-harvest-must-read-the-commit-stream --complements--> a-shared-worktree-merges-authorship-at-the-index
 - a-shared-worktree-merges-authorship-at-the-index --challenges--> coordination-claim-specification
 - a-shared-worktree-merges-authorship-at-the-index --references--> git-workflow-specification
 - a-shared-worktree-merges-authorship-at-the-index --complements--> divergence-is-an-unrouted-decision
@@ -466,6 +469,9 @@ framework_version: 3.31.0
 - inflection-candidates-are-computable --complements--> change-reconciliation-specification
 - inflection-candidates-are-computable --informs--> estate-cadence-cluster
 - inflection-candidates-are-computable --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- installation-is-not-activation --extends--> agents-cannot-self-install-permission-bearing-hooks
+- installation-is-not-activation --extends--> portability-claims-need-execution-tests
+- installation-is-not-activation --derived-from--> vendor-harness-adapter-foundation
 - interface-specification --implements--> llm-driven-systems-manifesto
 - interface-specification --complements--> provenance-specification
 - interface-specification --complements--> thing-specification
@@ -756,6 +762,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --implements--> portability-claims-need-execution-tests
 - vendor-harness-adapter-foundation --references--> protecting-one-budget-displaces-the-failure-into-the-other
 - vendor-harness-adapter-foundation --references--> agents-cannot-self-install-permission-bearing-hooks
+- vendor-harness-adapter-foundation --references--> installation-is-not-activation
 - vendor-harness-adapter-foundation --references--> a-layered-harness-is-a-co-author-not-a-substrate
 - vendor-harness-adapter-foundation --implements--> relative-path-hooks-break-in-nested-domain-repos
 - vendor-harness-adapter-foundation --references--> codex-port-challenge-2026-08-11

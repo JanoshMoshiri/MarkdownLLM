@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.24
+version: 1.25
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -28,6 +28,9 @@ linked_things:
   - id: agents-cannot-self-install-permission-bearing-hooks
     relation: references
     notes: "Preserves the human/tool gate around automatic powers and operator-owned configuration."
+  - id: installation-is-not-activation
+    relation: references
+    notes: "Phase 7 must document project distribution, human trust activation, and real-event execution as separate rollout facts."
   - id: a-layered-harness-is-a-co-author-not-a-substrate
     relation: references
     notes: "Keeps the adapter thin and prevents a harness operating layer from becoming Definition Zero."

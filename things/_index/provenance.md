@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-17
-generated: 2026-08-17T20:39:23
-generated_from: HEAD@e1dc925
+created: 2026-08-18
+generated: 2026-08-18T08:53:09
+generated_from: HEAD@be33b3a
 coverage: 29
 framework_version: 3.31.0
 ---
@@ -106,4 +106,5 @@ framework_version: 3.31.0
 ## vendor-harness-adapter-foundation
 - a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it (derived-from)
 - an-interface-is-what-its-consumers-call-not-what-it-declares (derived-from)
+- installation-is-not-activation (derived-from)
 
