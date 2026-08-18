@@ -2,7 +2,7 @@
 id: cowork-adapter
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-08-18
 priority: high
 tags: [harness, adapters, cowork, bootstrap, discovery, contract-emission, publication, estate, clean-architecture]
@@ -37,6 +37,12 @@ linked_things:
   - id: portability-claims-need-execution-tests
     relation: implements
     notes: "No Cowork compatibility row lands until a real ephemeral-VM run and a real local-session run produce graded evidence records, per the Phase 6 record conventions."
+  - id: a-consuming-environments-gate-is-a-build-time-constraint
+    relation: implements
+    notes: "Earned by this plan's Phase 3, twice. The build already refuses over-long descriptions and normalises line endings; Phase 6 owes the general statement — every gate the consuming environment enforces becomes a build-time refusal in the producer's vocabulary — as the standing rule for run-time-bound adapters."
+  - id: a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment
+    relation: implements
+    notes: "The finding that made Phase 1 more than a convenience: the session gate's attestation vouched for contract emission that only entry-file injection was supplying. `session-start --contract` closes it; Phase 6 owes the disposition of what the gate proved before today, in terms a strict-gate domain can audit."
 ---
 
 # Cowork Adapter — the third harness, built as one
@@ -341,9 +347,10 @@ failing there, moved to the build where the fix is one file away.**
 That shape belongs in the Phase 6 spec text as the general rule for
 run-time-bound adapters, not just as two fixes.
 
-**Next:** the operator installs the corrected bundle and runs the live
-remote leg — Phase 5's first evidence record. Phase 4 (local
-transport) and the ProbePort execution fingerprint follow it.
+**Next:** the corrected bundle installed and the live remote leg has
+run; its evaluation is in flight in another domain (see Phase 5's
+status note). Phase 5's record is written from that evaluation, then
+Phase 4 (local transport) and the ProbePort execution fingerprint.
 
 **v3.32.0 publication checkpoint — 2026-08-18.** The operator authorised
 publication of the Phase 0–3 substrate now that the settled-tree suite and
@@ -380,6 +387,34 @@ noise).
 
 **Gate:** both records exist; defects found route back to their owning
 phase, not patched in place.
+
+**Status at 2026-08-18 session end — the remote leg is RUNNING, and its
+evaluation is elsewhere.** The corrected bundle installed on the second
+attempt (the first failed the description limit; see the Phase 3 note).
+The operator then ran the live remote leg and is comparing that session's
+response against a Claude Code response to the same work, **in another
+domain**, where the operator says there are further findings to look
+into. So:
+
+- The evidence record for this leg is **owed but not writable here** —
+  it must rest on that evaluation, not on this session's expectations of
+  it. Writing it before the comparison lands would be exactly the
+  producer-side confidence this plan's own insights warn about.
+- The comparison is a *stronger* instrument than the plan asked for: a
+  two-harness differential on the same work, rather than a single Cowork
+  transcript read on its own terms. The `first-2x2-measured-convention-
+  following-not-reasoning` precedent applies — a differential says what a
+  single arm cannot.
+- Three questions this record must answer whatever else it finds:
+  did the skill **activate** (not merely install); did the Tier-0
+  contract appear in the transcript **before the first write**; did the
+  stale-bundle check stay quiet against a matching mechanism hash.
+
+Sequencing: findings from the other domain land first, then Phase 5's
+record is written from them, then Phase 4 and the ProbePort fingerprint.
+`vendor-harness-adapter-foundation` was updated with the Claude-side
+evidence in the same window (v3.32.0, Codex-sealed) — the two plans stay
+one-owner-per-surface, and this plan owns only the Cowork rows.
 
 ### Phase 6 — Specification and public surfaces
 

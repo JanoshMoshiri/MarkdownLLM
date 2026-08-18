@@ -120,7 +120,8 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   razor executed: the perimeter is protected by an interval, and the interval
   becomes mechanical (R2 of the same review).
 
-- **Boundary-term evidence check (added 2026-08-17, felt — second regression).**
+- **Boundary-term evidence check (added 2026-08-17, felt — third regression,
+  now blocking).**
   A `.boundary-terms` entry that appears in the repository's **own tracked
   content** is not a private identifier: either it is noise, or it is a leak
   already committed. Both outcomes are actionable, which is what makes this a
@@ -138,6 +139,23 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   `a-control-that-must-stay-local-has-no-floor`. Candidate home: `mdllm
   boundary` (a `--audit-terms` leg) rather than `coherence`, since the terms
   file is boundary's own subject and absent-file-is-a-no-op already lives there.
+
+  **Third regression, 2026-08-18 — and the first that cost working time.**
+  The same class returned and *blocked three commits in one session*: three
+  synthetic scaffold-target names, each coined during that session, each
+  entering the local file within minutes of first use, removed under the
+  file's own documented remedy, and at least two back afterwards. (They are
+  deliberately not named here: writing them into tracked content is the very
+  act that would make them permanently red — the note would create the
+  condition it describes. The check reads them in place, which is why the
+  invariant can exist where the list cannot.) Every blocked commit touched
+  `tools/tests/` only — exactly the falsely-refused path the 2026-08-13 note
+  predicted, and the fourth block landed on the session-end commit for a
+  *prose description of the problem*. Two further facts this instance adds:
+  the additions were **not** made by the floor (nothing in `boundary.py`
+  writes that file), and manual re-removal does not hold — whatever adds
+  them is unattributed and outlives the fix, so the invariant has to be the
+  thing that speaks, not the operator.
 
 Build when felt — and as of 2026-08-11 the same-builder items above *are* felt:
 the operator named the v3.30.x defect lump as the felt evidence commissioning
