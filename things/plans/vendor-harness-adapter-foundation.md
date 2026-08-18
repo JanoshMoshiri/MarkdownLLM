@@ -1721,6 +1721,33 @@ rerun pass. Until then, Phase 7's wider public-surface sweep is blocked.
 **Gate:** validate, coherence, kernel freshness where applicable, the full
 suite, and the Claude/Codex execution records all pass.
 
+**Claude half — landed and review findings (2026-08-18):**
+
+- `interface.md` v1.3 (`84aabc8`): the Claude route row corrected — the old
+  "CLAUDE.md at root references AGENTS.md" was under-specified on every word —
+  plus a new entry-pointer subsection carrying the three execution-earned
+  facts (core surface; presence-not-position; body-only injection). Codex
+  review requested.
+- `adapters/claude-code.settings.example.json` retired from pasteable form:
+  it still offered the disproved two-handler ordering as a paste target,
+  while current projections are path-instantiated and definition-hash-bound —
+  a static example is born stale **by construction**, so the file now explains
+  the render flow instead of impersonating its output. Doctor's
+  absent-remediation names `adapter-install . --harness claude` rather than
+  the file. Focused adapter + architecture suites 25/25.
+- **Handoff to Codex (its Phase 7 surfaces):** `domain-refresh.md` ~135–146
+  still teaches the operator-paste flow (copy the example, adjust
+  `../../tools/mdllm.py`) and bundles the Copilot claim into it. Needs
+  rewriting against `adapter-install`; the path-adjust instruction is the
+  same bare-`python` class as the live runtime audit. README's Claude row was
+  verified current 2026-08-17 — no text owed.
+- Full-suite verification deferred by concurrency: the working tree carries
+  the Codex runtime audit in flight (mdllm.ps1 / mdllm.py / scaffold /
+  validation / AGENTS surfaces); one runtime-resolver test fails against that
+  uncommitted state and is unattributable until it lands. Claude-half claims
+  above rest on the focused suites only; the Phase 7 gate's full-suite run
+  happens on a settled tree.
+
 ### Phase 8 — Rollout and migration decision (owner: operator)
 
 - [ ] Decide, with the operator, whether future scaffolds retain Claude as the

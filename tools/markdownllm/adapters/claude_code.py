@@ -385,7 +385,7 @@ class ClaudeCodeAdapter:
             installed="SessionStart adapter installed (.claude/settings.json)",
             absent="no SessionStart adapter — session-start runs by "
                    "interpretation (opt-in: "
-                   "adapters/claude-code.settings.example.json)")
+                   "mdllm adapter-install . --harness claude)")
 
     # ----------------------------------------------------------- inspection
 

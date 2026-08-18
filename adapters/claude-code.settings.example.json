@@ -1,31 +1,5 @@
 {
-  "_comment": "Optional harness adapter for Claude Code AND Copilot in VS Code (agent mode) — VS Code Copilot reads .claude/settings.json directly, so this one file hardens both. Merge the hooks block into the domain's .claude/settings.json. Opt-in: with no adapter, the AGENTS.md domain kernel still drives these by interpretation (the floor). The command paths assume framework_root: ../.. (domain two levels under the framework) and the hook's cwd is the domain root — adjust ../../tools/mdllm.py to your framework_root if it differs.",
-  "_anchors": "SessionStart hardens session-start:estate-sync + session-start:version-check (anchor harness-session) — estate-sync runs FIRST: orientation reads git log, and the log is only whole after the fetch. PostToolUse hardens post-write validation (an interpretation act hardened toward harness-session — the git-fs part is only the pre-commit drift net). Neither replaces the interpretation floor.",
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python ../../tools/mdllm.py estate-sync ."
-          },
-          {
-            "type": "command",
-            "command": "python ../../tools/mdllm.py session-start ."
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python ../../tools/mdllm.py validate . --quiet"
-          }
-        ]
-      }
-    ]
-  }
+  "_comment": "The Claude Code adapter is rendered per-domain, not pasted. Current projections are path-instantiated (the domain's framework_root is baked into the command) and definition-hash-bound, so any static copy of a hooks block is born stale by construction — including every prior version of this file. Render and install through the explicit human-invoked flow: python tools/mdllm.py adapter-install <domain> --harness claude --dry-run (review the owned diff), then the same command without --dry-run to apply. Inspect state at any time: python tools/mdllm.py doctor <domain> --harness claude.",
+  "_history": "Until 2026-08-18 this file carried a pasteable two-handler SessionStart block whose commentary asserted estate-sync-before-session-start ordering. Live Claude Code disproved that premise at Gate 5R.0 — matching handlers run in parallel — and that exact form survives only as recognised-legacy migration data (legacy-v1) inside the adapter, refreshable through adapter-install --refresh-legacy after a reviewed diff. The block is deliberately not reproduced here: an example that looks pasteable gets pasted.",
+  "_scope": "Claude Code lifecycle evidence and VS Code Copilot compatibility are separate claims (plan Phase 6). The rendered settings are Claude Code evidence only; Copilot reads .claude/settings.json but remains separately untested."
 }
