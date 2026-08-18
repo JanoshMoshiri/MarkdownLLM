@@ -2,7 +2,7 @@
 id: cowork-adapter
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-08-18
 priority: high
 tags: [harness, adapters, cowork, bootstrap, discovery, contract-emission, publication, estate, clean-architecture]
@@ -319,6 +319,13 @@ Cowork-signature discriminator shifts either way.
 **Next:** the operator installs the bundle and runs the live remote
 leg — Phase 5's first evidence record. Phase 4 (local transport) and
 the ProbePort execution fingerprint follow it.
+
+**v3.32.0 publication checkpoint — 2026-08-18.** The operator authorised
+publication of the Phase 0–3 substrate now that the settled-tree suite and
+real bundle build are complete. This is a build checkpoint, not a Cowork
+compatibility claim: local transport, both live verification records,
+specification/public-surface reconciliation, and operator rollout remain open
+in Phases 4–7 exactly as written below.
 
 ### Phase 4 — Local transport
 

@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.7
+version: 1.8
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -40,7 +40,7 @@ full-spec load (`mdllm tokens` measures it — never assert); twelve extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
 paper layer made mechanical, each subcommand mechanising a piece of it (mostly
-one per spec; a few carry several — change-reconciliation has three (`coherence`, `touchpoints`, `candidates` — the cue leg that fires on every commit), git-workflow two (`estate-sync`, `autopush`); View 3 is the census and wins — `coherence` for the catalog slice
+one per spec; a few carry several — change-reconciliation has three (`coherence`, `touchpoints`, `candidates` — the cue leg that fires on every commit), git-workflow three (`estate-sync`, `publish`, `autopush`); View 3 is the census and wins — `coherence` for the catalog slice
 and `touchpoints` for the Assimilate beat).
 
 ## View 1 — Elevation: the five bands
@@ -61,7 +61,7 @@ flowchart TD
         why, thing.md with the core operative specs, and 22 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
-        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 29
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 32
         mechanical subcommands and a git pre-commit hook that blocks invalid
         commits. At the base, git is the state machine, event stream and audit
         trail. The edges run as follows. AGENTS.md loads the kernel and routes
@@ -86,7 +86,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>29 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>32 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks invalid commits"]
     end
     GIT["git — state machine, event stream, audit trail"]
@@ -213,7 +213,7 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 flowchart LR
     accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
     accDescr {
-        A left column of 29 mdllm subcommands, each with a single edge to the
+        A left column of 32 mdllm subcommands, each with a single edge to the
         spec surface it serves in the right column. The tool is a mapping, not
         a monolith. Solid edges enforce or measure a spec, and dashed edges
         generate an artifact. Enforcing or measuring: validate, triggers,
@@ -221,7 +221,9 @@ flowchart LR
         touchpoints, cascade, imports-check, boundary, estate-check,
         estate-sync, calc, candidates, and the harness-event dispatcher.
         Generating: kernel, changelog, install-hook, worklog, domain-kernel,
-        session-start, mcp-serve, autopush and adapter-install. The division of
+        session-start, mcp-serve, bundle, autopush and adapter-install. The
+        new assembly and guarded-publication commands mechanise explicit
+        bootstrap and outbound publication. The division of
         labour is the point - the floor owns mechanical validation, structural,
         referential and schema, while the agent owns semantic validation only.
         Never re-perform a mechanical check by reasoning.
@@ -256,6 +258,9 @@ flowchart LR
         C27["runtime-probe"]
         C28["adapter-install"]
         C29["harness-event<br/>(internal)"]
+        C30["assemble"]
+        C31["bundle"]
+        C32["publish"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -287,6 +292,9 @@ flowchart LR
         T27["floor availability itself — per-candidate runtime facts"]
         T28["orchestration.md<br/>project-local harness adapter boundary"]
         T29["orchestration.md<br/>ordered lifecycle bindings"]
+        T30["orchestration.md<br/>explicit bootstrap lifecycle"]
+        T31["interface.md<br/>rendered distribution deliverable"]
+        T32["git-workflow.md<br/>guarded outbound publication"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -318,6 +326,9 @@ flowchart LR
     C27 -->|"probes interpreter/dependency/command for"| T27
     C28 -.->|"preflights and applies the selected"| T28
     C29 -->|"dispatches one adapter event through"| T29
+    C30 -->|"assembles and emits"| T30
+    C31 -.->|"renders"| T31
+    C32 -->|"guards"| T32
 ```
 
 Notes on this view:

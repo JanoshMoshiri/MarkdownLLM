@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.31
+version: 1.32
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -73,6 +73,9 @@ linked_things:
   - id: a-degrading-command-cannot-trigger-approval-by-succeeding
     relation: references
     notes: "Splits non-blocking lifecycle sync from an operator-requested freshness gate so Codex approval has a mechanical failure signal to route."
+  - id: codex-gate-7-0b-qms-operator-acceptance-2026-08-18
+    relation: references
+    notes: "Operator-relayed fresh QMS task confirming non-cached estate sync, full orientation, and ordinary Git reads after the Gate 7.0b repair."
 ---
 
 # Vendor Harness Adapter Foundation
@@ -1824,6 +1827,16 @@ guarantees. Framework validation passed 220 framework things plus 20 examples
 with zero findings; coherence passed with zero Errors/Warnings (two Info notes
 on recently changed stable specs); relationships/provenance indexes are in
 sync and the regenerated kernel is current.
+
+**Independent operator acceptance — 2026-08-18.** A later fresh QMS Codex
+task returned a non-cached `up-to-date` estate state, the complete orientation
+(11 open conflicts, 19 open loops, fired and upcoming triggers), and successful
+`git log` / `git status` reads. The operator explicitly confirmed that this is
+the domain-use consequence they needed. The surviving excerpt is graded
+relayed because it carries no task/build identifiers; the direct
+restricted-then-approved strict-sync proof above remains the first-hand
+mechanism evidence. Record:
+`codex-gate-7-0b-qms-operator-acceptance-2026-08-18`.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 

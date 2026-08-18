@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T13:57:59
-generated_from: HEAD@50cf336
-coverage: 220
-framework_version: 3.31.0
+generated: 2026-08-18T15:47:37
+generated_from: HEAD@56d1bbe
+coverage: 221
+framework_version: 3.32.0
 ---
 
 # Relationships Index — framework
@@ -203,6 +203,8 @@ framework_version: 3.31.0
 - codex-desktop-session-start-negative-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - codex-final-handoff-audit-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-final-handoff-audit-2026-08-11 --implements--> portability-claims-need-execution-tests
+- codex-gate-7-0b-qms-operator-acceptance-2026-08-18 --documents--> vendor-harness-adapter-foundation
+- codex-gate-7-0b-qms-operator-acceptance-2026-08-18 --supports--> a-degrading-command-cannot-trigger-approval-by-succeeding
 - codex-phase6-post-6r-acceptance-2026-08-16 --documents--> vendor-harness-adapter-foundation
 - codex-phase6-post-6r-acceptance-2026-08-16 --extends--> codex-cli-live-dispatch-2026-08-14
 - codex-phase6-post-6r-acceptance-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
@@ -795,6 +797,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> a-generated-contract-change-is-an-estate-migration
 - vendor-harness-adapter-foundation --references--> the-harness-bound-path-is-the-least-tested-path
 - vendor-harness-adapter-foundation --references--> a-degrading-command-cannot-trigger-approval-by-succeeding
+- vendor-harness-adapter-foundation --references--> codex-gate-7-0b-qms-operator-acceptance-2026-08-18
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification
