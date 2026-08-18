@@ -702,9 +702,9 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
     if mode not in ("warn", "strict"):
         return []
     sev = SEV_ERROR if mode == "strict" else SEV_WARNING
-    remedy = ("run `python {framework_root}/tools/mdllm.py session-start .` in "
-              "this clone — it emits the Tier-0 contract and records the "
-              "attestation — then commit")
+    remedy = ("run `mdllm session-start .` through the manual CLI launch "
+              "route in this clone's on-disk AGENTS.md — it emits the Tier-0 "
+              "contract and records the attestation — then commit")
     gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
                         capture_output=True, text=True)
     if gd.returncode != 0 or not gd.stdout.strip():

@@ -300,7 +300,11 @@ def cmd_scaffold(args) -> int:
         text = (text.replace("[domain]", name)
                     .replace("[Domain Name]", title)
                     .replace("[Domain]", title)
-                    .replace("[ISO-date]", today))
+                    .replace("[ISO-date]", today)
+                    # Required-at-t0 paths must live in prose as well as
+                    # frontmatter: harness injection may deliver only the
+                    # AGENTS.md body (Gate 7.0 live QMS finding).
+                    .replace("[framework-root]", rel_fw))
         text = re.sub(r"framework_root: \[[^\]]*\]", f"framework_root: {rel_fw}", text)
         text = re.sub(r"framework_version_seen: \[[^\]]*\]",
                       f"framework_version_seen: {fw_version}", text)

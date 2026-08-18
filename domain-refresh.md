@@ -2,7 +2,7 @@
 id: domain-refresh-specification
 type: specification
 status: evolving
-version: 1.4
+version: 1.5
 created: 2026-05-19
 linked_things:
   - id: framework-discovery-specification
@@ -101,7 +101,8 @@ The refresh process reads these framework files in order:
 
 7. If authorised, update domain files:
    → Update domain AGENTS.md to reference new framework capabilities
-   → Run `python {framework_root}/tools/mdllm.py domain-kernel .` — the
+   → Run `mdllm domain-kernel .` through the manual CLI launch route in the
+     domain's on-disk AGENTS.md — the
      absorbed version may have changed the generated managed blocks, and
      the domain's own pre-commit coherence check flags drift until the
      regen is committed

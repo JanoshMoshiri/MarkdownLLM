@@ -138,12 +138,97 @@ def test_powershell_entry_probes_the_dependency():
     resolver = (Path(mdllm.__file__).resolve().parent /
                 "resolve-runtime.ps1").read_text(encoding="utf-8")
     assert "Resolve-MdllmPython" in ps1
+    assert "-Root $invocationRoot" in ps1
+    assert "-FrameworkRoot $frameworkRoot" in ps1
     assert "-TimeoutSeconds 10" in ps1
     assert resolver.count("'import yaml'") == 1
     assert "'import sys'" not in ps1
     assert "[System.Diagnostics.Stopwatch]" in resolver
     assert "WaitForExit($remaining)" in resolver
     assert "PrefixArguments = @('-3')" in resolver
+
+
+def test_powershell_entry_passes_domain_and_framework_roots_separately(
+        tmp_path):
+    if os.name != "nt":
+        import pytest
+        pytest.skip("native Windows host is required")
+    powershell = shutil.which("powershell.exe")
+    if powershell is None:
+        import pytest
+        pytest.skip("native Windows PowerShell is required")
+
+    framework = tmp_path / "framework"
+    tool_dir = framework / "tools"
+    tool_dir.mkdir(parents=True)
+    nested = framework / "domain" / "directly-opened"
+    (nested / ".git").mkdir(parents=True)
+    capture = tmp_path / "resolver-roots.txt"
+    shutil.copy2(Path(mdllm.__file__).resolve().with_name("mdllm.ps1"),
+                 tool_dir / "mdllm.ps1")
+    (tool_dir / "mdllm.py").write_text(
+        "print('manual launcher executed')\n", encoding="utf-8")
+    (tool_dir / "resolve-runtime.ps1").write_text(
+        "function Resolve-MdllmPython {\n"
+        "  param([string]$Root, [string]$FrameworkRoot, "
+        "[int]$TimeoutSeconds)\n"
+        "  [IO.File]::WriteAllText($env:MDLLM_TEST_CAPTURE, "
+        "$Root + [Environment]::NewLine + $FrameworkRoot)\n"
+        "  [PSCustomObject]@{ Executable = $env:MDLLM_TEST_PYTHON; "
+        "PrefixArguments = @() }\n"
+        "}\n", encoding="utf-8")
+    env = dict(os.environ)
+    env["MDLLM_TEST_CAPTURE"] = str(capture)
+    env["MDLLM_TEST_PYTHON"] = sys.executable
+
+    completed = subprocess.run(
+        [powershell, "-NoLogo", "-NoProfile", "-NonInteractive",
+         "-ExecutionPolicy", "Bypass", "-File",
+         str(tool_dir / "mdllm.ps1"), "--help"],
+        cwd=nested, env=env, capture_output=True, text=True, timeout=30,
+        encoding="utf-8", errors="replace")
+
+    assert completed.returncode == 0, completed.stderr or completed.stdout
+    roots = capture.read_text(encoding="utf-8").splitlines()
+    assert [Path(p).resolve() for p in roots] == \
+        [nested.resolve(), framework.resolve()]
+
+
+def test_powershell_caller_can_chain_manual_runner_invocations(tmp_path):
+    if os.name != "nt":
+        import pytest
+        pytest.skip("native Windows host is required")
+    powershell = shutil.which("powershell.exe")
+    if powershell is None:
+        import pytest
+        pytest.skip("native Windows PowerShell is required")
+
+    tool_dir = tmp_path / "framework" / "tools"
+    tool_dir.mkdir(parents=True)
+    shutil.copy2(Path(mdllm.__file__).resolve().with_name("mdllm.ps1"),
+                 tool_dir / "mdllm.ps1")
+    (tool_dir / "mdllm.py").write_text(
+        "import sys\nprint('runner:' + sys.argv[1])\n", encoding="utf-8")
+    (tool_dir / "resolve-runtime.ps1").write_text(
+        "function Resolve-MdllmPython {\n"
+        "  [PSCustomObject]@{ Executable = $env:MDLLM_TEST_PYTHON; "
+        "PrefixArguments = @() }\n"
+        "}\n", encoding="utf-8")
+    env = dict(os.environ)
+    env["MDLLM_TEST_PYTHON"] = sys.executable
+    runner = str(tool_dir / "mdllm.ps1").replace("'", "''")
+    command = (f"& '{runner}' first; Write-Output between; "
+               f"& '{runner}' second; Write-Output after")
+
+    completed = subprocess.run(
+        [powershell, "-NoLogo", "-NoProfile", "-NonInteractive",
+         "-ExecutionPolicy", "Bypass", "-Command", command],
+        cwd=tool_dir.parent, env=env, capture_output=True, text=True,
+        timeout=30, encoding="utf-8", errors="replace")
+
+    assert completed.returncode == 0, completed.stderr or completed.stdout
+    assert [line.strip() for line in completed.stdout.splitlines()] == [
+        "runner:first", "between", "runner:second", "after"]
 
 
 def test_powershell_51_continues_after_stderr_writing_path_candidate(
@@ -153,8 +238,9 @@ def test_powershell_51_continues_after_stderr_writing_path_candidate(
     Windows PowerShell 5.1 turns native stderr into a terminating
     ``RemoteException`` while ``ErrorActionPreference`` is ``Stop``.  The
     committed command fixtures make that behavior independent of Microsoft
-    Store aliases or the author's PATH: ``python`` is the known-bad first
-    candidate and ``python3`` is the known-good successor.
+    Store aliases or the author's PATH: ``python3`` is the known-bad first
+    PATH candidate and ``python`` is the known-good successor (the resolver's
+    declared order).
     """
     if os.name != "nt":
         import pytest
@@ -168,9 +254,9 @@ def test_powershell_51_continues_after_stderr_writing_path_candidate(
     candidate_dir = tmp_path / "candidate-bin"
     candidate_dir.mkdir()
     shutil.copy2(fixture_dir / "stderr-python.cmd",
-                 candidate_dir / "python.cmd")
-    shutil.copy2(fixture_dir / "floor-python.cmd",
                  candidate_dir / "python3.cmd")
+    shutil.copy2(fixture_dir / "floor-python.cmd",
+                 candidate_dir / "python.cmd")
 
     tool_dir = tmp_path / "framework" / "tools"
     tool_dir.mkdir(parents=True)
@@ -188,7 +274,7 @@ def test_powershell_51_continues_after_stderr_writing_path_candidate(
         [powershell, "-NoLogo", "-NoProfile", "-NonInteractive",
          "-ExecutionPolicy", "Bypass", "-File",
          str(tool_dir / "mdllm.ps1"), "runtime-probe", "."],
-        env=env, capture_output=True, text=True, timeout=30,
+        cwd=tool_dir.parent, env=env, capture_output=True, text=True, timeout=30,
         encoding="utf-8", errors="replace")
 
     version = subprocess.run(
@@ -199,6 +285,70 @@ def test_powershell_51_continues_after_stderr_writing_path_candidate(
     assert version.stdout.strip().startswith("5.1"), version.stdout
     assert completed.returncode == 0, completed.stderr or completed.stdout
     assert "MDLLM deterministic floor candidate executed" in completed.stdout
+
+
+def test_manual_powershell_route_runs_nested_session_and_validation_when_bare_python_fails(
+        tmp_path):
+    if os.name != "nt":
+        import pytest
+        pytest.skip("native Windows host is required")
+    powershell = shutil.which("powershell.exe")
+    if powershell is None:
+        import pytest
+        pytest.skip("native Windows PowerShell is required")
+
+    domain = tmp_path / "directly-opened-domain"
+    domain.mkdir()
+    _git_repo(domain)
+    fw_root = Path(mdllm.__file__).resolve().parents[1]
+    fw_version = mdllm.framework_version(fw_root)
+    (domain / "AGENTS.md").write_text(
+        "---\nname: Direct Manual Route\n"
+        f'framework_root: "{fw_root.as_posix()}"\n'
+        f"framework_version_seen: {fw_version}\n---\n\n# Direct Manual Route\n",
+        encoding="utf-8")
+    (domain / "things").mkdir()
+    (domain / "things" / "_schema.yaml").write_text(
+        "types: {}\noptions:\n  session_gate: strict\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=domain, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "fixture: domain"],
+                   cwd=domain, check=True)
+
+    candidate_dir = tmp_path / "candidate-bin"
+    candidate_dir.mkdir()
+    (candidate_dir / "python.cmd").write_text(
+        "@echo off\necho fixture Python lacks PyYAML 1>&2\nexit /b 37\n",
+        encoding="utf-8")
+    (candidate_dir / "python3.cmd").write_text(
+        f'@echo off\n"{sys.executable}" %*\n', encoding="utf-8")
+    env = dict(os.environ)
+    env["PATH"] = str(candidate_dir) + os.pathsep + env.get("PATH", "")
+    bare = subprocess.run(
+        [env.get("COMSPEC", "cmd.exe"), "/d", "/s", "/c",
+         '"python -c ""import yaml"""'],
+        cwd=domain, env=env, capture_output=True, text=True, timeout=10,
+        encoding="utf-8", errors="replace")
+    assert bare.returncode != 0, "fixture bare Python unexpectedly loaded PyYAML"
+
+    runner = fw_root / "tools" / "mdllm.ps1"
+    session = subprocess.run(
+        [powershell, "-NoLogo", "-NoProfile", "-NonInteractive",
+         "-ExecutionPolicy", "Bypass", "-File", str(runner),
+         "session-start", "."],
+        cwd=domain, env=env, capture_output=True, text=True, timeout=60,
+        encoding="utf-8", errors="replace")
+    assert session.returncode == 0, session.stderr or session.stdout
+    assert "# MarkdownLLM — Session Start" in session.stdout
+    assert (domain / ".git" / "mdllm-attest").is_file()
+
+    validation = subprocess.run(
+        [powershell, "-NoLogo", "-NoProfile", "-NonInteractive",
+         "-ExecutionPolicy", "Bypass", "-File", str(runner),
+         "validate", "."],
+        cwd=domain, env=env, capture_output=True, text=True, timeout=60,
+        encoding="utf-8", errors="replace")
+    assert validation.returncode == 0, validation.stderr or validation.stdout
+    assert "Errors: 0" in validation.stdout
 
 
 def test_powershell_resolver_enforces_total_deadline_and_kills_probe(

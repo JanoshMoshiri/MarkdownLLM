@@ -22,9 +22,20 @@ git:
 
 > This file is the **domain kernel** — the slim, harness-loaded entry surface.
 > Sections marked `<!-- generated:NAME -->` are produced by
-> `python {framework_root}/tools/mdllm.py domain-kernel .` and **must not be
+> `mdllm domain-kernel .` through the manual launch route below and **must not be
 > hand-edited** (the pre-commit coherence check fails on drift). Everything
 > outside those blocks is authored and preserved verbatim across regenerations.
+
+> **Manual CLI launch — read before Session Start.** In this file, `mdllm
+> <command>` is notation for the framework CLI, not an assumption that an
+> executable named `mdllm` is installed. On Windows PowerShell and Codex managed
+> shells, run `& "[framework-root]/tools/mdllm.ps1" <command>` even when
+> `python` exists: a visible or harness-bundled interpreter may lack PyYAML, and
+> the launcher selects one only after dependency-probing it. Elsewhere, use
+> `python [framework-root]/tools/mdllm.py <command>` only with an interpreter
+> that can `import yaml`. Interpret older bare-Python or `mdllm` instructions in
+> generated blocks and copied prompts through this route. The framework path is
+> rendered into this body because harness injection may omit YAML frontmatter.
 
 ## What This System Does
 

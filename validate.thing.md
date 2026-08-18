@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 2.6
+version: 2.7
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -25,7 +25,7 @@ linked_things:
 # Validate Thing
 
 <!-- kernel -->
-**Mechanical validation is the tool's job:** `python {framework_root}/tools/mdllm.py validate <path>` — structure, references, schema conformance, index integrity. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
+**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
 
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as orphaned from session memory — no inbound edge from a live thing (promote/dismiss/link from live work/keep-active). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 
@@ -54,7 +54,7 @@ what only you can do.
 Run the tool — do not reason through these checks:
 
 ```
-python {framework_root}/tools/mdllm.py validate <domain-path>
+mdllm validate <domain-path>  # expand through AGENTS.md's manual CLI route
 ```
 
 The tool enforces, deterministically:

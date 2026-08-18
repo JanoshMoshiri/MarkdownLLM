@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """mdllm — the MarkdownLLM deterministic floor (entry shim).
 
-The public entry point: `python {framework_root}/tools/mdllm.py <cmd>`. This
-path is a contract — every domain's AGENTS.md, the installed pre-commit
-hooks, and the generated .claude/settings.json all invoke it — so it stays,
-while the implementation lives in the `markdownllm/` package beside it
+The public entry file is `{framework_root}/tools/mdllm.py`. A floor-capable
+Python may invoke it directly; the Windows manual route (`mdllm.ps1`) and
+harness projections resolve and dependency-probe an interpreter before they
+invoke the same file. This path is a contract, so it stays, while the
+implementation lives in the `markdownllm/` package beside it
 (one module per reason to change; see markdownllm/__init__.py).
 
 The re-exports below are the module's public face for programmatic use
