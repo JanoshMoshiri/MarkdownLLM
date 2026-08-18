@@ -20,6 +20,9 @@ linked_things:
   - id: an-honest-ledger-replicates-full-compliance-does-not
     relation: references
     notes: "The re-open evidence this plan waits on: if interpretation-layer variance persists across further sessions, the next rightward move is either this gate or mechanical skill emission — the two candidates named at the sweep's close."
+  - id: emitted-content-is-read-instructed-content-is-economised
+    relation: references
+    notes: "The re-open evidence arrived 2026-08-18: variance persisted across two harnesses in one day. The queued fork (this gate vs mechanical skill emission) is live; the evidence favours emission first. Un-parking stays the operator's call."
 ---
 
 # PreToolUse Action-Boundary Gate

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T17:48:34
-generated_from: HEAD@7ceb757
-coverage: 224
+generated: 2026-08-18T18:06:45
+generated_from: HEAD@4569360
+coverage: 225
 framework_version: 3.32.0
 ---
 
@@ -106,6 +106,7 @@ framework_version: 3.32.0
 - an-environments-reachable-set-is-not-an-architecture --extends--> portability-claims-need-execution-tests
 - an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
 - an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
+- an-honest-ledger-replicates-full-compliance-does-not --references--> emitted-content-is-read-instructed-content-is-economised
 - an-incident-seeded-list-encodes-the-symptom-not-the-rule --extends--> a-crossing-thing-carries-its-producers-private-graph
 - an-injected-file-arrives-without-its-frontmatter --derived-from--> claude-no-adapter-entry-probe-2026-08-17
 - an-injected-file-arrives-without-its-frontmatter --informs--> interface-specification
@@ -354,6 +355,9 @@ framework_version: 3.32.0
 - domain-specification-guide --references--> trigger-specification
 - domain-specification-guide --references--> reasoning-lenses-specification
 - domain-specification-guide --complements--> validate-thing-specification
+- emitted-content-is-read-instructed-content-is-economised --extends--> session-start-loses-to-the-first-request
+- emitted-content-is-read-instructed-content-is-economised --supports--> an-honest-ledger-replicates-full-compliance-does-not
+- emitted-content-is-read-instructed-content-is-economised --informs--> pretooluse-action-boundary-gate
 - estate-cadence-cluster --complements--> estate-git-sync
 - estate-cadence-cluster --complements--> cohesiveness-sensors
 - estate-cadence-cluster --references--> premature-publish-manufactures-discipline-eroding-urgency
@@ -628,6 +632,7 @@ framework_version: 3.32.0
 - pretooluse-action-boundary-gate --references--> hard-hooks-require-observable-agent-caused-triggers
 - pretooluse-action-boundary-gate --references--> a-layered-harness-is-a-co-author-not-a-substrate
 - pretooluse-action-boundary-gate --references--> an-honest-ledger-replicates-full-compliance-does-not
+- pretooluse-action-boundary-gate --references--> emitted-content-is-read-instructed-content-is-economised
 - prose-references-are-mechanically-checkable --challenges--> mechanical-assimilation-is-blind-to-prose-dependencies
 - prose-references-are-mechanically-checkable --supports--> existence-is-not-currency
 - prose-references-are-mechanically-checkable --supports--> mis-keyed-links-pass-the-floor-silently
@@ -711,6 +716,7 @@ framework_version: 3.32.0
 - session-start-loses-to-the-first-request --supports--> hook-enforcement-has-three-anchors
 - session-start-loses-to-the-first-request --supports--> agents-md-discovery-is-harness-dependent
 - session-start-loses-to-the-first-request --informs--> orchestration-specification
+- session-start-loses-to-the-first-request --references--> emitted-content-is-read-instructed-content-is-economised
 - shared-domain-failures-are-a-framework-signal-without-a-path --references--> divergence-is-an-unrouted-decision
 - shared-domain-failures-are-a-framework-signal-without-a-path --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - source-behind-mirror-is-still-a-consumer-side-read --extends--> cross-domain-handoff-is-built-inbound-only

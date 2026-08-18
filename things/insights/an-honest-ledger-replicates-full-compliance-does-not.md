@@ -2,11 +2,11 @@
 id: an-honest-ledger-replicates-full-compliance-does-not
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-08-08
 session: 2026-08-08
 source: both
-confidence: medium
+confidence: high
 origin: inferred
 tags: [verification, compliance, ledger, contract, cowork, evidence]
 linked_things:
@@ -16,6 +16,9 @@ linked_things:
   - id: assistant-register
     relation: supports
     notes: "Same thesis from another direction: formats hold where styles decay. The ledger is honesty given a named shape — files, line counts, declared skips — and the shape is what replicated."
+  - id: emitted-content-is-read-instructed-content-is-economised
+    relation: references
+    notes: "The 2026-08-18 two-harness evidence that moved this from medium to high: two further grilled sessions, ledgers again, gaps again disjoint."
 ---
 
 # An honest ledger replicates; full compliance does not
@@ -31,8 +34,11 @@ before writing but skipped the prompt files and most of the schema
 vocabulary. Each session economised somewhere different, invisibly until
 asked.
 
-Confidence is medium — two data points, one day — but the shape of the
-inference is worth holding now:
+Confidence was medium at capture — two data points, one day. Raised to high
+on 2026-08-18: two further grilled sessions — the same live domain run in two
+harnesses on one day — returned ledgers again, with again-disjoint gaps
+([[emitted-content-is-read-instructed-content-is-economised]]). The shape of
+the inference held:
 
 1. **Interpretation-layer compliance is variably partial even in good
    sessions.** The economising instinct never disappears; it relocates.

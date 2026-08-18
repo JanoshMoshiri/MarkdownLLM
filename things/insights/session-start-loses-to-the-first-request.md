@@ -16,6 +16,9 @@ linked_things:
     relation: supports
   - id: orchestration-specification
     relation: informs
+  - id: emitted-content-is-read-instructed-content-is-economised
+    relation: references
+    notes: "2026-08-18 evidence extends the skip to a stronger model tier in two harnesses at once, and sharpens the mechanical-delivery fix to a rule about form: emit the content, don't instruct its load."
 ---
 
 # Session-Start Loses To The User's First Request — Regardless Of Model Tier
