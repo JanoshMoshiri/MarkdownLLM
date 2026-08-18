@@ -221,7 +221,96 @@ def _kernel_reference(domain: Path) -> str:
         return kernel.as_posix()
 
 
-def _record_session_attestation(domain: Path) -> None:
+# Contract emission bounds. The Tier-0 contract is inherently large (an
+# operative kernel plus a domain entry file), so these are generous — but
+# they are real: an unbounded emitter fails exactly once, on the domain
+# whose entry file grew pathological (Gate 6R: protect every budget, or the
+# failure moves to the unprotected one). Per-section, with marked elision
+# naming the on-disk path; total output is bounded by construction because
+# every unbounded input passes through a bounded section.
+CONTRACT_SECTION_CHARACTERS = 48_000
+
+
+def _elide(text: str, limit: int, read_path: str) -> str:
+    if len(text) <= limit:
+        return text
+    return (text[:limit]
+            + f"\n\n[contract elided: {len(text) - limit:,} of {len(text):,} "
+              f"characters withheld by the emission bound — read "
+              f"`{read_path}` in full before acting past this point]")
+
+
+def _emit_contract(domain: Path) -> list[str]:
+    """The Tier-0 contract CONTENT, emitted — injection, not instruction.
+
+    In harnesses with entry-file discovery, AGENTS.md is in context before
+    the first action and this emission is redundant (harmlessly so). In a
+    harness with none — where a bootstrap assembles the workspace after the
+    session has started — an instruction to *go read* the contract loses to
+    the live request, and the session gate's attestation would otherwise
+    vouch for an emission of ritual, not contract. This emits the contract
+    itself: the operative kernel, the entry file, and a reading list derived
+    from the filesystem at emission time, which therefore cannot be short
+    (the 2026-08-08 field failure: an authored handoff list omitted what the
+    domain's own text named, invisibly — the list was the instrument the
+    load was checked against).
+    """
+    from .domain_kernel import routed_prompts, routed_skills
+    from .scaffold import MDLLM_ENTRY
+
+    out = ["# MarkdownLLM — Tier-0 Contract (emitted)", "",
+           "This is the contract itself, not a pointer at it. Everything "
+           "below is in your context now; the derived list at the end names "
+           "what remains on disk for you to read at the moments it states.",
+           ""]
+
+    kernel_ref = _kernel_reference(domain)
+    kernel = MDLLM_ENTRY.resolve().parents[1] / "kernel.md"
+    if kernel.is_file():
+        out += [f"## The operative kernel — `{kernel_ref}`", "",
+                _elide(kernel.read_text(encoding="utf-8"),
+                       CONTRACT_SECTION_CHARACTERS, kernel_ref), ""]
+    else:
+        out += ["## The operative kernel — MISSING", "",
+                f"`{kernel_ref}` does not exist — regenerate it at the "
+                "framework root (`mdllm kernel`) and re-run. The contract "
+                "is incomplete without it and this emission says so rather "
+                "than papering over it.", ""]
+
+    agents = domain / "AGENTS.md"
+    if agents.is_file():
+        out += ["## The entry file — `AGENTS.md`", "",
+                _elide(agents.read_text(encoding="utf-8"),
+                       CONTRACT_SECTION_CHARACTERS, "AGENTS.md"), ""]
+    else:
+        out += ["## The entry file — MISSING", "",
+                "No `AGENTS.md` at this root: nothing governs this position, "
+                "and work here is work outside any domain contract.", ""]
+
+    skills = routed_skills(domain)
+    prompts = routed_prompts(domain)
+    out += ["## Derived reading list (from the filesystem at emission time)",
+            ""]
+    if skills:
+        out.append("**Domain skills** — the specification and write skills "
+                   "are required reading before any write (kernel rule, not "
+                   "discretionary); read/workflow skills per session intent:")
+        out += [f"- `skills/{s}`" for s in skills]
+        out.append("")
+    if prompts:
+        out.append("**Domain prompts** — the entry file's Session Start "
+                   "block names when each runs:")
+        out += [f"- `prompts/{p}`" for p in prompts]
+        out.append("")
+    if not skills and not prompts:
+        out.append("_(no `skills/` or `prompts/` files at this root — "
+                   "nothing further to route)_")
+        out.append("")
+    return out
+
+
+def _record_session_attestation(domain: Path, *,
+                                contract_emitted: bool = False) -> None:
     """Record that the Tier-0 contract entered this session, per clone.
 
     Running session-start IS the mechanical proxy for the contract entering
@@ -248,8 +337,14 @@ def _record_session_attestation(domain: Path) -> None:
                                   capture_output=True, text=True)
             sha = head.stdout.strip() if head.returncode == 0 else "unknown"
             stamp = dt.datetime.now(dt.timezone.utc).isoformat()
+            # A third token records that the contract CONTENT was emitted,
+            # not only the ritual — the distinction the gate's claim rests on
+            # in harnesses with no entry-file injection. The gate reads only
+            # token 0 (freshness), so old two-token attestations stay valid;
+            # this token is evidence for humans and Phase 5 records.
+            tail = " contract" if contract_emitted else ""
             ((domain / gd.stdout.strip()).resolve() / "mdllm-attest").write_text(
-                f"{stamp} {sha}\n", encoding="utf-8")
+                f"{stamp} {sha}{tail}\n", encoding="utf-8")
     except Exception:
         pass
 
@@ -302,9 +397,20 @@ def cmd_session_start(args) -> int:
         meta, _, _ = parse_frontmatter(agents.read_text(encoding="utf-8"))
         meta = meta or {}
 
-    out = ["# MarkdownLLM — Session Start (run before the user's first request)", "",
+    # --contract: inject the Tier-0 contract content ahead of orientation.
+    # Ordering is the point — the contract governs how the orientation below
+    # is read and acted on, so it enters context first. Never part of the
+    # hook lifecycle bindings (their output budget is two orders of magnitude
+    # too small); this mode exists for bootstraps and adapterless harnesses
+    # where nothing injects the entry file.
+    emit_contract = bool(getattr(args, "contract", False))
+    out: list[str] = _emit_contract(domain) if emit_contract else []
+
+    out += ["# MarkdownLLM — Session Start (run before the user's first request)", "",
            "The live request will pull you toward itself; do these first, then await intent:",
-           f"1. Load `{_kernel_reference(domain)}` (operative kernel).",
+           f"1. Load `{_kernel_reference(domain)}` (operative kernel)."
+           + (" Already emitted above — loaded; do not re-read."
+              if emit_contract else ""),
            "2. Act on the version + velocity (backward) and open-loops (forward) status below.",
            "3. Surface the fired triggers below to the user; judge the ones the "
            "floor could not evaluate.", ""]
@@ -415,7 +521,7 @@ def cmd_session_start(args) -> int:
     for message in retrospective_due:
         out.append(f"- **Retrospective cadence:** {message}")
 
-    _record_session_attestation(domain)
+    _record_session_attestation(domain, contract_emitted=emit_contract)
 
     print("\n".join(out))
     return 0

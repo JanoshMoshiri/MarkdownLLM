@@ -172,6 +172,12 @@ def build_cli() -> argparse.ArgumentParser:
                         help="emit the session-start ritual (version + velocity) for a "
                              "harness startup hook to inject")
     ss.add_argument("path", nargs="?", default=".")
+    ss.add_argument("--contract", action="store_true",
+                    help="emit the Tier-0 contract CONTENT first (kernel + "
+                         "entry file + filesystem-derived reading list) — "
+                         "injection for harnesses where no entry-file "
+                         "discovery exists; too large for hook budgets, "
+                         "so hook bindings never pass it")
     ss.set_defaults(fn=cmd_session_start)
 
     co = sub.add_parser("coherence", help="dark-region checks: generated-artifact "

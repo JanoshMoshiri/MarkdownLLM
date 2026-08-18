@@ -108,11 +108,24 @@ def _dk_session_start(domain: Path, meta: dict) -> str:
         "7. Then await intent.")
 
 
+def routed_skills(domain: Path) -> list[str]:
+    """The skill filenames the tier-routing block routes — THE source any
+    derived reading list must share (a-handoff-list-replaces-the-contract-
+    it-points-at: derived from one source, a named file cannot go missing)."""
+    return (sorted(p.name for p in (domain / "skills").glob("*.skill.md"))
+            if (domain / "skills").is_dir() else [])
+
+
+def routed_prompts(domain: Path) -> list[str]:
+    """The prompt filenames the tier-routing block routes; same rule."""
+    return (sorted(p.name for p in (domain / "prompts").glob("*.md"))
+            if (domain / "prompts").is_dir() else [])
+
+
 def _dk_tier_routing(domain: Path, meta: dict) -> str:
     t1 = TIERS["Tier 1 (full specs, load individually on demand)"]
     t2 = TIERS["Tier 2 (on demand)"]
-    skills = (sorted(p.name for p in (domain / "skills").glob("*.skill.md"))
-              if (domain / "skills").is_dir() else [])
+    skills = routed_skills(domain)
     # prompts/ is routed here for the same reason skills are: a reading list
     # derived from this block is the only reading list a handoff can honestly
     # carry, and until 2026-08-09 the prompts were delivered (scaffold) and
@@ -120,8 +133,7 @@ def _dk_tier_routing(domain: Path, meta: dict) -> str:
     # omitted them, invisibly (substrate sweep B1; field evidence 2026-08-08:
     # a bootstrap handoff inherited the omission and four session-start steps
     # ran without their instructions).
-    prompts = (sorted(p.name for p in (domain / "prompts").glob("*.md"))
-               if (domain / "prompts").is_dir() else [])
+    prompts = routed_prompts(domain)
     t1_specs = " · ".join(f"`{{framework_root}}/{n}`" for n in t1)
     skills_line = (" · ".join(f"`skills/{s}`" for s in skills)
                    if skills else "_(none yet)_")

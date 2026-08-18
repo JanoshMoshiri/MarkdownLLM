@@ -180,28 +180,46 @@ the exact wording HEAD's assertion expects), touching no file this
 phase owns — the full-suite gate re-runs on a settled tree, per the
 foundation plan's own Phase 7 precedent.
 
-### Phase 1 — Contract emission (floor primitive, harness-agnostic)
+### Phase 1 — Contract emission (floor primitive, harness-agnostic) ✅ (2026-08-18)
 
-- [ ] New floor surface (CLI spelling decided in-phase: `mdllm contract
+- [x] New floor surface (CLI spelling decided in-phase: `mdllm contract
   <domain>` or a `session-start` mode): emits the Tier-0 contract
   content — the framework kernel and the domain's entry file — plus the
   reading list *derived from the same source `domain-kernel` routes
   from* (skills and prompts from the filesystem, never an authored
   list).
-- [ ] Attestation semantics: when emission runs as part of session
+- [x] Attestation semantics: when emission runs as part of session
   start, the attestation covers contract emission — making the gate's
   claim ("the contract was emitted into this session") true in
   adapterless harnesses, not only injected ones.
-- [ ] Output budgeting: bounded like the lifecycle steps, elision marked
+- [x] Output budgeting: bounded like the lifecycle steps, elision marked
   (the Gate 6R lesson — protect every budget, or the failure moves to
   the unprotected one).
-- [ ] Tests: derived list completeness (a domain adding a prompt file
+- [x] Tests: derived list completeness (a domain adding a prompt file
   cannot produce a short list), bounded output, framework-root and
   nested-domain positions.
 
 **Gate:** the QMS porch insight's dismissal condition is *satisfiable*
 (the derived list exists at the floor); the insight itself is
 dispositioned only when the bundle consumes it (Phase 3).
+
+**Closed 2026-08-18.** CLI spelling settled as `mdllm session-start
+--contract`, not a separate command, for the reason the phase left the
+decision open: the hook lifecycle output budget (2,200 characters) is
+two orders of magnitude below a contract (~35KB), so emission can never
+ride a hook binding — it is a bootstrap/adapterless-harness mode of the
+one command that already owns the attestation. Emission order is the
+contract's content first (kernel, then entry file, then the derived
+list from `domain_kernel.routed_skills`/`routed_prompts` — extracted
+from the tier-routing builder byte-neutrally, proven by a live
+`domain-kernel --check` on the largest domain reading in-sync), then
+orientation, whose step 1 stops instructing the read emission already
+performed. Sections are bounded (48,000 chars) with marked elision
+naming the on-disk path. The attestation gains a third token
+(`contract`) recording real emission; the gate reads token 0 only, so
+both forms stay valid and the token is evidence for Phase 5 records.
+8 new tests; fitness gate green (session.py and cli.py stay neutral);
+36 focused session/kernel/gate tests green.
 
 ### Phase 2 — Publication leg (floor)
 
