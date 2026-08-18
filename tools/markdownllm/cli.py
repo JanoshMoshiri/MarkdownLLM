@@ -65,6 +65,7 @@ from .evals import cmd_eval
 from .history import cmd_changelog, cmd_worklog
 from .harness_ports import LIFECYCLE_BINDINGS
 from .imports_check import cmd_estate_check, cmd_imports_check
+from .publish import cmd_publish
 from .sync import cmd_autopush, cmd_estate_sync
 from .indexes import cmd_index
 from .kernel_gen import cmd_kernel
@@ -311,6 +312,18 @@ def build_cli() -> argparse.ArgumentParser:
     es.add_argument("--timeout", type=int, default=20,
                     help="seconds per network call before degrading (default 20)")
     es.set_defaults(fn=cmd_estate_sync)
+
+    pb = sub.add_parser("publish", help="guarded publication: push the current "
+                        "commit to the repo's REAL default branch — branch READ "
+                        "(mdllm.defaultbranch / origin HEAD), never typed; "
+                        "checkout must match; remote ref must already exist "
+                        "(never creates one); fast-forward only; remote tip "
+                        "re-verified. Credentials: ambient, or GH_PAT / "
+                        "MDLLM_GIT_TOKEN via a command-scoped header (never "
+                        "on disk, redacted from output) for ephemeral "
+                        "containers where autopush honestly fails")
+    pb.add_argument("path", nargs="?", default=".")
+    pb.set_defaults(fn=cmd_publish)
 
     ap_ = sub.add_parser("autopush", help="post-commit publication leg: push the "
                          "current branch to its upstream unless AGENTS.md declares "

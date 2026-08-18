@@ -221,21 +221,32 @@ both forms stay valid and the token is evidence for Phase 5 records.
 8 new tests; fitness gate green (session.py and cli.py stay neutral);
 36 focused session/kernel/gate tests green.
 
-### Phase 2 — Publication leg (floor)
+### Phase 2 — Publication leg (floor) ✅ (2026-08-18)
 
-- [ ] Port `default-branch.sh` and `push.sh` guard-for-guard into the
+- [x] Port `default-branch.sh` and `push.sh` guard-for-guard into the
   floor (branch read from `mdllm.defaultbranch`/origin HEAD, never
   typed; checkout must match; remote ref must already exist; ff-only;
   remote tip re-read and compared; credential via command-scoped header
   from an env var, never on disk, redacted in output).
-- [ ] One publication surface, two credential modes: ambient (local —
+- [x] One publication surface, two credential modes: ambient (local —
   autopush's existing leg unchanged) and env-scoped (remote). The
   refusal messages name the remedy and never invite `--force`.
-- [ ] Tests: every refusal path, the stray-branch non-creation
+- [x] Tests: every refusal path, the stray-branch non-creation
   guarantee, verification failure, redaction.
 
 **Gate:** the guard scripts' behaviour is reproduced under test;
 `push.sh`/`default-branch.sh` become thin callers or retire.
+
+**Closed 2026-08-18.** `mdllm publish <repo>` lands as a neutral floor
+command (`publish.py`): all five guards ported, ambient credentials by
+default, `GH_PAT`/`MDLLM_GIT_TOKEN` via command-scoped header when set
+(never on disk, redacted with the raw token and its base64 form both
+stripped). The scripts retire at Phase 3 — the rendered bundle ships no
+bash guards, only the floor call. 11 tests over local bare remotes
+whose default branch is deliberately not `main`, including the
+load-bearing stray-branch non-creation proof (`mian` with faked local
+corroboration → refusal, origin untouched) and the non-ff refusal that
+names never-force. Fitness gate green.
 
 ### Phase 3 — The bundle as a projection
 
