@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.25
+version: 1.26
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -76,7 +76,16 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** Phases 5R, 6R, and 6 are complete. Gate 6
+**Current execution boundary:** Phases 5R, 6R, and 6 are complete. Phase 7 is
+blocked at Gate 7.0: a directly opened Codex domain receives startup through
+the dependency-aware Windows launcher, but the generated interpretation
+contract still tells the agent to invoke `mdllm.py` with bare `python`. In the
+observed managed shell that visible interpreter exists without PyYAML, so an
+automatic SessionStart succeeds and the agent's manual rerun fails in the same
+session. Gate 7.0 makes manual and automatic launch resolve the same
+floor-capable runtime before the wider public-surface reconciliation proceeds.
+QMS is the first operator-requested domain refresh and live acceptance target;
+this does not authorise an estate-wide rewrite. Gate 6
 closed on 2026-08-17 after first-hand, differential proof that a core entry
 pointer keeps Claude interpretation available without the optional project
 adapter; the earlier conflict is resolved `both-valid`. The accepted evidence
@@ -106,6 +115,36 @@ handlers in parallel, so the scaffolded two-handler SessionStart form does not
 guarantee `estate-sync` before `session-start`. The framework root and nested
 estate now carry both adapters where selected; publication remains the
 operator's act.
+
+## Operator amendment — v1.26 (2026-08-18, manual-launch parity blocker)
+
+A live QMS session exposed a seventh boundary defect after lifecycle trust was
+granted. Codex automatically dispatched the current SessionStart projection,
+whose Windows command resolves the framework `.venv` and dependency-probes
+PyYAML. When the operator asked the agent to rerun orientation manually, the
+domain's generated Session Start block prescribed
+`python {framework_root}/tools/mdllm.py ...`. The managed shell's bare Python
+exists but lacks PyYAML, so the same capability was available through the
+adapter and unavailable through the interpretation contract.
+
+This is not hook trust drift and not a missing dependency in the framework
+environment. A QMS-position `tools/mdllm.ps1 runtime-probe .` selected the
+framework `.venv`, loaded PyYAML, and executed the floor CLI. The inflection is
+therefore the public launch vocabulary: `mdllm.py` remains the one entry file,
+while each environment reaches it through a dependency-aware launch route.
+Windows PowerShell and Codex managed shells use `tools/mdllm.ps1`; a direct
+Python invocation is valid only where that interpreter can import PyYAML.
+Agents must not infer that a harness-bundled interpreter is the project
+runtime.
+
+Gate 7.0 lands before the wider Phase 7 prose sweep because the operator cannot
+use active domains reliably until manual invocation and automatic lifecycle
+dispatch agree. Its acceptance is deliberately behavioural: a fresh nested
+fixture whose visible bare Python lacks PyYAML must still run the relevant
+manual CLI route through the framework environment, generated domain guidance
+must name that route before its first command, and QMS must be refreshed and
+observed in a new Codex task. The QMS change is one requested domain migration;
+all other existing domains remain a Phase 8 offer, never a batch rewrite.
 
 ## Claude acceptance amendments — v1.10 (2026-08-12)
 
@@ -1608,6 +1647,33 @@ the probe fixtures were deleted after capture. Gate 6 is accepted for both
 harnesses with no claim wider than the tested surfaces: Codex CLI 0.147.0 and
 Claude Code CLI 2.1.233 / 2.1.229, Windows 11 Pro 10.0.26200. Phase 7 owns
 the public-surface reconciliation; Phase 8 remains the operator's.
+
+### Gate 7.0 — Manual CLI parity in managed domains (blocking)
+
+- [ ] Define one prose-level `mdllm <command>` launch vocabulary before the
+  generated domain kernel's first command: Windows PowerShell / Codex managed
+  shells expand it to `{framework_root}/tools/mdllm.ps1`; environments whose
+  selected Python can import PyYAML may invoke `mdllm.py` directly. Keep
+  `mdllm.py` as the one entry file; do not present an arbitrary visible or
+  harness-bundled Python as the project runtime.
+- [ ] Use that vocabulary consistently for generated Session Start, version
+  validation, deterministic-floor, scaffold, and refresh instructions. Add a
+  same-builder test so future generated guidance cannot regress to a bare
+  Python-only route.
+- [ ] Add a Windows nested-domain execution test in which the PATH `python`
+  exists without PyYAML while the framework `.venv` is floor-capable. Invoke
+  the documented manual route and prove real `session-start` and validation
+  complete from the domain working directory.
+- [ ] Refresh QMS only, preserving its authored domain content and current
+  adapter bytes. Record its pre/post domain-kernel state and leave the other
+  twelve domains untouched pending the Phase 8 offer.
+- [ ] Open a fresh Codex QMS task after the deterministic gate. Automatic
+  startup and an operator-requested manual rerun must both succeed; capture the
+  exact Codex surface/build and do not infer wider execution support.
+
+**Gate:** generated guidance and the actual nested Windows launch agree; the
+focused runtime/domain-kernel tests, validate, coherence, and QMS's manual live
+rerun pass. Until then, Phase 7's wider public-surface sweep is blocked.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
