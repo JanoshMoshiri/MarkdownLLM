@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.28
+version: 1.29
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -64,6 +64,9 @@ linked_things:
   - id: a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
     relation: references
     notes: "Earned by this plan's alternating cross-harness review rounds; it is the reason the acceptance gates are seat-swapped rather than same-hand."
+  - id: a-generated-contract-change-is-an-estate-migration
+    relation: references
+    notes: "Gate 7.0's rollout boundary: changing a currency-enforced shared generator is an estate migration even when the source edit is local."
 ---
 
 # Vendor Harness Adapter Foundation

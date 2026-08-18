@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T09:32:50
-generated_from: HEAD@c199002
-coverage: 217
+generated: 2026-08-18T09:55:22
+generated_from: HEAD@f05bd37
+coverage: 218
 framework_version: 3.31.0
 ---
 
@@ -40,6 +40,9 @@ framework_version: 3.31.0
 - a-flat-re-export-shim-is-an-uncollided-namespace --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - a-flat-re-export-shim-is-an-uncollided-namespace --references--> srp-extraction-is-tier-promotion
 - a-flat-re-export-shim-is-an-uncollided-namespace --informs--> repeated-drift-promotes-a-fact-into-the-floor
+- a-generated-contract-change-is-an-estate-migration --complements--> a-generated-surface-collapses-its-walk
+- a-generated-contract-change-is-an-estate-migration --complements--> existence-is-not-currency
+- a-generated-contract-change-is-an-estate-migration --derived-from--> vendor-harness-adapter-foundation
 - a-generated-surface-collapses-its-walk --complements--> change-reconciliation-specification
 - a-generated-surface-collapses-its-walk --complements--> inflection-candidates-are-computable
 - a-generated-surface-collapses-its-walk --references--> cohesiveness-sensors
@@ -776,6 +779,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> a-missing-contract-degrades-to-semantic-drift-not-breakage
 - vendor-harness-adapter-foundation --references--> an-injected-file-arrives-without-its-frontmatter
 - vendor-harness-adapter-foundation --references--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
+- vendor-harness-adapter-foundation --references--> a-generated-contract-change-is-an-estate-migration
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification
