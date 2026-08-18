@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.3
+version: 1.4
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -187,7 +187,7 @@ to invoke directly.
 | `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
 | `estate-check [roots...]` | Batches `imports-check` over consumer roots with a roll-up — named explicitly, or (no args) the local clones the `estate-sync` walk finds; ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
 | `triggers --estate` | The attention sweep: per-domain trigger evaluation over the same local-clone walk, with a roll-up (fired / not-evaluable per domain) | After `estate-sync`, when the question is "what needs doing across the estate?" |
-| `estate-sync [root]` | Fetch + ff-only pull across the estate's repos (root + `domain(s)/*`); divergence reported never resolved; never pushes; `--status` = publication debt from cached refs, no network | Session start (the adapter runs it before orientation); `--status` at session end |
+| `estate-sync [root] [--require-fresh]` | Fetch + ff-only pull across the estate's repos (root + `domain(s)/*`); divergence reported never resolved; never pushes. Plain mode is non-blocking lifecycle sync; `--require-fresh` returns nonzero on cached/unresolved state; `--status` = publication debt from cached refs, no network | Plain mode at automatic session start; `--require-fresh` when you explicitly ask an agent to prove fresh state (and allow a restricted harness to route approval); `--status` at session end |
 | `boundary [path] [--history]` | Disclosure-boundary check of staged content/filenames/commit messages against the local gitignored `.boundary-terms` (absent ⇒ no-op) | Before any publication event, `--history` for a full-archive audit |
 | `calc [path] [--thing ID] [--expr E]` | Evaluates declared derivations (`computed:` blocks): sums a body table, a frontmatter list, or a field across selected things; reports, never writes; exit 1 on disagreement. `validate` re-checks the same blocks at every commit | Ingesting a statement or preparing a return — the tool does every sum; `--expr` for an ad-hoc pivot. Grammar: `docs/calculation-reference.md` |
 
@@ -305,7 +305,7 @@ person is visible instead of silent. The estate-wide question — *what needs
 doing?* — is one loop at the estate root:
 
 ```
-mdllm estate-sync .        # fresh clones first — the sweep is only as honest as the log
+mdllm estate-sync . --require-fresh  # manual sweep: cached state is not accepted as fresh
 mdllm triggers --estate    # per-domain evaluation, rolled up
 mdllm estate-check         # membrane freshness + face coverage, per consumer
 ```
@@ -328,6 +328,14 @@ committed since the last sync and the merge is *your* decision
 (`divergence-is-an-unrouted-decision`); `dirty` means a working tree it
 refused to touch; `offline` means it degraded gracefully and you are
 orienting from last-fetched state — the session never blocks on the network.
+
+That non-blocking return is correct for automatic lifecycle startup, but it is
+too weak when you explicitly ask an agent to prove the state is fresh. Use
+`estate-sync --require-fresh` for that manual request. If network or `.git`
+access is denied, the command keeps the truthful cached-state report but exits
+nonzero, allowing Codex's restricted mode to ask for one-command approval and
+retry the exact operation. The repository cannot grant its own sandbox
+authority; this mode makes the missing authority mechanically visible.
 
 The mirror runs at session end: `estate-sync --status` reports **publication
 debt** — commits that are real on this machine and invisible to the estate.

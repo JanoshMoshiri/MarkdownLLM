@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.30
+version: 1.31
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -70,6 +70,9 @@ linked_things:
   - id: the-harness-bound-path-is-the-least-tested-path
     relation: references
     notes: "Gate 7.0 adds a third consequence-bearing case: estate-sync=0 proves safe command completion, not that a remote fetch refreshed the cached refs."
+  - id: a-degrading-command-cannot-trigger-approval-by-succeeding
+    relation: references
+    notes: "Splits non-blocking lifecycle sync from an operator-requested freshness gate so Codex approval has a mechanical failure signal to route."
 ---
 
 # Vendor Harness Adapter Foundation
@@ -82,15 +85,23 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** Phases 5R, 6R, 6, and Gate 7.0 are complete.
+**Current execution boundary:** Phases 5R and 6R/6 are complete. Gate 7.0 is
+now split by the consequence the earlier acceptance blurred: **7.0a runtime
+parity and 7.0b Codex Git authority under “Approve for me” are both closed.**
 A fresh directly opened QMS task on Codex Desktop `26.810.7004.0` / command
 runner `0.148.0-alpha.9` automatically dispatched the current SessionStart
 projection, then manually reran `estate-sync`, `session-start`, `triggers`, and
 validation through `../../tools/mdllm.ps1`; 224 things passed with zero Errors
-or Warnings and no PyYAML failure. Its remaining degraded line was a distinct
-Codex task-shell network boundary: restricted sync now reports `offline` and
-cached state, while the same wrapper with one-command network approval reports
-QMS `ahead +2`, proving the remote and stored credential. Phase 7 is unblocked.
+or Warnings and no PyYAML failure. A later Full Access QMS session proved the
+remote and credential end to end: manual sync succeeded and real commit
+`ef5e820` passed the floor and published. That proof does not cover the middle
+authority lane. In “Approve for me,” ordinary manual `estate-sync` degraded to
+cached state, returned zero, and was falsely paraphrased as authentication
+failure; the zero prevented Codex's approval path from being triggered. The
+strict manual surface now makes that missing consequence nonzero, and live QMS
+acceptance proved the restricted → approved retry plus commit/autopush. Phase
+7's public-surface reconciliation may proceed; Phase 8 remains an operator
+offer/rollout decision, never an automatic estate sweep.
 QMS remains the only existing domain carrying the authored compatibility
 contract; this does not authorise an estate-wide rewrite. Gate 6
 closed on 2026-08-17 after first-hand, differential proof that a core entry
@@ -1694,7 +1705,7 @@ harnesses with no claim wider than the tested surfaces: Codex CLI 0.147.0 and
 Claude Code CLI 2.1.233 / 2.1.229, Windows 11 Pro 10.0.26200. Phase 7 owns
 the public-surface reconciliation; Phase 8 remains the operator's.
 
-### Gate 7.0 — Manual CLI parity in managed domains (closed 2026-08-18)
+### Gate 7.0a — Manual CLI runtime parity in managed domains (closed 2026-08-18)
 
 - [x] Define one prose-level `mdllm <command>` launch vocabulary in authored
   entry prose before the generated domain kernel's first command: Windows
@@ -1724,14 +1735,10 @@ the public-surface reconciliation; Phase 8 remains the operator's.
 - [x] Open a fresh Codex QMS task after the deterministic gate. Automatic
   startup and an operator-requested manual rerun must both succeed; capture the
   exact Codex surface/build and do not infer wider execution support.
-- [x] Preserve non-interactive automatic sync while distinguishing a
-  network-disabled Codex task shell from invalid Git credentials. A restricted
-  manual run must report cached/offline state; an operator-requested fresh run
-  may retry only the wrapper command with one-command network approval.
-
 **Gate:** entry guidance and the actual nested Windows launch agree; the
 focused runtime/domain-kernel tests, validate, coherence, and QMS's manual live
-rerun pass. Gate closed; Phase 7's wider public-surface sweep may proceed.
+rerun pass without a PyYAML failure. Gate closed; Git authority is owned by
+7.0b below, not smuggled into runtime acceptance.
 
 **Deterministic leg complete — 2026-08-18 (`3c41f91`).** The Windows launcher
 now supplies the directly opened repository and framework as distinct resolver
@@ -1753,7 +1760,7 @@ Codex managed shell, `runtime-probe`, `session-start`, `validate`, `triggers`,
 framework `.venv`; bare `python` remained present-without-PyYAML. The QMS commit
 is intentionally unpushed under the work-package publication boundary.
 
-**Fresh-task leg complete — 2026-08-18.** In a directly opened QMS task,
+**Runtime fresh-task leg complete — 2026-08-18.** In a directly opened QMS task,
 Codex Desktop `26.810.7004.0` / command runner `0.148.0-alpha.9` on Windows
 `10.0.26200.9168` dispatched the current project hook at
 `2026-08-18T09:01:26Z` (`definition_current=true`, `estate-sync=0`,
@@ -1765,11 +1772,58 @@ one orphaned working document, and four quarantined external things; the task's
 final summary omitted the working document, a reporting error with no bearing
 on runtime acceptance.
 
-The follow-up transport correction is local QMS commit `32a4bd1`: managed
-blocks remain current, adapter hashes remain byte-identical, restricted sync
-reports `offline — +2 (unpushed) (cached)`, and a network-approved invocation
-reports `ahead — +2 (unpushed)`. Runtime/core regression suite: 220 passed;
-full deterministic suite: 472 passed.
+The follow-up QMS guidance at `32a4bd1` correctly warned that sandbox denial is
+not invalid Git credentials, but it was prose rather than a capability fix.
+The next fresh task ignored it, ordinary sync still returned zero on cached
+state, and generic local `Permission denied` text could still produce the
+false `auth-failed` label. Runtime/core regression suite: 220 passed; full
+deterministic suite: 472 passed. Those counts remain runtime evidence only.
+
+### Gate 7.0b — Codex Git authority under “Approve for me” (closed 2026-08-18)
+
+- [x] Establish the authority boundary rather than blaming credentials. The
+  automatic lifecycle executor fetched the private QMS remote; Full Access
+  manual sync succeeded; GitHub access and real QMS publication at `ef5e820`
+  succeeded. The failed ordinary manual rerun was the restricted task-shell
+  lane.
+- [x] Add `estate-sync --require-fresh` for explicitly requested manual state.
+  Plain lifecycle sync remains bounded and exit-zero; cached or unresolved
+  strict outcomes retain their diagnostic and return nonzero so Codex can
+  route one-command network/filesystem approval.
+- [x] Stop calling generic local/sandbox `Permission denied` an authentication
+  failure. Transport evidence takes precedence in mixed stderr; a pure local
+  denial reports `permission-denied`. Regression fixtures cover both shapes.
+- [x] In a QMS “Approve for me” task, run the strict wrapper first in the
+  restricted shell, observe the nonzero cached/permission result, then approve
+  and rerun the exact command to a non-cached state.
+- [x] Commit the authored QMS entry update through that same authority lane;
+  prove pre-commit validation and post-commit autopush complete, leaving QMS
+  clean and level with its upstream.
+
+**Gate:** the two QMS live consequences above pass; adapter bytes and managed
+blocks remain unchanged; focused sync tests, full suite, validate, coherence,
+and kernel freshness pass. Only then may Phase 8 offer the authored entry
+change to other domains. No estate sweep is authorised.
+
+**Live QMS acceptance — 2026-08-18.** In the restricted tool shell,
+`../../tools/mdllm.ps1 estate-sync . --require-fresh` reported
+`offline — working tree not clean (cached)` and exited 1. Codex then routed
+one-command approval; the exact rerun reached the private remote and reported
+`up-to-date`. The authored entry change committed as `6d94d6e`; the installed
+pre-commit floor passed and the post-commit hook reported
+`autopush: published main -> origin/main`. QMS finished clean at
+`main...origin/main`. `domain-kernel --check` remained in sync (six blocks),
+and `.claude/settings.json` / `.codex/hooks.json` retained their existing
+hashes. This proves the “Approve for me” middle path; Full Access is no longer
+required for an explicitly requested fresh sync or the approved Git write.
+
+**Deterministic seal — 2026-08-18.** The focused estate-sync suite passed
+13/13. The full suite passed 483/483 after the scaffold contract assertion was
+updated from the superseded approval wording to the strict command it now
+guarantees. Framework validation passed 220 framework things plus 20 examples
+with zero findings; coherence passed with zero Errors/Warnings (two Info notes
+on recently changed stable specs); relationships/provenance indexes are in
+sync and the regenerated kernel is current.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 

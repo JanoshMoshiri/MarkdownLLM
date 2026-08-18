@@ -36,11 +36,12 @@ git:
 > that can `import yaml`. Interpret older bare-Python or `mdllm` instructions in
 > generated blocks and copied prompts through this route. The framework path is
 > rendered into this body because harness injection may omit YAML frontmatter.
-> Automatic startup stays non-interactive. If an operator explicitly requests a
-> fresh manual estate sync in a Codex task whose tool shell denies network
-> access, retry only that wrapper command with one-command network approval;
-> otherwise report that orientation used cached refs. A sandbox transport denial
-> is not evidence that the repository's Git credentials are invalid.
+> Automatic startup uses plain `estate-sync` and stays non-interactive and
+> best-effort. If an operator explicitly requests a fresh manual estate sync,
+> run `mdllm estate-sync . --require-fresh`; cached or unresolved state then
+> exits nonzero so a restricted Codex task can request one-command
+> network/filesystem approval and rerun the exact wrapper command. A sandbox
+> denial is not evidence that the repository's Git credentials are invalid.
 
 ## What This System Does
 

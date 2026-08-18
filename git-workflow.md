@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: 1.5
+version: 1.6
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -30,7 +30,7 @@ linked_things:
 <!-- kernel -->
 **The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit are *defined over* committed state — the evaluators read the tree as it stands, and the `post-write:commit` invariant is what makes tree and HEAD coincide; a fired trigger on a dirty tree evidences a discipline breach, not committed state.
 
-**Multi-machine sync:** sync before orienting — `mdllm estate-sync`: fetch + `pull --ff-only`, bounded, never prompting, degrading offline to "orienting from last-fetched state". Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
+**Multi-machine sync:** sync before orienting — automatic `mdllm estate-sync` is fetch + `pull --ff-only`, bounded, never prompting, and degrades offline to "orienting from last-fetched state" so lifecycle startup does not block. When the operator explicitly asks for fresh manual state, `mdllm estate-sync --require-fresh` turns any cached or unresolved outcome into a nonzero approval/routing signal. Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
 
 **Publication:** the autopush leg (post-commit hook) publishes each floor-validated commit unless the repo declares `git: autopush: false` — absence is ON; the per-domain declaration is the standing human instruction. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) opt out: a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under autopush, an anomaly report.
 
@@ -281,6 +281,12 @@ read velocity. This is what `mdllm estate-sync` mechanises and the
   line — "orienting from last-fetched state" — and the session proceeds. A
   session start must never *require* the network (orchestration.md, the
   upward version check's doctrine, which this sharpens rather than violates).
+- **Lifecycle fallback and manual freshness are distinct.** Plain
+  `estate-sync` is the non-blocking lifecycle form. When the operator
+  explicitly requests fresh state, `estate-sync --require-fresh` returns
+  nonzero for cached or unresolved outcomes so a restricted harness can route
+  one-command network/filesystem approval. The flag grants no authority by
+  itself; it makes the missing consequence visible to the authority layer.
 - **A dirty working tree is never touched.** Fetch is always safe; the
   fast-forward is skipped and reported. Session-end discipline (nothing left
   uncommitted) makes this rare; the guard makes it harmless.

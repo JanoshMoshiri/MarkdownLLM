@@ -81,14 +81,17 @@ def _classify_fetch_failure(stderr: str) -> str:
     of an answer to a question you could not answer). An undiagnosed failure
     now says so, and carries its evidence in the detail at the call sites."""
     s = stderr.lower()
-    if ("terminal prompts disabled" in s or "authentication" in s
-            or "permission denied" in s or "403" in s or "401" in s):
-        return "auth-failed"
     if ("could not resolve host" in s or "connection refused" in s
             or "failed to connect" in s or "could not connect to server" in s
             or "timed out" in s or "network is unreachable" in s
             or "no route to host" in s):
         return "offline"
+    if ("terminal prompts disabled" in s or "authentication" in s
+            or "permission denied (publickey)" in s
+            or "403" in s or "401" in s):
+        return "auth-failed"
+    if "permission denied" in s or "access is denied" in s:
+        return "permission-denied"
     return "fetch-failed"
 
 
@@ -105,8 +108,8 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
 
     States: synced / up-to-date / ahead / diverged / dirty / local-only /
     no-upstream / detached / unborn / in-operation / offline / auth-failed /
-    fetch-failed / pull-failed / budget-exhausted. Only 'synced' moves the
-    tree; everything else reports.
+    permission-denied / fetch-failed / pull-failed / budget-exhausted. Only
+    'synced' moves the tree; everything else reports.
     """
     out = {"repo": repo, "state": "up-to-date", "detail": "", "moved": False}
 
@@ -156,17 +159,23 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
             if out["state"] == "fetch-failed":
                 out["detail"] = (f"undiagnosed ({_first_stderr_line(f.stderr)}) — "
                                  f"orienting from last-fetched state")
+            elif out["state"] == "permission-denied":
+                out["detail"] = (f"permission denied "
+                                 f"({_first_stderr_line(f.stderr)}) — "
+                                 f"orienting from last-fetched state")
 
     counts = _counts(repo)
     if counts is None:
         if out["state"] in (
-                "offline", "auth-failed", "fetch-failed", "budget-exhausted"):
+                "offline", "auth-failed", "permission-denied",
+                "fetch-failed", "budget-exhausted"):
             return out
         out["state"] = "no-upstream"
         return out
     ahead, behind = counts
     cached = " (cached)" if out["state"] in (
-        "offline", "auth-failed", "fetch-failed", "budget-exhausted") else ""
+        "offline", "auth-failed", "permission-denied", "fetch-failed",
+        "budget-exhausted") else ""
     degraded = out["state"] if cached else None
 
     dirty = _git(repo, "status", "--porcelain")
@@ -209,7 +218,7 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
     elif is_dirty:
         # Up to date with the remote but uncommitted work in the tree — not
         # sync's problem to fix, but worth a word at session start.
-        out["detail"] = "working tree not clean"
+        out["detail"] = f"working tree not clean{cached}"
     return out
 
 
@@ -309,7 +318,8 @@ _LABEL = {
     "diverged": "DIVERGED", "dirty": "dirty", "local-only": "local-only",
     "no-upstream": "no-upstream", "detached": "detached", "unborn": "unborn",
     "in-operation": "in-operation", "offline": "offline",
-    "auth-failed": "auth-failed", "pull-failed": "pull-failed",
+    "auth-failed": "auth-failed", "permission-denied": "permission-denied",
+    "pull-failed": "pull-failed",
     "fetch-failed": "fetch-failed",
     "budget-exhausted": "budget-exhausted",
 }
@@ -325,8 +335,10 @@ def cmd_estate_sync(args) -> int:
         print(f"estate-sync: no git repos under {root}")
         return 0
 
-    fetch = not args.status
-    title = "Publication Debt" if args.status else "Estate Sync"
+    status_only = getattr(args, "status", False)
+    require_fresh = getattr(args, "require_fresh", False)
+    fetch = not status_only
+    title = "Publication Debt" if status_only else "Estate Sync"
     print(f"## {title} — {root.name} ({len(repos)} repo(s))\n")
     deadline = (time.monotonic() + ESTATE_GLOBAL_TIMEOUT) if fetch else None
     results = [sync_repo(r, fetch=fetch, timeout=args.timeout,
@@ -338,18 +350,32 @@ def cmd_estate_sync(args) -> int:
         line = f"- `{name}`: {label}"
         if res["detail"]:
             line += f" — {res['detail']}" if res["state"] != "synced" else f" ({res['detail']})"
-        if args.status and res["state"] not in ("ahead", "diverged", "dirty"):
+        if status_only and res["state"] not in ("ahead", "diverged", "dirty"):
             continue  # debt view: only what the estate cannot see yet
         print(line)
-        if args.status:
+        if status_only:
             debt += 1
-    if args.status:
+    if status_only:
         if debt == 0:
             print("- nothing unpublished — the estate sees everything committed here")
         print("\nUnder autopush (the default) every line above is an anomaly — route it, "
               "don't just push it. Where `git: autopush: false`, publication stays yours: "
               "review `git log`, then push per repo when satisfied.")
         return 0
+
+    if require_fresh:
+        fresh_states = {"synced", "up-to-date", "ahead", "local-only"}
+        incomplete = [res for res in results
+                      if res["state"] not in fresh_states]
+        if incomplete:
+            summary = ", ".join(
+                f"{res['repo'].name}={_LABEL.get(res['state'], res['state'])}"
+                for res in incomplete)
+            print(f"\nFresh sync incomplete: {summary}.")
+            print("Cached or unresolved state is not fresh state. In a "
+                  "restricted Codex task, rerun this exact command with "
+                  "one-command network/filesystem approval.")
+            return 1
 
     moved = [res["repo"] for res in results if res["moved"]]
     diverged = [res["repo"].name for res in results if res["state"] == "diverged"]

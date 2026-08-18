@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T12:37:56
-generated_from: HEAD@5bf22fe
-coverage: 219
+generated: 2026-08-18T13:57:59
+generated_from: HEAD@50cf336
+coverage: 220
 framework_version: 3.31.0
 ---
 
@@ -37,6 +37,9 @@ framework_version: 3.31.0
 - a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist --complements--> the-rough-true-account-is-generative-infrastructure
 - a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist --complements--> existence-is-not-currency
 - a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist --complements--> a-ruling-triages-more-cheaply-than-a-mechanism
+- a-degrading-command-cannot-trigger-approval-by-succeeding --informs--> vendor-harness-adapter-foundation
+- a-degrading-command-cannot-trigger-approval-by-succeeding --supports--> the-harness-bound-path-is-the-least-tested-path
+- a-degrading-command-cannot-trigger-approval-by-succeeding --complements--> agents-cannot-self-install-permission-bearing-hooks
 - a-flat-re-export-shim-is-an-uncollided-namespace --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - a-flat-re-export-shim-is-an-uncollided-namespace --references--> srp-extraction-is-tier-promotion
 - a-flat-re-export-shim-is-an-uncollided-namespace --informs--> repeated-drift-promotes-a-fact-into-the-floor
@@ -791,6 +794,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - vendor-harness-adapter-foundation --references--> a-generated-contract-change-is-an-estate-migration
 - vendor-harness-adapter-foundation --references--> the-harness-bound-path-is-the-least-tested-path
+- vendor-harness-adapter-foundation --references--> a-degrading-command-cannot-trigger-approval-by-succeeding
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification

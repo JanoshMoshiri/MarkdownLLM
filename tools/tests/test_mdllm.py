@@ -761,7 +761,8 @@ def test_scaffold_birth_sequence(tmp_path, capsys):
     assert "[framework-root]" not in agents
     assert "Manual CLI launch — read before Session Start" in agents
     assert "tools/mdllm.ps1" in agents and "even when" in agents
-    assert "one-command network approval" in agents
+    assert "estate-sync . --require-fresh" in agents
+    assert "one-command" in agents and "network/filesystem approval" in agents
     assert "Git credentials are invalid" in agents
     assert agents.index("Manual CLI launch") < \
         agents.index("<!-- generated:session-start -->")
@@ -2392,10 +2393,16 @@ def test_estate_sync_classifies_transport_without_inventing_authentication():
     cases = (
         ("fatal: Failed to connect to github.com port 443: "
          "Could not connect to server", "offline"),
+        ("warning: unable to access 'C:/Users/example/.config/git/ignore': "
+         "Permission denied\n"
+         "fatal: Failed to connect to github.com port 443: "
+         "Could not connect to server", "offline"),
         ("fatal: unable to access remote: Could not resolve host: github.com",
          "offline"),
         ("fatal: Authentication failed for "
          "'https://github.com/example/repo.git/'", "auth-failed"),
+        ("error: cannot open .git/FETCH_HEAD: Permission denied",
+         "permission-denied"),
         ("fatal: unexpected transport response", "fetch-failed"),
     )
     for stderr, expected in cases:
@@ -2466,6 +2473,27 @@ def test_estate_sync_dirty_tree_skips_pull(tmp_path):
     assert (clone / "a.txt").read_text(encoding="utf-8") == "uncommitted local edit\n"
 
 
+def test_estate_sync_degraded_dirty_tree_keeps_cached_marker(
+        tmp_path, monkeypatch):
+    import subprocess
+    from markdownllm import sync as sync_mod
+    _src, clone = _seed_pair(tmp_path)
+    (clone / "a.txt").write_text("uncommitted local edit\n", encoding="utf-8")
+    original = sync_mod._git
+
+    def offline_fetch(repo, *args, **kwargs):
+        if args[:2] == ("fetch", "--quiet"):
+            return subprocess.CompletedProcess(
+                args, 1, "", "fatal: Failed to connect to github.com")
+        return original(repo, *args, **kwargs)
+
+    monkeypatch.setattr(sync_mod, "_git", offline_fetch)
+    res = sync_mod.sync_repo(clone)
+
+    assert res["state"] == "offline"
+    assert res["detail"] == "working tree not clean (cached)"
+
+
 def test_estate_sync_local_only_repo_is_legitimate(tmp_path):
     from markdownllm.sync import sync_repo
     solo = tmp_path / "solo"
@@ -2488,6 +2516,42 @@ def test_estate_sync_status_mode_reports_debt_without_network(tmp_path, capsys):
     out = capsys.readouterr().out
     assert rc == 0 and "Publication Debt" in out
     assert "ahead" in out and "+1 (unpushed)" in out
+
+
+def test_estate_sync_require_fresh_splits_manual_gate_from_lifecycle_fallback(
+        tmp_path, monkeypatch, capsys):
+    from markdownllm import sync as sync_mod
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    result = {
+        "repo": repo,
+        "state": "permission-denied",
+        "detail": "orienting from last-fetched state",
+        "moved": False,
+    }
+    monkeypatch.setattr(sync_mod, "discover_repos", lambda _root: [repo])
+    monkeypatch.setattr(sync_mod, "sync_repo", lambda *_args, **_kw: result)
+
+    lifecycle_rc = sync_mod.cmd_estate_sync(_ns(
+        paths=[str(repo)], status=False, require_fresh=False, timeout=20))
+    lifecycle_out = capsys.readouterr().out
+    strict_rc = sync_mod.cmd_estate_sync(_ns(
+        paths=[str(repo)], status=False, require_fresh=True, timeout=20))
+    strict_out = capsys.readouterr().out
+    result["state"] = "up-to-date"
+    result["detail"] = ""
+    fresh_rc = sync_mod.cmd_estate_sync(_ns(
+        paths=[str(repo)], status=False, require_fresh=True, timeout=20))
+    fresh_out = capsys.readouterr().out
+
+    assert lifecycle_rc == 0
+    assert "permission-denied" in lifecycle_out
+    assert strict_rc == 1
+    assert "Fresh sync incomplete: repo=permission-denied" in strict_out
+    assert "one-command network/filesystem approval" in strict_out
+    assert fresh_rc == 0
+    assert "up-to-date" in fresh_out
+    assert "Fresh sync incomplete" not in fresh_out
 
 
 def test_estate_sync_in_progress_merge_is_skipped(tmp_path):

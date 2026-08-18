@@ -303,12 +303,18 @@ def build_cli() -> argparse.ArgumentParser:
     es = sub.add_parser("estate-sync", help="sync before orienting: fetch + "
                         "ff-only pull across the estate's repos (root + domain(s)/*); "
                         "divergence reported, never resolved; never pushes; "
-                        "--status = publication debt from cached refs, no network")
+                        "--status = publication debt from cached refs, no network; "
+                        "--require-fresh = fail if sync used cached or unresolved state")
     es.add_argument("paths", nargs="*", help="root to discover under (default .), "
                     "or several explicit repo paths")
-    es.add_argument("--status", action="store_true",
-                    help="no network: report unpushed/diverged/dirty repos only "
-                         "(the session-end publication-debt view)")
+    es_mode = es.add_mutually_exclusive_group()
+    es_mode.add_argument("--status", action="store_true",
+                         help="no network: report unpushed/diverged/dirty repos only "
+                              "(the session-end publication-debt view)")
+    es_mode.add_argument("--require-fresh", action="store_true",
+                         help="operator-requested manual mode: return nonzero if "
+                              "any repo used cached state or could not complete "
+                              "its safe inbound sync")
     es.add_argument("--timeout", type=int, default=20,
                     help="seconds per network call before degrading (default 20)")
     es.set_defaults(fn=cmd_estate_sync)

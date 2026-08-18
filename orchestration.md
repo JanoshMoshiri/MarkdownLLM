@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.14
+version: 1.15
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -37,7 +37,7 @@ linked_things:
 1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in and surfaces the change-reconciliation advisories (cue candidates, serve-side publication notices — advisory, never blocking). **The publication leg:** the post-commit hook then publishes the validated commit (`mdllm autopush`) unless the repo declares `git: autopush: false` (absence = on; release surfaces opt out). Bounded, never forces; a rejected push is divergence on the push side — surfaced, never resolved (`autopush-moves-the-deliberate-act`).
 2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — the check itself never requires the network); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
-4. `session-start:estate-sync` — sync before orienting (orientation reads the log sync updates): `mdllm estate-sync` walks root + `domain(s)/*` repos — `git fetch` + `pull --ff-only`, bounded, `GIT_TERMINAL_PROMPT=0`, degrading offline to an advisory line. Reports per repo: synced/up-to-date/ahead-unpushed/DIVERGED/offline/dirty/local-only. Divergence and dirty trees reported, never resolved; never pushes, never merges. Session end: `estate-sync --status` reports publication debt (unpushed commits). A *required* network call at session start stays forbidden; this is a bounded attempt, not a gate.
+4. `session-start:estate-sync` — sync before orienting (orientation reads the log sync updates): plain `mdllm estate-sync` walks root + `domain(s)/*` repos — `git fetch` + `pull --ff-only`, bounded, `GIT_TERMINAL_PROMPT=0`, degrading offline to an advisory line. Reports per repo: synced/up-to-date/ahead-unpushed/DIVERGED/offline/dirty/local-only. Divergence and dirty trees reported, never resolved; never pushes, never merges. Session end: `estate-sync --status` reports publication debt (unpushed commits). A *required* network call at session start stays forbidden; this is a bounded attempt, not a gate. An operator-requested fresh manual rerun uses `estate-sync --require-fresh`, whose nonzero cached/unresolved outcome gives a restricted harness an approval signal without changing lifecycle behavior.
 
 **Anchor decides enforcement (the primary axis); hard/soft is only config.** Every hook has one **anchor** — the surface that makes it fire: `interpretation` (the agent reads the entry file and acts — portable across every harness, *not* mechanically enforced, the default and sufficient for correctness), `git-fs` (a real git/filesystem mechanism fires — mechanical, universal), or `harness-session` (a harness lifecycle event — enforced only if a per-harness adapter binds it). `hard`/`soft` is config only — always-on vs opt-in — and does **not** imply enforcement: a `hard` + `interpretation` hook is exactly as skippable as a soft one, and is a hardening candidate. Hardening = moving a hook's anchor rightward without touching hard/soft: the **git pre-commit hook** (`mdllm install-hook`) makes validation `git-fs`; optional **per-harness adapters** (`adapters/`) bind `harness-session` hooks to real events. Adapters stay optional — never the difference between working and not.
 
@@ -239,7 +239,14 @@ This hook checks version drift in **two directions** along the same chain — *p
 3. Report one line per repo: `synced (+n)` / `up-to-date` / `ahead +n (unpushed)` / `DIVERGED (+a/+b)` / `offline` / `dirty` / `local-only` / skipped-state. Divergence and dirty trees are **reported, never resolved** (`divergence-is-an-unrouted-decision`).
 4. If any domain moved, advise `mdllm estate-check` over the moved consumers — pulled source commits can flip imports stale/diverged. Advise only; the membrane check stays deliberate.
 
-**Mechanised by `mdllm estate-sync`.** Session end runs the mirror: `estate-sync --status` (no network) reports publication debt — unpushed commits the estate cannot see.
+**Mechanised by `mdllm estate-sync`.** The automatic hook uses the plain,
+non-blocking form. An operator-requested fresh manual rerun uses
+`estate-sync --require-fresh`: cached or unresolved state is still reported,
+but now exits nonzero so the harness can request network/filesystem approval
+and rerun the exact command. The flag does not grant permission; it prevents a
+degraded success code from suppressing the approval path. Session end runs the
+mirror: `estate-sync --status` (no network) reports publication debt —
+unpushed commits the estate cannot see.
 
 **Why it's hard:** Orientation reads committed state, and in a multi-machine estate committed state partly lives on the remote. A session that orients without syncing reads a stale event stream *silently* — velocity, triggers, and verified-flip surfacing all quietly wrong. The worst outcome of a failed sync is orienting from stale state *and being told so*, which is strictly better than the alternative this hook replaces.
 

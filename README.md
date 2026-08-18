@@ -146,7 +146,7 @@ python tools/mdllm.py scaffold <new-domain> --harness codex  # deterministic bir
 python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + horizon; --estate rolls up every local domain
 python tools/mdllm.py provenance <domain>    # decision pins resolve; no output rests on unverified content
 python tools/mdllm.py calc <domain>          # declared derivations (`computed:`) — the floor does every sum
-python tools/mdllm.py estate-sync            # fetch + ff-only pull across the estate's repos; --status = publication debt
+python tools/mdllm.py estate-sync            # fetch + ff-only pull; --require-fresh = strict manual state; --status = publication debt
 python tools/mdllm.py imports-check <domain> # cross-domain imports re-checked against the source's face
 python tools/mdllm.py eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
 python tools/mdllm.py kernel                 # regenerate the operative kernel from spec blocks

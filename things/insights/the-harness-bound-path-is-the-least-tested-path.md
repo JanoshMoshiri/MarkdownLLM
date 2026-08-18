@@ -2,7 +2,7 @@
 id: the-harness-bound-path-is-the-least-tested-path
 type: insight
 status: active
-version: 1.1
+version: 1.2
 created: 2026-08-13
 session: 2026-08-13
 source: field
@@ -39,11 +39,13 @@ paths exit 0.**
 - The reconciled framework root's `session-start` step exceeded its
   per-step budget and truncated, so a session began with no orientation.
   The hook still exited 0 by design (`surface-and-continue`).
-- A fresh QMS Codex task attested `estate-sync=0`, but its task shell had
-  network access disabled. The sync command correctly degraded to cached refs
-  and returned 0, so the attestation proved safe lifecycle completion—not that
-  the remote had been fetched. Only the outcome line plus a network-approved
-  rerun distinguished cached orientation from fresh orientation.
+- A fresh QMS Codex task's automatic lifecycle lane attested `estate-sync=0`
+  and did fetch the private remote. A later ordinary manual rerun in the same
+  task crossed into the restricted tool-shell lane, degraded to cached refs,
+  and also returned 0. The shared status code hid two different consequences;
+  only the per-invocation outcome and an approved rerun distinguished them.
+  This earned the stricter companion insight
+  `a-degrading-command-cannot-trigger-approval-by-succeeding`.
 
 ## Why the usual defences miss it
 
