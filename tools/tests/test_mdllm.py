@@ -761,6 +761,8 @@ def test_scaffold_birth_sequence(tmp_path, capsys):
     assert "[framework-root]" not in agents
     assert "Manual CLI launch — read before Session Start" in agents
     assert "tools/mdllm.ps1" in agents and "even when" in agents
+    assert "one-command network approval" in agents
+    assert "Git credentials are invalid" in agents
     assert agents.index("Manual CLI launch") < \
         agents.index("<!-- generated:session-start -->")
     assert "[What this domain does]" in agents  # semantic half untouched
@@ -2383,6 +2385,21 @@ def _seed_pair(tmp_path, name="d"):
     clone = tmp_path / name
     _sync_git(tmp_path, "clone", "-q", str(src), str(clone))
     return src, clone
+
+
+def test_estate_sync_classifies_transport_without_inventing_authentication():
+    from markdownllm.sync import _classify_fetch_failure
+    cases = (
+        ("fatal: Failed to connect to github.com port 443: "
+         "Could not connect to server", "offline"),
+        ("fatal: unable to access remote: Could not resolve host: github.com",
+         "offline"),
+        ("fatal: Authentication failed for "
+         "'https://github.com/example/repo.git/'", "auth-failed"),
+        ("fatal: unexpected transport response", "fetch-failed"),
+    )
+    for stderr, expected in cases:
+        assert _classify_fetch_failure(stderr) == expected
 
 
 def test_estate_sync_discovery_walks_root_and_domain_children(tmp_path):

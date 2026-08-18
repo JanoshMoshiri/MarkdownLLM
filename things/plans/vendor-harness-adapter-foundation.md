@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.29
+version: 1.30
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -79,16 +79,17 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** Phases 5R, 6R, and 6 are complete. Phase 7 is
-blocked at Gate 7.0: a directly opened Codex domain receives startup through
-the dependency-aware Windows launcher, but the generated interpretation
-contract still tells the agent to invoke `mdllm.py` with bare `python`. In the
-observed managed shell that visible interpreter exists without PyYAML, so an
-automatic SessionStart succeeds and the agent's manual rerun fails in the same
-session. Gate 7.0 makes manual and automatic launch resolve the same
-floor-capable runtime before the wider public-surface reconciliation proceeds.
-QMS is the first operator-requested domain refresh and live acceptance target;
-this does not authorise an estate-wide rewrite. Gate 6
+**Current execution boundary:** Phases 5R, 6R, 6, and Gate 7.0 are complete.
+A fresh directly opened QMS task on Codex Desktop `26.810.7004.0` / command
+runner `0.148.0-alpha.9` automatically dispatched the current SessionStart
+projection, then manually reran `estate-sync`, `session-start`, `triggers`, and
+validation through `../../tools/mdllm.ps1`; 224 things passed with zero Errors
+or Warnings and no PyYAML failure. Its remaining degraded line was a distinct
+Codex task-shell network boundary: restricted sync now reports `offline` and
+cached state, while the same wrapper with one-command network approval reports
+QMS `ahead +2`, proving the remote and stored credential. Phase 7 is unblocked.
+QMS remains the only existing domain carrying the authored compatibility
+contract; this does not authorise an estate-wide rewrite. Gate 6
 closed on 2026-08-17 after first-hand, differential proof that a core entry
 pointer keeps Claude interpretation available without the optional project
 adapter; the earlier conflict is resolved `both-valid`. The accepted evidence
@@ -106,8 +107,9 @@ Claude has completed native Linux lifecycle dispatch at `3254a99`, and all 13
 nested domains are migrated to the one-handler projection and sealed to
 v3.31.0. Codex Desktop build `26.803.10989.0` injected AGENTS instructions but
 did not dispatch the current project SessionStart hook in a fresh
-framework-root task, while Codex CLI has now established positive automatic
-generic SessionStart evidence at root and in a directly opened nested domain.
+framework-root task; build `26.810.7004.0` later dispatched it in directly
+opened QMS, while Codex CLI established positive automatic generic SessionStart
+evidence at root and in a directly opened nested domain.
 The current attestation does not preserve the normalized source, so no
 individual `resume`, `clear`, or `compact` claim is made. Neither harness may
 reuse pre-correction attestations. Two earlier
@@ -169,6 +171,23 @@ root and framework root, so it could not prefer a directly opened domain's own
 `.venv` as the neutral candidate policy requires. Gate 7.0 restores that
 ordering by deriving the nearest repository root from the caller's working
 directory, with the framework environment still the next candidate.
+
+### QMS acceptance amendment — v1.30 (2026-08-18, task-shell transport)
+
+The fresh-task acceptance closed manual runtime parity and exposed a separate
+permissions boundary. Codex's lifecycle executor completed automatic
+`estate-sync` and `session-start`, and the task-shell manual route selected the
+framework `.venv`, loaded PyYAML, and completed the floor commands. The task
+shell itself declared `network_access: false`, so its manual fetch degraded to
+cached refs. Running the identical QMS wrapper once with normal network and Git
+credential access succeeded and reported only the expected unpublished local
+commits. The remote and credential were never defective.
+
+The repair keeps automatic startup bounded and non-interactive, adds explicit
+one-command network-approval guidance for an operator-requested fresh manual
+sync, and classifies Git's observed `Failed to connect` / `Could not connect to
+server` evidence as `offline` rather than undiagnosed fetch failure. It does not
+grant an adapter network permission or make startup depend on an approval.
 
 ## Claude acceptance amendments — v1.10 (2026-08-12)
 
@@ -1672,7 +1691,7 @@ harnesses with no claim wider than the tested surfaces: Codex CLI 0.147.0 and
 Claude Code CLI 2.1.233 / 2.1.229, Windows 11 Pro 10.0.26200. Phase 7 owns
 the public-surface reconciliation; Phase 8 remains the operator's.
 
-### Gate 7.0 — Manual CLI parity in managed domains (blocking)
+### Gate 7.0 — Manual CLI parity in managed domains (closed 2026-08-18)
 
 - [x] Define one prose-level `mdllm <command>` launch vocabulary in authored
   entry prose before the generated domain kernel's first command: Windows
@@ -1699,13 +1718,17 @@ the public-surface reconciliation; Phase 8 remains the operator's.
   managed blocks, other authored domain content, and current adapter bytes.
   Record its pre/post domain-kernel state and leave the other twelve domains
   untouched pending the Phase 8 offer.
-- [ ] Open a fresh Codex QMS task after the deterministic gate. Automatic
+- [x] Open a fresh Codex QMS task after the deterministic gate. Automatic
   startup and an operator-requested manual rerun must both succeed; capture the
   exact Codex surface/build and do not infer wider execution support.
+- [x] Preserve non-interactive automatic sync while distinguishing a
+  network-disabled Codex task shell from invalid Git credentials. A restricted
+  manual run must report cached/offline state; an operator-requested fresh run
+  may retry only the wrapper command with one-command network approval.
 
 **Gate:** entry guidance and the actual nested Windows launch agree; the
 focused runtime/domain-kernel tests, validate, coherence, and QMS's manual live
-rerun pass. Until then, Phase 7's wider public-surface sweep is blocked.
+rerun pass. Gate closed; Phase 7's wider public-surface sweep may proceed.
 
 **Deterministic leg complete — 2026-08-18 (`3c41f91`).** The Windows launcher
 now supplies the directly opened repository and framework as distinct resolver
@@ -1725,8 +1748,25 @@ adapter files remained byte-identical. From the QMS working directory in this
 Codex managed shell, `runtime-probe`, `session-start`, `validate`, `triggers`,
 `doctor --harness codex`, and `domain-kernel --check` all completed through the
 framework `.venv`; bare `python` remained present-without-PyYAML. The QMS commit
-is intentionally unpushed under the work-package publication boundary. The
-unchecked fresh-task observation above is the only remaining Gate 7.0 leg.
+is intentionally unpushed under the work-package publication boundary.
+
+**Fresh-task leg complete — 2026-08-18.** In a directly opened QMS task,
+Codex Desktop `26.810.7004.0` / command runner `0.148.0-alpha.9` on Windows
+`10.0.26200.9168` dispatched the current project hook at
+`2026-08-18T09:01:26Z` (`definition_current=true`, `estate-sync=0`,
+`session-start=0`). At `09:06:56Z`, the operator-requested manual rerun invoked
+`../../tools/mdllm.ps1`; session start, triggers, and separate validation all
+completed, with 224 things, zero Errors, zero Warnings, and ten Info findings.
+No PyYAML failure recurred. The ten Info findings were five orphaned decisions,
+one orphaned working document, and four quarantined external things; the task's
+final summary omitted the working document, a reporting error with no bearing
+on runtime acceptance.
+
+The follow-up transport correction is local QMS commit `32a4bd1`: managed
+blocks remain current, adapter hashes remain byte-identical, restricted sync
+reports `offline — +2 (unpushed) (cached)`, and a network-approved invocation
+reports `ahead — +2 (unpushed)`. Runtime/core regression suite: 220 passed;
+full deterministic suite: 472 passed.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 

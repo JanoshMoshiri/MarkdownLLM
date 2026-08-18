@@ -85,6 +85,7 @@ def _classify_fetch_failure(stderr: str) -> str:
             or "permission denied" in s or "403" in s or "401" in s):
         return "auth-failed"
     if ("could not resolve host" in s or "connection refused" in s
+            or "failed to connect" in s or "could not connect to server" in s
             or "timed out" in s or "network is unreachable" in s
             or "no route to host" in s):
         return "offline"
