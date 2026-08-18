@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T18:06:45
-generated_from: HEAD@4569360
-coverage: 225
+generated: 2026-08-18T18:07:17
+generated_from: HEAD@2546dfe
+coverage: 226
 framework_version: 3.32.0
 ---
 
@@ -582,6 +582,11 @@ framework_version: 3.32.0
 - operating-is-programming --supports--> asks-travel-as-exposed-things
 - operating-is-programming --derived-from--> assistant-register
 - operating-is-programming --supports--> consequence-is-recoverable-only-in-retrospect
+- operating-layer-quality-loop --implements--> the-operating-layer-has-no-quality-loop
+- operating-layer-quality-loop --references--> mechanical-coherence-checks-backlog
+- operating-layer-quality-loop --references--> retrospective-specification
+- operating-layer-quality-loop --related--> cowork-adapter
+- operating-layer-quality-loop --related--> vendor-harness-adapter-foundation
 - operating-scope-promotion --informs--> llm-driven-systems-manifesto
 - operating-scope-promotion --references--> divergence-primitive-promotion
 - operating-scope-promotion --references--> assistant-register
