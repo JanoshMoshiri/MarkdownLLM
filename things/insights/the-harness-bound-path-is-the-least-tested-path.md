@@ -2,7 +2,7 @@
 id: the-harness-bound-path-is-the-least-tested-path
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-08-13
 session: 2026-08-13
 source: field
@@ -24,9 +24,9 @@ linked_things:
 
 ## The observation
 
-Two defects surfaced on 2026-08-13, hours apart, in unrelated mechanisms.
-Both had the same shape: **the path a harness actually runs diverged from
-the path everyone tests, and the divergence was invisible because both
+Three defects surfaced across two live acceptance sessions, in unrelated
+mechanisms. All had the same shape: **the path a harness actually runs diverged
+from the path everyone tests, and the divergence was invisible because both
 paths exit 0.**
 
 - A live domain session opened through the scaffolded hook, which runs
@@ -39,6 +39,11 @@ paths exit 0.**
 - The reconciled framework root's `session-start` step exceeded its
   per-step budget and truncated, so a session began with no orientation.
   The hook still exited 0 by design (`surface-and-continue`).
+- A fresh QMS Codex task attested `estate-sync=0`, but its task shell had
+  network access disabled. The sync command correctly degraded to cached refs
+  and returned 0, so the attestation proved safe lifecycle completion—not that
+  the remote had been fetched. Only the outcome line plus a network-approved
+  rerun distinguished cached orientation from fresh orientation.
 
 ## Why the usual defences miss it
 
@@ -65,6 +70,8 @@ side effect the contract depends on — not merely that the command ran.**
 For the gate that means: assert the attestation exists *and* that the clone
 clears the gate afterwards. For a budgeted lifecycle: assert the step
 completes inside its budget at realistic corpus scale, not that it returns.
+For a degrading transport: assert the reported transport state or freshness
+consequence, not merely its intentionally non-blocking return code.
 The question to ask of any harness integration is not "does it run?" but
 "what does the operator's contract depend on it having *done*, and is that
 asserted?"

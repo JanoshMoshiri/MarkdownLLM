@@ -67,6 +67,9 @@ linked_things:
   - id: a-generated-contract-change-is-an-estate-migration
     relation: references
     notes: "Gate 7.0's rollout boundary: changing a currency-enforced shared generator is an estate migration even when the source edit is local."
+  - id: the-harness-bound-path-is-the-least-tested-path
+    relation: references
+    notes: "Gate 7.0 adds a third consequence-bearing case: estate-sync=0 proves safe command completion, not that a remote fetch refreshed the cached refs."
 ---
 
 # Vendor Harness Adapter Foundation
