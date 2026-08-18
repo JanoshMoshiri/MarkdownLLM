@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.32
+version: 1.33
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -314,7 +314,7 @@ papers over a Claude assumption nor expands into an unbounded rewrite.
 | cwd-relative Claude project path | remove now at the Claude edge using its documented project-root surface | Claude owner, 5R.2 |
 | stale-vs-known-legacy ambiguity | remove now with exact legacy data and explicit generic refresh | split ownership, 5R.3 |
 | Claude Code lifecycle plus GitHub Copilot prompt shortcuts in one concrete adapter | preserve compatibility, but name it as an adapter bundle or split capability projections before claiming a general vendor registry | Phase 7/8; not a 5R blocker |
-| registry requires Render and Inspect from every entry | either declare it specifically as the lifecycle-project-adapter registry or make capabilities optional before onboarding a non-lifecycle diagnostic vendor | architecture debt; gate before third adapter |
+| registry requires Render and Inspect from every entry | **came due 2026-08-18 with the Cowork adapter and was settled inside that build rather than ahead of it (sequencing breach, recorded).** Settlement is port-derived data, not a vendor branch: a renderer emitting no project artifacts yields *not-applicable* configuration/currency, and execution evidence binds to a run-time attestation | closed in `cowork-adapter`; the completion criterion carries the honest amendment |
 | `.claude`, `.codex`, and `CLAUDE.md` exclusions named in the corpus model | replace eventually with an adapter-independent infrastructure-ignore rule; do not import vendor adapters into the domain model | separate model cleanup |
 | `mdllm eval --run` launches `claude -p` | keep in the separately owned multi-backend eval scope; lifecycle portability must not be restated as all-tooling portability | existing explicit boundary |
 | Claude remains the no-flag scaffold default | retain until the operator's Phase 8 product-policy decision | operator, not an architecture repair |
@@ -1916,6 +1916,23 @@ This plan is complete only when:
   while unknown stale or extended forms remain zero-write refusals;
 - adding a third harness requires a new adapter, tests, and docs—not edits to
   domain policy, scaffold control flow, or doctor control flow;
+  **[Exercised 2026-08-18 by the third harness (Cowork), and the letter did
+  not survive contact: doctor control flow was edited.** What happened, and
+  why, recorded plainly rather than reworded away: this criterion was written
+  when both existing adapters were project-artifact-shaped, so its letter
+  silently encoded that shape — the same implicit assumption the coupling
+  table below had already flagged as debt gated “before third adapter”. That
+  gate was then settled *inside* the third adapter’s build instead of ahead
+  of it — a sequencing breach, acknowledged, not excused. The edit itself
+  honours the criterion’s intent: `diagnose_harness` derives a
+  *not-applicable* project configuration from the neutral render port
+  (an adapter whose `render()` emits nothing binds elsewhere) — port-derived
+  data, no vendor-shaped branch, and the architecture fitness gate still
+  forbids neutral modules naming any vendor, `cowork` included. The
+  enforceable core is therefore restated: adding a harness must not add
+  **vendor-shaped conditionals** to shared control flow; a port-derived
+  generalisation is a **contract amendment** that reopens cross-seat review
+  — which this note is. Full record: `cowork-adapter` → registry gate.]**
 - compatibility claims name the exact harness and evidence that earned them.
 - Claude Code and VS Code Copilot lifecycle claims remain separate unless each
   has its own inspected contract and execution record;
