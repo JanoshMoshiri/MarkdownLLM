@@ -1,6 +1,6 @@
 ---
 name: spin-up-domain
-description: Reconstruct and operate any MarkdownLLM domain from a fresh Cowork session. Reads targets from a config file, clones the framework and the configured domain repo(s) — all of them, or only the ones the user names — nests each under domains/, installs the deterministic floor pre-commit hook, resolves each repo's real default branch from its remote instead of assuming one, and emits each domain's Tier-0 contract into the transcript before work starts. Use when the user says "spin up my domain", "spin up my QMS domain", "load qms and engineering", "start my session", "load my markdownllm domain", "bootstrap my domain", or wants to resume work on one or more MarkdownLLM domains in a session that has no prior memory.
+description: Reconstruct and operate any MarkdownLLM domain in a session with no prior memory. Clones the framework and the configured domains, installs the deterministic floor, resolves each repo's real default branch, and emits each domain's contract before work starts. Use when the user says "spin up my domain", "spin up my QMS domain", "load qms and engineering", "start my session", "load my markdownllm domain", or "bootstrap my domain".
 ---
 
 # Spin Up a MarkdownLLM Domain

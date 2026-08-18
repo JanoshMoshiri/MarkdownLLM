@@ -33,6 +33,8 @@ fitness gate).
 from __future__ import annotations
 
 import hashlib
+import json
+import re
 from pathlib import Path
 from typing import Mapping
 
@@ -43,6 +45,14 @@ from ..harness_ports import (
 BUNDLE_TEMPLATES_DIR = "cowork-bundle"
 PLUGIN_NAME = "markdownllm-bootstrap"
 
+# Platform constraint, learned at an install failure (2026-08-18): the
+# harness rejects a plugin whose manifest or skill description exceeds 500
+# characters, and it rejects it at INSTALL — the one moment the operator is
+# furthest from the templates that caused it. So the build refuses instead,
+# where the fix is one file away. A vendor limit belongs in the vendor
+# adapter; a future bundle harness declares its own.
+MAX_DESCRIPTION_CHARACTERS = 500
+
 # The MECHANISM: the templates whose rendered forms decide how a session
 # behaves. Hashed for run-time currency — operator config (config.env) is
 # deliberately outside the hash, so retargeting the estate never reads as
@@ -52,6 +62,52 @@ _MECHANISM_TEMPLATES = (
     "SESSION.md.template",
     "bootstrap.sh.template",
 )
+
+
+def _frontmatter_description(text: str) -> str | None:
+    """The `description:` value from a skill's YAML frontmatter, folded to
+    the single line the harness measures (a block scalar wrapped over five
+    source lines is still one description to the installer)."""
+    match = re.match(r"^---\s*\n(.*?)\n---\s*\n", text, re.S)
+    if not match:
+        return None
+    body = match.group(1)
+    field = re.search(r"^description:[ \t]*(.*(?:\n(?![A-Za-z_-]+:).*)*)",
+                      body, re.M)
+    if not field:
+        return None
+    return " ".join(field.group(1).split())
+
+
+def description_findings(rendered: Mapping[str, bytes]) -> list[str]:
+    """Every description the harness will measure, checked against its
+    limit. Returns one finding per violation, naming the file, the length,
+    and the overage — the install error names none of those."""
+    out: list[str] = []
+    for path, content in sorted(rendered.items()):
+        text = content.decode("utf-8")
+        if path.endswith(".claude-plugin/plugin.json"):
+            try:
+                description = json.loads(text).get("description", "")
+            except json.JSONDecodeError:
+                out.append(f"{path}: not valid JSON — the manifest would "
+                           "be unreadable at install")
+                continue
+        elif path.endswith("SKILL.md"):
+            description = _frontmatter_description(text)
+            if description is None:
+                out.append(f"{path}: no frontmatter `description:` — the "
+                           "harness has nothing to trigger the skill on")
+                continue
+        else:
+            continue
+        if len(description) > MAX_DESCRIPTION_CHARACTERS:
+            out.append(
+                f"{path}: description is {len(description)} characters, "
+                f"{len(description) - MAX_DESCRIPTION_CHARACTERS} over the "
+                f"{MAX_DESCRIPTION_CHARACTERS}-character limit — shorten it "
+                "in templates/cowork-bundle/ and rebuild")
+    return out
 
 
 class CoworkAdapter:
@@ -142,7 +198,7 @@ class CoworkAdapter:
         ).encode("utf-8")
 
         skill = f"{PLUGIN_NAME}/skills/spin-up-domain"
-        return {
+        rendered = {
             f"{PLUGIN_NAME}/.claude-plugin/plugin.json":
                 render("plugin.json.template"),
             f"{PLUGIN_NAME}/README.md": render("README.md.template"),
@@ -153,6 +209,12 @@ class CoworkAdapter:
             f"{skill}/references/config.env.example":
                 (base / "config.env.example").read_bytes(),
         }
+        problems = description_findings(rendered)
+        if problems:
+            raise ValueError(
+                "this bundle would be rejected at install:\n  "
+                + "\n  ".join(problems))
+        return rendered
 
 
 COWORK = CoworkAdapter()

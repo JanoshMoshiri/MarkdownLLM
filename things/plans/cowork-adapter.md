@@ -316,9 +316,34 @@ v0.4.0's authored config used the company address — `config.env` is
 editable if the old attribution is wanted; note the estate sweep's
 Cowork-signature discriminator shifts either way.
 
-**Next:** the operator installs the bundle and runs the live remote
-leg — Phase 5's first evidence record. Phase 4 (local transport) and
-the ProbePort execution fingerprint follow it.
+**Install-leg defect, found and closed the same day.** The first
+install attempt **failed**: the harness rejects a plugin whose manifest
+or skill `description` exceeds 500 characters, and it rejects it at
+install — the moment the operator is furthest from the templates that
+caused it. Rendered lengths were 557 (manifest) and 720 (skill). Both
+rewritten to 432, every trigger phrase preserved and pinned by test,
+and the constraint moved to where it can be enforced: the adapter
+declares `MAX_DESCRIPTION_CHARACTERS` and `bundle()` **refuses to
+render** a bundle its harness would reject, naming the file, the actual
+length, the overage, and the template directory to fix. A vendor limit
+in the vendor adapter; a future bundle harness declares its own.
+`mdllm bundle` reports the refusal as a clean exit 2, not a traceback.
+Tests: the real rendered lengths, trigger-phrase survival, the guard
+firing on a deliberately bloated template, and folded-frontmatter
+measurement (a description wrapped over several source lines is still
+one line to the installer). 25 tests green; bundle rebuilt (mechanism
+`b88df7d1…`) and re-delivered.
+
+This is the second install-surface fact the build now owns — the first
+was LF-only bytes for the Linux `bash` shebang. Both share a shape:
+**a constraint the consuming environment enforces, discovered by
+failing there, moved to the build where the fix is one file away.**
+That shape belongs in the Phase 6 spec text as the general rule for
+run-time-bound adapters, not just as two fixes.
+
+**Next:** the operator installs the corrected bundle and runs the live
+remote leg — Phase 5's first evidence record. Phase 4 (local
+transport) and the ProbePort execution fingerprint follow it.
 
 **v3.32.0 publication checkpoint — 2026-08-18.** The operator authorised
 publication of the Phase 0–3 substrate now that the settled-tree suite and

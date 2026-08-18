@@ -10,6 +10,7 @@ from local clones' remotes, never authored.
 Run: python -m pytest tools/tests/test_assemble.py -q
 """
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -284,6 +285,65 @@ def test_rendered_bytes_are_lf_only_and_hash_is_eol_stable(tmp_path):
         data = f.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
         (dst / f.name).write_bytes(data)
     assert COWORK.bundle_hash(crlf_root) == COWORK.bundle_hash(TEMPLATES)
+
+
+def test_rendered_descriptions_fit_the_install_limit():
+    """Field failure 2026-08-18: the harness rejected the bundle at INSTALL
+    because descriptions exceeded 500 characters — the moment furthest from
+    the templates that caused it. This pins the real rendered lengths."""
+    import json as _json
+    from markdownllm.adapters.cowork import (
+        MAX_DESCRIPTION_CHARACTERS, _frontmatter_description,
+        description_findings)
+
+    rendered = COWORK.bundle(TEMPLATES, {"FRAMEWORK_VERSION": "3.31.0",
+                                         "GIT_NAME": "Build Test"})
+    assert description_findings(rendered) == []
+
+    manifest = _json.loads(rendered[
+        "markdownllm-bootstrap/.claude-plugin/plugin.json"].decode())
+    assert len(manifest["description"]) <= MAX_DESCRIPTION_CHARACTERS
+
+    skill_desc = _frontmatter_description(rendered[
+        "markdownllm-bootstrap/skills/spin-up-domain/SKILL.md"].decode())
+    assert skill_desc and len(skill_desc) <= MAX_DESCRIPTION_CHARACTERS
+    # The trigger phrases must survive shortening — a skill nothing fires
+    # is worse than a long description.
+    for phrase in ("spin up my domain", "start my session",
+                   "bootstrap my domain"):
+        assert phrase in skill_desc
+
+
+def test_build_refuses_an_over_long_description(tmp_path):
+    """The guard must FAIL THE BUILD, not warn: an uninstallable bundle
+    that builds cleanly just relocates the failure to the operator."""
+    from markdownllm.adapters.cowork import MAX_DESCRIPTION_CHARACTERS
+
+    src = TEMPLATES / "cowork-bundle"
+    dst = tmp_path / "templates" / "cowork-bundle"
+    dst.mkdir(parents=True)
+    for f in src.iterdir():
+        dst.joinpath(f.name).write_bytes(f.read_bytes())
+    bloated = "x" * (MAX_DESCRIPTION_CHARACTERS + 1)
+    skill = dst / "SKILL.md.template"
+    skill.write_text(
+        re.sub(r"^description: .*$", f"description: {bloated}",
+               skill.read_text(encoding="utf-8"), count=1, flags=re.M),
+        encoding="utf-8")
+
+    with pytest.raises(ValueError) as excinfo:
+        COWORK.bundle(tmp_path / "templates", {"FRAMEWORK_VERSION": "1"})
+    message = str(excinfo.value)
+    assert "rejected at install" in message
+    assert str(MAX_DESCRIPTION_CHARACTERS + 1) in message   # actual length
+    assert "templates/cowork-bundle/" in message            # where to fix
+
+
+def test_folded_frontmatter_description_is_measured_as_one_line():
+    from markdownllm.adapters.cowork import _frontmatter_description
+    text = ("---\nname: s\ndescription: one two\n  three four\n"
+            "  five\nother: x\n---\n# body\n")
+    assert _frontmatter_description(text) == "one two three four five"
 
 
 def test_bundle_hash_is_config_independent():

@@ -127,7 +127,14 @@ def cmd_bundle(args) -> int:
                 break
     config["FRAMEWORK_VERSION"] = version or "unknown"
 
-    rendered = adapter.bundle(templates_root, config)
+    try:
+        rendered = adapter.bundle(templates_root, config)
+    except ValueError as exc:
+        # An adapter refuses to render a bundle its harness would reject.
+        # Failing here is the point: the alternative is a clean build and
+        # an install failure, where the operator is furthest from the fix.
+        print(f"mdllm: {exc}")
+        return 2
     out = Path(args.out) if getattr(args, "out", None) else (
         root / ".bundle-build" / args.harness)
     for rel, content in sorted(rendered.items()):
