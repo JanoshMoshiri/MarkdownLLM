@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-18
-generated: 2026-08-18T08:59:59
-generated_from: HEAD@13ba202
-coverage: 216
+generated: 2026-08-18T09:32:50
+generated_from: HEAD@c199002
+coverage: 217
 framework_version: 3.31.0
 ---
 
@@ -496,6 +496,8 @@ framework_version: 3.31.0
 - live-agent-handoff-is-for-new-output-not-known-implementation --supports--> cross-domain-handoff-is-verified-external-input
 - live-agent-handoff-is-for-new-output-not-known-implementation --informs--> interface-specification
 - live-agent-handoff-is-for-new-output-not-known-implementation --informs--> phase-3-run-domain-task-reverted
+- live-eval-scope-bounded-to-claude --informs--> vendor-harness-adapter-foundation
+- live-eval-scope-bounded-to-claude --informs--> evidence-and-eval-backlog
 - llm-driven-systems-manifesto --informs--> scalability-guide
 - llm-driven-systems-manifesto --informs--> domain-specification-guide
 - llm-driven-systems-manifesto --references--> divergence-is-an-unrouted-decision

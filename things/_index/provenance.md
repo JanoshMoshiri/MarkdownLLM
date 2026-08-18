@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-18
-generated: 2026-08-18T09:00:02
-generated_from: HEAD@13ba202
+generated: 2026-08-18T09:33:00
+generated_from: HEAD@c199002
 coverage: 29
 framework_version: 3.31.0
 ---
@@ -107,4 +107,5 @@ framework_version: 3.31.0
 - a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it (derived-from)
 - an-interface-is-what-its-consumers-call-not-what-it-declares (derived-from)
 - installation-is-not-activation (derived-from)
+- live-eval-scope-bounded-to-claude (pinned @c199002)
 
