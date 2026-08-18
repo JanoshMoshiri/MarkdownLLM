@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.27
+version: 1.28
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -1671,7 +1671,7 @@ the public-surface reconciliation; Phase 8 remains the operator's.
 
 ### Gate 7.0 — Manual CLI parity in managed domains (blocking)
 
-- [ ] Define one prose-level `mdllm <command>` launch vocabulary in authored
+- [x] Define one prose-level `mdllm <command>` launch vocabulary in authored
   entry prose before the generated domain kernel's first command: Windows
   PowerShell / Codex managed shells expand it to
   `{framework_root}/tools/mdllm.ps1`; environments whose selected Python can
@@ -1680,19 +1680,19 @@ the public-surface reconciliation; Phase 8 remains the operator's.
   project runtime. Reinterpret older bare-Python and `mdllm` notation through
   this route rather than changing the managed-block builder and staling the
   estate at this gate.
-- [ ] Instantiate the relative `framework_root` value into that authored body
+- [x] Instantiate the relative `framework_root` value into that authored body
   so the contract survives harness injection without frontmatter. Carry the
   same route into the shared operative kernel, session-gate remedy, scaffold
   template, and refresh instruction. Add a scaffold/same-builder test proving
   regeneration preserves the contract outside managed blocks.
-- [ ] Make the PowerShell launcher pass the nearest caller repository root and
+- [x] Make the PowerShell launcher pass the nearest caller repository root and
   the framework root as distinct resolver inputs, so manual invocation keeps
   the neutral domain-venv → framework-venv → PATH candidate order.
-- [ ] Add a Windows nested-domain execution test in which the PATH `python`
+- [x] Add a Windows nested-domain execution test in which the PATH `python`
   exists without PyYAML while the framework `.venv` is floor-capable. Invoke
   the documented manual route and prove real `session-start` and validation
   complete from the domain working directory.
-- [ ] Refresh QMS only by adding the authored launch contract, preserving its
+- [x] Refresh QMS only by adding the authored launch contract, preserving its
   managed blocks, other authored domain content, and current adapter bytes.
   Record its pre/post domain-kernel state and leave the other twelve domains
   untouched pending the Phase 8 offer.
@@ -1703,6 +1703,27 @@ the public-surface reconciliation; Phase 8 remains the operator's.
 **Gate:** entry guidance and the actual nested Windows launch agree; the
 focused runtime/domain-kernel tests, validate, coherence, and QMS's manual live
 rerun pass. Until then, Phase 7's wider public-surface sweep is blocked.
+
+**Deterministic leg complete — 2026-08-18 (`3c41f91`).** The Windows launcher
+now supplies the directly opened repository and framework as distinct resolver
+roots; authored entry prose carries an instantiated manual route before the
+managed Session Start block; the shared kernel, refresh instruction, and
+session-gate remedy use that route. A regression fixture proves that visible
+bare `python` can lack PyYAML while manual `session-start` and `validate` still
+complete, and a second fixture proves multiple wrapper calls return to one
+parent PowerShell session. Focused runtime/core CLI suite: 219 passed. Full
+deterministic suite: 471 passed. Framework validation: 217 framework things +
+20 example things, zero findings; coherence: zero Errors/Warnings (one Info on
+Claude's same-session `interface.md` stability review).
+
+QMS carries one authored entry change at local commit `5c3f468`; all six
+managed blocks remained current before and after, and both Claude and Codex
+adapter files remained byte-identical. From the QMS working directory in this
+Codex managed shell, `runtime-probe`, `session-start`, `validate`, `triggers`,
+`doctor --harness codex`, and `domain-kernel --check` all completed through the
+framework `.venv`; bare `python` remained present-without-PyYAML. The QMS commit
+is intentionally unpushed under the work-package publication boundary. The
+unchecked fresh-task observation above is the only remaining Gate 7.0 leg.
 
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
