@@ -1,15 +1,14 @@
 ---
 id: a-session-harvest-must-read-the-commit-stream
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
+promoted_to: session-memory-specification
 created: 2026-08-18
 session: 2026-08-18
 source: both
 confidence: high
 origin: stated
-disposition: keep-active
-disposition_reason: "A standing session-end rule for long and multi-harness work; no single active plan owns it, and every future harvest can apply it."
 tags: [session-memory, git, compaction, harvest, multi-agent]
 linked_things:
   - id: session-memory-specification
@@ -24,6 +23,11 @@ linked_things:
 ---
 
 # A Session Harvest Must Read The Commit Stream
+
+> **Promoted 2026-08-18 → `session-memory.md` and the
+> `session-end-continuity` bound prompt.** The ritual now reconstructs a logical
+> session from both surviving dialogue and its commit range, explicitly
+> independent of harness compaction cadence.
 
 A long Codex conversation carried the vendor-adapter work across many days,
 handoffs, compactions, live probes, and intermediate Claude session-end

@@ -1,12 +1,14 @@
 ---
 id: session-end-continuity
 type: prompt
-status: stable
-version: 1.1
+status: evolving
+version: 1.2
 created: 2026-05-28
 inputs:
   - name: session-conversation
-    description: "The full session dialogue — questions asked, positions taken, decisions made, tensions surfaced"
+    description: "The session dialogue still available after any harness compactions — useful but never assumed complete"
+  - name: session-commit-range
+    description: "The relevant git log/worklog range across the operator's logical session, including intermediate handoffs and harvests"
   - name: existing-insights
     description: "Current active insights in things/insights/"
   - name: existing-things
@@ -43,7 +45,22 @@ At the end of a session, extract generative knowledge — emerging ideas, held v
 
 ### 1. Scan For Insights
 
-Review the session for:
+First reconstruct the **logical session**. A harness may compact only near its
+context ceiling, at an earlier threshold or cadence, repeatedly, or not at all.
+**Compaction changes the available dialogue; it is not a session boundary.**
+The operator's declared start/end and continuing task define the scope.
+
+Read both sources:
+
+1. **Surviving dialogue** — scan the conversation still available after any
+   compactions for ideas not yet committed.
+2. **The relevant commit range** — inspect `git log` / `mdllm worklog` across the
+   logical session for work, decisions, evidence and intermediate harvests
+   already made real. Attribute multi-harness commits to their seats, but do not
+   mistake another agent's intermediate `session-end:` delimiter for the end of
+   the operator's larger session.
+
+Then review the reconstructed session for:
 - Non-obvious positions taken by either party
 - Hypotheses agreed on but not acted on
 - Questions raised but not answered
@@ -51,6 +68,10 @@ Review the session for:
 - Reframings that changed how something is understood
 
 Apply the **preservation test**: *Would a fresh agent starting this domain cold benefit from knowing this?* If yes, preserve. If routine, procedural, or already captured in a thing, skip.
+
+If the commit range already contains the learning and the surviving dialogue
+adds none, report **"no additional insight"**, not "no insight." Context can be
+lossy after compaction; git cannot contain an idea that was never written.
 
 ### 2. Create Insight Things
 

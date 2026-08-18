@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.13
+version: 1.14
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -435,7 +435,7 @@ These are prompts that ship with the framework and apply to any domain:
 - **session-orientation** — At session start, summarize what's changed since last session
 - **surface-attention** — Determine which things need user attention and in what priority order
 - **detect-conflicts** — Check if a proposed change conflicts with existing state (lens conflicts, dependency violations)
-- **session-end-continuity** — At session end, extract insights, disposition the standing insights, check for contradictions, manage open-loop things, commit with a rich `session-end:` message (the backward record is git; `mdllm worklog` is an on-demand view, not a committed file), then report publication debt (`estate-sync --status` — after the commit, never elided from this summary: two summaries ended at the commit while every operative surface carried the debt step)
+- **session-end-continuity** — At session end, reconstruct the logical session from both surviving dialogue and its commit range (compaction is not a session boundary), extract any additional insights, disposition the standing insights, check for contradictions, manage open-loop things, commit with a rich `session-end:` message (the backward record is git; `mdllm worklog` is an on-demand view, not a committed file), then report publication debt (`estate-sync --status` — after the commit, never elided from this summary: two summaries ended at the commit while every operative surface carried the debt step)
 - **domain-velocity** — At session start, read git history as telemetry to surface stalled, churning, or untouched work the current-state snapshot can't see
 - **review-schema-coherence** — At retrospective, audit the domain's emergent frontmatter vocabulary (via the schema registry) for fields that have drifted apart in name but converged in meaning
 

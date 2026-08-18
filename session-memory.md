@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.4
+version: 1.5
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -154,7 +154,24 @@ The prompt is explicitly invoked at session end — either by the user requestin
 
 ### Step 1: Scan For Insights
 
-Review the session for:
+First reconstruct the **logical session**, because the dialogue still visible to
+the agent is not guaranteed to be the whole session. A harness may compact only
+near its context ceiling, at an earlier threshold or cadence, repeatedly, or not
+at all during the session. **Compaction changes the available context; it does
+not create a session boundary.** The operator's declared start/end and task
+continuity define the session.
+
+Use two evidence sources together:
+
+1. **Surviving dialogue** — scan the conversation still present after any
+   compactions for uncommitted positions, questions, tensions, and reframings.
+2. **The relevant commit range** — inspect `git log` / `mdllm worklog` across the
+   logical session for work, decisions, evidence, and intermediate harvests
+   already made real. In multi-harness work, attribute those commits to their
+   seats; do not treat another agent's intermediate `session-end:` delimiter as
+   the end of the operator's larger session.
+
+Then review the reconstructed session for:
 - Non-obvious positions taken by either party
 - Hypotheses that were agreed on but not acted on
 - Questions raised but not answered
@@ -162,6 +179,12 @@ Review the session for:
 - Reframings that changed how something is understood
 
 Apply the **preservation test**: *Would a fresh agent starting this domain cold benefit from knowing this?* If yes, preserve. If routine, procedural, or already captured in a thing, skip.
+
+Report already-captured learning honestly. If the commit range contains the
+session's insights and the surviving dialogue adds none, say **"no additional
+insight"**, never "no insight." Neither source substitutes for the other:
+context alone can be lossy after compaction; git cannot contain an idea that was
+discussed but never written.
 
 ### Step 2: Create Insight Things
 
