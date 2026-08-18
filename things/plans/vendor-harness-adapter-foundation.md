@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.23
+version: 1.24
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -42,10 +42,10 @@ linked_things:
     notes: "Final A/0–2 acceptance evidence: the shared runtime passes real Codex-shell probes, while incomplete service-facing ports and unsafe Claude currency inspection return Phase 2C for correction."
   - id: claude-phase6-no-adapter-and-root-2026-08-16
     relation: references
-    notes: "Phase 6 Claude evidence: automatic framework-root SessionStart/PostToolUse after the Gate 6R refresh, and the disposable no-adapter floor proof whose interpretation leg did not close."
+    notes: "Phase 6 Claude evidence: automatic framework-root SessionStart/PostToolUse after the Gate 6R refresh, plus the initial disposable no-adapter floor record whose interpretation leg was later closed by the first-hand differential probe."
   - id: claude-entry-surface-unprovisioned-for-no-adapter-domains
     relation: references
-    notes: "The open finding that blocks the Claude adapter-optionality leg: no scaffold mode writes the CLAUDE.md wrapper that carries Claude's automatic entry route."
+    notes: "The resolved finding that established entry pointers as core scaffold surface rather than adapter output, closing the Claude adapter-optionality leg."
   - id: claude-domain-entry-pointer-observation-2026-08-17
     relation: references
     notes: "Relayed domain-position evidence: the QMS pointer auto-loaded its entry file at t=0, and the framework root's pointer was inherited unexpanded — the finding that made the root wrapper route both of its positions and constrained the remaining probe design to out-of-estate."
@@ -55,6 +55,9 @@ linked_things:
   - id: a-missing-contract-degrades-to-semantic-drift-not-breakage
     relation: references
     notes: "Earned by that finding: nine domains ran without their entry file and still validated clean, so the failure mode is drift that passes the floor — which is why no backward audit was run."
+  - id: an-injected-file-arrives-without-its-frontmatter
+    relation: references
+    notes: "Constrains Phase 7 entry-surface reconciliation: anything required at t=0 must live in prose because harness injection strips YAML frontmatter."
   - id: a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
     relation: references
     notes: "Earned by this plan's alternating cross-harness review rounds; it is the reason the acceptance gates are seat-swapped rather than same-hand."
@@ -70,23 +73,13 @@ This is an architecture and rollout plan. It authorises no adapter or domain
 configuration changes by itself. Implementation begins only after the operator
 accepts the boundary and phase order.
 
-**Current execution boundary:** Phase 5R is complete. Claude independently
-accepted Gate 5R.5 at `ea4ea12`: the unchanged PowerShell 5.1 reproduction
-passed and a real automatic framework-root session emitted both successful
-steps, all four orientation elements, a fresh session-gate attestation, and
-current-definition evidence. **Phase 6R is complete and Gate 6R was
-independently accepted by Claude on 2026-08-16 at `b82061f`
-(`evidence/claude-gate-6r-acceptance-2026-08-16.md`). **The post-6R Codex
-root, directly opened nested-domain, PostToolUse and no-adapter records are
-complete on Windows CLI 0.147.0
-(`evidence/codex-phase6-post-6r-acceptance-2026-08-16.md`). The matching Claude
-framework-root record is complete on Claude Code 2.1.229
-(`evidence/claude-phase6-no-adapter-and-root-2026-08-16.md`), and the Claude
-disposable no-adapter run closed its session-gate and Git-floor legs. Its
-interpretation leg did not close: no scaffold mode writes the `CLAUDE.md`
-wrapper that carries Claude's documented automatic entry route, so a
-`--harness none` domain has no automatic Claude entry surface at all
-(`claude-entry-surface-unprovisioned-for-no-adapter-domains`, open).** Estate rollout had
+**Current execution boundary:** Phases 5R, 6R, and 6 are complete. Gate 6
+closed on 2026-08-17 after first-hand, differential proof that a core entry
+pointer keeps Claude interpretation available without the optional project
+adapter; the earlier conflict is resolved `both-valid`. The accepted evidence
+is scoped to Codex CLI 0.147.0 and Claude Code CLI 2.1.233 / 2.1.229 on Windows
+11 Pro 10.0.26200. Phase 7 now owns public-surface reconciliation; Phase 8
+remains the operator's scaffold-default and rollout decision. Estate rollout had
 exposed that the neutral runner's 2,200-character global tail slice silently
 dropped version, velocity, and open-loop orientation on large domains even
 when both lifecycle steps succeeded. The correction allocates bounded output

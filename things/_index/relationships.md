@@ -3,9 +3,9 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-17
-generated: 2026-08-17T20:38:52
-generated_from: HEAD@e1dc925
+created: 2026-08-18
+generated: 2026-08-18T07:42:30
+generated_from: HEAD@9eb0522
 coverage: 214
 framework_version: 3.31.0
 ---
@@ -765,6 +765,7 @@ framework_version: 3.31.0
 - vendor-harness-adapter-foundation --references--> claude-domain-entry-pointer-observation-2026-08-17
 - vendor-harness-adapter-foundation --references--> claude-no-adapter-entry-probe-2026-08-17
 - vendor-harness-adapter-foundation --references--> a-missing-contract-degrades-to-semantic-drift-not-breakage
+- vendor-harness-adapter-foundation --references--> an-injected-file-arrives-without-its-frontmatter
 - vendor-harness-adapter-foundation --references--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification
