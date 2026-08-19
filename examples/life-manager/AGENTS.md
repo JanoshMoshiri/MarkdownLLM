@@ -18,7 +18,7 @@ This system transforms how you manage your life by inverting the traditional app
 1. **Atomic Units** — Everything is a thing: projects, tasks, goals, dependencies, recurring actions. No special cases.
 2. **Minimal Core, Emergent Detail** — Start with basic metadata; let your schema grow as your life becomes more complex.
 3. **LLM-Centric Structure** — Optimized for the LLM to reason about your life semantically, not for you to manually manage data.
-4. **Vendor Agnostic** — Works with any capable LLM using standard markdown and YAML conventions.
+4. **Vendor Agnostic by contract** — Uses standard markdown and YAML any file-aware LLM can understand; discovery and lifecycle execution remain harness-specific.
 5. **Versioned and Durable** — Git tracks your entire life management history; complete transparency and rollback capability.
 6. **Self-Describing** — This domain is itself a thing within the MarkdownLLM framework. The specifications describe the system they govern.
 
@@ -108,7 +108,7 @@ the agent's:
 
 ```
 Your Request
-    ↓ (auto-discovered)
+    ↓ (delivered by the harness entry route)
 Load Life Manager AGENTS.md
     ↓
 Evaluate triggers (session start)

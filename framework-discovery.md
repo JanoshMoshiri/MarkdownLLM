@@ -2,7 +2,7 @@
 id: framework-discovery-specification
 type: specification
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-19
 linked_things:
   - id: domain-specification-guide
@@ -79,6 +79,30 @@ framework_root: .
 In this case, the framework specs are co-located (copied or submoduled into the domain root).
 
 ## Agent Startup Behaviour
+
+### Entry discovery precedes framework discovery
+
+`framework_root` answers *where the shared framework is* only after a harness
+has delivered the domain's entry contract. Keep these two discovery layers
+separate:
+
+1. **Harness entry discovery** gets the operative `AGENTS.md` body into the
+   session. A harness may read `AGENTS.md` directly, or it may auto-load a
+   differently named core entry pointer such as `CLAUDE.md` which imports it.
+   Entry pointers are scaffold surface in `templates/entry/`, not lifecycle
+   adapter output, and survive `--harness none`.
+2. **Framework discovery** reads the on-disk AGENTS frontmatter, resolves
+   `framework_root`, verifies the sentinel, and loads the kernel as described
+   below.
+
+A lifecycle adapter is optional hardening after entry discovery, not a third
+way to locate the framework. The current public evidence is surface-specific:
+Claude Code's pointer route and Codex's named entry/lifecycle surfaces have
+execution records; other product rows stay designed-for or unverified until
+their own records exist. A harness with no project-file discovery needs an
+explicit bootstrap/emission route. Cowork is the first such registered shape,
+but its public discovery guarantee remains owned by `cowork-adapter` Phase 6
+until both transport records exist; registration alone is not that evidence.
 
 When a domain agent loads, its startup sequence becomes:
 

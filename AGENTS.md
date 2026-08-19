@@ -30,7 +30,7 @@ You predict the next move — the next token, sentence, or action — from the s
 Every domain in this framework — including the framework itself — follows the same three-layer pattern:
 
 ```
-Layer 1: AGENTS.md        ← Entry point; discovered automatically; orchestrates everything
+Layer 1: AGENTS.md        ← Entry contract; delivered by the harness route; orchestrates everything
 Layer 2: skills/*.md      ← Reusable capabilities loaded by the agent at startup
 Layer 3: things/*.md      ← Data instances — the actual content the domain manages
                               ↓
@@ -195,7 +195,7 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 3. **Atomic & Composable** — Each spec is self-contained but explicitly linked to others. You can read any one spec independently, but together they form a complete system.
 4. **Minimal Core, Emergent Detail** — Start with the essential structure. Let the schema grow with domain needs. Never over-engineer upfront; add complexity only when it earns its place.
 5. **Evolving** — Specifications have status (`draft`, `evolving`, `stable`). New specs start as drafts and mature through use.
-6. **Vendor Agnostic** — This AGENTS.md works with GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini CLI. No vendor-specific memory stores required — the framework is the memory.
+6. **Vendor Agnostic by contract** — This AGENTS.md uses no vendor-specific memory store; the framework is the memory. Discovery and lifecycle compatibility are still product capabilities, so public claims remain limited to the exact harness evidence that earned them.
 7. **Transparent & Auditable** — Every decision, every state change, every reasoning step is committed to git. Full history is always available.
 8. **Git-Backed** — Git is the state machine, not just version control. Commit messages are the event stream and carry the session narrative (`mdllm worklog` prints an on-demand view; nothing is committed back).
 9. **Elegant Constraint Enables Efficiency (hypothesis, under test)** — Structure makes reasoning consistent across sessions and vendors — that much is demonstrated. The stronger claim that a *smaller* model with structure matches or beats a *larger* model without it is the framework's central **hypothesis**, not a proven result: it rests on one eval whose reasoning core saturated, and stays a hypothesis until a more discriminating fixture tests it. Keep this distinct from the framework's *utility*, which independent adoption evidences directly. (See the manifesto, "Elegant Constraint Enables Efficiency.")
@@ -226,7 +226,7 @@ and deriving it here is on `mechanical-coherence-checks-backlog`.)*
 
 ## Key Innovations
 
-1. **Automatic Discovery** — AGENTS.md is discovered at workspace open. No manual includes, no configuration. The agent finds its own context.
+1. **Harness-delivered discovery** — AGENTS.md is the one canonical contract. A harness may load it directly, reach it through a core entry pointer, or require explicit bootstrap/emission; automatic discovery is measured, not presumed.
 2. **Multi-Lens Reasoning** — Complex decisions are analysed through multiple lenses simultaneously (e.g. Domain Logic, Compliance Logic, Audit Logic). Each lens asks different questions of the same data.
 3. **Tiered Context Loading** — Agents choose their context depth based on the query:
    - *Level 1* — Metadata only (frontmatter fields; fast, broad)
@@ -248,7 +248,7 @@ and deriving it here is on `mechanical-coherence-checks-backlog`.)*
 
 ```
 User Request (about the framework or a domain)
-    ↓ (auto-discovered)
+    ↓ (delivered by the harness entry route)
 Load this AGENTS.md
     ↓
 Identify: framework work or domain work?

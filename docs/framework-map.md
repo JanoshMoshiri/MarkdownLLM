@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.8
+version: 1.9
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -25,7 +25,7 @@ linked_things:
 # Framework Map — The Visual Architecture
 
 A scrollable codebase teaches you its shapes; a specification framework hides
-them in frontmatter. This map is the substitute for that intimacy: four views,
+them in frontmatter. This map is the substitute for that intimacy: five views,
 zooming in, each derived from the repo itself — the spec-to-spec edges from
 each file's `linked_things` frontmatter, the subcommand list from
 `mdllm --help`, the tier structure from `AGENTS.md`, the estate seam from
@@ -56,7 +56,7 @@ flowchart TD
     accTitle: View 1 - the five bands of the framework, read top-down as a session's life
     accDescr {
         Five stacked bands. The entry band, tier 0, holds AGENTS.md as the
-        auto-discovered entry point and kernel.md as a generated digest. Below
+        harness-delivered entry contract and kernel.md as a generated digest. Below
         it the specification layer holds 29 spec things: the manifesto for the
         why, thing.md with the core operative specs, and 22 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
@@ -71,7 +71,7 @@ flowchart TD
         specs and things alike, and commits at meaning boundaries into git.
     }
     subgraph entry ["entry — tier 0"]
-        AGENTS["AGENTS.md<br/>entry point — auto-discovered"]
+        AGENTS["AGENTS.md<br/>entry contract — harness-delivered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
     subgraph specs ["specification layer — 29 spec things"]
@@ -353,16 +353,92 @@ Notes on this view:
   lifecycle hook calls it to run ordered bindings and record hash-bound
   execution evidence. Neither makes an adapter part of the portable core.
 
-## View 4 — Two domains: the estate seam
+## View 4 — Optional harness adapters around the portable core
 
-Views 1–3 are one domain deep. This is the only view with two: how a producer's
+The adapter registry hardens selected lifecycle moments without becoming the
+substrate. Two binding shapes now exercise the same declared ports. A
+project-bound adapter renders an owned project artifact before the session; a
+run-time-bound adapter renders no project artifact and binds later through a
+bundle/bootstrap surface. Doctor reports those different facts without
+inventing a vendor branch or collapsing support, configuration, currency,
+trust, runtime, and execution into one green light.
+
+```mermaid
+flowchart TB
+    accTitle: View 4 - optional harness adapters around the portable entry contract and Git floor
+    accDescr {
+        The portable core contains the entry contract, neutral lifecycle
+        bindings, and Git filesystem floor. An adapter registry reaches two
+        binding shapes through declared ports. Project-bound Claude Code and
+        Codex adapters render owned project artifacts reviewed by adapter
+        install, and real harness events enter the neutral runner. The
+        run-time-bound Cowork adapter renders no project artifact; an
+        account-level bundle and session activation enter the same lifecycle
+        contract. Doctor reads capabilities, render or inspection results,
+        runtime probes, and hash-bound attestations, reporting each fact
+        independently. Cowork's live compatibility remains an open evidence
+        gate even though the adapter is registered.
+    }
+
+    subgraph CORE["portable core — works with no adapter"]
+        ENTRY["entry contract<br/>AGENTS.md + core pointers"]
+        BIND["neutral lifecycle bindings<br/>ordered application service"]
+        FLOOR["Git/filesystem floor<br/>validate + commit hooks"]
+        ENTRY --> BIND
+        BIND --> FLOOR
+    end
+
+    REG["adapter registry + declared ports"]
+
+    subgraph PROJECT["project-bound adapters"]
+        PC["Claude Code / Codex"]
+        RENDER["render + inspect<br/>definition hash"]
+        ART["owned project artifact"]
+        INSTALL["adapter-install<br/>dry-run → reviewed apply"]
+        PC --> RENDER --> ART --> INSTALL
+    end
+
+    subgraph RUNTIME["run-time-bound adapter"]
+        CW["Cowork<br/>(registered; live gate open)"]
+        BUNDLE["account bundle<br/>mechanism hash"]
+        ACT["session activation + emission"]
+        CW --> BUNDLE --> ACT
+    end
+
+    EVENT["real harness event / attestation"]
+    DOC["doctor<br/>independent facts"]
+
+    REG --> PC
+    REG --> CW
+    INSTALL --> EVENT --> BIND
+    ACT --> BIND
+    DOC -. "capabilities / config / currency" .-> REG
+    DOC -. "runtime / trust / execution" .-> EVENT
+```
+
+Notes on this view:
+
+- Entry discovery is left of the adapter boundary. `CLAUDE.md` is a core entry
+  pointer written even by `--harness none`; neither adapter removal nor a
+  run-time-bound adapter may make the domain's interpretation contract vanish.
+- `adapter-install` is meaningful only when a renderer owns project bytes. An
+  empty render is the port-derived signal for not-applicable project
+  configuration, not a special Cowork conditional in shared control flow.
+- Registration proves the adapter satisfies the build-time contracts. A public
+  compatibility row requires its own live, graded evidence. Claude Code and
+  Codex have named records; Cowork's remote/local records remain owned by its
+  plan.
+
+## View 5 — Two domains: the estate seam
+
+Views 1–4 are one domain deep. This is the only view with two: how a producer's
 curated face reaches a consumer's quarantined import, and how the consumer
 keeps that hand-off honest as both sides move. Every arrow that crosses the
 seam passes through the porch — including "have you changed?".
 
 ```mermaid
 flowchart LR
-    accTitle: View 4 - the estate seam between a producer domain and a consumer domain
+    accTitle: View 5 - the estate seam between a producer domain and a consumer domain
     accDescr {
         Two domains side by side, and every arrow crossing between them passes
         through the porch - including the question have you changed. In domain
@@ -423,8 +499,12 @@ over them:
   restating; a review-loop finding caught this label two behind reality.
 - **View 2:** each spec's `linked_things` frontmatter; the kernel coverage
   count in `kernel.md` frontmatter (`coverage: 6`).
-- **View 3:** `python tools/mdllm.py --help`.
-- **View 4:** `provenance.md` → Cross-Domain Imports (the states and the
+- **View 3:** `mdllm --help` through the repository's manual launch route.
+- **View 4:** `tools/markdownllm/adapters/__init__.py`,
+  `harness_ports.py`, `harness_diagnostics.py`, and the adapter capability /
+  render / probe contracts. The plan evidence, not this diagram, decides which
+  named product claims are verified.
+- **View 5:** `provenance.md` → Cross-Domain Imports (the states and the
   membrane rule) and `mdllm imports-check --help` / `estate-check --help`.
 
 When a spec is added, removed, or rewired — or a subcommand lands — update the

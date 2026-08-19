@@ -6,7 +6,7 @@ Every agent session starts from scratch, so you have to hand the agent its conte
 
 State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. The difference is that their integrity is non-negotiable. A deterministic floor — one CLI, one git pre-commit hook — checks structure, references, and schema on every commit; a record that doesn't hold together can't be committed at all. A reconciliation pass walks the blast radius of any consequential change; a retrospective sweeps for what slipped through. Each session, orientation is rebuilt from git history — not reloaded from a memory file. The result isn't more memory; it's state you can rely on.
 
-A framework discovered by agents, directed by you, and grown together. It works with any LLM tool that can read and write files — Claude Code, Codex, Cursor, and the like — and a domain is a valid Obsidian vault, so the human GUI comes for free.
+A framework discovered by agents, directed by you, and grown together. Its entry contract, markdown state, and Git floor are portable to file-aware LLM tools; discovery and lifecycle support are verified per harness rather than inferred from a product name. A domain is also a valid Obsidian vault, so the human GUI comes for free.
 
 ---
 
@@ -41,14 +41,14 @@ So the framework is itself the foundational domain, managed by its own agent. An
 The framework gives agents a three-layer model to work within:
 
 ```
-AGENTS.md   — Orchestration & discovery (auto-loaded at session start)
+AGENTS.md   — Orchestration & discovery (delivered by the harness entry route)
    ↓
 SKILLS/     — Reasoning capabilities (.skill.md); foundational specs via framework_root
    ↓
 THINGS/     — Structured data instances (atomic units following thing.md)
 ```
 
-**Layer 1 — AGENTS.md.** The agent's entry point, auto-discovered by the LLM harness at session start. It declares what the domain is, where skills live, where the framework root is, and the session protocol. Every session begins by re-reading this structure; the agent rebuilds its bearings from committed state, not from a context window that compaction can erode.
+**Layer 1 — AGENTS.md.** The agent's canonical entry contract, delivered by the harness either directly, through a core entry pointer, or through an explicit bootstrap. It declares what the domain is, where skills live, where the framework root is, and the session protocol. Every session begins by re-reading this structure; the agent rebuilds its bearings from committed state, not from a context window that compaction can erode.
 
 **Layer 2 — Skills.** Instructions *for the agent* — how to think and operate within the domain: a specification skill (philosophy and principles), a read skill, a write skill, and a workflow skill. Foundational specs like `thing.md` live in the framework root, resolved via `framework_root` — see [framework-discovery.md](framework-discovery.md).
 
@@ -134,28 +134,28 @@ For a domain in production use, the framework's own repository is the working ex
 
 ### The Deterministic Floor (`tools/mdllm.py`)
 
-Since v3.0, the framework pairs its specifications with a no-package-install CLI (one entry file, a package of single-responsibility modules behind it — Python 3.10+ with PyYAML is the only runtime requirement, and the shared launcher described below handles managed shells where `python` or PyYAML is not otherwise available) that guarantees everything mechanical, so the LLM spends its reliability on reasoning:
+Since v3.0, the framework pairs its specifications with a no-package-install CLI (one entry file, a package of single-responsibility modules behind it — Python 3.10+ with PyYAML is the only runtime requirement, and the shared launcher described below handles managed shells where `python` or PyYAML is not otherwise available) that guarantees everything mechanical, so the LLM spends its reliability on reasoning. In the examples, `mdllm` is route-neutral notation: use `./tools/mdllm.ps1` on Windows PowerShell, or `python tools/mdllm.py` elsewhere only with an interpreter that can import PyYAML:
 
 ```bash
-python tools/mdllm.py validate <domain>      # structure, references, schema, declared derivations — exit 1 on Errors
-python tools/mdllm.py install-hook <domain>  # git hooks: pre-commit validation + cue, commit-msg boundary, post-commit publication
-python tools/mdllm.py doctor <domain> --harness codex  # independent adapter/runtime/trust/execution facts
-python tools/mdllm.py adapter-install <domain> --harness codex --dry-run  # exact owned diff, no write
+mdllm validate <domain>      # structure, references, schema, declared derivations — exit 1 on Errors
+mdllm install-hook <domain>  # git hooks: pre-commit validation + cue, commit-msg boundary, post-commit publication
+mdllm doctor <domain> --harness codex  # independent adapter/runtime/trust/execution facts
+mdllm adapter-install <domain> --harness codex --dry-run  # exact owned diff, no write
 # Exact recognised legacy only: add --refresh-legacy; review with --dry-run first
-python tools/mdllm.py scaffold <new-domain> --harness codex  # deterministic birth + selected outer adapter
-python tools/mdllm.py triggers <domain>      # deadline & trigger evaluation + horizon; --estate rolls up every local domain
-python tools/mdllm.py provenance <domain>    # decision pins resolve; no output rests on unverified content
-python tools/mdllm.py calc <domain>          # declared derivations (`computed:`) — the floor does every sum
-python tools/mdllm.py estate-sync            # fetch + ff-only pull; --require-fresh = strict manual state; --status = publication debt
-python tools/mdllm.py imports-check <domain> # cross-domain imports re-checked against the source's face
-python tools/mdllm.py eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
-python tools/mdllm.py kernel                 # regenerate the operative kernel from spec blocks
-python tools/mdllm.py session-start <domain> # emit the startup ritual + orient view (open loops) for a SessionStart hook to inject at t=0
+mdllm scaffold <new-domain> --harness codex  # deterministic birth + selected outer adapter
+mdllm triggers <domain>      # deadline & trigger evaluation + horizon; --estate rolls up every local domain
+mdllm provenance <domain>    # decision pins resolve; no output rests on unverified content
+mdllm calc <domain>          # declared derivations (`computed:`) — the floor does every sum
+mdllm estate-sync            # fetch + ff-only pull; --require-fresh = strict manual state; --status = publication debt
+mdllm imports-check <domain> # cross-domain imports re-checked against the source's face
+mdllm eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
+mdllm kernel                 # regenerate the operative kernel from spec blocks
+mdllm session-start <domain> # emit the startup ritual + orient view (open loops) for a SessionStart hook to inject at t=0
 ```
 
-That's the working core — `python tools/mdllm.py --help` lists the full 29-subcommand surface (coherence checks, blast-radius reads, the disclosure boundary, MCP serving, and more; [framework-map.md](docs/framework-map.md) View 3 maps each subcommand to the spec it mechanises). The commit boundary carries three legs: **pre-commit** validates and asks the change-reconciliation cue question, **commit-msg** enforces the local disclosure boundary, and **post-commit** publishes each floor-validated commit (`mdllm autopush`) unless the repo opts out — release surfaces do, so a public release stays a deliberate human act.
+That's the working core — `mdllm --help` lists the full command surface (coherence checks, blast-radius reads, the disclosure boundary, MCP serving, and more; [framework-map.md](docs/framework-map.md) View 3 maps each subcommand to the spec it mechanises). The commit boundary carries three legs: **pre-commit** validates and asks the change-reconciliation cue question, **commit-msg** enforces the local disclosure boundary, and **post-commit** publishes each floor-validated commit (`mdllm autopush`) unless the repo opts out — release surfaces do, so a public release stays a deliberate human act.
 
-Each domain declares its thing types, **its own status vocabularies**, and which of those statuses mean *settled* in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) — the operative rules at a small fraction of the full-spec cost (`mdllm tokens` measures the live split; figures are not restated in prose, where they have drifted four times) — at session start; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a lifecycle hook so the agent runs version-check + velocity and reads the generated **orient** view — the open loops (non-terminal owned work + open conflicts; imported mirrors file under a separate Watched line) that replace the retired `continuity.md` — at t=0 rather than hoping it surfaces from a long entry file. `scaffold --harness claude|codex|all|none` selects only the outer harness projection; omitting the flag preserves the Claude compatibility default (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
+Each domain declares its thing types, **its own status vocabularies**, and which of those statuses mean *settled* in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) — the operative rules at a small fraction of the full-spec cost (`mdllm tokens` measures the live split; figures are not restated in prose, where they have drifted four times) — at session start; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a lifecycle hook so the agent runs version-check + velocity and reads the generated **orient** view — the open loops (non-terminal owned work + open conflicts; imported mirrors file under a separate Watched line) that replace the retired `continuity.md` — at t=0 rather than hoping it surfaces from a long entry file. `scaffold --harness <registered>|all|none` selects the outer adapter projection; omission preserves the Claude compatibility default, while a run-time-bound selection may have no project artifact to render (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
 
 ### Templates
 
@@ -200,7 +200,7 @@ irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1
 
 You need an LLM tool with file-system access, plus `git` and Python 3.10+ — the installer offers to install the latter two if they're missing. Prefer to do it by hand? `git clone` the repo and `pip install pyyaml`.
 
-### Codex support: current tracked projection; live verification still open
+### Codex support: verified on named Windows surfaces
 
 The vendor-neutral adapter boundary and project-local Codex renderer are
 implemented and covered by unit and integration tests. The renderer produces
@@ -210,22 +210,15 @@ configuration, currency, trust, runtime, and real-event execution as separate
 facts. Static inspection and a runnable command never promote execution to
 verified.
 
-That is **designed-for evidence, not a completed Codex rollout**. Phase 5R.1
-closed the shared Windows/POSIX launch defects and Phase 5R.2 replaced Claude's
-parallel legacy projection with one ordered neutral-runner handler. Recognised
-legacy Claude fragments can now be refreshed only through the explicit,
-reviewed `--refresh-legacy` path; extensions and ambiguity still refuse. Phase
-5R.4 used that same generic path to refresh both recognised root legacy forms
-atomically. The framework now tracks current `.claude/settings.json` and
-`.codex/hooks.json` projections as deliberate self-hosted state; no nested
-domain was migrated.
-
-After that repair, Phase 6 still has to install/review the corrected project
-layer and observe real framework-root and directly opened domain lifecycle events.
-Official documentation assigns exact hook review and trust to `/hooks` in the
-**Codex CLI**; the Desktop chat command palette observed during this preflight
-did not expose that command, so the plan does not pretend a CLI review happened
-inside Desktop. The boundary and execution checklist remain in
+The projection is no longer only designed-for. Phase 6 verified automatic
+framework-root and directly opened domain lifecycle dispatch on Codex CLI
+0.147.0 / Windows 11, with definition-hash-bound attestations and
+harness-owned transcript correlation. Later QMS work on Codex Desktop
+26.810.7004.0 / runner 0.148.0-alpha.9 separately verified the dependency-
+probing manual launcher, automatic startup, a full manual rerun, and the
+restricted-then-approved `estate-sync --require-fresh` → pre-commit → publish
+path. These are exact-surface records, not a claim about every Codex product,
+version, operating system, or lifecycle trigger. The full boundary remains in
 [`vendor-harness-adapter-foundation`](things/plans/vendor-harness-adapter-foundation.md).
 
 Use the read-only paths before authorising a project write:
@@ -235,22 +228,20 @@ Use the read-only paths before authorising a project write:
 ./tools/mdllm.ps1 adapter-install . --harness codex --dry-run
 ```
 
-Do not apply that diff while the repair gate is open. Once Phase 5R passes, the
-operator may rerun the dry-run against the current renderer, apply the reviewed
-diff, and complete the product-specific trust flow on a surface that actually
-supports it.
+Apply only the exact diff you reviewed, then complete the product-specific
+trust flow on a surface that actually supports it.
 The installer owns only MarkdownLLM's project lifecycle groups; it does not
 modify user-global Codex configuration. Ambiguous or unsafe existing state is
 refused rather than overwritten.
 
-#### Codex desktop shared runtime compatibility (root and nested verified 2026-08-11)
+#### Codex desktop shared runtime compatibility (root and nested; re-verified 2026-08-18)
 
 This runtime compatibility layer was added and tested in the Codex desktop
-harness — specifically, not as an untested generalisation. Its PowerShell
-command shell had no `python` on `PATH`; its bundled Python was 3.12 but did
-not include PyYAML. A repository-local, gitignored `.venv` with PyYAML makes
-the deterministic floor available without changing the machine-wide Python
-installation:
+harness — specifically, not as an untested generalisation. Managed shells may
+have no `python` on PATH or expose a bundled interpreter without PyYAML. The
+PowerShell launcher dependency-probes domain, framework, then PATH candidates;
+a repository-local, gitignored `.venv` can therefore provide the floor without
+changing machine-wide Python:
 
 ```powershell
 ./tools/mdllm.ps1 doctor .
@@ -268,7 +259,7 @@ a real commit through the generated pre-commit hook. The earlier external
 `dirname` dependency and unprobed PowerShell candidates were repaired in the
 shared runtime rather than worked around inside the Codex adapter. This
 verifies runtime and Git-floor execution on the measured Codex desktop shell;
-it does not substitute for Phase 6's real Codex lifecycle/trust evidence.
+lifecycle and trust remain separately evidenced facts.
 
 Then open the folder in your LLM tool, let it discover `AGENTS.md`, and tell it what you want:
 
@@ -280,24 +271,25 @@ The agent reads the specs, proposes a structure, and builds it; you refine throu
 
 ### What works
 
-The framework relies only on the cross-vendor `AGENTS.md` convention plus plain files and git, so it is vendor-agnostic *by design* — but "designed for" is intent, not measurement. Discovery and hook execution are harness properties, and the one non-IDE harness tested so far surfaced real differences. Treat the table as compatibility intent until an eval has exercised each row.
+The framework relies on one entry contract plus plain files and git, so it is vendor-agnostic *by design* — but "designed for" is intent, not measurement. Entry discovery and hook execution are harness properties. Each row therefore distinguishes the portable contract from the exact product evidence that has exercised it.
 
 | Tool | Discovery | Status |
 |------|-----------|--------|
-| Codex desktop | AGENTS.md auto-load | Root + directly opened nested domain runtime/Git floor verified 2026-08-11; project lifecycle adapter implemented, with Phase 5R runtime/launch repair and Phase 6 live dispatch/trust verification still open ([plan](things/plans/vendor-harness-adapter-foundation.md)) |
+| Codex desktop | AGENTS.md on the named tested builds | Root + directly opened nested-domain runtime/Git floor verified; QMS automatic startup, manual launcher, strict-sync approval and real publication verified 2026-08-18 on Desktop 26.810.7004.0 / runner 0.148.0-alpha.9. This does not imply every Desktop build or lifecycle trigger ([plan](things/plans/vendor-harness-adapter-foundation.md)) |
 | Claude Code | CLAUDE.md → AGENTS.md (scaffolded in every harness selection) | Core framework use verified; automatic framework-root SessionStart/PostToolUse dispatch verified 2026-08-16 on 2.1.229/Windows ([evidence](evidence/claude-phase6-no-adapter-and-root-2026-08-16.md)). Adapter-optionality verified 2026-08-17 on CLI 2.1.233: in a differential `--harness none` probe pair the entry pointer delivered `AGENTS.md` at t=0 and its removal left no automatic surface, with all four floor legs adapter-free ([evidence](evidence/claude-no-adapter-entry-probe-2026-08-17.md)) |
-| Codex (VS Code) | AGENTS.md auto-load | Exercised on a real project; not yet eval-measured |
-| GitHub Copilot, Codex CLI, Cursor, Windsurf, Gemini CLI | AGENTS.md auto-load | Designed for; not yet exercised |
+| Codex CLI | AGENTS.md + project lifecycle adapter | Automatic framework-root and directly opened domain lifecycle verified on CLI 0.147.0 / Windows 11 with hash-bound attestations and transcript correlation; no wider OS/version claim |
+| Codex (VS Code) | Intended AGENTS.md route | Exercised on a real project; not lifecycle/eval-measured |
+| GitHub Copilot, Cursor, Windsurf, Gemini CLI | Intended/configurable AGENTS.md route | Designed for; no framework execution record yet. Claude or Codex evidence does not transfer |
 
 **What does NOT work:** any interface without file-system access (ChatGPT web, Claude web, bare API calls without tool use). The agent must be able to discover files, read them, and write them.
 
 ### Vendor setup
 
 - **Claude Code** — `CLAUDE.md` is written for you: the installer writes one at the framework root, and `scaffold` writes one in every new domain under **every** `--harness` selection, `none` included. It is an entry pointer (`@AGENTS.md`) holding no domain content of its own, so it is either needed or harmlessly redundant; the framework root's wrapper additionally routes its second read position — Claude Code loads ancestor `CLAUDE.md` files into nested-domain sessions, and the inherited pointer must say whose `AGENTS.md` governs — which harness the operator opens is not knowable at scaffold time, and a domain the harness cannot see is a domain that does not run. Delete it if your harness reads `AGENTS.md` directly. Claude remains the compatibility default. New projections use one handler entering the neutral ordered runner; the historical two-handler form is recognised legacy data and refreshes only through the explicit reviewed path. Existing domain settings remain untouched unless their operator chooses that migration.
-- **Optional lifecycle hardening** — `scaffold <path> --harness claude|codex|all|none` selects the project adapter(s) for a new domain (`claude-code` is also accepted as the canonical Claude name). Omitting the flag still selects the historical Claude default. `none` leaves the portable `AGENTS.md` interpretation path plus Git floor. Existing projects inspect with `doctor` and review `adapter-install --dry-run`; an exact reported legacy fragment additionally requires `--refresh-legacy`, while extensions and ambiguity remain operator-resolved refusals.
+- **Optional lifecycle hardening** — `scaffold <path> --harness <registered>|all|none` selects the adapter(s) for a new domain (`claude-code`, alias `claude`; `codex`; and `cowork` are currently registered). Omitting the flag still selects the historical Claude default. `none` leaves the portable entry contract plus Git floor. Project-bound adapters inspect with `doctor` and review `adapter-install --dry-run`; an exact reported legacy fragment additionally requires `--refresh-legacy`, while extensions and ambiguity remain operator-resolved refusals. Cowork is run-time-bound and renders no project artifact; its live remote/local verification remains open, so registration is not yet a compatibility-table row.
 - **GitHub Copilot (VS Code)** — set `"chat.useAgentsMdFile": true` and `"chat.useNestedAgentsMdFiles": true`.
-- **Codex** — auto-discovers `AGENTS.md`. The project adapter is implemented and the root tracks its current rendered `.codex/hooks.json`; Phase 6 still owns live verification. The [official Codex hook documentation](https://developers.openai.com/codex/hooks) names `/hooks` as a **CLI** review/trust surface; do not assume it is a Desktop chat command. `doctor . --harness codex` remains `execution: untested` until a matching real event and harness-owned transcript correlate.
-- **Cursor, Windsurf, Gemini CLI** — no configuration; they auto-discover `AGENTS.md` at root.
+- **Codex** — the named CLI and Desktop records above establish exact entry/lifecycle/runtime facts; the project adapter is implemented and the root tracks its current rendered `.codex/hooks.json`. The [official Codex hook documentation](https://developers.openai.com/codex/hooks) names `/hooks` as a **CLI** review/trust surface; do not assume it is a Desktop chat command. Doctor promotes execution only when a matching real event and harness-owned transcript correlate.
+- **Cursor, Windsurf, Gemini CLI** — use the intended direct `AGENTS.md` route, but verify it in the product rather than treating this designed-for line as an execution record.
 
 ### Deployment: the nested-repository model
 
@@ -325,7 +317,8 @@ Framework and domains version independently, and many domains can share one fram
 2. **Definition-Driven** — structure emerges from clear definitions, not rigid templates.
 3. **Atomic & Composable** — everything is a thing; everything links explicitly.
 4. **Minimal Core, Emergent Detail** — start simple; let the schema grow through use.
-5. **Vendor Agnostic** — works across any LLM with file-system access.
+5. **Vendor Agnostic by contract** — portable to file-aware LLM harnesses;
+   discovery and lifecycle compatibility remain evidence-specific.
 6. **Version-Controlled** — git is the source of truth.
 7. **Transparent** — no black boxes; all logic is explicit and readable.
 

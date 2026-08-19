@@ -65,7 +65,7 @@ You're not fighting an app's architecture. You're partnering with an intelligenc
 
 **LLM-Centric Structure:** The metadata and body are optimized for the agent to parse and reason with, not for you to read. The agent is the primary consumer. Readability for humans is secondary.
 
-**Vendor Agnostic:** Uses standard conventions (AGENTS.md, .skill.md files, YAML frontmatter) so any LLM—Claude, Copilot, any other agent—can understand and operate within the system.
+**Vendor Agnostic by contract:** Uses standard conventions (AGENTS.md, .skill.md files, YAML frontmatter) so a file-aware LLM can understand the system; discovery and lifecycle operation still require harness-specific evidence.
 
 **Versioned, Durable:** Git means your entire life management system is versioned, backed up, and transparent. You can see how things evolved. You can roll back if needed.
 

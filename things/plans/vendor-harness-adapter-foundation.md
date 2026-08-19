@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.33
+version: 1.34
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -1805,8 +1805,9 @@ deterministic suite: 472 passed. Those counts remain runtime evidence only.
 
 **Gate:** the two QMS live consequences above pass; adapter bytes and managed
 blocks remain unchanged; focused sync tests, full suite, validate, coherence,
-and kernel freshness pass. Only then may Phase 8 offer the authored entry
-change to other domains. No estate sweep is authorised.
+and kernel freshness pass. The authored QMS paragraph is a test fixture, not a
+presumed estate migration: a differential domain probe decides whether any
+shared/domain prose rollout is needed. No estate sweep is authorised.
 
 **Live QMS acceptance — 2026-08-18.** In the restricted tool shell,
 `../../tools/mdllm.ps1 estate-sync . --require-fresh` reported
@@ -1838,18 +1839,34 @@ restricted-then-approved strict-sync proof above remains the first-hand
 mechanism evidence. Record:
 `codex-gate-7-0b-qms-operator-acceptance-2026-08-18`.
 
+**Differential acceptance and QMS cleanup — 2026-08-18.** JMTM Software still
+carried the v3.31 domain entry surface: no QMS authored compatibility
+paragraph, older generated direct-Python examples, and no local `python`
+command in the managed shell. The central PowerShell launcher nevertheless
+ran the floor and complete session start. After the unrelated untracked
+`.claude/settings.local.json` was deliberately ignored (`d5e1aca`), its next
+estate sync reached the expected restricted `.git/FETCH_HEAD` boundary,
+requested one-command approval, reran the same wrapper, and returned
+`up-to-date`. That is the consequence the QMS paragraph was meant to produce,
+without the paragraph. The QMS-only authored additions were therefore removed
+at `9457709`; its managed blocks and adapter artifacts were not an estate
+rollout candidate. The durable fix is the shared resolver, truthful strict-sync
+failure signal, approval route, and public launcher guidance. Phase 8 still
+owns adapter defaults and opt-in project projections, not an AGENTS prose
+sweep.
+
 ### Phase 7 — Reconcile every public surface (Codex lead; Claude review)
 
-- [ ] Update orchestration, discovery, refresh, operator guide, first-hour,
+- [x] Update orchestration, discovery, refresh, operator guide, first-hour,
   domain guide, README compatibility table, scaffold output, and adapter
   examples from the same settled capability vocabulary. **[v1.3]** Phase A has
   already swept the canonical prose-address surfaces; this phase must not
   re-open them for address, only for capability claims that the build changed.
-- [ ] Replace “the adapter” where it means Claude with a generic rule plus
+- [x] Replace “the adapter” where it means Claude with a generic rule plus
   named vendor projections. Preserve vendor-specific instructions where the
   distinction is real.
-- [ ] Add a framework-map adapter/diagnostic node if the new CLI surface lands.
-- [ ] Run the change-reconciliation dark-region walk; do not rely only on grep
+- [x] Add a framework-map adapter/diagnostic node if the new CLI surface lands.
+- [x] Run the change-reconciliation dark-region walk; do not rely only on grep
   or generated checks for semantic claims.
 
 **Gate:** validate, coherence, kernel freshness where applicable, the full
@@ -1881,6 +1898,45 @@ suite, and the Claude/Codex execution records all pass.
   uncommitted state and is unattributable until it lands. Claude-half claims
   above rest on the focused suites only; the Phase 7 gate's full-suite run
   happens on a settled tree.
+
+**Phase 7 CLOSED — 2026-08-19, settled-tree Codex seal.** The public surface
+now uses one capability vocabulary across `orchestration.md`,
+`framework-discovery.md`, `domain-refresh.md`, `interface.md`, README,
+operator/first-hour/domain guides, scaffold completion output, the Claude
+adapter example, and the framework map. Entry discovery, optional lifecycle
+hardening, project-bound versus run-time-bound adapters, and live compatibility
+are independent facts. Claude Code and Codex keep their exact evidence scope;
+Copilot and the other designed-for rows remain unverified; Cowork is named as
+a registered run-time-bound build with its remote/local evidence gates still
+open, so no compatibility row was manufactured.
+
+The framework map now has a separate adapter/diagnostic view: the registry and
+declared ports fan out to project-bound Claude/Codex renderers and the
+run-time-bound Cowork bundle, while the entry contract and Git floor remain the
+portable core. Scaffold guidance no longer labels Claude lifecycle execution
+as Copilot lifecycle evidence, and the static Claude example points only to
+the renderer-backed dry-run/apply flow. The stale domain-refresh operator paste
+and hand-adjusted Python path are gone.
+
+The dark-region walk ran through every changed thing's declared edges and
+literal references. It widened the surface to the root entry file, manifesto,
+contributor guide, scaffold skill template, and examples, and caught three
+standing insights whose prose had become false: hand-paste was no longer
+unavoidable, the QMS authored seam was not an estate rollout unit, and the
+portability record lacked the JMTM differential. All three were amended rather
+than left as historical-looking current guidance. `public-docs-face-build`
+retains its separate derived-documentation scope; this phase changed only the
+harness capability claims that plan explicitly assigns here.
+
+Mechanical seal: touchpoints completed for all changed specs/guides/plans;
+relationships and provenance indexes rebuilt and checked in sync; kernel
+regenerated; framework validation clean (227 things) plus both examples (6 +
+14), zero findings; coherence clean; focused adapter/runtime/scaffold gate
+97/97; strict estate-sync gate 13/13; complete deterministic suite 518/518 in
+771.78 seconds. The pre-existing Claude/Codex live records remain the execution
+legs of this gate. Phase 8 is now only the operator's default/opt-in rollout
+and release decision; it is not permission to recreate the removed QMS prose
+across the estate.
 
 ### Phase 8 — Rollout and migration decision (owner: operator)
 

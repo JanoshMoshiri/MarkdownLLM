@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: evolving
-version: 2.8
+version: 2.9
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
@@ -285,7 +285,7 @@ The implications:
 
 3. **Create instances** — Your actual data lives as thing files in `things/`. Each file is an instance of your atomic unit, with YAML metadata and narrative body.
 
-4. **Interact through any route** — Speak, type, or otherwise communicate your intent through any input route (VS Code, CLI, mobile, voice). The agent auto-loads and reasons within your domain.
+4. **Interact through any route** — Speak, type, or otherwise communicate your intent through any file-aware route (editor, CLI, voice-to-text, or an explicit bootstrap). The harness delivers the domain's entry contract directly, through a pointer, or by emission; automatic discovery is a measured product capability, not a universal premise.
 
 5. **Let it flow** — The agent produces things (persistent state) and deliverables (documents, code, images, notifications) depending on what you need. Updates flow back through your output route.
 

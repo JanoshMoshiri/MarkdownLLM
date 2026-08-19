@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.15
+version: 1.16
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -86,10 +86,16 @@ unrecoverable, trade "the agent should" for "the machine guarantees":
   no adapter because git is universal — which is why the one genuinely
   load-bearing hook (`pre-commit` validation) is also the one that never has to
   know which harness it runs under.
-- A **per-harness adapter** (`adapters/`) can harden the session-lifecycle hooks
-  by binding them to real harness events (Claude Code's `SessionStart`, `Stop`,
-  `PostToolUse`; the equivalent elsewhere). `adapters/claude-code.settings.example.json`
-  does exactly this for `post-write` validation.
+- A **registered harness adapter** (`tools/markdownllm/adapters/`) can harden
+  session-lifecycle hooks by translating the neutral bindings into a named
+  harness's real events and output envelope. Project-bound adapters such as
+  Claude Code and Codex render project artifacts reviewed through
+  `mdllm adapter-install --dry-run`; a run-time-bound adapter may render no
+  project artifact and bind later through its own bundle/bootstrap surface.
+  `adapters/claude-code.settings.example.json` is explanatory history and a
+  pointer to that renderer-backed flow, not pasteable configuration. Shared
+  files or shortcuts do not turn Claude Code execution evidence into GitHub
+  Copilot lifecycle evidence.
 
 If a hook can only be hardened by an adapter and you write no adapter, it falls
 back to interpretation — which is where it started, and where the framework
@@ -188,7 +194,7 @@ These four hard hooks are part of every agent's operating contract with the fram
 4. Commit the domain files to the domain's own repo
 5. Create a remote repository and push
 
-**Mechanised by the `scaffold` subcommand:** `python tools/mdllm.py scaffold <path>` performs steps 1–4 deterministically (plus instantiated templates and the pre-commit hook), and exits non-zero if any step of the sequence fails — running it is the canonical way to satisfy this hook. Step 5 (the remote) stays with the human. The hook still binds when scaffolding by hand: the *ordering* is the invariant, not the tool. (Spec prose does not name framework versions — the sentinel is the only version surface; a hand-written "since vX.Y" drifted here within hours of being written.)
+**Mechanised by the `scaffold` subcommand:** `mdllm scaffold <path>` through the repository's manual CLI launch route performs steps 1–4 deterministically (plus instantiated templates and the pre-commit hook), and exits non-zero if any step of the sequence fails — running it is the canonical way to satisfy this hook. Step 5 (the remote) stays with the human. The hook still binds when scaffolding by hand: the *ordering* is the invariant, not the tool. (Spec prose does not name framework versions — the sentinel is the only version surface; a hand-written "since vX.Y" drifted here within hours of being written.)
 
 **Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
 

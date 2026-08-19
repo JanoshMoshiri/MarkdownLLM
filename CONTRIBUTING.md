@@ -81,14 +81,14 @@ The framework is self-describing — its own specifications are things within th
 
 ### Prerequisites
 
-You need an **LLM tool with file system access** — one that can traverse directories, read and write files, and auto-discover AGENTS.md. Compatible tools include GitHub Copilot (VS Code), Claude Code, OpenAI Codex CLI, Cursor, Windsurf, and Gemini CLI. Web-based chat interfaces (ChatGPT, Claude web) will not work — the LLM must have direct access to your file system.
+You need an **LLM tool with file-system access** — one that can traverse directories, read and write files, and either deliver `AGENTS.md` through a tested entry route or accept an explicit bootstrap. The framework has named execution evidence for Claude Code and Codex surfaces; other file-aware products are designed-for until their own route is exercised. Ordinary web chat without file access will not work.
 
 ### Setting Up Your Own Domain
 
 1. **Clone the framework** — `git clone` this repository
 2. **Read the manifesto** — `llm-driven-systems.manifesto.md` explains the philosophy
 3. **Read `domain-specification-guide.md`** — the step-by-step guide for creating domains
-4. **Scaffold your domain** — `python tools/mdllm.py scaffold domains/my-domain` performs the whole birth sequence deterministically (templates, `git init`, `.gitignore` isolation, pre-commit hook, first commit). Don't hand-roll it — hand-rolled births drop steps.
+4. **Scaffold your domain** — `mdllm scaffold domains/my-domain --harness <selection>` through the repository's manual CLI launch route performs the whole birth sequence deterministically (templates, `git init`, `.gitignore` isolation, pre-commit hook, selected adapter projection, first commit). Don't hand-roll it — hand-rolled births drop steps.
 5. **Tell your LLM agent to fill the semantic half** — describe your domain; the agent declares your thing types in `_schema.yaml`, writes the skill bodies, and creates seed things
 6. **Explore examples** — look at `examples/life-manager/` or `examples/compliance-patterns/` for reference
 7. **Iterate** — refine skills and thing types as you learn what works

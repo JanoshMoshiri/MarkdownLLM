@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.4
+version: 1.5
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -180,9 +180,9 @@ to invoke directly.
 | `worklog [path] [--write]` | Prints an on-demand session-grouped view of the commit stream (sessions split on `session-end:` commits); `--write` saves a gitignored local snapshot | Reviewing recent session history — not a committed file (retired v3.17) |
 | `refresh <domain> [--seal]` | Floor-only domain refresh: reports the version delta + unseen CHANGELOG entries; `--seal` bumps `framework_version_seen` after adoption | Bringing a stale domain current with the framework |
 | `install-hook [path]` | Installs the three mdllm git hooks: pre-commit (boundary + validate + coherence, blocking), commit-msg (disclosure boundary, blocking), post-commit (autopush — on a repo with a remote and no `autopush: false`, commits PUBLISH from then on) | Once per domain repo, at floor adoption |
-| `doctor [path] [--harness claude\|codex\|all]` | Probes the floor and, when selected, reports adapter support, project configuration, currency, trust, runtime, and real-event execution independently; static config or a runnable command never counts as an executed lifecycle event | New machine, new harness, after a refresh, or "is the floor actually on here?" |
-| `adapter-install [path] --harness <name> [--dry-run] [--refresh-legacy]` | Preflights a project-local adapter, shows every decision and exact owned diff, then creates or safely merges only the selected adapter surface. `--refresh-legacy` can replace only an exact adapter-declared historical managed span; extensions and ambiguity still refuse | Run with `--dry-run` first. Use `--refresh-legacy` only when doctor names a legacy ID, then rerun without `--dry-run` only after reviewing that exact diff |
-| `scaffold <path> [--harness claude\|codex\|all\|none]` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, Git hook, first commit, and only the selected outer harness projection. Omitting the flag preserves the Claude compatibility default | Creating a new domain — the mechanical half is one command, while `none` proves the substrate does not depend on an adapter |
+| `doctor [path] [--harness <registered>\|all]` | Probes the floor and, when selected, reports adapter support, project configuration, currency, trust, runtime, and real-event execution independently; static config or a runnable command never counts as an executed lifecycle event. Current registered names are `claude-code` (`claude` alias), `codex`, and `cowork` | New machine, new harness, after a refresh, or "is the floor actually on here?" |
+| `adapter-install [path] --harness <name> [--dry-run] [--refresh-legacy]` | Preflights a **project-bound** adapter, shows every decision and exact owned diff, then creates or safely merges only the selected adapter surface. `--refresh-legacy` can replace only an exact adapter-declared historical managed span; extensions and ambiguity still refuse. Doctor reports project configuration/currency as not applicable for a run-time-bound adapter; do not invent an install target for it | Run with `--dry-run` first. Use `--refresh-legacy` only when doctor names a legacy ID, then rerun without `--dry-run` only after reviewing that exact diff |
+| `scaffold <path> [--harness <registered>\|all\|none]` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, Git hook, first commit, and the selected adapter projection, if that adapter has a project artifact. Omitting the flag preserves the Claude compatibility default; `cowork` is registered but binds later at run time | Creating a new domain — the mechanical half is one command, while `none` proves the substrate does not depend on an adapter |
 | `mcp-serve <domain> [--http --port N --token]` | Serves the domain's exposed face (`exposed: true` things only) over MCP — stdio by default, Streamable HTTP with `--http` (loopback-only; non-loopback binds refused until the OAuth 2.1 leg). `--token` mints a per-run bearer token for tunnelled cross-machine probes | Wired into a consumer's `.mcp.json` (stdio: `command`; HTTP: `url` + optional `headers` carrying the token); stdio you rarely run by hand, `--http` you run when a porch should outlive its callers |
 | `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
 | `estate-check [roots...]` | Batches `imports-check` over consumer roots with a roll-up — named explicitly, or (no args) the local clones the `estate-sync` walk finds; ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
@@ -193,25 +193,33 @@ to invoke directly.
 
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
 
-### Project harness adapters
+### Harness adapters
 
 Adapters harden the portable lifecycle; they are not the substrate. A domain
-without one still operates through `AGENTS.md` interpretation and the Git
-floor. For an existing project, inspect before writing:
+without one still operates through its entry contract and the Git floor. The
+registry now contains two binding shapes:
+
+- **Project-bound:** Claude Code and Codex render project artifacts. For an
+  existing project, inspect before writing:
 
 ```powershell
 ./tools/mdllm.ps1 doctor . --harness codex
 ./tools/mdllm.ps1 adapter-install . --harness codex --dry-run
 ```
 
-The Codex project adapter is implemented and unit/integration tested. Phase
-5R.1 closed the shared launch defects, 5R.2 replaced Claude's parallel legacy
-projection with the ordered neutral runner, and 5R.4 refreshed both root
-adapters atomically through the reviewed recognised-legacy path. The framework
-root now tracks current `.claude/settings.json` and `.codex/hooks.json` as
-self-hosted project state. Nested domains were not migrated.
+- **Run-time bound:** Cowork renders no project artifact; its account-level
+  bundle binds when a session activates it. Doctor therefore reports project
+  configuration/currency as not applicable. The adapter and bundle build are
+  registered and tested, but remote/local live compatibility remains open in
+  the Cowork plan; registration is not a compatibility row.
 
-Installing the corrected reviewed diff remains an operator action. The
+The current project renderers are implemented and covered by unit/integration
+tests. The shared launch repair, Claude's ordered neutral-runner migration, and
+both recognised root refreshes are complete. The framework root tracks current
+`.claude/settings.json` and `.codex/hooks.json` as self-hosted project state;
+nested domains were not batch-migrated.
+
+Installing any reviewed diff remains an operator action. The
 [official Codex hook documentation](https://developers.openai.com/codex/hooks) names
 `/hooks` as a **CLI** inspection/trust command; it was not available in the
 observed Desktop chat command palette, so Desktop and CLI trust evidence must
@@ -220,11 +228,13 @@ lifecycle event is correlated with harness-owned transcript evidence and a
 fresh definition-hash-bound record. The installer never mutates user-global
 Codex configuration.
 
-The shared runtime underneath adapters has separately been exercised in the
-Codex desktop managed shell at the framework root and from a directly opened
-nested domain, including a real nested-repository commit through the Git
-floor. That runtime evidence must not be relabelled as Codex lifecycle or
-trust evidence.
+Codex's lifecycle projection is verified on Codex CLI 0.147.0 / Windows 11,
+and the Desktop managed shell has separate root and directly opened nested
+domain runtime/Git evidence. Gate 7.0 additionally proved the dependency-
+probing PowerShell route and the restricted-then-approved strict estate sync,
+pre-commit, and publication path in QMS. Each fact keeps its own surface and
+build; none is relabelled as global Codex compatibility or machine-readable
+trust.
 
 Claude Code's core framework path remains proven in use. Its current projection
 uses one handler per lifecycle moment and enters the ordered neutral runner.

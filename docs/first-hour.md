@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.2
+version: 1.3
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -20,9 +20,11 @@ linked_things:
 
 ## Who This Is For
 
-You have never used this framework. You have an agent harness (Claude Code,
-Copilot, Cursor, Codex — anything that reads files, writes files, and runs
-commands), sixty minutes, and a healthy suspicion of 850-line guides.
+You have never used this framework. You have an agent harness that can read
+files, write files, and run commands, sixty minutes, and a healthy suspicion
+of 850-line guides. Named products differ in how they discover entry files and
+bind lifecycle events; the compatibility table records what has actually been
+exercised rather than treating a product list as proof.
 
 Almost everything else in this repository is written for your agent to read.
 This document and the `operator-guide.md` are the two written for you — this
@@ -58,6 +60,10 @@ irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1
 Prefer to do it yourself? `git clone` the repo and `pip install pyyaml` — the
 script only removes those steps, it doesn't hide anything. Either way, open the
 cloned folder; then, before involving the agent, look at two things yourself:
+
+In the prose below, `mdllm <command>` means this repository's CLI. On Windows
+PowerShell use `./tools/mdllm.ps1 <command>`; elsewhere use
+`python tools/mdllm.py <command>` only with a Python that can import PyYAML.
 
 1. **One real thing.** Open
    `examples/life-manager/things/task-choose-worktop.md`. That is the entire
@@ -109,8 +115,12 @@ What should happen next — and what you should do:
   repository, and the domain folder is added to the framework's
   `.gitignore`. This is mandatory, not stylistic — your domain's history
   stays yours. The mechanical half of this is one command
-  (`python tools/mdllm.py scaffold <path>`), which the agent should reach
-  for. Red flag worth catching in hour one: domain files appearing in the
+  (`mdllm scaffold <path> --harness <selection>`), which the agent should
+  reach for. Select `claude`, `codex`, `cowork`, `all`, or `none`; omitting
+  the flag preserves the current Claude compatibility default. `none` keeps
+  the entry contract and Git floor but installs no lifecycle adapter, while a
+  run-time-bound selection such as Cowork has no project artifact to write.
+  Red flag worth catching in hour one: domain files appearing in the
   *framework's* `git log`.
 - **You get a seed thing or two**, not an empty shell. Ask for one if you
   don't get one.
@@ -128,7 +138,7 @@ Prove it bites: open any thing in your domain, change its `status:` to
 `banana`, and run
 
 ```
-python tools/mdllm.py validate <path-to-your-domain>
+mdllm validate <path-to-your-domain>
 ```
 
 You get an Error naming the file, the field, and the legal values — and with
@@ -160,13 +170,15 @@ whole system; everything else is refinement.
 
 ## Honest Footnotes for Hour One
 
-- **Discovery varies by harness.** Auto-discovery of `AGENTS.md` is measured
-  on Claude Code; other harnesses are designed-for but not all verified-on.
-  The pasted bootstrap line above works everywhere.
+- **Discovery varies by harness.** Claude Code's scaffolded `CLAUDE.md` →
+  `AGENTS.md` pointer route and named Codex entry/lifecycle surfaces have
+  execution records; Copilot, Cursor, Windsurf, and Gemini remain designed-for
+  where no framework record exists. The pasted bootstrap line works in a
+  file-aware session, but it is manual discovery, not proof of auto-load.
 - **The floor needs Python.** If the hook can't run on some machine (no
   Python, sandboxed git), you are in degraded mode: ask the agent to run
   `mdllm validate` manually before each commit and say so out loud.
-  `python tools/mdllm.py doctor <path>` checks all of this mechanically —
+  `mdllm doctor <path> --harness <name>` checks all of this mechanically —
   including whether the hook actually *executes*, not just exists — and
   tells you which mode you're in.
 - **Session-start hardening uses one ordered handler.** Current Claude launches

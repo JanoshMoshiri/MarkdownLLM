@@ -37,7 +37,7 @@ List 4-7 principles that guide how things work in this domain. Each should be:
 - **Atomic Units:** Everything is a thing. No special cases or exceptions.
 - **Minimal Core, Emergent Detail:** Start simple; let the schema grow with your needs.
 - **LLM-Centric Structure:** Optimized for LLM reasoning, not manual editing.
-- **Vendor Agnostic:** Uses standard conventions so any LLM can understand.
+- **Vendor Agnostic by contract:** Uses standard conventions any file-aware LLM can understand; discovery and lifecycle execution still require harness-specific evidence.
 - **Versioned & Durable:** Git tracks everything; full audit trail.
 
 ## How It Works

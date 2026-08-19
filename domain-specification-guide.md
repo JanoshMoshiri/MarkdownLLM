@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.10
+version: 2.11
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -40,9 +40,14 @@ This guide explains how to create a complete domain specification using the Mark
 
 ## Prerequisites
 
-Creating a domain requires an **LLM tool that can traverse file directories, read and write files**, and discover agent files automatically. Each domain is an **agent app** — a self-contained, LLM-driven application — and **the LLM agent is your primary tool for creating it**.
+Creating a domain requires an **LLM tool that can traverse file directories, read and write files**, plus either an automatic entry route or an explicit bootstrap that delivers the entry contract. Each domain is an **agent app** — a self-contained, LLM-driven application — and **the LLM agent is your primary tool for creating it**.
 
-**Compatible tools:** GitHub Copilot (VS Code), Claude Code, OpenAI Codex CLI, Cursor, Windsurf, Gemini CLI — any tool where the LLM has direct file system access and auto-discovers AGENTS.md at the workspace root.
+**Compatibility is evidence-qualified, not conferred by a name.** Claude Code's scaffolded entry-pointer route and named Codex surfaces have execution records. GitHub Copilot, Cursor, Windsurf, Gemini CLI, and other file-aware harnesses remain designed-for where the framework has not recorded their own discovery/lifecycle execution. See README's compatibility table for the current boundary.
+
+In commands below, `mdllm <command>` is route-neutral notation. On Windows
+PowerShell use `./tools/mdllm.ps1 <command>`; elsewhere use
+`python tools/mdllm.py <command>` only with an interpreter that can import
+PyYAML.
 
 **Not compatible:** Web-based chat interfaces (ChatGPT, Claude web) or raw API calls without a file-access harness. The LLM must be able to navigate directories, read markdown files, and create/modify files.
 
@@ -60,12 +65,16 @@ The key distinction: **the framework agent scaffolds domains; the domain agent o
 
 ### Layer 1: Agent (Orchestration & Discovery)
 The **agent file** (`AGENTS.md` or `agent.md`) sits at the root of your domain and serves as the entry point for the LLM. It:
-- Is automatically discovered by the tool/harness you're using (GitHub Copilot, Claude Code, Codex CLI, etc.)
+- Is delivered by the harness's entry route: direct `AGENTS.md`, a scaffolded core entry pointer such as `CLAUDE.md`, or an explicit bootstrap where the product has no project-file discovery
 - Orchestrates how skills should be loaded and used
 - Defines the behavioral rules and protocols for your domain
 - Loads once per session and bootstraps all context
 
-**Key insight:** You don't have to manually include or reference the agent. When properly placed at root, it auto-loads. This ensures the vision and protocol are always part of the context, solving the "lost on new session" problem.
+**Key insight:** The domain has one canonical entry contract, but its arrival is
+a harness capability. A verified auto-load or pointer route removes the manual
+step; an unverified route must be tested, and an explicit-bootstrap harness
+must emit the contract before work begins. Do not turn portability by design
+into an automatic-discovery claim for every product.
 
 ### Layer 2: Skills (Reusable Capabilities)
 **Skills** are atomic, reusable capabilities that teach the LLM how to work within your domain. Every skill file has:
@@ -213,7 +222,7 @@ MarkdownLLM/                        ← Framework git repo (cloned from GitHub)
 ### Setup Steps
 
 1. **Clone the framework:** `git clone https://github.com/[org]/MarkdownLLM.git`
-2. **Scaffold the mechanical shell:** `python tools/mdllm.py scaffold domains/my-domain` — this performs the entire birth sequence deterministically: instantiated templates (AGENTS.md with `framework_root` and `framework_version_seen` filled in, `things/_schema.yaml`, the four skill files), `git init`, the framework-side `.gitignore` isolation *committed before any domain commit*, the pre-commit hook, and the domain's first commit. It satisfies the `pre-domain-scaffold:isolate` hard hook by construction.
+2. **Scaffold the mechanical shell:** `mdllm scaffold domains/my-domain --harness <selection>` — this performs the entire birth sequence deterministically: instantiated templates (AGENTS.md with `framework_root` and `framework_version_seen` filled in, `things/_schema.yaml`, the four skill files), `git init`, the framework-side `.gitignore` isolation *committed before any domain commit*, the pre-commit hook, the selected adapter projection where one exists, and the domain's first commit. Choose `claude`, `codex`, `cowork`, `all`, or `none`; omission preserves the current Claude compatibility default. It satisfies the `pre-domain-scaffold:isolate` hard hook by construction.
 3. **Tell the agent to fill the semantic half** — describe what you want; the agent declares your thing types and vocabularies in `_schema.yaml`, writes the skill bodies, completes AGENTS.md, and creates seed things
 
 ### Why This Model
@@ -556,7 +565,24 @@ Seed from `templates/retrospective.md.template`.
 
 ## Vendor Tooling Integration
 
-Different tools discover agent files differently. Configure your setup based on where your domain lives:
+Different tools discover entry files and bind lifecycle events differently.
+The canonical domain contract remains `AGENTS.md`; an entry pointer is core
+scaffold surface, while a lifecycle adapter is optional hardening.
+
+Start from the registry rather than hand-written vendor files:
+
+```text
+mdllm doctor . --harness <name>
+mdllm adapter-install . --harness <name> --dry-run
+```
+
+Doctor reports support, project configuration, currency, trust, runtime, and
+execution independently. `adapter-install` is only for project-bound adapters
+and writes nothing in dry-run mode. Apply the reviewed diff only by explicit
+operator action; add `--refresh-legacy` only when doctor names an exact legacy
+ID. Unknown stale or extended state refuses. A run-time-bound adapter such as
+Cowork has no project artifact, so its project configuration/currency are not
+applicable and its bundle/bootstrap flow owns activation.
 
 ### If Using GitHub Copilot (in VS Code)
 
@@ -569,7 +595,10 @@ Enable AGENTS.md support in VS Code settings:
 }
 ```
 
-This tells GitHub Copilot to auto-discover `AGENTS.md` at the root of your workspace and any nested directories.
+This enables the intended AGENTS.md discovery route. Treat it as configured,
+not execution-verified, until your own session confirms the entry contract is
+present before work. Copilot lifecycle compatibility is separate from Claude
+Code even where shortcut or settings files overlap.
 
 **Alternatively**, place instructions in `.github/copilot-instructions.md`:
 ```markdown
@@ -580,26 +609,20 @@ This tells GitHub Copilot to auto-discover `AGENTS.md` at the root of your works
 
 ### If Using Claude Code Directly
 
-Claude Code looks for `CLAUDE.md` at the root:
-
-```markdown
----
-name: [Domain]
-description: What this domain does
----
-
-# [Domain] - Claude Code Instructions
-
-@AGENTS.md
-
-[Claude Code specific behavior, if needed]
-```
-
-The `@AGENTS.md` reference tells Claude Code to read `AGENTS.md` first, then apply any Claude-specific rules.
+Every scaffold selection, including `none`, writes the core `CLAUDE.md` entry
+pointer that imports `AGENTS.md`; do not hand-create or copy one. Selecting the
+Claude adapter additionally renders the optional project lifecycle projection.
+For an existing domain, use doctor and the reviewed installer flow above; the
+static adapter example is explanatory and is deliberately not pasteable.
 
 ### If Using OpenAI Codex, Cursor, Windsurf, or Gemini CLI
 
-These tools auto-discover `AGENTS.md` at the root—no configuration needed.
+Codex reads `AGENTS.md` on the named tested surfaces, and its optional project
+adapter is selected with `--harness codex`. Cursor, Windsurf, and Gemini CLI are
+designed for the same direct-entry contract but remain unverified by this
+framework until their own sessions provide evidence. If a harness fails to
+deliver the entry contract, explicitly ask it to read the root `AGENTS.md`
+before work and record that as manual bootstrap rather than automatic discovery.
 
 ---
 
@@ -634,7 +657,7 @@ You don't need to answer these perfectly upfront. Start with what you know. The 
 
 ### Step 3: Let the Framework Agent Build It
 
-Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent discovers the framework's `AGENTS.md`, knows the specifications, and knows how to scaffold domains. Describe what you want — the agent runs `python tools/mdllm.py scaffold domains/my-domain` for the mechanical shell (templates, `git init`, `.gitignore` isolation, pre-commit hook, first commit — the whole birth sequence, deterministically) and then fills the semantic half inside `domains/my-domain/`:
+Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent receives the framework's `AGENTS.md` through the configured entry route, knows the specifications, and knows how to scaffold domains. Describe what you want and select the target harness if you want lifecycle hardening — the agent runs `mdllm scaffold domains/my-domain --harness <selection>` for the mechanical shell (templates, `git init`, `.gitignore` isolation, pre-commit hook, selected adapter projection, first commit — the whole birth sequence, deterministically) and then fills the semantic half inside `domains/my-domain/`:
 
 - `AGENTS.md` at domain root — with `framework_root: ../..` pointing to the framework
 - `skills/` directory with the four baseline skills:
@@ -660,7 +683,7 @@ This is the handoff. From this point forward, the **domain agent** takes over �
 ### Step 5: Test Your Domain
 
 In your domain workspace, the domain agent should:
-- Auto-discover AGENTS.md at root
+- Deliver `AGENTS.md` through the harness's verified direct, pointer, or explicit-bootstrap route
 - Load your skills and understand the domain
 - Follow the workflow when you make requests
 - Reason according to your principles
@@ -782,21 +805,21 @@ Two knowledge primitives also matter at scaffold time:
 
 ## Getting Started: Complete Checklist
 
-- [ ] **Prerequisites** — Confirm you have an LLM tool with file system access (Copilot, Claude Code, Codex CLI, etc.)
+- [ ] **Prerequisites** — Confirm you have an LLM tool with file-system access and a tested entry route; a product name alone is not evidence
 - [ ] **Understand** — Read `llm-driven-systems.manifesto.md` and `thing.md`
 - [ ] **Plan** — Answer: What problem? What atomic units? What workflows?
 - [ ] **Clone framework** — Clone the MarkdownLLM repository
-- [ ] **Scaffold domain** — `python tools/mdllm.py scaffold domains/my-domain`. Never hand-create the directory or its git repo — birth is mechanical (this checklist once said "create the folder and initialise a git repo", contradicting Step 1 above; hand-rolled births drop steps)
+- [ ] **Scaffold domain** — `mdllm scaffold domains/my-domain --harness <selection>`. Never hand-create the directory or its git repo — birth is mechanical (this checklist once said "create the folder and initialise a git repo", contradicting Step 1 above; hand-rolled births drop steps)
 - [ ] **Fill the semantic half** — Tell the framework agent to complete AGENTS.md's authored sections, declare types in `_schema.yaml`, and write the skill bodies
 - [ ] **Open domain workspace** — Open the domain folder as its own workspace — the domain agent takes over from here
 - [ ] **Nothing to set up for session memory** — forward state is the thing graph (surfaced by the `mdllm session-start` orient view) and the backward record is the commit stream; `continuity.md` and `WORKLOG.md` are retired (v3.17)
 - [ ] **Understand thing.md** — The atomic unit specification (including triggers) — do NOT copy it into your domain
 - [ ] **Declare the schema** — Copy `templates/_schema.yaml.template` to `things/_schema.yaml`: types, status vocabularies, relations (enforced by `mdllm validate`)
-- [ ] **Install the hook** — `python tools/mdllm.py install-hook <domain-path>` so structural errors cannot be committed
+- [ ] **Install the hook** — `mdllm install-hook <domain-path>` so structural errors cannot be committed
 - [ ] **Add semantic validation rules** — Judgement-level rules in your specification skill (the agent's layer, per `validate.thing.md` v2.0; the mechanical layer is the tool's)
 - [ ] **Define commit conventions** — Follow `git-workflow.md` patterns for structured commit messages
-- [ ] **Enable tooling** — Configure GitHub Copilot or Claude Code if needed
-- [ ] **Test** — Verify the domain agent auto-discovers AGENTS.md and follows your domain
+- [ ] **Enable tooling** — Configure the chosen entry route; inspect any project-bound lifecycle adapter with doctor plus `adapter-install --dry-run`
+- [ ] **Test** — Verify the domain agent receives AGENTS.md before work, and label the result automatic, pointer-mediated, or manual exactly as observed
 - [ ] **Iterate** — Refine skills as you learn what works
 - [ ] **Commit** — Version control everything in git with meaningful messages
 
@@ -824,13 +847,13 @@ This is the fractal nature of the framework: the same structure at every scale, 
 ## Key Takeaways
 
 1. **Three layers, one pattern:** Agent (orchestration) → Skills (capabilities) → Things (data)
-2. **Agent auto-loads:** No manual includes needed; it's discovered at startup
+2. **Entry contract arrives:** A verified direct/pointer route auto-loads it; an explicit-bootstrap route emits it before work
 3. **Skills are composable:** Each skill stands alone but references others
 4. **Things follow spec:** All instances follow `thing.md` patterns (including triggers)
 5. **Everything is a thing:** Your domain's specs, skills, and data all share the same structure (YAML frontmatter + markdown body). The framework itself follows this pattern — it is self-describing.
 6. **Git is the state machine:** Commits are where state becomes real. Commit at meaningful boundaries. Structured messages make git log a domain narrative. See `git-workflow.md`.
 7. **Interface is existing routes:** Use VS Code, CLI, mobile, voice — whatever connects you to an LLM. Don't build a new interface. See `interface.md`.
 8. **Validation is built in:** `validate.thing.md` checks structural integrity, referential consistency, and semantic coherence. Domain-specific rules live in your specification skill.
-9. **Vendor agnostic:** Works across GitHub Copilot, Claude Code, Codex, Cursor, Windsurf, Gemini
+9. **Vendor agnostic by contract, evidence-specific in operation:** The files and floor are portable; each discovery and lifecycle claim names the harness that proved it
 10. **Transparent:** Everything versioned in git; all logic explicit and readable; two audit layers (git log — `mdllm worklog` views it; git diff)
 11. **Knowledge compounds:** Session insights, contradictions, and retrospectives accumulate as first-class `type: insight`, `type: conflict`, and `type: retrospective` things. The domain learns across sessions, not just within them.

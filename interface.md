@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: stable
-version: 1.3
+version: 1.4
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -49,14 +49,14 @@ An input route is any channel through which a human can communicate intent to th
 
 ### Currently Viable Routes
 
-| Route | How It Works | Discovery |
-|-------|-------------|-----------|
-| **VS Code + GitHub Copilot** | AGENTS.md auto-discovered at workspace root. Chat or voice input via editor. | Automatic |
-| **Claude Code (CLI + desktop)** | `CLAUDE.md` entry pointer imports `AGENTS.md` (`@AGENTS.md`). Core scaffold surface — born with every domain in every `--harness` selection, `none` included. | Automatic — verified 2026-08-17 |
-| **OpenAI Codex CLI** | AGENTS.md auto-discovered. Terminal-based interaction. | Automatic |
-| **Cursor / Windsurf** | AGENTS.md auto-discovered at workspace root. Editor-based chat. | Automatic |
-| **Gemini CLI** | AGENTS.md auto-discovered. Terminal-based interaction. | Automatic |
-| **Mobile chat apps** | Feed AGENTS.md + context to any LLM API via mobile client (Claude iOS, ChatGPT, etc.) | Manual context |
+| Route | How It Works | Discovery / evidence boundary |
+|-------|-------------|-------------------------------|
+| **VS Code + GitHub Copilot** | Configurable AGENTS.md support; chat or voice input via editor. | Designed/configured route; lifecycle compatibility is unverified and is not inferred from Claude's `.claude` projection or shortcut files. |
+| **Claude Code (CLI + desktop)** | `CLAUDE.md` entry pointer imports `AGENTS.md` (`@AGENTS.md`). Core scaffold surface — born with every domain in every `--harness` selection, `none` included. | Automatic pointer route verified 2026-08-17; named lifecycle evidence is separate. |
+| **OpenAI Codex CLI / desktop** | Reads AGENTS.md; the optional project adapter binds lifecycle events. | Automatic on the named tested Windows surfaces; CLI lifecycle and Desktop/runtime/Git claims are recorded separately rather than generalized. |
+| **Cursor / Windsurf** | Intended AGENTS.md workspace route; editor-based chat. | Designed-for; no framework execution record yet. |
+| **Gemini CLI** | Intended AGENTS.md terminal route. | Designed-for; no framework execution record yet. |
+| **Mobile chat apps** | A file-aware client or middleware may feed the entry contract and selected context to an LLM API. | Manual bootstrap only; an ordinary web/mobile chat without file access is not a compatible route. |
 | **Voice-to-text + any route** | OS-level speech recognition (Windows Speech, macOS Dictation, etc.) feeds text into any of the above routes. | Transparent |
 
 ### The entry pointer (harnesses that auto-load a differently named file)
@@ -104,7 +104,10 @@ LLM receives: agent context + skills + relevant things + user request
 Processing begins
 ```
 
-The framework doesn't care which route you used. Once intent reaches the agent, the processing layer takes over identically regardless of how you got there.
+The portable processing contract does not care which route delivered it. The
+delivery guarantees do: discovery, trust, lifecycle events, sandbox authority,
+and output envelopes are harness capabilities and are never inferred from a
+different product's evidence.
 
 ### Voice as a First-Class Input
 
@@ -266,7 +269,11 @@ The interface takes care of itself.
 
 ### For the Framework
 
-The framework remains interface-agnostic. As new LLM tools emerge (new IDEs, new CLI tools, new mobile apps, new voice assistants), they become valid routes automatically — as long as they can load AGENTS.md and feed context to an LLM.
+The framework remains interface-agnostic. A new IDE, CLI, mobile client, or
+voice surface becomes a *candidate* route when it can deliver the entry
+contract and selected context to an LLM with the required file/tool access. It
+becomes a verified route only after that discovery and consequence are
+observed; portability of the contract does not certify a product automatically.
 
 This is future-proofing through absence of opinion. The framework doesn't couple to any interface, so it survives all interface changes.
 

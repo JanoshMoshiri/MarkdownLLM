@@ -1,7 +1,7 @@
 """The session-start ritual, mechanically emitted.
 
 The mechanical half of the session-start ritual, printed to stdout for a
-harness SessionStart hook to inject (Claude Code; Copilot agent mode). This is
+registered harness lifecycle binding to inject. This is
 the HARDENING that moves the `session-start:version-check` hook's anchor from
 its `interpretation` default to `harness-session` where an adapter binds it: a
 weak (or distracted) model receives the ritual at t=0 instead of having to

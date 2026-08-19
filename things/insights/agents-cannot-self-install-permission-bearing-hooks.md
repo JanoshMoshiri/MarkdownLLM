@@ -2,7 +2,7 @@
 id: agents-cannot-self-install-permission-bearing-hooks
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-24
 session: 2026-06-24
 source: both
@@ -21,15 +21,18 @@ linked_things:
 
 ## The Insight
 
-The session-lifecycle hardening adapter is a `hooks` block in `.claude/settings.json`
-— the *same file* that holds permission allow-rules. The harness self-modification
-guard blocks an agent from writing that file at all (it reads any edit as the agent
-widening its own permissions), even to add only hooks. So the hardening adapter
-**cannot be installed by the agent through its editor**; it is installed only by a
-human paste, or by a deterministic tool the human ran (`mdllm scaffold` writes it at
-domain birth). Adapter installation is *structurally* a human/tool action, not an
-agent action — and the line is precise: the guard is on **agent-via-editor
-self-modification**, not on tool output.
+A project-bound session-lifecycle adapter may own a permission-bearing file
+(`.claude/settings.json` is the first observed case). The harness
+self-modification guard blocks an agent from editing that file as ordinary
+content because the edit could widen its own authority. So the adapter
+**cannot be self-installed through the agent's editor**. Installation is an
+operator-reviewed tool action: `mdllm scaffold` may render it at birth, and
+`mdllm adapter-install --dry-run` now shows the exact renderer-owned diff for
+an existing domain before the operator invokes or approves the apply.
+Adapter installation is structurally a human/tool action, not an agent action
+— and the line is precise: the guard is on **agent-via-editor
+self-modification**, not on deterministic tool output reviewed at a human
+boundary.
 
 ## Why It Matters
 
@@ -37,13 +40,14 @@ self-modification**, not on tool output.
   *literally cannot* self-install the adapter into a live repo, so the human (or a
   tool they invoked) is **always in the loop** for granting the framework new
   automatic powers. That is an enforced guarantee, not a convention.
-- It dictates the deployment story: session-start hardening must ship as (a) a
-  documented human paste, or (b) a scaffold-time tool write — never as an agent
-  convenience step mid-session. Plan and docs should say so, or an agent will keep
-  trying and hitting the wall.
-- It explains a real friction the operator will otherwise re-hit: copying the hooks
-  block by hand into every existing domain's `settings.json` is unavoidable;
-  scaffold solves it only for *new* domains.
+- It dictates the deployment story: session-start hardening ships as a
+  scaffold-time render or an explicit renderer-backed install reviewed by the
+  operator — never as an agent convenience edit mid-session. Static pasteable
+  examples are wrong because path-instantiated, definition-hash-bound output is
+  stale as soon as it is copied.
+- It removes the old false choice between unavoidable hand-paste and new-domain
+  only support. Existing domains have an opt-in dry-run/apply route, while
+  unknown stale state, local extensions, and ambiguity still refuse.
 
 ## Context
 
@@ -51,5 +55,8 @@ While rounding off the v3.15.0 deployment, the agent tried twice to add the
 SessionStart/PostToolUse hooks to `.claude/settings.json` (via Write, then Edit) and
 was blocked both times by the auto-mode classifier as self-modification /
 permission-widening — because that file also carries permission allow-rules. The
-framework and jmtm hooks had to be pasted by the operator; `scaffold` writes them for
-new domains precisely because it runs as the tool, outside the guarded editor path.
+framework and JMTM hooks had to be pasted by the operator; `scaffold` wrote them for
+new domains precisely because it ran as the tool, outside the guarded editor path.
+That incident remains the evidence for the authority boundary. The later
+`adapter-install` service replaced the paste mechanism without changing who
+authorises the consequence.

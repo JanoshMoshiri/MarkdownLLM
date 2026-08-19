@@ -2,9 +2,11 @@
 
 Everything Claude-shaped that used to live inline in scaffold and doctor:
 the `.claude/settings.json` lifecycle projection, the deliberate-shortcut
-projections (`.claude/commands/` for Claude Code, `.github/prompts/` for VS
-Code Copilot agent mode — one adapter because one settings file serves both
-harnesses), the scaffold completion guidance, and the doctor advisory line.
+projections (`.claude/commands/` for Claude Code and `.github/prompts/` for VS
+Code Copilot), the scaffold completion guidance, and the doctor advisory line.
+Those shortcut projections share a renderer for compatibility; Claude Code
+lifecycle execution and Copilot lifecycle compatibility remain separate
+evidence claims.
 
 Thin by construction: this module translates the inward lifecycle bindings
 into Claude's config format and reads that format back. It contains no domain
@@ -91,8 +93,11 @@ def _shell_single_quote(value: str) -> str:
 
 
 class ClaudeCodeAdapter:
-    """Render + inspect + shortcut projections for Claude Code (and, via the
-    same artifacts, VS Code Copilot agent mode)."""
+    """Render/inspect Claude Code lifecycle plus compatible shortcut files.
+
+    The `.github/prompts/` projection is inert until Copilot invokes it. It
+    does not make a Claude lifecycle transcript evidence for Copilot.
+    """
 
     name = "claude-code"
 
@@ -100,8 +105,8 @@ class ClaudeCodeAdapter:
         return AdapterCapabilities(
             harness=self.name,
             lifecycle_moments=("session-start", "post-write"),
-            notes="one settings file also serves VS Code Copilot agent mode; "
-                  "legacy lifecycle bytes await one-handler migration")
+            notes="Claude Code lifecycle projection; Copilot shortcut output "
+                  "is separate and its lifecycle remains unverified")
 
     def install_policies(self):
         """Own only the top-level hooks member in composite settings."""
@@ -371,12 +376,12 @@ class ClaudeCodeAdapter:
     # this vocabulary; until then the bytes must not drift.
 
     def scaffold_guidance(self) -> str:
-        return ("  - hardened out of the box: .claude/settings.json fires "
-                "session-start + post-write validation automatically (Claude "
-                "Code / VS Code Copilot agent mode), and /end-session + "
-                "/retrospective are installed. Delete .claude/ to fall back "
-                "to interpretation-only — the domain kernel still drives "
-                "both.")
+        return ("  - Claude Code lifecycle hardened out of the box: "
+                ".claude/settings.json fires session-start + post-write "
+                "validation automatically; /end-session + /retrospective "
+                "shortcuts are installed. VS Code Copilot lifecycle remains "
+                "separately unverified. Delete .claude/ to fall back to "
+                "interpretation-only — the domain kernel still drives both.")
 
     def diagnostic_presentation(self) -> DiagnosticPresentation:
         """Display strings only (DiagnosticPresentationPort) — the install

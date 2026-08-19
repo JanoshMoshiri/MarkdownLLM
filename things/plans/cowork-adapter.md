@@ -2,7 +2,7 @@
 id: cowork-adapter
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-08-18
 priority: high
 tags: [harness, adapters, cowork, bootstrap, discovery, contract-emission, publication, estate, clean-architecture]
@@ -409,6 +409,33 @@ into. So:
   did the skill **activate** (not merely install); did the Tier-0
   contract appear in the transcript **before the first write**; did the
   stale-bundle check stay quiet against a matching mechanism hash.
+
+The evidence record is not a narrative summary alone. For each transport it
+must carry the following packet, marking any unavailable item **NOT TESTED**
+rather than reconstructing it after the fact:
+
+- evidence grade (`first-hand` or `relayed`), domain, transport (`remote
+  ephemeral VM` or `local`), exact Cowork/plugin build where observable,
+  framework version/HEAD, initial domain HEAD, and the bundle mechanism hash;
+- observed skill **activation**, the emitted Tier-0 contract before the first
+  write, and a fresh session-gate attestation tied to that mechanism;
+- the default branch selected from the branch map, installed pre-commit floor,
+  real commit ID, guarded publication result, remote tip equality with that
+  commit, and end-of-session publication debt;
+- bundle currency against the matching mechanism and, as a separate test, the
+  deliberately stale-bundle response. The live matching-bundle session cannot
+  retroactively prove the stale branch: if no known-stale bundle was opened in
+  a fresh session, record **NOT TESTED** and schedule that controlled probe;
+- credential handling/leakage observation, exact limitations and still-
+  unproven requirements, then a bounded `pass` / `partial` / `fail` verdict.
+
+Execution and grading stay in different seats. The domain agent running inside
+Cowork owns the live consequence and captures the transcript/state facts; the
+framework agent grades that packet, writes the evidence thing, and advances
+this plan only after the record exists. The local leg is a distinct session on
+an existing clone with ambient credentials: no clone, no PAT prompt, and no
+remote-mode `AUTH-FAILED` residue. A Claude comparison can strengthen the
+analysis, but it cannot substitute for either transport's own packet.
 
 Sequencing: findings from the other domain land first, then Phase 5's
 record is written from them, then Phase 4 and the ProbePort fingerprint.

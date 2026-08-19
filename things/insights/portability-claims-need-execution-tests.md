@@ -2,7 +2,7 @@
 id: portability-claims-need-execution-tests
 type: insight
 status: active
-version: 1.4
+version: 1.5
 created: 2026-06-11
 session: 2026-06-11
 source: both
@@ -48,8 +48,8 @@ but verification still stopped short of execution.
 3. **Codex desktop harness (2026-08-11):** its PowerShell shell had no
    `python` on PATH, while its bundled Python 3.12 lacked PyYAML. The generic
    candidate chain therefore found neither a usable interpreter nor the
-   dependency the floor needs. The repair is deliberately a Codex-harness
-   adapter, not a universal runtime claim: a gitignored repository `.venv`,
+   dependency the floor needs. At that gate the repair was deliberately scoped
+   to the observed Codex harness rather than asserted as universal: a gitignored repository `.venv`,
    `tools/mdllm.ps1` as its entry point, and generated hooks that prefer
    `.venv/Scripts/python.exe` (or `.venv/bin/python` on POSIX). `mdllm doctor`,
    validation, coherence, and the real pre-commit hook all executed through
@@ -82,6 +82,16 @@ but verification still stopped short of execution.
    artifact, not preservation of the intended `estate-sync → session-start`
    behavior. A contract fixture needs a semantic execution test in addition to
    a golden byte test.
+
+7. **QMS prose versus the shared Codex consequence (2026-08-18):** the first
+   manual-launch probe added an authored compatibility paragraph to QMS. A
+   later JMTM session retained the older entry surface, had no `python` command,
+   and still completed the floor through the shared PowerShell resolver. Its
+   sync then failed only at the restricted `.git/FETCH_HEAD` authority boundary,
+   requested one-command approval, and succeeded on the exact rerun. The
+   differential proved the shared runtime/strict-sync mechanism, while the QMS
+   paragraph was redundant and removed. A local test aid is not automatically
+   a rollout unit.
 
 ## Why It Matters
 

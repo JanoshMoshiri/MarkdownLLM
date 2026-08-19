@@ -117,7 +117,7 @@ All three lenses must align before proceeding. If they conflict, the conflict be
 
 ```
 Domain Builder or Auditor
-    ↓ (auto-discovered)
+    ↓ (delivered by the harness entry route)
 Load Compliance Patterns Agent
     ↓
 Evaluate triggers (orphaned patterns, incomplete examples)

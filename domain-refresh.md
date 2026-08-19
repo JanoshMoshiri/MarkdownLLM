@@ -2,7 +2,7 @@
 id: domain-refresh-specification
 type: specification
 status: evolving
-version: 1.5
+version: 1.6
 created: 2026-05-19
 linked_things:
   - id: framework-discovery-specification
@@ -51,7 +51,7 @@ This is not optional. Without it, domain files would appear as untracked files i
 
 A domain agent should check for framework updates:
 
-1. **Session start** — via the `session-start:version-check` hard hook (see orchestration.md). By default this fires every session by *interpretation* (no configuration). A harness may additionally **harden** it so the ritual is injected mechanically at t=0 — see *Hardening: the harness adapter* below; that path needs a one-time `.claude/settings.json` step the operator (not the agent) performs.
+1. **Session start** — via the `session-start:version-check` hard hook (see orchestration.md). By default this fires every session by *interpretation* (no configuration). A registered harness adapter may additionally **harden** it so the ritual is delivered mechanically at t=0 — see *Hardening: harness adapters* below. Selecting or updating an adapter is a separate operator-reviewed action, not an automatic consequence of absorbing a framework version.
 2. **On explicit request** — When a user says "check the framework", "update yourself from framework", or similar
 3. **On validation failure** — When validation surfaces things that don't conform to current spec definitions, a refresh may explain why
 
@@ -108,17 +108,22 @@ The refresh process reads these framework files in order:
      regen is committed
    → Update domain skills to use new patterns
    → Commit with message: refresh: absorbed framework v{version} changes
-   → (operator step) if absorbing v3.15.0+, add the harness adapter hooks —
-     see "Hardening: the harness adapter" below
+   → (operator step) inspect any selected harness independently:
+     `mdllm doctor . --harness <name>`
+   → if that adapter owns project artifacts, review its exact proposed diff:
+     `mdllm adapter-install . --harness <name> --dry-run`
+     Apply only after review; when doctor names an exact legacy ID, add
+     `--refresh-legacy` to both the dry run and the reviewed apply.
    → (backfill) a domain born before a scaffold artifact existed never
      received it — refresh is where it catches up. Check and backfill:
      · pre-v3.20.0 births: the disclosure boundary (.boundary-terms from
        templates/boundary-terms.template, gitignored) and a domain .gitignore
      · pre-v3.24.0 births: prompts/ (templates/prompts/ — the reasoning
-       prompts the generated session-start block names), the estate-sync
-       entry ahead of session-start in .claude/settings.json, and the
-       `types` managed block in AGENTS.md (templates/AGENTS.md.template
-       shows placement; `mdllm domain-kernel .` fills it)
+       prompts the generated session-start block names) and the `types`
+       managed block in AGENTS.md (templates/AGENTS.md.template shows
+       placement; `mdllm domain-kernel .` fills it). Do not infer project
+       adapter state from the birth version; inspect the selected harness
+       through doctor and the renderer-backed install flow above.
      · pre-v3.30.0 births: the prompt templates changed (fired/upcoming
        split, import triggers, terminal-status wording — the substrate
        reconciliation) — diff the domain's prompts/ against
@@ -126,24 +131,47 @@ The refresh process reads these framework files in order:
        routes prompts/, so the domain-kernel regen above is not optional
 ```
 
-### Hardening: The Harness Adapter (Operator, Optional)
+### Hardening: Harness Adapters (Operator, Optional)
 
-From **v3.15.0**, the session-start ritual and post-write validation can be
-*hardened* from interpretation to a real harness event: a `SessionStart` hook
-that injects the version/velocity ritual at t=0, and a `PostToolUse` hook that
-runs `validate` after every write. A new domain born via `mdllm scaffold` gets
-this `.claude/settings.json` block automatically. **An existing domain absorbing
-v3.15.0+ does not** — and the agent cannot add it: `.claude/settings.json`
-carries permission rules, so writing it is a self-modification the agent is
-blocked from (see `things/insights/agents-cannot-self-install-permission-bearing-hooks.md`).
+The adapter registry projects the framework's neutral lifecycle intents onto
+specific harness surfaces. Claude Code and Codex are **project-bound** adapters:
+their renderers produce path-instantiated, definition-hash-bound project
+artifacts. Cowork is **run-time bound**: its registered adapter renders no
+project artifact and binds through an account-level bundle when a session
+activates it. Registration is a capability statement, not live compatibility
+evidence; each public execution claim still names the exact product surface
+and record that earned it.
 
-So this is a one-time **operator paste**, not an agent action. Copy the hooks
-block from [`adapters/claude-code.settings.example.json`](adapters/claude-code.settings.example.json)
-into the domain's `.claude/settings.json`, adjusting the `../../tools/mdllm.py`
-path to the domain's `framework_root`, then commit it (with `.gitignore` and
-`CLAUDE.md`). The same one Claude-format file hardens Claude Code **and** Copilot
-in VS Code. It is opt-in: with no adapter the ritual still fires by interpretation
-— hardening only removes the dependency on the agent remembering to run it.
+For an existing domain, start read-only:
+
+```text
+mdllm doctor . --harness <name>
+mdllm adapter-install . --harness <name> --dry-run
+```
+
+`doctor` keeps support, project configuration, currency, trust, runtime, and
+real-event execution independent. For a project-bound adapter, the second
+command is the operator's mutation boundary: it shows the renderer-owned diff
+and applies nothing. Run it without `--dry-run` only after review. If doctor
+recognises an exact historical managed span it names the legacy ID and the
+additional `--refresh-legacy` flag; unknown stale forms, extensions, and
+ambiguity refuse rather than being overwritten. A run-time-bound adapter has
+no project install target, so project configuration and currency are reported
+as not applicable; its bundle/bootstrap plan owns installation and live proof.
+
+An agent may report these facts and prepare the review, but it must not
+self-install a permission-bearing project adapter. The operator invokes or
+approves the reviewed mutation (see
+`things/insights/agents-cannot-self-install-permission-bearing-hooks.md`). Never
+paste or hand-edit a generated hook block, and never adjust a copied Python
+path: the renderer and the repository's manual CLI launch route own both.
+Claude Code lifecycle evidence and VS Code Copilot lifecycle compatibility are
+separate claims even where their surrounding project files or shortcuts
+overlap.
+
+Every adapter remains optional. With no adapter, the entry contract and Git
+floor still operate; hardening removes reliance on interpretation for only the
+lifecycle moments the selected harness actually binds.
 
 ### What The Domain May Update
 
@@ -157,7 +185,10 @@ The domain MUST NOT modify:
 
 - Framework files (read-only relationship)
 - Domain things (refresh is about capabilities, not data)
-- `.claude/settings.json` (operator-owned; permission-bearing, so the agent is structurally barred from writing it — surface the paste step to the operator instead)
+- Harness project artifacts such as `.claude/settings.json` or
+  `.codex/hooks.json` (operator-owned and potentially permission-bearing; the
+  agent surfaces `doctor` plus the renderer-backed dry run, and the operator
+  invokes or approves any apply)
 
 ### Version Tracking
 
