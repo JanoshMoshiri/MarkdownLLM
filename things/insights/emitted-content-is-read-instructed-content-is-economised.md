@@ -71,7 +71,8 @@ emitted; judgement must be pulled.
 ## Context
 
 2026-08-18: the operator ran the same live compliance domain in two harnesses
-on the same day, same model family — an accidental controlled experiment. The
+on the same day, both on Claude Opus 5 at xhigh effort — an accidental
+controlled experiment. The
 Cowork bootstrap **emitted** the Tier-0 contract and the kernel into the
 transcript: both were read end to end. The Claude Code adapter injected the
 session-start digest and carried the entry file by import, but only
@@ -110,6 +111,13 @@ precision bounds the ledger ("loaded?" hides truncation, "read end to end?"
 surfaces it). Four sessions, four disjoint gap profiles; the skill layer is
 the only artifact skipped in all four
 ([[a-prerequisite-declared-only-inside-its-target-cannot-gate-it]]).
+
+Attribution note: the cross-day comparison is neither harness- nor
+effort-matched — the Claude runs were Opus 5 at **xhigh** effort, the Codex
+runs medium. That confound sharpens rather than weakens the structural
+diagnosis: maximum reasoning effort did not buy ritual compliance. The
+model-gradient claim rests on the clean pair — Terra vs Solo, same harness,
+same effort — not on the cross-harness comparison.
 
 The overcoming plan is deliberately not yet written: the operator is taking
 thinking time on the implications before choosing the shape (adapter

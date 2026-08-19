@@ -61,8 +61,8 @@ it.
 
 Surfaced 2026-08-19 while comparing four session-start transcripts against
 the same live compliance domain with identical probe wording: Cowork and
-Claude Code on Claude (2026-08-18), Codex on GPT 5.6 Terra and GPT 5.6 Solo
-(both medium effort, 2026-08-19). Steps 4–6 compliance ranged from
+Claude Code, both on Claude Opus 5 at xhigh effort (2026-08-18); Codex on
+GPT 5.6 Terra and GPT 5.6 Solo, both medium effort (2026-08-19). Steps 4–6 compliance ranged from
 confessed-without-completing to substantially-done-unprompted; the skill
 layer alone was skipped in all four. Tracing why led to the kernel: the
 write gate present in Tier 0, the read gate absent — the asymmetry the
