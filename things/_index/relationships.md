@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-19
-generated: 2026-08-19T08:54:15
-generated_from: HEAD@11a0b98
-coverage: 227
+generated: 2026-08-19T13:10:52
+generated_from: HEAD@9e28a4c
+coverage: 228
 framework_version: 3.32.0
 ---
 
@@ -69,6 +69,8 @@ framework_version: 3.32.0
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --derived-from--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --complements--> mis-keyed-links-pass-the-floor-silently
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --supports--> the-harness-bound-path-is-the-least-tested-path
+- a-prerequisite-declared-only-inside-its-target-cannot-gate-it --extends--> emitted-content-is-read-instructed-content-is-economised
+- a-prerequisite-declared-only-inside-its-target-cannot-gate-it --challenges--> read-thing-specification
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --extends--> a-true-primitive-is-discovered-not-authored
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --supports--> source-behind-mirror-is-still-a-consumer-side-read
@@ -362,6 +364,7 @@ framework_version: 3.32.0
 - emitted-content-is-read-instructed-content-is-economised --extends--> session-start-loses-to-the-first-request
 - emitted-content-is-read-instructed-content-is-economised --supports--> an-honest-ledger-replicates-full-compliance-does-not
 - emitted-content-is-read-instructed-content-is-economised --informs--> pretooluse-action-boundary-gate
+- emitted-content-is-read-instructed-content-is-economised --references--> a-prerequisite-declared-only-inside-its-target-cannot-gate-it
 - estate-cadence-cluster --complements--> estate-git-sync
 - estate-cadence-cluster --complements--> cohesiveness-sensors
 - estate-cadence-cluster --references--> premature-publish-manufactures-discipline-eroding-urgency

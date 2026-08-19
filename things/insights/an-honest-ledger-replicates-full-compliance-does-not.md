@@ -37,8 +37,11 @@ asked.
 Confidence was medium at capture — two data points, one day. Raised to high
 on 2026-08-18: two further grilled sessions — the same live domain run in two
 harnesses on one day — returned ledgers again, with again-disjoint gaps
-([[emitted-content-is-read-instructed-content-is-economised]]). The shape of
-the inference held:
+([[emitted-content-is-read-instructed-content-is-economised]]); and again on
+2026-08-19 across two models in one harness — four sessions, four distinct
+gap profiles, and a second-vendor model producing the same ledger shape
+(files, line counts, declared skips), proving the format contract-induced,
+not vendor-cultural. The shape of the inference held:
 
 1. **Interpretation-layer compliance is variably partial even in good
    sessions.** The economising instinct never disappears; it relocates.

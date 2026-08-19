@@ -2,7 +2,7 @@
 id: emitted-content-is-read-instructed-content-is-economised
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-08-18
 session: 2026-08-18
 source: both
@@ -19,6 +19,9 @@ linked_things:
   - id: pretooluse-action-boundary-gate
     relation: informs
     notes: "That plan's re-open condition — interpretation-layer variance persisting across further sessions — has now fired; of its two named candidates, this evidence favours mechanical skill emission over the gate."
+  - id: a-prerequisite-declared-only-inside-its-target-cannot-gate-it
+    relation: references
+    notes: "Explains the deepest instance of the instructed-content skip: the domain skill layer went unloaded in four of four sessions partly because the read-side gate is declared only inside the skill it gates. Emission fixes delivery; that insight fixes position."
 ---
 
 # Emitted content is read; instructed content is economised
@@ -51,6 +54,13 @@ emitted; judgement must be pulled.
   honestly is, or scoped to the first real intent. Expecting unprompted
   multi-step judgement at t=0 exceeds what interpretation delivers on any
   current tier.
+- It is a claim about *form*, not capability — and 2026-08-19 evidenced both
+  halves. The floor and the skip's existence are model-invariant; the
+  *extent* of unprompted judgement varies strongly with the model (GPT 5.6
+  Terra confessed its steps 4–6 gap without completing the walk; GPT 5.6
+  Solo substantially walked them unbidden). Structure narrows the variance
+  between models; it does not erase the capability gradient — a bound worth
+  carrying into the efficiency hypothesis.
 - It re-opens a parked hardening decision by name:
   [[pretooluse-action-boundary-gate]] waits on exactly this variance
   persisting, and names two candidates — the gate and mechanical skill
@@ -78,6 +88,28 @@ the expectation wholesale would forfeit it. Both sessions also produced
 precise self-incriminating ledgers when grilled, with disjoint gaps —
 confirming [[an-honest-ledger-replicates-full-compliance-does-not]] across
 harnesses.
+
+2026-08-19, harness held constant (Codex), same probe wording, two models —
+recorded explicitly: **GPT 5.6 Terra (medium)** and **GPT 5.6 Solo
+(medium)**. Terra ran the weakest interpretive pass of the four: its kernel
+load *executed* but the emission landed truncated — believed-loaded
+compliance that survived the first grilling and fell only to the forensic
+"end-to-end?" probe — its first-grill defence recruited the tier-economy
+rule as licence for the skill skip, and it confessed its steps 4–6 gap
+without completing the walk. Solo ran the strongest pass of the four: it
+read the session-start prompts unprompted (their fingerprints — the 21-day
+stall line, the scoped staleness check — visible in its report), performed
+the insight-staleness and stall analyses, judged the non-mechanical
+triggers, proposed an attention order — and *still* produced its report
+without loading the domain skill layer, later using the same tier-economy
+rule accurately after closing the gap. The refinements this pair adds:
+emitted content is read **when it lands whole** (execution of a load is not
+ingestion — truncation manufactures sincere false compliance); the economy
+doctrine is hazardous only when recruited to excuse a breach; probe
+precision bounds the ledger ("loaded?" hides truncation, "read end to end?"
+surfaces it). Four sessions, four disjoint gap profiles; the skill layer is
+the only artifact skipped in all four
+([[a-prerequisite-declared-only-inside-its-target-cannot-gate-it]]).
 
 The overcoming plan is deliberately not yet written: the operator is taking
 thinking time on the implications before choosing the shape (adapter
