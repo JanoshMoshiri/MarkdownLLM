@@ -1,8 +1,8 @@
 ---
 id: session-start-hardening
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-08-19
 priority: high
 tags: [session-start, tier-0, emission, kernel, gates, adapters, hardening, evidence]
@@ -37,6 +37,9 @@ linked_things:
   - id: orchestration-specification
     relation: references
     notes: "The anchor doctrine governs every move here: hardening is moving delivery rightward without touching hard/soft."
+  - id: partial-coverage-quiets-the-uncovered-steps
+    relation: references
+    notes: "Earned by Phase 0: the run under test articulated the masking mechanism from inside. Justifies Phase 4 — every Phase 2–3 emission deepens the quiet over the residue, so the residue gets a named invocation, never leftover pull."
 ---
 
 # Session-Start Hardening
@@ -90,12 +93,30 @@ Pre-registered predictions (scored at the gate, not adjusted after):
 - **P4** — honest ledger at the first forensic probe.
 - **P5** — version refresh deferred as change-control, unprompted.
 
-- [ ] Run executed and transcript captured (fifth column of the evidence
+- [x] Run executed and transcript captured (fifth column of the evidence
   table)
-- [ ] Predictions scored; insights updated with the outcome (confidence
+- [x] Predictions scored; insights updated with the outcome (confidence
   moves recorded, either direction)
 
-**Gate:** the scored run is committed. Only then may contract surfaces move.
+**Phase 0 outcome (2026-08-19, scored):** Fable in Claude Code at xhigh.
+All five predictions confirmed. **P1** ✓. **P2** ✓ — validate and the full
+trigger evaluation run unprompted, fired triggers judged, a curated
+lookahead produced: clearly above the Opus 5 run in the same harness at the
+same effort, giving the second clean within-harness gradient pair
+(mirroring Terra < Solo). **P3** ✓, the discriminating cell: no domain
+skills before first output — the invariant is now five for five — and the
+kernel was again skipped under instruction-delivery at the strongest
+available tier. **P4** exceeded: the ledger arrived at the first *casual*
+probe, itemised, with the substitution self-diagnosed ("the tool's output
+substituted for the operative rules"). **P5** ✓. Beyond the predictions:
+the run articulated the masking mechanism from inside — "the adapter's
+partial coverage makes the uncovered steps quieter, not louder" — captured
+as [[partial-coverage-quiets-the-uncovered-steps]], now the standing
+argument for Phase 4. A no-adapter control run is that insight's named
+discriminating test and an optional Phase 5 cell.
+
+**Gate: CLOSED 2026-08-19.** The scored run is committed; contract surfaces
+are unfrozen and Phase 1 may begin on the operator's word.
 
 ## Phase 1 — Position: lift the read gate upstream
 

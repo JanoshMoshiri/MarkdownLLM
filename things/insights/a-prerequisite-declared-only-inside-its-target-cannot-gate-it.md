@@ -34,11 +34,12 @@ it.
 
 ## Why It Matters
 
-- It explains the cleanest invariant in the four-session, two-vendor,
-  three-harness, three-model evidence: **no session loaded the domain skill
-  layer before its first output** — including the strongest run observed
-  (Codex, GPT 5.6 Solo, 2026-08-19), which substantially performed the
-  orientation walk unprompted and still reported without the skills. That
+- It explains the cleanest invariant in the five-session, two-vendor,
+  three-harness, four-model evidence: **no session loaded the domain skill
+  layer before its first output** — including the strongest runs observed
+  (Codex on GPT 5.6 Solo, and Claude Code on Fable at xhigh, both
+  2026-08-19), each of which performed substantial unprompted orientation
+  work and still reported without the skills. That
   session found the read gate only while auditing itself under the
   operator's challenge — by reading the very skill the gate lives in. The
   skip is therefore partly a contract defect, not purely an agent failure:
@@ -67,6 +68,13 @@ confessed-without-completing to substantially-done-unprompted; the skill
 layer alone was skipped in all four. Tracing why led to the kernel: the
 write gate present in Tier 0, the read gate absent — the asymmetry the
 title generalises.
+
+The fifth run (Fable, Claude Code, xhigh, 2026-08-19 — the pre-registered
+Phase 0 baseline completion of `session-start-hardening`) confirmed the
+discriminating prediction: the invariant held at Claude's strongest tier,
+five for five. That session even named its read-skill breach unprompted in
+its ledger and still deferred the load — exactly the wobble an upstream
+gate resolves.
 
 Dismissal condition: promoted when the read gate (or an authoring/coherence
 check enforcing upstream declaration of prerequisites) lands in the kernel

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-19
-generated: 2026-08-19T13:43:29
-generated_from: HEAD@c692091
-coverage: 229
+generated: 2026-08-19T15:17:05
+generated_from: HEAD@0d61f81
+coverage: 230
 framework_version: 3.32.0
 ---
 
@@ -624,6 +624,8 @@ framework_version: 3.32.0
 - orient-and-reconciliation-are-the-corpus-two-sides --implements--> llm-driven-systems-manifesto
 - origin-external-conflates-ingestion-with-import --informs--> provenance-specification
 - origin-external-conflates-ingestion-with-import --informs--> cross-domain-sync-catchup
+- partial-coverage-quiets-the-uncovered-steps --extends--> emitted-content-is-read-instructed-content-is-economised
+- partial-coverage-quiets-the-uncovered-steps --complements--> session-start-loses-to-the-first-request
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-built-inbound-only
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-verified-external-input
@@ -735,6 +737,7 @@ framework_version: 3.32.0
 - session-start-hardening --references--> operating-layer-quality-loop
 - session-start-hardening --references--> read-thing-specification
 - session-start-hardening --references--> orchestration-specification
+- session-start-hardening --references--> partial-coverage-quiets-the-uncovered-steps
 - session-start-loses-to-the-first-request --supports--> hook-enforcement-has-three-anchors
 - session-start-loses-to-the-first-request --supports--> agents-md-discovery-is-harness-dependent
 - session-start-loses-to-the-first-request --informs--> orchestration-specification

@@ -2,7 +2,7 @@
 id: emitted-content-is-read-instructed-content-is-economised
 type: insight
 status: active
-version: 1.1
+version: 1.2
 created: 2026-08-18
 session: 2026-08-18
 source: both
@@ -118,6 +118,17 @@ runs medium. That confound sharpens rather than weakens the structural
 diagnosis: maximum reasoning effort did not buy ritual compliance. The
 model-gradient claim rests on the clean pair — Terra vs Solo, same harness,
 same effort — not on the cross-harness comparison.
+
+2026-08-19, fifth run — Fable (Claude's top tier) in Claude Code at xhigh,
+completing the pre-registered Phase 0 baseline of `session-start-hardening`:
+all five predictions confirmed. Under instruction-delivery the kernel was
+again skipped, now at the strongest available tier, while unprompted
+interpretive extent clearly exceeded the Opus 5 run in the same harness at
+the same effort — the second clean within-harness gradient pair. The ledger
+arrived at the first *casual* probe, self-diagnosing the substitution ("the
+tool's output substituted for the operative rules"). The run also
+articulated, from inside the failure, the masking corollary now held
+separately: [[partial-coverage-quiets-the-uncovered-steps]].
 
 The overcoming plan is deliberately not yet written: the operator is taking
 thinking time on the implications before choosing the shape (adapter

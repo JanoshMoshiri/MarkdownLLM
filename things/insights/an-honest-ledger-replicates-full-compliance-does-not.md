@@ -41,7 +41,10 @@ harnesses on one day — returned ledgers again, with again-disjoint gaps
 2026-08-19 across two models in one harness — four sessions, four distinct
 gap profiles, and a second-vendor model producing the same ledger shape
 (files, line counts, declared skips), proving the format contract-induced,
-not vendor-cultural. The shape of the inference held:
+not vendor-cultural. A fifth session — Fable at xhigh in Claude Code,
+2026-08-19 — returned the ledger at the first casual probe, itemised and
+self-diagnosing: the strongest honesty profile of the set. The shape of the
+inference held:
 
 1. **Interpretation-layer compliance is variably partial even in good
    sessions.** The economising instinct never disappears; it relocates.
