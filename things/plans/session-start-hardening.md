@@ -2,11 +2,14 @@
 id: session-start-hardening
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-08-19
 priority: high
 tags: [session-start, tier-0, emission, kernel, gates, adapters, hardening, evidence]
 linked_things:
+  - id: cowork-remote-phase5-evidence-2026-08-19
+    relation: references
+    notes: "Live remote proof of Phase 2's constraints, unprompted by this plan: the Cowork harness truncated a 76.4 KB contract emission to a ~2 KB preview (lands-whole), and the session gate accepted a marker-less attestation because it reads only the timestamp. Two defects land in Phase 2's checklist from this record."
   - id: emitted-content-is-read-instructed-content-is-economised
     relation: implements
     notes: "The plan operationalises the insight's law: content can be emitted; judgement must be pulled. The reasoning lives there and is not restated here."
@@ -168,6 +171,15 @@ foundation, named so they cannot be rediscovered the hard way:
 - [ ] Budget shares verified on the largest live domain (the Gate 6R
   fixture class)
 - [ ] Token cost measured and recorded
+- [ ] The session-gate remedy text names the emitting form and the gate
+  reads the marker it writes — or the gate's claim narrows to freshness in
+  its own words, docstring included. From the 2026-08-19 remote evidence:
+  plain `session-start` wrote a marker-less attestation the gate accepted,
+  while its error text promised contract emission.
+- [ ] Bootstrap/bundle emission fits the harness's output handling in
+  bounded chunks — the Cowork 76.4 KB emission was truncated to a ~2 KB
+  preview and receipt required manual file recovery
+  (`cowork-remote-phase5-evidence-2026-08-19`, F1/F2).
 - [ ] Migration versioned per the adapter foundation's rules
 
 **Gate:** a fresh session in each of the three harnesses shows the kernel

@@ -2,11 +2,14 @@
 id: cowork-adapter
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-08-18
 priority: high
 tags: [harness, adapters, cowork, bootstrap, discovery, contract-emission, publication, estate, clean-architecture]
 linked_things:
+  - id: cowork-remote-phase5-evidence-2026-08-19
+    relation: references
+    notes: "Phase 5 remote leg graded PARTIAL: transport-critical controls all passed and were corroborated from the estate's own clone; F1/F2 route to session-start-hardening Phase 2, F4 to Phase 3 here, F5 bounds Phase 6 claims; the stale bundle stays NOT TESTED."
   - id: vendor-harness-adapter-foundation
     relation: extends
     notes: "The third harness through the same ports. That plan's registry promise — 'adding a third harness requires a new adapter, tests, and docs, not another conditional' — gets its first exercise here, and the exercise stretches two port assumptions honestly: the render target is an account-level bundle, not a project file, and currency is evaluated at run time, when the bundle meets the framework it just cloned."
@@ -359,6 +362,13 @@ compatibility claim: local transport, both live verification records,
 specification/public-surface reconciliation, and operator rollout remain open
 in Phases 4–7 exactly as written below.
 
+**Defect routed back 2026-08-19 (from the Phase 5 remote leg):** the
+bootstrap's floor self-test printed "the commit boundary is NOT enforced"
+while the non-zero exit was the boundary *working* — the session gate was
+legitimately unsatisfied at that instant. The self-test must distinguish
+"hook did not execute" from "hook executed and correctly refused"
+(`cowork-remote-phase5-evidence-2026-08-19`, F4).
+
 ### Phase 4 — Local transport
 
 - [ ] Mode detection (configured local estate path exists and is the
@@ -443,6 +453,24 @@ record is written from them, then Phase 4 and the ProbePort fingerprint.
 evidence in the same window (v3.32.0, Codex-sealed) — the two plans stay
 one-owner-per-surface, and this plan owns only the Cowork rows.
 
+**Remote leg graded 2026-08-19 — PARTIAL**
+(`cowork-remote-phase5-evidence-2026-08-19`). The packet arrived and was
+graded requirement by requirement, with the publication chain independently
+corroborated from this estate's own clone of the repository. All
+transport-critical controls passed — floor blocking, branch from record,
+ff-only publication verified twice, zero debt, zero credential residue,
+bundle current — and the guarded publisher additionally held against real,
+unplanned divergence mid-session. Short of PASS on four findings and one
+untested leg: contract emission was truncated by the harness and receipt
+needed manual recovery (F1 → `session-start-hardening` Phase 2); the
+session gate reads only the timestamp and its remedy omits the emitting
+flag (F2 → same owner); the bootstrap floor self-test reported the inverse
+of the truth (F4 → Phase 3, note there); emission alone did not produce
+compliant behaviour (F5 → bounds Phase 6 claims). The named next test:
+install a known-older bundle, open a fresh session, watch the STALE
+warning fire. The remote checkbox stays open on exactly that residue; the
+local leg is owed separately at the same standard.
+
 ### Phase 6 — Specification and public surfaces
 
 - [ ] `framework-discovery.md`: the **explicit bootstrap route** as a
@@ -460,6 +488,10 @@ one-owner-per-surface, and this plan owns only the Cowork rows.
   `agents-md-discovery-is-harness-dependent` (route landed), the QMS
   porch pair (conditions met at Phase 3), with the sweep's residual
   framing updated.
+- [ ] Claim bound from Phase 5 evidence (F5): public surfaces may say the
+  bootstrap emits the contract and that the emission is attested — never
+  that emission produces a compliant agent. Emission yields an agent that
+  *can* comply (`emitted-content-is-read-instructed-content-is-economised`).
 - [ ] Coordinate with `vendor-harness-adapter-foundation` Phase 7/8: a
   third registry entry lands while its public-surface sweep is open —
   one owner per surface, no double edits.

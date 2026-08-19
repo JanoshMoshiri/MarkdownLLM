@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-19
-generated: 2026-08-19T15:17:05
-generated_from: HEAD@0d61f81
-coverage: 230
+generated: 2026-08-19T17:43:25
+generated_from: HEAD@7002e05
+coverage: 231
 framework_version: 3.32.0
 ---
 
@@ -260,6 +260,7 @@ framework_version: 3.32.0
 - coordination-claim-specification --extends--> thing-specification
 - coordination-claim-specification --complements--> git-workflow-specification
 - coordination-claim-specification --complements--> workflow-state-specification
+- cowork-adapter --references--> cowork-remote-phase5-evidence-2026-08-19
 - cowork-adapter --extends--> vendor-harness-adapter-foundation
 - cowork-adapter --extends--> cowork-integrity-estate-sweep
 - cowork-adapter --extends--> framework-discovery-specification
@@ -274,6 +275,10 @@ framework_version: 3.32.0
 - cowork-adapter --implements--> a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment
 - cowork-integrity-estate-sweep --references--> framework-upward-signal
 - cowork-integrity-estate-sweep --references--> pretooluse-action-boundary-gate
+- cowork-remote-phase5-evidence-2026-08-19 --documents--> cowork-adapter
+- cowork-remote-phase5-evidence-2026-08-19 --references--> session-start-hardening
+- cowork-remote-phase5-evidence-2026-08-19 --supports--> emitted-content-is-read-instructed-content-is-economised
+- cowork-remote-phase5-evidence-2026-08-19 --supports--> the-harness-bound-path-is-the-least-tested-path
 - cross-domain-handoff-is-built-inbound-only --extends--> cross-domain-handoff-is-verified-external-input
 - cross-domain-handoff-is-built-inbound-only --supports--> directional-graph-reads-come-in-inbound-outbound-pairs
 - cross-domain-handoff-is-built-inbound-only --supports--> mechanism-pairs-come-from-two-reflection-axes
@@ -727,6 +732,7 @@ framework_version: 3.32.0
 - session-memory-specification --complements--> git-workflow-specification
 - session-memory-specification --implements--> llm-driven-systems-manifesto
 - session-memory-specification --complements--> belief-revision-specification
+- session-start-hardening --references--> cowork-remote-phase5-evidence-2026-08-19
 - session-start-hardening --implements--> emitted-content-is-read-instructed-content-is-economised
 - session-start-hardening --implements--> a-prerequisite-declared-only-inside-its-target-cannot-gate-it
 - session-start-hardening --implements--> session-start-loses-to-the-first-request
