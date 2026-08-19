@@ -53,6 +53,14 @@ the fact; the pre-commit coherence check gains root-scope drift enforcement
 for them, same as every domain already has. Success test: the sections that
 drifted in rounds 1–5 become mechanically incapable of drifting.
 
+**Evidence — the enum drift is not inert (2026-08-19).** The Standard Thing
+Structure `linked_things` line still advertises `related`, which the
+2026-06-12 review pruned from `_schema.yaml` (35 → 13). A session authoring a
+plan read the line, used `related`, and took two `validate` Warnings for it.
+So the restatement does not merely sit stale — it actively instructs sessions
+into defects the floor then catches, which is the strongest available argument
+for deriving the block rather than correcting the word.
+
 ## Phase 2 — Build the commit-boundary checks *(owner: `mechanical-coherence-checks-backlog`)*
 
 The backlog's hold is lifted for the felt items (review-9 promotions,

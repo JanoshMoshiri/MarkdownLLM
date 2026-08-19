@@ -17,10 +17,10 @@ linked_things:
     relation: references
     notes: "The hook home: the judgement half lands as reflexive scan #6"
   - id: cowork-adapter
-    relation: related
+    relation: references
     notes: "Deliberate sequencing, not a hard dependency: parked until the vendor-adapter workstream is put to bed, to avoid mixing workstreams"
   - id: vendor-harness-adapter-foundation
-    relation: related
+    relation: references
     notes: "Same sequencing note as cowork-adapter"
 ---
 

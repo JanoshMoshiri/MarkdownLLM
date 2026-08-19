@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-18
-generated: 2026-08-18T18:07:17
-generated_from: HEAD@2546dfe
-coverage: 226
+created: 2026-08-19
+generated: 2026-08-19T08:34:59
+generated_from: HEAD@e137ed6
+coverage: 227
 framework_version: 3.32.0
 ---
 
@@ -50,6 +50,10 @@ framework_version: 3.32.0
 - a-degrading-command-cannot-trigger-approval-by-succeeding --informs--> vendor-harness-adapter-foundation
 - a-degrading-command-cannot-trigger-approval-by-succeeding --supports--> the-harness-bound-path-is-the-least-tested-path
 - a-degrading-command-cannot-trigger-approval-by-succeeding --complements--> agents-cannot-self-install-permission-bearing-hooks
+- a-finding-does-not-earn-its-own-type --informs--> thing-specification
+- a-finding-does-not-earn-its-own-type --informs--> session-memory-specification
+- a-finding-does-not-earn-its-own-type --references--> retrospective-specification
+- a-finding-does-not-earn-its-own-type --references--> external-review-2026-08-10
 - a-flat-re-export-shim-is-an-uncollided-namespace --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - a-flat-re-export-shim-is-an-uncollided-namespace --references--> srp-extraction-is-tier-promotion
 - a-flat-re-export-shim-is-an-uncollided-namespace --informs--> repeated-drift-promotes-a-fact-into-the-floor
@@ -585,8 +589,8 @@ framework_version: 3.32.0
 - operating-layer-quality-loop --implements--> the-operating-layer-has-no-quality-loop
 - operating-layer-quality-loop --references--> mechanical-coherence-checks-backlog
 - operating-layer-quality-loop --references--> retrospective-specification
-- operating-layer-quality-loop --related--> cowork-adapter
-- operating-layer-quality-loop --related--> vendor-harness-adapter-foundation
+- operating-layer-quality-loop --references--> cowork-adapter
+- operating-layer-quality-loop --references--> vendor-harness-adapter-foundation
 - operating-scope-promotion --informs--> llm-driven-systems-manifesto
 - operating-scope-promotion --references--> divergence-primitive-promotion
 - operating-scope-promotion --references--> assistant-register
