@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-19
-generated: 2026-08-19T13:10:52
-generated_from: HEAD@9e28a4c
-coverage: 228
+generated: 2026-08-19T13:43:29
+generated_from: HEAD@c692091
+coverage: 229
 framework_version: 3.32.0
 ---
 
@@ -725,6 +725,16 @@ framework_version: 3.32.0
 - session-memory-specification --complements--> git-workflow-specification
 - session-memory-specification --implements--> llm-driven-systems-manifesto
 - session-memory-specification --complements--> belief-revision-specification
+- session-start-hardening --implements--> emitted-content-is-read-instructed-content-is-economised
+- session-start-hardening --implements--> a-prerequisite-declared-only-inside-its-target-cannot-gate-it
+- session-start-hardening --implements--> session-start-loses-to-the-first-request
+- session-start-hardening --references--> an-honest-ledger-replicates-full-compliance-does-not
+- session-start-hardening --references--> pretooluse-action-boundary-gate
+- session-start-hardening --references--> vendor-harness-adapter-foundation
+- session-start-hardening --references--> protecting-one-budget-displaces-the-failure-into-the-other
+- session-start-hardening --references--> operating-layer-quality-loop
+- session-start-hardening --references--> read-thing-specification
+- session-start-hardening --references--> orchestration-specification
 - session-start-loses-to-the-first-request --supports--> hook-enforcement-has-three-anchors
 - session-start-loses-to-the-first-request --supports--> agents-md-discovery-is-harness-dependent
 - session-start-loses-to-the-first-request --informs--> orchestration-specification
