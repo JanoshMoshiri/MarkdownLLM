@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-19
-generated: 2026-08-19T17:43:25
-generated_from: HEAD@7002e05
-coverage: 231
+generated: 2026-08-19T23:13:19
+generated_from: HEAD@394e65a
+coverage: 232
 framework_version: 3.32.0
 ---
 
@@ -777,6 +777,8 @@ framework_version: 3.32.0
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
 - substrate-reconciliation-2026-08-09 --references--> autopush-moves-the-deliberate-act
+- the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
+- the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
 - the-harness-bound-path-is-the-least-tested-path --supports--> portability-claims-need-execution-tests
 - the-harness-bound-path-is-the-least-tested-path --derived-from--> field-report-2026-08-13-domain-session
 - the-harness-bound-path-is-the-least-tested-path --derived-from--> claude-gate-5r4-acceptance-2026-08-13
