@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: kernel
 created: 2026-08-20
-generated: 2026-08-20T08:42:01
-generated_from: HEAD@087d5d9
+generated: 2026-08-20T09:20:38
+generated_from: HEAD@43679e5
 coverage: 6
 framework_version: 3.32.0
 ---
@@ -67,7 +67,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; you transcribe and reason about the result, you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
 
-**The session gate** (declared per domain — scaffold births every new domain `strict`, so "opt-in" describes the declaration mechanism, not the scaffolded default; the framework root declares `warn`): a domain declaring `options: {session_gate: warn|strict}` requires a fresh `mdllm session-start` attestation for the clone before any commit — absent or >24h old fires Warning (`warn`) or a commit-blocking Error (`strict`), with the remedy named. It proves the Tier-0 contract was *emitted into the session*, not that it was heeded; its job is making a contract-less session loud at the first write, in any harness, with no adapter.
+**The session gate** (declared per domain — scaffold births every new domain `strict`, so "opt-in" describes the declaration mechanism, not the scaffolded default; the framework root declares `warn`): a domain declaring `options: {session_gate: warn|strict}` requires a fresh `mdllm session-start` attestation for the clone before any commit — absent or >24h old fires Warning (`warn`) or a commit-blocking Error (`strict`), with the remedy named. It proves the Tier-0 contract was *emitted into the session*, not that it was heeded; its job is making a contract-less session loud at the first write, in any harness, with no adapter. The attestation also carries a **kernel token** recording what the emission did with the operative kernel — `whole:<sha>:<lines>` / `deferred` (hook channel, by design) / `elided` / `absent` — and the gate surfaces `elided`/`absent` as Warnings in **both** modes, never a strict Error: the remedy (read the named file in full) is evidence the floor cannot receive, and a gate the session cannot clear is a dead end. Legacy attestations carry no token and stay silent.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 

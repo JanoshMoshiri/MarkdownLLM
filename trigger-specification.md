@@ -2,7 +2,7 @@
 id: trigger-specification
 type: specification
 status: stable
-version: 1.4
+version: 1.5
 created: 2026-05-29
 linked_things:
   - id: thing-specification
@@ -64,7 +64,13 @@ triggers:
   (`2026-09-01`), that date is treated as the fire date — past dates on
   unsettled things fire, dates within 30 days surface as upcoming, later dates
   join the horizon. A free-text condition naming no parseable date is reported
-  as not mechanically evaluable — never silently dropped.
+  as not mechanically evaluable — never silently dropped. The evaluator
+  additionally cues **self-answering armed triggers** (session-start-hardening
+  Phase 3): a future-dated free-text trigger whose action text already answers
+  its own condition ("do not re-ask", "already issued", "remedies are spent")
+  is surfaced in its own bucket — a heuristic advisory, because left armed it
+  fires on its own answer (six wore the pattern at once in one live domain);
+  confirming each and disarming or re-conditioning it stays the agent's.
 - `type: date` is accepted as an alias of `type: time` — domains write it
   naturally, and rejecting it silently would kill the control one character of
   drift away from the supported spelling.

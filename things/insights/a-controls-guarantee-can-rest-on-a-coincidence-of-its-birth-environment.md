@@ -2,7 +2,7 @@
 id: a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-08-18
 session: 2026-08-18
 source: both
@@ -90,6 +90,17 @@ operative kernel, the entry file, and a reading list derived from the
 filesystem at emission time — ahead of orientation, and the attestation
 records that it did so with a distinct token. The gate's claim now rests
 on the gate in every harness, not on injection in some of them.
+
+**2026-08-20 (session-start-hardening Phases 2–4):** the correction
+widened to the default path. The narrative above — "It does not emit the
+contract. It emits a pointer to it" — now describes the pre-fix emitter:
+plain `session-start` is channel-aware (kernel emitted whole with an
+integrity trailer on direct channels; loudly deferred with the same
+integrity facts on the budgeted hook channel), the attestation carries a
+kernel token recording what the emission did, and the gate reads it —
+`elided`/`absent` surface as Warnings. The standing check below is
+unchanged and was the instrument that found the follow-on defects too
+(a truncated emission clearing a timestamp-only gate).
 
 ## Why this is on the porch
 

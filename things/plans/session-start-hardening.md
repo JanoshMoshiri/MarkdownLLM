@@ -291,10 +291,18 @@ clean; full suite green at commit.
 - [ ] `pretooluse-action-boundary-gate` updated: fork resolved-for-now in
   emission's favour; re-open condition restated — if post-emission variance
   persists at the *action* boundary, the gate is the next rightward move
+- [ ] `session-start-loses-to-the-first-request` dispositioned — its fix
+  directive ("deliver the ritual mechanically at t=0") is now executed;
+  promotion candidate (added by the 2026-08-20 dark-region re-walk: it was
+  missing from this list while its two siblings were on it)
 - [ ] Per-domain skill emission decision made from evidence (build only if
   the skill layer still fails post gate-lift)
 - [ ] CHANGELOG entry; framework version bump; refresh offered per
-  migration rules
+  migration rules. **Tripwire:** the Phase 4 prose forward-references
+  v3.33 in two places (AGENTS.md Tier-0 block, orchestration.md Binding
+  Scope) while `.markdownllm` still says 3.32.0 — the bump must be 3.33.0
+  or the prose reworded, and it must land before any publication of these
+  commits
 
 **Exit:** the next cold session in any harness starts with Tier 0 landed
 whole, the read gate visible before read work, the computable cues in the
