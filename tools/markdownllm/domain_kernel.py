@@ -19,6 +19,7 @@ from pathlib import Path
 
 from .model import RESERVED_STATUSES, load_schema, parse_frontmatter
 from .repo import TIERS
+from .repository_view import RepositoryView
 
 DOMAIN_KERNEL_BLOCKS = ("standing-truth", "session-start", "tier-routing",
                         "types", "hooks", "floor")
@@ -27,8 +28,8 @@ _FRAMEWORK_HARD_HOOKS = (
     "- `post-write:commit` — commit every created/modified frontmatter `.md` to the "
     "owning repo before completing the response. Anchor: `git-fs` (validation via the "
     "pre-commit hook) + `interpretation` (the commit act itself). The post-commit hook "
-    "then publishes the validated commit (`mdllm autopush`) unless this domain declares "
-    "`git: autopush: false` — absence is on; rejection is divergence surfaced, never "
+    "then publishes the validated commit (`mdllm autopush`) only when this domain declares "
+    "literal `git: autopush: true` — absence/malformed/false are off; rejection is divergence surfaced, never "
     "forced (`autopush-moves-the-deliberate-act`).\n"
     "- `session-start:version-check` — performed in **Session Start** above. "
     "Anchor: `interpretation` by default, hardened to `harness-session` where "
@@ -54,7 +55,8 @@ def _gen_block_re(name: str) -> "re.Pattern":
         re.DOTALL)
 
 
-def _dk_standing_truth(domain: Path, meta: dict) -> str:
+def _dk_standing_truth(domain: Path, meta: dict,
+                       view: RepositoryView | None = None) -> str:
     return (
         "You predict the next move — the next token, sentence, or action — from the "
         "stream of what comes next. You cannot predict its *consequence* the same way. "
@@ -69,7 +71,8 @@ def _dk_standing_truth(domain: Path, meta: dict) -> str:
         "`{framework_root}/things/insights/consequence-is-recoverable-only-in-retrospect.md`.")
 
 
-def _dk_session_start(domain: Path, meta: dict) -> str:
+def _dk_session_start(domain: Path, meta: dict,
+                      view: RepositoryView | None = None) -> str:
     return (
         "**Run this before responding to the user's first request — the live request "
         "will pull you toward itself; resist until these are done.**\n\n"
@@ -88,6 +91,11 @@ def _dk_session_start(domain: Path, meta: dict) -> str:
         "work things + open conflicts, computed from the graph (`mdllm session-start`). "
         "Backward history is the commit stream (velocity); insight "
         "liveness is a graph property — see session-memory.md. (continuity.md is retired.)\n"
+        "   For a full-corpus or otherwise significant read, pin the full "
+        "`commit:<sha>` base emitted by `mdllm session-start`; immediately before "
+        "writing its conclusions run `mdllm session-start . --assert-head <sha>`. "
+        "Moved HEAD is a reconciliation stop, never permission to apply a mixed "
+        "snapshot. This checks byte currency, not model reading or adherence.\n"
         "3. **Version check** — `session-start:version-check` (anchor "
         "`interpretation` by default, `harness-session` where an adapter binds "
         "it — your duty in an adapterless harness, not the environment's). "
@@ -108,24 +116,37 @@ def _dk_session_start(domain: Path, meta: dict) -> str:
         "7. Then await intent.")
 
 
-def routed_skills(domain: Path) -> list[str]:
+def _routed_names(domain: Path, subdir: str, suffix: str,
+                  view: RepositoryView | None) -> list[str]:
+    if view is None:
+        folder = domain / subdir
+        return (sorted(p.name for p in folder.glob(f"*{suffix}"))
+                if folder.is_dir() else [])
+    relative = domain.resolve().relative_to(view.root)
+    prefix = "" if relative == Path(".") else relative.as_posix().rstrip("/") + "/"
+    wanted = f"{prefix}{subdir}/"
+    return sorted(p.name for p in view.list_paths(suffix=suffix)
+                  if p.as_posix().startswith(wanted)
+                  and "/" not in p.as_posix()[len(wanted):])
+
+
+def routed_skills(domain: Path, view: RepositoryView | None = None) -> list[str]:
     """The skill filenames the tier-routing block routes — THE source any
     derived reading list must share (a-handoff-list-replaces-the-contract-
     it-points-at: derived from one source, a named file cannot go missing)."""
-    return (sorted(p.name for p in (domain / "skills").glob("*.skill.md"))
-            if (domain / "skills").is_dir() else [])
+    return _routed_names(domain, "skills", ".skill.md", view)
 
 
-def routed_prompts(domain: Path) -> list[str]:
+def routed_prompts(domain: Path, view: RepositoryView | None = None) -> list[str]:
     """The prompt filenames the tier-routing block routes; same rule."""
-    return (sorted(p.name for p in (domain / "prompts").glob("*.md"))
-            if (domain / "prompts").is_dir() else [])
+    return _routed_names(domain, "prompts", ".md", view)
 
 
-def _dk_tier_routing(domain: Path, meta: dict) -> str:
+def _dk_tier_routing(domain: Path, meta: dict,
+                     view: RepositoryView | None = None) -> str:
     t1 = TIERS["Tier 1 (full specs, load individually on demand)"]
     t2 = TIERS["Tier 2 (on demand)"]
-    skills = routed_skills(domain)
+    skills = routed_skills(domain, view)
     # prompts/ is routed here for the same reason skills are: a reading list
     # derived from this block is the only reading list a handoff can honestly
     # carry, and until 2026-08-09 the prompts were delivered (scaffold) and
@@ -133,7 +154,7 @@ def _dk_tier_routing(domain: Path, meta: dict) -> str:
     # omitted them, invisibly (substrate sweep B1; field evidence 2026-08-08:
     # a bootstrap handoff inherited the omission and four session-start steps
     # ran without their instructions).
-    prompts = routed_prompts(domain)
+    prompts = routed_prompts(domain, view)
     t1_specs = " · ".join(f"`{{framework_root}}/{n}`" for n in t1)
     skills_line = (" · ".join(f"`skills/{s}`" for s in skills)
                    if skills else "_(none yet)_")
@@ -156,14 +177,15 @@ def _dk_tier_routing(domain: Path, meta: dict) -> str:
         "**Tier 2 — on demand:** " + t2_specs)
 
 
-def _dk_types(domain: Path, meta: dict) -> str:
+def _dk_types(domain: Path, meta: dict,
+              view: RepositoryView | None = None) -> str:
     """Generated from `things/_schema.yaml` — the schema is the authority on
     the type vocabulary, and the 2026-08-01 estate sweep found the authored
     §Thing Types list lagging it in most active domains (the harness-loaded
     surface was the least-checked). Repeated drift promotes a fact into the
     floor: the list is now derived, so it cannot disagree with the schema."""
     try:
-        schema = load_schema(domain)
+        schema = load_schema(domain, view)
     except Exception:
         schema = None
     types = (schema or {}).get("types") or {}
@@ -190,7 +212,8 @@ def _dk_types(domain: Path, meta: dict) -> str:
     return "\n".join(lines)
 
 
-def _dk_hooks(domain: Path, meta: dict) -> str:
+def _dk_hooks(domain: Path, meta: dict,
+              view: RepositoryView | None = None) -> str:
     parts = ["**Framework hard hooks (always active by config; anchor decides "
              "enforcement):**\n" + _FRAMEWORK_HARD_HOOKS]
     dh = meta.get("hard_hooks") or []
@@ -217,7 +240,8 @@ def _dk_hooks(domain: Path, meta: dict) -> str:
     return "\n\n".join(parts)
 
 
-def _dk_floor(domain: Path, meta: dict) -> str:
+def _dk_floor(domain: Path, meta: dict,
+              view: RepositoryView | None = None) -> str:
     return (
         "Structure (`id`/`type`/`status`/`created`), reference integrity, and schema "
         "conformance are owned by `python {framework_root}/tools/mdllm.py validate .` and "
@@ -236,10 +260,13 @@ _DK_BUILDERS = {
 }
 
 
-def build_domain_kernel_blocks(domain: Path, meta: dict) -> dict:
+def build_domain_kernel_blocks(
+    domain: Path, meta: dict, view: RepositoryView | None = None
+) -> dict:
     """Canonical body for each managed block — the single source the generator
     writes and the drift check compares against, so the two cannot disagree."""
-    return {name: _DK_BUILDERS[name](domain, meta) for name in DOMAIN_KERNEL_BLOCKS}
+    return {name: _DK_BUILDERS[name](domain, meta, view)
+            for name in DOMAIN_KERNEL_BLOCKS}
 
 
 def domain_kernel_status(text: str, blocks: dict) -> tuple[list, list]:

@@ -2,11 +2,13 @@
 #
 # MarkdownLLM installer (Windows / PowerShell 7+).
 #
-# Run from any folder (downloads + sets everything up):
-#   irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1 | iex
-#
-# Or from inside a checkout you already cloned:
+# Run from a release-pinned checkout whose installer hash you verified (the
+# exact commands and current hashes are in README.md):
 #   ./install.ps1
+#
+# Direct invocation outside a checkout is also supported, but requires the
+# immutable release commit explicitly:
+#   ./install.ps1 -Ref <40-character-release-commit>
 #
 # It checks prerequisites, clones the framework if needed, installs PyYAML and
 # the deterministic-floor git hooks (validation, disclosure boundary,
@@ -15,7 +17,10 @@
 # winget (with consent) and otherwise prints the command for you to run.
 # Pass -Yes to skip the prompt. Safe to re-run.
 
-param([switch]$Yes)
+param(
+  [switch]$Yes,
+  [string]$Ref = $env:MARKDOWNLLM_RELEASE_COMMIT
+)
 
 $ErrorActionPreference = 'Stop'
 $RepoUrl = 'https://github.com/JanoshMoshiri/MarkdownLLM.git'
@@ -97,25 +102,38 @@ if ($RepoDir) {
   if (Test-Path 'MarkdownLLM') {
     Stop2 "./MarkdownLLM already exists but isn't a framework checkout — move it aside and re-run."
   }
-  Say 'Cloning MarkdownLLM into ./MarkdownLLM'
-  git clone $RepoUrl MarkdownLLM
-  if ($LASTEXITCODE -ne 0) { Stop2 'git clone failed.' }
+  if ($Ref -notmatch '^[0-9a-fA-F]{40}$') {
+    Stop2 'outside a checkout, pass -Ref with the full 40-character release commit; moving branches are not an install authority'
+  }
+  Say "Fetching MarkdownLLM release commit $Ref into ./MarkdownLLM"
+  git init -q MarkdownLLM
+  if ($LASTEXITCODE -ne 0) { Stop2 'git init failed.' }
+  git -C MarkdownLLM remote add origin $RepoUrl
+  if ($LASTEXITCODE -ne 0) { Stop2 'adding origin failed.' }
+  git -C MarkdownLLM fetch --depth 1 origin "${Ref}:refs/remotes/origin/verified-release"
+  if ($LASTEXITCODE -ne 0) { Stop2 'fetching the release commit failed.' }
+  $Fetched = (git -C MarkdownLLM rev-parse FETCH_HEAD).Trim()
+  if ($LASTEXITCODE -ne 0 -or $Fetched -ne $Ref.ToLowerInvariant()) {
+    Stop2 'fetched commit did not match -Ref.'
+  }
+  git -C MarkdownLLM checkout -q --detach $Ref
+  if ($LASTEXITCODE -ne 0) { Stop2 'checking out the release commit failed.' }
   $RepoDir = Join-Path (Get-Location).Path 'MarkdownLLM'
 }
 Set-Location $RepoDir
 
 # --- 4. PyYAML (the only dependency we install for you) ---
-Say 'Ensuring PyYAML is available'
-RunPy '-c' 'import yaml' 2>$null
+Say 'Ensuring PyYAML 6.0.3 is available'
+RunPy '-c' 'import yaml, sys; sys.exit(0 if yaml.__version__ == "6.0.3" else 1)' 2>$null
 if ($LASTEXITCODE -eq 0) {
-  Ok 'pyyaml already installed'
+  Ok 'pyyaml 6.0.3 already installed'
 } else {
-  RunPy '-m' 'pip' 'install' 'pyyaml' | Out-Null
+  RunPy '-m' 'pip' 'install' 'PyYAML==6.0.3' | Out-Null
   if ($LASTEXITCODE -eq 0) {
-    Ok 'pyyaml installed'
+    Ok 'pyyaml 6.0.3 installed'
   } else {
     Warn 'automatic pip install failed. Try:'
-    Write-Host "       $PyCmd -m pip install --user pyyaml"
+    Write-Host "       $PyCmd -m pip install --user PyYAML==6.0.3"
     Stop2 'install PyYAML, then re-run.'
   }
 }

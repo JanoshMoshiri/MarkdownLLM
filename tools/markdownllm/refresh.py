@@ -13,6 +13,8 @@ from pathlib import Path
 
 import yaml
 
+from .yaml_loader import load_version_sentinel
+
 from .domain_kernel import (apply_domain_kernel, build_domain_kernel_blocks,
                             domain_kernel_status)
 from .model import parse_frontmatter
@@ -41,8 +43,14 @@ def cmd_refresh(args) -> int:
     agents = domain / "AGENTS.md"
     if not agents.is_file():
         sys.exit(f"mdllm: {domain} has no AGENTS.md — not a domain")
-    text = agents.read_text(encoding="utf-8")
-    meta, _, _ = parse_frontmatter(text)
+    try:
+        text = agents.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        sys.exit(f"mdllm: refresh cannot read AGENTS.md as UTF-8 — {exc}")
+    meta, _, agents_error = parse_frontmatter(text, source=agents)
+    if agents_error:
+        sys.exit(f"mdllm: refresh refused invalid AGENTS.md frontmatter — "
+                 f"{agents_error}")
     fr = (meta or {}).get("framework_root")
     if not fr:
         sys.exit("mdllm: AGENTS.md has no framework_root — not a wired domain")
@@ -51,7 +59,12 @@ def cmd_refresh(args) -> int:
     if not sentinel.is_file():
         sys.exit(f"mdllm: framework_root `{fr}` does not resolve to a framework "
                  f"(.markdownllm not found at {sentinel})")
-    fv = str((yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {}).get("version"))
+    try:
+        sentinel_data = load_version_sentinel(
+            sentinel.read_text(encoding="utf-8"), source=sentinel)
+    except (OSError, UnicodeError, yaml.YAMLError) as exc:
+        sys.exit(f"mdllm: refresh refused invalid/unreadable {sentinel} — {exc}")
+    fv = str(sentinel_data.get("version"))
     seen = str(meta.get("framework_version_seen", "")) if meta else ""
 
     print(f"## Domain Refresh — {domain.name}\n")

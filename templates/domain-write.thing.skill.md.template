@@ -14,7 +14,7 @@ linked_things:
   - id: [domain]-workflow-skill
     relation: complements
 description: How to create, update, and manage [domain] things
-applies_to: "[domain]/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # [Domain] Write Thing Skill

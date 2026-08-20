@@ -40,6 +40,12 @@ if [ -z "$FRAMEWORK_REPO" ]; then
   echo "ERROR: FRAMEWORK_REPO missing from config.env" >&2
   exit 1
 fi
+FRAMEWORK_COMMIT="$(grep -E '^FRAMEWORK_COMMIT=' "$CONFIG" | head -1 | cut -d= -f2- | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
+if ! printf '%s' "$FRAMEWORK_COMMIT" | grep -Eq '^[0-9a-fA-F]{40}$'; then
+  echo "ERROR: FRAMEWORK_COMMIT must be a full framework commit; refusing a moving source" >&2
+  exit 1
+fi
+FRAMEWORK_COMMIT="$(printf '%s' "$FRAMEWORK_COMMIT" | tr '[:upper:]' '[:lower:]')"
 
 WORK="${HOME}/mdllm-run"
 AUTH="Authorization: Basic $(printf 'x-access-token:%s' "$PAT" | base64 | tr -d '\n')"
@@ -49,28 +55,45 @@ echo "==> workspace: ${WORK}"
 rm -rf "$WORK"; mkdir -p "$WORK"; cd "$WORK"
 
 FW_NAME="$(basename "$FRAMEWORK_REPO")"
-echo "==> framework: ${FRAMEWORK_REPO}"
-git -c http.extraheader="$AUTH" clone --quiet \
-  "https://github.com/${FRAMEWORK_REPO}.git" 2>&1 | redact
+echo "==> framework: ${FRAMEWORK_REPO}@${FRAMEWORK_COMMIT}"
+mkdir "$FW_NAME"
+git -C "$FW_NAME" init --quiet
+git -C "$FW_NAME" remote add origin \
+  "https://github.com/${FRAMEWORK_REPO}.git"
+git -C "$FW_NAME" -c http.extraheader="$AUTH" fetch --quiet --depth 1 \
+  origin "$FRAMEWORK_COMMIT" 2>&1 | redact
+FETCHED="$(git -C "$FW_NAME" rev-parse FETCH_HEAD)"
+if [ "$FETCHED" != "$FRAMEWORK_COMMIT" ]; then
+  echo "ERROR: fetched framework commit does not match the bundle pin" >&2
+  exit 1
+fi
+git -C "$FW_NAME" checkout --quiet --detach "$FRAMEWORK_COMMIT"
 cd "$FW_NAME"
 
-# The deterministic floor needs PyYAML.
-python3 -c "import yaml" 2>/dev/null || \
-  pip install pyyaml --break-system-packages --quiet 2>&1 | tail -1 || true
+# The deterministic floor needs the build-pinned PyYAML runtime. An ambient,
+# different version is not silently accepted.
+if ! python3 -c 'import yaml, sys; sys.exit(0 if yaml.__version__ == "6.0.3" else 1)' 2>/dev/null; then
+  pip install 'PyYAML==6.0.3' --break-system-packages --quiet 2>&1 | tail -1
+fi
+python3 -c 'import yaml, sys; sys.exit(0 if yaml.__version__ == "6.0.3" else 1)' 2>/dev/null || {
+  echo "ERROR: PyYAML 6.0.3 is unavailable; refusing to run an unpinned floor" >&2
+  exit 1
+}
 
-# Run-time currency: is this bundle's mechanism still what the framework
-# would render now? The comparison runs at the first moment bundle and
+# Run-time binding integrity: is this bundle's mechanism what the exact pinned
+# framework tree would render? The comparison runs at the first moment bundle and
 # framework coexist — the binding moment of a run-time-bound adapter.
 # Drift degrades honestly rather than failing: every command below is the
-# cloned framework's own floor, current by construction.
+# pinned framework commit's own floor. Currency against a newer release is a
+# bundle rebuild decision, not permission to execute a moving branch.
 STAMPED="{bundle_hash}"
 EXPECTED="$(python3 tools/mdllm.py bundle --harness cowork --hash 2>/dev/null || echo unknown)"
 if [ "$EXPECTED" != "$STAMPED" ]; then
-  echo "!! BUNDLE STALE: this bundle's mechanism is ${STAMPED:0:12}..., but the"
-  echo "   framework it just cloned would render ${EXPECTED:0:12}... today."
+  echo "!! BUNDLE MISMATCH: this bundle's mechanism is ${STAMPED:0:12}..., but the"
+  echo "   exact framework tree it cloned would render ${EXPECTED:0:12}...."
   echo "   Rebuild + reinstall from your local estate:"
   echo "     python tools/mdllm.py bundle --harness cowork"
-  echo "   Continuing — the assembly below runs the cloned framework's current floor."
+  echo "   Continuing — the assembly below runs the pinned framework commit's floor."
 fi
 
 # Hand off to the floor. GH_PAT is process-scoped: never written to disk,

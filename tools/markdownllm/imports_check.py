@@ -24,76 +24,271 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
+import threading
+import time
 
+from .external_trust import (
+    ExternalTrustError, ExternalTrustPolicy, LocalExternalTrustPolicy,
+    load_mcp_address_book,
+)
 from .model import scan
 
-def _load_address_book(consumer_root: Path) -> dict:
-    # The consumer's `.mcp.json` mcpServers map IS the address book — operator-
-    # wired, per trust zone. Two entry forms, mirroring MCP's two transports:
-    # name -> {command, args} (stdio: spawn the source's server) or
-    # name -> {url} (Streamable HTTP: POST to a served porch).
-    import json
-    p = consumer_root / ".mcp.json"
-    if not p.is_file():
-        return {}
+
+MAX_EXTERNAL_RESPONSE_BYTES = 2 * 1024 * 1024
+MAX_EXTERNAL_STDERR_BYTES = 8 * 1024
+DEFAULT_EXTERNAL_TIMEOUT_SECONDS = 10.0
+MAX_EXTERNAL_TIMEOUT_SECONDS = 30.0
+
+
+def _bounded_timeout(value: int | float) -> float:
     try:
-        return (json.loads(p.read_text(encoding="utf-8")) or {}).get("mcpServers", {}) or {}
-    except Exception:
-        return {}
+        parsed = float(value)
+    except (TypeError, ValueError):
+        parsed = DEFAULT_EXTERNAL_TIMEOUT_SECONDS
+    return min(MAX_EXTERNAL_TIMEOUT_SECONDS, max(0.05, parsed))
+
+
+def _initialize_message() -> dict:
+    from .mcp_server import MCP_PROTOCOL_VERSION
+    return {
+        "jsonrpc": "2.0", "id": 1, "method": "initialize",
+        "params": {
+            "protocolVersion": MCP_PROTOCOL_VERSION,
+            "capabilities": {},
+            "clientInfo": {"name": "mdllm-imports-check", "version": "1"},
+        },
+    }
+
+
+def _initialized_message() -> dict:
+    return {"jsonrpc": "2.0", "method": "notifications/initialized",
+            "params": {}}
+
+def _load_address_book_result(
+        consumer_root: Path) -> tuple[dict, str | None]:
+    """Distinguish an absent route book from an invalid definition.
+
+    Absence means a source may truthfully receive ``no-address-book-entry``.
+    A present-but-malformed file is a different state: no declared route can
+    be selected safely, and collapsing it to absence hides definition
+    corruption (including duplicate-key shadowing).
+    """
+    path = Path(consumer_root) / ".mcp.json"
+    if not path.exists():
+        return {}, None
+    try:
+        return load_mcp_address_book(consumer_root), None
+    except ExternalTrustError as exc:
+        return {}, str(exc)
 
 
 def _mcp_client_read(command: str, args: list, cwd: Path, uris: list[str],
-                     timeout: int = 30) -> dict | None:
+                     timeout: int | float = DEFAULT_EXTERNAL_TIMEOUT_SECONDS,
+                     max_response_bytes: int = MAX_EXTERNAL_RESPONSE_BYTES
+                     ) -> dict | None:
     # A minimal MCP stdio *client*: spawn the source's server once, read the
     # given resource URIs through the face. Returns {uri: text} for every URI
     # the server answered; None when the spawn itself fails (bad command/path,
     # spawn failure, timeout) — the honest "sync state unknown" answer, never
     # a silent "fresh".
     import json
-    reqs = [{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}]
-    for i, uri in enumerate(uris, start=2):
-        reqs.append({"jsonrpc": "2.0", "id": i, "method": "resources/read",
-                     "params": {"uri": uri}})
-    payload = "\n".join(json.dumps(r) for r in reqs) + "\n"
-    try:
-        out = subprocess.run([command, *args], input=payload, cwd=str(cwd),
-                             capture_output=True, text=True, timeout=timeout)
-    except Exception:
-        return None
-    by_id: dict[int, dict] = {}
-    for line in out.stdout.splitlines():
+    import os
+    import queue
+
+    deadline = time.monotonic() + _bounded_timeout(timeout)
+    responses: queue.Queue[bytes | None] = queue.Queue()
+    out_state: dict = {"total": 0, "oversized": False, "failed": False}
+    err_state: dict = {"total": 0, "oversized": False, "failed": False}
+    proc = None
+
+    def read_stdout(pipe) -> None:
+        pending = bytearray()
         try:
-            msg = json.loads(line)
+            while True:
+                chunk = os.read(pipe.fileno(), 64 * 1024)
+                if not chunk:
+                    break
+                out_state["total"] += len(chunk)
+                if out_state["total"] > max_response_bytes:
+                    out_state["oversized"] = True
+                    pending.clear()
+                    continue  # drain to keep the child from blocking; retain nothing
+                pending.extend(chunk)
+                while b"\n" in pending:
+                    line, _, remainder = pending.partition(b"\n")
+                    pending = bytearray(remainder)
+                    responses.put(bytes(line))
+            if pending and not out_state["oversized"]:
+                responses.put(bytes(pending))
         except Exception:
-            continue
-        if msg.get("id") and "result" in msg:
-            by_id[msg["id"]] = msg["result"]
+            out_state["failed"] = True
+        finally:
+            responses.put(None)
+
+    def drain_stderr(pipe) -> None:
+        # Drain without surfacing repository-controlled diagnostics.  Retain no
+        # bytes, so secrets in a command's error path cannot enter a prompt.
+        try:
+            while True:
+                chunk = os.read(pipe.fileno(), 64 * 1024)
+                if not chunk:
+                    break
+                err_state["total"] += len(chunk)
+                if err_state["total"] > MAX_EXTERNAL_STDERR_BYTES:
+                    err_state["oversized"] = True
+        except Exception:
+            err_state["failed"] = True
+
+    def remaining() -> float:
+        return max(0.0, deadline - time.monotonic())
+
+    def next_message() -> dict | None:
+        while remaining() > 0:
+            try:
+                line = responses.get(timeout=max(0.05, remaining()))
+            except queue.Empty:
+                return None
+            if line is None:
+                return None
+            try:
+                value = json.loads(line.decode("utf-8", "replace"))
+            except Exception:
+                continue
+            if isinstance(value, dict):
+                return value
+        return None
+
+    def encode_frames(frames: list[dict]) -> bytes:
+        return ("\n".join(json.dumps(frame) for frame in frames) + "\n").encode(
+            "utf-8")
+
+    def stop() -> None:
+        if proc is None:
+            return
+        try:
+            if proc.poll() is None:
+                proc.kill()
+            proc.wait(timeout=1)
+        except Exception:
+            pass
+
+    try:
+        proc = subprocess.Popen(
+            [command, *args], cwd=str(cwd), stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        out_thread = threading.Thread(target=read_stdout, args=(proc.stdout,),
+                                      daemon=True)
+        err_thread = threading.Thread(target=drain_stderr, args=(proc.stderr,),
+                                      daemon=True)
+        out_thread.start(); err_thread.start()
+
+        # Initialization is a real handshake, not a batch prefix: wait for the
+        # response before sending the initialized notification or any request.
+        proc.stdin.write(encode_frames([_initialize_message()]))
+        proc.stdin.flush()
+        init = None
+        while remaining() > 0:
+            msg = next_message()
+            if msg is None:
+                stop(); return None
+            if msg.get("id") == 1:
+                init = msg
+                break
+        if not init or "result" not in init:
+            stop(); return None
+
+        frames = [_initialized_message()]
+        for i, uri in enumerate(uris, start=2):
+            frames.append({"jsonrpc": "2.0", "id": i,
+                           "method": "resources/read", "params": {"uri": uri}})
+        payload = encode_frames(frames)
+        input_state: dict = {"failed": False}
+
+        def feed_remaining() -> None:
+            try:
+                proc.stdin.write(payload)
+                proc.stdin.close()
+            except (BrokenPipeError, OSError):
+                input_state["failed"] = True
+
+        input_thread = threading.Thread(target=feed_remaining, daemon=True)
+        input_thread.start()
+        by_id: dict[int, dict] = {}
+        eof = False
+        while remaining() > 0 and not eof:
+            try:
+                line = responses.get(timeout=max(0.05, remaining()))
+            except queue.Empty:
+                break
+            if line is None:
+                eof = True
+                break
+            try:
+                msg = json.loads(line.decode("utf-8", "replace"))
+            except Exception:
+                continue
+            if (isinstance(msg, dict) and isinstance(msg.get("id"), int)
+                    and msg.get("id", 0) >= 2 and isinstance(msg.get("result"), dict)):
+                by_id[msg["id"]] = msg["result"]
+        if not eof:
+            stop(); return None
+        input_thread.join(timeout=1); out_thread.join(timeout=1); err_thread.join(timeout=1)
+        try:
+            proc.wait(timeout=max(0.05, remaining()))
+        except subprocess.TimeoutExpired:
+            stop(); return None
+        if (proc.returncode != 0 or input_thread.is_alive()
+                or input_state["failed"] or out_state["failed"]
+                or out_state["oversized"]):
+            return None
+    except Exception:
+        stop()
+        return None
+
     got: dict[str, str] = {}
     for i, uri in enumerate(uris, start=2):
         r = by_id.get(i)
         if r:
             try:
-                got[uri] = r["contents"][0]["text"]
+                value = r["contents"][0]["text"]
+                if isinstance(value, str):
+                    got[uri] = value
             except Exception:
                 pass
     return got
 
 
 def _mcp_http_read(url: str, uris: list[str], timeout: int = 30,
-                   headers: dict | None = None) -> dict | None:
+                   headers: dict | None = None,
+                   max_response_bytes: int = MAX_EXTERNAL_RESPONSE_BYTES
+                   ) -> dict | None:
     # The same face read over Streamable HTTP: one POST per JSON-RPC message
     # (batching left the MCP spec), Accept covering both response shapes the
     # spec allows. A failed initialize is None — "sync state unknown", never a
     # silent fresh; a failed single read just leaves that URI absent, exactly
     # like an error response on stdio.
     import json
+    import urllib.error
     import urllib.request
     from urllib.parse import urlsplit
     if urlsplit(url).scheme not in ("http", "https"):
         return None
     session = {"id": None}
+    deadline = time.monotonic() + _bounded_timeout(timeout)
+    response_budget = {"remaining": max(0, int(max_response_bytes)),
+                       "exhausted": False}
 
-    def post(msg: dict) -> dict | None:
+    class _NoRedirect(urllib.request.HTTPRedirectHandler):
+        # Trust pins one exact destination.  A redirect is a second destination
+        # and therefore has no authority, even when it is same-origin.
+        def redirect_request(self, req, fp, code, msg, headers_, newurl):
+            return None
+
+    opener = urllib.request.build_opener(
+        urllib.request.ProxyHandler({}), _NoRedirect())
+
+    def post(msg: dict, expect_response: bool = True) -> dict | None:
         req = urllib.request.Request(
             url, data=json.dumps(msg).encode(), method="POST",
             headers={"Content-Type": "application/json",
@@ -101,20 +296,49 @@ def _mcp_http_read(url: str, uris: list[str], timeout: int = 30,
                      **(headers or {})})
         if session["id"]:
             req.add_header("Mcp-Session-Id", session["id"])
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return None
+        with opener.open(req, timeout=max(0.05, remaining)) as r:
             sid = r.headers.get("Mcp-Session-Id")
             if sid:
                 session["id"] = sid
             ctype = r.headers.get("Content-Type", "")
-            raw = r.read().decode("utf-8", "replace")
+            declared = r.headers.get("Content-Length")
+            if declared:
+                try:
+                    declared_size = int(declared)
+                    if (declared_size < 0
+                            or declared_size > response_budget["remaining"]):
+                        response_budget["exhausted"] = True
+                        return None
+                except ValueError:
+                    return None
+            bounded = r.read(response_budget["remaining"] + 1)
+            if len(bounded) > response_budget["remaining"]:
+                response_budget["exhausted"] = True
+                return None
+            response_budget["remaining"] -= len(bounded)
+            raw = bounded.decode("utf-8", "replace")
+        if time.monotonic() > deadline:
+            return None
+        if not expect_response:
+            return {}
+        if ("application/json" not in ctype
+                and "text/event-stream" not in ctype):
+            return None
         if "text/event-stream" in ctype:  # SSE-wrapped response: last data frame
             frames = [ln[5:].strip() for ln in raw.splitlines() if ln.startswith("data:")]
             raw = frames[-1] if frames else ""
         return json.loads(raw) if raw.strip() else None
 
     try:
-        init = post({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
+        init = post(_initialize_message())
         if not init or "result" not in init:
+            return None
+        # MCP lifecycle completion is a notification and therefore has no
+        # JSON-RPC response body (the local server returns HTTP 202).
+        if post(_initialized_message(), expect_response=False) is None:
             return None
     except Exception:
         return None
@@ -124,28 +348,45 @@ def _mcp_http_read(url: str, uris: list[str], timeout: int = 30,
             resp = post({"jsonrpc": "2.0", "id": i, "method": "resources/read",
                          "params": {"uri": uri}})
             if resp and "result" in resp:
-                got[uri] = resp["result"]["contents"][0]["text"]
+                value = resp["result"]["contents"][0]["text"]
+                if isinstance(value, str):
+                    got[uri] = value
         except Exception:
             pass
+    if response_budget["exhausted"]:
+        # A partial face is not a bounded successful operation.  In
+        # particular, do not let an omitted oversized URI resemble a source
+        # withdrawal while retaining earlier responses from the same read.
+        return None
     return got
 
 
 def _addressed(cfg) -> bool:
-    return bool(isinstance(cfg, dict) and (cfg.get("command") or cfg.get("url")))
+    return bool(isinstance(cfg, dict) and ("command" in cfg or "url" in cfg))
 
 
-def _mcp_face_read(cfg: dict, cwd: Path, uris: list[str]) -> dict | None:
+def _mcp_face_read(cfg: dict, cwd: Path, uris: list[str], server: str,
+                   policy: ExternalTrustPolicy | None = None
+                   ) -> tuple[str, dict | None]:
     # One consumer-side read, either transport — the membrane semantics
-    # (unreachable = unknown, per-URI misses tolerated) are identical.
+    # (unreachable = unknown, per-URI misses tolerated) are identical.  The
+    # authority check occurs before selecting either I/O adapter.
+    decision = (policy or LocalExternalTrustPolicy()).evaluate(cwd, server, cfg)
+    if not decision.authorized:
+        return decision.state, None
     if cfg.get("url"):
         # `headers` rides the entry (the ecosystem's .mcp.json convention) —
         # how a tunnelled probe carries its per-run bearer token.
-        return _mcp_http_read(cfg["url"], uris, headers=cfg.get("headers"))
-    return _mcp_client_read(cfg["command"], cfg.get("args", []), cwd, uris)
+        got = _mcp_http_read(cfg["url"], uris, headers=cfg.get("headers"))
+    else:
+        got = _mcp_client_read(cfg["command"], cfg.get("args", []), cwd, uris)
+    return ("ok", got) if got is not None else ("unreachable", None)
 
 
 def _face_body(rendered: str) -> str:
     # `thing://` text is `---\n{frontmatter}---\n\n{body}` (_mcp_render_thing).
+    if not isinstance(rendered, str):
+        return ""
     if rendered.startswith("---\n"):
         parts = rendered.split("---\n", 2)
         if len(parts) == 3:
@@ -168,14 +409,29 @@ def _pins_match(a, b) -> bool:
     human's attributed flip on nothing. Two consumer domains hit it
     independently and patched it locally by quoting; the framework's own CI
     then flaked on it. Normalise here, at the single comparison seam (v3.27.0)."""
-    return (a is not None and b is not None
-            and str(a).strip() == str(b).strip())
+    if a is None or b is None:
+        return False
+    left, right = str(a).strip(), str(b).strip()
+    if left == right:
+        return True
+    # v3.33 migration: producers now stamp the immutable full commit while
+    # existing consumer things legitimately carry the prior 7+-hex short pin.
+    # Accept only an unambiguous shape transition, never arbitrary prefixes.
+    import re
+    hex_re = re.compile(r"^[0-9a-fA-F]+$")
+    for short, full in ((left, right), (right, left)):
+        if (7 <= len(short) < len(full)
+                and len(full) in (40, 64)
+                and hex_re.fullmatch(short) and hex_re.fullmatch(full)
+                and full.lower().startswith(short.lower())):
+            return True
+    return False
 
 
 def imports_freshness(consumer_root: Path) -> list[dict]:
     import json
     corpus, _ = scan(consumer_root)
-    book = _load_address_book(consumer_root)
+    book, book_error = _load_address_book_result(consumer_root)
     imports = [t for t in corpus.things if str(t.meta.get("origin")) == "external"]
 
     # One spawn per source, reading the manifest plus every imported thing's
@@ -189,16 +445,23 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
             by_source.setdefault(str(sd), []).append(str(sid))
     faces: dict[str, tuple[str, tuple[dict, dict] | None]] = {}
     for sd, sids in by_source.items():
+        if book_error is not None:
+            faces[sd] = ("unevaluable-invalid-config", None)
+            continue
         cfg = book.get(sd)
         if not _addressed(cfg):
             faces[sd] = ("no-address", None)
             continue
         uris = [f"manifest://{sd}"] + [f"thing://{sd}/{sid}" for sid in sids]
-        got = _mcp_face_read(cfg, consumer_root, uris)
+        read_state, got = _mcp_face_read(cfg, consumer_root, uris, str(sd))
+        if read_state != "ok":
+            faces[sd] = (read_state, None)
+            continue
         man = None
         if got and f"manifest://{sd}" in got:
             try:
-                man = json.loads(got[f"manifest://{sd}"])
+                candidate = json.loads(got[f"manifest://{sd}"])
+                man = candidate if isinstance(candidate, dict) else None
             except Exception:
                 man = None
         faces[sd] = ("ok", (man, got)) if man else ("unreachable", None)
@@ -227,10 +490,14 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
             row["state"] = "no-address-book-entry"
         elif state == "unreachable":
             row["state"] = "unreachable"  # sync state unknown — the honest answer
+        elif state in {"unevaluable-untrusted", "unevaluable-invalid-config"}:
+            row["state"] = state
         else:
             man, got = payload
-            current = next((k.get("source_commit") for k in man.get("knows", [])
-                            if k.get("id") == sid), None)
+            knows = man.get("knows", [])
+            knows = knows if isinstance(knows, list) else []
+            current = next((k.get("source_commit") for k in knows
+                            if isinstance(k, dict) and k.get("id") == sid), None)
             if current is None:
                 row["state"] = "withdrawn"  # no longer exposed by the source
             else:
@@ -261,7 +528,10 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
 
 def _render_rows(rows: list[dict]) -> None:
     order = {"stale": 0, "diverged": 1, "unreachable": 2, "withdrawn": 3,
-             "no-address-book-entry": 4, "incomplete": 5, "fresh": 6, "ingested": 7}
+             "unevaluable-untrusted": 3,
+             "unevaluable-invalid-config": 4,
+             "no-address-book-entry": 5, "incomplete": 6, "fresh": 7,
+             "ingested": 8}
     for r in sorted(rows, key=lambda r: order.get(r["state"], 9)):
         if r["state"] == "stale":
             sp = f"  ({r['species']})" if r.get("species") else ""
@@ -277,6 +547,12 @@ def _render_rows(rows: list[dict]) -> None:
             print(f"- fresh      {r['id']}  ({r['source']})  @ {r['pin']}")
         elif r["state"] == "unreachable":
             print(f"- UNKNOWN    {r['id']}  ({r['source']})  unreachable — sync state cannot be determined")
+        elif r["state"] == "unevaluable-untrusted":
+            print(f"- UNTRUSTED  {r['id']}  ({r['source']})  external route was not executed")
+            print("             review it with `mdllm external-trust review`; "
+                  "trust remains clone-local and hash-bound")
+        elif r["state"] == "unevaluable-invalid-config":
+            print(f"- INVALID    {r['id']}  ({r['source']})  external route is not safe to evaluate")
         elif r["state"] == "withdrawn":
             print(f"- WITHDRAWN  {r['id']}  ({r['source']})  source no longer exposes `{r['source'].split('/')[-1]}`")
         elif r["state"] == "no-address-book-entry":
@@ -338,22 +614,31 @@ def face_coverage(consumer_root: Path) -> list[dict]:
     legitimate disposition; the line is information, not a finding.
     """
     corpus, _ = scan(consumer_root)
-    book = _load_address_book(consumer_root)
+    book, book_error = _load_address_book_result(consumer_root)
     imported: dict[str, int] = {}
     for t in corpus.things:
         if str(t.meta.get("origin")) == "external" and t.meta.get("source_domain"):
             sd = str(t.meta["source_domain"])
             imported[sd] = imported.get(sd, 0) + 1
+    if book_error is not None:
+        return [{"source": ".mcp.json", "state": "unevaluable-invalid-config",
+                 "offered": None, "imported": sum(imported.values())}]
     out = []
     for sd, cfg in sorted(book.items()):
         if not _addressed(cfg):
             continue
-        got = _mcp_face_read(cfg, consumer_root, [f"manifest://{sd}"])
+        read_state, got = _mcp_face_read(
+            cfg, consumer_root, [f"manifest://{sd}"], str(sd))
+        if read_state != "ok":
+            out.append({"source": sd, "state": read_state,
+                        "offered": None, "imported": imported.get(sd, 0)})
+            continue
         man = None
         if got and f"manifest://{sd}" in got:
             import json
             try:
-                man = json.loads(got[f"manifest://{sd}"])
+                candidate = json.loads(got[f"manifest://{sd}"])
+                man = candidate if isinstance(candidate, dict) else None
             except Exception:
                 man = None
         if man is None:
@@ -361,7 +646,8 @@ def face_coverage(consumer_root: Path) -> list[dict]:
                         "offered": None, "imported": imported.get(sd, 0)})
         else:
             out.append({"source": sd, "state": "ok",
-                        "offered": len(man.get("knows") or []),
+                        "offered": len(man.get("knows"))
+                        if isinstance(man.get("knows"), list) else 0,
                         "imported": imported.get(sd, 0)})
     return out
 
@@ -373,6 +659,12 @@ def _render_face_coverage(cov: list[dict]) -> None:
     for c in cov:
         if c["state"] == "unreachable":
             print(f"- {c['source']}: unreachable — offering unknown "
+                  f"({c['imported']} imported)")
+        elif c["state"] == "unevaluable-untrusted":
+            print(f"- {c['source']}: untrusted — route not executed "
+                  f"({c['imported']} imported); review with `mdllm external-trust review`")
+        elif c["state"] == "unevaluable-invalid-config":
+            print(f"- {c['source']}: invalid external route — offering unevaluable "
                   f"({c['imported']} imported)")
         elif c["offered"] and c["imported"] == 0:
             print(f"- {c['source']}: offers {c['offered']}, imported 0 — "

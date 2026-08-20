@@ -179,6 +179,8 @@ framework_version: 3.32.0
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> framework-discovery-specification
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> claude-phase6-no-adapter-and-root-2026-08-16
 - claude-entry-surface-unprovisioned-for-no-adapter-domains --references--> claude-no-adapter-entry-probe-2026-08-17
+- claude-entry-surface-unprovisioned-for-no-adapter-domains --parties--> interface-specification
+- claude-entry-surface-unprovisioned-for-no-adapter-domains --parties--> vendor-harness-adapter-foundation
 - claude-gate-5r1-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-gate-5r1-acceptance-2026-08-13 --derived-from--> claude-phase5r0-red-acceptance-2026-08-12
 - claude-gate-5r1-acceptance-2026-08-13 --derived-from--> posix-floor-record-2026-08-13
@@ -779,6 +781,8 @@ framework_version: 3.32.0
 - status-vocabulary-universal-vs-domain --references--> validate-thing-specification
 - status-vocabulary-universal-vs-domain --references--> domain-specification-guide
 - status-vocabulary-universal-vs-domain --references--> framework-v3-transformation-plan
+- status-vocabulary-universal-vs-domain --parties--> validate-thing-specification
+- status-vocabulary-universal-vs-domain --parties--> domain-specification-guide
 - structural-pointers-need-reverse-edge-indexing --informs--> change-reconciliation-specification
 - structural-pointers-need-reverse-edge-indexing --informs--> derived-index-specification
 - structural-pointers-need-reverse-edge-indexing --informs--> workflow-state-specification

@@ -4,7 +4,7 @@ name: Life Manager Workflow
 type: skill
 mode: workflow
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-18
 linked_things:
   - id: life-manager-specification
@@ -14,7 +14,7 @@ linked_things:
   - id: life-manager-write-thing-skill
     relation: orchestrates
 description: Process orchestration and execution patterns for life management
-applies_to: "life-manager/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # Life Manager Workflow

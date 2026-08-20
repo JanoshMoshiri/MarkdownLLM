@@ -16,12 +16,14 @@ the `mcp` SDK is not a dependency.
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 
-from .model import Corpus, Thing, scan
-from .repo import git_short_sha
+from .model import Corpus, Thing, parse_frontmatter, scan
+from .repository_view import (
+    RepositoryView, RepositoryViewError, RepositoryViewMode,
+)
+from .structural_refs import egress_private_fields
 
 MCP_PROTOCOL_VERSION = "2025-11-25"  # echoed back to the client if it offers one
 MCP_SERVER_VERSION = "0.1"
@@ -68,12 +70,9 @@ def _mcp_summary(t: Thing) -> str:
 # just as much as `linked_things` does — they leaked for two versions because
 # the list was built from the road test's symptom, not from the rule (review 6,
 # finding 2).
-_MCP_INTERNAL_GRAPH = ("linked_things", "dependencies", "blocks", "parent",
-                       "definition", "triggers", "informed_by", "parties")
-
-
 def _mcp_egress_meta(meta: dict) -> dict:
-    return {k: v for k, v in meta.items() if k not in _MCP_INTERNAL_GRAPH}
+    private = egress_private_fields()
+    return {k: v for k, v in meta.items() if k not in private}
 
 
 def _mcp_render_thing(t: Thing) -> str:
@@ -82,21 +81,64 @@ def _mcp_render_thing(t: Thing) -> str:
     return f"---\n{fm}---\n\n{t.body.lstrip(chr(10))}"
 
 
-def _mcp_thing_commit(root: Path, t: Thing) -> str:
-    # The pin is *per-thing*: the last commit that touched this exposed thing,
-    # not the domain HEAD — so a freshness check fires only when the consumed
-    # thing actually changed, not on any commit to the source. Computed
-    # source-side; only the resulting commit crosses, never the file path.
+def _mcp_logical_path(view: RepositoryView, t: Thing) -> Path:
     try:
-        rel = t.path.relative_to(root)
+        return t.path.relative_to(view.root)
     except ValueError:
-        rel = t.path
+        return t.path
+
+
+def _mcp_source(root: Path, corpus: Corpus, t: Thing) -> tuple[Thing, dict]:
+    """Describe the exact provenance of the bytes parsed into ``t``.
+
+    A full last-touch commit is returned only when those bytes came from an
+    immutable commit view or are byte-identical to the current HEAD view.  A
+    draft/index candidate remains usable on the local porch, but it is marked
+    ``uncommitted`` and cannot masquerade as a reference triple.
+    """
+    root = Path(root).resolve()
+    view = corpus.view or RepositoryView.worktree(root)
+    logical = _mcp_logical_path(view, t)
+    source = t.source_text.encode("utf-8") if t.source_text is not None else None
+
+    if view.mode is RepositoryViewMode.COMMIT:
+        if source is None or not view.exists(logical) or view.read_bytes(logical) != source:
+            return t, {"state": "unknown", "source_commit": "unknown",
+                       "view": view.identifier}
+        commit = view.last_commit_for(logical)
+        if commit:
+            return t, {"state": "committed", "source_commit": commit,
+                       "view": view.identifier}
+        return t, {"state": "unknown", "source_commit": "unknown",
+                   "view": view.identifier}
+
     try:
-        out = subprocess.run(["git", "log", "-1", "--format=%h", "--", str(rel)],
-                             cwd=root, capture_output=True, text=True, check=True)
-        return out.stdout.strip() or "unknown"
-    except Exception:
-        return "unknown"
+        head = RepositoryView.commit(root)
+    except RepositoryViewError:
+        return t, {"state": "unknown", "source_commit": "unknown",
+                   "view": view.identifier}
+
+    committed_source = head.read_bytes(logical) if head.exists(logical) else None
+    # A Windows checkout may expose CRLF while Git's immutable blob is LF.
+    # Treat only that one safe transport normalization as equivalent, then
+    # substitute the actual committed bytes for egress.  We never stamp the
+    # ambient worktree rendering and merely hope the content is the same.
+    matches = bool(source is not None and committed_source is not None and (
+        source == committed_source or source.replace(b"\r\n", b"\n") == committed_source
+    ))
+    if matches:
+        commit = head.last_commit_for(logical)
+        if commit:
+            text = committed_source.decode("utf-8")
+            meta, body, err = parse_frontmatter(text)
+            if err is None and meta is not None:
+                t = Thing(path=t.path, meta=meta, body=body, source_text=text)
+                return t, {"state": "committed", "source_commit": commit,
+                           "view": f"commit:{head.commit_sha}"}
+
+    state = "candidate" if view.mode is RepositoryViewMode.INDEX else "uncommitted"
+    return t, {"state": state, "source_commit": "uncommitted",
+               "base_commit": head.commit_sha, "view": view.identifier}
 
 
 def mcp_list_tools() -> list[dict]:
@@ -120,7 +162,13 @@ def mcp_list_tools() -> list[dict]:
 
 def mcp_query_things(corpus: Corpus, typ=None, tag=None, status=None, text=None) -> list[dict]:
     rows = []
-    for t in mcp_exposed_things(corpus):
+    source_root = corpus.view.root if corpus.view is not None else corpus.root
+    for exposed in mcp_exposed_things(corpus):
+        # Query results cross the same membrane as deliverables.  Resolve the
+        # exact source before reading row fields so a clean CRLF worktree uses
+        # the committed blob, while a draft/index value stays usable only with
+        # its explicit uncommitted/candidate label.
+        t, source = _mcp_source(source_root, corpus, exposed)
         m = t.meta
         if typ and str(m.get("type")) != str(typ):
             continue
@@ -133,7 +181,8 @@ def mcp_query_things(corpus: Corpus, typ=None, tag=None, status=None, text=None)
         if text and text.lower() not in (f"{t.id} {_mcp_summary(t)} {t.body}").lower():
             continue
         rows.append({"id": t.id, "type": m.get("type"),
-                     "status": m.get("status"), "summary": _mcp_summary(t)})
+                     "status": m.get("status"), "summary": _mcp_summary(t),
+                     "_mcp_source": source})
     return rows
 
 
@@ -144,8 +193,10 @@ def mcp_get_deliverable(root: Path, corpus: Corpus, domain_id: str, tid: str) ->
     t = {x.id: x for x in mcp_exposed_things(corpus)}.get(tid)
     if t is None:
         return None
+    t, source = _mcp_source(root, corpus, t)
     return {"reference_triple": {"source_domain": domain_id, "source_id": tid,
-                                 "source_commit": _mcp_thing_commit(root, t)},
+                                 "source_commit": source["source_commit"]},
+            "source_state": source,
             "frontmatter": _mcp_egress_meta(t.meta), "content": t.body}
 
 
@@ -154,12 +205,22 @@ def mcp_build_manifest(root: Path, corpus: Corpus, domain_id: str) -> dict:
     # `knows` entry carries the thing's per-thing `source_commit` so a consumer's
     # freshness check reads current pins from the face in one call.
     things = mcp_exposed_things(corpus)
+    states = {t.id: _mcp_source(root, corpus, t)[1] for t in things}
+    view = corpus.view or RepositoryView.worktree(root)
+    if view.mode is RepositoryViewMode.COMMIT:
+        head_commit = view.commit_sha
+    else:
+        try:
+            head_commit = RepositoryView.commit(root).commit_sha
+        except RepositoryViewError:
+            head_commit = "unknown"
     return {"name": domain_id, "domain_id": domain_id,
-            "head_commit": git_short_sha(root),
-            "liveness": "corpus",
+            "head_commit": head_commit,
+            "liveness": view.identifier,
             "knows": [{"id": t.id, "type": t.meta.get("type"),
                        "status": t.meta.get("status"), "summary": _mcp_summary(t),
-                       "source_commit": _mcp_thing_commit(root, t)}
+                       "source_commit": states[t.id]["source_commit"],
+                       "source_state": states[t.id]["state"]}
                       for t in things],
             "can_do": [tool["name"] for tool in mcp_list_tools()],
             # Deliberately empty, permanently — operator ruling 2026-07-28:
@@ -191,7 +252,11 @@ def mcp_read_resource(root: Path, corpus: Corpus, domain_id: str, uri: str) -> d
         t = {x.id: x for x in mcp_exposed_things(corpus)}.get(uri[len(prefix):])
         if t is None:
             return None
-        return {"uri": uri, "mimeType": "text/markdown", "text": _mcp_render_thing(t)}
+        t, source = _mcp_source(root, corpus, t)
+        return {"uri": uri, "mimeType": "text/markdown",
+                "sourceState": source["state"],
+                "sourceCommit": source["source_commit"],
+                "text": _mcp_render_thing(t)}
     return None
 
 

@@ -13,6 +13,9 @@ from pathlib import Path
 
 from .model import Corpus, Finding, SEV_ERROR, SEV_WARNING, parse_frontmatter, scan
 from .repo import framework_version, git_short_sha
+from .repository_view import RepositoryView
+from .structural_refs import REFERENCE_BY_FIELD, iter_structural_references
+from .yaml_loader import load_version_sentinel
 
 def build_index_body(corpus: Corpus, signal: str) -> tuple[str, int]:
     """Returns (body, coverage)."""
@@ -44,30 +47,22 @@ def build_index_body(corpus: Corpus, signal: str) -> tuple[str, int]:
         return "\n".join(lines), len(corpus.things)
     if signal == "relationships":
         for t in sorted(corpus.things, key=lambda x: x.id or ""):
-            for e in t.meta.get("linked_things") or []:
-                if isinstance(e, dict):
-                    lines.append(f"- {t.id} --{e.get('relation')}--> {e.get('id')}")
-            # Singular structural pointers are declared edges too. They live in
-            # their own load-bearing fields (modelled on `parent`), not in
-            # `linked_things`, so the loop above is blind to them — which left the
-            # change-reconciliation Assimilate beat unable to recall a definition's
-            # runs or a parent's children in reverse. Emit them as edges so a
-            # reverse read over this index has total recall over what is declared,
-            # not just over `linked_things`. (structural-pointers-need-reverse-edge-indexing)
-            for field in ("parent", "definition"):
-                tgt = t.meta.get(field)
-                if isinstance(tgt, str) and tgt:
-                    lines.append(f"- {t.id} --{field}--> {tgt}")
+            for ref in iter_structural_references(t.meta, reverse_only=True):
+                owner = ref.field.split(".", 1)[0]
+                if REFERENCE_BY_FIELD[owner].index_signal != "relationships":
+                    continue
+                lines.append(f"- {t.id} --{ref.relation}--> {ref.target}")
         return "\n".join(lines), len(corpus.things)
     if signal == "provenance":
         # Reverse map: for each knowledge thing, which decisions pin it and
         # which outputs derive from those decisions. See provenance.md.
         dependents: dict[str, list[str]] = {}
         for t in sorted(corpus.things, key=lambda x: x.id or ""):
-            for pin in t.meta.get("informed_by") or []:
-                if isinstance(pin, dict) and pin.get("id"):
-                    dependents.setdefault(pin["id"], []).append(
-                        f"{t.id} (pinned @{pin.get('commit', '?')})")
+            for ref in iter_structural_references(t.meta, reverse_only=True):
+                owner = ref.field.split(".", 1)[0]
+                if REFERENCE_BY_FIELD[owner].index_signal == "provenance":
+                    dependents.setdefault(ref.target, []).append(
+                        f"{t.id} (pinned @{ref.commit or '?'})")
             for e in t.meta.get("linked_things") or []:
                 if isinstance(e, dict) and e.get("relation") == "derived-from":
                     dependents.setdefault(str(e.get("id")), []).append(
@@ -85,7 +80,42 @@ INDEX_FILES = {"triggers": "triggers.md", "schema": "schema.md",
                "relationships": "relationships.md", "provenance": "provenance.md"}
 
 
-def _anchor_notes(root: Path, meta: dict, signal: str) -> list[str]:
+def _stored_index_payload(body: str) -> str:
+    """Remove the generated title without inventing content for an empty index.
+
+    The old ``strip().split("\\n", 1)[-1]`` spelling returned the title itself
+    when a legitimately empty index had no second line.  That made an empty
+    triggers index report drift immediately after its own rebuild.
+    """
+    lines = body.strip().splitlines()
+    if not lines:
+        return ""
+    if lines[0].startswith("# "):
+        return "\n".join(lines[1:]).strip()
+    return "\n".join(lines).strip()
+
+
+def _view_framework_version(root: Path, view: RepositoryView | None) -> str:
+    """Read the sentinel from the same repository view when it owns one."""
+    if view is not None:
+        sentinel = Path(root).resolve() / ".markdownllm"
+        try:
+            logical = sentinel.relative_to(view.root).as_posix()
+        except ValueError:
+            logical = ""
+        if logical and view.exists(logical):
+            data = load_version_sentinel(
+                view.read_text(logical), source=logical)
+            return str(data.get("version", "unknown"))
+    # A downstream domain's framework sentinel lives outside its repository
+    # view; that external version dependency remains an explicitly ambient
+    # input, while a framework-root candidate never leaks to the worktree.
+    return framework_version(root)
+
+
+def _anchor_notes(
+    root: Path, meta: dict, signal: str, view: RepositoryView | None = None,
+) -> list[str]:
     """Integrity of a stored index's own generation stamp — content parity is
     not the whole story. `generated_from` must still resolve (a history rewrite
     kills the anchor while the body stays "in sync" — found live on the
@@ -101,7 +131,8 @@ def _anchor_notes(root: Path, meta: dict, signal: str) -> list[str]:
         if not ok:
             notes.append(f"`generated_from` anchor `{gf}` no longer resolves "
                          f"(history rewritten?) — rebuild to re-pin")
-    stamped, current = str(meta.get("framework_version", "")), framework_version(root)
+    stamped = str(meta.get("framework_version", ""))
+    current = _view_framework_version(root, view)
     if stamped and current and stamped != str(current):
         notes.append(f"stamped at framework {stamped}, current is {current} — "
                      f"rebuild to re-pin")
@@ -117,15 +148,23 @@ def index_drift_findings(root: Path, corpus: Corpus) -> list[Finding]:
     idx_dir = root / "things" / "_index"
     for signal, fname in INDEX_FILES.items():
         path = idx_dir / fname
-        if not path.exists():
+        view = corpus.view
+        if view is not None:
+            logical = path.resolve().relative_to(view.root).as_posix()
+            exists = view.exists(logical)
+            existing = view.read_text(logical) if exists else None
+        else:
+            exists = path.exists()
+            existing = path.read_text(encoding="utf-8") if exists else None
+        if not exists:
             continue  # not deployed — opt-in, not a defect
         body, _ = build_index_body(corpus, signal)
-        meta, ex_body, _ = parse_frontmatter(path.read_text(encoding="utf-8"))
-        if ex_body.strip().split("\n", 1)[-1].strip() != f"{body}".strip():
+        meta, ex_body, _ = parse_frontmatter(existing or "", source=path)
+        if _stored_index_payload(ex_body) != f"{body}".strip():
             out.append(Finding(SEV_ERROR, f"{signal}-index",
                        f"DRIFT — stored body differs from rebuild; run "
                        f"`mdllm index {root} rebuild --signal {signal}`"))
-        for note in _anchor_notes(root, meta or {}, signal):
+        for note in _anchor_notes(root, meta or {}, signal, corpus.view):
             out.append(Finding(SEV_WARNING, f"{signal}-index", note))
     return out
 
@@ -170,7 +209,7 @@ def cmd_index(args) -> int:
                 continue
             existing = path.read_text(encoding="utf-8")
             ex_meta, ex_body, _ = parse_frontmatter(existing)
-            if ex_body.strip().split("\n", 1)[-1].strip() != (f"{body}").strip():
+            if _stored_index_payload(ex_body) != (f"{body}").strip():
                 print(f"{signal}: DRIFT — stored body differs from rebuild; "
                       f"run `mdllm index {root} rebuild --signal {signal}`")
                 rc = 1

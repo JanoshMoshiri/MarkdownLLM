@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 1.9
+version: 2.0
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -48,8 +48,8 @@ and `touchpoints` for the Assimilate beat).
 Read top-down, this is a session's life: `AGENTS.md` routes the query and
 loads the kernel (itself generated *from* the spec layer — hence the dashed
 return edge), the specs define the types that the things in `things/`
-instantiate, `mdllm` validates everything mechanically, and git makes state
-real at the commit boundary.
+instantiate, `mdllm` validates declared mechanical invariants, and git makes a
+candidate the accepted recorded state at the commit boundary.
 
 ```mermaid
 flowchart TD
@@ -61,10 +61,11 @@ flowchart TD
         why, thing.md with the core operative specs, and 22 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
-        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 32
-        mechanical subcommands and a git pre-commit hook that blocks invalid
-        commits. At the base, git is the state machine, event stream and audit
-        trail. The edges run as follows. AGENTS.md loads the kernel and routes
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 33
+        mechanical subcommands and a git pre-commit hook that, when current and
+        runnable, blocks commits with mechanical Errors. At the base, git is
+        the accepted-state machine, event stream and inspectable audit aid.
+        The edges run as follows. AGENTS.md loads the kernel and routes
         to the specs. The specs distil back up into the kernel via mdllm
         kernel, which is why that one edge points upward. The specs instantiate
         domain memory. The CLI installs the hook. The floor validates memory,
@@ -86,10 +87,10 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>32 mechanical subcommands"]
-        HOOK["git pre-commit hook<br/>blocks invalid commits"]
+        MDLLM["mdllm CLI<br/>33 mechanical subcommands"]
+        HOOK["git pre-commit hook<br/>blocks mechanical Errors when active"]
     end
-    GIT["git — state machine, event stream, audit trail"]
+    GIT["git — accepted-state machine,<br/>event stream, inspectable history"]
 
     AGENTS -->|loads| KERNEL
     AGENTS -->|routes & loads| specs
@@ -213,13 +214,14 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 flowchart LR
     accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
     accDescr {
-        A left column of 32 mdllm subcommands, each with a single edge to the
+        A left column of 33 mdllm subcommands, each with a single edge to the
         spec surface it serves in the right column. The tool is a mapping, not
         a monolith. Solid edges enforce or measure a spec, and dashed edges
         generate an artifact. Enforcing or measuring: validate, triggers,
         index, provenance, eval, tokens, doctor, scaffold, refresh, coherence,
-        touchpoints, cascade, imports-check, boundary, estate-check,
-        estate-sync, calc, candidates, and the harness-event dispatcher.
+        touchpoints, cascade, imports-check, external-trust, boundary,
+        estate-check, estate-sync, calc, candidates, and the harness-event
+        dispatcher.
         Generating: kernel, changelog, install-hook, worklog, domain-kernel,
         session-start, mcp-serve, bundle, autopush and adapter-install. The
         new assembly and guarded-publication commands mechanise explicit
@@ -261,6 +263,7 @@ flowchart LR
         C30["assemble"]
         C31["bundle"]
         C32["publish"]
+        C33["external-trust"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -295,6 +298,7 @@ flowchart LR
         T30["orchestration.md<br/>explicit bootstrap lifecycle"]
         T31["interface.md<br/>rendered distribution deliverable"]
         T32["git-workflow.md<br/>guarded outbound publication"]
+        T33["clone-local MCP authority<br/>exact entry hash in Git directory"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -329,6 +333,7 @@ flowchart LR
     C30 -->|"assembles and emits"| T30
     C31 -.->|"renders"| T31
     C32 -->|"guards"| T32
+    C33 -->|"authorises exact local definition for"| T33
 ```
 
 Notes on this view:
@@ -337,8 +342,9 @@ Notes on this view:
   (structural, referential, schema); the agent owns semantic validation only
   (`validate.thing.md` → Layer 2). Never re-perform a mechanical check by
   reasoning.
-- `install-hook` is the floor enforcing itself: it wires `validate` into the
-  commit boundary so the guarantee survives agents that forget to run it.
+- `install-hook` is the floor enforcing its enumerated checks: when the hook is
+  installed and runnable, it wires `validate` into the commit boundary so
+  mechanical Errors are caught even when an agent forgets to run it by hand.
 - `doctor` is the floor checking it can exist here at all: prerequisites,
   hook *execution* (resolution is not verification), and framework-version
   drift for domains. With `--harness`, support, configuration, currency,
@@ -444,8 +450,10 @@ flowchart LR
         through the porch - including the question have you changed. In domain
         A, the producer, things opted in with exposed true feed the porch, a
         curated read-only face served by mdllm mcp-serve. In domain B, the
-        consumer, an address book in .mcp.json holds operator-wired trust zones
-        and spawns the producer's porch. The porch hands over a deliverable
+        consumer, an address book in .mcp.json proposes a producer route. A
+        clone-local trust record in the Git directory must authorize the exact
+        entry hash before anything spawns or contacts the porch. The porch
+        hands over a deliverable
         plus the reference triple, which becomes an import marked origin
         external, pinning source domain, id and commit. That import is checked
         by mdllm imports-check, which reports fresh, stale, diverged or
@@ -459,11 +467,13 @@ flowchart LR
         EX --> PORCH
     end
     subgraph B["domain B (consumer)"]
-        AB["address book (.mcp.json)<br/>operator-wired trust zones"]
+        AB["address book (.mcp.json)<br/>repository proposal — inert by default"]
+        TRUST["external-trust<br/>clone-local exact-hash authority"]
         IMP["import — origin: external<br/>pins source_domain/id/commit"]
         IC["mdllm imports-check<br/>fresh / stale / diverged / unreachable"]
         CR["change-reconciliation<br/>receives external inflection"]
-        AB -. spawns .-> PORCH
+        AB -->|"review exact entry"| TRUST
+        TRUST -. "only when authorised: spawn/contact" .-> PORCH
         PORCH -- "deliverable + triple" --> IMP
         IMP --> IC
         IC -. "freshness + content poll" .-> PORCH
@@ -477,6 +487,9 @@ Notes on this view:
   under the pin; `diverged` = the pin is current but the mirror's content no
   longer matches the face (the loop was bypassed). The producer never learns
   who consumes it.
+- `.mcp.json` is committed data, never authority by itself. `external-trust`
+  stores the operator's exact-hash grant below the clone's Git directory; the
+  record is not committed, and a changed entry returns to default-deny.
 - `estate-check` is this view repeated per named consumer root and rolled up —
   batching, never an index; nothing is discovered, persisted, or
   reverse-mapped.

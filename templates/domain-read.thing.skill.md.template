@@ -12,7 +12,7 @@ linked_things:
   - id: [domain]-workflow-skill
     relation: complements
 description: How to read, analyze, and reason about [domain] things
-applies_to: "[domain]/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # [Domain] Read Thing Skill

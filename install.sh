@@ -2,11 +2,13 @@
 #
 # MarkdownLLM installer (macOS / Linux / Git-Bash).
 #
-# Run from any folder (downloads + sets everything up):
-#   curl -fsSL https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.sh | bash
-#
-# Or from inside a checkout you already cloned:
+# Run from a release-pinned checkout whose installer hash you verified (the
+# exact commands and current hashes are in README.md):
 #   ./install.sh
+#
+# Direct invocation outside a checkout is also supported, but requires the
+# immutable release commit explicitly:
+#   ./install.sh --ref <40-character-release-commit>
 #
 # It checks prerequisites, clones the framework if needed, installs PyYAML and
 # the deterministic-floor git hooks (validation, disclosure boundary,
@@ -55,7 +57,19 @@ py_hint() {
 
 # --- consent-based dependency install (offered, never forced) ---
 AUTO_YES=0
-for arg in "$@"; do case "$arg" in -y|--yes) AUTO_YES=1 ;; esac; done
+RELEASE_REF="${MARKDOWNLLM_RELEASE_COMMIT:-}"
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -y|--yes) AUTO_YES=1 ;;
+    --ref)
+      shift
+      [ "$#" -gt 0 ] || die "--ref requires a full release commit"
+      RELEASE_REF="$1"
+      ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
 
 PKG=""
 case "$OS" in
@@ -153,22 +167,34 @@ else
   if [ -e "MarkdownLLM" ]; then
     die "./MarkdownLLM already exists but isn't a framework checkout — move it aside and re-run."
   fi
-  say "Cloning MarkdownLLM into ./MarkdownLLM"
-  git clone "$REPO_URL" MarkdownLLM
+  [ "${#RELEASE_REF}" -eq 40 ] || \
+    die "outside a checkout, pass --ref with the full 40-character release commit; moving branches are not an install authority"
+  case "$RELEASE_REF" in
+    *[!0-9a-fA-F]*) die "--ref must be a hexadecimal release commit" ;;
+  esac
+  RELEASE_REF="$(printf '%s' "$RELEASE_REF" | tr '[:upper:]' '[:lower:]')"
+  say "Fetching MarkdownLLM release commit ${RELEASE_REF} into ./MarkdownLLM"
+  git init -q MarkdownLLM
+  git -C MarkdownLLM remote add origin "$REPO_URL"
+  git -C MarkdownLLM fetch --depth 1 origin \
+    "$RELEASE_REF:refs/remotes/origin/verified-release"
+  FETCHED="$(git -C MarkdownLLM rev-parse FETCH_HEAD)"
+  [ "$FETCHED" = "$RELEASE_REF" ] || die "fetched commit did not match --ref"
+  git -C MarkdownLLM checkout -q --detach "$RELEASE_REF"
   REPO_DIR="$PWD/MarkdownLLM"
 fi
 cd "$REPO_DIR"
 
 # --- 4. PyYAML (the only dependency we install for you) ---
-say "Ensuring PyYAML is available"
-if "$PY" -c 'import yaml' 2>/dev/null; then
-  ok "pyyaml already installed"
-elif "$PY" -m pip install pyyaml >/dev/null 2>&1; then
-  ok "pyyaml installed"
+say "Ensuring PyYAML 6.0.3 is available"
+if "$PY" -c 'import yaml, sys; sys.exit(0 if yaml.__version__ == "6.0.3" else 1)' 2>/dev/null; then
+  ok "pyyaml 6.0.3 already installed"
+elif "$PY" -m pip install 'PyYAML==6.0.3' >/dev/null 2>&1; then
+  ok "pyyaml 6.0.3 installed"
 else
   warn "automatic pip install failed. Try one of:"
-  echo "       $PY -m pip install --user pyyaml"
-  echo "       $PY -m pip install --break-system-packages pyyaml   # PEP 668 environments"
+  echo "       $PY -m pip install --user 'PyYAML==6.0.3'"
+  echo "       $PY -m pip install --break-system-packages 'PyYAML==6.0.3'   # PEP 668 environments"
   die "install PyYAML, then re-run."
 fi
 

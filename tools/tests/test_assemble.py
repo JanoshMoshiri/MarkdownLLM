@@ -24,10 +24,13 @@ from markdownllm.adapters.cowork import COWORK  # noqa: E402
 from markdownllm.assemble import (  # noqa: E402
     clone_url, cmd_assemble, parse_config, select_domains,
 )
-from markdownllm.bundle_service import derive_estate_config, owner_repo  # noqa: E402
+from markdownllm.bundle_service import (  # noqa: E402
+    derive_estate_config, framework_source_findings, owner_repo,
+)
 
 FW_ROOT = Path(mdllm.__file__).resolve().parents[1]
 TEMPLATES = FW_ROOT / "templates"
+TEST_FRAMEWORK_COMMIT = "0123456789abcdef0123456789abcdef01234567"
 
 
 def _ns(**kw):
@@ -63,6 +66,20 @@ def _bare_domain(tmp_path: Path, name: str, branch: str = "trunk") -> Path:
     _run(seed, "remote", "add", "origin", str(origin))
     _run(seed, "push", "-q", "origin", branch)
     return origin
+
+
+def _advance_remote(tmp_path: Path, origin: Path, branch: str,
+                    marker: str) -> str:
+    writer = tmp_path / f"writer-{marker}"
+    subprocess.run(["git", "clone", "-q", "-b", branch,
+                    str(origin), str(writer)], check=True)
+    _run(writer, "config", "user.email", "writer@test")
+    _run(writer, "config", "user.name", "writer")
+    (writer / f"{marker}.txt").write_text(marker + "\n", encoding="utf-8")
+    _run(writer, "add", "-A")
+    _run(writer, "commit", "-q", "-m", marker)
+    _run(writer, "push", "-q", "origin", branch)
+    return _run(writer, "rev-parse", "HEAD")
 
 
 @pytest.fixture()
@@ -177,6 +194,84 @@ def test_assemble_is_idempotent(workspace, capsys):
     assert "reusing the existing clone" in capsys.readouterr().out
 
 
+def test_reused_clean_clone_fast_forwards_through_shared_sync(
+        workspace, tmp_path, capsys):
+    root, config, alpha, *_ = workspace
+    args = _ns(config=str(config), root=str(root), filters=["alpha"])
+    assert cmd_assemble(args) == 0
+    capsys.readouterr()
+
+    remote_tip = _advance_remote(tmp_path, alpha, "trunk", "remote-update")
+    clone = root / "domains" / "alpha-estate"
+    assert _run(clone, "rev-parse", "HEAD") != remote_tip
+
+    assert cmd_assemble(args) == 0
+    out = capsys.readouterr().out
+    assert "sync: synced" in out
+    assert _run(clone, "rev-parse", "HEAD") == remote_tip
+
+
+def test_reused_dirty_clone_is_reported_and_not_resolved(
+        workspace, tmp_path, capsys):
+    root, config, alpha, *_ = workspace
+    args = _ns(config=str(config), root=str(root), filters=["alpha"])
+    assert cmd_assemble(args) == 0
+    capsys.readouterr()
+    clone = root / "domains" / "alpha-estate"
+    original = _run(clone, "rev-parse", "HEAD")
+    local_draft = clone / "operator-draft.txt"
+    local_draft.write_text("keep me\n", encoding="utf-8")
+    remote_tip = _advance_remote(tmp_path, alpha, "trunk", "remote-dirty")
+
+    assert cmd_assemble(args) == 0
+    out = capsys.readouterr().out
+    assert "sync: dirty" in out
+    assert "left untouched" in out
+    assert _run(clone, "rev-parse", "HEAD") == original
+    assert original != remote_tip
+    assert local_draft.read_text(encoding="utf-8") == "keep me\n"
+
+
+def test_reused_dirty_up_to_date_clone_is_still_reported_as_dirty(
+        workspace, capsys):
+    root, config, *_ = workspace
+    args = _ns(config=str(config), root=str(root), filters=["alpha"])
+    assert cmd_assemble(args) == 0
+    capsys.readouterr()
+    clone = root / "domains" / "alpha-estate"
+    original = _run(clone, "rev-parse", "HEAD")
+    local_draft = clone / "operator-draft.txt"
+    local_draft.write_text("keep me\n", encoding="utf-8")
+
+    assert cmd_assemble(args) == 0
+    out = capsys.readouterr().out
+    assert "sync: dirty" in out
+    assert "working tree not clean" in out
+    assert _run(clone, "rev-parse", "HEAD") == original
+    assert local_draft.read_text(encoding="utf-8") == "keep me\n"
+
+
+def test_reused_diverged_clone_is_reported_and_not_merged(
+        workspace, tmp_path, capsys):
+    root, config, alpha, *_ = workspace
+    args = _ns(config=str(config), root=str(root), filters=["alpha"])
+    assert cmd_assemble(args) == 0
+    capsys.readouterr()
+    clone = root / "domains" / "alpha-estate"
+    (clone / "local.txt").write_text("local\n", encoding="utf-8")
+    _run(clone, "add", "-A")
+    _run(clone, "commit", "-q", "-m", "local")
+    local_tip = _run(clone, "rev-parse", "HEAD")
+    remote_tip = _advance_remote(tmp_path, alpha, "trunk", "remote-diverged")
+
+    assert cmd_assemble(args) == 0
+    out = capsys.readouterr().out
+    assert "sync: diverged" in out
+    assert "decision is owed, not a merge" in out
+    assert _run(clone, "rev-parse", "HEAD") == local_tip
+    assert local_tip != remote_tip
+
+
 def test_assemble_refuses_unresolvable_default_branch(
         workspace, tmp_path, capsys):
     root, config, *_ = workspace
@@ -215,6 +310,9 @@ def test_estate_config_is_derived_not_authored(tmp_path):
     _run(root, "config", "user.email", "derived@e")
     _run(root, "remote", "add", "origin",
          "https://github.com/owner/framework.git")
+    (root / "seed.txt").write_text("seed\n", encoding="utf-8")
+    _run(root, "add", "seed.txt")
+    _run(root, "commit", "-q", "-m", "seed")
     for name, url in (("d-one", "https://github.com/owner/d-one.git"),
                       ("d-two", "git@github.com:owner/d-two.git")):
         d = root / "domain" / name
@@ -229,12 +327,42 @@ def test_estate_config_is_derived_not_authored(tmp_path):
     assert config["FRAMEWORK_REPO"] == "owner/framework"
     assert config["DOMAINS"] == "owner/d-one owner/d-two"
     assert config["GIT_NAME"] == "Derived Name"
+    assert config["FRAMEWORK_COMMIT"] == _run(root, "rev-parse", "HEAD")
     assert any("d-local" in n for n in notes)
+
+
+def test_bundle_source_must_be_clean_and_fetchable(tmp_path):
+    root = tmp_path / "framework"
+    origin = tmp_path / "framework.git"
+    subprocess.run(["git", "init", "-q", "-b", "main", str(root)],
+                   check=True)
+    subprocess.run(["git", "init", "-q", "--bare", str(origin)],
+                   check=True)
+    _run(root, "config", "user.email", "bundle@test")
+    _run(root, "config", "user.name", "bundle")
+    (root / "source.txt").write_text("one\n", encoding="utf-8")
+    _run(root, "add", "source.txt")
+    _run(root, "commit", "-q", "-m", "one")
+    _run(root, "remote", "add", "origin", str(origin))
+    _run(root, "push", "-q", "-u", "origin", "main")
+    assert framework_source_findings(root, root) == []
+
+    (root / "source.txt").write_text("dirty\n", encoding="utf-8")
+    assert any("dirty" in finding
+               for finding in framework_source_findings(root, root))
+
+    _run(root, "add", "source.txt")
+    _run(root, "commit", "-q", "-m", "unpublished")
+    assert any("not contained" in finding
+               for finding in framework_source_findings(root, root))
+    assert any("not the framework source checkout" in finding
+               for finding in framework_source_findings(root, tmp_path))
 
 
 def test_bundle_renders_complete_and_hash_stamped(tmp_path):
     config = {
         "FRAMEWORK_REPO": "owner/framework",
+        "FRAMEWORK_COMMIT": TEST_FRAMEWORK_COMMIT,
         "GIT_NAME": "Build Test", "GIT_EMAIL": "b@t",
         "DOMAINS": "owner/d-one owner/d-two",
         "FRAMEWORK_VERSION": "9.9.9",
@@ -261,12 +389,16 @@ def test_bundle_renders_complete_and_hash_stamped(tmp_path):
     bootstrap = rendered[
         f"{plugin}/skills/spin-up-domain/bootstrap.sh"].decode("utf-8")
     assert f'STAMPED="{mechanism}"' in bootstrap
+    assert "fetch --quiet --depth 1" in bootstrap
+    assert 'origin "$FRAMEWORK_COMMIT"' in bootstrap
+    assert "PyYAML==6.0.3" in bootstrap
     assert "mdllm.py assemble --config" in bootstrap
 
     env = rendered[
         f"{plugin}/skills/spin-up-domain/references/config.env"
     ].decode("utf-8")
     assert "DOMAINS=owner/d-one owner/d-two" in env
+    assert f"FRAMEWORK_COMMIT={TEST_FRAMEWORK_COMMIT}" in env
     assert "GIT_NAME=Build Test" in env
 
 
@@ -274,7 +406,10 @@ def test_rendered_bytes_are_lf_only_and_hash_is_eol_stable(tmp_path):
     """bootstrap.sh runs under bash on Linux — CRLF is 'bad interpreter'.
     And the mechanism hash must not depend on checkout line endings, or a
     Windows-built stamp false-STALEs against a Linux VM's recomputation."""
-    rendered = COWORK.bundle(TEMPLATES, {"FRAMEWORK_VERSION": "1"})
+    rendered = COWORK.bundle(TEMPLATES, {
+        "FRAMEWORK_VERSION": "1",
+        "FRAMEWORK_COMMIT": TEST_FRAMEWORK_COMMIT,
+    })
     for rel, content in rendered.items():
         assert b"\r" not in content, rel
 
@@ -298,8 +433,11 @@ def test_rendered_descriptions_fit_the_install_limit():
         MAX_DESCRIPTION_CHARACTERS, _frontmatter_description,
         description_findings)
 
-    rendered = COWORK.bundle(TEMPLATES, {"FRAMEWORK_VERSION": "3.31.0",
-                                         "GIT_NAME": "Build Test"})
+    rendered = COWORK.bundle(TEMPLATES, {
+        "FRAMEWORK_VERSION": "3.31.0",
+        "FRAMEWORK_COMMIT": TEST_FRAMEWORK_COMMIT,
+        "GIT_NAME": "Build Test",
+    })
     assert description_findings(rendered) == []
 
     manifest = _json.loads(rendered[
@@ -334,7 +472,10 @@ def test_build_refuses_an_over_long_description(tmp_path):
         encoding="utf-8")
 
     with pytest.raises(ValueError) as excinfo:
-        COWORK.bundle(tmp_path / "templates", {"FRAMEWORK_VERSION": "1"})
+        COWORK.bundle(tmp_path / "templates", {
+            "FRAMEWORK_VERSION": "1",
+            "FRAMEWORK_COMMIT": TEST_FRAMEWORK_COMMIT,
+        })
     message = str(excinfo.value)
     assert "rejected at install" in message
     assert str(MAX_DESCRIPTION_CHARACTERS + 1) in message   # actual length
@@ -349,12 +490,21 @@ def test_folded_frontmatter_description_is_measured_as_one_line():
 
 
 def test_bundle_hash_is_config_independent():
-    a = COWORK.bundle(TEMPLATES, {"DOMAINS": "x/y",
-                                  "FRAMEWORK_VERSION": "1"})
-    b = COWORK.bundle(TEMPLATES, {"DOMAINS": "p/q r/s",
-                                  "FRAMEWORK_VERSION": "2"})
+    a = COWORK.bundle(TEMPLATES, {
+        "DOMAINS": "x/y", "FRAMEWORK_VERSION": "1",
+        "FRAMEWORK_COMMIT": TEST_FRAMEWORK_COMMIT,
+    })
+    b = COWORK.bundle(TEMPLATES, {
+        "DOMAINS": "p/q r/s", "FRAMEWORK_VERSION": "2",
+        "FRAMEWORK_COMMIT": TEST_FRAMEWORK_COMMIT,
+    })
     # Mechanism files identical across estates; only config.env and the
     # version stamp differ.
     key = "markdownllm-bootstrap/skills/spin-up-domain/references/config.env"
     assert a[key] != b[key]
     assert COWORK.bundle_hash(TEMPLATES) == COWORK.bundle_hash(TEMPLATES)
+
+
+def test_bundle_refuses_missing_or_moving_framework_source():
+    with pytest.raises(ValueError, match="FRAMEWORK_COMMIT"):
+        COWORK.bundle(TEMPLATES, {"FRAMEWORK_COMMIT": "main"})

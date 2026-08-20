@@ -28,6 +28,8 @@ harness config; presentation vocabulary belongs to Phase 3.
 
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -210,19 +212,127 @@ def git_supports_hook_run(cwd: Path) -> bool:
     return bool(m) and (int(m.group(1)), int(m.group(2))) >= (2, 36)
 
 
+def _hook_path(root: Path, hook: str) -> Path | None:
+    """Resolve the same hook path Git uses, including core.hooksPath."""
+    resolved = subprocess.run(
+        ["git", "rev-parse", "--path-format=absolute", "--git-path",
+         f"hooks/{hook}"], cwd=root, capture_output=True, text=True)
+    if resolved.returncode != 0 or not resolved.stdout.strip():
+        resolved = subprocess.run(
+            ["git", "rev-parse", "--git-path", f"hooks/{hook}"], cwd=root,
+            capture_output=True, text=True)
+    if resolved.returncode != 0 or not resolved.stdout.strip():
+        return None
+    path = Path(resolved.stdout.strip())
+    return path if path.is_absolute() else root / path
+
+
+def _git_windows_shell() -> str | None:
+    """Find Git-for-Windows' own shell without trusting an arbitrary PATH sh."""
+    git_executable = shutil.which("git")
+    if not git_executable:
+        return None
+    git_path = Path(git_executable).resolve()
+    # The normal layout is <root>/cmd/git.exe + <root>/bin/sh.exe (with
+    # usr/bin as a compatible alternate).  Keep every candidate inside the
+    # same resolved installation root as the git executable we are using.
+    install_root = git_path.parent.parent
+    for candidate in (
+            install_root / "bin" / "sh.exe",
+            install_root / "usr" / "bin" / "sh.exe"):
+        try:
+            resolved = candidate.resolve()
+            resolved.relative_to(install_root.resolve())
+        except (OSError, ValueError):
+            continue
+        if resolved.is_file():
+            return str(resolved)
+    return None
+
+
+def run_git_hook(
+        root: Path, hook: str, args: tuple[str, ...] = (), *,
+        env: dict | None = None, expected_bytes: bytes | None = None,
+        ) -> dict:
+    """Execute a hook through Git, or through a conservative old-Git path.
+
+    Git before 2.36 has no ``git hook run``.  On POSIX, direct argv execution
+    (never ``shell=True``) gives the same shebang/executable semantics Git
+    uses.  On Windows, direct shebang execution is not a platform primitive;
+    fallback is permitted only for exact caller-attested bytes and an explicit
+    ``sh`` executable.  Unknown operator scripts are never guessed through a
+    shell.  If neither safe route exists the result stays explicitly untested.
+    """
+    root = Path(root).resolve()
+    if git_supports_hook_run(root):
+        result = subprocess.run(
+            ["git", "hook", "run", hook, "--", *args], cwd=root, env=env,
+            capture_output=True, text=True, encoding="utf-8",
+            errors="replace")
+        return {"hook": hook, "supported": True, "executed": True,
+                "passed": result.returncode == 0, "via": "git-hook-run",
+                "returncode": result.returncode,
+                "stdout": result.stdout or "", "stderr": result.stderr or "",
+                "detail": (result.stderr or result.stdout or "").strip()[-400:]}
+
+    path = _hook_path(root, hook)
+    if path is None or not path.is_file() or path.is_symlink():
+        return {"hook": hook, "supported": False, "executed": False,
+                "passed": None, "via": "none", "returncode": None,
+                "stdout": "", "stderr": "",
+                "detail": "hook path is absent or not a regular file"}
+    try:
+        current = path.read_bytes()
+    except OSError as exc:
+        return {"hook": hook, "supported": False, "executed": False,
+                "passed": None, "via": "none", "returncode": None,
+                "stdout": "", "stderr": "", "detail": str(exc)}
+    if expected_bytes is not None and current != expected_bytes:
+        return {"hook": hook, "supported": False, "executed": False,
+                "passed": None, "via": "none", "returncode": None,
+                "stdout": "", "stderr": "",
+                "detail": "hook bytes changed before compatibility execution"}
+
+    command: list[str] | None = None
+    if os.name != "nt":
+        if os.access(path, os.X_OK):
+            command = [str(path), *args]
+    elif expected_bytes is not None:
+        shell_path = _git_windows_shell()
+        if shell_path:
+            command = [shell_path, str(path), *args]
+    if command is None:
+        return {"hook": hook, "supported": False, "executed": False,
+                "passed": None, "via": "none", "returncode": None,
+                "stdout": "", "stderr": "",
+                "detail": "no semantics-preserving old-Git execution route"}
+    try:
+        result = subprocess.run(
+            command, cwd=root, env=env, capture_output=True, text=True,
+            encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return {"hook": hook, "supported": False, "executed": False,
+                "passed": None, "via": "none", "returncode": None,
+                "stdout": "", "stderr": "", "detail": str(exc)}
+    return {"hook": hook, "supported": True, "executed": True,
+            "passed": result.returncode == 0, "via": "direct-compatible",
+            "returncode": result.returncode,
+            "stdout": result.stdout or "", "stderr": result.stderr or "",
+            "detail": (result.stderr or result.stdout or "").strip()[-400:]}
+
+
 def execution_test_hook(root: Path, hook: str = "pre-commit") -> dict:
     """Run the installed hook through git itself. `supported: False` is a
     valid result, not a failure — untested stays distinct from passed/failed
     (portability-claims-need-execution-tests)."""
-    if not git_supports_hook_run(root):
-        return {"hook": hook, "supported": False, "executed": False,
-                "passed": None}
-    r = subprocess.run(["git", "hook", "run", hook], cwd=root,
-                       capture_output=True, text=True, encoding="utf-8",
-                       errors="replace")
-    return {"hook": hook, "supported": True, "executed": True,
-            "passed": r.returncode == 0,
-            "detail": (r.stderr or r.stdout or "").strip()[-400:]}
+    # Deferred import avoids runtime <-> scaffold's hook-body construction
+    # cycle.  Exact bytes are what makes the Windows shell fallback safe: an
+    # operator replacement is reported untested rather than executed.
+    from .scaffold import _HOOK_BODIES, hook_mdllm_route
+    rel = hook_mdllm_route(root)
+    body = _HOOK_BODIES.get(hook)
+    expected = body.format(rel=rel).encode("utf-8") if body else None
+    return run_git_hook(root, hook, expected_bytes=expected)
 
 
 def cmd_runtime_probe(args) -> int:

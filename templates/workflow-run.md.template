@@ -6,10 +6,11 @@ created: [ISO-date]
 definition: [process-name]-definition   # structural pointer to the workflow-definition (floor-resolved)
 current_stage: [stage-id]               # MUST be a stage id in that definition
 held_by: [operator-or-agent-id]         # advisory claim (coordination-claim.md); omit when unheld
-linked_things:
-  # Accrued decisions link here as they are made (provenance.md):
-  # - id: decision-[some-call]
-  #   relation: informs
+linked_things: []
+# Accrued decisions link here as they are made (provenance.md):
+# linked_things:
+#   - id: decision-[some-call]
+#     relation: informs
 ---
 
 # Run: [Human-readable title for this instance]

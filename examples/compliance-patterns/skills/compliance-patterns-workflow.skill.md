@@ -4,7 +4,7 @@ name: Compliance Patterns Workflow
 type: skill
 mode: workflow
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-18
 linked_things:
   - id: compliance-patterns-specification
@@ -14,7 +14,7 @@ linked_things:
   - id: compliance-patterns-write-thing-skill
     relation: orchestrates
 description: How domain builders integrate compliance patterns into their domains
-applies_to: "compliance-patterns/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # Compliance Patterns Workflow

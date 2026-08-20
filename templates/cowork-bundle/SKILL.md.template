@@ -11,7 +11,9 @@ rules for the session. It is the Cowork adapter for MarkdownLLM (framework
 v{framework_version}, mechanism {bundle_hash}): the bash layer only assembles;
 every duty after the framework clone runs through the framework's own tested
 floor (`mdllm assemble`), which emits each domain's Tier-0 contract INTO this
-transcript rather than instructing you to go read it.
+transcript rather than instructing you to go read it. The framework checkout is
+the exact `FRAMEWORK_COMMIT` embedded at bundle build; it never executes a
+later default-branch revision by surprise.
 
 ## Step 0 — Load the operating contract
 
@@ -49,9 +51,10 @@ bash "<this-skill-dir>/bootstrap.sh" "<PAT>" qms engineering
 ```
 
 If a filter matches nothing, the output lists the configured domains —
-relay them and ask which. If the bootstrap reports **BUNDLE STALE**, tell
-the user plainly: the assembly still ran on the framework's current floor,
-and rebuilding the plugin from their local estate refreshes the bundle.
+relay them and ask which. If the bootstrap reports **BUNDLE MISMATCH**, tell
+the user plainly: the assembly still ran on the pinned framework commit's
+floor, and rebuilding the plugin from a clean, remotely available framework
+commit restores the binding. This is not a latest-release signal.
 
 ## Step 3 — Read what arrived (the contract is already in context)
 
@@ -81,16 +84,21 @@ Then orient: relay the per-domain orientation in plain language, leading
 with anything time-sensitive (deadlines and fired triggers), then open
 conflicts, then open loops and version state.
 
-## Step 4 — Work, then PUBLISH AFTER EVERY COMMIT
+## Step 4 — Work, then close every authorised commit
 
 Do the work the user asks for, under each domain's own contract. The floor
 hook validates every commit; never bypass it with `--no-verify`.
 
-**Expect `autopush: AUTH-FAILED` on every commit.** It is not a fault: the
-credential is command-scoped and deliberately absent from git config, so
-the post-commit hook has no credentials. The framework's guarantee that
-every validated commit is published does not hold mechanically here —
-which is why publication is a step, not a habit. After EVERY commit:
+Publication is default-deny. Before the first write in each domain, inspect
+its entry contract. Only literal `git.autopush: true` grants standing
+publication authority; false, absent, or malformed is off. The PAT and
+bootstrap invocation do not grant future push authority. If authority is off,
+tell the user the disposable-container risk and ask whether they want to make
+that future-facing domain change; do not make it for them.
+
+When literal true is present, expect `autopush: AUTH-FAILED` after a commit:
+the credential is command-scoped and deliberately absent from git config.
+Close each authorised commit explicitly:
 
 ```bash
 GH_PAT="<PAT>" python3 tools/mdllm.py publish domains/<name>
@@ -103,10 +111,11 @@ commit landed. A non-zero exit means STOP and read the message — never
 route around it with `--force` or a different branch name. Confirm each
 publication to the user naming the branch.
 
-Do not batch, do not wait to be asked: the container is disposable, and a
-committed-but-unpublished change is lost the moment the compute is
-reclaimed. If a subagent or script will commit, hand it the exact publish
-command — "push to the default branch" is an invitation to guess.
+Do not batch authorised publications: the container is disposable, and a
+committed-but-unpublished change is lost when the compute is reclaimed. A
+subagent inherits neither authority nor branch context; only after the same
+literal-true check, hand it the exact publish command — "push to the default
+branch" is an invitation to guess.
 
 ## Step 5 — Wrap-up
 

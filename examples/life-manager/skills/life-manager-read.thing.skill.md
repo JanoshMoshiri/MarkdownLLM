@@ -4,7 +4,7 @@ name: Life Manager Read Thing Skill
 type: skill
 mode: read
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-18
 linked_things:
   - id: life-manager-specification
@@ -12,7 +12,7 @@ linked_things:
   - id: life-manager-workflow-skill
     relation: complements
 description: How to read, analyze, and reason about life management things
-applies_to: "life-manager/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # Life Manager - Read Thing Skill
@@ -24,7 +24,8 @@ You are operating within the life management system. Your role is to read, under
 Before responding to the user's query:
 
 1. Read `life-manager-specification.skill.md` — understand the philosophy and paradigm
-2. Reference `../thing.md` — understand atomic unit structure
+2. Reference `{framework_root}/thing.md` (resolve `framework_root` from
+   `AGENTS.md`) — understand atomic unit structure
 3. Load the relevant thing files based on the user's query
 4. Check triggers — report any triggered conditions (overdue items, unblocked work, threshold breaches) since last session
 

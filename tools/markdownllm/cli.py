@@ -33,9 +33,12 @@ unqualified heading — a hand list drifts; argparse does not):
   tokens   [path]      Measure spec token costs by loading tier.
   doctor   [path]      Probe the environment: floor prerequisites, hook
                        execution (not just presence), framework version drift.
-  scaffold <path>      Deterministic domain birth: instantiated templates,
+  scaffold <path> [--autopush true|false]
+                       Deterministic domain birth: instantiated templates,
                        nested git repo, outer .gitignore isolation, hook,
-                       first commit. The semantic half stays with the agent.
+                       first commit. Publication authority defaults to false;
+                       only explicit true enables post-commit sends. The
+                       semantic half stays with the agent.
   boundary [path]      Disclosure-boundary check: staged additions/filenames,
                        --message FILE (commit-msg hook), or --history audit,
                        against the LOCAL gitignored .boundary-terms file.
@@ -53,6 +56,8 @@ from __future__ import annotations
 import argparse
 import sys
 
+import yaml
+
 from .adapters import names as adapter_names, selection_choices
 from .boundary import cmd_boundary
 from .adapter_install import cmd_adapter_install
@@ -62,6 +67,7 @@ from .coherence import cmd_coherence
 from .doctor import cmd_doctor
 from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
+from .external_trust import CAPABILITY_NAMES, cmd_external_trust
 from .history import cmd_changelog, cmd_worklog
 from .harness_ports import LIFECYCLE_BINDINGS
 from .imports_check import cmd_estate_check, cmd_imports_check
@@ -95,6 +101,9 @@ def build_cli() -> argparse.ArgumentParser:
     v = sub.add_parser("validate", help="Levels 1-3 mechanical validation")
     v.add_argument("path", nargs="?", default=".")
     v.add_argument("--quiet", action="store_true", help="only print on Errors")
+    v.add_argument("--view", choices=("worktree", "index"), default="worktree",
+                   help="source of bytes to validate; the pre-commit hook uses "
+                        "the exact staged index candidate")
     v.set_defaults(fn=cmd_validate)
 
     t = sub.add_parser("triggers", help="evaluate trigger conditions; --estate "
@@ -136,6 +145,12 @@ def build_cli() -> argparse.ArgumentParser:
 
     pv = sub.add_parser("provenance", help="validate provenance chains (provenance.md)")
     pv.add_argument("path", nargs="?", default=".")
+    pv.add_argument("--view", choices=("worktree", "index", "commit"),
+                    default="worktree",
+                    help="repository bytes to scan (default: worktree)")
+    pv.add_argument("--revision", metavar="REV",
+                    help="revision to resolve with --view commit (default: HEAD; "
+                         "invalid for worktree/index)")
     pv.set_defaults(fn=cmd_provenance)
 
     k = sub.add_parser("tokens", help="measure spec token costs by tier")
@@ -181,6 +196,10 @@ def build_cli() -> argparse.ArgumentParser:
                          "injection for harnesses where no entry-file "
                          "discovery exists; too large for hook budgets, "
                          "so hook bindings never pass it")
+    ss.add_argument("--assert-head", metavar="FULL_SHA",
+                    help="before writing from a significant/full-corpus read, "
+                         "assert that its emitted full base commit is still HEAD; "
+                         "moved HEAD exits nonzero and requires reconciliation")
     ss.set_defaults(fn=cmd_session_start)
 
     co = sub.add_parser("coherence", help="dark-region checks: generated-artifact "
@@ -189,6 +208,8 @@ def build_cli() -> argparse.ArgumentParser:
     co.add_argument("--window", type=int, default=15,
                     help="stable-staleness lookback in commits (default 15)")
     co.add_argument("--quiet", action="store_true", help="only print on Errors")
+    co.add_argument("--view", choices=("worktree", "index"), default="worktree",
+                    help="source of bytes; pre-commit uses the exact staged index candidate")
     co.set_defaults(fn=cmd_coherence)
 
     c = sub.add_parser("changelog", help="draft a CHANGELOG entry from commits")
@@ -223,6 +244,9 @@ def build_cli() -> argparse.ArgumentParser:
     sc.add_argument("--harness", choices=selection_choices(),
                     help="outer adapter projection: one harness, all, or none; "
                          "omitting preserves the compatibility default")
+    sc.add_argument("--autopush", choices=("true", "false"), default="false",
+                    help="birth-time publication authority (default false); "
+                         "only an explicit true enables post-commit sends")
     sc.set_defaults(fn=cmd_scaffold)
 
     ai = sub.add_parser(
@@ -247,6 +271,8 @@ def build_cli() -> argparse.ArgumentParser:
                         "i.e. a full validate — minutes on a large domain, and "
                         "long enough to trip a harness tool timeout). The hook "
                         "is then installed but unproven, and says so.")
+    h.add_argument("--uninstall", action="store_true",
+                   help="remove only hooks demonstrably owned by mdllm for this repository")
     h.set_defaults(fn=cmd_install_hook)
     # Hook body is portable since v3.4.1: root/interpreter resolved at run time.
 
@@ -293,6 +319,22 @@ def build_cli() -> argparse.ArgumentParser:
                         "(both directions: stale = source moved, diverged = mirror moved)")
     ic.add_argument("path", nargs="?", default=".", help="the consumer domain")
     ic.set_defaults(fn=cmd_imports_check)
+
+    et = sub.add_parser(
+        "external-trust",
+        help="review, hash-confirm, or revoke clone-local authority for one "
+             ".mcp.json server entry; repository content is inert by default")
+    et.add_argument("action", choices=("review", "trust", "revoke"))
+    et.add_argument("server", nargs="?",
+                    help="mcpServers name; omit for review-all or revoke-all")
+    et.add_argument("--path", default=".", help="the consumer Git clone")
+    et.add_argument("--hash", dest="expected_hash",
+                    help="exact sha256 printed by `external-trust review` "
+                         "(required for trust)")
+    et.add_argument("--allow", nargs="+", choices=CAPABILITY_NAMES,
+                    help="granular permissions to add: command/network/headers/"
+                         "body-read")
+    et.set_defaults(fn=cmd_external_trust)
 
     ec = sub.add_parser("estate-check", help="operator-axis batch of imports-check "
                         "over consumer roots — named explicitly, or (no args) the "
@@ -357,7 +399,9 @@ def build_cli() -> argparse.ArgumentParser:
     bd.set_defaults(fn=cmd_bundle)
 
     pb = sub.add_parser("publish", help="guarded publication: push the current "
-                        "commit to the repo's REAL default branch — branch READ "
+                        "commit only with standing literal git.autopush: true "
+                        "or an explicit one-shot human instruction; then use the "
+                        "repo's REAL default branch — branch READ "
                         "(mdllm.defaultbranch / origin HEAD), never typed; "
                         "checkout must match; remote ref must already exist "
                         "(never creates one); fast-forward only; remote tip "
@@ -366,11 +410,16 @@ def build_cli() -> argparse.ArgumentParser:
                         "on disk, redacted from output) for ephemeral "
                         "containers where autopush honestly fails")
     pb.add_argument("path", nargs="?", default=".")
+    pb.add_argument("--authorize-once", action="store_true",
+                    help="record the operator's explicit authority for this one "
+                         "publish when standing git.autopush is off; agents must "
+                         "not infer or self-grant this irreversible authority")
     pb.set_defaults(fn=cmd_publish)
 
     ap_ = sub.add_parser("autopush", help="post-commit publication leg: push the "
-                         "current branch to its upstream unless AGENTS.md declares "
-                         "git.autopush: false (absence = on); bounded, never forces, "
+                         "current branch to its upstream only when AGENTS.md declares "
+                         "literal git.autopush: true (all other states are off); "
+                         "bounded, never forces, "
                          "rejection surfaced as DIVERGED never resolved; exit 0 always")
     ap_.add_argument("path", nargs="?", default=".")
     ap_.add_argument("--timeout", type=int, default=20,
@@ -382,6 +431,8 @@ def build_cli() -> argparse.ArgumentParser:
                         "definition surface or fan-in) and the serve-side notice "
                         "(exposed => this change publishes); never blocks, exit 0 always")
     cd.add_argument("path", nargs="?", default=".")
+    cd.add_argument("--view", choices=("worktree", "index"), default="worktree",
+                    help="source of thing metadata; the pre-commit hook uses index")
     cd.set_defaults(fn=cmd_candidates)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
@@ -404,4 +455,16 @@ def main() -> int:
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8")
     args = build_cli().parse_args()
-    return args.fn(args)
+    try:
+        return args.fn(args)
+    except yaml.YAMLError as exc:
+        print(f"mdllm: {args.cmd} refused invalid YAML — {exc}", file=sys.stderr)
+        return 2
+    except UnicodeError as exc:
+        print(f"mdllm: {args.cmd} refused a definition that is not valid UTF-8 "
+              f"— {exc}", file=sys.stderr)
+        return 2
+    except OSError as exc:
+        print(f"mdllm: {args.cmd} could not read its definition input — {exc}",
+              file=sys.stderr)
+        return 2

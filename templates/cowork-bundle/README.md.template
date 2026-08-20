@@ -12,10 +12,12 @@ than editing it.
 Invoke it ("spin up my domain"), paste a short-lived GitHub token when
 asked, and the bootstrap:
 
-1. Clones the framework named in `config.env`.
-2. Checks its own mechanism hash against what that framework would render
-   today — a stale bundle says so and continues on the framework's
-   current floor.
+1. Fetches the framework named in `config.env` at the exact
+   `FRAMEWORK_COMMIT` recorded when this bundle was built. The default branch
+   is not executable authority.
+2. Checks its own mechanism hash against what that exact framework tree would
+   render — a mismatch says so and continues on the pinned framework commit's
+   floor. This is a binding-integrity check, not a latest-release check.
 3. Hands off to `mdllm assemble`, which clones the domains you named (or
    all configured ones), resolves each repo's **real default branch** from
    its remote's own HEAD (refusing to guess), installs the deterministic
@@ -26,9 +28,11 @@ asked, and the bootstrap:
    reading list derived from the filesystem at that moment), prints the
    full trigger evaluation and the imports COVERAGE line, and closes with
    the BRANCH MAP and an honest handoff.
-4. During work, every commit is followed by `mdllm publish` — the guarded
-   publication that reads the recorded branch, refuses to create remote
-   branches, pushes fast-forward only, and verifies the remote tip.
+4. During work, a commit is followed by `mdllm publish` only when that
+   domain literally declares `git.autopush: true` — the guarded publication
+   reads the recorded branch, refuses to create remote branches, pushes
+   fast-forward only, and verifies the remote tip. Supplying a PAT or invoking
+   bootstrap is not standing publication authority.
 
 ## Configuration
 
@@ -40,10 +44,21 @@ enters the framework repo.
 
 ```
 FRAMEWORK_REPO=OWNER/MarkdownLLM
+FRAMEWORK_COMMIT=0123456789abcdef0123456789abcdef01234567
 GIT_NAME=Your Name
 GIT_EMAIL=you@example.com
 DOMAINS=OWNER/domain-a OWNER/domain-b
 ```
+
+## Trust boundaries
+
+The exact commit and mechanism hash constrain *which bytes* run; they are not
+a signature and do not establish who authored them. Remaining trust roots are
+the installed bundle and its private config, Git and the GitHub repository
+identity/TLS used for fetches, PyPI/TLS for the exact PyYAML pin, the Cowork
+runtime, and the short-lived PAT. The PAT is process-scoped but is still pasted
+into the session transcript; revoke it at session end. Repository publication
+requires a separate literal `git.autopush: true` decision in each domain.
 
 ## Rebuilding
 

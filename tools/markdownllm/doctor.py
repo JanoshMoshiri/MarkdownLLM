@@ -23,8 +23,11 @@ from .harness_ports import (
 )
 from .model import parse_frontmatter
 from .repo import _version_lt
-from .runtime import probe as runtime_probe
-from .scaffold import HOOK_BODY, MDLLM_ENTRY
+from .runtime import execution_test_hook, probe as runtime_probe
+from .scaffold import (HOOK_BODY, MDLLM_ENTRY, hook_mdllm_route,
+                       resolve_hooks_dir)
+from .sync import PublicationPolicyState, publication_policy
+from .yaml_loader import load_version_sentinel
 
 def _upstream_sentinel_version(root: Path):
     """Read the framework version from the *cached* upstream copy of
@@ -43,8 +46,9 @@ def _upstream_sentinel_version(root: Path):
                               cwd=root, capture_output=True, text=True)
         if show.returncode == 0 and show.stdout.strip():
             try:
-                data = yaml.safe_load(show.stdout) or {}
-            except yaml.YAMLError:
+                data = load_version_sentinel(
+                    show.stdout, source=f"{ref}:.markdownllm")
+            except (yaml.YAMLError, UnicodeError):
                 continue
             v = data.get("version")
             if v is not None:
@@ -98,6 +102,21 @@ def cmd_doctor(args) -> int:
         else:
             report("WARN", f"git {key} unset — commits will fail until configured")
 
+    # Publication authority is intentionally independent from floor health.
+    # Fail-closed is safe, but the operator still needs to know *why* no send
+    # will occur; false, absence, and malformed input are different remedies.
+    policy = publication_policy(root)
+    if policy.state is PublicationPolicyState.LITERAL_TRUE:
+        report("OK", "autopush ENABLED — literal `git.autopush: true` "
+                     "authorises the post-commit send")
+    elif policy.state is PublicationPolicyState.LITERAL_FALSE:
+        report("OK", "autopush OFF — literal `git.autopush: false`; "
+                     "publication remains operator-owned")
+    elif policy.state is PublicationPolicyState.ABSENT:
+        report("--", f"autopush OFF — authority absent: {policy.reason}")
+    else:
+        report("WARN", f"autopush OFF — {policy.state.value}: {policy.reason}")
+
     # repo + hook (executed, not just resolved)
     inside = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
                             capture_output=True, text=True)
@@ -105,8 +124,7 @@ def cmd_doctor(args) -> int:
         report("FAIL", "not a git repository — `git init` first")
         floor_ok = False
     else:
-        git_dir = (root / inside.stdout.strip()).resolve()
-        hook = git_dir / "hooks" / "pre-commit"
+        hook = resolve_hooks_dir(root) / "pre-commit"
         if not hook.is_file():
             report("FAIL", "pre-commit hook not installed — run `mdllm install-hook .`")
             floor_ok = False
@@ -118,31 +136,27 @@ def cmd_doctor(args) -> int:
             # `coherence` missing). Compare the copy against what install-hook
             # would write now. Advisory, not fatal: the hook still runs
             # `validate`, so the floor is active — just not current.
-            try:
-                rel = Path(os.path.relpath(MDLLM_ENTRY, root)).as_posix()
-            except ValueError:
-                rel = MDLLM_ENTRY.as_posix()
+            rel = hook_mdllm_route(root)
             installed = hook.read_text(encoding="utf-8").replace("\r\n", "\n").strip()
             if installed != HOOK_BODY.format(rel=rel).replace("\r\n", "\n").strip():
                 report("WARN", "pre-commit hook body is STALE vs the current mdllm "
                                "HOOK_BODY — re-run `mdllm install-hook` to pick up "
                                "newer checks (the sentinel may claim enforcement the "
                                "hook does not run)")
-            run = subprocess.run(["git", "hook", "run", "pre-commit"], cwd=root,
-                                 capture_output=True, text=True)
-            if "is not a git command" in (run.stderr or ""):
-                report("WARN", "git < 2.36 — cannot execution-test the hook "
-                               "(file present; make one commit to verify)")
-            elif run.returncode == 0:
+            run = execution_test_hook(root)
+            if not run["supported"]:
+                report("WARN", "pre-commit hook is installed but could not be "
+                               "execution-tested safely — " + run["detail"])
+            elif run["passed"]:
                 report("OK", "pre-commit hook EXECUTES (validation currently clean)")
-            elif run.returncode == 1 and "Traceback" not in (run.stderr or ""):
+            elif run["returncode"] == 1 and "Traceback" not in run["stderr"]:
                 # Exit 1 without a crash is the hook DOING ITS JOB — one of its
                 # checks is blocking. Attribute the block to the failing check,
                 # never report it as an execution failure: the 2026-08-01 sweep
                 # found a domain whose drifted kernel block read as "hook failed
                 # to execute", sending the operator toward the environment when
                 # the remedy was one regen command.
-                combined = (run.stdout or "") + (run.stderr or "")
+                combined = run["stdout"] + run["stderr"]
                 # Setup-ordering, not a failure: on a fresh gated clone the
                 # session-start attestation cannot exist before session-start
                 # has run, so a doctor run before it always finds the gate
@@ -173,21 +187,32 @@ def cmd_doctor(args) -> int:
                                  f"for the report)")
             else:
                 report("FAIL", f"pre-commit hook present but failed to execute "
-                               f"(exit {run.returncode}) — resolution is not verification")
+                               f"(exit {run['returncode']}) — resolution is not verification")
                 floor_ok = False
 
     # framework / domain version drift
     sentinel = root / ".markdownllm"
     if sentinel.is_file():
-        data = yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {}
-        local_v = str(data.get("version"))
-        report("OK", f"framework root — sentinel version {local_v}")
+        try:
+            data = load_version_sentinel(
+                sentinel.read_text(encoding="utf-8"), source=sentinel)
+        except (OSError, UnicodeError, yaml.YAMLError) as exc:
+            report("FAIL", f"framework sentinel invalid/unreadable — {exc}")
+            floor_ok = False
+            data = None
+        local_v = str(data.get("version")) if data is not None else None
+        if data is not None:
+            report("OK", f"framework root — sentinel version {local_v}")
         # Upstream leg (advisory, cached, non-blocking): compare the local
         # sentinel against the *already-fetched* upstream copy. No live fetch —
         # `git show` reads objects git already has (orchestration.md → upward
         # leg). Never flips floor_ok: this coordinates humans, not integrity.
-        upstream_v = _upstream_sentinel_version(root)
-        if upstream_v is None:
+        upstream_v = (_upstream_sentinel_version(root)
+                      if data is not None else None)
+        if data is None:
+            report("--", "upstream version comparison skipped until the local "
+                         "sentinel is valid")
+        elif upstream_v is None:
             report("--", "upstream version unknown — no fetched remote-tracking "
                          "copy of .markdownllm (run `git fetch`, then `mdllm doctor`)")
         elif upstream_v == local_v:
@@ -203,34 +228,68 @@ def cmd_doctor(args) -> int:
     else:
         agents = root / "AGENTS.md"
         meta = None
+        agents_error = None
         if agents.is_file():
-            meta, _, _ = parse_frontmatter(agents.read_text(encoding="utf-8"))
+            try:
+                meta, _, agents_error = parse_frontmatter(
+                    agents.read_text(encoding="utf-8"), source=agents)
+            except (OSError, UnicodeError) as exc:
+                agents_error = f"cannot read as UTF-8: {exc}"
+            if agents_error:
+                report("FAIL", f"AGENTS.md frontmatter invalid/unreadable — "
+                               f"{agents_error}")
+                floor_ok = False
         fr = (meta or {}).get("framework_root")
         if fr:
             fsent = (root / fr / ".markdownllm").resolve()
             if fsent.is_file():
-                fdata = yaml.safe_load(fsent.read_text(encoding="utf-8")) or {}
-                fv, seen = str(fdata.get("version")), str(meta.get("framework_version_seen"))
-                if fv == seen:
-                    report("OK", f"domain current with framework {fv}")
+                try:
+                    fdata = load_version_sentinel(
+                        fsent.read_text(encoding="utf-8"), source=fsent)
+                except (OSError, UnicodeError, yaml.YAMLError) as exc:
+                    report("FAIL", f"framework sentinel invalid/unreadable — {exc}")
+                    floor_ok = False
                 else:
-                    report("WARN", f"domain last saw framework {seen}; framework is {fv} "
-                                   f"— run the domain-refresh process")
+                    fv = str(fdata.get("version"))
+                    seen = str(meta.get("framework_version_seen"))
+                    if fv == seen:
+                        report("OK", f"domain current with framework {fv}")
+                    else:
+                        report("WARN", f"domain last saw framework {seen}; framework is {fv} "
+                                       f"— run the domain-refresh process")
             else:
                 report("FAIL", f"framework_root `{fr}` does not resolve to a framework "
                                f"(.markdownllm not found at {fsent})")
                 floor_ok = False
-        else:
+        elif not agents_error:
             report("--", "no .markdownllm and no framework_root in AGENTS.md — "
                          "neither a framework root nor a wired domain")
 
     # domain-kernel freshness + harness adapter (advisory; existence != currency)
     agents_p = root / "AGENTS.md"
     if agents_p.is_file():
-        atext = agents_p.read_text(encoding="utf-8")
-        ameta, _, _ = parse_frontmatter(atext)
-        present, drifted = domain_kernel_status(
-            atext, build_domain_kernel_blocks(root, ameta or {}))
+        agents_read_error = None
+        try:
+            atext = agents_p.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            atext = ""
+            agents_read_error = str(exc)
+        ameta, _, aerr = parse_frontmatter(atext, source=agents_p)
+        if agents_read_error:
+            report("FAIL", f"AGENTS.md unreadable — {agents_read_error}")
+            floor_ok = False
+        elif aerr:
+            report("FAIL", f"AGENTS.md frontmatter invalid — {aerr}")
+            floor_ok = False
+        if aerr:
+            # The framework/domain leg above already reports this as a floor
+            # failure.  Do not derive managed blocks from ambiguous metadata.
+            ameta = None
+        if not atext or aerr:
+            present, drifted = [], []
+        else:
+            present, drifted = domain_kernel_status(
+                atext, build_domain_kernel_blocks(root, ameta or {}))
         if not present:
             report("--", "AGENTS.md has no domain-kernel managed blocks "
                          "(opt-in; the entry file runs by interpretation)")

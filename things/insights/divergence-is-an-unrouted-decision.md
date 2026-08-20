@@ -9,7 +9,6 @@ origin: external
 verified: true
 verified_by: Janosh Moshiri
 source_domain: code-architect
-source_domain: code-architect
 source_id: divergence-is-an-unrouted-decision
 source_commit: bd8fc48
 promoted_to: llm-driven-systems-manifesto

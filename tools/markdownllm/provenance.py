@@ -11,14 +11,57 @@ import subprocess
 from pathlib import Path
 
 from .model import Finding, SEV_ERROR, SEV_INFO, SEV_WARNING, scan
+from .repository_view import (
+    RepositoryView, RepositoryViewError, RepositoryViewMode,
+)
+
+
+def _provenance_view(root: Path, args) -> RepositoryView:
+    """Resolve one explicit source of repository bytes.
+
+    ``getattr`` keeps direct/legacy callers that predate the CLI option on the
+    worktree.  A commit revision is resolved immediately by RepositoryView and
+    therefore appears as a full object id in the report.
+    """
+    requested = getattr(args, "view", "worktree") or "worktree"
+    revision = getattr(args, "revision", None)
+    if isinstance(requested, RepositoryView):
+        if revision is not None:
+            raise RepositoryViewError(
+                "revision cannot accompany an already constructed view")
+        return requested
+    mode = str(requested)
+    if mode == RepositoryViewMode.WORKTREE.value:
+        if revision is not None:
+            raise RepositoryViewError(
+                "--revision is valid only with --view commit")
+        return RepositoryView.worktree(root)
+    if mode == RepositoryViewMode.INDEX.value:
+        if revision is not None:
+            raise RepositoryViewError(
+                "--revision is valid only with --view commit")
+        return RepositoryView.index(root)
+    if mode == RepositoryViewMode.COMMIT.value:
+        return RepositoryView.commit(root, revision or "HEAD")
+    raise RepositoryViewError(
+        f"unknown provenance view {mode!r}; expected worktree, index, or commit")
+
 
 def cmd_provenance(args) -> int:
     """Mechanical checks for provenance chains (provenance.md)."""
     root = Path(args.path).resolve()
-    corpus, _ = scan(root)
+    try:
+        view = _provenance_view(root, args)
+        corpus, _ = scan(root, view)
+    except RepositoryViewError as exc:
+        print(f"mdllm: cannot construct provenance view: {exc}")
+        return 1
     by_id = corpus.by_id()
     findings: list[Finding] = []
     today = dt.date.today()
+    history_tip = (view.commit_sha
+                   if view.mode is RepositoryViewMode.COMMIT
+                   else "HEAD")
 
     def commit_exists(sha: str) -> bool:
         return subprocess.run(["git", "cat-file", "-e", f"{sha}^{{commit}}"],
@@ -72,7 +115,8 @@ def cmd_provenance(args) -> int:
                                     f"pins UNVERIFIED external thing `{pid}` — "
                                     f"quarantine rule violated"))
                 rel = src.path.relative_to(root).as_posix()
-                log = subprocess.run(["git", "log", "--oneline", f"{sha}..HEAD",
+                log = subprocess.run(["git", "log", "--oneline",
+                                      f"{sha}..{history_tip}",
                                       "--", rel], cwd=root, capture_output=True,
                                      text=True)
                 if log.returncode == 0 and log.stdout.strip():
@@ -96,7 +140,8 @@ def cmd_provenance(args) -> int:
                                 f"external thing still unverified{age}"))
 
     errors = [x for x in findings if x.severity == SEV_ERROR]
-    print(f"## Provenance Report — {root}\n")
+    print(f"## Provenance Report — {root}")
+    print(f"view: {view.identifier}\n")
     if not findings:
         print("No provenance issues found.")
     for title, group in (("Errors", errors),

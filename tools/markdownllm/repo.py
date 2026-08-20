@@ -10,7 +10,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-import yaml
+from .yaml_loader import load_version_sentinel
 
 def git_short_sha(root: Path) -> str:
     try:
@@ -25,7 +25,8 @@ def framework_version(root: Path) -> str:
     for _ in range(4):
         f = p / ".markdownllm"
         if f.exists():
-            data = yaml.safe_load(f.read_text(encoding="utf-8"))
+            data = load_version_sentinel(
+                f.read_text(encoding="utf-8"), source=f)
             return str(data.get("version", "unknown"))
         p = p.parent
     return "unknown"

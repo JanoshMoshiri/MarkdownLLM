@@ -34,9 +34,10 @@ import argparse
 import re
 from pathlib import Path
 
-from .publish import TOKEN_ENV_VARS, _git, _token, redact  # noqa: F401
+from .publish import command_token, git_command, redact
 from .scaffold import cmd_install_hook
 from .session import cmd_session_start
+from .sync import sync_repo
 
 
 def parse_config(path: Path) -> tuple[dict[str, str], str]:
@@ -88,13 +89,13 @@ def select_domains(entries: list[str], filters: list[str]
 
 def resolve_remote_head(repo: Path, token: str | None) -> str:
     """The remote's own HEAD, then clone's origin/HEAD. Never a guess."""
-    symref = _git(repo, "ls-remote", "--symref", "origin", "HEAD",
-                  token=token)
+    symref = git_command(repo, "ls-remote", "--symref", "origin", "HEAD",
+                         token=token)
     for line in symref.stdout.splitlines():
         if line.startswith("ref:"):
             return line.split()[1].removeprefix("refs/heads/")
-    local = _git(repo, "symbolic-ref", "--short",
-                 "refs/remotes/origin/HEAD")
+    local = git_command(repo, "symbolic-ref", "--short",
+                        "refs/remotes/origin/HEAD")
     return local.stdout.strip().removeprefix("origin/")
 
 
@@ -114,14 +115,17 @@ def assemble_domain(root: Path, entry: str, config: dict[str, str],
 
     if target.exists() and (target / ".git").exists():
         say(f"   - {name}: already present — reusing the existing clone")
-        fetched = _git(target, "fetch", "origin", token=token)
-        if fetched.returncode != 0:
-            say(f"     (fetch failed — continuing from last-fetched state)")
+        result = sync_repo(target, token=token)
+        detail = f" — {result['detail']}" if result["detail"] else ""
+        say(f"     sync: {result['state']}{detail}")
+        if result["state"] in {"dirty", "diverged", "in-operation"}:
+            say("     !! unresolved repository state was reported and left "
+                "untouched; assembly will not merge, reset, or discard it")
     else:
         say(f"   - {entry} -> domains/{name}")
         (root / "domains").mkdir(exist_ok=True)
-        cloned = _git(root, "clone", "--quiet", clone_url(entry),
-                      str(target), token=token)
+        cloned = git_command(root, "clone", "--quiet", clone_url(entry),
+                             str(target), token=token)
         if cloned.returncode != 0:
             say(f"     !! FAILED to clone {entry}: "
                 f"{cloned.stderr.strip()}")
@@ -134,23 +138,23 @@ def assemble_domain(root: Path, entry: str, config: dict[str, str],
             f"operator which branch is authoritative, then: "
             f"git -C domains/{name} config mdllm.defaultbranch <branch>")
         return None
-    if _git(target, "show-ref", "--verify", "--quiet",
-            f"refs/remotes/origin/{branch}").returncode != 0:
+    if git_command(target, "show-ref", "--verify", "--quiet",
+                   f"refs/remotes/origin/{branch}").returncode != 0:
         say(f"     !! FAILED: resolved {branch!r} for {entry}, but "
             f"origin/{branch} does not exist")
         return None
 
-    _git(target, "config", "user.name", config["GIT_NAME"])
-    _git(target, "config", "user.email", config["GIT_EMAIL"])
-    _git(target, "config", "mdllm.defaultbranch", branch)
-    _git(target, "remote", "set-head", "origin", branch)
+    git_command(target, "config", "user.name", config["GIT_NAME"])
+    git_command(target, "config", "user.email", config["GIT_EMAIL"])
+    git_command(target, "config", "mdllm.defaultbranch", branch)
+    git_command(target, "remote", "set-head", "origin", branch)
 
     if cmd_install_hook(_ns(path=str(target))) != 0:
         say(f"     !! floor hook installation failed for {name} — the "
             "commit boundary is NOT enforced in this clone")
 
-    checked_out = _git(target, "rev-parse", "--abbrev-ref",
-                       "HEAD").stdout.strip()
+    checked_out = git_command(target, "rev-parse", "--abbrev-ref",
+                              "HEAD").stdout.strip()
     if checked_out != branch:
         say(f"     !! WARNING: {name} is checked out on {checked_out!r} "
             f"but its default branch is {branch!r} — do not publish "
@@ -176,7 +180,7 @@ def _leak_check(root: Path, names: list[str]) -> bool:
 
 def cmd_assemble(args) -> int:
     root = Path(getattr(args, "root", ".")).resolve()
-    token = _token()
+    token = command_token()
 
     config, problem = parse_config(Path(args.config))
     if problem:
@@ -214,11 +218,10 @@ def cmd_assemble(args) -> int:
     for name, _, _ in branch_map:
         target = root / "domains" / name
         print(f"\n=========================  {name}  =========================")
-        fetched = _git(target, "fetch", "--quiet", "origin", token=token)
         print("----- estate-sync (sync BEFORE orienting) -----")
-        print("  fetched origin" if fetched.returncode == 0 else
-              "  fetch failed (offline or credential scope) — orienting "
-              "from last-fetched state")
+        result = sync_repo(target, token=token)
+        detail = f" — {result['detail']}" if result["detail"] else ""
+        print(f"  {result['state']}{detail}")
         print("----- session-start (the Tier-0 contract is emitted below —"
               " it is IN CONTEXT once printed) -----")
         cmd_session_start(_ns(path=str(target), contract=True))

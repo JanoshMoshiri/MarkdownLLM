@@ -2,8 +2,8 @@
 
 Thing/Finding/Corpus, frontmatter parsing, corpus scanning, and the constants
 that define the universal vocabulary (reserved statuses, core fields,
-severities). Imports nothing from the rest of the package — everything else
-imports inward to here.
+severities). Its only inward dependency is the repository read port; everything
+else imports the model.
 """
 
 from __future__ import annotations
@@ -11,12 +11,17 @@ from __future__ import annotations
 import re
 import sys
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 try:
     import yaml
 except ImportError:
-    sys.exit("mdllm: PyYAML is required (pip install pyyaml)")
+    sys.exit("mdllm: PyYAML is required "
+             "(python -m pip install PyYAML==6.0.3)")
+
+from .repository_view import RepositoryView
+from .structural_refs import structural_field_names
+from .yaml_loader import load_yaml, load_yaml_mapping
 
 # ---------------------------------------------------------------- constants
 
@@ -146,10 +151,9 @@ def is_terminal(schema: dict | None, meta: dict | None) -> bool:
 CORE_FIELDS = {
     # identity & lifecycle (level 1)
     "id", "type", "status", "created", "due_date", "review_date",
-    # relational graph (level 1-2 referential integrity)
-    "linked_things", "dependencies", "blocks", "parent", "parties", "definition",
-    # triggers & workflow-run cursor
-    "triggers", "current_stage", "stages",
+    # workflow-run cursor (structural reference fields are supplied once by
+    # structural_field_names() below)
+    "current_stage", "stages",
     # declared derivations (calc.py) — how a figure in this thing was reached,
     # evaluated by `mdllm calc` and re-checked by `validate`. Tool-read and
     # framework-shipped, so a domain never registers it (criterion 2, the same
@@ -158,7 +162,7 @@ CORE_FIELDS = {
     # provenance (provenance.md) — `verified_by` names the human verifier on a
     # `verified: true` flip (ALCOA attributable; verified-flip-enforcement plan);
     # the source triple is the cross-domain import pin `imports-check` reads
-    "informed_by", "origin", "verified", "verified_by",
+    "origin", "verified", "verified_by",
     "source_domain", "source_id", "source_commit",
     # ingestion triple (provenance.md → Ingestion Is Not Import) — the
     # outside-the-estate pin `imports-check` reports as `ingested` with the
@@ -184,7 +188,7 @@ CORE_FIELDS = {
     # until the ninth review (2026-08-09) caught the framework root itself
     # forced to register them in its own _schema.yaml.
     "priority", "tags", "confidence", "version",
-}
+} | structural_field_names()
 
 DEFAULT_EXCLUDES = {".git", ".claude", ".codex", "node_modules", "templates", "examples",
                     "domain", "domains", "tools", "adapters", "evals", "outputs",
@@ -205,6 +209,9 @@ class Thing:
     path: Path
     meta: dict
     body: str
+    # Exact decoded source from the selected repository view.  Provenance-
+    # bearing egress can compare the bytes it parsed with the bytes it stamps.
+    source_text: str | None = None
 
     @property
     def id(self) -> str | None:
@@ -225,6 +232,10 @@ class Corpus:
     things: list[Thing] = field(default_factory=list)
     schema: dict | None = None
     skipped: list[Path] = field(default_factory=list)
+    view: RepositoryView | None = None
+    # Corpus root within the repository view. ``.`` is the common whole-repo
+    # case; examples and other separately-scoped corpora use a logical prefix.
+    view_prefix: PurePosixPath = PurePosixPath(".")
 
     def by_id(self) -> dict[str, Thing]:
         out: dict[str, Thing] = {}
@@ -234,7 +245,9 @@ class Corpus:
         return out
 
 
-def parse_frontmatter(text: str) -> tuple[dict | None, str, str | None]:
+def parse_frontmatter(
+    text: str, source: str | Path = "<frontmatter>"
+) -> tuple[dict | None, str, str | None]:
     """Returns (meta, body, parse_error)."""
     if not text.startswith("---"):
         return None, text, None
@@ -242,7 +255,7 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str, str | None]:
     if not m:
         return None, text, "unterminated frontmatter block"
     try:
-        meta = yaml.safe_load(m.group(1))
+        meta = load_yaml(m.group(1), source=source)
     except yaml.YAMLError as e:
         return None, m.group(2), f"YAML parse error: {e}"
     if not isinstance(meta, dict):
@@ -262,19 +275,47 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str, str | None]:
     return meta, m.group(2), None
 
 
-def load_schema(root: Path) -> dict | None:
-    for candidate in (root / "_schema.yaml", root / "things" / "_schema.yaml"):
-        if candidate.exists():
-            with open(candidate, encoding="utf-8") as f:
-                return yaml.safe_load(f)
+def _view_prefix(root: Path, view: RepositoryView) -> PurePosixPath:
+    requested = Path(root).resolve()
+    try:
+        relative = requested.relative_to(view.root)
+    except ValueError as exc:
+        raise ValueError(
+            f"scan root {requested} is outside repository view root {view.root}"
+        ) from exc
+    return PurePosixPath(relative.as_posix())
+
+
+def _in_view(prefix: PurePosixPath, relative: PurePosixPath) -> PurePosixPath:
+    return relative if prefix == PurePosixPath(".") else prefix / relative
+
+
+def load_schema(root: Path, view: RepositoryView | None = None) -> dict | None:
+    selected = view or RepositoryView.worktree(root)
+    prefix = _view_prefix(root, selected)
+    for candidate in (PurePosixPath("_schema.yaml"),
+                      PurePosixPath("things/_schema.yaml")):
+        logical = _in_view(prefix, candidate)
+        if selected.exists(logical):
+            return load_yaml_mapping(
+                selected.read_text(logical), source=logical.as_posix())
     return None
 
 
-def scan(root: Path) -> tuple[Corpus, list[Finding]]:
-    corpus = Corpus(root=root)
+def scan(root: Path, view: RepositoryView | None = None) -> tuple[Corpus, list[Finding]]:
+    """Scan things and their schema from one explicit repository view.
+
+    Worktree remains the default for CLI compatibility.  Deterministic callers
+    can pass an index snapshot or immutable commit; no ambient file reads then
+    leak into that claim.
+    """
+    selected = view or RepositoryView.worktree(root)
+    requested_root = Path(root).resolve()
+    prefix = _view_prefix(requested_root, selected)
+    corpus = Corpus(root=requested_root, view=selected, view_prefix=prefix)
     findings: list[Finding] = []
     try:
-        corpus.schema = load_schema(root)
+        corpus.schema = load_schema(requested_root, selected)
     except yaml.YAMLError as e:
         # An unparseable schema must be a finding, not a crash — otherwise
         # one bad edit to _schema.yaml takes the whole floor down with it.
@@ -285,14 +326,19 @@ def scan(root: Path) -> tuple[Corpus, list[Finding]]:
     if corpus.schema and isinstance(corpus.schema.get("exclude"), list):
         excludes |= set(corpus.schema["exclude"])
 
-    for path in sorted(root.rglob("*.md")):
-        rel = path.relative_to(root)
+    for logical in selected.iter_paths(suffix=".md"):
+        try:
+            relative = (logical if prefix == PurePosixPath(".")
+                        else logical.relative_to(prefix))
+        except ValueError:
+            continue
+        rel = Path(*relative.parts)
         if any(part in excludes for part in rel.parts):
             continue
-        if path.name in NON_THING_FILES:
+        if logical.name in NON_THING_FILES:
             continue
-        text = path.read_text(encoding="utf-8")
-        meta, body, err = parse_frontmatter(text)
+        text = selected.read_text(logical)
+        meta, body, err = parse_frontmatter(text, source=rel)
         if err:
             findings.append(Finding(SEV_ERROR, str(rel), err))
             continue
@@ -302,5 +348,7 @@ def scan(root: Path) -> tuple[Corpus, list[Finding]]:
         if not any(k in meta for k in ("id", "type", "status")):
             corpus.skipped.append(rel)  # frontmatter, but not thing-shaped
             continue
-        corpus.things.append(Thing(path=path, meta=meta, body=body))
+        path = requested_root.joinpath(*relative.parts)
+        corpus.things.append(Thing(path=path, meta=meta, body=body,
+                                   source_text=text))
     return corpus, findings

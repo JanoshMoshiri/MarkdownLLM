@@ -1,6 +1,7 @@
 # Shell scripts must keep LF line endings regardless of platform, or they
 # break when run on macOS/Linux ("bad interpreter: /usr/bin/env bash^M").
 *.sh text eol=lf
+*.ps1 text eol=lf
 
 # Bundle templates render into files that run on Linux (bootstrap.sh in an
 # ephemeral VM), and the mechanism hash reads their bytes — keep both

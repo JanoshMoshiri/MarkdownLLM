@@ -3,7 +3,7 @@ id: life-manager-specification
 name: Life Manager Specification
 type: specification
 status: stable
-version: 2.1
+version: 2.2
 created: 2026-05-18
 linked_things:
   - id: life-manager-read-thing-skill
@@ -13,7 +13,7 @@ linked_things:
   - id: life-manager-workflow-skill
     relation: informs
 description: Philosophy, principles, and paradigm for life management using LLM reasoning
-applies_to: "life-manager/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # Life Manager Specification

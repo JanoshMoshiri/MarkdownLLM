@@ -12,8 +12,11 @@ It creates a branch called ``mian`` on the remote, reports success, and
 the work becomes invisible — to the operator, to CI, and to the next
 session. Prose cannot prevent that reliably; a refusal-first command can.
 
-Guards, in order:
+Authority and guards, in order:
 
+0. Publication is authorized by literal ``git.autopush: true`` or an explicit
+   one-shot operator instruction (``--authorize-once``).  False, absent,
+   malformed, and unreadable policy refuse before any remote contact.
 1. The branch name is READ — ``mdllm.defaultbranch`` git config (recorded
    at assembly from the remote's own HEAD) or ``refs/remotes/origin/HEAD``
    (set by clone) — never typed, never guessed, no fallback to ``main``.
@@ -54,7 +57,13 @@ _TOKEN_PATTERNS = [
 ]
 
 
-def _token() -> str | None:
+def command_token() -> str | None:
+    """Return the optional command-scoped Git credential from the environment.
+
+    This is a public application port shared by publication and ephemeral
+    estate assembly.  It returns the value for an individual command; callers
+    must never persist it in a remote URL or Git configuration.
+    """
     for var in TOKEN_ENV_VARS:
         value = os.environ.get(var, "").strip()
         if value:
@@ -74,8 +83,9 @@ def redact(text: str, token: str | None = None) -> str:
     return text
 
 
-def _git(repo: Path, *args: str, token: str | None = None
-         ) -> subprocess.CompletedProcess:
+def git_command(repo: Path, *args: str, token: str | None = None
+                ) -> subprocess.CompletedProcess:
+    """Run one Git command with an optional process-scoped credential."""
     cmd = ["git", "-C", str(repo)]
     if token:
         auth = base64.b64encode(
@@ -83,6 +93,12 @@ def _git(repo: Path, *args: str, token: str | None = None
         cmd += ["-c", f"http.extraheader=Authorization: Basic {auth}"]
     cmd += list(args)
     return subprocess.run(cmd, capture_output=True, text=True)
+
+
+# Compatibility aliases for callers outside this package that may have used
+# the pre-port implementation.  Package modules consume the public names.
+_token = command_token
+_git = git_command
 
 
 def resolve_default_branch(repo: Path) -> tuple[str | None, str]:
@@ -93,11 +109,11 @@ def resolve_default_branch(repo: Path) -> tuple[str | None, str]:
     clone). There is deliberately NO guess: a wrong branch name is worse
     than a hard stop.
     """
-    recorded = _git(repo, "config", "--get", "mdllm.defaultbranch")
+    recorded = git_command(repo, "config", "--get", "mdllm.defaultbranch")
     branch = recorded.stdout.strip()
     if not branch:
-        symref = _git(repo, "symbolic-ref", "--short",
-                      "refs/remotes/origin/HEAD")
+        symref = git_command(repo, "symbolic-ref", "--short",
+                             "refs/remotes/origin/HEAD")
         branch = symref.stdout.strip().removeprefix("origin/")
     if not branch:
         return None, (
@@ -107,8 +123,8 @@ def resolve_default_branch(repo: Path) -> tuple[str | None, str]:
             "(`git remote set-head origin --auto`) or ask the operator "
             "which branch is authoritative, then record it: "
             "`git config mdllm.defaultbranch <branch>`")
-    verify = _git(repo, "show-ref", "--verify", "--quiet",
-                  f"refs/remotes/origin/{branch}")
+    verify = git_command(repo, "show-ref", "--verify", "--quiet",
+                         f"refs/remotes/origin/{branch}")
     if verify.returncode != 0:
         return None, (
             f"resolved {branch!r} but refs/remotes/origin/{branch} does "
@@ -117,17 +133,32 @@ def resolve_default_branch(repo: Path) -> tuple[str | None, str]:
     return branch, ""
 
 
-def publish(repo: Path) -> int:
-    token = _token()
+def publish(repo: Path, *, authorize_once: bool = False) -> int:
+    token = command_token()
 
     def say(line: str) -> None:
         print(redact(line, token))
 
     repo = Path(repo).resolve()
-    inside = _git(repo, "rev-parse", "--git-dir")
+    inside = git_command(repo, "rev-parse", "--git-dir")
     if inside.returncode != 0:
         say(f"publish: {repo} is not a git repository")
         return 2
+
+    # -- 0. sending authority must be explicit --------------------------
+    # Local import avoids a module cycle: sync's Git transport shares the
+    # credential redactor defined above.
+    from .sync import publication_policy
+    policy = publication_policy(repo)
+    if not policy.enabled and not authorize_once:
+        say(f"publish: ABORT — publication authority is off: {policy.reason}. "
+            "A human may either declare literal git.autopush: true as standing "
+            "authority or explicitly instruct this one event and invoke "
+            "`mdllm publish --authorize-once`. No remote was contacted.")
+        return 3
+    if authorize_once and not policy.enabled:
+        say("publish: one-shot authority supplied for this invocation; the "
+            "repository's standing publication policy remains off.")
 
     # -- 1. the branch is read, never typed ------------------------------
     branch, why_not = resolve_default_branch(repo)
@@ -135,14 +166,14 @@ def publish(repo: Path) -> int:
         say(f"publish: ABORT — {why_not}")
         return 3
 
-    local = _git(repo, "rev-parse", "HEAD")
+    local = git_command(repo, "rev-parse", "HEAD")
     if local.returncode != 0:
         say("publish: no commits to publish")
         return 3
     local_sha = local.stdout.strip()
 
     # -- 2. the checkout must be on that branch --------------------------
-    current = _git(repo, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+    current = git_command(repo, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
     if current == "HEAD":
         say("publish: ABORT — detached HEAD; check out the default branch "
             f"({branch}) before publishing")
@@ -155,8 +186,8 @@ def publish(repo: Path) -> int:
         return 3
 
     # -- 3. the branch must already exist on the remote ------------------
-    listed = _git(repo, "ls-remote", "origin", f"refs/heads/{branch}",
-                  token=token)
+    listed = git_command(repo, "ls-remote", "origin", f"refs/heads/{branch}",
+                         token=token)
     if listed.returncode != 0:
         say(f"publish: ABORT — could not reach origin to verify "
             f"refs/heads/{branch}: {listed.stderr.strip()}")
@@ -178,8 +209,8 @@ def publish(repo: Path) -> int:
 
     # -- 4. plain fast-forward push --------------------------------------
     say(f"publish: -> origin/{branch}  ({remote_sha[:8]} -> {local_sha[:8]})")
-    pushed = _git(repo, "push", "origin", f"HEAD:refs/heads/{branch}",
-                  token=token)
+    pushed = git_command(repo, "push", "origin", f"HEAD:refs/heads/{branch}",
+                         token=token)
     if pushed.returncode != 0:
         say(pushed.stderr.strip() or pushed.stdout.strip())
         say("publish: FAILED — the remote rejected the push. Do not retry "
@@ -188,8 +219,8 @@ def publish(repo: Path) -> int:
         return 3
 
     # -- 5. the remote must actually have moved --------------------------
-    verify = _git(repo, "ls-remote", "origin", f"refs/heads/{branch}",
-                  token=token)
+    verify = git_command(repo, "ls-remote", "origin", f"refs/heads/{branch}",
+                         token=token)
     verified_sha = next((line.split()[0] for line in
                          verify.stdout.splitlines() if line.strip()), "")
     if verified_sha != local_sha:
@@ -202,4 +233,7 @@ def publish(repo: Path) -> int:
 
 
 def cmd_publish(args) -> int:
-    return publish(Path(args.path))
+    return publish(
+        Path(args.path),
+        authorize_once=bool(getattr(args, "authorize_once", False)),
+    )

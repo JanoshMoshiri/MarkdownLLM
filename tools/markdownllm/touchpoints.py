@@ -7,10 +7,10 @@ pins, plus the literal-reference grep tier. Human-invoked, never hooked.
 (`inflection-candidates-are-computable`): the cue VERDICT stays human and
 `touchpoints` stays invoked-never-hooked — but the cue QUESTION (does anything
 reason from what was just modified?) is a mechanical predicate, and the
-pre-commit hook asks it in one advisory line. Modified ∧ reasoned-from;
-additions are skipped by the spec's own premise (a fresh thing on a clean
-slate carries no consistency risk). Never blocks, never scores, never runs
-the pass.
+pre-commit hook asks it in one advisory line. Modified things qualify by
+definition-surface/fan-in; additions, deletions, and renames receive their own
+truthful duplicate/contradiction/removal/path questions. Never blocks, never
+scores, never runs the pass.
 """
 
 from __future__ import annotations
@@ -20,6 +20,8 @@ from collections import Counter
 from pathlib import Path
 
 from .model import scan
+from .repository_view import RepositoryView, RepositoryViewError
+from .structural_refs import iter_structural_references
 
 
 def cmd_touchpoints(args) -> int:
@@ -55,15 +57,15 @@ def cmd_touchpoints(args) -> int:
         if src == target:
             continue
         hits: list[str] = []
-        for e in t.meta.get("linked_things") or []:
-            if isinstance(e, dict) and e.get("id") == target:
-                hits.append(f"(linked_things) relation `{e.get('relation')}`")
-        for fieldname in ("parent", "definition"):
-            if t.meta.get(fieldname) == target:
-                hits.append(f"(structural) via `{fieldname}`")
-        for pin in t.meta.get("informed_by") or []:
-            if isinstance(pin, dict) and pin.get("id") == target:
-                hits.append(f"(provenance) informed_by @{pin.get('commit', '?')}")
+        for ref in iter_structural_references(t.meta, reverse_only=True):
+            if ref.target != target:
+                continue
+            if ref.field == "linked_things":
+                hits.append(f"(linked_things) relation `{ref.relation}`")
+            elif ref.field == "informed_by":
+                hits.append(f"(provenance) informed_by @{ref.commit or '?'}")
+            else:
+                hits.append(f"(structural) via `{ref.field}`")
         if hits:
             declared_srcs.add(src)
             for h in hits:
@@ -114,50 +116,168 @@ def _inbound_counts(corpus) -> Counter:
     provenance pins — the same edge set touchpoints walks, counted."""
     counts: Counter = Counter()
     for t in corpus.things:
-        for e in t.meta.get("linked_things") or []:
-            if isinstance(e, dict) and e.get("id"):
-                counts[e["id"]] += 1
-        for fieldname in ("parent", "definition"):
-            if t.meta.get(fieldname):
-                counts[t.meta[fieldname]] += 1
-        for pin in t.meta.get("informed_by") or []:
-            if isinstance(pin, dict) and pin.get("id"):
-                counts[pin["id"]] += 1
+        for ref in iter_structural_references(t.meta, cue_only=True):
+            counts[ref.target] += 1
     return counts
 
 
+def _parse_name_status_z(raw: bytes) -> list[tuple[str, str | None, str]]:
+    """Parse ``git diff --name-status -z`` without a line/text boundary.
+
+    With ``-z`` Git emits ``status NUL path NUL`` (and two paths for a
+    rename/copy).  Paths may themselves contain tabs or newlines, so neither
+    ``splitlines`` nor tab splitting is a valid parser.  Decode with
+    ``surrogateescape`` so even non-UTF-8 Git path bytes round-trip through the
+    local filesystem boundary rather than being replaced.
+    """
+    fields = raw.split(b"\0")
+    if fields and fields[-1] == b"":
+        fields.pop()
+    changes: list[tuple[str, str | None, str]] = []
+    cursor = 0
+    while cursor < len(fields):
+        try:
+            status_text = fields[cursor].decode("ascii")
+        except UnicodeDecodeError:
+            break
+        cursor += 1
+        if not status_text:
+            continue
+        state = status_text[0]
+        path_count = 2 if state in {"R", "C"} else 1
+        if cursor + path_count > len(fields):
+            break
+        paths = [field.decode("utf-8", errors="surrogateescape")
+                 for field in fields[cursor:cursor + path_count]]
+        cursor += path_count
+        if state == "R":
+            old_rel, rel = paths
+            if old_rel.endswith(".md") or rel.endswith(".md"):
+                changes.append((state, old_rel, rel))
+        elif state in {"A", "M", "D"}:
+            rel = paths[0]
+            if rel.endswith(".md"):
+                changes.append((state, rel if state == "D" else None, rel))
+    return changes
+
+
 def cmd_candidates(args) -> int:
-    """Advisory, exit 0 always: for each STAGED MODIFIED thing, say whether a
-    cue question exists (reasoned-from) and whether the change publishes
-    (exposed on the porch). Saying no to a named question is a decision;
-    not being asked was drift."""
+    """Advisory, exit 0 always: classify every staged Markdown state.
+
+    Additions ask about duplicate ownership/latent contradiction; deletions
+    ask where their dependants go; renames ask about path and identity;
+    modifications qualify by definition-surface or fan-in.  Exposure is named
+    independently because add/change/delete all alter the served face.
+    """
     root = Path(args.path).resolve()
     try:
-        r = subprocess.run(["git", "diff", "--cached", "--name-status"],
-                           cwd=root, capture_output=True, text=True, timeout=20)
+        r = subprocess.run(
+            ["git", "diff", "--cached", "--name-status", "-z", "-M"],
+            cwd=root, capture_output=True, timeout=20)
     except Exception:
         return 0
     if r.returncode != 0:
         return 0
-    modified: list[str] = []
-    for line in r.stdout.splitlines():
-        parts = line.split("\t")
-        if len(parts) >= 2 and parts[0].startswith("M") and parts[-1].endswith(".md"):
-            modified.append(parts[-1])
-    if not modified:
+    changes = _parse_name_status_z(r.stdout)
+    if not changes:
         return 0
 
-    corpus, _ = scan(root)
+    mode = getattr(args, "view", "worktree")
+    try:
+        view = (RepositoryView.index(root) if mode == "index"
+                else RepositoryView.worktree(root))
+    except RepositoryViewError:
+        return 0  # advisory only; validation reports an unavailable index
+    corpus, _ = scan(root, view)
     by_path = {t.path.resolve(): t for t in corpus.things}
+    prior_by_path = {}
+    if any(state in {"M", "D", "R"} for state, _, _ in changes):
+        try:
+            prior, _ = scan(root, RepositoryView.commit(root))
+            prior_by_path = {t.path.resolve(): t for t in prior.things}
+        except RepositoryViewError:
+            pass  # unborn/no HEAD: there can be no committed deletion
     inbound = None  # computed lazily — most commits touch no reasoned-from thing
     lines: list[str] = []
-    for rel in modified:
+    for state, old_rel, rel in changes:
         t = by_path.get((root / rel).resolve())
+        prior_rel = old_rel if old_rel else (rel if state == "M" else None)
+        old = (prior_by_path.get((root / prior_rel).resolve())
+               if prior_rel else None)
+        if state == "D":
+            if old is None or not old.id:
+                lines.append(f"cue: deleted `{rel}` — inspect whether the removed "
+                             "identity had conceptual or literal consumers.")
+                continue
+            if old.meta.get("exposed") is True:
+                lines.append(f"porch: `{old.id}` was exposed — this deletion "
+                             "withdraws it from consumers on their next imports-check.")
+            lines.append(f"cue: `{old.id}` is deleted — route its inbound, provenance, "
+                         "and conceptual dependants before accepting removal; "
+                         "inspect the prior commit's inbound set before it disappears.")
+            continue
+
+        # A Git modification can still be a semantic remove/add operation:
+        # frontmatter may disappear, appear, or change identity while the path
+        # remains stable.  These are exactly the states an A/M/D/R cue must not
+        # let fall silent.
+        if state in {"M", "R"} and old and old.id and (t is None or not t.id):
+            if old.meta.get("exposed") is True:
+                lines.append(f"porch: `{old.id}` was exposed — this change withdraws "
+                             "it from consumers on their next imports-check.")
+            removal = ("removing its thing frontmatter" if state == "M"
+                       else f"moving `{old_rel}` outside the Markdown corpus")
+            lines.append(f"cue: `{old.id}` is deleted as a thing by {removal} — "
+                         "route its inbound, provenance, and conceptual dependants "
+                         "before accepting removal.")
+            continue
         if t is None or not t.id:
             continue
-        if t.meta.get("exposed") is True:
-            lines.append(f"porch: `{t.id}` is exposed — this change publishes; "
+        semantic_addition = state == "M" and (old is None or not old.id)
+        identity_change = bool(
+            state == "M" and old and old.id and old.id != t.id)
+        any_identity_change = bool(
+            state in {"M", "R"} and old and old.id and old.id != t.id)
+        if state == "A":
+            lines.append(f"cue: `{t.id}` is new — check duplicate ownership, latent "
+                         "contradiction, and whether existing things should link to it; "
+                         f"`mdllm touchpoints {t.id}`")
+        elif semantic_addition:
+            lines.append(f"cue: `{t.id}` is new as a thing at existing path `{rel}` — "
+                         "check duplicate ownership, latent contradiction, and whether "
+                         "existing things should link to it.")
+        elif identity_change:
+            lines.append(f"cue: modification changes identity `{old.id}` -> `{t.id}` "
+                         f"at `{rel}` — treat it as a removal plus an addition and "
+                         "reconcile both.")
+        elif state == "R":
+            if old and old.id == t.id:
+                lines.append(f"cue: `{t.id}` moved `{old_rel}` -> `{rel}` with identity "
+                             "stable — check literal/path consumers and loading routes.")
+            else:
+                old_id = old.id if old and old.id else old_rel
+                lines.append(f"cue: rename changes identity `{old_id}` -> `{t.id}` — "
+                             "treat it as a removal plus an addition and reconcile both.")
+
+        old_exposed = bool(old and old.meta.get("exposed") is True)
+        new_exposed = t.meta.get("exposed") is True
+        if any_identity_change and old_exposed:
+            lines.append(f"porch: `{old.id}` was exposed — its identity removal "
+                         "withdraws it from consumers on their next imports-check.")
+        elif old_exposed and not new_exposed:
+            lines.append(f"porch: `{old.id}` was exposed — this {state.lower()} "
+                         "withdraws it from consumers on their next imports-check.")
+        if new_exposed:
+            if state == "A" or semantic_addition or any_identity_change:
+                verb = "addition publishes"
+            elif old_exposed:
+                verb = "change publishes"
+            else:
+                verb = "change begins publishing"
+            lines.append(f"porch: `{t.id}` is exposed — this {verb}; "
                          f"consumers' pins go stale on their next imports-check.")
+        if state in {"A", "R"} or semantic_addition or identity_change:
+            continue  # these states already received truthful cue questions
         typ = t.meta.get("type")
         if typ in DEFINITION_SURFACE_TYPES:
             reason = f"definition surface (`{typ}`)"

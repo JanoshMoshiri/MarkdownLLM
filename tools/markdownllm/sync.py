@@ -26,22 +26,54 @@ Doctrine, by construction:
 
 from __future__ import annotations
 
+import base64
 import os
+import re
 import subprocess
 import time
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
+
+import yaml
+
+from .yaml_loader import load_yaml
 
 DEFAULT_TIMEOUT = 20  # seconds per network call; a hook that can hang a session start is worse than none
 ESTATE_GLOBAL_TIMEOUT = 75
 
 
-def _git(repo: Path, *args: str, timeout: int = DEFAULT_TIMEOUT):
-    """Run git non-interactively; None on timeout (caller treats as offline)."""
+def _redact(text: str, token: str | None = None) -> str:
+    """Late-bind the shared transport redactor without a module cycle.
+
+    ``publish`` consumes this module's publication-policy port, while sync
+    consumes publish's credential redaction.  Importing both at module load
+    makes CLI startup order-dependent; the function boundary keeps the shared
+    implementations single-sourced and the import graph executable.
+    """
+    from .publish import redact
+    return redact(text, token)
+
+
+def _git(repo: Path, *args: str, timeout: int = DEFAULT_TIMEOUT,
+         token: str | None = None):
+    """Run git non-interactively; None on timeout (caller treats as offline).
+
+    `token`, when supplied, follows publish.py's command-scoped credential
+    route: an HTTP header on this process only. It is never written to a URL,
+    git config, the environment, or disk.
+    """
     env = os.environ.copy()
     env["GIT_TERMINAL_PROMPT"] = "0"  # never prompt — degrade instead
     env.setdefault("GCM_INTERACTIVE", "never")
+    command = ["git"]
+    if token:
+        auth = base64.b64encode(
+            f"x-access-token:{token}".encode()).decode()
+        command += ["-c", f"http.extraheader=Authorization: Basic {auth}"]
+    command += list(args)
     try:
-        return subprocess.run(["git", *args], cwd=repo, capture_output=True,
+        return subprocess.run(command, cwd=repo, capture_output=True,
                               text=True, timeout=timeout, env=env)
     except subprocess.TimeoutExpired:
         return None
@@ -95,16 +127,21 @@ def _classify_fetch_failure(stderr: str) -> str:
     return "fetch-failed"
 
 
-def _first_stderr_line(stderr: str) -> str:
+def _first_stderr_line(stderr: str, token: str | None = None) -> str:
     for line in (stderr or "").splitlines():
         if line.strip():
-            return line.strip()[:120]
+            return _redact(line.strip(), token)[:120]
     return "no stderr"
 
 
 def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
-              deadline: float | None = None) -> dict:
+              deadline: float | None = None,
+              token: str | None = None) -> dict:
     """One repo's sync outcome: {'repo', 'state', 'detail', 'moved'}.
+
+    `token` is optional command-scoped authentication compatible with
+    publish.py. Callers serving ephemeral containers may pass the token they
+    already hold; local callers leave it `None` and use ambient git auth.
 
     States: synced / up-to-date / ahead / diverged / dirty / local-only /
     no-upstream / detached / unborn / in-operation / offline / auth-failed /
@@ -143,7 +180,7 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
                              "— orienting from last-fetched state")
         else:
             f = _git(repo, "fetch", "--quiet",
-                     timeout=min(float(timeout), remaining))
+                     timeout=min(float(timeout), remaining), token=token)
         if f is None and out["state"] != "budget-exhausted":
             if deadline is not None and time.monotonic() >= deadline:
                 out["state"] = "budget-exhausted"
@@ -157,11 +194,11 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
             out["state"] = _classify_fetch_failure(f.stderr)
             out["detail"] = "orienting from last-fetched state"
             if out["state"] == "fetch-failed":
-                out["detail"] = (f"undiagnosed ({_first_stderr_line(f.stderr)}) — "
+                out["detail"] = (f"undiagnosed ({_first_stderr_line(f.stderr, token)}) — "
                                  f"orienting from last-fetched state")
             elif out["state"] == "permission-denied":
                 out["detail"] = (f"permission denied "
-                                 f"({_first_stderr_line(f.stderr)}) — "
+                                 f"({_first_stderr_line(f.stderr, token)}) — "
                                  f"orienting from last-fetched state")
 
     counts = _counts(repo)
@@ -203,46 +240,117 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
                                  "global estate deadline exhausted")
             else:
                 p = _git(repo, "pull", "--ff-only", "--quiet",
-                         timeout=min(float(timeout), remaining))
+                         timeout=min(float(timeout), remaining), token=token)
             if p is not None and p.returncode == 0:
                 out["state"] = "synced"
                 out["detail"] = f"+{behind}"
                 out["moved"] = True
             elif out["state"] != "budget-exhausted":
                 out["state"] = "pull-failed"
-                err = (p.stderr.strip().splitlines() or ["?"])[-1] if p else "timeout"
-                out["detail"] = err
+                err = ((p.stderr.strip().splitlines() or ["?"])[-1]
+                       if p else "timeout")
+                out["detail"] = _redact(err, token)
     elif ahead:
         out["state"] = "ahead" if not degraded else out["state"]
         out["detail"] = f"+{ahead} (unpushed){cached}"
     elif is_dirty:
         # Up to date with the remote but uncommitted work in the tree — not
         # sync's problem to fix, but worth a word at session start.
+        if not degraded:
+            out["state"] = "dirty"
         out["detail"] = f"working tree not clean{cached}"
     return out
 
 
-def _autopush_enabled(repo: Path) -> bool:
-    """`git.autopush` from the repo's AGENTS.md frontmatter — absence is ON
-    (estate-cadence-cluster Phase 1, operator ruling 2026-08-04: the opt-out
-    set is the small one). Only an explicit `autopush: false` opts out; a
-    missing AGENTS.md, missing git block, or unparseable frontmatter all mean
-    the default applies."""
+class PublicationPolicyState(str, Enum):
+    """Why the post-commit publication leg is enabled or disabled."""
+
+    LITERAL_TRUE = "literal-true"
+    LITERAL_FALSE = "literal-false"
+    ABSENT = "absent"
+    MALFORMED = "malformed"
+    UNREADABLE = "unreadable"
+
+
+@dataclass(frozen=True)
+class PublicationPolicy:
+    """One typed, inspectable reading of ``AGENTS.md`` publication authority."""
+
+    enabled: bool
+    state: PublicationPolicyState
+    reason: str
+
+
+def publication_policy(repo: Path) -> PublicationPolicy:
+    """Read the fail-closed publication authority and preserve its reason.
+
+    Only the YAML boolean ``true`` at ``git.autopush`` enables a send.  The
+    distinction between false, absent, malformed, and unreadable is retained
+    for diagnostics; collapsing all four to ``False`` made a safe refusal
+    operationally opaque.
+    """
     agents = repo / "AGENTS.md"
     if not agents.is_file():
-        return True
+        return PublicationPolicy(
+            False, PublicationPolicyState.ABSENT,
+            "AGENTS.md is absent; no publication authority was declared")
     try:
-        import re
-        import yaml
-        text = agents.read_text(encoding="utf-8", errors="replace")
-        m = re.match(r"^---\r?\n(.*?)\r?\n---", text, re.S)
-        if not m:
-            return True
-        fm = yaml.safe_load(m.group(1)) or {}
-        git_cfg = fm.get("git") or {}
-        return git_cfg.get("autopush") is not False
-    except Exception:
-        return True
+        text = agents.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return PublicationPolicy(
+            False, PublicationPolicyState.UNREADABLE,
+            f"AGENTS.md cannot be read as UTF-8 ({exc})")
+
+    if not text.startswith("---"):
+        return PublicationPolicy(
+            False, PublicationPolicyState.ABSENT,
+            "AGENTS.md has no YAML frontmatter; git.autopush is absent")
+    m = re.match(r"^---\s*\r?\n(.*?)\r?\n---(?:\s*\r?\n|\s*$)", text, re.S)
+    if not m:
+        return PublicationPolicy(
+            False, PublicationPolicyState.MALFORMED,
+            "AGENTS.md opens YAML frontmatter but does not close it cleanly")
+    try:
+        fm = load_yaml(m.group(1), source=agents) or {}
+    except yaml.YAMLError as exc:
+        return PublicationPolicy(
+            False, PublicationPolicyState.MALFORMED,
+            f"AGENTS.md frontmatter is invalid YAML ({exc})")
+    if not isinstance(fm, dict):
+        return PublicationPolicy(
+            False, PublicationPolicyState.MALFORMED,
+            "AGENTS.md frontmatter must be a YAML mapping")
+    if "git" not in fm:
+        return PublicationPolicy(
+            False, PublicationPolicyState.ABSENT,
+            "AGENTS.md has no git mapping; git.autopush is absent")
+    git_cfg = fm.get("git")
+    if not isinstance(git_cfg, dict):
+        return PublicationPolicy(
+            False, PublicationPolicyState.MALFORMED,
+            "AGENTS.md git must be a YAML mapping")
+    if "autopush" not in git_cfg:
+        return PublicationPolicy(
+            False, PublicationPolicyState.ABSENT,
+            "AGENTS.md git.autopush is absent")
+    value = git_cfg.get("autopush")
+    if value is True:
+        return PublicationPolicy(
+            True, PublicationPolicyState.LITERAL_TRUE,
+            "AGENTS.md git.autopush is the YAML boolean true")
+    if value is False:
+        return PublicationPolicy(
+            False, PublicationPolicyState.LITERAL_FALSE,
+            "AGENTS.md git.autopush is the YAML boolean false")
+    return PublicationPolicy(
+        False, PublicationPolicyState.MALFORMED,
+        "AGENTS.md git.autopush must be the YAML boolean true or false "
+        f"(got {type(value).__name__})")
+
+
+def _autopush_enabled(repo: Path) -> bool:
+    """Compatibility query; new diagnostics consume ``publication_policy``."""
+    return publication_policy(repo).enabled
 
 
 def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
@@ -255,8 +363,10 @@ def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
     regardless), never resolves a rejection — a rejected push is DIVERGED on
     the push side, an unrouted decision the operator routes."""
     out = {"repo": repo, "state": "published", "detail": ""}
-    if not _autopush_enabled(repo):
+    policy = publication_policy(repo)
+    if not policy.enabled:
         out["state"] = "off"
+        out["detail"] = policy.reason
         return out
     remotes = _git(repo, "remote")
     if remotes is None or not remotes.stdout.strip():
@@ -276,13 +386,29 @@ def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
         out["detail"] = (f"branch `{branch}` has no upstream — set one "
                          f"(`git push -u origin {branch}`) or declare `git: autopush: false`")
         return out
-    p = _git(repo, "push", "--porcelain", timeout=timeout)
+    # Never delegate publication scope to ambient ``push.default``.  In
+    # particular, ``matching`` would publish every matching local branch even
+    # though this post-commit hook was authorized by one current commit.  Pin
+    # the configured upstream as an exact remote + destination refspec.
+    remote = _git(repo, "config", "--get", f"branch.{branch}.remote")
+    merge = _git(repo, "config", "--get", f"branch.{branch}.merge")
+    if (remote is None or remote.returncode != 0 or not remote.stdout.strip()
+            or merge is None or merge.returncode != 0
+            or not merge.stdout.strip().startswith("refs/heads/")):
+        out["state"] = "no-upstream"
+        out["detail"] = (f"branch `{branch}` has no unambiguous branch upstream; "
+                         "publication was not attempted")
+        return out
+    remote_name = remote.stdout.strip()
+    merge_ref = merge.stdout.strip()
+    p = _git(repo, "push", "--porcelain", "--", remote_name,
+             f"HEAD:{merge_ref}", timeout=timeout)
     if p is None:
         out["state"] = "offline"
         out["detail"] = "push timed out — commit stands as publication debt (`mdllm estate-sync --status`)"
         return out
     if p.returncode == 0:
-        out["detail"] = f"{branch} -> {upstream.stdout.strip()}"
+        out["detail"] = f"{branch} -> {remote_name}/{merge_ref.removeprefix('refs/heads/')}"
         return out
     stderr = p.stderr.lower() + p.stdout.lower()
     if "non-fast-forward" in stderr or "rejected" in stderr or "fetch first" in stderr:
@@ -358,9 +484,10 @@ def cmd_estate_sync(args) -> int:
     if status_only:
         if debt == 0:
             print("- nothing unpublished — the estate sees everything committed here")
-        print("\nUnder autopush (the default) every line above is an anomaly — route it, "
-              "don't just push it. Where `git: autopush: false`, publication stays yours: "
-              "review `git log`, then push per repo when satisfied.")
+        print("\nAutopush is fail-closed: only an explicit `git: autopush: true` "
+              "publishes after commit. Where it is false, absent, or malformed, "
+              "publication stays yours: review `git log`, then push per repo "
+              "when satisfied.")
         return 0
 
     if require_fresh:

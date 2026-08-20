@@ -105,7 +105,12 @@ def to_decimal(v, where: str = "value") -> Decimal:
     if isinstance(v, int):
         return Decimal(v)
     if isinstance(v, float):
-        return Decimal(str(v))
+        # The strict YAML boundary retains the exact scalar token on its
+        # float-compatible wrapper.  Falling back to ``str`` preserves the
+        # public API for programmatic/plain Python floats while preventing a
+        # long decimal in frontmatter from being rounded before Decimal sees
+        # it.
+        return Decimal(getattr(v, "yaml_lexeme", str(v)).replace("_", ""))
     if isinstance(v, str):
         s = v.strip().translate(_STRIP)
         neg = s.startswith("(") and s.endswith(")")

@@ -9,14 +9,129 @@ evals/results/ is the committed evidence mirror.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import json
+import os
+import re
 import subprocess
 import sys
+import tempfile
+import uuid
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
-from .model import Corpus, SEV_ERROR, scan
-from .validation import validate_level1, validate_level2, validate_level3
+from .calc import CalcError, to_decimal
+from .yaml_loader import load_version_sentinel, load_yaml_mapping
+
+from .model import Corpus, SEV_ERROR, SEV_INFO, SEV_WARNING, scan
+from .validation import validation_reports
+
+
+def _full_validation_errors(root: Path) -> list:
+    """The exact Error set behind ``mdllm validate``, without reformatting."""
+    return [finding
+            for _, _, findings in validation_reports(root)
+            for finding in findings if finding.severity == SEV_ERROR]
+
+
+def _validation_summary(root: Path) -> dict[str, int]:
+    """Count the complete validation boundary without dropping scan findings."""
+    counts = {SEV_ERROR: 0, SEV_WARNING: 0, SEV_INFO: 0}
+    for _, _, findings in validation_reports(root):
+        for finding in findings:
+            counts[finding.severity] = counts.get(finding.severity, 0) + 1
+    return {
+        "errors": counts[SEV_ERROR],
+        "warnings": counts[SEV_WARNING],
+        "info": counts[SEV_INFO],
+    }
+
+
+def _validation_control_failure(assertions: list[dict],
+                                summary: dict[str, int]) -> bool:
+    """Whether validation needs its own trial-level control failure.
+
+    An explicit ``validates_clean`` assertion already represents the same
+    complete boundary and must not be double-counted.  Without that assertion,
+    validation remains an unconditional integrity leg of an agent-run trial.
+    """
+    declared = any("validates_clean" in item
+                   for item in assertions if isinstance(item, dict))
+    return bool(summary.get("errors")) and not declared
+
+
+def _run_id(model: str, condition: str, trial: int) -> str:
+    """Collision-resistant, path-safe evidence identity.
+
+    Second-resolution ids collided during repeated/concurrent trials.  Time is
+    retained for operator readability; a UUID suffix supplies identity.
+    """
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d-%H%M%S-%f")
+    safe_model = re.sub(r"[^A-Za-z0-9._-]+", "-", str(model)).strip("-") or "model"
+    return f"{stamp}-{safe_model}-{condition}-t{trial}-{uuid.uuid4().hex[:10]}"
+
+
+def _git_value(root: Path, *args: str) -> str | None:
+    out = subprocess.run(["git", *args], cwd=root, capture_output=True,
+                         text=True, encoding="utf-8", errors="replace")
+    return out.stdout.strip() if out.returncode == 0 and out.stdout.strip() else None
+
+
+def _agent_failure(proc, stdout_meta: object) -> str | None:
+    """Return the invocation failure reason; success is ``None``.
+
+    Process, transport and agent-reported success are separate facts.  An eval
+    trial cannot be green when any one of them is red or unreadable.
+    """
+    if proc.returncode != 0:
+        return f"process exited {proc.returncode}"
+    if not isinstance(stdout_meta, dict):
+        return "agent stdout is not a JSON object"
+    if stdout_meta.get("is_error"):
+        return f"agent reported error ({stdout_meta.get('subtype') or 'unspecified'})"
+    if stdout_meta.get("subtype") not in (None, "success"):
+        return f"agent subtype is {stdout_meta.get('subtype')!r}, not success"
+    return None
+
+
+def _command_version(executable: str) -> str:
+    """Return an observed harness build string, or an explicit unknown.
+
+    A successful agent trial without the executable build is not reproducible
+    evidence.  Version probing is deliberately bounded and never promotes the
+    framework version into a vendor-build claim.
+    """
+    try:
+        proc = subprocess.run(
+            [executable, "--version"], capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=10)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return f"unknown ({type(exc).__name__})"
+    text = (proc.stdout or proc.stderr or "").strip()
+    if proc.returncode != 0 or not text:
+        return f"unknown (version command exited {proc.returncode})"
+    return text.splitlines()[0].strip()
+
+
+def _eval_run_dir(root: Path, run_id: str) -> Path:
+    """Resolve an isolated workspace and refuse a source-tree descendant."""
+    base = Path(os.environ.get(
+        "MDLLM_EVAL_RUN_ROOT",
+        str(Path(tempfile.gettempdir()) / "mdllm-evals"))).resolve()
+    candidate = (base / run_id).resolve()
+    try:
+        candidate.relative_to(root.resolve())
+    except ValueError:
+        return candidate
+    raise ValueError(
+        "eval workspace must be outside the framework/source repository; "
+        "set MDLLM_EVAL_RUN_ROOT to an isolated directory")
+
+
+def _results_exit_code(results: list[dict]) -> int:
+    return 1 if any(r.get("failed", 0) for r in results) else 0
 
 def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[str]]:
     """Stage 1: deterministic assertions against a domain's current state.
@@ -52,14 +167,19 @@ def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[s
             t = by_id.get(fa["id"])
             actual = t.meta.get(fa["name"]) if t else "<missing>"
             expected = fa["equals"]
-            ok = actual == expected
-            if not ok and isinstance(expected, (int, float)) and not isinstance(expected, bool):
-                # `2500.00` written as the string "2500.00" is semantically
-                # correct — coerce before failing a numeric contract.
+            if (isinstance(expected, (int, float, Decimal))
+                    and not isinstance(expected, bool)):
+                # Compare numeric contracts through the exact-decimal
+                # boundary *before* Python float equality.  LexicalFloat is a
+                # float-compatible YAML value, so two distinct long lexemes
+                # can otherwise compare equal after binary rounding.
                 try:
-                    ok = abs(float(actual) - float(expected)) < 1e-9
-                except (TypeError, ValueError):
+                    ok = to_decimal(actual, "actual") == to_decimal(
+                        expected, "expected")
+                except (CalcError, TypeError, ValueError):
                     ok = False
+            else:
+                ok = actual == expected
             report(ok, f"{fa['id']}.{fa['name']} == {expected!r} (actual: {actual!r})")
         elif "link" in a:
             ln = a["link"]
@@ -70,12 +190,7 @@ def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[s
                 for e in t.meta.get("linked_things") or [])
             report(ok, f"link: {ln['from']} --{ln['relation']}--> {ln['to']}")
         elif "validates_clean" in a:
-            findings = []
-            for t in corpus.things:
-                findings.extend(validate_level1(t, corpus.schema))
-            findings.extend(validate_level2(corpus))
-            findings.extend(validate_level3(corpus))
-            errs = [x for x in findings if x.severity == SEV_ERROR]
+            errs = _full_validation_errors(droot)
             report(not errs, f"validates clean (Errors: {len(errs)})")
         elif "file_exists" in a:
             paths = a["file_exists"]
@@ -198,13 +313,27 @@ def cmd_eval(args) -> int:
         return eval_report(root)
     if not args.fixture:
         sys.exit("mdllm: eval requires --fixture (or --report)")
-    fixture = yaml.safe_load(Path(args.fixture).read_text(encoding="utf-8"))
+    fixture_path = Path(args.fixture).resolve()
+    try:
+        fixture_bytes = fixture_path.read_bytes()
+    except OSError as exc:
+        sys.exit(f"mdllm: eval cannot read fixture {fixture_path} — {exc}")
+    fixture_hash = hashlib.sha256(fixture_bytes).hexdigest()
+    try:
+        fixture = load_yaml_mapping(fixture_bytes, source=fixture_path)
+    except (UnicodeError, yaml.YAMLError) as exc:
+        sys.exit(f"mdllm: eval refused invalid fixture {fixture_path} — {exc}")
     sentinel = root / ".markdownllm"
+    sentinel_data = None
     if sentinel.is_file():
         # Fixtures must not hardcode the framework version (it breaks on the
         # next release) — `{framework_version}` resolves from the sentinel.
-        fv = str((yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {})
-                 .get("version"))
+        try:
+            sentinel_data = load_version_sentinel(
+                sentinel.read_text(encoding="utf-8"), source=sentinel)
+        except (OSError, UnicodeError, yaml.YAMLError) as exc:
+            sys.exit(f"mdllm: eval refused invalid/unreadable {sentinel} — {exc}")
+        fv = str(sentinel_data.get("version"))
 
         def _subst(o):
             if isinstance(o, str):
@@ -216,6 +345,10 @@ def cmd_eval(args) -> int:
             return o
         fixture = _subst(fixture)
     name = fixture.get("name", args.fixture)
+    framework_commit = _git_value(root, "rev-parse", "HEAD")
+    framework_version = None
+    if sentinel_data is not None:
+        framework_version = str(sentinel_data.get("version") or "") or None
 
     # A longitudinal fixture declares `sessions:` — a list of {name, prompt,
     # assertions} — instead of one top-level prompt/assertions pair. Each
@@ -256,23 +389,39 @@ def cmd_eval(args) -> int:
     bare_preamble = fixture.get("bare_preamble",
                                 "You are in a directory of markdown files with YAML "
                                 "frontmatter representing business records.")
-    import json as _json
     results = []
+    claude_exe: str | None = None
+    harness_build = "not executed (dry run)"
+    if not args.dry_run:
+        import shutil as _sh
+        exe = _sh.which("claude")
+        if not exe:
+            sys.exit("mdllm: `claude` CLI not on PATH — install "
+                     "@anthropic-ai/claude-code or use --dry-run")
+        claude_exe = _resolve_claude_cli(exe)
+        harness_build = _command_version(claude_exe)
 
     def record(run_id: str, run_dir: Path, res: dict) -> None:
         """Run dirs are gitignored workspaces; evals/results/ is the committed
         evidence mirror — the claim and the data travel together."""
         results.append(res)
-        payload = _json.dumps(res, indent=2)
+        payload = json.dumps(res, indent=2)
         (run_dir / "result.json").write_text(payload, encoding="utf-8")
         res_dir = root / "evals" / "results"
         res_dir.mkdir(parents=True, exist_ok=True)
         (res_dir / f"{run_id}.json").write_text(payload, encoding="utf-8")
 
     for trial in range(1, args.trials + 1):
-        run_id = (f"{dt.datetime.now():%Y%m%d-%H%M%S}-"
-                  f"{args.model}-{'bare' if args.bare else 'fw'}-t{trial}")
-        run_dir = root / "evals" / "runs" / run_id
+        condition = "bare" if args.bare else "fw"
+        run_id = _run_id(args.model, condition, trial)
+        # Isolation means outside the source repository, not merely under an
+        # ignored folder.  The 2026-07 longitudinal run proved that an agent in
+        # evals/runs can walk upward and edit the canonical seed.  Operators may
+        # pin a sandbox root; the OS temp directory is the default.
+        try:
+            run_dir = _eval_run_dir(root, run_id)
+        except ValueError as exc:
+            sys.exit(f"mdllm: {exc}")
         run_dir.parent.mkdir(parents=True, exist_ok=True)
         seed_run_dir(root, fixture, run_dir, args.bare)
         print(f"## Trial {trial}/{args.trials} — {run_id}"
@@ -280,6 +429,7 @@ def cmd_eval(args) -> int:
         t_passed = t_failed = 0
         sess_records: list[dict] = []
         aborted = False
+        abort_reason: str | None = None
         for si, sess in enumerate(sessions, 1):
             sname = str(sess.get("name", f"s{si}"))
             prompt = sess["prompt"]
@@ -303,12 +453,8 @@ def cmd_eval(args) -> int:
                 print(f"  [{sname}] would run (cwd=workspace): {' '.join(cmd[:2])} "
                       f"<prompt {len(prompt)} chars> {' '.join(cmd[3:])}")
                 continue
-            import shutil as _sh
-            exe = _sh.which("claude")
-            if not exe:
-                sys.exit("mdllm: `claude` CLI not on PATH — install "
-                         "@anthropic-ai/claude-code or use --dry-run")
-            cmd[0] = _resolve_claude_cli(exe)
+            assert claude_exe is not None
+            cmd[0] = claude_exe
             t0 = dt.datetime.now()
             try:
                 proc = subprocess.run(cmd, cwd=run_dir, capture_output=True, text=True,
@@ -316,17 +462,32 @@ def cmd_eval(args) -> int:
             except subprocess.TimeoutExpired:
                 wall = (dt.datetime.now() - t0).total_seconds()
                 n_asserts = len(sess.get("assertions") or [])
+                validation_root = ((run_dir / fixture["domain_dir"])
+                                   if fixture.get("domain_dir") else run_dir)
+                validation_summary = _validation_summary(validation_root)
                 # Downstream sessions depend on this one's end state — the
                 # chain is unresumable, so their assertions fail with it.
                 rest = sum(len(s.get("assertions") or []) for s in sessions[si:])
                 print(f"  [{sname}] TIMEOUT after {wall:.0f}s — session 0/{n_asserts}"
                       + (f", chain aborted ({rest} downstream assertions failed)"
                          if rest else ""))
-                sess_records.append({"name": sname, "passed": 0, "failed": n_asserts,
+                sess_records.append({"name": sname, "passed": 0,
+                                     "failed": n_asserts + 1,
                                      "wall_s": round(wall), "cost_usd": None,
-                                     "turns": None, "timeout": True})
-                t_failed += n_asserts + rest
+                                     "turns": None, "timeout": True,
+                                     "process_returncode": None,
+                                     "agent_failure": "timeout",
+                                     "validation_errors":
+                                         validation_summary["errors"],
+                                     "validation_summary": validation_summary,
+                                     "assertion_result": {
+                                         "passed": 0,
+                                         "failed": n_asserts,
+                                         "not_run_downstream": rest,
+                                     }})
+                t_failed += n_asserts + rest + 1
                 aborted = True
+                abort_reason = "timeout"
                 break
             wall = (dt.datetime.now() - t0).total_seconds()
             # Always persist the agent's raw output — a 2-second 1-turn
@@ -338,15 +499,31 @@ def cmd_eval(args) -> int:
                 (run_dir / f"agent-stderr{suffix}.txt").write_text(
                     proc.stderr, encoding="utf-8")
             cost = turns = None
+            meta = None
             try:
-                meta = _json.loads(proc.stdout)
-                cost, turns = meta.get("total_cost_usd"), meta.get("num_turns")
-                if meta.get("is_error") or meta.get("subtype") not in (None, "success"):
-                    print(f"  [{sname}] AGENT ERROR ({meta.get('subtype')}): "
-                          f"{str(meta.get('result'))[:200]}")
+                meta = json.loads(proc.stdout)
+                if isinstance(meta, dict):
+                    cost = meta.get("total_cost_usd")
+                    turns = meta.get("num_turns")
             except (ValueError, TypeError):
-                pass
+                meta = None
+            agent_failure = _agent_failure(proc, meta)
+            if agent_failure:
+                print(f"  [{sname}] AGENT FAILURE: {agent_failure}")
             passed, failed, lines = check_assertions(sfx, run_dir)
+            assertion_result = {"passed": passed, "failed": failed}
+            validation_root = ((run_dir / fixture["domain_dir"])
+                               if fixture.get("domain_dir") else run_dir)
+            validation_summary = _validation_summary(validation_root)
+            if _validation_control_failure(
+                    sfx.get("assertions") or [], validation_summary):
+                failed += 1
+                lines.append(
+                    "  FAIL  complete validation boundary: "
+                    f"{validation_summary['errors']} Error(s)")
+            if agent_failure:
+                failed += 1  # control failure is separate from state assertions
+                lines.insert(0, f"  FAIL  agent invocation: {agent_failure}")
             if len(sessions) > 1:
                 print(f"  --- session {si}/{len(sessions)}: {sname} ---")
             print("\n".join(lines))
@@ -356,7 +533,22 @@ def cmd_eval(args) -> int:
             t_failed += failed
             sess_records.append({"name": sname, "passed": passed, "failed": failed,
                                  "wall_s": round(wall), "cost_usd": cost,
-                                 "turns": turns})
+                                 "turns": turns,
+                                 "process_returncode": proc.returncode,
+                                 "agent_failure": agent_failure,
+                                 "validation_errors":
+                                     validation_summary["errors"],
+                                 "validation_summary": validation_summary,
+                                 "assertion_result": assertion_result})
+            if agent_failure:
+                # Later sessions depend on a trustworthy state transition.  Do
+                # not convert a failed invocation into a longitudinal success.
+                rest = sum(len(s.get("assertions") or [])
+                           for s in sessions[si:])
+                t_failed += rest
+                aborted = True
+                abort_reason = agent_failure
+                break
         if args.dry_run:
             continue
         walls = [s["wall_s"] for s in sess_records if s.get("wall_s") is not None]
@@ -367,15 +559,46 @@ def cmd_eval(args) -> int:
                "passed": t_passed, "failed": t_failed,
                "wall_s": sum(walls) if walls else None,
                "cost_usd": round(sum(costs), 6) if costs else None,
-               "turns": sum(turns_) if turns_ else None}
+               "turns": sum(turns_) if turns_ else None,
+               "framework_commit": framework_commit,
+               "framework_version": framework_version,
+               "fixture_sha256": fixture_hash,
+               "fixture_path": fixture_path.name,
+               "execution_surface": "claude-cli",
+               "harness": "Claude Code CLI",
+               "harness_build": harness_build,
+               "tool_version": framework_version,
+               "reasoning_effort": "CLI default (not explicitly configured)",
+               "reasoning_effort_requested": fixture.get("reasoning_effort"),
+               "process_status": [s.get("process_returncode")
+                                  for s in sess_records],
+               "validation_errors": sum(s.get("validation_errors", 0)
+                                        for s in sess_records),
+               "validation_summary": {
+                   key: sum((s.get("validation_summary") or {}).get(key, 0)
+                            for s in sess_records)
+                   for key in ("errors", "warnings", "info")
+               },
+               "assertion_result": {
+                   "passed": sum((s.get("assertion_result") or {}).get(
+                       "passed", 0) for s in sess_records),
+                   "failed": sum((s.get("assertion_result") or {}).get(
+                       "failed", 0) for s in sess_records),
+                   "not_run_downstream": sum(
+                       (s.get("assertion_result") or {}).get(
+                           "not_run_downstream", 0) for s in sess_records),
+               }}
         if len(sessions) > 1:
             res["sessions"] = sess_records
         if aborted:
-            res["timeout"] = True
+            res["aborted"] = True
+            res["abort_reason"] = abort_reason
+            if abort_reason == "timeout":
+                res["timeout"] = True
         print(f"  trial score {t_passed}/{t_passed + t_failed}\n")
         record(run_id, run_dir, res)
     if results:
         ok = sum(1 for r in results if r["failed"] == 0)
         print(f"### {name}: {ok}/{len(results)} trials fully passing "
               f"({args.model}, {'bare' if args.bare else 'framework'})")
-    return 0
+    return _results_exit_code(results)

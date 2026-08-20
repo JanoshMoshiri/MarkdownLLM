@@ -2,7 +2,7 @@
 id: session-end-continuity
 type: prompt
 status: evolving
-version: 1.2
+version: 1.3
 created: 2026-05-28
 inputs:
   - name: session-conversation
@@ -155,8 +155,10 @@ it). History lives in git and nowhere else.
 ### 7. Report Publication Debt
 
 The commit made the session's state real on this machine; publication makes it real
-to the estate — and under autopush (the default since v3.26) publication normally
-already happened at each commit. This step is the anomaly check, not the push:
+to the estate. Where the repo explicitly declares literal `git.autopush: true`,
+publication normally already happened at each commit. Otherwise debt is expected
+until a human-authorized push. This step reports the distinction; it grants no send
+authority:
 
 Run `python {framework_root}/tools/mdllm.py estate-sync . --status` (no network —
 cached refs) and surface every line. Any `ahead +n (unpushed)` is something to
@@ -164,11 +166,12 @@ cached refs) and surface every line. Any `ahead +n (unpushed)` is something to
 - an offline session → the debt clears at the next connected commit;
 - a rejected push → divergence on the push side; surface it to the operator, never
   resolve by force;
-- an opted-out repo (`git: autopush: false` — release surfaces) → holding work for
-  its deliberate publish is correct; name it so the operator can decide.
+- a repo with false, absent, or malformed autopush policy → no automatic send was
+  authorized; holding work is correct until the operator chooses a push or adds
+  literal true.
 
-Never push an opted-out repo yourself (git-workflow.md → The Outbound Rules;
-`autopush-moves-the-deliberate-act`).
+Never infer push authority from silence (git-workflow.md → The Outbound Rules;
+`autopush-requires-explicit-authority`).
 
 ## Extraction Heuristic
 

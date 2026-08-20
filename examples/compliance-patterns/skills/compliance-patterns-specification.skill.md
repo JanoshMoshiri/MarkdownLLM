@@ -3,7 +3,7 @@ id: compliance-patterns-specification
 name: Compliance Patterns Specification
 type: specification
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-18
 linked_things:
   - id: compliance-patterns-read-thing-skill
@@ -13,7 +13,7 @@ linked_things:
   - id: compliance-patterns-workflow-skill
     relation: informs
 description: Philosophy and approach to encoding compliance as verifiable reasoning
-applies_to: "compliance-patterns/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # Compliance Patterns Specification

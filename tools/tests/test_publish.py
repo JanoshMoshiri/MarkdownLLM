@@ -59,6 +59,10 @@ def estate(tmp_path):
                    check=True)
     _run(clone, "config", "user.email", "t@t")
     _run(clone, "config", "user.name", "t")
+    (clone / "AGENTS.md").write_text(
+        "---\ngit:\n  autopush: true\n---\n\n# Test Domain\n",
+        encoding="utf-8",
+    )
     return origin, clone
 
 
@@ -109,6 +113,42 @@ def test_nothing_to_push_is_calm(estate, capsys):
     _, clone = estate
     assert publish(clone) == 0
     assert "nothing to push" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("agents", [
+    "# no policy\n",
+    "---\ngit:\n  autopush: false\n---\n",
+    "---\ngit:\n  autopush: 'true'\n---\n",
+])
+def test_publish_refuses_without_explicit_authority_before_remote_contact(
+        estate, capsys, agents):
+    origin, clone = estate
+    (clone / "AGENTS.md").write_text(agents, encoding="utf-8")
+    _commit(clone, "withheld.txt")
+    before = _origin_heads(origin)["trunk"]
+
+    assert publish(clone) == 3
+
+    out = capsys.readouterr().out
+    assert "publication authority is off" in out
+    assert "No remote was contacted" in out
+    assert _origin_heads(origin)["trunk"] == before
+
+
+def test_one_shot_human_authority_publishes_without_changing_policy(
+        estate, capsys):
+    origin, clone = estate
+    (clone / "AGENTS.md").write_text(
+        "---\ngit:\n  autopush: false\n---\n", encoding="utf-8")
+    _commit(clone, "operator-approved.txt")
+    local = _run(clone, "rev-parse", "HEAD").stdout.strip()
+
+    assert publish(clone, authorize_once=True) == 0
+
+    out = capsys.readouterr().out
+    assert "one-shot authority supplied" in out
+    assert _origin_heads(origin)["trunk"] == local
+    assert "autopush: false" in (clone / "AGENTS.md").read_text(encoding="utf-8")
 
 
 def test_refuses_from_the_wrong_branch(estate, capsys):

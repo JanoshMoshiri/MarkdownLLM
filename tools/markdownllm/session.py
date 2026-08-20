@@ -21,8 +21,11 @@ from pathlib import Path
 
 import yaml
 
+from .yaml_loader import load_version_sentinel
+
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
 from .model import is_terminal, parse_frontmatter, scan
+from .repository_view import RepositoryHeadMoved, RepositoryView, RepositoryViewError
 from .validation import version_tuple
 
 def _velocity_signal(domain: Path) -> str:
@@ -232,30 +235,27 @@ def _floor_status(root: Path) -> str | None:
     (that stays doctor's deep probe): this runs on every session start.
     Imports are deferred because scaffold imports this module.
     """
-    from .scaffold import COMMIT_MSG_HOOK_BODY, HOOK_BODY, MDLLM_ENTRY
-    import os
+    from .scaffold import (COMMIT_MSG_HOOK_BODY, HOOK_BODY,
+                           hook_mdllm_route, resolve_hooks_dir)
 
     inside = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
                             capture_output=True, text=True,
                             encoding="utf-8", errors="replace")
     if inside.returncode != 0:
         return None  # not a git repo — scaffold/doctor own that case
-    git_dir = (root / inside.stdout.strip()).resolve()
+    hooks_dir = resolve_hooks_dir(root)
     missing = [n for n in ("pre-commit", "commit-msg")
-               if not (git_dir / "hooks" / n).is_file()]
+               if not (hooks_dir / n).is_file()]
     if missing:
         return (f"- **Floor: NOT INSTALLED** — missing git {', '.join(missing)} "
                 f"hook(s). Mechanical validation is NOT enforced at the commit "
                 f"boundary (hooks live in .git/hooks and are never cloned). "
                 f"Run `mdllm install-hook .`")
-    try:
-        rel = Path(os.path.relpath(MDLLM_ENTRY, root)).as_posix()
-    except ValueError:
-        rel = MDLLM_ENTRY.as_posix()
+    rel = hook_mdllm_route(root)
     stale = []
     for name, body in (("pre-commit", HOOK_BODY),
                        ("commit-msg", COMMIT_MSG_HOOK_BODY)):
-        installed = (git_dir / "hooks" / name).read_text(
+        installed = (hooks_dir / name).read_text(
             encoding="utf-8").replace("\r\n", "\n").strip()
         if installed != body.format(rel=rel).replace("\r\n", "\n").strip():
             stale.append(name)
@@ -300,6 +300,42 @@ def _kernel_integrity(text: str) -> tuple[int, str]:
     normal = text.replace("\r\n", "\n")
     lines = normal.count("\n") + (0 if normal.endswith("\n") else 1)
     return lines, hashlib.sha256(normal.encode("utf-8")).hexdigest()[:12]
+
+
+def _contract_fingerprint(domain: Path) -> str:
+    """Fingerprint the operative Tier-0 definition, not unrelated HEAD.
+
+    A session legitimately advances Git after it starts, so HEAD equality
+    would expire every honest write.  The contract changes only when the
+    framework kernel or the opened domain's entry contract changes.  Labels,
+    missing markers and byte lengths are included to make concatenation
+    unambiguous; line endings are normalised across checkouts.
+    """
+    digest = hashlib.sha256()
+    for label, path in (("framework-kernel", _kernel_path()),
+                        ("domain-agents", domain / "AGENTS.md")):
+        try:
+            raw = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+        except (OSError, UnicodeError):
+            raw = "<missing>"
+        payload = raw.encode("utf-8")
+        digest.update(label.encode("utf-8") + b"\0")
+        digest.update(str(len(payload)).encode("ascii") + b"\0")
+        digest.update(payload)
+    return digest.hexdigest()
+
+
+# Evidence classes are ordered only by what additional observation each
+# requires.  The producer writes ``emitted``; receipt, reading, application and
+# outcome evidence must be added by the observing boundary that establishes
+# them, never inferred from this attestation.
+SESSION_EVIDENCE_LEVELS = (
+    "emitted",
+    "received-whole",
+    "read-observed",
+    "applied-evidence",
+    "outcome-validated",
+)
 
 
 _KERNEL_TRAILER = ("[kernel emitted whole — {lines} lines, sha256 {digest}. "
@@ -356,7 +392,7 @@ def _elide(text: str, limit: int, read_path: str) -> str:
               f"`{read_path}` in full before acting past this point]")
 
 
-def _emit_contract(domain: Path) -> list[str]:
+def _emit_contract(domain: Path, *, bounded: bool = True) -> list[str]:
     """The Tier-0 contract CONTENT, emitted — injection, not instruction.
 
     In harnesses with entry-file discovery, AGENTS.md is in context before
@@ -384,8 +420,9 @@ def _emit_contract(domain: Path) -> list[str]:
     if kernel.is_file():
         text = kernel.read_text(encoding="utf-8")
         out += [f"## The operative kernel — `{kernel_ref}`", "",
-                _elide(text, CONTRACT_SECTION_CHARACTERS, kernel_ref)]
-        if len(text) <= CONTRACT_SECTION_CHARACTERS:
+                (_elide(text, CONTRACT_SECTION_CHARACTERS, kernel_ref)
+                 if bounded else text)]
+        if not bounded or len(text) <= CONTRACT_SECTION_CHARACTERS:
             lines_n, digest = _kernel_integrity(text)
             out.append(_KERNEL_TRAILER.format(
                 lines=lines_n, digest=digest, ref=kernel_ref))
@@ -399,9 +436,10 @@ def _emit_contract(domain: Path) -> list[str]:
 
     agents = domain / "AGENTS.md"
     if agents.is_file():
+        agents_text = agents.read_text(encoding="utf-8")
         out += ["## The entry file — `AGENTS.md`", "",
-                _elide(agents.read_text(encoding="utf-8"),
-                       CONTRACT_SECTION_CHARACTERS, "AGENTS.md"), ""]
+                (_elide(agents_text, CONTRACT_SECTION_CHARACTERS, "AGENTS.md")
+                 if bounded else agents_text), ""]
     else:
         out += ["## The entry file — MISSING", "",
                 "No `AGENTS.md` at this root: nothing governs this position, "
@@ -451,7 +489,8 @@ def _write_contract_copy(domain: Path, text: str) -> str | None:
 
 def _record_session_attestation(domain: Path, *,
                                 contract_emitted: bool = False,
-                                kernel_state: str = "") -> None:
+                                kernel_state: str = "",
+                                delivery_state: str | None = None) -> None:
     """Record that the Tier-0 contract entered this session, per clone.
 
     Running session-start IS the mechanical proxy for the contract entering
@@ -478,22 +517,30 @@ def _record_session_attestation(domain: Path, *,
                                   capture_output=True, text=True)
             sha = head.stdout.strip() if head.returncode == 0 else "unknown"
             stamp = dt.datetime.now(dt.timezone.utc).isoformat()
-            # A third token records that the contract CONTENT was emitted,
+            # The contract token records that contract CONTENT was emitted,
             # not only the ritual — the distinction the gate's claim rests on
-            # in harnesses with no entry-file injection. The gate reads only
-            # token 0 (freshness), so old two-token attestations stay valid;
-            # this token is evidence for humans and Phase 5 records.
-            tail = " contract" if contract_emitted else ""
+            # in harnesses with no entry-file injection.  Legacy two-token
+            # attestations remain readable, but validation reports that their
+            # contract currency is unknown.
             # A kernel token records what the emitter DID with the kernel:
-            # whole:<sha12>:<lines> (landed, checkable), elided (bounded —
-            # did not land whole), deferred (hook channel, by design), or
-            # absent. The gate keeps reading token 0 for freshness (old
-            # attestations stay valid) and additionally surfaces `elided`
-            # as a Warning — the remote Cowork evidence (2026-08-19) showed
-            # a truncated emission clearing a timestamp-only gate.
+            # whole:<sha12>:<lines> (emitted, checkable), elided (bounded),
+            # deferred (hook channel, by design), or absent.  The gate also
+            # checks the content fingerprint and surfaces `elided` as a
+            # Warning — the remote Cowork evidence (2026-08-19) showed a
+            # truncated emission clearing a timestamp-only gate.
             mark = f" kernel={kernel_state}" if kernel_state else ""
+            contract_hash = _contract_fingerprint(domain)
+            # Evidence levels are deliberately not collapsed.  This producer
+            # can prove emission and describe its delivery attempt; it cannot
+            # prove that a model read, applied, or complied with the contract.
+            delivery = delivery_state or (
+                "full-contract" if contract_emitted else
+                ("kernel-whole" if kernel_state.startswith("whole:")
+                 else kernel_state or "digest-only"))
+            evidence = (f" contract={contract_hash} evidence=emitted "
+                        f"delivery={delivery}")
             ((domain / gd.stdout.strip()).resolve() / "mdllm-attest").write_text(
-                f"{stamp} {sha}{tail}{mark}\n", encoding="utf-8")
+                f"{stamp} {sha}{mark}{evidence}\n", encoding="utf-8")
     except Exception:
         pass
 
@@ -540,10 +587,57 @@ def _fired_by_thing(domain: Path):
 
 def cmd_session_start(args) -> int:
     domain = Path(args.path).resolve()
+
+    # A significant/full-corpus read is longer than one command and cannot be
+    # made atomic by hoping HEAD stays still.  Session-start emits a full base
+    # commit below; this narrowly-scoped check is the application boundary an
+    # agent calls immediately before writing conclusions derived from that
+    # immutable view.  Only a full object id is accepted: a moving branch name
+    # or abbreviated id would weaken the very claim this check makes.
+    expected_head = getattr(args, "assert_head", None)
+    if expected_head is not None:
+        expected = str(expected_head).strip().lower()
+        if not re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", expected):
+            print("mdllm: --assert-head requires one full 40- or 64-hex "
+                  "commit id")
+            return 2
+        try:
+            snapshot = RepositoryView.commit(domain, expected)
+            if snapshot.commit_sha != expected:
+                # Defensive for future Git object formats: the supplied full
+                # id must resolve to itself, not merely to some accepted name.
+                print("mdllm: --assert-head did not resolve to the supplied "
+                      "full commit id")
+                return 2
+            snapshot.assert_head_unchanged()
+        except RepositoryHeadMoved as exc:
+            print(f"mdllm: long-read base moved — expected commit:{exc.expected}; "
+                  f"current commit:{exc.actual}. Reconcile before writing.")
+            return 1
+        except RepositoryViewError as exc:
+            print(f"mdllm: cannot verify long-read base: {exc}")
+            return 2
+        print(f"long-read view current: commit:{expected}")
+        return 0
+
+    try:
+        long_read_view = RepositoryView.commit(domain)
+    except RepositoryViewError:
+        long_read_view = None
     agents = domain / "AGENTS.md"
     meta = {}
+    agents_text = ""
     if agents.is_file():
-        meta, _, _ = parse_frontmatter(agents.read_text(encoding="utf-8"))
+        try:
+            agents_text = agents.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            raise SystemExit(
+                f"mdllm: session-start cannot read AGENTS.md as UTF-8 — {exc}")
+        meta, _, agents_error = parse_frontmatter(agents_text, source=agents)
+        if agents_error:
+            raise SystemExit(
+                "mdllm: session-start refused invalid AGENTS.md frontmatter — "
+                f"{agents_error}")
         meta = meta or {}
 
     # --contract: inject the Tier-0 contract content ahead of orientation.
@@ -564,9 +658,14 @@ def cmd_session_start(args) -> int:
     # believed-loaded failure (truncation marked is not landing).
     runner_channel = bool(os.environ.get("MDLLM_LIFECYCLE_CHANNEL"))
     out: list[str] = []
+    receipt_contract: list[str] = []
+    contract_prefix_lines = 0
     kernel_state = ""
     if emit_contract:
-        out += _emit_contract(domain)
+        contract_block = _emit_contract(domain)
+        receipt_contract = _emit_contract(domain, bounded=False)
+        out += contract_block
+        contract_prefix_lines = len(contract_block)
         _, kernel_state = _kernel_emission(domain)
     elif runner_channel:
         kernel_state = "deferred"
@@ -606,13 +705,34 @@ def cmd_session_start(args) -> int:
            "3. Surface the fired triggers below to the user; judge the ones the "
            "floor could not evaluate.", ""]
 
+    if long_read_view is not None and long_read_view.commit_sha is not None:
+        base = long_read_view.commit_sha
+        out += [
+            f"- **Significant-read base:** `commit:{base}` — pin any full-corpus "
+            "or other long read to these immutable bytes. Immediately before "
+            "writing conclusions from it, run "
+            f"`mdllm session-start . --assert-head {base}`; moved HEAD is a "
+            "reconciliation stop, not permission to apply a mixed snapshot. "
+            "This names and checks byte currency; it does not prove model reading "
+            "or adherence.",
+            "",
+        ]
+
     fr = meta.get("framework_root")
     if (domain / ".markdownllm").is_file():
         # This IS a framework root (it carries the sentinel), not a downstream
         # domain — `framework_root: .` points at itself, so the domain
         # version-check does not apply.
-        fv = str((yaml.safe_load((domain / ".markdownllm").read_text(encoding="utf-8"))
-                  or {}).get("version"))
+        domain_sentinel = domain / ".markdownllm"
+        try:
+            sentinel_data = load_version_sentinel(
+                domain_sentinel.read_text(encoding="utf-8"),
+                source=domain_sentinel)
+        except (OSError, UnicodeError, yaml.YAMLError) as exc:
+            raise SystemExit(
+                "mdllm: session-start refused invalid/unreadable framework "
+                f"sentinel {domain_sentinel} — {exc}")
+        fv = str(sentinel_data.get("version"))
         out.append(f"- **Version:** framework root (v{fv}) — not a downstream domain; "
                    f"no refresh applies.")
     elif not fr:
@@ -622,7 +742,14 @@ def cmd_session_start(args) -> int:
         if not sentinel.is_file():
             out.append(f"- **Version:** unknown — `framework_root` `{fr}` has no .markdownllm.")
         else:
-            fv = str((yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {}).get("version"))
+            try:
+                sentinel_data = load_version_sentinel(
+                    sentinel.read_text(encoding="utf-8"), source=sentinel)
+            except (OSError, UnicodeError, yaml.YAMLError) as exc:
+                raise SystemExit(
+                    "mdllm: session-start refused invalid/unreadable framework "
+                    f"sentinel {sentinel} — {exc}")
+            fv = str(sentinel_data.get("version"))
             seen = str(meta.get("framework_version_seen", ""))
             if not seen:
                 out.append(f"- **Version: STALE** — framework v{fv}; domain has no "
@@ -658,7 +785,7 @@ def cmd_session_start(args) -> int:
 
     if agents.is_file():
         _, drifted = domain_kernel_status(
-            agents.read_text(encoding="utf-8"),
+            agents_text,
             build_domain_kernel_blocks(domain, meta))
         if drifted:
             out.append(f"- **Domain kernel: DRIFT** in {', '.join(drifted)} — run "
@@ -729,10 +856,8 @@ def cmd_session_start(args) -> int:
     for message in retrospective_due:
         out.append(f"- **Retrospective cadence:** {message}")
 
-    _record_session_attestation(domain, contract_emitted=emit_contract,
-                                kernel_state=kernel_state)
-
     text = "\n".join(out)
+    delivery_state: str | None = None
     if emit_contract:
         # Receipt path (cowork-remote-phase5-evidence-2026-08-19 F1/F2): a
         # harness may preview-truncate a large emission in its transcript
@@ -741,11 +866,31 @@ def cmd_session_start(args) -> int:
         # disk (inside the git dir: uncommittable by construction) and named
         # in-band, so recovery is one file read on any harness — Read is
         # every harness's native full-content channel.
-        copy_ref = _write_contract_copy(domain, text)
+        # The transcript is intentionally bounded.  The receipt is not: it
+        # replaces only the bounded Tier-0 prefix with the complete source
+        # bytes, retaining the session-start digest that followed it.
+        receipt_text = "\n".join(
+            receipt_contract + out[contract_prefix_lines:])
+        copy_ref = _write_contract_copy(domain, receipt_text)
+        contract_complete = (_kernel_path().is_file()
+                             and (domain / "AGENTS.md").is_file())
+        preview_elided = "[contract elided:" in "\n".join(
+            out[:contract_prefix_lines])
+        if not contract_complete:
+            delivery_state = "contract-incomplete"
+        elif copy_ref:
+            delivery_state = "full-contract-receipt-available"
+        elif not preview_elided:
+            delivery_state = "full-contract-inline"
+        else:
+            delivery_state = "contract-elided"
         if copy_ref:
             text += ("\n\n[receipt: this emission is also on disk at "
                      f"`{copy_ref}` — if any [truncated] or [contract "
                      "elided: marker appears above, read that file in full "
                      "instead of trusting the preview]")
+    _record_session_attestation(
+        domain, contract_emitted=emit_contract, kernel_state=kernel_state,
+        delivery_state=delivery_state)
     print(text)
     return 0

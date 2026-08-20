@@ -36,7 +36,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import mdllm  # noqa: E402
 from markdownllm.session import (  # noqa: E402
-    CONTRACT_SECTION_CHARACTERS, _emit_contract,
+    CONTRACT_SECTION_CHARACTERS, SESSION_EVIDENCE_LEVELS,
+    _emit_contract,
 )
 
 
@@ -211,21 +212,24 @@ def _attest(domain: Path) -> str:
 def test_attestation_marks_real_emission_and_gate_accepts_both(
         mutable, capsys, monkeypatch):
     monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
-    # Plain ritual on a direct channel: no contract mark, kernel landed whole.
+    # Plain ritual on a direct channel: kernel landed whole and the operative
+    # contract is fingerprinted, without claiming the model read or applied it.
     assert mdllm.cmd_session_start(_ns(path=str(mutable))) == 0
     capsys.readouterr()
     plain = _attest(mutable).strip()
-    assert " contract" not in plain
     assert " kernel=whole:" in plain
+    assert " contract=" in plain
+    assert " evidence=emitted" in plain
+    assert " delivery=kernel-whole" in plain
 
-    # Emission: the contract token records that the contract content went
-    # out, and the kernel token rides beside it.
+    # Full emission records its delivery form separately.
     assert mdllm.cmd_session_start(
         _ns(path=str(mutable), contract=True)) == 0
     capsys.readouterr()
     emitted = _attest(mutable).strip()
-    assert " contract" in emitted
+    assert " contract=" in emitted
     assert " kernel=whole:" in emitted
+    assert " delivery=full-contract" in emitted
 
     # The scaffolded domain declares session_gate: strict; token 0 stays the
     # freshness fact, so both attestation forms clear it.
@@ -249,6 +253,34 @@ def test_contract_emission_writes_receipt_copy(mutable, capsys, monkeypatch):
     saved = copy.read_text(encoding="utf-8")
     assert "Framework Operative Kernel" in saved
     assert "MarkdownLLM — Session Start" in saved
+
+
+def test_receipt_copy_contains_bytes_elided_from_the_transcript(
+        mutable, capsys, monkeypatch):
+    monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
+    sentinel = "TAIL-ONLY-IN-FULL-RECEIPT"
+    agents = mutable / "AGENTS.md"
+    agents.write_text(
+        agents.read_text(encoding="utf-8")
+        + ("\nexpanded contract line" * CONTRACT_SECTION_CHARACTERS)
+        + "\n" + sentinel + "\n",
+        encoding="utf-8")
+    assert mdllm.cmd_session_start(
+        _ns(path=str(mutable), contract=True)) == 0
+    out = capsys.readouterr().out
+    assert "[contract elided:" in out
+    assert sentinel not in out
+    gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=mutable,
+                        capture_output=True, text=True).stdout.strip()
+    saved = ((mutable / gd).resolve() / "mdllm-contract-emission.md").read_text(
+        encoding="utf-8")
+    assert sentinel in saved
+
+
+def test_session_evidence_vocabulary_never_collapses_delivery_into_adherence():
+    assert SESSION_EVIDENCE_LEVELS == (
+        "emitted", "received-whole", "read-observed", "applied-evidence",
+        "outcome-validated")
 
 
 def test_runner_channel_attests_deferred_kernel(mutable, capsys, monkeypatch):

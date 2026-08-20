@@ -1,15 +1,17 @@
-# Shape-only validation record. Fill the placeholders with ABSTRACTED content
-# only — no operator, client, product, or domain-specific data. An empty
-# placeholder is honest; an invented detail is not. See evidence/README.md.
-# Save the filled copy as evidence/validation-record-<label>.md (it IS validated).
 ---
 id: validation-record-[short-abstract-label]
 type: artifact
-status: draft
+status: evolving
 created: [ISO-date]
 ---
 
 # Validation Record — [Abstracted Label, e.g. "a regulated multi-stage filing domain"]
+
+> Shape-only record. Fill placeholders with **abstracted** content only — no
+> operator, client, product, or domain-specific data. An empty placeholder is
+> honest; an invented detail is not. See `evidence/README.md`. Save the filled
+> copy as `evidence/validation-record-<label>.md`; it is validated as an
+> `artifact`, whose lifecycle is `evolving | stable | deprecated`.
 
 ## Context (one paragraph, fully abstracted)
 

@@ -14,7 +14,7 @@ linked_things:
   - id: [domain]-write-thing-skill
     relation: orchestrates
 description: Processes and orchestration patterns for [domain]
-applies_to: "[domain]/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # [Domain] Workflow

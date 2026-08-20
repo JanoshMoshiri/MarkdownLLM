@@ -1,0 +1,5 @@
+# Exact versions exercised by the 2026-08-20 Windows remediation run.
+# PyPI + TLS remain the package trust root; these pins prevent an unrelated
+# future release from changing CI between framework commits.
+PyYAML==6.0.3
+pytest==9.1.1

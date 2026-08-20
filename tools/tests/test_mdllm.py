@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 RECENT = (_dt.date.today() - _dt.timedelta(days=1)).isoformat()
 
 import mdllm  # noqa: E402
+import markdownllm.doctor as doctor_module  # noqa: E402
 
 # Tests that commit (scaffold's nested repo, hook execution) must not depend
 # on the machine's global git identity — CI runners and sandboxes have none.
@@ -918,6 +919,29 @@ def test_doctor_warns_on_stale_hook_body(tmp_path, capsys):
     assert rc == 0 and "hook body is STALE" in out and "FLOOR ACTIVE" in out
 
 
+def test_doctor_uses_shared_hook_execution_fallback(tmp_path, capsys, monkeypatch):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/alpha.md", thing_text(GOOD))
+    mdllm.cmd_install_hook(_ns(path=str(tmp_path), no_test=True))
+    capsys.readouterr()
+
+    observed = {}
+
+    def compatible_result(root):
+        observed["root"] = Path(root)
+        return {"hook": "pre-commit", "supported": True, "executed": True,
+                "passed": True, "via": "direct-compatible", "returncode": 0,
+                "stdout": "", "stderr": "", "detail": ""}
+
+    monkeypatch.setattr(doctor_module, "execution_test_hook", compatible_result)
+    rc = mdllm.cmd_doctor(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+
+    assert rc == 0
+    assert observed["root"] == tmp_path.resolve()
+    assert "pre-commit hook EXECUTES" in out
+
+
 def test_assertions_scaffold_failures(tmp_path):
     fixture = {"domain_dir": "nope", "assertions": [
         {"file_exists": "nope/AGENTS.md"},
@@ -1028,6 +1052,17 @@ def test_coherence_index_drift_errors(tmp_path):
         GOOD + "linked_things:\n  - id: b\n    relation: supersedes"))
     errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
     assert any("DRIFT" in m for m in errs)
+
+
+def test_empty_trigger_index_is_in_sync_immediately_after_rebuild(
+        tmp_path, capsys):
+    write(tmp_path, "things/a.md", thing_text(GOOD))
+    args = _ns(path=str(tmp_path), signal="triggers")
+
+    assert mdllm.cmd_index(_ns(**vars(args), action="rebuild")) == 0
+    capsys.readouterr()
+    assert mdllm.cmd_index(_ns(**vars(args), action="check")) == 0
+    assert "triggers: in sync (coverage 0)" in capsys.readouterr().out
 
 
 # ---------------------------------------------------------------- triggers
@@ -1485,6 +1520,22 @@ def _git_short(root):
                   capture_output=True, text=True).stdout.strip()
 
 
+def _trust_mcp_entry(consumer, server, entry):
+    """Tests that exercise a route grant the exact clone-local declaration.
+
+    The security regression tests live in test_external_trust.py; the legacy
+    membrane tests below are trusted-happy-path tests and say so explicitly.
+    """
+    import subprocess as sp
+    if not (consumer / ".git").exists():
+        sp.run(["git", "init", "-q"], cwd=consumer, check=True)
+    decision = mdllm.LocalExternalTrustPolicy().evaluate(consumer, server, entry)
+    mdllm.grant_external_trust(
+        consumer, server, entry,
+        [p.value for p in mdllm.required_capabilities(entry)],
+        decision.entry_hash)
+
+
 def _consumer_with_import(con, source_domain, source_id, pin, server_cfg,
                           body="# Imported Spec\n\nQuarantined.\n"):
     import json
@@ -1494,6 +1545,7 @@ def _consumer_with_import(con, source_domain, source_id, pin, server_cfg,
         f"origin: external\nverified: false\nsource_domain: {source_domain}\n"
         f"source_id: {source_id}\nsource_commit: {pin}",
         body))
+    _trust_mcp_entry(con, source_domain, server_cfg)
 
 
 def test_imports_freshness_fresh_then_stale(tmp_path):
@@ -2635,6 +2687,7 @@ def test_face_coverage_sees_the_unimported_face(tmp_path):
     write(con, ".mcp.json", json.dumps({"mcpServers": {"srcdom": _server_cfg(src)}}))
     write(con, "things/own.md", thing_text(
         "id: own-thing\ntype: note\nstatus: in-progress\ncreated: 2026-06-01"))
+    _trust_mcp_entry(con, "srcdom", _server_cfg(src))
     cov = mdllm.face_coverage(con)
     assert len(cov) == 1
     assert cov[0]["source"] == "srcdom" and cov[0]["state"] == "ok"
@@ -2650,6 +2703,7 @@ def test_face_coverage_counts_imports_and_unreachable(tmp_path):
     book = json.loads((con / ".mcp.json").read_text(encoding="utf-8"))
     book["mcpServers"]["ghost"] = {"command": "no-such-binary-xyz", "args": []}
     (con / ".mcp.json").write_text(json.dumps(book), encoding="utf-8")
+    _trust_mcp_entry(con, "ghost", book["mcpServers"]["ghost"])
     cov = {c["source"]: c for c in mdllm.face_coverage(con)}
     assert cov["srcdom"]["offered"] == 2 and cov["srcdom"]["imported"] == 1
     assert cov["ghost"]["state"] == "unreachable"
@@ -2710,6 +2764,7 @@ def test_import_trigger_porch_offers_unimported(tmp_path, capsys):
         "id: watcher\ntype: note\nstatus: in-progress\ncreated: 2026-06-01\n"
         "triggers:\n  - type: import\n    condition: porch_offers_unimported\n"
         "    source: srcdom\n    action: surface"))
+    _trust_mcp_entry(con, "srcdom", _server_cfg(src))
     rc = mdllm.cmd_triggers(_ns(path=str(con)))
     out = capsys.readouterr().out
     assert rc == 0
@@ -2783,7 +2838,7 @@ def test_estate_check_no_args_walks_local_clones(tmp_path, capsys, monkeypatch):
 
 # ---------------------------------------------------------------------------
 # autopush (sync.py) — the publication leg: transport of committed state,
-# default-on opt-out, no --force ever, rejection surfaced never resolved
+# explicit opt-in, no --force ever, rejection surfaced never resolved
 # (estate-cadence-cluster Phase 1)
 # ---------------------------------------------------------------------------
 
@@ -2793,6 +2848,8 @@ def _seed_bare_pair(tmp_path, name="d"):
     _sync_git(tmp_path, "init", "-q", "--bare", str(bare))
     clone = tmp_path / name
     _sync_git(tmp_path, "clone", "-q", str(bare), str(clone))
+    (clone / "AGENTS.md").write_text(
+        "---\nname: X\ngit:\n  autopush: true\n---\n# X\n", encoding="utf-8")
     (clone / "a.txt").write_text("one\n", encoding="utf-8")
     _sync_git(clone, "add", "-A")
     _sync_git(clone, "commit", "-q", "-m", "c1")
@@ -2812,13 +2869,14 @@ def test_autopush_publishes_committed_state(tmp_path):
     assert "local work" in log.stdout
 
 
-def test_autopush_absence_of_config_is_on(tmp_path):
+def test_autopush_absence_of_config_is_off(tmp_path):
     from markdownllm.sync import _autopush_enabled
     bare, clone = _seed_bare_pair(tmp_path)
-    assert _autopush_enabled(clone) is True  # no AGENTS.md at all
+    (clone / "AGENTS.md").unlink()
+    assert _autopush_enabled(clone) is False  # no AGENTS.md at all
     (clone / "AGENTS.md").write_text(
         "---\nname: X\ngit:\n  autocommit: true\n---\n# X\n", encoding="utf-8")
-    assert _autopush_enabled(clone) is True  # git block without the key
+    assert _autopush_enabled(clone) is False  # git block without the key
 
 
 def test_autopush_explicit_false_opts_out_and_pushes_nothing(tmp_path):
@@ -2839,6 +2897,8 @@ def test_autopush_local_only_is_silent_state(tmp_path):
     repo = tmp_path / "solo"
     repo.mkdir()
     _sync_git(repo, "init", "-q")
+    (repo / "AGENTS.md").write_text(
+        "---\nname: X\ngit:\n  autopush: true\n---\n# X\n", encoding="utf-8")
     (repo / "a.txt").write_text("x\n", encoding="utf-8")
     _sync_git(repo, "add", "-A")
     _sync_git(repo, "commit", "-q", "-m", "c1")
@@ -2884,7 +2944,7 @@ def test_autopush_cmd_always_exits_zero(tmp_path, capsys):
 
 # ---------------------------------------------------------------------------
 # candidates (touchpoints.py) — the cue question made mechanical:
-# modified + reasoned-from advises, additions stay silent, exposed publishes
+# additions/modifications/deletions/renames get truthful cues; exposed publishes
 # (estate-cadence-cluster Phase 4; inflection-candidates-are-computable)
 # ---------------------------------------------------------------------------
 
@@ -2925,14 +2985,35 @@ def test_candidates_modified_reasoned_from_thing_advises(tmp_path, capsys):
     assert "cue: `spine`" in out and "3 inbound" in out and "touchpoints spine" in out
 
 
-def test_candidates_added_thing_is_silent(tmp_path, capsys):
+def test_candidates_added_thing_asks_duplicate_and_contradiction_question(tmp_path, capsys):
     root = _seed_candidates_repo(tmp_path)
     (root / "things" / "fresh.md").write_text(
         "---\nid: fresh\ntype: specification\nstatus: draft\ncreated: 2026-08-04\n---\n# F\n",
         encoding="utf-8")
     _sync_git(root, "add", "-A")
     rc, out = _run_candidates(root, capsys)
-    assert rc == 0 and out == ""  # a fresh thing on a clean slate carries no risk
+    assert rc == 0
+    assert "cue: `fresh` is new" in out
+    assert "duplicate ownership" in out and "latent contradiction" in out
+
+
+def test_candidates_deleted_thing_routes_removal_and_withdrawal(tmp_path, capsys):
+    root = _seed_candidates_repo(tmp_path)
+    (root / "things" / "porch.md").unlink()
+    _sync_git(root, "add", "-A")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0
+    assert "`porch-thing` is deleted" in out
+    assert "withdraws it from consumers" in out
+
+
+def test_candidates_rename_names_path_consumers(tmp_path, capsys):
+    root = _seed_candidates_repo(tmp_path)
+    _sync_git(root, "mv", "things/spine.md", "things/backbone.md")
+    rc, out = _run_candidates(root, capsys)
+    assert rc == 0
+    assert "moved `things/spine.md` -> `things/backbone.md`" in out
+    assert "literal/path consumers" in out
 
 
 def test_candidates_modified_leaf_is_silent(tmp_path, capsys):
@@ -3108,8 +3189,10 @@ def _write_attest(root, age_hours=0):
                  capture_output=True, text=True).stdout.strip()
     stamp = (_dt.datetime.now(_dt.timezone.utc)
              - _dt.timedelta(hours=age_hours)).isoformat()
+    from markdownllm.session import _contract_fingerprint
     ((root / gd).resolve() / "mdllm-attest").write_text(
-        f"{stamp} deadbeef\n", encoding="utf-8")
+        f"{stamp} deadbeef contract={_contract_fingerprint(root)} "
+        "evidence=emitted delivery=digest-only\n", encoding="utf-8")
 
 
 def test_session_gate_silent_when_undeclared(tmp_path):
@@ -3182,7 +3265,7 @@ def test_session_start_writes_attestation(tmp_path, capsys):
     _git_commit(tmp_path, "base")
     mdllm.cmd_session_start(_ns(path=str(tmp_path)))
     capsys.readouterr()
-    assert _gate(tmp_path) == [] or True  # attestation presence is the assert below
+    assert _gate(tmp_path) == []
     import subprocess as _sp
     gd = _sp.run(["git", "rev-parse", "--git-dir"], cwd=tmp_path,
                  capture_output=True, text=True).stdout.strip()
@@ -3193,6 +3276,54 @@ def test_session_start_writes_attestation(tmp_path, capsys):
     assert len(sha) >= 7  # HEAD sha recorded beside the timestamp
     # The kernel token records what the emission did (Phase 2).
     assert any(t.startswith("kernel=") for t in tokens[2:])
+    assert any(t.startswith("contract=") for t in tokens[2:])
+    assert "evidence=emitted" in tokens[2:]
+    assert not any(t.startswith(("read=", "applied=", "compliant="))
+                   for t in tokens[2:])
+
+
+def test_session_gate_expires_on_contract_change_not_unrelated_head_movement(
+        tmp_path, capsys):
+    _git_repo(tmp_path)
+    write(tmp_path, "AGENTS.md", "---\nname: T\n---\n\n# T\n")
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "base")
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    mdllm.cmd_session_start(_ns(path=str(tmp_path)))
+    capsys.readouterr()
+    assert _gate(tmp_path) == []
+
+    # Domain work and HEAD movement do not change the operative contract.
+    write(tmp_path, "things/work.md", thing_text(
+        "id: work\ntype: note\nstatus: in-progress\ncreated: 2026-08-20\n"))
+    _git_commit(tmp_path, "ordinary work")
+    assert _gate(tmp_path) == []
+
+    write(tmp_path, "AGENTS.md", "---\nname: T\n---\n\n# T\n\nChanged contract.\n")
+    findings = _gate(tmp_path)
+    assert len(findings) == 1
+    assert findings[0].severity == mdllm.SEV_ERROR
+    assert "contract changed" in findings[0].message
+
+
+def test_legacy_attestation_is_fresh_but_contract_currency_is_unknown(tmp_path):
+    _git_repo(tmp_path)
+    write(tmp_path, "things/base.md", thing_text(
+        "id: base\ntype: note\nstatus: not-started\ncreated: 2026-07-16\n"))
+    _git_commit(tmp_path, "base")
+    write(tmp_path, "_schema.yaml", GATE_SCHEMA_STRICT)
+    import datetime as _dt
+    import subprocess as _sp
+    gd = _sp.run(["git", "rev-parse", "--git-dir"], cwd=tmp_path,
+                 capture_output=True, text=True).stdout.strip()
+    stamp = _dt.datetime.now(_dt.timezone.utc).isoformat()
+    ((tmp_path / gd).resolve() / "mdllm-attest").write_text(
+        f"{stamp} deadbeef\n", encoding="utf-8")
+    findings = _gate(tmp_path)
+    assert len(findings) == 1
+    assert findings[0].severity == mdllm.SEV_WARNING
+    assert "legacy attestation" in findings[0].message
 
 
 def test_session_start_attests_and_the_clone_then_clears_the_gate(tmp_path,

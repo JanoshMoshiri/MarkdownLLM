@@ -19,8 +19,8 @@ which before trusting any of them:
 
 | Control | Anchor | Here |
 | --- | --- | --- |
-| pre-commit `validate` + `coherence` | `git-fs` | **Works.** Installed by assembly. The control that will stop you. |
-| `mdllm publish` branch + ff guards | `git-fs` | **Works.** Refuses guessed branches, never creates one, verifies the remote tip. |
+| pre-commit `validate` + `coherence` | `git-fs` | Installed by assembly. Confirm real execution in this build/session; when runnable, the enumerated mechanical Errors stop the commit. |
+| `mdllm publish` branch + ff guards | `git-fs` | Enforced when invoked: refuses guessed branches, never creates one, verifies the remote tip. This does not prove invocation or grant authority to invoke it. |
 | post-commit `autopush` | `git-fs` | **Fails, loudly, by design.** No credentials in git config. Publication is your explicit step. |
 | Tier-0 contract into context | emitted by assembly | **Ran once, at assembly.** `session-start --contract` printed the kernel + each domain's AGENTS.md into the transcript; the attestation records it. |
 | domain `.claude/settings.json` hooks | `harness-session` | **Never fire here.** The repo was cloned after session start; `doctor` saying "installed" means the file exists, not that anything runs it. Writes are NOT validated as you make them — the pre-commit floor at commit time is the first check that sees them. |
@@ -28,8 +28,14 @@ which before trusting any of them:
 
 ## Publication discipline — the core rule
 
-**Publish immediately after every commit. Always. Automatically.** The
-user has standing pre-approval for publishing their own committed work.
+Publication is default-deny. A PAT and a bootstrap invocation authorize the
+requested assembly reads; they do not silently authorize future pushes. Before
+the first write in each domain, read its entry contract: only a literal
+`git.autopush: true` is standing publication authority. False, absent, or
+malformed is off. Surface the disposable-container risk and ask the operator
+whether they want to make that future-facing choice; do not make it for them.
+
+When literal true is present, publish immediately after every commit:
 
 ```bash
 GH_PAT="<PAT>" python3 tools/mdllm.py publish domains/<name>
@@ -51,7 +57,8 @@ GH_PAT="<PAT>" python3 tools/mdllm.py publish domains/<name>
 - Working branches, when a domain's contract calls for one, are cut from
   the resolved default; the name comes from the user or the domain's
   convention, never invented.
-- Subagents inherit nothing: hand them the exact publish command.
+- Subagents inherit neither authority nor branch context: only after the same
+  literal-true check, hand them the exact publish command.
 
 ## Credential handling
 
@@ -76,9 +83,10 @@ GH_PAT="<PAT>" python3 tools/mdllm.py publish domains/<name>
 
 ## Floor discipline
 
-- The pre-commit floor (`validate` + `coherence`) is the mechanical
-  guarantee. Never `--no-verify`. If a commit is blocked, fix the cause;
-  the message names the remedy.
+- The pre-commit floor (`validate` + `coherence`) owns its enumerated
+  mechanical checks when the installed hook actually executes. Never
+  `--no-verify`. If a commit is blocked, fix the cause; the message names the
+  remedy.
 - Mechanical checks belong to the tool; your validation duty is semantic
   (the emitted kernel carries the split).
 

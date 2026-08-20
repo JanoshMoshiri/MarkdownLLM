@@ -23,8 +23,8 @@ What this adapter truthfully claims today (Phase 0):
 
 The bundle itself (skill, bootstrap, publication guard, session contract)
 is rendered by the Phase 3 build from framework-owned templates; run-time
-currency — the installed bundle's hash against the freshly cloned
-framework's expectation — lands there too, alongside the ``ProbePort``
+binding integrity — the installed bundle's hash against the exact cloned
+framework commit's expectation — lands there too, alongside the ``ProbePort``
 fingerprints that let a real bootstrap attest execution. This module is
 the single place Cowork vocabulary may appear in code (architecture
 fitness gate).
@@ -54,7 +54,7 @@ PLUGIN_NAME = "markdownllm-bootstrap"
 MAX_DESCRIPTION_CHARACTERS = 500
 
 # The MECHANISM: the templates whose rendered forms decide how a session
-# behaves. Hashed for run-time currency — operator config (config.env) is
+# behaves. Hashed for run-time binding integrity — operator config (config.env) is
 # deliberately outside the hash, so retargeting the estate never reads as
 # mechanism drift, and a mechanism change always does.
 _MECHANISM_TEMPLATES = (
@@ -146,7 +146,7 @@ class CoworkAdapter:
 
     # -- BundlePort --------------------------------------------------------
     def bundle_hash(self, templates_root: Path) -> str:
-        """The canonical mechanism hash — run-time currency's anchor.
+        """The canonical mechanism hash — run-time binding-integrity anchor.
 
         Hashes the RAW template bytes (placeholders included, config
         excluded), so the framework can answer "what would I render now?"
@@ -168,6 +168,11 @@ class CoworkAdapter:
         """Render the account-level plugin bundle. Pure: path → bytes;
         the caller (bundle_service) writes, and keeps the output private —
         the rendered config.env names the operator's repositories."""
+        framework_commit = config.get("FRAMEWORK_COMMIT", "")
+        if not re.fullmatch(r"[0-9a-fA-F]{40}", framework_commit):
+            raise ValueError(
+                "FRAMEWORK_COMMIT must be a full Git object id; refusing "
+                "to render a bundle with moving or missing executable source")
         base = templates_root / BUNDLE_TEMPLATES_DIR
         mechanism = self.bundle_hash(templates_root)
         substitutions = {
@@ -192,6 +197,7 @@ class CoworkAdapter:
             f"v{config.get('FRAMEWORK_VERSION', 'unknown')}). Edit freely; "
             "rebuild to re-derive.\n"
             f"FRAMEWORK_REPO={config.get('FRAMEWORK_REPO', '')}\n"
+            f"FRAMEWORK_COMMIT={config.get('FRAMEWORK_COMMIT', '')}\n"
             f"GIT_NAME={config.get('GIT_NAME', '')}\n"
             f"GIT_EMAIL={config.get('GIT_EMAIL', '')}\n"
             f"DOMAINS={config.get('DOMAINS', '')}\n"

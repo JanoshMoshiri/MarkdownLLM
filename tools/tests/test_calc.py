@@ -284,7 +284,9 @@ def test_calc_expr_in_a_things_context_is_the_pivot(tmp_path, capsys):
                             expr="sum(rows.amount)"))
     out = capsys.readouterr().out
     assert rc == 0
-    assert out.splitlines()[0] == "15.5"
+    # The strict YAML boundary retains the source scale; 10.00 + 5.50 is
+    # rendered as the exact Decimal result rather than a float-collapsed 15.5.
+    assert out.splitlines()[0] == "15.50"
     assert "sum over 2 value(s)" in out
 
 
@@ -589,6 +591,35 @@ def test_an_unevaluable_derivation_is_reported_never_silent(tmp_path):
     f = _findings(tmp_path)
     assert len(f) == 1 and f[0].severity == mdllm.SEV_WARNING
     assert "not evaluable" in f[0].message and "unknown reference" in f[0].message
+
+
+def test_strict_mode_makes_unevaluable_a_blocking_error(tmp_path):
+    write(tmp_path, "_schema.yaml",
+          "schema_version: 1\ndomain: t\noptions:\n  computed: strict\n"
+          "types:\n  note:\n    statuses: [in-progress]\n")
+    write(tmp_path, "things/vat.md", thing_text(
+        "id: vat\ntype: note\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 69.00\ncomputed:\n  total: \"sum(nowhere.net)\""))
+    f = _findings(tmp_path)
+    assert len(f) == 1 and f[0].severity == mdllm.SEV_ERROR
+    assert "not evaluable" in f[0].message
+
+
+def test_validation_surfaces_quarantined_inputs_excluded_from_aggregate(tmp_path):
+    write(tmp_path, "things/report.md", thing_text(
+        "id: report\ntype: report\nstatus: in-progress\ncreated: 2026-08-02\n"
+        "total: 10\ncomputed:\n"
+        "  total: 'sum(things(type=\"expense\").amount)'"))
+    write(tmp_path, "things/native.md", thing_text(
+        "id: native\ntype: expense\nstatus: completed\ncreated: 2026-08-02\n"
+        "amount: 10"))
+    write(tmp_path, "things/external.md", thing_text(
+        "id: external\ntype: expense\nstatus: completed\ncreated: 2026-08-02\n"
+        "origin: external\nverified: false\namount: 99"))
+    f = _findings(tmp_path)
+    assert any(x.severity == mdllm.SEV_WARNING
+               and "reduced input set" in x.message
+               and "external" in x.message for x in f)
 
 
 def test_the_check_is_silent_when_the_figures_agree(tmp_path):

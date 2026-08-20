@@ -13,8 +13,11 @@ from pathlib import Path
 
 import yaml
 
+from .yaml_loader import load_version_sentinel
+
 from .model import parse_frontmatter
 from .repo import git_short_sha
+from .repository_view import RepositoryView
 
 KERNEL_RE = re.compile(r"<!--\s*kernel\s*-->\s*\n(.*?)<!--\s*/kernel\s*-->", re.DOTALL)
 
@@ -38,7 +41,8 @@ def _token_counter():
         return lambda s: round(len(s) / 3.8)
 
 
-def build_kernel(root: Path, specs: list[str], count) -> tuple[str, list[tuple], int, int]:
+def build_kernel(root: Path, specs: list[str], count,
+                 view: RepositoryView | None = None) -> tuple[str, list[tuple], int, int]:
     """The deterministic kernel body (sans frontmatter) plus per-spec token
     detail. Shared by `kernel` (generate / --check) and `coherence` (drift
     check) so the two cannot disagree about what the kernel *should* contain —
@@ -48,9 +52,15 @@ def build_kernel(root: Path, specs: list[str], count) -> tuple[str, list[tuple],
     full_total = kernel_total = 0
     for name in specs:
         p = root / name
-        if not p.exists():
-            continue
-        text = p.read_text(encoding="utf-8")
+        if view is None:
+            if not p.exists():
+                continue
+            text = p.read_text(encoding="utf-8")
+        else:
+            logical = p.resolve().relative_to(view.root).as_posix()
+            if not view.exists(logical):
+                continue
+            text = view.read_text(logical)
         full_total += count(text)
         blocks = KERNEL_RE.findall(text)
         if not blocks:
@@ -68,8 +78,17 @@ def cmd_kernel(args) -> int:
     sentinel = root / ".markdownllm"
     if not sentinel.exists():
         sys.exit("mdllm: kernel requires a framework root (.markdownllm not found)")
-    data = yaml.safe_load(sentinel.read_text(encoding="utf-8"))
-    specs = data.get("foundational_specs") or []
+    try:
+        data = load_version_sentinel(
+            sentinel.read_text(encoding="utf-8"), source=sentinel)
+    except (OSError, UnicodeError, yaml.YAMLError) as exc:
+        sys.exit(f"mdllm: kernel refused invalid/unreadable {sentinel} — {exc}")
+    specs = data.get("foundational_specs")
+    if (not isinstance(specs, list)
+            or not all(isinstance(name, str) and name.strip()
+                       for name in specs)):
+        sys.exit("mdllm: kernel refused invalid framework sentinel — "
+                 "`foundational_specs` must be a list of non-empty paths")
     count = _token_counter()
     body, detail, full_total, kernel_total = build_kernel(root, specs, count)
     for name, kb, fb in detail:
@@ -83,7 +102,15 @@ def cmd_kernel(args) -> int:
         if not out.exists():
             print("\nkernel.md missing — run `mdllm kernel` to generate it")
             return 1
-        _, existing_body, _ = parse_frontmatter(out.read_text(encoding="utf-8"))
+        try:
+            existing_text = out.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            sys.exit(f"mdllm: kernel --check cannot read kernel.md — {exc}")
+        _, existing_body, existing_error = parse_frontmatter(
+            existing_text, source=out)
+        if existing_error:
+            sys.exit(f"mdllm: kernel --check refused invalid kernel.md "
+                     f"frontmatter — {existing_error}")
         if existing_body.strip() != body.strip():
             print("\nkernel: DRIFT — spec kernel blocks changed since kernel.md "
                   "was generated; run `mdllm kernel` and commit the result")

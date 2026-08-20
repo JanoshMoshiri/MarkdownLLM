@@ -7,6 +7,10 @@ framework_root: [relative path to MarkdownLLM framework root, e.g. ../.. ]
 framework_version_seen: [framework version at time of domain creation — copy the `version` field from {framework_root}/.markdownllm, e.g. 3.14.0]
 git:
   autocommit: true
+  # Publication is fail-closed. A new domain is born false; choose
+  # `scaffold --autopush true` or change this only when automatic sends are
+  # deliberately authorised for the owning repository.
+  autopush: false
   branch: main
 # Optional domain hard hooks (surface in the generated Hooks block):
 # hard_hooks:

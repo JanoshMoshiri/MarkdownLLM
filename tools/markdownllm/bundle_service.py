@@ -11,8 +11,8 @@ operator's repository names — so it lands in a gitignored build
 directory and must never be committed to the framework repo. The
 templates the adapter renders from are public and name no repository.
 
-``--hash`` prints the canonical mechanism hash only: the run-time
-currency anchor an installed bundle compares its build stamp against.
+``--hash`` prints the canonical mechanism hash only: the run-time binding
+integrity anchor an installed bundle compares its build stamp against.
 """
 
 from __future__ import annotations
@@ -21,8 +21,11 @@ import re
 import subprocess
 from pathlib import Path
 
+import yaml
+
 from . import adapters as harness_adapters
 from .harness_ports import BundlePort
+from .yaml_loader import load_version_sentinel
 
 _REMOTE_FORMS = [
     re.compile(r"^https://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/]+?)(?:\.git)?/?$"),
@@ -79,6 +82,9 @@ def derive_estate_config(root: Path) -> tuple[dict[str, str], list[str]]:
         "GIT_EMAIL": _git(root, "config", "user.email")
                      or _git(root, "config", "--global", "user.email"),
         "DOMAINS": " ".join(domains),
+        # A rendered bundle executes the framework tree it was built from,
+        # not whatever later occupies the repository's default branch.
+        "FRAMEWORK_COMMIT": _git(root, "rev-parse", "HEAD"),
     }
     fw_url = _git(root, "remote", "get-url", "origin")
     fw_entry = owner_repo(fw_url) if fw_url else None
@@ -90,6 +96,43 @@ def derive_estate_config(root: Path) -> tuple[dict[str, str], list[str]]:
     return config, notes
 
 
+def framework_source_findings(root: Path, source_root: Path) -> list[str]:
+    """Refuse a bundle pin that cannot reproduce the bytes being rendered.
+
+    The bundle templates are loaded from ``source_root``.  The estate config
+    and commit pin are read from ``root``.  Those must be the same clean Git
+    checkout, and cached ``origin`` refs must contain HEAD; otherwise the
+    ephemeral bootstrap either executes different bytes or cannot fetch the
+    promised commit at all.
+    """
+    root = root.resolve()
+    source_root = source_root.resolve()
+    findings: list[str] = []
+    if root != source_root:
+        return [
+            f"bundle root {root} is not the framework source checkout "
+            f"{source_root}; run the command from the framework root",
+        ]
+    commit = _git(root, "rev-parse", "HEAD")
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", commit):
+        return ["framework source has no full HEAD commit"]
+    if _git(root, "status", "--porcelain=v1", "--untracked-files=all"):
+        findings.append(
+            "framework source is dirty; commit or remove every source "
+            "change before rendering so FRAMEWORK_COMMIT identifies the "
+            "bundle's actual bytes")
+    remote_refs = _git(
+        root, "for-each-ref", "--contains", commit,
+        "--format=%(refname)", "refs/remotes/origin",
+    ).splitlines()
+    if not any(ref.startswith("refs/remotes/origin/") for ref in remote_refs):
+        findings.append(
+            f"framework commit {commit} is not contained by any cached "
+            "origin ref; fetch or publish it before building because the "
+            "bootstrap must fetch this exact commit")
+    return findings
+
+
 def cmd_bundle(args) -> int:
     root = Path(getattr(args, "root", ".")).resolve()
     adapter = harness_adapters.get(args.harness)
@@ -98,7 +141,8 @@ def cmd_bundle(args) -> int:
               "it distributes through project artifacts, not a bundle")
         return 2
 
-    templates_root = Path(__file__).resolve().parents[2] / "templates"
+    source_root = Path(__file__).resolve().parents[2]
+    templates_root = source_root / "templates"
 
     if getattr(args, "hash", False):
         print(adapter.bundle_hash(templates_root))
@@ -107,6 +151,15 @@ def cmd_bundle(args) -> int:
     config, notes = derive_estate_config(root)
     for note in notes:
         print(f"  note: {note}")
+    source_findings = framework_source_findings(root, source_root)
+    if source_findings:
+        for finding in source_findings:
+            print(f"mdllm: {finding}")
+        return 2
+    if not config.get("FRAMEWORK_REPO"):
+        print("mdllm: framework origin is not a recognised GitHub remote; "
+              "the bootstrap has no fetch authority")
+        return 2
     if not config.get("DOMAINS"):
         print("mdllm: no domains derived — nothing under domain/ or "
               "domains/ carries a recognised GitHub origin. A bundle with "
@@ -117,14 +170,22 @@ def cmd_bundle(args) -> int:
               "clone or globally — set one before building; every commit "
               "the bundle's sessions make is authored with it.")
         return 2
+    if not re.fullmatch(r"[0-9a-fA-F]{40}",
+                        config.get("FRAMEWORK_COMMIT", "")):
+        print("mdllm: framework HEAD is not a full Git commit — refusing "
+              "to build a bundle whose executable source could move")
+        return 2
 
     version = ""
     sentinel = root / ".markdownllm"
     if sentinel.is_file():
-        for line in sentinel.read_text(encoding="utf-8").splitlines():
-            if line.startswith("version:"):
-                version = line.split(":", 1)[1].strip()
-                break
+        try:
+            sentinel_data = load_version_sentinel(
+                sentinel.read_text(encoding="utf-8"), source=sentinel)
+        except (OSError, UnicodeError, yaml.YAMLError) as exc:
+            print(f"mdllm: bundle refused invalid/unreadable {sentinel} — {exc}")
+            return 2
+        version = str(sentinel_data.get("version") or "")
     config["FRAMEWORK_VERSION"] = version or "unknown"
 
     try:
@@ -148,6 +209,6 @@ def cmd_bundle(args) -> int:
           "It is gitignored here; install it in the harness and never "
           "commit it to the framework repo.")
     print(f"bundle: mechanism hash {adapter.bundle_hash(templates_root)} "
-          "(stamped into the build; the bundle re-checks it against the "
-          "framework it clones at run time)")
+              "(stamped into the build; the bundle re-checks it against the "
+              "exact framework commit it clones at run time)")
     return 0

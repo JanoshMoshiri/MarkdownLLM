@@ -20,6 +20,8 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
+from .repository_view import RepositoryView, RepositoryViewError
+
 TERMS_FILE = ".boundary-terms"
 
 
@@ -66,28 +68,46 @@ def _git(root: Path, args: list[str]) -> str:
     return out.stdout if out.returncode == 0 and out.stdout else ""
 
 
-def self_guard(root: Path) -> str | None:
+def self_guard(root: Path, view: RepositoryView | None = None) -> str | None:
     """The terms file must never itself be tracked — the mechanism protecting
     the boundary must not become the leak."""
-    if _git(root, ["ls-files", "--", TERMS_FILE]).strip():
+    candidate = view or RepositoryView.index(root)
+    if candidate.exists(TERMS_FILE):
         return (f"{TERMS_FILE} is TRACKED — it must stay local. "
                 f"`git rm --cached {TERMS_FILE}` and add it to .gitignore.")
     return None
 
 
-def staged_findings(root: Path,
-                    terms: list[tuple[str, str | None]]) -> list[str]:
+def _empty_tree(root: Path) -> str:
+    made = subprocess.run(
+        ["git", "mktree"], cwd=root, input="", capture_output=True,
+        text=True, encoding="utf-8", errors="replace")
+    if made.returncode != 0 or not made.stdout.strip():
+        raise RepositoryViewError("could not construct Git's empty tree")
+    return made.stdout.strip()
+
+
+def staged_findings(
+        root: Path, terms: list[tuple[str, str | None]],
+        view: RepositoryView | None = None) -> list[str]:
     """Scan staged ADDITIONS (the boundary is the crossing, not the archive)
     plus staged filenames."""
     findings: list[str] = []
-    for name in _git(root, ["diff", "--cached", "--name-only"]).splitlines():
+    candidate = view or RepositoryView.index(root)
+    assert candidate.tree_sha is not None
+    head = subprocess.run(
+        ["git", "rev-parse", "--verify", "-q", "HEAD"], cwd=root,
+        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    base = head.stdout.strip() if head.returncode == 0 else _empty_tree(root)
+    diff_prefix = [base, candidate.tree_sha, "--"]
+    for name in _git(root, ["diff", "--name-only", *diff_prefix]).splitlines():
         low = name.lower()
         for term, repl in terms:
             if term.lower() in low:
                 hint = f" — use {repl!r}" if repl else ""
                 findings.append(
                     f"{name}: filename contains boundary term {term!r}{hint}")
-    diff = _git(root, ["diff", "--cached", "--unified=0", "--no-color"])
+    diff = _git(root, ["diff", "--unified=0", "--no-color", *diff_prefix])
     current = "?"
     for line in diff.splitlines():
         if line.startswith("+++ b/"):
@@ -138,16 +158,35 @@ def cmd_boundary(args) -> int:
                   f"vocabulary is local-only)")
         return 0
     findings: list[str] = []
-    guard = self_guard(root)
-    if guard:
-        findings.append(guard)
     if getattr(args, "message", None):
+        try:
+            guard = self_guard(root)
+        except RepositoryViewError as exc:
+            print(f"boundary: BLOCKED — staged candidate could not be frozen: {exc}")
+            return 1
+        if guard:
+            findings.append(guard)
         text = Path(args.message).read_text(encoding="utf-8", errors="replace")
         findings.extend(scan_text(text, terms, "commit message"))
     elif getattr(args, "history", False):
+        try:
+            guard = self_guard(root)
+        except RepositoryViewError as exc:
+            print(f"boundary: BLOCKED — staged candidate could not be frozen: {exc}")
+            return 1
+        if guard:
+            findings.append(guard)
         findings.extend(history_findings(root, terms))
     else:
-        findings.extend(staged_findings(root, terms))
+        try:
+            view = RepositoryView.index(root)
+            guard = self_guard(root, view)
+            if guard:
+                findings.append(guard)
+            findings.extend(staged_findings(root, terms, view))
+        except RepositoryViewError as exc:
+            print(f"boundary: BLOCKED — staged candidate could not be frozen: {exc}")
+            return 1
     if findings:
         print("boundary: BLOCKED — content crosses the disclosure boundary:")
         for f in findings:

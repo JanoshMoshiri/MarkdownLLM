@@ -13,7 +13,7 @@ linked_things:
   - id: [domain]-workflow-skill
     relation: informs
 description: Philosophy, principles, and reasoning patterns for [domain]
-applies_to: "[domain]/**/*.md"
+applies_to: "**/*.md"
 ---
 
 # [Domain] Specification

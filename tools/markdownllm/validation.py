@@ -14,7 +14,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 import subprocess
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import yaml
 
@@ -23,6 +23,13 @@ from .model import (
     is_terminal, terminal_statuses_for,
     ID_RE, ISO_RE, SEV_ERROR, SEV_WARNING, SEV_INFO,
     Thing, Finding, Corpus, parse_frontmatter, scan,
+)
+from .yaml_loader import load_yaml
+from .repository_view import (
+    RepositoryView, RepositoryViewError, RepositoryViewMode,
+)
+from .structural_refs import (
+    iter_structural_references, structural_field_names, structural_shape_errors,
 )
 
 def valid_statuses_for(typ: str, schema: dict | None) -> tuple[list[str] | None, bool]:
@@ -68,20 +75,8 @@ def validate_level1(t: Thing, schema: dict | None) -> list[Finding]:
             sev = SEV_ERROR if fld == "created" else SEV_WARNING
             f.append(Finding(sev, name, f"`{fld}` is not ISO 8601: {v!r}"))
 
-    lt = meta.get("linked_things")
-    if lt is not None:
-        if not isinstance(lt, list):
-            f.append(Finding(SEV_ERROR, name, "`linked_things` is not a list"))
-        else:
-            for i, entry in enumerate(lt):
-                if not isinstance(entry, dict) or "id" not in entry or "relation" not in entry:
-                    f.append(Finding(SEV_ERROR, name,
-                             f"`linked_things[{i}]` must be an object with `id` and `relation`"))
-
-    for fld in ("dependencies", "blocks"):
-        v = meta.get(fld)
-        if v is not None and (not isinstance(v, list) or not all(isinstance(x, str) for x in v)):
-            f.append(Finding(SEV_ERROR, name, f"`{fld}` must be an array of id strings"))
+    for field, reason in structural_shape_errors(meta):
+        f.append(Finding(SEV_ERROR, name, f"`{field}` {reason}"))
 
     trig = meta.get("triggers")
     if trig is not None:
@@ -156,25 +151,8 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
         # liveness. Using the per-type set here made this check fire on five
         # healthy insights the moment a domain declared its vocabulary.
         src_live = str(meta.get("status")) not in TERMINAL_STATUSES
-        refs: list[tuple[str, str]] = []
-        for entry in meta.get("linked_things") or []:
-            if isinstance(entry, dict) and isinstance(entry.get("id"), str):
-                refs.append(("linked_things", entry["id"]))
-        for fld in ("dependencies", "blocks", "parties"):
-            for rid in meta.get(fld) or []:
-                if isinstance(rid, str):
-                    refs.append((fld, rid))
-        if isinstance(meta.get("parent"), str):
-            refs.append(("parent", meta["parent"]))
-        if isinstance(meta.get("definition"), str):
-            refs.append(("definition", meta["definition"]))
-        for tr in meta.get("triggers") or []:
-            if isinstance(tr, dict):
-                watch = tr.get("watch")
-                for rid in (watch if isinstance(watch, list) else [watch] if watch else []):
-                    if isinstance(rid, str):
-                        refs.append(("triggers.watch", rid))
-        for fld, rid in refs:
+        for ref in iter_structural_references(meta, validation_only=True):
+            fld, rid = ref.field, ref.target
             referenced.add(rid)
             if src_live:
                 referenced_by_live.add(rid)
@@ -296,8 +274,7 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
         meta = t.meta
         if str(meta.get("type")) in ("continuity-brief", "index", "prompt"):
             continue
-        has_rel = bool(meta.get("linked_things") or meta.get("dependencies")
-                       or meta.get("blocks") or meta.get("parent") or meta.get("triggers"))
+        has_rel = any(meta.get(field) for field in structural_field_names())
         if not has_rel and t.id not in referenced:
             f.append(Finding(SEV_INFO, t.id or t.path.name,
                      "orphaned — no relationships, triggers, or inbound references"))
@@ -338,32 +315,165 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
     return f
 
 
+def workflow_transition_findings(
+    root: Path, corpus: Corpus, view: RepositoryView | None = None,
+) -> list[Finding]:
+    """Enforce old -> new workflow edges at the next-commit boundary.
+
+    Membership is a property of the candidate corpus and remains in
+    :func:`validate_level2`.  Transition legality needs two explicit views:
+    the frozen index tree supplies the candidate cursor, while the prior
+    commit supplies both the old cursor and the definition that governed the
+    move.  A definition edit in the same commit therefore cannot retroactively
+    authorize its own run transition.
+
+    Worktree and historical-commit validation remain useful read surfaces but
+    cannot claim to be the exact next commit, so this check deliberately fires
+    only for ``RepositoryView.index``.  A repository with no prior commit has
+    no old run state to compare and is valid by construction.
+    """
+    candidate = view or corpus.view
+    if candidate is None or candidate.mode is not RepositoryViewMode.INDEX:
+        return []
+    try:
+        prior_view = RepositoryView.commit(candidate.root, "HEAD")
+    except RepositoryViewError:
+        return []
+
+    prior, _ = scan(root, prior_view)
+    prior_by_id = prior.by_id()
+    candidate_by_id = corpus.by_id()
+    findings: list[Finding] = []
+
+    for run_id, new_run in candidate_by_id.items():
+        if str(new_run.meta.get("type")) != "workflow-run":
+            continue
+        old_run = prior_by_id.get(run_id)
+        if old_run is None or str(old_run.meta.get("type")) != "workflow-run":
+            continue  # creation is not a transition
+
+        old_stage = old_run.meta.get("current_stage")
+        new_stage = new_run.meta.get("current_stage")
+        if old_stage is None or new_stage is None or str(old_stage) == str(new_stage):
+            continue
+
+        old_definition_id = old_run.meta.get("definition")
+        new_definition_id = new_run.meta.get("definition")
+        if (not isinstance(old_definition_id, str)
+                or not isinstance(new_definition_id, str)):
+            # Candidate structural findings already name a missing new
+            # pointer.  The old pointer is needed to establish the edge, so
+            # make that inability explicit rather than guessing.
+            findings.append(Finding(
+                SEV_ERROR, run_id,
+                f"cannot verify workflow transition `{old_stage}` -> "
+                f"`{new_stage}` because the prior or candidate `definition` "
+                "pointer is missing",
+            ))
+            continue
+        if old_definition_id != new_definition_id:
+            findings.append(Finding(
+                SEV_ERROR, run_id,
+                f"workflow transition `{old_stage}` -> `{new_stage}` also "
+                f"changes `definition` from `{old_definition_id}` to "
+                f"`{new_definition_id}` — migrate the definition in a separate "
+                "meaning-boundary commit before advancing the cursor",
+            ))
+            continue
+
+        definition = prior_by_id.get(old_definition_id)
+        if (definition is None
+                or str(definition.meta.get("type")) != "workflow-definition"):
+            findings.append(Finding(
+                SEV_ERROR, run_id,
+                f"cannot verify workflow transition `{old_stage}` -> "
+                f"`{new_stage}`: prior definition `{old_definition_id}` is "
+                "missing or is not a workflow-definition",
+            ))
+            continue
+
+        source_stages = [stage for stage in definition.meta.get("stages") or []
+                         if isinstance(stage, dict)
+                         and str(stage.get("id")) == str(old_stage)]
+        if len(source_stages) != 1:
+            findings.append(Finding(
+                SEV_ERROR, run_id,
+                f"cannot verify workflow transition `{old_stage}` -> "
+                f"`{new_stage}`: prior definition `{old_definition_id}` "
+                f"declares {len(source_stages)} source stages named "
+                f"`{old_stage}`",
+            ))
+            continue
+        allowed = source_stages[0].get("to")
+        if (not isinstance(allowed, list)
+                or not all(isinstance(stage, str) for stage in allowed)):
+            findings.append(Finding(
+                SEV_ERROR, run_id,
+                f"cannot verify workflow transition `{old_stage}` -> "
+                f"`{new_stage}`: prior stage `{old_stage}` has no valid "
+                "`to` edge list",
+            ))
+            continue
+        if str(new_stage) not in allowed:
+            findings.append(Finding(
+                SEV_ERROR, run_id,
+                f"workflow transition `{old_stage}` -> `{new_stage}` is not "
+                f"declared by prior definition `{old_definition_id}` "
+                f"(allowed: {allowed})",
+            ))
+    return findings
+
+
 def version_tuple(v: str) -> tuple[int, int, int]:
     parts = [int(x) for x in re.findall(r"\d+", str(v))[:3]]
     return tuple(parts + [0] * (3 - len(parts)))  # type: ignore[return-value]
 
 
-def check_version_sync(root: Path) -> list[Finding]:
+def _view_logical(root: Path, relative: str, view: RepositoryView) -> PurePosixPath:
+    prefix = Path(root).resolve().relative_to(view.root).as_posix()
+    base = PurePosixPath(prefix)
+    rel = PurePosixPath(relative)
+    return rel if base == PurePosixPath(".") else base / rel
+
+
+def _candidate_text(root: Path, relative: str,
+                    view: RepositoryView | None) -> str | None:
+    if view is None:
+        path = root / relative
+        return path.read_text(encoding="utf-8") if path.is_file() else None
+    logical = _view_logical(root, relative, view)
+    return view.read_text(logical) if view.exists(logical) else None
+
+
+def check_version_sync(root: Path,
+                       view: RepositoryView | None = None) -> list[Finding]:
     """Framework root only: `.markdownllm`, AGENTS.md frontmatter, and the
     latest CHANGELOG entry must agree on the version. The sentinel is what
     domain agents key their refresh off — a stale sentinel silently disables
     domain-refresh for everything shipped since."""
-    sentinel = root / ".markdownllm"
-    if not sentinel.exists():
+    sentinel_text = _candidate_text(root, ".markdownllm", view)
+    if sentinel_text is None:
         return []
     versions: dict[str, str] = {}
-    data = yaml.safe_load(sentinel.read_text(encoding="utf-8")) or {}
+    try:
+        data = load_yaml(sentinel_text, source=".markdownllm") or {}
+    except yaml.YAMLError as exc:
+        return [Finding(SEV_ERROR, "framework-version",
+                f"version sentinel is invalid YAML: {exc}")]
+    if not isinstance(data, dict):
+        return [Finding(SEV_ERROR, "framework-version",
+                "version sentinel must be a YAML mapping")]
     if data.get("version"):
         versions[".markdownllm"] = str(data["version"])
-    agents = root / "AGENTS.md"
-    if agents.exists():
-        meta, _, _ = parse_frontmatter(agents.read_text(encoding="utf-8"))
+    agents_text = _candidate_text(root, "AGENTS.md", view)
+    if agents_text is not None:
+        meta, _, _ = parse_frontmatter(agents_text)
         if meta and meta.get("version"):
             versions["AGENTS.md"] = str(meta["version"])
-    changelog = root / "CHANGELOG.md"
-    if changelog.exists():
+    changelog_text = _candidate_text(root, "CHANGELOG.md", view)
+    if changelog_text is not None:
         m = re.search(r"^## \[(\d+(?:\.\d+){1,2})\]",
-                      changelog.read_text(encoding="utf-8"), re.MULTILINE)
+                      changelog_text, re.MULTILINE)
         if m:
             versions["CHANGELOG.md"] = m.group(1)
     if len({version_tuple(v) for v in versions.values()}) > 1:
@@ -617,11 +727,13 @@ def retrospective_findings(root: Path, corpus: Corpus) -> list[Finding]:
     return []
 
 
-def validate_corpus(root: Path) -> tuple[Corpus, list[Finding]]:
-    corpus, findings = scan(root)
+def validate_corpus(root: Path,
+                    view: RepositoryView | None = None) -> tuple[Corpus, list[Finding]]:
+    corpus, findings = scan(root, view)
     for t in corpus.things:
         findings.extend(validate_level1(t, corpus.schema))
     findings.extend(validate_level2(corpus))
+    findings.extend(workflow_transition_findings(root, corpus, view))
     findings.extend(validate_level3(corpus))
     findings.extend(derivation_findings(corpus))
     return corpus, findings
@@ -641,8 +753,11 @@ def derivation_findings(corpus: Corpus) -> list[Finding]:
     recorded truth outranks internal consistency, and only the domain knows
     which of its figures are its own to reconcile.
 
-    Non-evaluability is always a Warning and never silent: an expression the
-    floor cannot run is a check the operator believes is running.
+    Non-evaluability is a Warning by default and an Error in strict mode: an
+    expression the floor cannot run is a check the operator believes is
+    running, and strict cannot be disabled by a typo.  Corpus exclusions are
+    surfaced for the same reason — agreement over a silently smaller input set
+    is not a trustworthy aggregate.
 
     Quiet when healthy: a domain that declares no derivation gets no finding,
     and one whose figures agree gets no finding either.
@@ -657,26 +772,74 @@ def derivation_findings(corpus: Corpus) -> list[Finding]:
         name = t.id or t.path.name
         for d in evaluate_block(t.meta, context_for(t, corpus)):
             if d.error is not None:
-                out.append(Finding(SEV_WARNING, name,
+                out.append(Finding(SEV_ERROR if strict else SEV_WARNING, name,
                            f"`computed.{d.target}` is not evaluable: {d.error}"))
             elif d.agrees is False:
                 out.append(Finding(SEV_ERROR if strict else SEV_WARNING, name,
                            f"`{d.target}` is {fmt(d.asserted)} but its own "
                            f"derivation `{d.expr}` computes {fmt(d.value)}"))
+            for note in d.notes:
+                if str(note).startswith("EXCLUDED "):
+                    out.append(Finding(SEV_ERROR if strict else SEV_WARNING,
+                               name, f"`computed.{d.target}` used a reduced "
+                               f"input set: {note}"))
     return out
 
 
-def example_corpora(root: Path) -> list[Path]:
+def example_corpora(root: Path,
+                    view: RepositoryView | None = None) -> list[Path]:
     """Example domains live in <root>/examples/<name>/ with their own
     AGENTS.md and _schema.yaml. They are excluded from the root corpus walk
     (separate id space, separate schema) but they are NOT exempt from the
     floor: validate discovers and checks each one as its own corpus, so the
     pre-commit hook covers them in the same run."""
-    examples = root / "examples"
-    if not examples.is_dir():
-        return []
-    return sorted(d for d in examples.iterdir()
-                  if d.is_dir() and (d / "AGENTS.md").exists())
+    if view is None:
+        examples = root / "examples"
+        if not examples.is_dir():
+            return []
+        return sorted(d for d in examples.iterdir()
+                      if d.is_dir() and (d / "AGENTS.md").exists())
+
+    prefix = Path(root).resolve().relative_to(view.root)
+    logical_prefix = PurePosixPath(prefix.as_posix())
+    names: set[str] = set()
+    for logical in view.list_paths():
+        try:
+            rel = (logical if logical_prefix == PurePosixPath(".")
+                   else logical.relative_to(logical_prefix))
+        except ValueError:
+            continue
+        if (len(rel.parts) == 3 and rel.parts[0] == "examples"
+                and rel.parts[2] == "AGENTS.md"):
+            names.add(rel.parts[1])
+    return [root / "examples" / name for name in sorted(names)]
+
+
+def validation_reports(
+    root: Path, view: RepositoryView | None = None,
+) -> list[tuple[Path, Corpus, list[Finding]]]:
+    """Build the complete validation result used by the CLI boundary.
+
+    Keeping this composition public prevents other mechanical consumers (the
+    eval harness in particular) from quietly defining a smaller meaning of
+    "validates clean".  Formatting stays in ``cmd_validate``; this function is
+    the one semantic-free result boundary.
+    """
+    reports: list[tuple[Path, Corpus, list[Finding]]] = []
+    corpus, findings = validate_corpus(root, view)
+    findings.extend(check_version_sync(root, view))
+    findings.extend(quarantine_findings(root, corpus))
+    findings.extend(session_gate_findings(root, corpus))
+    findings.extend(retrospective_findings(root, corpus))
+    reports.append((root, corpus, findings))
+    for sub in example_corpora(root, view):
+        # Example corpora skip retrospective cadence: teaching corpora carry
+        # frozen dates rather than live sessions.
+        sub_corpus, sub_findings = validate_corpus(sub, view)
+        history_root = view.root if view is not None else sub
+        sub_findings.extend(quarantine_findings(history_root, sub_corpus))
+        reports.append((sub, sub_corpus, sub_findings))
+    return reports
 
 
 SESSION_GATE_WINDOW_HOURS = 24
@@ -774,24 +937,45 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
                         "session gate: the attested emission found NO kernel "
                         "file — regenerate it at the framework root "
                         "(`mdllm kernel`) and re-run `mdllm session-start .`")]
+    contract_token = next((t for t in tokens[1:]
+                           if t.startswith("contract=")), "")
+    if contract_token:
+        try:
+            from .session import _contract_fingerprint
+            attested = contract_token.partition("=")[2]
+            current = _contract_fingerprint(root)
+        except Exception:
+            attested = current = ""  # unreadable is handled as an advisory below
+        if not attested or not current:
+            return [Finding(SEV_WARNING, "_session-gate",
+                            "session gate: contract fingerprint could not be "
+                            "checked — " + remedy)]
+        if attested != current:
+            return [Finding(sev, "_session-gate",
+                            "session gate: the operative Tier-0 contract "
+                            "changed after session-start; unrelated HEAD "
+                            "movement does not expire the gate, but AGENTS.md "
+                            "or kernel changes do — " + remedy)]
+    else:
+        # Backward-compatible but loud.  A legacy timestamp can establish
+        # freshness only; it cannot establish which contract was emitted.
+        return [Finding(SEV_WARNING, "_session-gate",
+                        "session gate: legacy attestation has no contract "
+                        "fingerprint — freshness is known but contract currency "
+                        "is not; " + remedy)]
     return []
 
 
 def cmd_validate(args) -> int:
     root = Path(args.path).resolve()
-    reports: list[tuple[Path, Corpus, list[Finding]]] = []
-    corpus, findings = validate_corpus(root)
-    findings.extend(check_version_sync(root))
-    findings.extend(quarantine_findings(root, corpus))
-    findings.extend(session_gate_findings(root, corpus))
-    findings.extend(retrospective_findings(root, corpus))
-    reports.append((root, corpus, findings))
-    for sub in example_corpora(root):
-        # Example corpora skip the retrospective-cadence check: they are
-        # teaching corpora with frozen dates, not domains running sessions.
-        sub_corpus, sub_findings = validate_corpus(sub)
-        sub_findings.extend(quarantine_findings(sub, sub_corpus))
-        reports.append((sub, sub_corpus, sub_findings))
+    mode = getattr(args, "view", "worktree")
+    try:
+        view = (RepositoryView.index(root) if mode == "index"
+                else RepositoryView.worktree(root))
+    except RepositoryViewError as exc:
+        print(f"mdllm: cannot construct {mode} validation view: {exc}")
+        return 1
+    reports = validation_reports(root, view)
 
     total_errors = 0
     for rpt_root, rpt_corpus, rpt_findings in reports:
@@ -802,6 +986,7 @@ def cmd_validate(args) -> int:
 
         if not args.quiet or errors:
             print(f"## Validation Report — {rpt_root}")
+            print(f"view: {rpt_corpus.view.identifier if rpt_corpus.view else view.identifier}")
             print(f"schema: {'_schema.yaml found' if rpt_corpus.schema else 'none (default vocabulary, advisory)'}\n")
             for title, group in (("Errors (must fix)", errors),
                                  ("Warnings (should fix)", warnings),

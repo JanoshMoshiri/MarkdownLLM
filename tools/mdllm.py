@@ -31,15 +31,23 @@ from markdownllm.model import (
     Thing, Finding, Corpus, parse_frontmatter, load_schema, scan,
     terminal_statuses_for, is_terminal,
 )
+from markdownllm.repository_view import (
+    RepositoryHeadMoved, RepositoryView, RepositoryViewError,
+    RepositoryViewMode,
+)
 from markdownllm.validation import (
     valid_statuses_for, validate_level1, validate_level2, version_tuple,
     check_version_sync, validate_level3, validate_corpus, example_corpora,
+    workflow_transition_findings,
     quarantine_findings, retrospective_findings, derivation_findings,
     session_gate_findings, SESSION_GATE_WINDOW_HOURS,
     cmd_validate,
 )
 from markdownllm.repo import git_short_sha, framework_version, _version_lt, TIERS
-from markdownllm.triggers import evaluate, cmd_triggers
+from markdownllm.triggers import (
+    TriggerEvaluation, TriggerOutcome, TriggerResult,
+    evaluate, evaluate_results, evaluate_typed, cmd_triggers,
+)
 from markdownllm.indexes import (
     INDEX_FILES, build_index_body, index_drift_findings, cmd_index,
 )
@@ -100,7 +108,17 @@ from markdownllm.mcp_server import (
 from markdownllm.imports_check import (
     imports_freshness, face_coverage, cmd_imports_check, cmd_estate_check,
 )
-from markdownllm.sync import discover_repos, sync_repo, cmd_estate_sync
+from markdownllm.external_trust import (
+    ExternalCapability, ExternalTrustError, ExternalTrustPolicy,
+    LocalExternalTrustPolicy, RepositoryIdentity, TrustDecision,
+    canonical_entry_hash, repository_identity, required_capabilities,
+    grant_external_trust, revoke_external_trust, review_lines,
+    load_mcp_address_book, cmd_external_trust,
+)
+from markdownllm.sync import (
+    PublicationPolicy, PublicationPolicyState, discover_repos,
+    publication_policy, sync_repo, cmd_estate_sync,
+)
 from markdownllm.cli import build_cli, main
 
 if __name__ == "__main__":

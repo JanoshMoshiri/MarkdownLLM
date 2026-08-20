@@ -78,6 +78,7 @@ def test_scaffold_selection_changes_only_outer_projection(tmp_path):
         "default": _scaffold(tmp_path / "default"),
         "claude": _scaffold(tmp_path / "claude", "claude"),
         "codex": _scaffold(tmp_path / "codex", "codex"),
+        "cowork": _scaffold(tmp_path / "cowork", "cowork"),
         "all": _scaffold(tmp_path / "all", "all"),
         "none": _scaffold(tmp_path / "none", "none"),
     }
@@ -92,6 +93,11 @@ def test_scaffold_selection_changes_only_outer_projection(tmp_path):
     assert (targets["codex"] / ".codex" / "hooks.json").is_file()
     assert not (targets["codex"] / ".claude").exists()
     assert not (targets["codex"] / ".github").exists()
+    # Cowork is account-level and run-time bound: selecting it must remain an
+    # honest empty project projection, not manufacture a repo-local adapter.
+    assert not (targets["cowork"] / ".cowork").exists()
+    assert not (targets["cowork"] / ".claude").exists()
+    assert not (targets["cowork"] / ".codex").exists()
     assert (targets["all"] / ".claude" / "settings.json").is_file()
     assert (targets["all"] / ".codex" / "hooks.json").is_file()
     assert not (targets["none"] / ".claude").exists()
