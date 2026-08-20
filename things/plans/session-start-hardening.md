@@ -254,22 +254,29 @@ suite rides the Phase 4 commit (Phase 4 is prose-only).
 What remains after Phases 2–3 is judgement no channel can perform. Decisions
 this phase owns:
 
-- [ ] The deep orientation walk becomes explicitly invoked (session-end
-  symmetry — a bound prompt the operator or the agent deliberately
-  triggers), and/or intent-scoped on the first substantive request; the
-  entry file stops demanding un-pulled judgement at t=0 and names the
-  invocation instead
-- [ ] The two-voices collision is resolved in prose: Tier-0 emission is not
-  subject to the tier-economy rule (emitted content requires no loading
-  decision); the economy rule governs Tier 1/2 only. The Codex first-grill
-  defence must have nothing left to recruit
-- [ ] The forensic probe ladder (casual → end-to-end → steps 4–6) is
-  recorded as operator verification practice in the operator guide —
-  evidence over assurances, the smooth-yes tell named
+- [x] The deep orientation walk is now the **`orient` bound prompt** in the
+  framework root's AGENTS.md — explicitly invoked (operator's word) *and*
+  intent-scoped (the agent invokes it the moment intent first touches
+  domain state — the moment the pull exists). The entry file's Tier-0
+  section now describes emission and the owed deferral read instead of
+  instructing loads. orchestration.md v1.17 records the re-homing and its
+  boundary: scaffolded domains inherit it via the versioned managed-block
+  migration (refresh, offered per domain); until adopted, their generated
+  block stays their truth.
+- [x] The two-voices collision resolved in the entry file's own words: the
+  economy rule now opens with "This economy governs Tier 1 and Tier 2 only
+  — Tier 0 is emitted or owed, never economised," and Tier 0's heading
+  says "exempt from the economy rule above." Nothing left to recruit.
+- [x] The probe ladder recorded in the operator guide (v1.6, "Grilling A
+  Session"): the three rungs, the smooth-yes tell, probe-precision
+  discipline, evidence-over-assurances — with the ladder linked as the
+  ledger insight's operator-facing implementation.
 
-**Gate:** AGENTS.md, kernel, and the projection agree with each other;
-reconciliation walked; no surface still instructs what another surface
-emits.
+**Gate: CLOSED 2026-08-20.** AGENTS.md, kernel, and the projection agree;
+reconciliation walked (textual tier: every remaining "load kernel.md"
+instruction is a domain-side surface riding the versioned migration, or a
+historical record — none is a framework-root contradiction); coherence
+clean; full suite green at commit.
 
 ## Phase 5 — Re-test, disposition, seal
 

@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T08:05:40
-generated_from: HEAD@c863633
+generated: 2026-08-20T08:42:33
+generated_from: HEAD@087d5d9
 coverage: 232
 framework_version: 3.32.0
 ---
@@ -612,6 +612,8 @@ framework_version: 3.32.0
 - operator-guide --references--> domain-refresh-specification
 - operator-guide --references--> orchestration-specification
 - operator-guide --references--> git-workflow-specification
+- operator-guide --implements--> an-honest-ledger-replicates-full-compliance-does-not
+- operator-guide --references--> session-start-hardening
 - orchestration-specification --extends--> thing-specification
 - orchestration-specification --informs--> estate-git-sync
 - orchestration-specification --complements--> write-thing-specification

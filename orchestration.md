@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.16
+version: 1.17
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -562,6 +562,19 @@ interpretation. *(This supersedes the earlier claim that no framework-level
 bindings are inherited — the generated block is exactly such a binding, and
 describing it as opt-in left agents free to read the session-start steps as
 optional. Substrate reconciliation, 2026-08-09.)*
+
+**Where the four prompts' judgement half fires moved in v3.33
+(session-start-hardening Phase 4).** The framework root now routes it
+through an explicitly-invoked **`orient`** bound prompt — session-end's
+symmetry — invoked by the operator or by the agent when intent first
+touches domain state. The digest absorbed the computable cores (velocity
+trend, stall lines, fired triggers, self-answering cues), and five-run
+evidence showed the un-pulled judgement residue does not run at t=0 on any
+model tier while partial mechanisation quiets what remains. Scaffolded
+domains inherit the re-homing through the versioned managed-block
+migration (`mdllm refresh`, offered per domain, never swept); until a
+domain adopts, its generated Session Start block continues to bind the
+four prompts at session-start and remains the domain's truth.
 
 Everything beyond that set is opt-in and authored: domain hook points,
 additional prompts, `when:` conditions, session-end and retrospective
