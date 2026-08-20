@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T08:42:33
-generated_from: HEAD@087d5d9
-coverage: 232
+generated: 2026-08-20T09:27:27
+generated_from: HEAD@a9028f8
+coverage: 234
 framework_version: 3.32.0
 ---
 
@@ -227,6 +227,16 @@ framework_version: 3.32.0
 - codex-phase6-post-6r-acceptance-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
 - codex-port-challenge-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-port-challenge-2026-08-11 --implements--> portability-claims-need-execution-tests
+- codex-substrate-review-response-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
+- codex-substrate-review-response-2026-08-20 --references--> independent-review-2026-08-11-codex
+- codex-substrate-review-response-2026-08-20 --complements--> session-start-hardening
+- codex-substrate-review-response-2026-08-20 --complements--> vendor-harness-adapter-foundation
+- codex-substrate-review-response-2026-08-20 --complements--> cowork-adapter
+- codex-substrate-review-response-2026-08-20 --complements--> evidence-and-eval-backlog
+- codex-substrate-review-response-2026-08-20 --complements--> deterministic-calculation
+- codex-substrate-review-response-2026-08-20 --complements--> mechanical-coherence-checks-backlog
+- codex-substrate-review-response-2026-08-20 --complements--> scaffold-declares-visibility
+- codex-substrate-review-response-2026-08-20 --references--> llm-driven-systems-manifesto
 - coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks
 - coherence-is-a-maintained-rate-not-a-state --supports--> repeated-drift-promotes-a-fact-into-the-floor
 - coherence-is-a-maintained-rate-not-a-state --supports--> hook-enforcement-has-three-anchors
@@ -512,6 +522,13 @@ framework_version: 3.32.0
 - independent-review-2026-08-11-codex --challenges--> hook-enforcement-has-three-anchors
 - independent-review-2026-08-11-codex --supports--> portability-claims-need-execution-tests
 - independent-review-2026-08-11-codex --informs--> vendor-harness-adapter-foundation
+- independent-substrate-review-2026-08-20-codex --extends--> independent-review-2026-08-11-codex
+- independent-substrate-review-2026-08-20-codex --informs--> codex-substrate-review-response-2026-08-20
+- independent-substrate-review-2026-08-20-codex --challenges--> llm-driven-systems-manifesto
+- independent-substrate-review-2026-08-20-codex --supports--> hook-enforcement-has-three-anchors
+- independent-substrate-review-2026-08-20-codex --informs--> session-start-hardening
+- independent-substrate-review-2026-08-20-codex --informs--> vendor-harness-adapter-foundation
+- independent-substrate-review-2026-08-20-codex --informs--> cowork-adapter
 - inflection-candidates-are-computable --complements--> change-reconciliation-specification
 - inflection-candidates-are-computable --informs--> estate-cadence-cluster
 - inflection-candidates-are-computable --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it

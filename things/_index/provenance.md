@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-19
-generated: 2026-08-19T08:54:15
-generated_from: HEAD@11a0b98
-coverage: 30
+created: 2026-08-20
+generated: 2026-08-20T09:27:56
+generated_from: HEAD@a9028f8
+coverage: 31
 framework_version: 3.32.0
 ---
 
@@ -70,6 +70,9 @@ framework_version: 3.32.0
 
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## independent-substrate-review-2026-08-20-codex
+- codex-substrate-review-response-2026-08-20 (derived-from)
 
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
