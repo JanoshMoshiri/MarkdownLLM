@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T13:01:27
-generated_from: HEAD@2673168
-coverage: 237
+generated: 2026-08-20T15:25:15
+generated_from: HEAD@eb80d46
+coverage: 238
 framework_version: 3.33.0
 ---
 
@@ -235,14 +235,12 @@ framework_version: 3.33.0
 - codex-port-challenge-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - codex-port-challenge-2026-08-11 --implements--> portability-claims-need-execution-tests
 - codex-substrate-review-response-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
-- codex-substrate-review-response-2026-08-20 --references--> independent-review-2026-08-11-codex
+- codex-substrate-review-response-2026-08-20 --references--> substrate-review-phase0-disposition-2026-08-20
+- codex-substrate-review-response-2026-08-20 --references--> substrate-review-implementation-evidence-2026-08-20
+- codex-substrate-review-response-2026-08-20 --references--> harness-capability-evidence-matrix-2026-08-20
 - codex-substrate-review-response-2026-08-20 --complements--> session-start-hardening
 - codex-substrate-review-response-2026-08-20 --complements--> vendor-harness-adapter-foundation
 - codex-substrate-review-response-2026-08-20 --complements--> cowork-adapter
-- codex-substrate-review-response-2026-08-20 --complements--> evidence-and-eval-backlog
-- codex-substrate-review-response-2026-08-20 --complements--> deterministic-calculation
-- codex-substrate-review-response-2026-08-20 --complements--> mechanical-coherence-checks-backlog
-- codex-substrate-review-response-2026-08-20 --complements--> scaffold-declares-visibility
 - codex-substrate-review-response-2026-08-20 --references--> llm-driven-systems-manifesto
 - coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks
 - coherence-is-a-maintained-rate-not-a-state --supports--> repeated-drift-promotes-a-fact-into-the-floor
@@ -813,6 +811,10 @@ framework_version: 3.33.0
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
 - substrate-reconciliation-2026-08-09 --references--> autopush-moves-the-deliberate-act
+- substrate-review-implementation-evidence-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
+- substrate-review-implementation-evidence-2026-08-20 --documents--> codex-substrate-review-response-2026-08-20
+- substrate-review-implementation-evidence-2026-08-20 --extends--> substrate-review-phase0-disposition-2026-08-20
+- substrate-review-implementation-evidence-2026-08-20 --references--> harness-capability-evidence-matrix-2026-08-20
 - substrate-review-phase0-disposition-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
 - substrate-review-phase0-disposition-2026-08-20 --documents--> codex-substrate-review-response-2026-08-20
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19

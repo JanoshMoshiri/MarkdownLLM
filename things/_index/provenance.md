@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-20
-generated: 2026-08-20T13:01:36
-generated_from: HEAD@2673168
+generated: 2026-08-20T15:25:23
+generated_from: HEAD@eb80d46
 coverage: 36
 framework_version: 3.33.0
 ---
@@ -91,6 +91,7 @@ framework_version: 3.33.0
 ## independent-substrate-review-2026-08-20-codex
 - autopush-requires-explicit-authority (pinned @27b95e739f78cad6fa609cee7b1359897ccf40ae)
 - codex-substrate-review-response-2026-08-20 (derived-from)
+- substrate-review-implementation-evidence-2026-08-20 (derived-from)
 - substrate-review-phase0-disposition-2026-08-20 (derived-from)
 
 ## lifecycle-output-truncation-2026-08-14

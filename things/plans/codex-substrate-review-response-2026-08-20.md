@@ -1,383 +1,193 @@
 ---
 id: codex-substrate-review-response-2026-08-20
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+version: 1.2
 created: 2026-08-20
 priority: critical
 exposed: false
-tags: [review-response, security, transaction-integrity, repository-view, adapters, specification-adherence, hardening]
+tags: [review-response, security, transaction-integrity, repository-view, adapters, specification-adherence, closeout]
 linked_things:
   - id: independent-substrate-review-2026-08-20-codex
     relation: derived-from
-    notes: "Immutable finding set and acceptance oracle for this remediation."
-  - id: independent-review-2026-08-11-codex
+    notes: "Immutable requirements and finding oracle."
+  - id: substrate-review-phase0-disposition-2026-08-20
     relation: references
-    notes: "The fifteen earlier findings are re-dispositioned rather than copied into a second untraceable backlog."
+    notes: "Pinned baseline, reproductions, dispositions, ownership, and touchpoint residue."
+  - id: substrate-review-implementation-evidence-2026-08-20
+    relation: references
+    notes: "Finding-by-finding implementation, tests, commits, residual risk, and final closeout evidence."
+  - id: harness-capability-evidence-matrix-2026-08-20
+    relation: references
+    notes: "Exact-build live-harness evidence boundary; pending rows remain external acceptance."
   - id: session-start-hardening
     relation: complements
-    notes: "Existing owner for contract delivery, integrity, orientation pull, and live re-test; this plan owns cross-cutting evidence semantics and integration acceptance."
+    notes: "Owns contract delivery and fresh receipt/read/application evidence."
   - id: vendor-harness-adapter-foundation
     relation: complements
-    notes: "Existing owner for Claude Code and Codex adapter acceptance; this plan owns transaction/trust prerequisites and the integrated three-harness closeout."
+    notes: "Owns fresh Claude Code and Codex product acceptance."
   - id: cowork-adapter
     relation: complements
-    notes: "Existing owner for Cowork assembly and live evidence; this plan requires lifecycle-service parity and consumes its acceptance records."
-  - id: evidence-and-eval-backlog
-    relation: complements
-    notes: "Existing owner for longitudinal/model evidence; eval-command correctness is repaired here only to make that owner's evidence boundary trustworthy."
-  - id: deterministic-calculation
-    relation: complements
-    notes: "Existing owner for calculation capability; this plan routes strict-mode and exact-decimal defects there and verifies their closure."
-  - id: mechanical-coherence-checks-backlog
-    relation: complements
-    notes: "Existing owner for earned deterministic checks; template-instantiation validation is reconciled there rather than duplicated."
-  - id: scaffold-declares-visibility
-    relation: complements
-    notes: "The exposure-at-birth work remains separately owned; scaffold transaction changes must not silently absorb or bypass it."
+    notes: "Owns fresh Cowork remote and local product acceptance."
   - id: llm-driven-systems-manifesto
     relation: references
-    notes: "Final claim reconciliation preserves the thesis while narrowing guarantees to demonstrated layers."
+    notes: "The reconciliation preserves the thesis while narrowing guarantees to demonstrated layers."
 ---
 
-# Codex Substrate Review Response — Transaction Integrity
+# Codex Substrate Review Response — Local Closeout
 
-## Purpose
+## Purpose And Current State
 
-Disposition and remediate `independent-substrate-review-2026-08-20-codex`
-without creating fifteen unrelated patches or stealing scope from existing live
-plans. The programme is organised around the five shared seams the review found:
-repository state view, authority/transaction, canonical definition, evidence
-semantics, and claim vocabulary.
+This plan executes the sealed Codex review as the requirements specification
+for the substrate hardening. Local implementation, reconciliation, and Phase 8
+acceptance are complete. The final tested architecture is
+`eb80d46f141d7fb77027cdf51e222d7f72db5a6c`; complete Windows and native WSL
+suites and the exact candidate/full-commit checks accepted those bytes.
 
-The plan was drafted behind an operator-review gate. On 2026-08-20 the operator
-explicitly waived that intermediate pause, accepted the review as the
-requirements specification, accepted this plan as the design, and instructed
-execution through completion without further routine input. This commit seals
-the plan before Phase 0 implementation begins.
+The original design, sequencing, gates, and checklists remain immutable in Git
+at `27b95e739f78cad6fa609cee7b1359897ccf40ae`. This v1.2 surface deliberately
+does not retain hundreds of stale open boxes after their implementation landed.
+Detailed finding evidence lives in
+`substrate-review-implementation-evidence-2026-08-20`; exact product evidence
+lives in `harness-capability-evidence-matrix-2026-08-20`.
 
-Exposure decision: **no**. This plan is internal framework work. Its eventual
-public result belongs in a release note derived after acceptance, not in a live
-served face while the findings remain open.
+The plan is **completed locally**. The containing closeout-record commit seals
+this plan, the implementation evidence, and their regenerated indexes; its SHA
+is intentionally resolved from Git history rather than embedded
+self-referentially. Live harnesses, hosted CI, independent review, and release
+authority remain in the external register below.
 
-## Authority And Autonomy Boundary
+## Authority And Completion Boundary
 
-Approval of this plan authorises the agent to implement code, tests, templates,
-specifications, docs, review/decision/evidence things, index regeneration, and
-local commits at the meaning boundaries below. It does **not** authorise a
-release, push of the framework public repository, modification of downstream
-domain repositories, use or storage of credentials, live network trust, or a
-claim that an unavailable harness was verified.
+The operator authorised local code, tests, specifications, templates, docs,
+evidence artifacts, generated artifacts, and commits. That authority does not
+include a public release or push, credentials, live external trust grants, or a
+claim that an unavailable product surface was verified.
 
-The agent can complete all local engineering and documentary work without
-further input after approval. Four closeout facts remain human- or
-environment-dependent:
+Local remediation can close without self-certifying live model behaviour.
+Fresh Claude Code, Codex, and Cowork sessions, public release/push judgement,
+and the requested independent Claude assessment have been transferred to the
+external acceptance register below. They remain real work under their existing
+owners, but are not prerequisites that this local implementation can honestly
+mark passed.
 
-1. approval or rejection of the recommended autopush reversal (default deny,
-   explicit `autopush: true`);
-2. fresh live acceptance sessions in Claude Code, Codex, and Cowork where this
-   session cannot launch the actual product surface;
-3. public release/push judgement;
-4. the requested independent Claude assessment.
+## Sealed Commit And Evidence Boundaries
 
-If the operator approves this plan unchanged, item 1 is considered decided in
-favour of the recommended default-deny design. The agent should then need no
-interruption until it reaches live-harness evidence or a genuinely new product
-choice not represented here.
-
-## Ownership Rule
-
-One surface, one owner. This plan owns the integration sequence, new shared
-ports, critical trust boundary, transaction corrections, and final acceptance
-matrix. Existing plans keep their subject-matter ownership:
-
-| Surface | Owning plan | This plan's role |
+| Boundary | Immutable reference | Meaning |
 |---|---|---|
-| Session contract delivery and deep-orient routing | `session-start-hardening` | verify evidence vocabulary; integrate and close only after its gates close |
-| Claude Code / Codex lifecycle adapter | `vendor-harness-adapter-foundation` | supply shared state/transaction ports; consume acceptance evidence |
-| Cowork bootstrap/assembly/live behaviour | `cowork-adapter` | repair shared lifecycle use; consume local and remote acceptance |
-| Longitudinal/model evidence programme | `evidence-and-eval-backlog` | make the eval command a trustworthy boundary; do not redesign the programme |
-| Calculation capability | `deterministic-calculation` | route exactness/strictness fixes and test them in the integrated floor |
-| Earned coherence checks and template residue | `mechanical-coherence-checks-backlog` | add only same-builder template instantiation checks that meet its admission rule |
-| Exposure at scaffold birth | `scaffold-declares-visibility` | preserve its decision and avoid duplicate implementation |
+| Review and original response design | `27b95e739f78cad6fa609cee7b1359897ccf40ae` | Requirements, architecture, Phase 0–8 design, and initial acceptance gates |
+| Mechanical architecture | `26731680996b8706eb8f1cd08835de3b70769339` | Repository views and transactions, external trust, strict definitions, total mechanical state, eval, adapters, templates, and tests |
+| Doctrine and reconciliation | `a14b0c3f9439cb14e5058bc5820526e65e2ee402` | v3.33 specifications, claims, human guides, evidence, generated artifacts, and compact subject plans |
+| Final tested architecture | `eb80d46f141d7fb77027cdf51e222d7f72db5a6c` | Dependency-direction closure, typed sync results, clean-checkout LF contract, and final code/test tree |
+| Final cross-platform suites | C3 above | Windows 682 passed; native WSL 675 passed and 7 platform-conditional skips |
+| Closeout record seal | Commit containing this plan | Exact-index validation/hook judges the plan, evidence, and regenerated indexes; `git log -1 -- <path>` resolves the non-self-referential SHA |
 
-Where execution discovers duplicate ownership, reconcile the plans before code.
-Do not let this umbrella become another 2,000-line history ledger.
+## Phase Outcomes
 
-## Phase 0 — Freeze, Reproduce, And Route
+| Phase | Local status | Outcome |
+|---|---|---|
+| **0 — Freeze, reproduce, and route** | **Complete** | Pinned the clean `27b95e7…` baseline; reproduced and accepted every mechanical finding; assigned owners; recorded the touchpoint and prose-only residue in `substrate-review-phase0-disposition-2026-08-20`. |
+| **1 — External execution boundary** | **Complete** | Added clone-local, configuration-hash-bound, granular `ExternalTrustPolicy`; automatic session/trigger paths default deny; command/HTTP execution is bounded, redacted, protocol-correct, and tested without public-network calls. |
+| **2 — One repository view** | **Complete** | Added explicit WORKTREE, frozen INDEX, and immutable COMMIT views; validation, coherence, MCP provenance, significant reads, and prior/candidate state name the bytes they judge; mismatch and moved-HEAD fixtures pass. |
+| **3 — Transaction and publication authority** | **Complete** | Added exact-path optimistic repository transactions, staged-state preservation, Git-resolved hook handling, foreign-hook safety, scaffold failure recovery, and literal-true-only publication authority with explanatory diagnostics. |
+| **4 — Canonical definitions** | **Complete** | Added strict duplicate-rejecting YAML across operative definition surfaces, a canonical structural-reference registry, and lossless A/M/D/R candidate parsing including Git-valid tabs and newlines. |
+| **5 — Total state and evidence semantics** | **Complete** | Trigger results are total and typed; workflow edges use prior/candidate views; calculation preserves lexical decimals and makes strict non-evaluation blocking; eval failures return failure; session assurance states and contract fingerprints remain distinct. |
+| **6 — Adapter lifecycle and forward state** | **Complete** | Cowork assembly uses shared sync application services; adapter evidence uses seven distinct lifecycle dimensions; the build-specific matrix records what actually ran; the three oversized subject plans were compacted without deleting Git history. |
+| **7 — Birth, supply, and claims** | **Complete** | Distributable templates instantiate and validate; Git attributes preserve their exact LF bytes in fresh Windows checkouts; examples distinguish policy, enforcement, and evidence; dependencies/actions/install guidance are pinned or integrity-checked; public prose separates deterministic structure, probabilistic interpretation, recorded state, and build-specific evidence. |
 
-Pin the implementation baseline and turn every review finding into an evidence-
-backed disposition against current HEAD.
+“Complete” in this table means the locally executable outcome and its focused
+regression evidence exist in the sealed implementation, reconciliation, and
+final architecture commits.
+It does not erase the explicit residuals in the implementation evidence or
+promote an external acceptance row.
 
-- [ ] Record baseline full SHA, branch, working-tree/index state, Python/runtime,
-  test count, and validator/coherence/index/provenance results.
-- [ ] Reproduce every open previous finding and each new finding with the
-  smallest deterministic fixture that proves or refutes it.
-- [ ] Mark each finding `accepted`, `narrowed`, `already-fixed`, or `rejected`,
-  with evidence and exact owner; do not treat the review's severity as proof.
-- [ ] Run `mdllm touchpoints` for every specification or stable thing whose rule
-  will change; record the prose-only residue the index cannot see.
-- [ ] Reconcile the existing plan graph so no checklist item has two owners.
-- [ ] Add regression tests that fail for every accepted mechanical defect before
-  implementing the fix, where a safe failing fixture is possible.
+## Phase 8 — Local Closeout Complete
 
-**Gate:** one disposition matrix, no accepted finding unowned, a clean pinned
-baseline, and failing tests that describe the critical/high defects precisely.
+### Committed baseline already established
 
-## Phase 1 — Close The Automatic External-Execution Boundary
+At doctrine commit `a14b0c3f9439cb14e5058bc5820526e65e2ee402`:
 
-This phase precedes architectural refactoring because the current session-start
-path can reach repository-supplied commands and network destinations.
+- the full Windows unit/integration suite passed: **675 passed in 881.15s**;
+- exact-index validation accepted 237 framework things, 6 compliance-pattern
+  things, and 14 life-manager things;
+- exact-index coherence reported no Errors or Warnings;
+- exact-index provenance had informational dated-input advisories only; and
+- the installed frozen-tree hook passed against the exact staged candidate.
 
-- [ ] Introduce an `ExternalTrustPolicy` application port. Its input is the
-  exact server entry plus repository identity; its result distinguishes
-  command, network, headers/credentials, and body-read authorization.
-- [ ] Store approvals only in the clone's Git directory or another explicitly
-  local untracked location, pinned to a cryptographic hash of the exact selected
-  `.mcp.json` entry. A config change invalidates trust.
-- [ ] Make automatic/session/trigger paths default to `unevaluable-untrusted`;
-  they must not launch a command or make a request merely because the repository
-  declares one.
-- [ ] Add an explicit CLI trust/review flow that shows command, arguments, URL,
-  header names (never secret values), repository, and hash before recording
-  approval. Trust is granular and revocable.
-- [ ] Bound response bytes and time, redact errors, constrain schemes, handle
-  redirects deliberately, and complete the MCP initialize/initialized sequence.
-- [ ] Treat external bodies as quoted data in egress/prompt surfaces; metadata
-  quarantine is not permission to execute instructions found in the body.
-- [ ] Test malicious stdio sentinel, config-hash drift, arbitrary URL, redirect,
-  header redaction, oversized body, timeout, protocol sequence, and trusted happy
-  paths. No test may actually exfiltrate or call the public network.
+This remained the comparison baseline while C3 closed the last architecture
+and clean-checkout gaps.
 
-**Gate:** opening or orienting an untrusted repository cannot execute its
-configured MCP command or make its configured request; trusted entries remain
-usable and hash-bound.
+### Final local gates
 
-## Phase 2 — One Repository View For Every Deterministic Claim
+- [x] Seal the final tested architecture and record full SHA
+  `eb80d46f141d7fb77027cdf51e222d7f72db5a6c` in this plan and the
+  implementation-evidence artifact.
+- [x] Run the complete Windows suite from a fresh clone of C3: **682 passed in
+  929.50 seconds**.
+- [x] Run the complete native WSL/Ubuntu suite from a fresh clone of C3:
+  **675 passed, 7 platform-conditional skips in 118.26 seconds**.
+- [x] Prove the exact candidate boundary and rerun validation, coherence,
+  relationship/provenance index checks, immutable-commit provenance, doctor,
+  kernel/build, installer parsers, and template checkout-byte acceptance. C3
+  exact-index validation was 237 + 6 + 14 clean with no Error or Warning;
+  doctor reported the installed hook executing with validation clean.
+- [x] Replace every closeout placeholder in the implementation-evidence
+  artifact and set this plan to `completed`; the containing record-seal
+  candidate is committed only after the same frozen-index hook accepts it.
 
-Add the minimum central abstraction needed to name the bytes being reasoned
-about. Avoid a general virtual filesystem.
+Local remediation is complete. The behavioural evidence is pinned to the final
+code SHA; the subsequent record seal changes only this plan, its evidence, and
+derived indexes and is judged by the exact-index hook. A public push is not part
+of this completion condition.
 
-- [ ] Introduce `RepositoryView` with three explicit modes: `WORKTREE` for
-  drafts, `INDEX` for the commit candidate, and immutable `COMMIT(<full-sha>)`
-  for stable reads/serving.
-- [ ] Make scanning/parsing accept a view and logical path rather than opening
-  ambient filesystem paths internally. Preserve current CLI worktree behaviour
-  unless a command's contract requires another mode.
-- [ ] Make the pre-commit floor validate the exact candidate tree (`git
-  write-tree`/index plumbing), including examples, schemas, indexes, boundary
-  checks, and candidate cues.
-- [ ] Prove both mismatch directions with real Git commits: invalid staged +
-  repaired worktree must block; valid staged + invalid worktree must commit.
-- [ ] Make MCP serve bytes from the exact full commit it stamps. Dirty exposed
-  worktree content is refused or explicitly marked uncommitted without a false
-  reference triple.
-- [ ] Pin full-corpus and significant agent reads to a base commit; before write,
-  detect moved HEAD and require explicit reconciliation rather than silently
-  applying conclusions from a mixed snapshot.
-- [ ] Expose prior/current candidate views for mechanical state-transition checks
-  without teaching each validator Git plumbing.
+## External Acceptance Register — Transferred, Not Self-Certified
 
-**Gate:** validation, provenance, serving, and long-read evidence each name one
-view; no test can make committed bytes differ from the bytes the floor accepted.
+| External acceptance | Current truthful state | Owner and durable destination | Relationship to local closeout |
+|---|---|---|---|
+| Fresh Claude Code lifecycle, contract receipt/read/application probe, nested floor, and write feedback | Pending exact-build rerun | `vendor-harness-adapter-foundation` + `session-start-hardening`; record in the harness capability matrix | Does not block local mechanical closeout |
+| Fresh Codex app/CLI instruction delivery, lifecycle dispatch, restricted-to-approved Git path, nested floor, and write-feedback limits | Pending exact-build rerun | `vendor-harness-adapter-foundation` + `session-start-hardening`; record in the harness capability matrix | Does not block local mechanical closeout |
+| Fresh Cowork remote and local assembly, sync, contract, adherence, commit floor, and publication-path evidence | Pending exact client/plugin runs | `cowork-adapter`; record in the harness capability matrix | Does not block local mechanical closeout |
+| Public v3.33 release and push | Not authorised or performed | Operator; reconcile changelog, compatibility/migration notes, artifact integrity, publication debt, and release judgement | Explicitly outside local completion |
+| Independent Claude assessment of review, plan, commits, evidence, and residuals | Pending after final immutable commit/evidence | Operator/review follow-up; preserve Claude's closed/narrowed/reopened disposition as a review artifact | Independent assurance, not something this implementation may self-award |
 
-## Phase 3 — Make Mutation And Publication Transactional
+Pending rows must remain pending. “Adapter exists,” “content emitted,” and
+“tests pass” are not substitutes for a product receiving, reading, applying, or
+independently satisfying a contract.
 
-Reuse the adapter installer's preflight/plan/apply/verify shape instead of
-inventing another transaction model.
+## Residual Risk Register
 
-- [ ] Add a small `RepositoryTransaction` service for exact-path staging,
-  temporary-index or equivalent isolation, apply/rollback reporting, and
-  optimistic HEAD checks.
-- [ ] Scaffold preflights the outer repository and either preserves unrelated
-  staged state exactly or refuses before any write. Its isolation commit contains
-  only the intended `.gitignore` delta.
-- [ ] Scaffold failure leaves a recoverable, truthfully reported state; add
-  failure injection at every boundary and assert no unrelated state moves.
-- [ ] Resolve the hooks directory through Git, including gitfiles, worktrees,
-  bare/linked layouts, and `core.hooksPath`.
-- [ ] Never overwrite operator hooks. Install a managed fragment/dispatcher,
-  chain safely, or refuse with an explicit reviewed replacement path. Preserve
-  bytes, order, exit semantics, and uninstallability.
-- [ ] Reverse publication authorization to fail closed: explicit
-  `git.autopush: true` enables; false, absent, malformed, or unknown disables and
-  `doctor` explains why. Update scaffold/template/migration guidance so new
-  domains make an explicit choice rather than inheriting ambiguity.
-- [ ] Preserve the framework root's deliberate `autopush: false`; never publish
-  this remediation automatically.
+| Residual | Local control | Remaining owner |
+|---|---|---|
+| Trusted external execution is authorised but not sandboxed | Default deny, granular permissions, exact config hash, local revocation, bounded/redacted I/O | Human granting trust; future sandbox work only if separately specified |
+| Model read/application/outcome cannot be inferred from delivery | Five distinct evidence states and build-specific matrix | Harness plans and live product probes |
+| Exact external decimals can be lost before reaching YAML | Lexical decimal preservation and strict errors | Domain author must quote/preserve exact external inputs |
+| Scaffold can cross effects Git cannot universally roll back | Preflight, exact staging, preservation, and truthful recoverable-state reporting | Operator only when an explicit recovery instruction is emitted |
+| Supply-chain trust cannot be reduced to zero | Pinned actions/dependency, full commit input, installer-byte verification, documented trust root | Release operator |
 
-**Gate:** adversarial staged-state, worktree, custom-hooks-path, existing-hook,
-parse-failure, and partial-failure tests show exact preservation; no send occurs
-without explicit valid authorization.
+## Execution Variance
 
-## Phase 4 — Give Definitions One Canonical Owner
+The original plan required commits at each phase or smaller meaning boundary
+and updates after every boundary. Execution instead accumulated the integrated
+mechanical work in one **84-file** C1 commit (8,800 insertions, 925 deletions),
+then placed the 33-file doctrine/evidence/generated reconciliation in C2. C3
+returned to a smaller boundary for dependency direction, typed sync results,
+and deterministic checkout bytes. C1 preserved one internally consistent
+frozen candidate, but enlarged the review and bisection radius beyond the
+designed shape.
 
-- [ ] Introduce one strict YAML loader for thing frontmatter, schemas, sentinel,
-  AGENTS frontmatter, fixtures, and internal config. Reject duplicate mapping
-  keys with file/key/location; preserve the deliberate YAML-1.1 `on` handling or
-  replace it consistently.
-- [ ] Add corpus regression fixtures for duplicate status, dependencies,
-  origin/verified, Git policy, and schema keys.
-- [ ] Introduce one structural-reference registry describing field shape,
-  target cardinality, egress privacy, reverse indexing, validation, and cue
-  relevance. Make validation, indexes, touchpoints, MCP egress, candidates, and
-  schema-field ownership consume it.
-- [ ] Extend candidate semantics to additions, modifications, deletions, and
-  renames. Each state receives a truthful cue question; a new thing is not
-  presumed incapable of contradiction.
-- [ ] Delete duplicated field lists only after cross-builder tests prove the
-  registry feeds each consumer.
+The umbrella plan was also updated late rather than after every meaning
+boundary. That process variance is recorded rather than rewritten as intended
+execution. Traceability is recovered through the immutable original design at
+`27b95e739f78cad6fa609cee7b1359897ccf40ae`, the Phase 0 disposition, the
+finding-by-finding implementation evidence, focused regression files, and the
+C1/C2/C3 split. Future work should return to smaller boundary commits and live
+forward-state updates.
 
-**Gate:** duplicate keys cannot enter any operative definition surface; adding
-one registered structural field makes all relevant consumers see it or makes a
-fitness test fail.
+## Closeout Outcome
 
-## Phase 5 — Make Mechanical State And Evidence Semantics Total
-
-Split into meaning-boundary commits; the grouping here is about one guarantee:
-machine-readable conditions never crash, fall silent, or return success for
-failure.
-
-### 5A — Trigger and workflow state
-
-- [ ] Compile trigger declarations into typed results: `fired`, `not-fired`,
-  `unevaluable`, or `invalid`, with reasons. Evaluators do not throw on input.
-- [ ] Invalid thresholds, unknown conditions/types, absent watched things, and
-  missing subtasks are explicit validation/evaluation results. Empty or partial
-  sets never become success.
-- [ ] Use prior-commit and candidate views to enforce declared workflow
-  transition edges mechanically. Whether work deserves advancement remains
-  semantic; whether an edge exists is not.
-
-### 5B — Calculation and eval evidence
-
-- [ ] Route exact-decimal and strict-mode fixes through
-  `deterministic-calculation`: preserve numeric lexemes or require quoted exact
-  decimals; strict non-evaluability is Error; excluded/quarantined inputs are
-  visible whenever they change the input set.
-- [ ] Make `validates_clean` invoke the complete validation boundary and retain
-  scan findings.
-- [ ] Agent process non-zero, timeout, parse failure, agent-reported error,
-  validation error, or failed assertion makes the trial fail and the command
-  return non-zero.
-- [ ] Use collision-resistant run identity and record full framework commit,
-  fixture content hash, CLI/tool version, model, effort, harness/build, process
-  status, validation summary, and assertion result.
-
-### 5C — Session evidence vocabulary
-
-- [ ] Reconcile with `session-start-hardening`; do not create a parallel gate.
-- [ ] Record contract version/content fingerprint and distinguish `emitted`,
-  `received-whole`, `read-observed`, `applied-evidence`, and
-  `outcome-validated`. No stronger state is inferred from a weaker one.
-- [ ] Invalidate freshness when the operative contract changes, not whenever
-  unrelated HEAD advances.
-- [ ] Replace vacuous or permissive assertions with behavioural tests.
-
-**Gate:** malformed definitions produce findings rather than exceptions or
-silence; every failed eval leg returns non-zero; session reports use only the
-evidence level actually established.
-
-## Phase 6 — Unify The Three Adapter Lifecycles And Compact Forward State
-
-- [ ] Replace Cowork assembler's fetch-under-an-estate-sync-heading with the
-  shared sync application service and its typed result; reused clean clones
-  fast-forward, dirty/diverged clones are reported and never resolved.
-- [ ] Remove private cross-module imports in assembly by promoting only the
-  smallest stable application ports required.
-- [ ] Define one lifecycle result vocabulary across Claude Code, Codex, and
-  Cowork: dispatched, executed, output received, contract whole/deferred,
-  floor active, write feedback available, and publication authority.
-- [ ] Publish an internal capability/evidence matrix by exact harness build;
-  “adapter exists” is never a synonym for adherence or full support.
-- [ ] Complete local automated renderer/inspector/runner/install/sync tests for
-  all three adapters.
-- [ ] Reconcile completed narrative out of the 2,021-line adapter foundation and
-  other oversized live plans into stable evidence/review artifacts. Live plans
-  retain current state, remaining gates, decisions, and links; Git retains the
-  detailed evolution. Do not delete evidence.
-- [ ] Finish agent-executable parts of `session-start-hardening`,
-  `vendor-harness-adapter-foundation`, and `cowork-adapter`; preserve any real
-  live-product gate as pending rather than self-certifying it.
-
-**Gate:** one shared service implements each lifecycle action; plans are
-forward-readable; local matrix green; unavailable live rows remain explicitly
-pending.
-
-## Phase 7 — Harden Birth, Release, And Claim Surfaces
-
-- [ ] Treat templates as build inputs: instantiate every scaffold/evidence/thing
-  template into disposable fixtures and validate the result under its target
-  schema. Reconcile the check into `mechanical-coherence-checks-backlog`.
-- [ ] Repair example language to separate declared policy, enforcement
-  mechanism, and evidence of operation; label legal examples synthetic and
-  non-authoritative.
-- [ ] Replace moving-branch pipe-to-shell guidance with versioned release
-  artifacts and integrity verification. Pin dependencies and CI actions where
-  practicable; document the remaining trust root.
-- [ ] Reconcile manifesto, README, operator docs, framework map, adapter matrix,
-  and release claims around the accepted vocabulary: deterministic structural
-  layer, probabilistic interpreter, recorded accepted state, incomplete reason
-  trace, and build-specific harness evidence.
-- [ ] Preserve the manifesto's thesis and efficiency hypothesis; narrow only
-  claims the substrate cannot test or guarantee.
-
-**Gate:** a fresh domain born from every supported template validates and runs
-its declared floor; installation guidance is version-pinned; public prose does
-not claim a stronger guarantee than the acceptance matrix demonstrates.
-
-## Phase 8 — Adversarial Acceptance And Independent Closeout
-
-### Agent-executable acceptance
-
-- [ ] Full unit/integration suite green on Windows and the available POSIX CI
-  surface.
-- [ ] Framework validation, examples, coherence, index checks, provenance,
-  doctor, package/build, and template-instantiation checks clean at one full
-  commit.
-- [ ] Real-Git adversarial suite covers staged/worktree mismatch, concurrent
-  HEAD movement, dirty MCP serving, malicious `.mcp.json`, unrelated staged
-  state, existing hooks, malformed publication policy, invalid transitions,
-  total trigger results, strict calculations, and failed eval exit status.
-- [ ] Produce a stable implementation evidence artifact mapping every review
-  finding to commit, test, disposition, residual risk, and owner.
-- [ ] Update this plan after every meaning boundary; do not wait until the end
-  to reconstruct progress.
-
-### Human/harness acceptance
-
-- [ ] Fresh Claude Code run: exact build, automatic lifecycle, contract receipt,
-  read/application probe, nested domain floor, and write feedback.
-- [ ] Fresh Codex run: exact app/CLI build, instruction delivery, lifecycle
-  dispatch, restricted→approved Git path, nested domain floor, and write
-  feedback limitations.
-- [ ] Fresh Cowork remote and local runs: exact build/plugin, assembly sync,
-  contract receipt, adherence probe, commit floor, and publication path.
-- [ ] Operator decides release/push after reviewing change reconciliation,
-  changelog, version, compatibility/migration notes, and residual risk.
-- [ ] Claude receives this immutable review, this plan, the implementation
-  evidence, and the final commit range; Claude independently marks each finding
-  closed, narrowed, rejected, or reopened.
-
-**Done when:** every critical/high finding is closed or explicitly accepted by
-the operator with residual risk; lower findings are closed or owned with a
-dated gate; the three-harness evidence matrix says exactly what ran; Claude's
-assessment is captured; validation/coherence/tests are clean; the tree is
-committed; publication debt is reported. A public push is a separate release
-decision and is not a completion criterion for the local remediation.
-
-## Execution Discipline
-
-- Commit at each phase or smaller meaning boundary; never one giant remediation
-  commit.
-- Significant rule changes run cue → assimilate → walk → seal across the full
-  corpus, including insights and human docs.
-- Add a test before or with every mechanical fix. A prose claim does not close a
-  code finding; a code path does not close a live-harness claim.
-- Prefer deletion/consolidation of duplicated mechanism over another drift
-  checker. Add checks only where truth is mechanically decidable and built from
-  a different artifact than the surface being checked.
-- Do not broaden the ontology while transaction work is open unless a finding
-  proves a missing primitive.
-- Never use `--no-verify`, never force-push, never silently overwrite operator
-  state, and never promote unavailable evidence into “passed.”
+The completion rule is satisfied at C3 plus this record seal: the final tested
+architecture SHA, Windows and WSL results, and exact-byte acceptance are written
+into the implementation evidence, while the record candidate remains subject
+to the installed frozen-index hook. External acceptance stays with its named
+owners. Publication debt is reported separately; no authority to push is
+inferred.
