@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import subprocess
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -43,3 +44,22 @@ def test_relation_choices_must_exist_in_the_scaffold_schema(tmp_path):
 def test_current_framework_birth_sources_are_clean():
     root = Path(__file__).resolve().parents[2]
     assert template_source_findings(root) == []
+
+
+def test_birth_sources_have_checkout_stable_lf_bytes():
+    root = Path(__file__).resolve().parents[2]
+    paths = sorted(
+        path.relative_to(root).as_posix()
+        for holder in (root / "templates", root / "tools" / "tests" / "fixtures")
+        for path in holder.rglob("*")
+        if path.is_file()
+    )
+    checked = subprocess.run(
+        ["git", "-C", str(root), "check-attr", "eol", "--", *paths],
+        capture_output=True,
+        text=True,
+    )
+    assert checked.returncode == 0, checked.stderr
+    rows = checked.stdout.splitlines()
+    assert len(rows) == len(paths)
+    assert all(row.endswith(": eol: lf") for row in rows), rows

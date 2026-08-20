@@ -927,8 +927,10 @@ def test_doctor_uses_shared_hook_execution_fallback(tmp_path, capsys, monkeypatc
 
     observed = {}
 
-    def compatible_result(root):
+    def compatible_result(root, hook="pre-commit", *, expected_bytes=None):
         observed["root"] = Path(root)
+        observed["hook"] = hook
+        observed["expected_bytes"] = expected_bytes
         return {"hook": "pre-commit", "supported": True, "executed": True,
                 "passed": True, "via": "direct-compatible", "returncode": 0,
                 "stdout": "", "stderr": "", "detail": ""}
@@ -939,6 +941,8 @@ def test_doctor_uses_shared_hook_execution_fallback(tmp_path, capsys, monkeypatc
 
     assert rc == 0
     assert observed["root"] == tmp_path.resolve()
+    assert observed["hook"] == "pre-commit"
+    assert observed["expected_bytes"]
     assert "pre-commit hook EXECUTES" in out
 
 
@@ -2475,30 +2479,32 @@ def test_estate_sync_discovery_walks_root_and_domain_children(tmp_path):
 
 
 def test_estate_sync_fast_forwards_when_remote_ahead(tmp_path):
-    from markdownllm.sync import sync_repo
+    from markdownllm.sync import SyncState, sync_repo
     src, clone = _seed_pair(tmp_path)
     (src / "a.txt").write_text("two\n", encoding="utf-8")
     _sync_git(src, "commit", "-q", "-am", "c2")
     res = sync_repo(clone)
-    assert res["state"] == "synced" and res["moved"] and "+1" in res["detail"]
+    assert res.state is SyncState.SYNCED
+    assert res.moved and "+1" in res.detail
     assert (clone / "a.txt").read_text(encoding="utf-8") == "two\n"
 
 
 def test_estate_sync_reports_ahead_never_pushes(tmp_path):
-    from markdownllm.sync import sync_repo
+    from markdownllm.sync import SyncState, sync_repo
     src, clone = _seed_pair(tmp_path)
     (clone / "b.txt").write_text("local\n", encoding="utf-8")
     _sync_git(clone, "add", "-A")
     _sync_git(clone, "commit", "-q", "-m", "local work")
     res = sync_repo(clone)
-    assert res["state"] == "ahead" and "unpushed" in res["detail"]
+    assert res.state is SyncState.AHEAD
+    assert "unpushed" in res.detail
     # the remote must NOT have received the commit
     log = _sync_git(src, "log", "--oneline")
     assert "local work" not in log.stdout
 
 
 def test_estate_sync_divergence_reported_never_resolved(tmp_path):
-    from markdownllm.sync import sync_repo
+    from markdownllm.sync import SyncState, sync_repo
     src, clone = _seed_pair(tmp_path)
     (src / "a.txt").write_text("remote2\n", encoding="utf-8")
     _sync_git(src, "commit", "-q", "-am", "remote c2")
@@ -2506,21 +2512,21 @@ def test_estate_sync_divergence_reported_never_resolved(tmp_path):
     _sync_git(clone, "add", "-A")
     _sync_git(clone, "commit", "-q", "-m", "local c2")
     res = sync_repo(clone)
-    assert res["state"] == "diverged" and not res["moved"]
-    assert "+1 local / +1 remote" in res["detail"]
+    assert res.state is SyncState.DIVERGED and not res.moved
+    assert "+1 local / +1 remote" in res.detail
     # no merge commit was created
     log = _sync_git(clone, "log", "--oneline")
     assert len(log.stdout.strip().splitlines()) == 2
 
 
 def test_estate_sync_dirty_tree_skips_pull(tmp_path):
-    from markdownllm.sync import sync_repo
+    from markdownllm.sync import SyncState, sync_repo
     src, clone = _seed_pair(tmp_path)
     (src / "a.txt").write_text("remote2\n", encoding="utf-8")
     _sync_git(src, "commit", "-q", "-am", "remote c2")
     (clone / "a.txt").write_text("uncommitted local edit\n", encoding="utf-8")
     res = sync_repo(clone)
-    assert res["state"] == "dirty" and not res["moved"]
+    assert res.state is SyncState.DIRTY and not res.moved
     # the uncommitted edit survives untouched
     assert (clone / "a.txt").read_text(encoding="utf-8") == "uncommitted local edit\n"
 
@@ -2542,12 +2548,12 @@ def test_estate_sync_degraded_dirty_tree_keeps_cached_marker(
     monkeypatch.setattr(sync_mod, "_git", offline_fetch)
     res = sync_mod.sync_repo(clone)
 
-    assert res["state"] == "offline"
-    assert res["detail"] == "working tree not clean (cached)"
+    assert res.state is sync_mod.SyncState.OFFLINE
+    assert res.detail == "working tree not clean (cached)"
 
 
 def test_estate_sync_local_only_repo_is_legitimate(tmp_path):
-    from markdownllm.sync import sync_repo
+    from markdownllm.sync import SyncState, sync_repo
     solo = tmp_path / "solo"
     solo.mkdir()
     _sync_git(solo, "init", "-q")
@@ -2555,7 +2561,7 @@ def test_estate_sync_local_only_repo_is_legitimate(tmp_path):
     _sync_git(solo, "add", "-A")
     _sync_git(solo, "commit", "-q", "-m", "c1")
     res = sync_repo(solo)
-    assert res["state"] == "local-only"
+    assert res.state is SyncState.LOCAL_ONLY
 
 
 def test_estate_sync_status_mode_reports_debt_without_network(tmp_path, capsys):
@@ -2575,14 +2581,14 @@ def test_estate_sync_require_fresh_splits_manual_gate_from_lifecycle_fallback(
     from markdownllm import sync as sync_mod
     repo = tmp_path / "repo"
     repo.mkdir()
-    result = {
-        "repo": repo,
-        "state": "permission-denied",
-        "detail": "orienting from last-fetched state",
-        "moved": False,
-    }
+    current = [sync_mod.SyncResult(
+        repo=repo,
+        state=sync_mod.SyncState.PERMISSION_DENIED,
+        detail="orienting from last-fetched state",
+    )]
     monkeypatch.setattr(sync_mod, "discover_repos", lambda _root: [repo])
-    monkeypatch.setattr(sync_mod, "sync_repo", lambda *_args, **_kw: result)
+    monkeypatch.setattr(
+        sync_mod, "sync_repo", lambda *_args, **_kw: current[0])
 
     lifecycle_rc = sync_mod.cmd_estate_sync(_ns(
         paths=[str(repo)], status=False, require_fresh=False, timeout=20))
@@ -2590,8 +2596,10 @@ def test_estate_sync_require_fresh_splits_manual_gate_from_lifecycle_fallback(
     strict_rc = sync_mod.cmd_estate_sync(_ns(
         paths=[str(repo)], status=False, require_fresh=True, timeout=20))
     strict_out = capsys.readouterr().out
-    result["state"] = "up-to-date"
-    result["detail"] = ""
+    current[0] = sync_mod.SyncResult(
+        repo=repo,
+        state=sync_mod.SyncState.UP_TO_DATE,
+    )
     fresh_rc = sync_mod.cmd_estate_sync(_ns(
         paths=[str(repo)], status=False, require_fresh=True, timeout=20))
     fresh_out = capsys.readouterr().out
@@ -2607,12 +2615,12 @@ def test_estate_sync_require_fresh_splits_manual_gate_from_lifecycle_fallback(
 
 
 def test_estate_sync_in_progress_merge_is_skipped(tmp_path):
-    from markdownllm.sync import sync_repo
+    from markdownllm.sync import SyncState, sync_repo
     src, clone = _seed_pair(tmp_path)
     gitdir = clone / ".git"
     (gitdir / "MERGE_HEAD").write_text("0" * 40 + "\n", encoding="utf-8")
     res = sync_repo(clone)
-    assert res["state"] == "in-operation" and not res["moved"]
+    assert res.state is SyncState.IN_OPERATION and not res.moved
 
 
 def test_estate_sync_global_deadline_skips_remote_and_reads_cached_state(
@@ -2630,8 +2638,8 @@ def test_estate_sync_global_deadline_skips_remote_and_reads_cached_state(
     res = sync_mod.sync_repo(
         clone, deadline=sync_mod.time.monotonic() - 1)
 
-    assert res["state"] == "budget-exhausted"
-    assert "last-fetched state" in res["detail"]
+    assert res.state is sync_mod.SyncState.BUDGET_EXHAUSTED
+    assert "last-fetched state" in res.detail
     assert not any(args and args[0] in ("fetch", "pull") for args in calls)
 
 
@@ -3189,9 +3197,9 @@ def _write_attest(root, age_hours=0):
                  capture_output=True, text=True).stdout.strip()
     stamp = (_dt.datetime.now(_dt.timezone.utc)
              - _dt.timedelta(hours=age_hours)).isoformat()
-    from markdownllm.session import _contract_fingerprint
+    from markdownllm.session_contract import contract_fingerprint
     ((root / gd).resolve() / "mdllm-attest").write_text(
-        f"{stamp} deadbeef contract={_contract_fingerprint(root)} "
+        f"{stamp} deadbeef contract={contract_fingerprint(root)} "
         "evidence=emitted delivery=digest-only\n", encoding="utf-8")
 
 

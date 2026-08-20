@@ -43,7 +43,9 @@ from markdownllm.validation import (
     session_gate_findings, SESSION_GATE_WINDOW_HOURS,
     cmd_validate,
 )
-from markdownllm.repo import git_short_sha, framework_version, _version_lt, TIERS
+from markdownllm.repo import git_short_sha, framework_version, version_lt, TIERS
+
+_version_lt = version_lt  # compatibility for the historical CLI facade
 from markdownllm.triggers import (
     TriggerEvaluation, TriggerOutcome, TriggerResult,
     evaluate, evaluate_results, evaluate_typed, cmd_triggers,
@@ -66,8 +68,10 @@ from markdownllm.evals import (
     check_assertions, seed_run_dir, eval_report, _resolve_claude_cli, cmd_eval,
 )
 from markdownllm.kernel_gen import (
-    KERNEL_RE, _token_counter, build_kernel, cmd_kernel,
+    KERNEL_RE, token_counter, build_kernel, cmd_kernel,
 )
+
+_token_counter = token_counter  # compatibility for the historical CLI facade
 from markdownllm.domain_kernel import (
     DOMAIN_KERNEL_BLOCKS, apply_domain_kernel, build_domain_kernel_blocks,
     cmd_domain_kernel, domain_kernel_status,
@@ -88,7 +92,6 @@ from markdownllm.adapter_install import (
     InstallRefused, InstallStateChanged, AtomicInstallError,
     WholeArtifactPolicy, TopLevelJsonFragmentPolicy,
     target_for_adapter, preflight_install, apply_install,
-    cmd_adapter_install,
 )
 from markdownllm.lifecycle_runner import (
     StepExecution, LifecycleExecution, execute_lifecycle,
@@ -119,7 +122,7 @@ from markdownllm.sync import (
     PublicationPolicy, PublicationPolicyState, discover_repos,
     publication_policy, sync_repo, cmd_estate_sync,
 )
-from markdownllm.cli import build_cli, main
+from markdownllm.cli import build_cli, cmd_adapter_install, main
 
 if __name__ == "__main__":
     sys.exit(main())

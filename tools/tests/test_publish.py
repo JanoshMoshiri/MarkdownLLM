@@ -24,7 +24,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from markdownllm.publish import publish, redact, resolve_default_branch  # noqa: E402
+from markdownllm.git_transport import redact  # noqa: E402
+from markdownllm.publish import publish, resolve_default_branch  # noqa: E402
 
 
 def _run(cwd: Path, *args: str) -> subprocess.CompletedProcess:

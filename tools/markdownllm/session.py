@@ -26,6 +26,7 @@ from .yaml_loader import load_version_sentinel
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
 from .model import is_terminal, parse_frontmatter, scan
 from .repository_view import RepositoryHeadMoved, RepositoryView, RepositoryViewError
+from .session_contract import contract_fingerprint, kernel_path
 from .validation import version_tuple
 
 def _velocity_signal(domain: Path) -> str:
@@ -269,10 +270,7 @@ def _floor_status(root: Path) -> str | None:
 
 
 
-def _kernel_path() -> Path:
-    from .scaffold import MDLLM_ENTRY
-
-    return MDLLM_ENTRY.resolve().parents[1] / "kernel.md"
+_kernel_path = kernel_path
 
 
 def _kernel_reference(domain: Path) -> str:
@@ -302,27 +300,7 @@ def _kernel_integrity(text: str) -> tuple[int, str]:
     return lines, hashlib.sha256(normal.encode("utf-8")).hexdigest()[:12]
 
 
-def _contract_fingerprint(domain: Path) -> str:
-    """Fingerprint the operative Tier-0 definition, not unrelated HEAD.
-
-    A session legitimately advances Git after it starts, so HEAD equality
-    would expire every honest write.  The contract changes only when the
-    framework kernel or the opened domain's entry contract changes.  Labels,
-    missing markers and byte lengths are included to make concatenation
-    unambiguous; line endings are normalised across checkouts.
-    """
-    digest = hashlib.sha256()
-    for label, path in (("framework-kernel", _kernel_path()),
-                        ("domain-agents", domain / "AGENTS.md")):
-        try:
-            raw = path.read_text(encoding="utf-8").replace("\r\n", "\n")
-        except (OSError, UnicodeError):
-            raw = "<missing>"
-        payload = raw.encode("utf-8")
-        digest.update(label.encode("utf-8") + b"\0")
-        digest.update(str(len(payload)).encode("ascii") + b"\0")
-        digest.update(payload)
-    return digest.hexdigest()
+_contract_fingerprint = contract_fingerprint
 
 
 # Evidence classes are ordered only by what additional observation each

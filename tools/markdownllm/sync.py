@@ -26,10 +26,7 @@ Doctrine, by construction:
 
 from __future__ import annotations
 
-import base64
-import os
 import re
-import subprocess
 import time
 from dataclasses import dataclass
 from enum import Enum
@@ -37,46 +34,74 @@ from pathlib import Path
 
 import yaml
 
+from .git_transport import git_command, redact
 from .yaml_loader import load_yaml
 
 DEFAULT_TIMEOUT = 20  # seconds per network call; a hook that can hang a session start is worse than none
 ESTATE_GLOBAL_TIMEOUT = 75
 
 
-def _redact(text: str, token: str | None = None) -> str:
-    """Late-bind the shared transport redactor without a module cycle.
+class SyncState(str, Enum):
+    """Closed vocabulary for one repository's synchronization outcome."""
 
-    ``publish`` consumes this module's publication-policy port, while sync
-    consumes publish's credential redaction.  Importing both at module load
-    makes CLI startup order-dependent; the function boundary keeps the shared
-    implementations single-sourced and the import graph executable.
-    """
-    from .publish import redact
-    return redact(text, token)
+    SYNCED = "synced"
+    UP_TO_DATE = "up-to-date"
+    AHEAD = "ahead"
+    DIVERGED = "diverged"
+    DIRTY = "dirty"
+    LOCAL_ONLY = "local-only"
+    NO_UPSTREAM = "no-upstream"
+    DETACHED = "detached"
+    UNBORN = "unborn"
+    IN_OPERATION = "in-operation"
+    OFFLINE = "offline"
+    AUTH_FAILED = "auth-failed"
+    PERMISSION_DENIED = "permission-denied"
+    FETCH_FAILED = "fetch-failed"
+    PULL_FAILED = "pull-failed"
+    BUDGET_EXHAUSTED = "budget-exhausted"
+
+    def __str__(self) -> str:
+        return self.value
+
+
+@dataclass(frozen=True)
+class SyncResult:
+    """Immutable observation returned by :func:`sync_repo`."""
+
+    repo: Path
+    state: SyncState
+    detail: str = ""
+    moved: bool = False
+
+    def __post_init__(self) -> None:
+        if self.moved and self.state is not SyncState.SYNCED:
+            raise ValueError("only a synced result may report repository movement")
+
+
+_DEGRADED_SYNC_STATES = frozenset({
+    SyncState.OFFLINE,
+    SyncState.AUTH_FAILED,
+    SyncState.PERMISSION_DENIED,
+    SyncState.FETCH_FAILED,
+    SyncState.BUDGET_EXHAUSTED,
+})
 
 
 def _git(repo: Path, *args: str, timeout: int = DEFAULT_TIMEOUT,
          token: str | None = None):
     """Run git non-interactively; None on timeout (caller treats as offline).
 
-    `token`, when supplied, follows publish.py's command-scoped credential
-    route: an HTTP header on this process only. It is never written to a URL,
-    git config, the environment, or disk.
+    ``_git`` remains the sync service's focused test seam.  Construction and
+    credential handling belong to the neutral Git transport boundary.
     """
-    env = os.environ.copy()
-    env["GIT_TERMINAL_PROMPT"] = "0"  # never prompt — degrade instead
-    env.setdefault("GCM_INTERACTIVE", "never")
-    command = ["git"]
-    if token:
-        auth = base64.b64encode(
-            f"x-access-token:{token}".encode()).decode()
-        command += ["-c", f"http.extraheader=Authorization: Basic {auth}"]
-    command += list(args)
-    try:
-        return subprocess.run(command, cwd=repo, capture_output=True,
-                              text=True, timeout=timeout, env=env)
-    except subprocess.TimeoutExpired:
-        return None
+    return git_command(
+        repo,
+        *args,
+        timeout=timeout,
+        token=token,
+        non_interactive=True,
+    )
 
 
 def discover_repos(root: Path) -> list[Path]:
@@ -130,136 +155,143 @@ def _classify_fetch_failure(stderr: str) -> str:
 def _first_stderr_line(stderr: str, token: str | None = None) -> str:
     for line in (stderr or "").splitlines():
         if line.strip():
-            return _redact(line.strip(), token)[:120]
+            return redact(line.strip(), token)[:120]
     return "no stderr"
 
 
 def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
               deadline: float | None = None,
-              token: str | None = None) -> dict:
-    """One repo's sync outcome: {'repo', 'state', 'detail', 'moved'}.
+              token: str | None = None) -> SyncResult:
+    """Return one immutable, typed repository synchronization observation.
 
-    `token` is optional command-scoped authentication compatible with
-    publish.py. Callers serving ephemeral containers may pass the token they
-    already hold; local callers leave it `None` and use ambient git auth.
+    ``token`` is optional command-scoped authentication. Callers serving
+    ephemeral containers may pass the token they already hold; local callers
+    leave it ``None`` and use ambient Git authentication.
 
     States: synced / up-to-date / ahead / diverged / dirty / local-only /
     no-upstream / detached / unborn / in-operation / offline / auth-failed /
     permission-denied / fetch-failed / pull-failed / budget-exhausted. Only
     'synced' moves the tree; everything else reports.
     """
-    out = {"repo": repo, "state": "up-to-date", "detail": "", "moved": False}
+    state = SyncState.UP_TO_DATE
+    detail = ""
+    moved = False
+
+    def result() -> SyncResult:
+        return SyncResult(repo=repo, state=state, detail=detail, moved=moved)
 
     remotes = _git(repo, "remote")
     if remotes is None or not remotes.stdout.strip():
-        out["state"] = "local-only"
-        return out
+        state = SyncState.LOCAL_ONLY
+        return result()
 
     gitdir_r = _git(repo, "rev-parse", "--git-dir")
     gitdir = repo / (gitdir_r.stdout.strip() if gitdir_r and gitdir_r.returncode == 0 else ".git")
     if any((gitdir / f).exists() for f in ("MERGE_HEAD", "rebase-merge", "rebase-apply")):
-        out["state"] = "in-operation"
-        out["detail"] = "merge/rebase in progress — skipped"
-        return out
+        state = SyncState.IN_OPERATION
+        detail = "merge/rebase in progress — skipped"
+        return result()
 
     if (r := _git(repo, "rev-parse", "--verify", "-q", "HEAD")) is None or r.returncode != 0:
-        out["state"] = "unborn"
-        return out
+        state = SyncState.UNBORN
+        return result()
     if (r := _git(repo, "symbolic-ref", "-q", "--short", "HEAD")) is None or r.returncode != 0:
-        out["state"] = "detached"
-        out["detail"] = "detached HEAD — skipped"
-        return out
+        state = SyncState.DETACHED
+        detail = "detached HEAD — skipped"
+        return result()
 
     if fetch:
         remaining = ((deadline - time.monotonic())
                      if deadline is not None else float(timeout))
         if remaining <= 0:
             f = None
-            out["state"] = "budget-exhausted"
-            out["detail"] = ("global estate deadline exhausted before fetch "
-                             "— orienting from last-fetched state")
+            state = SyncState.BUDGET_EXHAUSTED
+            detail = ("global estate deadline exhausted before fetch "
+                      "— orienting from last-fetched state")
         else:
             f = _git(repo, "fetch", "--quiet",
                      timeout=min(float(timeout), remaining), token=token)
-        if f is None and out["state"] != "budget-exhausted":
+        if f is None and state is not SyncState.BUDGET_EXHAUSTED:
             if deadline is not None and time.monotonic() >= deadline:
-                out["state"] = "budget-exhausted"
-                out["detail"] = ("global estate deadline exhausted during "
-                                 "fetch — orienting from last-fetched state")
+                state = SyncState.BUDGET_EXHAUSTED
+                detail = ("global estate deadline exhausted during "
+                          "fetch — orienting from last-fetched state")
             else:
-                out["state"] = "offline"
-                out["detail"] = ("fetch timed out — orienting from "
-                                 "last-fetched state")
+                state = SyncState.OFFLINE
+                detail = ("fetch timed out — orienting from "
+                          "last-fetched state")
         elif f is not None and f.returncode != 0:
-            out["state"] = _classify_fetch_failure(f.stderr)
-            out["detail"] = "orienting from last-fetched state"
-            if out["state"] == "fetch-failed":
-                out["detail"] = (f"undiagnosed ({_first_stderr_line(f.stderr, token)}) — "
-                                 f"orienting from last-fetched state")
-            elif out["state"] == "permission-denied":
-                out["detail"] = (f"permission denied "
-                                 f"({_first_stderr_line(f.stderr, token)}) — "
-                                 f"orienting from last-fetched state")
+            state = SyncState(_classify_fetch_failure(f.stderr))
+            detail = "orienting from last-fetched state"
+            if state is SyncState.FETCH_FAILED:
+                detail = (
+                    f"undiagnosed ({_first_stderr_line(f.stderr, token)}) — "
+                    "orienting from last-fetched state")
+            elif state is SyncState.PERMISSION_DENIED:
+                detail = (
+                    "permission denied "
+                    f"({_first_stderr_line(f.stderr, token)}) — "
+                    "orienting from last-fetched state")
 
     counts = _counts(repo)
     if counts is None:
-        if out["state"] in (
-                "offline", "auth-failed", "permission-denied",
-                "fetch-failed", "budget-exhausted"):
-            return out
-        out["state"] = "no-upstream"
-        return out
+        if state in _DEGRADED_SYNC_STATES:
+            return result()
+        state = SyncState.NO_UPSTREAM
+        return result()
     ahead, behind = counts
-    cached = " (cached)" if out["state"] in (
-        "offline", "auth-failed", "permission-denied", "fetch-failed",
-        "budget-exhausted") else ""
-    degraded = out["state"] if cached else None
+    cached = " (cached)" if state in _DEGRADED_SYNC_STATES else ""
+    degraded = state if cached else None
 
     dirty = _git(repo, "status", "--porcelain")
     is_dirty = bool(dirty and dirty.stdout.strip())
 
     if ahead and behind:
-        out["state"] = "diverged"
-        out["detail"] = f"+{ahead} local / +{behind} remote{cached} — a decision is owed, not a merge"
+        state = SyncState.DIVERGED
+        detail = (f"+{ahead} local / +{behind} remote{cached} — "
+                  "a decision is owed, not a merge")
     elif behind:
         if is_dirty:
-            out["state"] = "dirty"
-            out["detail"] = f"+{behind} remote{cached} — pull skipped, working tree not clean"
+            state = SyncState.DIRTY
+            detail = (f"+{behind} remote{cached} — pull skipped, "
+                      "working tree not clean")
         elif degraded:
             reason = ("global estate deadline exhausted"
-                      if degraded == "budget-exhausted" else "fetch failed")
-            out["detail"] = (f"+{behind} remote (cached) — pull skipped, "
-                             f"{reason}")
+                      if degraded is SyncState.BUDGET_EXHAUSTED
+                      else "fetch failed")
+            detail = (f"+{behind} remote (cached) — pull skipped, "
+                      f"{reason}")
         else:
             remaining = ((deadline - time.monotonic())
                          if deadline is not None else float(timeout))
             if remaining <= 0:
                 p = None
-                out["state"] = "budget-exhausted"
-                out["detail"] = (f"+{behind} remote (cached) — pull skipped, "
-                                 "global estate deadline exhausted")
+                state = SyncState.BUDGET_EXHAUSTED
+                detail = (f"+{behind} remote (cached) — pull skipped, "
+                          "global estate deadline exhausted")
             else:
                 p = _git(repo, "pull", "--ff-only", "--quiet",
                          timeout=min(float(timeout), remaining), token=token)
             if p is not None and p.returncode == 0:
-                out["state"] = "synced"
-                out["detail"] = f"+{behind}"
-                out["moved"] = True
-            elif out["state"] != "budget-exhausted":
-                out["state"] = "pull-failed"
+                state = SyncState.SYNCED
+                detail = f"+{behind}"
+                moved = True
+            elif state is not SyncState.BUDGET_EXHAUSTED:
+                state = SyncState.PULL_FAILED
                 err = ((p.stderr.strip().splitlines() or ["?"])[-1]
                        if p else "timeout")
-                out["detail"] = _redact(err, token)
+                detail = redact(err, token)
     elif ahead:
-        out["state"] = "ahead" if not degraded else out["state"]
-        out["detail"] = f"+{ahead} (unpushed){cached}"
+        if not degraded:
+            state = SyncState.AHEAD
+        detail = f"+{ahead} (unpushed){cached}"
     elif is_dirty:
         # Up to date with the remote but uncommitted work in the tree — not
         # sync's problem to fix, but worth a word at session start.
         if not degraded:
-            out["state"] = "dirty"
-        out["detail"] = f"working tree not clean{cached}"
-    return out
+            state = SyncState.DIRTY
+        detail = f"working tree not clean{cached}"
+    return result()
 
 
 class PublicationPolicyState(str, Enum):
@@ -440,14 +472,22 @@ def cmd_autopush(args) -> int:
 
 
 _LABEL = {
-    "synced": "synced", "up-to-date": "up-to-date", "ahead": "ahead",
-    "diverged": "DIVERGED", "dirty": "dirty", "local-only": "local-only",
-    "no-upstream": "no-upstream", "detached": "detached", "unborn": "unborn",
-    "in-operation": "in-operation", "offline": "offline",
-    "auth-failed": "auth-failed", "permission-denied": "permission-denied",
-    "pull-failed": "pull-failed",
-    "fetch-failed": "fetch-failed",
-    "budget-exhausted": "budget-exhausted",
+    SyncState.SYNCED: "synced",
+    SyncState.UP_TO_DATE: "up-to-date",
+    SyncState.AHEAD: "ahead",
+    SyncState.DIVERGED: "DIVERGED",
+    SyncState.DIRTY: "dirty",
+    SyncState.LOCAL_ONLY: "local-only",
+    SyncState.NO_UPSTREAM: "no-upstream",
+    SyncState.DETACHED: "detached",
+    SyncState.UNBORN: "unborn",
+    SyncState.IN_OPERATION: "in-operation",
+    SyncState.OFFLINE: "offline",
+    SyncState.AUTH_FAILED: "auth-failed",
+    SyncState.PERMISSION_DENIED: "permission-denied",
+    SyncState.PULL_FAILED: "pull-failed",
+    SyncState.FETCH_FAILED: "fetch-failed",
+    SyncState.BUDGET_EXHAUSTED: "budget-exhausted",
 }
 
 
@@ -471,12 +511,14 @@ def cmd_estate_sync(args) -> int:
                          deadline=deadline) for r in repos]
     debt = 0
     for res in results:
-        name = res["repo"].name
-        label = _LABEL.get(res["state"], res["state"])
+        name = res.repo.name
+        label = _LABEL[res.state]
         line = f"- `{name}`: {label}"
-        if res["detail"]:
-            line += f" — {res['detail']}" if res["state"] != "synced" else f" ({res['detail']})"
-        if status_only and res["state"] not in ("ahead", "diverged", "dirty"):
+        if res.detail:
+            line += (f" ({res.detail})" if res.state is SyncState.SYNCED
+                     else f" — {res.detail}")
+        if status_only and res.state not in {
+                SyncState.AHEAD, SyncState.DIVERGED, SyncState.DIRTY}:
             continue  # debt view: only what the estate cannot see yet
         print(line)
         if status_only:
@@ -491,12 +533,17 @@ def cmd_estate_sync(args) -> int:
         return 0
 
     if require_fresh:
-        fresh_states = {"synced", "up-to-date", "ahead", "local-only"}
+        fresh_states = {
+            SyncState.SYNCED,
+            SyncState.UP_TO_DATE,
+            SyncState.AHEAD,
+            SyncState.LOCAL_ONLY,
+        }
         incomplete = [res for res in results
-                      if res["state"] not in fresh_states]
+                      if res.state not in fresh_states]
         if incomplete:
             summary = ", ".join(
-                f"{res['repo'].name}={_LABEL.get(res['state'], res['state'])}"
+                f"{res.repo.name}={_LABEL[res.state]}"
                 for res in incomplete)
             print(f"\nFresh sync incomplete: {summary}.")
             print("Cached or unresolved state is not fresh state. In a "
@@ -504,8 +551,9 @@ def cmd_estate_sync(args) -> int:
                   "one-command network/filesystem approval.")
             return 1
 
-    moved = [res["repo"] for res in results if res["moved"]]
-    diverged = [res["repo"].name for res in results if res["state"] == "diverged"]
+    moved = [res.repo for res in results if res.moved]
+    diverged = [res.repo.name for res in results
+                if res.state is SyncState.DIVERGED]
     if moved:
         roots = " ".join(str(m) for m in moved)
         print(f"\n{len(moved)} repo(s) moved — consider `mdllm estate-check {roots}` "

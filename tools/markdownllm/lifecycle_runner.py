@@ -27,7 +27,7 @@ from .harness_ports import (
     LifecycleBinding,
     LifecycleOutputPort,
 )
-from .scaffold import MDLLM_ENTRY
+from .hook_contract import MDLLM_ENTRY
 
 
 @dataclass(frozen=True)

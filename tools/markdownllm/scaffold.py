@@ -26,6 +26,7 @@ from .boundary import TERMS_FILE
 from .harness_ports import (
     HarnessContext, RenderPort, ScaffoldNoticePort, ShortcutPort,
 )
+from .hook_contract import HookByteContract, MDLLM_ENTRY
 from .runtime import SH_RESOLVE, execution_test_hook
 from .domain_kernel import apply_domain_kernel, build_domain_kernel_blocks
 from .model import ID_RE, parse_frontmatter
@@ -33,8 +34,6 @@ from .repository_transaction import (
     RepositoryTransaction, RepositoryTransactionError,
 )
 from .yaml_loader import load_version_sentinel
-
-MDLLM_ENTRY = Path(__file__).resolve().parents[1] / "mdllm.py"
 
 HOOK_BODY = """#!/bin/sh
 # mdllm pre-commit: deterministic validation floor (transformation plan Phase 1)
@@ -172,6 +171,15 @@ _HOOK_MARKERS = {
     "commit-msg": "# mdllm commit-msg:",
     "post-commit": "# mdllm post-commit:",
 }
+
+
+def rendered_hook_contract(root: Path) -> HookByteContract:
+    """Return the exact managed hook bytes trusted for ``root``."""
+    rel = hook_mdllm_route(root)
+    return HookByteContract.from_mapping({
+        name: body.format(rel=rel).encode("utf-8")
+        for name, body in _HOOK_BODIES.items()
+    })
 
 
 def _git_path(root: Path, *args: str) -> subprocess.CompletedProcess:
@@ -441,7 +449,8 @@ def cmd_install_hook(args) -> int:
     # Execution-test the hook we just wrote (vendor-harness-adapter-foundation
     # Phase 1): installed is a weaker fact than runs. The runtime owns safe
     # modern-Git and compatibility execution; no safe route remains untested.
-    result = execution_test_hook(root)
+    result = execution_test_hook(
+        root, expected_bytes=rendered_hook_contract(root).expected("pre-commit"))
     if not result["supported"]:
         print("execution test: UNTESTED — no semantics-preserving execution "
               f"route was available ({result['detail']}); the hook will first "
@@ -496,7 +505,8 @@ def _preflight_outer_isolation(target: Path) -> _OuterIsolation:
 
     outer_root = Path(outer.stdout.strip()).resolve()
     try:
-        transaction = RepositoryTransaction.begin(outer_root)
+        transaction = RepositoryTransaction.begin(
+            outer_root, hook_contract=rendered_hook_contract(outer_root))
     except RepositoryTransactionError as exc:
         sys.exit(f"mdllm: could not start outer repository transaction: {exc}")
     rel_t = Path(os.path.relpath(target, outer_root)).as_posix() + "/"
@@ -1096,7 +1106,8 @@ def _cmd_scaffold_impl(args, progress: _ScaffoldProgress) -> int:
     progress.stage = "domain staging"
     first = None
     try:
-        transaction = RepositoryTransaction.begin(target)
+        transaction = RepositoryTransaction.begin(
+            target, hook_contract=rendered_hook_contract(target))
         progress.stage = "first commit"
         first = transaction.commit_exact(
             tuple(birth_paths),

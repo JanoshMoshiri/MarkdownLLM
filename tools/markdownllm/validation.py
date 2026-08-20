@@ -31,6 +31,7 @@ from .repository_view import (
 from .structural_refs import (
     iter_structural_references, structural_field_names, structural_shape_errors,
 )
+from .session_contract import contract_fingerprint
 
 def valid_statuses_for(typ: str, schema: dict | None) -> tuple[list[str] | None, bool]:
     """Returns (allowed_statuses, declared). declared=False means default vocabulary."""
@@ -941,9 +942,8 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
                            if t.startswith("contract=")), "")
     if contract_token:
         try:
-            from .session import _contract_fingerprint
             attested = contract_token.partition("=")[2]
-            current = _contract_fingerprint(root)
+            current = contract_fingerprint(root)
         except Exception:
             attested = current = ""  # unreadable is handled as an advisory below
         if not attested or not current:

@@ -18,7 +18,7 @@ from .yaml_loader import load_version_sentinel
 from .domain_kernel import (apply_domain_kernel, build_domain_kernel_blocks,
                             domain_kernel_status)
 from .model import parse_frontmatter
-from .repo import _version_lt
+from .repo import version_lt
 
 def _changelog_versions_since(changelog: Path, seen: str) -> list[str]:
     """Heading lines (`## [x.y.z] - date`) in CHANGELOG.md newer than `seen`."""
@@ -27,7 +27,7 @@ def _changelog_versions_since(changelog: Path, seen: str) -> list[str]:
     out = []
     for line in changelog.read_text(encoding="utf-8").splitlines():
         m = re.match(r"^## \[([0-9][^\]]*)\] - (.+)$", line.strip())
-        if m and (not seen or _version_lt(seen, m.group(1))):
+        if m and (not seen or version_lt(seen, m.group(1))):
             out.append(f"v{m.group(1)} ({m.group(2)})")
     return out
 

@@ -43,62 +43,9 @@ Exit codes: 0 = pushed and verified (or nothing to push); 2 = usage;
 
 from __future__ import annotations
 
-import base64
-import os
-import re
-import subprocess
 from pathlib import Path
 
-TOKEN_ENV_VARS = ("GH_PAT", "MDLLM_GIT_TOKEN")
-
-_TOKEN_PATTERNS = [
-    re.compile(r"github_pat_[A-Za-z0-9_]+"),
-    re.compile(r"ghp_[A-Za-z0-9]+"),
-]
-
-
-def command_token() -> str | None:
-    """Return the optional command-scoped Git credential from the environment.
-
-    This is a public application port shared by publication and ephemeral
-    estate assembly.  It returns the value for an individual command; callers
-    must never persist it in a remote URL or Git configuration.
-    """
-    for var in TOKEN_ENV_VARS:
-        value = os.environ.get(var, "").strip()
-        if value:
-            return value
-    return None
-
-
-def redact(text: str, token: str | None = None) -> str:
-    """Strip credential material from any line this module emits."""
-    for pattern in _TOKEN_PATTERNS:
-        text = pattern.sub("[REDACTED]", text)
-    if token:
-        text = text.replace(token, "[REDACTED]")
-        text = text.replace(
-            base64.b64encode(f"x-access-token:{token}".encode()).decode(),
-            "[REDACTED]")
-    return text
-
-
-def git_command(repo: Path, *args: str, token: str | None = None
-                ) -> subprocess.CompletedProcess:
-    """Run one Git command with an optional process-scoped credential."""
-    cmd = ["git", "-C", str(repo)]
-    if token:
-        auth = base64.b64encode(
-            f"x-access-token:{token}".encode()).decode()
-        cmd += ["-c", f"http.extraheader=Authorization: Basic {auth}"]
-    cmd += list(args)
-    return subprocess.run(cmd, capture_output=True, text=True)
-
-
-# Compatibility aliases for callers outside this package that may have used
-# the pre-port implementation.  Package modules consume the public names.
-_token = command_token
-_git = git_command
+from .git_transport import command_token, git_command, redact
 
 
 def resolve_default_branch(repo: Path) -> tuple[str | None, str]:
@@ -146,8 +93,8 @@ def publish(repo: Path, *, authorize_once: bool = False) -> int:
         return 2
 
     # -- 0. sending authority must be explicit --------------------------
-    # Local import avoids a module cycle: sync's Git transport shares the
-    # credential redactor defined above.
+    # Publication policy remains a sync-owned port.  Generic Git transport is
+    # neutral, so this one-way application dependency cannot form a cycle.
     from .sync import publication_policy
     policy = publication_policy(repo)
     if not policy.enabled and not authorize_once:

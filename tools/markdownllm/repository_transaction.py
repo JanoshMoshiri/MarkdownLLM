@@ -16,6 +16,7 @@ from pathlib import Path, PurePosixPath
 import subprocess
 import tempfile
 
+from .hook_contract import HookByteContract
 from .runtime import run_git_hook
 
 
@@ -60,16 +61,21 @@ class RepositoryTransaction:
 
     root: Path
     expected_head: str | None
+    hook_contract: HookByteContract = HookByteContract()
 
     @classmethod
-    def begin(cls, root: Path) -> "RepositoryTransaction":
+    def begin(
+            cls, root: Path, *,
+            hook_contract: HookByteContract | None = None,
+            ) -> "RepositoryTransaction":
         resolved = Path(root).resolve()
         top = _run(resolved, "rev-parse", "--show-toplevel")
         if (top.returncode != 0 or not top.stdout.strip()
                 or Path(top.stdout.strip()).resolve() != resolved):
             raise RepositoryTransactionError(
                 f"transaction root must be a Git worktree root: {resolved}")
-        return cls(resolved, _head(resolved))
+        return cls(resolved, _head(resolved),
+                   hook_contract or HookByteContract())
 
     def assert_head_unchanged(self) -> None:
         current = _head(self.root)
@@ -96,19 +102,11 @@ class RepositoryTransaction:
             return  # Git commit also treats an absent hook as success.
         if os.name != "nt" and not os.access(hook_path, os.X_OK):
             return  # Match Git's non-executable-hook skip semantics.
-        expected = None
+        expected = self.hook_contract.expected(name)
         try:
-            # A verified mdllm body permits the conservative Windows/old-Git
-            # shell fallback.  Unknown operator hooks are never attested by
-            # reading their own bytes and calling that trust.
-            from .scaffold import _HOOK_BODIES, hook_mdllm_route
-            body = _HOOK_BODIES.get(name)
-            if body is not None:
-                candidate = body.format(
-                    rel=hook_mdllm_route(self.root)).encode("utf-8")
-                if hook_path.read_bytes() == candidate:
-                    expected = candidate
-        except (ImportError, OSError, SystemExit):
+            if expected is not None and hook_path.read_bytes() != expected:
+                expected = None
+        except OSError:
             expected = None
         result = run_git_hook(
             self.root, name, args, env=env, expected_bytes=expected)

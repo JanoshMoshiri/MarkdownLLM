@@ -37,6 +37,7 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Literal, Mapping, Protocol, runtime_checkable
 
 from .harness_ports import HarnessContext, InspectionReport, ManagedFragment
+from .hook_contract import MDLLM_ENTRY
 
 
 InstallAction = Literal["create", "merge", "refresh", "no-op", "refuse"]
@@ -1136,11 +1137,8 @@ def apply_install(plan: InstallPlan) -> ApplyResult:
     )
 
 
-def cmd_adapter_install(args) -> int:
+def run_adapter_install(args, registry) -> int:
     """Show the complete owned diff, then apply only an unambiguous plan."""
-    from . import adapters
-    from .scaffold import MDLLM_ENTRY
-
     root = Path(args.path).resolve()
     if not root.is_dir():
         print(f"mdllm: adapter-install target is not a directory: {root}")
@@ -1153,8 +1151,8 @@ def cmd_adapter_install(args) -> int:
               "to embed an absolute machine-specific adapter command")
         return 2
     context = HarnessContext(framework_root_rel=framework_rel)
-    selected = adapters.selection(args.harness)
-    targets = tuple(target_for_adapter(adapters.get(name), context)
+    selected = registry.selection(args.harness)
+    targets = tuple(target_for_adapter(registry.get(name), context)
                     for name in selected)
     plan = preflight_install(
         root, targets,

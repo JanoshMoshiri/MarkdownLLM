@@ -32,7 +32,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 PKG = Path(__file__).resolve().parents[1] / "markdownllm"
 
 NEUTRAL_MODULES = [
-    "harness_ports.py", "runtime.py", "scaffold.py", "doctor.py",
+    "harness_ports.py", "hook_contract.py", "session_contract.py",
+    "runtime.py", "scaffold.py", "doctor.py",
     "cli.py", "session.py", "harness_diagnostics.py",
     "lifecycle_runner.py", "adapter_install.py",
     "assemble.py", "publish.py", "bundle_service.py",
@@ -44,6 +45,122 @@ FORBIDDEN = [
     "settings.json", "hooks.json", "commandwindows", "copilot",
     "claude", "codex", "cowork",
 ]
+
+
+def _package_modules() -> dict[str, Path]:
+    modules: dict[str, Path] = {}
+    for path in PKG.rglob("*.py"):
+        relative = path.relative_to(PKG)
+        parts = list(relative.with_suffix("").parts)
+        if parts[-1] == "__init__":
+            parts.pop()
+        name = "markdownllm" + ("." + ".".join(parts) if parts else "")
+        modules[name] = path
+    return modules
+
+
+def _local_imports(module: str, path: Path,
+                   known: set[str]) -> tuple[set[str], list[tuple[str, str]]]:
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    package = module if path.name == "__init__.py" else module.rpartition(".")[0]
+    dependencies: set[str] = set()
+    private: list[tuple[str, str]] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name in known:
+                    dependencies.add(alias.name)
+            continue
+        if not isinstance(node, ast.ImportFrom):
+            continue
+        if node.level:
+            anchor = package.split(".")
+            if node.level > 1:
+                anchor = anchor[:-(node.level - 1)]
+            target = ".".join(anchor + (node.module or "").split(".")).rstrip(".")
+        else:
+            target = node.module or ""
+        if target in known:
+            dependencies.add(target)
+        if not node.module:
+            for alias in node.names:
+                candidate = f"{target}.{alias.name}" if target else alias.name
+                if candidate in known:
+                    dependencies.add(candidate)
+        if target.startswith("markdownllm"):
+            private.extend((target, alias.name) for alias in node.names
+                           if alias.name.startswith("_") and alias.name != "__future__")
+    return dependencies, private
+
+
+def _import_sccs(graph: dict[str, set[str]]) -> list[tuple[str, ...]]:
+    """Tarjan SCCs, returned only when they contain an actual cycle."""
+    counter = 0
+    indices: dict[str, int] = {}
+    low: dict[str, int] = {}
+    stack: list[str] = []
+    active: set[str] = set()
+    cycles: list[tuple[str, ...]] = []
+
+    def visit(node: str) -> None:
+        nonlocal counter
+        indices[node] = low[node] = counter
+        counter += 1
+        stack.append(node)
+        active.add(node)
+        for dependency in graph[node]:
+            if dependency not in indices:
+                visit(dependency)
+                low[node] = min(low[node], low[dependency])
+            elif dependency in active:
+                low[node] = min(low[node], indices[dependency])
+        if low[node] != indices[node]:
+            return
+        component: list[str] = []
+        while True:
+            item = stack.pop()
+            active.remove(item)
+            component.append(item)
+            if item == node:
+                break
+        if len(component) > 1 or node in graph[node]:
+            cycles.append(tuple(sorted(component)))
+
+    for name in sorted(graph):
+        if name not in indices:
+            visit(name)
+    return sorted(cycles)
+
+
+def test_package_import_graph_is_acyclic():
+    modules = _package_modules()
+    known = set(modules)
+    graph = {name: _local_imports(name, path, known)[0]
+             for name, path in modules.items()}
+    assert not _import_sccs(graph), (
+        "package import cycle(s) make initialization order observable: "
+        f"{_import_sccs(graph)}")
+
+
+def test_package_has_no_cross_module_private_imports():
+    modules = _package_modules()
+    known = set(modules)
+    found: set[tuple[str, str, str]] = set()
+    for consumer, path in modules.items():
+        _, imports = _local_imports(consumer, path, known)
+        found.update((consumer, provider, symbol)
+                     for provider, symbol in imports)
+    assert not found, "cross-module private imports: " + repr(sorted(found))
+
+
+def test_hook_execution_layers_do_not_depend_on_scaffold():
+    modules = _package_modules()
+    known = set(modules)
+    for name in ("markdownllm.hook_contract", "markdownllm.runtime",
+                 "markdownllm.repository_transaction"):
+        dependencies, _ = _local_imports(name, modules[name], known)
+        assert "markdownllm.scaffold" not in dependencies, (
+            f"{name} imports the hook producer instead of its leaf contract")
 
 
 def _code_only(path: Path) -> str:

@@ -32,7 +32,7 @@ def framework_version(root: Path) -> str:
     return "unknown"
 
 
-def _version_lt(a: str, b: str) -> bool:
+def version_lt(a: str, b: str) -> bool:
     """Semver-ish less-than over dotted numeric versions, tolerant of junk."""
     def parts(v: str):
         out = []

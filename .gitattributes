@@ -1,5 +1,6 @@
 # Shell scripts must keep LF line endings regardless of platform, or they
 # break when run on macOS/Linux ("bad interpreter: /usr/bin/env bash^M").
+.gitattributes text eol=lf
 *.sh text eol=lf
 *.ps1 text eol=lf
 
@@ -7,3 +8,9 @@
 # ephemeral VM), and the mechanism hash reads their bytes — keep both
 # checkout-stable across platforms.
 templates/cowork-bundle/* text eol=lf
+
+# Scaffolding templates and their byte-level acceptance fixtures are
+# repository contracts, not editor-native prose.  A fresh Windows checkout
+# must expose the same LF bytes that the renderer emits and hashes.
+templates/** text eol=lf
+tools/tests/fixtures/** text eol=lf

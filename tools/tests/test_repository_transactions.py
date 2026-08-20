@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+from dataclasses import FrozenInstanceError
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,9 +13,13 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from markdownllm import assemble as assemble_mod  # noqa: E402
+from markdownllm import git_transport as transport_mod  # noqa: E402
+from markdownllm import publish as publish_mod  # noqa: E402
 from markdownllm import scaffold as scaffold_mod  # noqa: E402
 from markdownllm import sync as sync_mod  # noqa: E402
 from markdownllm import runtime as runtime_mod  # noqa: E402
+from markdownllm.hook_contract import HookByteContract  # noqa: E402
 from markdownllm.repository_transaction import (  # noqa: E402
     RepositoryTransaction, RepositoryTransactionError,
 )
@@ -199,6 +204,33 @@ def test_old_git_fallback_executes_only_attested_hook_bytes(
     assert refused["supported"] is False
     assert refused["executed"] is False
     assert "bytes changed" in refused["detail"]
+
+
+def test_exact_transaction_carries_managed_hook_bytes_to_old_git_fallback(
+        tmp_path, monkeypatch):
+    repo = _repo(tmp_path / "repo", commit=True)
+    hook = repo / ".git" / "hooks" / "pre-commit"
+    payload = b"#!/bin/sh\necho ran > .hook-ran\n"
+    hook.write_bytes(payload)
+    hook.chmod(hook.stat().st_mode | 0o111)
+    monkeypatch.setattr(runtime_mod, "git_supports_hook_run", lambda _root: False)
+
+    candidate = repo / "candidate.txt"
+    candidate.write_text("candidate\n", encoding="utf-8")
+    transaction = RepositoryTransaction.begin(
+        repo,
+        hook_contract=HookByteContract.from_mapping({"pre-commit": payload}),
+    )
+    try:
+        result = transaction.commit_exact(
+            (candidate.name,), "test: exact old-Git hook contract")
+    except RepositoryTransactionError as exc:
+        if "cannot be executed safely" in str(exc):
+            pytest.skip(str(exc))
+        raise
+
+    assert result.committed_paths == (candidate.name,)
+    assert (repo / ".hook-ran").read_text(encoding="utf-8").strip() == "ran"
 
 
 def test_repository_index_view_honours_validated_hook_tree_pin(
@@ -532,7 +564,7 @@ def test_sync_git_token_is_command_scoped_not_persisted(tmp_path, monkeypatch):
         observed["env"] = kwargs["env"]
         return subprocess.CompletedProcess(command, 0, "", "")
 
-    monkeypatch.setattr(sync_mod.subprocess, "run", run)
+    monkeypatch.setattr(transport_mod.subprocess, "run", run)
     token = "github_pat_COMMAND_SCOPED_SECRET"
     result = sync_mod._git(tmp_path, "fetch", "--quiet", token=token)
 
@@ -574,6 +606,31 @@ def test_sync_repo_passes_token_to_fetch_and_redacts_failure(
     result = sync_mod.sync_repo(tmp_path, token=token)
 
     assert fetch_tokens == [token]
-    assert result["state"] == "fetch-failed"
-    assert token not in result["detail"]
-    assert "[REDACTED]" in result["detail"]
+    assert result.state is sync_mod.SyncState.FETCH_FAILED
+    assert token not in result.detail
+    assert "[REDACTED]" in result.detail
+
+
+def test_sync_result_is_frozen_and_rejects_impossible_movement(tmp_path):
+    result = sync_mod.SyncResult(
+        repo=tmp_path,
+        state=sync_mod.SyncState.UP_TO_DATE,
+    )
+
+    with pytest.raises(FrozenInstanceError):
+        result.detail = "changed"
+    with pytest.raises(ValueError, match="only a synced result"):
+        sync_mod.SyncResult(
+            repo=tmp_path,
+            state=sync_mod.SyncState.DIRTY,
+            moved=True,
+        )
+
+
+def test_git_transport_has_one_neutral_owner():
+    assert sync_mod.git_command is transport_mod.git_command
+    assert assemble_mod.git_command is transport_mod.git_command
+    assert publish_mod.git_command is transport_mod.git_command
+    assert sync_mod.redact is transport_mod.redact
+    assert assemble_mod.redact is transport_mod.redact
+    assert publish_mod.redact is transport_mod.redact

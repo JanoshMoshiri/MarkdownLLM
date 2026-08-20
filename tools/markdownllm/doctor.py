@@ -22,10 +22,10 @@ from .harness_ports import (
     DiagnosticPresentationPort, HarnessContext, InspectPort,
 )
 from .model import parse_frontmatter
-from .repo import _version_lt
+from .repo import version_lt
 from .runtime import execution_test_hook, probe as runtime_probe
-from .scaffold import (HOOK_BODY, MDLLM_ENTRY, hook_mdllm_route,
-                       resolve_hooks_dir)
+from .hook_contract import MDLLM_ENTRY
+from .scaffold import rendered_hook_contract, resolve_hooks_dir
 from .sync import PublicationPolicyState, publication_policy
 from .yaml_loader import load_version_sentinel
 
@@ -136,14 +136,16 @@ def cmd_doctor(args) -> int:
             # `coherence` missing). Compare the copy against what install-hook
             # would write now. Advisory, not fatal: the hook still runs
             # `validate`, so the floor is active — just not current.
-            rel = hook_mdllm_route(root)
+            expected = rendered_hook_contract(root).expected("pre-commit")
+            assert expected is not None
             installed = hook.read_text(encoding="utf-8").replace("\r\n", "\n").strip()
-            if installed != HOOK_BODY.format(rel=rel).replace("\r\n", "\n").strip():
+            expected_text = expected.decode("utf-8").replace("\r\n", "\n").strip()
+            if installed != expected_text:
                 report("WARN", "pre-commit hook body is STALE vs the current mdllm "
                                "HOOK_BODY — re-run `mdllm install-hook` to pick up "
                                "newer checks (the sentinel may claim enforcement the "
                                "hook does not run)")
-            run = execution_test_hook(root)
+            run = execution_test_hook(root, expected_bytes=expected)
             if not run["supported"]:
                 report("WARN", "pre-commit hook is installed but could not be "
                                "execution-tested safely — " + run["detail"])
@@ -218,7 +220,7 @@ def cmd_doctor(args) -> int:
         elif upstream_v == local_v:
             report("OK", f"framework current with published upstream {upstream_v} "
                          f"(as of last fetch)")
-        elif _version_lt(local_v, upstream_v):
+        elif version_lt(local_v, upstream_v):
             report("WARN", f"local framework is {local_v}; published upstream is "
                            f"{upstream_v} (as of last fetch) — consider pulling. "
                            f"Advisory only; does not block.")

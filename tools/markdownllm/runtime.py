@@ -36,6 +36,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .harness_ports import LAUNCH_RESOLUTION_SECONDS
+from .hook_contract import MDLLM_ENTRY
 
 # The dependency that makes an interpreter *usable* by the floor, not merely
 # present. One name, probed everywhere the floor may run.
@@ -321,25 +322,22 @@ def run_git_hook(
             "detail": (result.stderr or result.stdout or "").strip()[-400:]}
 
 
-def execution_test_hook(root: Path, hook: str = "pre-commit") -> dict:
+def execution_test_hook(
+        root: Path, hook: str = "pre-commit", *,
+        expected_bytes: bytes | None = None) -> dict:
     """Run the installed hook through git itself. `supported: False` is a
     valid result, not a failure — untested stays distinct from passed/failed
     (portability-claims-need-execution-tests)."""
-    # Deferred import avoids runtime <-> scaffold's hook-body construction
-    # cycle.  Exact bytes are what makes the Windows shell fallback safe: an
-    # operator replacement is reported untested rather than executed.
-    from .scaffold import _HOOK_BODIES, hook_mdllm_route
-    rel = hook_mdllm_route(root)
-    body = _HOOK_BODIES.get(hook)
-    expected = body.format(rel=rel).encode("utf-8") if body else None
-    return run_git_hook(root, hook, expected_bytes=expected)
+    # Exact caller-supplied bytes make the Windows shell fallback safe: an
+    # operator replacement is reported untested rather than executed. Runtime
+    # consumes this contract; it never imports the scaffold producer.
+    return run_git_hook(root, hook, expected_bytes=expected_bytes)
 
 
 def cmd_runtime_probe(args) -> int:
     """The reproducible runtime/commit probe (plan Phase 1): run it at the
     framework root or in a directly opened nested domain, in any harness's
     shell. Exit 0 iff a floor-capable interpreter resolves."""
-    from .scaffold import MDLLM_ENTRY
     root = Path(args.path).resolve()
     result = probe(root, MDLLM_ENTRY)
     print(f"## Runtime Probe — {root}")

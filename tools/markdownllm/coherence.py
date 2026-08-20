@@ -18,7 +18,7 @@ import yaml
 
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
 from .indexes import index_drift_findings
-from .kernel_gen import _normalize_newlines, _token_counter, build_kernel
+from .kernel_gen import build_kernel, normalize_newlines, token_counter
 from .model import (Finding, RESERVED_STATUSES, SEV_ERROR, SEV_INFO,
                     SEV_WARNING, parse_frontmatter, scan)
 from .repo import TIERS
@@ -390,14 +390,14 @@ def coherence_findings(root: Path, window: int,
         # kernel drift, via the shared builder (cannot disagree with what
         # `mdllm kernel` would write — same source).
         kpath = root / "kernel.md"
-        kbody, _, _, _ = build_kernel(root, specs, _token_counter(), view)
+        kbody, _, _, _ = build_kernel(root, specs, token_counter(), view)
         ktext = _view_text(kpath, view)
         if ktext is None:
             findings.append(Finding(SEV_ERROR, "kernel.md",
                 "missing — run `mdllm kernel` to generate it"))
         else:
             _, ex_body, _ = parse_frontmatter(ktext, source=kpath)
-            if _normalize_newlines(ex_body).strip() != kbody.strip():
+            if normalize_newlines(ex_body).strip() != kbody.strip():
                 findings.append(Finding(SEV_ERROR, "kernel.md",
                     "DRIFT — spec kernel blocks changed since kernel.md was "
                     "generated; run `mdllm kernel` and commit the result"))

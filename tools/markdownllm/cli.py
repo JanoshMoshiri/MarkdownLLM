@@ -58,9 +58,10 @@ import sys
 
 import yaml
 
+from . import adapters as adapter_registry
 from .adapters import names as adapter_names, selection_choices
 from .boundary import cmd_boundary
-from .adapter_install import cmd_adapter_install
+from .adapter_install import run_adapter_install
 from .calc import cmd_calc
 from .cascade import cmd_cascade
 from .coherence import cmd_coherence
@@ -88,6 +89,11 @@ from .tokens import cmd_tokens
 from .touchpoints import cmd_candidates, cmd_touchpoints
 from .triggers import cmd_triggers
 from .validation import cmd_validate
+
+
+def cmd_adapter_install(args) -> int:
+    """Compose the adapter-neutral installer with the registry boundary."""
+    return run_adapter_install(args, adapter_registry)
 
 def build_cli() -> argparse.ArgumentParser:
     # Separate from main() so the parser registry is introspectable: generated

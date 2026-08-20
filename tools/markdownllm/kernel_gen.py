@@ -32,12 +32,12 @@ KERNEL_HEADER = (
 )
 
 
-def _normalize_newlines(text: str) -> str:
+def normalize_newlines(text: str) -> str:
     """Canonical text form for generated-kernel semantic comparisons."""
     return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
-def _token_counter():
+def token_counter():
     try:
         import tiktoken
         enc = tiktoken.get_encoding("o200k_base")
@@ -71,7 +71,7 @@ def build_kernel(root: Path, specs: list[str], count,
         # Kernel blocks are textual semantics and the generated artifact is
         # canonical LF, so normalize both routes here. Otherwise a CRLF
         # worktree can report drift while ``kernel --check`` says in sync.
-        text = _normalize_newlines(text)
+        text = normalize_newlines(text)
         full_total += count(text)
         blocks = KERNEL_RE.findall(text)
         if not blocks:
@@ -100,7 +100,7 @@ def cmd_kernel(args) -> int:
                        for name in specs)):
         sys.exit("mdllm: kernel refused invalid framework sentinel — "
                  "`foundational_specs` must be a list of non-empty paths")
-    count = _token_counter()
+    count = token_counter()
     body, detail, full_total, kernel_total = build_kernel(root, specs, count)
     for name, kb, fb in detail:
         print(f"  {name:<40} {kb:>6,} / {fb:>6,} tokens")
@@ -122,7 +122,7 @@ def cmd_kernel(args) -> int:
         if existing_error:
             sys.exit(f"mdllm: kernel --check refused invalid kernel.md "
                      f"frontmatter — {existing_error}")
-        if _normalize_newlines(existing_body).strip() != body.strip():
+        if normalize_newlines(existing_body).strip() != body.strip():
             print("\nkernel: DRIFT — spec kernel blocks changed since kernel.md "
                   "was generated; run `mdllm kernel` and commit the result")
             return 1

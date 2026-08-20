@@ -20,8 +20,8 @@ the framework (credential intake + framework clone) and then hands off
 to this command.
 
 Credentials: ambient by default; ``GH_PAT``/``MDLLM_GIT_TOKEN`` when set
-are supplied per-command through a scoped HTTP header (publish.py's
-mechanics — never on disk, never in git config, redacted from output).
+are supplied per-command through the neutral Git transport boundary — never
+on disk, never in git config, redacted from output.
 
 Exit codes: 0 = every selected domain assembled and oriented;
 1 = at least one domain failed (each failure printed in place);
@@ -34,10 +34,10 @@ import argparse
 import re
 from pathlib import Path
 
-from .publish import command_token, git_command, redact
+from .git_transport import command_token, git_command, redact
 from .scaffold import cmd_install_hook
 from .session import cmd_session_start
-from .sync import sync_repo
+from .sync import SyncState, sync_repo
 
 
 def parse_config(path: Path) -> tuple[dict[str, str], str]:
@@ -116,9 +116,11 @@ def assemble_domain(root: Path, entry: str, config: dict[str, str],
     if target.exists() and (target / ".git").exists():
         say(f"   - {name}: already present — reusing the existing clone")
         result = sync_repo(target, token=token)
-        detail = f" — {result['detail']}" if result["detail"] else ""
-        say(f"     sync: {result['state']}{detail}")
-        if result["state"] in {"dirty", "diverged", "in-operation"}:
+        detail = f" — {result.detail}" if result.detail else ""
+        say(f"     sync: {result.state}{detail}")
+        if result.state in {
+                SyncState.DIRTY, SyncState.DIVERGED,
+                SyncState.IN_OPERATION}:
             say("     !! unresolved repository state was reported and left "
                 "untouched; assembly will not merge, reset, or discard it")
     else:
@@ -220,8 +222,8 @@ def cmd_assemble(args) -> int:
         print(f"\n=========================  {name}  =========================")
         print("----- estate-sync (sync BEFORE orienting) -----")
         result = sync_repo(target, token=token)
-        detail = f" — {result['detail']}" if result["detail"] else ""
-        print(f"  {result['state']}{detail}")
+        detail = f" — {result.detail}" if result.detail else ""
+        print(f"  {result.state}{detail}")
         print("----- session-start (the Tier-0 contract is emitted below —"
               " it is IN CONTEXT once printed) -----")
         cmd_session_start(_ns(path=str(target), contract=True))
