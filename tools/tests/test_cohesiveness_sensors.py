@@ -98,7 +98,7 @@ triggers:
 """))
     meta, _, _ = mdllm.parse_frontmatter((tmp_path / "things/a.md").read_text(encoding="utf-8"))
     assert meta["triggers"][0].get("on") == "status_changed_to"
-    hits, _, _, _ = mdllm.evaluate(tmp_path)
+    hits, *_ = mdllm.evaluate(tmp_path)
     assert any("all watched (b) are `completed`" in h for h in hits)
 
 
@@ -112,7 +112,7 @@ triggers:
   - type: dependency
     action: unblock
 """))
-    _, _, _, skipped = mdllm.evaluate(tmp_path)
+    _, _, _, skipped, _ = mdllm.evaluate(tmp_path)
     assert any("never fires as declared" in s for s in skipped)
 
 

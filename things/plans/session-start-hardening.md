@@ -222,20 +222,32 @@ cues get judged (all five sessions deferred the version refresh unprompted)
 while un-emitted duties get skipped. Move the computable cores of the
 orientation walk into the floor's output:
 
-- [ ] Velocity as week-over-week trend buckets, not a 30-day total (the
-  85→16→9 deceleration the flat total masked)
-- [ ] Stall-line findings surfaced by the floor: critical/high non-terminal
-  things past the velocity prompt's 21-day line, named per thing
-- [ ] Self-answering armed triggers: an armed future-dated trigger whose
-  action text answers its own condition (the do-not-re-ask pattern) → Info
-- [ ] Dead-trigger candidates only if a mechanical test exists; otherwise
-  the check stays judgement — label the act, not its net
-- [ ] Session-start prompts updated to consume the computed signals rather
-  than recompute them; the judgement residue in each prompt shrinks to what
-  is genuinely semantic
+- [x] Velocity as week-over-week trend buckets beside the 30-day total:
+  "Weekly commits to `things/` (oldest→newest): a · b · c · d" in the
+  digest's velocity line
+- [x] Stall-line findings surfaced by the floor: critical/high,
+  non-terminal, native work things past the 21-day line, named per thing
+  with days untouched, keyed on the commit stream (never mtime); knowledge
+  types and external mirrors excluded
+- [x] Self-answering armed triggers: heuristic regex over armed
+  future-dated time triggers' action text (do-not-re-ask / already-issued /
+  remedies-spent patterns), surfaced in the digest and as its own section
+  in `mdllm triggers` — the cue is the floor's, the disarm/re-condition
+  judgement stays the agent's
+- [x] Dead-trigger candidates: DECIDED — stays judgement. A condition's
+  foreclosure (a limb that can no longer fire because the world moved) is
+  irreducibly semantic; a mechanical test would need a hand-maintained
+  suppression list, which change-reconciliation.md names as judgement in
+  mechanical clothing
+- [x] Prompts updated to consume: `domain-velocity` v1.2 (stall +
+  cadence signals floor-computed; residue named as churn, ignored
+  unblocks, below-threshold stalls, meaning), `evaluate-triggers` v1.3
+  (fifth bucket documented, judgement residue named)
 
-**Gate:** the digest shows each new signal on a fixture where it is
-known-present; prompts reference the computed output.
+**Gate: CLOSED 2026-08-20.** All three signals shown on fixtures where
+they are known-present (test_digest_signals.py, 4 tests); prompts
+reference the computed output. 34 focused tests green at commit; full
+suite rides the Phase 4 commit (Phase 4 is prose-only).
 
 ## Phase 4 — Residue: route the pull, reconcile the two voices
 

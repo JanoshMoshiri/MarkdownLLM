@@ -2,7 +2,7 @@
 id: evaluate-triggers
 type: prompt
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-20
 inputs:
   - name: trigger-index
@@ -49,6 +49,11 @@ reasoning. Its output keeps four buckets apart, and so must your report:
 - **Not mechanically evaluable** — prose conditions left to your judgment;
   these, plus the proportional-response reasoning below, are what this prompt
   is for.
+- **Self-answering armed (heuristic)** — armed future-dated triggers whose
+  action text already answers the condition ("do not re-ask", "already
+  issued", "remedies are spent"). Left armed, they fire on their own answer
+  — six wore this pattern at once in one live domain. The floor cues them;
+  confirming each and disarming or re-conditioning it is yours.
 
 ## Choosing The Scan Substrate
 

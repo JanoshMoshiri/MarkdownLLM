@@ -43,7 +43,28 @@ def _velocity_signal(domain: Path) -> str:
                           "--", "things"], cwd=domain, capture_output=True, text=True,
                          encoding="utf-8", errors="replace")
     n = cnt.stdout.strip() if cnt.returncode == 0 else "?"
-    return (f"last `things/` change {when} (\"{subj.strip()}\"); {n} commit(s) in 30d. "
+    # Weekly buckets, not only a period total: a flat 30-day count masked a
+    # three-week deceleration (85 → 16 → 9) that the deep velocity walk had
+    # to be grilled into finding (session-start-hardening Phase 3 — the
+    # trend is the computable core of that walk, emitted as a cue).
+    trend_note = ""
+    dates = subprocess.run(["git", "log", "--since=28.days", "--format=%cs",
+                            "--", "things"], cwd=domain, capture_output=True,
+                           text=True, encoding="utf-8", errors="replace")
+    if dates.returncode == 0 and dates.stdout.strip():
+        today = dt.date.today()
+        buckets = [0, 0, 0, 0]
+        for line in dates.stdout.split():
+            try:
+                age = (today - dt.date.fromisoformat(line)).days
+            except ValueError:
+                continue
+            if 0 <= age < 28:
+                buckets[3 - age // 7] += 1
+        trend_note = (" Weekly commits to `things/` (oldest→newest): "
+                      + " · ".join(str(b) for b in buckets) + ".")
+    return (f"last `things/` change {when} (\"{subj.strip()}\"); {n} commit(s) in 30d."
+            f"{trend_note} "
             f"Read `git log -- things/` for the full picture.")
 
 
@@ -52,6 +73,49 @@ def _velocity_signal(domain: Path) -> str:
 _ORIENT_KNOWLEDGE_TYPES = {"specification", "guide", "manifesto", "insight",
                            "retrospective", "index", "continuity-brief", "prompt",
                            "workflow-definition", "decision", "artifact"}
+
+# The stall line the velocity prompt reasons from (default 21 days), now
+# computed by the floor and emitted as a cue (session-start-hardening
+# Phase 3): every emitted cue is a pull-router — two critical plans sat
+# exactly on this line while four of five baseline sessions never ran the
+# judgement walk that would have found them.
+_STALL_DAYS = 21
+
+
+def _stall_lines(domain: Path) -> list[str]:
+    """Critical/high, non-terminal, native work things whose file has not
+    moved in the commit stream past the stall line — looks active, is not.
+    Staleness keys on git history, not mtime (clone-local noise)."""
+    try:
+        corpus, _ = scan(domain)
+    except Exception:
+        return []
+    today = dt.date.today()
+    stalls: list[tuple[int, str]] = []
+    for t in corpus.things:
+        meta = t.meta
+        if str(meta.get("priority")) not in ("critical", "high"):
+            continue
+        if str(meta.get("type")) in _ORIENT_KNOWLEDGE_TYPES:
+            continue
+        if str(meta.get("origin")) == "external":
+            continue
+        if is_terminal(corpus.schema, meta):
+            continue
+        last = subprocess.run(
+            ["git", "log", "-1", "--format=%cs", "--", str(t.path)],
+            cwd=domain, capture_output=True, text=True,
+            encoding="utf-8", errors="replace")
+        try:
+            last_day = dt.date.fromisoformat(last.stdout.strip())
+        except ValueError:
+            continue  # untracked / no history — creation is its own signal
+        days = (today - last_day).days
+        if days > _STALL_DAYS:
+            stalls.append((days, f"`{t.id or t.path.name}` "
+                                 f"({meta.get('priority')}, "
+                                 f"{meta.get('status')}) untouched {days}d"))
+    return [line for _, line in sorted(stalls, reverse=True)]
 
 
 def _orient_forward(domain: Path) -> list[str]:
@@ -444,24 +508,24 @@ def _record_session_attestation(domain: Path, *,
 
 def _fired_by_thing(domain: Path):
     """{thing_id: [condition, ...]} for every trigger the floor evaluated as
-    fired, plus the upcoming/horizon/skipped buckets. The floor already
-    computes this; session-start simply stopped asking — which is why the
-    most urgent thing in a domain could be absent from the one output the
-    operator always reads. `upcoming` (≤30d look-aheads) is carried
-    SEPARATELY and must never be folded into `fired` — the v3.29.0 conflation
-    made a quiet domain read as a domain under pressure."""
+    fired, plus the upcoming/horizon/skipped/self-answering buckets. The
+    floor already computes this; session-start simply stopped asking — which
+    is why the most urgent thing in a domain could be absent from the one
+    output the operator always reads. `upcoming` (≤30d look-aheads) is
+    carried SEPARATELY and must never be folded into `fired` — the v3.29.0
+    conflation made a quiet domain read as a domain under pressure."""
     try:
         from .triggers import evaluate
-        hits, upcoming, horizon, skipped = evaluate(domain)
+        hits, upcoming, horizon, skipped, selfanswer = evaluate(domain)
     except Exception:
-        return {}, [], [], []
+        return {}, [], [], [], []
     fired: dict[str, list[str]] = {}
     for h in hits:
         tid, _, rest = h.partition(": ")
         # Drop the `-> action` tail: the action is the *derivation*, retrievable
         # via --why. The line here says what matured, not what to do about it.
         fired.setdefault(tid.strip(), []).append(rest.split(" -> ")[0].strip())
-    return fired, upcoming, horizon, skipped
+    return fired, upcoming, horizon, skipped, selfanswer
 
 
 
@@ -579,6 +643,13 @@ def cmd_session_start(args) -> int:
     velocity = _velocity_signal(domain)
     out.append(f"- **Velocity:** {velocity}")
 
+    stalls = _stall_lines(domain)
+    if stalls:
+        out.append(f"- **Stalled past the {_STALL_DAYS}-day line "
+                   f"({len(stalls)}):** critical/high work whose file has "
+                   f"not moved — looks active, is not:")
+        out.extend(f"    - {s}" for s in stalls)
+
     flips = _verified_flips_recent(domain)
     if flips:
         out.append(f"- **Verified flips since last session ({len(flips)}):** "
@@ -613,7 +684,7 @@ def cmd_session_start(args) -> int:
     # (2026-08-01 estate sweep). Fired hits verbatim from the same evaluator
     # `mdllm triggers` runs; horizon and not-evaluable compressed to counts —
     # quiet when healthy, one line when not.
-    fired, upcoming, horizon, skipped = _fired_by_thing(domain)
+    fired, upcoming, horizon, skipped, selfanswer = _fired_by_thing(domain)
     if fired:
         out.append(f"- **Triggers fired ({sum(len(v) for v in fired.values())}):**")
         for tid in sorted(fired):
@@ -637,6 +708,16 @@ def cmd_session_start(args) -> int:
         tail.append(f"{len(skipped)} not mechanically evaluable — yours to judge")
     if tail:
         out.append(f"    ({'; '.join(tail)} — `mdllm triggers .` for the full evaluation)")
+    if selfanswer:
+        # The pattern six armed triggers wore at once in one live domain: an
+        # action text that already answers the condition, still set to fire
+        # on a future date — it will fire on its own answer. Heuristic cue;
+        # the disarm/re-condition judgement stays the agent's.
+        out.append(f"- **Self-answering armed triggers ({len(selfanswer)}):** "
+                   f"armed on a future date while the action text already "
+                   f"answers the condition — each wants disarming or "
+                   f"re-conditioning:")
+        out.extend(f"    - {s}" for s in selfanswer)
 
     # Retrospective cadence at the moment it can be acted on (estate-cadence-
     # cluster Phase 2): the v3.24.0 sensor fired only in `validate` — mid-commit,

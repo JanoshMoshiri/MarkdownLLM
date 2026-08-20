@@ -21,6 +21,17 @@ from .model import ISO_RE, is_terminal, scan
 
 _DATE_IN_TEXT = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
+# The self-answering pattern (session-start-hardening Phase 3): an armed
+# future-dated trigger whose ACTION text already answers its own condition
+# — "do not re-ask", "already issued", "both remedies are spent". Left
+# armed, it fires on its own answer. Six triggers wore this at once in one
+# live domain (2026-08-18). A heuristic cue, not a verdict: the
+# disarm/re-condition judgement stays the agent's.
+_SELF_ANSWERING = re.compile(
+    r"(?:do\s+not|don'?t)\s+re-?ask"
+    r"|already\s+(?:answered|issued|discharged|resolved|sent)"
+    r"|remed(?:y|ies)\s+(?:is|are)\s+spent", re.I)
+
 
 def _embedded_date(cond):
     """First ISO date appearing anywhere in a free-text condition, or None."""
@@ -65,8 +76,10 @@ def _porch_coverage(root: Path) -> list | None:
 
 
 def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]],
-                                  list[tuple[int, str]], list[str]]:
-    """One domain's trigger evaluation: (fired, upcoming, horizon, skipped).
+                                  list[tuple[int, str]], list[str],
+                                  list[str]]:
+    """One domain's trigger evaluation:
+    (fired, upcoming, horizon, skipped, selfanswer).
 
     `fired` holds only conditions that are TRUE NOW (a date reached, a
     dependency satisfied, a threshold crossed). `upcoming` holds conditions
@@ -74,7 +87,9 @@ def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]],
     v3.29.0 and earlier mixed both into one `hits` list that session-start
     labelled "Triggers fired", so a quiet domain with a busy fortnight ahead
     read as a domain under pressure (2026-08-08 field evidence, two domains).
-    `horizon` is beyond 30 days; `skipped` is not-mechanically-evaluable."""
+    `horizon` is beyond 30 days; `skipped` is not-mechanically-evaluable;
+    `selfanswer` is the heuristic cue for armed future triggers whose action
+    text already answers the condition (see _SELF_ANSWERING)."""
     _MEMBRANE_CACHE.clear()
     corpus, _ = scan(root)
     today = dt.date.today()
@@ -83,6 +98,7 @@ def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]],
     upcoming: list[tuple[int, str]] = []
     skipped: list[str] = []
     horizon: list[tuple[int, str]] = []
+    selfanswer: list[str] = []
 
     def as_date(v):
         if isinstance(v, dt.datetime):
@@ -142,6 +158,12 @@ def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]],
                     # here — the no-silent-default law, same bug class as the
                     # `relationship` branch one screen down).
                     d = _embedded_date(cond)
+                    if (d is not None and d > today and action
+                            and _SELF_ANSWERING.search(str(action))):
+                        selfanswer.append(
+                            f"{name}: armed for {d} while its action text "
+                            f"already answers the condition — disarm or "
+                            f"re-condition")
                     if d is None:
                         skipped.append(f"{name}: time condition {cond!r} names no "
                                        f"parseable date - left to the agent")
@@ -267,10 +289,11 @@ def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]],
             elif days > 30:
                 horizon.append((days, f"{name}: due {due} ({days}d out)"))
 
-    return hits, upcoming, horizon, skipped
+    return hits, upcoming, horizon, skipped, selfanswer
 
 
-def _print_evaluation(hits, upcoming, horizon, skipped) -> None:
+def _print_evaluation(hits, upcoming, horizon, skipped,
+                      selfanswer=()) -> None:
     if hits:
         for h in hits:
             print(f"- {h}")
@@ -287,6 +310,10 @@ def _print_evaluation(hits, upcoming, horizon, skipped) -> None:
     if skipped:
         print("\n### Not mechanically evaluable")
         for s in skipped:
+            print(f"- {s}")
+    if selfanswer:
+        print("\n### Self-answering armed triggers (heuristic)")
+        for s in selfanswer:
             print(f"- {s}")
 
 
@@ -312,7 +339,7 @@ def cmd_triggers(args) -> int:
         total_hits = 0
         rollup = []
         for repo in repos:
-            hits, upcoming, horizon, skipped = evaluate(repo)
+            hits, upcoming, horizon, skipped, selfanswer = evaluate(repo)
             # Retrospective debt joins the sweep (estate-cadence-cluster
             # Phase 2): per-domain the v3.24.0 sensor fires as scatter across
             # thirteen validates; here it lands as one picture in the one
@@ -331,7 +358,7 @@ def cmd_triggers(args) -> int:
             rollup.append((repo.name, len(hits), len(upcoming), len(skipped), retro))
             total_hits += len(hits)
             print(f"### {repo.name}")
-            _print_evaluation(hits, upcoming, horizon, skipped)
+            _print_evaluation(hits, upcoming, horizon, skipped, selfanswer)
             print()
         print("### Roll-up")
         overdue = 0
@@ -348,7 +375,7 @@ def cmd_triggers(args) -> int:
         print(f"\n{'; '.join(tailbits)}. Ephemeral — never an index.")
         return 0
 
-    hits, upcoming, horizon, skipped = evaluate(root)
+    hits, upcoming, horizon, skipped, selfanswer = evaluate(root)
     print(f"## Trigger Evaluation — {root}  ({today})\n")
-    _print_evaluation(hits, upcoming, horizon, skipped)
+    _print_evaluation(hits, upcoming, horizon, skipped, selfanswer)
     return 0

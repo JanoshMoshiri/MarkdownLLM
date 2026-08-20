@@ -2,7 +2,7 @@
 id: domain-velocity
 type: prompt
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-06-08
 inputs:
   - name: git-log-things
@@ -60,6 +60,14 @@ things were actually modified recently.
 | **Cadence** | Commits per week over the period — is the domain accelerating, steady, or gone quiet? |
 | **Churn vs. progress** | Many `update:` commits on one thing with no `complete:`/`unblock:` — spinning, not finishing. |
 | **Recently unblocked, then ignored** | An `unblock:` commit with no follow-up commit on that thing — the unblock didn't lead to action. |
+
+> **Floor-computed since session-start-hardening Phase 3:** the session-start
+> digest now emits the stalled-work signal (critical/high, non-terminal,
+> past the 21-day line, named per thing) and cadence as weekly trend buckets
+> (a flat 30-day total once masked an 85 → 16 → 9 deceleration). Consume
+> those cues — never recompute them by reasoning. Your judgement residue in
+> this table is the rest: churn-vs-progress, ignored unblocks, untouched
+> commitments below the priority threshold, and what the stalls *mean*.
 
 ### 3. Proportional reporting
 
