@@ -3,9 +3,9 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-19
-generated: 2026-08-19T23:13:19
-generated_from: HEAD@394e65a
+created: 2026-08-20
+generated: 2026-08-20T08:05:40
+generated_from: HEAD@c863633
 coverage: 232
 framework_version: 3.32.0
 ---

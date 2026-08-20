@@ -129,16 +129,22 @@ read work, load the domain's read skill (its specification skill first).
 This is a declared inflection on a stable spec: the operator declares it by
 starting this phase; the four-beat reconciliation walk applies.
 
-- [ ] Read gate line added to `read.thing.md`'s kernel block; version bumped
-- [ ] `mdllm kernel` regenerated; `mdllm coherence` clean
-- [ ] Reconciliation walked (cue → assimilate → walk → seal); prose-only
-  residue checked (tier table, framework map)
-- [ ] Decide in-phase, not now: whether the general authoring rule ("declare
-  gates upstream of their target") earns a line in write.thing.md, or stays
-  carried by the insight — minimal core applies
-- [ ] Gate insight dispositioned toward promotion (`promoted_to` populated)
+- [x] Read gate line added to `read.thing.md`'s kernel block (v2.3); version
+  bumped
+- [x] `mdllm kernel` regenerated (read block 311 tokens); `mdllm coherence`
+  clean
+- [x] Reconciliation walked: `mdllm touchpoints read-thing-specification`
+  found 8 declared edges + 1 literal — all consistent under an additive
+  gate; templates carry no self-referential gate text; the QMS read skill's
+  own prereq is across the membrane and inherits the upstream gate via
+  refresh (Phase 5 offer)
+- [x] In-phase decision: the general authoring rule ("declare gates upstream
+  of their target") stays carried by the insight — no write.thing.md line;
+  minimal core
+- [x] Gate insight promoted: `promoted_to: read-thing-specification`
 
-**Gate:** the kernel carries the read gate; validate and coherence clean.
+**Gate: CLOSED 2026-08-20.** The kernel carries the read gate; validate and
+coherence clean.
 
 ## Phase 2 — Delivery: emit Tier 0, don't instruct it
 

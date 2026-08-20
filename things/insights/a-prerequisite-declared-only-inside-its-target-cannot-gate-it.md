@@ -1,13 +1,14 @@
 ---
 id: a-prerequisite-declared-only-inside-its-target-cannot-gate-it
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-08-19
 session: 2026-08-19
 source: both
 confidence: high
 origin: inferred
+promoted_to: read-thing-specification
 tags: [kernel, tier-0, skills, gates, session-start, contract-design]
 linked_things:
   - id: emitted-content-is-read-instructed-content-is-economised
@@ -15,7 +16,7 @@ linked_things:
     notes: "Locates the one skip common to all four observed sessions: delivery form explains most of the pattern; declaration position explains why the skill layer specifically never loads."
   - id: read-thing-specification
     relation: challenges
-    notes: "The read spec's kernel block carries no read-side gate, while write.thing.md's kernel block carries the write-side one. The fix is one upstream line plus kernel regen — named here, deliberately not applied ahead of the operator's overcoming plan."
+    notes: "The read spec's kernel block carried no read-side gate while write.thing.md's did. Fix applied 2026-08-20: read.thing.md v2.3 kernel block now carries the gate (session-start-hardening Phase 1); this insight promoted into it."
 ---
 
 # A prerequisite declared only inside its target cannot gate it

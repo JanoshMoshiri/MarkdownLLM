@@ -2,7 +2,7 @@
 id: read-thing-specification
 type: specification
 status: stable
-version: 2.2
+version: 2.3
 created: 2026-05-13
 linked_things:
   - id: thing-specification
@@ -17,6 +17,8 @@ linked_things:
 
 <!-- kernel -->
 **Read mode = analysis without modification.** No file changes, no status updates, no new things, no commitments on the user's behalf; suggest changes only when asked — except surfacing what a declared trigger fired on (a trigger is the domain's standing request to be told).
+
+**Before domain read work:** load the domain's read skill, its specification skill first — the read skill is where a domain keeps its trust semantics (mirror-vs-native, what `verified` means) and its read lenses. This gate mirrors write.thing.md's; it lived only inside the read skill it gates until five sessions across three harnesses reported domain state without it (2026-08-18/19, `a-prerequisite-declared-only-inside-its-target-cannot-gate-it`).
 
 **Load tiered, contextually:** L1 metadata for broad questions ("what's my situation?") · L2 +relationships for connection/path questions · L3 full body for deep questions about specific things. Load the relevant subset (by tag, time, domain), never everything. Go deeper only where L1 surfaced something.
 
