@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-20
-generated: 2026-08-20T19:50:54
-generated_from: HEAD@97a4f41
-coverage: 36
+generated: 2026-08-20T22:40:31
+generated_from: HEAD@84c3e14
+coverage: 37
 framework_version: 3.33.0
 ---
 
@@ -87,6 +87,12 @@ framework_version: 3.33.0
 
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## independent-substrate-review-2026-08-20-claude
+- floor-structure-residue (derived-from)
+- framework-retrospective-2026-08b (derived-from)
+- substrate-totality-residue (derived-from)
+- v3-33-release-and-external-acceptance (derived-from)
 
 ## independent-substrate-review-2026-08-20-codex
 - autopush-requires-explicit-authority (pinned @27b95e739f78cad6fa609cee7b1359897ccf40ae)

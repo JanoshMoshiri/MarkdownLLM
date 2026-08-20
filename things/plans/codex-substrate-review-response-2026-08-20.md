@@ -32,6 +32,12 @@ linked_things:
   - id: llm-driven-systems-manifesto
     relation: references
     notes: "The reconciliation preserves the thesis while narrowing guarantees to demonstrated layers."
+  - id: independent-substrate-review-2026-08-20-claude
+    relation: references
+    notes: "The independent closeout that discharged the register's assessment row: remediation accepted, one finding narrowed, one adjacent defect reopened."
+  - id: v3-33-release-and-external-acceptance
+    relation: references
+    notes: "Carries the register's remaining external rows in the orient view, since a completed plan no longer surfaces them."
 ---
 
 # Codex Substrate Review Response — Local Closeout
@@ -148,11 +154,17 @@ of this completion condition.
 | Fresh Codex app/CLI instruction delivery, lifecycle dispatch, restricted-to-approved Git path, nested floor, and write-feedback limits | Pending exact-build rerun | `vendor-harness-adapter-foundation` + `session-start-hardening`; record in the harness capability matrix | Does not block local mechanical closeout |
 | Fresh Cowork remote and local assembly, sync, contract, adherence, commit floor, and publication-path evidence | Pending exact client/plugin runs | `cowork-adapter`; record in the harness capability matrix | Does not block local mechanical closeout |
 | Public v3.33 release and push | Not authorised or performed | Operator; reconcile changelog, compatibility/migration notes, artifact integrity, publication debt, and release judgement | Explicitly outside local completion |
-| Independent Claude assessment of review, plan, commits, evidence, and residuals | Pending after final immutable commit/evidence | Operator/review follow-up; preserve Claude's closed/narrowed/reopened disposition as a review artifact | Independent assurance, not something this implementation may self-award |
+| Independent Claude assessment of review, plan, commits, evidence, and residuals | **Closed 2026-08-20** — `reviews/REVIEW-independent-substrate-2026-08-20-claude.md`. Verified against current bytes at `commit:97a4f41`, not against this record: sixteen findings confirmed closed, three narrowed as stated, finding 11 reopened at one edge and the eval-isolation corner of finding 8 reopened as new work. Residue carried by `substrate-totality-residue` and `floor-structure-residue` | Recorded as a review artifact; its disposition table is the closeout | Independent assurance, received rather than self-awarded |
 
 Pending rows must remain pending. “Adapter exists,” “content emitted,” and
 “tests pass” are not substitutes for a product receiving, reading, applying, or
 independently satisfying a contract.
+
+The four rows that are still pending now live in
+`v3-33-release-and-external-acceptance`. A completed plan leaves the orient
+view, so the register that named them stopped being visible the moment this plan
+closed honestly — the carrier holds them where the next session will meet them.
+The rows are not restated there; their owners are unchanged.
 
 ## Residual Risk Register
 

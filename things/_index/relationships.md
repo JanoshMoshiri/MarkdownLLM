@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T19:50:16
-generated_from: HEAD@97a4f41
-coverage: 239
+generated: 2026-08-20T22:40:24
+generated_from: HEAD@84c3e14
+coverage: 245
 framework_version: 3.33.0
 ---
 
@@ -87,6 +87,10 @@ framework_version: 3.33.0
 - a-shared-worktree-merges-authorship-at-the-index --challenges--> coordination-claim-specification
 - a-shared-worktree-merges-authorship-at-the-index --references--> git-workflow-specification
 - a-shared-worktree-merges-authorship-at-the-index --complements--> divergence-is-an-unrouted-decision
+- a-stated-dismissal-condition-needs-a-reader --informs--> framework-retrospective-2026-08b
+- a-stated-dismissal-condition-needs-a-reader --challenges--> session-memory-specification
+- a-stated-dismissal-condition-needs-a-reader --references--> trigger-specification
+- a-stated-dismissal-condition-needs-a-reader --supports--> a-uniform-answer-is-a-dead-judgment
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --references--> llm-driven-systems-manifesto
 - a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -242,6 +246,8 @@ framework_version: 3.33.0
 - codex-substrate-review-response-2026-08-20 --complements--> vendor-harness-adapter-foundation
 - codex-substrate-review-response-2026-08-20 --complements--> cowork-adapter
 - codex-substrate-review-response-2026-08-20 --references--> llm-driven-systems-manifesto
+- codex-substrate-review-response-2026-08-20 --references--> independent-substrate-review-2026-08-20-claude
+- codex-substrate-review-response-2026-08-20 --references--> v3-33-release-and-external-acceptance
 - coherence-is-a-maintained-rate-not-a-state --supports--> cumulative-drift-is-invisible-to-per-change-walks
 - coherence-is-a-maintained-rate-not-a-state --supports--> repeated-drift-promotes-a-fact-into-the-floor
 - coherence-is-a-maintained-rate-not-a-state --supports--> hook-enforcement-has-three-anchors
@@ -446,6 +452,13 @@ framework_version: 3.33.0
 - first-hour-guide --references--> framework-discovery-specification
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
+- floor-structure-residue --derived-from--> independent-substrate-review-2026-08-20-claude
+- floor-structure-residue --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
+- floor-structure-residue --references--> srp-extraction-is-tier-promotion
+- floor-structure-residue --implements--> portability-claims-need-execution-tests
+- floor-structure-residue --references--> code-architect-governs-substrate-code
+- floor-structure-residue --references--> mechanical-coherence-checks-backlog
+- floor-structure-residue --supports--> cumulative-drift-is-invisible-to-per-change-walks
 - framework-discovery-specification --extends--> domain-specification-guide
 - framework-discovery-specification --references--> thing-specification
 - framework-discovery-specification --references--> git-workflow-specification
@@ -487,6 +500,14 @@ framework_version: 3.33.0
 - framework-retrospective-2026-08a --references--> inflection-candidates-are-computable
 - framework-retrospective-2026-08a --references--> a-generated-surface-collapses-its-walk
 - framework-retrospective-2026-08a --supports--> a-true-primitive-is-discovered-not-authored
+- framework-retrospective-2026-08b --extends--> framework-retrospective-2026-08a
+- framework-retrospective-2026-08b --implements--> retrospective-specification
+- framework-retrospective-2026-08b --implements--> session-memory-specification
+- framework-retrospective-2026-08b --derived-from--> independent-substrate-review-2026-08-20-claude
+- framework-retrospective-2026-08b --references--> a-uniform-answer-is-a-dead-judgment
+- framework-retrospective-2026-08b --references--> a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist
+- framework-retrospective-2026-08b --informs--> a-stated-dismissal-condition-needs-a-reader
+- framework-retrospective-2026-08b --references--> thing-lifecycle-specification
 - framework-root-tracks-both-adapters --informs--> vendor-harness-adapter-foundation
 - framework-root-tracks-both-adapters --references--> code-architect-governs-substrate-code
 - framework-upward-signal --implements--> shared-domain-failures-are-a-framework-signal-without-a-path
@@ -539,6 +560,16 @@ framework_version: 3.33.0
 - independent-review-2026-08-11-codex --challenges--> hook-enforcement-has-three-anchors
 - independent-review-2026-08-11-codex --supports--> portability-claims-need-execution-tests
 - independent-review-2026-08-11-codex --informs--> vendor-harness-adapter-foundation
+- independent-substrate-review-2026-08-20-claude --validates--> independent-substrate-review-2026-08-20-codex
+- independent-substrate-review-2026-08-20-claude --validates--> codex-substrate-review-response-2026-08-20
+- independent-substrate-review-2026-08-20-claude --references--> substrate-review-implementation-evidence-2026-08-20
+- independent-substrate-review-2026-08-20-claude --references--> harness-capability-evidence-matrix-2026-08-20
+- independent-substrate-review-2026-08-20-claude --supports--> coherence-is-a-maintained-rate-not-a-state
+- independent-substrate-review-2026-08-20-claude --informs--> substrate-totality-residue
+- independent-substrate-review-2026-08-20-claude --informs--> floor-structure-residue
+- independent-substrate-review-2026-08-20-claude --informs--> framework-retrospective-2026-08b
+- independent-substrate-review-2026-08-20-claude --informs--> v3-33-release-and-external-acceptance
+- independent-substrate-review-2026-08-20-claude --validates--> llm-driven-systems-manifesto
 - independent-substrate-review-2026-08-20-codex --extends--> independent-review-2026-08-11-codex
 - independent-substrate-review-2026-08-20-codex --informs--> codex-substrate-review-response-2026-08-20
 - independent-substrate-review-2026-08-20-codex --challenges--> llm-driven-systems-manifesto
@@ -826,6 +857,11 @@ framework_version: 3.33.0
 - substrate-review-retrospective-reconciliation-2026-08-20 --documents--> codex-substrate-review-response-2026-08-20
 - substrate-review-retrospective-reconciliation-2026-08-20 --extends--> substrate-review-implementation-evidence-2026-08-20
 - substrate-review-retrospective-reconciliation-2026-08-20 --implements--> change-reconciliation-specification
+- substrate-totality-residue --derived-from--> independent-substrate-review-2026-08-20-claude
+- substrate-totality-residue --implements--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- substrate-totality-residue --references--> a-wrong-sum-is-indistinguishable-from-a-right-one
+- substrate-totality-residue --implements--> validate-thing-specification
+- substrate-totality-residue --references--> trigger-specification
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
 - the-harness-bound-path-is-the-least-tested-path --supports--> portability-claims-need-execution-tests
@@ -872,6 +908,12 @@ framework_version: 3.33.0
 - trigger-specification --complements--> derived-index-specification
 - trigger-specification --informs--> membrane-attention-cluster
 - trigger-specification --references--> provenance-specification
+- v3-33-release-and-external-acceptance --extends--> codex-substrate-review-response-2026-08-20
+- v3-33-release-and-external-acceptance --derived-from--> independent-substrate-review-2026-08-20-claude
+- v3-33-release-and-external-acceptance --documents--> harness-capability-evidence-matrix-2026-08-20
+- v3-33-release-and-external-acceptance --complements--> session-start-hardening
+- v3-33-release-and-external-acceptance --complements--> vendor-harness-adapter-foundation
+- v3-33-release-and-external-acceptance --complements--> cowork-adapter
 - validate-thing-specification --validates--> thing-specification
 - validate-thing-specification --validates--> orchestration-specification
 - validate-thing-specification --complements--> belief-revision-specification
