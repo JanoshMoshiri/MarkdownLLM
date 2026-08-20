@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T23:01:33
-generated_from: HEAD@ed5cb3d
-coverage: 246
+generated: 2026-08-20T23:32:53
+generated_from: HEAD@35de802
+coverage: 247
 framework_version: 3.33.0
 ---
 
@@ -853,6 +853,21 @@ framework_version: 3.33.0
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
 - substrate-reconciliation-2026-08-09 --references--> autopush-moves-the-deliberate-act
+- substrate-review-consolidated-remedy-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-claude
+- substrate-review-consolidated-remedy-2026-08-20 --derived-from--> independent-substrate-current-state-review-2026-08-20-codex
+- substrate-review-consolidated-remedy-2026-08-20 --references--> codex-substrate-review-response-2026-08-20
+- substrate-review-consolidated-remedy-2026-08-20 --implements--> llm-driven-systems-manifesto
+- substrate-review-consolidated-remedy-2026-08-20 --subtask--> substrate-totality-residue
+- substrate-review-consolidated-remedy-2026-08-20 --subtask--> floor-structure-residue
+- substrate-review-consolidated-remedy-2026-08-20 --subtask--> framework-retrospective-2026-08b
+- substrate-review-consolidated-remedy-2026-08-20 --subtask--> evidence-and-eval-backlog
+- substrate-review-consolidated-remedy-2026-08-20 --subtask--> coherence-mechanism-build
+- substrate-review-consolidated-remedy-2026-08-20 --subtask--> v3-33-release-and-external-acceptance
+- substrate-review-consolidated-remedy-2026-08-20 --references--> session-start-hardening
+- substrate-review-consolidated-remedy-2026-08-20 --references--> vendor-harness-adapter-foundation
+- substrate-review-consolidated-remedy-2026-08-20 --references--> cowork-adapter
+- substrate-review-consolidated-remedy-2026-08-20 --references--> mechanical-coherence-checks-backlog
+- substrate-review-consolidated-remedy-2026-08-20 --references--> external-review-response-2026-08-10
 - substrate-review-implementation-evidence-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
 - substrate-review-implementation-evidence-2026-08-20 --documents--> codex-substrate-review-response-2026-08-20
 - substrate-review-implementation-evidence-2026-08-20 --extends--> substrate-review-phase0-disposition-2026-08-20
