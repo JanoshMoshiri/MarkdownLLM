@@ -141,12 +141,14 @@ def test_assemble_end_to_end(workspace, capsys):
     # The handoff states publication mode honestly (ambient here — no
     # token in the test environment means autopush would work).
     assert "HANDOFF" in out
-    # Attestations recorded per clone with the contract token.
+    # Attestations recorded per clone with the contract token (the kernel
+    # token rides beside it since session-start-hardening Phase 2).
     for name in ("alpha-estate", "beta-estate"):
         attest = (root / "domains" / name / ".git" / "mdllm-attest")
         assert attest.is_file()
-        assert attest.read_text(encoding="utf-8").strip().endswith(
-            " contract")
+        text = attest.read_text(encoding="utf-8").strip()
+        assert " contract" in text
+        assert " kernel=" in text
 
 
 def test_assemble_filters_and_reports_misses(workspace, capsys):

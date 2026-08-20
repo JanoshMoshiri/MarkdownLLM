@@ -13,6 +13,8 @@ session.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -203,6 +205,12 @@ def _floor_status(root: Path) -> str | None:
 
 
 
+def _kernel_path() -> Path:
+    from .scaffold import MDLLM_ENTRY
+
+    return MDLLM_ENTRY.resolve().parents[1] / "kernel.md"
+
+
 def _kernel_reference(domain: Path) -> str:
     """The path a reader in `domain` can actually open to reach the kernel.
 
@@ -211,14 +219,58 @@ def _kernel_reference(domain: Path) -> str:
     2026-08-13). AGENTS.md already says `{framework_root}/kernel.md`; this
     renders the same fact resolved.
     """
-    from .scaffold import MDLLM_ENTRY
-    import os
-
-    kernel = MDLLM_ENTRY.resolve().parents[1] / "kernel.md"
+    kernel = _kernel_path()
     try:
         return Path(os.path.relpath(kernel, domain.resolve())).as_posix()
     except ValueError:            # different drive — no relative path exists
         return kernel.as_posix()
+
+
+def _kernel_integrity(text: str) -> tuple[int, str]:
+    """Line count + short digest of the kernel as emitted, so "did it land
+    whole" is checkable in-context (the trailer) and on disk (the
+    attestation) instead of being a memory claim — the Terra failure mode:
+    a load that *executed* but landed truncated produced sincere believed
+    compliance that survived a casual grilling (2026-08-19). Normalised to
+    `\\n` so the mark survives checkout line-ending differences."""
+    normal = text.replace("\r\n", "\n")
+    lines = normal.count("\n") + (0 if normal.endswith("\n") else 1)
+    return lines, hashlib.sha256(normal.encode("utf-8")).hexdigest()[:12]
+
+
+_KERNEL_TRAILER = ("[kernel emitted whole — {lines} lines, sha256 {digest}. "
+                   "This trailer is the integrity mark: if it is missing, or "
+                   "a [truncated] / [contract elided: marker appears in the "
+                   "kernel above, the channel cut the emission — read "
+                   "`{ref}` in full before acting.]")
+
+
+def _kernel_emission(domain: Path) -> tuple[list[str], str]:
+    """The operative kernel emitted inline, plus the attestation state:
+    `whole:<sha12>:<lines>`, `elided`, or `absent`.
+
+    Emission, not instruction — the five-run baseline (2026-08-18/19, two
+    vendors, three harnesses, four models): emitted content is read,
+    instructed content is economised. Only channels that can carry the
+    kernel whole call this; the hook/runner channel defers loudly instead
+    (see cmd_session_start), because truncation marked is not landing.
+    """
+    ref = _kernel_reference(domain)
+    kernel = _kernel_path()
+    if not kernel.is_file():
+        return (["## The operative kernel — MISSING", "",
+                 f"`{ref}` does not exist — regenerate it at the framework "
+                 f"root (`mdllm kernel`) and re-run; the ritual below is "
+                 f"ungoverned without it.", ""], "absent")
+    text = kernel.read_text(encoding="utf-8")
+    lines, digest = _kernel_integrity(text)
+    if len(text) > CONTRACT_SECTION_CHARACTERS:
+        return ([f"## The operative kernel — `{ref}`", "",
+                 _elide(text, CONTRACT_SECTION_CHARACTERS, ref), ""],
+                "elided")
+    return ([f"## The operative kernel — `{ref}` (emitted)", "", text,
+             _KERNEL_TRAILER.format(lines=lines, digest=digest, ref=ref),
+             ""], f"whole:{digest}:{lines}")
 
 
 # Contract emission bounds. The Tier-0 contract is inherently large (an
@@ -256,7 +308,6 @@ def _emit_contract(domain: Path) -> list[str]:
     load was checked against).
     """
     from .domain_kernel import routed_prompts, routed_skills
-    from .scaffold import MDLLM_ENTRY
 
     out = ["# MarkdownLLM — Tier-0 Contract (emitted)", "",
            "This is the contract itself, not a pointer at it. Everything "
@@ -265,11 +316,16 @@ def _emit_contract(domain: Path) -> list[str]:
            ""]
 
     kernel_ref = _kernel_reference(domain)
-    kernel = MDLLM_ENTRY.resolve().parents[1] / "kernel.md"
+    kernel = _kernel_path()
     if kernel.is_file():
+        text = kernel.read_text(encoding="utf-8")
         out += [f"## The operative kernel — `{kernel_ref}`", "",
-                _elide(kernel.read_text(encoding="utf-8"),
-                       CONTRACT_SECTION_CHARACTERS, kernel_ref), ""]
+                _elide(text, CONTRACT_SECTION_CHARACTERS, kernel_ref)]
+        if len(text) <= CONTRACT_SECTION_CHARACTERS:
+            lines_n, digest = _kernel_integrity(text)
+            out.append(_KERNEL_TRAILER.format(
+                lines=lines_n, digest=digest, ref=kernel_ref))
+        out.append("")
     else:
         out += ["## The operative kernel — MISSING", "",
                 f"`{kernel_ref}` does not exist — regenerate it at the "
@@ -309,8 +365,29 @@ def _emit_contract(domain: Path) -> list[str]:
     return out
 
 
+def _write_contract_copy(domain: Path, text: str) -> str | None:
+    """Write the full contract emission inside the git dir and return a
+    domain-relative reference, or None (best-effort — emission never fails
+    on its receipt copy)."""
+    try:
+        gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=domain,
+                            capture_output=True, text=True)
+        if gd.returncode != 0 or not gd.stdout.strip():
+            return None
+        target = ((domain / gd.stdout.strip()).resolve()
+                  / "mdllm-contract-emission.md")
+        target.write_text(text + "\n", encoding="utf-8")
+        try:
+            return Path(os.path.relpath(target, domain.resolve())).as_posix()
+        except ValueError:
+            return target.as_posix()
+    except Exception:
+        return None
+
+
 def _record_session_attestation(domain: Path, *,
-                                contract_emitted: bool = False) -> None:
+                                contract_emitted: bool = False,
+                                kernel_state: str = "") -> None:
     """Record that the Tier-0 contract entered this session, per clone.
 
     Running session-start IS the mechanical proxy for the contract entering
@@ -343,8 +420,16 @@ def _record_session_attestation(domain: Path, *,
             # token 0 (freshness), so old two-token attestations stay valid;
             # this token is evidence for humans and Phase 5 records.
             tail = " contract" if contract_emitted else ""
+            # A kernel token records what the emitter DID with the kernel:
+            # whole:<sha12>:<lines> (landed, checkable), elided (bounded —
+            # did not land whole), deferred (hook channel, by design), or
+            # absent. The gate keeps reading token 0 for freshness (old
+            # attestations stay valid) and additionally surfaces `elided`
+            # as a Warning — the remote Cowork evidence (2026-08-19) showed
+            # a truncated emission clearing a timestamp-only gate.
+            mark = f" kernel={kernel_state}" if kernel_state else ""
             ((domain / gd.stdout.strip()).resolve() / "mdllm-attest").write_text(
-                f"{stamp} {sha}{tail}\n", encoding="utf-8")
+                f"{stamp} {sha}{tail}{mark}\n", encoding="utf-8")
     except Exception:
         pass
 
@@ -404,13 +489,55 @@ def cmd_session_start(args) -> int:
     # too small); this mode exists for bootstraps and adapterless harnesses
     # where nothing injects the entry file.
     emit_contract = bool(getattr(args, "contract", False))
-    out: list[str] = _emit_contract(domain) if emit_contract else []
+
+    # The kernel is EMITTED, not instructed, on every channel that can carry
+    # it whole — the five-run baseline (session-start-hardening Phase 0):
+    # emitted content is read; instructed content is economised. The one
+    # channel that cannot is the hook/runner path (2,200-character budget,
+    # two orders of magnitude below the kernel); the runner marks itself via
+    # MDLLM_LIFECYCLE_CHANNEL and gets a loud, checkable deferral instead —
+    # a partial kernel, even with elision marked, recreates the
+    # believed-loaded failure (truncation marked is not landing).
+    runner_channel = bool(os.environ.get("MDLLM_LIFECYCLE_CHANNEL"))
+    out: list[str] = []
+    kernel_state = ""
+    if emit_contract:
+        out += _emit_contract(domain)
+        _, kernel_state = _kernel_emission(domain)
+    elif runner_channel:
+        kernel_state = "deferred"
+    else:
+        block, kernel_state = _kernel_emission(domain)
+        out += block
+
+    kernel_ref = _kernel_reference(domain)
+    if emit_contract or kernel_state.startswith("whole"):
+        step1 = (f"1. Load `{kernel_ref}` (operative kernel). Already "
+                 f"emitted above — loaded; do not re-read.")
+    elif kernel_state == "deferred":
+        kernel_file = _kernel_path()
+        if kernel_file.is_file():
+            lines_n, digest = _kernel_integrity(
+                kernel_file.read_text(encoding="utf-8"))
+            step1 = (f"1. **Kernel NOT emitted** (hook channel budget) — "
+                     f"read `{kernel_ref}` END TO END before acting on "
+                     f"anything below: {lines_n} lines, sha256 {digest}. "
+                     f"A read that cannot account for both did not land "
+                     f"whole.")
+        else:
+            step1 = (f"1. Load `{kernel_ref}` (operative kernel) — MISSING; "
+                     f"regenerate at the framework root (`mdllm kernel`).")
+    elif kernel_state == "elided":
+        step1 = (f"1. The kernel above was ELIDED at the emission bound — "
+                 f"read `{kernel_ref}` in full past the elision mark before "
+                 f"acting.")
+    else:  # absent
+        step1 = (f"1. Load `{kernel_ref}` (operative kernel) — MISSING; "
+                 f"regenerate at the framework root (`mdllm kernel`).")
 
     out += ["# MarkdownLLM — Session Start (run before the user's first request)", "",
            "The live request will pull you toward itself; do these first, then await intent:",
-           f"1. Load `{_kernel_reference(domain)}` (operative kernel)."
-           + (" Already emitted above — loaded; do not re-read."
-              if emit_contract else ""),
+           step1,
            "2. Act on the version + velocity (backward) and open-loops (forward) status below.",
            "3. Surface the fired triggers below to the user; judge the ones the "
            "floor could not evaluate.", ""]
@@ -521,7 +648,23 @@ def cmd_session_start(args) -> int:
     for message in retrospective_due:
         out.append(f"- **Retrospective cadence:** {message}")
 
-    _record_session_attestation(domain, contract_emitted=emit_contract)
+    _record_session_attestation(domain, contract_emitted=emit_contract,
+                                kernel_state=kernel_state)
 
-    print("\n".join(out))
+    text = "\n".join(out)
+    if emit_contract:
+        # Receipt path (cowork-remote-phase5-evidence-2026-08-19 F1/F2): a
+        # harness may preview-truncate a large emission in its transcript
+        # display — 76.4 KB became a ~2 KB preview and receipt required
+        # manual recovery. The full emission is therefore also written to
+        # disk (inside the git dir: uncommittable by construction) and named
+        # in-band, so recovery is one file read on any harness — Read is
+        # every harness's native full-content channel.
+        copy_ref = _write_contract_copy(domain, text)
+        if copy_ref:
+            text += ("\n\n[receipt: this emission is also on disk at "
+                     f"`{copy_ref}` — if any [truncated] or [contract "
+                     "elided: marker appears above, read that file in full "
+                     "instead of trusting the preview]")
+    print(text)
     return 0

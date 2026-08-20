@@ -15,9 +15,13 @@ Pinned here:
 - emission is bounded with MARKED elision naming the on-disk path;
 - the attestation records real contract emission with a third token the
   gate ignores (token 0 stays the freshness fact old attestations carry);
-- the plain hook path is byte-identical to before — hook budgets are two
-  orders of magnitude too small for a contract, so hook bindings never
-  pass ``--contract``.
+- the plain path is CHANNEL-AWARE (session-start-hardening Phase 2): on a
+  direct channel it emits the kernel whole with an integrity trailer; on
+  the runner channel (``MDLLM_LIFECYCLE_CHANNEL`` set — hook budgets are
+  two orders of magnitude too small for a kernel) it defers loudly with
+  the kernel's line count and digest, never a marked-but-partial kernel;
+- the attestation carries a kernel token (whole/deferred/elided/absent);
+  the gate surfaces ``elided`` as a non-blocking Warning in both modes.
 
 Run: python -m pytest tools/tests/test_contract_emission.py -q
 """
@@ -93,12 +97,33 @@ def test_contract_precedes_orientation_and_carries_both_files(
     assert "Already emitted above" in out
 
 
-def test_plain_session_start_is_unchanged(pristine, capsys):
+def test_plain_session_start_emits_kernel_on_direct_channel(
+        pristine, capsys, monkeypatch):
+    """Emission, not instruction: a direct CLI run (manual, Codex, any
+    unbudgeted transcript channel) carries the kernel whole with the
+    integrity trailer, and step 1 stops instructing the read."""
+    monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
     assert mdllm.cmd_session_start(_ns(path=str(pristine))) == 0
     out = capsys.readouterr().out
-    assert "Tier-0 Contract" not in out
-    assert "Already emitted above" not in out
+    assert "Tier-0 Contract" not in out          # --contract stays its own mode
+    assert "Framework Operative Kernel" in out   # kernel CONTENT landed
+    assert "[kernel emitted whole —" in out      # integrity trailer present
+    assert "Already emitted above" in out        # step 1 is not an instruction
+
+
+def test_runner_channel_defers_kernel_loudly(pristine, capsys, monkeypatch):
+    """The hook channel cannot carry the kernel (2,200-char budget); the
+    runner marks itself and the emitter defers LOUDLY — line count and
+    digest named so the follow-up read is checkable — rather than letting
+    the structural bound cut the kernel mid-body (truncation marked is not
+    landing)."""
+    monkeypatch.setenv("MDLLM_LIFECYCLE_CHANNEL", "session-start")
+    assert mdllm.cmd_session_start(_ns(path=str(pristine))) == 0
+    out = capsys.readouterr().out
     assert out.startswith("# MarkdownLLM — Session Start")
+    assert "## The operative kernel" not in out  # no partial kernel body
+    assert "**Kernel NOT emitted** (hook channel budget)" in out
+    assert "sha256" in out and "END TO END" in out
 
 
 def test_derived_list_cannot_be_short(mutable, capsys):
@@ -184,21 +209,78 @@ def _attest(domain: Path) -> str:
 
 
 def test_attestation_marks_real_emission_and_gate_accepts_both(
-        mutable, capsys):
-    # Plain ritual: two tokens, no contract mark.
+        mutable, capsys, monkeypatch):
+    monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
+    # Plain ritual on a direct channel: no contract mark, kernel landed whole.
     assert mdllm.cmd_session_start(_ns(path=str(mutable))) == 0
     capsys.readouterr()
     plain = _attest(mutable).strip()
-    assert not plain.endswith(" contract")
+    assert " contract" not in plain
+    assert " kernel=whole:" in plain
 
-    # Emission: third token records that the contract content went out.
+    # Emission: the contract token records that the contract content went
+    # out, and the kernel token rides beside it.
     assert mdllm.cmd_session_start(
         _ns(path=str(mutable), contract=True)) == 0
     capsys.readouterr()
     emitted = _attest(mutable).strip()
-    assert emitted.endswith(" contract")
+    assert " contract" in emitted
+    assert " kernel=whole:" in emitted
 
-    # The scaffolded domain declares session_gate: strict; the gate reads
-    # token 0 only, so both attestation forms clear it.
+    # The scaffolded domain declares session_gate: strict; token 0 stays the
+    # freshness fact, so both attestation forms clear it.
     assert mdllm.cmd_validate(_ns(path=str(mutable), quiet=True)) == 0
     capsys.readouterr()
+
+
+def test_contract_emission_writes_receipt_copy(mutable, capsys, monkeypatch):
+    """A harness may preview-truncate a large emission (the 76.4 KB → ~2 KB
+    Cowork case); the full emission is also written inside the git dir and
+    named in-band, so receipt is one file read on any harness."""
+    monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
+    assert mdllm.cmd_session_start(
+        _ns(path=str(mutable), contract=True)) == 0
+    out = capsys.readouterr().out
+    assert "[receipt: this emission is also on disk at" in out
+    gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=mutable,
+                        capture_output=True, text=True).stdout.strip()
+    copy = (mutable / gd).resolve() / "mdllm-contract-emission.md"
+    assert copy.is_file()
+    saved = copy.read_text(encoding="utf-8")
+    assert "Framework Operative Kernel" in saved
+    assert "MarkdownLLM — Session Start" in saved
+
+
+def test_runner_channel_attests_deferred_kernel(mutable, capsys, monkeypatch):
+    monkeypatch.setenv("MDLLM_LIFECYCLE_CHANNEL", "session-start")
+    assert mdllm.cmd_session_start(_ns(path=str(mutable))) == 0
+    capsys.readouterr()
+    assert " kernel=deferred" in _attest(mutable).strip()
+    # Deferred is by design (the hook channel cannot carry the kernel) —
+    # the strict gate stays clear.
+    assert mdllm.cmd_validate(_ns(path=str(mutable), quiet=True)) == 0
+    capsys.readouterr()
+
+
+def test_elided_kernel_is_attested_and_warned_never_blocked(
+        mutable, capsys, monkeypatch):
+    """An emission whose kernel section hit the bound records kernel=elided,
+    and the gate surfaces it as a WARNING in both modes — never a strict
+    Error, because the remedy (read the named file in full) is evidence the
+    floor cannot receive, and a commit-block the session cannot clear is a
+    dead-end gate. The remote Cowork evidence (2026-08-19): a truncated
+    emission cleared the timestamp-only gate unseen."""
+    monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
+    import markdownllm.session as session
+    monkeypatch.setattr(session, "CONTRACT_SECTION_CHARACTERS", 200)
+    assert mdllm.cmd_session_start(_ns(path=str(mutable))) == 0
+    out = capsys.readouterr().out
+    assert "[contract elided:" in out            # marked, naming the path
+    assert "ELIDED" in out                       # step 1 says so loudly
+    assert " kernel=elided" in _attest(mutable).strip()
+
+    # The scaffolded domain declares strict; elided is a Warning, so the
+    # exit code stays 0 (non-blocking) while the finding is printed.
+    assert mdllm.cmd_validate(_ns(path=str(mutable), quiet=False)) == 0
+    validate_out = capsys.readouterr().out
+    assert "ELIDED kernel" in validate_out

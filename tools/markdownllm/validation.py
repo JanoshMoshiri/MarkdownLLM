@@ -696,15 +696,22 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
     the attestation proves the Tier-0 contract was *emitted into this clone's
     session*, not that it was heeded — the heeding residue belongs to the
     register work, and is a categorically smaller failure class than
-    never-saw-it. Severity: Warning under `warn`, commit-blocking Error under
+    never-saw-it. Token 0 carries the freshness fact; the kernel token
+    (session-start-hardening Phase 2) says what the kernel emission DID —
+    whole/deferred/elided/absent — and `elided`/`absent` surface as
+    Warnings in both modes, never a strict Error (the remedy is a read the
+    floor cannot witness; a gate the session cannot clear is a dead end).
+    Severity: Warning under `warn`, commit-blocking Error under
     `strict`. Anchor: git-fs (runs in the pre-commit hook via validate)."""
     mode = ((corpus.schema or {}).get("options") or {}).get("session_gate")
     if mode not in ("warn", "strict"):
         return []
     sev = SEV_ERROR if mode == "strict" else SEV_WARNING
     remedy = ("run `mdllm session-start .` through the manual CLI launch "
-              "route in this clone's on-disk AGENTS.md — it emits the Tier-0 "
-              "contract and records the attestation — then commit")
+              "route in this clone's on-disk AGENTS.md — on a direct channel "
+              "it emits the operative kernel whole (`--contract` emits the "
+              "full Tier-0 contract) and records an attestation whose kernel "
+              "token says what landed — then commit")
     gd = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
                         capture_output=True, text=True)
     if gd.returncode != 0 or not gd.stdout.strip():
@@ -734,7 +741,8 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
                         "this clone has been working without the Tier-0 "
                         "contract; " + remedy)]
     try:
-        stamp = attest.read_text(encoding="utf-8").split()[0]
+        tokens = attest.read_text(encoding="utf-8").split()
+        stamp = tokens[0]
         age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(stamp)
     except Exception:
         return [Finding(sev, "_session-gate",
@@ -745,6 +753,27 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
                         f"session gate: attestation is {hrs}h old (window "
                         f"{SESSION_GATE_WINDOW_HOURS}h) — this session opened on "
                         "yesterday's contract; " + remedy)]
+    # The kernel token (session-start-hardening Phase 2): the emitter records
+    # what it DID with the kernel — whole:<sha>:<lines> / deferred (hook
+    # channel, by design) / elided / absent. `elided` means the emission ran
+    # but the kernel did not land whole (the remote Cowork evidence: a
+    # truncated emission cleared this gate's timestamp-only check unseen).
+    # Deliberately a Warning in BOTH modes, never a strict Error: the remedy
+    # — read the named file in full — is evidence the floor cannot receive,
+    # and a commit-block the session cannot clear is a dead-end gate.
+    # Legacy attestations carry no kernel token and stay silent.
+    kernel_token = next((t for t in tokens[1:] if t.startswith("kernel=")), "")
+    if kernel_token == "kernel=elided":
+        return [Finding(SEV_WARNING, "_session-gate",
+                        "session gate: the attested emission carried an "
+                        "ELIDED kernel — it did not land whole; read the "
+                        "kernel file named in the emission in full before "
+                        "acting on domain state")]
+    if kernel_token == "kernel=absent":
+        return [Finding(SEV_WARNING, "_session-gate",
+                        "session gate: the attested emission found NO kernel "
+                        "file — regenerate it at the framework root "
+                        "(`mdllm kernel`) and re-run `mdllm session-start .`")]
     return []
 
 

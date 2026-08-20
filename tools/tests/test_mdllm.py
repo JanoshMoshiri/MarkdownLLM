@@ -3062,7 +3062,10 @@ def test_session_start_cadence_quiet_for_young_domain(tmp_path, capsys):
     _sync_git(root, "commit", "-q", "-m", "born recently")
     cmd_session_start(argparse.Namespace(path=str(root)))
     out = capsys.readouterr().out
-    assert "Retrospective cadence" not in out  # quiet when healthy
+    # Quiet when healthy — the formatted finding line specifically: the
+    # emitted kernel's own text mentions the phrase, so the assert targets
+    # the digest line, not the whole output.
+    assert "- **Retrospective cadence:**" not in out
 
 
 def test_estate_sweep_rolls_up_retrospective_debt(tmp_path, capsys):
@@ -3185,8 +3188,11 @@ def test_session_start_writes_attestation(tmp_path, capsys):
                  capture_output=True, text=True).stdout.strip()
     attest = (tmp_path / gd).resolve() / "mdllm-attest"
     assert attest.is_file()
-    stamp, sha = attest.read_text(encoding="utf-8").split()
+    tokens = attest.read_text(encoding="utf-8").split()
+    stamp, sha = tokens[0], tokens[1]
     assert len(sha) >= 7  # HEAD sha recorded beside the timestamp
+    # The kernel token records what the emission did (Phase 2).
+    assert any(t.startswith("kernel=") for t in tokens[2:])
 
 
 def test_session_start_attests_and_the_clone_then_clears_the_gate(tmp_path,
@@ -3283,8 +3289,12 @@ def test_session_start_names_an_openable_kernel(tmp_path, capsys):
     mdllm.cmd_session_start(_ns(path=str(tmp_path)))
     out = capsys.readouterr().out
 
-    line = next(l for l in out.splitlines() if "operative kernel" in l)
-    reference = line.split("Load `")[1].split("`")[0]
+    # The direct channel emits the kernel under a header naming the openable
+    # reference (Phase 2); the regression intent is unchanged — the name a
+    # reader is given must resolve from inside the domain.
+    line = next(l for l in out.splitlines()
+                if l.startswith("## The operative kernel"))
+    reference = line.split("`")[1]
     assert reference != "kernel.md", "a bare name resolves inside the domain"
     assert (tmp_path / reference).resolve().is_file()
 

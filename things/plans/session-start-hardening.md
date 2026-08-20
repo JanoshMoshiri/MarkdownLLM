@@ -172,25 +172,48 @@ foundation, named so they cannot be rediscovered the hard way:
 - **Scope: kernel only.** Cost measured with `mdllm tokens` before/after
   and recorded in the changelog — not restated in prose.
 
-- [ ] `mdllm session-start` emits kernel content whole, with integrity
-  trailer and loud degradation path
-- [ ] Budget shares verified on the largest live domain (the Gate 6R
-  fixture class)
-- [ ] Token cost measured and recorded
-- [ ] The session-gate remedy text names the emitting form and the gate
-  reads the marker it writes — or the gate's claim narrows to freshness in
-  its own words, docstring included. From the 2026-08-19 remote evidence:
-  plain `session-start` wrote a marker-less attestation the gate accepted,
-  while its error text promised contract emission.
-- [ ] Bootstrap/bundle emission fits the harness's output handling in
-  bounded chunks — the Cowork 76.4 KB emission was truncated to a ~2 KB
-  preview and receipt required manual file recovery
-  (`cowork-remote-phase5-evidence-2026-08-19`, F1/F2).
-- [ ] Migration versioned per the adapter foundation's rules
+- [x] `mdllm session-start` emits kernel content whole, with integrity
+  trailer and loud degradation path. The default path is channel-aware:
+  direct channels (manual CLI, Codex, bootstraps) emit the kernel whole
+  with the trailer (line count + sha256 — the mark whose absence reveals
+  truncation); the hook/runner channel, marked via `MDLLM_LIFECYCLE_CHANNEL`
+  set by the runner, gets the loud checkable deferral ("Kernel NOT emitted
+  — N lines, sha256 X, read END TO END") because a partial kernel, even
+  elision-marked, recreates the believed-loaded failure. `--contract`
+  gains the same trailer.
+- [x] Budget shares verified on the largest live domain: hook channel
+  5,886 raw chars with the deferral as step 1 (the runner bounds to its
+  2,200 budget structurally); direct channel 22,236 chars, kernel whole,
+  trailer present.
+- [x] Token cost measured: the kernel adds ~18,000 characters (~4,250
+  tokens, `mdllm kernel`'s own figure) to big-channel session starts;
+  framework-root direct emission measured at 18,056 chars. The hook
+  channel is unchanged at 2,200 chars.
+- [x] The gate now reads the marker the emitter writes: the attestation
+  carries a kernel token (`whole:<sha>:<lines>` / `deferred` / `elided` /
+  `absent`); `elided` and `absent` surface as Warnings in **both** modes —
+  never a strict Error, because the remedy (read the named file in full)
+  is evidence the floor cannot receive, and a commit-block the session
+  cannot clear is a dead-end gate. The remedy text and docstring now name
+  what actually emits. Legacy attestations carry no token and stay silent.
+- [x] Receipt path for preview-truncating harnesses: `--contract` also
+  writes the full emission to `<git-dir>/mdllm-contract-emission.md`
+  (uncommittable by construction) and names it in-band — recovery is one
+  file read on any harness, no manual surgery. Chunked emission was
+  considered and rejected: chunk thresholds are harness-specific; a file
+  read is every harness's native full-content channel.
+- [x] Migration: none triggered, by construction — the runner marks the
+  channel via environment, not argv, so rendered hook configs and their
+  definition hashes stay byte-identical estate-wide. Domain-side prose
+  (managed blocks still instructing the kernel load) rides the versioned
+  refresh offer in Phase 5, per Gate 7.0's migration-boundary rule.
 
-**Gate:** a fresh session in each of the three harnesses shows the kernel
-landed whole, verified by the trailer, with no silent truncation on the
-largest domain.
+**Gate: implementation closed 2026-08-20; acceptance PENDING OPERATOR
+RUNS** — a fresh session in each of the three harnesses showing the kernel
+landed whole (trailer verified) or loudly deferred, with no silent
+truncation on the largest domain. Suite green at commit (12 emission tests
++ full run; four pre-existing tests updated where the old expectations
+pinned the instruction-era output).
 
 ## Phase 3 — Digest: compute the computable cores of steps 4–6
 

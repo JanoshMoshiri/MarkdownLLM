@@ -12,6 +12,7 @@ complete enforcement boundary.
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -268,10 +269,20 @@ def execute_lifecycle(
         step_timeout = (min(float(timeout_per_step), available)
                         if timeout_per_step is not None else available)
         try:
+            # The channel marker: steps invoked through the runner emit into
+            # a bounded hook channel, and channel-aware emitters (session-
+            # start's kernel emission) must defer loudly rather than let the
+            # structural bound cut their content — a partial kernel with
+            # elision marked still recreates the believed-loaded failure
+            # (session-start-hardening Phase 2). Environment, not argv: the
+            # rendered hook configs and their definition hashes stay
+            # byte-identical across the estate.
             run = subprocess.run(
                 command, cwd=root, capture_output=True, text=True,
                 encoding="utf-8", errors="replace",
-                timeout=step_timeout)
+                timeout=step_timeout,
+                env={**os.environ,
+                     "MDLLM_LIFECYCLE_CHANNEL": binding.moment})
             result = StepExecution(
                 operation=step.operation, argv=argv,
                 returncode=run.returncode,
