@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T15:25:15
-generated_from: HEAD@eb80d46
-coverage: 238
+generated: 2026-08-20T19:50:16
+generated_from: HEAD@97a4f41
+coverage: 239
 framework_version: 3.33.0
 ---
 
@@ -288,6 +288,7 @@ framework_version: 3.33.0
 - cowork-adapter --references--> the-estates-second-clone-is-an-independent-witness
 - cowork-integrity-estate-sweep --references--> framework-upward-signal
 - cowork-integrity-estate-sweep --references--> pretooluse-action-boundary-gate
+- cowork-integrity-estate-sweep --references--> session-start-hardening
 - cowork-remote-phase5-evidence-2026-08-19 --documents--> cowork-adapter
 - cowork-remote-phase5-evidence-2026-08-19 --references--> session-start-hardening
 - cowork-remote-phase5-evidence-2026-08-19 --supports--> emitted-content-is-read-instructed-content-is-economised
@@ -383,6 +384,7 @@ framework_version: 3.33.0
 - emitted-content-is-read-instructed-content-is-economised --supports--> an-honest-ledger-replicates-full-compliance-does-not
 - emitted-content-is-read-instructed-content-is-economised --informs--> pretooluse-action-boundary-gate
 - emitted-content-is-read-instructed-content-is-economised --references--> a-prerequisite-declared-only-inside-its-target-cannot-gate-it
+- emitted-content-is-read-instructed-content-is-economised --informs--> session-start-hardening
 - estate-cadence-cluster --complements--> estate-git-sync
 - estate-cadence-cluster --complements--> cohesiveness-sensors
 - estate-cadence-cluster --references--> premature-publish-manufactures-discipline-eroding-urgency
@@ -390,6 +392,7 @@ framework_version: 3.33.0
 - estate-cadence-cluster --informs--> consequence-is-recoverable-only-in-retrospect
 - estate-cadence-cluster --informs--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - estate-cadence-cluster --implements--> change-reconciliation-specification
+- estate-cadence-cluster --references--> autopush-requires-explicit-authority
 - estate-cadence-cluster --implements--> inflection-candidates-are-computable
 - estate-cadence-cluster --references--> a-generated-surface-collapses-its-walk
 - estate-git-sync --implements--> divergence-is-an-unrouted-decision
@@ -678,6 +681,7 @@ framework_version: 3.33.0
 - posix-live-dispatch-record-2026-08-14 --derived-from--> posix-floor-record-2026-08-13
 - posix-live-dispatch-record-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - premature-publish-manufactures-discipline-eroding-urgency --references--> change-reconciliation-specification
+- premature-publish-manufactures-discipline-eroding-urgency --complements--> autopush-requires-explicit-authority
 - premature-publish-manufactures-discipline-eroding-urgency --complements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - premature-publish-manufactures-discipline-eroding-urgency --supports--> the-rough-true-account-is-generative-infrastructure
 - pretooluse-action-boundary-gate --implements--> consequence-is-recoverable-only-in-retrospect
@@ -817,6 +821,11 @@ framework_version: 3.33.0
 - substrate-review-implementation-evidence-2026-08-20 --references--> harness-capability-evidence-matrix-2026-08-20
 - substrate-review-phase0-disposition-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
 - substrate-review-phase0-disposition-2026-08-20 --documents--> codex-substrate-review-response-2026-08-20
+- substrate-review-retrospective-reconciliation-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
+- substrate-review-retrospective-reconciliation-2026-08-20 --references--> independent-review-2026-08-11-codex
+- substrate-review-retrospective-reconciliation-2026-08-20 --documents--> codex-substrate-review-response-2026-08-20
+- substrate-review-retrospective-reconciliation-2026-08-20 --extends--> substrate-review-implementation-evidence-2026-08-20
+- substrate-review-retrospective-reconciliation-2026-08-20 --implements--> change-reconciliation-specification
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
 - the-harness-bound-path-is-the-least-tested-path --supports--> portability-claims-need-execution-tests

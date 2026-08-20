@@ -6,7 +6,7 @@ Every agent session starts from scratch, so you have to hand the agent its conte
 
 State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. A deterministic structural floor — one CLI and an installed three-hook Git boundary — checks declared structure, references, and schema against the candidate commit. When the current hook is installed and runnable, mechanical Errors block that commit. A probabilistic agent still interprets meaning; reconciliation and retrospectives route semantic drift for review rather than pretending code can prove truth. Each session, orientation is rebuilt from the accepted state and history recorded in git — not reloaded from a memory file.
 
-A framework discovered by agents, directed by you, and grown together. Its entry contract, markdown state, and Git floor are portable to file-aware LLM tools; discovery and lifecycle support are verified per harness rather than inferred from a product name. A domain is also a valid Obsidian vault, so the human GUI comes for free.
+A framework discovered by agents, directed by you, and grown together. Its entry contract, markdown state, and Git floor are portable to file-aware LLM tools; discovery and lifecycle support are verified per harness rather than inferred from a product name. A domain is a plain Markdown folder and can be opened in tools such as Obsidian; full vault-compatibility remains an execution-test claim, not an assumption.
 
 ---
 
@@ -180,7 +180,7 @@ That's the framework's central hypothesis, **now being tested rather than assert
 
 What holds regardless of the verdict:
 
-- **The domain is the product.** The LLM is replaceable (vendor-agnostic); the domain definition is the durable asset you and your agent build over time.
+- **The domain is the product.** The domain definition is the durable asset you and your agent build over time. Its contract is vendor-neutral; actual replacement compatibility remains harness- and build-specific evidence.
 - **Recorded state compounds.** Every session can build on committed, mechanically validated things rather than depending only on a summary of the last one. State and reasoning that were never recorded can still be lost to compaction.
 - **Cost scales with precision, not volume.** Tiered context loading means the agent loads only what it needs, not the whole specification.
 - **Inspectable accepted state.** Local framework files, recorded inputs, decision narratives, commits, and diffs are readable. They show what was accepted and changed, but they are an audit aid rather than a complete trace of a model's hidden or unrecorded reasoning. Vendor models and harness internals remain outside this transparency boundary.

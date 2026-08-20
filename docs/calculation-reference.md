@@ -147,18 +147,20 @@ test.
 
 ## Money
 
-- **`Decimal`, never float.** A YAML `16.80` routes through `str`, so binary
-  floating point never touches a figure. Text parses as it arrives:
+- **`Decimal`, never float.** The strict loader preserves the authored YAML
+  numeric lexeme, so `16.80` reaches calculation as exact decimal text rather
+  than through a binary-float round trip. Text parses as it arrives:
   `£1,200.00`, `(45.60)` (accounting negative), `-£8.50`, and bold or
   backticked table cells.
 - **No implicit tolerance.** Computed and asserted compare exactly. Sums of
   2dp inputs are exactly 2dp; anything that needs rounding declares it.
 - **`round()` is HALF_UP**, the money convention — not Python's banker's
   rounding — so an operator checking by hand gets the same answer.
-- **Scale is presentation.** YAML has already dropped the trailing zero of
-  `10.00` before the floor sees it, so a sum prints `15.5`. Comparison is
-  numeric, so nothing turns on it; a domain wanting two decimal places says
-  `round(x, 2)`.
+- **Scale is presentation, but authored scale is retained.** With lexical
+  inputs, `10.00 + 5.50` prints `15.50`; comparison remains numeric. A domain
+  that needs an explicitly different output scale declares it with
+  `round(x, 2)` (or the required scale) rather than relying on ambient
+  formatting.
 
 ## Quarantine
 

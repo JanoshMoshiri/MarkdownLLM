@@ -3,7 +3,7 @@ id: cowork-integrity-estate-sweep
 type: plan
 status: completed
 completed: 2026-08-08
-version: 1.1
+version: 1.2
 created: 2026-08-08
 priority: critical
 tags: [integrity, cowork, harness, adapters, estate, audit, sweep]
@@ -14,9 +14,19 @@ linked_things:
   - id: pretooluse-action-boundary-gate
     relation: references
     notes: "Paused plan directly relevant to prevention: a mechanical gate at the tool boundary is one of the candidate shapes for making the Tier-0 contract enforceable rather than hoped."
+  - id: session-start-hardening
+    relation: references
+    notes: "v3.33 supersedes the historical timestamp+HEAD attestation mechanics below with contract fingerprints, integrity-aware delivery, and five non-promotable evidence states."
 ---
 
 # Cowork Integrity Estate Sweep — extent, rectification, prevention
+
+> **Current control boundary (reconciled 2026-08-20):** the sweep below records
+> the v3.28 decision and remains historical evidence. The live session gate no
+> longer rests on timestamp+HEAD or treats a command run as proof of contract
+> reading: v3.33 fingerprints operative contract content and distinguishes
+> `emitted`, `received-whole`, `read-observed`, `applied-evidence`, and
+> `outcome-validated`. Fresh Cowork product evidence remains pending.
 
 ## The determination this rests on
 

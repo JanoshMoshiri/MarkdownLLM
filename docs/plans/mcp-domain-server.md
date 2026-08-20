@@ -2,7 +2,7 @@
 id: mcp-domain-server-design
 type: specification
 status: draft
-version: 0.2
+version: 0.3
 created: 2026-06-25
 tags: [cross-domain, mcp, interface, provenance, design-draft]
 linked_things:
@@ -38,6 +38,12 @@ honour-system control the floor exists to replace. The reference triple and
 the membrane's direction became doctrine in `provenance.md` (v3.23). Read those
 specs for the current contract — this draft is kept for the design reasoning.
 
+**v3.33 reconciliation:** the shipped read face now binds every committed
+`source_commit` to the immutable bytes it serves; draft/candidate bytes are
+explicitly labelled uncommitted. Repository-supplied command or HTTP routes are
+also default-deny until a clone-local, exact-config-hash trust grant authorises
+the required capability. MCP is transport, not execution authority or a sandbox.
+
 ## What This Designs
 
 The mechanism by which one domain exposes a curated face to another and lets the
@@ -45,12 +51,16 @@ other consume it — built on **MCP (Model Context Protocol)**, the established
 agent-to-capability standard, so domains can later reach the wider agent community
 with no rewrite. It realises the cross-domain federation model: each domain is an
 MCP server (its *porch*); the consumer's client config is the *address book*
-(operator-wired, per trust zone); the floor still owns provenance and freshness.
+(operator-wired, per trust zone); the floor still owns provenance, freshness,
+and local execution authority.
 
 The guiding constraint, unchanged: **a domain stays comprehensible by reading only
-itself plus its quarantined external imports.** MCP is a process boundary, which
-*is* the trust boundary — only typed results and curated resources cross; the
-producer's reasoning never flows into the consumer.
+itself plus its quarantined external imports.** MCP marks a process and
+transport boundary, but that boundary does not grant authority by itself. Only
+typed results and curated resources cross; the consumer separately grants
+clone-local execution/network authority to the exact route it reviewed. That
+grant authorises execution but does not sandbox it, and the producer's reasoning
+never flows into the consumer.
 
 ## Why MCP, And Why Not "Just HTTP"
 
@@ -89,15 +99,19 @@ one live-agent tool) spawns a domain-scoped agent. Git remains the state machine
 
 - `manifest://<domain-id>` — the porch itself: name, liveness, the exposed
   catalog, the capability (tool) list, the address book ("who I know"), and the
-  repo HEAD commit. This is the "give me your name, then your catalog" entry point.
+  selected repository view. A committed face names a full immutable commit; a
+  draft/candidate face says so explicitly. This is the "give me your name, then
+  your catalog" entry point.
   **Shape it as / align it with an MCP Server Card** (the emerging automatic-
   discovery convention, maturing H2 2026) so the organic discovery layer arrives as
   a standard feature rather than a bespoke build.
 - `thing://<domain-id>/<thing-id>` — one exposed thing (frontmatter + body).
 - `resources/list` enumerates **only exposed things**, never the whole corpus (the
   semi-permeable membrane; see *Exposure Control*).
-- Every resource carries `source_commit` in its `_meta` so the consumer can record
-  the reference triple and later detect drift.
+- Every committed resource carries the full `source_commit` in its `_meta` so
+  the consumer can record the reference triple and later detect drift. A draft
+  resource carries an explicit uncommitted/candidate provenance state instead;
+  it is never stamped with adjacent HEAD.
 
 ### Tools — capabilities ("what I can do")
 

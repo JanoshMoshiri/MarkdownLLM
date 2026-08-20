@@ -2,7 +2,7 @@
 id: estate-cadence-cluster
 type: plan
 status: completed
-version: 1.3
+version: 1.4
 completed: 2026-08-04
 created: 2026-08-04
 priority: high
@@ -29,6 +29,9 @@ linked_things:
   - id: change-reconciliation-specification
     relation: implements
     notes: "v1.1: the deep dive (2026-08-04) reframed this plan as that spec's missing half — Phases 2/3 are the net-beneath-the-net given a clock, Phase 4 is the cue question made mechanical. The build itself is an inflection and commits to running the four beats on itself."
+  - id: autopush-requires-explicit-authority
+    relation: references
+    notes: "Supersedes only this completed plan's default-on publication ruling; the historical build record below remains unchanged."
   - id: inflection-candidates-are-computable
     relation: implements
     notes: "Phase 4's first half is this insight built."
@@ -38,6 +41,12 @@ linked_things:
 ---
 
 # Estate Cadence Cluster — publication becomes mechanical, retrospection gets a clock
+
+> **Current doctrine (reconciled 2026-08-20):** this is the historical build
+> record for v3.27. Its default-on ruling was later superseded by
+> `autopush-requires-explicit-authority`: standing automation remains, but only
+> literal `git.autopush: true` authorises a send. The completed retrospective,
+> cue, and release-walk work remains current.
 
 ## The finding (operator, 2026-08-04)
 

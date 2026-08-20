@@ -4,7 +4,7 @@ type: insight
 status: active
 disposition: keep-active
 disposition_reason: "Process razor + the in-session instance of [[the-rough-true-account-is-generative-infrastructure]]; kept visible deliberately as a worked, symmetric example of publishing-before-reconciled and the discipline cost manufactured urgency exacts on whoever is in the loop."
-version: 1.1
+version: 1.2
 created: 2026-06-28
 session: 2026-06-28
 source: both
@@ -14,6 +14,9 @@ tags: [process, git-workflow, reconciliation, honesty, provenance, agent-boundar
 linked_things:
   - id: change-reconciliation-specification
     relation: references
+  - id: autopush-requires-explicit-authority
+    relation: complements
+    notes: "Preserves the human authority boundary under standing automation: only literal true or a specific one-shot instruction authorises a send."
   - id: judgement-checks-need-a-suppression-list-which-is-itself-drift
     relation: complements
   - id: the-rough-true-account-is-generative-infrastructure
@@ -68,11 +71,12 @@ Two durable pulls come out of it:
   public. Finish the [change-reconciliation](../../change-reconciliation.md) Walk —
   including the insight corpus — *then* push. A green floor is necessary but not
   sufficient: it does not prove the human-backed Walk ran.
-- **The agent commits; the operator publishes.** That boundary exists precisely so
-  that the irreversible, externally-visible act stays a deliberate human decision,
-  immune to manufactured urgency. An agent should treat "push" as out of scope
-  unless asked for that specific push — and treat its own felt urgency as a signal
-  to *slow down*, not a licence.
+- **The agent never self-authorises publication.** The operator may grant standing
+  authority with literal `git.autopush: true` or authorise one specific push; false,
+  absence, malformed policy, and inference from urgency grant nothing. The boundary
+  keeps the externally-visible act a human decision even when an already-decided
+  standing send is mechanical. An agent treats its own felt urgency as a signal to
+  *slow down*, never as a licence.
 
 ## Context
 

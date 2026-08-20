@@ -2,7 +2,7 @@
 id: emitted-content-is-read-instructed-content-is-economised
 type: insight
 status: active
-version: 1.2
+version: 1.3
 created: 2026-08-18
 session: 2026-08-18
 source: both
@@ -22,6 +22,9 @@ linked_things:
   - id: a-prerequisite-declared-only-inside-its-target-cannot-gate-it
     relation: references
     notes: "Explains the deepest instance of the instructed-content skip: the domain skill layer went unloaded in four of four sessions partly because the read-side gate is declared only inside the skill it gates. Emission fixes delivery; that insight fixes position."
+  - id: session-start-hardening
+    relation: informs
+    notes: "The local v3.33 mechanism now emits Tier-0 content with integrity and separates five evidence states; fresh product runs still own the dismissal test."
 ---
 
 # Emitted content is read; instructed content is economised
@@ -130,11 +133,15 @@ tool's output substituted for the operative rules"). The run also
 articulated, from inside the failure, the masking corollary now held
 separately: [[partial-coverage-quiets-the-uncovered-steps]].
 
-The overcoming plan is deliberately not yet written: the operator is taking
-thinking time on the implications before choosing the shape (adapter
-emission scope, digest upgrades, where the judgement residue re-homes).
+**2026-08-20 reconciliation:** the overcoming plan was subsequently written and
+its local mechanism implemented in `session-start-hardening`: Tier-0 emission has
+integrity facts, direct and budgeted channels are distinguished, and emission,
+whole receipt, observed reading, applied evidence, and validated outcome are
+separate states. This does not satisfy the insight's behavioural dismissal
+condition. Fresh exact-build Claude, Codex, and Cowork runs remain the evidence
+owners for whether whole emitted content is read and applied in each product.
 
-Dismissal condition: superseded when the adapters emit Tier-0 content and the
-content-level variance disappears (the residue question then lives in
-whatever plan resolves the emission-vs-gate fork); refuted if further
-sessions show emitted content being economised too.
+Dismissal condition: superseded when the adapters emit Tier-0 content **and
+fresh exact-build evidence shows the content-level variance disappears** (the
+mechanism half is locally complete; the behavioural half is not); refuted if
+further sessions show whole emitted content being economised too.

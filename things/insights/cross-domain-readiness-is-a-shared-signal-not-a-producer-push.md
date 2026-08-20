@@ -4,7 +4,7 @@ type: insight
 status: active
 disposition: keep-active
 disposition_reason: "Parked — capture-don't-decide; awaiting a real heterogeneous multi-agent hand-off before the awareness signal is designed."
-version: 1.1
+version: 1.2
 created: 2026-06-26
 session: 2026-06-26
 source: operator-scenario
@@ -118,10 +118,12 @@ This insight is the razor that holds that line for the awareness facet: when a
 producer is "ready," the framework-true move is **publish + let the wired peer
 discover**, never **push to a consumer the producer should not be able to name.**
 
-It also notes the heterogeneous-harness part is the *easy* part — MCP is the
-protocol, harness-agnostic by construction; Codex and OpenClaude read a domain's
-face exactly as Claude does (remote reach is the unbuilt Phase 5 transport, not a
-new design). The hard part is purely the awareness signal above.
+It also separates protocol neutrality from product evidence. MCP gives the face
+a vendor-neutral wire contract; it does **not** prove that Codex, OpenClaude,
+Claude, or any other harness discovers, receives, or applies that face in the
+same way. Each product/build earns those claims through its own transport and
+behavioural evidence. The unresolved design question here remains the awareness
+signal above, not an assumed cross-harness equivalence.
 
 ## Status / Next
 

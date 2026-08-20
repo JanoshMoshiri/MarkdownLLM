@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-20
-generated: 2026-08-20T15:25:23
-generated_from: HEAD@eb80d46
+generated: 2026-08-20T19:50:54
+generated_from: HEAD@97a4f41
 coverage: 36
 framework_version: 3.33.0
 ---
@@ -93,6 +93,7 @@ framework_version: 3.33.0
 - codex-substrate-review-response-2026-08-20 (derived-from)
 - substrate-review-implementation-evidence-2026-08-20 (derived-from)
 - substrate-review-phase0-disposition-2026-08-20 (derived-from)
+- substrate-review-retrospective-reconciliation-2026-08-20 (derived-from)
 
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)

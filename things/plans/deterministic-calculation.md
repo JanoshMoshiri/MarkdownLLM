@@ -2,7 +2,7 @@
 id: deterministic-calculation
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-08-02
 priority: high
 tags: [floor, calculation, arithmetic, provenance, quarantine, money]
@@ -124,8 +124,10 @@ mirroring the established `options: {quarantine: strict}` precedent. Nothing
 new is invented for this.
 
 **Non-evaluability is reported, never silent.** An expression the floor cannot
-parse or whose references do not resolve produces a Warning naming the reason.
-The no-silent-default law the floor already applies to triggers.
+parse or whose references do not resolve produces a Warning naming the reason;
+under `options: {computed: strict}` it is an Error, because strict arithmetic
+cannot accept a figure it could not recompute. The no-silent-default law the
+floor already applies to triggers.
 
 **A derivation over quarantined data is computable, and stamped.** The
 provenance law is that no calculation may *rest on* an unverified external
@@ -219,6 +221,12 @@ regenerated; `framework-map` node and count; `CHANGELOG.md`; version 3.25.0 in
       toolbox row; CHANGELOG; v3.25.0.
 
 241 tests pass; `validate`, `coherence` and `boundary` clean.
+
+**v3.33 reconciliation (2026-08-20):** the strict YAML boundary now preserves
+authored numeric lexemes and their scale before calculation, strict
+non-evaluability blocks, and eval assertions compare through the same decimal
+path. This closes the binary-float and `10.00`→`10.0` loopholes without changing
+the plan's remaining domain-adoption gate.
 
 **What the build itself surfaced:** the no-silent-default law has an arithmetic
 form that is sharper than its trigger form. A trigger that cannot be evaluated

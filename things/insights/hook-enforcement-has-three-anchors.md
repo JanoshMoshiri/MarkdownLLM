@@ -2,7 +2,7 @@
 id: hook-enforcement-has-three-anchors
 type: insight
 status: promoted
-version: 1.2
+version: 1.3
 created: 2026-06-19
 session: 2026-06-19
 source: both
@@ -29,9 +29,10 @@ Orthogonal to it, and more decisive for portability, is what actually makes a
 hook fire. Every hook anchors to exactly one of three surfaces:
 
 1. **Agent interpretation** — the agent reads the entry file and acts on the
-   prose. Portable across every harness, *sufficient for correctness*, and the
-   default. (This is the framework's true portability layer — an LLM reading
-   AGENTS.md — not git, not any vendor hook.)
+   prose. This is the portable contract fallback and the default, but it is
+   probabilistic: availability of prose is not evidence of receipt, reading,
+   application, or outcome correctness. The neutral contract is the portability
+   layer; each harness still earns its lifecycle claims through evidence.
 2. **Git / filesystem** — a real mechanism fires (the `pre-commit` hook, a file
    write). Mechanical, enforced, and universal because git is present under
    every harness.
@@ -80,5 +81,7 @@ Surfaced when the operator asked whether the framework was "just a harness, or
 like Hermes / OpenClaw for an agent." Walking the distinction produced the
 three-anchor frame, which became the `orchestration.md` "Enforcement: Three
 Anchors, Not Two" section and drove a surface reduction (two prompts deleted).
-The Copilot-then-Claude-Code build history is the lived proof that the
-interpretation anchor is sufficient with zero adapters.
+The Copilot-then-Claude-Code build history demonstrates useful operation with
+zero adapters. It does not prove that every instruction was received, read, or
+applied; later session evidence is exactly what forced that distinction into
+the promoted orchestration specification.
