@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.6
+version: 1.7
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -47,11 +47,12 @@ reasoned through after every write — and you were the backstop. You caught
 the broken link, the status value that didn't exist, the index that quietly
 drifted, and told the agent to go fix itself. The v3 finding that forced the
 change: a live domain had 17 of 17 things violating a validation rule at
-Error severity, and nothing noticed. Since v3.0, every check that can be
-expressed as code *is* code (`tools/mdllm.py`), wired into git so that
-nonconforming work physically cannot be committed. The framework calls this
-**replacing diligence with construction**. Your role narrows to the part
-that was always genuinely yours: judgment.
+Error severity, and nothing noticed. Since v3.0, the framework moves earned,
+enumerated structural checks into code (`tools/mdllm.py`) and wires them into
+git. A current, runnable hook blocks candidate commits with mechanical Errors;
+it does not prove semantic truth, agent adherence, or the completeness of the
+rule set. The framework calls this **replacing diligence with construction**.
+Your role narrows to the part that was always genuinely yours: judgment.
 
 ## What You No Longer Have To Carry
 
@@ -66,23 +67,23 @@ that was always genuinely yours: judgment.
 | Reconstruct *why* a judgment call was made months ago | `type: decision` things pin their inputs to exact commits (`informed_by`); `mdllm provenance` enforces the chain |
 | Worry that a workflow that worked last quarter silently regressed | Eval fixtures assert the contracted end state against committed domain state — a regression net you can run any time |
 
-The pattern across every row: things you held in your head on the domain's
-behalf became things the machinery holds by construction.
+The pattern across every row: mechanically decidable facts you once held in
+your head became checks the active floor can reproduce. Meaning and omissions
+remain the work of the probabilistic agent and your review.
 
 ## What It Feels Like: Six Scenarios
 
 ### 1. An ordinary session — nothing changed, and that's the point
 
-You open a domain workspace and ask about the current VAT quarter. Before
-answering, the agent has already: loaded the domain AGENTS.md plus the
-framework kernel (operative rules at a small fraction of the full-spec cost),
-checked the framework version sentinel (silent when nothing changed),
-read the generated **orient** view (the open loops — non-terminal work and open
-conflicts — that replace the retired hand-kept session brief), and evaluated
-triggers (a filing deadline inside its horizon gets surfaced unprompted). None
-of this is visible unless something needs your attention.
-The conversation is the same conversation it always was — the floor only
-exists underneath it.
+You open a domain workspace and ask about the current VAT quarter. A supported
+lifecycle route emits the startup contract or loudly defers the kernel with an
+integrity fingerprint, then reports the version sentinel, generated **orient**
+view (non-terminal work and open conflicts), and trigger results. Those are
+delivery and mechanical-result facts, not proof the agent read or applied the
+contract. `doctor`, the session attestation, and the probe ladder below keep
+those evidence levels separate. The conversation can still feel ordinary; the
+important difference is that missing or partial startup is named rather than
+promoted to adherence.
 
 *Specs: `orchestration.md` (hard hooks), `kernel.md`, `trigger-specification.md`.*
 
@@ -170,9 +171,9 @@ to invoke directly.
 | `validate [path]` | Levels 1–3 mechanical validation; exit 1 on Errors | Sanity-checking a domain's whole corpus on demand |
 | `triggers [path]` | Evaluates time/dependency/threshold/import conditions, deadline horizon (import = live face reads via imports-check) | "What needs attention?" without starting a full session |
 | `index [path] check\|rebuild` | Rebuild-and-diff derived indexes (`--signal triggers\|schema\|relationships\|provenance`) | Suspected index drift; after bulk edits |
-| `provenance [path]` | Validates decision chains and the external-content quarantine | Auditing why-trails before relying on a decision |
+| `provenance [path] [--view worktree\|index\|commit] [--revision REV]` | Validates decision chains and the external-content quarantine against one named repository view; commit revisions resolve to a full immutable SHA | Auditing why-trails before relying on a decision, or proving the exact candidate/commit assessed |
 | `touchpoints <id> [path]` | The Assimilate beat: one thing's declared inbound set + literal body references — "what did I just put at risk?" | Before changing a load-bearing thing; during an inflection walk |
-| `autopush [path]` | The post-commit publication leg: pushes the validated commit per the repo's standing declaration (absence = on); bounded, never forces | Run by the post-commit hook — invoke by hand only when diagnosing publication debt |
+| `autopush [path]` | The post-commit publication leg: pushes a validated commit only when the repo literally declares `git.autopush: true`; false, absent, or malformed is off. Bounded, never forces | Run by the post-commit hook — invoke by hand only when diagnosing publication debt |
 | `candidates [path]` | The cue advisory's derivation: which things are reconciliation cue candidates and why | When a pre-commit cue line surprises you |
 | `cascade <id> [path]` | Mirror of touchpoints: the declared downstream set a completion unblocks — "what did I just unblock?" | After completing a thing with dependants |
 | `eval [path] --fixture <f>` | Asserts a fixture's contracted end state against committed domain state | Regression check after framework or skill changes |
@@ -180,17 +181,19 @@ to invoke directly.
 | `tokens [path]` | Measures spec token cost by loading tier | Checking session-cost impact after spec edits |
 | `kernel [--check]` | Regenerates `kernel.md` from spec kernel blocks; `--check` gates drift | Framework maintenance (CI runs `--check` for you) |
 | `domain-kernel [path] [--check]` | Regenerates the managed `<!-- generated:NAME -->` blocks in a domain's AGENTS.md (session-start, tier-routing, types, hooks, floor); `--check` gates drift | After a refresh, or when coherence reports a drifted block |
-| `session-start [path]` | Emits the mechanical session-start ritual: version check, floor state, velocity, open loops, verified flips, and trigger evaluation | The SessionStart adapter runs it for you; by hand when orienting without a harness |
+| `session-start [path] [--assert-head FULL_SHA]` | Emits the mechanical session-start ritual plus a full significant-read base; `--assert-head` refuses if HEAD moved before conclusions are written | A configured adapter may run the ritual on an evidenced harness/build; use the assertion immediately before applying a full-corpus or other long-read result |
 | `coherence [path]` | Dark-region checks: generated-artifact (kernel/index) freshness, `foundational_specs`↔filesystem, stale `stable` labels, dead vocabulary. Corpus-general; framework-only checks switch on at a `.markdownllm` root. Runs in the pre-commit hook | After adding/removing a spec; suspected drift between catalog and disk |
 | `changelog --since <tag>` | Drafts a CHANGELOG entry from the commit stream | Framework release prep |
 | `worklog [path] [--write]` | Prints an on-demand session-grouped view of the commit stream (sessions split on `session-end:` commits); `--write` saves a gitignored local snapshot | Reviewing recent session history — not a committed file (retired v3.17) |
 | `refresh <domain> [--seal]` | Floor-only domain refresh: reports the version delta + unseen CHANGELOG entries; `--seal` bumps `framework_version_seen` after adoption | Bringing a stale domain current with the framework |
-| `install-hook [path]` | Installs the three mdllm git hooks: pre-commit (boundary + validate + coherence, blocking), commit-msg (disclosure boundary, blocking), post-commit (autopush — on a repo with a remote and no `autopush: false`, commits PUBLISH from then on) | Once per domain repo, at floor adoption |
+| `install-hook [path]` | Installs the three mdllm git hooks: pre-commit (boundary + validate + coherence, blocking), commit-msg (disclosure boundary, blocking), post-commit (autopush, but publication remains off unless the repo literally declares `git.autopush: true`) | Once per domain repo, at floor adoption |
 | `doctor [path] [--harness <registered>\|all]` | Probes the floor and, when selected, reports adapter support, project configuration, currency, trust, runtime, and real-event execution independently; static config or a runnable command never counts as an executed lifecycle event. Current registered names are `claude-code` (`claude` alias), `codex`, and `cowork` | New machine, new harness, after a refresh, or "is the floor actually on here?" |
 | `adapter-install [path] --harness <name> [--dry-run] [--refresh-legacy]` | Preflights a **project-bound** adapter, shows every decision and exact owned diff, then creates or safely merges only the selected adapter surface. `--refresh-legacy` can replace only an exact adapter-declared historical managed span; extensions and ambiguity still refuse. Doctor reports project configuration/currency as not applicable for a run-time-bound adapter; do not invent an install target for it | Run with `--dry-run` first. Use `--refresh-legacy` only when doctor names a legacy ID, then rerun without `--dry-run` only after reviewing that exact diff |
-| `scaffold <path> [--harness <registered>\|all\|none]` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, Git hook, first commit, and the selected adapter projection, if that adapter has a project artifact. Omitting the flag preserves the Claude compatibility default; `cowork` is registered but binds later at run time | Creating a new domain — the mechanical half is one command, while `none` proves the substrate does not depend on an adapter |
-| `mcp-serve <domain> [--http --port N --token]` | Serves the domain's exposed face (`exposed: true` things only) over MCP — stdio by default, Streamable HTTP with `--http` (loopback-only; non-loopback binds refused until the OAuth 2.1 leg). `--token` mints a per-run bearer token for tunnelled cross-machine probes | Wired into a consumer's `.mcp.json` (stdio: `command`; HTTP: `url` + optional `headers` carrying the token); stdio you rarely run by hand, `--http` you run when a porch should outlive its callers |
+| `scaffold <path> [--harness <registered>\|all\|none] [--autopush true\|false]` | Deterministic domain birth: templates, nested repo, `.gitignore` isolation, Git hook, first commit, an explicit publication choice, and the selected adapter projection where one exists. Publication defaults to false; only literal true enables sends. Omitting the harness flag preserves the Claude compatibility default; `cowork` binds later at run time | Creating a new domain — the mechanical half is one command, while `none` proves the substrate does not depend on an adapter |
+| `publish [path] [--authorize-once]` | Guarded push to the repository's real default branch. Standing literal `git.autopush: true` authorizes it; otherwise a human must explicitly instruct this one event and the invocation names that with `--authorize-once`. Never creates a remote branch, forces, or guesses `main` | Deliberate publication after reconciliation; agents must never infer or self-grant the one-shot flag |
+| `mcp-serve <domain> [--http --port N --token]` | Serves the domain's exposed face (`exposed: true` things only) over MCP — stdio by default, Streamable HTTP with `--http` (loopback-only; non-loopback binds refused until the OAuth 2.1 leg). `--token` mints a per-run bearer token for tunnelled cross-machine probes | After reviewing and locally trusting the exact consumer `.mcp.json` entry; stdio you rarely run by hand, `--http` you run when a porch should outlive its callers |
 | `imports-check [path]` | Checks a consumer's external imports against their sources' faces — both directions: `stale` (source moved) and `diverged` (mirror moved); summary states coverage | "Are my imports still honest?" — after a session in any producing domain, or on suspicion |
+| `external-trust review [server] --path <path>` / `trust <server> --path <path> --hash <sha256> [--allow ...]` / `revoke [server] --path <path>` | Reviews one or all repository-supplied `.mcp.json` entries and records clone-local authority bound to an exact definition hash; the trust record is uncommitted and automatic reads default-deny missing or changed authority | Before the first import read from a configured source, after any `.mcp.json` change, or to revoke a source without editing shared repository content |
 | `estate-check [roots...]` | Batches `imports-check` over consumer roots with a roll-up — named explicitly, or (no args) the local clones the `estate-sync` walk finds; ephemeral, per-consumer, never an index | The estate-wide sync question, when you run more than one domain |
 | `triggers --estate` | The attention sweep: per-domain trigger evaluation over the same local-clone walk, with a roll-up (fired / not-evaluable per domain) | After `estate-sync`, when the question is "what needs doing across the estate?" |
 | `estate-sync [root] [--require-fresh]` | Fetch + ff-only pull across the estate's repos (root + `domain(s)/*`); divergence reported never resolved; never pushes. Plain mode is non-blocking lifecycle sync; `--require-fresh` returns nonzero on cached/unresolved state; `--status` = publication debt from cached refs, no network | Plain mode at automatic session start; `--require-fresh` when you explicitly ask an agent to prove fresh state (and allow a restricted harness to route approval); `--status` at session end |
@@ -261,10 +264,13 @@ the connection runs through three pieces — all operator-wired, none automatic:
   `exposed: true`; `mdllm mcp-serve` serves exactly that set (content and
   descriptive frontmatter — the internal relationship graph is stripped on
   egress). Nothing crosses by default; publication is an authoring decision.
-- **The address book.** A consumer's `.mcp.json` `mcpServers` map names which
-  producers it may read and how to spawn them. You wire it by hand, per trust
-  zone. Discovery is never organic — a domain is reached because you listed
-  it.
+- **The address book and its local authority.** A consumer's `.mcp.json`
+  `mcpServers` map proposes which producers it may read and how to spawn them;
+  repository content alone is inert. Review and hash-confirm an entry with
+  `mdllm external-trust` in each clone. The uncommitted trust record is bound to
+  the exact definition, so a changed command or URL returns to default-deny.
+  Discovery is never organic — a domain is reached because it was listed and
+  locally authorised.
 - **The membrane's direction.** Everything a consumer learns about a peer
   crosses through the face — including "have you changed?". A producer never
   learns who consumes it, keeps no consumer registry, and pushes nothing;
@@ -355,11 +361,10 @@ authority; this mode makes the missing authority mechanically visible.
 
 The mirror runs at session end: `estate-sync --status` reports **publication
 debt** — commits that are real on this machine and invisible to the estate.
-Under autopush (the default since v3.26.0: the post-commit hook publishes
-each floor-validated commit unless a repo declares `git: autopush: false`)
-this report is an **anomaly detector** — any line means an offline session,
-a rejected push awaiting your routing, or an opted-out repo holding work for
-its deliberate release. Where autopush is off, the push stays yours
+When a repo explicitly declares `git.autopush: true`, this report is an
+**anomaly detector** — any line means an offline session or a rejected push
+awaiting your routing. False, absent, and malformed declarations are off; in
+that mode the push stays yours and publication debt is expected
 (git-workflow.md → The Outbound Rules); the report means you no longer have
 to remember it. Note `estate-sync`
 *discovers* its repos where `estate-check` refuses to: the guardrail there
@@ -388,9 +393,10 @@ deliberately you:
 - **Evolving the framework.** Domains read the framework; only humans (with
   the framework agent) change it.
 
-The honest summary: v3 did not make the system smarter, it made the system
-*unable to silently be wrong* about the mechanical layer — so that when you
-do spend attention, it lands on judgment instead of bookkeeping.
+The honest summary: v3 did not make the system smarter. It made declared
+mechanical discrepancies reproducible and blocking at an active commit
+boundary, while leaving semantic interpretation probabilistic. When you do
+spend attention, more of it can land on judgment instead of bookkeeping.
 
 ## Grilling A Session — The Probe Ladder
 

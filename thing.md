@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.20
+version: 2.21
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -20,11 +20,11 @@ linked_things:
 # Thing Definition
 
 <!-- kernel -->
-**A thing** = one markdown file: YAML frontmatter + narrative body. One identity, one reason to change.
+**A thing** = one markdown file: strict YAML frontmatter + narrative body. One identity, one reason to change. Duplicate mapping keys are invalid on every operative YAML surface; ambiguity is rejected, never resolved by last-key-wins parsing.
 
 **Required fields:** `id` (kebab-case, stable, unique), `type`, `status`, `created` (ISO 8601).
 
-**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, `parent`, `linked_things[{id, relation, notes?}]`, `dependencies[]`, `blocks[]`, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; all three or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false, relational graph stripped on egress). Emergent fields: add only when they serve reasoning.
+**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, structural references, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). The tool's structural-reference registry is the authority for reference shape and behaviour across validation, reverse indexes, reconciliation cues, and egress; its current public fields include `parent`, `linked_things`, `dependencies`, `blocks`, `parties`, `definition`, trigger `watch`, and `informed_by`. Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; the commit is a full SHA and all three fields are required or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false, structural references stripped on egress). Emergent fields: add only when they serve reasoning.
 
 **Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned. A type may also declare `terminal_statuses` — which of its own statuses mean *settled*; the declaration replaces the universal terminal set for that type, and every forward-work check (orientation, triggers, cascade) reads it through one `is_terminal`. Not declarable on reserved types (the tool owns their settled sets).
 
@@ -32,7 +32,7 @@ linked_things:
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
 
-**Derived figures:** a figure the domain *derives* declares how, in `computed: {field-path: expression}` — the floor evaluates it (`mdllm calc`) and re-checks it at every commit (`validate`: Warning, Error under `options: {computed: strict}`). The assertion stays in place; the derivation sits beside it. Never assert a total you could declare a derivation for — arithmetic is mechanical, and reasoning gets it wrong silently. Grammar: `docs/calculation-reference.md`.
+**Derived figures:** a figure the domain *derives* declares how, in `computed: {field-path: expression}` — the floor evaluates it (`mdllm calc`) and re-checks it at every commit (`validate`: Warning, Error under `options: {computed: strict}`). Exact decimal evaluation starts from the authored YAML numeric lexeme rather than a binary float. In strict mode, an unevaluable expression is an Error; quarantined or otherwise excluded inputs are named whenever they alter the selected set. The assertion stays in place; the derivation sits beside it. Never assert a total you could declare a derivation for — arithmetic is mechanical, and reasoning gets it wrong silently. Grammar: `docs/calculation-reference.md`.
 
 **Cohesion (one reason to change):** decompose when content serves a different audience, changes at a different rate, or is independently reusable (`instance-of`/`derived-from`/`template-for`/`applies-to` = split). Compose the inverse: one responsibility spread across several things → consolidate into the cohesive survivor and mark the rest `superseded-by` it. Merge duplication, never contradiction.
 
@@ -53,7 +53,9 @@ A thing is:
 
 ## Structure Of A Thing
 
-Every thing file follows this pattern:
+Every thing file follows this pattern. The YAML is strict: a mapping key may
+appear only once at its level. Duplicate fields such as two `status` values are
+an Error with both source locations, not an instruction to keep the latter.
 
 ```
 ---
@@ -218,13 +220,13 @@ These aren't required, but they unlock richer reasoning from the agent:
 - Present only on `origin: external` things imported from *another domain's exposed face* (`provenance.md` → Cross-Domain Imports; design record: `docs/plans/mcp-domain-server.md`)
 - `source_domain` — the producing domain, named as in the consumer's `.mcp.json` address book entry
 - `source_id` — the thing's id in the producer's id-space (foreign to this domain; never resolved locally)
-- `source_commit` — the producer-computed commit that last touched the exposed thing at import time: the pin `mdllm imports-check` compares against the source's current face
+- `source_commit` — the producer-computed **full commit SHA** that last touched the exposed thing at import time: the pin `mdllm imports-check` compares against the source's current face. Older unambiguous abbreviated pins remain readable for migration, but every newly served or refreshed pin is full-length.
 - All three are required for the import to be sync-checkable; an import missing any part reports `INCOMPLETE` and counts as unchecked coverage, never as fresh
 
 **exposed** (boolean)
 - Opt-in marker joining this thing to the domain's exposed face, served by `mdllm mcp-serve`
 - Default false — nothing crosses the domain boundary unless its author opts it in (the semi-permeable membrane)
-- Exposure is publication: an exposed thing's content and descriptive frontmatter cross to any consumer the operator wires; its relational graph (`linked_things`, `dependencies`, `parent`, `triggers`, `informed_by`, `parties`) never does — those ids live in this domain's id-space and are stripped on egress
+- Exposure is publication: an exposed thing's content and descriptive frontmatter cross to any consumer the operator wires; fields the structural-reference registry marks private never do — those ids live in this domain's id-space and are stripped on egress. This single registry, rather than a prose-maintained list, is the operative authority.
 
 #### Emergent Fields
 

@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T09:27:27
-generated_from: HEAD@a9028f8
-coverage: 234
-framework_version: 3.32.0
+generated: 2026-08-20T13:01:27
+generated_from: HEAD@2673168
+coverage: 237
+framework_version: 3.33.0
 ---
 
 # Relationships Index — framework
@@ -133,6 +133,11 @@ framework_version: 3.32.0
 - autopush-moves-the-deliberate-act --informs--> git-workflow-specification
 - autopush-moves-the-deliberate-act --references--> premature-publish-manufactures-discipline-eroding-urgency
 - autopush-moves-the-deliberate-act --references--> consequence-is-recoverable-only-in-retrospect
+- autopush-moves-the-deliberate-act --superseded-by--> autopush-requires-explicit-authority
+- autopush-requires-explicit-authority --supersedes--> autopush-moves-the-deliberate-act
+- autopush-requires-explicit-authority --informs--> git-workflow-specification
+- autopush-requires-explicit-authority --informs--> orchestration-specification
+- autopush-requires-explicit-authority --implements--> consequence-is-recoverable-only-in-retrospect
 - belief-revision-specification --extends--> thing-specification
 - belief-revision-specification --complements--> validate-thing-specification
 - belief-revision-specification --complements--> session-memory-specification
@@ -273,18 +278,16 @@ framework_version: 3.32.0
 - coordination-claim-specification --complements--> git-workflow-specification
 - coordination-claim-specification --complements--> workflow-state-specification
 - cowork-adapter --references--> cowork-remote-phase5-evidence-2026-08-19
+- cowork-adapter --references--> harness-capability-evidence-matrix-2026-08-20
 - cowork-adapter --extends--> vendor-harness-adapter-foundation
 - cowork-adapter --extends--> cowork-integrity-estate-sweep
 - cowork-adapter --extends--> framework-discovery-specification
 - cowork-adapter --implements--> agents-md-discovery-is-harness-dependent
-- cowork-adapter --implements--> a-layered-harness-is-a-co-author-not-a-substrate
-- cowork-adapter --references--> a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it
-- cowork-adapter --references--> an-environments-reachable-set-is-not-an-architecture
-- cowork-adapter --references--> installation-is-not-activation
 - cowork-adapter --implements--> hook-enforcement-has-three-anchors
 - cowork-adapter --implements--> portability-claims-need-execution-tests
 - cowork-adapter --implements--> a-consuming-environments-gate-is-a-build-time-constraint
 - cowork-adapter --implements--> a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment
+- cowork-adapter --references--> the-estates-second-clone-is-an-independent-witness
 - cowork-integrity-estate-sweep --references--> framework-upward-signal
 - cowork-integrity-estate-sweep --references--> pretooluse-action-boundary-gate
 - cowork-remote-phase5-evidence-2026-08-19 --documents--> cowork-adapter
@@ -399,6 +402,7 @@ framework_version: 3.32.0
 - estate-mechanics-guide --documents--> git-workflow-specification
 - estate-mechanics-guide --documents--> change-reconciliation-specification
 - estate-mechanics-guide --documents--> retrospective-specification
+- estate-mechanics-guide --documents--> autopush-requires-explicit-authority
 - estate-migration-record-2026-08-14 --documents--> vendor-harness-adapter-foundation
 - estate-migration-record-2026-08-14 --derived-from--> claude-gate-5r3-acceptance-2026-08-13
 - estate-migration-record-2026-08-14 --implements--> assistant-register-does-not-graduate
@@ -498,11 +502,21 @@ framework_version: 3.32.0
 - git-workflow-specification --complements--> write-thing-specification
 - git-workflow-specification --complements--> validate-thing-specification
 - git-workflow-specification --complements--> derived-index-specification
+- git-workflow-specification --implements--> autopush-requires-explicit-authority
 - hard-hooks-require-observable-agent-caused-triggers --informs--> orchestration-specification
 - hard-hooks-require-observable-agent-caused-triggers --extends--> hook-compliance-correlates-with-scope-not-awareness
 - hard-invariants-encode-a-semantic-assumption --informs--> validate-thing-specification
 - hard-invariants-encode-a-semantic-assumption --references--> thing-specification
 - hard-invariants-encode-a-semantic-assumption --complements--> consistency-is-maintained-at-change-not-by-sweeping
+- harness-capability-evidence-matrix-2026-08-20 --documents--> vendor-harness-adapter-foundation
+- harness-capability-evidence-matrix-2026-08-20 --documents--> cowork-adapter
+- harness-capability-evidence-matrix-2026-08-20 --references--> session-start-hardening
+- harness-capability-evidence-matrix-2026-08-20 --derived-from--> claude-gate-6r-acceptance-2026-08-16
+- harness-capability-evidence-matrix-2026-08-20 --derived-from--> claude-phase6-no-adapter-and-root-2026-08-16
+- harness-capability-evidence-matrix-2026-08-20 --derived-from--> claude-no-adapter-entry-probe-2026-08-17
+- harness-capability-evidence-matrix-2026-08-20 --derived-from--> codex-phase6-post-6r-acceptance-2026-08-16
+- harness-capability-evidence-matrix-2026-08-20 --derived-from--> codex-desktop-session-start-negative-2026-08-14
+- harness-capability-evidence-matrix-2026-08-20 --derived-from--> cowork-remote-phase5-evidence-2026-08-19
 - hook-compliance-correlates-with-scope-not-awareness --informs--> orchestration-specification
 - hook-compliance-correlates-with-scope-not-awareness --supports--> tiered-loading-is-tiered-reading-applied-to-specs
 - hook-enforcement-has-three-anchors --informs--> orchestration-specification
@@ -644,6 +658,7 @@ framework_version: 3.32.0
 - orchestration-specification --complements--> trigger-specification
 - orchestration-specification --implements--> domain-refresh-specification
 - orchestration-specification --complements--> derived-index-specification
+- orchestration-specification --implements--> autopush-requires-explicit-authority
 - orient-and-reconciliation-are-the-corpus-two-sides --complements--> change-reconciliation-specification
 - orient-and-reconciliation-are-the-corpus-two-sides --complements--> session-memory-specification
 - orient-and-reconciliation-are-the-corpus-two-sides --supports--> mechanism-pairs-come-from-two-reflection-axes
@@ -754,15 +769,13 @@ framework_version: 3.32.0
 - session-memory-specification --implements--> llm-driven-systems-manifesto
 - session-memory-specification --complements--> belief-revision-specification
 - session-start-hardening --references--> cowork-remote-phase5-evidence-2026-08-19
+- session-start-hardening --references--> harness-capability-evidence-matrix-2026-08-20
 - session-start-hardening --implements--> emitted-content-is-read-instructed-content-is-economised
 - session-start-hardening --implements--> a-prerequisite-declared-only-inside-its-target-cannot-gate-it
 - session-start-hardening --implements--> session-start-loses-to-the-first-request
 - session-start-hardening --references--> an-honest-ledger-replicates-full-compliance-does-not
 - session-start-hardening --references--> pretooluse-action-boundary-gate
 - session-start-hardening --references--> vendor-harness-adapter-foundation
-- session-start-hardening --references--> protecting-one-budget-displaces-the-failure-into-the-other
-- session-start-hardening --references--> operating-layer-quality-loop
-- session-start-hardening --references--> read-thing-specification
 - session-start-hardening --references--> orchestration-specification
 - session-start-hardening --references--> partial-coverage-quiets-the-uncovered-steps
 - session-start-loses-to-the-first-request --supports--> hook-enforcement-has-three-anchors
@@ -800,6 +813,8 @@ framework_version: 3.32.0
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
 - substrate-reconciliation-2026-08-09 --references--> autopush-moves-the-deliberate-act
+- substrate-review-phase0-disposition-2026-08-20 --derived-from--> independent-substrate-review-2026-08-20-codex
+- substrate-review-phase0-disposition-2026-08-20 --documents--> codex-substrate-review-response-2026-08-20
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
 - the-harness-bound-path-is-the-least-tested-path --supports--> portability-claims-need-execution-tests
@@ -861,23 +876,14 @@ framework_version: 3.32.0
 - vendor-harness-adapter-foundation --extends--> domain-refresh-specification
 - vendor-harness-adapter-foundation --implements--> hook-enforcement-has-three-anchors
 - vendor-harness-adapter-foundation --implements--> portability-claims-need-execution-tests
-- vendor-harness-adapter-foundation --references--> protecting-one-budget-displaces-the-failure-into-the-other
-- vendor-harness-adapter-foundation --references--> agents-cannot-self-install-permission-bearing-hooks
 - vendor-harness-adapter-foundation --references--> installation-is-not-activation
-- vendor-harness-adapter-foundation --references--> a-layered-harness-is-a-co-author-not-a-substrate
-- vendor-harness-adapter-foundation --implements--> relative-path-hooks-break-in-nested-domain-repos
-- vendor-harness-adapter-foundation --references--> codex-port-challenge-2026-08-11
-- vendor-harness-adapter-foundation --references--> codex-final-handoff-audit-2026-08-11
-- vendor-harness-adapter-foundation --references--> claude-phase6-no-adapter-and-root-2026-08-16
-- vendor-harness-adapter-foundation --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
-- vendor-harness-adapter-foundation --references--> claude-domain-entry-pointer-observation-2026-08-17
-- vendor-harness-adapter-foundation --references--> claude-no-adapter-entry-probe-2026-08-17
-- vendor-harness-adapter-foundation --references--> a-missing-contract-degrades-to-semantic-drift-not-breakage
-- vendor-harness-adapter-foundation --references--> an-injected-file-arrives-without-its-frontmatter
-- vendor-harness-adapter-foundation --references--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - vendor-harness-adapter-foundation --references--> a-generated-contract-change-is-an-estate-migration
-- vendor-harness-adapter-foundation --references--> the-harness-bound-path-is-the-least-tested-path
-- vendor-harness-adapter-foundation --references--> a-degrading-command-cannot-trigger-approval-by-succeeding
+- vendor-harness-adapter-foundation --references--> an-injected-file-arrives-without-its-frontmatter
+- vendor-harness-adapter-foundation --references--> protecting-one-budget-displaces-the-failure-into-the-other
+- vendor-harness-adapter-foundation --references--> harness-capability-evidence-matrix-2026-08-20
+- vendor-harness-adapter-foundation --references--> claude-phase6-no-adapter-and-root-2026-08-16
+- vendor-harness-adapter-foundation --references--> claude-no-adapter-entry-probe-2026-08-17
+- vendor-harness-adapter-foundation --references--> codex-phase6-post-6r-acceptance-2026-08-16
 - vendor-harness-adapter-foundation --references--> codex-gate-7-0b-qms-operator-acceptance-2026-08-18
 - verified-flip-enforcement --implements--> independent-review-2026-07-14-fable
 - version-mismatch-triggers-validation-cascade --informs--> orchestration-specification

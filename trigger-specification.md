@@ -2,7 +2,7 @@
 id: trigger-specification
 type: specification
 status: stable
-version: 1.5
+version: 2.0
 created: 2026-05-29
 linked_things:
   - id: thing-specification
@@ -35,6 +35,24 @@ triggers:
     condition: [what to check]
     action: [what to do if true]
 ```
+
+Every declaration has exactly one mechanical result. Evaluation is total over
+authored input: malformed metadata becomes a result, never an exception or a
+silent branch.
+
+| Result | Meaning |
+|---|---|
+| `fired` | The complete required input set is available and the condition is true now. |
+| `not-fired` | The declaration is valid, completely evaluable, and false now. Future dated conditions remain `not-fired` with upcoming/horizon timing metadata. |
+| `unevaluable` | The declaration is meaningful but the required evidence or authority is unavailable — for example history the evaluator does not retain, an unreachable face, or an untrusted external route. |
+| `invalid` | The declaration, threshold, type, condition, target set, or returned data is malformed or names no usable subject. |
+
+Partial sets cannot fire. A dependency watch with a missing member, an import
+read with one untrusted route, or a porch scan with incomplete coverage is
+invalid or unevaluable as appropriate; it is never promoted from the visible
+subset into success. `mdllm triggers` retains its human-facing buckets as a
+projection of these typed results, while application consumers may use the
+typed API directly.
 
 ## Trigger Types
 
@@ -169,6 +187,14 @@ Both conditions are consumer-side reads through the face. Nothing here tells
 a producer who is watching (provenance.md → The Membrane's Direction Is a
 Ruling).
 
+An import route is also an external execution boundary. Automatic trigger and
+session paths default to `unevaluable` while its exact `.mcp.json` entry is
+untrusted; they do not execute a repository-declared command or request a URL
+merely because the trigger exists. A clone-local, config-hash-bound trust grant
+may authorize the exact command/network capabilities. Changing the entry
+invalidates that grant. Invalid route configuration is `invalid`; unavailable
+or untrusted authority is `unevaluable`.
+
 ## Human-Gated Waits: Date the Chase
 
 Some conditions genuinely cannot be mechanised: *"the sponsor rules on the
@@ -214,7 +240,7 @@ Actions are declarative. They tell the agent what kind of response is appropriat
 
 ## When Triggers Are Evaluated
 
-1. **Session start** — The agent scans active things for trigger conditions. Any that are met get surfaced immediately: "3 things need attention since your last session." This is the primary evaluation point. **At scale, scanning every thing's frontmatter here becomes expensive.** A domain that has grown past the point where this is cheap maintains a `triggers` derived index (`things/_index/triggers.md`) — a regenerable aggregation of every active trigger — and the agent evaluates the index instead of re-reading all things. Index maintenance rides the `post-write` event; evaluation is performed by the `evaluate-triggers` prompt. See `derived-index.md`.
+1. **Session start** — The floor evaluates active declarations into the four result states above. Fired conditions are surfaced immediately; invalid and unevaluable declarations stay visible under their honest class. This is the primary evaluation point. It never crosses an untrusted external route. **At scale, scanning every thing's frontmatter here becomes expensive.** A domain that has grown past the point where this is cheap maintains a `triggers` derived index (`things/_index/triggers.md`) — a regenerable aggregation of every active trigger — and the agent evaluates the index instead of re-reading all things. Index maintenance rides the `post-write` event; evaluation is performed by the `evaluate-triggers` prompt. See `derived-index.md`.
 2. **After every write** — When the agent modifies a thing, it checks whether any other things have triggers watching it and cascades accordingly. This is how completing a task automatically surfaces things it was blocking. If a triggers index exists, this same write is when its affected entry is updated (in the same commit).
 3. **Scheduled invocation** — An external mechanism (cron job, OS scheduler, GitHub Actions, a recurring calendar event) periodically invokes the agent with a "check triggers" intent.
 

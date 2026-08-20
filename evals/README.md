@@ -34,14 +34,19 @@ assertions:
 
 **Stage 1 (implemented):** assertion checking against current state. Use after
 running a workflow with the agent: did it leave the domain in the contracted
-state? Also usable in CI as a regression net over committed state.
+state? `validates_clean` invokes the complete `mdllm validate` boundary,
+including scan/parse findings rather than only validators that received a
+corpus. Any failed assertion returns a non-zero command status. Also usable in
+CI as a regression net over committed state.
 
 **Stage 2 (implemented):** the full loop. The fixture adds `seed` (a directory
 copied into an isolated git workspace under `evals/runs/`, gitignored) and
 `prompt` (the scenario instruction). The runner invokes a fresh headless agent
 (`claude -p`, requires the CLI on PATH: `npm i -g @anthropic-ai/claude-code`),
-then runs the Stage 1 assertions on whatever the agent left behind, recording
-score, wall time, cost, and turns per trial.
+then runs the Stage 1 assertions on whatever the agent left behind. A non-zero
+process, timeout, unparseable result, agent-reported error, validation Error, or
+failed assertion fails the trial and makes the command return non-zero. It is
+impossible for a failed evidence leg to produce a successful eval exit status.
 
 ```bash
 # the framework condition
@@ -54,10 +59,18 @@ python tools/mdllm.py eval . --fixture evals/vat-quarter-basic.yaml --run --dry-
 python tools/mdllm.py eval . --report
 ```
 
-The bare condition is a real control: the framework checkout is not granted to
-the agent (`--add-dir` is framework-condition only), so a bare agent cannot
-discover the specs it is being measured without. Timed-out trials are recorded
-as 0/N, not discarded.
+Run workspaces live outside the source repository by default (`$TMP/mdllm-evals`,
+or `MDLLM_EVAL_RUN_ROOT`). This is an isolation boundary, not merely a
+gitignored folder: an agent cannot walk upward into the canonical seed and edit
+or read the answer key. The bare condition also withholds the framework
+`--add-dir`. Timed-out and failed invocations are recorded, never discarded.
+
+Every result uses a collision-resistant run id and records the full framework
+commit, framework/tool version, fixture SHA-256, model, requested and observed
+effort facts, harness and observed CLI build, process status, complete validation
+summary, and assertion result. Raw stdout/stderr stays with the isolated run;
+the result JSON is mirrored into `evals/results/` so any committed evidence can
+travel with the claim.
 
 **Longitudinal fixtures (Stage 2 only):** replace the top-level `prompt` /
 `assertions` pair with a `sessions:` list — each entry `{name, prompt,

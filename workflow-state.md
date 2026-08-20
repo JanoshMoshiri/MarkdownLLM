@@ -2,7 +2,7 @@
 id: workflow-state-specification
 type: specification
 status: evolving
-version: 0.4
+version: 0.5
 created: 2026-06-15
 linked_things:
   - id: thing-specification
@@ -87,7 +87,7 @@ stages:
 The definition carries no link back to its runs: a definition has many runs, and each run points *up* to it via its `definition:` field, exactly as children point up to a `parent` rather than the parent enumerating children.
 
 - **`stages[].id`** — the stage set. The cheap mechanical fact: `run.current_stage` must be one of these (floor-checked — see Division of Labour).
-- **`stages[].to`** — the directed edges out of each stage. This is the *semantic* fact: whether a given move was legal given the loops.
+- **`stages[].to`** — the directed edges out of each stage. Whether an authored edge exists for an old→new cursor move is a mechanical fact; whether the work deserves that move remains semantic.
 - **`to: []` means terminal — by definition.** An empty edge list is the explicit marker of a terminal stage, not "edges not written yet." A definition with a non-terminal stage whose edges are genuinely unfinished is simply a draft the author has not completed; there is no ambiguous third state. (If a future definition-completeness linter is built, this is the rule it enforces.)
 
 The body holds what the stages *mean* — entry/exit criteria, what each stage produces, who acts. That prose is the definition's reason to change; the run never edits it.
@@ -143,9 +143,10 @@ This follows the framework's standard split (`validate.thing.md`):
 | Check | Owner | What |
 |---|---|---|
 | `definition` resolves, and `current_stage` ∈ its stage set | **floor** (mechanical) | Pure referential integrity — the same class as "`linked_things` targets must exist." Enforced now: `mdllm validate` errors on a missing `definition`, an unresolved one, a `definition` that is not a `workflow-definition`, or a `current_stage` the definition does not declare. |
-| Was this a *legal* transition? | **agent** (semantic, Layer 2) | Judges the move against `stages[].to` and the loop structure. |
+| Does the prior definition declare this old→new edge? | **floor** (mechanical) | At pre-commit, compares the frozen index candidate with `HEAD`. The governing edge list comes from the prior committed definition, so the candidate cannot authorize its own move by rewriting the graph. A definition migration and cursor advance must be separate meaning-boundary commits. New runs have no prior transition and are allowed. |
+| Should the run advance now? | **agent** (semantic, Layer 2) | Judges stage exit criteria, evidence, authorization, and whether the work deserves the mechanically-permitted move. |
 
-The membership check earns its place immediately because it is referential, not semantic: a typo'd `current_stage` is the honour-system hole the floor exists to close, and leaving it unchecked is exactly the failure mode (`hook-compliance`/jmtm) the deterministic floor was built to kill. Do **not**, however, push cyclic-traversal *legality* into the floor — judging whether a move was allowed given the loops is Layer 2, and forcing it mechanical is how this spec would bloat. (Cross-domain case: when the `definition` lives in another corpus the floor cannot see, membership is unresolvable and is skipped, not failed.)
+Both membership and edge existence earn their place because each is a finite lookup over declared data, not judgement. A typo'd `current_stage` and an undeclared transition are the same honour-system hole at adjacent moments. The floor therefore compares the exact candidate tree to the prior commit and rejects an edge the prior definition does not declare. It does **not** infer entry/exit criteria, decide whether evidence is adequate, or advance a run; those remain Layer 2. (Cross-domain case: when the `definition` lives in another corpus the floor cannot see, membership remains unresolvable and is skipped rather than fabricated.)
 
 ## Concurrency and Coordination
 
@@ -165,8 +166,8 @@ Mature this on the framework's **reserve-but-draft** ladder — now one rung up,
 
 1. The originating idea is captured as `workflow-run-is-the-decomposition-principle-applied-to-processes` (`type: insight`).
 2. The types are *reserved* (fixed status vocabularies, built into the floor) so cross-domain consumers can rely on the semantics — held since they were first reserved.
-3. Exercised on a real domain. Beyond the `examples/life-manager/` demonstration pair (a renovation process + a live run), the primitive is now in active use in a live domain — which is what promotes this spec from `draft` to `evolving`. Remaining hardening (a definition-completeness linter, transition-legality affordances) lands as that use reveals the need.
-4. The floor's referential checks (`definition` resolves; `current_stage` ∈ its stages) are **already enforced** — they are integrity, not semantics. What stays deferred is *transition-legality* across the loop graph, which is the agent's Layer-2 judgment until a domain shows it needs more.
+3. Exercised on a real domain. Beyond the `examples/life-manager/` demonstration pair (a renovation process + a live run), the primitive is now in active use in a live domain — which is what promotes this spec from `draft` to `evolving`. Remaining hardening (for example, a definition-completeness linter) lands as that use reveals the need.
+4. The floor's referential and transition-shape checks are **enforced**: `definition` resolves; `current_stage` belongs to its stage set; and an existing run's candidate move follows an edge declared by the prior committed definition. What stays with the agent is transition *merit*: whether exit criteria and authorization justify using that edge.
 
 A type being reserved but undeployed in most domains is expected: it is exactly how the framework treats `conflict`, `retrospective`, and `index`. "Spec when foreseeable, deploy when felt" means primitives are *available*, not mandatory. A recipe domain never minting a workflow run is no different from its never minting a conflict.
 

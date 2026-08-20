@@ -1,7 +1,7 @@
 ---
 id: autopush-moves-the-deliberate-act
 type: decision
-status: made
+status: superseded
 created: 2026-08-04
 session: 2026-08-04
 decided_by: human
@@ -19,6 +19,9 @@ linked_things:
   - id: consequence-is-recoverable-only-in-retrospect
     relation: references
     notes: "Why --force stays structurally outside the mechanism and why release publishes keep the human: transport of committed state is recoverable; overwriting a remote or publishing a release is not."
+  - id: autopush-requires-explicit-authority
+    relation: superseded-by
+    notes: "The standing-declaration mechanism remains; its default direction is reversed so only literal true authorizes a send."
 ---
 
 # Decision: the deliberate act moves from each push to the declaration

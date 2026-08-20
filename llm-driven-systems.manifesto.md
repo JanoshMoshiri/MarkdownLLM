@@ -31,7 +31,7 @@ We are at an inflection point in how humans and machines collaborate on complex 
 
 For decades, a program could only do what it was told. Code is a fixed set of instructions, and the processing unit at its center carried them out exactly as written — no more, no less. To change what the system did, you changed the code.
 
-What has changed is the processing unit itself. With an LLM at the center, a system no longer just carries out the instructions it is given — it reasons within them. It brings fresh ideas, insight, and inference to the data passed into it. This changes both what a program can do and what it *is*: programs can now identify the bugs within themselves and fix them, modify themselves, grow, change, and evolve — none of which a fixed set of instructions could ever do. That is the paradigm shift.
+What has changed is the processing unit itself. With an LLM at the centre, a system no longer only executes fixed instructions — a probabilistic interpreter can reason within definitions, propose ideas and inferences, and help identify or repair defects. Those proposals still require tools, authority, and evidence before they become accepted state. That changed collaboration boundary is the paradigm shift.
 
 A new pattern is emerging: **humans define domains, LLMs reason within those domains, and structured data in version control becomes the persistent state.**
 
@@ -48,39 +48,39 @@ This framework is the same two things in a different notation:
 - `thing.md` defines the **data structure**.
 - The prompts in `templates/prompts/` are the **instructions**.
 - The hooks in `orchestration.md` are the **control flow**.
-- Git is the **state machine** — the commit is the moment state becomes real.
+- Git is the **accepted-state machine** — the commit is the moment a candidate becomes the recorded domain state, not the moment the outside world becomes true.
 
-What changed is the notation, and with it the reader of the notation. A compiler-parsable grammar gave way to natural language; a deterministic compiler gave way to a reasoning model. The artifact did not become something new — the program is still a program. It is simply written in a notation a mind can reason over rather than one a machine must parse, and so the reader can now hold ambiguity, weigh context, and revise its own understanding, which no compiler ever could.
+What changed is the notation, and with it the reader of the notation. A compiler-parsable grammar gave way in part to natural language; a deterministic compiler gave way in part to a probabilistic reasoning model. The definitions and their executable behaviour are therefore not literally one artifact: a stochastic interpreter connects them, while deterministic tools enforce the subset expressed as code. Treating the combined system as a program is the useful architectural model, not a claim of compiler equivalence.
 
-This is why the old discipline still governs the new medium. Clean Architecture and SOLID are not loose analogies borrowed for flavour — they apply because this is literally the same kind of artifact they were always about. The paradigm did not abolish software engineering. It freed software from the demand that its notation be mechanically parsable, and moved the leverage from *making the syntax precise enough to compile* to *making the definition clear enough to reason within*.
+This is why the old discipline still governs the new medium. Clean Architecture and SOLID are more than flavour: their boundary, cohesion, and dependency principles apply to this composite artifact even though natural-language interpretation is not compilation. The paradigm did not abolish software engineering. It adds leverage at *making the definition clear enough to reason within* while retaining precise executable checks wherever the invariant is mechanically decidable.
 
 See `the-notation-changed-not-the-primitives` for the canonical articulation.
 
 ### The Second Collapse: Operation Is Programming
 
-The continuity above says the artifact is still a program. What the notation change does to the *people around* the artifact took longer to see: every previous notation forced programming and use apart. The user speaks in their own nouns; the program is written in another language; so a translator — the programmer — must sit between them, and friction travels the long way round: felt, reported, translated, coded, deployed. Because this notation *is* the language the operator already speaks, the split collapses. Friction stated in the working channel is source: it routes to a surface — a seed, a spec, an insight, an ask exposed on a domain's porch — where the floor validates it, a commit makes it durable, and the next session runs the changed program. **The operator programs the system by operating it** — in their own words, at the moment the friction is felt, without ever changing roles.
+The continuity above treats the composite artifact as a program. What the notation change does to the *people around* the artifact took longer to see: previous notations often forced programming and use apart. The user speaks in their own nouns; the program is written in another language; so a translator must sit between them. Natural-language definitions lower that translation boundary. Friction stated in the working channel becomes candidate source when it is routed to a seed, spec, insight, or exposed ask; validation checks its mechanical shape, and review plus commit make it durable. **The operator can program the system by operating it** without pretending every utterance is executable or accepted automatically.
 
-This is why every prior attempt at end-user programming fell short where this does not: they lowered the notation toward the user and hit a ceiling; this raised the reader to the notation the user already speaks, so there is no ceiling to hit — when the current definitions are outgrown, they are extended *in the same notation, in the same conversation*. The escape hatch points inward. And the collapse is only trustworthy because the floor stands between the utterance and the durable program — an unvalidated conversational change is just drift with a good story. The routing, and the floor beneath it, are precisely the framework's job.
+This differs from many prior end-user programming approaches by raising the reader toward notation the user already speaks. It does not remove every ceiling or the need for specialist code; it makes many definition changes possible *in the same notation, in the same conversation*. The route is trustworthy only to the extent its boundaries are active and evidenced: an unreviewed or mechanically invalid conversational change is still drift with a good story.
 
 See `operating-is-programming` for the canonical articulation and its evidence.
 
 ## The Thesis
 
-Strip the framework to one sentence: **treat the language model as a reasoning processor, and build a loosely-coupled, modular software engine around it — so that a non-deterministic processor yields a system that is consistent, auditable, and resistant to drift.**
+Strip the framework to one sentence: **treat the language model as a reasoning processor, and build a loosely-coupled, modular software engine around it — so deterministic structural boundaries and inspectable accepted state make a non-deterministic processor more consistent, auditable, and resistant to drift.**
 
-The goal is not to make the model deterministic. It cannot be, and pretending otherwise is the mistake. The goal is to surround a non-deterministic processor with the structures that make *any* software system maintainable, extensible, and long-lived — clear boundaries, modular units, explicit state, version control, enforced invariants — so that the **system** holds the properties the **processor** cannot guarantee alone.
+The goal is not to make the model deterministic. It cannot be, and pretending otherwise is the mistake. The goal is to surround a non-deterministic processor with clear boundaries, modular units, explicit state, version control, and enforced invariants. The deterministic layer can then hold the properties it actually checks; semantic correctness and adherence remain probabilistic outcomes that require evidence and human judgment.
 
-This is a synthesis, not a trade-off. The model brings what software never had: reasoning over ambiguity, weighing context, revising its own understanding. Software engineering brings what a model alone never has: consistency across time, an audit trail, integrity that does not depend on the processor *remembering* to be careful, and mechanisms that catch drift before it compounds — preventing it where the failure is mechanical, surfacing it for correction where the failure is semantic. The bet is that these combine — reasoning *and* engineering discipline at once — and that the whole is worth more than either part.
+This is a synthesis, not a trade-off. The model brings reasoning over ambiguity, weighing context, and revising an interpretation. Software engineering brings durable accepted state, an audit aid, invariants that do not depend on the processor *remembering* to be careful, and mechanisms that catch enumerated drift — preventing it where the failure is mechanical, surfacing it for correction where the failure is semantic. Git history records decisions and changes that were actually captured; it is not a complete trace of hidden or unrecorded reasoning. The bet is that these combine, and that the whole is worth more than either part.
 
 A scope note the thesis's own words already permit: "integrity that does not depend on the processor remembering to be careful" never specified *which* processor. The floor disciplines the human by exactly the mechanism it disciplines the model — records kept, provenance held, state persisted without anyone remembering to maintain it. For the professional whose field already practices records discipline, the substrate is a recognition of their own profession's demands; for the everyday operator who finds sustained record-keeping too tedious to maintain, the discipline is not a barrier the substrate demands but *the product it delivers*. One floor, two processors, the same prosthesis — and its best-served user is the person every prior tool quietly abandoned, because for them the discipline is not overhead on the value; it is the value. See `the-substrate-is-a-discipline-prosthesis` for the canonical articulation.
 
-There is a reason the processor cannot hold these properties alone, and it is not a shortfall that scale will cure: a language model predicts the next move — the next token, the next action — but never its *consequence*. Consequence is recoverable only in retrospect, by reasoning back over moves already made; it cannot be forecast forward the way the next token can. Asking the model to "consider the consequences" does not lift this — it can reason about them, it cannot foresee them. So the foresight a trustworthy system needs has to be supplied by the structure around the processor, considered ahead of time and etched in, not awaited from the processor in the moment. See `consequence-is-recoverable-only-in-retrospect` for the canonical articulation.
+There is a reason the processor cannot hold these properties alone: a language model predicts the next move — the next token, the next action — but does not certify its future consequence. It can compare plausible outcomes and risks; actual consequence becomes recoverable only in retrospect. Asking the model to "consider the consequences" is useful prospective analysis, not foresight guaranteed. Irreversible authority therefore belongs to the human and to structures considered ahead of time, alongside ordinary risk analysis. See `consequence-is-recoverable-only-in-retrospect` for the canonical articulation.
 
-That bet is what the framework exists to prove. Everything else in this document — the three decoupled layers, atomic things, git as the state machine, the deterministic floor — is machinery in service of it. To build or extend a domain is to build another instance of that machinery: structure placed around a reasoning processor so the system stays trustworthy over time.
+That bet is what the framework exists to test. Everything else in this document — the three decoupled layers, atomic things, git as the accepted-state machine, the deterministic floor — is machinery in service of it. To build or extend a domain is to place structure around a reasoning processor and then measure how well the resulting system earns trust over time.
 
 ## The Primitive Beneath: A Divergence Is an Unrouted Decision
 
-A domain is a model of a reality it does not control. The thing-graph is the model; git and the world are the reality. The two will always diverge — that is not a defect to engineer away, it is the standing condition of any model-of-reality system. The discipline is not *preventing* divergence; it is **routing every divergence, and never letting one resolve by silent default or by blur.** Each divergence between the model and its reality is an *unrouted decision*, and there are exactly three honest routes:
+A domain is a model of a reality it does not control. The thing-graph at a commit is the accepted recorded model; the world is the reality. They will diverge — that is not a defect to engineer away, it is the standing condition of any model-of-reality system. The discipline is not *preventing* divergence; it is **routing every discovered divergence, and never letting one resolve by silent default or by blur.** Each discovered divergence is an *unrouted decision*, and the framework provides three honest routes:
 
 1. **Restore the model** — the divergence is a regression; bring reality back to the spec.
 2. **Revise the model** — the spec was wrong or incidental; change it, *with recorded rationale*.
@@ -118,8 +118,8 @@ This is a deliberate philosophical choice. Every piece of infrastructure this fr
 
 This means:
 - **Lower barrier to entry** — Everything here is something people already know
-- **No vendor lock-in** — Every component is interchangeable with equivalents
-- **Durability** — The framework survives any single tool disappearing because it depends on patterns, not products
+- **Reduced vendor coupling** — Plain files and explicit contracts preserve a migration path; equivalent harness behaviour still has to be evidenced per product and build
+- **Durability ambition** — The durable state is not owned by one model vendor, while Git hosts, runtimes, adapters, and package sources remain real dependencies
 - **Focus** — Energy goes into domain definition and reasoning patterns, not infrastructure
 
 The insight is that the LLM era doesn't need new protocols, new databases, or new interface paradigms. It needs a clear architecture for how existing tools compose around a new kind of intelligence. That's what this framework provides.
@@ -140,7 +140,7 @@ Traditional applications couple three concerns:
 
 This coupling creates rigidity. Changing the interface means touching the logic. Adding storage means redesigning. Everything is interdependent.
 
-The new pattern decouples these entirely:
+The new pattern separates these behind explicit contracts:
 
 **Processing:** An LLM (Claude, GPT, or any capable model) becomes the reasoning engine. The LLM understands context, handles ambiguity, reasons about complexity. It's not rule-based logic—it's semantic understanding.
 
@@ -148,19 +148,19 @@ The new pattern decouples these entirely:
 
 **Storage:** Git repositories containing markdown files with YAML frontmatter. Your data lives in plain text, versioned, human-readable, completely portable. Not in databases or proprietary formats. In git.
 
-These three layers are now independent. You can swap the interface without touching storage. You can change which LLM you use without rewriting anything. You can migrate your data by copying files.
+These layers can change at different rates. Plain files make storage migration straightforward; interfaces and models can be replaced when their entry, lifecycle, and capability contracts are compatible. Named harness tests — not the architecture alone — establish whether a particular swap works.
 
 ## Discovery: The Partnership Without Configuration
 
 The architecture above only works if an agent can *find it*. This is where discovery comes in — and it's what makes the human-agent partnership effortless.
 
-When you open a workspace, the agent discovers `AGENTS.md` at root. This is not something you configure or invoke — it's a convention that LLM tools already support. The agent reads AGENTS.md, finds the skills it should load, resolves `framework_root` to locate foundational specifications, and enters the domain fully oriented. No manual context loading. No "here, read this file first." The agent arrives ready.
+When you open a workspace, a harness may discover `AGENTS.md` directly, reach it through a pointer, or require an explicit bootstrap/emission. The entry contract then names the skills and `framework_root`. Discovery, whole-contract delivery, reading, application, and validated outcome are distinct evidence levels; support is recorded for exact harness builds rather than inferred from a product name.
 
-This is what enables the relationship to be natural. You don't need to teach the agent how to use the framework — the framework teaches the agent. You don't need to remember what context to provide — the agent discovers it. You just start talking about what you want to do, and the agent is already grounded in the domain's philosophy, structure, and history.
+When that route is active, the relationship can feel natural: the framework supplies durable context instead of asking the operator to reconstruct it manually. But emitted content is not automatically read or obeyed. Integrity trailers, attestations, `doctor`, and behavioural probes report what the substrate can actually observe.
 
 Discovery is also what makes the system grow without friction. When you add a new skill, the agent picks it up next session. When you commit new things, they're part of the context the agent reads. When the framework itself evolves, domain agents can detect and incorporate those changes through the refresh mechanism. The system expands and the agent adapts — with the human directing where it goes, and the agent handling how to get there.
 
-This is the quiet foundation beneath everything else: a set of file conventions that mean an agent can enter any MarkdownLLM domain and immediately understand what it is, how it works, and how to help.
+This is the quiet foundation beneath everything else: a set of file conventions and tested delivery routes that give a file-aware agent a portable way to enter a MarkdownLLM domain. Portability is the contract; compatibility is build-specific evidence.
 
 The same law binds the other direction, and deserves stating symmetrically: **the framework must teach the operator the way it teaches the agent** — through discovery, in the channel, at the moment of relevance, in the operator's own nouns. The agent's entry point is AGENTS.md; the operator's entry point is the orientation the session opens with. An operator cannot ask for what they don't know exists, so the conversational surface carries its own affordances — what can be asked arrives beside what was found, exceptions arrive with their remedy attached, and depth is revealed on demand rather than up front. The manual is the conversation.
 
@@ -174,19 +174,36 @@ This is what changes the nature of the relationship. The system no longer just c
 
 ## Why This Works
 
-**LLMs are remarkably good at understanding semi-structured data.** You don't need rigid schemas or normalized databases. YAML frontmatter provides enough structure for reliable parsing. Markdown provides enough narrative context for true semantic understanding.
+**LLMs are often effective over semi-structured data.** Many domains do not
+need a rigid relational model, but they still need an explicit schema at the
+mechanical boundary. YAML frontmatter gives the deterministic parser declared
+fields; Markdown gives the probabilistic interpreter narrative context. Neither
+format, by itself, guarantees a correct interpretation.
 
-**Markdown + YAML is a universal format.** Every LLM can read it. Every programmer can read it. Every version control system handles it. It's not locked to a platform or vendor.
+**Markdown + YAML is a widely portable plain-text format.** File-aware LLM
+harnesses, people, parsers, and Git can work with it without a proprietary data
+store. Whether a particular harness discovers, delivers, reads, or applies the
+definitions is still an exact-product evidence question.
 
-**Git is a miracle for state management.** Your entire history is preserved. You can see how things evolved. You can roll back. Collaboration and merging work. Backup is trivial.
+**Git is unusually well suited to accepted-state management.** Retained commits
+make evolution and rollback inspectable, and Git supplies explicit collaboration
+mechanics. History can still be rewritten or lost, merge decisions remain real
+decisions, and a local repository is not a backup until an independent copy is
+actually maintained.
 
 **Users understand files.** You don't need to learn a new interface paradigm. Files are files. Folders are folders. Git is git.
 
-**The LLM handles the cognitive load.** Instead of building complex conditional logic in code, you let the LLM reason about context. Instead of designing UIs, you define data structures and let the interface be simple.
+**The LLM can carry part of the cognitive load.** Instead of encoding every
+contextual judgment as branching code, you give a reasoning model structured
+context. Deterministic rules and purpose-built interfaces still belong in code
+where the consequence or repeatability demands them.
 
 ## The Generalization
 
-What started as a life management system is actually a generalizable framework for **any domain that requires persistent state, relationship management, and LLM reasoning.**
+What started as a life management system is a reusable candidate for **many
+domains that require persistent state, relationship management, and LLM
+reasoning.** Suitability is demonstrated per domain; self-description is not a
+proof of universality.
 
 Examples:
 
@@ -240,7 +257,7 @@ This is a subtle but important inversion. Humans can read it (because markdown i
 
 Use standard conventions (AGENTS.md, .skill.md, YAML frontmatter). Don't lock yourself to one LLM vendor or framework.
 
-Any LLM should be able to read your definitions and operate within your system. This gives you optionality and future-proofs your investment.
+Any capable file-aware LLM is a portability target for these definitions. Actual discovery, lifecycle execution, and adherence remain harness- and build-specific claims.
 
 ### 6. Version-Controlled Everything
 
@@ -248,17 +265,17 @@ Git isn't just for code. It's for your life, your knowledge, your work, your tho
 
 You get temporal history. You can see how things evolved. You can compare versions. You can collaborate. You can migrate. You can audit.
 
-But git is more than version control in this framework — **git is the state machine.** In a traditional application, writing to the database is the moment state becomes real. Here, the commit is that moment. Everything before the commit is working state. Everything after is persisted, versioned, auditable truth.
+But git is more than version control in this framework — **git is the state machine for accepted recorded state.** In a traditional application, writing to the database is the moment application state becomes durable. Here, the commit is that moment. Everything before the commit is working state. Everything after is persisted and versioned; it is not thereby guaranteed true of the outside world.
 
 This means commit discipline matters. Commits should happen at the boundary where domain state changes meaning: when a thing is created, when a status transitions, when a write session completes. Each commit message should describe the domain state change — not "modified 3 files" but "complete: data-collection → unblocks quarterly-review." Git log becomes a readable narrative of your domain's evolution.
 
-This also means git history becomes the event stream. Triggers that watch for state changes (a dependency resolved, a due date passed) evaluate against committed history. Session orientation reads recent commits to understand what changed. Two layers — commit history (git log, whose messages carry the narrative) and exact modifications (git diff) — together provide complete traceability from intent through action to detail.
+This also means git history becomes the recorded event stream. Triggers that watch for state changes evaluate against committed history. Session orientation reads recent commits to understand what changed. Commit messages and diffs provide strong traceability from recorded intent through accepted modification to bytes, but cannot reconstruct reasoning or events that were never captured.
 
 See `git-workflow.md` for the full operational specification.
 
 ### 7. Transparent and Auditable
 
-Your entire system is readable. No black boxes. The LLM's reasoning can be explained because it's working from clear definitions and explicit data.
+The framework-owned files and accepted domain state are readable. The LLM's recorded inputs, decisions, and changes can be explained from explicit data; the model's hidden reasoning and the vendor harness remain external black boxes the framework does not claim to expose.
 
 You can see what changed, when, and why (if you document it). You can disagree with the LLM and override it. You remain in control.
 
@@ -268,12 +285,12 @@ The system can describe itself within itself. The same pattern — YAML frontmat
 
 This is a fractal property. In nature, fractals are patterns that recur at every level of magnification — the same structure whether you look at the whole or any part. This framework has the same quality: a thing is a thing whether it's a task in your life manager, a compliance pattern in your regulatory domain, or a specification that defines how things work.
 
-This is not a requirement imposed on domain builders. It's a property that emerges naturally from the design: if everything is a thing, then everything — including the definitions themselves — can be structured, linked, validated, and reasoned about using the same patterns.
+This is not a requirement imposed on domain builders. It is a property of managed domain knowledge: instances and the definitions that govern them can both be structured, linked, validated, and reasoned about as things. Executable code, configuration, evidence, and release artifacts retain the formats appropriate to their own boundaries.
 
 The implications:
 
-- A framework that can define itself proves its own universality
-- No special cases exist — the rules apply to themselves
+- A framework that can define itself demonstrates reflexivity and exposes gaps under its own rules; it does not prove universality
+- Managed knowledge follows the same rules at both framework and domain levels; implementation and distribution artifacts have explicit separate boundaries
 - An LLM can reason about the system and about itself within the system using the same skills
 - Evolution of the framework is tracked, validated, and auditable just like evolution of domain data
 
@@ -293,13 +310,14 @@ The implications:
 
 7. **Iterate** — The loop repeats. Definitions evolve. Schema grows. Triggers catch what needs attention. The system becomes more sophisticated while remaining transparent.
 
-Git preserves all of it. You have a complete audit trail and history.
+Git preserves what was committed. You have an inspectable history of accepted
+state, not a complete trace of unrecorded reasoning or external reality.
 
 ## What This Enables
 
 **User agency.** You define your system. You're not locked into someone else's design choices. You can fork and modify anything.
 
-**Portability.** Your data is just files. You can move it anywhere. Run it on any LLM. Integrate it with any tool that reads markdown and git.
+**Portability.** Your data is plain files that can be moved and inspected widely. File-aware LLMs and tools are compatibility candidates; named build evidence decides which discovery and lifecycle routes actually work.
 
 **Composability.** Multiple domains can coexist — they're all just files under one framework. Within a domain, things compose freely. *Across* domains, composition is deliberate, not implicit: domains are isolated, separate-id-space repos by design, so one domain consuming another's output is a verified hand-off (treated as external input — quarantined until confirmed, see `provenance.md`), not a raw cross-repo link. The full mechanism shipped in v3.22–v3.23: a domain serves a *face* (`exposed: true` things, graph stripped on egress) over the porch (`mdllm mcp-serve`); the consumer mirrors, pins with the reference triple, and quarantines until a human flips; `mdllm imports-check` keeps every pin honest (`fresh`/`stale`/`diverged`/`withdrawn`). See `provenance.md` and `interface.md` → The Membrane.
 
@@ -307,7 +325,7 @@ Git preserves all of it. You have a complete audit trail and history.
 
 **Collaboration.** If multiple people need to work within the system, git's collaboration tools work naturally. Merge, branch, resolve conflicts using standard git workflows.
 
-**Auditing.** Everything is transparent and versioned in git: the commit log captures state changes *and* intent in structured commit messages (an on-demand `mdllm worklog` groups them by session); git diff captures the exact modifications. Together, these provide complete traceability — from why a decision was made, through what changed, down to the specific bytes that were modified. No black boxes. No lost context.
+**Auditing.** Accepted state is versioned in git: structured commit messages capture recorded intent and `git diff` captures exact modifications; decision things can pin declared inputs. Together these provide an inspectable accepted-state trail. They do not expose vendor-model internals, recover reasoning that was never recorded, or prevent context from being lost before it is committed.
 
 ## Corollary: Elegant Constraint Enables Efficiency
 
@@ -319,15 +337,15 @@ When you provide a smaller LLM with a clearly defined domain, explicit rules, st
 
 That's fundamentally different from asking a model to invent the system and reason within it at the same time.
 
-A smaller model—one that costs less, runs faster, produces lower latency—can handle complex systems effectively when the system itself is well-defined. The cognitive load isn't on the model to figure out what to do. The cognitive load is on the human to define the domain clearly. Then the model executes within those constraints.
+A smaller model—one that costs less, runs faster, and produces lower latency—may handle some complex systems effectively when the domain is well-defined. The structure can reduce how much of the problem space the model must infer, but it does not guarantee adherence or eliminate the need for discriminating evaluation.
 
 This has profound implications:
 
-**Cost.** Smaller models are cheaper to run. If your system is well-designed, you don't need frontier-level reasoning. You need reliable reasoning within constraints.
+**Cost.** Smaller models are cheaper to run. A well-designed system may need less frontier-level reasoning, but the required capability is an empirical property of the task.
 
 **Speed.** Smaller models are faster. On a phone, in a real-time application, latency matters. A smaller model that gives you 95% of what you need in half the time is often better than a larger model that's slower.
 
-**Reliability.** Constrained systems with explicit rules have less room for hallucination. The model isn't inventing; it's executing within boundaries.
+**Reliability.** Explicit constraints reduce ambiguity and create more checkable outcomes. The model still interprets and can ignore or misapply them; the floor catches only the failures expressed as mechanical invariants.
 
 **Accessibility.** Not everyone needs or can afford the most powerful models. A well-designed system using a smaller model is more accessible to more people.
 
@@ -337,8 +355,8 @@ This corollary follows from the thesis. If the structure carries the domain's de
 
 Three claims must be kept apart, because the framework has different evidence for each:
 
-- **The thesis — partially evidenced.** That structure gives a reasoning processor software-grade properties — consistency, auditability, integrity, drift-resistance — is the central claim. The mechanical half is demonstrated: the deterministic floor enforces integrity at the commit boundary and is covered by its own self-test suite. The longitudinal half — that a structured domain resists and corrects drift *across many sessions* where an unstructured one rots — is designed but not yet measured by a multi-session eval. Claim it as far as the floor reaches; no further.
-- **Utility — evidenced.** The framework delivers real value: it is in production use across live domains and hosts its own development as a domain. Structure buying consistency across sessions and vendors is demonstrated in that use. (Earlier external-adoption anecdotes — pre-floor and unverified — are deliberately held back and not cited as evidence; the framework is not argued from anecdote.)
+- **The thesis — partially evidenced.** That structure gives a reasoning processor stronger consistency, auditability, integrity, and drift-resistance is the central claim. The mechanical half is demonstrated for the floor's enumerated checks when the active commit boundary runs; its self-test suite exercises those checks. The longitudinal half — that a structured domain resists and corrects drift *across many sessions* where an unstructured one rots — is designed but not yet measured by a multi-session eval. Claim it as far as the floor and exact harness evidence reach; no further.
+- **Utility — evidenced on named use surfaces.** The framework is in production use across live domains and hosts its own development as a domain. That demonstrates practical value and reflexivity. Cross-session and cross-vendor consistency claims remain bounded to the recorded domains, fixtures, harnesses, and builds that earned them.
 - **Model-tier superiority — a secondary, still-open hypothesis.** That a *smaller* model with structure beats a *larger* one without it is the efficiency corollary above — and its general form is already well-supported in the broader literature, so re-proving it adds little. The framework's own test of it rests on one eval (2026-06-11, `evals/README.md`) whose reasoning core *saturated*: the task separated the conditions only on cost and determinism, not reasoning quality. It stays untested until a harder, non-saturating fixture exists. Do not cite it as proven.
 
 This is about shifting the optimization target. Instead of "how do we build more powerful models," ask "how do we design systems that enable smaller models to be effective." The answer is clarity, structure, and constraint.
@@ -375,10 +393,10 @@ The MarkdownLLM framework defines how things work. The framework's own specifica
 
 **Why this matters:**
 
-- **Proof of universality** — If the framework can represent itself, it can represent anything. If it couldn't, that would reveal a gap.
-- **Dogfooding** — Every principle the framework espouses is tested against itself. "Everything is a thing" is either true or it isn't. It is.
+- **Evidence of reflexivity** — Representing itself exercises the same managed-knowledge pattern and reveals gaps; it does not prove the pattern represents every domain.
+- **Dogfooding** — The framework subjects its own managed specifications and plans to its thing rules. Code, configuration, evidence, and release artifacts keep separate, explicit formats.
 - **Agent-navigable** — The framework's own AGENTS.md lets an LLM reason about the framework itself — understanding which specs exist, how they relate, which are mature, which are drafts.
-- **No special cases** — There is no category of "meta-stuff that doesn't follow the rules." The rules apply everywhere, including to themselves.
+- **No hidden exemption for managed knowledge** — Framework specifications follow the same thing rules they define; other artifact classes declare their own boundaries rather than being mislabeled as things.
 
 This is the philosophical endpoint of definition-driven systems: the system that defines itself, manages itself, and evolves itself — with a human directing and an LLM reasoning.
 
@@ -388,7 +406,7 @@ If you want to build a system using this pattern:
 
 1. **Start small.** Pick a domain you care about. Define it clearly.
 
-2. **Create your AGENTS.md.** This is where you design how the agent should behave within your domain — what skills it loads, what reasoning patterns it follows, what constraints it operates within. The agent discovers this automatically. You're not configuring a tool; you're defining a collaborator's operating principles.
+2. **Create your AGENTS.md.** This is where you design how the agent should behave within your domain — what skills it loads, what reasoning patterns it follows, what constraints it operates within. Configure or verify the harness route that delivers it; automatic discovery is a measured capability, not a universal assumption.
 
 3. **Create your skills.** Specification (philosophy), read (how to analyse), write (how to modify), workflow (process patterns). These are the agent's expertise for your domain — the guidance that makes it reason consistently and well.
 
@@ -402,4 +420,4 @@ If you want to build a system using this pattern:
 
 8. **Iterate and share.** Your definitions will evolve. Skills refine. Thing types mature. Workflows adapt. Document the journey. Once you've built something useful, share it — others can fork and adapt for their own domains.
 
-This is the new way of building systems. Not with code and databases and complex integrations. With clear thinking, structured definitions, and an ongoing partnership between human direction and machine reasoning.
+This is one way of building systems: sometimes alongside code, databases, and integrations, and sometimes without them. Its distinctive material is clear thinking, structured definitions, deterministic structural boundaries, and an ongoing partnership between human direction and probabilistic machine reasoning.

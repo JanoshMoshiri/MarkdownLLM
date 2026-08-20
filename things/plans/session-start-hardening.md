@@ -2,310 +2,123 @@
 id: session-start-hardening
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-08-19
 priority: high
 tags: [session-start, tier-0, emission, kernel, gates, adapters, hardening, evidence]
 linked_things:
   - id: cowork-remote-phase5-evidence-2026-08-19
     relation: references
-    notes: "Live remote proof of Phase 2's constraints, unprompted by this plan: the Cowork harness truncated a 76.4 KB contract emission to a ~2 KB preview (lands-whole), and the session gate accepted a marker-less attestation because it reads only the timestamp. Two defects land in Phase 2's checklist from this record."
+    notes: "Live proof that preview truncation and marker-only freshness could manufacture a false receipt claim."
+  - id: harness-capability-evidence-matrix-2026-08-20
+    relation: references
+    notes: "Shows which historical live surfaces can be re-probed and why those records do not accept changed definitions."
   - id: emitted-content-is-read-instructed-content-is-economised
     relation: implements
-    notes: "The plan operationalises the insight's law: content can be emitted; judgement must be pulled. The reasoning lives there and is not restated here."
   - id: a-prerequisite-declared-only-inside-its-target-cannot-gate-it
     relation: implements
-    notes: "Phase 1 is that insight's named fix: lift the read gate into the kernel surface, upstream of what it gates."
   - id: session-start-loses-to-the-first-request
     relation: implements
-    notes: "Executes the June directive — deliver the ritual mechanically at t=0 — at the content level it was always about."
   - id: an-honest-ledger-replicates-full-compliance-does-not
     relation: references
-    notes: "Supplies the verification method throughout: evidence over assurances, the forensic probe ladder, and the smooth-yes tell."
   - id: pretooluse-action-boundary-gate
     relation: references
-    notes: "Phase 5 records this plan's fork resolution: emission first; the gate stays parked with its re-open condition restated at the action boundary."
   - id: vendor-harness-adapter-foundation
     relation: references
-    notes: "Phase 2 rides its projection and migration machinery and obeys its rules: per-step protected output budgets (Gate 6R) and generated-contract change as estate migration."
-  - id: protecting-one-budget-displaces-the-failure-into-the-other
-    relation: references
-    notes: "Constrains Phase 2 directly: kernel emission through a budgeted channel must be protected or loudly degraded — silent truncation mechanically recreates the believed-loaded failure."
-  - id: operating-layer-quality-loop
-    relation: references
-    notes: "Adjacent, distinct: that plan owns skill content quality; this one owns ritual delivery and gating. Both sequenced against the adapter workstream."
-  - id: read-thing-specification
-    relation: references
-    notes: "Phase 1's edit target: the kernel block gains the read-side gate the write block already carries."
   - id: orchestration-specification
     relation: references
-    notes: "The anchor doctrine governs every move here: hardening is moving delivery rightward without touching hard/soft."
   - id: partial-coverage-quiets-the-uncovered-steps
     relation: references
-    notes: "Earned by Phase 0: the run under test articulated the masking mechanism from inside. Justifies Phase 4 — every Phase 2–3 emission deepens the quiet over the residue, so the residue gets a named invocation, never leftover pull."
 ---
 
 # Session-Start Hardening
 
-Five sessions of evidence (2026-08-18/19, two vendors, three harnesses, three
-models, two effort tiers, one live domain) established the law this plan
-operationalises: **content is emitted, judgement is pulled, and instructions
-are heeded when the task makes them relevant.** The reasoning lives in the
-linked insights; this plan is the remedy shape. Baseline evidence commits:
-`2546dfe`, `c80998f`, `c692091`.
+## Current purpose
 
-The remedy has four legs, phased below: complete the baseline (the Fable
-run), fix gate *position* (read gate upstream), fix content *delivery*
-(emit Tier 0, don't instruct it), and *route the pull* for the judgement
-residue no delivery mechanism can perform.
+Tier 0 is now delivered as content or loudly deferred, its computable digest
+is mechanical, and the remaining judgement has an explicit `orient` pull. The
+plan remains open because changed delivery/attestation definitions require
+fresh product events; deterministic tests cannot accept their own harness
+projection.
 
-## Non-goals
+The detailed baseline predictions, phase diaries and reconciliation notes are
+preserved in Git:
 
-- No per-domain skill emission is built here. It is named as a possible
-  `session_emit:` declaration and deployed only if Phase 5 evidence shows
-  the skill layer still failing after the gate lift — spec when foreseeable,
-  deploy when felt.
-- The PreToolUse action-boundary gate stays parked. This plan resolves the
-  emission-vs-gate fork in emission's favour; Phase 5 restates the gate's
-  re-open condition at the action boundary where it belongs.
-- No estate batch migration. Generated-contract changes are versioned and
-  adopted per-domain via refresh, per the adapter foundation's rules.
-- The operating-layer quality loop (skill content quality) stays its own
-  parked plan.
+`git show 27b95e7:things/plans/session-start-hardening.md`.
 
-## Phase 0 — Complete the baseline (operator-run; contract frozen)
+The forward build/evidence boundary is
+[`harness-capability-evidence-matrix-2026-08-20`](../../evidence/harness-capability-evidence-matrix-2026-08-20.md).
 
-The Fable run: Claude Code harness, Fable, **xhigh effort** (matching the
-Opus 5 runs), same live domain, same probe ladder — casual grill ("are you
-running as the domain agent?"), then forensic ("read end-to-end?"), then
-the steps 4–6 probe. **Contract surfaces are frozen until this closes**: no
-changes to kernel.md, AGENTS.md, the session-start projection, read.thing.md,
-or the test domain's skills land before the run, or the five-run baseline
-stops being comparable.
+## Problem statement
 
-Pre-registered predictions (scored at the gate, not adjusted after):
+Agents economise instructions that ask them to load more content, and emitted
+mechanics can quiet the judgement they do not cover. A successful command or a
+fresh timestamp therefore cannot stand in for receipt, reading or compliance.
+The system must:
 
-- **P1** — mechanical floor consumed, digest relayed, near-certain.
-- **P2** — unprompted interpretive extent ≥ the Opus 5 runs (model gradient
-  within one vendor).
-- **P3** — **domain skills still not loaded before first output.** The
-  discriminating cell: confirms position over capability. If Fable loads
-  the read skill unbidden, the gate insight weakens and capability
-  re-weights the diagnosis — Phases 1–2 still proceed, but Phase 4's
-  residue design re-opens.
-- **P4** — honest ledger at the first forensic probe.
-- **P5** — version refresh deferred as change-control, unprompted.
+1. put the non-negotiable Tier-0 contract in the delivery channel;
+2. distinguish whole delivery, explicit deferral and missing/elided content;
+3. bind receipt evidence to the actual contract definition;
+4. compute only the digest signals the floor can answer;
+5. route the irreducible judgement through an explicit invocation; and
+6. grade real consequences, never assurances.
 
-- [x] Run executed and transcript captured (fifth column of the evidence
-  table)
-- [x] Predictions scored; insights updated with the outcome (confidence
-  moves recorded, either direction)
+## Completed phases
 
-**Phase 0 outcome (2026-08-19, scored):** Fable in Claude Code at xhigh.
-All five predictions confirmed. **P1** ✓. **P2** ✓ — validate and the full
-trigger evaluation run unprompted, fired triggers judged, a curated
-lookahead produced: clearly above the Opus 5 run in the same harness at the
-same effort, giving the second clean within-harness gradient pair
-(mirroring Terra < Solo). **P3** ✓, the discriminating cell: no domain
-skills before first output — the invariant is now five for five — and the
-kernel was again skipped under instruction-delivery at the strongest
-available tier. **P4** exceeded: the ledger arrived at the first *casual*
-probe, itemised, with the substitution self-diagnosed ("the tool's output
-substituted for the operative rules"). **P5** ✓. Beyond the predictions:
-the run articulated the masking mechanism from inside — "the adapter's
-partial coverage makes the uncovered steps quieter, not louder" — captured
-as [[partial-coverage-quiets-the-uncovered-steps]], now the standing
-argument for Phase 4. A no-adapter control run is that insight's named
-discriminating test and an optional Phase 5 cell.
+| Phase | State | Durable result |
+|---|---|---|
+| 0 — baseline | complete | Five cross-harness/model observations scored the delivery and masking hypotheses before the contract changed |
+| 1 — position | complete | Read-side prerequisite moved into the upstream kernel; the gate no longer lives only inside the skill it gates |
+| 2 — delivery | complete in code | Direct channels emit the kernel whole with hash/line integrity; budgeted hook channels defer loudly to an openable receipt; contract emission writes definition-bound evidence |
+| 3 — digest | complete | Velocity trend, high/critical stall lines and self-answering trigger cues are computed and emitted without pretending to judge the residue |
+| 4 — residue | complete | `orient` owns the deep judgement walk; entry contract, prompts and operator probe ladder use one two-voice model |
 
-**Gate: CLOSED 2026-08-19.** The scored run is committed; contract surfaces
-are unfrozen and Phase 1 may begin on the operator's word.
+## Current receipt semantics
 
-## Phase 1 — Position: lift the read gate upstream
+- Direct/manual/Codex/bootstrap channels emit the kernel whole and include an
+  integrity trailer. A missing trailer or `[truncated]` means the channel did
+  not deliver the claimed whole.
+- The protected lifecycle-hook channel explicitly defers the kernel and names
+  the full file read owed before acting on domain state.
+- Preview-truncating routes persist a full receipt artifact rather than
+  guessing a product-specific chunk threshold.
+- The session attestation records a SHA-256 fingerprint of the operative
+  kernel plus domain `AGENTS.md`, together with evidence and delivery levels.
+  It does **not** claim `read`, `applied` or `compliant`.
+- The session gate checks that contract fingerprint. Unrelated HEAD movement
+  does not expire it; a contract change does. Legacy timestamp-only records
+  remain usable but warn that contract currency is unknown.
 
-The one-line fix the gate insight names: `read.thing.md`'s `<!-- kernel -->`
-block gains the read-side gate, mirroring the write block — before domain
-read work, load the domain's read skill (its specification skill first).
-This is a declared inflection on a stable spec: the operator declares it by
-starting this phase; the four-beat reconciliation walk applies.
+These are implementation statements at the current working boundary, not a
+live-harness acceptance. The historical Cowork packet used older marker-only
+semantics and remains historical.
 
-- [x] Read gate line added to `read.thing.md`'s kernel block (v2.3); version
-  bumped
-- [x] `mdllm kernel` regenerated (read block 311 tokens); `mdllm coherence`
-  clean
-- [x] Reconciliation walked: `mdllm touchpoints read-thing-specification`
-  found 8 declared edges + 1 literal — all consistent under an additive
-  gate; templates carry no self-referential gate text; the QMS read skill's
-  own prereq is across the membrane and inherits the upstream gate via
-  refresh (Phase 5 offer)
-- [x] In-phase decision: the general authoring rule ("declare gates upstream
-  of their target") stays carried by the insight — no write.thing.md line;
-  minimal core
-- [x] Gate insight promoted: `promoted_to: read-thing-specification`
+## Phase 5 — re-test, disposition and seal
 
-**Gate: CLOSED 2026-08-20.** The kernel carries the read gate; validate and
-coherence clean.
+- [ ] Re-run the probe ladder on at least two harnesses: one Claude Code and
+  one Codex surface. Record exact build, contract fingerprint, delivery level,
+  transcript consequence and any truncation/manual recovery.
+- [ ] Confirm the next cold direct session receives Tier 0 whole and the next
+  budgeted-hook session defers it loudly before domain-state action.
+- [ ] Update `emitted-content-is-read-instructed-content-is-economised` from
+  the new evidence; emission remains delivery, not behavioral compliance.
+- [ ] Re-score and disposition
+  `a-prerequisite-declared-only-inside-its-target-cannot-gate-it`,
+  `session-start-loses-to-the-first-request` and
+  `partial-coverage-quiets-the-uncovered-steps`.
+- [ ] Record the resolved-for-now decision on
+  `pretooluse-action-boundary-gate`: emission first; reopen an action gate only
+  if live evidence shows an irreversible pre-action failure that Git cannot
+  recover.
+- [ ] Decide from evidence whether any per-domain skill emission is earned.
+  Do not build it merely because the mechanism is imaginable.
+- [ ] Reconcile specs/docs/generated kernel, add the release changelog/version,
+  and offer per-domain refresh rather than silently migrating the estate.
 
-## Phase 2 — Delivery: emit Tier 0, don't instruct it
+## Exit condition
 
-Change the generated session-start projection so the kernel arrives as
-content, not as a load instruction — one change serving all three harness
-routes (adapter-injected in Claude Code, bootstrap-emitted in Cowork,
-agent-run or native in Codex). Constraints inherited from the adapter
-foundation, named so they cannot be rediscovered the hard way:
-
-- **Lands-whole or loudly absent.** The injection channels have character
-  budgets, and Gate 6R already proved silent truncation drops orientation
-  content. A truncated kernel emission mechanically recreates the Terra
-  believed-loaded failure. The kernel's share is protected per-step; where
-  it cannot fit, the projection must degrade to an explicit
-  "kernel NOT emitted — load `kernel.md` before proceeding" line, never a
-  silent partial emission. Truncation marked is not landing.
-- **Emission-integrity marker.** The emission carries a trailer the agent
-  and the grilling can check mechanically (kernel line count + content
-  hash), so "did it land whole" stops being a memory claim. The session
-  gate's honest limit is stated: attestation proves emission, the trailer
-  makes landing checkable, nothing proves reading.
-- **Generated-contract change = estate migration.** The managed-block
-  change is versioned; the framework root adopts immediately; domains adopt
-  via `refresh` on request; everything else is an offer, never a sweep.
-- **Scope: kernel only.** Cost measured with `mdllm tokens` before/after
-  and recorded in the changelog — not restated in prose.
-
-- [x] `mdllm session-start` emits kernel content whole, with integrity
-  trailer and loud degradation path. The default path is channel-aware:
-  direct channels (manual CLI, Codex, bootstraps) emit the kernel whole
-  with the trailer (line count + sha256 — the mark whose absence reveals
-  truncation); the hook/runner channel, marked via `MDLLM_LIFECYCLE_CHANNEL`
-  set by the runner, gets the loud checkable deferral ("Kernel NOT emitted
-  — N lines, sha256 X, read END TO END") because a partial kernel, even
-  elision-marked, recreates the believed-loaded failure. `--contract`
-  gains the same trailer.
-- [x] Budget shares verified on the largest live domain: hook channel
-  5,886 raw chars with the deferral as step 1 (the runner bounds to its
-  2,200 budget structurally); direct channel 22,236 chars, kernel whole,
-  trailer present.
-- [x] Token cost measured: the kernel adds ~18,000 characters (~4,250
-  tokens, `mdllm kernel`'s own figure) to big-channel session starts;
-  framework-root direct emission measured at 18,056 chars. The hook
-  channel is unchanged at 2,200 chars.
-- [x] The gate now reads the marker the emitter writes: the attestation
-  carries a kernel token (`whole:<sha>:<lines>` / `deferred` / `elided` /
-  `absent`); `elided` and `absent` surface as Warnings in **both** modes —
-  never a strict Error, because the remedy (read the named file in full)
-  is evidence the floor cannot receive, and a commit-block the session
-  cannot clear is a dead-end gate. The remedy text and docstring now name
-  what actually emits. Legacy attestations carry no token and stay silent.
-- [x] Receipt path for preview-truncating harnesses: `--contract` also
-  writes the full emission to `<git-dir>/mdllm-contract-emission.md`
-  (uncommittable by construction) and names it in-band — recovery is one
-  file read on any harness, no manual surgery. Chunked emission was
-  considered and rejected: chunk thresholds are harness-specific; a file
-  read is every harness's native full-content channel.
-- [x] Migration: none triggered, by construction — the runner marks the
-  channel via environment, not argv, so rendered hook configs and their
-  definition hashes stay byte-identical estate-wide. Domain-side prose
-  (managed blocks still instructing the kernel load) rides the versioned
-  refresh offer in Phase 5, per Gate 7.0's migration-boundary rule.
-
-**Gate: implementation closed 2026-08-20; acceptance PENDING OPERATOR
-RUNS** — a fresh session in each of the three harnesses showing the kernel
-landed whole (trailer verified) or loudly deferred, with no silent
-truncation on the largest domain. Suite green at commit (12 emission tests
-+ full run; four pre-existing tests updated where the old expectations
-pinned the instruction-era output).
-
-## Phase 3 — Digest: compute the computable cores of steps 4–6
-
-Every cue the digest emits is a pull-router — the evidence shows emitted
-cues get judged (all five sessions deferred the version refresh unprompted)
-while un-emitted duties get skipped. Move the computable cores of the
-orientation walk into the floor's output:
-
-- [x] Velocity as week-over-week trend buckets beside the 30-day total:
-  "Weekly commits to `things/` (oldest→newest): a · b · c · d" in the
-  digest's velocity line
-- [x] Stall-line findings surfaced by the floor: critical/high,
-  non-terminal, native work things past the 21-day line, named per thing
-  with days untouched, keyed on the commit stream (never mtime); knowledge
-  types and external mirrors excluded
-- [x] Self-answering armed triggers: heuristic regex over armed
-  future-dated time triggers' action text (do-not-re-ask / already-issued /
-  remedies-spent patterns), surfaced in the digest and as its own section
-  in `mdllm triggers` — the cue is the floor's, the disarm/re-condition
-  judgement stays the agent's
-- [x] Dead-trigger candidates: DECIDED — stays judgement. A condition's
-  foreclosure (a limb that can no longer fire because the world moved) is
-  irreducibly semantic; a mechanical test would need a hand-maintained
-  suppression list, which change-reconciliation.md names as judgement in
-  mechanical clothing
-- [x] Prompts updated to consume: `domain-velocity` v1.2 (stall +
-  cadence signals floor-computed; residue named as churn, ignored
-  unblocks, below-threshold stalls, meaning), `evaluate-triggers` v1.3
-  (fifth bucket documented, judgement residue named)
-
-**Gate: CLOSED 2026-08-20.** All three signals shown on fixtures where
-they are known-present (test_digest_signals.py, 4 tests); prompts
-reference the computed output. 34 focused tests green at commit; full
-suite rides the Phase 4 commit (Phase 4 is prose-only).
-
-## Phase 4 — Residue: route the pull, reconcile the two voices
-
-What remains after Phases 2–3 is judgement no channel can perform. Decisions
-this phase owns:
-
-- [x] The deep orientation walk is now the **`orient` bound prompt** in the
-  framework root's AGENTS.md — explicitly invoked (operator's word) *and*
-  intent-scoped (the agent invokes it the moment intent first touches
-  domain state — the moment the pull exists). The entry file's Tier-0
-  section now describes emission and the owed deferral read instead of
-  instructing loads. orchestration.md v1.17 records the re-homing and its
-  boundary: scaffolded domains inherit it via the versioned managed-block
-  migration (refresh, offered per domain); until adopted, their generated
-  block stays their truth.
-- [x] The two-voices collision resolved in the entry file's own words: the
-  economy rule now opens with "This economy governs Tier 1 and Tier 2 only
-  — Tier 0 is emitted or owed, never economised," and Tier 0's heading
-  says "exempt from the economy rule above." Nothing left to recruit.
-- [x] The probe ladder recorded in the operator guide (v1.6, "Grilling A
-  Session"): the three rungs, the smooth-yes tell, probe-precision
-  discipline, evidence-over-assurances — with the ladder linked as the
-  ledger insight's operator-facing implementation.
-
-**Gate: CLOSED 2026-08-20.** AGENTS.md, kernel, and the projection agree;
-reconciliation walked (textual tier: every remaining "load kernel.md"
-instruction is a domain-side surface riding the versioned migration, or a
-historical record — none is a framework-root contradiction); coherence
-clean; full suite green at commit.
-
-## Phase 5 — Re-test, disposition, seal
-
-- [ ] Probe ladder re-run on at least two harnesses (one Claude, one
-  non-Claude) against the changed contract; results scored against the
-  five-run baseline
-- [ ] `emitted-content-is-read-instructed-content-is-economised`
-  dispositioned per its own dismissal condition (promoted if content-level
-  variance is gone)
-- [ ] `a-prerequisite-declared-only-inside-its-target-cannot-gate-it`
-  promoted (Phase 1 is its fix landing)
-- [ ] `pretooluse-action-boundary-gate` updated: fork resolved-for-now in
-  emission's favour; re-open condition restated — if post-emission variance
-  persists at the *action* boundary, the gate is the next rightward move
-- [ ] `session-start-loses-to-the-first-request` dispositioned — its fix
-  directive ("deliver the ritual mechanically at t=0") is now executed;
-  promotion candidate (added by the 2026-08-20 dark-region re-walk: it was
-  missing from this list while its two siblings were on it)
-- [ ] Per-domain skill emission decision made from evidence (build only if
-  the skill layer still fails post gate-lift)
-- [ ] CHANGELOG entry; framework version bump; refresh offered per
-  migration rules. **Tripwire:** the Phase 4 prose forward-references
-  v3.33 in two places (AGENTS.md Tier-0 block, orchestration.md Binding
-  Scope) while `.markdownllm` still says 3.32.0 — the bump must be 3.33.0
-  or the prose reworded, and it must land before any publication of these
-  commits
-
-**Exit:** the next cold session in any harness starts with Tier 0 landed
-whole, the read gate visible before read work, the computable cues in the
-digest, and a named invocation for the judgement residue — and a grilled
-session's ledger shows gaps only where judgement was genuinely never
-pulled.
+A cold session on each accepted harness begins with Tier 0 either landed whole
+or explicitly owed, its attestation is bound to the contract actually emitted,
+the digest supplies computable attention, and `orient` carries the remaining
+judgement. The evidence record states exact builds and does not promote
+delivery into a claim of compliance.

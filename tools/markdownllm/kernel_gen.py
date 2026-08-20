@@ -32,6 +32,11 @@ KERNEL_HEADER = (
 )
 
 
+def _normalize_newlines(text: str) -> str:
+    """Canonical text form for generated-kernel semantic comparisons."""
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def _token_counter():
     try:
         import tiktoken
@@ -61,6 +66,12 @@ def build_kernel(root: Path, specs: list[str], count,
             if not view.exists(logical):
                 continue
             text = view.read_text(logical)
+        # ``Path.read_text`` applies universal-newline translation while a
+        # RepositoryView deliberately preserves exact blob/worktree bytes.
+        # Kernel blocks are textual semantics and the generated artifact is
+        # canonical LF, so normalize both routes here. Otherwise a CRLF
+        # worktree can report drift while ``kernel --check`` says in sync.
+        text = _normalize_newlines(text)
         full_total += count(text)
         blocks = KERNEL_RE.findall(text)
         if not blocks:
@@ -111,7 +122,7 @@ def cmd_kernel(args) -> int:
         if existing_error:
             sys.exit(f"mdllm: kernel --check refused invalid kernel.md "
                      f"frontmatter — {existing_error}")
-        if existing_body.strip() != body.strip():
+        if _normalize_newlines(existing_body).strip() != body.strip():
             print("\nkernel: DRIFT — spec kernel blocks changed since kernel.md "
                   "was generated; run `mdllm kernel` and commit the result")
             return 1

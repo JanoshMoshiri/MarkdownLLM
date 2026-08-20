@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.11
+version: 2.12
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -221,8 +221,11 @@ MarkdownLLM/                        ← Framework git repo (cloned from GitHub)
 
 ### Setup Steps
 
-1. **Clone the framework:** `git clone https://github.com/[org]/MarkdownLLM.git`
-2. **Scaffold the mechanical shell:** `mdllm scaffold domains/my-domain --harness <selection>` — this performs the entire birth sequence deterministically: instantiated templates (AGENTS.md with `framework_root` and `framework_version_seen` filled in, `things/_schema.yaml`, the four skill files), `git init`, the framework-side `.gitignore` isolation *committed before any domain commit*, the pre-commit hook, the selected adapter projection where one exists, and the domain's first commit. Choose `claude`, `codex`, `cowork`, `all`, or `none`; omission preserves the current Claude compatibility default. It satisfies the `pre-domain-scaffold:isolate` hard hook by construction.
+1. **Acquire a pinned framework release:** follow README's *Getting Started*
+   flow: fetch the named full release commit, verify the installer hash, and
+   run it from that detached checkout. A moving branch is development state,
+   not installation authority.
+2. **Scaffold the mechanical shell:** `mdllm scaffold domains/my-domain --harness <selection> --autopush false` — this performs the entire birth sequence deterministically: instantiated templates (AGENTS.md with `framework_root` and `framework_version_seen` filled in, `things/_schema.yaml`, the four skill files), `git init`, the framework-side `.gitignore` isolation *committed before any domain commit*, the pre-commit hook, the explicit publication choice, the selected adapter projection where one exists, and the domain's first commit. Choose `claude`, `codex`, `cowork`, `all`, or `none`; omission preserves the current Claude compatibility default. Publication defaults to false; pass `--autopush true` only when automatic sends are the deliberate standing instruction. It satisfies the `pre-domain-scaffold:isolate` hard hook by construction.
 3. **Tell the agent to fill the semantic half** — describe what you want; the agent declares your thing types and vocabularies in `_schema.yaml`, writes the skill bodies, completes AGENTS.md, and creates seed things
 
 ### Why This Model
@@ -279,6 +282,7 @@ framework_version_seen: [copy from {framework_root}/.markdownllm]
 git:
   autocommit: true
   branch: main
+  autopush: false  # safe birth default; set true only as an explicit publication choice
 ---
 
 # [Domain Name] Agent
@@ -630,12 +634,11 @@ before work and record that as manual bootstrap rather than automatic discovery.
 
 ### Step 1: Set Up the Deployment Model
 
-Clone the MarkdownLLM framework repository:
-
-```bash
-git clone https://github.com/[org]/MarkdownLLM.git
-cd MarkdownLLM
-```
+Acquire MarkdownLLM through README's pinned *Getting Started* flow. It names a
+full published commit and the installer hash for each platform; verify both
+before execution. Do not install by cloning or piping a moving branch. A
+development checkout may follow a branch only when development, rather than
+installation, is the operator's explicit intent.
 
 Do **not** hand-create the domain directory or its git repo — birth is
 mechanical (`mdllm scaffold`, run in Step 3), and the eval record is blunt
@@ -657,7 +660,7 @@ You don't need to answer these perfectly upfront. Start with what you know. The 
 
 ### Step 3: Let the Framework Agent Build It
 
-Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent receives the framework's `AGENTS.md` through the configured entry route, knows the specifications, and knows how to scaffold domains. Describe what you want and select the target harness if you want lifecycle hardening — the agent runs `mdllm scaffold domains/my-domain --harness <selection>` for the mechanical shell (templates, `git init`, `.gitignore` isolation, pre-commit hook, selected adapter projection, first commit — the whole birth sequence, deterministically) and then fills the semantic half inside `domains/my-domain/`:
+Open the **framework root** (`MarkdownLLM/`) as your workspace. The framework agent receives the framework's `AGENTS.md` through the configured entry route, knows the specifications, and knows how to scaffold domains. Describe what you want and select the target harness if you want lifecycle hardening — the agent runs `mdllm scaffold domains/my-domain --harness <selection> --autopush false` for the mechanical shell (templates, `git init`, `.gitignore` isolation, explicit publication choice, pre-commit hook, selected adapter projection, first commit — the whole birth sequence, deterministically) and then fills the semantic half inside `domains/my-domain/`:
 
 - `AGENTS.md` at domain root — with `framework_root: ../..` pointing to the framework
 - `skills/` directory with the four baseline skills:
@@ -808,8 +811,8 @@ Two knowledge primitives also matter at scaffold time:
 - [ ] **Prerequisites** — Confirm you have an LLM tool with file-system access and a tested entry route; a product name alone is not evidence
 - [ ] **Understand** — Read `llm-driven-systems.manifesto.md` and `thing.md`
 - [ ] **Plan** — Answer: What problem? What atomic units? What workflows?
-- [ ] **Clone framework** — Clone the MarkdownLLM repository
-- [ ] **Scaffold domain** — `mdllm scaffold domains/my-domain --harness <selection>`. Never hand-create the directory or its git repo — birth is mechanical (this checklist once said "create the folder and initialise a git repo", contradicting Step 1 above; hand-rolled births drop steps)
+- [ ] **Acquire framework** — Fetch the README-named immutable release commit and verify the installer hash; do not treat a moving branch as install authority
+- [ ] **Scaffold domain** — `mdllm scaffold domains/my-domain --harness <selection> --autopush false` (use true only for an explicit standing publication instruction). Never hand-create the directory or its git repo — birth is mechanical (this checklist once said "create the folder and initialise a git repo", contradicting Step 1 above; hand-rolled births drop steps)
 - [ ] **Fill the semantic half** — Tell the framework agent to complete AGENTS.md's authored sections, declare types in `_schema.yaml`, and write the skill bodies
 - [ ] **Open domain workspace** — Open the domain folder as its own workspace — the domain agent takes over from here
 - [ ] **Nothing to set up for session memory** — forward state is the thing graph (surfaced by the `mdllm session-start` orient view) and the backward record is the commit stream; `continuity.md` and `WORKLOG.md` are retired (v3.17)

@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -23,6 +23,9 @@ linked_things:
     relation: complements
   - id: derived-index-specification
     relation: complements
+  - id: autopush-requires-explicit-authority
+    relation: implements
+    notes: "Supersedes the default-on publication rule: only literal true authorizes a send; absent, malformed, and false are off."
 ---
 
 # Git Workflow
@@ -32,7 +35,7 @@ linked_things:
 
 **Multi-machine sync:** sync before orienting — automatic `mdllm estate-sync` is fetch + `pull --ff-only`, bounded, never prompting, and degrades offline to "orienting from last-fetched state" so lifecycle startup does not block. When the operator explicitly asks for fresh manual state, `mdllm estate-sync --require-fresh` turns any cached or unresolved outcome into a nonzero approval/routing signal. Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
 
-**Publication:** the autopush leg (post-commit hook) publishes each floor-validated commit unless the repo declares `git: autopush: false` — absence is ON; the per-domain declaration is the standing human instruction. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) opt out: a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under autopush, an anomaly report.
+**Publication:** the autopush leg (post-commit hook) publishes a floor-validated commit **only** when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off; publication authority never comes from silence. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) declare false, so a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under explicitly enabled autopush, an anomaly report.
 
 **Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
 
@@ -190,9 +193,10 @@ reprioritize: Q2 realignment — 5 things updated
 
 The agent commits freely to the local repository after each meaningful state
 change. The pre-commit floor validates every commit on the way in; the
-post-commit **autopush leg** then publishes each floor-validated commit —
-unless the repo declares `git: autopush: false` in its AGENTS.md frontmatter
-(absence means on; full rules in *The Outbound Rules: Autopush* below).
+post-commit **autopush leg** then publishes a floor-validated commit only when
+the repo declares literal `git: autopush: true` in its AGENTS.md frontmatter.
+False, absence, malformed YAML, or any other value means no send (full rules in
+*The Outbound Rules: Autopush* below).
 
 **Why this works:**
 
@@ -201,22 +205,25 @@ unless the repo declares `git: autopush: false` in its AGENTS.md frontmatter
 - **The floor gates, not diligence** — the pre-commit hook validates what
   enters history; autopush transports only what the floor passed
 - **Rollback capability** — Individual commits can be reverted without affecting others
-- **The deliberate act lives in the declaration** — the per-repo `autopush`
-  setting is the standing human instruction, made once and owned in config;
+- **The deliberate act lives in an affirmative declaration** — literal
+  `autopush: true` is the per-repo standing human instruction, made once and
+  owned in config; silence carries no authority;
   what stays per-event is *routing non-clean outcomes* (a rejected push, an
   offline session), which surface as publication debt and are never resolved
-  by force (`autopush-moves-the-deliberate-act`, 2026-08-04, which supersedes
-  the earlier "push is always the human's deliberate act" doctrine)
+  by force (`autopush-requires-explicit-authority`, which narrows
+  `autopush-moves-the-deliberate-act`: declaration-level authority remains,
+  but it must be affirmative)
 
 **In practice:**
 
 1. You ask the agent to update things
 2. The agent modifies files and commits with structured messages; the floor
-   validates at the commit boundary; autopush publishes each validated commit
+   validates at the commit boundary; explicitly enabled autopush publishes each validated commit
 3. If something is wrong, revert the specific commit: `git revert <hash>` —
    history is append-only in both directions, so the correction is itself a
    published commit
-4. On an opted-out repo (`autopush: false` — release surfaces), you review
+4. On any repo without literal `autopush: true` (including release surfaces
+   declaring false), you review
    and push deliberately: `git log --oneline -10`, then `git push`
 
 ### Alternative: Agent Stages, Human Commits
@@ -232,15 +239,11 @@ This adds friction but gives the human approval over every commit. Useful for se
 ### What The Agent Should Not Do
 
 - **Never push outside the declared publication mechanism** — publication is
-  either the autopush leg acting on floor-validated commits (the per-repo
-  `git: autopush` declaration is the standing human instruction, and absence
-  means on), or — where a repo declares `autopush: false`, every release
-  surface included — an explicit human instruction per push. Never push a
-  repo that opted out; never push to *make* something true that reconciliation
-  hasn't finished making true. (Revised from "never push without explicit
-  human instruction" by `autopush-moves-the-deliberate-act`, 2026-08-04 — the
-  deliberate act moved from each push to the declaration and the routing of
-  non-clean outcomes.)
+  either the autopush leg acting on floor-validated commits after literal
+  `git: autopush: true`, or an explicit human instruction for that push. False,
+  absent, malformed, and unknown policies authorize nothing. Never push a repo
+  that has not granted one of those two authorities; never push to *make*
+  something true that reconciliation has not finished making true.
 - **Never force-push** — History is sacred in this framework, and `--force`
   is structurally outside the autopush mechanism's vocabulary
 - **Never amend published commits** — Once pushed, commits are immutable
@@ -293,18 +296,19 @@ read velocity. This is what `mdllm estate-sync` mechanises and the
 
 ### The Outbound Rules: Autopush
 
-The mirror of the inbound rules, and the same argument in reverse: a push of
-a floor-validated commit is pure transport of state already real locally —
-safe to make mechanical. Once orientation reads the estate, an unpushed
-commit is state withheld from the thing that orients on it; holding
-publication back by default stopped being protection and became a lie the
-membrane tells (`autopush-moves-the-deliberate-act`, which supersedes the
-v3.22.0 "push stays the human's deliberate act" line).
+The mirror of the inbound rules, with an additional authority boundary: a push
+of a floor-validated commit is mechanically simple transport, but it is still
+a send. The mechanism may automate it only after the owning repo grants
+affirmative standing authority. This preserves declaration-level automation
+without treating missing or malformed policy as consent
+(`autopush-requires-explicit-authority`).
 
-- **Default on, opt-out declared.** `git: autopush: false` in a repo's
-  AGENTS.md frontmatter opts out; anything else — including absence — is on.
-  The deliberate act moves up a level: from each push to the per-repo
-  declaration, made once, owned in config.
+- **Fail closed; opt in explicitly.** Only literal `git: autopush: true` in the
+  owning repo's AGENTS.md enables the post-commit send. False, absence,
+  malformed YAML, a non-boolean value, or an unreadable entry is off and
+  `doctor` explains why. The deliberate act may move up a level — from each
+  push to a standing declaration — but the declaration must exist and be
+  affirmative.
 - **Post-commit, post-floor.** The leg runs after the pre-commit floor has
   validated the commit; it transports what the floor passed. It never
   initiates a commit and never blocks one — a post-commit surface must not
@@ -320,9 +324,16 @@ v3.22.0 "push stays the human's deliberate act" line).
 - **Release surfaces keep the human.** A repo whose push is a *release* —
   consumed by outsiders, gated by judgement with no mechanical completeness
   check (the framework root's public repo) — declares `autopush: false`:
-  the default-on rule applied honestly, as that repo's own opt-out
+  an explicit statement that only a per-event human instruction may publish
   (`premature-publish-manufactures-discipline-eroding-urgency` stands
   unrevised).
+- **The guarded one-shot path names the event authority.** `mdllm publish`
+  observes the same fail-closed policy before contacting a remote. When
+  standing authority is off, only the human's explicit instruction for that
+  individual send licenses `mdllm publish --authorize-once`; an agent must not
+  infer or self-grant the flag. The command then applies its real-default-branch,
+  existing-remote-ref, fast-forward-only, and post-push verification guards.
+  The one-shot flag does not mutate `AGENTS.md` or create standing authority.
 
 ### The Release Walk
 
@@ -531,7 +542,7 @@ record is git itself, and the narrative lives in the commit messages.
 | When to commit? | After each meaningful state change (creation, status transition, write session, session end) |
 | What do commit messages say? | Domain state changes, not file modifications |
 | Who commits? | Agent commits locally; the floor validates at the boundary |
-| Who pushes? | The autopush leg, mechanically, per the repo's standing declaration (`git: autopush` — absence is on); release surfaces opt out and keep the human's deliberate push |
+| Who pushes? | The autopush leg only under literal `git: autopush: true`; otherwise a human gives a per-push instruction. False, absent, or malformed policy is off, and release surfaces keep the deliberate human push. |
 | How does history help? | Git log is the event stream; triggers evaluate against it; session orientation reads it |
 | What about branching? | `main` only for now; branching for exploration and collaboration later |
 | What about rollback? | Revert specific commits; granular commits make this surgical, not destructive |
@@ -637,8 +648,8 @@ git add + git commit
 
 **Autocommit itself never pushes** — it ends at the commit. Publication is a
 separate, post-commit concern: the **autopush leg** (see *The Outbound Rules*)
-publishes each floor-validated commit unless the repo declares
-`git: autopush: false`. The two compose but stay distinct:
+publishes each floor-validated commit only when the repo declares literal
+`git: autopush: true`. The two compose but stay distinct:
 
 - Autocommit decides *when state becomes real locally* (at meaning boundaries)
 - Autopush decides *when real state reaches the estate* (each validated

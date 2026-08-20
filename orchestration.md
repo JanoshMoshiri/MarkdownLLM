@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.17
+version: 1.19
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -28,18 +28,22 @@ linked_things:
     relation: implements
   - id: derived-index-specification
     relation: complements
+  - id: autopush-requires-explicit-authority
+    relation: implements
 ---
 
 # Orchestration
 
 <!-- kernel -->
 **Hard hooks — always active by config (enforcement depends on anchor — see below):**
-1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) mechanically validates on the way in and surfaces the change-reconciliation advisories (cue candidates, serve-side publication notices — advisory, never blocking). **The publication leg:** the post-commit hook then publishes the validated commit (`mdllm autopush`) unless the repo declares `git: autopush: false` (absence = on; release surfaces opt out). Bounded, never forces; a rejected push is divergence on the push side — surfaced, never resolved (`autopush-moves-the-deliberate-act`).
-2. `pre-domain-scaffold:isolate` — new domain, in order: `git init` in domain dir → add path to framework `.gitignore` → commit `.gitignore` to framework → commit domain files to domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: `mdllm scaffold <path>` performs steps 1–4 plus templates and hook; the remote stays human.
+1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) freezes one candidate tree/root pin; its boundary, validation, coherence, and cue processes construct views from that same pin, and a final tree comparison rejects index movement. Ambient worktree bytes cannot substitute for staged bytes. **The publication leg:** the post-commit hook calls `mdllm autopush`, which sends only when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off. Bounded, never forces; a rejected push is divergence on the push side — surfaced, never resolved (`autopush-requires-explicit-authority`).
+2. `pre-domain-scaffold:isolate` — new domain, in order: preflight outer and target state → `git init` in domain dir → add exactly the domain path to framework `.gitignore` → commit only that delta while preserving unrelated index state → commit domain files to the domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: transactional `mdllm scaffold <path>` performs the local steps with optimistic HEAD checks and compare-and-swap rollback while state remains transaction-owned; after the outer isolation commit, later failures retain an explicit recoverable state instead of erasing committed truth. The remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — the check itself never requires the network); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 4. `session-start:estate-sync` — sync before orienting (orientation reads the log sync updates): plain `mdllm estate-sync` walks root + `domain(s)/*` repos — `git fetch` + `pull --ff-only`, bounded, `GIT_TERMINAL_PROMPT=0`, degrading offline to an advisory line. Reports per repo: synced/up-to-date/ahead-unpushed/DIVERGED/offline/dirty/local-only. Divergence and dirty trees reported, never resolved; never pushes, never merges. Session end: `estate-sync --status` reports publication debt (unpushed commits). A *required* network call at session start stays forbidden; this is a bounded attempt, not a gate. An operator-requested fresh manual rerun uses `estate-sync --require-fresh`, whose nonzero cached/unresolved outcome gives a restricted harness an approval signal without changing lifecycle behavior.
 
-**Anchor decides enforcement (the primary axis); hard/soft is only config.** Every hook has one **anchor** — the surface that makes it fire: `interpretation` (the agent reads the entry file and acts — portable across every harness, *not* mechanically enforced, the default and sufficient for correctness), `git-fs` (a real git/filesystem mechanism fires — mechanical, universal), or `harness-session` (a harness lifecycle event — enforced only if a per-harness adapter binds it). `hard`/`soft` is config only — always-on vs opt-in — and does **not** imply enforcement: a `hard` + `interpretation` hook is exactly as skippable as a soft one, and is a hardening candidate. Hardening = moving a hook's anchor rightward without touching hard/soft: the **git pre-commit hook** (`mdllm install-hook`) makes validation `git-fs`; optional **per-harness adapters** (`adapters/`) bind `harness-session` hooks to real events. Adapters stay optional — never the difference between working and not.
+**Repository read boundary:** a full-corpus or otherwise significant read names one immutable `COMMIT(<full-sha>)` view rather than mixing ambient paths over time. `mdllm session-start` emits that base; immediately before writing conclusions from it, run `mdllm session-start . --assert-head <full-sha>`. Moved HEAD is a reconciliation stop. This mechanically proves byte currency only — not that a model received, read, applied, or complied with the contract.
+
+**Anchor decides enforcement (the primary axis); hard/soft is only config.** Every hook has one **anchor** — the surface that makes it fire: `interpretation` (the agent reads the entry file and acts — portable across every harness, *not* mechanically enforced), `git-fs` (a real git/filesystem mechanism fires — mechanical, universal), or `harness-session` (a harness lifecycle event — enforced only if a per-harness adapter binds it). Interpretation is the portability fallback; evidence must not promote it into mechanical enforcement. `hard`/`soft` is config only — always-on vs opt-in — and does **not** imply enforcement: a `hard` + `interpretation` hook is exactly as skippable as a soft one, and is a hardening candidate. Hardening = moving a hook's anchor rightward without touching hard/soft: the **git pre-commit hook** (`mdllm install-hook`) makes validation `git-fs`; optional **per-harness adapters** (`adapters/`) bind `harness-session` hooks to real events. Adapters stay optional — never the difference between the definition-driven model working and not, but build-specific lifecycle enforcement remains an evidence claim.
 
 **Soft orchestration (opt-in per domain):** hook points (session-start, session-end, pre-commit, post-commit, post-write, on-create, on-status-change, on-error, retrospective + domain-defined) · prompts (`type: prompt` — one focused reasoning task) · bindings (`{hook, when?, invoke: [prompts...], anchor?}` in AGENTS.md or workflow skill; declaration order = execution order; `anchor` defaults to `interpretation`).
 
@@ -72,12 +76,14 @@ is enforced and whether it survives a change of harness.
 | **Git / filesystem** | a real mechanism fires (git `pre-commit` hook, a file write) | Yes — mechanical | ✅ Universal — git is present under every harness |
 | **Harness session lifecycle** | the harness decides a "session" started or ended | Only if an adapter binds it | ❌ Differs per harness |
 
-**Interpretation is the default, and it is sufficient for correctness.** The
-framework was built and run end-to-end under GitHub Copilot before it ever touched
-Claude Code; the agent read `AGENTS.md` and executed the prose. *That* is the
-portability layer — not git, not any vendor hook. A domain with zero adapters and
-zero mechanical hooks still works, because the universal substrate under every
-harness is an LLM reading the entry file.
+**Interpretation is the portable fallback, not a correctness proof.** The
+framework was built and run end-to-end through prose-delivery routes before it
+had vendor adapters; that demonstrates useful operation, not guaranteed receipt,
+reading, application, or outcome compliance. A domain with zero adapters can
+still operate because an LLM can read the entry contract, but any claim that a
+specific lifecycle step fired must come from build-specific execution evidence
+or a mechanical anchor. The portability layer is the neutral contract; the
+evidence layer says how much of it a harness actually delivered and ran.
 
 **Hardening is optional, and it is the same move twice.** Where being wrong is
 unrecoverable, trade "the agent should" for "the machine guarantees":
@@ -98,14 +104,15 @@ unrecoverable, trade "the agent should" for "the machine guarantees":
   Copilot lifecycle evidence.
 
 If a hook can only be hardened by an adapter and you write no adapter, it falls
-back to interpretation — which is where it started, and where the framework
-already works.
+back to interpretation — a usable but probabilistic route whose execution must
+not be claimed without evidence.
 
 ### The Distribution
 
 Every hook and prompt, by anchor. Read the last column to see why interpretation
-is safe for almost all of them: git reconstructs state, and validation catches
-drift later, so a skipped hook degrades gracefully rather than corrupting.
+is recoverable for most of them: git reconstructs state, and validation catches
+some drift later, so a skipped hook usually degrades visibly rather than making
+accepted state unverifiable. That is a recovery property, not proof it ran.
 
 | Hook / Prompt | Anchor | Enforced by today | If the agent skips it |
 |---|---|---|---|
@@ -116,7 +123,7 @@ drift later, so a skipped hook degrades gracefully rather than corrupting.
 | `session-start:estate-sync` | interpretation → harness-session (adapter) | interpretation (adapters bind it where installed) | Moderate — orientation reads a stale log; an unpulled checkout orients on a past domain |
 | `session-start`, `session-end` | harness-session | interpretation | **Moderate** — the state is regenerable from git, but the session *acts on the misread live*: two 2026-08-08 field incidents (an orientation the operator could not follow; a write made without the workflow skill's authorisation step) trace to skipped session-start steps |
 | `post-write` | interpretation (act) — git-fs is only the pre-commit drift net | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
-| `post-commit` | git/fs | ⚙️ git hook (mechanical — `mdllm autopush`, the publication leg; v3.26.0) | Low — publication debt, surfaced by `estate-sync --status` |
+| `post-commit` | git/fs | ⚙️ git hook invokes `mdllm autopush`; a send occurs only under literal `git.autopush: true` | Low — publication debt, surfaced by `estate-sync --status` |
 | `on-create`, `on-status-change`, `on-error`, `retrospective` | interpretation (semantic) | interpretation — no mechanical detector possible | Moderate — downstream not cascaded |
 | reasoning prompts (`cascade-completion`, `evaluate-triggers`, `surface-attention`, `detect-conflicts`, `session-orientation`, `domain-velocity`, `review-schema-coherence`, `session-end-continuity`) | interpretation | interpretation — they *are* reasoning | Low–Moderate |
 
@@ -124,10 +131,11 @@ Two consequences fall out:
 
 1. **Three git hooks are mechanically enforced today** (`mdllm install-hook`):
    `pre-commit` validation + coherence (blocks), the `commit-msg` disclosure
-   boundary (blocks), and `post-commit` autopush (publishes, never blocks). The
-   two blocking legs are the ones with unrecoverable consequence — the floor
-   still guards exactly what must never be wrong, and the publication leg only
-   transports what the blocking legs passed. *(This consequence said "only
+   boundary (blocks), and `post-commit` autopush (invokes the fail-closed
+   publication policy, never blocks). The
+   two blocking legs guard accepted state and disclosure. The publication leg
+   transports what they passed only when affirmative repo policy authorizes the
+   send. *(This consequence said "only
    pre-commit" for four releases after the other two legs landed — a
    review-loop finding; the table above is the census, and it was wrong too.)*
 2. **Adapters touch only the session-lifecycle rows**, the lowest-consequence rows
@@ -177,7 +185,7 @@ These four hard hooks are part of every agent's operating contract with the fram
 
 **Why it's hard:** Git is the framework's state machine. An uncommitted change is a change that doesn't exist yet — the "single source of truth" principle is violated by any thing that exists only in a working directory. This cannot be left to convention or memory.
 
-**Mechanical backstop (v3.0):** the commit boundary is also where the deterministic floor fires — the git `pre-commit` hook (installed via `python tools/mdllm.py install-hook`) runs full mechanical validation and blocks the commit on any Error. The agent does not enforce structural/referential integrity by diligence; the hook does it by construction. See `validate.thing.md` v2.0.
+**Mechanical backstop:** the commit boundary is also where the deterministic floor fires — the git `pre-commit` hook (installed via the repository's declared `mdllm install-hook` route) freezes the index candidate, then runs full mechanical validation, coherence, and cue generation against that one view. It blocks the commit on any Error. The agent does not enforce structural/referential integrity by diligence; the hook does it by construction. See `validate.thing.md`.
 
 **What failure looks like:** Thing files created in a session but never committed. State that exists in files but not in history. The session ends and the work is only partially real.
 
@@ -194,7 +202,7 @@ These four hard hooks are part of every agent's operating contract with the fram
 4. Commit the domain files to the domain's own repo
 5. Create a remote repository and push
 
-**Mechanised by the `scaffold` subcommand:** `mdllm scaffold <path>` through the repository's manual CLI launch route performs steps 1–4 deterministically (plus instantiated templates and the pre-commit hook), and exits non-zero if any step of the sequence fails — running it is the canonical way to satisfy this hook. Step 5 (the remote) stays with the human. The hook still binds when scaffolding by hand: the *ordering* is the invariant, not the tool. (Spec prose does not name framework versions — the sentinel is the only version surface; a hand-written "since vX.Y" drifted here within hours of being written.)
+**Mechanised by the `scaffold` subcommand:** `mdllm scaffold <path>` through the repository's manual CLI launch route preflights both repositories, preserves unrelated outer staged state exactly, performs only the intended `.gitignore` commit, instantiates and validates templates, and installs the managed hook set. An optimistic HEAD check refuses to apply a plan derived from a moved base. Failures before isolation, or later changes still owned by the current transaction, are rolled back with compare-and-swap checks. Once the accepted outer isolation commit has landed, a later render/hook/domain-commit failure is retained as an explicit recoverable state rather than erasing committed truth; the command exits non-zero and names what remains. Hook installation resolves Git's actual hooks directory (including gitfiles, linked worktrees, and `core.hooksPath`), never overwrites a foreign hook, and has an uninstall path. Step 5 (the remote) stays with the human. The hook still binds when scaffolding by hand: the *ordering* is the invariant, not the tool.
 
 **Why it's hard:** The nested repo isolation pattern is architectural. Domain git history must never appear in framework git history. If domain files are committed to the framework repo first, the separation is compromised — undoing it requires a soft reset, a `.gitignore` update, and re-committing to the right repo. Friction that is entirely avoidable if the isolation happens upfront.
 
@@ -259,6 +267,21 @@ unpushed commits the estate cannot see.
 **Why it never blocks:** the network-call rule above — a required network call at session start is forbidden; this hook is a bounded attempt that degrades to an advisory line and proceeds. It never pushes and never merges — publication is the post-commit autopush leg's job, not the sync walk's (git-workflow.md → The Outbound Rules; release surfaces keep the deliberate act).
 
 **What failure looks like:** Two machines each "up to date" in their own eyes, drifting for days; the eventual collision surfacing as a surprise merge conflict instead of a routine `DIVERGED` line at session start; a cloud session planning work the local machine already did.
+
+### The Significant-Read Boundary
+
+A validator invocation is short enough to freeze one index tree internally. A
+full-corpus review, architecture assessment, or other significant agent read is
+not: it spans many reads and may outlive concurrent commits. Such work must
+record the full commit SHA whose immutable blobs it reads. Before applying its
+conclusions, run `mdllm session-start . --assert-head <full-sha>` against that
+base. A mismatch refuses and names both commits; reconcile or deliberately
+repeat the affected read before writing.
+
+This is an optimistic concurrency boundary, not a reading detector. The floor
+can prove that the named base is still HEAD. It cannot prove that a harness made
+the model consume every byte, or that the model obeyed it; those remain separate
+receipt, read, application, and outcome-evidence classes.
 
 ### Declaring Domain-Level Hard Hooks
 

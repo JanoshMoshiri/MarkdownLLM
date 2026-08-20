@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.3
+version: 1.4
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -35,31 +35,27 @@ do not need to read any specification to finish this page.
 
 You describe a domain — anything you want to track and reason about over
 time — and your agent builds it as a folder of markdown files with structured
-YAML headers, in its own git repository. From then on, the agent reads those
-files at the start of every session, reasons within the structure they
-declare, and updates them as your situation changes — git is the memory.
-A small Python tool (`tools/mdllm.py`) plus a set of git hooks mechanically
-blocks structurally broken changes at the commit boundary, so the agent's
-reliability is spent on reasoning, not bookkeeping.
+YAML headers, in its own git repository. A supported entry route delivers the
+domain contract; the agent reasons within that structure and updates it as your
+situation changes — git records the accepted state. A small Python tool
+(`tools/mdllm.py`) plus a set of current, runnable git hooks deterministically
+checks structural invariants and blocks commits with mechanical Errors. The
+agent remains a probabilistic interpreter responsible for meaning.
 
 ## Minutes 0–10: Install, Then a Look Around
 
-One command does the mechanical setup. It checks `git` and Python 3.10+
-(offering to install them through your package manager if they're missing),
-clones the framework into `./MarkdownLLM`, installs PyYAML and the validation
-floor, and finishes on a `doctor` report that should read **FLOOR ACTIVE**:
+Use the [verified release installation](../README.md#getting-started): fetch the
+named immutable commit, confirm the checked-out commit and installer SHA-256,
+then run the local script. Do not pipe a moving branch into a shell. The
+verified sequence provisions the exact PyYAML runtime before invoking the
+published installer, installs the hooks, and finishes on a `doctor` report that
+should read **FLOOR ACTIVE**. That pre-install matters because the published
+v3.32.0 scripts predate the dependency pin now present in the next-release
+installers. The README also names the remaining trust roots; release metadata
+is not yet signed.
 
-```
-# macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.sh | bash
-
-# Windows (PowerShell)
-irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1 | iex
-```
-
-Prefer to do it yourself? `git clone` the repo and `pip install pyyaml` — the
-script only removes those steps, it doesn't hide anything. Either way, open the
-cloned folder; then, before involving the agent, look at two things yourself:
+Open the verified checkout; then, before involving the agent, look at two things
+yourself:
 
 In the prose below, `mdllm <command>` means this repository's CLI. On Windows
 PowerShell use `./tools/mdllm.ps1 <command>`; elsewhere use
@@ -131,7 +127,7 @@ framework work.
 
 ## Minutes 45–55: Watch the Floor Catch Something
 
-The floor is already in place — the installer set it up for the framework, and
+The floor should now be in place — the installer set it up for the framework, and
 `scaffold` installed the git hooks inside your new domain (validation before
 each commit, a disclosure check on the commit message, publication after).
 Prove it bites: open any thing in your domain, change its `status:` to
@@ -156,8 +152,9 @@ still matches reality.
 In your domain workspace, do one piece of real work by talking — "add the
 client I signed yesterday, invoice due end of month." Watch what lands in
 git: the agent commits as it writes (`git log` in the domain shows the event
-stream). Then stop. That loop — talk, files change, git remembers — is the
-whole system; everything else is refinement.
+stream). Then stop. That loop — talk, files change, git records the accepted
+state — is the whole system; unrecorded reasoning is not a complete audit
+trace, and everything else is refinement.
 
 ## What to Read Next
 
@@ -188,13 +185,13 @@ whole system; everything else is refinement.
   settings remain untouched unless their operator reviews and explicitly runs
   `adapter-install --refresh-legacy`; extensions and ambiguity still refuse.
   Copilot lifecycle compatibility remains a separate unverified claim.
-- **Your domain publishes itself — once you give it somewhere to go.** A fresh
-  domain has no remote, so commits simply stay local. The moment you add one
-  (`git remote add origin …`), the post-commit hook publishes each validated
-  commit automatically (`mdllm autopush`). That default is deliberate — unpushed
-  work is invisible to your other machines — and per-repo opt-out
-  (`git: autopush: false` in `AGENTS.md`) exists for surfaces where publishing
-  should stay a considered act.
+- **Your scaffolded domain is born without publication authority.** Its
+  AGENTS.md literally declares `git.autopush: false`, and false, absence, or a
+  malformed value are all off. If automatic publication is the deliberate
+  choice, make it at birth with `mdllm scaffold <path> --autopush true` (or
+  change the declaration later) and add the remote explicitly. The post-commit
+  hook can then publish each validated commit through `mdllm autopush`; no
+  repository gets publication authority by omission.
 - **Some words should never reach a commit.** `scaffold` gave your domain a
   local `.boundary-terms` file (never committed, never cloned). List client
   names or personal identifiers there and the commit-msg/pre-commit hooks block

@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from markdownllm.coherence import coherence_findings  # noqa: E402
 from markdownllm.indexes import _anchor_notes, build_index_body  # noqa: E402
+from markdownllm.kernel_gen import build_kernel  # noqa: E402
 from markdownllm.model import SEV_ERROR, scan  # noqa: E402
 from markdownllm.repository_view import RepositoryView  # noqa: E402
 
@@ -143,3 +144,34 @@ def test_index_anchor_version_uses_candidate_sentinel_not_worktree(tmp_path):
     assert not any("stamped at framework" in note for note in
                    _anchor_notes(root, {"framework_version": "3.32.0"},
                                  "relationships", candidate))
+
+
+def test_worktree_kernel_build_normalizes_crlf_like_direct_text_reads(tmp_path):
+    root = tmp_path / "framework"
+    root.mkdir()
+    spec = (
+        "---\nid: operative\ntype: specification\nstatus: stable\n"
+        "created: 2026-08-20\n---\n\n# Operative\n\n"
+        "<!-- kernel -->\nRule one.\n\nRule two.\n<!-- /kernel -->\n"
+    )
+    (root / "operative.md").write_bytes(spec.replace("\n", "\r\n").encode())
+
+    direct, *_ = build_kernel(root, ["operative.md"], len)
+    viewed, *_ = build_kernel(
+        root, ["operative.md"], len, RepositoryView.worktree(root))
+
+    assert viewed == direct
+
+    (root / ".markdownllm").write_text(
+        "framework: MarkdownLLM\nversion: 1.0.0\n"
+        "foundational_specs: [operative.md]\n", encoding="utf-8")
+    kernel = (
+        "---\nid: framework-kernel\ntype: index\nstatus: live\n"
+        "index_of: kernel\ncreated: 2026-08-20\ngenerated: 2026-08-20T00:00:00\n"
+        "generated_from: HEAD@unknown\ncoverage: 1\nframework_version: 1.0.0\n"
+        "---\n\n" + direct
+    )
+    (root / "kernel.md").write_bytes(kernel.replace("\n", "\r\n").encode())
+
+    findings = coherence_findings(root, 15, RepositoryView.worktree(root))
+    assert not any(f.thing == "kernel.md" for f in findings)

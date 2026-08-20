@@ -2,7 +2,7 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-06-13
 linked_things:
   - id: thing-specification
@@ -45,10 +45,13 @@ other half — the semantic consistency that no schema can check, because a
 contradiction lives *between* two individually-valid things and is *created*,
 never prevented, by a change to one of them.
 
-The premise is deliberately narrow: **a fresh thing on a clean slate carries no
-consistency risk** — there is nothing for it to contradict. Risk enters only at
-*change* to something the domain already reasons from. So consistency is
-maintained at the moment of change, by reconciling that change against
+The premise is deliberately narrow: consistency risk enters whenever the
+accepted corpus changes — **addition, modification, deletion, or rename**. A
+fresh leaf may have no inbound dependents yet, but it can still duplicate or
+contradict an existing claim, seize an existing identity, or expose a new
+publication surface. A deletion can withdraw a load-bearing truth; a rename can
+break path identity without changing content. Consistency is therefore
+maintained at the moment of corpus change, by reconciling the candidate against
 everything it touches. This is change management, applied to knowledge.
 
 After this spec, any meaningful change can answer: **"what did I just put at
@@ -112,10 +115,11 @@ prevent.
 2. **Assimilate** — gather the *complete* affected set, mechanically, in two
    passes of widening visibility:
    - **Declared edges** — the `relationships` derived index supplies every inbound
-     `linked_things` edge *and* every inbound structural pointer (`definition`,
-     `parent`) — the singular load-bearing fields that name exactly one target
-     without being a `linked_things` relation, so a definition's runs and a parent's
-     children are recalled, not just `linked_things` dependents; the `provenance`
+     field owned by the tool's structural-reference registry: relation objects,
+     list pointers, singular pointers, trigger watches, workflow definitions,
+     conflict parties, and other registered reference shapes. The same registry
+     drives validation, reverse indexing, candidate relevance, and private egress,
+     so adding a structural field cannot silently update only one consumer. The `provenance`
      (reverse) index supplies every decision pinned to the changed thing and every
      output derived from it. Total recall over what is *declared*, like a compiler
      listing every call site.
@@ -160,8 +164,9 @@ The dark region is the set of dependencies a change touches through **prose**
 rather than through a declared edge. It is not monolithic — it is tiered by how
 reachable each dependency is, and each tier has its own mechanical reach:
 
-- **Declared edges** — `linked_things` relations, the singular structural pointers
-  (`definition`, `parent`), and `informed_by`/`derived-from` pins. The
+- **Declared edges** — every field in the structural-reference registry,
+  including `linked_things`, prerequisites, singular pointers, trigger watches,
+  conflict parties, workflow definitions, and `informed_by` pins. The
   `relationships` and `provenance` indexes walk these in full — a declared edge is
   walked wherever it lives, whether in `linked_things` or in its own structural field.
 - **Literal references** — the thing's `id` or canonical name appearing as text in
@@ -270,8 +275,8 @@ what a change disturbs; the judgement of what to do about it stays where it
 belongs.
 
 The Assimilate beat is exposed as a floor affordance: `mdllm touchpoints <id>`
-reports the complete declared inbound set (every `linked_things` edge, the
-structural `parent`/`definition` pointers, and `informed_by` provenance pins)
+reports the complete declared inbound set (every reference shape owned by the
+canonical structural registry, including provenance pins)
 plus the literal textual references, computed fresh from the live corpus — not
 from the committed indexes, because assimilation must be complete *and* current.
 The subcommand is deliberately **invoked, never hooked**: it makes the blast
@@ -281,15 +286,18 @@ Inflection*). The spec mandates the discipline of running the pass at an
 inflection, not the existence of the tool; the tool is the affordance that makes
 the discipline cheap.
 
-Since v3.26.0 the floor also asks the **cue question** without answering it
-(`inflection-candidates-are-computable`): the pre-commit hook's `mdllm
-candidates` advisory names any staged *modified* thing that is reasoned-from —
-a definition-surface type, or fan-in at threshold — in one non-blocking line
-pointing at `touchpoints`. This refines rather than revises the division above:
-the cue *verdict* remains the driver's, and `touchpoints` remains
-invoked-never-hooked; what the floor now guarantees is that the question
-existed at the moment it arose. Saying no to a named question is a decision,
-where not being asked was drift. Fresh things stay silent — the premise stands.
+The floor also asks the **cue question** without answering it
+(`inflection-candidates-are-computable`): the pre-commit hook's index-view
+`mdllm candidates` advisory reads Git's full A/M/D/R candidate set. A modified
+thing that is reasoned-from asks whether its dependents still hold. An addition
+asks whether its identity or claim duplicates/contradicts the corpus and whether
+new exposure is intended. A deletion asks which dependents lose their target
+and whether an exposed truth is being withdrawn. A rename asks whether identity
+and path-sensitive references remain honest. The cue *verdict* remains the
+driver's, and `touchpoints` remains invoked-never-hooked; what the floor
+guarantees is that the truthful question existed at the exact candidate
+boundary. Saying no to a named question is a decision, where not being asked was
+drift.
 
 ## Relationship To Other Specs
 

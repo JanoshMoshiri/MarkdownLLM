@@ -1,7 +1,7 @@
 ---
 name: MarkdownLLM Framework
 description: A self-describing specification framework for building LLM-driven systems using markdown, YAML, and git
-version: 3.32.0
+version: 3.33.0
 applies_to: "**/*.md"
 framework_root: .
 git:
@@ -9,9 +9,9 @@ git:
   branch: main
   # The public repo is a RELEASE surface, not estate working state: pushing it
   # is a version event gated by judgement (reconciliation, changelog, version)
-  # with no mechanical completeness gate. The default-on rule applied honestly
-  # is this opt-out (estate-cadence-cluster Phase 1;
-  # premature-publish-manufactures-discipline-eroding-urgency stands unrevised).
+  # with no mechanical completeness gate. Publication is fail-closed everywhere:
+  # only literal true authorises the post-commit send; this release surface is
+  # explicitly false (autopush-requires-explicit-authority).
   autopush: false
 ---
 
@@ -25,6 +25,10 @@ This is the MarkdownLLM framework — a specification for building LLM-driven sy
 
 You predict the next move — the next token, sentence, or action — from the stream of what comes next. You cannot predict its *consequence* the same way. Consequence is recoverable only in retrospect, by reasoning back over moves already made; it is not forecastable forward. Being asked to consider consequences does not change this: you can reason about them, you cannot foresee them. So when a move's consequence could not be recovered after the fact — anything that deletes, sends, spends, or otherwise cannot be taken back — that judgement belongs to the human and to the structure, not to a prediction of yours. Reach for the structure; defer the irreversible. This is orientation, not a hook the floor enforces. Full reasoning: `things/insights/consequence-is-recoverable-only-in-retrospect.md`.
 
+This authority principle complements rather than replaces ordinary prospective
+risk analysis: a model can compare plausible outcomes, but cannot certify the
+future.
+
 ## Three-Layer Architecture
 
 Every domain in this framework — including the framework itself — follows the same three-layer pattern:
@@ -34,7 +38,7 @@ Layer 1: AGENTS.md        ← Entry contract; delivered by the harness route; or
 Layer 2: skills/*.md      ← Reusable capabilities loaded by the agent at startup
 Layer 3: things/*.md      ← Data instances — the actual content the domain manages
                               ↓
-                          Git — the audit trail, state machine, and version history
+                          Git — accepted state, event stream, and inspectable history
 ```
 
 | Layer | File Pattern | Purpose |
@@ -81,6 +85,8 @@ This is where the reasoning lives — not just the data.
 > **Manual CLI launch — read before the first command.** Here, `mdllm <command>` is notation for this repository's CLI, not an assumption that an executable named `mdllm` is installed. On Windows PowerShell and Codex managed shells, run `& ".\tools\mdllm.ps1" <command>` even when `python` exists: the visible or harness-bundled interpreter may lack PyYAML, and the launcher selects one only after dependency-probing it. Elsewhere, use `python tools/mdllm.py <command>` only with an interpreter that can `import yaml`. Interpret older direct-Python examples below through this route; never infer that a harness-bundled Python is the project runtime. Automatic startup uses plain `estate-sync` and stays non-interactive/best-effort. If an operator explicitly requests a fresh manual estate sync, run `mdllm estate-sync . --require-fresh`; cached or unresolved state then exits nonzero so a restricted Codex task can request one-command network/filesystem approval and rerun the exact wrapper command. A sandbox denial is not evidence that the repository's Git credentials are invalid.
 
 > **[HARD HOOK: `session-start:estate-sync`]** Sync before orienting — orientation reads `git log`, and in a multi-machine estate committed state partly lives on the remote. Run `mdllm estate-sync .` through the route above (root + nested domain repos: fetch + ff-only pull, bounded, degrades offline to an advisory line) *before* reading velocity or evaluating triggers. Divergence and dirty trees are reported, never resolved; it never pushes. The Claude Code SessionStart adapter already runs it ahead of `session-start`; run it by hand in any harness without an adapter. Full spec: `orchestration.md` → Hard Hooks; `git-workflow.md` → The Machine Axis.
+
+> **[READ BOUNDARY: `significant-read:pin`]** A full-corpus review or other significant read must name one immutable `commit:<full-sha>` view; never build conclusions from ambient paths while HEAD can move underneath them. `mdllm session-start` emits the base. Immediately before writing from that read, run `mdllm session-start . --assert-head <full-sha>`; moved HEAD requires reconciliation or a deliberate re-read. This proves byte currency only, not receipt, reading, application, or adherence. Full spec: `orchestration.md` → The Significant-Read Boundary.
 
 > **[BOUND PROMPT: `orient`]** The deep orientation walk — the judgement half of session start: `session-orientation` (with its scoped insight-staleness check), `domain-velocity`'s residue (churn, ignored unblocks, what the stalls the digest names *mean*), `evaluate-triggers`' judgement over the not-mechanically-evaluable set, and `surface-attention`'s ordering. **Explicitly invoked, not automatic** — the operator says "orient", or the agent invokes it the moment intent first touches domain state (the moment the pull exists). The mechanical half needs no invocation: the session-start digest computes and emits version, velocity trend, stall lines, open loops, fired triggers, and self-answering cues — consume those, never recompute them. Rationale: un-pulled judgement at t=0 does not happen on any model tier (`emitted-content-is-read-instructed-content-is-economised`), and every mechanised step quiets the remainder (`partial-coverage-quiets-the-uncovered-steps`) — so the residue is routed to invocation, exactly as `session-end` is. Prompt files: `templates/prompts/`. Full spec: `orchestration.md` → Bindings.
 
@@ -132,7 +138,7 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 
 > **[HARD HOOK: `post-write:commit`]** After creating or modifying any `.md` file with YAML frontmatter, commit it to the **owning repo** before completing the response. Walk up the directory tree from the modified file to find the correct `.git` root — never assume it is the framework repo. Full spec: `orchestration.md` → Hard Hooks.
 
-> **[HARD HOOK: `pre-domain-scaffold:isolate`]** When scaffolding a new domain, the isolation sequence is mandatory and must complete before any domain files are committed anywhere: (1) `git init` in the domain folder, (2) add domain path to framework `.gitignore`, (3) commit `.gitignore` to framework repo, (4) commit domain files to domain repo, (5) create remote and push. Never commit domain files to the framework repo. **Run `python tools/mdllm.py scaffold <path>` — it performs steps 1–4 deterministically plus instantiated templates and the pre-commit hook; only the remote and the semantic content stay with you.** Full spec: `orchestration.md` → Hard Hooks.
+> **[HARD HOOK: `pre-domain-scaffold:isolate`]** When scaffolding a new domain, the isolation sequence is mandatory and must complete before any domain files are committed anywhere: (1) `git init` in the domain folder, (2) add the domain path to the framework `.gitignore`, (3) commit that exact `.gitignore` delta to the framework repo, (4) commit domain files to the domain repo, (5) add a remote and publish only under separate explicit authority. Never commit domain files to the framework repo. **Run `python tools/mdllm.py scaffold <path> --autopush false` — it performs steps 1–4 transactionally plus instantiated templates and the hook set; use `--autopush true` only when the human has deliberately granted standing publication authority. Only the remote and semantic content stay with you.** Full spec: `orchestration.md` → Hard Hooks.
 
 > **[BOUND PROMPT: `session-end`]** At the end of any session where a domain was discussed or modified, invoke the `session-end-continuity` prompt: reconstruct the logical session from surviving dialogue **and its commit range** (compaction is not a session boundary), extract any additional insights, disposition the standing insights (promote/dismiss/keep-active), check for contradictions, manage open-loop things, commit with a rich `session-end:` message (the backward record is git — `continuity.md` and `WORKLOG.md` are retired), then report publication debt (`mdllm estate-sync . --status` — the step after the commit; a summary that ends at the commit ends one step early). Explicitly invoked — not automatic. Full spec: `orchestration.md` → Bindings, `templates/prompts/session-end-continuity.md`.
 
@@ -192,14 +198,14 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 
 ## Framework Principles (Applied To Itself)
 
-1. **Definition-Driven** — Humans define the constraints; LLMs reason within them. Not prompt-driven, not fully autonomous — definition-driven. The structure is the interface.
-2. **Self-Describing** — The framework is a domain within itself. Its specifications are things with frontmatter, relationships, statuses, and versions.
+1. **Definition-Driven** — Humans define the constraints; LLMs reason within them. Not driven by ephemeral chat residue and not fully autonomous: the durable definitions are instructions in the broad technical sense, and the structure is the interface.
+2. **Self-Describing** — The framework is a domain within itself. Its specifications are things with frontmatter, relationships, statuses, and versions. That dogfooding demonstrates reflexivity; it does not by itself prove universality or adherence in another harness.
 3. **Atomic & Composable** — Each spec is self-contained but explicitly linked to others. You can read any one spec independently, but together they form a complete system.
 4. **Minimal Core, Emergent Detail** — Start with the essential structure. Let the schema grow with domain needs. Never over-engineer upfront; add complexity only when it earns its place.
 5. **Evolving** — Specifications have status (`draft`, `evolving`, `stable`). New specs start as drafts and mature through use.
 6. **Vendor Agnostic by contract** — This AGENTS.md uses no vendor-specific memory store; the framework is the memory. Discovery and lifecycle compatibility are still product capabilities, so public claims remain limited to the exact harness evidence that earned them.
-7. **Transparent & Auditable** — Every decision, every state change, every reasoning step is committed to git. Full history is always available.
-8. **Git-Backed** — Git is the state machine, not just version control. Commit messages are the event stream and carry the session narrative (`mdllm worklog` prints an on-demand view; nothing is committed back).
+7. **Inspectable & Auditable** — Accepted state changes, recorded decisions, their declared inputs, and byte-level diffs are committed to git. This is a strong audit aid, not a complete trace of hidden or unrecorded model reasoning; vendor models and harness internals remain external trust boundaries.
+8. **Git-Backed** — Git is the state machine for accepted recorded domain state, not a claim that the record is true of the outside world. Commit messages are the event stream and carry the session narrative (`mdllm worklog` prints an on-demand view; nothing is committed back).
 9. **Elegant Constraint Enables Efficiency (hypothesis, under test)** — Structure makes reasoning consistent across sessions and vendors — that much is demonstrated. The stronger claim that a *smaller* model with structure matches or beats a *larger* model without it is the framework's central **hypothesis**, not a proven result: it rests on one eval whose reasoning core saturated, and stays a hypothesis until a more discriminating fixture tests it. Keep this distinct from the framework's *utility*, which independent adoption evidences directly. (See the manifesto, "Elegant Constraint Enables Efficiency.")
 
 ## Thing Types In This Domain
@@ -272,4 +278,4 @@ Before committing framework changes:
 - [ ] Kernel regenerated (`python tools/mdllm.py kernel`) if any spec's `<!-- kernel -->` block or operative content changed
 - [ ] Commit message follows git-workflow.md conventions (rich — the commit is the backward record)
 
-> **The Deterministic Floor (v3.0):** mechanical validation (structural, referential, schema) is owned by `tools/mdllm.py` and enforced by the git pre-commit hook — never re-perform those checks by reasoning. The agent's validation responsibility is semantic only (validate.thing.md → Layer 2). Domain status vocabularies are declared in `_schema.yaml` / `things/_schema.yaml`, not fixed by the framework.
+> **The Deterministic Floor (v3.0):** mechanical validation (structural, referential, schema) is owned by `tools/mdllm.py`; when the current pre-commit hook is installed and runnable, mechanical Errors are enforced at that boundary. Never re-perform those checks by reasoning. The agent's validation responsibility is semantic only (validate.thing.md → Layer 2). Domain status vocabularies are declared in `_schema.yaml` / `things/_schema.yaml`, not fixed by the framework.

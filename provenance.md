@@ -2,7 +2,7 @@
 id: provenance-specification
 type: specification
 status: draft
-version: 1.1
+version: 1.3
 created: 2026-06-11
 linked_things:
   - id: membrane-attention-cluster
@@ -48,8 +48,11 @@ The mechanism is two primitives and one rule:
 3. **The pinning rule** — provenance references name a thing *and* the commit
    whose version of that thing was actually used
 
-Git already provides immutable versioning; provenance is just pinning. No new
-storage, no new infrastructure — the commit SHA is the citation.
+Git already provides immutable versioning; provenance is just pinning. Pins
+written by the framework are full commit SHAs so the citation is unambiguous;
+older unambiguous abbreviations may be read during migration but are never
+emitted anew. No new storage, no new infrastructure — the commit SHA is the
+citation.
 
 ## `type: decision`
 
@@ -68,9 +71,9 @@ decided_by: human|agent|both
 confidence: high|medium|low
 informed_by:
   - id: [knowledge-thing-id]
-    commit: [short-sha]      # the committed version actually used
+    commit: [full-sha]       # the committed version actually used
   - id: [another-thing-id]
-    commit: [short-sha]
+    commit: [full-sha]
 linked_things:
   - id: [produced-output-or-affected-thing]
     relation: informs
@@ -208,8 +211,10 @@ triple** in its frontmatter — the pin that makes the import sync-checkable:
 - `source_domain` — the producing domain, as named in the consumer's
   `.mcp.json` address book (operator-wired, per trust zone)
 - `source_id` — the thing's id in the *producer's* id-space
-- `source_commit` — the producer-computed commit that last touched the exposed
-  thing at import time (per-thing, so unrelated source commits never fire it)
+- `source_commit` — the producer-computed **full commit SHA** that last touched
+  the exposed thing at import time (per-thing, so unrelated source commits
+  never fire it). An older unambiguous abbreviated pin remains readable only
+  as a compatibility input and is upgraded to full length on refresh.
 
 Unlike an `informed_by` pin, which is domain-local ("the pinned commit exists
 in the domain repo"), the triple points *across the membrane* — so it is never
@@ -225,6 +230,37 @@ and reports each import as one of:
 | `diverged` | Pin is current but the mirror's content no longer matches the face — source behind mirror: the loop was bypassed (mirror edited locally, or source changed without committing) |
 | `withdrawn` | The source no longer exposes the thing |
 | `unreachable` / `no-address-book-entry` / `incomplete` | The comparison could not be made — counted as unchecked coverage, **never as fresh** |
+
+The producer face is itself a pinned read. `mdllm mcp-serve` serves the thing
+bytes from the immutable full commit it reports; it never stamps ambient dirty
+worktree content with a committed SHA. A deliberate draft read is labelled
+uncommitted rather than promoted into a reference triple. This makes the
+provenance claim and the served bytes one repository view.
+
+That label applies to **every egress shape**, not only the full deliverable:
+query rows, manifests, resources, and fetched things each carry the selected
+view plus either a full committed source pin or an explicit
+`uncommitted`/`candidate` state. Body-derived summaries therefore cannot leave
+through a lighter-weight listing while concealing that their bytes are draft
+state.
+
+The consumer route is an authority boundary, not merely an address. Automatic
+orientation and trigger paths do not execute a repository-declared stdio
+command or contact a configured URL until a clone-local trust record authorizes
+the exact `.mcp.json` entry hash and the required command/network/header/body
+capabilities. Trust lives under the clone's Git directory, is never committed,
+and is invalidated by configuration drift. HTTP reads are bounded, schemes and
+redirects constrained, secret header values redacted from review/error output,
+and stdio follows the MCP initialize/initialized protocol. Without trust the
+honest state is `unevaluable-untrusted`, never `fresh` and never an implicit
+execution grant.
+
+A stdio grant is authority to run the reviewed command as the current OS user;
+it is not a sandbox and cannot make an arbitrary executable least-privileged.
+The review flow says this explicitly. Use an OS/container boundary when the
+command itself is not trusted with that user's files, environment, and network
+reach. Hash binding prevents repository config from silently changing the
+approved command; it does not reduce what the approved process can do.
 
 **Re-quarantine-on-drift:** `stale` or `diverged` is the mechanical signal that
 the established hand-off is no longer honest. The disposition — re-read the
@@ -306,8 +342,14 @@ The mechanical parts of this spec are validated by the deterministic floor
 (`validate.thing.md` v2.0):
 
 ```
-python {framework_root}/tools/mdllm.py provenance <domain-path>
+python {framework_root}/tools/mdllm.py provenance <domain-path> \
+  --view worktree|index|commit [--revision <rev>]
 ```
+
+The report always prints the selected view. `commit` resolves its revision
+immediately to a full immutable object id; `index` freezes one candidate tree;
+`worktree` remains the explicit mutable drafting view. A provenance result never
+silently combines those sources.
 
 | Check | Rule | Severity |
 |---|---|---|

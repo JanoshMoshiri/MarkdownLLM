@@ -4,7 +4,7 @@
 
 Every agent session starts from scratch, so you have to hand the agent its context back — sensibly, cheaply, without burying it. Plenty of tools already do the storing and the retrieving: Obsidian vaults, LLM wiki, file lookups. What they leave open is what happens after hundreds of sessions and a mountain of saved memory — when the question stops being *how do I retrieve this* and becomes *is any of it still true*. That's what MarkdownLLM is about: not storing more, but keeping what's stored coherent.
 
-State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. The difference is that their integrity is non-negotiable. A deterministic floor — one CLI, one git pre-commit hook — checks structure, references, and schema on every commit; a record that doesn't hold together can't be committed at all. A reconciliation pass walks the blast radius of any consequential change; a retrospective sweeps for what slipped through. Each session, orientation is rebuilt from git history — not reloaded from a memory file. The result isn't more memory; it's state you can rely on.
+State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. A deterministic structural floor — one CLI and an installed three-hook Git boundary — checks declared structure, references, and schema against the candidate commit. When the current hook is installed and runnable, mechanical Errors block that commit. A probabilistic agent still interprets meaning; reconciliation and retrospectives route semantic drift for review rather than pretending code can prove truth. Each session, orientation is rebuilt from the accepted state and history recorded in git — not reloaded from a memory file.
 
 A framework discovered by agents, directed by you, and grown together. Its entry contract, markdown state, and Git floor are portable to file-aware LLM tools; discovery and lifecycle support are verified per harness rather than inferred from a product name. A domain is also a valid Obsidian vault, so the human GUI comes for free.
 
@@ -12,7 +12,7 @@ A framework discovered by agents, directed by you, and grown together. Its entry
 
 ## The Partnership
 
-The agent is the one reading the specs — `thing.md`, `write.thing.md`, `validate.thing.md` are its operating manual. It discovers structure, reasons about it, creates and validates things, and maintains consistency across sessions.
+The agent is the one reading the specs — `thing.md`, `write.thing.md`, `validate.thing.md` are its operating manual. It discovers structure, reasons about it, creates and validates things, and works to reconcile consistency across sessions. The interpreter remains probabilistic; the floor makes only its enumerated structural checks deterministic.
 
 But you hold the vision. You define what the domain is, shape the orchestration, design the workflows, use the output, and come back to say "this isn't working" or "we need to handle this case." You are the directing intelligence throughout — not just at creation, but in every session and every refinement.
 
@@ -97,7 +97,7 @@ These are the specs the agent loads and reasons with:
 | [thing.md](thing.md) | The atomic unit specification — what a thing is, how it's structured |
 | [read.thing.md](read.thing.md) | How agents read and analyze things |
 | [write.thing.md](write.thing.md) | How agents create and update things |
-| [validate.thing.md](validate.thing.md) | The validation contract: the `mdllm` tool guarantees mechanical checks; the agent performs semantic ones |
+| [validate.thing.md](validate.thing.md) | The validation contract: `mdllm` deterministically runs its enumerated mechanical checks; the agent and human perform semantic ones |
 | [provenance.md](provenance.md) | Output traceability: `type: decision` records with commit-pinned inputs, quarantine for external content |
 | [interface.md](interface.md) | I/O layer: input routes, output types, deliverables vs things |
 | [git-workflow.md](git-workflow.md) | Git as state machine: commits, conventions, autocommit |
@@ -134,7 +134,7 @@ For a domain in production use, the framework's own repository is the working ex
 
 ### The Deterministic Floor (`tools/mdllm.py`)
 
-Since v3.0, the framework pairs its specifications with a no-package-install CLI (one entry file, a package of single-responsibility modules behind it — Python 3.10+ with PyYAML is the only runtime requirement, and the shared launcher described below handles managed shells where `python` or PyYAML is not otherwise available) that guarantees everything mechanical, so the LLM spends its reliability on reasoning. In the examples, `mdllm` is route-neutral notation: use `./tools/mdllm.ps1` on Windows PowerShell, or `python tools/mdllm.py` elsewhere only with an interpreter that can import PyYAML:
+Since v3.0, the framework pairs its specifications with a small CLI (one entry file, a package of single-responsibility modules behind it — Python 3.10+ with PyYAML is the runtime requirement, and the shared launcher described below handles managed shells where `python` or PyYAML is not otherwise available). It deterministically evaluates the structural invariants each command declares; it does not certify semantic truth or agent adherence. In the examples, `mdllm` is route-neutral notation: use `./tools/mdllm.ps1` on Windows PowerShell, or `python tools/mdllm.py` elsewhere only with an interpreter that can import PyYAML:
 
 ```bash
 mdllm validate <domain>      # structure, references, schema, declared derivations — exit 1 on Errors
@@ -148,12 +148,13 @@ mdllm provenance <domain>    # decision pins resolve; no output rests on unverif
 mdllm calc <domain>          # declared derivations (`computed:`) — the floor does every sum
 mdllm estate-sync            # fetch + ff-only pull; --require-fresh = strict manual state; --status = publication debt
 mdllm imports-check <domain> # cross-domain imports re-checked against the source's face
+mdllm external-trust review <server> --path <domain> # inspect exact .mcp.json authority before command/network use
 mdllm eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
 mdllm kernel                 # regenerate the operative kernel from spec blocks
 mdllm session-start <domain> # emit the startup ritual + orient view (open loops) for a SessionStart hook to inject at t=0
 ```
 
-That's the working core — `mdllm --help` lists the full command surface (coherence checks, blast-radius reads, the disclosure boundary, MCP serving, and more; [framework-map.md](docs/framework-map.md) View 3 maps each subcommand to the spec it mechanises). The commit boundary carries three legs: **pre-commit** validates and asks the change-reconciliation cue question, **commit-msg** enforces the local disclosure boundary, and **post-commit** publishes each floor-validated commit (`mdllm autopush`) unless the repo opts out — release surfaces do, so a public release stays a deliberate human act.
+That's the working core — `mdllm --help` lists the full command surface (coherence checks, blast-radius reads, the disclosure boundary, MCP serving, and more; [framework-map.md](docs/framework-map.md) View 3 maps each subcommand to the spec it mechanises). The commit boundary carries three legs: **pre-commit** validates and asks the change-reconciliation cue question, **commit-msg** enforces the local disclosure boundary, and **post-commit** publishes a floor-validated commit (`mdllm autopush`) only when the repo literally declares `git.autopush: true`. False, absent, or malformed values do not publish; this release surface declares false, so a public release stays a deliberate human act.
 
 Each domain declares its thing types, **its own status vocabularies**, and which of those statuses mean *settled* in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) — the operative rules at a small fraction of the full-spec cost (`mdllm tokens` measures the live split; figures are not restated in prose, where they have drifted four times) — at session start; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a lifecycle hook so the agent runs version-check + velocity and reads the generated **orient** view — the open loops (non-terminal owned work + open conflicts; imported mirrors file under a separate Watched line) that replace the retired `continuity.md` — at t=0 rather than hoping it surfaces from a long entry file. `scaffold --harness <registered>|all|none` selects the outer adapter projection; omission preserves the Claude compatibility default, while a run-time-bound selection may have no project artifact to render (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
 
@@ -173,32 +174,76 @@ Starting structures the agent uses when scaffolding a new domain:
 
 ## Why It Works — Structure Beats Scale
 
-A well-defined domain makes even a small model powerful; an undefined domain makes even the largest model mediocre. When an agent operates within explicit thing types, known relationships, declared triggers, and validated integrity, it reasons with precision — it isn't inventing the system and reasoning within it at the same time. The cognitive load shifts from "figure out the problem space" to "apply straightforward reasoning within constraints that are already defined."
+A well-defined domain can let a smaller model spend more of its capability on the task; an undefined domain asks any model to infer the system and solve within it at once. Explicit thing types, relationships, triggers, and validated structural integrity reduce that ambiguity. Whether a particular model then reasons well is an empirical question, not a property the definitions guarantee.
 
-That's the framework's central hypothesis, **now being tested rather than asserted.** First eval results (2026-06-11; 2×2 model × framework, 20 trials) support part of it: structure bought determinism — the framework + large-model cell was the only one to pass all assertions in all trials — and small-model-with-framework edged out large-model-without (94% vs 89% of assertions) at roughly a quarter of the cost. But the fixture's reasoning core proved too easy to discriminate, so the stronger reasoning-quality claim is still open. See [evals/README.md](evals/README.md) for the honest read.
+That's the framework's central hypothesis, **now being tested rather than asserted.** First eval results (2026-06-11; 2×2 model × framework, 20 trials) support a narrower result: the framework + large-model cell was the only one to pass every recorded assertion in every trial, and small-model-with-framework edged out large-model-without (94% vs 89% of assertions) at roughly a quarter of the cost. The fixture's reasoning core proved too easy to discriminate, so neither universal determinism nor the stronger reasoning-quality claim follows. See [evals/README.md](evals/README.md) for the honest read.
 
 What holds regardless of the verdict:
 
 - **The domain is the product.** The LLM is replaceable (vendor-agnostic); the domain definition is the durable asset you and your agent build over time.
-- **Consistency compounds.** Every session builds on committed state and validated things — not a summarized memory of the last one. Refinements accumulate; nothing is lost to compaction.
+- **Recorded state compounds.** Every session can build on committed, mechanically validated things rather than depending only on a summary of the last one. State and reasoning that were never recorded can still be lost to compaction.
 - **Cost scales with precision, not volume.** Tiered context loading means the agent loads only what it needs, not the whole specification.
-- **Transparency throughout.** Every file is readable; you can always see what the agent built, how it reasoned, and what it changed. Validation at the commit boundary keeps the mechanical half honest so reasoning can carry the rest.
+- **Inspectable accepted state.** Local framework files, recorded inputs, decision narratives, commits, and diffs are readable. They show what was accepted and changed, but they are an audit aid rather than a complete trace of a model's hidden or unrecorded reasoning. Vendor models and harness internals remain outside this transparency boundary.
 
 ---
 
 ## Getting Started
 
-One command checks prerequisites, clones the framework, installs PyYAML and the deterministic-floor hook, and verifies the result with `mdllm doctor`:
+Install from an immutable release commit, verify the installer bytes, and then
+run the local script. This example pins the published v3.32.0 artifact at
+`c86363382b1a66f7be7697410e5b1826c0ab1930`:
 
 ```bash
 # macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.sh | bash
-
-# Windows (PowerShell)
-irm https://raw.githubusercontent.com/JanoshMoshiri/MarkdownLLM/main/install.ps1 | iex
+RELEASE_COMMIT=c86363382b1a66f7be7697410e5b1826c0ab1930
+INSTALLER_SHA256=a0c4d00c2f4d7f4e336f101f4a3549321b817b88dede390bfdcd73ea6c8d01fa
+git init MarkdownLLM
+git -C MarkdownLLM config core.autocrlf false
+git -C MarkdownLLM remote add origin https://github.com/JanoshMoshiri/MarkdownLLM.git
+git -C MarkdownLLM fetch --depth 1 origin "$RELEASE_COMMIT:refs/remotes/origin/verified-release"
+git -C MarkdownLLM checkout --detach "$RELEASE_COMMIT"
+test "$(git -C MarkdownLLM rev-parse HEAD)" = "$RELEASE_COMMIT"
+cd MarkdownLLM
+printf '%s  install.sh\n' "$INSTALLER_SHA256" | sha256sum -c -
+python3 -m pip install 'PyYAML==6.0.3'
+python3 -c 'import yaml; assert yaml.__version__ == "6.0.3"'
+./install.sh
 ```
 
-You need an LLM tool with file-system access, plus `git` and Python 3.10+ — the installer offers to install the latter two if they're missing. Prefer to do it by hand? `git clone` the repo and `pip install pyyaml`.
+```powershell
+# Windows (PowerShell 7+)
+$ReleaseCommit = 'c86363382b1a66f7be7697410e5b1826c0ab1930'
+$InstallerSha256 = 'af55ce58cce7c06b369a152d850839320c58564e8f0d9c9937ea38393e33f7d3'
+git init MarkdownLLM
+git -C MarkdownLLM config core.autocrlf false
+git -C MarkdownLLM remote add origin https://github.com/JanoshMoshiri/MarkdownLLM.git
+git -C MarkdownLLM fetch --depth 1 origin "${ReleaseCommit}:refs/remotes/origin/verified-release"
+git -C MarkdownLLM checkout --detach $ReleaseCommit
+if ((git -C MarkdownLLM rev-parse HEAD) -ne $ReleaseCommit) { throw 'release commit mismatch' }
+Set-Location MarkdownLLM
+if ((Get-FileHash ./install.ps1 -Algorithm SHA256).Hash.ToLowerInvariant() -ne $InstallerSha256) { throw 'installer hash mismatch' }
+python -m pip install 'PyYAML==6.0.3'
+python -c "import yaml; assert yaml.__version__ == '6.0.3'"
+./install.ps1
+```
+
+This removes the moving-branch pipe-to-shell path. The remaining bootstrap
+trust root is explicit: a trusted copy of this release commit and hash, the
+GitHub repository identity/TLS used to fetch it, Git itself, and the platform
+package sources the installer offers to use with consent. Releases are not yet
+signed, and PyPI remains the source for the exact `PyYAML==6.0.3` pin. The
+published v3.32.0 installers predate the in-script dependency pin, so the
+verified sequence above installs and checks that version first; do not let the
+older script acquire an unspecified `pyyaml` release. The next release contains
+the same exact pin inside both installers. If those trust roots are not
+acceptable, acquire and verify the source through your own approved channel
+before running it.
+
+You need an LLM tool with file-system access, plus `git`, Python 3.10+, and the
+verified PyYAML version above. The installer can offer to install the system
+tools if they are missing, installs the hooks, and verifies the result with
+`mdllm doctor`; for the pinned published artifact, provision Python and PyYAML
+before invoking it so its older unpinned dependency fallback is never reached.
 
 ### Codex support: verified on named Windows surfaces
 
@@ -261,7 +306,8 @@ shared runtime rather than worked around inside the Codex adapter. This
 verifies runtime and Git-floor execution on the measured Codex desktop shell;
 lifecycle and trust remain separately evidenced facts.
 
-Then open the folder in your LLM tool, let it discover `AGENTS.md`, and tell it what you want:
+Then open the folder in your LLM tool, verify the configured entry route
+delivers `AGENTS.md`, and tell it what you want:
 
 > "I want a domain for tracking architectural decisions across our microservices — each decision capturing the context, options considered, decision made, and consequences."
 
@@ -313,14 +359,14 @@ Framework and domains version independently, and many domains can share one fram
 
 ## Core Principles
 
-1. **Agent-Consumed, Human-Directed** — every spec is written for agents to reason with; every decision is the human's.
+1. **Agent-Consumed, Human-Directed** — every spec is written for agents to reason with; domain vision and irreversible authority remain human, while recorded decisions may be human, agent, or both.
 2. **Definition-Driven** — structure emerges from clear definitions, not rigid templates.
-3. **Atomic & Composable** — everything is a thing; everything links explicitly.
+3. **Atomic & Composable** — managed domain knowledge is represented as things and linked explicitly; implementation, configuration, release, and evidence artifacts keep their appropriate formats.
 4. **Minimal Core, Emergent Detail** — start simple; let the schema grow through use.
 5. **Vendor Agnostic by contract** — portable to file-aware LLM harnesses;
    discovery and lifecycle compatibility remain evidence-specific.
-6. **Version-Controlled** — git is the source of truth.
-7. **Transparent** — no black boxes; all logic is explicit and readable.
+6. **Version-Controlled** — git records accepted state and its byte-level history; it does not make that state true of the outside world.
+7. **Locally inspectable** — framework logic and managed state are readable; vendor models and harness internals are external trust boundaries, not claimed-away black boxes.
 
 ---
 
@@ -332,7 +378,7 @@ Framework and domains version independently, and many domains can share one fram
 
 **Why "MarkdownLLM"?** Markup pointed text at a parser; markdown pointed it back at a person; the LLM is the first machine that reads it on human terms — so the name is the format and its reader, finally matched.
 
-**Do I need to understand the specs to use this?** No. The agent understands the specs; you understand your domain. You'll absorb the patterns over time because you can read everything the agent produces — but you never need to study them upfront.
+**Do I need to understand the specs to use this?** No. The entry route supplies the specs to the agent; delivery and adherence are checked separately where the harness exposes evidence. You understand your domain and can inspect the records it produces without studying every framework spec upfront.
 
 **Is this production-ready?** The architecture is actively used — the framework develops itself as a domain, and a private estate of over a dozen domains runs on it daily (regulated-compliance, finance, and life-operations domains among them, worked across multiple machines and consuming each other's published faces). Specifications range from `draft` to `stable` (check frontmatter); `examples/` are small validated demonstrations, not production load. Your specific domain matures through use — that's by design.
 

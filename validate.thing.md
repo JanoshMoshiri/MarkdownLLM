@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 2.8
+version: 3.0
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -25,13 +25,13 @@ linked_things:
 # Validate Thing
 
 <!-- kernel -->
-**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Exit 1 = Errors; the pre-commit hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema is wrong — fix it with the human.
+**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, and mechanically-declared state transitions. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
 
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as orphaned from session memory — no inbound edge from a live thing (promote/dismiss/link from live work/keep-active). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 
-**Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; you transcribe and reason about the result, you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
+**Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; exact decimals are evaluated from authored numeric lexemes, not binary-float round trips. Under `options: {computed: strict}`, non-evaluability is an Error, and any quarantined or otherwise excluded inputs are named whenever they change the selected set. You transcribe and reason about the result; you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
 
-**The session gate** (declared per domain — scaffold births every new domain `strict`, so "opt-in" describes the declaration mechanism, not the scaffolded default; the framework root declares `warn`): a domain declaring `options: {session_gate: warn|strict}` requires a fresh `mdllm session-start` attestation for the clone before any commit — absent or >24h old fires Warning (`warn`) or a commit-blocking Error (`strict`), with the remedy named. It proves the Tier-0 contract was *emitted into the session*, not that it was heeded; its job is making a contract-less session loud at the first write, in any harness, with no adapter. The attestation also carries a **kernel token** recording what the emission did with the operative kernel — `whole:<sha>:<lines>` / `deferred` (hook channel, by design) / `elided` / `absent` — and the gate surfaces `elided`/`absent` as Warnings in **both** modes, never a strict Error: the remedy (read the named file in full) is evidence the floor cannot receive, and a gate the session cannot clear is a dead end. Legacy attestations carry no token and stay silent.
+**The session gate** (declared per domain — scaffold births every new domain `strict`, so "opt-in" describes the declaration mechanism, not the scaffolded default; the framework root declares `warn`): a domain declaring `options: {session_gate: warn|strict}` requires a fresh `mdllm session-start` attestation for the clone before any commit — absent or >24h old fires Warning (`warn`) or a commit-blocking Error (`strict`), with the remedy named. Freshness is bound to a content fingerprint of the operative Tier-0 contract, so an unrelated HEAD advance does not expire it and a contract change does. The record proves only `emitted`; delivery metadata distinguishes whole/deferred/elided/absent. `received-whole`, `read-observed`, `applied-evidence`, and `outcome-validated` are separate evidence classes and are never inferred from emission or a timestamp. Elided/absent delivery remains a Warning in both modes: the floor cannot observe the model reading a remedy, so making that unobservable act a strict gate would deadlock. Legacy attestations without a fingerprint remain readable with an explicit migration warning.
 
 **Severities:** Error = fix now (blocks commit) · Warning = should fix · Info = worth knowing, may be intentional.
 <!-- /kernel -->
@@ -60,10 +60,12 @@ mdllm validate <domain-path>  # expand through AGENTS.md's manual CLI route
 The tool enforces, deterministically:
 
 - **Structural (old Level 1):** frontmatter parses; `id`/`type`/`status`/`created`
-  present; `id` format and filename match; ISO dates; `linked_things` /
-  `dependencies` / `blocks` / `triggers` shapes; body and title presence.
-- **Referential (old Level 2):** all referenced ids exist (`linked_things`,
-  `dependencies`, `blocks`, `parent`, `parties`, trigger `watch`); no duplicate
+  present; duplicate YAML mapping keys are rejected with both locations; `id`
+  format and filename match; ISO dates; every field registered as a structural
+  reference has its declared shape; body and title presence.
+- **Referential (old Level 2):** all ids named by the canonical structural-
+  reference registry exist (`linked_things`, `dependencies`, `blocks`, `parent`,
+  `parties`, `definition`, trigger `watch`, `informed_by`); no duplicate
   ids; no circular dependencies; bidirectional consistency; orphan detection;
   a terminal-status thing may not depend on unfinished work (terminal deps count
   as resolved); `contradicts` requires a conflict thing listing both parties;
@@ -83,6 +85,12 @@ The tool enforces, deterministically:
   or audit the list with `mdllm index <path> rebuild --signal schema`.
 - **Index integrity:** `mdllm index <path> check` performs the rebuild-and-diff
   drift detection for derived indexes (`derived-index.md`).
+- **Workflow transition integrity:** for an existing `workflow-run`, the index
+  candidate's prior `current_stage` → new `current_stage` edge must exist in the
+  **previous committed definition**. A candidate cannot authorize its own move
+  by rewriting the definition in the same commit, and a simultaneous definition
+  migration plus cursor move is rejected. New runs are allowed. Whether the work
+  *deserves* to advance remains semantic; whether a declared edge exists is not.
 - **Session-memory completeness (Info):** an `active` insight or `open` conflict
   with no inbound edge from a live (non-terminal) thing is orphaned from session
   memory — it returns to no future session and is invisible to the session-start
@@ -96,8 +104,11 @@ The tool enforces, deterministically:
   (`session-memory.md` → Insight Lifecycle Management.)
 
 Exit code 1 means Errors exist. The git `pre-commit` hook (installed via
-`mdllm install-hook`) runs the same validation, so things with Errors cannot be
-committed. The hard floor is the hook, not your diligence.
+`mdllm install-hook`) freezes one Git tree/root pin. Its boundary, validation,
+coherence, and candidate processes each construct an index view bound to that
+same immutable tree, and a final index-tree comparison rejects movement during
+the hook. Things with Errors cannot be committed. The hard floor is the hook
+over the exact candidate, not your diligence and not the ambient working tree.
 
 ### Status Vocabularies — Who Owns Them
 
@@ -171,8 +182,10 @@ type-checking for an event system with no runtime, and no domain ever used it.)*
 
 ## When Validation Runs
 
-1. **At commit — always, mechanically.** The pre-commit hook runs the tool. This
-   is the floor; it does not depend on anyone remembering.
+1. **At commit — always, mechanically.** The pre-commit hook runs the tool with
+   `--view index`. This is the floor; it does not depend on anyone remembering,
+   and every deterministic claim in that boundary refers to the same frozen
+   candidate tree.
 2. **After writes** — you run the tool before committing to see findings early
    and fix them in the same operation.
 3. **Session start** — if orientation suggests drift (version mismatch, external

@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-20
-generated: 2026-08-20T09:27:56
-generated_from: HEAD@a9028f8
-coverage: 31
-framework_version: 3.32.0
+generated: 2026-08-20T13:01:36
+generated_from: HEAD@2673168
+coverage: 36
+framework_version: 3.33.0
 ---
 
 # Provenance Index (reverse) — framework
@@ -30,10 +30,12 @@ framework_version: 3.32.0
 - lifecycle-output-truncation-2026-08-14 (derived-from)
 
 ## claude-gate-6r-acceptance-2026-08-16
+- harness-capability-evidence-matrix-2026-08-20 (derived-from)
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
 
 ## claude-no-adapter-entry-probe-2026-08-17
 - an-injected-file-arrives-without-its-frontmatter (derived-from)
+- harness-capability-evidence-matrix-2026-08-20 (derived-from)
 
 ## claude-phase5r0-matrix-completion-2026-08-13
 - claude-5r2-renderer-acceptance-2026-08-13 (derived-from)
@@ -43,8 +45,23 @@ framework_version: 3.32.0
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - claude-phase5r0-matrix-completion-2026-08-13 (derived-from)
 
+## claude-phase6-no-adapter-and-root-2026-08-16
+- harness-capability-evidence-matrix-2026-08-20 (derived-from)
+
+## codex-desktop-session-start-negative-2026-08-14
+- harness-capability-evidence-matrix-2026-08-20 (derived-from)
+
+## codex-phase6-post-6r-acceptance-2026-08-16
+- harness-capability-evidence-matrix-2026-08-20 (derived-from)
+
+## codex-substrate-review-response-2026-08-20
+- autopush-requires-explicit-authority (pinned @27b95e739f78cad6fa609cee7b1359897ccf40ae)
+
 ## cowork-adapter
 - a-consuming-environments-gate-is-a-build-time-constraint (derived-from)
+
+## cowork-remote-phase5-evidence-2026-08-19
+- harness-capability-evidence-matrix-2026-08-20 (derived-from)
 
 ## cross-domain-handoff-is-verified-external-input
 - phase-3-run-domain-task-reverted (pinned @2d4f6d4)
@@ -72,7 +89,9 @@ framework_version: 3.32.0
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## independent-substrate-review-2026-08-20-codex
+- autopush-requires-explicit-authority (pinned @27b95e739f78cad6fa609cee7b1359897ccf40ae)
 - codex-substrate-review-response-2026-08-20 (derived-from)
+- substrate-review-phase0-disposition-2026-08-20 (derived-from)
 
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
