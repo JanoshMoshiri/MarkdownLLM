@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-20
-generated: 2026-08-20T22:40:24
-generated_from: HEAD@84c3e14
-coverage: 245
+generated: 2026-08-20T23:01:33
+generated_from: HEAD@ed5cb3d
+coverage: 246
 framework_version: 3.33.0
 ---
 
@@ -560,6 +560,13 @@ framework_version: 3.33.0
 - independent-review-2026-08-11-codex --challenges--> hook-enforcement-has-three-anchors
 - independent-review-2026-08-11-codex --supports--> portability-claims-need-execution-tests
 - independent-review-2026-08-11-codex --informs--> vendor-harness-adapter-foundation
+- independent-substrate-current-state-review-2026-08-20-codex --extends--> independent-substrate-review-2026-08-20-codex
+- independent-substrate-current-state-review-2026-08-20-codex --complements--> independent-substrate-review-2026-08-20-claude
+- independent-substrate-current-state-review-2026-08-20-codex --challenges--> llm-driven-systems-manifesto
+- independent-substrate-current-state-review-2026-08-20-codex --supports--> a-ruling-triages-more-cheaply-than-a-mechanism
+- independent-substrate-current-state-review-2026-08-20-codex --supports--> a-generated-surface-collapses-its-walk
+- independent-substrate-current-state-review-2026-08-20-codex --supports--> coherence-is-a-maintained-rate-not-a-state
+- independent-substrate-current-state-review-2026-08-20-codex --informs--> evidence-and-eval-backlog
 - independent-substrate-review-2026-08-20-claude --validates--> independent-substrate-review-2026-08-20-codex
 - independent-substrate-review-2026-08-20-claude --validates--> codex-substrate-review-response-2026-08-20
 - independent-substrate-review-2026-08-20-claude --references--> substrate-review-implementation-evidence-2026-08-20
