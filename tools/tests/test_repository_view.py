@@ -481,3 +481,46 @@ def test_candidates_read_staged_metadata_not_conflicting_worktree(
     assert "porch: `validation-target` is exposed" in index_output
     assert cmd_candidates(Namespace(path=str(root), view="worktree")) == 0
     assert capsys.readouterr().out == ""
+
+
+def test_index_scan_git_spawn_count_is_bounded(tmp_path: Path, monkeypatch) -> None:
+    # Structural anti-regression (consolidated-remedy Phase 0 residue): an
+    # index-view corpus scan must cost a bounded constant number of git
+    # spawns, never one-or-more per thing. The per-file shape (`ls-tree` +
+    # `cat-file blob` per read) ran the framework root's pre-commit validate
+    # for 302s and timed out the commits it was protecting (2026-08-21).
+    import markdownllm.repository_view as rv
+
+    root = tmp_path / "domain"
+    _init_repo(root)
+    _write(root, "_schema.yaml", "types:\n  note:\n    statuses: [open, done]\n")
+    for i in range(30):
+        _write(root, f"things/thing-{i:02}.md",
+               "---\n"
+               f"id: thing-{i:02}\n"
+               "type: note\n"
+               "status: open\n"
+               "created: 2026-08-20\n"
+               "---\n\n"
+               f"# Thing {i}\n")
+    _commit_all(root, "seed")
+
+    calls: list[tuple[str, ...]] = []
+    real_git = rv._git
+
+    def counting_git(repo, *args, **kwargs):
+        calls.append(args)
+        return real_git(repo, *args, **kwargs)
+
+    monkeypatch.setattr(rv, "_git", counting_git)
+    view = RepositoryView.index(root)
+    calls.clear()  # view construction (rev-parse/write-tree) is out of scope
+    corpus, findings = scan(root, view)
+    assert len(corpus.things) == 30
+    assert not [f for f in findings if f.severity == "ERROR"]
+    # One tree listing, one batch content fetch, plus a small fixed overhead
+    # (schema read outside the batch). Thirty things must NOT mean thirty+
+    # spawns — the bound is deliberately far below the corpus size and
+    # deliberately above the exact count so incidental fixed calls do not
+    # make the test brittle.
+    assert len(calls) <= 6, [" ".join(c) for c in calls]

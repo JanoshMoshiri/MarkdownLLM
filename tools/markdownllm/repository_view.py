@@ -17,7 +17,7 @@ from __future__ import annotations
 import os
 import re
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path, PurePosixPath
 
@@ -60,11 +60,12 @@ FROZEN_INDEX_TREE_ENV = "MDLLM_FROZEN_INDEX_TREE"
 FROZEN_INDEX_ROOT_ENV = "MDLLM_FROZEN_INDEX_ROOT"
 
 
-def _git(root: Path, *args: str, text: bool = False) -> bytes | str:
+def _git(root: Path, *args: str, text: bool = False,
+         input_bytes: bytes | None = None) -> bytes | str:
     try:
         result = subprocess.run(
             ["git", *args], cwd=root, check=True, capture_output=True,
-            text=text,
+            text=text, input=input_bytes,
         )
     except (OSError, subprocess.CalledProcessError) as exc:
         detail = ""
@@ -114,6 +115,12 @@ class RepositoryView:
     mode: RepositoryViewMode
     commit_sha: str | None = None
     tree_sha: str | None = None
+    # Per-view caches (INDEX/COMMIT only): the tree's path->blob-oid map and
+    # prefetched blob contents. Cache CONTENTS mutate; the field bindings stay
+    # frozen, and both views name immutable trees so the caches cannot go
+    # stale within a view's lifetime. Excluded from repr/eq by design.
+    _tree_blobs: dict = field(default_factory=dict, repr=False, compare=False)
+    _blob_bytes: dict = field(default_factory=dict, repr=False, compare=False)
 
     @classmethod
     def worktree(cls, root: Path) -> "RepositoryView":
@@ -214,42 +221,91 @@ class RepositoryView:
                     paths.append(logical)
             return tuple(sorted(paths, key=lambda p: p.as_posix()))
 
-        raw = _git(self.root, "ls-tree", "-r", "-z", "--name-only", self._treeish())
-        assert isinstance(raw, bytes)
-        paths = []
-        for item in raw.split(b"\0"):
-            if not item:
-                continue
-            logical = _logical(item.decode("utf-8", errors="surrogateescape"))
-            if suffix is None or logical.name.endswith(suffix):
-                paths.append(logical)
+        # The tree map already names every readable blob; deriving the listing
+        # from it makes repeated list_paths calls free on an immutable view
+        # (coherence alone called this ten times per run — ten ls-tree spawns
+        # for one frozen tree).
+        paths = [PurePosixPath(name) for name in self._tree_blob_map()
+                 if suffix is None or name.endswith(suffix)]
         return tuple(sorted(paths, key=lambda p: p.as_posix()))
 
     def iter_paths(self, suffix: str | None = None):
         """Iterator spelling for callers that do not need the materialized tuple."""
         return iter(self.list_paths(suffix=suffix))
 
-    def _blob_id(self, logical: PurePosixPath) -> str:
-        raw = _git(
-            self.root, "ls-tree", "-z", self._treeish(), "--", logical.as_posix()
-        )
+    def _tree_blob_map(self) -> dict[str, str]:
+        """{logical posix path: blob oid} for the whole frozen tree, built
+        from ONE `git ls-tree -r -z` walk and cached on the view.
+
+        The per-path predecessor (`git ls-tree -z <tree> -- <path>` followed
+        by `git cat-file blob <oid>`, per file) spawned two git processes for
+        every thing read — at ~300ms per spawn on a cold Windows machine the
+        pre-commit hook's index-view validate ran for minutes and timed out
+        the very commits it was protecting."""
+        cached = self._tree_blobs.get("map")
+        if cached is not None:
+            return cached
+        raw = _git(self.root, "ls-tree", "-r", "-z", self._treeish())
         assert isinstance(raw, bytes)
-        entries = [entry for entry in raw.split(b"\0") if entry]
-        for entry in entries:
+        blobs: dict[str, str] = {}
+        for entry in raw.split(b"\0"):
+            if not entry:
+                continue
             header, sep, name = entry.partition(b"\t")
             if not sep:
                 continue
-            decoded = name.decode("utf-8", errors="surrogateescape")
-            if decoded != logical.as_posix():
-                continue
             fields = header.split()
             if len(fields) != 3 or fields[1] != b"blob":
-                raise FileNotFoundError(logical.as_posix())
+                continue  # submodules/trees are not readable blobs — absent
             oid = fields[2].decode("ascii")
             if not _FULL_OBJECT_ID.fullmatch(oid):
-                raise RepositoryViewError(f"Git returned a non-blob id for {logical}: {oid!r}")
-            return oid
-        raise FileNotFoundError(logical.as_posix())
+                raise RepositoryViewError(
+                    f"Git returned a non-blob id in tree listing: {oid!r}")
+            blobs[name.decode("utf-8", errors="surrogateescape")] = oid
+        self._tree_blobs["map"] = blobs
+        return blobs
+
+    def _blob_id(self, logical: PurePosixPath) -> str:
+        oid = self._tree_blob_map().get(logical.as_posix())
+        if oid is None:
+            raise FileNotFoundError(logical.as_posix())
+        return oid
+
+    def prefetch(self, paths) -> None:
+        """Batch-read the given logical paths' contents into the view cache.
+
+        INDEX/COMMIT only (worktree reads are already cheap): one
+        `git cat-file --batch` invocation fetches every requested blob in a
+        single process, so a corpus scan costs two git spawns instead of two
+        per file. Paths absent from the tree are skipped silently — the later
+        per-path read raises the same FileNotFoundError it always did."""
+        if self.mode is RepositoryViewMode.WORKTREE:
+            return
+        blob_map = self._tree_blob_map()
+        wanted: list[str] = []
+        for path in paths:
+            oid = blob_map.get(_logical(path).as_posix())
+            if oid is not None and oid not in self._blob_bytes:
+                wanted.append(oid)
+        if not wanted:
+            return
+        request = "".join(f"{oid}\n" for oid in dict.fromkeys(wanted))
+        raw = _git(self.root, "cat-file", "--batch",
+                   input_bytes=request.encode("ascii"))
+        assert isinstance(raw, bytes)
+        pos = 0
+        while pos < len(raw):
+            nl = raw.find(b"\n", pos)
+            if nl < 0:
+                break
+            header = raw[pos:nl].split()
+            pos = nl + 1
+            if len(header) == 3 and header[1] != b"missing":
+                oid = header[0].decode("ascii")
+                size = int(header[2])
+                self._blob_bytes[oid] = raw[pos:pos + size]
+                pos += size + 1  # trailing LF after content
+            # `<oid> missing` (2 fields) carries no body; loop continues
 
     def read_bytes(self, path: str | Path | PurePosixPath) -> bytes:
         logical = _logical(path)
@@ -258,8 +314,27 @@ class RepositoryView:
             if not candidate.is_file():
                 raise FileNotFoundError(logical.as_posix())
             return candidate.read_bytes()
-        raw = _git(self.root, "cat-file", "blob", self._blob_id(logical))
+        oid = self._blob_id(logical)
+        cached = self._blob_bytes.get(oid)
+        if cached is not None:
+            return cached
+        # First miss: batch-fetch every definition-surface blob in the tree
+        # (.md/.yaml/.yml/.json — ~2.5MB at the framework root) rather than
+        # paying one git spawn per scattered read. Coherence alone read 33
+        # files one at a time through this path. One-shot, flagged, and the
+        # missed file falls through to a single fetch if it is outside the
+        # definition set.
+        if "definitions-prefetched" not in self._tree_blobs:
+            self._tree_blobs["definitions-prefetched"] = True
+            self.prefetch(
+                PurePosixPath(name) for name in self._tree_blob_map()
+                if name.endswith((".md", ".yaml", ".yml", ".json")))
+            cached = self._blob_bytes.get(oid)
+            if cached is not None:
+                return cached
+        raw = _git(self.root, "cat-file", "blob", oid)
         assert isinstance(raw, bytes)
+        self._blob_bytes[oid] = raw
         return raw
 
     def read_text(

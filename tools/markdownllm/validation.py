@@ -336,6 +336,13 @@ def workflow_transition_findings(
     candidate = view or corpus.view
     if candidate is None or candidate.mode is not RepositoryViewMode.INDEX:
         return []
+    # Transitions are read off candidate workflow-runs; a corpus with none
+    # needs no prior view at all. Without this bail every index-view validate
+    # paid a full prior-HEAD corpus scan per corpus (three at the framework
+    # root) to verify zero transitions.
+    if not any(str(t.meta.get("type")) == "workflow-run"
+               for t in corpus.things):
+        return []
     try:
         prior_view = RepositoryView.commit(candidate.root, "HEAD")
     except RepositoryViewError:

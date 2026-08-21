@@ -340,6 +340,11 @@ def scan(root: Path, view: RepositoryView | None = None) -> tuple[Corpus, list[F
     if corpus.schema and isinstance(corpus.schema.get("exclude"), list):
         excludes |= set(corpus.schema["exclude"])
 
+    # Select first, then batch-read: on INDEX/COMMIT views a per-file read
+    # spawns git per blob, and the framework root's pre-commit validate ran
+    # 300s that way (2026-08-21). prefetch() turns the whole corpus read into
+    # two git spawns; worktree views no-op.
+    wanted: list[tuple[PurePosixPath, Path]] = []
     for logical in selected.iter_paths(suffix=".md"):
         try:
             relative = (logical if prefix == PurePosixPath(".")
@@ -351,6 +356,11 @@ def scan(root: Path, view: RepositoryView | None = None) -> tuple[Corpus, list[F
             continue
         if logical.name in NON_THING_FILES:
             continue
+        wanted.append((logical, rel))
+    selected.prefetch(logical for logical, _ in wanted)
+    for logical, rel in wanted:
+        relative = (logical if prefix == PurePosixPath(".")
+                    else logical.relative_to(prefix))
         text = selected.read_text(logical)
         meta, body, err = parse_frontmatter(text, source=rel)
         if err:
