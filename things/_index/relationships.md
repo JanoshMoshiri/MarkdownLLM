@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-21
-generated: 2026-08-21T21:42:40
-generated_from: HEAD@4daf3d5
-coverage: 253
+generated: 2026-08-21T23:50:37
+generated_from: HEAD@967773c
+coverage: 254
 framework_version: 3.33.0
 ---
 
@@ -92,6 +92,8 @@ framework_version: 3.33.0
 - a-shared-worktree-merges-authorship-at-the-index --challenges--> coordination-claim-specification
 - a-shared-worktree-merges-authorship-at-the-index --references--> git-workflow-specification
 - a-shared-worktree-merges-authorship-at-the-index --complements--> divergence-is-an-unrouted-decision
+- a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen --complements--> partial-coverage-quiets-the-uncovered-steps
+- a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen --references--> substrate-review-consolidated-remedy-2026-08-20
 - a-stated-dismissal-condition-needs-a-reader --informs--> framework-retrospective-2026-08b
 - a-stated-dismissal-condition-needs-a-reader --challenges--> session-memory-specification
 - a-stated-dismissal-condition-needs-a-reader --references--> trigger-specification
@@ -462,6 +464,7 @@ framework_version: 3.33.0
 - floor-block-requirements-2026-08 --references--> floor-structure-residue
 - floor-block-requirements-2026-08 --references--> coherence-mechanism-build
 - floor-block-requirements-2026-08 --references--> evidence-and-eval-backlog
+- floor-block-requirements-2026-08 --references--> a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen
 - floor-sprint-1-design-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-sprint-1-scope-2026-08-21 --informs--> run-floor-sprint-1-2026-08
 - floor-structure-residue --derived-from--> independent-substrate-review-2026-08-20-claude

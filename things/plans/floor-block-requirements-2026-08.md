@@ -19,6 +19,9 @@ linked_things:
     relation: references
   - id: evidence-and-eval-backlog
     relation: references
+  - id: a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen
+    relation: references
+    notes: "F9's rationale: the structural tests exist because the four-scan fix was landed as an unwired parameter and believed complete for two days."
 ---
 
 # Floor Block Requirements — 2026-08
