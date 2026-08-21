@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-21
-generated: 2026-08-21T21:35:29
-generated_from: HEAD@7aeb334
-coverage: 250
+generated: 2026-08-21T21:36:43
+generated_from: HEAD@34dd3ea
+coverage: 251
 framework_version: 3.33.0
 ---
 
@@ -457,6 +457,11 @@ framework_version: 3.33.0
 - first-hour-guide --references--> framework-discovery-specification
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
+- floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08
+- floor-block-requirements-2026-08 --derived-from--> substrate-review-consolidated-remedy-2026-08-20
+- floor-block-requirements-2026-08 --references--> floor-structure-residue
+- floor-block-requirements-2026-08 --references--> coherence-mechanism-build
+- floor-block-requirements-2026-08 --references--> evidence-and-eval-backlog
 - floor-structure-residue --derived-from--> independent-substrate-review-2026-08-20-claude
 - floor-structure-residue --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - floor-structure-residue --references--> srp-extraction-is-tier-promotion

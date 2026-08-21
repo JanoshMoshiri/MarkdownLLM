@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-20
-generated: 2026-08-20T23:33:01
-generated_from: HEAD@35de802
-coverage: 38
+created: 2026-08-21
+generated: 2026-08-21T21:37:02
+generated_from: HEAD@34dd3ea
+coverage: 39
 framework_version: 3.33.0
 ---
 
@@ -127,6 +127,9 @@ framework_version: 3.33.0
 
 ## substrate-currency-sweep
 - cumulative-drift-is-invisible-to-per-change-walks (derived-from)
+
+## substrate-review-consolidated-remedy-2026-08-20
+- floor-block-requirements-2026-08 (derived-from)
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)
