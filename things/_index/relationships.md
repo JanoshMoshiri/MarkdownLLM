@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-21
-generated: 2026-08-21T21:34:45
-generated_from: HEAD@1209f64
-coverage: 249
+generated: 2026-08-21T21:35:29
+generated_from: HEAD@7aeb334
+coverage: 250
 framework_version: 3.33.0
 ---
 
@@ -797,6 +797,8 @@ framework_version: 3.33.0
 - review-remediation-v3-17 --implements--> directional-graph-reads-come-in-inbound-outbound-pairs
 - review-remediation-v3-17 --implements--> repeated-drift-promotes-a-fact-into-the-floor
 - rich-founding-context-breaks-scaffold-then-jump --references--> agents-drop-mechanical-birth-steps-not-semantic-ones
+- run-floor-sprint-1-2026-08 --references--> substrate-review-consolidated-remedy-2026-08-20
+- run-floor-sprint-1-2026-08 --definition--> substrate-floor-development
 - scaffold-declares-visibility --extends--> boundary-disclosure-check
 - scaffold-declares-visibility --informs--> agents-drop-mechanical-birth-steps-not-semantic-ones
 - scaffold-declares-visibility --references--> hook-enforcement-has-three-anchors
