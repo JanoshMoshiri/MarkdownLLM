@@ -65,30 +65,14 @@ MDLLM_FROZEN_INDEX_TREE="$(git write-tree)" || {{
 }}
 MDLLM_FROZEN_INDEX_ROOT="$ROOT"
 export MDLLM_FROZEN_INDEX_TREE MDLLM_FROZEN_INDEX_ROOT
-# Disclosure boundary first: cheapest check, clearest message. Reads the LOCAL
-# gitignored .boundary-terms; absent (every fresh clone, all CI) => silent no-op.
-mdllm_python "$MDLLM" boundary "$ROOT" --quiet || {{
-  echo ""
-  echo "mdllm: staged content crosses the disclosure boundary — commit blocked."
-  exit 1
-}}
-mdllm_python "$MDLLM" validate "$ROOT" --quiet --view index || {{
-  echo ""
-  echo "mdllm: validation Errors — commit blocked. Fix or run with --no-verify (discouraged)."
-  exit 1
-}}
-# Coherence: generated-artifact freshness (kernel/index drift) + spec-catalog
-# integrity. Self-scoping — at a domain root (no .markdownllm) only the general
-# checks run, so the same hook is correct in the framework and in every domain.
-mdllm_python "$MDLLM" coherence "$ROOT" --quiet --view index || {{
-  echo ""
-  echo "mdllm: coherence Errors — a generated artifact (kernel/index) or the spec catalog is stale. Regenerate and re-commit, or --no-verify (discouraged)."
-  exit 1
-}}
-# Change-reconciliation advisories (estate-cadence-cluster Phase 1+4): the cue
-# question (modified thing that is reasoned-from) and the serve-side notice
-# (modified thing that is exposed). Advisory only — never blocks the commit.
-mdllm_python "$MDLLM" candidates "$ROOT" --view index || true
+# All four floor legs — boundary, validate, coherence (blocking) and the
+# change-reconciliation candidates advisory (never blocking) — run
+# CONCURRENTLY against the frozen candidate through one coordinator. The
+# legs are the same CLI commands with the same arguments and inherit the
+# frozen-index environment above; per-leg output, messages, and semantics
+# are unchanged (mdllm precommit composes, never reimplements). Wall time
+# is the slowest leg, not the sum of four (floor-sprint-1 F11 / remedy 3C).
+mdllm_python "$MDLLM" precommit "$ROOT" || exit 1
 MDLLM_CURRENT_INDEX_TREE="$(git write-tree)" || {{
   echo "mdllm: could not re-read the staged candidate — commit blocked."
   exit 1

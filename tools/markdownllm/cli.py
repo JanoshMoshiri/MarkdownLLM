@@ -61,6 +61,7 @@ import yaml
 from . import adapters as adapter_registry
 from .adapters import names as adapter_names, selection_choices
 from .boundary import cmd_boundary
+from .precommit import cmd_precommit
 from .adapter_install import run_adapter_install
 from .calc import cmd_calc
 from .cascade import cmd_cascade
@@ -451,6 +452,13 @@ def build_cli() -> argparse.ArgumentParser:
                     help="full-archive audit: all revs and messages (console only)")
     bd.add_argument("--quiet", action="store_true")
     bd.set_defaults(fn=cmd_boundary)
+
+    pc = sub.add_parser("precommit", help="the pre-commit legs (boundary + "
+                        "validate + coherence + candidates) run concurrently "
+                        "against one frozen candidate tree; composes the "
+                        "individual commands without changing their semantics")
+    pc.add_argument("path", nargs="?", default=".")
+    pc.set_defaults(fn=cmd_precommit)
 
     return p
 
