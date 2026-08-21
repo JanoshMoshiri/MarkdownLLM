@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-21
-generated: 2026-08-21T21:37:02
-generated_from: HEAD@34dd3ea
-coverage: 39
+generated: 2026-08-21T21:38:58
+generated_from: HEAD@6f79f13
+coverage: 40
 framework_version: 3.33.0
 ---
 
@@ -79,6 +79,9 @@ framework_version: 3.33.0
 - assistant-register-does-not-graduate (derived-from)
 - the-harness-bound-path-is-the-least-tested-path (derived-from)
 
+## floor-block-requirements-2026-08
+- floor-sprint-1-scope-2026-08-21 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
+
 ## framework-retrospective-2026-06
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
 
@@ -89,9 +92,11 @@ framework_version: 3.33.0
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## independent-substrate-current-state-review-2026-08-20-codex
+- floor-sprint-1-scope-2026-08-21 (pinned @35de802608d896e4e533ed6c2990d89966948e17)
 - substrate-review-consolidated-remedy-2026-08-20 (derived-from)
 
 ## independent-substrate-review-2026-08-20-claude
+- floor-sprint-1-scope-2026-08-21 (pinned @ed5cb3d1f0f8ccd15a30627293c79290dd9cf51c)
 - floor-structure-residue (derived-from)
 - framework-retrospective-2026-08b (derived-from)
 - substrate-review-consolidated-remedy-2026-08-20 (derived-from)
@@ -130,6 +135,7 @@ framework_version: 3.33.0
 
 ## substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 (derived-from)
+- floor-sprint-1-scope-2026-08-21 (pinned @1209f646767c16dfff2a36c574095aca3f97a0a1)
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)
