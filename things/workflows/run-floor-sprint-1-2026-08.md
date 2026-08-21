@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-21
 definition: substrate-floor-development
-current_stage: analysis
+current_stage: design
 held_by: claude-code
 linked_things:
   - id: substrate-review-consolidated-remedy-2026-08-20
@@ -17,16 +17,16 @@ linked_things:
 
 ## Where This Is
 
-At `analysis`. The requirements stage exited with
-`floor-block-requirements-2026-08` committed: thirteen functional
-requirements (F1–F13, owners preserved) and the N1–N8 budget table bound to
-the measured reference machine. The run was born at `requirements` because
-the problems inventory pre-existed it (the two 2026-08-20 reviews, the
-consolidated remedy, the 2026-08-21 measurements). Execution authority is
-with the agent per the operator's 2026-08-21 handover; human gates only at
-seal and irreversible acts.
+At `design`. Analysis exited with `floor-sprint-1-scope-2026-08-21` — the
+MoSCoW cut (necessity F9/F10/F11/F1, should F12/F13/F4, stretch F2/F6-part,
+structure and coherence deferred to sprints 2–3) with inputs pinned and a
+re-open condition recorded (budgets move only by recorded decision).
+Execution authority is with the agent per the operator's 2026-08-21
+handover; human gates only at seal and irreversible acts.
 
 ## Next
 
-Record the sprint-1 scope cut as a `type: decision` with inputs pinned, then
-advance to `design`.
+Produce the sprint-1 design thing: per-requirement components touched, how
+each change proves its budget (N3, N6, N7 are the missed ones), the focused
+test set per change, commit granularity, and risks with mitigations. Design
+must show F11 meeting N3 or promote F12 per the decision's re-open condition.
