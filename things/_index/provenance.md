@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-21
-generated: 2026-08-21T21:38:58
-generated_from: HEAD@6f79f13
-coverage: 40
+generated: 2026-08-21T21:42:44
+generated_from: HEAD@4daf3d5
+coverage: 41
 framework_version: 3.33.0
 ---
 
@@ -80,7 +80,11 @@ framework_version: 3.33.0
 - the-harness-bound-path-is-the-least-tested-path (derived-from)
 
 ## floor-block-requirements-2026-08
+- floor-sprint-1-design-2026-08 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
 - floor-sprint-1-scope-2026-08-21 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
+
+## floor-sprint-1-scope-2026-08-21
+- floor-sprint-1-design-2026-08 (pinned @10443b5aed763503161acc96833484c6786e6c7b)
 
 ## framework-retrospective-2026-06
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-21
-generated: 2026-08-21T21:38:56
-generated_from: HEAD@6f79f13
-coverage: 252
+generated: 2026-08-21T21:42:40
+generated_from: HEAD@4daf3d5
+coverage: 253
 framework_version: 3.33.0
 ---
 
@@ -462,6 +462,7 @@ framework_version: 3.33.0
 - floor-block-requirements-2026-08 --references--> floor-structure-residue
 - floor-block-requirements-2026-08 --references--> coherence-mechanism-build
 - floor-block-requirements-2026-08 --references--> evidence-and-eval-backlog
+- floor-sprint-1-design-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-sprint-1-scope-2026-08-21 --informs--> run-floor-sprint-1-2026-08
 - floor-structure-residue --derived-from--> independent-substrate-review-2026-08-20-claude
 - floor-structure-residue --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
