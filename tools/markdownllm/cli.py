@@ -44,9 +44,13 @@ unqualified heading — a hand list drifts; argparse does not):
                        against the LOCAL gitignored .boundary-terms file.
                        Absent file => silent no-op (CI never enforces this).
   install-hook [path]  Install the three mdllm git hooks: pre-commit
-                       (boundary + validate + coherence, blocking), commit-msg
-                       (disclosure boundary, blocking), post-commit (autopush
-                       publication leg, never blocking).
+                       (boundary + validate + coherence + candidates via one
+                       concurrent `precommit` coordinator; the first three
+                       block), commit-msg (disclosure boundary, blocking),
+                       post-commit (autopush publication leg, never blocking).
+  precommit [path]     The pre-commit legs run concurrently against one
+                       frozen candidate tree; composes the individual
+                       commands without changing their semantics.
 
 Requires: Python 3.10+, PyYAML. tiktoken optional (tokens falls back to heuristic).
 """

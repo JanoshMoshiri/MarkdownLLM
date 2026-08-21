@@ -220,8 +220,9 @@ flowchart LR
         generate an artifact. Enforcing or measuring: validate, triggers,
         index, provenance, eval, tokens, doctor, scaffold, refresh, coherence,
         touchpoints, cascade, imports-check, external-trust, boundary,
-        estate-check, estate-sync, calc, candidates, and the harness-event
-        dispatcher.
+        estate-check, estate-sync, calc, candidates, precommit (the hook's
+        legs composed concurrently against one frozen candidate), and the
+        harness-event dispatcher.
         Generating: kernel, changelog, install-hook, worklog, domain-kernel,
         session-start, mcp-serve, bundle, autopush and adapter-install. The
         new assembly and guarded-publication commands mechanise explicit

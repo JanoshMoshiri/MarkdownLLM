@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-20
-generated: 2026-08-20T13:01:20
-generated_from: HEAD@2673168
+created: 2026-08-21
+generated: 2026-08-21T22:38:55
+generated_from: HEAD@340f96f
 coverage: 6
 framework_version: 3.33.0
 ---
@@ -88,7 +88,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 ## orchestration.md
 
 **Hard hooks — always active by config (enforcement depends on anchor — see below):**
-1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) freezes one candidate tree/root pin; its boundary, validation, coherence, and cue processes construct views from that same pin, and a final tree comparison rejects index movement. Ambient worktree bytes cannot substitute for staged bytes. **The publication leg:** the post-commit hook calls `mdllm autopush`, which sends only when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off. Bounded, never forces; a rejected push is divergence on the push side — surfaced, never resolved (`autopush-requires-explicit-authority`).
+1. `post-write:commit` — after creating/modifying any frontmatter `.md`, commit to the **owning repo** (walk up to the nearest `.git`) before completing the response. The git pre-commit hook (`mdllm install-hook`) freezes one candidate tree/root pin; its boundary, validation, coherence, and cue legs — composed by `mdllm precommit`, which runs them concurrently — construct views from that same pin, and a final tree comparison rejects index movement. Ambient worktree bytes cannot substitute for staged bytes. **The publication leg:** the post-commit hook calls `mdllm autopush`, which sends only when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off. Bounded, never forces; a rejected push is divergence on the push side — surfaced, never resolved (`autopush-requires-explicit-authority`).
 2. `pre-domain-scaffold:isolate` — new domain, in order: preflight outer and target state → `git init` in domain dir → add exactly the domain path to framework `.gitignore` → commit only that delta while preserving unrelated index state → commit domain files to the domain repo → create remote + push. Never commit domain files to the framework repo. Mechanised: transactional `mdllm scaffold <path>` performs the local steps with optimistic HEAD checks and compare-and-swap rollback while state remains transaction-owned; after the outer isolation commit, later failures retain an explicit recoverable state instead of erasing committed truth. The remote stays human.
 3. `session-start:version-check` — two directions, both at session start. **Downward** (domain ← local framework): read `{framework_root}/.markdownllm` version vs `framework_version_seen`; on mismatch surface, run validation, offer `domain-refresh.md`. **Upward** (local framework ← published source): compare the local `.markdownllm` version against the *cached* upstream version (git's remote-tracking state, e.g. `git show origin/main:.markdownllm` — the check itself never requires the network); if behind, surface an **advisory, non-blocking** notice for the operator to act on. `mdllm doctor` reports both.
 4. `session-start:estate-sync` — sync before orienting (orientation reads the log sync updates): plain `mdllm estate-sync` walks root + `domain(s)/*` repos — `git fetch` + `pull --ff-only`, bounded, `GIT_TERMINAL_PROMPT=0`, degrading offline to an advisory line. Reports per repo: synced/up-to-date/ahead-unpushed/DIVERGED/offline/dirty/local-only. Divergence and dirty trees reported, never resolved; never pushes, never merges. Session end: `estate-sync --status` reports publication debt (unpushed commits). A *required* network call at session start stays forbidden; this is a bounded attempt, not a gate. An operator-requested fresh manual rerun uses `estate-sync --require-fresh`, whose nonzero cached/unresolved outcome gives a restricted harness an approval signal without changing lifecycle behavior.
