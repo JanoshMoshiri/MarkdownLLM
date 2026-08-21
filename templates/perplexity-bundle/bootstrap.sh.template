@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# markdownllm-bootstrap — the thin transport layer of the Perplexity adapter.
+#
+#   Usage:  bash bootstrap.sh [domain-filter ...]
+#           (ambient GitHub credentials via `gh auth setup-git`; no PAT)
+#
+# Rendered by `mdllm bundle --harness perplexity` from framework-owned
+# templates (framework v{framework_version}, mechanism {bundle_hash}). Do not
+# edit the rendered copy — change the templates and rebuild.
+#
+# This script does ONLY what must precede the framework existing here:
+# the framework clone, a PyYAML probe, and a run-time currency check.
+# Everything after — domain clones, branch resolution, floor hooks,
+# identity, the ordered lifecycle with Tier-0 contract emission, the branch
+# map and the handoff — is `mdllm assemble`: floor-owned, tested Python,
+# versioned with the framework it just cloned.
+#
+# Credentials are ambient: `gh auth setup-git` (run by the skill before this
+# script) configures the credential helper, and the framework's git transport
+# runs in ambient mode when GH_PAT is unset. No token is read, stored, or
+# echoed. If ambient credentials are not configured, this fails plainly rather
+# than silently prompting for a token.
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG="${SCRIPT_DIR}/config.env"
+if [ ! -f "$CONFIG" ]; then
+  echo "ERROR: config not found at ${CONFIG} (copy config.env.example to config.env)" >&2
+  exit 1
+fi
+
+# Flat KEY=VALUE parse — deliberately not `source`: no arrays, no code
+# execution from config, and the same format `mdllm assemble` reads.
+FRAMEWORK_REPO="$(grep -E '^FRAMEWORK_REPO=' "$CONFIG" | head -1 | cut -d= -f2- | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
+if [ -z "$FRAMEWORK_REPO" ]; then
+  echo "ERROR: FRAMEWORK_REPO missing from config.env" >&2
+  exit 1
+fi
+FRAMEWORK_COMMIT="$(grep -E '^FRAMEWORK_COMMIT=' "$CONFIG" | head -1 | cut -d= -f2- | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
+if ! printf '%s' "$FRAMEWORK_COMMIT" | grep -Eq '^[0-9a-fA-F]{40}$'; then
+  echo "ERROR: FRAMEWORK_COMMIT must be a full framework commit; refusing a moving source" >&2
+  exit 1
+fi
+FRAMEWORK_COMMIT="$(printf '%s' "$FRAMEWORK_COMMIT" | tr '[:upper:]' '[:lower:]')"
+
+# Fail fast: this adapter is ambient-credentials-only. A pasted PAT
+# (GH_PAT / MDLLM_GIT_TOKEN) would route the framework's git transport off
+# the ambient credential helper and contradict the security model — refuse
+# it loudly rather than silently inheriting a token.
+if [ -n "${GH_PAT:-}" ] || [ -n "${MDLLM_GIT_TOKEN:-}" ]; then
+  echo "ERROR: GH_PAT/MDLLM_GIT_TOKEN is set in the environment." >&2
+  echo "       This adapter uses ambient credentials only (gh auth setup-git);" >&2
+  echo "       a pasted PAT is refused. Unset it and reconnect GitHub." >&2
+  exit 1
+fi
+
+# Ambient credential check: refuse plainly rather than prompt for a token.
+if ! git config --global credential.helper >/dev/null 2>&1 \
+   && ! git config --system credential.helper >/dev/null 2>&1 \
+   && ! gh auth status >/dev/null 2>&1; then
+  echo "ERROR: no ambient GitHub credential configured." >&2
+  echo "       Run 'gh auth setup-git' (with the connected GitHub credential)" >&2
+  echo "       before this script, or connect the GitHub connector." >&2
+  exit 1
+fi
+
+WORK="${HOME}/mdllm-run"
+
+echo "==> workspace: ${WORK}"
+rm -rf "$WORK"; mkdir -p "$WORK"; cd "$WORK"
+
+FW_NAME="$(basename "$FRAMEWORK_REPO")"
+echo "==> framework: ${FRAMEWORK_REPO}@${FRAMEWORK_COMMIT}"
+mkdir "$FW_NAME"
+git -C "$FW_NAME" init --quiet
+git -C "$FW_NAME" remote add origin \
+  "https://github.com/${FRAMEWORK_REPO}.git"
+# Ambient credentials: no Authorization header, no PAT in the process env.
+git -C "$FW_NAME" fetch --quiet --depth 1 \
+  origin "$FRAMEWORK_COMMIT"
+FETCHED="$(git -C "$FW_NAME" rev-parse FETCH_HEAD)"
+if [ "$FETCHED" != "$FRAMEWORK_COMMIT" ]; then
+  echo "ERROR: fetched framework commit does not match the bundle pin" >&2
+  exit 1
+fi
+git -C "$FW_NAME" checkout --quiet --detach "$FRAMEWORK_COMMIT"
+cd "$FW_NAME"
+
+# The deterministic floor needs the build-pinned PyYAML runtime. An ambient,
+# different version is not silently accepted.
+if ! python3 -c 'import yaml, sys; sys.exit(0 if yaml.__version__ == "6.0.3" else 1)' 2>/dev/null; then
+  pip install 'PyYAML==6.0.3' --break-system-packages --quiet 2>&1 | tail -1
+fi
+python3 -c 'import yaml, sys; sys.exit(0 if yaml.__version__ == "6.0.3" else 1)' 2>/dev/null || {
+  echo "ERROR: PyYAML 6.0.3 is unavailable; refusing to run an unpinned floor" >&2
+  exit 1
+}
+
+# Run-time binding integrity: is this bundle's mechanism what the exact pinned
+# framework tree would render? Drift degrades honestly rather than failing:
+# every command below is the pinned framework commit's own floor.
+STAMPED="{bundle_hash}"
+EXPECTED="$(python3 tools/mdllm.py bundle --harness perplexity --hash 2>/dev/null || echo unknown)"
+if [ "$EXPECTED" != "$STAMPED" ]; then
+  echo "!! BUNDLE MISMATCH: this bundle's mechanism is ${STAMPED:0:12}..., but the"
+  echo "   exact framework tree it cloned would render ${EXPECTED:0:12}...."
+  echo "   Rebuild + reinstall from your local estate:"
+  echo "     python tools/mdllm.py bundle --harness perplexity"
+  echo "   Continuing — the assembly below runs the pinned framework commit's floor."
+fi
+
+# Hand off to the floor. GH_PAT is unset (refused above): the framework's
+# git transport uses the ambient credential helper configured above. No token
+# on disk, in git config, or in this process's environment.
+#
+# Friendly-surface domain subset: if the config sets FRIENDLY_DOMAINS (an
+# operator-supplied subset of DOMAINS, used by the friendly skill), restrict
+# assemble to exactly that set by writing a temp config with DOMAINS replaced.
+# Empty or absent FRIENDLY_DOMAINS leaves DOMAINS untouched (the full surface).
+FRIENDLY_DOMAINS_VAL="$( { grep -E '^FRIENDLY_DOMAINS=' "$CONFIG" || true; } | head -1 | cut -d= -f2- | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
+if [ -n "$FRIENDLY_DOMAINS_VAL" ]; then
+  ASSEMBLE_CONFIG="$(mktemp)"
+  grep -vE '^DOMAINS=' "$CONFIG" > "$ASSEMBLE_CONFIG"
+  printf 'DOMAINS=%s\n' "$FRIENDLY_DOMAINS_VAL" >> "$ASSEMBLE_CONFIG"
+  trap 'rm -f "$ASSEMBLE_CONFIG"' EXIT
+else
+  ASSEMBLE_CONFIG="$CONFIG"
+fi
+python3 tools/mdllm.py assemble --config "$ASSEMBLE_CONFIG" "$@"

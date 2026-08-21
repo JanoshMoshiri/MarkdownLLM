@@ -1,0 +1,160 @@
+---
+name: markdownllm-bootstrap
+description: "Reconstruct and operate any MarkdownLLM domain in an ephemeral Perplexity session with no prior memory. Uses connected ambient GitHub credentials (no PAT). Clones the framework at a pinned commit and the configured domains, installs the deterministic floor, resolves each repo's real default branch, and emits each domain's Tier-0 contract before work starts. Use when the user says spin up my domain, load my markdownllm domain, bootstrap my domain, or start my session."
+---
+
+# Spin Up a MarkdownLLM Domain (Perplexity)
+
+This session runs in an ephemeral cloud container with no memory of prior
+sessions. This skill rebuilds the working environment from git and fixes the
+operating rules for the session. It is the Perplexity adapter for MarkdownLLM
+(framework v{framework_version}, mechanism {bundle_hash}): the agent drives
+the steps through its bash tool using the connected GitHub credential; every
+duty after the framework clone runs through the framework's own tested floor
+(`mdllm assemble`), which emits each domain's Tier-0 contract INTO this
+transcript rather than instructing you to go read it. The framework checkout
+is the exact `FRAMEWORK_COMMIT` embedded at bundle build; it never executes a
+later default-branch revision by surprise.
+
+## Step 0 — Load the operating contract
+
+Read `references/SESSION.md` before anything else. It defines the
+non-negotiable rules: publication discipline, credential handling, commit
+attribution, floor discipline, and the controls table saying which
+guarantees are real in this harness.
+
+## Step 1 — Establish ambient GitHub credentials
+
+Perplexity has a connected GitHub credential, injected into your bash
+environment when you run a command with the github credential selected.
+Configure git to use it as an ambient credential helper — this carries clone,
+assemble, and publish with no personal access token anywhere:
+
+```bash
+gh auth setup-git
+```
+
+If `gh auth setup-git` is unavailable or reports no credential, STOP and ask
+the user to connect the GitHub connector. Do NOT ask for a pasted PAT — the
+ambient path is strictly safer and is the whole point of this adapter. No
+token is written to a file, echoed, placed in a URL, or stored in git config.
+
+## Step 2 — Assemble
+
+Run the bundled bootstrap from THIS skill's directory (it takes no PAT — it
+relies on the ambient credential configured above):
+
+```bash
+bash "<this-skill-dir>/references/bootstrap.sh"
+```
+
+**Domain selection.** If the user named specific domain(s), pass the terms as
+extra arguments — they match case-insensitively against each configured
+`owner/repo` or repo name, so "research" selects a repo with research in
+its name:
+
+```bash
+bash "<this-skill-dir>/references/bootstrap.sh" research operations
+```
+
+If a filter matches nothing, the output lists the configured domains — relay
+them and ask which. If the bootstrap reports **BUNDLE MISMATCH**, tell the
+user plainly: the assembly still ran on the pinned framework commit's floor,
+and rebuilding the skill from a clean, remotely available framework commit
+restores the binding. This is not a latest-release signal.
+
+## Step 3 — Read what arrived (the contract is already in context)
+
+The assembly output is not a log to skim — it contains, per domain:
+
+- **The emitted Tier-0 contract** — the operative kernel and the domain's
+  `AGENTS.md`, in full, plus a reading list derived from the filesystem at
+  emission time. **This is in your context now. Act under it.** Do not
+  summarise it away; do not re-read what was emitted; DO read the listed
+  domain skills at the moments the contract names — the write skill before
+  ANY write.
+- **The full trigger evaluation** — including the triggers the floor cannot
+  evaluate. Judging those is yours; a relationship trigger nobody judges is an
+  alarm nobody hears. Surface each verdict.
+- **The imports COVERAGE line** — `0 stale` over unpinned imports asserts
+  nothing; could-not-check and checked look identical in a summary, so relay
+  the coverage number, not just the verdict.
+- **The BRANCH MAP** — the ONLY branch names that may be published to, each
+  read from its remote's own HEAD. Relay it to the user, one line per domain,
+  so a wrong name is caught by them now rather than discovered later. A
+  MISMATCH row means: do not publish until resolved.
+- **The HANDOFF** — which controls ran mechanically and which remain yours
+  with no backstop. If you are about to skip one of the "yours" items, say so
+  to the user in plain words.
+
+Then orient: relay the per-domain orientation in plain language, leading with
+anything time-sensitive (deadlines and fired triggers), then open conflicts,
+then open loops and version state.
+
+## Step 4 — Work, then close every authorised commit
+
+Do the work the user asks for, under each domain's own contract. The floor hook
+validates every commit; never bypass it with `--no-verify`.
+
+Publication is default-deny. Before the first write in each domain, inspect its
+entry contract. Only literal `git.autopush: true` grants standing publication
+authority; false, absent, or malformed is off. The ambient credential does not
+grant future push authority. If authority is off, tell the user the
+disposable-container risk and ask whether they want to make that future-facing
+domain change; do not make it for them.
+
+When literal true is present, publish after each authorised commit using the
+ambient credential (GH_PAT unset — the framework's git transport falls back to
+the ambient credential helper):
+
+```bash
+python3 tools/mdllm.py publish --authorize-once domains/<name>
+```
+
+`mdllm publish` reads the recorded default branch (never accepts a typed one),
+refuses to publish from the wrong branch, refuses to create a remote branch,
+pushes fast-forward only, and re-reads the remote tip to prove the commit
+landed. A non-zero exit means STOP and read the message — never route around
+it with `--force` or a different branch name. Confirm each publication to the
+user naming the branch. `--authorize-once` is correct only after explicit
+operator approval for that specific publish — never as a post-commit habit.
+
+Do not batch authorised publications: the container is disposable, and a
+committed-but-unpublished change is lost when the compute is reclaimed. A
+subagent inherits neither authority nor branch context; only after the same
+literal-true check, hand it the exact publish command — "push to the default
+branch" is an invitation to guess.
+
+## Floor quirks — surface, do not auto-run
+
+When the floor blocks a commit, the message names the remedy. Two remedies
+mutate tracked files and must be run only after you surface them to the
+operator and they authorise the write path — never baked into spin-up as
+automatic steps:
+
+- **Stale domain-kernel blocks** in a domain's `AGENTS.md` — the floor says
+  `coherence: ERROR`. Remedy: `mdllm domain-kernel .` regenerates the kernel
+  blocks. Tell the operator: "the domain's operating file has drifted from
+  the framework; I'll regenerate the kernel blocks before saving."
+- **Session-gate tripped** by an `AGENTS.md` change since session-start —
+  the floor says `session-gate: ERROR`. Remedy: `mdllm session-start .`
+  re-attests. Tell the operator plainly and re-attest.
+
+The install self-test runs full validation, which escalates external things
+unverified for over 30 days to Errors and can report the floor hook as "NOT
+enforced". This is a false alarm: the REAL pre-commit uses `--view index`,
+where those same items are non-blocking Info. The floor IS wired and enforcing.
+If you see "NOT enforced" during install, verify with `python3 tools/mdllm.py
+validate . --view index` rather than trusting the self-test verdict.
+
+## Step 5 — Wrap-up
+
+Run the publication-debt check and relay it:
+
+```bash
+python3 tools/mdllm.py estate-sync . --status
+```
+
+On a healthy session it reports nothing unpublished. Because no PAT was used,
+there is no token to revoke — the ambient credential is managed by the
+harness, not pasted into this transcript.

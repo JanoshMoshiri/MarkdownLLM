@@ -1,0 +1,104 @@
+# Session Operating Contract
+
+The rules of engagement for working a MarkdownLLM domain inside an ephemeral
+Perplexity session. They exist because the compute is disposable and only
+published commits survive. Domain-agnostic; the targets live in `config.env`.
+(Perplexity adapter, framework v{framework_version}, mechanism {bundle_hash} —
+rendered from framework templates, do not hand-edit.)
+
+## The environment
+
+An isolated cloud container: compute reclaimable the moment the session
+idles, disk session-scoped. Nothing here is durable until **published** to the
+remote. Treat every commit as at-risk until its publication succeeds.
+
+## Which controls are real in this harness
+
+The kernel's rule is that **anchor decides enforcement**. Know which is which
+before trusting any of them:
+
+| Control | Anchor | Here |
+| --- | --- | --- |
+| pre-commit `validate` + `coherence` | `git-fs` | Installed by assembly. When runnable, the enumerated mechanical Errors stop the commit. |
+| `mdllm publish` branch + ff guards | `git-fs` | Enforced when invoked: refuses guessed branches, never creates one, verifies the remote tip. This does not prove invocation or grant authority to invoke it. |
+| post-commit `autopush` | `git-fs` | **Fails, loudly, by design.** No credentials in git config. Publication is your explicit step. |
+| Tier-0 contract into context | emitted by assembly | **Ran once, at assembly.** `session-start --contract` printed the kernel + each domain's AGENTS.md into the transcript; the attestation records it. |
+| domain harness hooks | `harness-session` | **Never fire here.** The repo was cloned after session start; "installed" means the file exists, not that anything runs it. Writes are NOT validated as you make them — the pre-commit floor at commit time is the first check that sees them. |
+| everything the HANDOFF lists as yours | `interpretation` | **Only as real as your compliance.** Skipping it is silent — which is why the handoff prints it. |
+
+## Credential handling — ambient, no PAT
+
+- Perplexity has a connected GitHub credential, injected per tool call by the
+  harness. `gh auth setup-git` configures the credential helper; the
+  framework's git transport runs in ambient-credential mode when `GH_PAT` is
+  unset, so clone, assemble, and publish all use it.
+- No personal access token is pasted, written to a file, echoed, placed in a
+  URL, or stored in git config. Nothing to revoke at session end — the
+  credential is managed by the harness, not by this transcript.
+- If the GitHub credential is absent or expired, STOP and ask the operator to
+  connect it. Do not fall back to a pasted PAT — the ambient path is the whole
+  point and is strictly safer.
+
+## Publication discipline — the core rule
+
+Publication is default-deny. The ambient credential authorizes the requested
+assembly reads; it does not silently authorize future pushes. Before the first
+write in each domain, read its entry contract: only a literal
+`git.autopush: true` is standing publication authority. False, absent, or
+malformed is off. Surface the disposable-container risk and ask the operator
+whether they want to make that future-facing choice; do not make it for them.
+
+When literal true is present, publish after each authorised commit, using the
+ambient credential (GH_PAT unset):
+
+```bash
+python3 tools/mdllm.py publish --authorize-once domains/<name>
+```
+
+- `--authorize-once` is correct only after explicit operator approval for that
+  specific publish — never as a post-commit habit.
+- The branch is READ (recorded at assembly from each remote's own HEAD).
+  Never type a branch name — not in publish, not in `checkout -b`, not in
+  `merge`, not as a PR base. A guessed name can create a stray remote branch,
+  report success, and make the work invisible to everyone including the next
+  session.
+- A branch name is per-repo, never per-session. Domains loaded together can
+  differ.
+- A non-zero exit is a STOP: read the message. Never `--force`, never a
+  different branch name to make an error go away. A rejected publication is
+  divergence, and routing it is the user's decision.
+- Subagents inherit neither authority nor branch context: only after the same
+  literal-true check, hand them the exact publish command.
+
+## Commit attribution
+
+- Author every commit as `GIT_NAME <GIT_EMAIL>` from `config.env` (assembly
+  sets this per domain).
+- No AI co-author trailer. "Unverified" on GitHub means unsigned, not fake —
+  signing would need the user's private key, which does not belong in this
+  container. Expected and accepted.
+
+## Floor discipline
+
+- The pre-commit floor (`validate` + `coherence`) owns its enumerated
+  mechanical checks when the installed hook actually executes. Never
+  `--no-verify`. If a commit is blocked, fix the cause; the message names the
+  remedy.
+- Two remedies mutate tracked files and must be run only after surfacing them
+  to the operator and getting authorisation — never automatic: `mdllm
+  domain-kernel .` (stale kernel blocks) and `mdllm session-start .`
+  (session-gate re-attest).
+- The install self-test's "NOT enforced" verdict is a false alarm when the
+  domain has external things unverified for over 30 days: full validation
+  escalates them, but the real pre-commit uses `--view index` where they are
+  non-blocking Info. Verify with `python3 tools/mdllm.py validate . --view
+  index` rather than trusting the self-test.
+- Mechanical checks belong to the tool; your validation duty is semantic (the
+  emitted kernel carries the split).
+
+## Human-decides boundary
+
+Some domains make determinations that belong to a human — regulated,
+compliance, financial, or otherwise consequential. Prepare figures, surface
+contradictions, draft records; irreversible or already-published acts are the
+user's call. Record their determination attributably; do not decide for them.

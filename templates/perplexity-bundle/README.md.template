@@ -1,0 +1,51 @@
+# markdownllm-bootstrap (Perplexity adapter)
+
+A Perplexity Agent Skill that reconstructs and operates any MarkdownLLM domain
+in an ephemeral session with no prior memory. Rendered by
+`mdllm bundle --harness perplexity` (framework v{framework_version}, mechanism
+{bundle_hash}) from framework-owned templates.
+
+## What this is
+
+Perplexity Computer is estate-level and run-time bound, like Cowork: the
+skill bundle assembles the workspace (cloning the framework and the selected
+domains) after the session starts. The difference is the credential path —
+Perplexity has a connected GitHub credential, so the bootstrap uses ambient
+credentials throughout and no personal access token is ever pasted, stored, or
+echoed.
+
+## Two surfaces
+
+The bundle renders two Perplexity Skills:
+
+- **`markdownllm-bootstrap`** — the full / operator skill. Drives the ordered
+  lifecycle, reads the emitted Tier-0 contract, relays the branch map and
+  handoff, and publishes with `--authorize-once`. For the operator who wants
+  the full picture.
+- **`markdownllm-bootstrap-friendly`** — a plain-spoken skill that greets the
+  user as the domain ("Hello, I'm the research domain. What do you need to
+  do today?"), reads the domain's `AGENTS.md` to take on the domain persona, and
+  hides all framework jargon. The operator's name and domain subset are set in
+  the private rendered `config.env` (`FRIENDLY_PROFILE_NAME`,
+  `FRIENDLY_DOMAINS`) — never in the public templates.
+
+## Using the skill
+
+1. Ensure the GitHub connector is connected, then configure the ambient
+   credential: `gh auth setup-git`.
+2. Run the bootstrap (no PAT): `bash references/bootstrap.sh [domain-filter]`.
+3. Act under the emitted contract; publish with
+   `python3 tools/mdllm.py publish --authorize-once domains/<name>` after
+   explicit approval.
+
+## Files
+
+- `SKILL.md` — the skill instructions (full surface).
+- `references/SESSION.md` — the session operating contract.
+- `references/bootstrap.sh` — the thin transport layer (clone, PyYAML probe,
+  binding check, assemble).
+- `references/config.env` — derived from your local estate (private).
+- `references/config.env.example` — hand-build reference.
+
+Do not hand-edit the rendered copy — change the templates in
+`templates/perplexity-bundle/` and rebuild.
