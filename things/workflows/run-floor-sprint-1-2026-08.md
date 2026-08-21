@@ -1,12 +1,11 @@
 ---
 id: run-floor-sprint-1-2026-08
 type: workflow-run
-status: active
+status: completed
 version: 1.0
 created: 2026-08-21
 definition: substrate-floor-development
 current_stage: seal
-held_by: claude-code
 linked_things:
   - id: substrate-review-consolidated-remedy-2026-08-20
     relation: references
