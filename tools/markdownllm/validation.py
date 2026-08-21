@@ -881,20 +881,37 @@ def validation_reports(
     "validates clean".  Formatting stays in ``cmd_validate``; this function is
     the one semantic-free result boundary.
     """
-    reports: list[tuple[Path, Corpus, list[Finding]]] = []
-    corpus, findings = validate_corpus(root, view)
-    findings.extend(check_version_sync(root, view))
-    findings.extend(quarantine_findings(root, corpus))
-    findings.extend(session_gate_findings(root, corpus))
-    findings.extend(retrospective_findings(root, corpus))
-    reports.append((root, corpus, findings))
-    for sub in example_corpora(root, view):
+    # The corpora are independent read-only evaluations over the same
+    # immutable view; warm the shared caches single-threaded, then evaluate
+    # concurrently — wall approaches the slowest corpus, not the sum
+    # (floor-sprint-1 F13). Report order stays deterministic: root first,
+    # examples sorted, exactly as the serial composition printed.
+    if view is not None:
+        view.prefetch(view.list_paths(suffix=".md"))
+
+    def _root_report() -> tuple[Path, Corpus, list[Finding]]:
+        corpus, findings = validate_corpus(root, view)
+        findings.extend(check_version_sync(root, view))
+        findings.extend(quarantine_findings(root, corpus))
+        findings.extend(session_gate_findings(root, corpus))
+        findings.extend(retrospective_findings(root, corpus))
+        return (root, corpus, findings)
+
+    def _example_report(sub: Path) -> tuple[Path, Corpus, list[Finding]]:
         # Example corpora skip retrospective cadence: teaching corpora carry
         # frozen dates rather than live sessions.
         sub_corpus, sub_findings = validate_corpus(sub, view)
         history_root = view.root if view is not None else sub
         sub_findings.extend(quarantine_findings(history_root, sub_corpus))
-        reports.append((sub, sub_corpus, sub_findings))
+        return (sub, sub_corpus, sub_findings)
+
+    subs = example_corpora(root, view)
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=1 + max(1, len(subs))) as pool:
+        root_future = pool.submit(_root_report)
+        sub_futures = [pool.submit(_example_report, sub) for sub in subs]
+        reports = [root_future.result()]
+        reports.extend(f.result() for f in sub_futures)
     return reports
 
 
