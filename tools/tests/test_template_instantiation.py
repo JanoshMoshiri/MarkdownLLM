@@ -111,7 +111,10 @@ relations: [informs, supports, challenges, contradicts]
                 "human|agent|both": "both",
                 "high|medium|low": "high",
                 "[knowledge-thing-id]": "support-one",
-                "[short-sha of the commit whose version was actually used]": pinned_commit,
+                "[full 40-hex sha of the commit whose version was actually "
+                "used — never abbreviated; an all-digit short sha parses as "
+                "YAML int and a suffix-matched abbreviation can pin the "
+                "wrong object]": pinned_commit,
                 "[produced-output-or-affected-thing]": "support-two",
             },
         ),
