@@ -24,47 +24,85 @@ import yaml
 from .yaml_loader import load_version_sentinel
 
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
-from .model import is_terminal, parse_frontmatter, scan
+from .model import is_terminal, origin_is_external, parse_frontmatter, scan
 from .repository_view import RepositoryHeadMoved, RepositoryView, RepositoryViewError
 from .session_contract import contract_fingerprint, kernel_path
 from .validation import version_tuple
 
-def _velocity_signal(domain: Path) -> str:
-    things = domain / "things"
-    if not things.is_dir():
-        return "no `things/` directory yet."
+class _ThingsHistory:
+    """Every backward signal session-start reads from the `things/` commit
+    stream, parsed from ONE `git log` walk. Each consumer used to run its own
+    full-history walk (velocity three calls, the touch map one, retrospective
+    cadence two) and every git spawn costs ~350ms on a cold Windows machine —
+    the walks, not the corpus, were most of the remaining hook budget."""
+
+    def __init__(self, commits: list[tuple[dt.date, str, str]],
+                 touch: dict[str, dt.date]):
+        self.commits = commits  # newest-first: (commit date, %cr, subject)
+        self.touch = touch      # repo-relative posix path -> newest commit date
+
+
+def _things_history(domain: Path) -> _ThingsHistory | None:
+    """None when there is no readable history over `things/` — the callers'
+    no-history branches stay distinct from an empty-but-real history."""
     # encoding is explicit: git emits UTF-8, but `text=True` decodes with the
     # locale codepage, which mangles every em-dash and section sign in a commit
     # subject on Windows. The orientation output is the one place a domain's own
     # prose is quoted back at the operator — it must not arrive as mojibake.
-    last = subprocess.run(["git", "log", "-1", "--format=%cr|%s", "--", "things"],
-                          cwd=domain, capture_output=True, text=True,
-                          encoding="utf-8", errors="replace")
-    if last.returncode != 0 or not last.stdout.strip():
+    out = subprocess.run(
+        ["git", "log", "--format=%x1e%cs%x1f%cr%x1f%s", "--name-only",
+         "--", "things"], cwd=domain, capture_output=True, text=True,
+        encoding="utf-8", errors="replace")
+    if out.returncode != 0 or not out.stdout.strip():
+        return None
+    commits: list[tuple[dt.date, str, str]] = []
+    touch: dict[str, dt.date] = {}
+    for record in out.stdout.split("\x1e"):
+        if not record.strip():
+            continue
+        header, _, paths = record.partition("\n")
+        parts = header.split("\x1f")
+        if len(parts) != 3:
+            continue
+        try:
+            day = dt.date.fromisoformat(parts[0].strip())
+        except ValueError:
+            continue
+        commits.append((day, parts[1].strip(), parts[2].strip()))
+        for line in paths.splitlines():
+            line = line.strip()
+            if line:
+                touch.setdefault(line, day)  # log is newest-first: first wins
+    if not commits:
+        return None
+    return _ThingsHistory(commits, touch)
+
+
+def _velocity_signal(domain: Path,
+                     history: _ThingsHistory | None = None) -> str:
+    things = domain / "things"
+    if not things.is_dir():
+        return "no `things/` directory yet."
+    if history is None:
+        history = _things_history(domain)
+    if history is None:
         return "no committed history over `things/` yet."
-    when, _, subj = last.stdout.strip().partition("|")
-    cnt = subprocess.run(["git", "rev-list", "--count", "--since=30.days", "HEAD",
-                          "--", "things"], cwd=domain, capture_output=True, text=True,
-                         encoding="utf-8", errors="replace")
-    n = cnt.stdout.strip() if cnt.returncode == 0 else "?"
+    today = dt.date.today()
+    _, when, subj = history.commits[0]
+    n = sum(1 for d, _, _ in history.commits if (today - d).days <= 30)
     # Weekly buckets, not only a period total: a flat 30-day count masked a
     # three-week deceleration (85 → 16 → 9) that the deep velocity walk had
     # to be grilled into finding (session-start-hardening Phase 3 — the
     # trend is the computable core of that walk, emitted as a cue).
     trend_note = ""
-    dates = subprocess.run(["git", "log", "--since=28.days", "--format=%cs",
-                            "--", "things"], cwd=domain, capture_output=True,
-                           text=True, encoding="utf-8", errors="replace")
-    if dates.returncode == 0 and dates.stdout.strip():
-        today = dt.date.today()
-        buckets = [0, 0, 0, 0]
-        for line in dates.stdout.split():
-            try:
-                age = (today - dt.date.fromisoformat(line)).days
-            except ValueError:
-                continue
-            if 0 <= age < 28:
-                buckets[3 - age // 7] += 1
+    buckets = [0, 0, 0, 0]
+    bucketed = False
+    for d, _, _ in history.commits:
+        age = (today - d).days
+        if 0 <= age < 28:
+            buckets[3 - age // 7] += 1
+            bucketed = True
+    if bucketed:
         trend_note = (" Weekly commits to `things/` (oldest→newest): "
                       + " · ".join(str(b) for b in buckets) + ".")
     return (f"last `things/` change {when} (\"{subj.strip()}\"); {n} commit(s) in 30d."
@@ -85,47 +123,24 @@ _ORIENT_KNOWLEDGE_TYPES = {"specification", "guide", "manifesto", "insight",
 # judgement walk that would have found them.
 _STALL_DAYS = 21
 
-# A `git log --name-only` walk interleaves date lines with path lines; the
-# date shape tells them apart without needing a NUL/control delimiter.
-_ISO_DAY = re.compile(r"\d{4}-\d{2}-\d{2}")
-
-
-def _last_touch_map(domain: Path) -> dict[str, dt.date]:
-    """{repo-relative posix path: date of its most recent commit} in ONE git
-    pass. The per-file alternative (`git log -1 -- <path>` per thing) cost a
-    subprocess each and pushed the session-start hook past its 60s budget on a
-    232-thing corpus — caught by this session's own SessionStart, which is the
-    acceptance evidence the plan asked for."""
-    out = subprocess.run(["git", "log", "--format=%cs", "--name-only",
-                          "--", "things"], cwd=domain, capture_output=True,
-                         text=True, encoding="utf-8", errors="replace")
-    if out.returncode != 0:
-        return {}
-    seen: dict[str, dt.date] = {}
-    cur: dt.date | None = None
-    for line in out.stdout.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        if _ISO_DAY.fullmatch(line):
-            cur = dt.date.fromisoformat(line)
-        elif cur is not None:
-            seen.setdefault(line, cur)  # log is newest-first: first wins
-    return seen
-
-
-def _stall_lines(domain: Path, corpus=None) -> list[str]:
+def _stall_lines(domain: Path, corpus=None,
+                 history: _ThingsHistory | None = None) -> list[str]:
     """Critical/high, non-terminal, native work things whose file has not
     moved in the commit stream past the stall line — looks active, is not.
     Staleness keys on git history, not mtime (clone-local noise). The corpus
-    is passed in where the caller already has one: session-start scanned the
-    same corpus three times before this was shared."""
+    and history are passed in where the caller already has them: session-start
+    scanned the same corpus three times and walked the same history five times
+    before these were shared. The per-file alternative (`git log -1 -- <path>`
+    per thing) cost a subprocess each and pushed the session-start hook past
+    its 60s budget on a 232-thing corpus."""
     try:
         if corpus is None:
             corpus, _ = scan(domain)
     except Exception:
         return []
-    touched = _last_touch_map(domain)
+    if history is None:
+        history = _things_history(domain)
+    touched = history.touch if history is not None else {}
     today = dt.date.today()
     stalls: list[tuple[int, str]] = []
     for t in corpus.things:
@@ -134,7 +149,7 @@ def _stall_lines(domain: Path, corpus=None) -> list[str]:
             continue
         if str(meta.get("type")) in _ORIENT_KNOWLEDGE_TYPES:
             continue
-        if str(meta.get("origin")) == "external":
+        if origin_is_external(meta):
             continue
         if is_terminal(corpus.schema, meta):
             continue
@@ -175,7 +190,7 @@ def _orient_forward(domain: Path, corpus=None) -> list[str]:
             # so it is not a loop here. Exclusion, not hiding: it gets its own
             # line. The distortion scaled with how well a domain consumed
             # (58% -> 81% of the count in one estate's measured session).
-            if str(t.meta.get("origin")) == "external":
+            if origin_is_external(t.meta):
                 watched.append((t.id, typ, status))
             else:
                 loops.append((t.id, typ, status))
@@ -246,7 +261,7 @@ def _verified_flips_recent(domain: Path) -> list[str]:
             continue  # flipped then deleted/moved — git has the record
         meta, _, _ = parse_frontmatter(f.read_text(encoding="utf-8"))
         if not (meta and meta.get("verified") is True
-                and str(meta.get("origin")) == "external"):
+                and origin_is_external(meta)):
             continue
         by = meta.get("verified_by")
         by = by.strip() if isinstance(by, str) and by.strip() else "UNATTRIBUTED"
@@ -563,7 +578,7 @@ def _record_session_attestation(domain: Path, *,
 
 
 
-def _fired_by_thing(domain: Path):
+def _fired_by_thing(domain: Path, corpus=None):
     """{thing_id: [condition, ...]} for every trigger the floor evaluated as
     fired, plus the upcoming/horizon/skipped/self-answering buckets. The
     floor already computes this; session-start simply stopped asking — which
@@ -573,7 +588,7 @@ def _fired_by_thing(domain: Path):
     conflation made a quiet domain read as a domain under pressure."""
     try:
         from .triggers import evaluate
-        hits, upcoming, horizon, skipped, selfanswer = evaluate(domain)
+        hits, upcoming, horizon, skipped, selfanswer = evaluate(domain, corpus)
     except Exception:
         return {}, [], [], [], []
     fired: dict[str, list[str]] = {}
@@ -777,10 +792,21 @@ def cmd_session_start(args) -> int:
     if floor:
         out.append(floor)
 
-    velocity = _velocity_signal(domain)
+    # One worktree scan and ONE `things/` history walk shared by every
+    # consumer below — stall lines, retrospective cadence, forward
+    # orientation, velocity, and trigger evaluation each rescanned the same
+    # corpus (four scans; the parameter existed but no caller passed it) and
+    # re-walked the same history (five full walks at ~350ms+ per git spawn).
+    try:
+        session_corpus, _ = scan(domain)
+    except Exception:
+        session_corpus = None
+    things_hist = _things_history(domain)
+
+    velocity = _velocity_signal(domain, things_hist)
     out.append(f"- **Velocity:** {velocity}")
 
-    stalls = _stall_lines(domain)
+    stalls = _stall_lines(domain, session_corpus, things_hist)
     if stalls:
         out.append(f"- **Stalled past the {_STALL_DAYS}-day line "
                    f"({len(stalls)}):** critical/high work whose file has "
@@ -804,15 +830,18 @@ def cmd_session_start(args) -> int:
     # Retrospective cadence, computed once and emitted below at its own
     # position.
     retrospective_due: list[str] = []
-    try:
-        from .model import scan as _scan
-        from .validation import retrospective_findings as _retro
-        _corpus, _ = _scan(domain)
-        retrospective_due = [f.message for f in _retro(domain, _corpus)]
-    except Exception:
-        retrospective_due = []  # advisory only — session start never fails on it
+    if session_corpus is not None:
+        try:
+            from .validation import retrospective_findings as _retro
+            things_dates = ([d for d, _, _ in things_hist.commits]
+                            if things_hist is not None else None)
+            retrospective_due = [
+                f.message for f in _retro(domain, session_corpus,
+                                          things_dates=things_dates)]
+        except Exception:
+            retrospective_due = []  # advisory only — session start never fails on it
 
-    out.extend(_orient_forward(domain))
+    out.extend(_orient_forward(domain, session_corpus))
 
     # Trigger evaluation, mechanically — session start is the primary
     # evaluation point (trigger-specification.md); until v3.24.0 this emitter
@@ -821,7 +850,8 @@ def cmd_session_start(args) -> int:
     # (2026-08-01 estate sweep). Fired hits verbatim from the same evaluator
     # `mdllm triggers` runs; horizon and not-evaluable compressed to counts —
     # quiet when healthy, one line when not.
-    fired, upcoming, horizon, skipped, selfanswer = _fired_by_thing(domain)
+    fired, upcoming, horizon, skipped, selfanswer = _fired_by_thing(
+        domain, session_corpus)
     if fired:
         out.append(f"- **Triggers fired ({sum(len(v) for v in fired.values())}):**")
         for tid in sorted(fired):

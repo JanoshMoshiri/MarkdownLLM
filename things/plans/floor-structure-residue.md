@@ -62,11 +62,17 @@ Ordered by leverage, not by size.
    until the shared setup has a home of its own. After that the membrane, sync
    and session-gate sections are coherent files waiting to be lifted out along
    banners that already exist.
-5. **Prune during the worktree walk.** Worktree-mode listing enumerates the
+5. **Prune during the worktree walk.** ~~Worktree-mode listing enumerates the
    entire tree before exclusions apply, so an interactive command in a working
    checkout pays a walk proportional to everything nested beneath it rather than
    to the corpus. The hook path is index-native and unaffected; the cost lands
-   on the commands an operator runs by hand.
+   on the commands an operator runs by hand.~~ **Landed 2026-08-21** — commit
+   `3017f64` prunes version-control internals, virtualenvs and build caches
+   during the walk (and made WORKTREE and COMMIT modes agree on the logical
+   corpus); the same session's follow-up removed session-start's redundant
+   rescans and history re-walks, switched the strict YAML boundary to the
+   libyaml C parser where compiled in, and parallelised the estate-sync repo
+   walk. Framework-root session-start: 67.8s → ~2s measured.
 6. **Widen the CI matrix, or say why not.** The substrate's most
    portability-sensitive machinery — the Windows command carriers, the shell
    resolver, the line-ending contract — is exercised on one platform only. Either
@@ -77,7 +83,13 @@ Smaller, same family: two copies of the staged-atomic-write primitive; a
 diagnostic that recovers its own floor's result by matching report prose rather
 than a structured fact; two adapter inspectors that classify by resemblance to a
 path string; dependency pins restated by hand in a bundle template beside the
-file that owns them.
+file that owns them. Added 2026-08-21 (measured during the perf pass): the
+emitted sh interpreter-resolution fragment probes file-path candidates by
+spawning `timeout` + python even when the path cannot exist (~330ms per
+lifecycle hook invocation on Windows for the POSIX venv path alone) — an
+`[ -x ]` existence guard before the spawn saves it, but the fragment is
+embedded in every installed hook body and its definition hash, so the change
+rides with the next adapter regeneration, not a hand edit.
 
 ## Perimeter
 

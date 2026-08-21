@@ -20,9 +20,43 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from .model import ISO_RE, is_terminal, scan
+from .model import ISO_RE, Corpus, is_terminal, scan
 
 _DATE_IN_TEXT = re.compile(r"(\d{4}-\d{2}-\d{2})")
+
+# A `git log --name-only` walk interleaves date lines with path lines; the
+# date shape tells them apart without needing a NUL/control delimiter.
+_ISO_DAY = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+# Import states meaning the floor could not SEE the source at all — distinct
+# from the states it read and can match against. A trigger may legitimately
+# watch FOR one of these values; only unavailability the trigger did not ask
+# about becomes unevaluable (substrate-totality-residue #1).
+_IMPORT_UNAVAILABLE = frozenset(
+    {"unreachable", "no-address-book-entry", "incomplete"})
+
+
+def _git_touch_map(root: Path) -> dict[str, "dt.date"]:
+    """{repo-relative posix path: date of its most recent commit} in ONE git
+    pass. The per-path alternative (`git log -1 -- <path>` per stale trigger)
+    cost a subprocess each — ~0.6s apiece on Windows — and scaled with the
+    trigger count; sixteen of them were most of session-start's git time."""
+    out = subprocess.run(["git", "log", "--format=%cs", "--name-only"],
+                         cwd=root, capture_output=True, text=True,
+                         encoding="utf-8", errors="replace")
+    if out.returncode != 0:
+        return {}
+    seen: dict[str, dt.date] = {}
+    cur: dt.date | None = None
+    for line in out.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if _ISO_DAY.fullmatch(line):
+            cur = dt.date.fromisoformat(line)
+        elif cur is not None:
+            seen.setdefault(line, cur)  # log is newest-first: first wins
+    return seen
 
 # The self-answering pattern (session-start-hardening Phase 3): an armed
 # future-dated trigger whose ACTION text already answers its own condition
@@ -150,7 +184,8 @@ def _porch_coverage(root: Path) -> list | None:
     return _MEMBRANE_CACHE[key]
 
 
-def _evaluate_typed_impl(root: Path) -> TriggerEvaluation:
+def _evaluate_typed_impl(root: Path,
+                         corpus: Corpus | None = None) -> TriggerEvaluation:
     """Evaluate every declaration to one typed result without input throws.
 
     `fired` holds only conditions that are TRUE NOW (a date reached, a
@@ -163,7 +198,8 @@ def _evaluate_typed_impl(root: Path) -> TriggerEvaluation:
     `selfanswer` is the heuristic cue for armed future triggers whose action
     text already answers the condition (see _SELF_ANSWERING)."""
     _MEMBRANE_CACHE.clear()
-    corpus, _ = scan(root)
+    if corpus is None:
+        corpus, _ = scan(root)
     today = dt.date.today()
     by_id = corpus.by_id()
     hits: list[str] = []
@@ -185,20 +221,24 @@ def _evaluate_typed_impl(root: Path) -> TriggerEvaluation:
                 return None
         return None
 
+    touch_map: dict[str, dt.date] | None = None
+
     def last_activity(path: Path) -> dt.date | None:
         # Staleness keys on the commit stream, not mtime: mtime is clone-local
         # noise (a fresh checkout resets it, a stray touch renews it) while
         # git history is the domain's actual activity record (review 5 drift
         # item; thing-lifecycle's last_active-from-git is the same fact).
-        # mtime is the fallback for untracked files / no git.
+        # mtime is the fallback for untracked files / no git. The map is one
+        # `git log --name-only` walk built lazily on the first stale trigger.
+        nonlocal touch_map
+        if touch_map is None:
+            touch_map = _git_touch_map(root)
         try:
-            out = subprocess.run(
-                ["git", "log", "-1", "--format=%cs", "--", str(path)],
-                cwd=root, capture_output=True, text=True, check=True).stdout.strip()
-            if out:
-                return dt.date.fromisoformat(out)
-        except Exception:
-            pass
+            rel = path.resolve().relative_to(root).as_posix()
+        except (ValueError, OSError):
+            rel = None
+        if rel is not None and rel in touch_map:
+            return touch_map[rel]
         try:
             return dt.date.fromtimestamp(path.stat().st_mtime)
         except OSError:
@@ -545,6 +585,21 @@ def _evaluate_typed_impl(root: Path) -> TriggerEvaluation:
                             unevaluable = {w: states[w] for w in watch
                                            if str(states[w]).startswith("unevaluable-")
                                            and w not in route_invalid}
+                            # Unavailability the trigger did not ask about is
+                            # not a state mismatch: `unreachable` /
+                            # `no-address-book-entry` / `incomplete` mean the
+                            # floor never read the watched state, so falling
+                            # through to the match test minted a confident
+                            # `not-fired` from a state it could not see. A
+                            # trigger watching FOR one of these values keeps
+                            # it as a match candidate — only the unasked-for
+                            # case degrades (substrate-totality-residue #1;
+                            # the porch branch is the sibling specification).
+                            unevaluable.update(
+                                {w: states[w] for w in watch
+                                 if states[w] in _IMPORT_UNAVAILABLE
+                                 and states[w] not in values
+                                 and w not in route_invalid})
                             if route_invalid:
                                 forced = TriggerOutcome.INVALID
                                 reason = ("route configuration is invalid for "
@@ -558,9 +613,15 @@ def _evaluate_typed_impl(root: Path) -> TriggerEvaluation:
                                 reason = ("one or more watched import routes cannot "
                                           "be evaluated")
                                 for w, state in unevaluable.items():
-                                    route_reason = ("route is untrusted and was not executed"
-                                                    if state == "unevaluable-untrusted"
-                                                    else "route is unevaluable")
+                                    if state == "unevaluable-untrusted":
+                                        route_reason = ("route is untrusted "
+                                                        "and was not executed")
+                                    elif state in _IMPORT_UNAVAILABLE:
+                                        route_reason = (f"is {state} — its "
+                                                        f"watched state could "
+                                                        f"not be read")
+                                    else:
+                                        route_reason = "route is unevaluable"
                                     skipped.append(f"{name}: import `{w}` {route_reason} — "
                                                    f"left unevaluable")
                             else:
@@ -729,10 +790,15 @@ def _evaluate_typed_impl(root: Path) -> TriggerEvaluation:
     )
 
 
-def evaluate_typed(root: Path) -> TriggerEvaluation:
-    """Total public boundary: malformed input becomes ``invalid``, never an exception."""
+def evaluate_typed(root: Path,
+                   corpus: Corpus | None = None) -> TriggerEvaluation:
+    """Total public boundary: malformed input becomes ``invalid``, never an exception.
+
+    ``corpus`` lets a caller that already scanned the same worktree share the
+    scan; session-start's four consumers each rescanning the corpus was most
+    of its budget overrun."""
     try:
-        return _evaluate_typed_impl(Path(root).resolve())
+        return _evaluate_typed_impl(Path(root).resolve(), corpus)
     except Exception as exc:
         reason = ("trigger evaluation failed safely: "
                   f"{type(exc).__name__}: {exc}")
@@ -749,11 +815,12 @@ def evaluate_results(root: Path) -> tuple[TriggerResult, ...]:
     return evaluate_typed(root).results
 
 
-def evaluate(root: Path) -> tuple[list[str], list[tuple[int, str]],
-                                  list[tuple[int, str]], list[str],
-                                  list[str]]:
+def evaluate(root: Path,
+             corpus: Corpus | None = None) -> tuple[list[str], list[tuple[int, str]],
+                                                    list[tuple[int, str]], list[str],
+                                                    list[str]]:
     """Backward-compatible five-bucket projection used by the existing CLI."""
-    return evaluate_typed(root).legacy()
+    return evaluate_typed(root, corpus).legacy()
 
 
 def _print_evaluation(hits, upcoming, horizon, skipped,
@@ -809,7 +876,11 @@ def cmd_triggers(args) -> int:
             # thirteen validates; here it lands as one picture in the one
             # sweep the operator's estate loop already reads. Quiet when
             # healthy — the sensor's own young/dormant gates hold.
-            retro = ""
+            # A failed computation must not render identically to "no debt
+            # owed" — the swallow made an error read as health
+            # (substrate-totality-residue sibling). None = could not compute;
+            # "" = computed, quiet.
+            retro: str | None = ""
             try:
                 from .model import scan as _scan
                 from .validation import retrospective_findings as _retro
@@ -817,8 +888,10 @@ def cmd_triggers(args) -> int:
                 rf = _retro(repo, _corpus)
                 if rf:
                     retro = rf[0].message.split(" — ")[0].split(" (")[0]
-            except Exception:
-                pass
+            except Exception as exc:
+                retro = None
+                print(f"(retrospective state unavailable for {repo.name}: "
+                      f"{type(exc).__name__})")
             rollup.append((repo.name, len(hits), len(upcoming), len(skipped), retro))
             total_hits += len(hits)
             print(f"### {repo.name}")
@@ -826,16 +899,23 @@ def cmd_triggers(args) -> int:
             print()
         print("### Roll-up")
         overdue = 0
+        unknown_retro = 0
         for name, nh, nu, ns, retro in rollup:
             line = (f"- {name}: {nh} fired, {nu} upcoming (≤30d), "
                     f"{ns} not mechanically evaluable")
-            if retro:
+            if retro is None:
+                line += " — retrospective state UNKNOWN (computation failed)"
+                unknown_retro += 1
+            elif retro:
                 line += f" — RETROSPECTIVE DEBT: {retro}"
                 overdue += 1
             print(line)
         tailbits = [f"{total_hits} trigger(s) fired across the walk"]
         if overdue:
             tailbits.append(f"{overdue} domain(s) owe a retrospective")
+        if unknown_retro:
+            tailbits.append(f"{unknown_retro} domain(s) with unknown "
+                            f"retrospective state")
         print(f"\n{'; '.join(tailbits)}. Ephemeral — never an index.")
         return 0
 

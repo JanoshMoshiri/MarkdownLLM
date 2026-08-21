@@ -35,7 +35,18 @@ class LexicalFloat(float):
         return obj
 
 
-class StrictSafeLoader(yaml.SafeLoader):
+# The C parser (libyaml) is ~10x faster than the pure-Python scanner and
+# produces the same node/mark interface the strict checks below read. The
+# duplicate-key rejection and float-lexeme retention both live on the Python
+# constructor side, which is identical for either base — so strictness is
+# unchanged; only the tokenising is. Falls back cleanly where libyaml is not
+# compiled in.
+_LOADER_BASE = (yaml.CSafeLoader
+                if getattr(yaml, "__with_libyaml__", False)
+                else yaml.SafeLoader)
+
+
+class StrictSafeLoader(_LOADER_BASE):
     """SafeLoader variant that rejects duplicate mapping keys."""
 
     source_name = "<yaml>"
@@ -70,7 +81,8 @@ class StrictSafeLoader(yaml.SafeLoader):
 def _construct_float(loader: StrictSafeLoader, node: yaml.ScalarNode) -> LexicalFloat:
     # Delegate YAML spellings (.inf, exponent, underscores, sexagesimal) to
     # PyYAML, then retain the original token for exact-decimal consumers.
-    value = yaml.SafeLoader.construct_yaml_float(loader, node)
+    # SafeConstructor is the shared constructor base of both loader bases.
+    value = yaml.constructor.SafeConstructor.construct_yaml_float(loader, node)
     return LexicalFloat(value, node.value)
 
 

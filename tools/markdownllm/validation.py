@@ -20,7 +20,7 @@ import yaml
 
 from .model import (
     RESERVED_STATUSES, DEFAULT_STATUSES, TERMINAL_STATUSES, CORE_FIELDS,
-    is_terminal, terminal_statuses_for,
+    is_terminal, origin_is_external, terminal_statuses_for,
     ID_RE, ISO_RE, SEV_ERROR, SEV_WARNING, SEV_INFO,
     Thing, Finding, Corpus, parse_frontmatter, scan,
 )
@@ -601,7 +601,7 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
     # stays quarantined) is the route. Same-builder: the thing's own frontmatter.
     today = dt.date.today()
     for t in corpus.things:
-        if str(t.meta.get("origin")) != "external" or t.meta.get("verified") is True:
+        if not origin_is_external(t.meta) or t.meta.get("verified") is True:
             continue
         created = t.meta.get("created")
         if isinstance(created, dt.datetime):
@@ -619,7 +619,7 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
                        f"unverified >30d)"))
 
     externals = [t for t in corpus.things
-                 if str(t.meta.get("origin")) == "external"
+                 if origin_is_external(t.meta)
                  and t.meta.get("verified") is True]
     if not externals:
         return out
@@ -678,7 +678,9 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
     return out
 
 
-def retrospective_findings(root: Path, corpus: Corpus) -> list[Finding]:
+def retrospective_findings(root: Path, corpus: Corpus,
+                           things_dates: list[dt.date] | None = None,
+                           ) -> list[Finding]:
     """retrospective.md → validate.thing.md: a domain with no retrospective in
     over 60 days of active sessions is flagged as one Info observation.
 
@@ -687,21 +689,34 @@ def retrospective_findings(root: Path, corpus: Corpus) -> list[Finding]:
     `things/` within the last 60 (dormant domains are silent — a paused domain
     owes no reflection). Both gates keep the check quiet-when-healthy: it fires
     only where sessions are running and the reflection ritual is not
-    (a-check-that-always-fires-teaches-the-operator-to-ignore-it)."""
-    first = _git_stdout(root, ["log", "--reverse", "--format=%cs", "--", "things"])
-    if not first:
-        return []  # no git history over things/ — nothing to say
-    try:
-        born = dt.date.fromisoformat(first.splitlines()[0].strip())
-    except ValueError:
-        return []
+    (a-check-that-always-fires-teaches-the-operator-to-ignore-it).
+
+    ``things_dates`` — newest-first commit dates over `things/` — lets a
+    caller that already walked the history (session-start) share the walk
+    instead of paying two more git spawns here."""
     today = dt.date.today()
-    if (today - born).days <= 60:
-        return []
-    recent = _git_stdout(root, ["rev-list", "--count", "--since=60.days",
-                                "HEAD", "--", "things"])
-    if not recent or not recent.isdigit() or int(recent) == 0:
-        return []
+    if things_dates is not None:
+        if not things_dates:
+            return []
+        born = things_dates[-1]
+        if (today - born).days <= 60:
+            return []
+        if not any((today - d).days <= 60 for d in things_dates):
+            return []
+    else:
+        first = _git_stdout(root, ["log", "--reverse", "--format=%cs", "--", "things"])
+        if not first:
+            return []  # no git history over things/ — nothing to say
+        try:
+            born = dt.date.fromisoformat(first.splitlines()[0].strip())
+        except ValueError:
+            return []
+        if (today - born).days <= 60:
+            return []
+        recent = _git_stdout(root, ["rev-list", "--count", "--since=60.days",
+                                    "HEAD", "--", "things"])
+        if not recent or not recent.isdigit() or int(recent) == 0:
+            return []
     newest: dt.date | None = None
     for t in corpus.things:
         if str(t.meta.get("type")) != "retrospective":

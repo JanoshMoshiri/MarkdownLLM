@@ -1,8 +1,8 @@
 ---
 id: substrate-totality-residue
 type: plan
-status: not-started
-version: 1.0
+status: completed
+version: 1.1
 created: 2026-08-20
 priority: high
 tags: [floor, totality, triggers, imports, provenance, honesty, review-residue]
@@ -80,10 +80,27 @@ stopped being this plan's work.
 
 ## Done when
 
-- [ ] Each of the three returns its honest typed result, with a regression test
+- [x] Each of the three returns its honest typed result, with a regression test
       that fails if the branch reverts to a definite answer.
-- [ ] The smaller siblings are either fixed or explicitly ruled acceptable, in
-      writing.
-- [ ] One deliberately unreachable route, exercised end to end, produces
+      *(2026-08-21: `state_is` folds `unreachable`/`no-address-book-entry`/
+      `incomplete` into the unevaluable set unless the trigger watches FOR that
+      value; pin-current-with-unread-content lands as `unreachable` with a
+      "divergence unverifiable" detail, never `fresh`; provenance `exists_at`
+      matches the exact basename. Regressions:
+      `test_import_trigger_unreachable_route_is_unevaluable_not_notfired`,
+      `test_import_trigger_watching_for_unreachable_still_fires`,
+      `test_imports_freshness_pin_current_unread_content_is_not_fresh`,
+      `test_provenance_pin_not_satisfied_by_suffix_named_neighbour`.)*
+- [x] The smaller siblings are either fixed or explicitly ruled acceptable, in
+      writing. *(2026-08-21, all three fixed: the estate sweep renders a failed
+      retrospective computation as "retrospective state UNKNOWN" distinct from
+      quiet health; the quarantine predicate is `model.origin_is_external`,
+      spelled once and used by calc, provenance, validation, imports-check and
+      session; sync_repo/autopush distinguish "`git remote` could not run —
+      remote configuration unknown" from a genuine empty remote list.)*
+- [x] One deliberately unreachable route, exercised end to end, produces
       `unevaluable` in the trigger report and a non-`fresh` row in the imports
       report — proved on contact rather than in a fixture alone.
+      *(2026-08-21: the unevaluable-not-notfired regression spawns the real
+      evaluator over a real repo whose route names an unspawnable binary; the
+      same fixture's imports report row asserts `unreachable`.)*

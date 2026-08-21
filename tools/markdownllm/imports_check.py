@@ -31,7 +31,7 @@ from .external_trust import (
     ExternalTrustError, ExternalTrustPolicy, LocalExternalTrustPolicy,
     load_mcp_address_book,
 )
-from .model import scan
+from .model import origin_is_external, scan
 
 
 MAX_EXTERNAL_RESPONSE_BYTES = 2 * 1024 * 1024
@@ -432,7 +432,7 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
     import json
     corpus, _ = scan(consumer_root)
     book, book_error = _load_address_book_result(consumer_root)
-    imports = [t for t in corpus.things if str(t.meta.get("origin")) == "external"]
+    imports = [t for t in corpus.things if origin_is_external(t.meta)]
 
     # One spawn per source, reading the manifest plus every imported thing's
     # face content in a single pass — the content read is what makes the
@@ -517,8 +517,19 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
                                           else "content changed")
                 else:
                     src_text = got.get(f"thing://{sd}/{sid}")
-                    if (src_text is not None
-                            and _norm_body(_face_body(src_text)) != _norm_body(t.body)):
+                    if src_text is None:
+                        # Pin current, but the face returned no content for
+                        # this thing: the divergence direction — one of the
+                        # two the check promises — was unverifiable, and
+                        # `fresh` would assert a comparison that never
+                        # happened. Same conservatism as the stale branch
+                        # above, which omits the species rather than guessing
+                        # (substrate-totality-residue #2).
+                        row["state"] = "unreachable"
+                        row["detail"] = ("pin current, but the content read "
+                                         "returned nothing — divergence "
+                                         "unverifiable")
+                    elif _norm_body(_face_body(src_text)) != _norm_body(t.body):
                         row["state"] = "diverged"
                     else:
                         row["state"] = "fresh"
@@ -546,7 +557,8 @@ def _render_rows(rows: list[dict]) -> None:
         elif r["state"] == "fresh":
             print(f"- fresh      {r['id']}  ({r['source']})  @ {r['pin']}")
         elif r["state"] == "unreachable":
-            print(f"- UNKNOWN    {r['id']}  ({r['source']})  unreachable — sync state cannot be determined")
+            why = r.get("detail") or "sync state cannot be determined"
+            print(f"- UNKNOWN    {r['id']}  ({r['source']})  unreachable — {why}")
         elif r["state"] == "unevaluable-untrusted":
             print(f"- UNTRUSTED  {r['id']}  ({r['source']})  external route was not executed")
             print("             review it with `mdllm external-trust review`; "
@@ -617,7 +629,7 @@ def face_coverage(consumer_root: Path) -> list[dict]:
     book, book_error = _load_address_book_result(consumer_root)
     imported: dict[str, int] = {}
     for t in corpus.things:
-        if str(t.meta.get("origin")) == "external" and t.meta.get("source_domain"):
+        if origin_is_external(t.meta) and t.meta.get("source_domain"):
             sd = str(t.meta["source_domain"])
             imported[sd] = imported.get(sd, 0) + 1
     if book_error is not None:

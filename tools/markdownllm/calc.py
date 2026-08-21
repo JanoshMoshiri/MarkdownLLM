@@ -961,5 +961,5 @@ def is_quarantined(meta: dict) -> bool:
     drawn from it is stamped, so it cannot be lifted out of a provisional
     context without that being visible.
     """
-    return (str(meta.get("origin", "")).strip() == "external"
-            and meta.get("verified") is not True)
+    from .model import origin_is_external
+    return origin_is_external(meta) and meta.get("verified") is not True

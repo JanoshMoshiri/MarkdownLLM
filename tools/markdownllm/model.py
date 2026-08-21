@@ -129,6 +129,20 @@ def is_terminal(schema: dict | None, meta: dict | None) -> bool:
     status = str(meta.get("status", ""))
     return status in terminal_statuses_for(schema, meta.get("type"))
 
+
+def origin_is_external(meta: dict | None) -> bool:
+    """The quarantine-class membership test, spelled once.
+
+    Three modules spelled this predicate three ways — one normalised
+    surrounding whitespace, two compared raw — so a single stray character
+    made a thing quarantined for arithmetic and invisible to the provenance
+    and membrane checks (substrate-totality-residue sibling). Every check
+    that means "is this thing of external origin?" goes through here.
+    """
+    if not isinstance(meta, dict):
+        return False
+    return str(meta.get("origin", "") or "").strip() == "external"
+
 # Universal frontmatter fields the floor itself reads and understands — the
 # built-in half of the field vocabulary (the CORE_FIELDS<->known_fields split
 # mirrors RESERVED_STATUSES<->_schema.yaml `types`: the tool owns the universal

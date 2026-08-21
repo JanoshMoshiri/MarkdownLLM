@@ -181,7 +181,16 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
         return SyncResult(repo=repo, state=state, detail=detail, moved=moved)
 
     remotes = _git(repo, "remote")
-    if remotes is None or not remotes.stdout.strip():
+    if remotes is None or remotes.returncode != 0:
+        # `git remote` failing to run is not evidence of "no remote
+        # configured": rendering it LOCAL_ONLY diagnosed a broken or
+        # timed-out environment as a deliberately unpublished repo — the
+        # same empty value for two different questions
+        # (substrate-totality-residue sibling).
+        state = SyncState.FETCH_FAILED
+        detail = "`git remote` could not run — remote configuration unknown"
+        return result()
+    if not remotes.stdout.strip():
         state = SyncState.LOCAL_ONLY
         return result()
 
@@ -401,7 +410,13 @@ def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
         out["detail"] = policy.reason
         return out
     remotes = _git(repo, "remote")
-    if remotes is None or not remotes.stdout.strip():
+    if remotes is None or remotes.returncode != 0:
+        # Same distinction as sync_repo: a failed `git remote` is an unknown
+        # publication surface, not a deliberately unpublished repo.
+        out["state"] = "failed"
+        out["detail"] = "`git remote` could not run — remote configuration unknown"
+        return out
+    if not remotes.stdout.strip():
         out["state"] = "local-only"  # legitimate standing state; estate-sync reports it
         return out
     if (r := _git(repo, "rev-parse", "--verify", "-q", "HEAD")) is None or r.returncode != 0:
@@ -507,8 +522,18 @@ def cmd_estate_sync(args) -> int:
     title = "Publication Debt" if status_only else "Estate Sync"
     print(f"## {title} — {root.name} ({len(repos)} repo(s))\n")
     deadline = (time.monotonic() + ESTATE_GLOBAL_TIMEOUT) if fetch else None
-    results = [sync_repo(r, fetch=fetch, timeout=args.timeout,
-                         deadline=deadline) for r in repos]
+    # Concurrent per-repo observation: each sync_repo is independent (its own
+    # working directory, its own subprocesses, no shared mutable state) and
+    # the wall time of a serial walk is the SUM of every repo's network round
+    # trip — 14 repos took ~21s serially where the slowest single fetch is
+    # ~2s. Results keep the repos' order; the shared deadline still bounds
+    # the whole walk.
+    from concurrent.futures import ThreadPoolExecutor
+    workers = min(8, max(1, len(repos)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(
+            lambda r: sync_repo(r, fetch=fetch, timeout=args.timeout,
+                                deadline=deadline), repos))
     debt = 0
     for res in results:
         name = res.repo.name

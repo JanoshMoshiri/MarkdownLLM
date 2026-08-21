@@ -3383,7 +3383,7 @@ def test_retrospective_debt_is_surfaced_at_session_start(tmp_path, capsys,
         message = "last retrospective was 40 days ago (cadence 30d)"
 
     monkeypatch.setattr(_validation, "retrospective_findings",
-                        lambda domain, corpus: [_Finding()])
+                        lambda domain, corpus, **kw: [_Finding()])
 
     mdllm.cmd_session_start(_ns(path=str(tmp_path)))
     out = capsys.readouterr().out
@@ -3457,3 +3457,145 @@ def test_session_gate_holds_from_second_commit(tmp_path):
     _git_commit(tmp_path, "birth")
     findings = _gate(tmp_path)
     assert {f.severity for f in findings} == {mdllm.SEV_ERROR}
+
+
+# ------------------------------------------ substrate-totality-residue regressions
+# Each of these pins a branch where the floor rendered a state it could not
+# look at as a definite answer. If a fix reverts, the confident-wrong answer
+# returns and the matching test fails (things/plans/substrate-totality-residue.md).
+
+
+def test_import_trigger_unreachable_route_is_unevaluable_not_notfired(
+        tmp_path, capsys):
+    # #1, proved on contact: a genuinely unspawnable route must land in "not
+    # mechanically evaluable", never in a confident not-fired ("no watched
+    # import state matches") — the sibling porch branch already said so.
+    from markdownllm.triggers import TriggerOutcome, evaluate_typed
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", "deadbee",
+        {"command": "this-binary-does-not-exist-xyz",
+         "args": ["mcp-serve", "/nope"]})
+    write(con, "things/watcher.md", thing_text(
+        "id: watcher\ntype: note\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "triggers:\n  - type: import\n    condition: state_is\n"
+        "    watch: [imported-spec]\n    action: re_evaluate"))
+    # Same fixture, imports report: the row is non-`fresh` (done-when bullet 3).
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "unreachable"
+    res = [r for r in evaluate_typed(con).results if r.thing_id == "watcher"]
+    assert res and res[0].outcome is TriggerOutcome.UNEVALUABLE
+    rc = mdllm.cmd_triggers(_ns(path=str(con)))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "No trigger conditions currently true." in out
+    assert "left unevaluable" in out and "unreachable" in out
+
+
+def test_import_trigger_watching_for_unreachable_still_fires(tmp_path, capsys):
+    # The care in the fix: unavailability the trigger explicitly watches FOR
+    # stays a match candidate — only the unasked-for case degrades.
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", "deadbee",
+        {"command": "this-binary-does-not-exist-xyz",
+         "args": ["mcp-serve", "/nope"]})
+    write(con, "things/watcher.md", thing_text(
+        "id: watcher\ntype: note\nstatus: in-progress\ncreated: 2026-06-01\n"
+        "triggers:\n  - type: import\n    condition: state_is\n"
+        "    watch: [imported-spec]\n    value: [unreachable]\n"
+        "    action: escalate"))
+    rc = mdllm.cmd_triggers(_ns(path=str(con)))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "watcher: import `imported-spec` is unreachable" in out
+
+
+def test_imports_freshness_pin_current_unread_content_is_not_fresh(
+        tmp_path, monkeypatch):
+    # #2: pin current but the face returned no content for the thing — the
+    # divergence direction was unverifiable, so `fresh` would assert a
+    # comparison that never happened.
+    import json
+    import markdownllm.imports_check as ic
+    con = tmp_path / "condom"
+    con.mkdir()
+    _consumer_with_import(con, "srcdom", "the-spec", "deadbee",
+        {"command": sys.executable, "args": ["-c", "pass"]})
+    man = json.dumps({"knows": [{"id": "the-spec", "source_commit": "deadbee"}]})
+    monkeypatch.setattr(
+        ic, "_mcp_face_read",
+        lambda cfg, cwd, uris, server, **kw: ("ok", {"manifest://srcdom": man}))
+    rows = {r["id"]: r for r in ic.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] != "fresh"
+    assert rows["imported-spec"]["state"] == "unreachable"
+    assert "unverifiable" in rows["imported-spec"]["detail"]
+
+
+def test_provenance_pin_not_satisfied_by_suffix_named_neighbour(
+        tmp_path, capsys):
+    # #3: `my-spec.md` must not satisfy a pin for `spec` — the suffix match
+    # suppressed the broken-chain Error the check exists to raise.
+    import subprocess as sp
+    _git_repo(tmp_path)
+    write(tmp_path, "things/my-spec.md", thing_text(GOOD.replace("alpha", "my-spec")))
+    sp.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    sp.run(["git", "commit", "-q", "-m", "seed"], cwd=tmp_path, check=True)
+    sha = sp.run(["git", "rev-parse", "HEAD"], cwd=tmp_path,
+                 capture_output=True, text=True).stdout.strip()
+    write(tmp_path, "things/d.md", thing_text(
+        "id: d\ntype: decision\nstatus: made\ncreated: 2026-06-01\n"
+        f"informed_by:\n  - id: spec\n    commit: {sha}"))
+    rc = mdllm.cmd_provenance(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert rc == 1 and "### Errors" in out
+    assert "`spec` not found" in out
+
+
+def test_estate_sweep_failed_retrospective_is_unknown_not_quiet(
+        tmp_path, capsys, monkeypatch):
+    # Sibling: a failed retrospective computation must not render identically
+    # to "no debt owed".
+    import subprocess as sp
+    import markdownllm.validation as validation_mod
+    monkeypatch.chdir(tmp_path)
+    sp.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    (tmp_path / "domain").mkdir()
+    dom = tmp_path / "domain" / "alpha"
+    write(dom, "things/t.md", thing_text(
+        "id: t\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    sp.run(["git", "init", "-q"], cwd=dom, check=True)
+
+    def boom(*a, **k):
+        raise RuntimeError("boom")
+    monkeypatch.setattr(validation_mod, "retrospective_findings", boom)
+    rc = mdllm.cmd_triggers(_ns(path=".", estate=True))
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "retrospective state UNKNOWN" in out
+    assert "unknown retrospective state" in out
+
+
+def test_sync_failed_git_remote_is_not_local_only(tmp_path, monkeypatch):
+    # Sibling: `git remote` failing to run is an unknown publication surface,
+    # not a deliberately unpublished repo.
+    import markdownllm.sync as sync_mod
+    repo = tmp_path / "r"
+    repo.mkdir()
+    monkeypatch.setattr(sync_mod, "_git", lambda *a, **k: None)
+    res = sync_mod.sync_repo(repo)
+    assert res.state is sync_mod.SyncState.FETCH_FAILED
+    assert "unknown" in res.detail
+
+
+def test_origin_external_predicate_is_whitespace_normalising():
+    # Sibling: one spelling for the quarantine-class predicate. A quoted
+    # YAML scalar can carry surrounding whitespace; arithmetic, provenance
+    # and membrane checks must agree on membership.
+    from markdownllm.model import origin_is_external
+    assert origin_is_external({"origin": "external"})
+    assert origin_is_external({"origin": " external "})
+    assert not origin_is_external({"origin": "internal"})
+    assert not origin_is_external({"origin": None})
+    assert not origin_is_external({})
+    assert not origin_is_external(None)

@@ -10,7 +10,8 @@ import datetime as dt
 import subprocess
 from pathlib import Path
 
-from .model import Finding, SEV_ERROR, SEV_INFO, SEV_WARNING, scan
+from .model import (Finding, SEV_ERROR, SEV_INFO, SEV_WARNING,
+                    origin_is_external, scan)
 from .repository_view import (
     RepositoryView, RepositoryViewError, RepositoryViewMode,
 )
@@ -70,8 +71,13 @@ def cmd_provenance(args) -> int:
     def exists_at(sha: str, thing_id: str) -> bool:
         out = subprocess.run(["git", "ls-tree", "-r", "--name-only", sha],
                              cwd=root, capture_output=True, text=True)
+        # Exact basename, never a suffix: `endswith(f"{thing_id}.md")` let a
+        # similarly-named neighbour (`bar-foo.md` for pin `foo`) satisfy the
+        # pin and suppress the broken-chain Error this check exists to raise
+        # (substrate-totality-residue #3).
+        wanted = f"{thing_id}.md"
         return out.returncode == 0 and any(
-            p.endswith(f"{thing_id}.md") for p in out.stdout.splitlines())
+            p.rsplit("/", 1)[-1] == wanted for p in out.stdout.splitlines())
 
     for t in corpus.things:
         name = t.id or t.path.name
@@ -109,7 +115,7 @@ def cmd_provenance(args) -> int:
                                 f"pinned input `{pid}` not found (current corpus "
                                 f"or at {sha})"))
             if src is not None:
-                if (str(src.meta.get("origin")) == "external"
+                if (origin_is_external(src.meta)
                         and src.meta.get("verified") is not True):
                     findings.append(Finding(SEV_ERROR, name,
                                     f"pins UNVERIFIED external thing `{pid}` — "
@@ -125,7 +131,7 @@ def cmd_provenance(args) -> int:
                                     f"input `{pid}` changed in {n} commit(s) since "
                                     f"pin {sha} — decision may be dated"))
 
-        if str(t.meta.get("origin")) == "external" and t.meta.get("verified") is not True:
+        if origin_is_external(t.meta) and t.meta.get("verified") is not True:
             created = t.meta.get("created")
             age = ""
             if isinstance(created, (dt.date, dt.datetime)):
