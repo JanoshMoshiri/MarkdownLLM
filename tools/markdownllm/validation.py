@@ -631,6 +631,39 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
     if not externals:
         return out
     toplevel = _git_stdout(root, ["rev-parse", "--show-toplevel"])
+    # Batch the per-thing git work (floor-sprint-1 F12): HEAD existence and
+    # content come from ONE commit view with a prefetched read (the per-thing
+    # `cat-file -e` + `show` pair cost two spawns each), and creation commits
+    # come from ONE --diff-filter=A walk instead of a log per thing. An
+    # import-heavy domain carries dozens of verified externals; per-thing
+    # spawns made this check scale with the mirror count.
+    head_view = None
+    created_map: dict[str, str] = {}
+    if toplevel is not None:
+        try:
+            head_view = RepositoryView.commit(root, "HEAD")
+        except RepositoryViewError:
+            head_view = None
+        if head_view is not None:
+            rels = []
+            for t in externals:
+                try:
+                    rels.append(t.path.resolve().relative_to(
+                        Path(toplevel).resolve()).as_posix())
+                except ValueError:
+                    continue
+            head_view.prefetch(rels)
+            adds = _git_stdout(root, ["log", "--diff-filter=A",
+                                      "--format=%x1e%H", "--name-only"])
+            for record in (adds or "").split("\x1e"):
+                if not record.strip():
+                    continue
+                sha, _, paths = record.partition("\n")
+                for line in paths.splitlines():
+                    line = line.strip()
+                    if line:
+                        # newest-first: first add wins, matching `log -1`
+                        created_map.setdefault(line, sha.strip())
     for t in externals:
         name = t.id or t.path.name
         vb = t.meta.get("verified_by")
@@ -639,15 +672,13 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
                        "`verified: true` without `verified_by` — the flip must "
                        "name its human verifier (quarantine flip discipline; "
                        "provenance.md)"))
-        if toplevel is None:
+        if toplevel is None or head_view is None:
             continue  # not a git repo — the git-keyed half skips, like provenance
         try:
             rel = t.path.resolve().relative_to(Path(toplevel).resolve()).as_posix()
         except ValueError:
             continue
-        in_head = subprocess.run(["git", "cat-file", "-e", f"HEAD:{rel}"],
-                                 cwd=root, capture_output=True).returncode == 0
-        if not in_head:
+        if not head_view.exists(rel):
             out.append(Finding(sev, name,
                        "about to be born `verified: true` — commit it "
                        "unverified first, then flip in a separate attributed "
@@ -655,13 +686,15 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
             continue
         # If HEAD still holds verified != true, the flip is only pending in the
         # working tree — a distinct commit from creation by construction.
-        head_text = _git_stdout(root, ["show", f"HEAD:{rel}"])
+        try:
+            head_text = head_view.read_text(rel)
+        except (FileNotFoundError, RepositoryViewError, UnicodeError):
+            head_text = None
         if head_text is not None:
             head_meta, _, _ = parse_frontmatter(head_text)
             if not (head_meta and head_meta.get("verified") is True):
                 continue
-        created = _git_stdout(root, ["log", "--diff-filter=A", "--format=%H",
-                                     "-1", "--", rel])
+        created = created_map.get(rel)
         # Newest commit whose post-image carries verified: true among commits
         # that touched such a line — the most recent flip (so a proper
         # re-verification heals a historical born-verified finding).
