@@ -22,6 +22,17 @@ from enum import Enum
 from pathlib import Path, PurePosixPath
 
 
+# Directories the worktree walk never descends into: version-control internals,
+# virtualenvs, and build/package caches. None can hold a domain thing, and the
+# COMMIT arm of `list_paths` (git ls-tree) already excludes them — pruning is
+# what makes the two modes return the same logical corpus.
+_WALK_PRUNE = frozenset({
+    ".git", ".venv", "venv", ".env", "node_modules", "__pycache__",
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox", ".eggs",
+    ".idea", ".vs", ".cache",
+})
+
+
 class RepositoryViewError(RuntimeError):
     """The requested repository view could not be constructed or read."""
 
@@ -187,11 +198,19 @@ class RepositoryView:
         """List file paths in this view, sorted by logical POSIX path."""
         if self.mode is RepositoryViewMode.WORKTREE:
             paths: list[PurePosixPath] = []
-            for path in self.root.rglob("*"):
-                if not path.is_file():
-                    continue
-                logical = PurePosixPath(path.relative_to(self.root).as_posix())
-                if suffix is None or logical.name.endswith(suffix):
+            for dirpath, dirnames, filenames in os.walk(self.root):
+                # Prune infrastructure the COMMIT arm cannot see either: it
+                # lists `git ls-tree`, so `.git`, `.venv` and friends are
+                # absent there by construction. An unpruned rglob made the
+                # two modes disagree AND stat'd 37k files to find 172 things
+                # — 36s at the framework root, which pushed the session-start
+                # hook past its 60s budget (2026-08-20).
+                dirnames[:] = [d for d in dirnames if d not in _WALK_PRUNE]
+                for name in filenames:
+                    if suffix is not None and not name.endswith(suffix):
+                        continue
+                    logical = PurePosixPath(
+                        Path(dirpath, name).relative_to(self.root).as_posix())
                     paths.append(logical)
             return tuple(sorted(paths, key=lambda p: p.as_posix()))
 

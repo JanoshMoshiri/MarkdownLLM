@@ -85,15 +85,47 @@ _ORIENT_KNOWLEDGE_TYPES = {"specification", "guide", "manifesto", "insight",
 # judgement walk that would have found them.
 _STALL_DAYS = 21
 
+# A `git log --name-only` walk interleaves date lines with path lines; the
+# date shape tells them apart without needing a NUL/control delimiter.
+_ISO_DAY = re.compile(r"\d{4}-\d{2}-\d{2}")
 
-def _stall_lines(domain: Path) -> list[str]:
+
+def _last_touch_map(domain: Path) -> dict[str, dt.date]:
+    """{repo-relative posix path: date of its most recent commit} in ONE git
+    pass. The per-file alternative (`git log -1 -- <path>` per thing) cost a
+    subprocess each and pushed the session-start hook past its 60s budget on a
+    232-thing corpus — caught by this session's own SessionStart, which is the
+    acceptance evidence the plan asked for."""
+    out = subprocess.run(["git", "log", "--format=%cs", "--name-only",
+                          "--", "things"], cwd=domain, capture_output=True,
+                         text=True, encoding="utf-8", errors="replace")
+    if out.returncode != 0:
+        return {}
+    seen: dict[str, dt.date] = {}
+    cur: dt.date | None = None
+    for line in out.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if _ISO_DAY.fullmatch(line):
+            cur = dt.date.fromisoformat(line)
+        elif cur is not None:
+            seen.setdefault(line, cur)  # log is newest-first: first wins
+    return seen
+
+
+def _stall_lines(domain: Path, corpus=None) -> list[str]:
     """Critical/high, non-terminal, native work things whose file has not
     moved in the commit stream past the stall line — looks active, is not.
-    Staleness keys on git history, not mtime (clone-local noise)."""
+    Staleness keys on git history, not mtime (clone-local noise). The corpus
+    is passed in where the caller already has one: session-start scanned the
+    same corpus three times before this was shared."""
     try:
-        corpus, _ = scan(domain)
+        if corpus is None:
+            corpus, _ = scan(domain)
     except Exception:
         return []
+    touched = _last_touch_map(domain)
     today = dt.date.today()
     stalls: list[tuple[int, str]] = []
     for t in corpus.things:
@@ -106,13 +138,12 @@ def _stall_lines(domain: Path) -> list[str]:
             continue
         if is_terminal(corpus.schema, meta):
             continue
-        last = subprocess.run(
-            ["git", "log", "-1", "--format=%cs", "--", str(t.path)],
-            cwd=domain, capture_output=True, text=True,
-            encoding="utf-8", errors="replace")
         try:
-            last_day = dt.date.fromisoformat(last.stdout.strip())
+            rel = t.path.resolve().relative_to(domain.resolve()).as_posix()
         except ValueError:
+            continue
+        last_day = touched.get(rel)
+        if last_day is None:
             continue  # untracked / no history — creation is its own signal
         days = (today - last_day).days
         if days > _STALL_DAYS:
@@ -122,14 +153,15 @@ def _stall_lines(domain: Path) -> list[str]:
     return [line for _, line in sorted(stalls, reverse=True)]
 
 
-def _orient_forward(domain: Path) -> list[str]:
+def _orient_forward(domain: Path, corpus=None) -> list[str]:
     """The forward half of orientation — the open loops the next session inherits,
     computed from the thing graph. Orient is the session-memory counterpart to
     change-reconciliation's work-content state: backward orientation is the commit
     stream (velocity), this is its forward complement (what is still open). Replaces
     the hand-maintained continuity brief (dissolve-continuity-into-reconciliation)."""
     try:
-        corpus, _ = scan(domain)
+        if corpus is None:
+            corpus, _ = scan(domain)
     except Exception:
         return []
     conflicts, loops, watched = [], [], []
