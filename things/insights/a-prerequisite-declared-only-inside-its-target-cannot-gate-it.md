@@ -14,6 +14,9 @@ linked_things:
   - id: emitted-content-is-read-instructed-content-is-economised
     relation: extends
     notes: "Locates the one skip common to all four observed sessions: delivery form explains most of the pattern; declaration position explains why the skill layer specifically never loads."
+  - id: a-scaffold-cannot-birth-its-own-author
+    relation: references
+    notes: "Supplies this insight's second limb: at the framework root the lifted gate names a specification skill that does not exist, so it is upstream and dead. Upstream is necessary, not sufficient — it must also resolve where it fires."
   - id: read-thing-specification
     relation: challenges
     notes: "The read spec's kernel block carried no read-side gate while write.thing.md's did. Fix applied 2026-08-20: read.thing.md v2.3 kernel block now carries the gate (session-start-hardening Phase 1); this insight promoted into it."
@@ -46,6 +49,15 @@ it.
   skip is therefore partly a contract defect, not purely an agent failure:
   an agent cannot be gated by a rule positioned where only compliance
   reveals it.
+- **Second limb, found 2026-08-20 when the fix landed: a gate must also
+  RESOLVE where it fires.** Lifting the read gate into the kernel put it
+  upstream of every reader — including sessions at the framework root, which
+  has no specification skill and no read skill to load. There the instruction
+  is upstream and dead, and a session that went hunting for the named surface
+  read `templates/` instead: documents addressed to a domain being scaffolded.
+  Upstream is necessary and not sufficient; a gate naming a surface that does
+  not exist in the position it fires from produces wrong reading, not no
+  reading ([[a-scaffold-cannot-birth-its-own-author]]).
 - The general authoring rule: **a gate must live upstream of what it gates**
   — in a surface the agent has already consumed at the moment the gated act
   begins. For this instance that means one line in read.thing.md's

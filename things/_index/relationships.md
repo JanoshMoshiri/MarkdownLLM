@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-20
-generated: 2026-08-20T23:32:53
-generated_from: HEAD@35de802
-coverage: 247
+created: 2026-08-21
+generated: 2026-08-21T08:36:26
+generated_from: HEAD@d52e37f
+coverage: 248
 framework_version: 3.33.0
 ---
 
@@ -70,6 +70,7 @@ framework_version: 3.33.0
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --complements--> mis-keyed-links-pass-the-floor-silently
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --supports--> the-harness-bound-path-is-the-least-tested-path
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --extends--> emitted-content-is-read-instructed-content-is-economised
+- a-prerequisite-declared-only-inside-its-target-cannot-gate-it --references--> a-scaffold-cannot-birth-its-own-author
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --challenges--> read-thing-specification
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --extends--> a-true-primitive-is-discovered-not-authored
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
@@ -81,6 +82,10 @@ framework_version: 3.33.0
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --complements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --complements--> existence-is-not-currency
 - a-same-builder-check-is-blind-to-a-self-contradictory-builder --informs--> mechanical-coherence-checks-backlog
+- a-scaffold-cannot-birth-its-own-author --challenges--> reasoning-lenses-specification
+- a-scaffold-cannot-birth-its-own-author --extends--> a-prerequisite-declared-only-inside-its-target-cannot-gate-it
+- a-scaffold-cannot-birth-its-own-author --references--> session-start-hardening
+- a-scaffold-cannot-birth-its-own-author --references--> domain-specification-guide
 - a-session-harvest-must-read-the-commit-stream --informs--> session-memory-specification
 - a-session-harvest-must-read-the-commit-stream --complements--> long-running-tasks-lack-pre-compaction-checkpoint
 - a-session-harvest-must-read-the-commit-stream --complements--> a-shared-worktree-merges-authorship-at-the-index

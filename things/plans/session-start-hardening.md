@@ -110,6 +110,13 @@ semantics and remains historical.
   `pretooluse-action-boundary-gate`: emission first; reopen an action gate only
   if live evidence shows an irreversible pre-action failure that Git cannot
   recover.
+- [ ] **Tripwire (2026-08-20):** Phase 1's lifted read gate does not resolve
+  at the framework root — no specification or read skill exists there, so it
+  names an absent surface and a session hunting for it read `templates/`
+  instead (documents addressed to a domain being scaffolded). Fix is the
+  framework's own thin specification skill plus a stated read/write collapse
+  (`a-scaffold-cannot-birth-its-own-author`); a new inflection, sequenced
+  AFTER the acceptance runs so the baseline stays comparable.
 - [ ] Decide from evidence whether any per-domain skill emission is earned.
   Do not build it merely because the mechanism is imaginable.
 - [ ] Reconcile specs/docs/generated kernel, add the release changelog/version,
