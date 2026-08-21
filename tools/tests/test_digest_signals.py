@@ -140,3 +140,61 @@ def test_triggers_cli_prints_self_answering_section(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "### Self-answering armed triggers (heuristic)" in out
     assert "armed: armed for" in out
+
+
+def test_session_start_structural_work_is_bounded(tmp_path, capsys,
+                                                  monkeypatch):
+    """Structural anti-regression (floor-sprint-1 F9): one session-start must
+    cost exactly ONE corpus scan, at most ONE things/-history walk, and a
+    bounded constant number of git spawns — never one-or-more per thing.
+    Four consumers each rescanning the corpus and five separate history
+    walks put the hook at 67.1s against a 60s budget (2026-08-19/21); the
+    sharing parameters existed but nothing passed them. If a future consumer
+    reverts to its own scan or per-candidate git call, this fails."""
+    import markdownllm.session as session_mod
+    import markdownllm.model as model_mod
+
+    root = _repo(tmp_path)
+    for i in range(20):
+        _thing(root, f"t{i:02}.md",
+               f"id: t{i:02}\ntype: task\nstatus: in-progress\n"
+               f"created: 2026-06-01\npriority: high\n",
+               _days_ago(30 - i))
+
+    scans = []
+    real_scan = model_mod.scan
+
+    def counting_scan(*a, **kw):
+        scans.append(a)
+        return real_scan(*a, **kw)
+
+    spawns = []
+    real_run = subprocess.run
+
+    def counting_run(cmd, *a, **kw):
+        if cmd and cmd[0] == "git":
+            spawns.append(tuple(cmd[:3]))
+        return real_run(cmd, *a, **kw)
+
+    # scan is bound per-module at import time; count through every consumer
+    # namespace on the session-start path, so a regression in any one of
+    # them (session, triggers) is seen.
+    import markdownllm.triggers as triggers_mod
+    monkeypatch.setattr(model_mod, "scan", counting_scan)
+    monkeypatch.setattr(session_mod, "scan", counting_scan)
+    monkeypatch.setattr(triggers_mod, "scan", counting_scan)
+    monkeypatch.setattr(session_mod.subprocess, "run", counting_run)
+    monkeypatch.setattr(triggers_mod.subprocess, "run", counting_run)
+
+    rc = mdllm.cmd_session_start(_ns(path=str(root)))
+    capsys.readouterr()
+    assert rc == 0
+
+    assert len(scans) == 1, f"session-start scanned the corpus {len(scans)}x"
+    history_walks = [c for c in spawns if c[:2] == ("git", "log")]
+    assert len(history_walks) <= 3, (
+        f"{len(history_walks)} git-log walks: {history_walks}")
+    # 20 high-priority things must NOT mean 20+ spawns. The bound is a
+    # deliberate constant far below the corpus size and above the exact
+    # count, so incidental fixed calls do not make this brittle.
+    assert len(spawns) <= 12, f"{len(spawns)} git spawns: {spawns}"
