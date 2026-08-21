@@ -1,8 +1,8 @@
 ---
 id: substrate-review-consolidated-remedy-2026-08-20
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-08-20
 tags: [substrate, remedy, deterministic-floor, performance, coherence]
 priority: high
@@ -108,6 +108,57 @@ These are constraints on every phase, not questions to reopen:
   transaction architecture is an input to this work, not unfinished work to
   reopen.
 
+## Operator Rulings — 2026-08-21
+
+Recorded per this plan's own rule that sequence deviations and gate decisions
+are written down, never inferred.
+
+**Superseding execution order (operator-decided).** The phase machinery below
+remains the work inventory and the gate definitions, but execution follows the
+operator's sequence, chosen so the deterministic floor is settled before the
+reflective and non-deterministic work begins:
+
+1. **Floor block** — all structural/code-side work in one arc: Phase 0
+   residue (measurement record + anti-regression structural tests), Phase 1
+   residue (perimeter prose corrections; eval-isolation machinery as agent
+   pre-work, the rerun stays operator-gated), Phase 3C (pre-commit
+   coordinator), Phase 4 (structural residue + coherence mechanism build).
+2. **Phase 2** — the retrospective, deliberately after the floor settles so
+   its drift walk reckons with the finished inflections once. The 2026-08-27
+   chase trigger is accepted as a chase, not a gate.
+3. **Session-start-hardening Phase 5** — the operator's three probe tests.
+4. **`operating-layer-quality-loop`** — the AGENTS/skills management gap,
+   unparked once the above closes.
+5. **Phases 5–6** — evals, receipts, release, per their existing gates.
+
+The retrospective-before-Phase-3 rationale ("stale mechanisms are not
+optimised before they are judged") was weighed: the floor block removes and
+consolidates rather than admits mechanisms, and no pre-commit check is a
+plausible retirement candidate, so the reordering risk is confined to 3C —
+mitigated by 3C's existing constraint that the coordinator is a thin
+composition adding no semantic rule, so a later retirement is a one-line
+removal.
+
+**Gate D2 — declined for now, with the evidence the decline requires.**
+Automatic startup sync keeps its current estate scope. The cost that motivated
+the recommendation was measured and removed instead: the serial 14-repo walk
+(~21s) became a concurrent one (~4.8s) on 2026-08-21, and a typical domain
+estate (4–5 repos) sits well under that. Scope-follows-read-set remains a live
+design question to re-decide deliberately after the floor block closes; this
+ruling is a dated deferral with its reason, not inertia.
+
+**Sequence deviation already executed (operator-ordered, 2026-08-21).** The
+operator directed immediate fixes ahead of the Phase 0 baseline: the Phase 1
+totality work landed complete (`substrate-totality-residue` → completed, seven
+regression tests, end-to-end unreachable-route proof), and the highest-leverage
+Phase 3A/3D work landed with before/after measurements in the commit record
+(session-start 13.5s → ~2.1s at the framework root, estate-sync 21s → ~4.8s,
+domain validate ~0.7s; commits `3017f64`, `2ede668`). The Phase 0 residue —
+a committed measurement record and the structural tests that fail on N+1
+regression — is owed at the top of the floor block so these gains cannot
+silently regress; no optimisation beyond it is credited without both
+comparisons.
+
 ## Finding-to-Owner Ledger
 
 | Concern | Canonical owner | Evidence that closes it |
@@ -131,8 +182,11 @@ is cohesive enough to stand alone.
 
 Purpose: make improvement falsifiable before changing the implementation.
 
-- [ ] Move this plan to `in-progress` and pin the implementation baseline to a
-      full commit SHA.
+- [x] Move this plan to `in-progress` and pin the implementation baseline to a
+      full commit SHA. *(2026-08-21: in-progress; baseline for the remaining
+      floor block is `2ede668` — the commit carrying the already-executed
+      totality and session-path work, so later comparisons measure what
+      remains rather than re-crediting it.)*
 - [ ] Record the reference environment and separate local computation from
       remote/network wait.
 - [ ] Measure at least three cold and three warm runs of the representative
@@ -165,16 +219,21 @@ structural and temporal comparison.
 
 Purpose: correctness precedes speed and new evidence precedes new claims.
 
-- [ ] Execute `substrate-totality-residue` in small, meaning-boundary commits:
+- [x] Execute `substrate-totality-residue` in small, meaning-boundary commits:
       fix the three high findings first, then resolve or explicitly rule out the
-      same-class siblings.
-- [ ] Give unreachable/no-address-book/incomplete import evaluation and failed
+      same-class siblings. *(2026-08-21: complete — landed as one commit
+      (`2ede668`) alongside the operator-ordered performance work rather than
+      several, a recorded deviation from the commit-granularity intent; the
+      substance, siblings and regression family are all in.)*
+- [x] Give unreachable/no-address-book/incomplete import evaluation and failed
       pin-body reads explicit typed outcomes; never render them as not-fired or
-      fresh.
-- [ ] Match provenance inputs by parsed thing identity and pinned commit, never
-      by path suffix.
-- [ ] Preserve retrospective-computation failures, distinguish “no remote” from
+      fresh. *(2026-08-21.)*
+- [x] Match provenance inputs by parsed thing identity and pinned commit, never
+      by path suffix. *(2026-08-21: exact-basename match; the broken-chain
+      Error is no longer suppressible by a similarly-named neighbour.)*
+- [x] Preserve retrospective-computation failures, distinguish “no remote” from
       “sync command could not run,” and centralise the quarantine predicate.
+      *(2026-08-21: `model.origin_is_external` is the one spelling.)*
 - [ ] Close the eval-isolation hole before any longitudinal rerun. Construct the
       agent workspace outside the canonical repository, remove any explicit
       canonical write channel, and prove the canonical seed and source tree are
