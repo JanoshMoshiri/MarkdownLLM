@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-21
-generated: 2026-08-21T08:36:26
-generated_from: HEAD@d52e37f
-coverage: 248
+generated: 2026-08-21T21:34:45
+generated_from: HEAD@1209f64
+coverage: 249
 framework_version: 3.33.0
 ---
 
@@ -854,6 +854,8 @@ framework_version: 3.33.0
 - substrate-currency-sweep --implements--> inflection-candidates-are-computable
 - substrate-currency-sweep --references--> tracking-artifacts-can-drift-from-reality
 - substrate-currency-sweep --references--> estate-cadence-cluster
+- substrate-floor-development --implements--> workflow-state-specification
+- substrate-floor-development --references--> substrate-review-consolidated-remedy-2026-08-20
 - substrate-reconciliation-2026-08-09 --informs--> orchestration-specification
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
