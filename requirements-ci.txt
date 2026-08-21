@@ -1,5 +1,7 @@
-# Exact versions exercised by the 2026-08-20 Windows remediation run.
+# Exact versions exercised by the 2026-08-20 Windows remediation run
+# (xdist added 2026-08-21, floor-sprint-1 F10).
 # PyPI + TLS remain the package trust root; these pins prevent an unrelated
 # future release from changing CI between framework commits.
 PyYAML==6.0.3
 pytest==9.1.1
+pytest-xdist==3.8.0
