@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-21
 definition: substrate-floor-development
-current_stage: requirements
+current_stage: analysis
 held_by: claude-code
 linked_things:
   - id: substrate-review-consolidated-remedy-2026-08-20
@@ -17,17 +17,16 @@ linked_things:
 
 ## Where This Is
 
-Born at `requirements` — the `problems` stage was satisfied before this run
-existed: two independent substrate reviews (Claude and Codex, 2026-08-20),
-their consolidated remedy ledger, and the 2026-08-21 measured bottleneck
-evidence (session-start 67.8s→2.1s, pre-commit ~8.7min→~20s, full test suite
-37min serial) together form the problem inventory with evidence. The operator
-handed execution authority to the agent on 2026-08-21: stages advance on the
-agent's judgement, with human gates only at seal and irreversible acts.
+At `analysis`. The requirements stage exited with
+`floor-block-requirements-2026-08` committed: thirteen functional
+requirements (F1–F13, owners preserved) and the N1–N8 budget table bound to
+the measured reference machine. The run was born at `requirements` because
+the problems inventory pre-existed it (the two 2026-08-20 reviews, the
+consolidated remedy, the 2026-08-21 measurements). Execution authority is
+with the agent per the operator's 2026-08-21 handover; human gates only at
+seal and irreversible acts.
 
 ## Next
 
-Write the floor-block requirements thing (functional set from the remedy
-ledger + non-functional budgets with numbers from the measured baseline),
-then advance to `analysis` and record the sprint-1 scope cut as a pinned
-decision.
+Record the sprint-1 scope cut as a `type: decision` with inputs pinned, then
+advance to `design`.
