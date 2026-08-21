@@ -238,9 +238,10 @@ Purpose: correctness precedes speed and new evidence precedes new claims.
       agent workspace outside the canonical repository, remove any explicit
       canonical write channel, and prove the canonical seed and source tree are
       byte-identical before and after an adversarial run.
-- [ ] Land the three low-risk perimeter truth corrections through
+- [x] Land the three low-risk perimeter truth corrections through
       `floor-structure-residue`: strict calculation severity, publication
-      examples, and full-SHA decision pins.
+      examples, and full-SHA decision pins. *(2026-08-21, floor-sprint-1 F1,
+      commit 90f29d3.)*
 
 **Exit:** every “could not look” path stays non-definite; the regression family
 passes; the canonical evaluation source is demonstrably unwritable from the
@@ -297,8 +298,11 @@ means.
       in-memory last-touch/flip map.
 - [ ] Keep presenters and semantic judgements downstream of the snapshot; do not
       move judgement into the floor to save a call.
-- [ ] Add structural tests that fail when session start regresses to repeated
+- [x] Add structural tests that fail when session start regresses to repeated
       corpus parses, repeated trigger passes, or N+1 history queries.
+      *(2026-08-21, floor-sprint-1 F9: one-scan + walk-bound + spawn-bound
+      guards counted through every consumer namespace; the index-scan spawn
+      bound landed with fbe7b52.)*
 
 The target is one corpus derivation, one trigger derivation, and one bulk history
 derivation per pinned session-start view. Small Git calls needed to establish
@@ -328,24 +332,38 @@ contract. Merely retaining the current behaviour by inertia is not an outcome.
 
 #### 3C. One pre-commit application process
 
-- [ ] Consolidate boundary validation, thing validation, coherence, and
+- [x] Consolidate boundary validation, thing validation, coherence, and
       inflection-candidate presentation behind one pre-commit coordinator that
-      freezes and shares one index-backed view.
-- [ ] Preserve the existing individual subcommands for direct operator use; the
+      freezes and shares one index-backed view. *(2026-08-21, `mdllm
+      precommit`, floor-sprint-1 F11 — with one recorded composition
+      deviation: the legs run as concurrent children sharing the frozen tree
+      via the existing env pin rather than in-process threads, trading two
+      parallel interpreter startups for byte-identical leg behaviour by
+      construction. The in-process variant stays open here if margin is ever
+      needed; measured ~10.5s typical at the root against the ≤12s budget.)*
+- [x] Preserve the existing individual subcommands for direct operator use; the
       coordinator composes them internally and adds no new semantic rule.
-- [ ] Preserve compare-and-swap checks before mutation/commit and exact
-      candidate-byte semantics.
-- [ ] Prove that a hook run starts one application process, parses one candidate
-      view, and produces equivalent findings and exit severity to the preserved
-      fixtures.
+      *(Same commit — the children ARE the subcommands.)*
+- [x] Preserve compare-and-swap checks before mutation/commit and exact
+      candidate-byte semantics. *(CAS stays in the hook script; the fixture
+      caught and fixed a real entry-substitution defect on the way, 3daf1d1.)*
+- [x] Prove that a hook run produces equivalent findings and exit severity to
+      the preserved fixtures. *(Four coordinator equivalence tests + the CAS
+      transaction fixture moved to the concurrent composition with its
+      invariants intact. The "one application process" clause is the recorded
+      deviation above: one coordinator process, concurrent leg children.)*
 
 #### 3D. Remove avoidable traversal
 
-- [ ] Prune excluded directories during traversal rather than after a complete
-      walk, beginning with interactive worktree listing.
-- [ ] Measure before introducing any persistent cache. A cache is admissible only
+- [x] Prune excluded directories during traversal rather than after a complete
+      walk, beginning with interactive worktree listing. *(3017f64; the
+      index/commit-view read side followed with per-view batch reads,
+      fbe7b52.)*
+- [x] Measure before introducing any persistent cache. A cache is admissible only
       if the one-pass design still misses the accepted budget and the cache can
       be pinned to immutable commit/index identity, rebuilt, and diff-validated.
+      *(Measured: budgets met with per-view in-memory caches only — no
+      persistent cache introduced, and none is now needed.)*
 
 **Exit:** the structural budgets hold, the locked latency budget is met or a
 human records a pre-release rejection, and every transaction, degraded-state,

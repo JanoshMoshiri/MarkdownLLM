@@ -113,6 +113,9 @@ instrument this class is currently protected by.
 
 - [ ] The fitness gate covers by default and excepts by declaration.
 - [ ] Items 2–5 are landed or explicitly ruled not-worth-it, in writing.
-- [ ] The three perimeter restatements are corrected at their source surfaces.
+- [x] The three perimeter restatements are corrected at their source surfaces.
+      *(2026-08-21, floor-sprint-1 F1, commit 90f29d3: calculation-reference
+      strict severity, the installed end-session command's publication
+      doctrine, the decision template + worked example full-SHA pins.)*
 - [ ] Any check this work argues for is routed to the coherence backlog rather
       than built here.

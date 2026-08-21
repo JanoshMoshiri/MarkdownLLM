@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-21
 definition: substrate-floor-development
-current_stage: reconcile
+current_stage: seal
 held_by: claude-code
 linked_things:
   - id: substrate-review-consolidated-remedy-2026-08-20
@@ -63,9 +63,32 @@ misses: both meet budget in the steady state the budget describes, and the
 requirements thing should gain a defined measurement protocol (steady-state
 vs post-suite) in its next revision rather than the budgets moving.
 
+## Reconcile record (2026-08-21)
+
+Walked and committed (f9be3fb): CLI help header (+precommit row),
+operator-guide install-hook row (+ re-run guidance for existing repos),
+orchestration.md v1.20 hard-hook sentence (kernel block) with kernel
+regenerated, framework-map command census. No enforcement semantics moved —
+only descriptions of how the one candidate is evaluated.
+
+## Seal record (2026-08-21)
+
+Ledgers set to truth: the remedy's Phase 1 perimeter box, Phase 3A
+structural-test box, and 3C/3D boxes ticked with dated annotations (3C
+carries the composition deviation in the ledger itself);
+floor-structure-residue's perimeter done-when ticked; the sprint design plan
+completed. Sprint-2 inventory left honestly open: F3, F4 (deferred here with
+layering evidence), F5, F6-full, F7 at floor-structure-residue; F8 at
+coherence-mechanism-build; N1's worktree-walk residual and the requirements
+thing's measurement-protocol definition.
+
+**Human gate — publication.** The framework root declares `autopush: false`;
+everything this sprint produced is local truth awaiting the operator's
+deliberate push. The changelog entry and version bump belong to that release
+act (v3-33-release-and-external-acceptance owns the walk) and were left
+unpreempted.
+
 ## Next
 
-Reconcile: the `precommit` composition touches the CLI help header, the
-operator guide's install-hook row, orchestration.md's hard-hook sentence
-(kernel block — carries a kernel regen), and the framework map's command
-census. Then seal.
+Nothing — the run is complete. Sprint 2 (structure: F3/F4/F5/F6/F7) starts
+as a new run of `substrate-floor-development` when execution resumes.
