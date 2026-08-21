@@ -6,7 +6,8 @@ created: 2026-06-05
 tags: [home, renovation]
 informed_by:
   - id: task-get-contractor-quotes
-    commit: bdb9571
+    # Always the full 40-hex id — never abbreviated (full-SHA pin rule)
+    commit: bdb95714c3a7e2f08d61b95a2f4ee90c1d2a4f6b
 linked_things:
   - id: project-kitchen-renovation
     relation: references

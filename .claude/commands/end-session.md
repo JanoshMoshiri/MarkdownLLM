@@ -19,12 +19,16 @@ when *you* judge the session worth it, never automatically. Follow
 5. Commit with a rich `session-end:` message — the commit *is* the backward record
    (no WORKLOG file; `mdllm worklog` prints an on-demand view of git when wanted).
 6. **Report publication debt:** run `python tools/mdllm.py estate-sync . --status`
-   and surface the result. Under autopush (the default) every `ahead +n
-   (unpushed)` line is an anomaly — an offline session, a rejected push owed a
-   routing decision, or an opted-out repo holding work for its deliberate
-   release. Route each line; never resolve a rejection by force, and never push
-   an opted-out repo yourself (git-workflow.md → The Outbound Rules;
-   `autopush-moves-the-deliberate-act`).
+   and surface the result. Autopush is **fail-closed**: only a repo declaring
+   literal `git: autopush: true` publishes after commit — false, absent, or
+   malformed policy is off, and publication authority never comes from
+   silence. In an opted-out repo, `ahead +n (unpushed)` is the normal
+   standing state of work awaiting its deliberate release — report it, never
+   resolve it. Only under *explicitly enabled* autopush is an unpushed line
+   an anomaly (offline session, or a rejected push owed a routing decision).
+   Never resolve a rejection by force, and never push an opted-out repo
+   yourself (git-workflow.md → Publication;
+   `autopush-requires-explicit-authority`).
 
 If the session has no domain-relevant changes worth harvesting, say so and stop —
 not every session earns an insight (publication debt still gets reported: step 6

@@ -8,7 +8,7 @@ decided_by: human|agent|both
 confidence: high|medium|low
 informed_by:
   - id: [knowledge-thing-id]
-    commit: [short-sha of the commit whose version was actually used]
+    commit: [full 40-hex sha of the commit whose version was actually used — never abbreviated; an all-digit short sha parses as YAML int and a suffix-matched abbreviation can pin the wrong object]
 linked_things:
   - id: [produced-output-or-affected-thing]
     relation: informs

@@ -84,7 +84,10 @@ with its asserted value or cannot be evaluated, so it can gate a script.
 **Warning**, or an **Error** under `options: {computed: strict}` in
 `_schema.yaml`. Warning is the default because a filed return whose box is
 arithmetically odd but is *what was actually filed* must stay recordable.
-A derivation that cannot be evaluated is always a Warning and never silent.
+A derivation that cannot be evaluated is a Warning by default and an
+**Error** under `options: {computed: strict}` — never silent. (Strict mode
+treats non-evaluability as a broken check the operator believes is running,
+so it blocks at the commit boundary like any other Error.)
 
 ## The grammar
 
