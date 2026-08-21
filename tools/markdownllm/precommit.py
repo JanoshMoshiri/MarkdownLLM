@@ -57,10 +57,23 @@ def _git_write_tree(root: Path) -> str | None:
     return tree if out.returncode == 0 and tree else None
 
 
+def _floor_entry() -> Path:
+    """The entry the children must run: the one THIS process was launched
+    from. In a nested estate the hook's ``$MDLLM`` may name a different
+    framework checkout than the one this module was imported from — the
+    coordinator must not silently substitute its own. Falls back to this
+    checkout's entry when argv[0] is not a real file (embedded callers)."""
+    candidate = Path(sys.argv[0]).resolve() if sys.argv and sys.argv[0] else None
+    if (candidate is not None and candidate.name == "mdllm.py"
+            and candidate.is_file()):
+        return candidate
+    return MDLLM_ENTRY
+
+
 def _run_leg(name: str, suffix: tuple[str, ...], root: Path,
-             env: dict) -> tuple[str, int, str]:
+             env: dict, entry: Path) -> tuple[str, int, str]:
     proc = subprocess.run(
-        [sys.executable, str(MDLLM_ENTRY), name, str(root), *suffix],
+        [sys.executable, str(entry), name, str(root), *suffix],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         env=env, cwd=root)
     text = (proc.stdout or "")
@@ -83,9 +96,10 @@ def cmd_precommit(args) -> int:
         env[FROZEN_INDEX_TREE_ENV] = tree
         env[FROZEN_INDEX_ROOT_ENV] = str(root)
 
+    entry = _floor_entry()
     with ThreadPoolExecutor(max_workers=len(_LEGS)) as pool:
         results = list(pool.map(
-            lambda leg: _run_leg(leg[0], leg[1], root, env), _LEGS))
+            lambda leg: _run_leg(leg[0], leg[1], root, env, entry), _LEGS))
 
     by_name = {name: (code, text) for name, code, text in results}
     blocked = False

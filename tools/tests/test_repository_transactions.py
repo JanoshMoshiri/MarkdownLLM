@@ -272,6 +272,13 @@ def test_real_hook_blocks_index_mutation_between_subchecks(
         "from markdownllm.repository_view import RepositoryView\n"
         "command = sys.argv[1]\n"
         "root = pathlib.Path(sys.argv[2]).resolve()\n"
+        "if command == 'precommit':\n"
+        "    # The hook now invokes the real coordinator, which re-spawns\n"
+        "    # THIS entry (argv[0]) for each leg — so the instrumentation\n"
+        "    # below still observes every leg, now concurrently.\n"
+        "    from types import SimpleNamespace\n"
+        "    from markdownllm.precommit import cmd_precommit\n"
+        "    raise SystemExit(cmd_precommit(SimpleNamespace(path=str(root))))\n"
         "view = RepositoryView.index(root)\n"
         "value = view.read_text('candidate.txt').strip()\n"
         f"log = pathlib.Path({str(log)!r})\n"
@@ -304,8 +311,12 @@ def test_real_hook_blocks_index_mutation_between_subchecks(
         result.stdout + result.stderr)
     rows = [line.split("|", 2) for line in log.read_text(
         encoding="utf-8").splitlines()]
-    assert [row[0] for row in rows] == [
-        "boundary", "validate", "coherence", "candidates"]
+    # The legs run CONCURRENTLY since the precommit coordinator (floor-
+    # sprint-1 F11), so execution order is nondeterministic; the invariant
+    # is that all four legs ran and every one observed the SAME frozen
+    # candidate despite the mid-floor mutation.
+    assert sorted(row[0] for row in rows) == [
+        "boundary", "candidates", "coherence", "validate"]
     assert len({row[1] for row in rows}) == 1
     assert {row[2] for row in rows} == {"one frozen candidate"}
     assert _git(repo, "show", f":{candidate.name}").stdout == "mutated mid-floor\n"
