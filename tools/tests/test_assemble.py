@@ -302,7 +302,20 @@ def test_owner_repo_parses_the_common_remote_forms():
     assert owner_repo("file:///x/y.git") is None
 
 
-def test_estate_config_is_derived_not_authored(tmp_path):
+def test_estate_config_is_derived_not_authored(tmp_path, monkeypatch):
+    # Hermetic against the host's git config: a sandbox/proxy environment
+    # with a global `url.<mirror>.insteadOf = https://github.com/` rewrite
+    # makes `git remote get-url` return the REWRITTEN url, so the GitHub
+    # remote this test just authored stops parsing and FRAMEWORK_REPO is
+    # never derived — a false failure first hit in a proxied Linux harness
+    # (2026-08-22), where it read as a floor-sprint-1 regression despite the
+    # sprint touching none of this path. The production behaviour is honest
+    # either way (the miss lands in notes); only this test's assumption that
+    # the url survives get-url verbatim needs pinning.
+    neutral = tmp_path / "git-config-empty"
+    neutral.write_text("", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(neutral))
+    monkeypatch.setenv("GIT_CONFIG_SYSTEM", str(neutral))
     root = tmp_path / "estate"
     (root / "domain").mkdir(parents=True)
     subprocess.run(["git", "init", "-q", str(root)], check=True)
