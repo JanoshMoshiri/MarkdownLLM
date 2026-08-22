@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-21
-generated: 2026-08-21T21:42:44
-generated_from: HEAD@4daf3d5
-coverage: 41
+created: 2026-08-22
+generated: 2026-08-22T08:40:25
+generated_from: HEAD@508d6c7
+coverage: 43
 framework_version: 3.33.0
 ---
 
@@ -82,9 +82,14 @@ framework_version: 3.33.0
 ## floor-block-requirements-2026-08
 - floor-sprint-1-design-2026-08 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
 - floor-sprint-1-scope-2026-08-21 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
+- floor-sprint-2-scope-2026-08-22 (pinned @f6dccaf9ed4c3309fd871ce622715a6528fe7d12)
 
 ## floor-sprint-1-scope-2026-08-21
 - floor-sprint-1-design-2026-08 (pinned @10443b5aed763503161acc96833484c6786e6c7b)
+- floor-sprint-2-scope-2026-08-22 (pinned @967773cb50f2dc9b9f661f8309c7aaacded8f4f1)
+
+## floor-structure-residue
+- floor-sprint-2-scope-2026-08-22 (pinned @e98cdd9a8cdcb3f40cc5eed936f7b3c9a485d656)
 
 ## framework-retrospective-2026-06
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
@@ -130,6 +135,9 @@ framework_version: 3.33.0
 ## posix-floor-record-2026-08-13
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - posix-live-dispatch-record-2026-08-14 (derived-from)
+
+## run-floor-sprint-1-2026-08
+- floor-sprint-2-scope-2026-08-22 (pinned @967773cb50f2dc9b9f661f8309c7aaacded8f4f1)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

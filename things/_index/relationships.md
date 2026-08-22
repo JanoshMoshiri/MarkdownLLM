@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-22
-generated: 2026-08-22T08:35:58
-generated_from: HEAD@a1d3eb8
-coverage: 255
+generated: 2026-08-22T08:40:01
+generated_from: HEAD@508d6c7
+coverage: 256
 framework_version: 3.33.0
 ---
 
@@ -467,6 +467,7 @@ framework_version: 3.33.0
 - floor-block-requirements-2026-08 --references--> a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen
 - floor-sprint-1-design-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-sprint-1-scope-2026-08-21 --informs--> run-floor-sprint-1-2026-08
+- floor-sprint-2-scope-2026-08-22 --informs--> run-floor-sprint-2-2026-08
 - floor-structure-residue --derived-from--> independent-substrate-review-2026-08-20-claude
 - floor-structure-residue --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - floor-structure-residue --references--> srp-extraction-is-tier-promotion
