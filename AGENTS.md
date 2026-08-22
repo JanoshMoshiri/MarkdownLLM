@@ -57,16 +57,16 @@ Every thing — regardless of domain or type — shares this YAML frontmatter st
 ```yaml
 ---
 id: unique-kebab-case-identifier
-type: specification|skill|guide|manifesto|[domain-specific-type]
-status: draft|evolving|stable|deprecated|[domain-declared vocabulary]   # reserved types use the fixed sets; domain types use the domain's _schema.yaml declaration (default not-started/in-progress/... where undeclared) — never coerce a domain thing into lifecycle statuses
+type: <reserved, or declared by the domain's _schema.yaml>
+status: <the type's vocabulary — reserved sets are the tool's; domain types declare their own>
 version: 1.0
 created: YYYY-MM-DD
 tags: [tag1, tag2]
-priority: low|medium|high|critical  # optional — thing.md owns this enum; this line once said high|medium|low while the kernel said four values, and a session held both
+priority: <optional>
 dependencies: [other-thing-id]     # optional; hard prerequisites — things that must FINISH first (floor-enforced: a terminal thing may not depend on unfinished work); for soft association use linked_things
 linked_things:
   - id: related-thing-id
-    relation: informs|implements|extends|complements|references|documents|subtask|related|[thing.md's decomposition + reserved sets]   # not a closed enum: thing.md owns the vocabulary — incl. instance-of/derived-from/template-for/applies-to and the reserved supersedes/superseded-by/contradicts (floor-enforced semantics); the domain schema may extend
+    relation: <the domain's declared vocabulary, plus the reserved relations the floor enforces>
 # Plus any domain-specific fields — schema grows with domain needs
 ---
 
@@ -75,6 +75,16 @@ linked_things:
 Narrative body: context, rationale, current state, next steps, blockers.
 This is where the reasoning lives — not just the data.
 ```
+
+**The enums are deliberately not written above.** `kernel.md` carries every
+one of them at Tier 0, on the always-loaded path, and `thing.md` owns them
+in full. This file used to restate them, and the restatement did not merely
+go stale — it *instructed*: the relation line still advertised `related`
+nine weeks after the 2026-06-12 schema prune removed it, a session read the
+line, used the relation, and took two validate Warnings for it. The
+priority line had carried three values against the kernel's four, and a
+session held both readings at once. A pointer cannot drift; an enum copied
+into a second file always eventually does.
 
 **Emergent schema:** Core fields are fixed. Everything else is added as the domain's complexity requires it. Never over-define upfront.
 
@@ -246,6 +256,11 @@ and deriving it here is on `mechanical-coherence-checks-backlog`.)*
 7. **Reflexive Behaviour via Derived Indexes** — The agent reasons not only *within* a domain but *about* it: domain velocity (git as telemetry), systematic trigger evaluation, conflict scanning, and schema-coherence review. At scale these run against regenerable derived indexes (`derived-index.md`) rather than re-scanning every thing — keeping reflexive work cheap, and drift-detectable through validation.
 
 ## Status Values For Framework Specs
+
+*The set itself is not declared here* — `RESERVED_STATUSES` in the tool owns
+it and `kernel.md` carries it. What follows is the editorial gloss: what
+each status means when it is a **framework spec** wearing it, which is
+judgement no authority mechanises.
 
 - `draft` — First version, created but not yet validated through real-world use
 - `evolving` — Actively being refined based on use and feedback
