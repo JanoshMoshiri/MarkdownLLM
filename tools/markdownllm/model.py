@@ -313,11 +313,29 @@ def _in_view(prefix: PurePosixPath, relative: PurePosixPath) -> PurePosixPath:
     return relative if prefix == PurePosixPath(".") else prefix / relative
 
 
+# The corpus schema is looked for at the root first, then under things/. Both
+# the loader and anything that must NAME the authority read this one tuple, so
+# a generated block cannot cite a path the loader did not use — the framework
+# root keeps its schema at the root, every domain keeps it under things/, and
+# a hardcoded citation was wrong for one of them.
+SCHEMA_CANDIDATES = (PurePosixPath("_schema.yaml"),
+                     PurePosixPath("things/_schema.yaml"))
+
+
+def schema_source(root: Path, view: RepositoryView | None = None) -> str | None:
+    """Relative posix path of the schema `load_schema` would read, or None."""
+    selected = view or RepositoryView.worktree(root)
+    prefix = _view_prefix(root, selected)
+    for candidate in SCHEMA_CANDIDATES:
+        if selected.exists(_in_view(prefix, candidate)):
+            return candidate.as_posix()
+    return None
+
+
 def load_schema(root: Path, view: RepositoryView | None = None) -> dict | None:
     selected = view or RepositoryView.worktree(root)
     prefix = _view_prefix(root, selected)
-    for candidate in (PurePosixPath("_schema.yaml"),
-                      PurePosixPath("things/_schema.yaml")):
+    for candidate in SCHEMA_CANDIDATES:
         logical = _in_view(prefix, candidate)
         if selected.exists(logical):
             return load_yaml_mapping(

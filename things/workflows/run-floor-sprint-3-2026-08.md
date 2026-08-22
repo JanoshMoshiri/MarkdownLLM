@@ -104,7 +104,31 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   bullets and loses only its implicit claim to own the set. Delete is for
   restatements; a gloss is not one.
 
+- **C3 / F8a derive leg landed** — the root's `## Thing Types In This
+  Domain` is now a `generated:types` managed block, and the framework root
+  becomes the last entry file in the estate to carry one. Three proofs
+  rather than three assertions:
+  1. **Zero estate drift, measured, not argued.** The `_dk_types` output
+     was computed for all 13 estate domains before and after the change and
+     compared byte-for-byte: 0 changed. That is the design's central claim,
+     and it was the reason reserved-type descriptions were rejected — they
+     would have drifted every domain's block at once and blocked commits on
+     a coherence Error, where sprint 2's F5 drift was merely advisory.
+  2. **The root drift check fires.** Tampering one generated line and
+     running `mdllm coherence .` produced the expected Error at
+     `AGENTS.md`; restoring cleared it. The generic check needed no
+     framework-root special case — it was already general.
+  3. **The block cites the schema it actually read.** `schema_source` now
+     supplies the path from the same candidate tuple `load_schema` walks,
+     so the root's block says `_schema.yaml` and a domain's says
+     `things/_schema.yaml`. The old hardcoded citation would have named an
+     authority the root had not read — precisely the defect class this
+     sprint exists to end, reproduced inside the fix for it.
+  204 focused tests green. Also observed and honoured: changing `AGENTS.md`
+  expired the session gate's contract fingerprint, exactly as designed —
+  re-attested rather than committed through.
+
 ## Next
 
-C3 through C7 in order, recording deviations in this body as they happen.
+C4 through C7 in order, recording deviations in this body as they happen.
 C8–C9 (probes) are stretch, gated on C1–C7 verifying.

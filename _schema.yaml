@@ -19,11 +19,17 @@ options:
   # outside a domain session. The regulated domains declare strict.
   session_gate: warn
 
+# `description:` is optional and, where present, is rendered into the entry
+# file's generated types block — the schema documenting its own vocabulary
+# rather than AGENTS.md restating it. Added 2026-08-23 (F8a): the authored
+# list this replaces had `artifact` missing while seven committed things
+# carried it.
 types:
   plan:
+    description: A phased, multi-session work plan for evolving the framework; phase checkboxes updated as work lands
     statuses: [not-started, in-progress, blocked, paused, completed, cancelled]
-  artifact: # committed record artifacts with a lifecycle — today the reviews/ records
-            # (the original examples, WORKLOG/REVIEWLOG, retired at v3.17)
+  artifact: # (the original examples, WORKLOG/REVIEWLOG, retired at v3.17)
+    description: A committed record artifact with its own lifecycle — today the independent review records in `reviews/`
     statuses: [evolving, stable, deprecated]
 
 # Declared relation vocabulary (validated at Warning severity).

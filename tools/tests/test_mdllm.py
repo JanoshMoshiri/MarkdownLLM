@@ -1199,6 +1199,53 @@ def test_domain_kernel_check_detects_drift(tmp_path):
     assert "session-start" in drifted
 
 
+def test_domain_kernel_types_render_optional_descriptions(tmp_path):
+    # `description:` is the schema documenting its own vocabulary, beside
+    # `statuses:` and `required_fields:`. Rendered where declared.
+    write(tmp_path, "things/_schema.yaml",
+          "types:\n  case:\n    description: One regulated matter, start to close\n"
+          "    statuses: [open, closed]\n")
+    block = mdllm.build_domain_kernel_blocks(tmp_path, {})["types"]
+    assert "- `case` — One regulated matter, start to close (statuses: open / closed)" in block
+
+
+def test_domain_kernel_types_are_byte_stable_without_descriptions(tmp_path):
+    # The estate guarantee behind F8a: no existing domain declares
+    # `description:`, so this rendering must be exactly what it was before the
+    # field existed. If this string changes, every domain's managed block
+    # drifts at once and their commits block on a coherence Error until each
+    # is regenerated — the reason reserved-type descriptions were rejected.
+    write(tmp_path, "things/_schema.yaml",
+          "types:\n  case:\n    statuses: [open, closed]\n    required_fields: [ref]\n")
+    block = mdllm.build_domain_kernel_blocks(tmp_path, {})["types"]
+    assert "- `case` — statuses: open / closed · required: ref" in block
+    assert block.startswith(
+        "**Declared domain types** (from `things/_schema.yaml` — the authority; "
+        "regenerate on schema change):")
+
+
+def test_domain_kernel_types_cite_the_schema_they_actually_read(tmp_path):
+    # A framework root keeps its schema at the root; a domain keeps it under
+    # things/. The block used to hardcode the domain path, so at the root it
+    # named an authority it had not read — the defect class F8a exists to end.
+    write(tmp_path, "_schema.yaml", "types:\n  plan:\n    statuses: [open]\n")
+    block = mdllm.build_domain_kernel_blocks(tmp_path, {})["types"]
+    assert "from `_schema.yaml`" in block
+    assert "things/_schema.yaml" not in block
+
+
+def test_domain_kernel_types_omit_reserved_descriptions(tmp_path):
+    # Reserved types are the tool's vocabulary; kernel.md names the set and
+    # routes each to its owning spec. The block lists them and says nothing
+    # more, deliberately.
+    write(tmp_path, "things/_schema.yaml",
+          "types:\n  case:\n    statuses: [open]\n")
+    block = mdllm.build_domain_kernel_blocks(tmp_path, {})["types"]
+    tail = block.split("Framework-reserved types")[1]
+    assert "`insight`" in tail and "`workflow-run`" in tail
+    assert "—" not in tail   # names only, no glosses
+
+
 def test_domain_kernel_tier_lists_skills(tmp_path):
     (tmp_path / "skills").mkdir()
     (tmp_path / "skills" / "t-workflow.skill.md").write_text("x", encoding="utf-8")

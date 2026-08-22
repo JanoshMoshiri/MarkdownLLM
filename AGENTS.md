@@ -220,27 +220,21 @@ Each example is its own corpus with its own `_schema.yaml`; `mdllm validate` run
 
 ## Thing Types In This Domain
 
-- `type: manifesto` — Philosophical vision and paradigm (one instance)
-- `type: specification` — Foundational definitions of how things work
-- `type: skill` — Reusable capabilities the agent can invoke
-- `type: guide` — Operational guidance for using the framework
-- `type: insight` — An emerging idea, held view, or hypothesis from a session, preserved for future context (framework-reserved)
-- `type: continuity-brief` — **Retired (v3.17), reserved-but-deprecated.** Was the domain's per-domain forward-looking session brief; superseded by the generated orient view (open-loop things). Kept reserved only so domains mid-transition still validate (framework-reserved)
-- `type: conflict` — A documented contradiction between two things, held as a first-class thing until resolved (framework-reserved)
-- `type: retrospective` — A periodic quality reflection on domain reasoning; one per period, not per session (framework-reserved)
-- `type: decision` — A judgement made from knowledge, inputs pinned to git commits via `informed_by`; the provenance chain's middle link (framework-reserved)
-- `type: index` — A regenerable cache aggregating one signal (triggers, relationships, schema) across a domain's things, in `things/_index/`; the things are the source of truth (framework-generated)
-- `type: workflow-definition` — A reusable process skeleton with stages as data and the transitions allowed between them (framework-reserved)
-- `type: workflow-run` — One live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative (framework-reserved)
-- `type: plan` — A phased, multi-session work plan for evolving the framework; uses workflow statuses; phase checkboxes updated as work lands (domain-specific to the framework domain)
-- `type: artifact` — A committed record artifact with its own lifecycle (the independent review records in `reviews/`); statuses evolving/stable/deprecated (domain-specific to the framework domain)
-- `type: prompt` — One focused reasoning task bound to a hook point; the eight reasoning prompts in `templates/prompts/` (framework-defined, domain-usable, fixed lifecycle vocabulary)
+The section below is **generated** — `mdllm domain-kernel .` writes it from
+`_schema.yaml` and the tool's reserved set, and `mdllm coherence` fails the
+commit if it drifts. It used to be authored, and it lagged its own sources
+repeatedly: a review-loop finding caught `artifact` missing here while seven
+committed things carried it. The reserved types no longer carry prose
+descriptions here at all — `kernel.md` names the reserved set and routes
+each type to the spec that owns it, which is where a description belongs.
 
-*(This list restates `_schema.yaml` + the tool's reserved set and has lagged
-them — a review-loop finding caught `artifact` missing here while seven
-committed things carried it. On any disagreement the schema and
-`RESERVED_STATUSES` win; scaffolded domains derive this list mechanically,
-and deriving it here is on `mechanical-coherence-checks-backlog`.)*
+<!-- generated:types -->
+**Declared domain types** (from `_schema.yaml` — the authority; regenerate on schema change):
+- `artifact` — A committed record artifact with its own lifecycle — today the independent review records in `reviews/` (statuses: evolving / stable / deprecated)
+- `plan` — A phased, multi-session work plan for evolving the framework; phase checkboxes updated as work lands (statuses: not-started / in-progress / blocked / paused / completed / cancelled)
+
+Framework-reserved types (built into the tool, no declaration needed): `conflict`, `continuity-brief`, `decision`, `guide`, `index`, `insight`, `manifesto`, `prompt`, `retrospective`, `skill`, `specification`, `workflow-definition`, `workflow-run`.
+<!-- /generated:types -->
 
 ## Key Innovations
 

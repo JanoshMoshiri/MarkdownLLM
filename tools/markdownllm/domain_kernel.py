@@ -17,7 +17,8 @@ import re
 import sys
 from pathlib import Path
 
-from .model import RESERVED_STATUSES, load_schema, parse_frontmatter
+from .model import (RESERVED_STATUSES, load_schema, parse_frontmatter,
+                    schema_source)
 from .repo import TIERS
 from .repository_view import RepositoryView
 
@@ -179,33 +180,57 @@ def _dk_tier_routing(domain: Path, meta: dict,
 
 def _dk_types(domain: Path, meta: dict,
               view: RepositoryView | None = None) -> str:
-    """Generated from `things/_schema.yaml` — the schema is the authority on
-    the type vocabulary, and the 2026-08-01 estate sweep found the authored
+    """Generated from the corpus schema — the schema is the authority on the
+    type vocabulary, and the 2026-08-01 estate sweep found the authored
     §Thing Types list lagging it in most active domains (the harness-loaded
     surface was the least-checked). Repeated drift promotes a fact into the
-    floor: the list is now derived, so it cannot disagree with the schema."""
+    floor: the list is now derived, so it cannot disagree with the schema.
+
+    Two things this block does NOT do, both deliberate. It never cites a
+    schema path it did not read (`schema_source` supplies the real one — the
+    framework root's schema is at the root, a domain's is under things/), and
+    it never renders descriptions for the *reserved* types: those are the
+    tool's own vocabulary, `kernel.md` already names the set and routes each
+    to its owning spec, and rendering them here would have drifted every
+    estate domain's managed block at once."""
     try:
         schema = load_schema(domain, view)
     except Exception:
         schema = None
+    try:
+        source = schema_source(domain, view)
+    except Exception:
+        source = None
+    source = source or "things/_schema.yaml"
     types = (schema or {}).get("types") or {}
     reserved = ", ".join(f"`{t}`" for t in sorted(RESERVED_STATUSES))
     if not types:
-        return ("No domain types declared yet — `things/_schema.yaml` is the "
+        return (f"No domain types declared yet — `{source}` is the "
                 "authority when they land. Framework-reserved types are built "
                 "into the tool: " + reserved + ".")
-    lines = ["**Declared domain types** (from `things/_schema.yaml` — the "
+    lines = [f"**Declared domain types** (from `{source}` — the "
              "authority; regenerate on schema change):"]
     for typ in sorted(types):
         tdef = types[typ] if isinstance(types[typ], dict) else {}
         statuses = tdef.get("statuses")
         req = tdef.get("required_fields")
+        desc = tdef.get("description")
         bits = []
         if isinstance(statuses, list) and statuses:
             bits.append("statuses: " + " / ".join(str(s) for s in statuses))
         if isinstance(req, list) and req:
             bits.append("required: " + ", ".join(str(r) for r in req))
-        lines.append(f"- `{typ}`" + (" — " + " · ".join(bits) if bits else ""))
+        row = f"- `{typ}`"
+        # An optional per-type `description:` — the schema documenting its own
+        # vocabulary, beside `statuses:` and `required_fields:`. Absent in every
+        # existing domain, so this rendering is byte-stable for all of them.
+        if isinstance(desc, str) and desc.strip():
+            row += " — " + desc.strip()
+            if bits:
+                row += " (" + " · ".join(bits) + ")"
+        elif bits:
+            row += " — " + " · ".join(bits)
+        lines.append(row)
     lines.append("")
     lines.append("Framework-reserved types (built into the tool, no declaration "
                  "needed): " + reserved + ".")
