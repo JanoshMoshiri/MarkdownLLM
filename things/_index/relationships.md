@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-22
-generated: 2026-08-22T12:24:02
-generated_from: HEAD@78f89e0
-coverage: 260
+generated: 2026-08-22T14:15:04
+generated_from: HEAD@7fc38d4
+coverage: 261
 framework_version: 3.33.0
 ---
 
@@ -860,6 +860,9 @@ framework_version: 3.33.0
 - session-start-loses-to-the-first-request --references--> emitted-content-is-read-instructed-content-is-economised
 - shared-domain-failures-are-a-framework-signal-without-a-path --references--> divergence-is-an-unrouted-decision
 - shared-domain-failures-are-a-framework-signal-without-a-path --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- some-changes-are-verifiable-only-by-publishing --extends--> portability-claims-need-execution-tests
+- some-changes-are-verifiable-only-by-publishing --derived-from--> run-floor-sprint-2-2026-08
+- some-changes-are-verifiable-only-by-publishing --informs--> floor-structure-residue
 - source-behind-mirror-is-still-a-consumer-side-read --extends--> cross-domain-handoff-is-built-inbound-only
 - source-behind-mirror-is-still-a-consumer-side-read --informs--> mcp-domain-server-design
 - source-behind-mirror-is-still-a-consumer-side-read --informs--> cross-domain-sync-catchup
@@ -887,6 +890,7 @@ framework_version: 3.33.0
 - substrate-currency-sweep --references--> estate-cadence-cluster
 - substrate-floor-development --implements--> workflow-state-specification
 - substrate-floor-development --implements--> prove-identity-before-you-change-bytes
+- substrate-floor-development --implements--> some-changes-are-verifiable-only-by-publishing
 - substrate-floor-development --references--> substrate-review-consolidated-remedy-2026-08-20
 - substrate-reconciliation-2026-08-09 --informs--> orchestration-specification
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification

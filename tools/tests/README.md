@@ -32,8 +32,10 @@ CI (`.github/workflows/validate.yml`) runs the suite on a
 **Linux + Windows matrix** (ubuntu-24.04, windows-2025) since sprint 2
 (F7).
 
-**Windows CI has still produced no green run.** Two failures so far, both
-environmental, neither a floor defect:
+**Windows CI is green as of 2026-08-22** (`7fc38d4`, both legs, 3m22s) —
+the framework's first Windows execution evidence. It took three published
+runs to get there, and the two failures were environmental, neither a floor
+defect:
 
 1. *Interpreter setup* (first run): the shared pin `3.12.13` has no
    win32-x64 build — `actions/python-versions` ships Windows builds of 3.12
@@ -53,10 +55,16 @@ fixtures stay out of the corpus walk). Cross-drive scaffolding is refused
 by design, not broken — `test_unrelatable_framework_path_refuses_before_
 target_creation` pins that guard on every platform.
 
-Until a green Windows leg is observed, **Windows portability claims rest on
-operator-reference-machine measurement alone**. If the hosted Windows leg
-proves intolerably slow once it does run, dropping it is the operator's
-call.
+Windows portability claims may now cite CI execution rather than
+operator-machine measurement alone — for what the suite actually covers, on
+this runner image, at these two patch levels. The legs run different patch
+levels of a security-only branch; that is recorded rather than hidden.
+
+Known flake: `test_imports_freshness_fresh_then_stale` can fail under
+`-n auto` when a spawned face-read exceeds the 10s external timeout. A red
+leg on that test alone is a known flake, not a regression — re-run before
+investigating. Mechanism and proposed fix: **F15** in
+`things/plans/floor-block-requirements-2026-08.md`.
 
 ## Markers
 

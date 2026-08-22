@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-22
-generated: 2026-08-22T12:25:00
-generated_from: HEAD@78f89e0
+generated: 2026-08-22T14:15:30
+generated_from: HEAD@7fc38d4
 coverage: 45
 framework_version: 3.33.0
 ---
@@ -146,6 +146,7 @@ framework_version: 3.33.0
 - a-performance-requirement-inherits-its-measurement-context (derived-from)
 - prove-identity-before-you-change-bytes (derived-from)
 - recognition-data-must-be-frozen-not-derived (derived-from)
+- some-changes-are-verifiable-only-by-publishing (derived-from)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

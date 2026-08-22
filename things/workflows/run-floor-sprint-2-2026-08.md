@@ -97,6 +97,15 @@ recorded as **F15** at the requirements ledger with its mechanism and a
 proposed shape. Deliberately not built — the run is sealed and the fix
 widens a product config surface, which belongs to an analysis cut.
 
+**Green, third run (2026-08-22, `7fc38d4`).** Both legs passed —
+`ubuntu-24.04 (3.12.13)` and `windows-2025 (3.12.10)`, 3m22s. This is the
+framework's **first Windows execution evidence**; the suite README's
+"operator-machine measurement alone" caveat is now discharged for CI, and
+`portability-claims-need-execution-tests` carries the episode as instances
+8 and 9. The three-run arc is itself harvested as
+`some-changes-are-verifiable-only-by-publishing`, whose rule is now bound
+into this definition's seal stage.
+
 ## Next
 
 Nothing — the run is complete. Sprint 3 (derivation: F8's three phases)

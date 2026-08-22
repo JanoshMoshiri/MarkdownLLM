@@ -29,6 +29,9 @@ linked_things:
   - id: prove-identity-before-you-change-bytes
     relation: implements
     notes: "The design stage's sequencing rule: split byte-identical restructuring from deliberate behaviour change and order identity first, naming each restructuring commit's proof before writing it."
+  - id: some-changes-are-verifiable-only-by-publishing
+    relation: implements
+    notes: "The seal stage's honesty rule: a surface the floor cannot execute (CI config, vendor lifecycle) is sealed as authored-and-unproven, naming the observation that would settle it — never as verified."
   - id: substrate-review-consolidated-remedy-2026-08-20
     relation: references
     notes: "The remedy's phase machinery is the first work inventory this process consumes; the remedy stays the finding ledger, this defines the repeatable process."
@@ -87,6 +90,12 @@ only if reconciliation exposes a code defect.
 **seal** — closure: plan/ledger states updated to truth, changelog/version
 judgement, publication debt reported. **Human gates live here and only
 here:** the push/release decision, any public claim, anything irreversible.
+Where the sprint changed a surface the floor cannot execute — CI config, a
+vendor lifecycle, anything whose runtime someone else supplies — seal it as
+*authored and unproven*, naming the observation that would settle it
+(`some-changes-are-verifiable-only-by-publishing`). Its first published runs
+belong to the work, and a red run after a green local suite is the probe
+doing its job, not a regression.
 
 ## Division of labour
 

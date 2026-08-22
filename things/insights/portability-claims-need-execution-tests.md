@@ -2,7 +2,7 @@
 id: portability-claims-need-execution-tests
 type: insight
 status: active
-version: 1.5
+version: 1.6
 created: 2026-06-11
 session: 2026-06-11
 source: both
@@ -92,6 +92,34 @@ but verification still stopped short of execution.
    differential proved the shared runtime/strict-sync mechanism, while the QMS
    paragraph was redundant and removed. A local test aid is not automatically
    a rollout unit.
+
+8. **Hosted Windows CI, run 1 (2026-08-22):** sprint 2 landed a Windows
+   matrix leg pinned to `3.12.13` — the reference machine's own version,
+   valid *there*. On the runner it does not exist: `actions/python-versions`
+   ships win32-x64 builds of 3.12 only through 3.12.10, because 3.12 is
+   security-only and upstream stopped publishing Windows installers. The job
+   died before a single test ran. The sprint had explicitly claimed only the
+   *authored* leg and never coverage; that caution was load-bearing.
+
+9. **Hosted Windows CI, run 2 (same day):** with a per-OS pin the suite ran
+   and produced 56 failures with **one** cause — the runner puts the
+   workspace on `D:` and `TEMP` on `C:`, so every test scaffolding into
+   `tmp_path` hit the floor's deliberate refusal to embed an absolute
+   machine-specific route. The floor was correct; the *test suite* carried an
+   unstated same-drive precondition, true on every machine it had ever run
+   on. Run 3 was green on both legs — the framework's first real Windows
+   execution evidence.
+
+Instances 8 and 9 sharpen the rule in two directions. First, **the test
+harness's own environment is part of the portability claim** — a suite can
+encode its author's machine as an invisible precondition and stay green
+forever without anyone writing that precondition down; the claim it appears
+to support is then narrower than it reads. Second, **a guarded branch with
+no test is invisible until an environment provokes it**: the cross-drive
+refusal shipped with a correct guard, a correct message, and no coverage, so
+its first execution was on a CI runner. It now has a regression test that
+provokes the guard portably, including where no second drive exists to
+provoke it naturally.
 
 ## Why It Matters
 
