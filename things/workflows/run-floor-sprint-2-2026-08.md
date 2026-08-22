@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-22
 definition: substrate-floor-development
-current_stage: build
+current_stage: verify
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-1-2026-08
@@ -74,6 +74,18 @@ here as they happen, not reconstructed. Design: `floor-sprint-2-design-2026-08`
      (execution test passed); estate domains reconcile via refresh, and
      their doctors will honestly report definition drift until they do.
 - Necessity (F3, F4, F5) is complete. 230 focused tests green at b33f6b4.
+- **F6 landed** (9ed15a2, bc29e8e, c0c194c, 9726711): corpus_harness
+  extracted (cross-file test imports gone), then estate-sync+autopush,
+  membrane, and session-gate lifted along their banners. Monolith
+  3601 → 2675 lines; collection count 696 held at every step. Two more
+  cross-section helpers (_trust_mcp_entry, _consumer_with_import) surfaced
+  and moved to the harness. One transient xdist flake observed once
+  (test_imports_freshness_fresh_then_stale) and green on every re-run —
+  watched at verify.
+- **F7 record leg landed** (1e400e5): platform-coverage limitation recorded
+  in the suite README and the CI workflow header; module→test map updated.
+- Should scope complete. Stretch (F7-matrix, F14) waits on verify per the
+  design gate.
 
 ## Notes
 
