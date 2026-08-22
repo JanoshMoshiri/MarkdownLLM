@@ -77,6 +77,26 @@ on. Currently a warning. Bumping them changes pinned trust roots, so it is
 a deliberate decision rather than a repair — routed to
 `floor-structure-residue`.
 
+**Second publication finding (same day).** With the interpreter fixed, the
+Windows leg ran the suite and produced **56 failures with one cause**: the
+runner puts the workspace on `D:` and `TEMP` on `C:`, so every test
+scaffolding into `tmp_path` hit scaffold's deliberate refusal to embed an
+absolute machine-specific adapter route. The floor was right; the suite's
+unstated same-drive assumption was not. Fixed in `b4d022a` by pointing
+`--basetemp` at `RUNNER_TEMP`, plus the regression test the branch had
+never had — provoked portably, so it now runs on Linux too. Reproduced
+locally first with a `subst` virtual drive; that reproduction's extra
+publish/assemble errors passed in isolation and appear nowhere in CI's
+list, so they were excluded as artifacts rather than folded in.
+
+**A flake promoted to a recorded defect.** `test_imports_freshness_fresh_
+then_stale` failed once during this sprint's build (dismissed then as
+transient) and again in the post-fix suite. Two occurrences is a pattern:
+traced to the face-read timeout being unreachable from the call path, and
+recorded as **F15** at the requirements ledger with its mechanism and a
+proposed shape. Deliberately not built — the run is sealed and the fix
+widens a product config surface, which belongs to an analysis cut.
+
 ## Next
 
 Nothing — the run is complete. Sprint 3 (derivation: F8's three phases)

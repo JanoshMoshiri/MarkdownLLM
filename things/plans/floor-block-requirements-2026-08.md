@@ -2,7 +2,7 @@
 id: floor-block-requirements-2026-08
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-08-21
 priority: high
 tags: [requirements, floor, performance, tests, concurrency, sprint]
@@ -120,6 +120,37 @@ Constraints carried from the remedy (settled, restated as requirements):
 no weakening of the transaction contract; no daemons, persistent caches, or
 new framework primitives for speed; typed non-definite results everywhere the
 floor could not look.
+
+Flake-sourced (added v1.2, 2026-08-22 — diagnosed, deliberately not built):
+
+- **F15** — The face-read timeout is unreachable from the call path, so
+  `imports_freshness` tests are load-flaky. Mechanism, traced end to end:
+  `imports_freshness` → `_mcp_face_read` → `_mcp_client_read`, and the last
+  hop never passes a timeout, so every face read uses
+  `DEFAULT_EXTERNAL_TIMEOUT_SECONDS = 10.0`. Each read spawns a real
+  interpreter that imports the whole package; under `-n auto` contention
+  that can exceed 10s, `_mcp_client_read` returns `None`, and the state
+  becomes `unreachable`. **The product is behaving correctly** — degrading
+  to "sync state unknown" rather than a silent `fresh` is the designed
+  answer (imports_check.md docstring) — so this is a *test* that is
+  coupled to a wall-clock budget on a loaded machine, not a floor defect.
+
+  Evidence: `test_imports_freshness_fresh_then_stale` failed twice under
+  `-n auto` (2026-08-21 during the F6 lifts, 2026-08-22 in the sprint-2
+  post-fix suite) and passes on every isolated run. 17 test call sites
+  share the exposure; only this one has been observed failing.
+
+  Proposed shape (unbuilt, needs an analysis cut): let the `.mcp.json`
+  entry carry a `timeout`, threaded through `_mcp_face_read` — the same
+  ecosystem convention `headers` already rides, default unchanged at 10s,
+  so a slow source (or a loaded test) can declare a longer budget. Entries
+  are permissive (`_addressed` checks only for `command`/`url`; no key
+  allowlist), so this is additive. **Not built in sprint 2**: the run was
+  sealed, and widening a product config surface is a design decision, not a
+  repair to bundle into a CI fix.
+
+  Until it is fixed, a red CI leg on this test alone is a known flake, not
+  a regression — re-run before investigating.
 
 ## Non-functional requirements — the budget table
 
