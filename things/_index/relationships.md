@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-22
-generated: 2026-08-22T08:40:01
-generated_from: HEAD@508d6c7
-coverage: 256
+generated: 2026-08-22T08:47:50
+generated_from: HEAD@ec7598b
+coverage: 257
 framework_version: 3.33.0
 ---
 
@@ -467,6 +467,10 @@ framework_version: 3.33.0
 - floor-block-requirements-2026-08 --references--> a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen
 - floor-sprint-1-design-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-sprint-1-scope-2026-08-21 --informs--> run-floor-sprint-1-2026-08
+- floor-sprint-2-design-2026-08 --informs--> run-floor-sprint-2-2026-08
+- floor-sprint-2-design-2026-08 --derived-from--> floor-sprint-2-scope-2026-08-22
+- floor-sprint-2-design-2026-08 --implements--> floor-structure-residue
+- floor-sprint-2-design-2026-08 --references--> code-architect-governs-substrate-code
 - floor-sprint-2-scope-2026-08-22 --informs--> run-floor-sprint-2-2026-08
 - floor-structure-residue --derived-from--> independent-substrate-review-2026-08-20-claude
 - floor-structure-residue --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
