@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-22
 definition: substrate-floor-development
-current_stage: design
+current_stage: build
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-1-2026-08
@@ -34,12 +34,14 @@ in sprint 1's verify record. No aspirational entries.
 
 ## Next
 
-Design: a committed design thing showing components touched, how each
-in-scope change proves its budget, the focused test set per change, commit
-granularity, and risks with mitigations. The scope decision
-(`floor-sprint-2-scope-2026-08-22`, e16096b) binds: necessity F3/F5/F4,
-should F6/F7-record, stretch F7-matrix/F14. Substrate code is read against
-the code-architect governance surface before it is written.
+Build, in the design's order: F3 (gate inversion + sync.py rewording) →
+commit A (F4 leaf move, byte-identical) → commit B (F5 adapter collapse,
+byte-identical) → commit C (probe guards — the one deliberate byte change,
+root hooks reinstalled) → D (corpus_harness extraction) → E… (per-section
+monolith lifts under the collection-count invariant) → F (F7 record leg) →
+stretch only after necessity + should are verified. Deviations recorded
+here as they happen, not reconstructed. Design: `floor-sprint-2-design-2026-08`
+(550fb37).
 
 ## Notes
 
