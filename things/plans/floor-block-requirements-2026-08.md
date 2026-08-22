@@ -2,7 +2,7 @@
 id: floor-block-requirements-2026-08
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-08-21
 priority: high
 tags: [requirements, floor, performance, tests, concurrency, sprint]
@@ -99,6 +99,17 @@ Bottleneck-census-sourced (new; evidence measured today):
 - **F13** — Validate's three corpora (root + examples) evaluated
   concurrently.
 
+Sprint-1-verify-sourced (added v1.1, evidence in the sealed run's verify
+record):
+
+- **F14** — Worktree-walk residual: session-start at the root still walks
+  the ~37k-file worktree to list the corpus; after a full test suite evicts
+  the filesystem cache, that walk alone pushes N1 from ~2.1s steady-state to
+  5.5–5.8s. Requirement: bound the walk to the corpus (index-assisted
+  listing, deeper pruning, or an equivalent) so the post-suite case
+  approaches the steady state rather than tripling it. [run-floor-sprint-1
+  verify record, N1 row]
+
 Constraints carried from the remedy (settled, restated as requirements):
 no weakening of the transaction contract; no daemons, persistent caches, or
 new framework primitives for speed; typed non-definite results everywhere the
@@ -119,6 +130,26 @@ Budgets any in-scope change must meet and the verify stage must measure.
 | N6 | focused test loop (one affected file) | ≤ 120s | 30–75s typical | inner-loop tolerability on this machine |
 | N7 | full suite | ≤ 12 min | 37 min | F10 parallelism; 8 workers realistic |
 | N8 | any lifecycle hook step | ≤ ⅓ of its harness budget at the root | varies | headroom is the requirement — 67.1s/60s must never recur |
+
+### Measurement protocol (added v1.1 — the definition sprint 1's verify owed)
+
+Budgets describe **steady state**: warm filesystem cache, no full test suite
+run in the preceding minutes, measured on the reference machine above. The
+verify stage measures each budget in steady state and records that as the
+verdict. Two named non-steady contexts are *recorded as context, never as
+budget misses*:
+
+- **Post-suite** — immediately after the full suite (hundreds of thousands
+  of temp files churn the cache). Record alongside the steady figure; a
+  post-suite exceedance is a finding for the residual's owner (F14), not a
+  loop-back trigger.
+- **Network-dominated paths** (N2) — remote round-trip variance dominates
+  local compute. A single-evening exceedance is not a verdict; re-measure
+  across days before any loop-back, and only a persistent local-compute
+  regression loops back to build.
+
+A budget is relaxed only by a requirements-stage revision of this thing,
+never by the verify stage reinterpreting a number.
 
 ## Out of scope for the block
 
