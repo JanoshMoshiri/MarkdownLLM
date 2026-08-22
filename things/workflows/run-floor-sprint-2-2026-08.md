@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-22
 definition: substrate-floor-development
-current_stage: analysis
+current_stage: design
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-1-2026-08
@@ -34,11 +34,12 @@ in sprint 1's verify record. No aspirational entries.
 
 ## Next
 
-Analysis: record the sprint cut as a `type: decision` with inputs pinned.
-Requirements stage exited at f6dccaf — the ledger's v1.1 revision added the
-measurement protocol and F14. Sprint 1's scope decision already prefigured
-this sprint's shape (F3/F5/F6-full/F7 structural, F8 → sprint 3); the cut
-formalises it against the v1.1 ledger.
+Design: a committed design thing showing components touched, how each
+in-scope change proves its budget, the focused test set per change, commit
+granularity, and risks with mitigations. The scope decision
+(`floor-sprint-2-scope-2026-08-22`, e16096b) binds: necessity F3/F5/F4,
+should F6/F7-record, stretch F7-matrix/F14. Substrate code is read against
+the code-architect governance surface before it is written.
 
 ## Notes
 
