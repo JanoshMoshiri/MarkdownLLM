@@ -43,7 +43,10 @@ from ..harness_ports import (
     HANDLER_TIMEOUT_SECONDS, AdapterCapabilities, DiagnosticPresentation,
     HarnessContext, InspectionReport, LifecycleBinding, ManagedFragment,
 )
-from ..hook_contract import SH_RESOLVE
+from .project_hook_emission import (
+    HASH_PLACEHOLDER, binding_hash_payload, lifecycle_envelope,
+    mdllm_posix_path, posix_event_command, unavailable_text,
+)
 
 
 def _unique_json_object(pairs):
@@ -72,7 +75,6 @@ _DELIVERY_EVENT_BY_MOMENT = {
     "post-write": "PostToolUse",
 }
 _FEEDBACK_MATCHER = "Write|Edit"
-_HASH_PLACEHOLDER = "<managed-definition-hash>"
 _ROOT_POWERSHELL_SESSION = (
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" estate-sync .; '
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" session-start .')
@@ -80,16 +82,6 @@ _ROOT_POWERSHELL_POST_WRITE = (
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" validate . --quiet')
 _LEGACY_ROOT_FIXED_STEP_V1 = Path(__file__).with_name("legacy") / \
     "claude-hooks-root-fixed-step-v1.json"
-
-
-def _shell_single_quote(value: str) -> str:
-    """Single-quote one literal for the POSIX hook command.
-
-    Every byte the render context supplies stays literal: `$`, backticks,
-    quotes and command substitutions inside a legal path must never become
-    shell syntax.
-    """
-    return "'" + value.replace("'", "'\"'\"'") + "'"
 
 
 class ClaudeCodeAdapter:
@@ -207,33 +199,13 @@ class ClaudeCodeAdapter:
         """
         event = _DELIVERY_EVENT[binding.delivery]
         group: dict = {"hooks": [
-            self._handler(context, binding.moment, _HASH_PLACEHOLDER)]}
+            self._handler(context, binding.moment, HASH_PLACEHOLDER)]}
         if binding.delivery != "context":
             group = {"matcher": _FEEDBACK_MATCHER, "hooks": group["hooks"]}
-        binding_payload = {
-            "moment": binding.moment,
-            "delivery": binding.delivery,
-            "failure": binding.failure,
-            "steps": [{
-                "operation": step.operation,
-                "argv": list(step.argv),
-                "protected_seconds": step.protected_seconds,
-                **({"protected_characters": step.protected_characters}
-                   if include_output else {}),
-            } for step in binding.steps],
-            "total_timeout_seconds": binding.total_timeout_seconds,
-            "runner_reserve_seconds": binding.runner_reserve_seconds,
-        }
-        if include_output:
-            binding_payload.update({
-                "output_limit_characters": binding.output_limit_characters,
-                "output_reserve_characters":
-                    binding.output_reserve_characters,
-            })
         return managed_definition_hash({
             "artifact": SETTINGS_PATH,
-            "binding": json.dumps(
-                binding_payload, sort_keys=True, separators=(",", ":")),
+            "binding": binding_hash_payload(
+                binding, include_output=include_output),
             "event": event,
             "group": json.dumps(group, sort_keys=True, separators=(",", ":")),
         })
@@ -279,19 +251,12 @@ class ClaudeCodeAdapter:
         because the Git pre-commit hook is the whole enforcement boundary and
         a harness hook must stay advisory (`surface-and-continue`).
         """
-        if moment == "post-write" and passed:
-            return ""
         try:
             event = _DELIVERY_EVENT_BY_MOMENT[moment]
         except KeyError as exc:
             raise ValueError(
                 f"unsupported Claude lifecycle moment: {moment}") from exc
-        return json.dumps({
-            "hookSpecificOutput": {
-                "hookEventName": event,
-                "additionalContext": text,
-            },
-        }, separators=(",", ":"))
+        return lifecycle_envelope(moment, text, passed, event)
 
     # ------------------------------------------------------------- rendering
 
@@ -312,26 +277,15 @@ class ClaudeCodeAdapter:
         launches matching handlers in parallel, so one handler is the only
         construction that can honour an ordered binding.
         """
-        rel = ctx.framework_root_rel.rstrip("/") or "."
-        mdllm = '"$ROOT/"' + _shell_single_quote(f"{rel}/tools/mdllm.py")
         unavailable = self.format_lifecycle_output(
-            moment,
-            f"MarkdownLLM {moment} could not run: no floor-capable Python "
-            "or mdllm.py was found.",
-            False,
-        )
-        return (
-            'ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}"\n'
-            f"MDLLM={mdllm}\n"
-            f"{SH_RESOLVE}\n"
-            'if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then\n'
-            f"  printf '%s\\n' {_shell_single_quote(unavailable)}\n"
-            "else\n"
-            f'  mdllm_python "$MDLLM" harness-event {self.name} {moment} '
-            f'"$ROOT" {_shell_single_quote(definition_hash)}\n'
-            "fi\n"
-            "exit 0"
-        )
+            moment, unavailable_text(moment), False)
+        return posix_event_command(
+            root_line=('ROOT="${CLAUDE_PROJECT_DIR'
+                       ':-$(git rev-parse --show-toplevel)}"'),
+            harness=self.name, moment=moment,
+            definition_hash=definition_hash,
+            mdllm_path=mdllm_posix_path(ctx),
+            unavailable=unavailable)
 
     def _handler(self, ctx: HarnessContext, moment: str,
                  definition_hash: str) -> dict:

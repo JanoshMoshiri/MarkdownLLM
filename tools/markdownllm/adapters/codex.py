@@ -43,11 +43,14 @@ from ..harness_diagnostics import (
     AdapterProbe,
     managed_definition_hash,
 )
-from ..hook_contract import SH_RESOLVE
 from ..adapter_install import (
     LegacyDefinition,
     NestedJsonArrayGroupsPolicy,
     load_unique_json,
+)
+from .project_hook_emission import (
+    HASH_PLACEHOLDER, binding_hash_payload, lifecycle_envelope,
+    mdllm_posix_path, posix_event_command, ps_quote, unavailable_text,
 )
 
 HOOKS_PATH = ".codex/hooks.json"
@@ -66,16 +69,6 @@ _EVENT_BY_MOMENT = {
     "session-start": "SessionStart",
     "post-write": "PostToolUse",
 }
-
-
-def _ps_quote(value: str) -> str:
-    """Single-quote one literal for an inline PowerShell program."""
-    return "'" + value.replace("'", "''") + "'"
-
-
-def _shell_single_quote(value: str) -> str:
-    """Single-quote one literal for the POSIX hook command."""
-    return "'" + value.replace("'", "'\"'\"'") + "'"
 
 
 class CodexAdapter:
@@ -150,14 +143,6 @@ class CodexAdapter:
     # ------------------------------------------------------------- rendering
 
     @staticmethod
-    def _mdllm_posix(context: HarnessContext) -> str:
-        rel = context.framework_root_rel.rstrip("/") or "."
-        # ROOT must expand, while every byte supplied by the render context
-        # stays literal.  In particular, $, backticks, quotes and command
-        # substitutions in a legal path must never become shell syntax.
-        return '"$ROOT/"' + _shell_single_quote(f"{rel}/tools/mdllm.py")
-
-    @staticmethod
     def _runner_windows(context: HarnessContext) -> str:
         rel = context.framework_root_rel.replace("/", "\\").rstrip("\\")
         rel = rel or "."
@@ -185,46 +170,29 @@ class CodexAdapter:
         remains quiet when validation passes and sends model-visible context
         only on failure; plain stdout is ignored for that event.
         """
-        if moment == "post-write" and passed:
-            return ""
-        event = self._event_name(moment)
-        return json.dumps({
-            "hookSpecificOutput": {
-                "hookEventName": event,
-                "additionalContext": text,
-            },
-        }, separators=(",", ":"))
+        return lifecycle_envelope(moment, text, passed,
+                                  self._event_name(moment))
 
     def _event_posix(self, context: HarnessContext, moment: str,
                      definition_hash: str) -> str:
         unavailable = self.format_lifecycle_output(
-            moment,
-            f"MarkdownLLM {moment} could not run: no floor-capable Python "
-            "or mdllm.py was found.",
-            False,
-        )
-        return (
-            'ROOT="$(git rev-parse --show-toplevel)"\n'
-            f"MDLLM={self._mdllm_posix(context)}\n"
-            f"{SH_RESOLVE}\n"
-            'if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then\n'
-            f"  printf '%s\\n' {_shell_single_quote(unavailable)}\n"
-            "else\n"
-            f'  mdllm_python "$MDLLM" harness-event codex {moment} "$ROOT" '
-            f'{_shell_single_quote(definition_hash)}\n'
-            "fi\n"
-            "exit 0"
-        )
+            moment, unavailable_text(moment), False)
+        return posix_event_command(
+            root_line='ROOT="$(git rev-parse --show-toplevel)"',
+            harness=self.name, moment=moment,
+            definition_hash=definition_hash,
+            mdllm_path=mdllm_posix_path(context),
+            unavailable=unavailable)
 
     def _event_windows(self, context: HarnessContext, moment: str,
                        definition_hash: str) -> str:
-        runner_rel = _ps_quote(self._runner_windows(context))
-        entry_rel = _ps_quote(self._entry_windows(context))
-        event = _ps_quote(self._event_name(moment))
-        unavailable = _ps_quote(
+        runner_rel = ps_quote(self._runner_windows(context))
+        entry_rel = ps_quote(self._entry_windows(context))
+        event = ps_quote(self._event_name(moment))
+        unavailable = ps_quote(
             f"MarkdownLLM {moment} could not run: no floor-capable Python "
             "or framework runner was found.")
-        failed = _ps_quote(
+        failed = ps_quote(
             f"MarkdownLLM {moment} returned a non-zero status; the lifecycle "
             "failure was surfaced but does not enforce the harness action.")
         script = (
@@ -263,7 +231,7 @@ class CodexAdapter:
             "'-File', $runner) }; "
             "if ($executable) { "
             f"& $executable @launchPrefix harness-event codex {moment} "
-            f"$root {_ps_quote(definition_hash)}; "
+            f"$root {ps_quote(definition_hash)}; "
             f"if ($LASTEXITCODE -ne 0) {{ Write-MdllmFailure {failed} }} "
             f"}} else {{ Write-MdllmFailure {unavailable} }} "
             "} catch { Write-MdllmFailure ("
@@ -318,33 +286,12 @@ class CodexAdapter:
         group = {
             "matcher": (_SESSION_MATCHER if moment == "session-start"
                         else _WRITE_MATCHER),
-            "hooks": [self._handler(
-                context, moment, "<managed-definition-hash>")],
+            "hooks": [self._handler(context, moment, HASH_PLACEHOLDER)],
         }
-        binding_payload = {
-            "moment": binding.moment,
-            "steps": [{
-                "operation": step.operation,
-                "argv": list(step.argv),
-                "protected_seconds": step.protected_seconds,
-                **({"protected_characters": step.protected_characters}
-                   if include_output else {}),
-            } for step in binding.steps],
-            "delivery": binding.delivery,
-            "failure": binding.failure,
-            "total_timeout_seconds": binding.total_timeout_seconds,
-            "runner_reserve_seconds": binding.runner_reserve_seconds,
-        }
-        if include_output:
-            binding_payload.update({
-                "output_limit_characters": binding.output_limit_characters,
-                "output_reserve_characters":
-                    binding.output_reserve_characters,
-            })
         return managed_definition_hash({
             "artifact": HOOKS_PATH,
-            "binding": json.dumps(
-                binding_payload, sort_keys=True, separators=(",", ":")),
+            "binding": binding_hash_payload(
+                binding, include_output=include_output),
             "description": _DESCRIPTION,
             "event": event,
             "group": json.dumps(group, sort_keys=True, separators=(",", ":")),
