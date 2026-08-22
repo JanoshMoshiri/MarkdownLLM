@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-22
 definition: substrate-floor-development
-current_stage: reconcile
+current_stage: seal
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-1-2026-08
@@ -123,6 +123,20 @@ shows domain-kernel drift against a fresh build (its coherence errors
 surfaced during measurement). That is the refresh channel carrying
 framework changes to a domain at its own cadence — not a sprint defect and
 not fixed from here.
+
+## Reconcile record (2026-08-22)
+
+Walked and committed (9b8e723, 8e37c36): the standing framework-map
+warning closed — `precommit` gained its View 3 node and all three count
+restatements moved 33 → 34 (the third hid in View 1's accDescr; the
+checker found it after the first fix, which is the mechanical check doing
+what prose walks miss). No other stale prose: greps for the moved
+resolution owner and the lifted monolith sections returned nothing; the
+suite README was reconciled inside the F7 commits; no spec kernel block
+changed, so no kernel regeneration was owed — `mdllm coherence` reports
+clean. The disclosure boundary blocked one commit mid-verify for naming a
+private domain and the wording was corrected — noted as the boundary leg
+working, not as a defect.
 
 ## Notes
 
