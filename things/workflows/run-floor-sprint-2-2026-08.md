@@ -43,6 +43,23 @@ stretch only after necessity + should are verified. Deviations recorded
 here as they happen, not reconstructed. Design: `floor-sprint-2-design-2026-08`
 (550fb37).
 
+## Build record
+
+- **F3 landed** (4cb9ca9): gate inverted, three-module exception probe held
+  exactly (model.py/evals.py excepted, sync.py reworded), 8/8 fitness green.
+- **Commit A / F4 landed** (fb587a1): leaf move byte-identical (SH_RESOLVE
+  1528 chars + all three hook bodies proven against HEAD). Two deviations
+  from the design, recorded as they happened:
+  1. `LAUNCH_RESOLUTION_SECONDS` **stayed in harness_ports** — it sits in a
+     cohesive family of lifecycle-timing constants; moving one member out
+     fractured the family for leaf purity the module never claimed absolutely.
+     The leaf now imports the ports contract (stdlib-pure leaf → leaf edge,
+     depending toward stability); its docstring says so.
+  2. `MDLLM_ENTRY` became **late-bound through the leaf** in scaffold — the
+     move exposed a double-binding (two module-level copies) that two tests
+     were monkeypatching around; one binding now serves every consumer and
+     every test double.
+
 ## Notes
 
 Sprint 1's two recorded deviations carry forward as constraints: the F11
