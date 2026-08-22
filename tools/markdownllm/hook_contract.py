@@ -123,8 +123,18 @@ def _render_sh_resolve() -> str:
                            ('mdllm_probe', quoted, prefix_text) if part)
         platform_guard = ('[ -n "$MDLLM_WINDOWS_SH" ] && '
                           if platform == "windows" else "")
+        # Existence-guard before the spawn (floor-structure-residue, landed
+        # sprint 2): probing a candidate that cannot exist still paid a
+        # timeout+python spawn (~330ms per dead file-path candidate on
+        # Windows). Both guards are shell builtins — a file candidate is
+        # tested with [ -x ], a PATH name with command -v — so an absent
+        # candidate now costs no process at all.
+        existence_guard = (
+            f'[ -x {quoted} ] && ' if executable.startswith("$")
+            else f'command -v {executable} >/dev/null 2>&1 && ')
         lines.append(
-            f'if [ -z "$PY" ] && {platform_guard}{command}; then')
+            f'if [ -z "$PY" ] && {platform_guard}{existence_guard}'
+            f'{command}; then')
         lines.append(f'  PY="{executable}"')
         if prefix:
             lines.append(f'  PY_PREFIX="{prefix[0]}"')
@@ -156,9 +166,9 @@ case "$MDLLM_ROUTE" in
   /*|[A-Za-z]:/*) MDLLM="$MDLLM_ROUTE" ;;
   *) MDLLM="$ROOT/$MDLLM_ROUTE" ;;
 esac
-# Interpreter resolution (one owner: markdownllm/runtime.py — the comment
-# there explains the candidate order and why the probe imports the floor's
-# real dependency rather than just proving an interpreter exists).
+# Interpreter resolution (one owner: markdownllm/hook_contract.py — the
+# comment there explains the candidate order and why the probe imports the
+# floor's real dependency rather than just proving an interpreter exists).
 {resolve}
 if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
   echo "mdllm: validation floor unavailable (no interpreter with PyYAML, or $MDLLM not found) — commit blocked."

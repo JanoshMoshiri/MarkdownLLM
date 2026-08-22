@@ -44,8 +44,9 @@ from ..harness_ports import (
     HarnessContext, InspectionReport, LifecycleBinding, ManagedFragment,
 )
 from .project_hook_emission import (
-    HASH_PLACEHOLDER, binding_hash_payload, lifecycle_envelope,
-    mdllm_posix_path, posix_event_command, unavailable_text,
+    HASH_PLACEHOLDER, LEGACY_SH_RESOLVE_V1, binding_hash_payload,
+    lifecycle_envelope, mdllm_posix_path, posix_event_command,
+    unavailable_text,
 )
 
 
@@ -144,7 +145,9 @@ class ClaudeCodeAdapter:
             handler = self._handler(
                 context, binding.moment,
                 self._definition_hash(
-                    context, binding, include_output=False))
+                    context, binding, include_output=False,
+                    resolve_fragment=LEGACY_SH_RESOLVE_V1),
+                resolve_fragment=LEGACY_SH_RESOLVE_V1)
             group: dict = {"hooks": [handler]}
             if binding.delivery != "context":
                 group = {"matcher": _FEEDBACK_MATCHER, "hooks": [handler]}
@@ -190,7 +193,8 @@ class ClaudeCodeAdapter:
 
     def _definition_hash(self, context: HarnessContext,
                          binding: LifecycleBinding, *,
-                         include_output: bool = True) -> str:
+                         include_output: bool = True,
+                         resolve_fragment: str | None = None) -> str:
         """Hash the complete owned definition with a stable hash placeholder.
 
         The literal attestation hash is excluded from its own input, so an
@@ -199,7 +203,8 @@ class ClaudeCodeAdapter:
         """
         event = _DELIVERY_EVENT[binding.delivery]
         group: dict = {"hooks": [
-            self._handler(context, binding.moment, HASH_PLACEHOLDER)]}
+            self._handler(context, binding.moment, HASH_PLACEHOLDER,
+                          resolve_fragment=resolve_fragment)]}
         if binding.delivery != "context":
             group = {"matcher": _FEEDBACK_MATCHER, "hooks": group["hooks"]}
         return managed_definition_hash({
@@ -261,7 +266,8 @@ class ClaudeCodeAdapter:
     # ------------------------------------------------------------- rendering
 
     def _command(self, ctx: HarnessContext, moment: str,
-                 definition_hash: str) -> str:
+                 definition_hash: str, *,
+                 resolve_fragment: str | None = None) -> str:
         """One sh command entering the neutral ordered runner exactly once.
 
         Shell form in sh dialect is the portable carrier established by live
@@ -285,13 +291,16 @@ class ClaudeCodeAdapter:
             harness=self.name, moment=moment,
             definition_hash=definition_hash,
             mdllm_path=mdllm_posix_path(ctx),
-            unavailable=unavailable)
+            unavailable=unavailable,
+            resolve_fragment=resolve_fragment)
 
     def _handler(self, ctx: HarnessContext, moment: str,
-                 definition_hash: str) -> dict:
+                 definition_hash: str, *,
+                 resolve_fragment: str | None = None) -> dict:
         return {
             "type": "command",
-            "command": self._command(ctx, moment, definition_hash),
+            "command": self._command(ctx, moment, definition_hash,
+                                     resolve_fragment=resolve_fragment),
             "timeout": HANDLER_TIMEOUT_SECONDS,
         }
 

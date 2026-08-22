@@ -18,11 +18,21 @@ adapters emitted before the collapse; the golden fixtures are the proof.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 from ..harness_ports import HarnessContext, LifecycleBinding
 from ..hook_contract import SH_RESOLVE
 
 HASH_PLACEHOLDER = "<managed-definition-hash>"
+
+# The v1 resolution fragment, frozen as data the day it changed (sprint 2's
+# existence-guard commit). Legacy definitions are RECOGNITION data for
+# historical installs and must embed the bytes those installs actually
+# carry — computing them from the live renderer let them drift silently,
+# which the frozen-hash tests caught the first time the renderer moved.
+LEGACY_SH_RESOLVE_V1 = (
+    Path(__file__).with_name("legacy") / "sh-resolve-v1.txt"
+).read_text(encoding="utf-8")
 
 
 def shell_single_quote(value: str) -> str:
@@ -74,7 +84,8 @@ def lifecycle_envelope(moment: str, text: str, passed: bool,
 
 def posix_event_command(*, root_line: str, harness: str, moment: str,
                         definition_hash: str, mdllm_path: str,
-                        unavailable: str) -> str:
+                        unavailable: str,
+                        resolve_fragment: str | None = None) -> str:
     """One sh command entering the neutral ordered runner exactly once.
 
     Shell form in sh dialect is the portable carrier established by live
@@ -82,11 +93,14 @@ def posix_event_command(*, root_line: str, harness: str, moment: str,
     schema's: both harnesses launch matching handlers in parallel, so one
     handler is the only construction that can honour an ordered binding.
     Root resolution differs per harness and arrives as ``root_line``.
+    ``resolve_fragment`` defaults to the live fragment; legacy definitions
+    pass a frozen generation instead.
     """
+    fragment = SH_RESOLVE if resolve_fragment is None else resolve_fragment
     return (
         f"{root_line}\n"
         f"MDLLM={mdllm_path}\n"
-        f"{SH_RESOLVE}\n"
+        f"{fragment}\n"
         'if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then\n'
         f"  printf '%s\\n' {shell_single_quote(unavailable)}\n"
         "else\n"

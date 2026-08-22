@@ -49,8 +49,9 @@ from ..adapter_install import (
     load_unique_json,
 )
 from .project_hook_emission import (
-    HASH_PLACEHOLDER, binding_hash_payload, lifecycle_envelope,
-    mdllm_posix_path, posix_event_command, ps_quote, unavailable_text,
+    HASH_PLACEHOLDER, LEGACY_SH_RESOLVE_V1, binding_hash_payload,
+    lifecycle_envelope, mdllm_posix_path, posix_event_command, ps_quote,
+    unavailable_text,
 )
 
 HOOKS_PATH = ".codex/hooks.json"
@@ -107,7 +108,9 @@ class CodexAdapter:
                 "hooks": [self._handler(
                     context, moment,
                     self._definition_hash(
-                        context, moment, include_output=False))],
+                        context, moment, include_output=False,
+                        resolve_fragment=LEGACY_SH_RESOLVE_V1),
+                    resolve_fragment=LEGACY_SH_RESOLVE_V1)],
             }]
             for moment, event in _EVENT_BY_MOMENT.items()
         }
@@ -174,7 +177,8 @@ class CodexAdapter:
                                   self._event_name(moment))
 
     def _event_posix(self, context: HarnessContext, moment: str,
-                     definition_hash: str) -> str:
+                     definition_hash: str, *,
+                     resolve_fragment: str | None = None) -> str:
         unavailable = self.format_lifecycle_output(
             moment, unavailable_text(moment), False)
         return posix_event_command(
@@ -182,7 +186,8 @@ class CodexAdapter:
             harness=self.name, moment=moment,
             definition_hash=definition_hash,
             mdllm_path=mdllm_posix_path(context),
-            unavailable=unavailable)
+            unavailable=unavailable,
+            resolve_fragment=resolve_fragment)
 
     def _event_windows(self, context: HarnessContext, moment: str,
                        definition_hash: str) -> str:
@@ -262,11 +267,13 @@ class CodexAdapter:
         )
 
     def _handler(self, context: HarnessContext, moment: str,
-                 definition_hash: str) -> dict:
+                 definition_hash: str, *,
+                 resolve_fragment: str | None = None) -> dict:
         return {
             "type": "command",
             "command": self._event_posix(
-                context, moment, definition_hash),
+                context, moment, definition_hash,
+                resolve_fragment=resolve_fragment),
             "commandWindows": self._event_windows(
                 context, moment, definition_hash),
             "timeout": HANDLER_TIMEOUT_SECONDS,
@@ -274,7 +281,8 @@ class CodexAdapter:
         }
 
     def _definition_hash(self, context: HarnessContext, moment: str, *,
-                         include_output: bool = True) -> str:
+                         include_output: bool = True,
+                         resolve_fragment: str | None = None) -> str:
         """Hash the complete owned definition with a stable hash placeholder.
 
         The literal attestation hash is intentionally excluded from its own
@@ -286,7 +294,8 @@ class CodexAdapter:
         group = {
             "matcher": (_SESSION_MATCHER if moment == "session-start"
                         else _WRITE_MATCHER),
-            "hooks": [self._handler(context, moment, HASH_PLACEHOLDER)],
+            "hooks": [self._handler(context, moment, HASH_PLACEHOLDER,
+                                    resolve_fragment=resolve_fragment)],
         }
         return managed_definition_hash({
             "artifact": HOOKS_PATH,

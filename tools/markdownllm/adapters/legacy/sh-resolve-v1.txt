@@ -1,0 +1,52 @@
+FW="${MDLLM%/*/*}"
+PY=""
+PY_PREFIX=""
+MDLLM_LAUNCH_DEADLINE=""
+MDLLM_DATE=""
+MDLLM_TIMEOUT=""
+if [ -x /usr/bin/date ] && [ -x /usr/bin/timeout ]; then
+  MDLLM_DATE=/usr/bin/date
+  MDLLM_TIMEOUT=/usr/bin/timeout
+elif timeout --version >/dev/null 2>&1 && date +%s >/dev/null 2>&1; then
+  MDLLM_DATE=date
+  MDLLM_TIMEOUT=timeout
+fi
+if [ -n "$MDLLM_DATE" ] && [ -n "$MDLLM_TIMEOUT" ]; then
+  MDLLM_LAUNCH_DEADLINE=$(( $("$MDLLM_DATE" +%s) + 10 ))
+fi
+mdllm_probe() {
+  [ -n "$MDLLM_LAUNCH_DEADLINE" ] || return 1
+  mdllm_remaining=$(( MDLLM_LAUNCH_DEADLINE - $("$MDLLM_DATE" +%s) ))
+  [ "$mdllm_remaining" -gt 0 ] || return 1
+  "$MDLLM_TIMEOUT" "$mdllm_remaining" "$@" -c "import yaml" >/dev/null 2>&1
+}
+MDLLM_WINDOWS_SH="${MSYSTEM:-}"
+if [ -z "$PY" ] && mdllm_probe "$ROOT/.venv/bin/python"; then
+  PY="$ROOT/.venv/bin/python"
+fi
+if [ -z "$PY" ] && [ -n "$MDLLM_WINDOWS_SH" ] && mdllm_probe "$ROOT/.venv/Scripts/python.exe"; then
+  PY="$ROOT/.venv/Scripts/python.exe"
+fi
+if [ -z "$PY" ] && mdllm_probe "$FW/.venv/bin/python"; then
+  PY="$FW/.venv/bin/python"
+fi
+if [ -z "$PY" ] && [ -n "$MDLLM_WINDOWS_SH" ] && mdllm_probe "$FW/.venv/Scripts/python.exe"; then
+  PY="$FW/.venv/Scripts/python.exe"
+fi
+if [ -z "$PY" ] && mdllm_probe python3; then
+  PY="python3"
+fi
+if [ -z "$PY" ] && mdllm_probe python; then
+  PY="python"
+fi
+if [ -z "$PY" ] && [ -n "$MDLLM_WINDOWS_SH" ] && mdllm_probe py "-3"; then
+  PY="py"
+  PY_PREFIX="-3"
+fi
+mdllm_python() {
+  if [ -n "$PY_PREFIX" ]; then
+    "$PY" "$PY_PREFIX" "$@"
+  else
+    "$PY" "$@"
+  fi
+}
