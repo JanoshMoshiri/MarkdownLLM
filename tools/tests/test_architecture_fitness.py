@@ -3,20 +3,18 @@
 Mechanically enforces the allowed vendor boundary (handoff acceptance
 condition 3): vendor vocabulary may appear only in the vendor adapters
 (markdownllm/adapters/), their fixtures/tests, and explicitly vendor-specific
-documentation. The declared NEUTRAL modules — lifecycle contract, runtime,
-scaffold, diagnostics, CLI, session — must contain no vendor config path,
-event name, artifact filename, or direct vendor-adapter import in CODE.
+documentation. Neutrality is **total by construction** (floor-structure-residue
+item 1, landed sprint 2): every package module outside ``adapters/`` is
+neutral — a newly added module is born gated, never born exempt. Exceptions
+are declared per module with a reason, and must stay exact: an exception
+whose module no longer trips the gate fails the suite.
 
 Docstrings and comments are exempt (they are documentation; e.g. session.py
 factually names the harnesses whose hooks feed it). The registry package
 front (markdownllm/adapters/__init__.py) is the one aggregation point where
 adapters are known by name — importing IT from a neutral module is the
-sanctioned seam; importing a vendor module directly is not.
-
-Known, documented exception: model.py's corpus-exclusion data (.claude and
-.codex in DEFAULT_EXCLUDES, CLAUDE.md in NON_THING_FILES) contains vendor paths
-as scan configuration rather than executable adapter policy. model.py remains
-deliberately outside this lexical gate rather than being silently passed.
+sanctioned seam; importing a vendor module directly is not, and that rule
+has no exceptions at all.
 
 Run: python -m pytest tools/tests/test_architecture_fitness.py -q
 """
@@ -31,13 +29,31 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 PKG = Path(__file__).resolve().parents[1] / "markdownllm"
 
-NEUTRAL_MODULES = [
-    "harness_ports.py", "hook_contract.py", "session_contract.py",
-    "runtime.py", "scaffold.py", "doctor.py",
-    "cli.py", "session.py", "harness_diagnostics.py",
-    "lifecycle_runner.py", "adapter_install.py",
-    "assemble.py", "publish.py", "bundle_service.py",
-]
+ADAPTER_PACKAGE = PKG / "adapters"
+
+
+def _neutral_modules() -> dict[str, Path]:
+    """Every package module OUTSIDE adapters/ — neutral by construction."""
+    return {
+        path.relative_to(PKG).as_posix(): path
+        for path in sorted(PKG.rglob("*.py"))
+        if ADAPTER_PACKAGE not in path.parents
+    }
+
+
+# Modules whose PURPOSE is vendor-facing, excepted from the lexical vocabulary
+# gate by declaration-with-reason. Exactness is itself tested below: a stale
+# entry (module gone, or no longer tripping the gate) fails the suite — the
+# same-builder blindness floor-structure-residue names must not accumulate
+# here.
+VENDOR_VOCABULARY_EXCEPTIONS = {
+    "model.py":
+        "corpus-exclusion scan data (.claude/.codex in DEFAULT_EXCLUDES, "
+        "CLAUDE.md in NON_THING_FILES) — configuration, not adapter policy",
+    "evals.py":
+        "drives the vendor CLI as its eval subject (`claude -p` headless "
+        "agent); the vocabulary is the module's purpose, not leaked policy",
+}
 
 # Vendor vocabulary that must not appear in neutral CODE (case-insensitive).
 FORBIDDEN = [
@@ -189,8 +205,10 @@ def _code_only(path: Path) -> str:
 
 def test_neutral_modules_carry_no_vendor_vocabulary():
     violations = []
-    for name in NEUTRAL_MODULES:
-        code = _code_only(PKG / name).lower()
+    for name, path in _neutral_modules().items():
+        if name in VENDOR_VOCABULARY_EXCEPTIONS:
+            continue
+        code = _code_only(path).lower()
         for token in FORBIDDEN:
             if token in code:
                 violations.append(f"{name}: {token!r}")
@@ -199,11 +217,27 @@ def test_neutral_modules_carry_no_vendor_vocabulary():
         + "\n  ".join(violations))
 
 
+def test_vendor_vocabulary_exceptions_are_exact():
+    neutral = _neutral_modules()
+    stale = []
+    for name in VENDOR_VOCABULARY_EXCEPTIONS:
+        path = neutral.get(name)
+        if path is None:
+            stale.append(f"{name}: not a neutral module (moved or deleted)")
+            continue
+        code = _code_only(path).lower()
+        if not any(token in code for token in FORBIDDEN):
+            stale.append(f"{name}: no longer trips the gate — remove it")
+    assert not stale, (
+        "stale vendor-vocabulary exceptions:\n  " + "\n  ".join(stale))
+
+
 def test_neutral_modules_import_only_the_registry():
     # `from .adapters import ...` (the registry front) is the sanctioned seam;
     # `from .adapters.claude_code import ...` (a vendor module) is not.
-    for name in NEUTRAL_MODULES:
-        tree = ast.parse((PKG / name).read_text(encoding="utf-8"))
+    # No exceptions: even vocabulary-excepted modules must not import one.
+    for name, path in _neutral_modules().items():
+        tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom):
                 mod = node.module or ""

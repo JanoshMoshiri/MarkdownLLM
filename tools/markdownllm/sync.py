@@ -572,8 +572,8 @@ def cmd_estate_sync(args) -> int:
                 for res in incomplete)
             print(f"\nFresh sync incomplete: {summary}.")
             print("Cached or unresolved state is not fresh state. In a "
-                  "restricted Codex task, rerun this exact command with "
-                  "one-command network/filesystem approval.")
+                  "network-restricted harness task, rerun this exact command "
+                  "with one-command network/filesystem approval.")
             return 1
 
     moved = [res.repo for res in results if res.moved]
