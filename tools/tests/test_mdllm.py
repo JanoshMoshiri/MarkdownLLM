@@ -941,6 +941,93 @@ def test_coherence_missing_foundational_spec_errors(tmp_path):
     assert not any("`present.md`" in m for m in errs)
 
 
+def _framework_root_with_entry(tmp_path, catalog_block="", tier2_block=""):
+    """Minimal framework root: sentinel + an AGENTS.md carrying the two
+    annotated prose sections the F8a check leg reads."""
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\nfoundational_specs: []\n")
+    write(tmp_path, "AGENTS.md",
+          "---\nname: F\n---\n\n# F\n\n"
+          "**Tier 2 — Load on demand by query type:**\n\n"
+          "| Query type | Load |\n|---|---|\n" + tier2_block + "\n"
+          "## Framework Specifications (Things)\n\n" + catalog_block + "\n"
+          "## After\n\ntail\n")
+
+
+def test_coherence_catalog_annotation_matches_frontmatter(tmp_path):
+    # The catalog's (type, status) pair is derivable from the spec's own
+    # frontmatter, but the one-line descriptions beside it are not — so this
+    # section is CHECKED rather than generated. Truth wins; the catalog line
+    # is expected to move in the same commit as the spec's status.
+    write(tmp_path, "alpha.md", thing_text(
+        "id: alpha\ntype: specification\nstatus: stable\ncreated: 2026-01-01"))
+    _framework_root_with_entry(
+        tmp_path,
+        catalog_block="- **alpha.md** — Some description. "
+                      "(`type: specification`, `status: draft`)\n")
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert any("`alpha.md` is annotated (`specification`, `draft`)" in m
+               and "frontmatter says (`specification`, `stable`)" in m
+               for m in errs)
+
+
+def test_coherence_catalog_annotation_clean_when_true(tmp_path):
+    write(tmp_path, "alpha.md", thing_text(
+        "id: alpha\ntype: specification\nstatus: stable\ncreated: 2026-01-01"))
+    _framework_root_with_entry(
+        tmp_path,
+        catalog_block="- **alpha.md** — Some description. "
+                      "(`type: specification`, `status: stable`)\n")
+    msgs = messages(mdllm.coherence_findings(tmp_path, 15))
+    assert not any("alpha.md" in m and "annotated" in m for m in msgs)
+
+
+def test_coherence_catalog_flags_listed_but_absent_spec(tmp_path):
+    _framework_root_with_entry(
+        tmp_path,
+        catalog_block="- **ghost.md** — Never written. "
+                      "(`type: specification`, `status: draft`)\n")
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert any("`ghost.md` is listed in the catalog but not present on disk" in m
+               for m in errs)
+
+
+def test_coherence_catalog_reports_when_it_cannot_look(tmp_path):
+    # Null-result discipline: a section that cannot be located reports that,
+    # rather than returning clean and reading like a pass.
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\nfoundational_specs: []\n")
+    write(tmp_path, "AGENTS.md", "---\nname: F\n---\n\n# F\n\nNo sections.\n")
+    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
+    assert any("not found" in m and "could not run" in m for m in warns)
+    assert any("Tier-2 routing table marker was not found" in m for m in warns)
+
+
+def test_coherence_tier2_routing_requires_a_row_per_spec(tmp_path):
+    # Every Tier-2 spec in the TIERS map must be reachable from the routing
+    # table: a spec nothing routes to is a spec nothing loads.
+    _framework_root_with_entry(tmp_path, tier2_block="| Some query | `thing.md` |\n")
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert any("no routing row in AGENTS.md names it" in m for m in errs)
+
+
+def test_coherence_tier2_routing_flags_row_naming_absent_file(tmp_path):
+    _framework_root_with_entry(tmp_path, tier2_block="| Some query | `nowhere.md` |\n")
+    errs = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_ERROR)
+    assert any("a routing row names `nowhere.md`, which is not on disk" in m
+               for m in errs)
+
+
+def test_coherence_tier2_routing_is_one_directional(tmp_path):
+    # The table legitimately routes surfaces outside TIERS and the catalog —
+    # the human-facing docs/ guides — so a mirror check would fire on correct
+    # prose. Routing an uncatalogued but real file is not a finding.
+    write(tmp_path, "docs/guide.md", "# Guide\n")
+    _framework_root_with_entry(tmp_path, tier2_block="| Some query | `docs/guide.md` |\n")
+    msgs = messages(mdllm.coherence_findings(tmp_path, 15))
+    assert not any("docs/guide.md" in m for m in msgs)
+
+
 def test_coherence_tiers_warns_spec_without_tier_entry(tmp_path):
     write(tmp_path, ".markdownllm",
           "framework: F\nversion: 1.0\nfoundational_specs:\n  - not-in-tiers.md\n")

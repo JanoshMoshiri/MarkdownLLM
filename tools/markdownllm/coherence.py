@@ -264,6 +264,126 @@ def template_source_findings(root: Path,
     return out
 
 
+# --- the entry file's two annotated prose sections (F8a check leg) --------
+#
+# Both sections are AUTHORED prose carrying a derivable annotation, which is
+# why they are checked and not generated: the one-line descriptions are the
+# sections' actual value, and a generator would delete them to own a fact it
+# could have merely verified. Delete > derive > check, and this is the third
+# case.
+#
+# Null-result discipline (`a-check-run-where-it-cannot-see-mints-a-false-
+# finding`): each helper distinguishes "nothing wrong" from "could not look".
+# A section that cannot be located reports that as a Warning rather than
+# returning a clean list, because a silently-skipped check reads exactly like
+# a passing one.
+
+_CATALOG_HEADING = "## Framework Specifications (Things)"
+_CATALOG_BULLET = re.compile(r"^- \*\*([A-Za-z0-9_./-]+\.md)\*\*", re.M)
+_CATALOG_ANNOTATION = re.compile(
+    r"\(`type: ([a-z-]+)`, `status: ([a-z-]+)`")
+_TIER2_MARKER = "**Tier 2 — Load on demand by query type:**"
+
+
+def _section_text(text: str, heading: str) -> str | None:
+    """The body of one `## ` section, or None when the heading is absent."""
+    start = text.find(heading)
+    if start < 0:
+        return None
+    rest = text[start + len(heading):]
+    nxt = re.search(r"^## ", rest, re.M)
+    return rest[:nxt.start()] if nxt else rest
+
+
+def _catalog_annotation_findings(root: Path, atext: str,
+                                 view: RepositoryView | None) -> list[Finding]:
+    """Each catalog bullet's `(type:, status:)` pair against live frontmatter.
+
+    Error, because it is the same class as kernel drift: a one-line fix, and
+    the point is that a spec's status change and its catalog line land in the
+    same commit rather than one release apart.
+    """
+    section = _section_text(atext, _CATALOG_HEADING)
+    if section is None:
+        return [Finding(SEV_WARNING, "AGENTS.md",
+                        f"`{_CATALOG_HEADING}` not found — the catalog "
+                        f"annotation check could not run (this is 'could not "
+                        f"look', not 'nothing wrong')")]
+    findings: list[Finding] = []
+    bullets = list(_CATALOG_BULLET.finditer(section))
+    if not bullets:
+        return [Finding(SEV_WARNING, "AGENTS.md",
+                        "no catalog bullets parsed from the spec catalog — the "
+                        "annotation check could not run; the bullet format "
+                        "changed, or the section moved")]
+    for i, m in enumerate(bullets):
+        name = m.group(1)
+        chunk = section[m.end():
+                        bullets[i + 1].start() if i + 1 < len(bullets)
+                        else len(section)]
+        ann = _CATALOG_ANNOTATION.search(chunk)
+        if not ann:          # authored freedom: a bullet may carry no annotation
+            continue
+        stated_type, stated_status = ann.group(1), ann.group(2)
+        text = _view_text(root / name, view)
+        if text is None:
+            findings.append(Finding(SEV_ERROR, "spec catalog",
+                f"`{name}` is listed in the catalog but not present on disk"))
+            continue
+        meta, _, err = parse_frontmatter(text, source=root / name)
+        if err or not isinstance(meta, dict):
+            continue         # frontmatter errors are validate's finding, not this one
+        actual_type = str(meta.get("type", ""))
+        actual_status = str(meta.get("status", ""))
+        if actual_type != stated_type or actual_status != stated_status:
+            findings.append(Finding(SEV_ERROR, "spec catalog",
+                f"`{name}` is annotated (`{stated_type}`, `{stated_status}`) "
+                f"but its frontmatter says (`{actual_type}`, "
+                f"`{actual_status}`) — fix the catalog line in the commit "
+                f"that changed the spec"))
+    return findings
+
+
+def _tier2_routing_findings(root: Path, atext: str,
+                            view: RepositoryView | None) -> list[Finding]:
+    """Every Tier-2 spec in `TIERS` has a routing row; every routed file exists.
+
+    ONE DIRECTION ONLY, deliberately. The table legitimately routes surfaces
+    that are outside both `TIERS` and the `.markdownllm` catalog — the
+    human-facing `docs/` guides — so a mirror check would fire on correct
+    prose. The reverse direction is already total where it can be:
+    `TIERS` <-> catalog, checked both ways below.
+    """
+    start = atext.find(_TIER2_MARKER)
+    if start < 0:
+        return [Finding(SEV_WARNING, "AGENTS.md",
+                        "the Tier-2 routing table marker was not found — the "
+                        "routing completeness check could not run")]
+    rows = []
+    for line in atext[start:].splitlines()[1:]:
+        if line.startswith("|"):
+            rows.append(line)
+        elif rows:
+            break            # the table ended
+    if not rows:
+        return [Finding(SEV_WARNING, "AGENTS.md",
+                        "no Tier-2 routing rows parsed — the completeness "
+                        "check could not run")]
+    routed = {f for row in rows
+              for f in re.findall(r"`([A-Za-z0-9_./-]+\.md)`", row)}
+    findings: list[Finding] = []
+    for name in sorted(set(TIERS.get("Tier 2 (on demand)", [])) - routed):
+        findings.append(Finding(SEV_ERROR, "Tier-2 routing",
+            f"`{name}` is a Tier-2 spec in the TIERS map "
+            f"(tools/markdownllm/repo.py) but no routing row in AGENTS.md "
+            f"names it — a spec nothing routes to is a spec nothing loads"))
+    for name in sorted(routed):
+        if not _view_is_file(root / name, view):
+            findings.append(Finding(SEV_ERROR, "Tier-2 routing",
+                f"a routing row names `{name}`, which is not on disk"))
+    return findings
+
+
 def coherence_findings(root: Path, window: int,
                        view: RepositoryView | None = None) -> list[Finding]:
     """Mechanical checks over the 'dark region' a hand-walk currently guards
@@ -325,6 +445,17 @@ def coherence_findings(root: Path, window: int,
     # --- framework root only ---------------------------------------------
     if _view_is_file(root / ".markdownllm", view):
         findings.extend(template_source_findings(root, view))
+
+        # The entry file's two annotated prose sections. Checked, not
+        # generated — see the helpers above for why.
+        if atext is None:
+            findings.append(Finding(SEV_WARNING, "AGENTS.md",
+                "not readable from the selected view — the entry-file "
+                "catalog and routing checks could not run"))
+        else:
+            findings.extend(_catalog_annotation_findings(root, atext, view))
+            findings.extend(_tier2_routing_findings(root, atext, view))
+
         sentinel = root / ".markdownllm"
         try:
             data = load_yaml(

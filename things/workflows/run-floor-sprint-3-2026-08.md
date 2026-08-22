@@ -128,7 +128,30 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   expired the session gate's contract fingerprint, exactly as designed —
   re-attested rather than committed through.
 
+- **C4 / F8a check leg landed** — the two annotated prose sections are now
+  mechanically checked, and F8a is complete. The catalog's `(type, status)`
+  pair is compared against each spec's live frontmatter (Error), and every
+  Tier-2 spec in the `TIERS` map must be named by a routing row (Error), as
+  must every routed file exist. Both land **green on the live corpus** —
+  all 28 catalog bullets already agree — so the check pins truth rather
+  than repairing drift, which is the honest outcome for a check written
+  after a reconciliation rather than before one.
+
+  Two shape decisions worth the record. The routing check runs **one
+  direction only**: the table legitimately routes four human-facing `docs/`
+  guides that sit outside both `TIERS` and the catalog, so a mirror check
+  would fire on correct prose — and the reverse direction is already total
+  where it can be (`TIERS` to catalog, both ways, since review 6). And both
+  helpers **report when they cannot look**: a missing section or an
+  unparseable table is a Warning naming that fact, never a clean return,
+  because a silently-skipped check reads exactly like a passing one
+  (`a-check-run-where-it-cannot-see-mints-a-false-finding`).
+
+  17 coherence tests green, 7 of them new. **N3 re-measured: 3.7s** against
+  a 12s budget (3.3s before the leg) — the first of the three budget
+  checkpoints the design named.
+
 ## Next
 
-C4 through C7 in order, recording deviations in this body as they happen.
+C5 through C7 in order, recording deviations in this body as they happen.
 C8–C9 (probes) are stretch, gated on C1–C7 verifying.
