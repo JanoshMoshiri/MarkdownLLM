@@ -30,12 +30,19 @@ silent serialisation.
 
 CI (`.github/workflows/validate.yml`) runs the suite on a
 **Linux + Windows matrix** (ubuntu-24.04, windows-2025) since sprint 2
-(F7). Caveat until the first post-publication green run is observed: the
-Windows leg's config has landed but never executed — CI runs only after
-the operator's push — so Windows portability claims remain
-operator-reference-machine evidence until that run exists. If the hosted
-Windows leg proves intolerably slow, dropping it is the operator's call
-at the release act.
+(F7).
+
+**Windows CI has still produced no test evidence.** Its first real run
+(2026-08-22, the sprint's publication) failed during interpreter setup,
+before a single test executed: the shared pin `3.12.13` has no win32-x64
+build, because `actions/python-versions` ships Windows builds of 3.12 only
+through 3.12.10. The pin is now per OS (Linux 3.12.13, Windows 3.12.10)
+and that repair is itself unproven until the next push — CI runs only
+after publication. Until a green Windows leg is observed, **Windows
+portability claims rest on operator-reference-machine measurement alone**.
+The two legs also run different patch levels of a security-only branch;
+that is recorded rather than hidden. If the hosted Windows leg proves
+intolerably slow once it does run, dropping it is the operator's call.
 
 ## Markers
 
