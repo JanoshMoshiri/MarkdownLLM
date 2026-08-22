@@ -2,7 +2,7 @@
 id: floor-block-requirements-2026-08
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-08-21
 priority: high
 tags: [requirements, floor, performance, tests, concurrency, sprint]
@@ -80,9 +80,42 @@ Review-sourced (owner in brackets; the remedy ledger is canonical):
   its banners. [floor-structure-residue]
 - **F7** — CI matrix widened to Windows + Linux, or the single-platform
   limitation recorded where portability claims are read. [floor-structure-residue]
-- **F8** — Root AGENTS.md derivable sections generated (types block, catalog
-  statuses, routing completeness); admitted mechanical checks; clean-clone
-  flow probes. [coherence-mechanism-build]
+- **F8** — Coherence by derivation. Decomposed at v1.3 (2026-08-23) because
+  one line covered three phases of unequal size and one slice of it had
+  already landed unnoticed. Owner stays `coherence-mechanism-build`; its
+  phases are canonical, these are the requirements they must satisfy.
+
+  - **F8a — the root's entry file stops restating derivable facts.**
+    `AGENTS.md` at the framework root is the estate's only entry file with
+    no managed blocks, and it produced findings in five of eight loop
+    rounds. Requirement, in the loop insight's own order (*delete > derive
+    > check*): a fact restated in the entry file is **deleted** in favour
+    of a pointer where the pointer suffices, **generated** where a block
+    can own the whole fact, and **checked** where the section is authored
+    prose carrying a derivable annotation. Success test unchanged from the
+    owner: the sections that drifted in rounds 1–5 become incapable of
+    drifting silently. [coherence-mechanism-build Phase 1]
+
+  - **F8b — the felt commit-boundary checks land.** The backlog is the
+    authority on *which*; the requirement here is only that the items its
+    own hold has lifted are built under its same-builder gate, and that
+    F8a runs first so no checker is built for a restatement F8a deletes.
+    [mechanical-coherence-checks-backlog, via Phase 2]
+
+  - **F8c — the execution flows cold reads cannot verify get probes.**
+    Executable scenario probes, each asserting observable output, each
+    failing if the behaviour it pins regresses — in CI, with no human
+    reading anything. [coherence-mechanism-build Phase 3]
+
+  **Already landed, not re-scoped (measured 2026-08-23).** Part of F8a's
+  stated territory arrived through other work and must not be rebuilt:
+  `mdllm coherence` already checks `.markdownllm foundational_specs` ↔
+  files on disk, the `TIERS` map ↔ the catalog *in both directions*,
+  `kernel.md` drift, the framework-map subcommand count, and example
+  `framework_version_seen` pins — and the domain-kernel managed-block
+  drift check exists and is generic, applied today to domains only. What
+  remains unbuilt at the root is the entry file itself.
+
 - **F9** — Structural anti-regression tests for the consolidated derivation
   paths: session-start must fail a test if it regresses to repeated corpus
   scans or N+1 history walks (index-scan spawn bound landed 2026-08-21;
@@ -152,6 +185,33 @@ Flake-sourced (added v1.2, 2026-08-22 — diagnosed, deliberately not built):
   Until it is fixed, a red CI leg on this test alone is a known flake, not
   a regression — re-run before investigating.
 
+Vocabulary-registry-sourced (added v1.3, 2026-08-23 — measured while
+opening sprint 3):
+
+- **F16** — `held_by` / `held_until` are framework vocabulary a domain is
+  made to register. Both fields are declared by two framework specs
+  (`coordination-claim.md`, `workflow-state.md`) and shipped into every
+  domain as part of the `workflow-run` reserved type's frontmatter
+  contract, yet neither is in `CORE_FIELDS` — so any domain that adopts
+  the framework's own advisory-claim convention is flagged
+  "field not in CORE_FIELDS or declared known_fields" for it.
+
+  This is `CORE_FIELDS`' **criterion 2** exactly ("the FRAMEWORK ships the
+  field into a domain as part of a reserved type's contract — a domain must
+  never be made to register the framework's own vocabulary"), and the same
+  class the comment beside it already records twice: the ingestion triple
+  (unregistered until v3.24.0) and the `type: prompt` contract (which
+  "flagged a domain 24 times for the framework's own field names").
+  Criterion 1 does not apply — `grep held_by tools/` returns nothing, so no
+  tool code reads the fields; they are read by agents, like `inputs`/
+  `outputs`/`bound_to`.
+
+  Evidence: `run-floor-sprint-2-2026-08` carried `held_by: claude-code`
+  through five stages under this warning, and `run-floor-sprint-3-2026-08`
+  took the same warning at creation on 2026-08-23 — the framework's own
+  corpus, using the framework's own reserved type, failing the framework's
+  own field check. Same-builder, no suppression list, two lines of fix.
+
 ## Non-functional requirements — the budget table
 
 Budgets any in-scope change must meet and the verify stage must measure.
@@ -167,6 +227,16 @@ Budgets any in-scope change must meet and the verify stage must measure.
 | N6 | focused test loop (one affected file) | ≤ 120s | 30–75s typical | inner-loop tolerability on this machine |
 | N7 | full suite | ≤ 12 min | 37 min | F10 parallelism; 8 workers realistic |
 | N8 | any lifecycle hook step | ≤ ⅓ of its harness budget at the root | varies | headroom is the requirement — 67.1s/60s must never recur |
+
+### What binds a new check (added v1.3)
+
+Every check F8b adds runs inside the pre-commit hook's coherence leg, so
+**N3 is the budget a new check spends against** — not a separate allowance.
+The leg is concurrent with validate and boundary (F11), which means a check
+is free until the coherence leg becomes the max; past that it is charged at
+full wall-clock. Today's root pre-commit is 3.3s against a 12s budget, so
+there is real headroom — and a verify stage that does not re-measure N3
+after adding checks has not verified them.
 
 ### Measurement protocol (added v1.1 — the definition sprint 1's verify owed)
 
