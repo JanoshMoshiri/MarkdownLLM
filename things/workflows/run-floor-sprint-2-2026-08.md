@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-22
 definition: substrate-floor-development
-current_stage: requirements
+current_stage: analysis
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-1-2026-08
@@ -34,11 +34,11 @@ in sprint 1's verify record. No aspirational entries.
 
 ## Next
 
-Requirements: revise `floor-block-requirements-2026-08` — add the
-measurement-protocol definition (steady-state vs post-suite) that sprint 1's
-verify found owing, and give the N1 worktree-walk residual a requirement row
-so the analysis cut can see it. Then advance to analysis and record the
-sprint cut as a decision with pinned inputs.
+Analysis: record the sprint cut as a `type: decision` with inputs pinned.
+Requirements stage exited at f6dccaf — the ledger's v1.1 revision added the
+measurement protocol and F14. Sprint 1's scope decision already prefigured
+this sprint's shape (F3/F5/F6-full/F7 structural, F8 → sprint 3); the cut
+formalises it against the v1.1 ledger.
 
 ## Notes
 
