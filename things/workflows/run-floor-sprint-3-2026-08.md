@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-23
 definition: substrate-floor-development
-current_stage: design
+current_stage: build
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-2-2026-08
@@ -26,7 +26,7 @@ linked_things:
 
 ## Where This Is
 
-At `design`. Born at `requirements`, same as both predecessors: the `problems`
+At `build`. Born at `requirements`, same as both predecessors: the `problems`
 stage was satisfied before this run existed. Sprint 2's seal record named
 the subject, `coherence-mechanism-build` carries the evidence for every
 phase (the eight-round review loop's measurement — derived surfaces held

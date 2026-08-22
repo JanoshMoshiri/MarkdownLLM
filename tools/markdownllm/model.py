@@ -168,6 +168,15 @@ CORE_FIELDS = {
     # workflow-run cursor (structural reference fields are supplied once by
     # structural_field_names() below)
     "current_stage", "stages",
+    # advisory coordination claim (coordination-claim.md) — read and respected
+    # by convention, not by the tool; SHIPPED by the framework into every
+    # domain as part of the `workflow-run` frontmatter contract
+    # (workflow-state.md), which is criterion 2, the same ground as the prompt
+    # contract below. Unadmitted until 2026-08-23, when the framework's own
+    # sprint runs took the warning for using the framework's own reserved
+    # convention — the third instance of this class after the ingestion triple
+    # and the prompt fields.
+    "held_by", "held_until",
     # declared derivations (calc.py) — how a figure in this thing was reached,
     # evaluated by `mdllm calc` and re-checked by `validate`. Tool-read and
     # framework-shipped, so a domain never registers it (criterion 2, the same

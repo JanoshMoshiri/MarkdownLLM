@@ -521,6 +521,25 @@ def test_field_registration_is_opt_in(tmp_path):
     assert not any("CORE_FIELDS" in m for m in messages(all_findings(tmp_path)))
 
 
+def test_coordination_claim_fields_are_framework_vocabulary(tmp_path):
+    # held_by/held_until are declared by coordination-claim.md and shipped into
+    # every domain as part of the workflow-run frontmatter contract
+    # (workflow-state.md), so CORE_FIELDS criterion 2 applies: a domain must
+    # never be made to register the framework's own vocabulary. Unadmitted
+    # until 2026-08-23, when the framework's own sprint runs took this warning
+    # for using the framework's own reserved convention.
+    write(tmp_path, "_schema.yaml",
+          "types:\n  task:\n    statuses: [in-progress]\n"
+          "known_fields:\n  - owner\n")
+    write(tmp_path, "things/r.md", thing_text(
+        "id: r\ntype: workflow-run\nstatus: active\ncreated: 2026-08-23\n"
+        "definition: d\ncurrent_stage: build\n"
+        "held_by: claude-code\nheld_until: 2026-08-24T12:00:00Z"))
+    warns = messages(all_findings(tmp_path), mdllm.SEV_WARNING)
+    assert not any("field `held_by`" in m for m in warns)
+    assert not any("field `held_until`" in m for m in warns)
+
+
 def test_field_registration_flags_unregistered_field(tmp_path):
     # Declaring `known_fields` activates the gate. CORE_FIELDS (status/created/
     # linked_things), the declared field (owner), and a per-type required_field
