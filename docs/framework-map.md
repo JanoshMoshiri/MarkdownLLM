@@ -61,7 +61,7 @@ flowchart TD
         why, thing.md with the core operative specs, and 22 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
-        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 33
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 34
         mechanical subcommands and a git pre-commit hook that, when current and
         runnable, blocks commits with mechanical Errors. At the base, git is
         the accepted-state machine, event stream and inspectable audit aid.
