@@ -1,12 +1,11 @@
 ---
 id: run-floor-sprint-2-2026-08
 type: workflow-run
-status: active
+status: completed
 version: 1.0
 created: 2026-08-22
 definition: substrate-floor-development
 current_stage: seal
-held_by: claude-code
 linked_things:
   - id: run-floor-sprint-1-2026-08
     relation: references
@@ -32,16 +31,32 @@ imports the leaf — the clean move rides with F5's reshaping); the N1
 worktree-walk residual and the measurement-protocol gap are measured findings
 in sprint 1's verify record. No aspirational entries.
 
+## Seal record (2026-08-22)
+
+Ledgers set to truth (024ccc4): floor-structure-residue items 1–3, 5, 6
+and the sh-fragment guard struck with dated commits, item 4 half-landed
+with the remainder named, all done-when boxes ticked; the sprint design
+plan completed; F14's did-not-reproduce evidence and re-open condition
+recorded at the requirements ledger.
+
+**Left honestly open:** the monolith's remaining banner sections (item 4's
+second half); the smaller same-family items (duplicate staged-atomic-write,
+prose-matching diagnostic, resemblance-classifying inspectors,
+hand-restated pins); F8 → sprint 3 (`coherence-mechanism-build`); F2 with
+its operator-sequenced owner `evidence-and-eval-backlog` — now 25 days
+stalled and surfaced to the operator at this seal, per the scope decision.
+
+**Human gates — all at this boundary, none pre-empted:** the framework
+root declares `autopush: false`, so every sprint commit is local truth
+awaiting the operator's deliberate push; the CHANGELOG entry and version
+judgement belong to that release act; the Windows CI leg's first run (and
+the keep/drop call if it proves slow) happens only after publication.
+
 ## Next
 
-Build, in the design's order: F3 (gate inversion + sync.py rewording) →
-commit A (F4 leaf move, byte-identical) → commit B (F5 adapter collapse,
-byte-identical) → commit C (probe guards — the one deliberate byte change,
-root hooks reinstalled) → D (corpus_harness extraction) → E… (per-section
-monolith lifts under the collection-count invariant) → F (F7 record leg) →
-stretch only after necessity + should are verified. Deviations recorded
-here as they happen, not reconstructed. Design: `floor-sprint-2-design-2026-08`
-(550fb37).
+Nothing — the run is complete. Sprint 3 (derivation: F8's three phases)
+starts as a new run of `substrate-floor-development` when execution
+resumes, generating from the module layout this sprint settled.
 
 ## Build record
 
