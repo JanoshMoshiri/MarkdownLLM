@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-23
 definition: substrate-floor-development
-current_stage: requirements
+current_stage: analysis
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-2-2026-08
@@ -26,7 +26,7 @@ linked_things:
 
 ## Where This Is
 
-At `requirements`. Born there, same as both predecessors: the `problems`
+At `analysis`. Born at `requirements`, same as both predecessors: the `problems`
 stage was satisfied before this run existed. Sprint 2's seal record named
 the subject, `coherence-mechanism-build` carries the evidence for every
 phase (the eight-round review loop's measurement — derived surfaces held
@@ -51,8 +51,25 @@ and F8 is this sprint. What remains after it is not buildable here —
 That matters for sequencing: the operator's order puts the framework
 retrospective after the block, and its time trigger fires 2026-08-27.
 
+## Stage record
+
+- **requirements (2026-08-23, efed48d)** — the ledger revised to v1.3: F8
+  decomposed into F8a/F8b/F8c because one line covered three phases of
+  unequal size; the slice that had already landed through other work named
+  so the sprint cannot rebuild it; **F16** added, found while creating this
+  run — `held_by`/`held_until` are framework-shipped `workflow-run`
+  vocabulary sitting outside `CORE_FIELDS`, so this run took a validate
+  Warning for using the framework's own reserved convention. The
+  non-functional addition: a new check spends against N3, not a separate
+  allowance.
+- **analysis (2026-08-23)** — cut committed as
+  `floor-sprint-3-scope-2026-08-23`. Necessity F8a + F16; should the three
+  felt F8b checks; stretch F8c probes 1 and 2. Residue item 8 (the Node 20
+  trust-root bump) routed to seal as a human gate rather than deferred
+  silently.
+
 ## Next
 
-Decompose F8 at `floor-block-requirements-2026-08` (v1.3) with the slice
-that has already landed marked as such, then advance to `analysis` for the
-cut.
+Design: components touched, how each change proves its budget, the focused
+test set per change, commit granularity, and the identity-first ordering
+where a change set mixes restructuring with behaviour change.

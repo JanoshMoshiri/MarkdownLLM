@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-22
-generated: 2026-08-22T18:15:33
-generated_from: HEAD@6601f2e
-coverage: 47
+created: 2026-08-23
+generated: 2026-08-23T00:26:03
+generated_from: HEAD@efed48d
+coverage: 50
 framework_version: 3.34.0
 ---
 
@@ -60,6 +60,9 @@ framework_version: 3.34.0
 ## codex-substrate-review-response-2026-08-20
 - autopush-requires-explicit-authority (pinned @27b95e739f78cad6fa609cee7b1359897ccf40ae)
 
+## coherence-mechanism-build
+- floor-sprint-3-scope-2026-08-23 (pinned @b764aaf96096caeea4be3ce2a77f9b1c9d4039d2)
+
 ## cowork-adapter
 - a-consuming-environments-gate-is-a-build-time-constraint (derived-from)
 
@@ -78,6 +81,9 @@ framework_version: 3.34.0
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
 
+## external-review-2026-08-10
+- floor-sprint-3-scope-2026-08-23 (pinned @5425f29437e94240c60ce0032ca3c424fa7c1ef9)
+
 ## field-report-2026-08-13-domain-session
 - assistant-register-does-not-graduate (derived-from)
 - the-harness-bound-path-is-the-least-tested-path (derived-from)
@@ -86,6 +92,7 @@ framework_version: 3.34.0
 - floor-sprint-1-design-2026-08 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
 - floor-sprint-1-scope-2026-08-21 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
 - floor-sprint-2-scope-2026-08-22 (pinned @f6dccaf9ed4c3309fd871ce622715a6528fe7d12)
+- floor-sprint-3-scope-2026-08-23 (pinned @efed48d7f589c8e5a29d70c87d4ebb251d7c7358)
 
 ## floor-sprint-1-scope-2026-08-21
 - floor-sprint-1-design-2026-08 (pinned @10443b5aed763503161acc96833484c6786e6c7b)
@@ -96,6 +103,7 @@ framework_version: 3.34.0
 
 ## floor-structure-residue
 - floor-sprint-2-scope-2026-08-22 (pinned @e98cdd9a8cdcb3f40cc5eed936f7b3c9a485d656)
+- floor-sprint-3-scope-2026-08-23 (pinned @4cea3aa123c05a5d6c489f767ef08f5c0388fb0c)
 
 ## framework-kernel
 - estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
@@ -135,6 +143,9 @@ framework_version: 3.34.0
 ## mcp-domain-server-design
 - phase-3-run-domain-task-reverted (pinned @fcd1c11)
 
+## mechanical-coherence-checks-backlog
+- floor-sprint-3-scope-2026-08-23 (pinned @4569360f7460e4a2aa97d4993d8cf6c1691f5648)
+
 ## operating-is-programming
 - operating-scope-promotion (pinned @604dfc4)
 
@@ -150,6 +161,7 @@ framework_version: 3.34.0
 
 ## run-floor-sprint-2-2026-08
 - a-performance-requirement-inherits-its-measurement-context (derived-from)
+- floor-sprint-3-scope-2026-08-23 (pinned @4c7383b9221f8dd67748393d49de6d50b8521112)
 - prove-identity-before-you-change-bytes (derived-from)
 - recognition-data-must-be-frozen-not-derived (derived-from)
 - some-changes-are-verifiable-only-by-publishing (derived-from)
