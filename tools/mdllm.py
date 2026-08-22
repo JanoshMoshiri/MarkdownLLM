@@ -100,8 +100,8 @@ from markdownllm.lifecycle_runner import (
     dispatch_lifecycle_event, cmd_harness_event,
 )
 from markdownllm.boundary import (
-    TERMS_FILE, load_terms, scan_text, self_guard, staged_findings,
-    history_findings, cmd_boundary,
+    TERMS_FILE, load_terms, load_located_terms, scan_text, self_guard,
+    staged_findings, history_findings, term_audit_findings, cmd_boundary,
 )
 from markdownllm.doctor import _upstream_sentinel_version, cmd_doctor
 from markdownllm.mcp_server import (

@@ -25,26 +25,40 @@ from .repository_view import RepositoryView, RepositoryViewError
 TERMS_FILE = ".boundary-terms"
 
 
+def load_located_terms(
+        root: Path) -> list[tuple[int, str, str | None]] | None:
+    """`load_terms`, but each entry carries the 1-based line it was read from.
+
+    The line number is what lets `--audit-terms` name an offending entry
+    without printing it: the operator opens the local file at that line. See
+    `term_audit_findings`.
+    """
+    path = root / TERMS_FILE
+    if not path.is_file():
+        return None
+    terms: list[tuple[int, str, str | None]] = []
+    for n, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "==>" in line:
+            term, _, repl = line.partition("==>")
+            terms.append((n, term.strip(), repl.strip() or None))
+        else:
+            terms.append((n, line, None))
+    return terms
+
+
 def load_terms(root: Path) -> list[tuple[str, str | None]] | None:
     """Parse the local terms file. Returns None when absent (=> no-op).
 
     Line format: `term`, or `term ==> approved replacement`, `#` comments.
     Terms match case-insensitively as literal substrings.
     """
-    path = root / TERMS_FILE
-    if not path.is_file():
+    located = load_located_terms(root)
+    if located is None:
         return None
-    terms: list[tuple[str, str | None]] = []
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        if "==>" in line:
-            term, _, repl = line.partition("==>")
-            terms.append((term.strip(), repl.strip() or None))
-        else:
-            terms.append((line, None))
-    return terms
+    return [(term, repl) for _n, term, repl in located]
 
 
 def scan_text(text: str, terms: list[tuple[str, str | None]],
@@ -148,9 +162,54 @@ def history_findings(root: Path,
     return findings
 
 
+def term_audit_findings(root: Path,
+                        located: list[tuple[int, str, str | None]]) -> list[str]:
+    """Entries that occur in this repository's OWN tracked content.
+
+    A term in a repo's own tracked tree is not a private identifier. Either it
+    is noise — and it is making the staged and history legs permanently red,
+    which trains the operator to ignore them — or it is a leak that is already
+    committed. Both are actionable, which is what makes this a check and not a
+    warning.
+
+    Why an invariant and not a state-once-and-derive promotion: the list this
+    reasons over must never be committed, so the floor cannot own it. It can
+    own a property OF it. (`a-control-that-must-stay-local-has-no-floor`.)
+
+    Reports by **line number in the local file, never by term.** The staged and
+    message legs print a term because they are refusing a specific edit and the
+    operator needs to see which word to change. This leg is different: a hit
+    means the word is already in tracked content, so naming it in output adds
+    exposure without adding information the operator cannot get by opening the
+    file at the line named.
+    """
+    findings: list[str] = []
+    for lineno, term, _repl in located:
+        hits = subprocess.run(
+            ["git", "grep", "-I", "-l", "-i", "-F", "-e", term, "HEAD"],
+            cwd=root, capture_output=True, text=True,
+            encoding="utf-8", errors="replace")
+        if hits.returncode not in (0, 1):
+            findings.append(
+                f"{TERMS_FILE}:{lineno}: could not be audited — `git grep` "
+                f"failed (rc {hits.returncode}); this is 'could not look', "
+                f"not 'clean'")
+            continue
+        paths = [l.split(":", 1)[1] for l in hits.stdout.splitlines()
+                 if ":" in l]
+        if paths:
+            findings.append(
+                f"{TERMS_FILE}:{lineno}: this entry occurs in "
+                f"{len(paths)} tracked file(s) — first: {paths[0]}. Either "
+                f"noise (remove it) or an already-committed leak (act on it). "
+                f"The term is deliberately not printed.")
+    return findings
+
+
 def cmd_boundary(args) -> int:
     root = Path(args.path).resolve()
-    terms = load_terms(root)
+    located = load_located_terms(root)
+    terms = None if located is None else [(t, r) for _n, t, r in located]
     quiet = getattr(args, "quiet", False)
     if terms is None:
         if not quiet:
@@ -158,6 +217,22 @@ def cmd_boundary(args) -> int:
                   f"vocabulary is local-only)")
         return 0
     findings: list[str] = []
+    if getattr(args, "audit_terms", False):
+        guard = self_guard(root)
+        if guard:
+            findings.append(guard)
+        findings.extend(term_audit_findings(root, located))
+        if findings:
+            print(f"boundary: {len(findings)} terms-file finding(s) — "
+                  f"each entry below is either noise or an already-committed "
+                  f"leak:")
+            for f in findings:
+                print(f"  - {f}")
+            return 1
+        if not quiet:
+            print(f"boundary: terms file clean ({len(located)} entries, none "
+                  f"present in tracked content)")
+        return 0
     if getattr(args, "message", None):
         try:
             guard = self_guard(root)

@@ -2417,6 +2417,76 @@ def test_boundary_parse_comments_and_blanks(tmp_path):
     assert len(terms) == 2
 
 
+def test_boundary_audit_terms_flags_entry_in_tracked_content(tmp_path, capsys):
+    # A term present in the repo's OWN tracked content is not a private
+    # identifier: either noise (which keeps the other legs permanently red) or
+    # a leak already committed. Both actionable — hence a check, not a warning.
+    import subprocess
+    _boundary_repo(tmp_path)
+    (tmp_path / "fixture.md").write_text("mentions codename-x inline\n",
+                                         encoding="utf-8")
+    subprocess.run(["git", "add", "fixture.md"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "add fixture"],
+                   cwd=tmp_path, check=True)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, audit_terms=True, quiet=True))
+    out = capsys.readouterr().out
+    assert rc == 1
+    assert ".boundary-terms:3" in out       # comment line 1, secretco 2, codename-x 3
+    assert "fixture.md" in out
+
+
+def test_boundary_audit_terms_never_prints_the_term(tmp_path, capsys):
+    # The invariant that shapes this leg. The staged and message legs print a
+    # term because they are refusing a specific edit; this leg reports a word
+    # that is ALREADY in tracked content, so naming it adds exposure without
+    # adding information the operator cannot get from the line number.
+    import subprocess
+    _boundary_repo(tmp_path)
+    (tmp_path / "fixture.md").write_text("mentions codename-x inline\n",
+                                         encoding="utf-8")
+    subprocess.run(["git", "add", "fixture.md"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "add fixture"],
+                   cwd=tmp_path, check=True)
+    mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None, history=False,
+                           audit_terms=True, quiet=True))
+    out = capsys.readouterr().out
+    assert "codename-x" not in out.lower()
+    assert "secretco" not in out.lower()
+
+
+def test_boundary_audit_terms_clean_when_nothing_tracked(tmp_path, capsys):
+    import subprocess
+    _boundary_repo(tmp_path)
+    (tmp_path / "fixture.md").write_text("nothing sensitive here\n",
+                                         encoding="utf-8")
+    subprocess.run(["git", "add", "fixture.md"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "add fixture"],
+                   cwd=tmp_path, check=True)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, audit_terms=True, quiet=False))
+    out = capsys.readouterr().out
+    assert rc == 0 and "terms file clean" in out
+
+
+def test_boundary_audit_terms_noops_without_terms_file(tmp_path, capsys):
+    _git_repo(tmp_path)
+    rc = mdllm.cmd_boundary(_ns(path=str(tmp_path), message=None,
+                                history=False, audit_terms=True, quiet=False))
+    assert rc == 0 and "skipped" in capsys.readouterr().out
+
+
+def test_located_terms_carry_their_line_numbers(tmp_path):
+    _boundary_repo(tmp_path, terms="\n# comment only\nplain-term\n"
+                                   "spaced ==> replacement here\n")
+    located = mdllm.load_located_terms(tmp_path)
+    assert (4, "plain-term", None) in located
+    assert (5, "spaced", "replacement here") in located
+    # and the flat loader still returns exactly what every other leg expects
+    assert mdllm.load_terms(tmp_path) == [("plain-term", None),
+                                          ("spaced", "replacement here")]
+
+
 def test_install_hook_writes_commit_msg_hook(tmp_path):
     _git_repo(tmp_path)
     mdllm.cmd_install_hook(_ns(path=str(tmp_path)))

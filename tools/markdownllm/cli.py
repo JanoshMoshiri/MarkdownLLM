@@ -40,8 +40,9 @@ unqualified heading — a hand list drifts; argparse does not):
                        only explicit true enables post-commit sends. The
                        semantic half stays with the agent.
   boundary [path]      Disclosure-boundary check: staged additions/filenames,
-                       --message FILE (commit-msg hook), or --history audit,
-                       against the LOCAL gitignored .boundary-terms file.
+                       --message FILE (commit-msg hook), --history audit, or
+                       --audit-terms (the terms file's own hygiene), against
+                       the LOCAL gitignored .boundary-terms file.
                        Absent file => silent no-op (CI never enforces this).
   install-hook [path]  Install the three mdllm git hooks: pre-commit
                        (boundary + validate + coherence + candidates via one
@@ -454,6 +455,11 @@ def build_cli() -> argparse.ArgumentParser:
                     help="scan a commit-message file (commit-msg hook mode)")
     bd.add_argument("--history", action="store_true",
                     help="full-archive audit: all revs and messages (console only)")
+    bd.add_argument("--audit-terms", action="store_true", dest="audit_terms",
+                    help="audit the terms file itself: report entries that "
+                         "occur in this repo's own tracked content (each is "
+                         "either noise or an already-committed leak). Reports "
+                         "by line number, never by term.")
     bd.add_argument("--quiet", action="store_true")
     bd.set_defaults(fn=cmd_boundary)
 

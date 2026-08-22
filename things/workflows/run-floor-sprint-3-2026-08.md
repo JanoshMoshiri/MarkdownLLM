@@ -151,7 +151,31 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   a 12s budget (3.3s before the leg) — the first of the three budget
   checkpoints the design named.
 
+- **C5 / F8b boundary-term evidence check landed** — `mdllm boundary
+  --audit-terms`. The backlog's most-felt item: three regressions, the third
+  of which blocked four commits in one session and cost working time, with
+  the blocking path primed to falsely refuse anything touching
+  `tools/tests/`. The control could not be promoted the usual way because
+  the list it reasons over must never be committed — so the floor owns an
+  *invariant over* the list instead
+  (`a-control-that-must-stay-local-has-no-floor`).
+
+  **It reports by line number, never by term** — a deliberate departure from
+  the module's other legs, which do print terms. The difference is what the
+  finding means: the staged and message legs refuse a specific edit and the
+  operator needs to see which word to change; this leg reports a word that
+  is *already in tracked content*, where naming it adds exposure without
+  adding anything the operator cannot get by opening the file at the line
+  named. A test asserts no term reaches the output.
+
+  **It paid for itself before it shipped: 16 findings on the live repo**,
+  every one classifiable without reading a term (by hit-path shape alone:
+  fifteen are framework test vocabulary, one also reaches `README.md`).
+  Surfaced to the operator at seal and *not acted on* — `.boundary-terms`
+  is an operator-owned control, and an agent editing it would be the floor
+  quietly deciding what the boundary protects.
+
 ## Next
 
-C5 through C7 in order, recording deviations in this body as they happen.
+C6 and C7, recording deviations in this body as they happen.
 C8–C9 (probes) are stretch, gated on C1–C7 verifying.
