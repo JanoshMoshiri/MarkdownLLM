@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-22
 definition: substrate-floor-development
-current_stage: verify
+current_stage: reconcile
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-1-2026-08
@@ -86,6 +86,43 @@ here as they happen, not reconstructed. Design: `floor-sprint-2-design-2026-08`
   in the suite README and the CI workflow header; module→test map updated.
 - Should scope complete. Stretch (F7-matrix, F14) waits on verify per the
   design gate.
+
+## Verify record (2026-08-22)
+
+**Full suite: 694 passed, 2 skipped, 4:03 under `-n auto`** (696 collected —
+the invariant held through every lift; the one xdist flake seen once during
+build did not recur). Budgets, steady-state per the v1.1 measurement
+protocol:
+
+| ID | Budget | Measured | Verdict |
+|---|---|---|---|
+| N1 session-start root | ≤ 5s | 1.8s | met |
+| N2 estate-sync root | ≤ 8s | 5.1s | met |
+| N3 precommit root | ≤ 12s | 3.3s | met |
+| N4 precommit domain | ≤ 5s | 1.4s | met |
+| N5 validate domain | ≤ 3s | 0.8s | met |
+| N6 focused loop | ≤ 120s | 2–57s across the build's focused runs | met |
+| N7 full suite | ≤ 12min | 4:03 | met |
+| N8 lifecycle step ≤ ⅓ budget | 20s | ~1.8s | met |
+
+Wrapper overhead (commit C's target): 348→273ms per invocation at the
+root, 514→311ms in a venv-less domain repo, measured in Git Bash.
+
+**Post-suite context (protocol-mandated, not a verdict):** N1 immediately
+after the full suite measured **1.9s** — sprint 1's 5.5–5.8s transient did
+not reproduce (the suite itself now finishes in 4:03 vs 9:20). **F14 left
+unbuilt on that evidence**: its motivating symptom is absent on today's
+measurement, and bounding an unmeasured cost would be speculative work.
+F14 stays owned at the requirements ledger with this dated context.
+
+**F7 matrix leg** (ef07edc): config landed, proof publication-gated — the
+verify record claims the authored leg, never coverage.
+
+**Estate observation:** the live domain used for the N4/N5 measurements
+shows domain-kernel drift against a fresh build (its coherence errors
+surfaced during measurement). That is the refresh channel carrying
+framework changes to a domain at its own cadence — not a sprint defect and
+not fixed from here.
 
 ## Notes
 
