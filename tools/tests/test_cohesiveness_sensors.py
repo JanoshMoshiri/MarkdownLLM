@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import mdllm  # noqa: E402
 
-from test_mdllm import thing_text, write, all_findings, messages  # noqa: E402
+from corpus_harness import thing_text, write, all_findings, messages  # noqa: E402
 
 
 # ------------------------------------------------- trigger completeness

@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import mdllm  # noqa: E402
 import pytest  # noqa: E402
 
-from test_mdllm import _ns, thing_text, write  # noqa: E402
+from corpus_harness import _ns, thing_text, write  # noqa: E402
 
 
 def ctx(meta=None, body="", corpus=None):
