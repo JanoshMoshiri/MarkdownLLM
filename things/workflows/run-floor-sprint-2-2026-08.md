@@ -59,6 +59,21 @@ here as they happen, not reconstructed. Design: `floor-sprint-2-design-2026-08`
      move exposed a double-binding (two module-level copies) that two tests
      were monkeypatching around; one binding now serves every consumer and
      every test double.
+- **Commit B / F5 collapse landed** (6d3aa81): `project_hook_emission` owns
+  the converged shape (quoting, envelope, POSIX command, binding-hash
+  payload, placeholder); goldens unchanged — byte-identity proven. 161
+  focused tests green.
+- **Commit C / probe guards landed** (b33f6b4): `[ -x ]` + `command -v`
+  guards; measured 348→273ms root, 514→311ms domain-repo per lifecycle
+  invocation. Third deviation, found by the frozen-hash tests:
+  3. The **output-tail legacy definitions were live-computed** — recognition
+     data that would drift with every renderer change. The v1 fragment is
+     now frozen as data (`adapters/legacy/sh-resolve-v1.txt`) and threaded
+     through the legacy paths; the original frozen hashes pass again, which
+     is the proof the freeze reproduces history. Root hooks reinstalled
+     (execution test passed); estate domains reconcile via refresh, and
+     their doctors will honestly report definition drift until they do.
+- Necessity (F3, F4, F5) is complete. 230 focused tests green at b33f6b4.
 
 ## Notes
 
