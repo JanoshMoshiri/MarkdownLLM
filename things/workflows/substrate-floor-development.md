@@ -26,6 +26,9 @@ linked_things:
   - id: workflow-state-specification
     relation: implements
     notes: "First workflow-definition minted at the framework root; the primitive applied to the framework's own development process."
+  - id: prove-identity-before-you-change-bytes
+    relation: implements
+    notes: "The design stage's sequencing rule: split byte-identical restructuring from deliberate behaviour change and order identity first, naming each restructuring commit's proof before writing it."
   - id: substrate-review-consolidated-remedy-2026-08-20
     relation: references
     notes: "The remedy's phase machinery is the first work inventory this process consumes; the remedy stays the finding ledger, this defines the repeatable process."
@@ -61,8 +64,12 @@ Loop back to requirements if analysis finds the set incomplete.
 **design** — proper design, not planning: components touched, how each change
 proves its budget, the focused test set per change, commit granularity, risks
 with mitigations. The design must show how every in-scope requirement is met
-and every budget verified. Exit: a committed design thing. Loop back to
-analysis if design shows the cut was wrong.
+and every budget verified. Where a change set contains both restructuring and
+behaviour change, order identity first — byte-identical commits with their
+proof named, then the deliberate change against a verified structure
+(`prove-identity-before-you-change-bytes`); a commit that does both proves
+neither. Exit: a committed design thing. Loop back to analysis if design shows
+the cut was wrong.
 
 **build** — implementation in meaning-boundary commits against the design.
 Deviations from the design are recorded in the run body as they happen, not

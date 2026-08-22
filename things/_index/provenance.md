@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-22
-generated: 2026-08-22T08:48:17
-generated_from: HEAD@ec7598b
-coverage: 44
+generated: 2026-08-22T12:25:00
+generated_from: HEAD@78f89e0
+coverage: 45
 framework_version: 3.33.0
 ---
 
@@ -141,6 +141,11 @@ framework_version: 3.33.0
 
 ## run-floor-sprint-1-2026-08
 - floor-sprint-2-scope-2026-08-22 (pinned @967773cb50f2dc9b9f661f8309c7aaacded8f4f1)
+
+## run-floor-sprint-2-2026-08
+- a-performance-requirement-inherits-its-measurement-context (derived-from)
+- prove-identity-before-you-change-bytes (derived-from)
+- recognition-data-must-be-frozen-not-derived (derived-from)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

@@ -106,7 +106,15 @@ build here; this phase exists so the sequence is visible in one place.
 ## Sequencing and exit
 
 Order: 1 → 2 → 3 (4 is standing). Phases 1+2 are plausibly one build
-session; Phase 3 a second. Exit condition = the loop insight's dismissal
+session; Phase 3 a second.
+
+**Precondition met 2026-08-22.** This plan was sequenced after the structure
+sprint so its generated blocks derive from a settled module layout rather
+than one about to be reshaped (`floor-sprint-1-scope-2026-08-21`, restated
+in `floor-sprint-2-scope-2026-08-22`). Sprint 2 sealed that reshaping: the
+leaf contract, the shared adapter emission module, and the inverted fitness
+gate are landed and verified. This plan is now unblocked and is the next
+sprint's subject. Exit condition = the loop insight's dismissal
 condition: the checks landed AND one post-release cold read returns zero
 fix-residue-class findings. At that point this plan completes and the
 insight retires into practice.

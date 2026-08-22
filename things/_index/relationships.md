@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-22
-generated: 2026-08-22T08:47:50
-generated_from: HEAD@ec7598b
-coverage: 257
+generated: 2026-08-22T12:24:02
+generated_from: HEAD@78f89e0
+coverage: 260
 framework_version: 3.33.0
 ---
 
@@ -69,6 +69,9 @@ framework_version: 3.33.0
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --derived-from--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --complements--> mis-keyed-links-pass-the-floor-silently
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --supports--> the-harness-bound-path-is-the-least-tested-path
+- a-performance-requirement-inherits-its-measurement-context --informs--> floor-block-requirements-2026-08
+- a-performance-requirement-inherits-its-measurement-context --derived-from--> run-floor-sprint-2-2026-08
+- a-performance-requirement-inherits-its-measurement-context --complements--> an-incident-seeded-list-encodes-the-symptom-not-the-rule
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --extends--> emitted-content-is-read-instructed-content-is-economised
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --references--> a-scaffold-cannot-birth-its-own-author
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --challenges--> read-thing-specification
@@ -465,6 +468,7 @@ framework_version: 3.33.0
 - floor-block-requirements-2026-08 --references--> coherence-mechanism-build
 - floor-block-requirements-2026-08 --references--> evidence-and-eval-backlog
 - floor-block-requirements-2026-08 --references--> a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen
+- floor-block-requirements-2026-08 --implements--> a-performance-requirement-inherits-its-measurement-context
 - floor-sprint-1-design-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-sprint-1-scope-2026-08-21 --informs--> run-floor-sprint-1-2026-08
 - floor-sprint-2-design-2026-08 --informs--> run-floor-sprint-2-2026-08
@@ -754,6 +758,9 @@ framework_version: 3.33.0
 - protecting-one-budget-displaces-the-failure-into-the-other --complements--> the-harness-bound-path-is-the-least-tested-path
 - protecting-one-budget-displaces-the-failure-into-the-other --derived-from--> lifecycle-output-truncation-2026-08-14
 - protecting-one-budget-displaces-the-failure-into-the-other --derived-from--> claude-gate-6r-acceptance-2026-08-16
+- prove-identity-before-you-change-bytes --informs--> substrate-floor-development
+- prove-identity-before-you-change-bytes --derived-from--> run-floor-sprint-2-2026-08
+- prove-identity-before-you-change-bytes --complements--> recognition-data-must-be-frozen-not-derived
 - provenance-specification --informs--> membrane-attention-cluster
 - provenance-specification --extends--> thing-specification
 - provenance-specification --complements--> git-workflow-specification
@@ -781,6 +788,9 @@ framework_version: 3.33.0
 - read-thing-specification --extends--> thing-specification
 - read-thing-specification --complements--> write-thing-specification
 - read-thing-specification --references--> reasoning-lenses-specification
+- recognition-data-must-be-frozen-not-derived --complements--> existence-is-not-currency
+- recognition-data-must-be-frozen-not-derived --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
+- recognition-data-must-be-frozen-not-derived --derived-from--> run-floor-sprint-2-2026-08
 - reconciliation-candidates-are-detectable-from-the-commit-stream --informs--> change-reconciliation-specification
 - reconciliation-candidates-are-detectable-from-the-commit-stream --supports--> orient-and-reconciliation-are-the-corpus-two-sides
 - reconciliation-candidates-are-detectable-from-the-commit-stream --supports--> directional-graph-reads-come-in-inbound-outbound-pairs
@@ -876,6 +886,7 @@ framework_version: 3.33.0
 - substrate-currency-sweep --references--> tracking-artifacts-can-drift-from-reality
 - substrate-currency-sweep --references--> estate-cadence-cluster
 - substrate-floor-development --implements--> workflow-state-specification
+- substrate-floor-development --implements--> prove-identity-before-you-change-bytes
 - substrate-floor-development --references--> substrate-review-consolidated-remedy-2026-08-20
 - substrate-reconciliation-2026-08-09 --informs--> orchestration-specification
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification

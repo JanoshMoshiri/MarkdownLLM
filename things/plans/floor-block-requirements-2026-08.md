@@ -22,6 +22,9 @@ linked_things:
   - id: a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen
     relation: references
     notes: "F9's rationale: the structural tests exist because the four-scan fix was landed as an unwired parameter and believed complete for two days."
+  - id: a-performance-requirement-inherits-its-measurement-context
+    relation: implements
+    notes: "The v1.1 measurement protocol is that insight's mechanism: budgets are steady-state facts, non-steady readings are recorded as context, and F14 carries its did-not-reproduce evidence rather than being silently dropped or built anyway."
 ---
 
 # Floor Block Requirements — 2026-08
