@@ -43,7 +43,7 @@ from ..harness_ports import (
     HANDLER_TIMEOUT_SECONDS, AdapterCapabilities, DiagnosticPresentation,
     HarnessContext, InspectionReport, LifecycleBinding, ManagedFragment,
 )
-from ..runtime import SH_RESOLVE
+from ..hook_contract import SH_RESOLVE
 
 
 def _unique_json_object(pairs):

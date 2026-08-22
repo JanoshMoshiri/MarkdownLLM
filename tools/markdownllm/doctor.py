@@ -25,7 +25,7 @@ from .model import parse_frontmatter
 from .repo import version_lt
 from .runtime import execution_test_hook, probe as runtime_probe
 from .hook_contract import MDLLM_ENTRY
-from .scaffold import rendered_hook_contract, resolve_hooks_dir
+from .hook_contract import rendered_hook_contract, resolve_hooks_dir
 from .sync import PublicationPolicyState, publication_policy
 from .yaml_loader import load_version_sentinel
 

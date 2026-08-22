@@ -170,10 +170,15 @@ def test_package_has_no_cross_module_private_imports():
 
 
 def test_hook_execution_layers_do_not_depend_on_scaffold():
+    # Executors (runtime, repository_transaction) and diagnosers (doctor,
+    # session) consume the leaf contract; none may reach back into the
+    # producer. doctor and session joined the set when sprint 2's F4 move
+    # deleted their scaffold edges — this pins them deleted.
     modules = _package_modules()
     known = set(modules)
     for name in ("markdownllm.hook_contract", "markdownllm.runtime",
-                 "markdownllm.repository_transaction"):
+                 "markdownllm.repository_transaction",
+                 "markdownllm.doctor", "markdownllm.session"):
         dependencies, _ = _local_imports(name, modules[name], known)
         assert "markdownllm.scaffold" not in dependencies, (
             f"{name} imports the hook producer instead of its leaf contract")

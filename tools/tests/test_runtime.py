@@ -18,6 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import mdllm  # noqa: E402
+from markdownllm import hook_contract  # noqa: E402
 from markdownllm import runtime  # noqa: E402
 from markdownllm import scaffold as scaffold_mod  # noqa: E402
 
@@ -74,7 +75,7 @@ def test_probe_reports_command_executed_as_its_own_fact(tmp_path, monkeypatch):
     # borrow a PyYAML-capable PATH interpreter from the authoring harness.
     monkeypatch.setattr(runtime, "interpreter_candidates",
                         lambda root, fw: [
-                            runtime.InterpreterCandidate(sys.executable)])
+                            hook_contract.InterpreterCandidate(sys.executable)])
     result = runtime.probe(tmp_path, Path(mdllm.__file__), dependency="yaml")
     assert result["resolved"] == sys.executable
     assert result["command_executed"] is True
@@ -102,7 +103,7 @@ def test_candidate_order_matches_the_sh_fragment(tmp_path):
             ("python3", ()), ("python", ())])
     assert [(c.executable, c.prefix_args)
             for c in cands[len(expected_paths):]] == expected_path_names
-    frag = runtime.SH_RESOLVE
+    frag = hook_contract.SH_RESOLVE
     order = [frag.index(f'"$ROOT/{t}"') for t in tails]
     order += [frag.index(f'"$FW/{t}"') for t in tails]
     assert order == sorted(order)
@@ -117,10 +118,10 @@ def test_candidate_order_matches_the_sh_fragment(tmp_path):
 
 
 def test_every_hook_body_carries_the_shared_fragment_once():
-    for body in (mdllm.HOOK_BODY, scaffold_mod.POST_COMMIT_HOOK_BODY,
-                 mdllm.COMMIT_MSG_HOOK_BODY):
+    for body in (mdllm.HOOK_BODY, hook_contract.POST_COMMIT_HOOK_BODY,
+                 hook_contract.COMMIT_MSG_HOOK_BODY):
         emitted = body.format(rel="../../tools/mdllm.py")
-        assert emitted.count(runtime.SH_RESOLVE) == 1
+        assert emitted.count(hook_contract.SH_RESOLVE) == 1
         assert "import yaml" in emitted          # dependency probe
         assert '-c "import sys"' not in emitted  # the defective probe is gone
         assert '"$FW/.venv' in emitted           # framework env reachable
@@ -402,7 +403,7 @@ def test_nested_domain_hook_derives_framework_env(tmp_path):
     rc = mdllm.cmd_scaffold(_ns(path=str(target)))
     assert rc == 0  # the birth commit itself already ran the new pre-commit
     hook = (target / ".git" / "hooks" / "pre-commit").read_text(encoding="utf-8")
-    assert runtime.SH_RESOLVE in hook
+    assert hook_contract.SH_RESOLVE in hook
     assert 'FW="${MDLLM%/*/*}"' in hook  # parameter expansion, no dirname
     assert "dirname" not in hook
 

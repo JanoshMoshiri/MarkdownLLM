@@ -27,7 +27,7 @@ from markdownllm.harness_ports import HarnessContext  # noqa: E402
 from markdownllm.harness_diagnostics import (  # noqa: E402
     record_execution_attestation,
 )
-from markdownllm.scaffold import MDLLM_ENTRY  # noqa: E402
+from markdownllm.hook_contract import MDLLM_ENTRY  # noqa: E402
 
 
 def _run_cli(argv: list[str]) -> int:

@@ -281,10 +281,11 @@ def _floor_status(root: Path) -> str | None:
 
     Deliberately cheap — presence and body-freshness only, no `git hook run`
     (that stays doctor's deep probe): this runs on every session start.
-    Imports are deferred because scaffold imports this module.
+    Contract bytes come from the leaf — session diagnoses against the
+    contract, never against the producer.
     """
-    from .scaffold import (COMMIT_MSG_HOOK_BODY, HOOK_BODY,
-                           hook_mdllm_route, resolve_hooks_dir)
+    from .hook_contract import (COMMIT_MSG_HOOK_BODY, HOOK_BODY,
+                                hook_mdllm_route, resolve_hooks_dir)
 
     inside = subprocess.run(["git", "rev-parse", "--git-dir"], cwd=root,
                             capture_output=True, text=True,

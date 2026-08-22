@@ -1,4 +1,8 @@
-"""Shared runtime resolution — one owner for "which interpreter runs the floor".
+"""Python-side execution of the floor's interpreter policy.
+
+The candidate policy itself — tables, emitted sh fragment, dependency name —
+is contract data owned by ``hook_contract`` (the leaf); this module probes
+and executes it.
 
 Before this module (vendor-harness-adapter-foundation, Phase 1) the candidate
 list lived three times in the emitted hook bodies and once more in mdllm.ps1,
@@ -32,111 +36,19 @@ import os
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 
-from .harness_ports import LAUNCH_RESOLUTION_SECONDS
-from .hook_contract import MDLLM_ENTRY
-
-# The dependency that makes an interpreter *usable* by the floor, not merely
-# present. One name, probed everywhere the floor may run.
-FLOOR_DEPENDENCY = "yaml"
-
-# Emitted into every hook body after ROOT and MDLLM are set. Kept free of
-# braces so the surrounding template's .format(rel=...) passes it through.
-# Candidate order: domain-local environment first (a domain that manages its
-# own venv wins), then the framework-root environment derived from MDLLM,
-# then PATH interpreters. POSIX and Windows venv layouts are both covered.
-# The framework root comes from parameter expansion, NOT dirname: managed
-# Git-hook shells (Codex, Phase 2B finding) run without the external utility
-# set on PATH, and $MDLLM always ends tools/mdllm.py, so stripping the last
-# two path components is exact and needs no subprocess at all.
-@dataclass(frozen=True)
-class InterpreterCandidate:
-    """One candidate as executable plus immutable prefix arguments."""
-
-    executable: str
-    prefix_args: tuple[str, ...] = ()
-
-    def command(self, *args: str) -> list[str]:
-        return [self.executable, *self.prefix_args, *args]
-
-
-_RELATIVE_CANDIDATES: tuple[tuple[str, str, str], ...] = (
-    ("root", ".venv/bin/python", "posix"),
-    ("root", ".venv/Scripts/python.exe", "windows"),
-    ("framework", ".venv/bin/python", "posix"),
-    ("framework", ".venv/Scripts/python.exe", "windows"),
-)
-_PATH_CANDIDATES: tuple[tuple[InterpreterCandidate, str], ...] = (
-    (InterpreterCandidate("python3"), "any"),
-    (InterpreterCandidate("python"), "any"),
-    (InterpreterCandidate("py", ("-3",)), "windows"),
+# The candidate policy, the emitted sh fragment, and the dependency name are
+# CONTRACT data and live in the leaf (hook_contract) — one owner shared with
+# the hook producers and the byte-currency diagnosers. This module owns the
+# Python-side EXECUTION of that policy: probing candidates, selecting the
+# interpreter, and execution-testing installed hooks.
+from .hook_contract import (
+    FLOOR_DEPENDENCY, MDLLM_ENTRY, InterpreterCandidate,
+    PATH_CANDIDATES, RELATIVE_CANDIDATES,
 )
 
 
-def _render_sh_resolve() -> str:
-    """Encode the neutral candidate policy for an sh-compatible edge."""
-    lines = [
-        'FW="${MDLLM%/*/*}"', 'PY=""', 'PY_PREFIX=""',
-        'MDLLM_LAUNCH_DEADLINE=""', 'MDLLM_DATE=""', 'MDLLM_TIMEOUT=""',
-        'if [ -x /usr/bin/date ] && [ -x /usr/bin/timeout ]; then',
-        '  MDLLM_DATE=/usr/bin/date',
-        '  MDLLM_TIMEOUT=/usr/bin/timeout',
-        'elif timeout --version >/dev/null 2>&1 && '
-        'date +%s >/dev/null 2>&1; then',
-        '  MDLLM_DATE=date',
-        '  MDLLM_TIMEOUT=timeout',
-        'fi',
-        'if [ -n "$MDLLM_DATE" ] && [ -n "$MDLLM_TIMEOUT" ]; then',
-        f'  MDLLM_LAUNCH_DEADLINE=$(( $("$MDLLM_DATE" +%s) + '
-        f'{LAUNCH_RESOLUTION_SECONDS} ))',
-        'fi',
-        'mdllm_probe() {',
-        '  [ -n "$MDLLM_LAUNCH_DEADLINE" ] || return 1',
-        '  mdllm_remaining=$(( MDLLM_LAUNCH_DEADLINE - '
-        '$("$MDLLM_DATE" +%s) ))',
-        '  [ "$mdllm_remaining" -gt 0 ] || return 1',
-        '  "$MDLLM_TIMEOUT" "$mdllm_remaining" "$@" -c "import yaml" '
-        '>/dev/null 2>&1',
-        '}',
-    ]
-    specs: list[tuple[str, tuple[str, ...], str]] = []
-    for anchor, suffix, platform in _RELATIVE_CANDIDATES:
-        base = "$ROOT" if anchor == "root" else "$FW"
-        specs.append((f"{base}/{suffix}", (), platform))
-    specs.extend((candidate.executable, candidate.prefix_args, platform)
-                 for candidate, platform in _PATH_CANDIDATES)
-    # MSYSTEM is the positive Git-for-Windows shell signal observed by the
-    # live Claude dispatch probe. Unlike inherited COMSPEC/Windows PATH
-    # entries, it is absent in native WSL/POSIX shells.
-    lines.append('MDLLM_WINDOWS_SH="${MSYSTEM:-}"')
-    for executable, prefix, platform in specs:
-        quoted = f'"{executable}"' if executable.startswith("$") else executable
-        prefix_text = " ".join(f'"{arg}"' for arg in prefix)
-        command = " ".join(part for part in
-                           ('mdllm_probe', quoted, prefix_text) if part)
-        platform_guard = ('[ -n "$MDLLM_WINDOWS_SH" ] && '
-                          if platform == "windows" else "")
-        lines.append(
-            f'if [ -z "$PY" ] && {platform_guard}{command}; then')
-        lines.append(f'  PY="{executable}"')
-        if prefix:
-            lines.append(f'  PY_PREFIX="{prefix[0]}"')
-        lines.append("fi")
-    lines.extend((
-        "mdllm_python() {",
-        '  if [ -n "$PY_PREFIX" ]; then',
-        '    "$PY" "$PY_PREFIX" "$@"',
-        "  else",
-        '    "$PY" "$@"',
-        "  fi",
-        "}",
-    ))
-    return "\n".join(lines)
-
-
-SH_RESOLVE = _render_sh_resolve()
 
 
 def interpreter_candidates(root: Path, fw_root: Path) \
@@ -145,9 +57,9 @@ def interpreter_candidates(root: Path, fw_root: Path) \
     bases = {"root": root, "framework": fw_root}
     windows = sys.platform == "win32"
     relative = [InterpreterCandidate(str(bases[anchor] / Path(suffix)))
-                for anchor, suffix, platform in _RELATIVE_CANDIDATES
+                for anchor, suffix, platform in RELATIVE_CANDIDATES
                 if platform != "windows" or windows]
-    path_candidates = [candidate for candidate, platform in _PATH_CANDIDATES
+    path_candidates = [candidate for candidate, platform in PATH_CANDIDATES
                        if platform != "windows" or windows]
     return [*relative, *path_candidates]
 

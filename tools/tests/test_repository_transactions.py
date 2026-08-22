@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from markdownllm import assemble as assemble_mod  # noqa: E402
 from markdownllm import git_transport as transport_mod  # noqa: E402
 from markdownllm import publish as publish_mod  # noqa: E402
+from markdownllm import hook_contract  # noqa: E402
 from markdownllm import scaffold as scaffold_mod  # noqa: E402
 from markdownllm import sync as sync_mod  # noqa: E402
 from markdownllm import runtime as runtime_mod  # noqa: E402
@@ -57,7 +58,7 @@ def test_install_hook_honours_core_hooks_path_and_is_uninstallable(tmp_path):
 
     scaffold_mod.install_hook(repo)
 
-    hooks = scaffold_mod.resolve_hooks_dir(repo)
+    hooks = hook_contract.resolve_hooks_dir(repo)
     assert hooks == (repo / ".operator-hooks").resolve()
     assert {p.name for p in hooks.iterdir()} == {
         "pre-commit", "commit-msg", "post-commit"}
@@ -92,13 +93,13 @@ def test_install_hook_resolves_gitfile_worktree_hooks(tmp_path):
 
     scaffold_mod.install_hook(linked)
 
-    hooks = scaffold_mod.resolve_hooks_dir(linked)
+    hooks = hook_contract.resolve_hooks_dir(linked)
     reported = _git(linked, "rev-parse", "--path-format=absolute",
                     "--git-path", "hooks").stdout.strip()
     assert hooks == Path(reported).resolve()
     assert (hooks / "pre-commit").is_file()
     installed = (hooks / "pre-commit").read_text(encoding="utf-8")
-    assert f'MDLLM_ROUTE="{scaffold_mod.MDLLM_ENTRY.as_posix()}"' in installed
+    assert f'MDLLM_ROUTE="{hook_contract.MDLLM_ENTRY.as_posix()}"' in installed
     assert 'MDLLM="$ROOT/C:' not in installed
     scaffold_mod.uninstall_hook(linked)
 
@@ -107,7 +108,7 @@ def test_install_hook_rollback_never_overwrites_concurrent_operator_edit(
         tmp_path, monkeypatch):
     repo = _repo(tmp_path / "repo")
     scaffold_mod.install_hook(repo)
-    hooks = scaffold_mod.resolve_hooks_dir(repo)
+    hooks = hook_contract.resolve_hooks_dir(repo)
     operator = b"#!/bin/sh\n# concurrent operator edit\nexit 7\n"
     original_replace = Path.replace
 
@@ -125,18 +126,18 @@ def test_install_hook_rollback_never_overwrites_concurrent_operator_edit(
 
     assert (hooks / "pre-commit").read_bytes() == operator
     # The failed and not-yet-applied legs retain their exact prior mdllm bytes.
-    rel = scaffold_mod.hook_mdllm_route(repo)
+    rel = hook_contract.hook_mdllm_route(repo)
     assert (hooks / "commit-msg").read_bytes() == (
-        scaffold_mod.COMMIT_MSG_HOOK_BODY.format(rel=rel).encode("utf-8"))
+        hook_contract.COMMIT_MSG_HOOK_BODY.format(rel=rel).encode("utf-8"))
     assert (hooks / "post-commit").read_bytes() == (
-        scaffold_mod.POST_COMMIT_HOOK_BODY.format(rel=rel).encode("utf-8"))
+        hook_contract.POST_COMMIT_HOOK_BODY.format(rel=rel).encode("utf-8"))
 
 
 def test_install_hook_rechecks_each_snapshot_before_first_replace(
         tmp_path, monkeypatch):
     repo = _repo(tmp_path / "repo")
     scaffold_mod.install_hook(repo)
-    hooks = scaffold_mod.resolve_hooks_dir(repo)
+    hooks = hook_contract.resolve_hooks_dir(repo)
     operator = b"#!/bin/sh\n# changed while payloads staged\nexit 3\n"
     original_stage = scaffold_mod._stage_hook
     staged_count = {"value": 0}
@@ -160,7 +161,7 @@ def test_uninstall_rollback_never_overwrites_concurrent_recreation(
         tmp_path, monkeypatch):
     repo = _repo(tmp_path / "repo")
     scaffold_mod.install_hook(repo)
-    hooks = scaffold_mod.resolve_hooks_dir(repo)
+    hooks = hook_contract.resolve_hooks_dir(repo)
     operator = b"#!/bin/sh\n# recreated after unlink\nexit 9\n"
     original_unlink = Path.unlink
 
@@ -289,7 +290,7 @@ def test_real_hook_blocks_index_mutation_between_subchecks(
         "    subprocess.run(['git', 'add', 'candidate.txt'], cwd=root, check=True)\n"
         "raise SystemExit(0)\n",
         encoding="utf-8", newline="\n")
-    monkeypatch.setattr(scaffold_mod, "MDLLM_ENTRY", fake_entry)
+    monkeypatch.setattr(hook_contract, "MDLLM_ENTRY", fake_entry)
     scaffold_mod.install_hook(repo)
     # Give the emitted portable resolver a repo-local POSIX candidate which
     # delegates to this test runner's known floor-capable interpreter. This is

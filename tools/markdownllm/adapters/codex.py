@@ -43,7 +43,7 @@ from ..harness_diagnostics import (
     AdapterProbe,
     managed_definition_hash,
 )
-from ..runtime import SH_RESOLVE
+from ..hook_contract import SH_RESOLVE
 from ..adapter_install import (
     LegacyDefinition,
     NestedJsonArrayGroupsPolicy,

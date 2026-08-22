@@ -26,196 +26,18 @@ from .boundary import TERMS_FILE
 from .harness_ports import (
     HarnessContext, RenderPort, ScaffoldNoticePort, ShortcutPort,
 )
-from .hook_contract import HookByteContract, MDLLM_ENTRY
-from .runtime import SH_RESOLVE, execution_test_hook
+from . import hook_contract as _contract
+from .hook_contract import (
+    HOOK_BODIES, HOOK_MARKERS, hook_mdllm_route,
+    rendered_hook_contract, repository_root, resolve_hooks_dir,
+)
+from .runtime import execution_test_hook
 from .domain_kernel import apply_domain_kernel, build_domain_kernel_blocks
 from .model import ID_RE, parse_frontmatter
 from .repository_transaction import (
     RepositoryTransaction, RepositoryTransactionError,
 )
 from .yaml_loader import load_version_sentinel
-
-HOOK_BODY = """#!/bin/sh
-# mdllm pre-commit: deterministic validation floor (transformation plan Phase 1)
-# Portable: repo root and interpreter are resolved at run time, mdllm.py via a
-# path relative to the repo root — so the same hook works wherever this repo is
-# checked out or mounted (Windows, WSL, CI, sandboxed agent harnesses).
-ROOT="$(git rev-parse --show-toplevel)"
-MDLLM_ROUTE="{rel}"
-case "$MDLLM_ROUTE" in
-  /*|[A-Za-z]:/*) MDLLM="$MDLLM_ROUTE" ;;
-  *) MDLLM="$ROOT/$MDLLM_ROUTE" ;;
-esac
-# Interpreter resolution (one owner: markdownllm/runtime.py — the comment
-# there explains the candidate order and why the probe imports the floor's
-# real dependency rather than just proving an interpreter exists).
-{resolve}
-if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
-  echo "mdllm: validation floor unavailable (no interpreter with PyYAML, or $MDLLM not found) — commit blocked."
-  echo "Run \\`mdllm runtime-probe .\\` (or \\`python <framework>/tools/mdllm.py runtime-probe .\\`) for a per-candidate report."
-  exit 1
-fi
-# Freeze one exact candidate for every floor subprocess. Without this pin,
-# four individually immutable RepositoryView.index constructions could still
-# observe four different trees if another process changed the index between
-# commands. The end comparison is the optimistic CAS: movement blocks retry.
-MDLLM_FROZEN_INDEX_TREE="$(git write-tree)" || {{
-  echo "mdllm: could not freeze the staged candidate — commit blocked."
-  exit 1
-}}
-MDLLM_FROZEN_INDEX_ROOT="$ROOT"
-export MDLLM_FROZEN_INDEX_TREE MDLLM_FROZEN_INDEX_ROOT
-# All four floor legs — boundary, validate, coherence (blocking) and the
-# change-reconciliation candidates advisory (never blocking) — run
-# CONCURRENTLY against the frozen candidate through one coordinator. The
-# legs are the same CLI commands with the same arguments and inherit the
-# frozen-index environment above; per-leg output, messages, and semantics
-# are unchanged (mdllm precommit composes, never reimplements). Wall time
-# is the slowest leg, not the sum of four (floor-sprint-1 F11 / remedy 3C).
-mdllm_python "$MDLLM" precommit "$ROOT" || exit 1
-MDLLM_CURRENT_INDEX_TREE="$(git write-tree)" || {{
-  echo "mdllm: could not re-read the staged candidate — commit blocked."
-  exit 1
-}}
-if [ "$MDLLM_CURRENT_INDEX_TREE" != "$MDLLM_FROZEN_INDEX_TREE" ]; then
-  echo ""
-  echo "mdllm: the staged index changed while the floor was running — commit blocked; retry against one candidate."
-  exit 1
-fi
-"""
-
-# The publication leg (estate-cadence-cluster Phase 1): after a commit lands
-# and the floor has validated it, publish it — transport of already-committed,
-# already-validated state, the mirror of estate-sync's fast-forwards. Opt-in
-# per repo via literal `git: autopush: true` in AGENTS.md frontmatter; absence,
-# malformed policy, and false are all off.
-# All outcome handling (rejected = DIVERGED surfaced never resolved, offline =
-# publication debt, no --force ever) lives in `mdllm autopush`; the hook only
-# invokes it and always exits 0 — a post-commit surface must never fail the
-# commit it follows.
-POST_COMMIT_HOOK_BODY = """#!/bin/sh
-# mdllm post-commit: autopush publication leg (estate-cadence-cluster Phase 1)
-ROOT="$(git rev-parse --show-toplevel)"
-MDLLM_ROUTE="{rel}"
-case "$MDLLM_ROUTE" in
-  /*|[A-Za-z]:/*) MDLLM="$MDLLM_ROUTE" ;;
-  *) MDLLM="$ROOT/$MDLLM_ROUTE" ;;
-esac
-{resolve}
-if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
-  exit 0  # no floor available: publication stays manual; estate-sync --status reports the debt
-fi
-mdllm_python "$MDLLM" autopush "$ROOT" || true
-exit 0
-"""
-
-# The commit MESSAGE is a surface pre-commit structurally cannot see (git has
-# not collected it yet) — and it is where honour-system disclosure failures
-# actually live. Same portable preamble as HOOK_BODY; $1 is the message file.
-COMMIT_MSG_HOOK_BODY = """#!/bin/sh
-# mdllm commit-msg: disclosure-boundary check on the commit message
-# (boundary-disclosure-check plan). Local .boundary-terms only; absent => no-op.
-ROOT="$(git rev-parse --show-toplevel)"
-MDLLM_ROUTE="{rel}"
-case "$MDLLM_ROUTE" in
-  /*|[A-Za-z]:/*) MDLLM="$MDLLM_ROUTE" ;;
-  *) MDLLM="$ROOT/$MDLLM_ROUTE" ;;
-esac
-{resolve}
-if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then
-  exit 0  # no floor available: the pre-commit hook already reported/blocked
-fi
-mdllm_python "$MDLLM" boundary "$ROOT" --message "$1" --quiet || {{
-  echo ""
-  echo "mdllm: the commit MESSAGE crosses the disclosure boundary — commit blocked."
-  exit 1
-}}
-"""
-
-# Interpreter resolution has ONE owner (runtime.py); substituted here once so
-# every consumer — install_hook's writes, doctor's currency comparison — sees
-# the same final bytes. Only {rel} remains for per-repo formatting, so the
-# fragment's shell braces (${MDLLM%/*/*}) are doubled to survive .format().
-_SH_RESOLVE_ESCAPED = SH_RESOLVE.replace("{", "{{").replace("}", "}}")
-HOOK_BODY = HOOK_BODY.replace("{resolve}", _SH_RESOLVE_ESCAPED)
-POST_COMMIT_HOOK_BODY = POST_COMMIT_HOOK_BODY.replace(
-    "{resolve}", _SH_RESOLVE_ESCAPED)
-COMMIT_MSG_HOOK_BODY = COMMIT_MSG_HOOK_BODY.replace(
-    "{resolve}", _SH_RESOLVE_ESCAPED)
-
-
-_HOOK_BODIES = {
-    "pre-commit": HOOK_BODY,
-    "commit-msg": COMMIT_MSG_HOOK_BODY,
-    "post-commit": POST_COMMIT_HOOK_BODY,
-}
-
-_HOOK_MARKERS = {
-    "pre-commit": "# mdllm pre-commit:",
-    "commit-msg": "# mdllm commit-msg:",
-    "post-commit": "# mdllm post-commit:",
-}
-
-
-def rendered_hook_contract(root: Path) -> HookByteContract:
-    """Return the exact managed hook bytes trusted for ``root``."""
-    rel = hook_mdllm_route(root)
-    return HookByteContract.from_mapping({
-        name: body.format(rel=rel).encode("utf-8")
-        for name, body in _HOOK_BODIES.items()
-    })
-
-
-def _git_path(root: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(root), *args],
-                          capture_output=True, text=True)
-
-
-def repository_root(root: Path) -> Path:
-    """Resolve the worktree root through git, including a `.git` gitfile."""
-    result = _git_path(root, "rev-parse", "--show-toplevel")
-    if result.returncode != 0 or not result.stdout.strip():
-        sys.exit(f"mdllm: {root} is not inside a git worktree")
-    return Path(result.stdout.strip()).resolve()
-
-
-def resolve_hooks_dir(root: Path) -> Path:
-    """Return the directory git will actually use for hooks.
-
-    `git rev-parse --git-path hooks` is the authority here: unlike
-    `root/.git/hooks`, it follows gitfiles/linked worktrees and
-    `core.hooksPath`.  The absolute form is available on supported modern git;
-    the fallback retains compatibility with older git and resolves its answer
-    against the worktree root.
-    """
-    repo = repository_root(root)
-    result = _git_path(
-        repo, "rev-parse", "--path-format=absolute", "--git-path", "hooks")
-    if result.returncode == 0 and result.stdout.strip():
-        return Path(result.stdout.strip()).resolve()
-    result = _git_path(repo, "rev-parse", "--git-path", "hooks")
-    if result.returncode != 0 or not result.stdout.strip():
-        sys.exit(f"mdllm: git could not resolve the hooks directory for {repo}")
-    hooks = Path(result.stdout.strip())
-    return hooks.resolve() if hooks.is_absolute() else (repo / hooks).resolve()
-
-
-def hook_mdllm_route(repo: Path) -> str:
-    """Route embedded in a hook, portable unless git shares it by worktree.
-
-    Linked worktrees share their common hooks directory but can sit at
-    unrelated filesystem depths. A route relative to whichever worktree ran
-    install would break the others, so that local (never cloned) hook uses the
-    framework's absolute path. Ordinary repos retain the move-friendly route.
-    """
-    repo = repository_root(repo)
-    if (repo / ".git").is_file():
-        return MDLLM_ENTRY.as_posix()
-    try:
-        return Path(os.path.relpath(MDLLM_ENTRY, repo)).as_posix()
-    except ValueError:  # different drives: no valid relative route exists
-        return MDLLM_ENTRY.as_posix()
-
 
 def _managed_for_repo(path: Path, name: str, rel: str) -> bool:
     """True only for a hook previously installed for this repository.
@@ -228,7 +50,7 @@ def _managed_for_repo(path: Path, name: str, rel: str) -> bool:
         installed = path.read_text(encoding="utf-8", errors="strict")
     except (OSError, UnicodeError):
         return False
-    return (_HOOK_MARKERS[name] in installed
+    return (HOOK_MARKERS[name] in installed
             and f'MDLLM_ROUTE="{rel}"' in installed)
 
 
@@ -336,7 +158,7 @@ def install_hook(root: Path) -> str:
     hooks_dir = resolve_hooks_dir(repo)
     rel = hook_mdllm_route(repo)
 
-    targets = {name: hooks_dir / name for name in _HOOK_BODIES}
+    targets = {name: hooks_dir / name for name in HOOK_BODIES}
     for name, path in targets.items():
         tmp = hooks_dir / f".{name}.mdllm-install"
         if tmp.exists():
@@ -358,7 +180,7 @@ def install_hook(root: Path) -> str:
     try:
         hooks_dir.mkdir(parents=True, exist_ok=True)
         for name, path in targets.items():
-            payload = _HOOK_BODIES[name].format(rel=rel).encode("utf-8")
+            payload = HOOK_BODIES[name].format(rel=rel).encode("utf-8")
             before = snapshots[path]
             mode = (before.mode | 0o111) if before.existed else 0o755
             tmp = _stage_hook(path, payload, mode)
@@ -389,7 +211,7 @@ def uninstall_hook(root: Path) -> Path:
     repo = repository_root(Path(root).resolve())
     hooks_dir = resolve_hooks_dir(repo)
     rel = hook_mdllm_route(repo)
-    targets = {name: hooks_dir / name for name in _HOOK_BODIES}
+    targets = {name: hooks_dir / name for name in HOOK_BODIES}
     for name, path in targets.items():
         if path.exists() and (path.is_symlink() or not path.is_file()
                               or not _managed_for_repo(path, name, rel)):
@@ -800,7 +622,9 @@ def _cmd_scaffold_impl(args, progress: _ScaffoldProgress) -> int:
     What remains semantic — thing types and vocabularies in _schema.yaml,
     skill content, AGENTS.md sections, the first real things — stays with
     the agent and the human, where it belongs."""
-    fw_root = MDLLM_ENTRY.parents[1]
+    # Late-bound through the leaf so one binding serves every
+    # consumer (and every test double) — no second copy to drift.
+    fw_root = _contract.MDLLM_ENTRY.parents[1]
     sentinel = fw_root / ".markdownllm"
     if not sentinel.is_file():
         sys.exit("mdllm: scaffold requires a framework checkout (.markdownllm not found)")

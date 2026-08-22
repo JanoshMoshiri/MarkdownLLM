@@ -18,6 +18,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from markdownllm import hook_contract
 from markdownllm import scaffold as scaffold_mod  # noqa: E402
 from markdownllm import cli as cli_mod  # noqa: E402
 from markdownllm.doctor import cmd_doctor  # noqa: E402
@@ -185,7 +186,7 @@ def test_scaffold_refuses_malformed_framework_sentinel_cleanly(
     fake_entry = framework / "tools" / "mdllm.py"
     fake_entry.parent.mkdir()
     fake_entry.write_text("# fake entry\n", encoding="utf-8")
-    monkeypatch.setattr(scaffold_mod, "MDLLM_ENTRY", fake_entry)
+    monkeypatch.setattr(hook_contract, "MDLLM_ENTRY", fake_entry)
 
     with pytest.raises(SystemExit) as raised:
         scaffold_mod.cmd_scaffold(SimpleNamespace(

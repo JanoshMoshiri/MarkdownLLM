@@ -78,12 +78,14 @@ from markdownllm.domain_kernel import (
 )
 from markdownllm.session import _velocity_signal, _orient_forward, cmd_session_start
 from markdownllm.coherence import _changed_files_recent, coherence_findings, cmd_coherence
+from markdownllm.hook_contract import (
+    HOOK_BODY, COMMIT_MSG_HOOK_BODY, FLOOR_DEPENDENCY, SH_RESOLVE,
+    InterpreterCandidate,
+)
 from markdownllm.scaffold import (
-    HOOK_BODY, COMMIT_MSG_HOOK_BODY, install_hook, cmd_install_hook,
-    cmd_scaffold,
+    install_hook, cmd_install_hook, cmd_scaffold,
 )
 from markdownllm.runtime import (
-    FLOOR_DEPENDENCY, SH_RESOLVE, InterpreterCandidate,
     interpreter_candidates, probe_candidate,
     probe, git_supports_hook_run, execution_test_hook, cmd_runtime_probe,
 )
