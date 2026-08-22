@@ -26,16 +26,16 @@ python -m pytest tools/tests -q -n auto
 `@pytest.mark.xdist_group("<reason>")` with the reason in a comment — no
 silent serialisation.
 
-## Platform coverage — the recorded limitation
+## Platform coverage
 
-CI (`.github/workflows/validate.yml`) exercises this suite on **Linux
-only** (ubuntu-24.04). The floor's most platform-sensitive machinery — the
-Windows command carriers (`commandWindows`, `mdllm.ps1`), the sh
-interpreter resolver, and the line-ending contract — is exercised in CI on
-one platform, and on Windows only by runs on the operator's reference
-machine. Read any portability claim accordingly: it is operator-machine
-evidence, not matrix evidence, until the CI matrix widens
-(floor-structure-residue item 6 owns that decision).
+CI (`.github/workflows/validate.yml`) runs the suite on a
+**Linux + Windows matrix** (ubuntu-24.04, windows-2025) since sprint 2
+(F7). Caveat until the first post-publication green run is observed: the
+Windows leg's config has landed but never executed — CI runs only after
+the operator's push — so Windows portability claims remain
+operator-reference-machine evidence until that run exists. If the hosted
+Windows leg proves intolerably slow, dropping it is the operator's call
+at the release act.
 
 ## Markers
 
