@@ -28,6 +28,9 @@ linked_things:
   - id: cumulative-drift-is-invisible-to-per-change-walks
     relation: supports
     notes: "The perimeter restatements below are fresh evidence for the razor: they sat outside every individual blast radius and were found by a cold read."
+  - id: a-declaration-is-inert-until-its-mechanism-is-current
+    relation: implements
+    notes: "Item 7's generalisation: the estate's hooks were three releases stale, so a current autopush declaration would have been unreadable by every installed byte. The item is the tool-side repair; the insight is the rule."
 ---
 
 # Floor Structure Residue

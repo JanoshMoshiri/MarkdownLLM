@@ -5,6 +5,9 @@ status: evolving
 version: 1.6
 created: 2026-05-19
 linked_things:
+  - id: a-domain-local-ruling-is-invisible-from-the-centre
+    relation: implements
+    notes: "The estate-sweep rule below: refreshes run per domain, embodied, because a domain's recorded rulings about an adoption are legible only from inside it. Paid for on 2026-08-23, when one domain's parked kernel-shape decision was found and honoured only by the agent oriented in it."
   - id: framework-discovery-specification
     relation: extends
   - id: git-workflow-specification
@@ -130,6 +133,34 @@ The refresh process reads these framework files in order:
        templates/prompts/ and re-adopt; the tier-routing managed block now
        routes prompts/, so the domain-kernel regen above is not optional
 ```
+
+### Refreshing The Estate: Per Domain, Embodied
+
+When several domains are refreshed in one operation, run each **as that
+domain's agent in its own context** — reading its `AGENTS.md`, orienting
+through its own session-start — never as a loop over directories from the
+framework root. Two reasons, both paid for on 2026-08-23:
+
+1. **A domain can record a decision that changes what the correct step is.**
+   One domain carried an operator ruling parking kernel-shape adoption with
+   an explicit unpark condition; only the agent oriented inside it saw the
+   ruling, skipped the regeneration, and named the skip in its commit. A
+   central loop would have overwritten the decision with every mechanical
+   check still reporting clean (`a-domain-local-ruling-is-invisible-from-the-centre`).
+2. **Sequential embodiment in one context degrades into a composite.** By the
+   ninth domain, an agent holding the previous eight is no longer reading the
+   ninth. Parallel isolated contexts are both faster and more faithful.
+
+Practical shape: one agent per domain, each given the walk and the hard
+constraints (no adapter installs — that boundary stays the operator's; no
+manual pushes; never `--no-verify`); each reports status back; the
+coordinating session verifies seals and publication afterwards. Also
+reinstall the domain's hooks in the same pass when a policy change depends
+on them (`a-declaration-is-inert-until-its-mechanism-is-current`), and
+rebuild derived indexes in dependency order — an index that is itself a
+thing (`triggers`) must be rebuilt *before* the indexes that must cover it
+(`schema`), or the first commit attempt is blocked by drift the rebuild
+itself created.
 
 ### Hardening: Harness Adapters (Operator, Optional)
 

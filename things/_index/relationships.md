@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-22
-generated: 2026-08-22T18:15:29
-generated_from: HEAD@6601f2e
-coverage: 264
+created: 2026-08-23
+generated: 2026-08-23T00:04:44
+generated_from: HEAD@aeb38b4
+coverage: 266
 framework_version: 3.34.0
 ---
 
@@ -47,9 +47,15 @@ framework_version: 3.34.0
 - a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist --complements--> the-rough-true-account-is-generative-infrastructure
 - a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist --complements--> existence-is-not-currency
 - a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist --complements--> a-ruling-triages-more-cheaply-than-a-mechanism
+- a-declaration-is-inert-until-its-mechanism-is-current --extends--> a-sharing-parameter-no-caller-passes-is-a-fix-that-did-not-happen
+- a-declaration-is-inert-until-its-mechanism-is-current --complements--> a-generated-contract-change-is-an-estate-migration
+- a-declaration-is-inert-until-its-mechanism-is-current --complements--> existence-is-not-currency
 - a-degrading-command-cannot-trigger-approval-by-succeeding --informs--> vendor-harness-adapter-foundation
 - a-degrading-command-cannot-trigger-approval-by-succeeding --supports--> the-harness-bound-path-is-the-least-tested-path
 - a-degrading-command-cannot-trigger-approval-by-succeeding --complements--> agents-cannot-self-install-permission-bearing-hooks
+- a-domain-local-ruling-is-invisible-from-the-centre --complements--> consistency-is-maintained-at-change-not-by-sweeping
+- a-domain-local-ruling-is-invisible-from-the-centre --complements--> a-generated-contract-change-is-an-estate-migration
+- a-domain-local-ruling-is-invisible-from-the-centre --references--> the-estates-second-clone-is-an-independent-witness
 - a-finding-does-not-earn-its-own-type --informs--> thing-specification
 - a-finding-does-not-earn-its-own-type --informs--> session-memory-specification
 - a-finding-does-not-earn-its-own-type --references--> retrospective-specification
@@ -375,6 +381,7 @@ framework_version: 3.34.0
 - divergence-is-an-unrouted-decision --informs--> llm-driven-systems-manifesto
 - divergence-primitive-promotion --informs--> llm-driven-systems-manifesto
 - divergence-primitive-promotion --informs--> divergence-is-an-unrouted-decision
+- domain-refresh-specification --implements--> a-domain-local-ruling-is-invisible-from-the-centre
 - domain-refresh-specification --extends--> framework-discovery-specification
 - domain-refresh-specification --references--> git-workflow-specification
 - domain-refresh-specification --references--> domain-specification-guide
@@ -485,6 +492,7 @@ framework_version: 3.34.0
 - floor-structure-residue --references--> code-architect-governs-substrate-code
 - floor-structure-residue --references--> mechanical-coherence-checks-backlog
 - floor-structure-residue --supports--> cumulative-drift-is-invisible-to-per-change-walks
+- floor-structure-residue --implements--> a-declaration-is-inert-until-its-mechanism-is-current
 - framework-discovery-specification --extends--> domain-specification-guide
 - framework-discovery-specification --references--> thing-specification
 - framework-discovery-specification --references--> git-workflow-specification
