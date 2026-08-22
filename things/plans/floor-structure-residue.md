@@ -78,10 +78,20 @@ Ordered by leverage, not by size.
 6. ~~**Widen the CI matrix, or say why not.**~~ **Both legs landed
    2026-08-22** (commits 1e400e5, ef07edc): the limitation recorded in the
    suite README + workflow header, then windows-2025 joined the matrix.
-   The Windows leg's first green run is publication-gated — until it is
-   observed, Windows evidence stays operator-machine measurement, and
-   dropping an intolerably slow hosted leg is the operator's release-act
-   call.
+   *Post-publication (2026-08-22): the Windows leg's first run failed at
+   interpreter setup — 3.12 has no win32-x64 build past 3.12.10 — repaired
+   with a per-OS pin in `30ecef1`. Windows CI still has **zero test
+   evidence**; the repair is publication-gated too. Not re-opened as an
+   item: the matrix decision is made and the remaining work is one
+   observation.*
+7. **Decide the Node 20 action bump.** GitHub is deprecating Node 20, which
+   both pinned actions run on (`actions/checkout` v4.2.2,
+   `actions/setup-python` v5.6.0); the 2026-08-22 run carried the warning.
+   Newer majors run Node 24, but bumping means moving **pinned immutable
+   trust roots** — the workflow's own comment calls the actions download
+   service a mutable trust root, so a SHA bump is a deliberate supply-chain
+   decision, not maintenance. Either bump both to reviewed SHAs, or record
+   why the deprecation is being carried and until when. Added 2026-08-22.
 
 Smaller, same family: two copies of the staged-atomic-write primitive; a
 diagnostic that recovers its own floor's result by matching report prose rather
@@ -128,6 +138,10 @@ instrument this class is currently protected by.
       *(2026-08-21, floor-sprint-1 F1, commit 90f29d3: calculation-reference
       strict severity, the installed end-session command's publication
       doctrine, the decision template + worked example full-SHA pins.)*
+- [ ] Item 7 (the Node 20 action bump) is decided — bumped to reviewed SHAs,
+      or carried with a written reason and a date. *Added 2026-08-22 after
+      the deprecation warning appeared in a real run; it is a supply-chain
+      decision, so it stays open rather than being repaired in passing.*
 - [x] Any check this work argues for is routed to the coherence backlog rather
       than built here. *(2026-08-22: sprint 2 proposed no new checks; the
       fitness-gate exactness test is a test-suite invariant, not an

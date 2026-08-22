@@ -52,6 +52,31 @@ awaiting the operator's deliberate push; the CHANGELOG entry and version
 judgement belong to that release act; the Windows CI leg's first run (and
 the keep/drop call if it proves slow) happens only after publication.
 
+## Post-seal addendum (2026-08-22, after publication)
+
+The run stays sealed; this records what the human gate found, because the
+seal predicted exactly this and the outcome belongs with the prediction.
+
+The operator pushed, and the F7 Windows leg's first real run **failed at
+interpreter setup, before any test executed**: the shared pin `3.12.13`
+has no win32-x64 build — `actions/python-versions` ships Windows builds of
+3.12 only through 3.12.10 (3.12 is security-only; upstream stopped
+publishing Windows installers). Repaired in `30ecef1` with a per-OS pin,
+Linux keeping reference-machine parity. **Windows CI still has zero test
+evidence**, and the repair is itself publication-gated.
+
+Two things this confirms rather than contradicts: the verify record was
+right to claim only the *authored* leg and never coverage, and
+"publication-gated proof" is a real gap in the loop, not a formality — the
+first three build-stage defects of a CI change are invisible to every
+local instrument the floor has.
+
+Also surfaced by the same run, unfixed here: GitHub is deprecating Node 20,
+which both pinned actions (`checkout` v4.2.2, `setup-python` v5.6.0) run
+on. Currently a warning. Bumping them changes pinned trust roots, so it is
+a deliberate decision rather than a repair — routed to
+`floor-structure-residue`.
+
 ## Next
 
 Nothing — the run is complete. Sprint 3 (derivation: F8's three phases)
