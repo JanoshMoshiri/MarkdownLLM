@@ -8,6 +8,13 @@ on:
 # to immutable commits; the comments retain the human-readable release names.
 # GitHub's hosted ubuntu-24.04 image/toolcache, its actions download service,
 # and PyPI over TLS remain mutable external trust roots.
+#
+# Platform coverage: Linux only. The floor's most platform-sensitive
+# machinery (Windows command carriers, the sh interpreter resolver, the
+# line-ending contract) is CI-exercised on one platform; Windows evidence
+# comes from the operator's reference machine (tools/tests/README.md,
+# "Platform coverage"). Widening the matrix is floor-structure-residue
+# item 6's open decision.
 permissions:
   contents: read
 

@@ -26,6 +26,17 @@ python -m pytest tools/tests -q -n auto
 `@pytest.mark.xdist_group("<reason>")` with the reason in a comment — no
 silent serialisation.
 
+## Platform coverage — the recorded limitation
+
+CI (`.github/workflows/validate.yml`) exercises this suite on **Linux
+only** (ubuntu-24.04). The floor's most platform-sensitive machinery — the
+Windows command carriers (`commandWindows`, `mdllm.ps1`), the sh
+interpreter resolver, and the line-ending contract — is exercised in CI on
+one platform, and on Windows only by runs on the operator's reference
+machine. Read any portability claim accordingly: it is operator-machine
+evidence, not matrix evidence, until the CI matrix widens
+(floor-structure-residue item 6 owns that decision).
+
 ## Markers
 
 New tests carry one of the registered tiers (`pytest.ini`): `unit` (no
@@ -42,10 +53,10 @@ CLI/integration surface and matches by `-k` keyword.
 |---|---|
 | model, validation | test_mdllm, test_mechanical_state, test_structural_reference_registry, test_template_instantiation |
 | repository_view, repository_transaction | test_repository_view, test_repository_transactions, test_coherence_repository_view, test_phase1_4_integration_audit |
-| session, session_contract, domain_kernel | test_digest_signals, test_contract_emission, test_residual_totality, test_mdllm |
+| session, session_contract, domain_kernel | test_digest_signals, test_contract_emission, test_residual_totality, test_mdllm, test_session_gate |
 | triggers | test_digest_signals, test_mechanical_state, test_mdllm |
-| imports_check, mcp_server, external_trust | test_mdllm, test_repository_view, test_external_trust |
-| sync, publish, git_transport | test_mdllm, test_publish, test_residual_totality |
+| imports_check, mcp_server, external_trust | test_mdllm, test_membrane, test_repository_view, test_external_trust |
+| sync, publish, git_transport | test_estate_sync, test_publish, test_residual_totality |
 | coherence, indexes, kernel_gen | test_coherence_repository_view, test_template_sources, test_phase1_4_integration_audit |
 | calc, yaml_loader | test_calc, test_strict_yaml, test_eval_integrity |
 | scaffold, repo, touchpoints | test_mdllm, test_template_instantiation, test_phase1_4_integration_audit |
