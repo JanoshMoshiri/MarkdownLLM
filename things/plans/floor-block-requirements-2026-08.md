@@ -108,7 +108,10 @@ record):
   5.5–5.8s. Requirement: bound the walk to the corpus (index-assisted
   listing, deeper pruning, or an equivalent) so the post-suite case
   approaches the steady state rather than tripling it. [run-floor-sprint-1
-  verify record, N1 row]
+  verify record, N1 row] *Sprint-2 evidence (2026-08-22): the symptom did
+  not reproduce — post-suite N1 measured 1.9s against 1.8s steady, with the
+  full suite itself at 4:03. Left unbuilt on that measurement; re-open only
+  if a post-suite exceedance is observed again.*
 
 Constraints carried from the remedy (settled, restated as requirements):
 no weakening of the transaction contract; no daemons, persistent caches, or

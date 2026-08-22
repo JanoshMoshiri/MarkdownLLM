@@ -1,8 +1,8 @@
 ---
 id: floor-structure-residue
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-08-20
 priority: medium
 tags: [clean-architecture, solid, tests, ci, perimeter, refactor, review-residue]
@@ -41,27 +41,29 @@ Ordered by leverage, not by size.
 
 ## Structure
 
-1. **Invert the fitness suite's vendor gate.** Its structural rules are derived
-   and total; its vendor-vocabulary gate runs over a hand-curated list of
-   neutral modules, so a newly added neutral module is born ungated — several
-   already are. Gate everything outside the adapter package, with documented
-   exceptions. This is the highest-leverage item here: it is the check that
-   protects every other structural claim.
-2. **Collapse the duplication between the two project-bound adapters.** Quoting,
-   output-envelope formatting, definition hashing, handler construction and
-   probing are near-identical in both. A shared project-hook helper collapses it
-   without breaching the rule that vendor vocabulary lives only in adapters —
-   the shapes are identical *because* the harnesses converged, and the
-   duplication is the rule's unpaid cost.
-3. **Move the hook byte contract out of the birth module.** Diagnostics import
-   scaffold solely to reach hook bodies and the resolved hooks directory; a leaf
-   contract module already exists as the right home. One wrong-direction edge,
-   one small move.
-4. **Extract a shared test fixture module, then split the monolith.** Three test
-   files import helpers from the largest test file, so it cannot be decomposed
-   until the shared setup has a home of its own. After that the membrane, sync
-   and session-gate sections are coherent files waiting to be lifted out along
-   banners that already exist.
+1. ~~**Invert the fitness suite's vendor gate.**~~ **Landed 2026-08-22**
+   (floor-sprint-2, commit 4cb9ca9): neutral by construction over everything
+   outside `adapters/`, exceptions declared with reasons and
+   exactness-tested (a stale exception fails the suite); sync.py's one
+   incidental vendor word reworded rather than excepted.
+2. ~~**Collapse the duplication between the two project-bound adapters.**~~
+   **Landed 2026-08-22** (commit 6d3aa81): `adapters/project_hook_emission`
+   owns the converged shape as plain parameterised functions — no base
+   class; goldens unchanged proved byte-identity.
+3. ~~**Move the hook byte contract out of the birth module.**~~ **Landed
+   2026-08-22** (commit fb587a1): `hook_contract.py` owns candidate policy,
+   sh fragment, hook bodies, path resolution and contract rendering;
+   doctor/session/runtime/adapters consume the leaf, and the fitness
+   layering test pins the deleted edges. `LAUNCH_RESOLUTION_SECONDS` stayed
+   with its timing family in harness_ports (recorded deviation).
+4. **Extract a shared test fixture module, then split the monolith.**
+   **Half landed 2026-08-22** (commits 9ed15a2 → 9726711):
+   `corpus_harness.py` extracted (cross-file test imports gone), then
+   estate-sync+autopush, membrane, and session-gate lifted along their
+   banners — monolith 3601 → 2675 lines, collection count 696 invariant
+   throughout. Remaining banner sections (mcp-serve, imports-check,
+   quarantine flip, disclosure boundary, candidates, retrospective-cadence,
+   terminal statuses) stay here for later lifts under the same invariant.
 5. **Prune during the worktree walk.** ~~Worktree-mode listing enumerates the
    entire tree before exclusions apply, so an interactive command in a working
    checkout pays a walk proportional to everything nested beneath it rather than
@@ -73,23 +75,26 @@ Ordered by leverage, not by size.
    rescans and history re-walks, switched the strict YAML boundary to the
    libyaml C parser where compiled in, and parallelised the estate-sync repo
    walk. Framework-root session-start: 67.8s → ~2s measured.
-6. **Widen the CI matrix, or say why not.** The substrate's most
-   portability-sensitive machinery — the Windows command carriers, the shell
-   resolver, the line-ending contract — is exercised on one platform only. Either
-   the matrix grows, or the limitation is recorded where a portability claim
-   would otherwise be read as covering it.
+6. ~~**Widen the CI matrix, or say why not.**~~ **Both legs landed
+   2026-08-22** (commits 1e400e5, ef07edc): the limitation recorded in the
+   suite README + workflow header, then windows-2025 joined the matrix.
+   The Windows leg's first green run is publication-gated — until it is
+   observed, Windows evidence stays operator-machine measurement, and
+   dropping an intolerably slow hosted leg is the operator's release-act
+   call.
 
 Smaller, same family: two copies of the staged-atomic-write primitive; a
 diagnostic that recovers its own floor's result by matching report prose rather
 than a structured fact; two adapter inspectors that classify by resemblance to a
 path string; dependency pins restated by hand in a bundle template beside the
-file that owns them. Added 2026-08-21 (measured during the perf pass): the
+file that owns them. ~~Added 2026-08-21 (measured during the perf pass): the
 emitted sh interpreter-resolution fragment probes file-path candidates by
-spawning `timeout` + python even when the path cannot exist (~330ms per
-lifecycle hook invocation on Windows for the POSIX venv path alone) — an
-`[ -x ]` existence guard before the spawn saves it, but the fragment is
-embedded in every installed hook body and its definition hash, so the change
-rides with the next adapter regeneration, not a hand edit.
+spawning `timeout` + python even when the path cannot exist.~~ **Landed
+2026-08-22** (commit b33f6b4, riding the F5 regeneration as predicted):
+`[ -x ]` on file candidates, `command -v` on PATH names — measured
+348→273ms per invocation at the root, 514→311ms in a venv-less domain
+repo; the change also exposed and fixed live-computed legacy recognition
+data (the v1 fragment is now frozen at `adapters/legacy/sh-resolve-v1.txt`).
 
 ## Perimeter
 
@@ -111,11 +116,19 @@ instrument this class is currently protected by.
 
 ## Done when
 
-- [ ] The fitness gate covers by default and excepts by declaration.
-- [ ] Items 2–5 are landed or explicitly ruled not-worth-it, in writing.
+- [x] The fitness gate covers by default and excepts by declaration.
+      *(2026-08-22, floor-sprint-2 F3, commit 4cb9ca9 — with a
+      stale-exception exactness test so the list cannot rot.)*
+- [x] Items 2–5 are landed or explicitly ruled not-worth-it, in writing.
+      *(2026-08-22: 2 and 3 landed whole (6d3aa81, fb587a1); 5 landed in
+      sprint 1 (3017f64); 4 half-landed — harness + three section lifts —
+      with the remaining sections named above as later work under the same
+      collection-count invariant.)*
 - [x] The three perimeter restatements are corrected at their source surfaces.
       *(2026-08-21, floor-sprint-1 F1, commit 90f29d3: calculation-reference
       strict severity, the installed end-session command's publication
       doctrine, the decision template + worked example full-SHA pins.)*
-- [ ] Any check this work argues for is routed to the coherence backlog rather
-      than built here.
+- [x] Any check this work argues for is routed to the coherence backlog rather
+      than built here. *(2026-08-22: sprint 2 proposed no new checks; the
+      fitness-gate exactness test is a test-suite invariant, not an
+      `mdllm coherence` check.)*
