@@ -84,7 +84,22 @@ Ordered by leverage, not by size.
    evidence**; the repair is publication-gated too. Not re-opened as an
    item: the matrix decision is made and the remaining work is one
    observation.*
-7. **Decide the Node 20 action bump.** GitHub is deprecating Node 20, which
+7. **Old-format mdllm hooks are unreachable by the tool.** Found
+   2026-08-22 during the estate-wide autopush rollout: every domain's hooks
+   predated the `MDLLM_ROUTE` format, and `_managed_for_repo` requires both
+   the `# mdllm` marker *and* a matching embedded route — so the tool
+   classified thirteen sets of its own stale hooks as operator hooks.
+   `install-hook` refuses to replace them and `--uninstall` refuses to
+   remove them (same ownership test), and there is no `--force`. The only
+   route was hand-deleting hook files after verifying the marker. The
+   refusal is right — protecting operator state is the point — but a
+   framework that regenerates its own hooks needs a sanctioned upgrade path
+   for its own old formats: recognise known historical hook bodies by
+   content (the adapters' `legacy_definitions` pattern, applied to git
+   hooks) and offer `--refresh-legacy`, refusing only genuinely unknown
+   bodies. Until then, a stale-format domain silently loses every hook leg
+   added since its install — here, the entire autopush leg.
+8. **Decide the Node 20 action bump.** GitHub is deprecating Node 20, which
    both pinned actions run on (`actions/checkout` v4.2.2,
    `actions/setup-python` v5.6.0); the 2026-08-22 run carried the warning.
    Newer majors run Node 24, but bumping means moving **pinned immutable
@@ -138,7 +153,7 @@ instrument this class is currently protected by.
       *(2026-08-21, floor-sprint-1 F1, commit 90f29d3: calculation-reference
       strict severity, the installed end-session command's publication
       doctrine, the decision template + worked example full-SHA pins.)*
-- [ ] Item 7 (the Node 20 action bump) is decided — bumped to reviewed SHAs,
+- [ ] Items 7 (legacy hook upgrade path) and 8 (the Node 20 action bump) are decided — bumped to reviewed SHAs,
       or carried with a written reason and a date. *Added 2026-08-22 after
       the deprecation warning appeared in a real run; it is a supply-chain
       decision, so it stays open rather than being repaired in passing.*

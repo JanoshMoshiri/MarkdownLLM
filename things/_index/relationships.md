@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-22
-generated: 2026-08-22T15:01:38
-generated_from: HEAD@3b255f7
-coverage: 262
+generated: 2026-08-22T18:15:29
+generated_from: HEAD@6601f2e
+coverage: 264
 framework_version: 3.34.0
 ---
 
@@ -423,6 +423,8 @@ framework_version: 3.34.0
 - estate-migration-record-2026-08-14 --documents--> vendor-harness-adapter-foundation
 - estate-migration-record-2026-08-14 --derived-from--> claude-gate-5r3-acceptance-2026-08-13
 - estate-migration-record-2026-08-14 --implements--> assistant-register-does-not-graduate
+- estate-wide-autopush-2026-08-22 --implements--> autopush-requires-explicit-authority
+- estate-wide-autopush-2026-08-22 --references--> estate-cadence-cluster
 - every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated
 - every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
 - every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose

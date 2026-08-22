@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-22
-generated: 2026-08-22T15:01:37
-generated_from: HEAD@3b255f7
-coverage: 45
+generated: 2026-08-22T18:15:33
+generated_from: HEAD@6601f2e
+coverage: 47
 framework_version: 3.34.0
 ---
 
@@ -14,6 +14,9 @@ framework_version: 3.34.0
 
 ## assistant-register
 - operating-is-programming (derived-from)
+
+## autopush-requires-explicit-authority
+- estate-wide-autopush-2026-08-22 (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
 
 ## claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage (derived-from)
@@ -93,6 +96,9 @@ framework_version: 3.34.0
 
 ## floor-structure-residue
 - floor-sprint-2-scope-2026-08-22 (pinned @e98cdd9a8cdcb3f40cc5eed936f7b3c9a485d656)
+
+## framework-kernel
+- estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
 
 ## framework-retrospective-2026-06
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
