@@ -85,7 +85,26 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   domain by construction, and the reserved types' root prose is deleted
   rather than generated — `kernel.md` already owns it.
 
+## Build record
+
+- **C1 / F16 landed** (`4c556c9`) — `held_by` and `held_until` admitted to
+  `CORE_FIELDS`, criterion 2 cited beside its two existing precedents. The
+  regression test was proven before it was trusted: reverted against the
+  unfixed tool it fails, which is the only thing that distinguishes a test
+  from a comment. Corpus back to 269/269 clean.
+- **C2 / F8a delete leg landed** (`d128fa0`) — the Standard Thing Structure
+  block's restated enums replaced by pointers, with the harm recorded in
+  place rather than quietly corrected, because the harm is the argument for
+  the leg. **Deviation 1, recorded as it happened:** the design said
+  `## Status Values For Framework Specs` "goes the same way". It does not.
+  Those four bullets are editorial definitions of what each status means
+  for a *framework spec*, and no authority carries them — the tool and the
+  kernel own the reserved *set*, not the gloss. Deleting them would have
+  destroyed content rather than a restatement. The section keeps its
+  bullets and loses only its implicit claim to own the set. Delete is for
+  restatements; a gloss is not one.
+
 ## Next
 
-Build C1 through C7 in order, recording deviations in this body as they
-happen. C8–C9 (probes) are stretch, gated on C1–C7 verifying.
+C3 through C7 in order, recording deviations in this body as they happen.
+C8–C9 (probes) are stretch, gated on C1–C7 verifying.
