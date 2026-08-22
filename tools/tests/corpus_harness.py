@@ -105,3 +105,31 @@ def _sync_git(cwd, *args):
     import subprocess
     return subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
                            *args], cwd=cwd, capture_output=True, text=True)
+
+
+def _trust_mcp_entry(consumer, server, entry):
+    """Tests that exercise a route grant the exact clone-local declaration.
+
+    The security regression tests live in test_external_trust.py; the legacy
+    membrane tests below are trusted-happy-path tests and say so explicitly.
+    """
+    import subprocess as sp
+    if not (consumer / ".git").exists():
+        sp.run(["git", "init", "-q"], cwd=consumer, check=True)
+    decision = mdllm.LocalExternalTrustPolicy().evaluate(consumer, server, entry)
+    mdllm.grant_external_trust(
+        consumer, server, entry,
+        [p.value for p in mdllm.required_capabilities(entry)],
+        decision.entry_hash)
+
+
+def _consumer_with_import(con, source_domain, source_id, pin, server_cfg,
+                          body="# Imported Spec\n\nQuarantined.\n"):
+    import json
+    write(con, ".mcp.json", json.dumps({"mcpServers": {source_domain: server_cfg}}))
+    write(con, "things/imported.md", thing_text(
+        f"id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        f"origin: external\nverified: false\nsource_domain: {source_domain}\n"
+        f"source_id: {source_id}\nsource_commit: {pin}",
+        body))
+    _trust_mcp_entry(con, source_domain, server_cfg)
