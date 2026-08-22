@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-21
-generated: 2026-08-21T23:50:37
-generated_from: HEAD@967773c
-coverage: 254
+created: 2026-08-22
+generated: 2026-08-22T08:35:58
+generated_from: HEAD@a1d3eb8
+coverage: 255
 framework_version: 3.33.0
 ---
 
@@ -809,6 +809,10 @@ framework_version: 3.33.0
 - rich-founding-context-breaks-scaffold-then-jump --references--> agents-drop-mechanical-birth-steps-not-semantic-ones
 - run-floor-sprint-1-2026-08 --references--> substrate-review-consolidated-remedy-2026-08-20
 - run-floor-sprint-1-2026-08 --definition--> substrate-floor-development
+- run-floor-sprint-2-2026-08 --references--> run-floor-sprint-1-2026-08
+- run-floor-sprint-2-2026-08 --references--> floor-structure-residue
+- run-floor-sprint-2-2026-08 --references--> floor-block-requirements-2026-08
+- run-floor-sprint-2-2026-08 --definition--> substrate-floor-development
 - scaffold-declares-visibility --extends--> boundary-disclosure-check
 - scaffold-declares-visibility --informs--> agents-drop-mechanical-birth-steps-not-semantic-ones
 - scaffold-declares-visibility --references--> hook-enforcement-has-three-anchors
