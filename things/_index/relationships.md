@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-23
-generated: 2026-08-23T00:04:44
-generated_from: HEAD@aeb38b4
-coverage: 266
+generated: 2026-08-23T00:22:04
+generated_from: HEAD@4cea3aa
+coverage: 267
 framework_version: 3.34.0
 ---
 
@@ -838,6 +838,11 @@ framework_version: 3.34.0
 - run-floor-sprint-2-2026-08 --references--> floor-structure-residue
 - run-floor-sprint-2-2026-08 --references--> floor-block-requirements-2026-08
 - run-floor-sprint-2-2026-08 --definition--> substrate-floor-development
+- run-floor-sprint-3-2026-08 --references--> run-floor-sprint-2-2026-08
+- run-floor-sprint-3-2026-08 --references--> coherence-mechanism-build
+- run-floor-sprint-3-2026-08 --references--> mechanical-coherence-checks-backlog
+- run-floor-sprint-3-2026-08 --references--> floor-block-requirements-2026-08
+- run-floor-sprint-3-2026-08 --definition--> substrate-floor-development
 - scaffold-declares-visibility --extends--> boundary-disclosure-check
 - scaffold-declares-visibility --informs--> agents-drop-mechanical-birth-steps-not-semantic-ones
 - scaffold-declares-visibility --references--> hook-enforcement-has-three-anchors
