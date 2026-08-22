@@ -32,17 +32,31 @@ CI (`.github/workflows/validate.yml`) runs the suite on a
 **Linux + Windows matrix** (ubuntu-24.04, windows-2025) since sprint 2
 (F7).
 
-**Windows CI has still produced no test evidence.** Its first real run
-(2026-08-22, the sprint's publication) failed during interpreter setup,
-before a single test executed: the shared pin `3.12.13` has no win32-x64
-build, because `actions/python-versions` ships Windows builds of 3.12 only
-through 3.12.10. The pin is now per OS (Linux 3.12.13, Windows 3.12.10)
-and that repair is itself unproven until the next push — CI runs only
-after publication. Until a green Windows leg is observed, **Windows
-portability claims rest on operator-reference-machine measurement alone**.
-The two legs also run different patch levels of a security-only branch;
-that is recorded rather than hidden. If the hosted Windows leg proves
-intolerably slow once it does run, dropping it is the operator's call.
+**Windows CI has still produced no green run.** Two failures so far, both
+environmental, neither a floor defect:
+
+1. *Interpreter setup* (first run): the shared pin `3.12.13` has no
+   win32-x64 build — `actions/python-versions` ships Windows builds of 3.12
+   only through 3.12.10. Fixed by pinning per OS (Linux 3.12.13, Windows
+   3.12.10). The legs now run different patch levels of a security-only
+   branch; that is recorded rather than hidden.
+2. *Drive mismatch* (second run): 56 failures, **one cause**. Hosted Windows
+   runners put the workspace on `D:` and `TEMP` on `C:`, so every test that
+   scaffolds into `tmp_path` hit scaffold's deliberate refusal to embed an
+   absolute machine-specific adapter route. Fixed by pointing pytest's
+   `--basetemp` at `RUNNER_TEMP`, which shares the workspace drive.
+
+**Running the suite on Windows requires the temp tree and the checkout to
+share a drive.** If yours differ, pass `--basetemp` explicitly to a
+directory on the checkout's drive (outside the repo, so scaffolded
+fixtures stay out of the corpus walk). Cross-drive scaffolding is refused
+by design, not broken — `test_unrelatable_framework_path_refuses_before_
+target_creation` pins that guard on every platform.
+
+Until a green Windows leg is observed, **Windows portability claims rest on
+operator-reference-machine measurement alone**. If the hosted Windows leg
+proves intolerably slow once it does run, dropping it is the operator's
+call.
 
 ## Markers
 

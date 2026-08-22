@@ -48,8 +48,17 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install --requirement requirements-ci.txt
+      # pytest's temp tree must sit on the SAME DRIVE as the checkout. On
+      # hosted Windows runners the workspace is D:\a\... while TEMP is on
+      # C:\Users\runneradmin\..., and scaffold deliberately refuses a domain
+      # it cannot reach by relative path ("refusing to embed an absolute
+      # machine-specific adapter command") — so every scaffolding test fails
+      # for an environment reason, not a floor defect. RUNNER_TEMP shares the
+      # workspace drive and lives outside the repo, which keeps the scaffolded
+      # fixtures out of the corpus walk the later steps perform. Verified by
+      # the 2026-08-22 Windows run: 56 failures, one cause.
       - name: Floor self-tests (mdllm is what defines "valid" — test it first)
-        run: python -m pytest tools/tests -q -n auto
+        run: python -m pytest tools/tests -q -n auto --basetemp="${{ runner.temp }}/pytest-basetemp"
       - name: Mechanical validation (includes version-sentinel sync)
         run: python tools/mdllm.py validate .
       - name: Provenance chains

@@ -172,6 +172,34 @@ def test_unknown_selection_refuses_before_target_creation(tmp_path):
     assert not target.exists()
 
 
+def test_unrelatable_framework_path_refuses_before_target_creation(
+        tmp_path, monkeypatch):
+    """A domain the framework cannot reach by relative path is refused.
+
+    On Windows a checkout and a target on different drives have no relative
+    path at all, and the emitted adapter command would have to carry an
+    absolute machine-specific route — so scaffold exits instead. The branch
+    shipped with a guard and no test, and stayed invisible until GitHub's
+    hosted Windows runners (workspace on D:, TEMP on C:) turned it into 56
+    failures in one run (2026-08-22). Provoked here by making relpath raise
+    for this target only, so the guard's HANDLING is pinned on every
+    platform rather than only where a second drive exists.
+    """
+    _git_repo(tmp_path)
+    target = tmp_path / "unrelatable-domain"
+    real_relpath = os.path.relpath
+
+    def _refuse_for_this_target(path, start=os.curdir):
+        if Path(start).resolve() == target.resolve():
+            raise ValueError("path is on mount 'D:', start on mount 'C:'")
+        return real_relpath(path, start)
+
+    monkeypatch.setattr(os.path, "relpath", _refuse_for_this_target)
+    with pytest.raises(SystemExit, match="no relative path"):
+        mdllm.cmd_scaffold(argparse.Namespace(path=str(target)))
+    assert not target.exists()
+
+
 class _CollidingAdapter:
     name = "collision-test"
 
