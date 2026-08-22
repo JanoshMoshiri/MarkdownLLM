@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-23
-generated: 2026-08-23T00:26:01
-generated_from: HEAD@efed48d
-coverage: 268
+generated: 2026-08-23T00:32:13
+generated_from: HEAD@36211b4
+coverage: 269
 framework_version: 3.34.0
 ---
 
@@ -485,6 +485,11 @@ framework_version: 3.34.0
 - floor-sprint-2-design-2026-08 --implements--> floor-structure-residue
 - floor-sprint-2-design-2026-08 --references--> code-architect-governs-substrate-code
 - floor-sprint-2-scope-2026-08-22 --informs--> run-floor-sprint-2-2026-08
+- floor-sprint-3-design-2026-08 --informs--> run-floor-sprint-3-2026-08
+- floor-sprint-3-design-2026-08 --derived-from--> floor-sprint-3-scope-2026-08-23
+- floor-sprint-3-design-2026-08 --implements--> coherence-mechanism-build
+- floor-sprint-3-design-2026-08 --references--> mechanical-coherence-checks-backlog
+- floor-sprint-3-design-2026-08 --references--> code-architect-governs-substrate-code
 - floor-sprint-3-scope-2026-08-23 --informs--> run-floor-sprint-3-2026-08
 - floor-sprint-3-scope-2026-08-23 --implements--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - floor-structure-residue --derived-from--> independent-substrate-review-2026-08-20-claude

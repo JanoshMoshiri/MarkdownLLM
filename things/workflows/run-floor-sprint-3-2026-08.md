@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-23
 definition: substrate-floor-development
-current_stage: analysis
+current_stage: design
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-2-2026-08
@@ -26,7 +26,7 @@ linked_things:
 
 ## Where This Is
 
-At `analysis`. Born at `requirements`, same as both predecessors: the `problems`
+At `design`. Born at `requirements`, same as both predecessors: the `problems`
 stage was satisfied before this run existed. Sprint 2's seal record named
 the subject, `coherence-mechanism-build` carries the evidence for every
 phase (the eight-round review loop's measurement — derived surfaces held
@@ -68,8 +68,24 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   trust-root bump) routed to seal as a human gate rather than deferred
   silently.
 
+- **design (2026-08-23)** — `floor-sprint-3-design-2026-08`. Nine commits,
+  ordered *subtract before you add*: no byte-identical restructuring is in
+  this sprint, so the identity-first rule has nothing to order and the
+  deletions lead instead. Three facts settled at design time by measurement
+  rather than assumption: the managed-block splice machinery is already
+  generic (F8a needs no new mechanism, only an opt-in), all 28 catalog
+  annotations currently agree with live frontmatter (the check lands green,
+  pinning truth), and the Tier-2 routing check is one-directional because
+  the table legitimately routes four `docs/` guides outside the catalog.
+
+  The design's sharpest call is C3's **zero estate blast radius**: rendering
+  tool-owned descriptions for the reserved types would have drifted all
+  thirteen domains' managed blocks at once and *blocked their commits* with
+  a coherence Error. The chosen shape is byte-stable for every existing
+  domain by construction, and the reserved types' root prose is deleted
+  rather than generated — `kernel.md` already owns it.
+
 ## Next
 
-Design: components touched, how each change proves its budget, the focused
-test set per change, commit granularity, and the identity-first ordering
-where a change set mixes restructuring with behaviour change.
+Build C1 through C7 in order, recording deviations in this body as they
+happen. C8–C9 (probes) are stretch, gated on C1–C7 verifying.

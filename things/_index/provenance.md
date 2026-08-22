@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-23
-generated: 2026-08-23T00:26:03
-generated_from: HEAD@efed48d
-coverage: 50
+generated: 2026-08-23T00:32:13
+generated_from: HEAD@36211b4
+coverage: 51
 framework_version: 3.34.0
 ---
 
@@ -100,6 +100,9 @@ framework_version: 3.34.0
 
 ## floor-sprint-2-scope-2026-08-22
 - floor-sprint-2-design-2026-08 (derived-from)
+
+## floor-sprint-3-scope-2026-08-23
+- floor-sprint-3-design-2026-08 (derived-from)
 
 ## floor-structure-residue
 - floor-sprint-2-scope-2026-08-22 (pinned @e98cdd9a8cdcb3f40cc5eed936f7b3c9a485d656)
