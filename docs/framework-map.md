@@ -87,7 +87,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>33 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>34 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks mechanical Errors when active"]
     end
     GIT["git — accepted-state machine,<br/>event stream, inspectable history"]
@@ -214,7 +214,7 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 flowchart LR
     accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
     accDescr {
-        A left column of 33 mdllm subcommands, each with a single edge to the
+        A left column of 34 mdllm subcommands, each with a single edge to the
         spec surface it serves in the right column. The tool is a mapping, not
         a monolith. Solid edges enforce or measure a spec, and dashed edges
         generate an artifact. Enforcing or measuring: validate, triggers,
@@ -265,6 +265,7 @@ flowchart LR
         C31["bundle"]
         C32["publish"]
         C33["external-trust"]
+        C34["precommit"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -335,6 +336,7 @@ flowchart LR
     C31 -.->|"renders"| T31
     C32 -->|"guards"| T32
     C33 -->|"authorises exact local definition for"| T33
+    C34 -->|"composes the hook's legs concurrently for"| T9
 ```
 
 Notes on this view:
