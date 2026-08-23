@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-23
 definition: substrate-floor-development
-current_stage: build
+current_stage: verify
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-2-2026-08
@@ -26,7 +26,7 @@ linked_things:
 
 ## Where This Is
 
-At `build`. Born at `requirements`, same as both predecessors: the `problems`
+At `verify`. Born at `requirements`, same as both predecessors: the `problems`
 stage was satisfied before this run existed. Sprint 2's seal record named
 the subject, `coherence-mechanism-build` carries the evidence for every
 phase (the eight-round review loop's measurement — derived surfaces held
@@ -257,6 +257,115 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   24 coherence tests green, 4 new. **N3 re-measured: 4.3s** against 12s —
   the third and last budget checkpoint the design named.
 
+- **C8–C9 / F8c stretch landed** — `tools/tests/test_flow_probes.py`, the
+  first probes of the layer `coherence-mechanism-build` Phase 3 names.
+  Started only after C1–C7 verified, per the design's gate.
+
+  Three probes, two flows. **Fresh-clone boot:** a cold clone must report
+  *setup ordering*, not a validation failure, and must be clean the moment
+  the attestation exists. Both directions are asserted inside the one test,
+  which is what makes it non-vacuous — the phrase must be present before
+  session-start and absent after, so a regression in either direction fails
+  it. **Scaffold birth:** the birth commit lands, the managed blocks match a
+  fresh generation (a domain born drifted is born lying), and the reasoning
+  prompts are delivered *and* graph-stripped — their `linked_things` point
+  into the framework's id space, which does not resolve in a domain.
+  **The gate's asymmetry:** the second commit is refused without an
+  attestation and succeeds with one. That asymmetry is the whole design and
+  is regressible in both directions — blocking the birth commit would
+  deadlock scaffold against its own output, never blocking would make the
+  gate decorative — and only an executed commit can tell them apart. That
+  is precisely why it is a probe and not a unit test.
+
+  Probes 3–5 (invariant breach, refresh end-to-end, session close) stay
+  owned by `coherence-mechanism-build` for a fourth sprint.
+
+## Verify record (2026-08-23)
+
+**Full suite: 735 passed, 3 skipped, 3:27 under `-n auto`** — against sprint
+2's 694/2 in 4:03, so 41 more tests in 36 seconds less. The known F15 flake
+(`test_imports_freshness_fresh_then_stale`) did not recur.
+
+Budgets, steady-state per the v1.1 measurement protocol:
+
+| ID | Budget | Measured | Verdict |
+|---|---|---|---|
+| N1 session-start root | ≤ 5s | 2.0s | met |
+| N3 precommit root | ≤ 12s | 4.3s | met |
+| N4 precommit domain | ≤ 5s | 3.3s | met |
+| N5 validate domain | ≤ 3s | 1.2s | met |
+| N7 full suite | ≤ 12min | 3:27 | met |
+| N6 focused loop | ≤ 120s | 4–54s across the build's focused runs | met |
+
+N3 was measured after each of the three commits that add hook-path work, as
+the design required: **3.7s** after C4, **5.1s** after C6 unbatched, **4.2s**
+after batching, **4.3s** after C7. The whole sprint's additions cost about
+1s against a 12s budget.
+
+**Non-steady contexts, recorded as context and not as verdicts** (the
+protocol's own instruction):
+
+- **Post-suite** — N1 measured **1.98s** and N3 **4.32s** immediately after
+  the full suite, both indistinguishable from steady state. Sprint 1's
+  5.5–5.8s cache-eviction transient did not reproduce, for the second sprint
+  running. **F14 stays unbuilt on that evidence**, and its re-open condition
+  is now two sprints unmet.
+- **Mid-suite** — N1 measured 4.98s *while* the full suite was running on
+  the same machine. Recorded because it is the reading that would have been
+  mistaken for a regression: it is CPU contention, not a code path, and the
+  protocol exists so a number taken at the wrong moment does not become a
+  finding.
+
+## Loop back: verify → build (2026-08-23)
+
+**The sprint's probes blocked the sprint's own commit, and that is how the
+backlog's unattributed adder was found.**
+
+Committing C8–C9 was refused by the disclosure-boundary leg: the probes had
+scaffolded a domain named `born`, and `born` was now a boundary term, so
+every file containing the word — 56 of them — crossed the boundary. The
+fourth block of exactly the class `mechanical-coherence-checks-backlog`
+records, on exactly the predicted path (`tools/tests/`), against a commit
+that was itself about the problem.
+
+**Cause, found in eleven minutes because the audit leg from C5 existed:**
+`scaffold.py` registers every newborn domain's name in the *framework root's*
+local `.boundary-terms` — private-by-default at birth, a sound intent. But
+`fw_root` is the **running tool's own checkout**, not the target's context,
+so a scaffold anywhere on the machine appended to this repo's
+operator-owned control file. Every scaffolding test did it, permanently.
+The backlog had recorded the adder as unattributed on the reasoning that
+"nothing in `boundary.py` writes that file" — a true statement whose search
+was scoped to the wrong module.
+
+**Corroboration, and why the cause stayed hidden:**
+`test_scaffold_harness_selection.py` already carried an autouse fixture
+restoring the framework's terms file after every test, with the comment
+"Scaffold birth registers a private name; tests must leave no local state."
+One test file had discovered the behaviour and patched its own symptom. That
+local patch is exactly why the remaining leaks looked sourceless — the
+obvious suspect was already clean.
+
+**Fixed at the source** (verify → build, the loop the definition provides):
+the registration now happens only when the newborn is actually nested under
+this framework root. The justification bounds itself — a domain outside this
+root can never be named by this repo's commits, so registering it buys no
+privacy and costs a permanent false positive. Proven by reverting the guard:
+the new probe fails against the unfixed tool.
+
+**Classification of what was already there, obtained without reading a
+single term** (the audit reports by line number, so this is by hit-path
+shape and a set-membership test alone): **all 17 flagged entries appear in
+this repository's own tracked content, and not one of them is a live domain
+name.** The whole class is accumulated tool output, not operator vocabulary.
+
+Only the entry this session's own probes created was removed —
+`.boundary-terms` is an operator-owned control, and an agent deleting from
+it on inference would be the floor deciding what the boundary protects. The
+other 16 are surfaced at seal with the cause named and a one-command remedy.
+
 ## Next
 
-Verify: full suite, budgets, then the stretch decision on C8–C9.
+Reconcile: the dark-region walk. Note that this sprint *moved items out of
+that region*, so the walk includes correcting the entry file's own
+description of what is still walked by hand.

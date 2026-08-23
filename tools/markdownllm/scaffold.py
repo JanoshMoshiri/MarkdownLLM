@@ -896,18 +896,38 @@ def _cmd_scaffold_impl(args, progress: _ScaffoldProgress) -> int:
     # rather than a default. Same invariant as the .gitignore step above: which
     # domains exist is domain state, and it reaches the framework repo only as
     # a local, uncommitted fact.
+    #
+    # ...but ONLY when the newborn is actually nested under this framework
+    # root. `fw_root` is the running tool's own checkout, not the target's
+    # context, so without this guard every scaffold anywhere on the machine
+    # appended a name to THIS repo's operator-owned control file. Every
+    # scaffold in the test suite did exactly that, permanently, and because
+    # those synthetic names then appear in the suite's own tracked source, the
+    # boundary check began falsely refusing commits that touched
+    # `tools/tests/` — three regressions, the third of which blocked four
+    # commits in one session. The adder was recorded as unattributed
+    # ("nothing in boundary.py writes that file") because the search had been
+    # scoped to the wrong module; it was here all along. Found 2026-08-23 by
+    # the audit leg this sprint added, then reproduced by the sprint's own
+    # probes blocking their own commit.
+    #
+    # The justification above is what bounds it: a domain OUTSIDE this root
+    # can never be mentioned by this repo's commits, so registering it buys
+    # no privacy and costs a permanent false positive.
     fw_terms = fw_root / TERMS_FILE
-    fw_existing = (fw_terms.read_text(encoding="utf-8")
-                   if fw_terms.is_file() else "")
-    fw_terms_present = {ln.split("==>")[0].strip().lower()
-                        for ln in fw_existing.splitlines()
-                        if ln.strip() and not ln.strip().startswith("#")}
-    if name.lower() not in fw_terms_present:
-        if not fw_existing and bt_template.is_file():
-            fw_existing = bt_template.read_text(encoding="utf-8")
-        fw_terms.write_text(
-            fw_existing.rstrip("\n") + ("\n" if fw_existing else "")
-            + f"{name}\n", encoding="utf-8", newline="\n")
+    in_estate = target.resolve().is_relative_to(fw_root.resolve())
+    if in_estate:
+        fw_existing = (fw_terms.read_text(encoding="utf-8")
+                       if fw_terms.is_file() else "")
+        fw_terms_present = {ln.split("==>")[0].strip().lower()
+                            for ln in fw_existing.splitlines()
+                            if ln.strip() and not ln.strip().startswith("#")}
+        if name.lower() not in fw_terms_present:
+            if not fw_existing and bt_template.is_file():
+                fw_existing = bt_template.read_text(encoding="utf-8")
+            fw_terms.write_text(
+                fw_existing.rstrip("\n") + ("\n" if fw_existing else "")
+                + f"{name}\n", encoding="utf-8", newline="\n")
 
     progress.stage = "hook installation"
     hook_via = install_hook(target)

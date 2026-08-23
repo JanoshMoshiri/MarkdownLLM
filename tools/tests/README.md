@@ -74,7 +74,7 @@ existing suite is deliberate non-work; the tiers grow at the edge.
 
 ## Module → owning test files
 
-Derived from imports 2026-08-21; regenerate the mapping when it drifts
+Derived from imports 2026-08-21, extended 2026-08-23 (sprint 3); regenerate the mapping when it drifts
 (grep `from markdownllm` over `tools/tests/`). `test_mdllm.py` is the broad
 CLI/integration surface and matches by `-k` keyword.
 
@@ -82,15 +82,25 @@ CLI/integration surface and matches by `-k` keyword.
 |---|---|
 | model, validation | test_mdllm, test_mechanical_state, test_structural_reference_registry, test_template_instantiation |
 | repository_view, repository_transaction | test_repository_view, test_repository_transactions, test_coherence_repository_view, test_phase1_4_integration_audit |
-| session, session_contract, domain_kernel | test_digest_signals, test_contract_emission, test_residual_totality, test_mdllm, test_session_gate |
+| session, session_contract, domain_kernel | test_digest_signals, test_contract_emission, test_residual_totality, test_mdllm, test_session_gate, test_flow_probes |
 | triggers | test_digest_signals, test_mechanical_state, test_mdllm |
 | imports_check, mcp_server, external_trust | test_mdllm, test_membrane, test_repository_view, test_external_trust |
 | sync, publish, git_transport | test_estate_sync, test_publish, test_residual_totality |
-| coherence, indexes, kernel_gen | test_coherence_repository_view, test_template_sources, test_phase1_4_integration_audit |
+| coherence, indexes, kernel_gen | test_coherence_repository_view, test_template_sources, test_phase1_4_integration_audit, test_mdllm |
 | calc, yaml_loader | test_calc, test_strict_yaml, test_eval_integrity |
-| scaffold, repo, touchpoints | test_mdllm, test_template_instantiation, test_phase1_4_integration_audit |
+| scaffold, repo, touchpoints | test_mdllm, test_template_instantiation, test_phase1_4_integration_audit, test_flow_probes |
 | adapters/*, harness_ports, lifecycle_runner, harness_diagnostics, adapter_install | test_adapter_cli, test_adapter_contract, test_adapter_install, test_codex_adapter, test_cowork_adapter, test_harness_ports, test_harness_diagnostics, test_lifecycle_runner, test_scaffold_harness_selection, test_architecture_fitness |
 | evals | test_eval_integrity, test_residual_totality |
-| doctor, refresh, cli | test_adapter_cli, test_residual_totality, test_runtime |
+| doctor, refresh, cli | test_adapter_cli, test_residual_totality, test_runtime, test_flow_probes |
 | assemble, bundle_service | test_assemble |
 | provenance | test_repository_view, test_mdllm |
+
+## Flow probes
+
+`test_flow_probes.py` is a different layer from the rest of the suite. A unit
+test pins one function's behaviour; a probe pins one END-TO-END FLOW by its
+observable output — fresh-clone boot, scaffold birth, the gate's second-commit
+asymmetry. They are integration-shaped deliberately: a probe that mocked the
+flow would be verifying the mock, and the defects this layer exists to catch
+live in exactly the seams a mock replaces. They are `gitfs` tier and slow by
+nature; that is the price of testing the thing rather than a model of it.
