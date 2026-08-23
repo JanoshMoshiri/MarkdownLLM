@@ -1,7 +1,7 @@
 ---
 id: floor-sprint-3-design-2026-08
 type: plan
-status: in-progress
+status: completed
 version: 1.0
 created: 2026-08-23
 priority: high

@@ -1,12 +1,11 @@
 ---
 id: run-floor-sprint-3-2026-08
 type: workflow-run
-status: active
+status: completed
 version: 1.0
 created: 2026-08-23
 definition: substrate-floor-development
-current_stage: reconcile
-held_by: claude-code
+current_stage: seal
 linked_things:
   - id: run-floor-sprint-2-2026-08
     relation: references
@@ -26,7 +25,7 @@ linked_things:
 
 ## Where This Is
 
-At `reconcile`. Born at `requirements`, same as both predecessors: the `problems`
+At `seal`, complete. Born at `requirements`, same as both predecessors: the `problems`
 stage was satisfied before this run existed. Sprint 2's seal record named
 the subject, `coherence-mechanism-build` carries the evidence for every
 phase (the eight-round review loop's measurement — derived surfaces held
@@ -408,6 +407,60 @@ git-derived pin cannot record *"walked, still correct"* — `CLAUDE.md` is 18
 lines of pure routing with nothing to go stale, so its Info will recur every
 release. Both are written down at their owners rather than quietly cleared.
 
+## Seal record (2026-08-23)
+
+**Ledgers set to truth.** `floor-block-requirements-2026-08` carries a
+seal-status section: F1, F9–F13, F3–F7, F8a, F8b, F16 and two thirds of F8c
+met, with every N1–N8 budget measured green at each sprint's verify.
+`mechanical-coherence-checks-backlog` has three items struck with dated
+commits and two declines recorded with their lifting conditions.
+`coherence-mechanism-build` is `in-progress` with per-phase state — it
+cannot complete here, because its exit condition needs a post-release cold
+read, which is an operator act after publication.
+
+**What the sprint actually delivered, against what it planned.** All of
+necessity, all of should, and the stretch. Three things it did not plan:
+the `_view_glob` semantic split (two branches of one function answering the
+same question differently), the boundary-terms adder (a four-week
+"unattributed" defect, named), and two live index-signal enumerations the
+ninth review's own fix pass had missed. Each was found by a mechanism this
+sprint built, which is the sprint's own thesis holding under its own weight.
+
+**Left honestly open:** probes 3–5; the two examples pinned at 3.33.0; the
+perimeter check's inability to record "walked, still correct"; F14's
+twice-unmet re-open condition; F15.
+
+## Human gates — all at this boundary, none pre-empted
+
+1. **Publication.** The framework root declares `autopush: false`, so all
+   **15 unpushed commits** are local truth awaiting a deliberate push. The
+   CHANGELOG entry and version judgement belong to that release act.
+2. **The Node 20 action bump** (`floor-structure-residue` item 8), routed
+   here by the analysis cut rather than deferred silently. Moving
+   `actions/checkout` and `actions/setup-python` to reviewed SHAs changes
+   pinned immutable trust roots — an authority-bound act, not agent
+   judgement. The alternative is a dated record of why the deprecation is
+   being carried and until when.
+3. **The 16 standing `.boundary-terms` entries.** Cause now identified and
+   fixed at the source, so the class cannot grow. All 16 appear in this
+   repo's own tracked content and none is a live domain name — but deleting
+   from an operator-owned control on the agent's inference is exactly the
+   move the floor should not make. `mdllm boundary . --audit-terms` lists
+   them by line number.
+4. **F2's owner, 27 days stalled** (`evidence-and-eval-backlog`). Third
+   consecutive surfacing. Two sprints have now declined to absorb it, which
+   is the honest move and also the reason it has not moved.
+5. **The retrospective fires 2026-08-27** — four days. The operator's
+   recorded order sequences it after the block, and the block's buildable
+   remainder is now empty.
+
+**Sealed as authored-and-unproven where the floor cannot execute:** nothing
+in this sprint touches CI configuration or a vendor lifecycle, so unlike
+sprint 2 there is no publication-gated proof owed. Everything claimed here
+was executed locally, and the full suite is the evidence.
+
 ## Next
 
-Seal.
+Nothing — the run is complete. Sprint 4, if it happens, is probes 3–5
+(`coherence-mechanism-build` Phase 3) — but the operator's order puts the
+retrospective first, and the block's buildable requirements are done.

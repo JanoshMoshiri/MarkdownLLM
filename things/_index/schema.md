@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-23
-generated: 2026-08-23T00:32:13
-generated_from: HEAD@36211b4
+generated: 2026-08-23T01:28:54
+generated_from: HEAD@8c603e1
 coverage: 269
 framework_version: 3.34.0
 ---
@@ -52,5 +52,4 @@ framework_version: 3.34.0
 | source_id | 1 |
 | source_commit | 1 |
 | triggers | 1 |
-| held_by | 1 |
 | stages | 1 |

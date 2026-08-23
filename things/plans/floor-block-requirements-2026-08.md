@@ -36,6 +36,32 @@ ledger stay canonical; this thing exists so the block's requirements —
 functional and non-functional — are one committed surface a sprint can be cut
 from.
 
+## Status at the floor-sprint-3 seal (2026-08-23)
+
+**Met:** F1, F9–F13 (sprint 1) · F3–F7 (sprint 2) · F8a, F8b, F16, and the
+first two thirds of F8c (sprint 3). Every non-functional budget N1–N8 was
+measured green at each sprint's verify stage, and the block's constraints
+held throughout: no transaction weakening, no daemons or persistent caches,
+no new primitives for speed, typed non-definite results preserved.
+
+**Open, and none of it buildable by another sprint of the same kind:**
+
+- **F2** — machinery whose owner (`evidence-and-eval-backlog`) is
+  operator-sequenced and now **27 days stalled**. Declined by two
+  consecutive sprints rather than absorbed; the third surfacing is at this
+  seal, and the decision is the operator's.
+- **F8c remainder** — probes 3–5, owned by `coherence-mechanism-build`.
+- **F14** — its re-open condition is now **two sprints unmet**: the
+  post-suite N1 transient did not reproduce in either. Bounding an
+  unmeasured cost stays speculative work.
+- **F15** — the face-read timeout. Still needs its own analysis cut; it
+  widens a product config surface. It did not fire once during sprint 3.
+
+**The block's own exit is therefore a judgement, not a checklist**: what is
+buildable is built, and the remainder is either an operator decision (F2,
+and the Node 20 trust-root bump routed to seal) or a requirement whose
+motivating measurement keeps failing to reproduce (F14).
+
 ## Reference environment
 
 All budgets are measured on and bound to the operator's machine (Windows 11
