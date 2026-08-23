@@ -17,10 +17,10 @@ from pathlib import Path
 import yaml
 
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
-from .indexes import index_drift_findings
+from .indexes import INDEX_FILES, index_drift_findings
 from .kernel_gen import build_kernel, normalize_newlines, token_counter
-from .model import (Finding, RESERVED_STATUSES, SEV_ERROR, SEV_INFO,
-                    SEV_WARNING, parse_frontmatter, scan)
+from .model import (CORE_FIELDS, Finding, RESERVED_STATUSES, SEV_ERROR,
+                    SEV_INFO, SEV_WARNING, parse_frontmatter, scan)
 from .repo import TIERS
 from .repository_view import RepositoryView, RepositoryViewError
 from .yaml_loader import load_yaml
@@ -510,6 +510,75 @@ def _perimeter_currency_findings(root: Path, specs: list, current: str,
     return findings
 
 
+# --- review-9 survivor promotions (F8b) -----------------------------------
+#
+# The ninth review's seven survivors were all hand-restated mirrors of tool
+# facts. Two of them promote cleanly into same-builder checks; the rest do
+# not, and saying so is part of the promotion — see the run record for the
+# ones deliberately declined.
+
+
+def _redundant_known_fields_findings(corpus) -> list[Finding]:
+    """A `known_fields` entry the tool already owns universally.
+
+    Survivor 7 was `CORE_FIELDS` violating its own admission criterion: the
+    framework root had been made to register the framework's own vocabulary in
+    its schema. This is that fault caught from the inside — whenever a field
+    joins `CORE_FIELDS`, every domain that had registered it becomes
+    redundant, and nothing told them. Info: a redundant declaration is inert,
+    not wrong, and removing it is the domain's call.
+    """
+    if not corpus.schema:
+        return []
+    declared = corpus.schema.get("known_fields") or []
+    if not isinstance(declared, list):
+        return []
+    return [Finding(SEV_INFO, "_schema.yaml",
+            f"`known_fields` registers `{name}`, which is now universal in "
+            f"CORE_FIELDS — the framework owns it; drop the registration")
+            for name in sorted({str(n) for n in declared} & set(CORE_FIELDS))]
+
+
+def _index_signal_enumeration_findings(
+        root: Path, specs: list, view: RepositoryView | None) -> list[Finding]:
+    """Prose that enumerates the derived-index signals must enumerate them all.
+
+    Survivor 6: the provenance index is a standard derived index the tool
+    rebuilds by default, yet five surfaces enumerated three signals. Keyed to
+    `INDEX_FILES` — the constant the rebuild loop itself walks — so the check
+    cannot disagree with truth, and it needs no suppression list: a sentence
+    that mentions "signal" and names two or more of them is enumerating them,
+    and an enumeration that stops short is the drift.
+
+    Scoped structurally to LIVE operative surfaces (the entry file, the
+    kernel, the catalogued specs). `CHANGELOG.md`, `reviews/` and `things/`
+    are excluded because they are historical records, where "three signals"
+    was true when written. That exclusion is defined by what a surface *is*,
+    not by which findings were inconvenient — the property that separates it
+    from the suppression list that sank the retired-vocabulary check.
+    """
+    signals = sorted(INDEX_FILES)
+    findings: list[Finding] = []
+    for name in ["AGENTS.md", "kernel.md"] + [str(s) for s in specs]:
+        text = _view_text(root / name, view)
+        if text is None:
+            continue
+        for sentence in re.split(r"(?<=[.:])\s+", text):
+            if "signal" not in sentence.lower():
+                continue
+            present = {s for s in signals
+                       if re.search(r"\b" + re.escape(s) + r"\b", sentence, re.I)}
+            if 2 <= len(present) < len(signals):
+                missing = ", ".join(f"`{s}`" for s in sorted(set(signals) - present))
+                findings.append(Finding(SEV_WARNING, name,
+                    f"enumerates derived-index signals but omits {missing} — "
+                    f"`INDEX_FILES` in tools/markdownllm/indexes.py is the "
+                    f"authority ({len(signals)} signals); name them all or "
+                    f"name none and point at the authority"))
+                break        # one finding per surface is enough to act on
+    return findings
+
+
 def coherence_findings(root: Path, window: int,
                        view: RepositoryView | None = None) -> list[Finding]:
     """Mechanical checks over the 'dark region' a hand-walk currently guards
@@ -545,6 +614,9 @@ def coherence_findings(root: Path, window: int,
         for typ in sorted(declared - used):
             findings.append(Finding(SEV_INFO, "_schema.yaml",
                 f"declared type `{typ}` is used by no thing — dead vocabulary?"))
+
+    # --- general: a domain registering the framework's own vocabulary ----
+    findings.extend(_redundant_known_fields_findings(corpus))
 
     # --- general: template residue in skills / entry file (Info) ---------
     findings.extend(_template_residue_findings(root, corpus, view))
@@ -643,6 +715,10 @@ def coherence_findings(root: Path, window: int,
                     f"pinned at framework_version_seen {seen} but the framework "
                     f"is {fw_version} — walk the example against the current "
                     f"shape, then re-pin"))
+
+        # Prose that enumerates the derived-index signals must enumerate all
+        # of them (review-9 survivor 6, promoted).
+        findings.extend(_index_signal_enumeration_findings(root, specs, view))
 
         # ...and the rest of the perimeter, dated from git rather than from a
         # pin the surface would have to carry (external review R2).

@@ -434,8 +434,8 @@ overall commit cadence (accelerating, steady, gone quiet). This is the reflexive
 counterpart to current-state orientation, performed by the `domain-velocity` prompt
 (`templates/prompts/domain-velocity.md`) at `session-start`.
 
-**Velocity needs no derived index.** Unlike triggers, schema, and relationships — which are
-aggregated into derived indexes to avoid re-scanning every thing (`derived-index.md`) — the
+**Velocity needs no derived index.** Unlike the signals that *are* aggregated into derived
+indexes to avoid re-scanning every thing (`derived-index.md` — the set is the tool's) — the
 velocity signal already lives in the git log, which is itself the authoritative event
 stream. Caching it would only add a surface that can drift from the history it summarises.
 Read the log directly.

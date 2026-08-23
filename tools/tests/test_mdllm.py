@@ -1085,6 +1085,56 @@ def test_view_glob_agrees_with_path_glob(tmp_path):
                                        RepositoryView.worktree(tmp_path))] == ["deep.md"]
 
 
+def test_coherence_flags_known_fields_the_framework_already_owns(tmp_path):
+    # Review-9 survivor 7 caught from the inside. Whenever a field joins
+    # CORE_FIELDS, every domain that had registered it becomes redundant and
+    # nothing told them — this tells them. Info: inert, not wrong.
+    write(tmp_path, "_schema.yaml",
+          "types:\n  task:\n    statuses: [open]\n"
+          "known_fields:\n  - held_by\n  - genuinely_local\n")
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert any("registers `held_by`, which is now universal in CORE_FIELDS" in m
+               for m in infos)
+    assert not any("genuinely_local" in m for m in infos)
+
+
+def test_coherence_index_signal_enumeration_must_be_complete(tmp_path):
+    # Review-9 survivor 6: five surfaces enumerated three signals while the
+    # tool rebuilt four. Keyed to INDEX_FILES, so it cannot disagree with
+    # truth; no suppression list, because "mentions signal AND names two or
+    # more of them" is what enumerating means.
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\nfoundational_specs: [spec.md]\n")
+    write(tmp_path, "spec.md",
+          "# Spec\n\nCaches that aggregate one signal (triggers, "
+          "relationships, schema) across a domain.\n")
+    warns = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_WARNING)
+    assert any("enumerates derived-index signals but omits `provenance`" in m
+               for m in warns)
+
+
+def test_coherence_index_signal_complete_enumeration_is_clean(tmp_path):
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\nfoundational_specs: [spec.md]\n")
+    write(tmp_path, "spec.md",
+          "# Spec\n\nCaches that aggregate one signal (triggers, "
+          "relationships, schema, provenance) across a domain.\n")
+    msgs = messages(mdllm.coherence_findings(tmp_path, 15))
+    assert not any("enumerates derived-index signals" in m for m in msgs)
+
+
+def test_coherence_index_signal_check_ignores_a_lone_mention(tmp_path):
+    # One signal name in a sentence is prose about that index, not an
+    # enumeration of the set. Two is the threshold, and it is what keeps this
+    # check off ordinary writing.
+    write(tmp_path, ".markdownllm",
+          "framework: F\nversion: 1.0\nfoundational_specs: [spec.md]\n")
+    write(tmp_path, "spec.md",
+          "# Spec\n\nThe triggers index is one signal among several.\n")
+    msgs = messages(mdllm.coherence_findings(tmp_path, 15))
+    assert not any("enumerates derived-index signals" in m for m in msgs)
+
+
 def test_coherence_tiers_warns_spec_without_tier_entry(tmp_path):
     write(tmp_path, ".markdownllm",
           "framework: F\nversion: 1.0\nfoundational_specs:\n  - not-in-tiers.md\n")

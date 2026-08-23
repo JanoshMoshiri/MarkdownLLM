@@ -216,6 +216,47 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   into one `--name-only` walk (F12's lesson — the cost of this check is
   process spawns, not computation). Budget 12s.
 
+- **C7 / F8b review-9 promotions landed — two built, two declined, and the
+  declining is part of the promotion.**
+
+  **Built.** *Survivor 7's inverse:* a `known_fields` entry that is already
+  in `CORE_FIELDS` is reported as a redundant registration (Info). C1 fixed
+  the outward direction of that fault; this catches the inward one, and it
+  matters precisely because C1 happened — whenever a field joins
+  `CORE_FIELDS`, every domain that had registered it becomes redundant and
+  nothing told them. *Survivor 6:* prose that enumerates the derived-index
+  signals must enumerate all of them, keyed to `INDEX_FILES` — the constant
+  the rebuild loop itself walks.
+
+  **It caught two live instances the ninth review's own fix pass missed.**
+  `AGENTS.md`'s catalog entry for `derived-index.md` and `git-workflow.md`'s
+  velocity paragraph both still enumerated three signals and omitted
+  `provenance` — nine weeks after the review that found five surfaces doing
+  exactly this and believed it fixed them all. Both repaired here (by
+  pointing at the authority rather than by adding the fourth name), so the
+  check lands green. This is the argument for promotion in a single
+  observation: the cold read found the class, and only the mechanism finds
+  the *rest* of the class.
+
+  **Declined, with the condition that would lift each.** *Survivor 3, the
+  trigger-type count:* there is no tool-owned authority to key to. The
+  evaluator dispatches on a chain of `elif ttype == ...` branches, so any
+  `TRIGGER_TYPES` constant introduced for the check would itself be a
+  restatement — the branches would remain the real authority and the
+  constant could drift from them silently. Lift the decline when the
+  dispatch itself reads a declared set; making it do so is evaluator
+  surgery, which is its own ordered work and not a should-scope item.
+  *Survivor 5, the reserved-set restatements:* a sentence naming two
+  reserved types is ordinary prose, not an enumeration, so the shape that
+  works for four index signals produces noise across thirteen reserved
+  types. That is the retired-vocabulary judgement repeated, and repeating
+  it honestly is cheaper than repeating the check.
+  *Survivors 1, 2, 4* were never candidates: each was a semantic
+  contradiction between a spec and its own kernel block.
+
+  24 coherence tests green, 4 new. **N3 re-measured: 4.3s** against 12s —
+  the third and last budget checkpoint the design named.
+
 ## Next
 
-C7, then verify. C8–C9 (probes) are stretch, gated on C1–C7 verifying.
+Verify: full suite, budgets, then the stretch decision on C8–C9.
