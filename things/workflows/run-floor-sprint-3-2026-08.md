@@ -175,7 +175,47 @@ retrospective after the block, and its time trigger fires 2026-08-27.
   is an operator-owned control, and an agent editing it would be the floor
   quietly deciding what the boundary protects.
 
+- **C6 / F8b perimeter currency check landed** — the external review's R2,
+  the razor `cumulative-drift-is-invisible-to-per-change-walks` executed:
+  the surfaces outside every individual blast radius are protected by an
+  interval, and the interval is now mechanical.
+
+  **Deviation 2, and the better design it forced:** the design said each
+  perimeter surface would carry a reconciled-at version marker. It carries
+  none — the pin is read from git instead (the sentinel version at the
+  file's last-touching commit). A marker would have been a *new hand-
+  maintained surface introduced by the check that exists to catch hand-
+  maintained surfaces going stale*, and three of them would have needed an
+  honest first value nobody could supply. Reading git needs no marker, and
+  the perimeter set is derived too: root and `docs/` markdown, minus the
+  catalog, minus anything `type: specification` (the catalog and TIERS
+  checks already own those).
+
+  **Two minors of tolerance, not one, for a measured artifact:** a surface
+  reconciled *during* a release cycle is touched before the version bump
+  lands, so it reads as exactly one behind while being perfectly current.
+  One would fire on correct work every cycle and teach the operator to
+  ignore it. At two, the live corpus yields exactly two findings —
+  `CLAUDE.md` (3 behind) and `CONTRIBUTING.md` (2 behind).
+
+- **A latent defect found by the cost, not by the check** (recorded here
+  because it is the sprint's most instructive find). The first run of the
+  perimeter check took **two minutes**. Cause: `_view_glob`'s two branches
+  answered the same question differently. The no-view branch delegates to
+  `Path.glob`, where `*` stops at a separator; the view branch used raw
+  `fnmatch`, where it does not — so `*.md` meant *this directory* without a
+  view and *the entire recursive tree* with one, 25 paths versus 1978. The
+  new check then spawned one `git` process per match. Fixed at the source
+  with segment-wise matching and a regression test asserting the two
+  branches agree, rather than worked around at the call site. Two paths
+  claiming to be the same and quietly disagreeing is this sprint's own
+  subject, found inside its own tooling.
+
+  **N3 re-measured: 5.1s, then 4.2s.** The first figure is the honest
+  unbatched cost; the second is after collapsing eleven `git log` spawns
+  into one `--name-only` walk (F12's lesson — the cost of this check is
+  process spawns, not computation). Budget 12s.
+
 ## Next
 
-C6 and C7, recording deviations in this body as they happen.
-C8–C9 (probes) are stretch, gated on C1–C7 verifying.
+C7, then verify. C8–C9 (probes) are stretch, gated on C1–C7 verifying.

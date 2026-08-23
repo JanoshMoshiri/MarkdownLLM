@@ -1028,6 +1028,63 @@ def test_coherence_tier2_routing_is_one_directional(tmp_path):
     assert not any("docs/guide.md" in m for m in msgs)
 
 
+def _perimeter_repo(tmp_path, born_at="1.0.0", now="3.0.0"):
+    """A repo where README.md was last touched at framework `born_at` and the
+    sentinel has since moved to `now` — the shape the perimeter check dates."""
+    import subprocess
+    _git_repo(tmp_path)
+    write(tmp_path, ".markdownllm",
+          f"framework: F\nversion: {born_at}\nfoundational_specs: []\n")
+    write(tmp_path, "README.md", "# Readme\n\nPerimeter prose.\n")
+    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "born"], cwd=tmp_path, check=True)
+    write(tmp_path, ".markdownllm",
+          f"framework: F\nversion: {now}\nfoundational_specs: []\n")
+    subprocess.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "release"], cwd=tmp_path, check=True)
+
+
+def test_coherence_perimeter_flags_a_surface_releases_behind(tmp_path):
+    # The interval made mechanical: a surface outside every individual blast
+    # radius is dated from git rather than from a pin it would have to carry,
+    # so the check creates no new surface of its own to drift.
+    _perimeter_repo(tmp_path)
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert any("`README.md` was last touched when the framework was 1.0.0" in m
+               and "it is now 3.0.0" in m for m in infos)
+
+
+def test_coherence_perimeter_tolerates_one_minor(tmp_path):
+    # Two minors, not one, and for a real artifact rather than caution: a
+    # surface reconciled DURING a release cycle is touched before the version
+    # bump lands, so it reads as exactly one behind while being current. A
+    # one-minor threshold would fire on correct work every single cycle.
+    _perimeter_repo(tmp_path, born_at="3.0.0", now="3.1.0")
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert not any("README.md" in m and "last touched" in m for m in infos)
+
+
+def test_view_glob_agrees_with_path_glob(tmp_path):
+    # The two branches of _view_glob must answer the same question. They did
+    # not: the no-view branch delegates to Path.glob (where `*` stops at a
+    # separator) while the view branch used raw fnmatch (where it does not),
+    # so `*.md` meant "this directory" without a view and "the whole tree"
+    # with one. The perimeter check spawned one git process per match and
+    # took two minutes; the same call had been correct in the other mode.
+    from markdownllm.repository_view import RepositoryView
+    from markdownllm.coherence import _view_glob
+    _git_repo(tmp_path)
+    write(tmp_path, "top.md", "# top\n")
+    write(tmp_path, "nested/deep.md", "# deep\n")
+    write(tmp_path, "nested/more/deeper.md", "# deeper\n")
+    plain = _view_glob(tmp_path, "*.md", None)
+    viewed = _view_glob(tmp_path, "*.md", RepositoryView.worktree(tmp_path))
+    assert [p.name for p in plain] == ["top.md"]
+    assert [p.name for p in viewed] == ["top.md"]
+    assert [p.name for p in _view_glob(tmp_path, "*/*.md",
+                                       RepositoryView.worktree(tmp_path))] == ["deep.md"]
+
+
 def test_coherence_tiers_warns_spec_without_tier_entry(tmp_path):
     write(tmp_path, ".markdownllm",
           "framework: F\nversion: 1.0\nfoundational_specs:\n  - not-in-tiers.md\n")

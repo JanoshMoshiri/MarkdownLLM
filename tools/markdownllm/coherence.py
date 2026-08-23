@@ -55,6 +55,22 @@ def _view_is_file(path: Path, view: RepositoryView | None) -> bool:
     return _view_text(path, view) is not None
 
 
+def _glob_matches(rel: str, pattern: str) -> bool:
+    """`Path.glob` semantics, not raw `fnmatch`: `*` does NOT cross `/`.
+
+    This matters because the two branches of `_view_glob` below must agree.
+    The no-view branch delegates to `Path.glob`, where `*.md` means *this
+    directory's* markdown; raw `fnmatch.fnmatchcase` treats `/` as an ordinary
+    character, so the view branch answered `*.md` with the entire recursive
+    tree — 1978 paths where `Path.glob` returns 25. Found 2026-08-23 when the
+    perimeter check spawned one `git log` per match and took two minutes;
+    the same call site had been correct without a view and wrong with one.
+    """
+    parts, pat = rel.split("/"), pattern.split("/")
+    return (len(parts) == len(pat)
+            and all(fnmatch.fnmatchcase(a, b) for a, b in zip(parts, pat)))
+
+
 def _view_glob(base: Path, pattern: str,
                view: RepositoryView | None) -> list[Path]:
     if view is None:
@@ -70,7 +86,7 @@ def _view_glob(base: Path, pattern: str,
         if not raw.startswith(prefix):
             continue
         rel = raw[len(prefix):]
-        if fnmatch.fnmatchcase(rel, pattern):
+        if _glob_matches(rel, pattern):
             out.append(base.joinpath(*Path(rel).parts))
     return sorted(out)
 
@@ -384,6 +400,116 @@ def _tier2_routing_findings(root: Path, atext: str,
     return findings
 
 
+# --- perimeter currency (F8b; external review R2) -------------------------
+#
+# `cumulative-drift-is-invisible-to-per-change-walks`: the surfaces outside
+# every individual blast radius are not protected by a sharper per-change
+# walk, they are protected by an interval. This makes the interval mechanical.
+#
+# Same-builder, no suppression list, and NO NEW MARKER: the pin is read from
+# git rather than authored, so this check creates no surface of its own to
+# drift. For each perimeter file, the version the sentinel carried at that
+# file's last-touching commit is the version it was last walked against.
+#
+# Two minors, not one, because of a real artifact rather than caution: a
+# surface reconciled DURING a release cycle is touched before the version
+# bump lands, so it reads as exactly one behind while being perfectly
+# current. One would fire on correct work every cycle, and
+# `a-check-that-always-fires-teaches-the-operator-to-ignore-it` is the
+# failure that ends a check's usefulness permanently.
+_PERIMETER_MINOR_LAG = 2
+_PERIMETER_NEVER = {"AGENTS.md", "kernel.md", "CHANGELOG.md"}
+
+
+def _minor_pair(version: str) -> tuple[int, int] | None:
+    m = re.match(r"^(\d+)\.(\d+)", version.strip())
+    return (int(m.group(1)), int(m.group(2))) if m else None
+
+
+def _perimeter_files(root: Path, specs: list, view: RepositoryView | None) -> list[str]:
+    """Human-facing markdown outside the spec catalog: the release perimeter.
+
+    Derived, not listed. A `type: specification` is excluded because the
+    catalog and TIERS checks already own it; `examples/` is excluded because
+    the `framework_version_seen` check above already owns it.
+    """
+    names: list[str] = []
+    for base, pattern in ((root, "*.md"), (root / "docs", "*.md")):
+        for path in _view_glob(base, pattern, view):
+            rel = path.relative_to(root).as_posix()
+            if rel in _PERIMETER_NEVER or rel in set(specs):
+                continue
+            meta, _, err = parse_frontmatter(
+                _view_text(path, view) or "", source=path)
+            if not err and isinstance(meta, dict) \
+                    and str(meta.get("type")) == "specification":
+                continue
+            names.append(rel)
+    return sorted(set(names))
+
+
+def _perimeter_currency_findings(root: Path, specs: list, current: str,
+                                 view: RepositoryView | None) -> list[Finding]:
+    now = _minor_pair(current)
+    if now is None:
+        return []
+    files = _perimeter_files(root, specs, view)
+    if not files:
+        return []
+    # ONE history walk for every perimeter file, not one per file (F12's
+    # lesson: the cost of this check is process spawns, not computation).
+    # `git log --name-only` over all of them at once, newest first; the first
+    # block naming a file is that file's last touch.
+    try:
+        log = subprocess.run(
+            ["git", "log", "--format=%x01%H", "--name-only", "--", *files],
+            cwd=root, capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return [Finding(SEV_INFO, "perimeter",
+            "could not be dated — `git log` was unavailable, so this is "
+            "'could not look', not 'current'")]
+    if log.returncode != 0:
+        return []                             # not a git repo: nothing to date
+    last_touch: dict[str, str] = {}
+    for block in log.stdout.split("\x01")[1:]:
+        lines = block.splitlines()
+        if not lines:
+            continue
+        sha = lines[0].strip()
+        for name in lines[1:]:
+            name = name.strip()
+            if name and name not in last_touch:
+                last_touch[name] = sha
+
+    seen: dict[str, str | None] = {}          # sha -> sentinel version there
+    findings: list[Finding] = []
+    for rel in files:
+        sha = last_touch.get(rel, "")
+        if not sha:
+            continue                          # untracked/new: nothing to date
+        if sha not in seen:
+            shown = subprocess.run(
+                ["git", "show", f"{sha}:.markdownllm"],
+                cwd=root, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=20)
+            found = None
+            if shown.returncode == 0:
+                m = re.search(r"^version:\s*(\S+)", shown.stdout, re.M)
+                found = m.group(1) if m else None
+            seen[sha] = found
+        then = _minor_pair(seen[sha] or "")
+        if then is None:
+            continue
+        lag = (now[0] - then[0]) * 1000 + (now[1] - then[1])
+        if lag >= _PERIMETER_MINOR_LAG:
+            findings.append(Finding(SEV_INFO, "perimeter",
+                f"`{rel}` was last touched when the framework was "
+                f"{seen[sha]}; it is now {current} — walk it, or accept that "
+                f"it teaches an older shape"))
+    return findings
+
+
 def coherence_findings(root: Path, window: int,
                        view: RepositoryView | None = None) -> list[Finding]:
     """Mechanical checks over the 'dark region' a hand-walk currently guards
@@ -517,6 +643,12 @@ def coherence_findings(root: Path, window: int,
                     f"pinned at framework_version_seen {seen} but the framework "
                     f"is {fw_version} — walk the example against the current "
                     f"shape, then re-pin"))
+
+        # ...and the rest of the perimeter, dated from git rather than from a
+        # pin the surface would have to carry (external review R2).
+        if fw_version:
+            findings.extend(
+                _perimeter_currency_findings(root, specs, fw_version, view))
 
         # kernel drift, via the shared builder (cannot disagree with what
         # `mdllm kernel` would write — same source).
