@@ -111,7 +111,48 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   (`reviews/REVIEW-external-2026-08-10.md`, R1): this class produced the entire
   survivor list; the restatement is the unit of future drift.
 
-- **Perimeter currency check (added 2026-08-11).** A releases-behind signal for
+  **Two promoted, two declined — 2026-08-23, floor-sprint-3 (`9ab0820`).**
+  Built: the `CORE_FIELDS` admission criterion, caught from the inside (a
+  `known_fields` entry already universal is a redundant registration), and
+  the index-signal count, keyed to `INDEX_FILES`. The second caught two live
+  instances the ninth review's own fix pass missed — `AGENTS.md`'s catalog
+  entry and `git-workflow.md`'s velocity paragraph both still omitted
+  `provenance`, nine weeks after the review that believed it had fixed all
+  five surfaces. Declined, each with its lifting condition: the
+  **trigger-type count** has no tool-owned authority to key to (the
+  evaluator dispatches on a chain of `elif ttype ==` branches, so a
+  constant introduced for the check would itself be a restatement — lift
+  when the dispatch reads a declared set), and the **reserved-set
+  restatements** fail this backlog's own gate, because a sentence naming two
+  reserved types is ordinary prose rather than an enumeration and the shape
+  that works for four signals produces noise across thirteen types. That is
+  the retired-vocabulary judgement repeated, deliberately.
+
+- ~~**Perimeter currency check (added 2026-08-11).**~~ **Built 2026-08-23**
+  (floor-sprint-3, `57f5293`), with one design change worth carrying: the
+  item below proposed comparing each surface's *version pin*. No pin was
+  added. A marker would have been a new hand-maintained surface introduced
+  by the very check that catches hand-maintained surfaces going stale, and
+  three of the four surfaces had no honest first value anyone could supply.
+  The pin is read from git instead — the sentinel version at the file's
+  last-touching commit — so the check creates no surface of its own, and the
+  perimeter set is derived rather than listed. Tolerance is two minors, not
+  one, because a surface reconciled *during* a cycle is touched before the
+  version bump lands and reads as one behind while being current.
+
+  **Known limitation, found the day it shipped and recorded rather than
+  papered over.** A derived pin has no way to record *"walked, still
+  correct"*. `CLAUDE.md` fired on its first run; reading it showed 18 lines
+  of pure routing with nothing version-specific to go stale, so the honest
+  answer is "walked, correct" — and the only way to say so to a git-derived
+  pin is to modify the file, which is the authored marker this design
+  deliberately refused. The Info therefore recurs each release for any
+  surface that is correct *and* rarely edited. That is a real cost, and it
+  is the milder half of the trade: the alternative was a marker on every
+  perimeter file, drifting. Revisit if the recurrence starts training the
+  operator to ignore the line — that is the condition, not a schedule.
+
+  Original item, for the record: A releases-behind signal for
   the surfaces outside every individual blast radius — README, `docs/first-hour.md`,
   `examples/`, `CONTRIBUTING.md`: compare each surface's version pins / stated
   facts' last reconciliation against the tool's current version and fire an
@@ -120,9 +161,38 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   razor executed: the perimeter is protected by an interval, and the interval
   becomes mechanical (R2 of the same review).
 
-- **Boundary-term evidence check (added 2026-08-17, felt — third regression,
-  now blocking).**
-  A `.boundary-terms` entry that appears in the repository's **own tracked
+- ~~**Boundary-term evidence check (added 2026-08-17, felt — third regression,
+  now blocking).**~~ **Built 2026-08-23** as `mdllm boundary --audit-terms`
+  (floor-sprint-3, `444b4d6`) — **and it found the adder within the hour.**
+
+  This item recorded the additions as unattributed: "the additions were
+  **not** made by the floor (nothing in `boundary.py` writes that file)…
+  whatever adds them is unattributed and outlives the fix". The statement was
+  true and the conclusion was wrong, because the search had been scoped to
+  one module. `scaffold.py` registers every newborn domain's name in the
+  **framework root's** terms file — private-by-default at birth, a sound
+  intent — but it resolves the framework root from the *running tool's own
+  checkout*, not from the target's context. So every scaffold anywhere on
+  the machine appended to this repo's operator-owned control file, the test
+  suite included, permanently.
+
+  Why it stayed hidden: `test_scaffold_harness_selection.py` already carried
+  an autouse fixture restoring the terms file after each test, commented
+  "Scaffold birth registers a private name; tests must leave no local
+  state." One test file had found the behaviour and patched its own symptom,
+  which is precisely why the remaining leaks looked sourceless.
+
+  Fixed at the source in the same sprint (registration only when the newborn
+  is nested under this framework root; a domain outside it can never be
+  named by this repo's commits, so registering it buys no privacy and costs
+  a permanent false positive), with a flow probe that fails against the
+  unfixed tool. The audit leg then classified the standing entries without
+  reading one: **all 17 appear in this repo's own tracked content and not
+  one is a live domain name** — the whole class is accumulated tool output.
+  Removal is the operator's, and is one `--audit-terms` run away.
+
+  Original item, for the record: A `.boundary-terms` entry that appears in
+  the repository's **own tracked
   content** is not a private identifier: either it is noise, or it is a leak
   already committed. Both outcomes are actionable, which is what makes this a
   check rather than a warning. Same-builder (the corpus is the tool's own), and

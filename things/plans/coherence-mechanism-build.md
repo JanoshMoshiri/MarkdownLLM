@@ -1,8 +1,8 @@
 ---
 id: coherence-mechanism-build
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-08-11
 priority: high
 tags: [coherence, floor, derivation, probes, sequencing]
@@ -102,6 +102,37 @@ R3: one cold read per substantial release — the measured cadence; *where the
 ritual lives* stays the operator's open decision. R4: the walk-attestation
 warning is re-judged only after Phase 2 lands, per its own hold. Nothing to
 build here; this phase exists so the sequence is visible in one place.
+
+## State after floor-sprint-3 (2026-08-23)
+
+- **Phase 1 — complete.** The root's entry file no longer restates derivable
+  facts, in this plan's own order: the enums *deleted* in favour of pointers
+  (`d128fa0`), the types section *derived* into a `generated:types` managed
+  block (`031c2ac`), and the catalog annotations plus Tier-2 routing
+  completeness *checked* (`c10c5a1`). The one departure from the plan's text
+  is where the derive/check line falls: the catalog and routing sections are
+  authored prose wrapped around a derivable annotation, so generating them
+  would have destroyed the one-line descriptions that are their value. They
+  are checked. Where a block could own the whole fact, it does.
+- **Phase 2 — the felt items, done.** Perimeter currency, the boundary-term
+  evidence check, and two of the four review-9 promotions landed; the other
+  two are declined on the record at the backlog with the condition that
+  would lift each. The unfelt items keep their original hold.
+- **Phase 3 — begun.** Probes 1 and 2 landed as `tools/tests/
+  test_flow_probes.py`, plus a third that exists *because* the sprint's own
+  probes blocked the sprint's own commit and exposed the boundary-terms
+  adder. Probes 3–5 (invariant breach, refresh end-to-end, session close)
+  remain owned here.
+- **Phase 4 — standing, unchanged.** The exit condition below is unmet by
+  construction: it needs a post-release cold read, which is an operator act
+  after publication, not a sprint deliverable.
+
+**The estimate was wrong in a useful direction.** This plan predicted
+"Phases 1+2 are plausibly one build session; Phase 3 a second." One session
+took Phase 1, the felt half of Phase 2, and two thirds of the probe work —
+because Phase 1's *delete* leg removed load that Phase 2 would otherwise
+have had to police. Subtracting before adding compounds; the sequencing
+fact this plan already carried was worth more than it claimed.
 
 ## Sequencing and exit
 

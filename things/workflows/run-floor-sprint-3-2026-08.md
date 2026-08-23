@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-23
 definition: substrate-floor-development
-current_stage: verify
+current_stage: reconcile
 held_by: claude-code
 linked_things:
   - id: run-floor-sprint-2-2026-08
@@ -26,7 +26,7 @@ linked_things:
 
 ## Where This Is
 
-At `verify`. Born at `requirements`, same as both predecessors: the `problems`
+At `reconcile`. Born at `requirements`, same as both predecessors: the `problems`
 stage was satisfied before this run existed. Sprint 2's seal record named
 the subject, `coherence-mechanism-build` carries the evidence for every
 phase (the eight-round review loop's measurement — derived surfaces held
@@ -364,8 +364,50 @@ Only the entry this session's own probes created was removed —
 it on inference would be the floor deciding what the boundary protects. The
 other 16 are surfaced at seal with the cause named and a one-command remedy.
 
+## Reconcile record (2026-08-23)
+
+The walk this sprint owed is unusual: it had to correct the entry file's own
+account of *what is still walked by hand*, because the sprint moved items
+out of the dark region.
+
+- **`AGENTS.md` step 3** named the coherence checks in prose and listed the
+  Tier-2 routing table and the spec catalog as prose-only residue. Both are
+  now mechanical. Rather than update the list, the line now **points at the
+  tool and says so**: a prose inventory of mechanical checks is the exact
+  restatement class those checks exist to end, and this one went stale
+  inside a single sprint. What remains genuinely human is named precisely —
+  the framework-map's counts, and the *descriptions* in the routing table
+  and catalog, whose annotations and completeness are now floor-owned.
+- **`docs/framework-map.md`**: `coherence` is no longer "the catalog slice"
+  of the Walk. Counts unchanged — `--audit-terms` is a leg on an existing
+  subcommand, not a new one, so View 3's census and its three restatements
+  all still hold (checked mechanically, as it happens).
+- **`docs/operator-guide.md`**: the `boundary` row carries `--audit-terms`,
+  with the line-number-not-term property stated, and the trigger an operator
+  actually feels — "when the boundary starts refusing commits you believe
+  are clean".
+- **`mechanical-coherence-checks-backlog`**: three items struck with dated
+  commits, the two declined promotions recorded with their lifting
+  conditions, and the boundary-term item rewritten to name the adder it had
+  recorded as unattributed.
+- **`coherence-mechanism-build`**: `not-started` → `in-progress` (v1.1),
+  with per-phase state. Its own estimate is corrected in place: it predicted
+  Phases 1+2 as one session and Phase 3 as a second; one session took
+  Phase 1, the felt half of 2, and two thirds of 3 — because the *delete*
+  leg removed load the *check* leg would otherwise have had to police.
+- **Kernel**: no spec's `<!-- kernel -->` block changed (the `git-workflow.md`
+  edit sits outside one), so no regeneration was owed — and coherence proves
+  that rather than memory.
+
+**Recorded, not silenced — three standing findings this sprint did not
+fix.** Both examples remain pinned at 3.33.0 against a 3.34.0 sentinel; that
+is release-cadence work belonging to the operator's walk, and re-pinning
+without walking would be a lie told by the very mechanism built to prevent
+it. And the perimeter check's own limitation surfaced on day one: a
+git-derived pin cannot record *"walked, still correct"* — `CLAUDE.md` is 18
+lines of pure routing with nothing to go stale, so its Info will recur every
+release. Both are written down at their owners rather than quietly cleared.
+
 ## Next
 
-Reconcile: the dark-region walk. Note that this sprint *moved items out of
-that region*, so the walk includes correcting the entry file's own
-description of what is still walked by hand.
+Seal.

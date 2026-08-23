@@ -40,7 +40,7 @@ full-spec load (`mdllm tokens` measures it — never assert); twelve extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
 paper layer made mechanical, each subcommand mechanising a piece of it (mostly
-one per spec; a few carry several — change-reconciliation has three (`coherence`, `touchpoints`, `candidates` — the cue leg that fires on every commit), git-workflow three (`estate-sync`, `publish`, `autopush`); View 3 is the census and wins — `coherence` for the catalog slice
+one per spec; a few carry several — change-reconciliation has three (`coherence`, `touchpoints`, `candidates` — the cue leg that fires on every commit), git-workflow three (`estate-sync`, `publish`, `autopush`); View 3 is the census and wins — `coherence` for the mechanised slice of the Walk
 and `touchpoints` for the Assimilate beat).
 
 ## View 1 — Elevation: the five bands
