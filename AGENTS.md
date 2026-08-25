@@ -164,6 +164,7 @@ The framework defines itself through these interconnected specifications:
 ### Foundational
 - **llm-driven-systems.manifesto.md** — Philosophy, paradigm shift, core principles. The "why." (`type: manifesto`, `status: evolving`)
 - **thing.md** — The atomic unit specification: schema definition, field reference, cohesion and decomposition principle. (`type: specification`, `status: evolving`)
+- **things/workflows/universal-workflow-methodology.md** — The universal workflow methodology: seven evidence-gated decisions from need to verified outcome, iterated by feeding each review into the next cycle's current-state assessment. The general problem-approach the framework's own rituals trace; exposed for any domain to instance. (`type: workflow-definition`, `status: draft`)
 
 ### Operational
 - **read.thing.md** — How LLMs read and reason about things without modification. (`type: specification`, `status: stable`)
