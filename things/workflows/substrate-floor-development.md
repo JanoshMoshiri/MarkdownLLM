@@ -2,7 +2,7 @@
 id: substrate-floor-development
 type: workflow-definition
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-08-21
 tags: [workflow, floor, development-process, sprint]
 stages:
@@ -26,6 +26,9 @@ linked_things:
   - id: workflow-state-specification
     relation: implements
     notes: "First workflow-definition minted at the framework root; the primitive applied to the framework's own development process."
+  - id: universal-workflow-methodology
+    relation: implements
+    notes: "Authored 2026-08-21, before the methodology entered the repo; recognised 2026-08-25 as its floor-development specialisation — the same seven decisions, compressed and hardened, with two substrate-specific gates added (reconcile's consistency walk, seal's human gates). Convergence, not derivation: the general form was operating here before it was written down."
   - id: prove-identity-before-you-change-bytes
     relation: implements
     notes: "The design stage's sequencing rule: split byte-identical restructuring from deliberate behaviour change and order identity first, naming each restructuring commit's proof before writing it."
@@ -45,8 +48,15 @@ skipped the analysis and design stages, and the result ignored performance
 until it was unusable. Stages are gates, not ceremony — each exists because
 skipping it has already cost a real sprint.
 
-**Not yet exposed:** this becomes `exposed: true` when a second corpus wants
-to instance it (a domain adopting the same development discipline).
+**Not exposed — and no longer the generalisation candidate.** The general
+form now lives in `universal-workflow-methodology` (exposed at birth); a
+second corpus adopting this discipline instances that, not this. This
+definition stays unexposed as the substrate's own specialisation: its
+stage mapping onto the general form is roughly problems+requirements ≈
+define-need/assess-current/define-prioritise, analysis ≈ set-mvp-target,
+design ≈ design-plan, build ≈ execute, verify+seal ≈ review-verify — with
+reconcile and seal's human gates as the floor-specific additions the
+general form leaves to proportionate application.
 
 ## Stages
 
