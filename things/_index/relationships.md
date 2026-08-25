@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-23
-generated: 2026-08-23T01:28:54
-generated_from: HEAD@8c603e1
-coverage: 269
+created: 2026-08-25
+generated: 2026-08-25T14:20:22
+generated_from: HEAD@196e537
+coverage: 270
 framework_version: 3.34.0
 ---
 
@@ -995,6 +995,8 @@ framework_version: 3.34.0
 - trigger-specification --complements--> derived-index-specification
 - trigger-specification --informs--> membrane-attention-cluster
 - trigger-specification --references--> provenance-specification
+- universal-workflow-methodology --implements--> workflow-state-specification
+- universal-workflow-methodology --references--> a-true-primitive-is-discovered-not-authored
 - v3-33-release-and-external-acceptance --extends--> codex-substrate-review-response-2026-08-20
 - v3-33-release-and-external-acceptance --derived-from--> independent-substrate-review-2026-08-20-claude
 - v3-33-release-and-external-acceptance --documents--> harness-capability-evidence-matrix-2026-08-20
