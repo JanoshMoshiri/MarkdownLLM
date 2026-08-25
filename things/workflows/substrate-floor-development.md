@@ -49,8 +49,9 @@ until it was unusable. Stages are gates, not ceremony — each exists because
 skipping it has already cost a real sprint.
 
 **Not exposed — and no longer the generalisation candidate.** The general
-form now lives in `universal-workflow-methodology` (exposed at birth); a
-second corpus adopting this discipline instances that, not this. This
+form now lives in the `universal-workflow.md` spec, which reaches every
+domain with the framework via domain-refresh; a domain adopting this
+discipline specialises that, not this. This
 definition stays unexposed as the substrate's own specialisation: its
 stage mapping onto the general form is roughly problems+requirements ≈
 define-need/assess-current/define-prioritise, analysis ≈ set-mvp-target,

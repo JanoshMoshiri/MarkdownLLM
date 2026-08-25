@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-25
-generated: 2026-08-25T16:09:41
-generated_from: HEAD@4a7af52
+generated: 2026-08-25T20:35:00
+generated_from: HEAD@dba29d0
 coverage: 272
 framework_version: 3.34.0
 ---
@@ -20,7 +20,7 @@ framework_version: 3.34.0
 | created | 272 |
 | linked_things | 266 |
 | version | 208 |
-| tags | 182 |
+| tags | 181 |
 | confidence | 136 |
 | session | 133 |
 | origin | 132 |
@@ -29,7 +29,7 @@ framework_version: 3.34.0
 | disposition_reason | 37 |
 | disposition | 36 |
 | promoted_to | 17 |
-| exposed | 15 |
+| exposed | 14 |
 | decided_by | 14 |
 | informed_by | 12 |
 | period_start | 7 |
@@ -48,8 +48,8 @@ framework_version: 3.34.0
 | resolution | 2 |
 | parties | 2 |
 | source_domain | 2 |
-| stages | 2 |
 | resolved_by | 1 |
 | source_id | 1 |
 | source_commit | 1 |
 | triggers | 1 |
+| stages | 1 |

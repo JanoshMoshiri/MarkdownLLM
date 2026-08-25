@@ -130,6 +130,7 @@ into a second file always eventually does.
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 | Multi-stage, multi-session process instances; workflow run-state; stage cursors | `workflow-state.md` |
 | Two operators/sessions contending for one thing; advisory claims, leases | `coordination-claim.md` |
+| Applying or specialising the universal workflow methodology; the seven stages, the two shapes | `universal-workflow.md` |
 | Composing workflow loops — modules, the metabolism, radii, estate-level operating models | `operating-model.md` |
 | Human operator asking what changed / what the tools are / what the v3 experience is | `docs/operator-guide.md` |
 | Human newcomer's first session; onboarding a non-author operator | `docs/first-hour.md` |
@@ -165,7 +166,7 @@ The framework defines itself through these interconnected specifications:
 ### Foundational
 - **llm-driven-systems.manifesto.md** — Philosophy, paradigm shift, core principles. The "why." (`type: manifesto`, `status: evolving`)
 - **thing.md** — The atomic unit specification: schema definition, field reference, cohesion and decomposition principle. (`type: specification`, `status: evolving`)
-- **things/workflows/universal-workflow-methodology.md** — The universal workflow methodology: seven evidence-gated decisions from need to verified outcome, iterated by feeding each review into the next cycle's current-state assessment. The general problem-approach the framework's own rituals trace; exposed for any domain to instance. (`type: workflow-definition`, `status: draft`)
+- **universal-workflow.md** — The universal workflow methodology: seven evidence-gated decisions from need to verified outcome, in two shapes (accumulative and repeatable), iterated by feeding each review into the next cycle's current-state assessment. The general problem-approach the framework's own rituals trace; foundation — it reaches domains via the framework version and domain-refresh, and domains specialise it as their own workflow-definitions. (`type: specification`, `status: draft`)
 
 ### Operational
 - **read.thing.md** — How LLMs read and reason about things without modification. (`type: specification`, `status: stable`)

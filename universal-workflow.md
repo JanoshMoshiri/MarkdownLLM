@@ -1,11 +1,63 @@
 ---
 id: universal-workflow-methodology
-type: workflow-definition
+type: specification
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-08-25
-tags: [workflow, methodology, universal, evidence-driven, iteration]
-exposed: true
+linked_things:
+  - id: workflow-state-specification
+    relation: implements
+    notes: "The methodology's stage graph is expressed in the workflow-definition shape that spec owns; a domain specialising this methodology mints its own definition and runs."
+  - id: a-true-primitive-is-discovered-not-authored
+    relation: references
+    notes: "The integration posture: the methodology arrived as doctrine the existing primitives already carry — zero mechanism was added to house it."
+---
+
+# The Universal Workflow Methodology
+
+The general method for approaching any problem in an evidence-driven,
+analytical, iterable way — a software build, a regulated change control, a
+one-shot record generation. Authored by Janosh Moshiri as *Universal
+Development Methodology v1.0*; integrated 2026-08-25 under its truer name
+(the method is not development-specific), and promoted from hosted content
+to this spec the same day: the methodology is **foundation**, so it
+reaches domains the way foundation does.
+
+**Distribution — the correction that moved it here (2026-08-25):** this
+spec arrives at every domain through the framework version and
+`domain-refresh.md`, exactly as `thing.md` does. It is **never** imported
+over a porch: the face/import/quarantine machinery is the domain↔domain
+axis, and conflating the two channels put the foundation on the wrong
+one. A domain does not import the methodology — it *receives* it with the
+framework and **specialises** it: minting its own `workflow-definition`
+(per `workflow-state.md`) whose stages realise these decisions for its
+context, linked `implements` to this spec.
+
+**Core idea** (from the source document): each stage establishes enough
+clarity to enter the next. Progression is evidence-led rather than
+automatic and may result in continuing, revising, deferring or stopping.
+The structure remains constant while the activities and evidence within it
+vary according to context, scale and risk.
+
+Those four progression outcomes are the four moves a `workflow-run`
+already has:
+
+| Progression outcome | Run mechanics (workflow-state.md) |
+|---|---|
+| Continuing | advance `current_stage` along a forward edge |
+| Revising | move along the declared backward edge |
+| Deferring | `status: paused` |
+| Stopping | `status: abandoned` |
+
+## The seven stages
+
+Each stage is a decision with a guiding question and one named output —
+the output is the stage's exit gate. A specialising definition keeps the
+decisions and re-names or subdivides the stages as its context demands
+(worked example in `operating-model.md`). The reference stage graph, in
+the workflow-definition shape a domain copies and adapts:
+
+```yaml
 stages:
   - id: define-need
     to: [assess-current]
@@ -21,47 +73,7 @@ stages:
     to: [review-verify, design-plan]
   - id: review-verify
     to: []
-linked_things:
-  - id: workflow-state-specification
-    relation: implements
-    notes: "The second workflow-definition minted at the framework root, and the first exposed one: the primitive carrying a methodology that predates its arrival here."
-  - id: a-true-primitive-is-discovered-not-authored
-    relation: references
-    notes: "The integration posture: the methodology arrived as data the existing primitive already holds — zero mechanism was added to house it."
----
-
-# Universal Workflow Methodology
-
-The operator's general method for approaching any problem in an
-evidence-driven, analytical, iterable way — a software build, a QMS change
-control, a one-shot record generation. Authored by Janosh Moshiri as
-*Universal Development Methodology v1.0* and integrated here 2026-08-25
-under its truer name: the method is not specific to development.
-
-**Core idea** (from the source document): each stage establishes enough
-clarity to enter the next. Progression is evidence-led rather than
-automatic and may result in continuing, revising, deferring or stopping.
-The structure remains constant while the activities and evidence within it
-vary according to context, scale and risk.
-
-Those four progression outcomes are not new mechanics — they are the four
-moves a `workflow-run` already has:
-
-| Progression outcome | Run mechanics (workflow-state.md) |
-|---|---|
-| Continuing | advance `current_stage` along a forward edge |
-| Revising | move along the declared backward edge |
-| Deferring | `status: paused` |
-| Stopping | `status: abandoned` |
-
-The floor enforces stage membership and declared edges on any run of this
-definition; whether the evidence at a gate justifies the move stays the
-agent's judgement, per stage criteria below.
-
-## The seven stages
-
-Each stage is a decision with a guiding question and one named output —
-the output is the stage's exit gate.
+```
 
 **define-need** — *What are we trying to solve, and for who?*
 Clearly describe the need, problem or opportunity before assessing
@@ -109,18 +121,15 @@ Output: outcome assessment and improvement backlog.
 
 *Review becomes evidence for the next current-state assessment.* The loop
 is deliberately **not** a cyclic stage edge: `review-verify` is terminal,
-and iteration is a new run — exactly how the substrate already iterates
-(floor sprints 1→3 were three runs, each seeded by the last). The evidence
-hand-off is structural: the next run pins the prior run's outcome
-assessment via `informed_by`, making the loop a provenance edge between
-runs rather than an arrow inside one.
+and iteration is a new run. The evidence hand-off is structural: the next
+run pins the prior run's outcome assessment via `informed_by`, making the
+loop a provenance edge between runs rather than an arrow inside one.
 
 ## Two shapes of application
 
-Stated by the author 2026-08-25, extending the v1.0 document (this is the
-v1.1 addition). The same seven decisions carry two shapes of work, and
-the structural difference between them is **where `review-verify`'s
-output lands**:
+Stated by the author 2026-08-25, extending the v1.0 document. The same
+seven decisions carry two shapes of work, and the structural difference
+between them is **where `review-verify`'s output lands**:
 
 - **Accumulative** — chained runs converging on or evolving a goal:
   development, migration, remediation. The review feeds the *next run's*
@@ -134,7 +143,7 @@ output lands**:
 
 The two interleave inside any operational module — an accumulative arc
 delivers operating state, repeatable loops maintain it. That composition
-is `operating-model.md`'s subject, not this thing's.
+is `operating-model.md`'s subject, not this spec's.
 
 ## Capacity at the cut
 
@@ -197,15 +206,26 @@ lenses at both ends of the transition.
 ## Position in the framework
 
 The framework's existing rituals already trace arcs of this loop:
-session orientation and the velocity digest are a standing
-current-state assessment; triggers are declared evidence that a need
-exists; change-reconciliation's cue → assimilate → walk → seal is a
-compressed traversal for one inflection; a retrospective is
-review-and-verify at domain radius; a floor sprint is a full traversal.
-This thing names the spine those rituals share — a discovery of common
-shape, not a new authority over them. Each ritual's own spec remains its
-authority.
+session orientation and the velocity digest are a standing current-state
+assessment; triggers are declared evidence that a need exists;
+change-reconciliation's cue → assimilate → walk → seal is a compressed
+traversal for one inflection; a retrospective is review-and-verify at
+domain radius; a floor sprint is a full traversal. This spec names the
+spine those rituals share — a discovery of common shape, not a new
+authority over them. Each ritual's own spec remains its authority.
 
-`substrate-floor-development` is the specialisation: the same seven
-decisions with two substrate-specific gates added (reconcile's
-consistency walk, seal's human gates) — the edge lives on that thing.
+`substrate-floor-development` is the framework's own specialisation: the
+same seven decisions with two substrate-specific gates added
+(reconcile's consistency walk, seal's human gates) — the edge lives on
+that thing. How many loops compose into modules and an estate is
+`operating-model.md`'s subject.
+
+## History
+
+Born 2026-08-25 as an exposed `workflow-definition` thing
+(`things/workflows/`, v1.0–v1.1); promoted to this spec the same day
+when the operator corrected the distribution channel. The id travelled
+with the content, so every edge minted against the thing resolves here
+unchanged. The v1.0 stage prose is the source document's, transcribed
+complete; v1.1 added the two shapes and the capacity closure (operator,
+in session); v1.2 is this promotion.

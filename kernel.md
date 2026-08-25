@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: kernel
 created: 2026-08-25
-generated: 2026-08-25T15:51:43
-generated_from: HEAD@67ec387
+generated: 2026-08-25T20:34:56
+generated_from: HEAD@dba29d0
 coverage: 6
 framework_version: 3.34.0
 ---

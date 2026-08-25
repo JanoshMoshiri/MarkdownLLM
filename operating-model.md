@@ -29,8 +29,7 @@ linked_things:
 
 ## What This Specifies
 
-`universal-workflow-methodology` (a thing, not a spec — the framework
-hosts it as exposed content) defines the **atom**: one loop of seven
+`universal-workflow.md` defines the **atom**: one loop of seven
 evidence-gated decisions, applied in two shapes. This spec defines
 **composition**: how many atoms run together inside a module, how modules
 compose into an estate, and what an application declares to make its
@@ -188,8 +187,10 @@ auditing it means reading declarations, not running a tool.
 
 ## Relationship to Other Specifications
 
-- **universal-workflow-methodology** (thing) — the atom: one loop, seven
-  decisions, two shapes. This spec never restates its stages.
+- **universal-workflow.md** — the atom: one loop, seven decisions, two
+  shapes. This spec never restates its stages. Both arrive at domains via
+  the framework version and `domain-refresh.md` — foundation travels the
+  refresh axis, never the porch.
 - **workflow-state.md** — definitions and runs; every composition
   statement resolves to them.
 - **trigger-specification.md** — the operating interval's sensors.

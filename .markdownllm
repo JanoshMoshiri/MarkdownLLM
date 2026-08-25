@@ -16,6 +16,7 @@ foundational_specs:
   - workflow-state.md
   - coordination-claim.md
   - operating-model.md
+  - universal-workflow.md
   - session-memory.md
   - belief-revision.md
   - change-reconciliation.md
