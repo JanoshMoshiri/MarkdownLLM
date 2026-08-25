@@ -36,7 +36,7 @@ the prose.
 is layering.** The manifesto defines [thing.md](../thing.md); five operative specs
 say what may be done to the atom; those six are distilled into
 [kernel.md](../kernel.md) so a session starts on a small fraction of the
-full-spec load (`mdllm tokens` measures it — never assert); twelve extension
+full-spec load (`mdllm tokens` measures it — never assert); thirteen extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
 paper layer made mechanical, each subcommand mechanising a piece of it (mostly
@@ -57,8 +57,8 @@ flowchart TD
     accDescr {
         Five stacked bands. The entry band, tier 0, holds AGENTS.md as the
         harness-delivered entry contract and kernel.md as a generated digest. Below
-        it the specification layer holds 29 spec things: the manifesto for the
-        why, thing.md with the core operative specs, and 22 extension and guide
+        it the specification layer holds 30 spec things: the manifesto for the
+        why, thing.md with the core operative specs, and 23 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
         deterministic floor is tools/mdllm.py, providing the mdllm CLI with 34
@@ -75,10 +75,10 @@ flowchart TD
         AGENTS["AGENTS.md<br/>entry contract — harness-delivered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
-    subgraph specs ["specification layer — 29 spec things"]
+    subgraph specs ["specification layer — 30 spec things"]
         MANIFESTO["manifesto<br/>the why"]
         THING["thing.md<br/>+ core operative specs"]
-        EXT["extensions<br/>+ guides — 22 specs"]
+        EXT["extensions<br/>+ guides — 23 specs"]
     end
     subgraph memory ["domain memory — things/"]
         INSIGHTS["insights"]
@@ -135,8 +135,8 @@ flowchart TD
         semantic layer only - all three operating on it. A band of extension
         specs each extends thing.md: trigger-specification, derived-index,
         provenance, change-reconciliation, workflow-state, coordination-claim,
-        session-memory, belief-revision, retrospective, example-things,
-        reasoning-lenses and thing-lifecycle. A separate band of guides and the
+        operating-model, session-memory, belief-revision, retrospective,
+        example-things, reasoning-lenses and thing-lifecycle. A separate band of guides and the
         domain bridge - domain-specification-guide, scalability-guide,
         operator-guide, framework-discovery, domain-refresh, interface,
         first-hour and framework-map - applies to the core rather than defining
@@ -159,6 +159,7 @@ flowchart TD
         CRECON["change-reconciliation"]
         WSTATE["workflow-state (evolving)"]
         COORD["coordination-claim (draft)"]
+        OPMODEL["operating-model (draft)"]
         SMEM["session-memory"]
         BREV["belief-revision"]
         RETRO["retrospective"]

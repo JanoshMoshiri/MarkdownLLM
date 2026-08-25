@@ -63,6 +63,7 @@ TIERS = {
         "retrospective.md", "trigger-specification.md", "derived-index.md",
         "example-things.md", "reasoning-lenses.md", "provenance.md",
         "change-reconciliation.md", "workflow-state.md", "coordination-claim.md",
+        "operating-model.md",
     ],
 }
 

@@ -130,6 +130,7 @@ into a second file always eventually does.
 | Decisions, pinned inputs, external content, output traceability | `provenance.md` |
 | Multi-stage, multi-session process instances; workflow run-state; stage cursors | `workflow-state.md` |
 | Two operators/sessions contending for one thing; advisory claims, leases | `coordination-claim.md` |
+| Composing workflow loops — modules, the metabolism, radii, estate-level operating models | `operating-model.md` |
 | Human operator asking what changed / what the tools are / what the v3 experience is | `docs/operator-guide.md` |
 | Human newcomer's first session; onboarding a non-author operator | `docs/first-hour.md` |
 | Orienting in the framework structure; what links to what; spec graph navigation | `docs/framework-map.md` |
@@ -184,6 +185,7 @@ The framework defines itself through these interconnected specifications:
 - **change-reconciliation.md** — How a domain stays consistent across change: the human declares an inflection, then a scale-free four-beat pass (cue → assimilate → walk → seal) reconciles the change against its blast radius using the relationships and reverse-provenance indexes. Semantic consistency is maintained at the point of change, not by sweeping. (`type: specification`, `status: draft`)
 - **workflow-state.md** — Workflow run-state as a primitive: `workflow-definition` (stages as data + allowed transitions) and `workflow-run` (a structural `definition` pointer, a `current_stage` cursor, resume in the body). The decomposition principle applied to processes; the floor enforces stage membership and declared prior→candidate edges, while the agent judges whether the work merits an allowed transition. Reserved, and now `evolving` — exercised on a live domain. (`type: specification`, `status: evolving`)
 - **coordination-claim.md** — The advisory-claim convention (`held_by` + optional `held_until` lease) for same-target contention: read-and-respected, not a lock; deploy-when-felt on a contended thing. General, not workflow-specific — `workflow-run` is its motivating consumer, and any contended singleton (a shared index, say) could adopt it. (`type: specification`, `status: draft`)
+- **operating-model.md** — How atoms compose: modules running accumulative arcs and repeatable loops, the metabolism between them, fractal radii, estate-radius composition over served faces, and the five declared dimensions that make a composition auditable. Doctrine over existing primitives — adds no mechanism; grows only on cross-corpus convergence. (`type: specification`, `status: draft`)
 
 - **example-things.md** — Full specification for `type: example` things: frontmatter template, when to use examples, and why examples work better than rules for inductive LLM learning. (`type: specification`, `status: stable`)
 - **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)

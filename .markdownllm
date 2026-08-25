@@ -15,6 +15,7 @@ foundational_specs:
   - provenance.md
   - workflow-state.md
   - coordination-claim.md
+  - operating-model.md
   - session-memory.md
   - belief-revision.md
   - change-reconciliation.md

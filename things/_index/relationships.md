@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-25
-generated: 2026-08-25T15:48:21
-generated_from: HEAD@706eed9
-coverage: 270
+generated: 2026-08-25T15:53:45
+generated_from: HEAD@67ec387
+coverage: 271
 framework_version: 3.34.0
 ---
 
@@ -712,6 +712,12 @@ framework_version: 3.34.0
 - operating-layer-quality-loop --references--> retrospective-specification
 - operating-layer-quality-loop --references--> cowork-adapter
 - operating-layer-quality-loop --references--> vendor-harness-adapter-foundation
+- operating-model-specification --extends--> universal-workflow-methodology
+- operating-model-specification --extends--> workflow-state-specification
+- operating-model-specification --complements--> trigger-specification
+- operating-model-specification --complements--> provenance-specification
+- operating-model-specification --complements--> coordination-claim-specification
+- operating-model-specification --references--> interface-specification
 - operating-scope-promotion --informs--> llm-driven-systems-manifesto
 - operating-scope-promotion --references--> divergence-primitive-promotion
 - operating-scope-promotion --references--> assistant-register
