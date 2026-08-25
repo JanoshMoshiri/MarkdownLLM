@@ -2,7 +2,7 @@
 id: universal-workflow-methodology
 type: workflow-definition
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-08-25
 tags: [workflow, methodology, universal, evidence-driven, iteration]
 exposed: true
@@ -114,6 +114,36 @@ and iteration is a new run — exactly how the substrate already iterates
 hand-off is structural: the next run pins the prior run's outcome
 assessment via `informed_by`, making the loop a provenance edge between
 runs rather than an arrow inside one.
+
+## Two shapes of application
+
+Stated by the author 2026-08-25, extending the v1.0 document (this is the
+v1.1 addition). The same seven decisions carry two shapes of work, and
+the structural difference between them is **where `review-verify`'s
+output lands**:
+
+- **Accumulative** — chained runs converging on or evolving a goal:
+  development, migration, remediation. The review feeds the *next run's*
+  `assess-current` (an `informed_by` pin run-to-run). The chain refines
+  the work.
+- **Repeatable** — sibling runs of one stable definition, each instanced
+  by a demand: an automation, a procedure, a record generation. Similar
+  outcome each time under different variants. The review's improvement
+  backlog feeds the *definition's own evolution*, not the next run. The
+  series refines the process.
+
+The two interleave inside any operational module — an accumulative arc
+delivers operating state, repeatable loops maintain it. That composition
+is `operating-model.md`'s subject, not this thing's.
+
+## Capacity at the cut
+
+Capacity is considered where the task set falls out and the minimal set
+is cut — `set-mvp-target` into `design-plan` — and nowhere else as a
+standing concern. It is not inherently human capacity: one resolution of
+"who does this" is *nobody — automate it*, which spawns a child
+accumulative arc whose deliverable is a new repeatable definition. One
+shape manufactures the other; the fractal closes on itself.
 
 ## Proportionate use
 
