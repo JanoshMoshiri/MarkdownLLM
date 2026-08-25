@@ -153,6 +153,13 @@ Bottleneck-census-sourced (new; evidence measured today):
   tier markers (fast unit vs git-fixture integration), and a documented
   focused-selection convention so the inner loop runs affected files only;
   the full suite becomes a verify-stage gate, not an inner loop.
+  *Felt again 2026-08-25 (operator, in session):* the 3.35.0 release gate
+  ran the full suite — sanctioned, it is the stage gate — but at N7's
+  measured 37 minutes for a session whose code delta was two data lines,
+  and the operator challenged it believing attribution was already solved.
+  It is solved as doctrine and as this requirement; only the mechanism is
+  unbuilt. Recurrence at the operator's own hand is the deploy-when-felt
+  signal: pull F10 into the next floor sprint's cut.
 - **F11** — Pre-commit concurrency: boundary/validate/coherence legs run
   concurrently against the same frozen tree (safe by immutability); wall
   time approaches max(legs), not sum.
