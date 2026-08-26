@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
-current_stage: requirements
+current_stage: analysis
 held_by: claude-framework-session-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
@@ -36,16 +36,18 @@ of the first documented executions of the methodology on real work.
 
 ## Where This Is
 
-At **requirements**. The problems inventory is the verified review
-(ingested and quarantine-lifted 2026-08-26, this run's `informed_by`
-pin); the requirements are F17–F20 on `floor-block-requirements-2026-08`
-v1.4, committed. This run's own dogfooding note: its `informed_by` pin to
-the review is F17 practised before F17 is specified — the initiating
-demand named on the run itself.
+At **analysis**, with the cut committed
+(`operating-model-seams-scope-2026-08-26`): F18 + F17 necessity, F19 +
+F20 should, advisory floor checks stretch. The requirements stage was
+satisfied by F17–F20 on `floor-block-requirements-2026-08` v1.4. Banked
+in-run lesson already: a pin written from memory shipped with a wrong
+tail and was corrected by hand — pins are transcribed from the log, and
+the stretch scope includes teaching the floor to resolve them.
 
 ## Next
 
-The analysis cut: which of F17–F20 this sprint takes, at what depth, as a
-`type: decision` with pinned inputs. Then design (the revision-binding
-semantics are the load-bearing piece), build, verify, reconcile, seal.
-Human gates at seal: version/changelog judgement and the push.
+Design: the revision-binding semantics (F18) are the load-bearing piece —
+how the pin is declared, how the floor reads membership and edges through
+the pinned revision, and the migration commit's shape. Then build,
+verify, reconcile, seal. Human gates at seal: version/changelog judgement
+and the push.
