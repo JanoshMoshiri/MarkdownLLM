@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
-current_stage: design
+current_stage: build
 held_by: codex-desktop-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
@@ -36,21 +36,12 @@ of the first documented executions of the methodology on real work.
 
 ## Where This Is
 
-At **design**, with the design committed
-(`operating-model-seams-design-2026-08`): F18 revision binding carrying
-the operator-pinned self-authorization guard as its non-negotiable
-centre; F17 on existing references; F19/F20 as bounded doctrine. The
-operator reviewed the constraint set in session and pinned the guard
-("we can't let that slip"); external contract-map diagrams from a second
-agent independently drew F20's consumer-owned-contract shape — the
-convergence rule fed twice in one day.
-
-**The spec half of build is already committed** — do not redo it:
-
-- `spec: workflow-state v0.6` (f1ca2bc) — revision binding incl. the
-  self-authorization guard, activation/fulfilment, executor-vs-authority.
-- `spec: operating-model 0.2` (96a207c) — consumer contract, addressing,
-  the executor/authority row.
+At **build**. The spec/doctrine half remains the committed design input
+(`f1ca2bc`, `96a207c`). The mandatory revision-binding floor and focused
+tests landed in `02e6c7c`; the F17 activation/fulfilment advisory stretch
+landed separately in `6d1adf8`. The focused revision suite and its
+neighbouring workflow/reference suites are green, including the
+adversarial migration-plus-cursor case.
 
 ## Next — the remaining arc, carried in another harness
 
@@ -61,14 +52,11 @@ the harness that designed them is the portability evidence the framework
 claims and rarely tests, and the builder is no longer its own verifier
 (`a-same-builder-check-is-blind-to-a-self-contradictory-builder`).
 
-Claim the run, then work the design's legs in order. Advance the cursor
-`design → build` once the build legs are committed, and carry on through
-verify (focused suites first, the full suite at the stage gate, budgets
-N3–N6 measured, and an adversarial attempt to *defeat* the
-self-authorization guard rather than confirm it), reconcile (the
-obligations the design declares, including the two-versions-stale
-examples), and seal — where the human gates are the operator's:
-version/changelog judgement and the push.
+Carry on through verify: re-run the focused surfaces, run the full suite
+once at the gate, measure N3–N6, and attempt to *defeat* the
+self-authorization guard rather than merely confirm it. Then reconcile
+the design's declared obligations (including the stale examples) and
+seal; version/changelog judgement and the push remain the human gates.
 
 One trap, named because it is this sprint's own mechanism biting its
 author: the self-application pin will be **rejected** if it shares a
