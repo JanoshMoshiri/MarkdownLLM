@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-25
-generated: 2026-08-25T21:04:11
-generated_from: HEAD@754980e
-coverage: 272
+created: 2026-08-26
+generated: 2026-08-26T01:45:02
+generated_from: HEAD@0bfa375
+coverage: 273
 framework_version: 3.35.0
 ---
 
@@ -837,6 +837,8 @@ framework_version: 3.35.0
 - retrospective-specification --complements--> derived-index-specification
 - retrospective-specification --complements--> change-reconciliation-specification
 - retrospective-specification --implements--> llm-driven-systems-manifesto
+- review-independent-operating-model-2026-08-26-codex --validates--> operating-model-specification
+- review-independent-operating-model-2026-08-26-codex --validates--> workflow-state-specification
 - review-loop-2026-08-10 --informs--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - review-loop-2026-08-10 --informs--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - review-loop-2026-08-10 --informs--> coherence-mechanism-build
