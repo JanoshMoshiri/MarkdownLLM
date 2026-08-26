@@ -52,47 +52,29 @@ convergence rule fed twice in one day.
 - `spec: operating-model 0.2` (96a207c) — consumer contract, addressing,
   the executor/authority row.
 
-## Next — build handover (operator's routing, 2026-08-26)
+## Next — the remaining arc, carried in another harness
 
-The remaining build legs go to a **Codex session**; this Claude session
-returns at **verify**. Split chosen by the operator so the builder and
-the verifier are different agents — the same separation
-`a-same-builder-check-is-blind-to-a-self-contradictory-builder` argues
-for, applied deliberately rather than after the fact.
+**Build through seal goes to the next session, deliberately in a
+different harness** (operator's routing, 2026-08-26). Two things come
+free from that choice: exercising verify, reconcile and **seal** outside
+the harness that designed them is the portability evidence the framework
+claims and rarely tests, and the builder is no longer its own verifier
+(`a-same-builder-check-is-blind-to-a-self-contradictory-builder`).
 
-**For the builder.** `operating-model-seams-design-2026-08` is the
-contract; build to it, not to this summary. Remaining legs, in its
-declared order:
+Claim the run, then work the design's legs in order. Advance the cursor
+`design → build` once the build legs are committed, and carry on through
+verify (focused suites first, the full suite at the stage gate, budgets
+N3–N6 measured, and an adversarial attempt to *defeat* the
+self-authorization guard rather than confirm it), reconcile (the
+obligations the design declares, including the two-versions-stale
+examples), and seal — where the human gates are the operator's:
+version/changelog judgement and the push.
 
-1. **Floor legs** — `tools/markdownllm/validation.py`, around
-   `workflow_transition_findings` (index view only, ~line 319): resolve
-   `definition_commit`; read stage membership and edges from the
-   **pinned** revision for pinned runs; keep today's prior-HEAD path for
-   unpinned runs plus the Info adoption advisory; rename-proof resolution
-   (current path first, id-scan in the pinned tree as fallback); batch
-   git reads per corpus. Register `definition_commit` where the
-   structural-reference/field registry requires it.
-2. **The non-negotiable** — reject (Error) any single commit that changes
-   both `definition_commit` and `current_stage` on the same run.
-   Rationale is `a-check-is-only-as-trustworthy-as-who-controls-its-inputs`;
-   read it before touching this leg. It is not optional and not
-   simplifiable.
-3. **Focused tests** — new `test_workflow_revision_binding.py` covering:
-   pin resolves · membership via pin · edge via pin · both-changed
-   rejection · legacy fallback + advisory · rename-proof resolution.
-   Plus activation cases beside the existing workflow tests.
-4. **Stretch, droppable** — the F17 Info advisory (completed run with no
-   initiating pin and no output pointing at it), and pin resolution at
-   the pre-commit provenance leg.
-5. **Self-application** — this run adds its own `definition_commit`,
-   becoming the estate's first revision-bound run. Its own guard applies:
-   that pin lands in a commit that moves nothing else on this run.
+One trap, named because it is this sprint's own mechanism biting its
+author: the self-application pin will be **rejected** if it shares a
+commit with any cursor move. Pin alone. That is the guard working.
 
-Claim this run (`held_by`) before starting; leave the cursor at `design`
-until the build legs are committed, then advance to `build`.
-
-**Then verify** (Claude, next session): focused suites, full suite at the
-stage gate, budgets N3–N6 measured, and an adversarial read of the guard
-specifically — the verifier's job is to try to defeat it, not confirm it.
-Reconcile obligations are declared in the design (including the
-two-versions-stale examples); seal holds the human gates.
+Everything else — the legs, their order, the tests, the budgets, the
+rationale for the guard — lives in
+`operating-model-seams-design-2026-08` and the specs it implements. This
+run deliberately does not restate any of it.
