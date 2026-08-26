@@ -2,7 +2,7 @@
 id: floor-block-requirements-2026-08
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-08-21
 priority: high
 tags: [requirements, floor, performance, tests, concurrency, sprint]
@@ -167,6 +167,41 @@ Bottleneck-census-sourced (new; evidence measured today):
   11 spawns ≈ 2.9s at the root today).
 - **F13** — Validate's three corpora (root + examples) evaluated
   concurrently.
+
+Review-sourced (added v1.4, 2026-08-26; evidence:
+`review-independent-operating-model-2026-08-26-codex`, verified — the
+four seams the operating-model convergence review named in existing
+primitives):
+
+- **F17** — Run activation and outcome correlation: `workflow-state.md`
+  (with `provenance.md` where the chain crosses) defines a run's
+  *initiating evidence* and *produced evidence* on existing references —
+  which demand instanced the run, which durable outputs belong to it,
+  which terminal output fulfilled the demand — so the end-to-end causal
+  chain holds even for routine work that never mints a decision record.
+  No new artefact type unless live use proves references cannot carry it.
+- **F18** — Definition revision binding: a live run names the committed
+  revision of the definition that governs it (git commit as the citation
+  unit, per the house pinning pattern), with an explicit policy for an
+  active run whose definition changes — stay pinned (default), migrate
+  by deliberate meaning-boundary commit, restart, or abandon. Floor legs:
+  the pin resolves; stage membership and transition edges read through
+  the pinned revision; legacy runs without the pin degrade to today's
+  behaviour with an advisory. Repeatability is unprovable without this.
+- **F19** — Executor vs gate authority (doctrine first): every
+  specialisation declares *who or what performs* a stage separately from
+  *who may authorise* its transition or accept its output. Prose in
+  `workflow-state.md` (definition body contract) + the gate-authority
+  dimension in `operating-model.md`. Machine-readable modality fields
+  only after two live modules need automation to consume them.
+- **F20** — Consumer-owned contract (doctrine first): `operating-model.md`
+  names the consumption contract as a composition of existing pieces —
+  address-book entry, import triggers, the definition an admitted input
+  starts, the fulfilment output class, the cadence that makes
+  non-consumption visible — consumer-owned always; producer blindness is
+  inviolable (no subscriber lists, no push, no remote execution state).
+  Alongside it, the addressing qualification: *addressed* = declared
+  intended relevance on the exposed thing, never delivery authority.
 
 Sprint-1-verify-sourced (added v1.1, evidence in the sealed run's verify
 record):
