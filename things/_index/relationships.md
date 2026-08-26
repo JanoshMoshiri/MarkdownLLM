@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T09:26:56
-generated_from: HEAD@0e7f317
-coverage: 280
+generated: 2026-08-26T09:28:21
+generated_from: HEAD@00865d9
+coverage: 281
 framework_version: 3.35.0
 ---
 
@@ -851,6 +851,8 @@ framework_version: 3.35.0
 - retrospective-specification --implements--> llm-driven-systems-manifesto
 - review-independent-operating-model-2026-08-26-codex --validates--> operating-model-specification
 - review-independent-operating-model-2026-08-26-codex --validates--> workflow-state-specification
+- review-independent-seams-verification-2026-08-26-claude --validates--> run-operating-model-seams-2026-08
+- review-independent-seams-verification-2026-08-26-claude --validates--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
 - review-loop-2026-08-10 --informs--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - review-loop-2026-08-10 --informs--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - review-loop-2026-08-10 --informs--> coherence-mechanism-build
