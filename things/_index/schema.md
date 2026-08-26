@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-26
-generated: 2026-08-26T03:32:57
-generated_from: HEAD@1725a6f
+generated: 2026-08-26T03:34:50
+generated_from: HEAD@4317e6c
 coverage: 279
 framework_version: 3.35.0
 ---

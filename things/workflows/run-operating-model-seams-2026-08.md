@@ -6,7 +6,7 @@ version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
 definition_commit: bbc17c355b85ae044d88f1825b445746e312e50d
-current_stage: verify
+current_stage: reconcile
 held_by: codex-desktop-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
@@ -37,11 +37,12 @@ of the first documented executions of the methodology on real work.
 
 ## Where This Is
 
-At **verify**. The spec/doctrine half remains the committed design input
+At **reconcile**. The spec/doctrine half remains the committed design input
 (`f1ca2bc`, `96a207c`). The mandatory revision-binding floor and focused
 tests landed in `02e6c7c`; the F17 activation/fulfilment advisory stretch
 landed separately in `6d1adf8`; self-application landed, pin-only, in
-`1725a6f`. Verification is complete and green on the changed surface.
+`1725a6f`; verification is sealed in `4317e6c` and green on the changed
+surface.
 
 ## Verify record (2026-08-26)
 
