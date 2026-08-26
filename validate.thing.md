@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 3.0
+version: 3.1
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -87,9 +87,12 @@ The tool enforces, deterministically:
   drift detection for derived indexes (`derived-index.md`).
 - **Workflow transition integrity:** for an existing `workflow-run`, the index
   candidate's prior `current_stage` → new `current_stage` edge must exist in the
-  **previous committed definition**. A candidate cannot authorize its own move
-  by rewriting the definition in the same commit, and a simultaneous definition
-  migration plus cursor move is rejected. New runs are allowed. Whether the work
+  run's governing definition revision: `definition_commit` when pinned, or the
+  previous committed definition for a legacy unpinned run. The pin must resolve
+  to a commit carrying the definition, pinned stage membership is read there,
+  and changing `definition_commit` plus `current_stage` in one candidate is
+  rejected. A candidate therefore cannot authorize its own move by choosing or
+  rewriting a friendlier definition. New runs are allowed. Whether the work
   *deserves* to advance remains semantic; whether a declared edge exists is not.
 - **Session-memory completeness (Info):** an `active` insight or `open` conflict
   with no inbound edge from a live (non-terminal) thing is orphaned from session

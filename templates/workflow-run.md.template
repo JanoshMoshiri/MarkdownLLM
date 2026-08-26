@@ -4,9 +4,14 @@ type: workflow-run
 status: active           # reserved: active | paused | completed | abandoned
 created: [ISO-date]
 definition: [process-name]-definition   # structural pointer to the workflow-definition (floor-resolved)
+# definition_commit: [full-40-hex-definition-commit]  # recommended; committed definition revision this run follows
 current_stage: [stage-id]               # MUST be a stage id in that definition
 held_by: [operator-or-agent-id]         # advisory claim (coordination-claim.md); omit when unheld
 linked_things: []
+# Pin the demand that instanced this run when there is one (provenance.md):
+# informed_by:
+#   - id: [initiating-demand-id]
+#     commit: [full-40-hex-demand-commit]
 # Accrued decisions link here as they are made (provenance.md):
 # linked_things:
 #   - id: decision-[some-call]
@@ -28,4 +33,6 @@ its state rather than reconstructing it from scratch.]
 ## Notes
 
 [Anything instance-specific worth carrying forward. Do NOT keep a stage_history
-list here — git's commit log is the history of this run's cursor changes.]
+list here — git's commit log is the history of this run's cursor changes.
+Durable outputs point back to this run with `informed_by` (id + commit), so the
+demand → run → output chain remains walkable.]

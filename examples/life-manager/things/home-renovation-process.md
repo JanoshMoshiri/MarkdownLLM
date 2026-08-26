@@ -30,28 +30,38 @@ only the run differs.
 **quotes**
 - Entry: scope is roughly known; ready to approach contractors.
 - Produces: comparable quotes and a hiring decision (`type: decision`).
+- Performer: the homeowner gathers the scope; contractors prepare quotes.
+- Gate authority: the homeowner authorises the hiring decision.
 - Exit: a contractor is chosen → `materials`.
 
 **materials**
 - Entry: contractor chosen; selections needed before work can be scheduled.
 - Produces: confirmed choices (worktop, units, fixtures) and their lead times.
+- Performer: the homeowner makes selections with supplier and contractor input.
+- Gate authority: the homeowner accepts cost and specification before fitting.
 - Exit: all long-lead choices made → `fitting`. May loop back to `quotes` if a
   selection blows the budget and the scope must be re-priced.
 
 **fitting**
 - Entry: materials confirmed and a fitter booked.
 - Produces: the installed work.
+- Performer: the appointed contractor executes the installation.
+- Gate authority: the homeowner accepts readiness for the snagging review.
 - Exit: install complete → `snagging`. May loop back to `materials` if the
   install surfaces a materials problem (wrong size, damage on arrival).
 
 **snagging**
 - Entry: install complete; walk-through done.
 - Produces: a snag list and its resolution.
+- Performer: homeowner and contractor inspect; the contractor clears snags.
+- Gate authority: the homeowner accepts the resolved work and final invoice.
 - Exit: snags cleared and invoice settled → `complete`. May loop back to
   `fitting` while snags remain.
 
 **complete (terminal)**
 - Entry: signed off, paid, site cleared.
+- Performer: the homeowner closes the project record.
+- Gate authority: the homeowner owns final acceptance.
 - "Done" means the run has nothing left to advance.
 
 ## Notes

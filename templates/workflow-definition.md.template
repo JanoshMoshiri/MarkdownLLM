@@ -28,19 +28,28 @@ ids above.
 **[first-stage]**
 - Entry criteria: [when a run enters this stage]
 - What it produces: [the deliverable or state change]
+- Performer: [who or what executes the stage]
+- Gate authority: [who may authorise transition or accept the output]
 - Exit / next: [what signals readiness to move, and to where]
 
 **[second-stage]**
 - Entry criteria: …
 - What it produces: …
+- Performer: …
+- Gate authority: …
 - Exit / next: … (note any rework loop back to [first-stage])
 
 **[third-stage] (terminal)**
 - Entry criteria: …
+- Performer: …
+- Gate authority: …
 - What "done" means for a run that reaches here
 
 ## Notes
 
-The body is the definition's reason to change — entry/exit criteria, ownership,
-what each stage means. A run never edits this; it only advances its own cursor.
+The body is the definition's reason to change — entry/exit criteria, what each
+stage means, who or what performs it, and who may authorise its transition or
+accept its output. Performer and gate authority are separate declarations; a
+machine may execute a human-authorised stage. A run never edits this; it only
+advances its own cursor.
 Keep instance-specific data OUT of here (that belongs in the run).

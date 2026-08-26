@@ -25,6 +25,9 @@ options:
 # list this replaces had `artifact` missing while seven committed things
 # carried it.
 types:
+  example:
+    description: A worked framework pattern distilled from verified execution, teaching by positive and negative contrast
+    statuses: [draft, evolving, stable, deprecated]
   plan:
     description: A phased, multi-session work plan for evolving the framework; phase checkboxes updated as work lands
     statuses: [not-started, in-progress, blocked, paused, completed, cancelled]
@@ -74,6 +77,9 @@ relations:
 # vocabulary, and this file restating them was the pattern its own header
 # disclaims.)
 known_fields:
+  - pattern_type    # example classification: the reusable pattern being taught
+  - demonstrates    # example stance: good practice, anti-pattern, or edge case
+  - applies_to      # thing types or domains to which an example transfers
   - session         # session number a thing was created in
   - source          # insight/decision enum: who surfaced it (human|agent|both|build|operator).
                     # Ruled 2026-08-04 (framework-retrospective-2026-08a): domain provenance

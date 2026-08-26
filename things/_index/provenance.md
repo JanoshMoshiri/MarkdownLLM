@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-26
-generated: 2026-08-26T03:34:50
-generated_from: HEAD@4317e6c
+generated: 2026-08-26T03:51:21
+generated_from: HEAD@45a582b
 coverage: 54
 framework_version: 3.35.0
 ---
@@ -154,7 +154,7 @@ framework_version: 3.35.0
 - operating-scope-promotion (pinned @604dfc4)
 
 ## operating-model-seams-scope-2026-08-26
-- operating-model-seams-design-2026-08 (pinned @8a88c40b1436330b39894572e7325571966dd9a1)
+- operating-model-seams-design-2026-08 (pinned @8a88c40449f2e00d6d4d1574de4d276446d76ca2)
 
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
@@ -179,6 +179,8 @@ framework_version: 3.35.0
 
 ## run-operating-model-seams-2026-08
 - operating-model-seams-scope-2026-08-26 (pinned @bc4aabcf140445baae2c824e17fcf1249e0eda09)
+- operating-model-seams-self-application (pinned @45a582b3fc424cb3bf812e235be3cc576615098d)
+- operating-model-seams-self-application (derived-from)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

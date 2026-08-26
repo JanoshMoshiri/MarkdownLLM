@@ -8,7 +8,7 @@ priority: high
 tags: [design, workflow-state, revision-binding, activation, sprint]
 informed_by:
   - id: operating-model-seams-scope-2026-08-26
-    commit: 8a88c40b1436330b39894572e7325571966dd9a1
+    commit: 8a88c40449f2e00d6d4d1574de4d276446d76ca2
 linked_things:
   - id: run-operating-model-seams-2026-08
     relation: informs

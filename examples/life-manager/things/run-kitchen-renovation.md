@@ -4,9 +4,13 @@ type: workflow-run
 status: active
 created: 2026-06-15
 definition: home-renovation-process
+definition_commit: e51faae1eadf1d067ae715e8c9ecac1b20645718
 current_stage: materials
 held_by: homeowner
 tags: [home, renovation]
+informed_by:
+  - id: project-kitchen-renovation
+    commit: 219c62e5bcb61d189c57dc9a0deddcf4f3cac09c
 linked_things:
   - id: project-kitchen-renovation
     relation: references
@@ -36,4 +40,7 @@ loop is in play yet; the risk is schedule, not scope.
 not the contractor. The day-to-day project breakdown (subtasks, the
 `subtasks_complete` trigger) lives in `project-kitchen-renovation`; this run
 holds only the process cursor and the resume point. No `stage_history` here —
-the cursor's path is the commit log.
+the cursor's path is the commit log. `definition_commit` binds the instance to
+the process revision it actually follows, while `informed_by` pins the project
+demand that instanced it. Any durable completion output would point back to this
+run with its own `informed_by` pin.

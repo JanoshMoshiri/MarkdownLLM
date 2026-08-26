@@ -333,8 +333,14 @@ class WorkflowDefinitionResolver:
     def __init__(self, root: Path, corpus: Corpus):
         self.root = Path(root).resolve()
         self.corpus = corpus
-        self.repository_root = (corpus.view.root if corpus.view is not None
-                                else self.root)
+        view_root = (corpus.view.root if corpus.view is not None else self.root)
+        # A corpus may be a nested, independently validated slice of its
+        # owning repository (the framework's example corpora are the live
+        # case). RepositoryView intentionally refuses to guess an ancestor
+        # repository, so discover that ownership here once and then construct
+        # every immutable revision view at the real Git boundary.
+        top = _git_stdout(view_root, ["rev-parse", "--show-toplevel"])
+        self.repository_root = (Path(top).resolve() if top else view_root)
         self._views: dict[str, RepositoryView] = {}
         self._view_errors: dict[str, str] = {}
         self._corpora: dict[str, Corpus] = {}

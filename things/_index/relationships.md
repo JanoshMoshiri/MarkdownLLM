@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T03:34:50
-generated_from: HEAD@4317e6c
-coverage: 279
+generated: 2026-08-26T03:51:21
+generated_from: HEAD@45a582b
+coverage: 280
 framework_version: 3.35.0
 ---
 
@@ -720,6 +720,9 @@ framework_version: 3.35.0
 - operating-model-seams-design-2026-08 --implements--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
 - operating-model-seams-design-2026-08 --implements--> a-transcribed-identifier-is-unverifiable-by-reading
 - operating-model-seams-scope-2026-08-26 --informs--> run-operating-model-seams-2026-08
+- operating-model-seams-self-application --implements--> universal-workflow-methodology
+- operating-model-seams-self-application --implements--> operating-model-specification
+- operating-model-seams-self-application --derived-from--> run-operating-model-seams-2026-08
 - operating-model-specification --extends--> universal-workflow-methodology
 - operating-model-specification --extends--> workflow-state-specification
 - operating-model-specification --complements--> trigger-specification

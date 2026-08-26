@@ -80,7 +80,7 @@ CLI/integration surface and matches by `-k` keyword.
 
 | Floor module | Owning test files |
 |---|---|
-| model, validation | test_mdllm, test_mechanical_state, test_structural_reference_registry, test_template_instantiation |
+| model, validation | test_mdllm, test_mechanical_state, test_structural_reference_registry, test_template_instantiation, test_workflow_revision_binding |
 | repository_view, repository_transaction | test_repository_view, test_repository_transactions, test_coherence_repository_view, test_phase1_4_integration_audit |
 | session, session_contract, domain_kernel | test_digest_signals, test_contract_emission, test_residual_totality, test_mdllm, test_session_gate, test_flow_probes |
 | triggers | test_digest_signals, test_mechanical_state, test_mdllm |

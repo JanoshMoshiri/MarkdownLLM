@@ -203,6 +203,25 @@ def test_definition_resolution_survives_a_path_rename(tmp_path: Path) -> None:
     assert not any("current_stage" in message for message in errors)
 
 
+def test_nested_corpus_resolves_pin_from_owning_repository(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    domain = repository / "examples" / "domain"
+    repository.mkdir(parents=True)
+    _git(repository, "init", "-q")
+    _write(domain, "things/process.md", _definition(V1))
+    _git(repository, "add", "-A")
+    _git(repository, "commit", "-q", "-m", "nested definition v1")
+    pin = _git(repository, "rev-parse", "HEAD")
+    _write(domain, "things/run.md", _run(stage="review", pin=pin))
+
+    _, findings = validate_corpus(domain)
+
+    assert not [finding for finding in findings
+                if finding.severity == SEV_ERROR]
+
+
 def test_definition_commit_is_framework_vocabulary(tmp_path: Path) -> None:
     root = tmp_path / "domain"
     pin = _init(root)
