@@ -2,7 +2,7 @@
 id: workflow-state-specification
 type: specification
 status: evolving
-version: 0.5
+version: 0.6
 created: 2026-06-15
 linked_things:
   - id: thing-specification
@@ -90,7 +90,7 @@ The definition carries no link back to its runs: a definition has many runs, and
 - **`stages[].to`** — the directed edges out of each stage. Whether an authored edge exists for an old→new cursor move is a mechanical fact; whether the work deserves that move remains semantic.
 - **`to: []` means terminal — by definition.** An empty edge list is the explicit marker of a terminal stage, not "edges not written yet." A definition with a non-terminal stage whose edges are genuinely unfinished is simply a draft the author has not completed; there is no ambiguous third state. (If a future definition-completeness linter is built, this is the rule it enforces.)
 
-The body holds what the stages *mean* — entry/exit criteria, what each stage produces, who acts. That prose is the definition's reason to change; the run never edits it.
+The body holds what the stages *mean* — entry/exit criteria, what each stage produces, and who acts. **"Who acts" is two declarations, not one:** who or what *performs* the stage (a person, an agent, deterministic automation, or a hybrid sequence — execution responsibility) is declared separately from who may *authorise* its transition or accept its output (gate authority). A hybrid stage may be machine-executed but human-authorised; an agent may prepare a decision it is forbidden to accept; the same definition may be executed by different modalities over time without its business meaning changing. Both stay proportionate prose in the body — machine-readable modality fields enter only when at least two live modules need automation to consume them. That prose is the definition's reason to change; the run never edits it.
 
 ## `workflow-run` — The Live Instance
 
@@ -101,6 +101,7 @@ type: workflow-run
 status: active          # reserved vocab: active | paused | completed | abandoned
 created: <ISO-date>
 definition: <process>-definition        # the structural pointer to the definition
+definition_commit: <full-sha>           # optional: the committed revision governing this run (see Revision Binding)
 current_stage: research                 # MUST be a stage id in the definition
 held_by: <operator-or-agent-id>         # advisory claim (coordination-claim.md); omit when unheld
 linked_things:
@@ -122,11 +123,69 @@ The immediate next move and what it is blocked on, if anything.
 Field discipline:
 
 - **`definition`** — the structural pointer to the `workflow-definition` this run instances. Singular and required; the floor resolves it to read the stage set.
+- **`definition_commit`** — optional but recommended: the full SHA of the committed revision whose definition governs this run (see Revision Binding). Transcribed from the log, never recalled.
 - **`current_stage`** — the cursor. Changing it *is* a stage transition; commit it at that boundary.
 - **`held_by`** — the advisory coordination claim defined in `coordination-claim.md`; not a lock. Omit (or clear) when the instance is unheld.
 - **`status`** — the run's *own* lifecycle, orthogonal to `current_stage`: `active`, `paused`, `completed` (only once a terminal stage is reached), or `abandoned`.
 
 **Blocked-ness lives on the work, not the cursor.** There is deliberately no `blocked` run-status. A run is a *pointer* into a process; it is `active` whenever it is live, even while the underlying work is stuck. Blockage is a property of the *work things* the run coordinates (a `task` blocked on a dependency, a deadline overdue) — read it there, not from the cursor. This keeps the run tiny and stops two things from claiming the same fact.
+
+## Revision Binding
+
+A definition is a mutable thing; a run is an execution of **one committed
+version** of it. `definition: <id>` proves identity; it cannot prove which
+procedure version was actually followed, and a repeatable process is not
+provably repeatable without that. So a run may pin it:
+
+- **Set at creation** to a commit whose tree carries the governing
+  definition — transcribed from the log, never recalled (field evidence,
+  2026-08-26: a pin written from memory shipped with a wrong tail the
+  same day this section was designed).
+- **Stay-pinned is the default.** A definition change never moves a live
+  run. New runs bind to the revision approved at their creation — which
+  is exactly the controlled-change shape a repeatable loop needs:
+  completed records stay bound to the revision they followed; the next
+  demand's run starts on the approved one.
+- **Migration is deliberate:** a commit that changes `definition_commit`
+  and nothing else on the run — its own meaning boundary, with its
+  reasoning in the message. Restart and abandonment are not migrations;
+  they use the existing statuses.
+- **The self-authorization guard.** One commit changing both
+  `definition_commit` and `current_stage` on the same run is rejected
+  outright: a run must never authorize its own move by choosing a
+  friendlier revision. This mirrors the standing rule that a definition
+  migration and a cursor advance are separate commits — the binding
+  mechanism must not become the bypass of the check it strengthens.
+- **Resolution is rename-proof.** The floor reads the definition at the
+  pinned commit by its current path, falling back to locating the id in
+  the pinned tree — a definition file that has moved since (the
+  methodology's own promotion to the spec layer is the live precedent)
+  does not break its runs' pins.
+- **Unpinned runs are legal** and keep the prior-committed-definition
+  semantics, with an Info advisory naming the adoption remedy. Nothing
+  here is retroactive.
+- **Cross-domain:** a run instancing an imported definition pins its
+  local mirror's commit; the source content is already pinned by the
+  reference triple, and the floor still skips what it cannot see.
+
+## Activation and Fulfilment
+
+The operating model says each demand is instanced as a run. These are the
+semantics that make that chain checkable end to end — on existing
+references only, no new artefact type:
+
+- **Initiating evidence.** The demand that instanced a run is pinned in
+  the run's `informed_by` at creation (id + full SHA). A self-initiated
+  run — routine maintenance, a sensor's own cadence — may carry none;
+  that is legal and stated, not a gap.
+- **Produced evidence.** Durable outputs a run creates carry
+  `informed_by` naming the run (id + commit). The chain
+  demand → run → output is then walkable in both directions through the
+  existing reverse-provenance index.
+- **Fulfilment.** Whether the terminal output satisfies the initiating
+  demand is judged at the definition's terminal stage and recorded in
+  the run's closing narrative. The floor checks link *presence* at most
+  (advisory); adequacy is judgement and stays so.
 
 ## What Not to Duplicate
 
@@ -143,8 +202,10 @@ This follows the framework's standard split (`validate.thing.md`):
 | Check | Owner | What |
 |---|---|---|
 | `definition` resolves, and `current_stage` ∈ its stage set | **floor** (mechanical) | Pure referential integrity — the same class as "`linked_things` targets must exist." Enforced now: `mdllm validate` errors on a missing `definition`, an unresolved one, a `definition` that is not a `workflow-definition`, or a `current_stage` the definition does not declare. |
-| Does the prior definition declare this old→new edge? | **floor** (mechanical) | At pre-commit, compares the frozen index candidate with `HEAD`. The governing edge list comes from the prior committed definition, so the candidate cannot authorize its own move by rewriting the graph. A definition migration and cursor advance must be separate meaning-boundary commits. New runs have no prior transition and are allowed. |
-| Should the run advance now? | **agent** (semantic, Layer 2) | Judges stage exit criteria, evidence, authorization, and whether the work deserves the mechanically-permitted move. |
+| Does the prior definition declare this old→new edge? | **floor** (mechanical) | At pre-commit, compares the frozen index candidate with `HEAD`. For an unpinned run the governing edge list comes from the prior committed definition; for a pinned run it comes from the **pinned revision's** definition. Either way the candidate cannot authorize its own move by rewriting the graph. A definition migration and cursor advance must be separate meaning-boundary commits. New runs have no prior transition and are allowed. |
+| `definition_commit` resolves, and its tree carries the definition | **floor** (mechanical) | The pin names a real commit in this repository whose tree contains the governing definition (current path first, id-scan fallback). For a pinned run, `current_stage` membership is read from the pinned revision. |
+| One commit changes both `definition_commit` and `current_stage` | **floor** (mechanical, Error) | The self-authorization guard: rejected outright, regardless of whether the move would be legal under either revision. |
+| Should the run advance now? Should it migrate? | **agent** (semantic, Layer 2) | Judges stage exit criteria, evidence, authorization, and whether the work deserves the mechanically-permitted move — and whether a definition change warrants migrating a live run at all (stay-pinned is the default). |
 
 Both membership and edge existence earn their place because each is a finite lookup over declared data, not judgement. A typo'd `current_stage` and an undeclared transition are the same honour-system hole at adjacent moments. The floor therefore compares the exact candidate tree to the prior commit and rejects an edge the prior definition does not declare. It does **not** infer entry/exit criteria, decide whether evidence is adequate, or advance a run; those remain Layer 2. (Cross-domain case: when the `definition` lives in another corpus the floor cannot see, membership remains unresolvable and is skipped rather than fabricated.)
 
