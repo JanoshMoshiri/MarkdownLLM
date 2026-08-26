@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-26
-generated: 2026-08-26T10:20:47
-generated_from: HEAD@a8556f6
+generated: 2026-08-26T10:28:09
+generated_from: HEAD@2e63f61
 coverage: 54
 framework_version: 3.35.0
 ---
@@ -175,6 +175,7 @@ framework_version: 3.35.0
 - floor-sprint-3-scope-2026-08-23 (pinned @4c7383b9221f8dd67748393d49de6d50b8521112)
 - prove-identity-before-you-change-bytes (derived-from)
 - recognition-data-must-be-frozen-not-derived (derived-from)
+- run-floor-sprint-3-2026-08 (pinned @4c7383b9221f8dd67748393d49de6d50b8521112)
 - some-changes-are-verifiable-only-by-publishing (derived-from)
 
 ## run-operating-model-seams-2026-08

@@ -440,12 +440,18 @@ def workflow_run_findings(
         current_stage = run.meta.get("current_stage")
         revision = run.meta.get("definition_commit")
         if revision is None:
-            findings.append(Finding(
-                SEV_INFO, name,
-                "workflow-run has no `definition_commit`; it uses legacy "
-                "prior-committed-definition semantics — pin the full commit "
-                "whose definition governs the run in a separate commit",
-            ))
+            # Adoption is only performable on a run that can still move. A
+            # terminal run's history is fixed, so a retro-pin would assert a
+            # reconstruction rather than record a decision, and the advisory
+            # would be an uncloseable nag on every future validate
+            # (`a-check-that-always-fires-teaches-the-operator-to-ignore-it`).
+            if not is_terminal(corpus.schema, run.meta):
+                findings.append(Finding(
+                    SEV_INFO, name,
+                    "workflow-run has no `definition_commit`; it uses legacy "
+                    "prior-committed-definition semantics — pin the full commit "
+                    "whose definition governs the run in a separate commit",
+                ))
         elif isinstance(definition_id, str):
             current_definition = by_id.get(definition_id)
             if (current_definition is not None

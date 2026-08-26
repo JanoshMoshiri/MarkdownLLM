@@ -6,6 +6,9 @@ version: 1.0
 created: 2026-08-23
 definition: substrate-floor-development
 current_stage: seal
+informed_by:
+  - id: run-floor-sprint-2-2026-08
+    commit: 4c7383b9221f8dd67748393d49de6d50b8521112
 linked_things:
   - id: run-floor-sprint-2-2026-08
     relation: references
@@ -458,6 +461,27 @@ twice-unmet re-open condition; F15.
 in this sprint touches CI configuration or a vendor lifecycle, so unlike
 sprint 2 there is no publication-gated proof owed. Everything claimed here
 was executed locally, and the full suite is the evidence.
+
+## Activation and fulfilment (recorded 2026-08-26, retrospectively)
+
+Added when the fulfilment advisory (F17) shipped and named this run.
+
+- **Initiating demand:** sprint 2's seal, pinned in `informed_by` above.
+  Its commit is the last state of `run-floor-sprint-2-2026-08` before
+  this run was created (`f39547f`, 2026-08-23), and its record names this
+  sprint's subject explicitly — "Sprint 3 (derivation: F8's three phases)
+  starts as a new run of substrate-floor-development when execution
+  resumes." The pin records a demand recoverable from git, not a
+  reconstructed judgement.
+- **Produced evidence:** the F8a/F8b/F8c commits and the coherence checks
+  they landed. None carries an `informed_by` pin back to this run,
+  because outputs predate the convention; that half of the chain stays
+  prose and is deliberately not backfilled.
+
+**Recorded retrospectively, and the retrospection is the point.** This
+run is the last one that ran without F17, so half its chain is pinnable
+and half is not — which is precisely the gap the semantics exist to
+close for every run after it.
 
 ## Next
 

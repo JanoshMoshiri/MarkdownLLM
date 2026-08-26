@@ -191,6 +191,26 @@ def test_unpinned_run_keeps_legacy_semantics_with_adoption_advisory(
     )
 
 
+def test_adoption_advisory_is_silent_on_a_terminal_run(tmp_path: Path) -> None:
+    """A completed run cannot adopt the pin; the remedy is unperformable.
+
+    Retro-pinning a finished run would assert a reconstruction rather than
+    record a decision, so the advisory would never be closeable and would
+    train the operator to ignore Info findings.
+    """
+    root = tmp_path / "domain"
+    _init(root)
+    _write(root, "things/run.md", _run(status="completed"))
+
+    _, findings = validate_corpus(root)
+    assert not [finding for finding in findings
+                if finding.severity == SEV_ERROR]
+    assert not [
+        finding for finding in findings
+        if "has no `definition_commit`" in finding.message
+    ]
+
+
 def test_definition_resolution_survives_a_path_rename(tmp_path: Path) -> None:
     root = tmp_path / "domain"
     pin = _init(root)
