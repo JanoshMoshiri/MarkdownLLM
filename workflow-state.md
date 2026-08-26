@@ -162,8 +162,11 @@ provably repeatable without that. So a run may pin it:
   methodology's own promotion to the spec layer is the live precedent)
   does not break its runs' pins.
 - **Unpinned runs are legal** and keep the prior-committed-definition
-  semantics, with an Info advisory naming the adoption remedy. Nothing
-  here is retroactive.
+  semantics. A *live* unpinned run draws an Info advisory naming the
+  adoption remedy; a terminal one does not, because a finished run cannot
+  adopt — retro-pinning it would assert a reconstruction, and an
+  advisory whose remedy is unperformable only teaches the operator to
+  ignore advisories. Nothing here is retroactive.
 - **Cross-domain:** a run instancing an imported definition pins its
   local mirror's commit; the source content is already pinned by the
   reference triple, and the floor still skips what it cannot see.

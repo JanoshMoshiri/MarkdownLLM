@@ -18,6 +18,9 @@ linked_things:
   - id: a-control-that-must-stay-local-has-no-floor
     relation: implements
     notes: "The boundary-term evidence check below is that insight's escape route made concrete: the floor cannot own a list that must never be committed, but it can own an invariant over it."
+  - id: an-advisory-is-scoped-by-who-can-perform-its-remedy
+    relation: implements
+    notes: "The standing scoping test every advisory in this backlog must pass before shipping — population is 'everything that can still reach the right state', never 'everything currently in the wrong one'."
   - id: a-check-run-where-it-cannot-see-mints-a-false-finding
     relation: references
     notes: "The reading-discipline half of this backlog's null-result and INCOMPLETE-conflation items: tool-side fixes live here, but the environment question before the content question stays the reader's."
@@ -61,6 +64,14 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
 - **install-hook self-test.** Have `install-hook` self-test its emitted script so a
   portability break is caught at install, not at first commit
   (`portability-claims-need-execution-tests`).
+> **Standing scoping test for every item below (added 2026-08-26).** Before
+> shipping any advisory here, write its remedy as an imperative and ask who
+> must execute it; if the population includes things that are finished or
+> frozen, scope the population down or rewrite the remedy
+> (`an-advisory-is-scoped-by-who-can-perform-its-remedy`). The seams sprint
+> shipped one cue that failed this test and one that passed it, in the same
+> file, on the same day.
+
 - **Structural-pin resolution at the commit boundary (added 2026-08-26, felt —
   twice in one sprint).** Every structural pin is a full SHA a human may
   transcribe, and the seams sprint mistranscribed two in two days: the run's

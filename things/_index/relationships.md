@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T10:32:05
-generated_from: HEAD@fe0c091
-coverage: 281
+generated: 2026-08-26T12:29:07
+generated_from: HEAD@91a0101
+coverage: 284
 framework_version: 3.36.0
 ---
 
@@ -114,6 +114,8 @@ framework_version: 3.36.0
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --references--> llm-driven-systems-manifesto
 - a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- a-verifier-assumes-the-inputs-it-did-not-observe --extends--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
+- a-verifier-assumes-the-inputs-it-did-not-observe --complements--> a-transcribed-identifier-is-unverifiable-by-reading
 - a-wrong-sum-is-indistinguishable-from-a-right-one --informs--> deterministic-calculation
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> divergence-is-an-unrouted-decision
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -127,6 +129,8 @@ framework_version: 3.36.0
 - an-adversarial-review-loop-converges-on-its-own-fix-residue --informs--> external-review-response-2026-08-10
 - an-adversarial-review-loop-converges-on-its-own-fix-residue --supports--> repeated-drift-promotes-a-fact-into-the-floor
 - an-adversarial-review-loop-converges-on-its-own-fix-residue --supports--> coherence-is-a-maintained-rate-not-a-state
+- an-advisory-is-scoped-by-who-can-perform-its-remedy --supports--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- an-advisory-is-scoped-by-who-can-perform-its-remedy --informs--> workflow-state-specification
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --complements--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --supports--> consequence-is-recoverable-only-in-retrospect
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --complements--> operator-gated-work-is-scheduled-on-the-operators-calendar
@@ -281,6 +285,9 @@ framework_version: 3.36.0
 - cohesiveness-sensors --informs--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - cohesiveness-sensors --informs--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cohesiveness-sensors --complements--> assistant-register
+- cold-read-of-the-seams-release --references--> review-independent-seams-verification-2026-08-26-claude
+- cold-read-of-the-seams-release --implements--> a-verifier-assumes-the-inputs-it-did-not-observe
+- cold-read-of-the-seams-release --references--> framework-retrospective-2026-08b
 - committed-state-carries-defects-as-faithfully-as-facts --extends--> structure-decides-figures-scale-decides-convention
 - committed-state-carries-defects-as-faithfully-as-facts --challenges--> mis-keyed-links-pass-the-floor-silently
 - committed-state-carries-defects-as-faithfully-as-facts --informs--> evidence-and-eval-backlog
@@ -687,6 +694,7 @@ framework_version: 3.36.0
 - mechanical-coherence-checks-backlog --implements--> prose-references-are-mechanically-checkable
 - mechanical-coherence-checks-backlog --references--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - mechanical-coherence-checks-backlog --implements--> a-control-that-must-stay-local-has-no-floor
+- mechanical-coherence-checks-backlog --implements--> an-advisory-is-scoped-by-who-can-perform-its-remedy
 - mechanical-coherence-checks-backlog --references--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - mechanism-pairs-come-from-two-reflection-axes --supports--> directional-graph-reads-come-in-inbound-outbound-pairs
 - mechanism-pairs-come-from-two-reflection-axes --supports--> composition-is-the-inverse-of-decomposition
