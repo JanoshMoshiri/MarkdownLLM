@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
-current_stage: analysis
+current_stage: design
 held_by: claude-framework-session-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
@@ -36,18 +36,20 @@ of the first documented executions of the methodology on real work.
 
 ## Where This Is
 
-At **analysis**, with the cut committed
-(`operating-model-seams-scope-2026-08-26`): F18 + F17 necessity, F19 +
-F20 should, advisory floor checks stretch. The requirements stage was
-satisfied by F17–F20 on `floor-block-requirements-2026-08` v1.4. Banked
-in-run lesson already: a pin written from memory shipped with a wrong
-tail and was corrected by hand — pins are transcribed from the log, and
-the stretch scope includes teaching the floor to resolve them.
+At **design**, with the design committed
+(`operating-model-seams-design-2026-08`): F18 revision binding carrying
+the operator-pinned self-authorization guard as its non-negotiable
+centre; F17 on existing references; F19/F20 as bounded doctrine. The
+operator reviewed the constraint set in session and pinned the guard
+("we can't let that slip"); external contract-map diagrams from a second
+agent independently drew F20's consumer-owned-contract shape — the
+convergence rule fed twice in one day.
 
 ## Next
 
-Design: the revision-binding semantics (F18) are the load-bearing piece —
-how the pin is declared, how the floor reads membership and edges through
-the pinned revision, and the migration commit's shape. Then build,
-verify, reconcile, seal. Human gates at seal: version/changelog judgement
+Build, per the design's commit granularity: workflow-state v0.6, then
+operating-model 0.2, then the floor legs with focused tests, then
+self-application (this run pins itself — the first pinned run). Verify
+measures N3–N6; reconcile walks the declared obligations including the
+stale examples; seal holds the human gates: version/changelog judgement
 and the push.
