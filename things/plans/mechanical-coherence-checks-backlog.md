@@ -61,6 +61,19 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
 - **install-hook self-test.** Have `install-hook` self-test its emitted script so a
   portability break is caught at install, not at first commit
   (`portability-claims-need-execution-tests`).
+- **Structural-pin resolution at the commit boundary (added 2026-08-26, felt —
+  twice in one sprint).** Every structural pin is a full SHA a human may
+  transcribe, and the seams sprint mistranscribed two in two days: the run's
+  `informed_by` pin (wrong tail, caught by hand the same day) and the design's
+  `informed_by` pin (nonexistent commit, caught by the builder at reconcile —
+  it survived five commits). `definition_commit` is now floor-resolved at
+  validation; `informed_by` commits are resolved only when `mdllm provenance`
+  is run on demand, so the hook path accepts a pin that names no commit.
+  Candidate: resolve every structural pin's commit against the frozen candidate
+  at pre-commit (one batched `rev-parse`; Error on no-such-commit). Keyed to
+  git itself — same-builder, no suppression list possible. Evidence:
+  `a-transcribed-identifier-is-unverifiable-by-reading` (promoted), and the
+  seams verification record.
 - **The primitive sweep — null-result instance first.** Upstream ask from an
   operating domain's porch (2026-08-06,
   `a-primitive-is-known-once-and-must-be-found-again-at-every-site`): a named

@@ -2,7 +2,7 @@
 id: operating-model-seams-self-application
 type: example
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-08-26
 pattern_type: universal-workflow-self-application
 demonstrates: good-practice
@@ -31,15 +31,21 @@ stage's durable output in the thing graph, and commit every transition on its
 own meaning boundary. The 2026-08 operating-model seams sprint followed that
 shape while building the revision binding that makes the shape repeatable.
 
-| Stage | Question answered | Durable evidence |
+| Stage (the atom's ids) | Question answered | Durable evidence |
 |---|---|---|
-| need | What outcome is required? | The verified convergence review named four missing seams (F17–F20). |
-| current-state | What already exists? | Existing references, Git transaction views, workflow state and operating-model doctrine were walked before adding mechanism. |
-| approach | What is the smallest useful cut? | The scope decision selected one mandatory guard, two doctrine clarifications and one droppable advisory. |
-| plan | How will it be delivered and proved? | The committed design mapped each requirement to files, focused tests, budgets and commit boundaries. |
-| implement | Does the result match the plan? | Revision resolution, cached immutable views, the self-authorization guard and fulfilment advisory landed separately. |
-| review-verify | Is the outcome evidenced? | Eleven focused tests, the adversarial bypass attempt, the full suite and four latency budgets were recorded on the run. |
-| iterate | What must the next cycle inherit? | Reconciliation updated the operative contract, birth templates and worked corpus; this example carries the reusable learning forward. |
+| define-need | What outcome is required? | The verified convergence review named four missing seams (F17–F20). |
+| assess-current | What already exists? | Existing references, Git transaction views, workflow state and operating-model doctrine were walked before adding mechanism. |
+| define-prioritise | Which changes are justified? | F18+F17 necessity, F19/F20 should, advisories stretch — recorded with pinned inputs. |
+| set-mvp-target | What is the smallest acceptable cut? | The scope decision selected one mandatory guard, two doctrine clarifications and one droppable advisory. |
+| design-plan | How will it be delivered and proved? | The committed design mapped each requirement to files, focused tests, budgets and commit boundaries. |
+| execute | Does the result match the plan? | Revision resolution, cached immutable views, the self-authorization guard and fulfilment advisory landed separately. |
+| review-verify | Is the outcome evidenced? | Twelve focused tests, the adversarial bypass attempt, the full suite and four latency budgets were recorded on the run — and the loop fed the next cycle: reconciliation updated the operative contract, birth templates and worked corpus, with this example carrying the learning forward. |
+
+(The sprint ran these through `substrate-floor-development`, the
+substrate's specialisation; the left column deliberately uses the atom's
+own stage ids so the example teaches the canonical vocabulary, with the
+specialisation's extra gates — reconcile, seal — folded into the final
+row's evidence.)
 
 ## Why It Matters
 
