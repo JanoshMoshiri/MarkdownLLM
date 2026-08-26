@@ -6,7 +6,7 @@ version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
 current_stage: design
-held_by: unheld — released 2026-08-26 for the build handover; the next builder claims it
+held_by: codex-desktop-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
     commit: ed44b2d91b84215fb7a5d95f33a8dbbf2325468b
