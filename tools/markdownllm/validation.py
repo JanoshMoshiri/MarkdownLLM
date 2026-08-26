@@ -474,6 +474,37 @@ def workflow_run_findings(
     return findings
 
 
+def workflow_fulfilment_findings(corpus: Corpus) -> list[Finding]:
+    """Cue completed runs whose activation/fulfilment chain is absent.
+
+    The check is intentionally presence-only and Info-grade: provenance owns
+    reference shape, while a definition's terminal gate judges whether the
+    evidence actually fulfils the initiating demand.
+    """
+    produced_for: set[str] = set()
+    for source in corpus.things:
+        for pin in source.meta.get("informed_by") or []:
+            if (isinstance(pin, dict) and isinstance(pin.get("id"), str)
+                    and source.id != str(pin.get("id"))):
+                produced_for.add(str(pin["id"]))
+
+    findings: list[Finding] = []
+    for run in corpus.things:
+        if (str(run.meta.get("type")) != "workflow-run"
+                or str(run.meta.get("status")) != "completed"):
+            continue
+        name = run.id or run.path.name
+        if not (run.meta.get("informed_by") or []) and name not in produced_for:
+            findings.append(Finding(
+                SEV_INFO, name,
+                "completed run has neither initiating `informed_by` evidence "
+                "nor a durable output that pins the run — record the judged "
+                "activation/fulfilment chain, or state that the run was "
+                "self-initiated and produced no durable output",
+            ))
+    return findings
+
+
 def workflow_transition_findings(
     root: Path, corpus: Corpus, view: RepositoryView | None = None,
     resolver: WorkflowDefinitionResolver | None = None,
@@ -984,6 +1015,7 @@ def validate_corpus(root: Path,
         findings.extend(validate_level1(t, corpus.schema))
     findings.extend(validate_level2(corpus))
     findings.extend(workflow_run_findings(root, corpus, workflow_resolver))
+    findings.extend(workflow_fulfilment_findings(corpus))
     findings.extend(workflow_transition_findings(
         root, corpus, view, workflow_resolver))
     findings.extend(validate_level3(corpus))

@@ -11,6 +11,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from markdownllm.indexes import build_index_body  # noqa: E402
 from markdownllm.model import SEV_ERROR, SEV_INFO, SEV_WARNING  # noqa: E402
 from markdownllm.repository_view import RepositoryView  # noqa: E402
 from markdownllm.validation import validate_corpus  # noqa: E402
@@ -235,3 +236,67 @@ def test_runs_sharing_a_revision_resolve_one_immutable_view(
     assert not [finding for finding in findings
                 if finding.severity == SEV_ERROR]
     assert calls == 1
+
+
+def test_completed_run_without_activation_or_output_gets_info_only(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "domain"
+    pin = _init(root)
+    _write(root, "things/run.md", _run(
+        stage="review", pin=pin, status="completed"))
+
+    _, findings = validate_corpus(root)
+    assert any(
+        finding.severity == SEV_INFO
+        and "completed run has neither initiating `informed_by` evidence"
+        in finding.message
+        for finding in findings
+    )
+    assert not [finding for finding in findings
+                if finding.severity == SEV_ERROR]
+
+
+def test_activation_or_produced_evidence_satisfies_completed_run_advisory(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "domain"
+    pin = _init(root)
+    _write(root, "things/demand.md", _thing(
+        "demand", "task", "completed"))
+    _git(root, "add", "things/demand.md")
+    _git(root, "commit", "-q", "-m", "record demand")
+    demand_pin = _git(root, "rev-parse", "HEAD")
+    _write(root, "things/run.md", _run(
+        stage="review", pin=pin, status="completed",
+        informed_by=("informed_by:\n"
+                     "  - id: demand\n"
+                     f"    commit: {demand_pin}\n")))
+
+    assert not any("completed run has neither" in message
+                   for message in _messages(root, SEV_INFO))
+
+    _write(root, "things/run.md", _run(
+        stage="review", pin=pin, status="completed"))
+    _git(root, "add", "things/run.md")
+    _git(root, "commit", "-q", "-m", "record completed run")
+    run_pin = _git(root, "rev-parse", "HEAD")
+    _write(root, "things/output.md", _thing(
+        "output", "task", "completed",
+        "informed_by:\n"
+        "  - id: run\n"
+        f"    commit: {run_pin}\n"))
+    corpus, findings = validate_corpus(root)
+    assert not any("completed run has neither" in finding.message
+                   for finding in findings)
+    body, _ = build_index_body(corpus, "provenance")
+    assert "## run" in body and f"output (pinned @{run_pin})" in body
+
+
+def test_activation_advisory_never_fires_before_completion(tmp_path: Path) -> None:
+    root = tmp_path / "domain"
+    pin = _init(root)
+    _write(root, "things/run.md", _run(pin=pin, status="active"))
+
+    assert not any("completed run has neither" in message
+                   for message in _messages(root, SEV_INFO))
