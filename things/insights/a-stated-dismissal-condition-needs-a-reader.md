@@ -1,13 +1,14 @@
 ---
 id: a-stated-dismissal-condition-needs-a-reader
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-08-20
 session: 2026-08-20
 source: agent
-confidence: medium
+confidence: high
 origin: inferred
+promoted_to: retrospective-specification
 linked_things:
   - id: framework-retrospective-2026-08b
     relation: informs
@@ -68,3 +69,15 @@ and about thirty with conditions no beat re-reads. Recorded as an observation
 rather than a design, because which of the two routes is right depends on how
 many conditions turn out to be mechanically datable — a question the next
 triage pass answers as a side effect of running.
+
+## Disposition — promoted 2026-08-27
+
+Route 1 taken: the conditions-met pass ran for the first time as part of the
+08c retrospective and entered `retrospective.md` v1.4 as standing scan 6. The
+first census also answered the open question above: of twelve standing
+conditions, one had already been honoured in-period and the rest key on
+*events* (fresh product runs, the next cold read, a sprint landing), not
+dates — so the retrospective beat, not dated triggers, is the right reader
+for the bulk, with dated triggers reserved for the datable minority.
+Confidence moves medium → high on the census's own evidence: several
+conditions were close to their trigger and none had a reader before this.

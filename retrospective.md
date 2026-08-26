@@ -2,7 +2,7 @@
 id: retrospective-specification
 type: specification
 status: stable
-version: 1.3
+version: 1.4
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -123,6 +123,7 @@ The retrospective is the natural home for the framework's *expensive* reflexive 
 3. **Index rebuild** — regenerate the domain's derived indexes from the things and reset their provenance, so the period closes with indexes provably in sync with reality (`validate.thing.md` → Index Integrity).
 4. **Change-driven reconciliation** (`change-reconciliation.md` → Retrospective Reconciliation) — for any change the period made *without* reconciling it at the time, run the full-corpus pass: freeze the period end as a baseline, reconstruct the delta from git, walk the affected set, and seal contradictions via `belief-revision.md`. This is the scan that catches the *twisted* domain — changes that landed with no change-time pass. Surfaced contradictions feed "What Didn't Work"; the realignment feeds "What Should Change." It is what makes running a retrospective *initiate* reconciliation, not merely reflect on it.
 5. **Insight triage & consolidation** (`session-memory.md` → Insight Lifecycle Management; `thing.md` → The Inverse: Composition) — the mechanical half of the triage beat above, two cheap passes the floor can compute. The *orphan check* lists `active` insights with no inbound edge from a non-terminal thing (the `validate` Info finding), so each is forced back into circulation — linked from live work — or to a terminal status rather than going dark. The *composition pre-filter* clusters insights sharing two or more `linked_things` targets as merge candidates for the Walk to judge. The retrospective is the framework's sanctioned home for sweeps — it already runs the conflict and schema scans here — so composition joins them as a *quality* pass; this does not violate `consistency-is-maintained-at-change-not-by-sweeping`, which governs *correctness*, maintained at change.
+6. **Conditions-met pass over the exempted set** — re-read every stated `disposition_reason` and standing dismissal/promotion condition in the active insight backlog and ask *which of these has since come true*. The keep-active marker exempts an insight from the orphan check, and the exemption is granted once; this pass is what keeps it honest — a stated condition is a trigger in everything but syntax, and the retrospective is its reader. Rule on each met condition (promote, dismiss, revise); a condition that names a date or a committed observable belongs as an actual dated trigger beside the prose instead (`trigger-specification`). Promoted here from `a-stated-dismissal-condition-needs-a-reader` after the first census (2026-08-27) found most conditions key on events rather than dates, making this beat — not dated triggers — the right reader for the bulk.
 
 These scans are *why* the retrospective produces more than a written reflection: they mechanically surface aggregate problems the period accumulated, which the reflection then reasons about.
 

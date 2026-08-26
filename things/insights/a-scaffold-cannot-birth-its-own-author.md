@@ -8,6 +8,8 @@ session: 2026-08-20
 source: both
 confidence: high
 origin: inferred
+disposition: keep-active
+disposition_reason: "Condition unmet by design: the remedy (a thin specification skill owning the lenses plus the stated read/write collapse) is deliberately sequenced after the session-start-hardening acceptance runs, which need the contract to hold still. Re-read at the next retrospective: if hardening has closed, build or dismiss. (Stamped at the 08c conditions-met census, 2026-08-27.)"
 tags: [self-describing, scaffold, skills, lenses, coherence, framework-domain]
 linked_things:
   - id: reasoning-lenses-specification

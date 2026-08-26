@@ -1,8 +1,8 @@
 ---
 id: mechanical-coherence-checks-backlog
 type: plan
-status: not-started
-version: 1.2
+status: in-progress
+version: 1.3
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -27,6 +27,15 @@ linked_things:
 ---
 
 # Mechanical Coherence Checks Backlog
+
+> Status corrected to `in-progress` at the 08c retrospective (2026-08-27):
+> floor-sprint-3 (2026-08-23) shipped four items from this backlog — two
+> review-9 promotions, the perimeter currency check, the boundary-term audit
+> leg — while the frontmatter still said `not-started`. That is the
+> tracking-drift class this backlog itself polices, standing in its own
+> header. Open items remain: broken-body-reference, install-hook self-test,
+> structural-pin resolution at the commit boundary, the primitive sweep, the
+> skills-directory-vs-artifacts check.
 
 Small, deferred floor checks — each a generated-artifact freshness or
 prose↔mechanical consistency check that belongs in `mdllm coherence`. Migrated from

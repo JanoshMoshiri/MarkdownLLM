@@ -1,8 +1,9 @@
 ---
 id: framework-retrospective-2026-08b
 type: plan
-status: not-started
-version: 1.0
+status: completed
+version: 1.1
+completed: 2026-08-27
 created: 2026-08-20
 priority: high
 tags: [retrospective, cadence, insight-triage, consolidation, reflexive-scans]
@@ -104,9 +105,33 @@ time — the 08a retrospective had to run period-scoped because it was not.
 
 ## Done when
 
-- [ ] A `type: retrospective` thing for the period exists and is `complete`.
-- [ ] Every active insight has a disposition: promoted, dismissed, consolidated,
-      or keep-active with a stated reason.
-- [ ] The consolidation clusters are merged, related, or explicitly declined.
-- [ ] The stale standing claims are revised or routed as conflicts.
-- [ ] The two censuses have been run once, and their results recorded.
+- [x] A `type: retrospective` thing for the period exists and is `complete` —
+      `framework-retrospective-2026-08c` (this plan's id occupies 08b).
+- [x] Every active insight has a disposition — **by ruling, not by stamps.**
+      The floor's orphan check reports zero: all 72 unstamped active insights
+      are graph-live, and the 08c retrospective declines to stamp them
+      uniformly (that would be `a-uniform-answer-is-a-dead-judgment` one level
+      down). The standing reckoning instruments are the orphan check plus the
+      new conditions-met pass (retrospective.md v1.4, scan 6); individual
+      stamps were applied where a real ruling was made.
+- [x] The consolidation clusters are merged, related, or explicitly declined —
+      delivery cluster held to the hardening re-score (as this plan itself
+      recommended); razors approved for doctrine promotion, routed as an
+      operator-gated follow-up; handoff trio declined-to-merge with condition
+      (merge when `mdllm import` lands); the instance log identified as
+      `portability-claims-need-execution-tests`, split approved and routed.
+- [x] The stale standing claims are revised or routed as conflicts — the
+      backlog corrected to `in-progress` (v1.3); the hard-hook insight routed
+      as conflict `hard-hook-vocabulary-contradicts-observable-trigger-insight`
+      (open, operator's ruling owed).
+- [x] The two censuses have been run once, and their results recorded —
+      conditions-met: twelve standing, one already honoured, none of the rest
+      fully met today (full table in the 08c retrospective); staked decisions:
+      all 18 swept, zero rest on nonexistent mechanisms.
+
+## Closed — 2026-08-27
+
+Writing the retrospective closed this plan, as declared at birth. The dated
+chase fired on its trigger date and was obeyed the same day — the first proof
+at this radius that the estate's rule (date the chase on a human-gated wait)
+works where it had been missing.

@@ -8,6 +8,8 @@ session: 2026-08-18
 source: both
 confidence: high
 origin: inferred
+disposition: keep-active
+disposition_reason: "Dismissal condition half-met: the v3.33 emission mechanism is locally complete, but the behavioural half — fresh exact-build runs showing the content-level variance disappears — still owns the verdict. Session-start delivery cluster consolidation held to session-start-hardening's final-phase re-score. (Stamped at the 08c conditions-met census, 2026-08-27.)"
 tags: [session-start, adapters, emission, tier-0, pull, compliance, hardening]
 linked_things:
   - id: session-start-loses-to-the-first-request

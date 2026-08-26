@@ -5,6 +5,7 @@ status: resolved
 created: 2026-08-16
 session: 2026-08-16
 resolution: both-valid
+resolved_by: claude-no-adapter-entry-probe-2026-08-17
 parties:
   - interface-specification
   - vendor-harness-adapter-foundation

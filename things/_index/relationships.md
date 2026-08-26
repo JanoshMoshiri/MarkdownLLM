@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-26
-generated: 2026-08-26T12:29:07
-generated_from: HEAD@91a0101
-coverage: 284
+created: 2026-08-27
+generated: 2026-08-27T00:45:55
+generated_from: HEAD@b97d92e
+coverage: 286
 framework_version: 3.36.0
 ---
 
@@ -560,6 +560,15 @@ framework_version: 3.36.0
 - framework-retrospective-2026-08b --references--> a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist
 - framework-retrospective-2026-08b --informs--> a-stated-dismissal-condition-needs-a-reader
 - framework-retrospective-2026-08b --references--> thing-lifecycle-specification
+- framework-retrospective-2026-08c --references--> framework-retrospective-2026-08a
+- framework-retrospective-2026-08c --references--> framework-retrospective-2026-08b
+- framework-retrospective-2026-08c --references--> hard-hook-vocabulary-contradicts-observable-trigger-insight
+- framework-retrospective-2026-08c --implements--> a-stated-dismissal-condition-needs-a-reader
+- framework-retrospective-2026-08c --references--> a-uniform-answer-is-a-dead-judgment
+- framework-retrospective-2026-08c --references--> substrate-floor-development
+- framework-retrospective-2026-08c --references--> session-start-hardening
+- framework-retrospective-2026-08c --references--> estate-wide-autopush-2026-08-22
+- framework-retrospective-2026-08c --supports--> a-true-primitive-is-discovered-not-authored
 - framework-root-tracks-both-adapters --informs--> vendor-harness-adapter-foundation
 - framework-root-tracks-both-adapters --references--> code-architect-governs-substrate-code
 - framework-upward-signal --implements--> shared-domain-failures-are-a-framework-signal-without-a-path
@@ -577,6 +586,12 @@ framework_version: 3.36.0
 - git-workflow-specification --complements--> validate-thing-specification
 - git-workflow-specification --complements--> derived-index-specification
 - git-workflow-specification --implements--> autopush-requires-explicit-authority
+- hard-hook-vocabulary-contradicts-observable-trigger-insight --contradicts--> hard-hooks-require-observable-agent-caused-triggers
+- hard-hook-vocabulary-contradicts-observable-trigger-insight --contradicts--> orchestration-specification
+- hard-hook-vocabulary-contradicts-observable-trigger-insight --references--> hook-enforcement-has-three-anchors
+- hard-hook-vocabulary-contradicts-observable-trigger-insight --derived-from--> framework-retrospective-2026-08c
+- hard-hook-vocabulary-contradicts-observable-trigger-insight --parties--> hard-hooks-require-observable-agent-caused-triggers
+- hard-hook-vocabulary-contradicts-observable-trigger-insight --parties--> orchestration-specification
 - hard-hooks-require-observable-agent-caused-triggers --informs--> orchestration-specification
 - hard-hooks-require-observable-agent-caused-triggers --extends--> hook-compliance-correlates-with-scope-not-awareness
 - hard-invariants-encode-a-semantic-assumption --informs--> validate-thing-specification

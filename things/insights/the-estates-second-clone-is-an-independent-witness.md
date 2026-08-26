@@ -14,6 +14,7 @@ linked_things:
   - id: git-workflow-specification
     relation: extends
     notes: "A consequence of the multi-machine estate model that the spec builds but never names as an evidence instrument: every clone that fetches a shared remote is a witness to what crossed it."
+disposition: keep-active
 disposition_reason: "Keep active until a second grading exercise uses the
 pattern deliberately (it was discovered mid-grading here, not designed in),
 or until the evidence conventions name corroboration-from-a-second-clone as
