@@ -2,7 +2,7 @@
 id: operating-model-specification
 type: specification
 status: draft
-version: 0.1
+version: 0.2
 created: 2026-08-25
 linked_things:
   - id: universal-workflow-methodology
@@ -117,6 +117,22 @@ run and a portfolio-radius run identically; only judgement scales.
   with a heartbeat (a schedule whose absence is invisible is not a
   control). It proposes; it never creates execution state on another
   module's surface.
+- **The consumer contract.** What a consumer takes from a face is a
+  declared composition owned entirely by the consumer: the address-book
+  entry naming the source, the import triggers watching it, the workflow
+  definition an admitted input starts, the output class that counts as
+  fulfilment, and the cadence that makes silence visible. A "contract"
+  between two modules is really **two** of these — one per direction,
+  each owned by that direction's consumer. Nothing in it creates a
+  producer-side obligation: no subscriber list, no push route, no
+  remotely created execution state. It composes existing pieces; it
+  becomes a primitive only if live use proves the composition cannot
+  carry it.
+- **Addressing.** *Addressed* means declared intended relevance — a
+  producer may state, on the exposed thing itself, who it believes needs
+  it. It is never delivery authority: admission always belongs to the
+  receiving module, which alone knows its capacity, priorities, controls
+  and current state.
 
 ## The Declared Dimensions
 
@@ -135,6 +151,15 @@ to an existing primitive; none is mandatory (see Posture).
 atom at the cut — sometimes by allocation, sometimes by the automation
 closure above — and a standing capacity declaration would restate what
 every cut must judge freshly (see the atom, v1.1).
+
+**Executor is not authority.** Who or what *performs* a stage — human,
+agent, deterministic automation, a hybrid sequence — is execution
+responsibility, declared in the definition's body separately from the
+gate authority that may authorise the transition or accept the output.
+The same definition may be executed by different modalities over time
+without its business meaning changing; `workflow-state.md` owns the
+doctrine and the condition under which modality ever becomes
+machine-readable.
 
 ## Posture: Open by Doctrine
 
