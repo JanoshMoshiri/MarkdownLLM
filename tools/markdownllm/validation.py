@@ -212,11 +212,11 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
                                  f"supersedes `{entry.get('id')}` but target has no "
                                  f"`superseded-by` link and is not deprecated"))
 
-    # workflow-run cursor integrity (workflow-state.md): a run points at its
-    # definition via the structural `definition` field, and `current_stage` must
-    # be a stage that definition declares. Pure referential integrity — the
-    # floor's job, same class as "linked_things targets must exist". (Transition
-    # *legality* across the loop graph stays the agent's Layer-2 judgment.)
+    # workflow-run cursor integrity for unpinned runs (workflow-state.md).
+    # Keep the legacy/current-definition arm here because validate_level2 is a
+    # public pure validator used by callers outside validate_corpus. Pinned
+    # membership needs Git I/O and is owned by workflow_run_findings below;
+    # structure and target type remain view-independent for both arms.
     for t in corpus.things:
         if str(t.meta.get("type")) != "workflow-run":
             continue
@@ -235,6 +235,8 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
             f.append(Finding(SEV_ERROR, name,
                      f"`definition` `{defn_id}` is not a workflow-definition"))
             continue
+        if t.meta.get("definition_commit") is not None:
+            continue  # immutable membership is the Git-backed arm below
         stage_ids = {s["id"] for s in target.meta.get("stages") or []
                      if isinstance(s, dict) and isinstance(s.get("id"), str)}
         if cur is not None and str(cur) not in stage_ids:
@@ -316,8 +318,165 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
     return f
 
 
+_FULL_COMMIT_RE = re.compile(r"^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$")
+
+
+class WorkflowDefinitionResolver:
+    """Resolve immutable workflow definitions once per validation pass.
+
+    Revision binding is Git-backed policy, not generic graph validation.  This
+    resolver keeps that I/O at one seam and caches by commit, so many runs on
+    one approved definition pay one revision resolution and one batched tree
+    read rather than one subprocess chain per run.
+    """
+
+    def __init__(self, root: Path, corpus: Corpus):
+        self.root = Path(root).resolve()
+        self.corpus = corpus
+        self.repository_root = (corpus.view.root if corpus.view is not None
+                                else self.root)
+        self._views: dict[str, RepositoryView] = {}
+        self._view_errors: dict[str, str] = {}
+        self._corpora: dict[str, Corpus] = {}
+        self._definitions: dict[tuple[str, str, str], tuple[Thing | None, str | None]] = {}
+
+    @staticmethod
+    def valid_pin(pin: object) -> bool:
+        return isinstance(pin, str) and _FULL_COMMIT_RE.fullmatch(pin) is not None
+
+    def _commit_view(self, pin: str) -> tuple[RepositoryView | None, str | None]:
+        key = pin.lower()
+        if key in self._views:
+            return self._views[key], None
+        if key in self._view_errors:
+            return None, self._view_errors[key]
+        try:
+            selected = RepositoryView.commit(self.repository_root, pin)
+        except RepositoryViewError:
+            message = (f"`definition_commit` `{pin}` does not resolve to a "
+                       "commit in this repository")
+            self._view_errors[key] = message
+            return None, message
+        self._views[key] = selected
+        return selected, None
+
+    def resolve(
+        self, pin: str, definition_id: str,
+        current_definition: Thing | None,
+    ) -> tuple[Thing | None, str | None]:
+        """Find ``definition_id`` at ``pin``, current path first then id scan."""
+        path_key = ""
+        if current_definition is not None:
+            try:
+                path_key = current_definition.path.resolve().relative_to(
+                    self.repository_root).as_posix()
+            except ValueError:
+                path_key = ""
+        cache_key = (pin.lower(), definition_id, path_key)
+        cached = self._definitions.get(cache_key)
+        if cached is not None:
+            return cached
+
+        selected, error = self._commit_view(pin)
+        if selected is None:
+            result = (None, error)
+            self._definitions[cache_key] = result
+            return result
+
+        # Fast path: definitions normally retain their current path.  Read that
+        # exact blob first; when a definition moved, fall back to an id-indexed
+        # corpus scan of the same immutable view. RepositoryView batches both
+        # tree and blob reads, and the fallback corpus is cached per commit.
+        if path_key and selected.exists(PurePosixPath(path_key)):
+            text = selected.read_text(PurePosixPath(path_key))
+            meta, body, parse_error = parse_frontmatter(text, source=path_key)
+            if (parse_error is None and isinstance(meta, dict)
+                    and str(meta.get("id")) == definition_id
+                    and str(meta.get("type")) == "workflow-definition"):
+                result = (Thing(
+                    path=self.repository_root.joinpath(*PurePosixPath(path_key).parts),
+                    meta=meta, body=body, source_text=text,
+                ), None)
+                self._definitions[cache_key] = result
+                return result
+
+        pinned = self._corpora.get(pin.lower())
+        if pinned is None:
+            pinned, _ = scan(self.root, selected)
+            self._corpora[pin.lower()] = pinned
+        definition = pinned.by_id().get(definition_id)
+        if (definition is None
+                or str(definition.meta.get("type")) != "workflow-definition"):
+            result = (
+                None,
+                f"`definition_commit` `{pin}` does not carry workflow-definition "
+                f"`{definition_id}` (current path miss and id fallback miss)",
+            )
+        else:
+            result = (definition, None)
+        self._definitions[cache_key] = result
+        return result
+
+
+def workflow_run_findings(
+    root: Path, corpus: Corpus,
+    resolver: WorkflowDefinitionResolver | None = None,
+) -> list[Finding]:
+    """Validate run references, revision pins, membership, and fulfilment shape."""
+    by_id = corpus.by_id()
+    selected = resolver or WorkflowDefinitionResolver(root, corpus)
+    findings: list[Finding] = []
+    for run in corpus.things:
+        if str(run.meta.get("type")) != "workflow-run":
+            continue
+        name = run.id or run.path.name
+        definition_id = run.meta.get("definition")
+        current_stage = run.meta.get("current_stage")
+        revision = run.meta.get("definition_commit")
+        if revision is None:
+            findings.append(Finding(
+                SEV_INFO, name,
+                "workflow-run has no `definition_commit`; it uses legacy "
+                "prior-committed-definition semantics — pin the full commit "
+                "whose definition governs the run in a separate commit",
+            ))
+        elif isinstance(definition_id, str):
+            current_definition = by_id.get(definition_id)
+            if (current_definition is not None
+                    and str(current_definition.meta.get("type"))
+                    == "workflow-definition"):
+                if not selected.valid_pin(revision):
+                    findings.append(Finding(
+                        SEV_ERROR, name,
+                        "`definition_commit` must be a full 40- or "
+                        "64-character Git commit object id",
+                    ))
+                else:
+                    definition, error = selected.resolve(
+                        str(revision), definition_id, current_definition)
+                    if error is not None:
+                        findings.append(Finding(SEV_ERROR, name, error))
+                    elif definition is not None and current_stage is not None:
+                        stage_ids = {
+                            stage["id"]
+                            for stage in definition.meta.get("stages") or []
+                            if (isinstance(stage, dict)
+                                and isinstance(stage.get("id"), str))
+                        }
+                        if str(current_stage) not in stage_ids:
+                            findings.append(Finding(
+                                SEV_ERROR, name,
+                                f"`current_stage` `{current_stage}` is not a "
+                                f"stage in `{definition_id}` at pinned revision "
+                                f"`{revision}` (stages: {sorted(stage_ids)})",
+                            ))
+
+    return findings
+
+
 def workflow_transition_findings(
     root: Path, corpus: Corpus, view: RepositoryView | None = None,
+    resolver: WorkflowDefinitionResolver | None = None,
 ) -> list[Finding]:
     """Enforce old -> new workflow edges at the next-commit boundary.
 
@@ -352,6 +511,7 @@ def workflow_transition_findings(
     prior_by_id = prior.by_id()
     candidate_by_id = corpus.by_id()
     findings: list[Finding] = []
+    selected = resolver or WorkflowDefinitionResolver(root, corpus)
 
     for run_id, new_run in candidate_by_id.items():
         if str(new_run.meta.get("type")) != "workflow-run":
@@ -363,6 +523,18 @@ def workflow_transition_findings(
         old_stage = old_run.meta.get("current_stage")
         new_stage = new_run.meta.get("current_stage")
         if old_stage is None or new_stage is None or str(old_stage) == str(new_stage):
+            continue
+
+        old_revision = old_run.meta.get("definition_commit")
+        new_revision = new_run.meta.get("definition_commit")
+        if old_revision != new_revision:
+            findings.append(Finding(
+                SEV_ERROR, run_id,
+                f"workflow-run changes both `definition_commit` and "
+                f"`current_stage` (`{old_stage}` -> `{new_stage}`) in one "
+                "candidate — migrate the governing revision in a separate "
+                "meaning-boundary commit before advancing the cursor",
+            ))
             continue
 
         old_definition_id = old_run.meta.get("definition")
@@ -400,6 +572,27 @@ def workflow_transition_findings(
             ))
             continue
 
+        definition_source = f"prior definition `{old_definition_id}`"
+        if old_revision is not None:
+            if not selected.valid_pin(old_revision):
+                findings.append(Finding(
+                    SEV_ERROR, run_id,
+                    "cannot verify workflow transition because the prior "
+                    "`definition_commit` is not a full Git commit object id",
+                ))
+                continue
+            definition, error = selected.resolve(
+                str(old_revision), old_definition_id, definition)
+            if error is not None or definition is None:
+                findings.append(Finding(
+                    SEV_ERROR, run_id,
+                    f"cannot verify workflow transition `{old_stage}` -> "
+                    f"`{new_stage}`: {error or 'pinned definition is missing'}",
+                ))
+                continue
+            definition_source = (
+                f"pinned definition `{old_definition_id}` at `{old_revision}`")
+
         source_stages = [stage for stage in definition.meta.get("stages") or []
                          if isinstance(stage, dict)
                          and str(stage.get("id")) == str(old_stage)]
@@ -407,7 +600,7 @@ def workflow_transition_findings(
             findings.append(Finding(
                 SEV_ERROR, run_id,
                 f"cannot verify workflow transition `{old_stage}` -> "
-                f"`{new_stage}`: prior definition `{old_definition_id}` "
+                f"`{new_stage}`: {definition_source} "
                 f"declares {len(source_stages)} source stages named "
                 f"`{old_stage}`",
             ))
@@ -426,7 +619,7 @@ def workflow_transition_findings(
             findings.append(Finding(
                 SEV_ERROR, run_id,
                 f"workflow transition `{old_stage}` -> `{new_stage}` is not "
-                f"declared by prior definition `{old_definition_id}` "
+                f"declared by {definition_source} "
                 f"(allowed: {allowed})",
             ))
     return findings
@@ -786,10 +979,13 @@ def retrospective_findings(root: Path, corpus: Corpus,
 def validate_corpus(root: Path,
                     view: RepositoryView | None = None) -> tuple[Corpus, list[Finding]]:
     corpus, findings = scan(root, view)
+    workflow_resolver = WorkflowDefinitionResolver(root, corpus)
     for t in corpus.things:
         findings.extend(validate_level1(t, corpus.schema))
     findings.extend(validate_level2(corpus))
-    findings.extend(workflow_transition_findings(root, corpus, view))
+    findings.extend(workflow_run_findings(root, corpus, workflow_resolver))
+    findings.extend(workflow_transition_findings(
+        root, corpus, view, workflow_resolver))
     findings.extend(validate_level3(corpus))
     findings.extend(derivation_findings(corpus))
     return corpus, findings

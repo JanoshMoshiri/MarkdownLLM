@@ -167,7 +167,7 @@ CORE_FIELDS = {
     "id", "type", "status", "created", "due_date", "review_date",
     # workflow-run cursor (structural reference fields are supplied once by
     # structural_field_names() below)
-    "current_stage", "stages",
+    "current_stage", "stages", "definition_commit",
     # advisory coordination claim (coordination-claim.md) — read and respected
     # by convention, not by the tool; SHIPPED by the framework into every
     # domain as part of the `workflow-run` frontmatter contract
