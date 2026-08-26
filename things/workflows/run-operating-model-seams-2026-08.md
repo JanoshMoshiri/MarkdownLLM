@@ -9,7 +9,7 @@ current_stage: requirements
 held_by: claude-framework-session-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
-    commit: ed44b2d1d3708524a1eddc31358176a37348d654
+    commit: ed44b2d91b84215fb7a5d95f33a8dbbf2325468b
 linked_things:
   - id: review-independent-operating-model-2026-08-26-codex
     relation: references

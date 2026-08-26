@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-26
-generated: 2026-08-26T01:47:41
-generated_from: HEAD@19579ef
+generated: 2026-08-26T01:49:12
+generated_from: HEAD@bc4aabc
 coverage: 52
 framework_version: 3.35.0
 ---
@@ -160,7 +160,7 @@ framework_version: 3.35.0
 - posix-live-dispatch-record-2026-08-14 (derived-from)
 
 ## review-independent-operating-model-2026-08-26-codex
-- run-operating-model-seams-2026-08 (pinned @ed44b2d1d3708524a1eddc31358176a37348d654)
+- run-operating-model-seams-2026-08 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
 
 ## run-floor-sprint-1-2026-08
 - floor-sprint-2-scope-2026-08-22 (pinned @967773cb50f2dc9b9f661f8309c7aaacded8f4f1)
