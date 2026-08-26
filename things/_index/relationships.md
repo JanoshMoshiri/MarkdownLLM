@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T04:00:39
-generated_from: HEAD@383a3a3
+generated: 2026-08-26T04:05:10
+generated_from: HEAD@cdc8dc8
 coverage: 280
 framework_version: 3.35.0
 ---
@@ -109,6 +109,7 @@ framework_version: 3.35.0
 - a-stated-dismissal-condition-needs-a-reader --challenges--> session-memory-specification
 - a-stated-dismissal-condition-needs-a-reader --references--> trigger-specification
 - a-stated-dismissal-condition-needs-a-reader --supports--> a-uniform-answer-is-a-dead-judgment
+- a-transcribed-identifier-is-unverifiable-by-reading --informs--> workflow-state-specification
 - a-transcribed-identifier-is-unverifiable-by-reading --supports--> a-wrong-sum-is-indistinguishable-from-a-right-one
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --references--> llm-driven-systems-manifesto

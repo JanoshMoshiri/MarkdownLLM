@@ -1,15 +1,19 @@
 ---
 id: a-transcribed-identifier-is-unverifiable-by-reading
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-08-26
 session: 2026-08-25/26
 source: build
 confidence: high
 origin: stated
+promoted_to: workflow-state-specification
 tags: [provenance, pins, transcription, floor, failure-modes]
 linked_things:
+  - id: workflow-state-specification
+    relation: informs
+    notes: "Revision binding now requires log-transcribed full SHAs and the floor resolves the commit plus governing definition; the workflow-specific lesson has crystallised into the operative contract."
   - id: a-wrong-sum-is-indistinguishable-from-a-right-one
     relation: supports
     notes: "The same failure shape on a different surface — an output whose correctness has no surface features. The remedies diverge, which is the useful part: a sum must refuse, a pin can simply be resolved."
@@ -59,3 +63,11 @@ the strongest argument available that the discipline alone is not enough.
 2026-08-26, mid-sprint, on `run-operating-model-seams-2026-08`'s own
 `informed_by` pin. Corrected in its own commit; the floor leg that would
 have caught it mechanically sits in the same sprint's stretch scope.
+
+## Disposition
+
+**Promoted (operating-model seams seal, 2026-08-26).** The workflow-specific
+lesson is now operative in `workflow-state.md`: pins are transcribed from Git,
+the floor resolves the object and definition, and the self-application plus
+worked example exercise the rule. The broader provenance validator already
+checks commit/input resolution; no second mechanism or open insight is owed.

@@ -2,12 +2,14 @@
 id: a-check-is-only-as-trustworthy-as-who-controls-its-inputs
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-08-26
 session: 2026-08-25/26
 source: both
 confidence: high
 origin: stated
+disposition: keep-active
+disposition_reason: "Standing design razor: every future check that admits a new self-declared input must re-run the authority test before it can be trusted."
 tags: [floor, checks, authority, self-authorization, versioning, failure-modes]
 linked_things:
   - id: workflow-state-specification
@@ -69,3 +71,11 @@ first one, the self authorization hole, we can't let that slip"* — before
 any of the mechanism was built. Recorded because the guard's rule is
 cheap to write and cheap to later "simplify away" by someone who never
 saw what it was protecting.
+
+## Disposition
+
+**Keep active (operating-model seams seal, 2026-08-26).** The workflow guard is
+implemented, but the lesson is deliberately broader than workflow state. It is
+a standing same-builder razor for future validators, pinning mechanisms and
+self-declared policy inputs, so crystallising only the present instance would
+discard the part future designs need.
