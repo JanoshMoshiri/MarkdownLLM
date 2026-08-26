@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-26
-generated: 2026-08-26T01:50:28
-generated_from: HEAD@8a88c40
-coverage: 53
+generated: 2026-08-26T02:25:25
+generated_from: HEAD@9ef30b8
+coverage: 54
 framework_version: 3.35.0
 ---
 
@@ -152,6 +152,9 @@ framework_version: 3.35.0
 
 ## operating-is-programming
 - operating-scope-promotion (pinned @604dfc4)
+
+## operating-model-seams-scope-2026-08-26
+- operating-model-seams-design-2026-08 (pinned @8a88c40b1436330b39894572e7325571966dd9a1)
 
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
