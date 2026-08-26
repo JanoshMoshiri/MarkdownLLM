@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T09:28:21
-generated_from: HEAD@00865d9
+generated: 2026-08-26T10:20:47
+generated_from: HEAD@a8556f6
 coverage: 281
 framework_version: 3.35.0
 ---
@@ -765,6 +765,7 @@ framework_version: 3.35.0
 - origin-external-conflates-ingestion-with-import --informs--> cross-domain-sync-catchup
 - partial-coverage-quiets-the-uncovered-steps --extends--> emitted-content-is-read-instructed-content-is-economised
 - partial-coverage-quiets-the-uncovered-steps --complements--> session-start-loses-to-the-first-request
+- partial-coverage-quiets-the-uncovered-steps --references--> review-independent-seams-verification-2026-08-26-claude
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-built-inbound-only
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-verified-external-input

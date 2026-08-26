@@ -2,11 +2,11 @@
 id: partial-coverage-quiets-the-uncovered-steps
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-08-19
 session: 2026-08-19
 source: both
-confidence: medium
+confidence: high
 origin: inferred
 tags: [adapters, session-start, coverage, masking, hardening, salience]
 linked_things:
@@ -16,6 +16,9 @@ linked_things:
   - id: session-start-loses-to-the-first-request
     relation: complements
     notes: "Pull-collision explains why un-pulled duties lose; this adds that partial mechanisation lowers their salience further — the session feels started."
+  - id: review-independent-seams-verification-2026-08-26-claude
+    relation: references
+    notes: "Second surface, 2026-08-26: an explicit reading list in a handover prompt quieted the routing table the same prompt invoked. The two specs the list omitted are exactly the two whose rules the builder then reconstructed from concept."
 ---
 
 # Partial coverage quiets the uncovered steps
@@ -65,3 +68,35 @@ Dismissal condition: dismissed if the no-adapter control shows
 equal-or-worse compliance without coverage (masking not evidenced beyond
 pull); promoted if a "name the uncovered steps loudly" rule lands in
 orchestration.md's adapter doctrine or the session-start projection.
+
+## Second surface — prompts, 2026-08-26 (confidence medium → high)
+
+The same shape appeared where no adapter was involved, and it is the
+cleaner instance because the original confound does not fit it.
+
+A handover prompt directed a builder to run session start, read
+`AGENTS.md` **end to end**, then named five specs explicitly and added
+"the other specifications relevant to the framework". The routing table
+in that very file has rows for both specs the list omitted. Both omitted
+rules were then reconstructed from concept rather than read: the atom's
+canonical stage ids became a third invented vocabulary, and a
+`type: example` thing was minted at `status: stable` with new schema
+vocabulary, without its governing spec.
+
+Why this discriminates: pull-collision cannot explain it. There was no
+competing live request stealing salience — the reading *was* the task,
+and the file containing the table was read as instructed. What quieted
+the two rows was the presence of a partial list beside them. **An
+explicit enumeration reads as the set, not as a floor the table
+extends** — coverage of five made the remainder quieter, exactly as
+mechanising four steps quiets the fifth.
+
+The named discriminating test for the *adapter* form (a bare-harness,
+no-adapter control) remains owed and unchanged; this instance raises
+confidence in the general claim, not in that untested one. Evidence:
+`review-independent-seams-verification-2026-08-26-claude`.
+
+**Practical corollary, now earned twice:** a partial list must say it is
+partial. A handover that names specs should name the routing table as
+the authority above them — "these, plus whatever the table routes you
+to" — or name nothing and let the table do its job.
