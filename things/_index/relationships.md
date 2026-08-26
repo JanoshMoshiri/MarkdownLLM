@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T01:47:41
-generated_from: HEAD@19579ef
-coverage: 274
+generated: 2026-08-26T01:49:53
+generated_from: HEAD@cdc16e4
+coverage: 275
 framework_version: 3.35.0
 ---
 
@@ -712,6 +712,7 @@ framework_version: 3.35.0
 - operating-layer-quality-loop --references--> retrospective-specification
 - operating-layer-quality-loop --references--> cowork-adapter
 - operating-layer-quality-loop --references--> vendor-harness-adapter-foundation
+- operating-model-seams-scope-2026-08-26 --informs--> run-operating-model-seams-2026-08
 - operating-model-specification --extends--> universal-workflow-methodology
 - operating-model-specification --extends--> workflow-state-specification
 - operating-model-specification --complements--> trigger-specification

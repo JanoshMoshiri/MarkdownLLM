@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-26
-generated: 2026-08-26T01:49:12
-generated_from: HEAD@bc4aabc
-coverage: 52
+generated: 2026-08-26T01:49:53
+generated_from: HEAD@cdc16e4
+coverage: 53
 framework_version: 3.35.0
 ---
 
@@ -93,6 +93,7 @@ framework_version: 3.35.0
 - floor-sprint-1-scope-2026-08-21 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
 - floor-sprint-2-scope-2026-08-22 (pinned @f6dccaf9ed4c3309fd871ce622715a6528fe7d12)
 - floor-sprint-3-scope-2026-08-23 (pinned @efed48d7f589c8e5a29d70c87d4ebb251d7c7358)
+- operating-model-seams-scope-2026-08-26 (pinned @19579efeea0dbd4abe1d0bdbd0499b60d79f1651)
 
 ## floor-sprint-1-scope-2026-08-21
 - floor-sprint-1-design-2026-08 (pinned @10443b5aed763503161acc96833484c6786e6c7b)
@@ -160,6 +161,7 @@ framework_version: 3.35.0
 - posix-live-dispatch-record-2026-08-14 (derived-from)
 
 ## review-independent-operating-model-2026-08-26-codex
+- operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
 - run-operating-model-seams-2026-08 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
 
 ## run-floor-sprint-1-2026-08
@@ -171,6 +173,9 @@ framework_version: 3.35.0
 - prove-identity-before-you-change-bytes (derived-from)
 - recognition-data-must-be-frozen-not-derived (derived-from)
 - some-changes-are-verifiable-only-by-publishing (derived-from)
+
+## run-operating-model-seams-2026-08
+- operating-model-seams-scope-2026-08-26 (pinned @bc4aabcf140445baae2c824e17fcf1249e0eda09)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

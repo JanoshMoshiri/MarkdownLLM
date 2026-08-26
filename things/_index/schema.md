@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-26
-generated: 2026-08-26T01:47:41
-generated_from: HEAD@19579ef
-coverage: 274
+generated: 2026-08-26T01:49:53
+generated_from: HEAD@cdc16e4
+coverage: 275
 framework_version: 3.35.0
 ---
 
@@ -14,13 +14,13 @@ framework_version: 3.35.0
 
 | field | things using it |
 |---|---|
-| id | 274 |
-| type | 274 |
-| status | 274 |
-| created | 274 |
-| linked_things | 268 |
-| version | 210 |
-| tags | 182 |
+| id | 275 |
+| type | 275 |
+| status | 275 |
+| created | 275 |
+| linked_things | 269 |
+| version | 211 |
+| tags | 183 |
 | confidence | 136 |
 | origin | 133 |
 | session | 133 |
@@ -31,7 +31,7 @@ framework_version: 3.35.0
 | promoted_to | 17 |
 | exposed | 14 |
 | decided_by | 14 |
-| informed_by | 13 |
+| informed_by | 14 |
 | period_start | 7 |
 | period_end | 7 |
 | domain | 7 |
