@@ -5,7 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
-current_stage: build
+current_stage: verify
 held_by: codex-desktop-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
@@ -36,7 +36,7 @@ of the first documented executions of the methodology on real work.
 
 ## Where This Is
 
-At **build**. The spec/doctrine half remains the committed design input
+At **verify**. The spec/doctrine half remains the committed design input
 (`f1ca2bc`, `96a207c`). The mandatory revision-binding floor and focused
 tests landed in `02e6c7c`; the F17 activation/fulfilment advisory stretch
 landed separately in `6d1adf8`. The focused revision suite and its
@@ -52,8 +52,7 @@ the harness that designed them is the portability evidence the framework
 claims and rarely tests, and the builder is no longer its own verifier
 (`a-same-builder-check-is-blind-to-a-self-contradictory-builder`).
 
-Carry on through verify: re-run the focused surfaces, run the full suite
-once at the gate, measure N3–N6, and attempt to *defeat* the
+Run the full suite once at this gate, measure N3–N6, and attempt to *defeat* the
 self-authorization guard rather than merely confirm it. Then reconcile
 the design's declared obligations (including the stale examples) and
 seal; version/changelog judgement and the push remain the human gates.
