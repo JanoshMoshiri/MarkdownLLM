@@ -5,7 +5,8 @@ status: evolving
 version: 1.0
 created: 2026-08-26
 origin: external
-verified: false
+verified: true
+verified_by: Janosh Moshiri
 tags: [review, independent, operating-model, workflow-state, convergence]
 linked_things:
   - id: operating-model-specification
