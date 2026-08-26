@@ -40,9 +40,38 @@ of the first documented executions of the methodology on real work.
 At **verify**. The spec/doctrine half remains the committed design input
 (`f1ca2bc`, `96a207c`). The mandatory revision-binding floor and focused
 tests landed in `02e6c7c`; the F17 activation/fulfilment advisory stretch
-landed separately in `6d1adf8`. The focused revision suite and its
-neighbouring workflow/reference suites are green, including the
-adversarial migration-plus-cursor case.
+landed separately in `6d1adf8`; self-application landed, pin-only, in
+`1725a6f`. Verification is complete and green on the changed surface.
+
+## Verify record (2026-08-26)
+
+**Full suite:** 752 passed, 1 skipped in 220.4s under `-n auto` — N7 met
+against ≤12 minutes. The focused revision-binding file passed all 11
+tests in 8.853s — N6 met against ≤120s.
+
+Steady-state budget readings:
+
+| ID | Budget | Measured | Verdict |
+|---|---|---|---|
+| N3 precommit, framework root (pinned run live) | ≤12s | 4.208s, exit 0 | met |
+| N4 precommit, 54-thing live domain | ≤5s | 1.143s | met for latency; candidate remained red on pre-existing domain-kernel drift |
+| N5 validate, same live domain | ≤3s | 0.931s, exit 0 | met |
+| N6 focused affected file | ≤120s | 8.853s | met |
+
+**Adversarial guard attempt:** a staged candidate migrated from the v1
+definition pin to a v2 revision whose graph authorised `intake → done`
+*and* moved the cursor to `done` in the same run-file diff. The candidate
+was rejected for changing both `definition_commit` and `current_stage`;
+the attack test passed in 1.822s. This attempts the bypass the guard exists
+to prevent rather than merely exercising a friendly transition.
+
+**Context, not a sprint regression:** the largest live corpus
+tested (251 things) measured ~24s and was already red on a stale
+session attestation plus domain-kernel drift. It contains no workflow
+runs, so neither revision resolution nor pinned Git reads execute there;
+its quarantine-heavy validation path is an existing separate performance
+surface, recorded rather than silently substituted for this sprint's
+changed path.
 
 ## Next — the remaining arc, carried in another harness
 
@@ -53,14 +82,10 @@ the harness that designed them is the portability evidence the framework
 claims and rarely tests, and the builder is no longer its own verifier
 (`a-same-builder-check-is-blind-to-a-self-contradictory-builder`).
 
-Run the full suite once at this gate, measure N3–N6, and attempt to *defeat* the
-self-authorization guard rather than merely confirm it. Then reconcile
-the design's declared obligations (including the stale examples) and
-seal; version/changelog judgement and the push remain the human gates.
-
-One trap, named because it is this sprint's own mechanism biting its
-author: the self-application pin will be **rejected** if it shares a
-commit with any cursor move. Pin alone. That is the guard working.
+Enter reconcile: run the declared touchpoint/literal/conceptual walk,
+bring the two stale example surfaces forward, add the domain-facing
+CHANGELOG adoption note, and regenerate any derived surfaces. Then seal;
+version judgement and the push remain the human gates.
 
 Everything else — the legs, their order, the tests, the budgets, the
 rationale for the guard — lives in
