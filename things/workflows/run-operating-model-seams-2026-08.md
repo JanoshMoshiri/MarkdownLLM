@@ -6,7 +6,7 @@ version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
 definition_commit: bbc17c355b85ae044d88f1825b445746e312e50d
-current_stage: reconcile
+current_stage: seal
 held_by: codex-desktop-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
@@ -37,12 +37,13 @@ of the first documented executions of the methodology on real work.
 
 ## Where This Is
 
-At **reconcile**. The spec/doctrine half remains the committed design input
-(`f1ca2bc`, `96a207c`). The mandatory revision-binding floor and focused
-tests landed in `02e6c7c`; the F17 activation/fulfilment advisory stretch
-landed separately in `6d1adf8`; self-application landed, pin-only, in
-`1725a6f`; verification is sealed in `4317e6c` and green on the changed
-surface.
+At **seal**. Build and verification remain as recorded below. The declared
+reconciliation walk closed in `12ff5ef`: operative wording, adoption
+templates, both example corpora, derived indexes and the worked
+self-application example now agree with the new contract. The remaining work
+is closure only — update the plan and requirements ledger to truth, make the
+version/changelog judgement, release the advisory claim, and report
+publication debt.
 
 ## Verify record (2026-08-26)
 
@@ -74,21 +75,55 @@ its quarantine-heavy validation path is an existing separate performance
 surface, recorded rather than silently substituted for this sprint's
 changed path.
 
-## Next — the remaining arc, carried in another harness
+## Reconcile record (2026-08-26)
 
-**Build through seal goes to the next session, deliberately in a
-different harness** (operator's routing, 2026-08-26). Two things come
-free from that choice: exercising verify, reconcile and **seal** outside
-the harness that designed them is the portability evidence the framework
-claims and rarely tests, and the builder is no longer its own verifier
-(`a-same-builder-check-is-blind-to-a-self-contradictory-builder`).
+**Cue:** the operator explicitly requested the reconciliation suite after the
+workflow/operating-model inflection. The significant read was pinned to
+`45a582b3fc424cb3bf812e235be3cc576615098d`; HEAD was asserted unchanged
+immediately before the reconciliation writes.
 
-Enter reconcile: run the declared touchpoint/literal/conceptual walk,
-bring the two stale example surfaces forward, add the domain-facing
-CHANGELOG adoption note, and regenerate any derived surfaces. Then seal;
-version judgement and the push remain the human gates.
+**Assimilate and walk:** declared touchpoints for workflow state, the operating
+model, the universal methodology and the substrate definition were walked with
+their linked insights, review, plan and active run. A literal sweep for
+`prior committed definition`, `definition_commit`, transition language and
+executor/authority wording found one stale operative statement in
+`validate.thing.md`, one stale maturity summary in `workflow-state.md`, and the
+anticipated birth/example adoption surfaces. Historical review and design
+statements were kept historical rather than rewritten.
 
-Everything else — the legs, their order, the tests, the budgets, the
-rationale for the guard — lives in
-`operating-model-seams-design-2026-08` and the specs it implements. This
-run deliberately does not restate any of it.
+**Actions:** `validate.thing.md` 3.1 now distinguishes pinned governing
+revisions from legacy prior-definition semantics; workflow birth templates
+teach revision pins, activation/fulfilment and performer versus gate authority;
+the life-manager definition/run pair is a real pinned worked instance with an
+initiating evidence pin; both example agents absorbed framework 3.35.0. The
+promoted workflow-run insight now distinguishes its three-field birth shape
+from the later optional revision pin. The design input's non-resolving
+transcribed SHA was corrected from Git history.
+
+The pinned example exposed a direct-validation seam: a nested corpus did not
+resolve revisions at its containing repository. The resolver now discovers the
+owning Git root once while keeping the scan scoped to the requested corpus;
+the twelfth focused gitfs test pins that case. No additional primitive or
+per-run Git scan was introduced.
+
+**Seal of the walk:** all four indexes were rebuilt (280 framework things),
+coherence has no Errors or Warnings, provenance has no sprint-specific Warning,
+and both example corpora validate without Errors or Warnings in the framework
+pass. The life-manager direct pass is also clean of Errors/Warnings apart from
+its pre-existing retrospective-cadence Info. The kernel was not regenerated:
+no `<!-- kernel -->` block moved, and the literal kernel sweep found no stale
+copy. No spec was added or removed, so the framework-map count/node residue was
+not implicated. The framework example is deliberately `exposed: false` because
+this doctrine travels through version + domain refresh, not a served face.
+
+**CHANGELOG judgement:** the changelog is a generated per-push release surface.
+The domain-facing adoption note therefore travels with the next version/push;
+writing a release entry without authorising that release would make the
+changelog contradict its own contract. Publication remains the human gate.
+
+## Next — seal
+
+Mark the sprint design complete, disposition F17–F20 on the requirements
+ledger without closing the broader ledger, run the final candidate and
+reconciliation checks, close this run at its terminal stage, and report the
+unpushed release debt. The actual push remains unauthorised.
