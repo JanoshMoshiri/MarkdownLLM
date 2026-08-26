@@ -5,6 +5,7 @@ status: active
 version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
+definition_commit: bbc17c355b85ae044d88f1825b445746e312e50d
 current_stage: verify
 held_by: codex-desktop-2026-08-26
 informed_by:
