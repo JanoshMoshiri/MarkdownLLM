@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-26
-generated: 2026-08-26T01:46:59
-generated_from: HEAD@ed44b2d
-coverage: 51
+generated: 2026-08-26T01:47:41
+generated_from: HEAD@19579ef
+coverage: 52
 framework_version: 3.35.0
 ---
 
@@ -158,6 +158,9 @@ framework_version: 3.35.0
 ## posix-floor-record-2026-08-13
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - posix-live-dispatch-record-2026-08-14 (derived-from)
+
+## review-independent-operating-model-2026-08-26-codex
+- run-operating-model-seams-2026-08 (pinned @ed44b2d1d3708524a1eddc31358176a37348d654)
 
 ## run-floor-sprint-1-2026-08
 - floor-sprint-2-scope-2026-08-22 (pinned @967773cb50f2dc9b9f661f8309c7aaacded8f4f1)

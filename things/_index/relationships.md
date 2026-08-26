@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T01:46:58
-generated_from: HEAD@ed44b2d
-coverage: 273
+generated: 2026-08-26T01:47:41
+generated_from: HEAD@19579ef
+coverage: 274
 framework_version: 3.35.0
 ---
 
@@ -858,6 +858,11 @@ framework_version: 3.35.0
 - run-floor-sprint-3-2026-08 --references--> mechanical-coherence-checks-backlog
 - run-floor-sprint-3-2026-08 --references--> floor-block-requirements-2026-08
 - run-floor-sprint-3-2026-08 --definition--> substrate-floor-development
+- run-operating-model-seams-2026-08 --references--> review-independent-operating-model-2026-08-26-codex
+- run-operating-model-seams-2026-08 --references--> floor-block-requirements-2026-08
+- run-operating-model-seams-2026-08 --references--> run-floor-sprint-3-2026-08
+- run-operating-model-seams-2026-08 --implements--> universal-workflow-methodology
+- run-operating-model-seams-2026-08 --definition--> substrate-floor-development
 - scaffold-carries-the-universal-workflow --references--> universal-workflow-methodology
 - scaffold-carries-the-universal-workflow --references--> operating-model-specification
 - scaffold-declares-visibility --extends--> boundary-disclosure-check

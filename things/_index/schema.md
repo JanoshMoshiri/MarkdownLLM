@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-26
-generated: 2026-08-26T01:46:58
-generated_from: HEAD@ed44b2d
-coverage: 273
+generated: 2026-08-26T01:47:41
+generated_from: HEAD@19579ef
+coverage: 274
 framework_version: 3.35.0
 ---
 
@@ -14,12 +14,12 @@ framework_version: 3.35.0
 
 | field | things using it |
 |---|---|
-| id | 273 |
-| type | 273 |
-| status | 273 |
-| created | 273 |
-| linked_things | 267 |
-| version | 209 |
+| id | 274 |
+| type | 274 |
+| status | 274 |
+| created | 274 |
+| linked_things | 268 |
+| version | 210 |
 | tags | 182 |
 | confidence | 136 |
 | origin | 133 |
@@ -31,7 +31,7 @@ framework_version: 3.35.0
 | promoted_to | 17 |
 | exposed | 14 |
 | decided_by | 14 |
-| informed_by | 12 |
+| informed_by | 13 |
 | period_start | 7 |
 | period_end | 7 |
 | domain | 7 |
@@ -41,10 +41,10 @@ framework_version: 3.35.0
 | coverage | 5 |
 | framework_version | 5 |
 | completed | 4 |
+| definition | 4 |
+| current_stage | 4 |
 | verified | 3 |
 | verified_by | 3 |
-| definition | 3 |
-| current_stage | 3 |
 | resolution | 2 |
 | parties | 2 |
 | source_domain | 2 |
@@ -52,4 +52,5 @@ framework_version: 3.35.0
 | source_id | 1 |
 | source_commit | 1 |
 | triggers | 1 |
+| held_by | 1 |
 | stages | 1 |
