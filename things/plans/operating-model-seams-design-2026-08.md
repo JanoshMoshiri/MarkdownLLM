@@ -1,9 +1,10 @@
 ---
 id: operating-model-seams-design-2026-08
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+version: 1.1
 created: 2026-08-26
+completed: 2026-08-26
 priority: high
 tags: [design, workflow-state, revision-binding, activation, sprint]
 informed_by:
@@ -139,3 +140,19 @@ stretch advisory fires only on completed runs.
   advisories; CHANGELOG note travels with the next version bump.
 - **Scope creep at build** — F19/F20 are sentences, not sections; if
   either grows past a paragraph it returns to analysis.
+
+## Completion (2026-08-26)
+
+All planned legs and the droppable F17 advisory shipped. The mandatory floor
+landed in `02e6c7c`, the advisory in `6d1adf8`, self-application in
+`1725a6f`, verification in `4317e6c`, and the declared reconciliation plus
+worked example in `12ff5ef`. Reconciliation added one justified regression
+case: directly validating the newly pinned nested example exposed repository
+ownership resolution, so the focused file closed with 12 tests rather than 11.
+
+N3–N7 were measured green on the changed path, the adversarial simultaneous
+pin/cursor migration was rejected, and the post-reconciliation full suite
+passed 753 tests with one skip. The remaining release action is not design
+work: the changelog/version
+entry is generated at the next authorised push, per the public surface's own
+per-push contract.

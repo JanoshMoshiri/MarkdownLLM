@@ -1,13 +1,13 @@
 ---
 id: run-operating-model-seams-2026-08
 type: workflow-run
-status: active
+status: completed
 version: 1.0
 created: 2026-08-26
+completed: 2026-08-26
 definition: substrate-floor-development
 definition_commit: bbc17c355b85ae044d88f1825b445746e312e50d
 current_stage: seal
-held_by: codex-desktop-2026-08-26
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
     commit: ed44b2d91b84215fb7a5d95f33a8dbbf2325468b
@@ -37,13 +37,12 @@ of the first documented executions of the methodology on real work.
 
 ## Where This Is
 
-At **seal**. Build and verification remain as recorded below. The declared
-reconciliation walk closed in `12ff5ef`: operative wording, adoption
+**Completed at seal.** Build and verification remain as recorded below. The
+declared reconciliation walk closed in `12ff5ef`: operative wording, adoption
 templates, both example corpora, derived indexes and the worked
-self-application example now agree with the new contract. The remaining work
-is closure only — update the plan and requirements ledger to truth, make the
-version/changelog judgement, release the advisory claim, and report
-publication debt.
+self-application example agree with the new contract. The plan and requirements
+ledger now state the outcome, the advisory claim is released, and the final
+post-reconciliation suite covers the exact Python state being sealed.
 
 ## Verify record (2026-08-26)
 
@@ -121,9 +120,26 @@ The domain-facing adoption note therefore travels with the next version/push;
 writing a release entry without authorising that release would make the
 changelog contradict its own contract. Publication remains the human gate.
 
-## Next — seal
+## Seal record (2026-08-26)
 
-Mark the sprint design complete, disposition F17–F20 on the requirements
-ledger without closing the broader ledger, run the final candidate and
-reconciliation checks, close this run at its terminal stage, and report the
-unpushed release debt. The actual push remains unauthorised.
+- The design plan is `completed`; F17–F20 are recorded met without closing the
+  broader floor requirements ledger or absorbing its unrelated open work.
+- The post-reconciliation full suite passed **753 tests with one expected skip
+  in 217.69s**. This supersedes the earlier 752-test verify count only as suite
+  coverage: both runs were green, and the added test owns the nested-corpus
+  repository seam found during reconciliation.
+- The initiating review's four seams are fulfilled by the workflow-state and
+  operating-model contracts, the revision-binding/fulfilment floor, the birth
+  templates and worked example. The example is durable produced evidence that
+  pins this run; adequacy is judged here rather than inferred from link presence.
+- No contradiction was introduced. The existing trust-input, cross-domain
+  handoff, reverse-edge and authority insights still hold; one promoted insight
+  received a historical qualifier because revision binding extended its birth
+  inventory without changing its primitive shape.
+- Version and CHANGELOG are deliberately unchanged: this public changelog is a
+  generated per-push surface, and no release/push authority was granted. The
+  local commits are publication debt, whose exact count is reported after the
+  final session-end commit.
+
+The run has reached its terminal stage and is complete. Publication is a
+separate human action, not hidden unfinished implementation work.

@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-26
-generated: 2026-08-26T03:51:21
-generated_from: HEAD@45a582b
+generated: 2026-08-26T04:00:39
+generated_from: HEAD@383a3a3
 coverage: 280
 framework_version: 3.35.0
 ---
@@ -35,12 +35,12 @@ framework_version: 3.35.0
 | period_start | 7 |
 | period_end | 7 |
 | domain | 7 |
+| completed | 6 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |
 | coverage | 5 |
 | framework_version | 5 |
-| completed | 4 |
 | definition | 4 |
 | current_stage | 4 |
 | verified | 3 |
@@ -56,5 +56,4 @@ framework_version: 3.35.0
 | demonstrates | 1 |
 | applies_to | 1 |
 | definition_commit | 1 |
-| held_by | 1 |
 | stages | 1 |

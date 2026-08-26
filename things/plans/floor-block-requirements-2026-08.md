@@ -2,7 +2,7 @@
 id: floor-block-requirements-2026-08
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-08-21
 priority: high
 tags: [requirements, floor, performance, tests, concurrency, sprint]
@@ -61,6 +61,24 @@ no new primitives for speed, typed non-definite results preserved.
 buildable is built, and the remainder is either an operator decision (F2,
 and the Node 20 trust-root bump routed to seal) or a requirement whose
 motivating measurement keeps failing to reproduce (F14).
+
+## Status at the operating-model-seams seal (2026-08-26)
+
+**Met:** F17–F20. `workflow-state.md` now carries activation/fulfilment,
+committed definition revision binding and the executor-versus-gate-authority
+contract; `operating-model.md` carries the consumer-owned contract and
+addressing qualification. The floor resolves pinned definitions, reads
+membership and edges from them, preserves legacy behaviour with an advisory,
+and rejects one-candidate pin-plus-cursor self-authorization. The stretch
+completed-run fulfilment cue also shipped. Evidence: the committed sprint run
+`run-operating-model-seams-2026-08`, its 12 focused gitfs tests, adversarial
+guard attempt, full-suite record, latency-budget table, reconciliation record
+and distilled worked example.
+
+**The broader ledger remains `in-progress`.** This seal closes only the four
+requirements added in v1.4; F2, the F8c remainder, F14 and F15 retain the
+dispositions recorded above. No unrelated open requirement was absorbed into
+this sprint or made to appear complete by its closure.
 
 ## Reference environment
 
