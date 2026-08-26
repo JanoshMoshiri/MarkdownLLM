@@ -11,6 +11,9 @@ linked_things:
   - id: a-true-primitive-is-discovered-not-authored
     relation: references
     notes: "The integration posture: the methodology arrived as doctrine the existing primitives already carry — zero mechanism was added to house it."
+  - id: the-wrong-distribution-channel-validates-clean
+    relation: references
+    notes: "Why the Distribution paragraph below exists at all: this spec was first shipped as an exposed thing on the porch, and every mechanical surface passed it. The insight is the rationale a future editor needs before deciding that paragraph is redundant."
 ---
 
 # The Universal Workflow Methodology

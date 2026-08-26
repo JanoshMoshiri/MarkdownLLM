@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-26
-generated: 2026-08-26T02:33:58
-generated_from: HEAD@f1ca2bc
-coverage: 276
+generated: 2026-08-26T02:42:24
+generated_from: HEAD@96a207c
+coverage: 279
 framework_version: 3.35.0
 ---
 
@@ -16,6 +16,8 @@ framework_version: 3.35.0
 - a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it --complements--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it --supports--> an-interface-is-what-its-consumers-call-not-what-it-declares
 - a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it --complements--> portability-claims-need-execution-tests
+- a-check-is-only-as-trustworthy-as-who-controls-its-inputs --informs--> workflow-state-specification
+- a-check-is-only-as-trustworthy-as-who-controls-its-inputs --complements--> consequence-is-recoverable-only-in-retrospect
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> cowork-integrity-estate-sweep
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> mechanical-coherence-checks-backlog
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --supports--> judgement-checks-need-a-suppression-list-which-is-itself-drift
@@ -107,6 +109,7 @@ framework_version: 3.35.0
 - a-stated-dismissal-condition-needs-a-reader --challenges--> session-memory-specification
 - a-stated-dismissal-condition-needs-a-reader --references--> trigger-specification
 - a-stated-dismissal-condition-needs-a-reader --supports--> a-uniform-answer-is-a-dead-judgment
+- a-transcribed-identifier-is-unverifiable-by-reading --supports--> a-wrong-sum-is-indistinguishable-from-a-right-one
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --references--> llm-driven-systems-manifesto
 - a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -714,6 +717,8 @@ framework_version: 3.35.0
 - operating-layer-quality-loop --references--> vendor-harness-adapter-foundation
 - operating-model-seams-design-2026-08 --informs--> run-operating-model-seams-2026-08
 - operating-model-seams-design-2026-08 --references--> floor-block-requirements-2026-08
+- operating-model-seams-design-2026-08 --implements--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
+- operating-model-seams-design-2026-08 --implements--> a-transcribed-identifier-is-unverifiable-by-reading
 - operating-model-seams-scope-2026-08-26 --informs--> run-operating-model-seams-2026-08
 - operating-model-specification --extends--> universal-workflow-methodology
 - operating-model-specification --extends--> workflow-state-specification
@@ -989,6 +994,8 @@ framework_version: 3.35.0
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
 - the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
 - the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming
+- the-wrong-distribution-channel-validates-clean --informs--> universal-workflow-methodology
+- the-wrong-distribution-channel-validates-clean --complements--> cross-domain-handoff-is-verified-external-input
 - thing-lifecycle-specification --extends--> thing-specification
 - thing-lifecycle-specification --complements--> scalability-guide
 - thing-lifecycle-specification --informs--> read-thing-specification
@@ -1016,6 +1023,7 @@ framework_version: 3.35.0
 - trigger-specification --references--> provenance-specification
 - universal-workflow-methodology --implements--> workflow-state-specification
 - universal-workflow-methodology --references--> a-true-primitive-is-discovered-not-authored
+- universal-workflow-methodology --references--> the-wrong-distribution-channel-validates-clean
 - v3-33-release-and-external-acceptance --extends--> codex-substrate-review-response-2026-08-20
 - v3-33-release-and-external-acceptance --derived-from--> independent-substrate-review-2026-08-20-claude
 - v3-33-release-and-external-acceptance --documents--> harness-capability-evidence-matrix-2026-08-20

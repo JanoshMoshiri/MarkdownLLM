@@ -16,6 +16,12 @@ linked_things:
   - id: floor-block-requirements-2026-08
     relation: references
     notes: "F17-F20 are the requirements this design meets; never restated here."
+  - id: a-check-is-only-as-trustworthy-as-who-controls-its-inputs
+    relation: implements
+    notes: "F18's self-authorization guard is this insight made mechanical: the pin is a new input to the transition check, so the run must not control both the pin and the move in one commit."
+  - id: a-transcribed-identifier-is-unverifiable-by-reading
+    relation: implements
+    notes: "F17's transcribe-never-recall rule and the stretch pin-resolution leg both answer this: the discipline is the interim, the floor check is the fix."
 ---
 
 # Design: Operating-Model Seams Sprint

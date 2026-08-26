@@ -6,7 +6,7 @@ version: 1.0
 created: 2026-08-26
 definition: substrate-floor-development
 current_stage: design
-held_by: claude-framework-session-2026-08-26
+held_by: unheld — released 2026-08-26 for the build handover; the next builder claims it
 informed_by:
   - id: review-independent-operating-model-2026-08-26-codex
     commit: ed44b2d91b84215fb7a5d95f33a8dbbf2325468b
@@ -45,11 +45,54 @@ operator reviewed the constraint set in session and pinned the guard
 agent independently drew F20's consumer-owned-contract shape — the
 convergence rule fed twice in one day.
 
-## Next
+**The spec half of build is already committed** — do not redo it:
 
-Build, per the design's commit granularity: workflow-state v0.6, then
-operating-model 0.2, then the floor legs with focused tests, then
-self-application (this run pins itself — the first pinned run). Verify
-measures N3–N6; reconcile walks the declared obligations including the
-stale examples; seal holds the human gates: version/changelog judgement
-and the push.
+- `spec: workflow-state v0.6` (f1ca2bc) — revision binding incl. the
+  self-authorization guard, activation/fulfilment, executor-vs-authority.
+- `spec: operating-model 0.2` (96a207c) — consumer contract, addressing,
+  the executor/authority row.
+
+## Next — build handover (operator's routing, 2026-08-26)
+
+The remaining build legs go to a **Codex session**; this Claude session
+returns at **verify**. Split chosen by the operator so the builder and
+the verifier are different agents — the same separation
+`a-same-builder-check-is-blind-to-a-self-contradictory-builder` argues
+for, applied deliberately rather than after the fact.
+
+**For the builder.** `operating-model-seams-design-2026-08` is the
+contract; build to it, not to this summary. Remaining legs, in its
+declared order:
+
+1. **Floor legs** — `tools/markdownllm/validation.py`, around
+   `workflow_transition_findings` (index view only, ~line 319): resolve
+   `definition_commit`; read stage membership and edges from the
+   **pinned** revision for pinned runs; keep today's prior-HEAD path for
+   unpinned runs plus the Info adoption advisory; rename-proof resolution
+   (current path first, id-scan in the pinned tree as fallback); batch
+   git reads per corpus. Register `definition_commit` where the
+   structural-reference/field registry requires it.
+2. **The non-negotiable** — reject (Error) any single commit that changes
+   both `definition_commit` and `current_stage` on the same run.
+   Rationale is `a-check-is-only-as-trustworthy-as-who-controls-its-inputs`;
+   read it before touching this leg. It is not optional and not
+   simplifiable.
+3. **Focused tests** — new `test_workflow_revision_binding.py` covering:
+   pin resolves · membership via pin · edge via pin · both-changed
+   rejection · legacy fallback + advisory · rename-proof resolution.
+   Plus activation cases beside the existing workflow tests.
+4. **Stretch, droppable** — the F17 Info advisory (completed run with no
+   initiating pin and no output pointing at it), and pin resolution at
+   the pre-commit provenance leg.
+5. **Self-application** — this run adds its own `definition_commit`,
+   becoming the estate's first revision-bound run. Its own guard applies:
+   that pin lands in a commit that moves nothing else on this run.
+
+Claim this run (`held_by`) before starting; leave the cursor at `design`
+until the build legs are committed, then advance to `build`.
+
+**Then verify** (Claude, next session): focused suites, full suite at the
+stage gate, budgets N3–N6 measured, and an adversarial read of the guard
+specifically — the verifier's job is to try to defeat it, not confirm it.
+Reconcile obligations are declared in the design (including the
+two-versions-stale examples); seal holds the human gates.
