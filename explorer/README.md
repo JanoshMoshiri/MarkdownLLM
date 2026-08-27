@@ -2,6 +2,13 @@
 
 MarkdownLLM Explorer is a standalone, read-only browser for a MarkdownLLM substrate and its nested domain estate. It shows each repository's commits, file tree, skills and memory, and renders Markdown as a styled document.
 
+> **Current release position — Windows preview.** The application is working
+> and its technical evidence is automated, but independent review and operator
+> acceptance are not yet closed. Active upgrade/uninstall synchronisation and
+> the breadth of adapter-swap evidence remain open release items, alongside
+> operator UAT and final clean-up. Do not describe this candidate as a stable or
+> production-accepted release yet.
+
 ## Start here
 
 - [Install Explorer on Windows](docs/installation-guide.md)
@@ -27,7 +34,9 @@ To build the Windows installer from source:
 ```
 
 The build requires Python 3.10+ and NSIS 3.12, but the resulting installer and
-installed application do not. The output is written to `dist/`.
+installed application do not. The output is written to the ignored `dist/`
+directory. A public installer must be rebuilt from the final immutable
+candidate, verified and attached as a release asset; it is not tracked in Git.
 
 ## Python development route
 

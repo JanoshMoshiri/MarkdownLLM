@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.4
+version: 1.5
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -14,6 +14,9 @@ linked_things:
     relation: references
   - id: framework-discovery-specification
     relation: references
+  - id: explorer-publication-position
+    relation: derived-from
+    notes: "v1.5 offers Explorer as an optional visual orientation path, never as a prerequisite or agent route."
 ---
 
 # The First Hour
@@ -70,6 +73,13 @@ PowerShell use `./tools/mdllm.ps1 <command>`; elsewhere use
    skim the headings only. This is the file an agent reads on arrival: what
    the domain is, what types exist, what to do on startup. Your domain will
    get one of these, written for you.
+
+**Optional visual route.** If you have installed the [MarkdownLLM Explorer
+Windows preview](../explorer/docs/installation-guide.md), open it now and use
+the substrate and domain lists to look around. It is a read-only orientation
+aid, not part of installing the floor and not a replacement for the agent that
+will create or change a domain. Nothing in the rest of this first hour depends
+on it.
 
 The README is the one-page overview if you want the *why*; skip
 `domain-specification-guide.md` entirely — that one is your *agent's* reading,
@@ -159,9 +169,11 @@ trace, and everything else is refinement.
 ## What to Read Next
 
 - **`operator-guide.md`** — the steady state: what the tooling carries for
-  you, the six recurring scenarios, what remains irreducibly your job.
+  you, the seven recurring scenarios, what remains irreducibly your job.
 - **`framework-map.md`** — one visual page of how the specs relate, for when
   you're curious what's underneath.
+- **Explorer's `user-guide.md`** — the short visual walkthrough if you prefer
+  to inspect the estate through the optional Windows preview.
 - Nothing else. The specifications are your agent's operating manual; read
   them when you *want* to, not because you must.
 

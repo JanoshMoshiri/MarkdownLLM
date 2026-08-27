@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.7
+version: 1.8
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -23,6 +23,9 @@ linked_things:
   - id: session-start-hardening
     relation: references
     notes: "Phase 4 landed the probe ladder here; the five-run baseline it distils is that plan's Phase 0 record."
+  - id: explorer-publication-position
+    relation: derived-from
+    notes: "v1.8 adds the optional read-only visual route while preserving the distinction between inspection and agent operation."
 ---
 
 # The Operator's Guide — Working In A Domain Since v3
@@ -71,7 +74,7 @@ The pattern across every row: mechanically decidable facts you once held in
 your head became checks the active floor can reproduce. Meaning and omissions
 remain the work of the probabilistic agent and your review.
 
-## What It Feels Like: Six Scenarios
+## What It Feels Like: Seven Scenarios
 
 ### 1. An ordinary session — nothing changed, and that's the point
 
@@ -157,6 +160,22 @@ statuses it really uses), triaging whatever the first validation pass
 surfaces, then one command to install the hook.
 
 *Spec: `domain-refresh.md`.*
+
+### 7. Seeing the estate without opening a coding harness
+
+You want to understand what exists before asking an agent to change anything.
+The optional [MarkdownLLM Explorer](../explorer/README.md) Windows preview opens
+the substrate and nested domain estate as a read-only visual surface: repository
+commits, the file tree, skills and memory, with Markdown rendered as a document.
+
+Explorer is a viewer, not an agent route. It cannot accept instructions, invoke
+skills, edit files, run `estate-sync`, validate, reconcile or publish. If its
+view is stale, synchronise the underlying repositories through the normal
+operator/agent workflow and refresh Explorer. Start with the [installation
+guide](../explorer/docs/installation-guide.md) and then the [user
+guide](../explorer/docs/user-guide.md).
+
+*Boundary: `interface.md`; release position: `explorer-publication-position`.*
 
 ## The Toolbox
 

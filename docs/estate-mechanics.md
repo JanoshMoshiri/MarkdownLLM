@@ -2,7 +2,7 @@
 id: estate-mechanics-guide
 type: guide
 status: evolving
-version: 1.4
+version: 1.5
 created: 2026-08-04
 linked_things:
   - id: git-workflow-specification
@@ -17,6 +17,9 @@ linked_things:
   - id: autopush-requires-explicit-authority
     relation: documents
     notes: "Publication transport is standing automation only under literal git.autopush true; absence never authorizes a send."
+  - id: explorer-publication-position
+    relation: derived-from
+    notes: "v1.5 clarifies that Explorer observes estate state but does not perform any operation in these three radii."
 ---
 
 # Estate Mechanics — publication, reconciliation and cadence at three radii
@@ -28,6 +31,11 @@ everything below, at every level: **the floor asks questions, gathers
 facts, and transports state; the human answers questions, routes
 divergences, and decides.** Nothing anywhere auto-edits, auto-merges, or
 auto-judges.
+
+The optional [MarkdownLLM Explorer](../explorer/README.md) can display this
+estate and its commits, but it sits outside every operational arrow below. It
+does not run `estate-sync`, `imports-check`, reconciliation or publication;
+its freshness is exactly the freshness of the repositories it reads.
 
 The architect can see these internals from memory. Nobody else can without
 reading the specs whole — this page is the shortcut. (Normative sources:

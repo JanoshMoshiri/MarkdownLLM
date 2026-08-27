@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "subject_sha256": "0fcd785db0b6d3f53645eaa43eab8184d121f4130f2cebdf65bf8ac781b5d071",
-  "subject_revalidated_at": "2026-08-27T10:56:14+01:00",
-  "subject_revalidation_basis": "The product source and packaging bytes are unchanged; the new subject adds public guides, fictional screenshots, their generator and documentation checks. The guides were exercised against the live loopback application in the in-app browser.",
+  "subject_sha256": "30c3ef82cf871f695473cba6649310b09ca873be8b3ccc48b1002f3a2e34f86a",
+  "subject_revalidated_at": "2026-08-27T15:03:32+01:00",
+  "subject_revalidation_basis": "The product source, packaging and retained browser-supporting artifacts are unchanged. This subject change only reconciles the Explorer README, public guides and cleanup note with the review-backed Windows-preview release position; the previously exercised runtime behaviours are unaffected.",
   "tool": {
     "name": "in-app-browser",
     "version": "26.818.61809"

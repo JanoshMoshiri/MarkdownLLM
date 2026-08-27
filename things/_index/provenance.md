@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T10:40:42
-generated_from: HEAD@47f7090
-coverage: 61
+generated: 2026-08-27T14:42:39
+generated_from: HEAD@1e4171f
+coverage: 64
 framework_version: 3.36.0
 ---
 
@@ -95,6 +95,14 @@ framework_version: 3.36.0
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
 
+## explorer-publication-position
+- estate-mechanics-guide (derived-from)
+- explorer-extraction-and-hosting (derived-from)
+- explorer-publication-readiness (derived-from)
+- first-hour-guide (derived-from)
+- interface-specification (derived-from)
+- operator-guide (derived-from)
+
 ## external-review-2026-08-10
 - floor-sprint-3-scope-2026-08-23 (pinned @5425f29437e94240c60ce0032ca3c424fa7c1ef9)
 
@@ -167,6 +175,12 @@ framework_version: 3.36.0
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
+
+## markdownllm-explorer-comprehensive-review-2026-08-27
+- explorer-publication-position (pinned @a8f4034dffd84df1196160ef07d68516f47bf3fb)
+
+## markdownllm-explorer-windows-distribution
+- explorer-publication-position (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 
 ## mcp-domain-server-design
 - phase-3-run-domain-task-reverted (pinned @fcd1c11)

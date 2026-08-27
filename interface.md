@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: stable
-version: 1.4
+version: 1.5
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -18,6 +18,9 @@ linked_things:
     relation: complements
   - id: write-thing-specification
     relation: complements
+  - id: explorer-publication-position
+    relation: derived-from
+    notes: "v1.5 distinguishes an optional read-only inspection surface from the human-to-agent I/O contract this specification owns."
 ---
 
 # Interface
@@ -42,6 +45,21 @@ This is a deliberate design choice:
 - Building a custom interface couples you to a platform and creates maintenance burden
 - Existing routes are already optimised for the interaction patterns you need
 - The framework's value is in the domain definition and data layer, not in the I/O mechanism
+
+### Optional inspection is not a new input route
+
+[MarkdownLLM Explorer](explorer/README.md) is an optional local presentation
+layer over the files and Git history. It makes a substrate and its domain estate
+visible to a human, but it is not a route to an LLM: it does not accept agent
+intent, load skills into a model, edit state, synchronise repositories,
+validate, reconcile or publish. The underlying Markdown and Git repositories
+remain authoritative.
+
+That distinction preserves the interface-agnostic contract. A read-only viewer
+may be added, removed, replaced or hosted separately without changing how a
+human reaches an agent or how a domain is defined. If a future Explorer begins
+carrying human intent to an LLM, that new boundary must be designed and
+verified as an input route rather than inferred from the current viewer.
 
 ## Input Routes
 
@@ -251,7 +269,7 @@ exists so the spec that owns output routes names all of them.
 ## What This Is Not
 
 - **Not a new protocol** — no WebSocket spec, no REST API, no message format to implement
-- **Not an interface framework** — no UI components, no rendering logic, no display layer
+- **Not an agent-interface framework** — the core contract defines no UI components, rendering logic or display layer; an optional viewer can sit outside it
 - **Not platform-specific** — works on any OS, any device, any LLM tool
 - **Not prescriptive** — use whatever route suits your context; switch freely
 

@@ -8,6 +8,12 @@ State lives as plain markdown files — atomic, explicitly linked, version-contr
 
 A framework discovered by agents, directed by you, and grown together. Its entry contract, markdown state, and Git floor are portable to file-aware LLM tools; discovery and lifecycle support are verified per harness rather than inferred from a product name. A domain is a plain Markdown folder and can be opened in tools such as Obsidian; full vault-compatibility remains an execution-test claim, not an assumption.
 
+**Want to see the estate before opening an agent harness?** [MarkdownLLM
+Explorer](explorer/README.md) is the optional, read-only Windows preview. It
+turns the substrate, domains, commits, files, skills and memory into a visual
+local interface without changing the files or becoming a second source of
+truth.
+
 ---
 
 ## The Partnership
@@ -78,7 +84,7 @@ Things are atomic (self-contained), linked (explicitly related to other things),
 
 ### For Humans
 
-The two documents written for the operator rather than the agent, plus the visual map:
+The human-facing guides and visual surfaces:
 
 | File | Purpose |
 |------|---------|
@@ -87,6 +93,29 @@ The two documents written for the operator rather than the agent, plus the visua
 | [framework-map.md](docs/framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping, the estate seam |
 | [estate-mechanics.md](docs/estate-mechanics.md) | Running more than one domain — the three radii of a change, sync and publication across repos |
 | [calculation-reference.md](docs/calculation-reference.md) | The `computed:` expression grammar — declared derivations the floor evaluates |
+| [Explorer installation guide](explorer/docs/installation-guide.md) | Install the read-only Windows preview without installing Python |
+| [Explorer user guide](explorer/docs/user-guide.md) | Look through the substrate, domains, commits, files, skills and memory |
+
+### Explore the estate visually
+
+MarkdownLLM Explorer is a local companion for people who want a clear way into
+the substrate without reading a repository as raw files. It discovers the
+framework and nested domain repositories, shows their Git history and tree,
+groups skills and memory, and renders Markdown as a document.
+
+Explorer is deliberately observation-only. It does not accept instructions for
+an LLM, invoke skills, edit files, synchronise repositories, validate,
+reconcile or publish. The framework remains usable without it, and the files
+and Git history remain authoritative.
+
+The current public position is a **working Windows preview** while the remaining
+independent-review findings and operator UAT are completed. The source and
+installer build recipe are tracked here; the built `.exe` is produced from the
+final candidate and attached separately as a release asset rather than
+committed to the repository. See the [installation
+guide](explorer/docs/installation-guide.md), [user
+guide](explorer/docs/user-guide.md), and [source/build
+notes](explorer/README.md).
 
 ### Foundational Specifications (Agent-Consumed)
 

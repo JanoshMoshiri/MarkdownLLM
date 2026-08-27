@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 2.0
+version: 2.1
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -20,6 +20,9 @@ linked_things:
     relation: documents
   - id: operator-guide
     relation: complements
+  - id: explorer-publication-position
+    relation: references
+    notes: "Explorer is intentionally outside the operative five-band chain: it observes files and Git but owns no framework state or authority."
 ---
 
 # Framework Map — The Visual Architecture
@@ -50,6 +53,12 @@ loads the kernel (itself generated *from* the spec layer — hence the dashed
 return edge), the specs define the types that the things in `things/`
 instantiate, `mdllm` validates declared mechanical invariants, and git makes a
 candidate the accepted recorded state at the commit boundary.
+
+The optional [MarkdownLLM Explorer](../explorer/README.md) is deliberately not
+a sixth band. It is a read-only presentation surface over the files and Git
+history shown here; it defines no thing, executes no floor rule and has no
+authority to accept or publish state. Leaving it outside the operative chain is
+the architecture, not an omission from the diagram.
 
 ```mermaid
 flowchart TD

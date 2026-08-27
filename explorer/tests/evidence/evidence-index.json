@@ -2,9 +2,9 @@
   "schema": 1,
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "0fcd785db0b6d3f53645eaa43eab8184d121f4130f2cebdf65bf8ac781b5d071"
+    "sha256": "30c3ef82cf871f695473cba6649310b09ca873be8b3ccc48b1002f3a2e34f86a"
   },
-  "generated_at": "2026-08-27T10:01:46.924753+00:00",
+  "generated_at": "2026-08-27T14:05:17.048040+00:00",
   "tool": {
     "name": "build_evidence_index.py",
     "version": "1",
@@ -34,8 +34,8 @@
     },
     {
       "path": "tests/evidence/browser-runtime.json",
-      "sha256": "52c4dd110e9455f1176cc4352c637e737ec1f3109970afe640526ea88e336150",
-      "bytes": 8255,
+      "sha256": "78e92b009fae6e02feab56a60d77edd89b932fab929c68de8a3f50e275d68f6d",
+      "bytes": 8305,
       "evidence_ids": [
         "browser::BT-SHELL-001",
         "browser::BT-NAV-001",
@@ -109,8 +109,8 @@
     },
     {
       "path": "tests/evidence/pytest.xml",
-      "sha256": "eb10ff1b54480d675a027de4fd01bd3fec7953eb66bb8b35c3388f72e946ba2e",
-      "bytes": 14229,
+      "sha256": "160c3cd17d951714422dd23c0ed5023fd3de502cda1f4f830604ac50d8c54214",
+      "bytes": 14228,
       "evidence_ids": []
     },
     {

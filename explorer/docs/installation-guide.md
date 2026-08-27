@@ -4,6 +4,10 @@ MarkdownLLM Explorer is a small, read-only window into your substrate. The
 Windows installer includes everything it needs: you do not have to install
 Python, Node or a browser extension.
 
+> Explorer is currently a **Windows preview**. Install it from a release source
+> you trust and treat it as a read-only viewer while independent review and
+> operator acceptance are completed.
+
 ## Install in three steps
 
 ### 1. Open the installer

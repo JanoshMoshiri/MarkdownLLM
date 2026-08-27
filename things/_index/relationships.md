@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T10:40:42
-generated_from: HEAD@47f7090
-coverage: 296
+generated: 2026-08-27T14:42:37
+generated_from: HEAD@1e4171f
+coverage: 299
 framework_version: 3.36.0
 ---
 
@@ -462,6 +462,7 @@ framework_version: 3.36.0
 - estate-mechanics-guide --documents--> change-reconciliation-specification
 - estate-mechanics-guide --documents--> retrospective-specification
 - estate-mechanics-guide --documents--> autopush-requires-explicit-authority
+- estate-mechanics-guide --derived-from--> explorer-publication-position
 - estate-migration-record-2026-08-14 --documents--> vendor-harness-adapter-foundation
 - estate-migration-record-2026-08-14 --derived-from--> claude-gate-5r3-acceptance-2026-08-13
 - estate-migration-record-2026-08-14 --implements--> assistant-register-does-not-graduate
@@ -490,6 +491,17 @@ framework_version: 3.36.0
 - expertise-is-an-output-not-a-prerequisite --supports--> provenance-specification
 - expertise-is-an-output-not-a-prerequisite --complements--> the-substrate-is-a-discipline-prosthesis
 - expertise-is-an-output-not-a-prerequisite --informs--> llm-driven-systems-manifesto
+- explorer-extraction-and-hosting --derived-from--> explorer-publication-position
+- explorer-extraction-and-hosting --references--> interface-specification
+- explorer-extraction-and-hosting --references--> markdownllm-explorer-windows-distribution
+- explorer-extraction-and-hosting --references--> code-architect-governs-substrate-code
+- explorer-extraction-and-hosting --dependencies--> explorer-publication-readiness
+- explorer-publication-position --informs--> interface-specification
+- explorer-publication-position --informs--> explorer-publication-readiness
+- explorer-publication-position --informs--> explorer-extraction-and-hosting
+- explorer-publication-readiness --derived-from--> explorer-publication-position
+- explorer-publication-readiness --references--> markdownllm-explorer-comprehensive-review-2026-08-27
+- explorer-publication-readiness --references--> markdownllm-explorer-windows-distribution
 - external-review-2026-08-10 --informs--> external-review-response-2026-08-10
 - external-review-2026-08-10 --informs--> coherence-is-a-maintained-rate-not-a-state
 - external-review-2026-08-10 --informs--> hook-enforcement-has-three-anchors
@@ -510,6 +522,7 @@ framework_version: 3.36.0
 - first-hour-guide --references--> domain-specification-guide
 - first-hour-guide --references--> framework-map
 - first-hour-guide --references--> framework-discovery-specification
+- first-hour-guide --derived-from--> explorer-publication-position
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
 - floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08
@@ -552,6 +565,7 @@ framework_version: 3.36.0
 - framework-map --documents--> git-workflow-specification
 - framework-map --documents--> derived-index-specification
 - framework-map --complements--> operator-guide
+- framework-map --references--> explorer-publication-position
 - framework-reserved-types-need-thing-md-as-single-source --references--> thing-specification
 - framework-retrospective-2026-05 --informs--> framework-retrospective-2026-06
 - framework-retrospective-2026-06 --informs--> framework-v3-transformation-plan
@@ -697,6 +711,7 @@ framework_version: 3.36.0
 - interface-specification --complements--> git-workflow-specification
 - interface-specification --complements--> read-thing-specification
 - interface-specification --complements--> write-thing-specification
+- interface-specification --derived-from--> explorer-publication-position
 - isolation-must-contain-writes-not-just-reads --extends--> withholding-is-not-isolation
 - isolation-must-contain-writes-not-just-reads --complements--> committed-state-carries-defects-as-faithfully-as-facts
 - isolation-must-contain-writes-not-just-reads --informs--> evidence-and-eval-backlog
@@ -805,6 +820,7 @@ framework_version: 3.36.0
 - operator-guide --references--> git-workflow-specification
 - operator-guide --implements--> an-honest-ledger-replicates-full-compliance-does-not
 - operator-guide --references--> session-start-hardening
+- operator-guide --derived-from--> explorer-publication-position
 - orchestration-specification --extends--> thing-specification
 - orchestration-specification --informs--> estate-git-sync
 - orchestration-specification --complements--> write-thing-specification
