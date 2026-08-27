@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T09:45:11
-generated_from: HEAD@e1ad077
-coverage: 294
+generated: 2026-08-27T10:15:17
+generated_from: HEAD@f235ce2
+coverage: 295
 framework_version: 3.36.0
 ---
 
@@ -55,6 +55,11 @@ framework_version: 3.36.0
 - a-degrading-command-cannot-trigger-approval-by-succeeding --informs--> vendor-harness-adapter-foundation
 - a-degrading-command-cannot-trigger-approval-by-succeeding --supports--> the-harness-bound-path-is-the-least-tested-path
 - a-degrading-command-cannot-trigger-approval-by-succeeding --complements--> agents-cannot-self-install-permission-bearing-hooks
+- a-dispatch-layer-outside-the-corpus-is-a-second-brain --informs--> closed-loop-operating-state
+- a-dispatch-layer-outside-the-corpus-is-a-second-brain --references--> trigger-specification
+- a-dispatch-layer-outside-the-corpus-is-a-second-brain --informs--> orchestration-specification
+- a-dispatch-layer-outside-the-corpus-is-a-second-brain --complements--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- a-dispatch-layer-outside-the-corpus-is-a-second-brain --supports--> tracking-artifacts-can-drift-from-reality
 - a-domain-local-ruling-is-invisible-from-the-centre --complements--> consistency-is-maintained-at-change-not-by-sweeping
 - a-domain-local-ruling-is-invisible-from-the-centre --complements--> a-generated-contract-change-is-an-estate-migration
 - a-domain-local-ruling-is-invisible-from-the-centre --references--> the-estates-second-clone-is-an-independent-witness
