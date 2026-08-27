@@ -1,0 +1,61 @@
+.shell { grid-template-columns: 270px minmax(0, 1fr) 250px; }
+.context-panel {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow: auto;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+}
+.context-head {
+  height: 74px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+.context-content { padding: 20px 18px; }
+.context-block { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.context-block:last-child { border: 0; }
+.context-block h2 { margin: 0 0 10px; color: var(--muted); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; }
+.context-block dl { margin: 0; }
+.context-block dt { margin-top: 10px; color: var(--muted); font-size: 11px; }
+.context-block dd { margin: 2px 0; overflow-wrap: anywhere; }
+.theme-field { display: flex; align-items: center; gap: 10px; }
+.theme-field select { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); padding: 6px 9px; }
+@media (max-width: 1100px) and (min-width: 851px) {
+  .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .split-view { grid-template-columns: 260px minmax(0, 1fr); }
+}
+@media (max-width: 899px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: fixed; left: -310px; width: 300px; transition: left .2s; box-shadow: var(--shadow); }
+  body.nav-open .sidebar { left: 0; }
+  .mobile-only { display: inline-grid; place-items: center; }
+  .topbar { height: auto; min-height: 88px; padding: 14px 18px; }
+  .tabs { padding: 0 18px; gap: 20px; overflow: auto; }
+  .content { padding: 20px 18px; }
+  .notice { margin: 12px 18px 0; }
+  .search-box { display: none; }
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .split-view { grid-template-columns: 1fr; }
+  .collection { max-height: 280px; }
+  .reader-body { padding: 20px; }
+  .settings-grid { grid-template-columns: 1fr; }
+  .settings-grid dt { border-bottom: 0; padding-bottom: 3px; }
+  .settings-grid dd { padding-top: 3px; }
+  .hero { flex-direction: column; }
+  .context-panel {
+    position: fixed;
+    right: -290px;
+    width: 280px;
+    z-index: 30;
+    transition: right .2s;
+    box-shadow: var(--shadow);
+  }
+  body.context-open .context-panel { right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

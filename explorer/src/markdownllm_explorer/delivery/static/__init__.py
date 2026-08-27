@@ -1,0 +1,2 @@
+"""Packaged Explorer web assets."""
+

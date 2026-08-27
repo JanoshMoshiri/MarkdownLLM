@@ -24,3 +24,6 @@ WORKLOG.md
 # Built harness bundles (mdllm bundle) are PRIVATE: the rendered config
 # names the operator's repositories. Templates are tracked; builds never are.
 .bundle-build/
+
+# Explorer's private synthetic/runtime evidence never enters the release surface.
+explorer/.test-tmp/

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MarkdownLLM Explorer</title>
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/context.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Estate navigation">
+      <header class="brand">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span><strong>MarkdownLLM</strong><small>Explorer</small></span>
+        <button id="sidebar-close" class="icon-button mobile-only" aria-label="Close navigation">×</button>
+      </header>
+      <div class="sidebar-scroll">
+        <nav id="source-nav" aria-label="Sources"></nav>
+        <section class="file-section" aria-labelledby="files-label">
+          <div class="section-heading"><span id="files-label">Source files</span><button id="tree-refresh" class="quiet-button">Refresh</button></div>
+          <div id="file-tree" class="tree" role="tree"></div>
+        </section>
+      </div>
+      <footer class="sidebar-footer"><span class="read-only-dot"></span>Read-only local view</footer>
+    </aside>
+    <main id="main" class="workspace" tabindex="-1">
+      <header class="topbar">
+        <button id="sidebar-open" class="icon-button mobile-only" aria-label="Open navigation">☰</button>
+        <div class="source-title">
+          <span id="source-icon" class="source-icon">S</span>
+          <div><h1 id="source-name">Substrate</h1><p id="source-kind">Framework source</p></div>
+        </div>
+        <div class="top-actions">
+          <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search source paths</span><input id="search-input" type="search" placeholder="Search files" autocomplete="off"></label>
+          <button id="theme-toggle" class="icon-button" aria-label="Change colour theme">◐</button>
+          <button id="context-open" class="icon-button mobile-only" aria-label="Open context panel">ⓘ</button>
+        </div>
+      </header>
+      <nav class="tabs" aria-label="Source views">
+        <button data-view="overview" class="active">Overview</button>
+        <button data-view="skills">Skills</button>
+        <button data-view="memory">Memory</button>
+        <button data-view="settings">Settings</button>
+      </nav>
+      <section id="notice" class="notice" hidden role="status"></section>
+      <section id="content" class="content" aria-live="polite"></section>
+    </main>
+    <aside id="context-panel" class="context-panel" aria-label="Source and document context">
+      <header class="context-head"><strong>Context</strong><button id="context-close" class="icon-button mobile-only" aria-label="Close context panel">×</button></header>
+      <div id="context-content" class="context-content"></div>
+    </aside>
+  </div>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
