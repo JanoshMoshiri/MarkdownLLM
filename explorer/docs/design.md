@@ -2,7 +2,7 @@
 
 **Status:** design cold review reconciled; implementation remains gated by the test trace ledger
 
-**Version:** 0.2
+**Version:** 0.3
 
 **Date:** 2026-08-27
 
@@ -29,7 +29,7 @@ Python 3.10+ is the v1 delivery language. It aligns with the deterministic floor
 
 ### D-002 — Standard-library HTTP at the edge
 
-The delivery adapter uses `http.server.ThreadingHTTPServer` with a bounded-request mixin and explicit routing. FastAPI/Flask would improve routing convenience but introduce a framework and server dependency for six GET APIs. HTTP stays outside the application boundary, so a later framework swap changes only delivery/composition and its tests.
+The delivery adapter uses `http.server.ThreadingHTTPServer` with a bounded-request mixin and explicit routing. FastAPI/Flask would improve routing convenience but introduce a framework and server dependency for seven GET APIs. HTTP stays outside the application boundary, so a later framework swap changes only delivery/composition and its tests.
 
 ### D-003 — Exactly pinned PyYAML is the only runtime package dependency
 
@@ -95,6 +95,7 @@ explorer/
 │   │   ├── browse_tree.py
 │   │   ├── search_paths.py
 │   │   ├── list_collection.py
+│   │   ├── get_settings.py
 │   │   └── read_document.py
 │   ├── adapters/
 │   │   ├── filesystem_catalogue.py
@@ -146,6 +147,7 @@ All core values are immutable dataclasses or enums.
 | `Source` | Source identity and public facts, with no native path | `id`, `kind`, `display_name`, `boundary_token`, `markers`, `git_kind` |
 | `EstateSnapshot` | One atomic ownership/catalogue observation | `sources`, `issues`, `revision`, `observed_at` |
 | `SourceIssue` | Non-fatal source discovery fact | `code`, `source_id?`, `message` |
+| `SourceSettingsRecord` | Authenticated outer source facts | `source_id`, `source_path`, `markers`, `kind`, `git_kind` |
 | `TreeNode` | One eligible directory/file row | `path`, `name`, `kind`, `size?`, `modified_at?`, `expandable` |
 | `Page[T]` | Bounded deterministic page | `items`, `next_cursor`, `partial`, `observed_at` |
 | `RepositoryState` | Git availability/state | `kind`, `head_sha?`, `branch?`, `dirty?`, `issue?` |
@@ -178,6 +180,9 @@ class PathSearch(Protocol):
 class CollectionReader(Protocol):
     def collection(self, source: Source, kind: CollectionKind,
                    cursor: str | None) -> Page[CollectionItem]: ...
+
+class SourceSettings(Protocol):
+    def settings(self, source: Source) -> SourceSettingsRecord: ...
 
 class DocumentReader(Protocol):
     def read(self, source: Source, path: RelativePath) -> RawDocument: ...
@@ -212,6 +217,7 @@ The protocols contain domain nouns and bounded operations only. They do not expo
 | `BrowseTree` | Directory-page semantics | catalogue, directory browser |
 | `SearchPaths` | Query validation and result semantics | catalogue, path search |
 | `ListCollection` | Skills/memory grouping contract | catalogue, collection reader |
+| `GetSettings` | Authenticated read-only source-path facts | catalogue, source settings |
 | `ReadDocument` | Mode-specific read/parse/link/present orchestration | catalogue, document reader, frontmatter parser, Markdown parser, link resolver, presenter |
 
 Use cases validate IDs/query shapes, call ports and return models. They do not catch generic exceptions. Expected core/application errors are typed; the single delivery boundary maps unknown failures to `internal_error` and logs only operation/request/source identity.
@@ -295,6 +301,7 @@ Static assets are source-insensitive. `/health` is unauthenticated and returns o
 | `GET /api/v1/tree` | `BrowseTree` | `source`, `path?`, `cursor?` |
 | `GET /api/v1/search` | `SearchPaths` | `source`, `q`, `cursor?` |
 | `GET /api/v1/collection` | `ListCollection` | `source`, `kind=skills|memory`, `cursor?` |
+| `GET /api/v1/settings` | `GetSettings` | `source` |
 | `GET /api/v1/document` | `ReadDocument` | `source`, `path`, `mode=raw|rendered` |
 
 Success uses `{data, meta: {request_id, observed_at, next_cursor?, partial?}}`. Public DTOs are defined in `response_encoding.py`; conversion is explicit and never serialises core/adaptor dataclasses directly. Common shapes are:
@@ -409,6 +416,6 @@ The test specification must turn this allocation into one row per requirement ID
 
 - The safe Markdown subset deliberately escapes raw HTML and omits images. Fidelity is constrained in favour of a smaller active-content boundary; real corpus goldens decide whether the subset is sufficient.
 - The source catalogue is fixed for one process. Restart is the v1 domain-add/remove refresh; file and commit reads remain live. A manual refresh control can follow after the visibility hypothesis is accepted.
-- The standard-library server is intentionally small. If route/protocol complexity grows beyond this six-GET surface, the HTTP adapter should be replaced, not expanded into application logic.
+- The standard-library server is intentionally small. If route/protocol complexity grows beyond this seven-GET surface, the HTTP adapter should be replaced, not expanded into application logic.
 - Full adversarial filesystem race resistance is OS-specific. v1 uses native handle/identity evidence and fails closed on disagreement; it does not claim protection from a fully privileged local attacker controlling the same machine.
 - Chromium runtime evidence is achievable in this environment. Firefox/Safari compatibility remains standards-backed and must be described as unexecuted until those browsers are actually exercised.

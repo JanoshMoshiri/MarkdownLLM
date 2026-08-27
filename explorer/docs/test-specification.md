@@ -8,7 +8,7 @@
 
 **Requirements:** `explorer/docs/requirements.md` v0.3
 
-**Design:** `explorer/docs/design.md` v0.2
+**Design:** `explorer/docs/design.md` v0.3
 
 ## 1. Test position
 
