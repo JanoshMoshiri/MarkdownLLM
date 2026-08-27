@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T09:35:43
-generated_from: HEAD@3c1b449
-coverage: 293
+generated: 2026-08-27T09:45:11
+generated_from: HEAD@e1ad077
+coverage: 294
 framework_version: 3.36.0
 ---
 
@@ -716,6 +716,9 @@ framework_version: 3.36.0
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> session-memory-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> orchestration-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --references--> git-workflow-specification
+- markdownllm-explorer-comprehensive-review-2026-08-27 --implements--> code-architect-governs-substrate-code
+- markdownllm-explorer-comprehensive-review-2026-08-27 --extends--> markdownllm-explorer-code-cold-review-2
+- markdownllm-explorer-comprehensive-review-2026-08-27 --references--> markdownllm-explorer-windows-distribution
 - mcp-domain-server-design --extends--> interface-specification
 - mcp-domain-server-design --complements--> provenance-specification
 - mcp-domain-server-design --complements--> orchestration-specification
