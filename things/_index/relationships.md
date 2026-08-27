@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-27
-generated: 2026-08-27T23:53:11
-generated_from: HEAD@812bfeb
-coverage: 304
+created: 2026-08-28
+generated: 2026-08-28T00:48:10
+generated_from: HEAD@1a278dd
+coverage: 305
 framework_version: 3.36.0
 ---
 
@@ -517,6 +517,9 @@ framework_version: 3.36.0
 - explorer-publication-readiness --references--> markdownllm-explorer-comprehensive-review-2026-08-27
 - explorer-publication-readiness --references--> markdownllm-explorer-windows-distribution
 - explorer-publication-readiness --references--> markdownllm-explorer-comprehensive-review-remediation-2026-08-27
+- explorer-ui-increment-2026-08 --complements--> explorer-publication-readiness
+- explorer-ui-increment-2026-08 --references--> explorer-publication-position
+- explorer-ui-increment-2026-08 --references--> explorer-extraction-and-hosting
 - external-review-2026-08-10 --informs--> external-review-response-2026-08-10
 - external-review-2026-08-10 --informs--> coherence-is-a-maintained-rate-not-a-state
 - external-review-2026-08-10 --informs--> hook-enforcement-has-three-anchors
