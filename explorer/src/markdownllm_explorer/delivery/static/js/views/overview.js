@@ -7,9 +7,9 @@ export function renderOverview(container, overview, onMore) {
       <span class="badge">${escapeText(repo.kind)}${escapeText(dirty)}</span>
     </section>
     <section class="metric-grid">
-      ${metric(overview.counts.eligible_files, "Eligible files")}
-      ${metric(overview.counts.skills, "Skills")}
-      ${metric(overview.counts.memory, "Memory things")}
+      ${metric(overview.counts.eligible_files, "Eligible files", overview.counts.partial)}
+      ${metric(overview.counts.skills, "Skills", overview.counts.partial)}
+      ${metric(overview.counts.memory, "Memory things", overview.counts.partial)}
       ${metric(overview.commits.items.length, "Commits shown")}
     </section>
     <div class="section-title"><h2>Commit history</h2><span class="badge">${repo.branch ? escapeText(repo.branch) : repo.kind}</span></div>
@@ -30,24 +30,24 @@ export function appendCommit(list, commit) {
   const row = document.createElement("article"); row.className = "list-row";
   const info = document.createElement("div");
   const title = document.createElement("h3");
-  const sha = document.createElement("span"); sha.className = "commit-sha"; sha.textContent = commit.sha.slice(0, 10);
-  sha.dataset.sha = commit.sha; sha.title = commit.sha;
+  const sha = document.createElement("span"); sha.className = "commit-sha"; sha.textContent = commit.sha.slice(0, 12);
+  sha.dataset.sha = commit.sha; sha.title = commit.sha; sha.setAttribute("aria-label", `Commit ${commit.sha}`);
   title.append(sha, document.createTextNode(commit.subject));
   const author = document.createElement("p"); author.textContent = commit.author_name;
   info.append(title, author);
   const time = document.createElement("time"); time.dateTime = commit.authored_at; time.textContent = new Date(commit.authored_at).toLocaleString();
-  row.append(info, time); list.append(row);
+  row.append(info, time); list.append(row); row.tabIndex = -1; return row;
 }
 
 export function refreshCommitAbbreviations(list) {
   const nodes = [...list.querySelectorAll(".commit-sha")];
   const values = nodes.map(node => node.dataset.sha);
   nodes.forEach(node => {
-    const value = node.dataset.sha; let length = 7;
+    const value = node.dataset.sha; let length = 12;
     while (length < value.length && values.some(other => other !== value && other.startsWith(value.slice(0, length)))) length += 1;
     node.textContent = value.slice(0, length);
   });
 }
 
-function metric(value, label) { return `<article class="metric"><strong>${Number(value).toLocaleString()}${label === "Eligible files" ? "" : ""}</strong><span>${escapeText(label)}</span></article>`; }
+function metric(value, label, partial = false) { return `<article class="metric"><strong>${partial ? "≥" : ""}${Number(value).toLocaleString()}</strong><span>${escapeText(label)}${partial ? " (partial)" : ""}</span></article>`; }
 function escapeText(value) { const span = document.createElement("span"); span.textContent = String(value ?? ""); return span.innerHTML; }

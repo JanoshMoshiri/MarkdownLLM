@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from fnmatch import fnmatchcase
-from pathlib import PurePosixPath
 
 
 ELIGIBLE_EXTENSIONS = frozenset(
@@ -51,7 +50,7 @@ class EligibilityPolicy:
             return True
         if name.startswith("."):
             return False
-        suffix = PurePosixPath(folded).suffix
+        suffix = f".{folded.rsplit('.', 1)[1]}" if "." in folded else ""
         if suffix:
             return suffix in self.eligible_extensions
         return folded in self.eligible_extensionless

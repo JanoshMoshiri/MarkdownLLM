@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import ast
+import os
+import re
 from pathlib import Path
 
 import pytest
 
 
-SOURCE = Path(__file__).parents[1] / "src" / "markdownllm_explorer"
+SOURCE = Path(os.environ.get("EXPLORER_MUTANT_SOURCE", Path(__file__).parents[1] / "src" / "markdownllm_explorer"))
 
 
 def imports(path: Path) -> set[str]:
@@ -21,7 +23,9 @@ def imports(path: Path) -> set[str]:
 @pytest.mark.architecture
 def test_core_has_no_outer_layer_imports():
     for path in (SOURCE / "core").glob("*.py"):
-        assert not any(name.startswith("markdownllm_explorer.application") or name.startswith("markdownllm_explorer.adapters") or name.startswith("markdownllm_explorer.delivery") for name in imports(path)), path
+        names = imports(path)
+        assert not any(name.startswith("markdownllm_explorer.application") or name.startswith("markdownllm_explorer.adapters") or name.startswith("markdownllm_explorer.delivery") for name in names), path
+        assert not ({"pathlib", "os", "subprocess", "http.server"} & names), path
 
 
 @pytest.mark.architecture
@@ -52,3 +56,37 @@ def test_static_assets_are_native_and_local_only():
     assert '["system", "light", "dark"]' in app
     assert "pushState" in app and "popstate" in app
     assert not (SOURCE / "delivery" / "static" / "node_modules").exists()
+
+
+@pytest.mark.architecture
+def test_use_cases_depend_on_focused_ports_and_public_encoding_is_explicit():
+    ports = (SOURCE / "application" / "ports.py").read_text(encoding="utf-8")
+    for protocol in ("SourceMetrics", "TreeReader", "PathSearcher", "CollectionReader", "DocumentReader", "SettingsReader"):
+        assert f"class {protocol}(Protocol)" in ports
+    assert "class SourceBrowser" not in ports
+    reader = (SOURCE / "adapters" / "confined_source_reader.py").read_text(encoding="utf-8")
+    assert "def collection(" not in reader and "SafeMarkdownParser" not in reader and "DocumentPresenter" not in reader
+    encoder = (SOURCE / "delivery" / "response_encoding.py").read_text(encoding="utf-8")
+    assert "asdict" not in encoder and "is_dataclass" not in encoder and "unsupported response value" in encoder
+    routes = (SOURCE / "delivery" / "api_routes.py").read_text(encoding="utf-8")
+    assert ": object" not in routes
+
+
+@pytest.mark.architecture
+def test_browser_state_declares_current_request_pagination_and_accessibility_algorithms():
+    static = SOURCE / "delivery" / "static"
+    state_js = (static / "js" / "state.js").read_text(encoding="utf-8")
+    app_js = (static / "js" / "app.js").read_text(encoding="utf-8")
+    nav_js = (static / "js" / "views" / "navigation.js").read_text(encoding="utf-8")
+    index = (static / "index.html").read_text(encoding="utf-8")
+    assert "requests: new Map()" in state_js and "identityKey" in state_js and "abortAllRequests" in state_js
+    assert all(operation in app_js for operation in ('beginRequest("view"', 'beginRequest("document"', 'beginRequest("search"', 'beginRequest("context"', "treeCursors"))
+    assert all(key in nav_js for key in ("aria-expanded", "aria-selected", "aria-level", "ArrowRight", "ArrowLeft", "Home", "End"))
+    assert 'role="tablist"' in index and 'role="tabpanel"' in index
+    assert 'aria-modal", "true"' in app_js and ".inert = true" in app_js
+    for view in (static / "js" / "views").glob("*.js"):
+        source = view.read_text(encoding="utf-8")
+        assert "fetch(" not in source, view
+        assert not re.search(r"(?:label|title|path|message)\.innerHTML\s*=", source), view
+    composition = (SOURCE / "composition.py").read_text(encoding="utf-8")
+    assert "resolve_trusted_git(root)" in composition

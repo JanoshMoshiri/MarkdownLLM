@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from urllib.parse import unquote, urlsplit
 
 from markdownllm_explorer.core.models import InlineNode, LinkCandidate, LinkKind, MarkdownBlock, MarkdownTree
 
@@ -96,8 +97,17 @@ class SafeMarkdownParser:
             link = _LINK.fullmatch(token)
             if link:
                 target = link.group(2).strip()
-                folded = target.casefold()
-                if folded.startswith(("http://", "https://", "mailto:")):
+                try:
+                    decoded_target = unquote(target, errors="strict")
+                except (UnicodeDecodeError, ValueError):
+                    decoded_target = "\x00"
+                parsed_url = urlsplit(decoded_target)
+                if (
+                    parsed_url.scheme.casefold() in {"http", "https"}
+                    and parsed_url.netloc
+                    and not any(ord(character) < 32 or ord(character) == 127 for character in decoded_target)
+                    and not target.startswith("//")
+                ):
                     kind = LinkKind.EXTERNAL
                 elif ":" in target.split("/", 1)[0] or target.startswith(("/", "//", "#")):
                     kind = LinkKind.INERT
@@ -116,4 +126,3 @@ class SafeMarkdownParser:
         if cursor < len(text):
             nodes.append(InlineNode("text", text[cursor:]))
         return tuple(nodes)
-

@@ -14,6 +14,7 @@ export function renderCollection(container, page, kind, onOpen, onMore) {
     const more = document.createElement("button"); more.className = "load-more"; more.textContent = "Load more";
     more.addEventListener("click", () => onMore(page.next_cursor, list, more)); list.append(more);
   }
+  if (page.partial) { const note = document.createElement("p"); note.className = "partial-note"; note.textContent = "This collection is partial because the source reached its scan limit."; list.append(note); }
 }
 
 export function appendItem(list, item, onOpen) {
@@ -24,5 +25,5 @@ export function appendItem(list, item, onOpen) {
   if (item.issues?.length) { const issue = document.createElement("small"); issue.className = "issue"; issue.textContent = item.issues.join(" · "); button.append(issue); }
   button.addEventListener("click", () => { list.querySelectorAll(".active").forEach(node => node.classList.remove("active")); button.classList.add("active"); onOpen(item.path); });
   list.append(button);
+  return button;
 }
-

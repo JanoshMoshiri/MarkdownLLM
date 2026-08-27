@@ -1,0 +1,79 @@
+version: 1
+requirements:
+  FR-EST-001: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_catalogue_discovers_substrate_and_only_marked_one_level_domains]}
+  FR-EST-002: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_catalogue_discovers_substrate_and_only_marked_one_level_domains, browser::BT-NAV-001]}
+  FR-EST-003: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_domain_and_substrate_return_distinct_documents]}
+  FR-EST-004: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_catalogue_discovers_substrate_and_only_marked_one_level_domains]}
+  FR-EST-005: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_domain_identity_normalisation_detects_case_and_unicode_collisions]}
+  FR-EST-006: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_catalogue_discovers_substrate_and_only_marked_one_level_domains, browser::BT-SHELL-001]}
+  FR-EST-007: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_git_history_is_exact_source_owned_and_newest_first]}
+  FR-EST-008: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_substrate_tree_excludes_owned_domain_tree_and_secrets]}
+  FR-NAV-001: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-NAV-001]}
+  FR-NAV-002: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_tree_is_lazy_sorted_and_page_cursor_is_stable, browser::BT-NAV-001]}
+  FR-NAV-003: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_directory_scan_limit_n_minus_one_n_n_plus_one, browser::BT-NAV-001]}
+  FR-NAV-004: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-DOCUMENT-001]}
+  FR-NAV-005: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-NAV-001]}
+  FR-NAV-006: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-RESPONSIVE-001, browser::BT-KEYBOARD-001]}
+  FR-TAB-001: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_git_history_is_exact_source_owned_and_newest_first, browser::BT-TABS-001]}
+  FR-TAB-002: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_git_cursor_is_pinned_to_head]}
+  FR-TAB-003: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_skills_and_memory_share_document_paths_and_report_metadata_issues, browser::BT-TABS-001]}
+  FR-TAB-004: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_skills_and_memory_share_document_paths_and_report_metadata_issues, browser::BT-TABS-001]}
+  FR-TAB-005: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_http.py::test_authenticated_api_has_public_dto_without_boundary_token, browser::BT-THEME-001]}
+  FR-TAB-006: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-KEYBOARD-001]}
+  FR-DOC-001: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_document_raw_and_rendered_modes_have_one_representation, browser::BT-DOCUMENT-001]}
+  FR-DOC-002: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_document_raw_and_rendered_modes_have_one_representation, browser::BT-DOCUMENT-001]}
+  FR-DOC-003: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_parsing.py::test_supported_markdown_structures_render_without_client_parser, browser::BT-DOCUMENT-001]}
+  FR-DOC-004: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-DOCUMENT-001]}
+  FR-DOC-005: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_unsupported_and_excluded_documents_have_stable_codes]}
+  FR-DOC-006: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_document_links_are_same_source_markdown_or_labelled_https_only, browser::BT-DOCUMENT-001]}
+  FR-DOC-007: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_core.py::test_secret_names_are_ineligible]}
+  FR-DOC-008: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_unsupported_and_excluded_documents_have_stable_codes]}
+  FR-SRCH-001: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_search_returns_only_eligible_owned_paths, browser::BT-SEARCH-001]}
+  FR-SRCH-002: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-SEARCH-001, browser::BT-RESPONSIVE-001]}
+  FR-RUN-001: {disposition: mixed, owner: runtime-suite, evidence: [pytest::tests/test_cli.py::test_cli_launches_from_arbitrary_cwd_with_packaged_assets, system::ST-INSTALL-001]}
+  FR-RUN-002: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_http.py::test_api_requires_exact_capability_host_and_origin]}
+  FR-RUN-003: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_http.py::test_only_get_and_head_are_allowed]}
+  FR-ERR-001: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_http.py::test_http_boundary_attacks_return_stable_public_errors]}
+  FR-ERR-002: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_browser_state.py::test_browser_request_state_rejects_a_after_b_and_isolates_operations, browser::BT-ASYNC-001]}
+  FR-UI-001: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-SHELL-001]}
+  FR-UI-002A: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-SHELL-001]}
+  FR-UI-002B: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-TABS-001]}
+  FR-UI-002C: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-DOCUMENT-001]}
+  FR-UI-003: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-THEME-001]}
+  FR-UI-004: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-RESPONSIVE-001]}
+  NFR-ARCH-001: {disposition: automated, owner: architecture-suite, evidence: [pytest::tests/test_architecture.py::test_core_has_no_outer_layer_imports]}
+  NFR-ARCH-002: {disposition: automated, owner: architecture-suite, evidence: [pytest::tests/test_architecture.py::test_use_cases_depend_on_focused_ports_and_public_encoding_is_explicit]}
+  NFR-ARCH-003: {disposition: automated, owner: architecture-suite, evidence: [pytest::tests/test_architecture.py::test_application_has_no_infrastructure_or_delivery_imports]}
+  NFR-ACC-001: {disposition: browser, owner: browser-runtime, evidence: [browser::BT-A11Y-001, browser::BT-RESPONSIVE-001, browser::BT-KEYBOARD-001]}
+  NFR-PERF-001: {disposition: analysis, owner: performance-runner, evidence: [analysis::PT-SCALE-001]}
+  NFR-PERF-002: {disposition: analysis, owner: performance-runner, evidence: [analysis::PT-SCALE-001]}
+  NFR-SAFE-001A: {disposition: automated, owner: safety-suite, evidence: [pytest::tests/test_safety.py::test_full_acceptance_journeys_leave_source_and_git_state_immutable]}
+  NFR-SAFE-001B: {disposition: automated, owner: safety-suite, evidence: [pytest::tests/test_adapters.py::test_git_adapter_supplies_fixed_argv_environment_and_limits, pytest::tests/test_safety.py::test_full_acceptance_journeys_leave_source_and_git_state_immutable]}
+  NFR-SAFE-001C: {disposition: automated, owner: safety-suite, evidence: [pytest::tests/test_safety.py::test_full_acceptance_journeys_leave_source_and_git_state_immutable]}
+  NFR-SAFE-002A: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_core.py::test_relative_path_rejects_ambiguous_or_outside_forms]}
+  NFR-SAFE-002B: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_adapters.py::test_reparse_or_symlink_parent_is_rejected_even_when_target_stays_inside_source]}
+  NFR-SAFE-003: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_http.py::test_api_requires_exact_capability_host_and_origin]}
+  NFR-SAFE-004: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_parsing.py::test_frontmatter_collection_budget_n_minus_one_n_n_plus_one, pytest::tests/test_adapters.py::test_directory_scan_limit_n_minus_one_n_n_plus_one]}
+  NFR-SAFE-005: {disposition: mixed, owner: explorer-suite, evidence: [pytest::tests/test_http.py::test_all_method_and_busy_responses_validate_boundary_and_share_security_headers, browser::BT-DOCUMENT-001]}
+  NFR-OFF-001: {disposition: mixed, owner: runtime-suite, evidence: [system::ST-INSTALL-001, system::ST-OFFLINE-001]}
+  NFR-PORT-001: {disposition: mixed, owner: runtime-suite, evidence: [pytest::tests/test_meta.py::test_supported_python_range_is_declared, system::ST-INSTALL-001]}
+  NFR-OBS-001: {disposition: automated, owner: explorer-suite, evidence: [pytest::tests/test_http.py::test_http_boundary_attacks_return_stable_public_errors]}
+  NFR-TEST-001: {disposition: analysis, owner: evidence-verifier, evidence: [analysis::TRACE-001]}
+  NFR-TEST-002: {disposition: analysis, owner: mutation-runner, evidence: [analysis::MT-MUTATION-001]}
+mutants:
+  M01: {subject: remove substrate domain exclusion, evidence: mutation::M01, tests: [tests/test_adapters.py::test_substrate_tree_excludes_owned_domain_tree_and_secrets]}
+  M02: {subject: make collision detection last-write-wins, evidence: mutation::M02, tests: [tests/test_adapters.py::test_domain_identity_normalisation_detects_case_and_unicode_collisions]}
+  M03: {subject: follow a reparse or symlink parent, evidence: mutation::M03, tests: [tests/test_adapters.py::test_reparse_or_symlink_parent_is_rejected_even_when_target_stays_inside_source]}
+  M04: {subject: reject a file at the permitted byte limit, evidence: mutation::M04, tests: [tests/test_adapters.py::test_file_size_limit_enforces_n_minus_one_n_and_n_plus_one]}
+  M05: {subject: bypass YAML event safety validation, evidence: mutation::M05, tests: [tests/test_parsing.py::test_frontmatter_rejects_aliases_duplicate_and_merge_keys]}
+  M06: {subject: treat unsafe URL schemes as relative, evidence: mutation::M06, tests: [tests/test_parsing.py::test_markdown_raw_html_and_unsafe_links_are_inert]}
+  M07: {subject: return multiple document representations, evidence: mutation::M07, tests: [tests/test_http.py::test_document_api_returns_exactly_one_mode_representation]}
+  M08: {subject: disable cursor HMAC comparison, evidence: mutation::M08, tests: [tests/test_core.py::test_cursor_is_signed_and_bound_to_operation_source_and_context]}
+  M09: {subject: defer Git executable lookup to source cwd, evidence: mutation::M09, tests: [tests/test_architecture.py::test_browser_state_declares_current_request_pagination_and_accessibility_algorithms]}
+  M10: {subject: omit optional-lock and lazy-fetch controls, evidence: mutation::M10, tests: [tests/test_adapters.py::test_git_adapter_supplies_fixed_argv_environment_and_limits]}
+  M11: {subject: accept a missing capability, evidence: mutation::M11, tests: [tests/test_http.py::test_api_requires_exact_capability_host_and_origin]}
+  M12: {subject: log the raw request target, evidence: mutation::M12, tests: [tests/test_http.py::test_http_boundary_attacks_return_stable_public_errors]}
+  M13: {subject: bypass admission control before thread creation, evidence: mutation::M13, tests: [tests/test_http.py::test_all_method_and_busy_responses_validate_boundary_and_share_security_headers]}
+  M14: {subject: accept stale response A after current B, evidence: mutation::M14, tests: [tests/test_browser_state.py::test_browser_request_state_rejects_a_after_b_and_isolates_operations]}
+  M15: {subject: insert repository metadata with innerHTML, evidence: mutation::M15, tests: [tests/test_architecture.py::test_browser_state_declares_current_request_pagination_and_accessibility_algorithms]}
+  M16: {subject: let a browser view call fetch directly, evidence: mutation::M16, tests: [tests/test_architecture.py::test_browser_state_declares_current_request_pagination_and_accessibility_algorithms]}

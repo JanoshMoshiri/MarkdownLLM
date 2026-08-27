@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import html
 
-from markdownllm_explorer.core.models import InlineNode, MarkdownTree, ResolvedLink
+from markdownllm_explorer.core.models import InlineNode, LinkKind, MarkdownTree, ResolvedLink
 
 
 class DocumentPresenter:
@@ -20,9 +20,7 @@ class DocumentPresenter:
             elif block.kind == "rule":
                 output.append("<hr>")
             elif block.kind == "code":
-                language = block.items[0][0].text if block.items else ""
-                class_name = f' class="language-{html.escape(language, quote=True)}"' if language else ""
-                output.append(f"<pre><code{class_name}>{html.escape(block.text)}</code></pre>")
+                output.append(f"<pre><code>{html.escape(block.text)}</code></pre>")
             elif block.kind in {"list", "ordered_list"}:
                 tag = "ol" if block.kind == "ordered_list" else "ul"
                 items = "".join(f"<li>{self._inline(item, resolved)}</li>" for item in block.items)
@@ -47,12 +45,11 @@ class DocumentPresenter:
                 parts.append(f"<em>{text}</em>")
             elif node.kind == "link" and node.link_index is not None:
                 link = links[node.link_index]
-                if link.href:
-                    external = ' target="_blank" rel="noopener noreferrer"' if link.kind.value == "external" else ""
+                if link.href and link.kind is not LinkKind.INERT:
+                    external = ' target="_blank" rel="noopener noreferrer external"' if link.kind.value == "external" else ""
                     parts.append(f'<a href="{html.escape(link.href, quote=True)}"{external}>{text}</a>')
                 else:
                     parts.append(f'<span class="inert-link">{text}</span>')
             else:
                 parts.append(text)
         return "".join(parts)
-

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import PurePosixPath
 from typing import Generic, Mapping, TypeVar
 from urllib.parse import quote
 
@@ -78,7 +77,7 @@ class RelativePath:
         parts = value.split("/") if value else []
         if any(part in {"", ".", ".."} for part in parts):
             raise ExplorerError("invalid_path", relative_path=None)
-        normalised = PurePosixPath(*parts).as_posix() if parts else ""
+        normalised = "/".join(parts)
         return cls(normalised)
 
     @property

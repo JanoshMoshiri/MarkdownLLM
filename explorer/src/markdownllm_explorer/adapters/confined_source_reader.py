@@ -7,50 +7,47 @@ import os
 import stat
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
-from urllib.parse import quote
+from urllib.parse import unquote
 
 from markdownllm_explorer.core.eligibility import EligibilityPolicy
 from markdownllm_explorer.core.errors import ExplorerError
 from markdownllm_explorer.core.limits import ExplorerLimits
 from markdownllm_explorer.core.models import (
-    BoundaryToken, CollectionItem, DocumentMode, DocumentRecord, EntryKind, FrontmatterResult, FrontmatterState,
-    LinkKind, Page, RelativePath, ResolvedLink, SourceCounts, SourceSettingsRecord, TreeNode,
+    BoundaryToken, EntryKind, Page, RawDocument, RelativePath, SourceCounts, SourceSettingsRecord, TreeNode,
 )
 
 from .cursors import CursorCodec, CursorState
-from .document_presenter import DocumentPresenter
 from .filesystem_catalogue import BoundaryRegistry, SourceBoundary, _is_reparse
-from .frontmatter_parser import FrontmatterParser
-from .safe_markdown_parser import SafeMarkdownParser
 
 
 class ConfinedSourceReader:
     def __init__(
         self, registry: BoundaryRegistry, policy: EligibilityPolicy, limits: ExplorerLimits,
-        cursors: CursorCodec, frontmatter: FrontmatterParser, markdown: SafeMarkdownParser,
-        presenter: DocumentPresenter,
+        cursors: CursorCodec,
     ) -> None:
         self._registry = registry
         self._policy = policy
         self._limits = limits
         self._cursors = cursors
-        self._frontmatter = frontmatter
-        self._markdown = markdown
-        self._presenter = presenter
 
     def counts(self, token: BoundaryToken) -> SourceCounts:
         boundary = self._registry.by_token(token)
         eligible = skills = memory = 0
         partial = False
-        for relative, _ in self._walk(boundary):
-            eligible += 1
-            if relative.parts and relative.parts[0].casefold() == "skills" and relative.name.casefold().endswith((".md", ".markdown")):
-                skills += 1
-            if self._memory_group(relative):
-                memory += 1
-            if eligible >= self._limits.candidate_scan:
-                partial = True
-                break
+        try:
+            for relative, _ in self._walk(boundary):
+                eligible += 1
+                if relative.parts and relative.parts[0].casefold() == "skills" and relative.name.casefold().endswith((".md", ".markdown")):
+                    skills += 1
+                if self._memory_group(relative):
+                    memory += 1
+                if eligible >= self._limits.candidate_scan:
+                    partial = True
+                    break
+        except ExplorerError as error:
+            if error.code != "directory_limit":
+                raise
+            partial = True
         return SourceCounts(eligible, skills, memory, partial)
 
     def tree(self, token: BoundaryToken, path: RelativePath, cursor: str | None) -> Page[TreeNode]:
@@ -60,15 +57,11 @@ class ConfinedSourceReader:
         directory = self._resolve_directory(boundary, path)
         nodes: list[TreeNode] = []
         try:
-            before_directory = directory.stat(follow_symlinks=False)
-            entries = list(os.scandir(directory))
-            after_directory = directory.stat(follow_symlinks=False)
+            entries = self._bounded_entries(directory)
         except FileNotFoundError:
             raise ExplorerError("file_not_found") from None
         except OSError:
             raise ExplorerError("source_unreadable") from None
-        if not _same_file(before_directory, after_directory) or before_directory.st_mtime_ns != after_directory.st_mtime_ns:
-            raise ExplorerError("source_changed")
         for entry in entries:
             child = path.child(entry.name)
             if self._excluded(boundary, child, entry.name) or (entry.is_dir(follow_symlinks=False) and self._policy.is_ignored_directory(entry.name)):
@@ -99,13 +92,18 @@ class ConfinedSourceReader:
         matches: list[TreeNode] = []
         scanned = 0
         partial = False
-        for relative, info in self._walk(boundary):
-            scanned += 1
-            if folded in relative.value.casefold():
-                matches.append(TreeNode(relative, relative.name, EntryKind.FILE, info.st_size, _iso(info.st_mtime)))
-            if scanned >= self._limits.candidate_scan:
-                partial = True
-                break
+        try:
+            for relative, info in self._walk(boundary):
+                scanned += 1
+                if folded in relative.value.casefold():
+                    matches.append(TreeNode(relative, relative.name, EntryKind.FILE, info.st_size, _iso(info.st_mtime)))
+                if scanned >= self._limits.candidate_scan:
+                    partial = True
+                    break
+        except ExplorerError as error:
+            if error.code != "directory_limit":
+                raise
+            partial = True
         matches.sort(key=lambda item: item.path.value.casefold())
         revision = self._revision(matches) + ("-partial" if partial else "")
         state = self._cursors.decode(cursor, operation="search", source=boundary.source.id.value, context=folded)
@@ -114,79 +112,14 @@ class ConfinedSourceReader:
         page = self._page(matches, state.offset, self._limits.search_page, "search", boundary, folded, revision)
         return Page(page.items, page.next_cursor, page.partial or partial, page.observed_at)
 
-    def collection(self, token: BoundaryToken, kind: str, cursor: str | None) -> Page[CollectionItem]:
-        boundary = self._registry.by_token(token)
-        if kind not in {"skills", "memory"}:
-            raise ExplorerError("invalid_request")
-        candidates: list[CollectionItem] = []
-        ids: dict[str, list[int]] = {}
-        scanned = 0
-        partial = False
-        for relative, _ in self._walk(boundary):
-            group = ""
-            if kind == "skills":
-                if not (relative.parts and relative.parts[0].casefold() == "skills" and relative.name.casefold().endswith((".md", ".markdown"))):
-                    continue
-                group = "Skills"
-            else:
-                group = self._memory_group(relative) or ""
-                if not group:
-                    continue
-            scanned += 1
-            issues: list[str] = []
-            title = relative.name.rsplit(".", 1)[0].replace("-", " ").replace("_", " ").title()
-            thing_id = thing_type = None
-            try:
-                raw = self._read_text(boundary, relative)
-                parsed = self._frontmatter.parse(raw[0])
-                if parsed.frontmatter.state is FrontmatterState.VALID:
-                    values = parsed.frontmatter.values
-                    thing_id = _string(values.get("id"))
-                    thing_type = _string(values.get("type"))
-                    title = self._title(parsed.body) or title
-                    if kind == "memory" and thing_type and thing_type.casefold() != group.rstrip("s").casefold():
-                        issues.append("frontmatter_type_mismatch")
-                elif parsed.frontmatter.state is FrontmatterState.INVALID:
-                    issues.append("frontmatter_invalid")
-                elif kind == "memory":
-                    issues.append("frontmatter_missing")
-            except ExplorerError as error:
-                issues.append(error.code)
-            item_index = len(candidates)
-            candidates.append(CollectionItem(relative, title, group, thing_id, thing_type, tuple(issues)))
-            if thing_id:
-                ids.setdefault(thing_id, []).append(item_index)
-            if scanned >= self._limits.memory_candidates:
-                partial = True
-                break
-        for indexes in ids.values():
-            if len(indexes) > 1:
-                for item_index in indexes:
-                    item = candidates[item_index]
-                    candidates[item_index] = CollectionItem(item.path, item.title, item.group, item.thing_id, item.thing_type, (*item.issues, "duplicate_id"))
-        candidates.sort(key=lambda item: (item.group.casefold(), item.title.casefold(), item.path.value))
-        revision = self._revision(candidates) + ("-partial" if partial else "")
-        state = self._cursors.decode(cursor, operation="collection", source=boundary.source.id.value, context=kind)
-        if state.revision and state.revision != revision:
-            raise ExplorerError("source_changed")
-        page = self._page(candidates, state.offset, self._limits.search_page, "collection", boundary, kind, revision)
-        return Page(page.items, page.next_cursor, page.partial or partial, page.observed_at)
-
-    def document(self, token: BoundaryToken, path: RelativePath, mode: DocumentMode) -> DocumentRecord:
+    def read(self, token: BoundaryToken, path: RelativePath) -> RawDocument:
         boundary = self._registry.by_token(token)
         text, size, modified = self._read_text(boundary, path)
-        is_markdown = PurePosixPath(path.value.casefold()).suffix in {".md", ".markdown"}
-        parsed = self._frontmatter.parse(text) if is_markdown else None
-        frontmatter = parsed.frontmatter if parsed else FrontmatterResult(FrontmatterState.ABSENT)
-        issues = (frontmatter.error_code,) if frontmatter.error_code else ()
-        actual_mode = mode if is_markdown else DocumentMode.RAW
-        if actual_mode is DocumentMode.RAW:
-            content = text
-        else:
-            tree = self._markdown.parse(parsed.body if parsed else text)
-            resolved = tuple(self._resolve_link(boundary, path, link) for link in tree.links)
-            content = self._presenter.render(tree, resolved)
-        return DocumentRecord(boundary.source.id, path, actual_mode, content, frontmatter, size, modified, tuple(issue for issue in issues if issue))
+        return RawDocument(boundary.source.id, path, text, size, modified)
+
+    def iter_files(self, token: BoundaryToken):
+        boundary = self._registry.by_token(token)
+        yield from self._walk(boundary)
 
     def settings(self, token: BoundaryToken) -> SourceSettingsRecord:
         boundary = self._registry.by_token(token)
@@ -266,19 +199,19 @@ class ConfinedSourceReader:
 
     def _walk(self, boundary: SourceBoundary):
         stack: list[tuple[Path, RelativePath, int]] = [(boundary.root, RelativePath(), 0)]
+        examined = 0
         while stack:
             directory, relative_dir, depth = stack.pop()
             if depth >= self._limits.directory_depth:
                 continue
             try:
-                before_directory = directory.stat(follow_symlinks=False)
-                entries = list(os.scandir(directory))
-                after_directory = directory.stat(follow_symlinks=False)
+                entries = self._bounded_entries(directory)
             except OSError:
                 continue
-            if not _same_file(before_directory, after_directory) or before_directory.st_mtime_ns != after_directory.st_mtime_ns:
-                raise ExplorerError("source_changed")
             for entry in sorted(entries, key=lambda item: item.name.casefold(), reverse=True):
+                examined += 1
+                if examined > self._limits.candidate_scan:
+                    raise ExplorerError("directory_limit")
                 child = relative_dir.child(entry.name)
                 if self._excluded(boundary, child, entry.name):
                     continue
@@ -293,6 +226,19 @@ class ConfinedSourceReader:
                         yield child, entry.stat(follow_symlinks=False)
                 except OSError:
                     continue
+
+    def _bounded_entries(self, directory: Path) -> list[os.DirEntry[str]]:
+        before = directory.stat(follow_symlinks=False)
+        entries: list[os.DirEntry[str]] = []
+        with os.scandir(directory) as iterator:
+            for entry in iterator:
+                entries.append(entry)
+                if len(entries) > self._limits.candidate_scan:
+                    raise ExplorerError("directory_limit")
+        after = directory.stat(follow_symlinks=False)
+        if not _same_file(before, after) or before.st_mtime_ns != after.st_mtime_ns:
+            raise ExplorerError("source_changed")
+        return entries
 
     def _excluded(self, boundary: SourceBoundary, relative: RelativePath, name: str) -> bool:
         if self._policy.is_secret_name(name) or any(self._policy.is_ignored_directory(part) for part in relative.parts[:-1]):
@@ -315,12 +261,9 @@ class ConfinedSourceReader:
         groups = {"insights": "Insights", "conflicts": "Conflicts", "retrospectives": "Retrospectives", "decisions": "Decisions"}
         return groups.get(relative.parts[1].casefold())
 
-    def _resolve_link(self, boundary: SourceBoundary, document: RelativePath, link) -> ResolvedLink:
-        if link.kind is LinkKind.EXTERNAL:
-            return ResolvedLink(link.label, link.kind, link.raw_target)
-        if link.kind is not LinkKind.RELATIVE:
-            return ResolvedLink(link.label, LinkKind.INERT)
-        target_text = link.raw_target.split("#", 1)[0].split("?", 1)[0]
+    def resolve_markdown_target(self, token: BoundaryToken, document: RelativePath, raw_target: str) -> RelativePath | None:
+        boundary = self._registry.by_token(token)
+        target_text = unquote(raw_target.split("#", 1)[0].split("?", 1)[0], errors="strict")
         try:
             combined = PurePosixPath(document.parent.value) / target_text
             parts: list[str] = []
@@ -333,13 +276,21 @@ class ConfinedSourceReader:
                     parts.append(part)
             target = RelativePath.parse("/".join(parts))
             candidate = boundary.root.joinpath(*target.parts)
-            if self._excluded(boundary, target, target.name) or not candidate.is_file() or _is_reparse(candidate) or not self._policy.is_eligible_file(target.name):
-                return ResolvedLink(link.label, LinkKind.INERT)
-            candidate.resolve(strict=True).relative_to(boundary.root)
-            href = f"#source={quote(boundary.source.id.value, safe='')}&path={target.quoted()}"
-            return ResolvedLink(link.label, LinkKind.RELATIVE, href)
+            if (
+                self._excluded(boundary, target, target.name)
+                or not candidate.is_file()
+                or _is_reparse(candidate)
+                or PurePosixPath(target.name.casefold()).suffix not in {".md", ".markdown"}
+            ):
+                return None
+            self._reject_reparse_components(boundary, target)
+            resolved = candidate.resolve(strict=True)
+            resolved.relative_to(boundary.root)
+            if boundary.excluded_root is not None and _inside(resolved, boundary.excluded_root):
+                return None
+            return target
         except (ValueError, OSError, ExplorerError):
-            return ResolvedLink(link.label, LinkKind.INERT)
+            return None
 
     def _page(self, items, offset: int, limit: int, operation: str, boundary: SourceBoundary, context: str, revision: str):
         selected = tuple(items[offset:offset + limit])
@@ -352,14 +303,6 @@ class ConfinedSourceReader:
     def _revision(items) -> str:
         content = "\n".join(repr(item) for item in items).encode()
         return hashlib.sha256(content).hexdigest()
-
-    @staticmethod
-    def _title(body: str) -> str | None:
-        for line in body.splitlines():
-            if line.startswith("# "):
-                return line[2:].strip()
-        return None
-
 
 def _same_file(left: os.stat_result, right: os.stat_result) -> bool:
     return (left.st_dev, left.st_ino, stat.S_IFMT(left.st_mode)) == (right.st_dev, right.st_ino, stat.S_IFMT(right.st_mode))
@@ -375,10 +318,6 @@ def _inside(candidate: Path, root: Path) -> bool:
 
 def _iso(timestamp: float) -> str:
     return datetime.fromtimestamp(timestamp, timezone.utc).isoformat()
-
-
-def _string(value: object) -> str | None:
-    return value if isinstance(value, str) and value else None
 
 
 def _opened_final_path(handle) -> Path | None:

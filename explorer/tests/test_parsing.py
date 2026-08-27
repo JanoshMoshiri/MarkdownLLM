@@ -34,10 +34,43 @@ def test_frontmatter_byte_budget_is_enforced():
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize(("limit", "value", "valid"), [(7, "123456", True), (6, "123456", True), (5, "123456", False)])
+def test_frontmatter_scalar_budget_n_minus_one_n_n_plus_one(limit, value, valid):
+    parsed = FrontmatterParser(ExplorerLimits(frontmatter_scalar_bytes=limit)).parse(f"---\nvalue: {value}\n---\nbody")
+    assert (parsed.frontmatter.state is FrontmatterState.VALID) is valid
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(("items", "valid"), [(2, True), (3, True), (4, False)])
+def test_frontmatter_collection_budget_n_minus_one_n_n_plus_one(items, valid):
+    values = ", ".join(str(index) for index in range(items))
+    parsed = FrontmatterParser(ExplorerLimits(frontmatter_collection_items=3)).parse(f"---\nvalues: [{values}]\n---\nbody")
+    assert (parsed.frontmatter.state is FrontmatterState.VALID) is valid
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(("depth", "valid"), [(2, True), (3, True), (4, False)])
+def test_frontmatter_depth_budget_n_minus_one_n_n_plus_one(depth, valid):
+    nested = "value"
+    for _ in range(depth - 1):
+        nested = f"[{nested}]"
+    parsed = FrontmatterParser(ExplorerLimits(frontmatter_depth=3)).parse(f"---\nroot: {nested}\n---\nbody")
+    assert (parsed.frontmatter.state is FrontmatterState.VALID) is valid
+
+
+@pytest.mark.unit
+def test_frontmatter_rejects_unsupported_tags_and_non_finite_or_wide_numbers():
+    parser = FrontmatterParser(ExplorerLimits())
+    for value in ("!python/object value", ".inf", str(2**64)):
+        parsed = parser.parse(f"---\nvalue: {value}\n---\nbody")
+        assert parsed.frontmatter.state is FrontmatterState.INVALID
+
+
+@pytest.mark.unit
 def test_markdown_raw_html_and_unsafe_links_are_inert():
-    tree = SafeMarkdownParser().parse("# Safe\n\n<script>alert(1)</script> [bad](javascript:alert(1)) [good](guide.md)")
+    tree = SafeMarkdownParser().parse("# Safe\n\n<script>alert(1)</script> [bad](javascript:alert(1)) [mail](mailto:test@example.invalid) [good](guide.md) [web](https://example.invalid)")
     resolved = tuple(
-        ResolvedLink(link.label, LinkKind.INERT) if link.label == "bad" else ResolvedLink(link.label, link.kind, "#safe")
+        ResolvedLink(link.label, LinkKind.INERT) if link.kind is LinkKind.INERT else ResolvedLink(link.label, link.kind, "#safe")
         for link in tree.links
     )
     rendered = DocumentPresenter().render(tree, resolved)
@@ -45,6 +78,8 @@ def test_markdown_raw_html_and_unsafe_links_are_inert():
     assert "&lt;script&gt;" in rendered
     assert "javascript:" not in rendered
     assert '<span class="inert-link">bad</span>' in rendered
+    assert "mailto:" not in rendered and '<span class="inert-link">mail</span>' in rendered
+    assert "language-" not in rendered
 
 
 @pytest.mark.unit
@@ -54,4 +89,3 @@ def test_supported_markdown_structures_render_without_client_parser():
     rendered = DocumentPresenter().render(tree, ())
     for tag in ("<h1>", "<strong>", "<code>", "<ul>", "<blockquote>", "<table>", "<pre>"):
         assert tag in rendered
-

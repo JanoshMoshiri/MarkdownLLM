@@ -13,6 +13,7 @@ from urllib.parse import quote
 
 from markdownllm_explorer.core.eligibility import EligibilityPolicy
 from markdownllm_explorer.core.errors import ExplorerError
+from markdownllm_explorer.core.limits import ExplorerLimits
 from markdownllm_explorer.core.models import (
     BoundaryToken, EstateSnapshot, GitKind, Source, SourceId, SourceIssue, SourceKind,
 )
@@ -50,7 +51,10 @@ class BoundaryRegistry:
 
 
 class FilesystemSourceCatalogue:
-    def __init__(self, root: Path, domain_dir: str, registry: BoundaryRegistry, policy: EligibilityPolicy) -> None:
+    def __init__(
+        self, root: Path, domain_dir: str, registry: BoundaryRegistry,
+        policy: EligibilityPolicy, limits: ExplorerLimits | None = None,
+    ) -> None:
         requested = root.expanduser().absolute()
         if not requested.exists() or not requested.is_dir():
             raise ExplorerError("source_unreadable", detail="Configured root is not a readable directory")
@@ -61,6 +65,7 @@ class FilesystemSourceCatalogue:
         self._domain_root = self._root.joinpath(*self._domain_relative.parts)
         self._registry = registry
         self._policy = policy
+        self._limits = limits or ExplorerLimits()
         self._snapshot: EstateSnapshot | None = None
 
     @property
@@ -75,30 +80,38 @@ class FilesystemSourceCatalogue:
         candidates: list[tuple[str, Path, str]] = []
         if self._domain_root.exists() and self._domain_root.is_dir() and not _is_reparse(self._domain_root):
             try:
-                entries = list(os.scandir(self._domain_root))
+                entries = []
+                with os.scandir(self._domain_root) as iterator:
+                    for entry in iterator:
+                        entries.append(entry)
+                        if len(entries) > self._limits.candidate_scan:
+                            issues.append(SourceIssue("domain_scan_limit", "The domain directory exceeded the discovery scan limit."))
+                            break
             except OSError:
                 issues.append(SourceIssue("domain_directory_unreadable", "The configured domain directory cannot be read."))
                 entries = []
             for entry in entries:
-                if self._policy.is_ignored_directory(entry.name) or entry.is_symlink():
-                    continue
-                path = Path(entry.path)
                 try:
-                    if not entry.is_dir(follow_symlinks=False) or _is_reparse(path):
+                    if self._policy.is_ignored_directory(entry.name):
+                        continue
+                    path = Path(entry.path)
+                    if entry.is_symlink() or _is_reparse(path):
+                        issues.append(SourceIssue("domain_boundary_invalid", "A domain candidate is a link or reparse point."))
+                        continue
+                    if not entry.is_dir(follow_symlinks=False):
                         continue
                     markers = tuple(marker for marker in ("AGENTS.md", ".markdownllm") if (path / marker).is_file())
                 except OSError:
-                    markers = ()
+                    issues.append(SourceIssue("domain_candidate_unreadable", "A domain candidate could not be inspected."))
+                    continue
                 if not markers:
                     continue
                 folded = unicodedata.normalize("NFC", entry.name).casefold()
-                source_id = "domain/" + quote(folded, safe="")
+                source_id = _normalised_domain_id(entry.name)
                 candidates.append((folded, path, source_id))
-        collisions: dict[str, list[Path]] = {}
-        for _, path, source_id in candidates:
-            collisions.setdefault(source_id, []).append(path)
+        collisions = _collision_ids(source_id for _, _, source_id in candidates)
         for folded, path, source_id in sorted(candidates, key=lambda item: (item[0], item[1].name)):
-            if len(collisions[source_id]) > 1:
+            if source_id in collisions:
                 issues.append(SourceIssue("source_id_collision", "Two domain directories normalise to the same identity.", SourceId(source_id)))
                 continue
             try:
@@ -138,9 +151,23 @@ def _safe_domain_dir(value: str) -> Path:
     return candidate
 
 
+def _normalised_domain_id(name: str) -> str:
+    folded = unicodedata.normalize("NFC", name).casefold()
+    return "domain/" + quote(folded, safe="")
+
+
+def _collision_ids(source_ids) -> set[str]:
+    seen: set[str] = set()
+    collisions: set[str] = set()
+    for source_id in source_ids:
+        if source_id in seen:
+            collisions.add(source_id)
+        seen.add(source_id)
+    return collisions
+
+
 def _is_reparse(path: Path) -> bool:
     try:
         return path.is_symlink() or bool(getattr(path, "is_junction", lambda: False)())
     except OSError:
         return True
-

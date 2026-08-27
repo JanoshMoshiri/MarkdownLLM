@@ -8,6 +8,10 @@ class ExplorerLimits:
     file_bytes: int = 1024 * 1024
     frontmatter_bytes: int = 128 * 1024
     frontmatter_json_bytes: int = 256 * 1024
+    frontmatter_depth: int = 20
+    frontmatter_scalar_bytes: int = 64 * 1024
+    frontmatter_collection_items: int = 2_000
+    frontmatter_nodes: int = 10_000
     directory_depth: int = 32
     directory_page: int = 500
     search_page: int = 200
@@ -19,4 +23,3 @@ class ExplorerLimits:
     response_bytes: int = 2 * 1024 * 1024
     concurrent_requests: int = 16
     browser_seconds: float = 10.0
-

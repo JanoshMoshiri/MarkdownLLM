@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
+import math
 import re
-from collections.abc import Mapping
 
 import yaml
 
@@ -31,30 +31,99 @@ class FrontmatterParser:
         if len(yaml_text.encode("utf-8")) > self._limits.frontmatter_bytes:
             return ParsedDocument(FrontmatterResult(FrontmatterState.INVALID, error_code="frontmatter_too_large"), body)
         try:
-            events = list(yaml.parse(yaml_text, Loader=yaml.BaseLoader))
-            if any(isinstance(event, yaml.events.AliasEvent) for event in events):
-                raise ValueError("aliases are not supported")
-            node = yaml.compose(yaml_text, Loader=yaml.BaseLoader)
-            self._reject_duplicate_keys(node)
-            values = yaml.load(yaml_text, Loader=yaml.BaseLoader) or {}
-            if not isinstance(values, Mapping):
+            self._validate_event_stream(yaml_text)
+            node = yaml.compose(yaml_text, Loader=yaml.SafeLoader)
+            values = self._normalise(node, depth=0) if node is not None else {}
+            if not isinstance(values, dict):
                 raise ValueError("frontmatter must be a mapping")
-            encoded = json.dumps(values, ensure_ascii=False).encode("utf-8")
+            encoded = json.dumps(values, ensure_ascii=False, allow_nan=False, separators=(",", ":")).encode("utf-8")
             if len(encoded) > self._limits.frontmatter_json_bytes:
                 raise ValueError("expanded frontmatter is too large")
-            return ParsedDocument(FrontmatterResult(FrontmatterState.VALID, dict(values)), body)
-        except (yaml.YAMLError, ValueError, TypeError):
+            return ParsedDocument(FrontmatterResult(FrontmatterState.VALID, values), body)
+        except (yaml.YAMLError, ValueError, TypeError, OverflowError):
             return ParsedDocument(FrontmatterResult(FrontmatterState.INVALID, error_code="frontmatter_invalid"), body)
 
-    def _reject_duplicate_keys(self, node: yaml.Node | None) -> None:
+    def _validate_event_stream(self, yaml_text: str) -> None:
+        depth = nodes = 0
+        collection_counts: list[list[int]] = []
+        for event in yaml.parse(yaml_text, Loader=yaml.SafeLoader):
+            if isinstance(event, yaml.events.AliasEvent):
+                raise ValueError("aliases are not supported")
+            if isinstance(event, (yaml.events.MappingStartEvent, yaml.events.SequenceStartEvent)):
+                if collection_counts:
+                    collection_counts[-1][1] += 1
+                    if collection_counts[-1][1] > collection_counts[-1][0]:
+                        raise ValueError("frontmatter collection limit exceeded")
+                depth += 1; nodes += 1
+                maximum = self._limits.frontmatter_collection_items * (2 if isinstance(event, yaml.events.MappingStartEvent) else 1)
+                collection_counts.append([maximum, 0])
+                if depth > self._limits.frontmatter_depth:
+                    raise ValueError("frontmatter nesting limit exceeded")
+                self._validate_tag(event.tag)
+            elif isinstance(event, (yaml.events.MappingEndEvent, yaml.events.SequenceEndEvent)):
+                depth -= 1; collection_counts.pop()
+            elif isinstance(event, yaml.events.ScalarEvent):
+                nodes += 1
+                if len(event.value.encode("utf-8")) > self._limits.frontmatter_scalar_bytes:
+                    raise ValueError("frontmatter scalar limit exceeded")
+                self._validate_tag(event.tag)
+                if collection_counts:
+                    collection_counts[-1][1] += 1
+                    if collection_counts[-1][1] > collection_counts[-1][0]:
+                        raise ValueError("frontmatter collection limit exceeded")
+            if nodes > self._limits.frontmatter_nodes:
+                raise ValueError("frontmatter node limit exceeded")
+
+    @staticmethod
+    def _validate_tag(tag: str | None) -> None:
+        allowed = {
+            None, "!", "tag:yaml.org,2002:map", "tag:yaml.org,2002:seq", "tag:yaml.org,2002:str",
+            "tag:yaml.org,2002:null", "tag:yaml.org,2002:bool", "tag:yaml.org,2002:int",
+            "tag:yaml.org,2002:float", "tag:yaml.org,2002:timestamp",
+        }
+        if tag not in allowed:
+            raise ValueError("unsupported YAML tag")
+
+    def _normalise(self, node: yaml.Node, depth: int) -> object:
+        if depth > self._limits.frontmatter_depth:
+            raise ValueError("frontmatter nesting limit exceeded")
         if isinstance(node, yaml.MappingNode):
-            seen: set[str] = set()
-            for key, value in node.value:
-                key_text = str(getattr(key, "value", ""))
-                if key_text in seen or key_text == "<<":
+            if len(node.value) > self._limits.frontmatter_collection_items:
+                raise ValueError("frontmatter mapping limit exceeded")
+            result: dict[str, object] = {}
+            for key_node, value_node in node.value:
+                if not isinstance(key_node, yaml.ScalarNode) or key_node.tag != "tag:yaml.org,2002:str":
+                    raise ValueError("frontmatter keys must be strings")
+                key = key_node.value
+                if key == "<<" or key in result:
                     raise ValueError("duplicate or merge key")
-                seen.add(key_text)
-                self._reject_duplicate_keys(value)
-        elif isinstance(node, yaml.SequenceNode):
-            for child in node.value:
-                self._reject_duplicate_keys(child)
+                result[key] = self._normalise(value_node, depth + 1)
+            return result
+        if isinstance(node, yaml.SequenceNode):
+            if len(node.value) > self._limits.frontmatter_collection_items:
+                raise ValueError("frontmatter sequence limit exceeded")
+            return [self._normalise(child, depth + 1) for child in node.value]
+        if not isinstance(node, yaml.ScalarNode):
+            raise ValueError("unsupported YAML node")
+        tag, value = node.tag, node.value
+        if tag in {"tag:yaml.org,2002:str", "tag:yaml.org,2002:timestamp"}:
+            return value
+        if tag == "tag:yaml.org,2002:null":
+            return None
+        if tag == "tag:yaml.org,2002:bool":
+            return value.casefold() in {"true", "yes", "on"}
+        if tag == "tag:yaml.org,2002:int":
+            parsed = yaml.safe_load(value)
+            if not isinstance(parsed, int) or isinstance(parsed, bool):
+                raise ValueError("invalid integer")
+            if not -(2**63) <= parsed < 2**63:
+                raise ValueError("integer is outside supported range")
+            return parsed
+        if tag == "tag:yaml.org,2002:float":
+            parsed = yaml.safe_load(value)
+            if not isinstance(parsed, float):
+                raise ValueError("invalid float")
+            if not math.isfinite(parsed):
+                raise ValueError("non-finite float")
+            return parsed
+        raise ValueError("unsupported YAML scalar")

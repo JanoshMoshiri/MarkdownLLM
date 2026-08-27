@@ -3,19 +3,49 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Protocol
 
 from markdownllm_explorer.core.errors import ExplorerError
+from markdownllm_explorer.core.models import CollectionItem, DocumentRecord, EstateSnapshot, OverviewRecord, Page, SourceSettingsRecord, TreeNode
+
+
+class DiscoverEstateUseCase(Protocol):
+    def execute(self) -> EstateSnapshot: ...
+
+
+class OverviewUseCase(Protocol):
+    def execute(self, source_id: str, cursor: str | None) -> OverviewRecord: ...
+
+
+class TreeUseCase(Protocol):
+    def execute(self, source_id: str, path: str | None, cursor: str | None) -> Page[TreeNode]: ...
+
+
+class SearchUseCase(Protocol):
+    def execute(self, source_id: str, query: str, cursor: str | None) -> Page[TreeNode]: ...
+
+
+class CollectionUseCase(Protocol):
+    def execute(self, source_id: str, kind: str, cursor: str | None) -> Page[CollectionItem]: ...
+
+
+class SettingsUseCase(Protocol):
+    def execute(self, source_id: str) -> SourceSettingsRecord: ...
+
+
+class DocumentUseCase(Protocol):
+    def execute(self, source_id: str, path: str, mode: str) -> DocumentRecord: ...
 
 
 @dataclass(frozen=True)
 class ExplorerUseCases:
-    discover_estate: object
-    get_overview: object
-    browse_tree: object
-    search_paths: object
-    list_collection: object
-    get_settings: object
-    read_document: object
+    discover_estate: DiscoverEstateUseCase
+    get_overview: OverviewUseCase
+    browse_tree: TreeUseCase
+    search_paths: SearchUseCase
+    list_collection: CollectionUseCase
+    get_settings: SettingsUseCase
+    read_document: DocumentUseCase
 
 
 class ApiRoutes:
@@ -62,4 +92,3 @@ class ApiRoutes:
     def _optional(query: dict[str, list[str]], key: str) -> str | None:
         values = query.get(key)
         return values[0] if values else None
-

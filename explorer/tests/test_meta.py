@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
@@ -8,34 +9,49 @@ import yaml
 
 
 EXPLORER = Path(__file__).parents[1]
-ROOT = EXPLORER.parent
 
 
 def manifest():
-    return yaml.safe_load((EXPLORER / "tests" / "traceability.yml").read_text(encoding="utf-8"))
+    return yaml.safe_load((EXPLORER / "tests" / "traceability.yaml").read_text(encoding="utf-8"))
+
+
+def collected_test_functions() -> set[str]:
+    found: set[str] = set()
+    for path in (EXPLORER / "tests").glob("test_*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test_"):
+                found.add(f"tests/{path.name}::{node.name}")
+    return found
 
 
 @pytest.mark.meta
-def test_traceability_is_exact_and_executable():
+def test_traceability_manifest_is_exact_and_well_formed():
     requirement_text = (EXPLORER / "docs" / "requirements.md").read_text(encoding="utf-8")
     requirement_ids = set(re.findall(r"(?:FR|NFR)-[A-Z]+-\d{3}[A-Z]?", requirement_text))
     traced = manifest()["requirements"]
-    assert set(traced) == requirement_ids
-    test_corpus = "\n".join(path.read_text(encoding="utf-8") for path in (EXPLORER / "tests").glob("test_*.py"))
-    assert len(requirement_ids) == 60
-    for requirement_id, evidence in traced.items():
-        assert evidence, requirement_id
-        assert all(f"def {test_name}" in test_corpus for test_name in evidence), (requirement_id, evidence)
+    assert set(traced) == requirement_ids and len(requirement_ids) == 60
+    tests = collected_test_functions()
+    allowed_dispositions = {"automated", "browser", "mixed", "analysis", "human_pending"}
+    allowed_prefixes = ("pytest::", "browser::", "system::", "analysis::", "human::")
+    for requirement_id, row in traced.items():
+        assert row["disposition"] in allowed_dispositions and row["owner"] and row["evidence"], requirement_id
+        assert all(item.startswith(allowed_prefixes) for item in row["evidence"]), requirement_id
+        for item in row["evidence"]:
+            if item.startswith("pytest::"):
+                assert item.removeprefix("pytest::") in tests, (requirement_id, item)
 
 
 @pytest.mark.meta
-def test_mutation_matrix_is_complete():
+def test_mutation_manifest_is_complete_and_targets_real_tests():
     specification = (EXPLORER / "docs" / "test-specification.md").read_text(encoding="utf-8")
     expected = set(re.findall(r"\bM(?:0[1-9]|1[0-6])\b", specification))
     mutants = manifest()["mutants"]
-    test_corpus = "\n".join(path.read_text(encoding="utf-8") for path in (EXPLORER / "tests").glob("test_*.py"))
     assert set(mutants) == expected == {f"M{index:02}" for index in range(1, 17)}
-    assert all(f"def {test_name}" in test_corpus for test_name in mutants.values())
+    tests = collected_test_functions()
+    for mutant_id, row in mutants.items():
+        assert row["subject"] and row["evidence"] == f"mutation::{mutant_id}" and row["tests"]
+        assert all(test in tests for test in row["tests"]), (mutant_id, row["tests"])
 
 
 @pytest.mark.meta

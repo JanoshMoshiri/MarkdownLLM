@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -14,15 +14,19 @@ from markdownllm_explorer.core.models import BoundaryToken, CommitRecord, Page, 
 
 from .cursors import CursorCodec, CursorState
 from .filesystem_catalogue import BoundaryRegistry
+from .process_runner import BoundedProcessRunner, ProcessRequest
 
 
 class GitCommitHistory:
-    def __init__(self, registry: BoundaryRegistry, cursors: CursorCodec, limits: ExplorerLimits, git_executable: str | None = None) -> None:
-        discovered = git_executable or shutil.which("git")
-        self._git = str(Path(discovered).resolve(strict=True)) if discovered else None
+    def __init__(
+        self, registry: BoundaryRegistry, cursors: CursorCodec, limits: ExplorerLimits,
+        git_executable: str | None = None, runner: BoundedProcessRunner | None = None,
+    ) -> None:
+        self._git = git_executable
         self._registry = registry
         self._cursors = cursors
         self._limits = limits
+        self._runner = runner or BoundedProcessRunner()
 
     def repository_state(self, token: BoundaryToken) -> RepositoryState:
         if not self._git:
@@ -30,27 +34,23 @@ class GitCommitHistory:
         boundary = self._registry.by_token(token)
         try:
             self._validate_store(boundary.root)
-            head = self._optional(boundary.root, ["rev-parse", "--verify", "HEAD"])
-            if not head:
-                return RepositoryState("unborn", branch=self._optional(boundary.root, ["symbolic-ref", "--short", "HEAD"]))
-            branch = self._optional(boundary.root, ["symbolic-ref", "--short", "HEAD"])
-            dirty = bool(self._run(boundary.root, ["status", "--porcelain=v1", "--untracked-files=no"]).strip())
-            return RepositoryState("repository", head, branch or None, dirty)
+            return self._state_from_status(boundary.root)
         except ExplorerError as error:
             kind = "external-store" if error.code == "git_store_external" else "unavailable"
             return RepositoryState(kind, issue=error.code)
 
-    def commits(self, token: BoundaryToken, cursor: str | None) -> Page[CommitRecord]:
+    def commits(self, token: BoundaryToken, cursor: str | None, head_hint: str | None = None, *, validate_store: bool = True) -> Page[CommitRecord]:
         if not self._git:
             raise ExplorerError("git_unavailable")
         boundary = self._registry.by_token(token)
-        self._validate_store(boundary.root)
-        head = self._optional(boundary.root, ["rev-parse", "--verify", "HEAD"])
+        if validate_store:
+            self._validate_store(boundary.root)
+        head = head_hint or self._optional(boundary.root, ["rev-parse", "--verify", "HEAD"])
         if not head:
             return Page((), None, False, datetime.now(timezone.utc).isoformat())
         state = self._cursors.decode(cursor, operation="commits", source=boundary.source.id.value, context="HEAD")
         pinned_head = state.revision or head
-        if state.revision and state.revision != head:
+        if state.revision and not self._commit_exists(boundary.root, pinned_head):
             raise ExplorerError("source_changed")
         count = self._limits.commit_page + 1
         output = self._run(
@@ -68,6 +68,35 @@ class GitCommitHistory:
         if more:
             next_cursor = self._cursors.encode(CursorState("commits", boundary.source.id.value, "HEAD", state.offset + self._limits.commit_page, pinned_head))
         return Page(tuple(records), next_cursor, False, datetime.now(timezone.utc).isoformat())
+
+    def snapshot(self, token: BoundaryToken, cursor: str | None) -> tuple[RepositoryState, Page[CommitRecord]]:
+        empty = Page((), None, False, datetime.now(timezone.utc).isoformat())
+        if not self._git:
+            return RepositoryState("unavailable", issue="git_unavailable"), empty
+        boundary = self._registry.by_token(token)
+        try:
+            self._validate_store(boundary.root)
+            repository = self._state_from_status(boundary.root)
+            commits = self.commits(token, cursor, repository.head_sha, validate_store=False) if repository.kind == "repository" else empty
+            return repository, commits
+        except ExplorerError as error:
+            kind = "external-store" if error.code == "git_store_external" else "unavailable"
+            return RepositoryState(kind, issue=error.code), empty
+
+    def _state_from_status(self, root: Path) -> RepositoryState:
+        output = self._run(root, ["status", "--porcelain=v2", "--branch", "--untracked-files=no"])
+        head = branch = None
+        dirty = False
+        for line in output.splitlines():
+            if line.startswith("# branch.oid "):
+                candidate = line.removeprefix("# branch.oid ").strip()
+                head = candidate if re.fullmatch(r"[0-9a-f]{40}", candidate) else None
+            elif line.startswith("# branch.head "):
+                candidate = line.removeprefix("# branch.head ").strip()
+                branch = None if candidate == "(detached)" else candidate
+            elif line and not line.startswith("# "):
+                dirty = True
+        return RepositoryState("repository" if head else "unborn", head, branch, dirty if head else None)
 
     def _validate_store(self, root: Path) -> None:
         if not (root / ".git").exists():
@@ -92,9 +121,20 @@ class GitCommitHistory:
                 return ""
             raise
 
+    def _commit_exists(self, root: Path, revision: str) -> bool:
+        try:
+            self._run(root, ["cat-file", "-e", f"{revision}^{{commit}}"])
+            return True
+        except ExplorerError as error:
+            if error.code == "git_unavailable":
+                return False
+            raise
+
     def _run(self, root: Path, arguments: list[str]) -> str:
         if not self._git:
             raise ExplorerError("git_unavailable")
+        if not _allowed_arguments(arguments):
+            raise ExplorerError("internal_error", detail="git argument template rejected")
         environment: dict[str, str] = {}
         for name in ("SYSTEMROOT", "WINDIR", "COMSPEC", "TEMP", "TMP"):
             if value := os.environ.get(name):
@@ -105,33 +145,60 @@ class GitCommitHistory:
                 "GIT_OPTIONAL_LOCKS": "0",
                 "GIT_NO_LAZY_FETCH": "1",
                 "GIT_PAGER": "cat",
+                "PAGER": "cat",
+                "GIT_EDITOR": "true",
+                "GIT_SEQUENCE_EDITOR": "true",
+                "GIT_EXTERNAL_DIFF": "",
+                "GIT_NO_REPLACE_OBJECTS": "1",
+                "GIT_ASKPASS": "",
+                "SSH_ASKPASS": "",
                 "GIT_CONFIG_NOSYSTEM": "1",
                 "GIT_CONFIG_GLOBAL": os.devnull,
                 "GIT_CONFIG_SYSTEM": os.devnull,
                 "LC_ALL": "C.UTF-8",
             }
         )
-        command = [
-            self._git, "-c", f"safe.directory={root}", "-c", "core.pager=cat", "-c", "diff.external=",
-            "-c", "filter.lfs.smudge=", "-c", "filter.lfs.process=", *arguments,
-        ]
-        try:
-            result = subprocess.run(
-                command, cwd=root, env=environment, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE, timeout=self._limits.git_seconds, check=False,
+        fixed = (
+            "-c", f"safe.directory={root}",
+            "-c", f"core.hooksPath={os.devnull}",
+            "-c", "core.pager=cat",
+            "-c", "core.fsmonitor=false",
+            "-c", "core.untrackedCache=false",
+            "-c", "core.preloadIndex=false",
+            "-c", "diff.external=",
+            "-c", "credential.helper=",
+            "-c", "filter.lfs.smudge=",
+            "-c", "filter.lfs.process=",
+            "-c", "protocol.file.allow=never",
+        )
+        result = self._runner.run(
+            ProcessRequest(
+                self._git, (*fixed, *arguments), root, environment,
+                self._limits.git_seconds, self._limits.git_output_bytes,
             )
-        except subprocess.TimeoutExpired:
-            raise ExplorerError("git_timeout") from None
-        except OSError:
-            raise ExplorerError("git_unavailable") from None
-        if len(result.stdout) > self._limits.git_output_bytes or len(result.stderr) > self._limits.git_output_bytes:
-            raise ExplorerError("git_unavailable")
+        )
         if result.returncode:
             raise ExplorerError("git_unavailable")
         try:
-            return result.stdout.decode("utf-8")
+            return result.output.decode("utf-8")
         except UnicodeDecodeError:
-            return result.stdout.decode("utf-8", errors="replace")
+            return result.output.decode("utf-8", errors="replace")
+
+
+def resolve_trusted_git(source_root: Path) -> str | None:
+    discovered = shutil.which("git")
+    if not discovered:
+        return None
+    try:
+        candidate = Path(discovered).resolve(strict=True)
+        if not candidate.is_file() or candidate.is_symlink():
+            return None
+        candidate.relative_to(source_root.resolve(strict=True))
+        return None
+    except ValueError:
+        return str(candidate)
+    except OSError:
+        return None
 
 
 def _inside(candidate: Path, root: Path) -> bool:
@@ -140,3 +207,27 @@ def _inside(candidate: Path, root: Path) -> bool:
         return True
     except ValueError:
         return False
+
+
+def _allowed_arguments(arguments: list[str]) -> bool:
+    exact = {
+        ("rev-parse", "--path-format=absolute", "--show-toplevel", "--git-dir", "--git-common-dir"),
+        ("rev-parse", "--verify", "HEAD"),
+        ("symbolic-ref", "--short", "HEAD"),
+        ("status", "--porcelain=v2", "--untracked-files=no"),
+        ("status", "--porcelain=v2", "--branch", "--untracked-files=no"),
+    }
+    value = tuple(arguments)
+    if value in exact:
+        return True
+    if len(arguments) == 3 and arguments[:2] == ["cat-file", "-e"]:
+        return bool(re.fullmatch(r"[0-9a-f]{40}\^\{commit\}", arguments[2]))
+    if len(arguments) == 6 and arguments[0] == "log":
+        return bool(
+            re.fullmatch(r"[0-9a-f]{40}", arguments[1])
+            and arguments[2] == "--topo-order"
+            and re.fullmatch(r"--skip=\d+", arguments[3])
+            and re.fullmatch(r"--max-count=\d+", arguments[4])
+            and arguments[5] == "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"
+        )
+    return False

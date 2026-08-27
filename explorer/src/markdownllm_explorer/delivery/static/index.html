@@ -10,7 +10,7 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="shell">
-    <aside class="sidebar" aria-label="Estate navigation">
+    <aside id="sidebar" class="sidebar" aria-label="Estate navigation">
       <header class="brand">
         <span class="brand-mark" aria-hidden="true">M</span>
         <span><strong>MarkdownLLM</strong><small>Explorer</small></span>
@@ -38,14 +38,14 @@
           <button id="context-open" class="icon-button mobile-only" aria-label="Open context panel">ⓘ</button>
         </div>
       </header>
-      <nav class="tabs" aria-label="Source views">
-        <button data-view="overview" class="active">Overview</button>
-        <button data-view="skills">Skills</button>
-        <button data-view="memory">Memory</button>
-        <button data-view="settings">Settings</button>
+      <nav class="tabs" aria-label="Source views" role="tablist">
+        <button id="tab-overview" data-view="overview" class="active" role="tab" aria-controls="content" aria-selected="true" tabindex="0">Overview</button>
+        <button id="tab-skills" data-view="skills" role="tab" aria-controls="content" aria-selected="false" tabindex="-1">Skills</button>
+        <button id="tab-memory" data-view="memory" role="tab" aria-controls="content" aria-selected="false" tabindex="-1">Memory</button>
+        <button id="tab-settings" data-view="settings" role="tab" aria-controls="content" aria-selected="false" tabindex="-1">Settings</button>
       </nav>
       <section id="notice" class="notice" hidden role="status"></section>
-      <section id="content" class="content" aria-live="polite"></section>
+      <section id="content" class="content" role="tabpanel" aria-labelledby="tab-overview" aria-live="polite" tabindex="0"></section>
     </main>
     <aside id="context-panel" class="context-panel" aria-label="Source and document context">
       <header class="context-head"><strong>Context</strong><button id="context-close" class="icon-button mobile-only" aria-label="Close context panel">×</button></header>
