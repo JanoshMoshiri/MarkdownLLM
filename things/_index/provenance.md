@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T10:15:17
-generated_from: HEAD@f235ce2
+generated: 2026-08-27T10:37:55
+generated_from: HEAD@926622b
 coverage: 60
 framework_version: 3.36.0
 ---
@@ -56,7 +56,7 @@ framework_version: 3.36.0
 
 ## closed-loop-operating-state
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
-- gates-census-2026-08 (pinned @8f6d92c1a29c7038a0448df1893a70762be6742d)
+- gates-census-2026-08 (pinned @8f6d92c2b498ce18c2314fd7001c97a2ddcf5ca0)
 
 ## codex-desktop-session-start-negative-2026-08-14
 - harness-capability-evidence-matrix-2026-08-20 (derived-from)
@@ -128,7 +128,7 @@ framework_version: 3.36.0
 ## framework-retrospective-2026-08c
 - closed-loop-operating-state (derived-from)
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
-- gates-census-2026-08 (pinned @7bffcb1170448eae0d18775e19adfae262a95c53)
+- gates-census-2026-08 (pinned @7bffcb162f01c5cc6afb98756eca58bc5c5f79fe)
 - gates-census-2026-08 (derived-from)
 - hard-hook-vocabulary-contradicts-observable-trigger-insight (derived-from)
 

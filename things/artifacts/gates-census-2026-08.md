@@ -8,9 +8,9 @@ session: 2026-08-27
 tags: [gates-census, closed-loop, human-seats, phase-1, verdicts]
 informed_by:
   - id: closed-loop-operating-state
-    commit: 8f6d92c1a29c7038a0448df1893a70762be6742d
+    commit: 8f6d92c2b498ce18c2314fd7001c97a2ddcf5ca0
   - id: framework-retrospective-2026-08c
-    commit: 7bffcb1170448eae0d18775e19adfae262a95c53
+    commit: 7bffcb162f01c5cc6afb98756eca58bc5c5f79fe
 linked_things:
   - id: closed-loop-operating-state
     relation: implements
