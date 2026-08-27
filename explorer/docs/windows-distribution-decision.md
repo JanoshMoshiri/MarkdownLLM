@@ -2,7 +2,7 @@
 id: markdownllm-explorer-windows-distribution
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-08-27
 decided_by: Janosh Moshiri
 origin: stated
@@ -18,7 +18,7 @@ The first Explorer increment was technically installable as a Python package, bu
 
 ## Decision
 
-Windows is the first native distribution target. Explorer will ship as one NSIS setup executable containing a PyInstaller one-folder runtime. Setup will install per user without elevation, validate and remember the substrate root, create Desktop and Start Menu shortcuts and register an uninstaller. The installed windowless launcher will open the default browser automatically and provide notification-area **Open Explorer** and **Exit Explorer** actions. Python remains the implementation language but is no longer an end-user prerequisite.
+Windows is the first native distribution target. Explorer will ship as one NSIS installer executable containing a PyInstaller one-folder runtime. The installer will install per user without elevation, validate and remember the substrate root, create Desktop and Start Menu shortcuts and register an uninstaller. The installed windowless launcher will open the default browser automatically and provide notification-area **Open Explorer** and **Exit Explorer** actions. Python remains the implementation language but is no longer an end-user prerequisite.
 
 The portable Python package and CLI remain supported for development, automation and later non-Windows work. Linux and macOS native packaging are deferred until their own captured runtime evidence is available.
 
@@ -36,6 +36,8 @@ The portable Python package and CLI remain supported for development, automation
 The installer becomes a separately tested release artefact built on Windows. PyInstaller and NSIS are build-time dependencies; they do not enter core/application code or the end-user machine as separate tools. The selected substrate root is the only application setting retained outside the browser. The capability remains process-memory-only.
 
 The build is structurally ready for Authenticode but cannot be publicly trusted as a known publisher until an authorised code-signing certificate is supplied. Unsigned local builds may therefore trigger Windows reputation warnings.
+
+On the 2026-08-27 operator machine, application control blocked the unsigned NSIS output when its filename contained `Setup` (`WinError 4551`) while the byte-identical file launched after being named `Installer`. This is local observed evidence, not a general Windows rule. The retained release filename is therefore `MarkdownLLM-Explorer-Installer-<version>.exe`; future packaging must not casually restore the blocked name, and recognised publisher signing remains the proper public-distribution control.
 
 ## Review Condition
 
