@@ -19,6 +19,7 @@ export function renderCollection(container, page, kind, onOpen, onMore) {
 
 export function appendItem(list, item, onOpen) {
   const button = document.createElement("button"); button.className = "collection-item";
+  button.dataset.path = item.path;
   const title = document.createElement("strong"); title.textContent = item.title;
   const path = document.createElement("small"); path.textContent = item.path;
   button.append(title, path);

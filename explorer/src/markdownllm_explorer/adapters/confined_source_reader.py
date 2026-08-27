@@ -56,6 +56,7 @@ class ConfinedSourceReader:
             raise ExplorerError("directory_limit")
         directory = self._resolve_directory(boundary, path)
         nodes: list[TreeNode] = []
+        depth_limited = False
         try:
             entries = self._bounded_entries(directory)
         except FileNotFoundError:
@@ -71,6 +72,9 @@ class ConfinedSourceReader:
                     continue
                 info = entry.stat(follow_symlinks=False)
                 if entry.is_dir(follow_symlinks=False):
+                    if path.depth >= self._limits.directory_depth:
+                        depth_limited = True
+                        continue
                     nodes.append(TreeNode(child, entry.name, EntryKind.DIRECTORY, expandable=True))
                 elif entry.is_file(follow_symlinks=False) and self._policy.is_eligible_file(entry.name):
                     nodes.append(TreeNode(child, entry.name, EntryKind.FILE, info.st_size, _iso(info.st_mtime)))
@@ -81,7 +85,8 @@ class ConfinedSourceReader:
         state = self._cursors.decode(cursor, operation="tree", source=boundary.source.id.value, context=path.value)
         if state.revision and state.revision != revision:
             raise ExplorerError("source_changed")
-        return self._page(nodes, state.offset, self._limits.directory_page, "tree", boundary, path.value, revision)
+        page = self._page(nodes, state.offset, self._limits.directory_page, "tree", boundary, path.value, revision)
+        return Page(page.items, page.next_cursor, page.partial or depth_limited, page.observed_at)
 
     def search(self, token: BoundaryToken, query: str, cursor: str | None) -> Page[TreeNode]:
         boundary = self._registry.by_token(token)
@@ -200,10 +205,9 @@ class ConfinedSourceReader:
     def _walk(self, boundary: SourceBoundary):
         stack: list[tuple[Path, RelativePath, int]] = [(boundary.root, RelativePath(), 0)]
         examined = 0
+        depth_limited = False
         while stack:
             directory, relative_dir, depth = stack.pop()
-            if depth >= self._limits.directory_depth:
-                continue
             try:
                 entries = self._bounded_entries(directory)
             except OSError:
@@ -221,11 +225,16 @@ class ConfinedSourceReader:
                         continue
                     if entry.is_dir(follow_symlinks=False):
                         if not self._policy.is_ignored_directory(entry.name):
-                            stack.append((path, child, depth + 1))
+                            if depth < self._limits.directory_depth:
+                                stack.append((path, child, depth + 1))
+                            else:
+                                depth_limited = True
                     elif entry.is_file(follow_symlinks=False) and self._policy.is_eligible_file(entry.name):
                         yield child, entry.stat(follow_symlinks=False)
                 except OSError:
                     continue
+        if depth_limited:
+            raise ExplorerError("directory_limit")
 
     def _bounded_entries(self, directory: Path) -> list[os.DirEntry[str]]:
         before = directory.stat(follow_symlinks=False)

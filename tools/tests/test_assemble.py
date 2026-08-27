@@ -288,7 +288,7 @@ def test_assemble_refuses_unresolvable_default_branch(
     assert rc == 1
     assert "FAILED" in out
     assert "main" not in _run(
-        root / "domains" / "broken-estate", "config", "--list") \
+        root / "domains" / "broken-estate", "config", "--local", "--list") \
         if (root / "domains" / "broken-estate" / ".git").exists() else True
 
 

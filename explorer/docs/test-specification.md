@@ -1,14 +1,14 @@
 # MarkdownLLM Explorer — Test Specification
 
-**Status:** implementation gate approved when the coverage checks in §11 pass
+**Status:** release-candidate gate approved when the coverage and evidence checks in §11 pass
 
-**Version:** 0.3
+**Version:** 0.4
 
 **Date:** 2026-08-27
 
 **Requirements:** `explorer/docs/requirements.md` v0.4
 
-**Design:** `explorer/docs/design.md` v0.4
+**Design:** `explorer/docs/design.md` v0.5
 
 ## 1. Test position
 
@@ -137,7 +137,7 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 - `CT-CATALOG-001` — root configuration, substrate identity, deterministic domain ordering, marker admission and issue taxonomy.
 - `GT-DISCOVERY-001` — F-ESTATE-IMPERFECT remains partially usable across native filesystem outcomes.
 - `GT-OWNERSHIP-001` — O-OWNERSHIP, including rejected/new domain candidates and cross-domain relative links.
-- `CT-TREE-001` — lazy immediate-directory pages, sorting, cursor signature/fingerprint, depth/entry boundaries and partial state.
+- `CT-TREE-001` — lazy immediate-directory pages, sorting, cursor signature/fingerprint, inclusive depth/entry N−1/N/N+1 boundaries and visible partial state shared with aggregate traversal.
 - `CT-SEARCH-001` — case-insensitive path search, 10,000-candidate cap, pagination and no file-body load.
 - `CT-COLLECTION-001` — Skills/Memory folder/type precedence, malformed/mismatch/duplicate ID and empty groups.
 - `GT-CONFINE-001` — traversal/case/separator/encoding/link/junction/reparse/replacement tests for the executed OS/filesystem profile.
@@ -162,8 +162,10 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 - `ST-WIN-BUNDLE-001` — clean PyInstaller one-folder build; executable PE/version/icon metadata, embedded interpreter/dependencies/static assets, no system-Python/Node resolution at runtime, and manifest/hash retained.
 - `ST-WIN-INSTALL-001` — NSIS setup is one executable; per-user/no-elevation and offline; valid-root gate; exact install files, selected-root registry value, uninstall registration and singleton Desktop/Start Menu shortcuts with quoted arguments.
 - `ST-WIN-LAUNCH-001` — frozen shortcut target starts with no console, reaches health, invokes the browser-opening port, exposes Open/Exit tray commands, reactivation routes `open` to the original process, and exits within five seconds without persisting capability material.
-- `ST-WIN-UPGRADE-001` — same-build reinstall preserves root, replaces files and leaves one owned shortcut/registration instance.
-- `ST-WIN-UNINSTALL-001` — silent and interactive uninstall remove only owned files, keys and shortcuts; source/outside O-IMMUTABILITY snapshots remain identical.
+- `ST-WIN-UPGRADE-001` — same-build reinstall while the primary and an active request are running waits for process termination, preserves root, replaces files and leaves one owned shortcut/registration instance.
+- `ST-WIN-UNINSTALL-001` — silent and interactive uninstall while the primary and an active request are running wait for process termination and remove only owned files, keys and shortcuts; source/outside O-IMMUTABILITY snapshots remain identical.
+- Native lifecycle automation may compile an identity-isolated installer from the exact frozen payload and NSIS source when a real Explorer installation must be preserved. That proves destructive install/upgrade/uninstall logic without touching operator state; publication still requires the final signed release installer itself to run and match the recorded release hash.
+- The signed release gate inspects Authenticode on the frozen application, generated uninstaller and setup, then repeats ST-WIN-INSTALL/UPGRADE/UNINSTALL on the signed installer. Missing signature, failed RFC 3161 timestamp or a Windows code-integrity block is a release failure, not an unknown-publisher warning to waive.
 - `ST-HTTP-AUTH-001` — exact Host on all routes; Origin policy; missing/wrong/right capability; no CORS; constant-time comparison seam; session-expiry state.
 - `ST-HTTP-HEADERS-001` — CSP, frame denial, nosniff, no-referrer, no-store and fixed MIME types on success/error/static/health.
 - `ST-HEALTH-001` — unauthenticated health returns only static status/version.
@@ -191,7 +193,7 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 
 - `PT-SCALE-001` — F-ESTATE-SCALE-V1, one discarded warm-up + 20 isolated runs, raw timings and 19/20 thresholds for all five budgets.
 - `PT-REAL-001` — privacy-safe observation on F-REAL-ESTATE-2026-08-27; never substitutes for PT-SCALE-001.
-- `AJ-01` through `AJ-07` — execute the exact requirements journeys and retain technical pass/fail evidence; human owners remain pending unless supplied.
+- `AJ-01` through `AJ-10` — execute the exact requirements journeys and retain technical pass/fail evidence; human owners remain pending unless attributable operator acceptance is supplied.
 
 ## 6. Test-the-tests mutation programme
 
@@ -267,7 +269,7 @@ Use the in-app browser against the real loopback process; no pasted static mocku
 4. Execute keyboard-only tree, tabs, search, document mode and theme.
 5. Inspect text clipping, overlap, unintended horizontal page scrolling, selected/hover/focus contrast and empty/error states.
 6. Execute hostile payloads through the real document/API route and inspect the final DOM, not only server HTML.
-7. Record AJ-01–07 technical dispositions. Mark CEO usability and Janosh product acceptance pending unless a human actually rules.
+7. Record AJ-01–10 technical dispositions. Keep human dispositions pending unless an attributable human actually rules; when supplied, retain that ruling as subject-bound evidence rather than inferring it from a technical walkthrough.
 
 Synthetic fixture screenshots may be committed. Private-estate screenshots/content must remain in gitignored `.test-tmp/explorer-evidence/` and are never publication evidence.
 
@@ -348,7 +350,9 @@ Gate checks:
 3. every evidence/test ID exists in collected tests or the browser/inspection manifest;
 4. every row has an observable pass condition and owner;
 5. all technical rows have a final disposition before completion; and
-6. human-owned rows may remain `pending-human` but may not be reported as accepted.
+6. human-owned rows remain `pending-human` unless a subject-bound attributable human decision names their exact scope.
+
+For the 2026-08-27 candidate, `tests/evidence/operator-acceptance.json` records Janosh's explicit product acceptance and names the exact human-owned rows it closes. The verifier rejects that record if its scope differs from the pending-human set; technical pass/fail remains independent.
 
 ## 12. Execution order and stop rules
 
@@ -382,5 +386,6 @@ Public, privacy-safe evidence is written to `explorer/tests/evidence/`:
 - `windows-installer.json` — frozen-build/setup hashes, environment, install/shortcut/launch/upgrade/uninstall observations and AJ-08–10 dispositions;
 - `visual-light.png`, `visual-dark.png`, `visual-narrow.png` — synthetic estate only; and
 - `traceability-result.json` — coverage and evidence-ID audit.
+- `operator-acceptance.json` — attributable human UAT decision and exact human-owned requirement scope.
 
 Private live-estate observations go only to gitignored `.test-tmp/explorer-evidence/`, contain no bodies/names/absolute paths and are summarised privacy-safely in the public report.

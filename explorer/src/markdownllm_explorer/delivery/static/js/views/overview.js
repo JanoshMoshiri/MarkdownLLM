@@ -32,7 +32,7 @@ export function appendCommit(list, commit) {
   const title = document.createElement("h3");
   const sha = document.createElement("span"); sha.className = "commit-sha"; sha.textContent = commit.sha.slice(0, 12);
   sha.dataset.sha = commit.sha; sha.title = commit.sha; sha.setAttribute("aria-label", `Commit ${commit.sha}`);
-  title.append(sha, document.createTextNode(commit.subject));
+  title.append(sha, document.createTextNode(` ${commit.subject}`));
   const author = document.createElement("p"); author.textContent = commit.author_name;
   info.append(title, author);
   const time = document.createElement("time"); time.dateTime = commit.authored_at; time.textContent = new Date(commit.authored_at).toLocaleString();

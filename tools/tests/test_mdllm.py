@@ -734,9 +734,9 @@ def test_scaffold_birth_sequence(tmp_path, capsys):
         findings.extend(mdllm.validate_level1(t, corpus.schema))
     findings.extend(mdllm.validate_level2(corpus))
     findings.extend(mdllm.validate_level3(corpus))
-    # 4 skills + 8 reasoning prompts (delivered since v3.24.0 — the generated
+    # 4 skills + 9 reasoning prompts (delivered since v3.24.0 — the generated
     # session-start block names them, so birth must include them)
-    assert findings == [] and len(corpus.things) == 12
+    assert findings == [] and len(corpus.things) == 13
 
 
 def test_domain_kernel_regeneration_preserves_authored_launch_contract(

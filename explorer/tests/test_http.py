@@ -51,6 +51,8 @@ def test_api_requires_exact_capability_host_and_origin(live_server):
     assert status == 401 and json.loads(body)["error"]["code"] == "capability_required"
     status, _, body = request(server, "GET", "/api/v1/estate", {"X-Explorer-Capability": "wrong"})
     assert status == 401 and json.loads(body)["error"]["code"] == "capability_invalid"
+    status, _, body = request(server, "GET", "/api/v1/estate", {"X-MDLLM-Capability": runtime.capability})
+    assert status == 401 and json.loads(body)["error"]["code"] == "capability_required"
     status, _, body = request(server, "GET", "/api/v1/estate", {"X-Explorer-Capability": runtime.capability, "Origin": "https://evil.invalid"})
     assert status == 403 and json.loads(body)["error"]["code"] == "origin_forbidden"
     connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)

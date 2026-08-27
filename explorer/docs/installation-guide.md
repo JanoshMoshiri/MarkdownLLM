@@ -4,9 +4,10 @@ MarkdownLLM Explorer is a small, read-only window into your substrate. The
 Windows installer includes everything it needs: you do not have to install
 Python, Node or a browser extension.
 
-> Explorer is currently a **Windows preview**. Install it from a release source
-> you trust and treat it as a read-only viewer while independent review and
-> operator acceptance are completed.
+> Explorer is currently a **Windows preview candidate**. The reviewed product
+> is accepted as a read-only viewer, but an unsigned local build is not a public
+> release asset. Publish only after the application and setup are signed and the
+> signed installer has completed the native lifecycle verification.
 
 ## Install in three steps
 
@@ -15,8 +16,11 @@ Python, Node or a browser extension.
 Get `MarkdownLLM-Explorer-Installer-0.2.0.exe` from your trusted MarkdownLLM
 release source, then double-click it.
 
-Windows may say the current unsigned build has an unknown publisher. Only
-continue when the installer came from a source you trust.
+Windows may warn about or, under Smart App Control or enterprise code-integrity
+policy, fully block an unsigned build. A public release must carry a trusted
+publisher signature; source trust alone does not override those policies.
+The release evidence must identify the signed installer by SHA-256; do not
+rename an unsigned local build and treat it as the verified release.
 
 ### 2. Choose your substrate
 
@@ -64,10 +68,12 @@ are finished.
 ## Update or remove it
 
 Run a newer installer to update Explorer. Your selected substrate folder is
-kept.
+kept. If Explorer is running, setup closes the local service, waits for it to
+finish active work, and only then replaces the installed files.
 
 To remove it, open **Installed apps** in Windows, find **MarkdownLLM Explorer**
-and choose **Uninstall**. Uninstalling Explorer does not change or remove your
+and choose **Uninstall**. The uninstaller closes a running Explorer before
+removing its files. Uninstalling Explorer does not change or remove your
 substrate.
 
 ## If Explorer does not open

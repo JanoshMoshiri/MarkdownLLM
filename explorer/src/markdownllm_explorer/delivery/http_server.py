@@ -13,13 +13,16 @@ import threading
 import time
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlsplit
 
-from markdownllm_explorer.composition import ExplorerRuntime
 from markdownllm_explorer import __version__
 from markdownllm_explorer.core.errors import ExplorerError
 
 from .response_encoding import to_wire
+
+if TYPE_CHECKING:
+    from markdownllm_explorer.composition import ExplorerRuntime
 
 
 _ASSETS = {
@@ -30,6 +33,9 @@ _ASSETS = {
     "/js/api.js": ("js/api.js", "text/javascript; charset=utf-8"),
     "/js/app.js": ("js/app.js", "text/javascript; charset=utf-8"),
     "/js/state.js": ("js/state.js", "text/javascript; charset=utf-8"),
+    "/js/routing.js": ("js/routing.js", "text/javascript; charset=utf-8"),
+    "/js/theme.js": ("js/theme.js", "text/javascript; charset=utf-8"),
+    "/js/overlays.js": ("js/overlays.js", "text/javascript; charset=utf-8"),
     "/js/views/navigation.js": ("js/views/navigation.js", "text/javascript; charset=utf-8"),
     "/js/views/overview.js": ("js/views/overview.js", "text/javascript; charset=utf-8"),
     "/js/views/tree.js": ("js/views/tree.js", "text/javascript; charset=utf-8"),

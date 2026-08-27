@@ -46,9 +46,11 @@ class FakeTraySurface:
 
 
 class FakeInstanceCoordinator:
-    def __init__(self, primary: bool):
+    def __init__(self, primary: bool, *, primary_exits: bool = True):
         self.primary = primary
+        self.primary_exits = primary_exits
         self.commands = []
+        self.exit_waits = []
         self.open_handler = None
         self.exit_handler = None
         self.closed = False
@@ -56,6 +58,10 @@ class FakeInstanceCoordinator:
     def send(self, command: str) -> bool:
         self.commands.append(command)
         return True
+
+    def wait_for_primary_exit(self, timeout_seconds: float) -> bool:
+        self.exit_waits.append(timeout_seconds)
+        return self.primary_exits
 
     def listen(self, open_handler, exit_handler):
         self.open_handler = open_handler
@@ -94,7 +100,7 @@ def test_secondary_activation_sends_only_open_without_composing_runtime(tmp_path
         error_reporter=lambda message: pytest.fail(message),
     )
 
-    assert result == 0 and coordinator.commands == ["open"] and coordinator.closed
+    assert result == 0 and coordinator.commands == ["open"] and not coordinator.exit_waits and coordinator.closed
 
 
 @pytest.mark.unit
@@ -112,7 +118,32 @@ def test_secondary_exit_command_stops_existing_instance_without_capability(tmp_p
         error_reporter=lambda message: pytest.fail(message),
     )
 
-    assert result == 0 and coordinator.commands == ["exit"] and coordinator.closed
+    assert result == 0 and coordinator.commands == ["exit"] and coordinator.exit_waits == [15.0] and coordinator.closed
+
+
+@pytest.mark.unit
+def test_secondary_exit_fails_closed_when_primary_does_not_terminate(tmp_path):
+    coordinator = FakeInstanceCoordinator(primary=False, primary_exits=False)
+    arguments = WindowsLaunchArguments(
+        root=tmp_path,
+        no_browser=True,
+        no_tray=True,
+        request_exit=True,
+    )
+
+    result = run_windows_application(
+        arguments,
+        runtime_builder=lambda *args: pytest.fail("exit request must not build runtime"),
+        server_factory=lambda *args: pytest.fail("exit request must not bind server"),
+        coordinator=coordinator,
+        browser_opener=lambda url: pytest.fail("exit request must not open browser"),
+        tray_factory=lambda: pytest.fail("exit request must not create tray"),
+        error_reporter=lambda message: pytest.fail(message),
+    )
+
+    assert result == 4
+    assert coordinator.commands == ["exit"] and coordinator.exit_waits == [15.0]
+    assert coordinator.closed
 
 
 @pytest.mark.unit

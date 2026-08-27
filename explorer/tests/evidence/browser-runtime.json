@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "subject_sha256": "30c3ef82cf871f695473cba6649310b09ca873be8b3ccc48b1002f3a2e34f86a",
-  "subject_revalidated_at": "2026-08-27T15:03:32+01:00",
-  "subject_revalidation_basis": "The product source, packaging and retained browser-supporting artifacts are unchanged. This subject change only reconciles the Explorer README, public guides and cleanup note with the review-backed Windows-preview release position; the previously exercised runtime behaviours are unaffected.",
+  "subject_sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad",
+  "subject_revalidated_at": "2026-08-27T20:23:04+01:00",
+  "subject_revalidation_basis": "The browser-facing package bytes are unchanged from the 19:01 executed run. Subsequent subject changes are confined to Windows process termination, installer replacement/signing, verification tooling/tests and failure cleanup, blocked-evidence accounting and release wording; the final 114-test Explorer suite rechecked the browser asset and architecture contracts. The retained run had already re-executed route restoration, depth, responsive overlays, theme persistence, hostile Markdown safety, search activation, accessibility and zero browser diagnostics after the UI corrections.",
   "tool": {
     "name": "in-app-browser",
     "version": "26.818.61809"
@@ -11,45 +11,45 @@
     "browser": "Codex in-app Browser for interaction; Google Chrome headless for retained synthetic screenshots",
     "browser_version": "in-app Browser plugin 26.818.61809 (embedded Chromium build not exposed); Chrome 151.0.7922.174",
     "os": "Windows",
-    "executed_at": "2026-08-27T06:14:00+01:00"
+    "executed_at": "2026-08-27T19:01:38+01:00"
   },
   "evidence": [
     {
       "id": "browser::BT-SHELL-001",
       "status": "pass",
       "checks": ["Substrate precedes the Domain estate", "three-region shell and four product tabs are present", "no irrelevant or write control is exposed"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "browser::BT-NAV-001",
       "status": "pass",
-      "checks": ["source and nested tree navigation work", "URL refresh and browser back restore source, tab, path and mode", "tree selection retains context"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "checks": ["source and nested tree navigation work", "URL refresh, Back and Forward restore source, tab, path and mode", "Skills and Memory deep links retain their collection-reader shell and selected item", "tree selection retains context"],
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "browser::BT-TABS-001",
       "status": "pass",
       "checks": ["Overview, Skills, Memory and Settings all render", "commit abbreviations are 12 characters", "Skills and grouped Memory open the same document reader"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "browser::BT-DOCUMENT-001",
       "status": "pass",
       "checks": ["styled and raw representations load on demand", "frontmatter and factual context are separate", "final hostile DOM contains no active unsafe content"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "browser::BT-SEARCH-001",
       "status": "pass",
       "checks": ["search is reachable in desktop and narrow layouts", "populated and terminal states render", "result activation opens an eligible document"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "browser::BT-THEME-001",
       "status": "pass",
       "checks": ["system, explicit light and explicit dark render", "explicit preference survives reload", "theme changes retain route and capability"],
       "artifacts": [
-        {"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"},
+        {"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"},
         {"path": "tests/evidence/visual-light.png", "sha256": "11a1cc7ccd46f955fa819d18e0340ce53029eb6114f63e0ac7d31872408f84e5"},
         {"path": "tests/evidence/visual-dark.png", "sha256": "7784ed962a0aeb495eaf3ef90b7b92be93ab3996214b220dba6cccaa9a7d147a"}
       ]
@@ -58,14 +58,14 @@
       "id": "browser::BT-ASYNC-001",
       "status": "pass",
       "checks": ["late A-after-B response cannot change the live B location", "operation slots are isolated", "loading, content, empty and error paths terminate"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "browser::BT-RESPONSIVE-001",
       "status": "pass",
       "checks": ["1440x900, 390x844 and 320 CSS-pixel layouts retain every capability", "900-pixel breakpoint is continuous", "page-level horizontal overflow is absent"],
       "artifacts": [
-        {"path": "tests/evidence/browser-layout-probe.json", "sha256": "f9aab5d40e496e2a7b99941860a9a6eff4a3e3637ecb8500d8ed0dd228eca094"},
+        {"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"},
         {"path": "tests/evidence/visual-narrow.png", "sha256": "dabb0950343943f82de95d61ac53ccd8dbfd3e2a7c72d4b302ec93b4be91518e"}
       ]
     },
@@ -73,13 +73,13 @@
       "id": "browser::BT-KEYBOARD-001",
       "status": "pass",
       "checks": ["tree arrows follow non-wrapping tree semantics", "collapse retains valid focus", "tabs use arrow navigation and paginated content receives focus"],
-      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f9aab5d40e496e2a7b99941860a9a6eff4a3e3637ecb8500d8ed0dd228eca094"}]
+      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"}]
     },
     {
       "id": "browser::BT-A11Y-001",
       "status": "pass",
       "checks": ["roles, names, states, focus return and background inertness were inspected", "all measured contrast ratios pass", "visible controls meet the 24 CSS-pixel target minimum", "unavailable accessibility-tree and native zoom capabilities are explicitly recorded"],
-      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f9aab5d40e496e2a7b99941860a9a6eff4a3e3637ecb8500d8ed0dd228eca094"}]
+      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"}]
     },
     {
       "id": "browser::BT-VISUAL-001",
@@ -95,7 +95,7 @@
       "id": "system::AJ-01",
       "status": "pass",
       "checks": ["substrate overview and commit history render from the running loopback process"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "system::AJ-02",
@@ -107,25 +107,25 @@
       "id": "system::AJ-03",
       "status": "pass",
       "checks": ["imperfect and hostile fixture outcomes remain bounded and contextual without hiding valid content"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "system::AJ-04",
       "status": "pass",
       "checks": ["narrow overlays, keyboard state machines, contrast, focus return and reflow pass with limitations recorded"],
-      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f9aab5d40e496e2a7b99941860a9a6eff4a3e3637ecb8500d8ed0dd228eca094"}]
+      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"}]
     },
     {
       "id": "system::AJ-05",
       "status": "pass",
       "checks": ["wheel installs offline in a clean environment and launches from an unrelated working directory"],
-      "artifacts": [{"path": "tests/evidence/clean-install.json", "sha256": "3e64e3abb5637f7f7c3812eb38b5332ba87530fcbeb5fbd1c73a97a4d03d61c6"}]
+      "artifacts": [{"path": "tests/evidence/clean-install.json", "sha256": "0759917fa41bd986bfa192c28bca985455da51228564b5f132f94f9281244f3f"}]
     },
     {
       "id": "system::AJ-06",
       "status": "pass",
       "checks": ["capability boundary and hostile final DOM fail closed without active payloads"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f"}]
+      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
     },
     {
       "id": "system::AJ-07",

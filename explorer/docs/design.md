@@ -1,14 +1,14 @@
 # MarkdownLLM Explorer — Design Specification
 
-**Status:** design cold review reconciled; implementation remains gated by the test trace ledger
+**Status:** implementation-reconciled, operator-accepted candidate; public Windows release remains gated by signing and signed-byte native verification
 
-**Version:** 0.4
+**Version:** 0.5
 
 **Date:** 2026-08-27
 
 **Requirements:** `explorer/docs/requirements.md` v0.4 in the same reconciled change set
 
-**Architectural sources:** MarkdownLLM framework `7bffcb162f01c5cc6afb98756eca58bc5c5f79fe`; Code Architect domain `c711d2a46225aaca471100e1eec2afceb02e751a`
+**Architectural sources:** MarkdownLLM framework v3.36.0; Code Architect domain `c711d2a46225aaca471100e1eec2afceb02e751a`
 
 ## 1. Position
 
@@ -41,7 +41,7 @@ Packaged ES modules provide state, routing, API access and focused view componen
 
 ### D-005 — Capability-bearing loopback session
 
-Loopback is necessary but insufficient. Each process generates a 256-bit capability and prints `http://127.0.0.1:<port>/#cap=<value>`. URL fragments never reach the HTTP request line or access logs. Bootstrap stores the value in `sessionStorage`, removes it from the visible URL with `history.replaceState`, and sends it only in `X-MDLLM-Capability`. APIs also validate exact Host and Origin and compare the bounded header with `hmac.compare_digest`. Capability and cursor-HMAC keys are independent, in memory only and die with the process/browser session.
+Loopback is necessary but insufficient. Each process generates a 256-bit capability and prints `http://127.0.0.1:<port>/#cap=<value>`. URL fragments never reach the HTTP request line or access logs. Bootstrap stores the value in `sessionStorage`, removes it from the visible URL with `history.replaceState`, and sends it only in `X-Explorer-Capability`. APIs also validate exact Host and Origin and compare the bounded header with `hmac.compare_digest`. Capability and cursor-HMAC keys are independent, in memory only and die with the process/browser session.
 
 ### D-006 — Shipped together, installed independently
 
@@ -50,6 +50,8 @@ Loopback is necessary but insufficient. Each process generates a 256-bit capabil
 ### D-007 — One-folder frozen runtime inside one NSIS setup executable
 
 PyInstaller freezes the Windows application as a one-folder bundle; NSIS packages that folder into the single setup `.exe` the user receives. A raw one-file PyInstaller executable was rejected because it must expand itself to a temporary directory on every launch, slows desktop startup and still provides no root selection, shortcuts, upgrade identity or uninstaller. NSIS is build-time infrastructure only. The installed runtime contains Python, PyYAML, browser assets and the Windows desktop adapter and requires no system interpreter.
+
+The public build supplies a SignTool path, a certificate-store thumbprint and an HTTPS RFC 3161 timestamp URL as one fail-closed set. The build signs the frozen application before packaging; NSIS `!uninstfinalize` signs the generated uninstaller and `!finalize` signs the setup. SHA-256 is used for file and timestamp digests. An unsigned build remains a local development artefact, not a releasable Windows binary.
 
 ### D-008 — The desktop launcher is an outer driver
 
@@ -119,9 +121,13 @@ explorer/
 │   │   ├── get_settings.py
 │   │   └── read_document.py
 │   ├── adapters/
+│   │   ├── collection_reader.py
+│   │   ├── confined_link_resolver.py
 │   │   ├── filesystem_catalogue.py
 │   │   ├── confined_source_reader.py
+│   │   ├── cursors.py
 │   │   ├── git_commit_history.py
+│   │   ├── process_runner.py
 │   │   ├── frontmatter_parser.py
 │   │   ├── safe_markdown_parser.py
 │   │   └── document_presenter.py
@@ -131,26 +137,32 @@ explorer/
 │       ├── response_encoding.py
 │       └── static/
 │           ├── index.html
-│           ├── styles.css
+│           ├── app.css
+│           ├── context.css
 │           └── js/
-│               ├── main.js
+│               ├── app.js
 │               ├── api.js
 │               ├── state.js
-│               ├── router.js
+│               ├── routing.js
 │               ├── theme.js
+│               ├── overlays.js
 │               └── views/
 │                   ├── navigation.js
 │                   ├── overview.js
+│                   ├── tree.js
 │                   ├── collection.js
 │                   ├── document.js
 │                   ├── settings.js
-│                   └── context_panel.js
+│                   └── context.js
 └── tests/
-    ├── unit/
-    ├── contract/
-    ├── gitfs/
-    ├── system/
-    ├── fixtures/
+    ├── test_core.py
+    ├── test_application.py
+    ├── test_adapters.py
+    ├── test_http.py
+    ├── test_architecture.py
+    ├── test_browser_state.py
+    ├── test_windows_app.py
+    ├── traceability.yaml
     └── evidence/
 ```
 
@@ -268,18 +280,16 @@ For each adapter operation, `ConfinedSourceReader`:
 2. Applies depth, ignored-name and secret-name policy to every component; extension/name allowlisting applies only to the final regular file.
 3. Uses adapter-private boundary data to walk components with non-following metadata calls, rejecting symlinks, junctions/reparse points and non-regular final types.
 4. Resolves the candidate and proves it is within the token's canonical root and outside its excluded roots (for substrate, the entire configured domain directory).
-5. Captures parent/final identity and metadata immediately before I/O.
-6. For file reads, POSIX uses `os.open(..., O_RDONLY|O_NOFOLLOW)` plus `fstat`; Windows uses a small `ctypes` wrapper around `CreateFileW` with sharing-for-read, reparse-point rejection, `GetFileInformationByHandle` identity and `GetFinalPathNameByHandleW` ownership validation. Both read at most limit+1 and compare identity/size/mtime after read.
+5. Captures final non-following identity and metadata immediately before I/O.
+6. Opens the already-confined candidate in binary read mode, compares the open handle's `fstat` identity with the pre-open identity, reads at most limit+1, and compares open-handle and final path identity/size/mtime after the read. On Windows, `GetFinalPathNameByHandleW` resolves the native open handle and repeats source/exclusion ownership checks before any content is returned. A fully privileged process able to replace a path between these checks remains outside the local v1 trust boundary; the adapter does not claim portable `openat`/`O_NOFOLLOW` race elimination.
 7. For directory enumeration, captures non-following directory identity/mtime, performs a bounded `os.scandir` without following children, and compares identity/mtime after the scan. A detected rename/replacement returns `source_changed`.
 8. Fails with `source_changed` when stable identity cannot be demonstrated.
 
-This is defence in depth for a local read surface and matches requirements v0.3. Directory enumeration remains path-based: a fully privileged local process able to win every check/use race is outside the v1 trust boundary. Tests record the executed filesystem/OS profile and prove ordinary link/reparse/replacement cases fail closed without claiming portable `openat`-style race elimination.
+This is defence in depth for a local read surface and matches requirements v0.4. Directory enumeration remains path-based. Tests record the executed filesystem/OS profile and prove ordinary link/reparse/replacement cases fail closed without promoting the residual privileged-race exclusion into a stronger claim.
 
-Cursors are operation-specific canonical JSON, base64url encoded and HMAC-signed with a cursor-only process key:
+Directory depth counts directories below the source root and is inclusive. A directory exactly at the configured depth remains listable and its eligible files appear consistently in tree, search, overview counts and curated collections. Deeper directories are omitted; the affected tree/search/collection page and overview counts carry `partial: true`, and requesting a deeper tree path returns `directory_limit`.
 
-- tree: `{v,source,path,offset,fingerprint}` over at most 10,000 sorted eligible immediate entries;
-- search/collection: `{v,source,query_or_kind,offset,fingerprint}` over a deterministic traversal capped at 10,000 eligible candidates, with `partial: true` at the cap; and
-- commits: the pinned-head schema in §10.
+Cursors are one exact operation-bound canonical JSON shape, base64url encoded with a truncated HMAC-SHA256 signature from a cursor-only process key: `{context,offset,operation,revision,source}`. Tree uses the relative directory as `context`; search uses the case-folded query; collection uses its kind; commits use `HEAD`. `revision` is the bounded result fingerprint for filesystem operations and the pinned full commit SHA for history. Traversal is capped at 10,000 eligible candidates and reports `partial: true` when the candidate or depth boundary truncates visibility.
 
 Directory/search fingerprints hash the bounded ordered identity fields actually paged, not file bodies. A changed fingerprint returns `source_changed`; malformed/tampered cursors return `invalid_cursor` and cannot inject paths or offsets.
 
@@ -359,9 +369,9 @@ Socket/request deadlines and browser-side 10-second aborts guarantee a visible c
 
 ### State and routing
 
-The single state object contains `estate`, `sourceId`, `tab`, `relativePath`, `documentMode`, `theme`, `expandedPaths`, `search`, and per-operation `{requestId,status,error}`. State transitions are explicit reducer functions; view modules receive state and dispatch intents.
+The single state object contains the estate/current source, active view/path/mode/theme, search state, open directories, paged tree entries/cursors/partial flags, source context, repository context and current-request records. `state.js` owns request identity, abort and stale-response checks; workflow coordinators mutate only that explicit object and passive view modules receive the values and callbacks they render.
 
-The hash route contains only source ID, tab, mode and percent-encoded relative path. `router.js` round-trips it and handles back/forward. Ancestors of the selected path are derived as expanded; additional expansions live in session state.
+The hash route contains only source ID, tab, mode and percent-encoded relative path. `routing.js` round-trips it and `app.js` applies back/forward restoration. Ancestors of the selected path are derived as expanded; additional expansions live in session state. Skills and Memory restoration first reloads the curated collection shell, then opens the routed document in its embedded reader so refresh/back/forward preserve the visible collection mental model.
 
 Each API operation and document mode owns an `AbortController` and monotonically increasing request ID. A source/tab/path/mode change aborts obsolete work. A response mutates state only when its full operation/source/path/mode identity is still current, closing the stale-response race. A 401 after process restart becomes a distinct `session_expired` view with relaunch guidance; it never clears the last safe location.
 
@@ -381,7 +391,7 @@ Below 900 px, header buttons open rail/context as modal overlays with labelled d
 
 The source tree is one `role="tree"` with nested `role="group"`/`treeitem` rows, `aria-expanded` on directories, `aria-selected` on the active document and one roving `tabindex=0`. Arrow Up/Down moves visible rows; Right expands or enters; Left collapses or moves to parent; Home/End move bounds; Enter activates. Collapsing/removing the focused descendant moves focus to the owning directory. A paginated “Load more” keeps focus on the first added item or the button when no item is added.
 
-Tabs use `tablist`/`tab`/`tabpanel` with Arrow/Home/End and stable focus. Responsive overlays are labelled dialogs; the background becomes `inert`, focus is trapped, Escape closes, and focus returns to the opener. Async status uses one de-duplicating `aria-live="polite"` region; fatal/load errors use `role="alert"` once. View modules render DOM and dispatch intents only: `overview.js`, `collection.js`, `document.js`, `settings.js`, `navigation.js` and `context_panel.js` do not fetch or own cross-view state.
+Tabs use `tablist`/`tab`/`tabpanel` with Arrow/Home/End and stable focus. Responsive overlays are labelled dialogs; the background becomes `inert`, focus is trapped, Escape closes, and focus returns to the opener. Async status uses one de-duplicating `aria-live="polite"` region; fatal/load errors use `role="alert"` once. Routing, theme and responsive-overlay state machines are isolated in `routing.js`, `theme.js` and `overlays.js`. View modules render DOM and dispatch intents only: `overview.js`, `collection.js`, `document.js`, `settings.js`, `navigation.js` and `context.js` do not fetch or own cross-view state.
 
 CSS custom properties define light/dark tokens. `theme.js` applies `light`, `dark` or `system`, listens for system changes only in system mode, and persists only the explicit mode in `localStorage`. Reduced-motion preference removes non-essential transitions.
 
@@ -394,7 +404,7 @@ CSS custom properties define light/dark tokens. `theme.js` applies `light`, `dar
 mdllm-explorer = "markdownllm_explorer.__main__:main"
 ```
 
-`__main__.py` parses `--root`, `--domain-dir` (default `domain`) and `--port` (default 0), validates configuration, and calls `composition.build_runtime`. Composition constructs limits/policy, catalogue/boundary registry, focused filesystem ports, git adapter, frontmatter/Markdown/presenter pipeline, use cases and HTTP adapter. No global singleton is created at import time.
+`__main__.py` parses `--root`, `--domain-dir` (default `domain`) and `--port` (default 0), validates configuration, and calls `composition.build_runtime` followed by `composition.build_server`. Composition constructs limits/policy, catalogue/boundary registry, focused filesystem ports, Git adapter, frontmatter/Markdown/presenter pipeline, use cases and the selected HTTP adapter. No global singleton is created at import time.
 
 Startup prints product/version, resolved root and fragment-capability URL. `KeyboardInterrupt` initiates `shutdown`, closes the listening socket and joins active request threads up to five seconds. The portable runtime creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.4 and a read-only installed-package system test proves launch does not depend on writing them.
 
@@ -402,9 +412,9 @@ Startup prints product/version, resolved root and fragment-capability URL. `Keyb
 
 `packaging/windows/build.ps1` is the reproducible build boundary. It invokes an exactly pinned PyInstaller build environment, produces a one-folder `MarkdownLLM Explorer.exe`, then invokes NSIS 3.12+ to produce `MarkdownLLM-Explorer-Installer-<version>.exe`. Build outputs live under ignored `explorer/build/` and `explorer/dist/`; the source definitions, hashes and verification evidence are committed, while publication of the installer remains a separate release act.
 
-The setup runs per user (`RequestExecutionLevel user`) into `%LOCALAPPDATA%\Programs\MarkdownLLM Explorer`, so installation needs no elevation. A custom page selects a directory containing `AGENTS.md`; silent verification supplies `/SUBSTRATEROOT=<path>`. Setup stores only that root under `HKCU\Software\MarkdownLLM Explorer`, writes one Desktop and one Start Menu shortcut with quoted `--root`, registers the uninstaller, and offers to launch the app on completion. Reinstallation reads the previous root, overwrites the application directory and recreates singleton shortcuts. Uninstall removes those exact owned surfaces and no source-root path.
+The setup runs per user (`RequestExecutionLevel user`) into `%LOCALAPPDATA%\Programs\MarkdownLLM Explorer`, so installation needs no elevation. A custom page selects a directory containing `AGENTS.md`; silent verification supplies `/SUBSTRATEROOT=<path>`. Setup stores only that root under `HKCU\Software\MarkdownLLM Explorer`, writes one Desktop and one Start Menu shortcut with quoted `--root`, registers the uninstaller, and offers to launch the app on completion. Before reinstallation or uninstall mutates installed files, it invokes `--request-exit` and aborts on any non-zero result. Reinstallation then reads the previous root, replaces the application directory and recreates singleton shortcuts. Uninstall removes those exact owned surfaces and no source-root path.
 
-`windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser` and `--no-tray` verification switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. Exit calls server shutdown, closes the listener/socket and joins active requests within the existing five-second budget. Startup failures surface one bounded native message box because a windowed executable has no console.
+`windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser`, `--no-tray` and `--request-exit` verification/lifecycle switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. For `exit`, the primary acknowledges its PID before beginning shutdown; the secondary opens that process with synchronisation rights and waits up to 15 seconds for process termination. Exit calls server shutdown, closes the listener/socket and joins active requests within the existing five-second budget. Setup therefore waits for positive primary-process termination, not merely the short-lived command sender. Startup failures surface one bounded native message box because a windowed executable has no console.
 
 The frozen application imports `pystray`/Pillow only at this outer Windows delivery edge; those packages are bundled build inputs, not dependencies of core/application or of the portable CLI package. The application icon is the Explorer `M` mark supplied as a multi-resolution `.ico` and used consistently by the executable, setup, Desktop shortcut and tray.
 
@@ -422,7 +432,7 @@ The benchmark owns one overall deadline per request rather than allowing each ad
 - Browser runtime validation uses the available in-app Chromium surface at required viewports and captures screenshots/DOM/accessibility evidence.
 - Windows distribution validation builds from a clean ignored directory, inspects the PE/version/data manifest, installs silently without network or Python discovery, checks exact shortcut target/arguments and uninstall registration, launches the frozen executable against a temporary substrate, tests reactivation and tray-driven shutdown, reinstalls over itself, then uninstalls and compares source/outside snapshots.
 - Architecture fitness parses imports and rejects `pathlib`, `os`, `subprocess`, HTTP or renderer implementations in `core/`/`application/`; rejects any inner import from `adapters`/`delivery`; permits concrete adapter imports only in `composition.py`; runs shared contracts against fake/real ports; and rejects browser view modules that call `fetch` or mutate the global state directly.
-- An adapter-swap fixture substitutes fake catalogue, metrics, directory, search, collection, document, link, history, parser and presenter ports, asserts no inner file changes, and retains the changed-path manifest required by NFR-ARCH-003.
+- A retained adapter-swap fixture independently substitutes the HTTP server, Git reader, confined filesystem reader and Markdown renderer, runs a runtime probe for each, and proves every changed-path set is exactly composition plus one outer adapter with no core/application change.
 - A mutation/misconfiguration suite proves tests fail when ownership checks, capability checks, escaping, git no-lock environment, size limits or stale-response guards are deliberately removed.
 
 ## 16. Requirement allocation
@@ -451,5 +461,5 @@ The test specification must turn this allocation into one row per requirement ID
 - The standard-library server is intentionally small. If route/protocol complexity grows beyond this seven-GET surface, the HTTP adapter should be replaced, not expanded into application logic.
 - Full adversarial filesystem race resistance is OS-specific. v1 uses native handle/identity evidence and fails closed on disagreement; it does not claim protection from a fully privileged local attacker controlling the same machine.
 - Chromium runtime evidence is achievable in this environment. Firefox/Safari compatibility remains standards-backed and must be described as unexecuted until those browsers are actually exercised.
-- The Windows setup and application are structurally ready for Authenticode signing but this repository has no signing certificate. Local/test builds therefore show an unknown-publisher warning; a public Windows release must sign both executable and setup in a separately authorised release process.
+- The Windows setup and application are structurally ready for Authenticode signing but this repository has no signing certificate. Local/test builds can show an unknown-publisher warning or be blocked completely by Smart App Control / enterprise code-integrity policy. A public Windows release must sign both executable and setup in a separately authorised release process, then repeat the native lifecycle proof on those exact signed bytes.
 - Linux and macOS native installers are deliberately outside this increment. The portable Python package remains their verified execution route until each platform earns its own packaging design and runtime evidence.

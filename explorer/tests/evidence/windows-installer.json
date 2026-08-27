@@ -1,21 +1,33 @@
 {
   "schema": 1,
-  "status": "pass",
+  "status": "blocked",
+  "subject_sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad",
   "tool": {
     "name": "verify_windows_installer.py",
-    "version": "1"
+    "version": "2"
   },
   "installer": {
     "name": "MarkdownLLM-Explorer-Installer-0.2.0.exe",
-    "bytes": 10507714,
-    "sha256": "acde4921c9eacefc6ef6e9f3b5a7d4591214a3f74e492d83d4bc441c03064d37"
+    "bytes": 10509386,
+    "sha256": "a963d146e40e9813c522b2f87bb67dde4e48a3aa14f3d5a3516b3dd27ddf4c27",
+    "authenticode": "not-signed"
+  },
+  "exercised_installer": {
+    "name": "MarkdownLLM-Explorer-Verification-review-20260827-0.2.0.exe",
+    "bytes": 10508893,
+    "sha256": "d1259730caace21e10c914201b995ecfd00e2f9b0d55189f3a81c541a36d6a36",
+    "same_as_release": false,
+    "identity_only_isolation": true,
+    "app_name": "MarkdownLLM Explorer Verification review-20260827",
+    "instance_identity": "MarkdownLLMExplorerVerifier-review-20260827"
   },
   "environment": {
     "per_user": true,
     "administrator_required": false,
     "system_python_required": false,
     "system_node_required": false,
-    "network_required_after_setup_obtained": false
+    "network_required_after_setup_obtained": false,
+    "operator_installation_preserved": true
   },
   "bundle": {
     "status": "pass",
@@ -40,16 +52,19 @@
   "upgrade": {
     "status": "pass",
     "root_preserved": true,
-    "shortcut_count": 2
+    "shortcut_count": 2,
+    "active_process_stopped": true,
+    "active_request_drain_bounded": true
   },
   "uninstall": {
-    "status": "pass",
-    "owned_state_removed": true,
-    "substrate_unchanged": true,
-    "outside_unchanged": true
+    "status": "blocked",
+    "active_process_stopped": false,
+    "active_request_drain_bounded": false,
+    "blocked_before_process_start": true,
+    "blocker_evidence": "windows-publication-gate.json"
   },
-  "source_before_sha256": "84ac76047cecdd014773b131ac3b76b98c7d9b8885e5ed49ccde49856993c277",
-  "source_after_sha256": "84ac76047cecdd014773b131ac3b76b98c7d9b8885e5ed49ccde49856993c277",
-  "outside_before_sha256": "a316144ad83dcac2b86229338e12f942d930f0d6d9cc944b3cc65d409e03d1a1",
-  "outside_after_sha256": "a316144ad83dcac2b86229338e12f942d930f0d6d9cc944b3cc65d409e03d1a1"
+  "source_before_sha256": null,
+  "source_after_sha256": null,
+  "outside_before_sha256": null,
+  "outside_after_sha256": null
 }

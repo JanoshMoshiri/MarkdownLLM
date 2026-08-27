@@ -28,7 +28,7 @@ export function renderSources(container, estate, activeId, onSelect) {
   }
 }
 
-export function renderTree(container, entries, cursors, openDirectories, selectedPath, onDirectory, onFile, onMore) {
+export function renderTree(container, entries, cursors, partials, openDirectories, selectedPath, onDirectory, onFile, onMore) {
   container.replaceChildren();
   const rootEntries = entries.get("") || [];
   if (!rootEntries.length) { const empty = document.createElement("div"); empty.className = "tree-empty"; empty.textContent = "No eligible files"; container.append(empty); return; }
@@ -59,6 +59,11 @@ export function renderTree(container, entries, cursors, openDirectories, selecte
     if (cursor) {
       const more = document.createElement("button"); more.className = "tree-more"; more.dataset.parent = parentPath;
       more.textContent = "Load more files"; more.addEventListener("click", () => onMore(parentPath, cursor, more)); parent.append(more);
+    }
+    if (partials.get(parentPath)) {
+      const note = document.createElement("div"); note.className = "tree-empty";
+      note.setAttribute("role", "status"); note.textContent = "This directory is partial at the configured depth limit.";
+      parent.append(note);
     }
   };
   renderLevel(rootEntries, container, 1, "");

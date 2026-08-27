@@ -7,9 +7,8 @@ import signal
 import sys
 from pathlib import Path
 
-from .composition import build_runtime
+from .composition import build_runtime, build_server
 from .core.errors import ExplorerError
-from .delivery.http_server import serve
 
 
 def _port(value: str) -> int:
@@ -31,7 +30,7 @@ def main() -> int:
     try:
         resolved_root = arguments.root.expanduser().resolve(strict=True)
         runtime = build_runtime(resolved_root, arguments.domain_dir)
-        server, url = serve(runtime, arguments.port)
+        server, url = build_server(runtime, arguments.port)
     except (ExplorerError, OSError) as error:
         code = error.code if isinstance(error, ExplorerError) else "startup_failed"
         message = error.public_message if isinstance(error, ExplorerError) else "Explorer could not bind the requested loopback port."

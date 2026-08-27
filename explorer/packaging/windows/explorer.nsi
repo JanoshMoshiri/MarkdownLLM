@@ -19,15 +19,34 @@ SetCompressor /SOLID lzma
 !ifndef APP_ICON
   !error "APP_ICON is required"
 !endif
+!ifdef SIGNTOOL_PATH
+  !ifndef SIGN_CERTIFICATE_THUMBPRINT
+    !error "SIGN_CERTIFICATE_THUMBPRINT is required when signing"
+  !endif
+  !ifndef SIGN_TIMESTAMP_URL
+    !error "SIGN_TIMESTAMP_URL is required when signing"
+  !endif
+  !finalize '"${SIGNTOOL_PATH}" sign /sha1 ${SIGN_CERTIFICATE_THUMBPRINT} /fd SHA256 /tr "${SIGN_TIMESTAMP_URL}" /td SHA256 "%1"' = 0
+  !uninstfinalize '"${SIGNTOOL_PATH}" sign /sha1 ${SIGN_CERTIFICATE_THUMBPRINT} /fd SHA256 /tr "${SIGN_TIMESTAMP_URL}" /td SHA256 "%1"' = 0
+!endif
 
-!define APP_NAME "MarkdownLLM Explorer"
-!define APP_REGISTRY "Software\MarkdownLLM Explorer"
-!define UNINSTALL_REGISTRY "Software\Microsoft\Windows\CurrentVersion\Uninstall\MarkdownLLM Explorer"
+!ifndef APP_NAME
+  !define APP_NAME "MarkdownLLM Explorer"
+!endif
+!ifndef APP_REGISTRY
+  !define APP_REGISTRY "Software\MarkdownLLM Explorer"
+!endif
+!ifndef UNINSTALL_REGISTRY
+  !define UNINSTALL_REGISTRY "Software\Microsoft\Windows\CurrentVersion\Uninstall\MarkdownLLM Explorer"
+!endif
+!ifndef OUTPUT_NAME
+  !define OUTPUT_NAME "MarkdownLLM-Explorer-Installer-${APP_VERSION}.exe"
+!endif
 
 Name "${APP_NAME}"
 Caption "${APP_NAME} Setup"
-OutFile "${OUTPUT_DIR}\MarkdownLLM-Explorer-Installer-${APP_VERSION}.exe"
-InstallDir "$LOCALAPPDATA\Programs\MarkdownLLM Explorer"
+OutFile "${OUTPUT_DIR}\${OUTPUT_NAME}"
+InstallDir "$LOCALAPPDATA\Programs\${APP_NAME}"
 InstallDirRegKey HKCU "${APP_REGISTRY}" "InstallDir"
 Icon "${APP_ICON}"
 UninstallIcon "${APP_ICON}"
@@ -43,7 +62,7 @@ Var RootInput
 !define MUI_UNICON "${APP_ICON}"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_TEXT "Open MarkdownLLM Explorer"
+!define MUI_FINISHPAGE_RUN_TEXT "Open ${APP_NAME}"
 !define MUI_FINISHPAGE_RUN_FUNCTION LaunchExplorer
 
 !insertmacro MUI_PAGE_WELCOME
@@ -130,8 +149,19 @@ Section "Install" SEC_INSTALL
     Abort
   ${EndIf}
 
-  IfFileExists "$INSTDIR\MarkdownLLM Explorer.exe" 0 +2
-    ExecWait '"$INSTDIR\MarkdownLLM Explorer.exe" --request-exit --root "$SubstrateRoot"'
+  IfFileExists "$INSTDIR\MarkdownLLM Explorer.exe" 0 stopped_for_install
+    ; The currently installed binary may predate termination acknowledgement.
+    ; Run the new payload from NSIS's private directory so an upgrade waits for
+    ; the old primary process before touching its files.
+    InitPluginsDir
+    SetOutPath "$PLUGINSDIR\ExplorerStop"
+    File /r "${FROZEN_DIR}\*.*"
+    ExecWait '"$PLUGINSDIR\ExplorerStop\MarkdownLLM Explorer.exe" --request-exit --root "$SubstrateRoot"' $0
+  ${If} $0 != 0
+    SetErrorLevel 4
+    Abort
+  ${EndIf}
+  stopped_for_install:
 
   RMDir /r "$INSTDIR\_internal"
   Delete "$INSTDIR\MarkdownLLM Explorer.exe"
@@ -150,18 +180,23 @@ Section "Install" SEC_INSTALL
   WriteRegDWORD HKCU "${UNINSTALL_REGISTRY}" "NoModify" 1
   WriteRegDWORD HKCU "${UNINSTALL_REGISTRY}" "NoRepair" 1
 
-  CreateDirectory "$SMPROGRAMS\MarkdownLLM Explorer"
-  CreateShortcut "$DESKTOP\MarkdownLLM Explorer.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\MarkdownLLM Explorer.exe" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
-  CreateShortcut "$SMPROGRAMS\MarkdownLLM Explorer\MarkdownLLM Explorer.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\MarkdownLLM Explorer.exe" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
-  CreateShortcut "$SMPROGRAMS\MarkdownLLM Explorer\Uninstall MarkdownLLM Explorer.lnk" "$INSTDIR\Uninstall.exe"
+  CreateDirectory "$SMPROGRAMS\${APP_NAME}"
+  CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\MarkdownLLM Explorer.exe" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\MarkdownLLM Explorer.exe" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall ${APP_NAME}.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
 
 Section "Uninstall"
-  IfFileExists "$INSTDIR\MarkdownLLM Explorer.exe" 0 +2
-    ExecWait '"$INSTDIR\MarkdownLLM Explorer.exe" --request-exit --root "$INSTDIR"'
+  IfFileExists "$INSTDIR\MarkdownLLM Explorer.exe" 0 stopped_for_uninstall
+    ExecWait '"$INSTDIR\MarkdownLLM Explorer.exe" --request-exit --root "$INSTDIR"' $0
+  ${If} $0 != 0
+    SetErrorLevel 4
+    Abort
+  ${EndIf}
+  stopped_for_uninstall:
 
-  Delete "$DESKTOP\MarkdownLLM Explorer.lnk"
-  RMDir /r "$SMPROGRAMS\MarkdownLLM Explorer"
+  Delete "$DESKTOP\${APP_NAME}.lnk"
+  RMDir /r "$SMPROGRAMS\${APP_NAME}"
   DeleteRegKey HKCU "${UNINSTALL_REGISTRY}"
   DeleteRegKey HKCU "${APP_REGISTRY}"
   RMDir /r "$INSTDIR"

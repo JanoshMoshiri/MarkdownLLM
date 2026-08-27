@@ -7,6 +7,7 @@ export const state = {
   openDirectories: new Set([""]),
   treeEntries: new Map(),
   treeCursors: new Map(),
+  treePartials: new Map(),
   selectedPath: null,
   documentMode: "rendered",
   themeChoice: "system",

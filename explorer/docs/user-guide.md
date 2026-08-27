@@ -49,7 +49,8 @@ or folder name but not where it lives.
 ## Find the reusable skills
 
 Open **Skills** to see the Markdown files in the active source's `skills`
-folder. Choose a skill to read it without losing the estate around you.
+folder. Choose a skill to read it without losing the estate around you. Refresh,
+Back and Forward restore both the skill and the surrounding Skills collection.
 
 ![A fictional discovery skill rendered inside Explorer](images/styled-skill.jpg)
 
@@ -57,7 +58,8 @@ folder. Choose a skill to read it without losing the estate around you.
 
 Open **Memory** to see decisions, insights, conflicts and retrospectives. Items
 are grouped by kind, so you can move from a decision to the learning that
-informed it.
+informed it. A refreshed or restored Memory link keeps the grouped collection
+visible beside the selected item.
 
 ![Fictional decisions, insights and retrospectives in the Memory view](images/memory-view.jpg)
 

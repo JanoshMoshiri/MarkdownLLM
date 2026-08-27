@@ -25,6 +25,7 @@ from .application.search_paths import SearchPaths
 from .core.eligibility import EligibilityPolicy
 from .core.limits import ExplorerLimits
 from .delivery.api_routes import ApiRoutes, ExplorerUseCases
+from .delivery.http_server import serve as serve_http
 
 
 @dataclass(frozen=True)
@@ -55,3 +56,9 @@ def build_runtime(root: Path, domain_dir: str = "domain", *, limits: ExplorerLim
         ReadDocument(catalogue, source_browser, frontmatter, markdown, link_resolver, presenter),
     )
     return ExplorerRuntime(ApiRoutes(use_cases), secrets.token_urlsafe(32), active_limits)
+
+
+def build_server(runtime: ExplorerRuntime, port: int = 0):
+    """Compose the replaceable HTTP delivery adapter at the outer boundary."""
+
+    return serve_http(runtime, port)

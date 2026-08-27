@@ -2,12 +2,10 @@
 
 MarkdownLLM Explorer is a standalone, read-only browser for a MarkdownLLM substrate and its nested domain estate. It shows each repository's commits, file tree, skills and memory, and renders Markdown as a styled document.
 
-> **Current release position — Windows preview.** The application is working
-> and its technical evidence is automated, but independent review and operator
-> acceptance are not yet closed. Active upgrade/uninstall synchronisation and
-> the breadth of adapter-swap evidence remain open release items, alongside
-> operator UAT and final clean-up. Do not describe this candidate as a stable or
-> production-accepted release yet.
+> **Current release position — operator-accepted Windows preview candidate.**
+> Independent review corrections are implemented. Public Windows publication
+> is still gated by Authenticode signing and a final native lifecycle run on the
+> signed bytes; the unsigned local build is not the release asset.
 
 ## Start here
 
@@ -23,15 +21,29 @@ installation is required.
 
 Open **MarkdownLLM Explorer** from either shortcut. It starts in the notification
 area and opens the Explorer in your default browser. Use the tray menu to reopen
-the browser or exit the local service. Windows may identify an unsigned local
-development build as coming from an unknown publisher; release signing can be
-added without changing the package layout.
+the browser or exit the local service. Windows may warn about or fully block an
+unsigned local development build. The public release must sign both the frozen
+application and setup before the final native verification run; signing does
+not change the package layout.
 
 To build the Windows installer from source:
 
 ```powershell
 .\packaging\windows\build.ps1
 ```
+
+For a public build, pass all three signing inputs together:
+
+```powershell
+.\packaging\windows\build.ps1 `
+  -SignToolPath 'C:\path\to\signtool.exe' `
+  -SignCertificateThumbprint '40_HEXADECIMAL_CHARACTERS' `
+  -TimestampUrl 'https://your-ca.example/rfc3161'
+```
+
+The build signs the frozen application first, then uses NSIS signing hooks for
+the generated uninstaller and final setup. It fails closed if any signing step
+or RFC 3161 timestamp fails.
 
 The build requires Python 3.10+ and NSIS 3.12, but the resulting installer and
 installed application do not. The output is written to the ignored `dist/`
@@ -66,8 +78,11 @@ Press Ctrl+C to stop the server.
 ## Development
 
 ```powershell
-python -m pip install -e C:\path\to\MarkdownLLM\explorer
-python -m pytest C:\path\to\MarkdownLLM\explorer\tests
+Set-Location C:\path\to\MarkdownLLM\explorer
+python -m pip install -e .
+python -m pytest
 ```
 
-The governing requirements, design and test ledger also live in `docs/`.
+The explicit working-directory step keeps Explorer's local test tools distinct
+from the framework root's `tools` package. The governing requirements, design
+and test ledger also live in `docs/`.

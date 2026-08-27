@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T17:19:54
-generated_from: HEAD@f52b930
-coverage: 301
+generated: 2026-08-27T20:04:40
+generated_from: HEAD@016150e
+coverage: 302
 framework_version: 3.36.0
 ---
 
@@ -506,6 +506,7 @@ framework_version: 3.36.0
 - explorer-publication-readiness --derived-from--> explorer-publication-position
 - explorer-publication-readiness --references--> markdownllm-explorer-comprehensive-review-2026-08-27
 - explorer-publication-readiness --references--> markdownllm-explorer-windows-distribution
+- explorer-publication-readiness --references--> markdownllm-explorer-comprehensive-review-remediation-2026-08-27
 - external-review-2026-08-10 --informs--> external-review-response-2026-08-10
 - external-review-2026-08-10 --informs--> coherence-is-a-maintained-rate-not-a-state
 - external-review-2026-08-10 --informs--> hook-enforcement-has-three-anchors
@@ -748,6 +749,9 @@ framework_version: 3.36.0
 - markdownllm-explorer-comprehensive-review-2026-08-27 --implements--> code-architect-governs-substrate-code
 - markdownllm-explorer-comprehensive-review-2026-08-27 --extends--> markdownllm-explorer-code-cold-review-2
 - markdownllm-explorer-comprehensive-review-2026-08-27 --references--> markdownllm-explorer-windows-distribution
+- markdownllm-explorer-comprehensive-review-remediation-2026-08-27 --extends--> markdownllm-explorer-comprehensive-review-2026-08-27
+- markdownllm-explorer-comprehensive-review-remediation-2026-08-27 --documents--> explorer-publication-readiness
+- markdownllm-explorer-comprehensive-review-remediation-2026-08-27 --implements--> code-architect-governs-substrate-code
 - mcp-domain-server-design --extends--> interface-specification
 - mcp-domain-server-design --complements--> provenance-specification
 - mcp-domain-server-design --complements--> orchestration-specification

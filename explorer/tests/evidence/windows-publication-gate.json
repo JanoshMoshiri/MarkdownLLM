@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "ST-WIN-PUBLICATION-GATE-001",
+  "status": "blocked",
+  "recorded_at": "2026-08-27T19:57:18+01:00",
+  "subject_sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad",
+  "release_candidate": {
+    "name": "MarkdownLLM-Explorer-Installer-0.2.0.exe",
+    "bytes": 10509386,
+    "sha256": "a963d146e40e9813c522b2f87bb67dde4e48a3aa14f3d5a3516b3dd27ddf4c27",
+    "authenticode": "not-signed"
+  },
+  "frozen_application": {
+    "name": "MarkdownLLM Explorer.exe",
+    "bytes": 3032565,
+    "sha256": "999edffeedd47d7285c7acbf60a599510849d2761820d354bbc71e8ba775eff8",
+    "authenticode": "not-signed"
+  },
+  "identity_isolated_candidate": {
+    "name": "MarkdownLLM-Explorer-Verification-review-20260827-0.2.0.exe",
+    "bytes": 10508893,
+    "sha256": "d1259730caace21e10c914201b995ecfd00e2f9b0d55189f3a81c541a36d6a36"
+  },
+  "observations": {
+    "clean_unsigned_build": "pass",
+    "release_invalid_root_exit": 2,
+    "isolated_install": "pass",
+    "isolated_active_upgrade": "pass",
+    "isolated_active_uninstall": "blocked-before-process-start",
+    "operator_installation_touched": false,
+    "test_owned_residue_removed": true
+  },
+  "blocker": {
+    "kind": "external-release-credential",
+    "policy": "Windows Smart App Control / Code Integrity",
+    "policy_id": "0283ac0f-fff1-49ae-ada1-8a933130cad6",
+    "event_id": 3077,
+    "event_time": "2026-08-27T19:51:26+01:00",
+    "message": "The generated unsigned Uninstall.exe did not meet the Enterprise signing level and was blocked before process start."
+  },
+  "implemented_release_path": {
+    "frozen_application_signing": true,
+    "nsis_uninstaller_signing_hook": "!uninstfinalize",
+    "nsis_setup_signing_hook": "!finalize",
+    "file_digest": "SHA256",
+    "timestamp_protocol": "RFC3161",
+    "timestamp_digest": "SHA256",
+    "partial_signing_inputs_fail_closed": true
+  },
+  "required_to_close": [
+    "Provide an authorised Authenticode certificate thumbprint, SignTool path and HTTPS RFC 3161 timestamp URL.",
+    "Build the frozen application, generated uninstaller and setup through the signed build route.",
+    "Run the full active install, upgrade and uninstall verifier on the signed release installer.",
+    "Reseal the technical trace and record the signed release installer SHA-256."
+  ]
+}

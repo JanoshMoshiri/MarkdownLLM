@@ -21,9 +21,8 @@ from multiprocessing.connection import Client, Listener
 from pathlib import Path
 from typing import Callable, Protocol
 
-from .composition import build_runtime
+from .composition import build_runtime, build_server
 from .core.errors import ExplorerError
-from .delivery.http_server import serve
 
 
 _STARTUP_MESSAGE = (
@@ -33,6 +32,10 @@ _STARTUP_MESSAGE = (
 _COMMANDS = {"open", "exit"}
 _PIPE_AUTHKEY = b"markdownllm-explorer-local-activation-v1"
 _ERROR_ALREADY_EXISTS = 183
+_ERROR_INVALID_PARAMETER = 87
+_SYNCHRONIZE = 0x00100000
+_WAIT_OBJECT_0 = 0
+_PRIMARY_EXIT_TIMEOUT_SECONDS = 15.0
 
 
 class ExplorerServer(Protocol):
@@ -163,13 +166,18 @@ class WindowsInstanceCoordinator:
         self._listener: Listener | None = None
         self._listener_thread: threading.Thread | None = None
         self._closing = threading.Event()
+        self._last_primary_pid: int | None = None
 
         if os.name != "nt":
             self.primary = True
             return
 
         kernel32 = ctypes.windll.kernel32
+        kernel32.CreateMutexW.argtypes = [
+            ctypes.c_void_p, ctypes.c_bool, ctypes.c_wchar_p
+        ]
         kernel32.CreateMutexW.restype = ctypes.c_void_p
+        kernel32.GetLastError.restype = ctypes.c_uint32
         self._mutex_handle = kernel32.CreateMutexW(
             None, False, f"Local\\MarkdownLLMExplorer-{identity}"
         )
@@ -190,12 +198,40 @@ class WindowsInstanceCoordinator:
                 )
                 try:
                     connection.send_bytes(payload)
+                    if connection.poll(2.0):
+                        response = connection.recv_bytes(32).decode("ascii")
+                        if response.isdecimal():
+                            self._last_primary_pid = int(response)
                 finally:
                     connection.close()
                 return True
-            except (FileNotFoundError, ConnectionRefusedError, OSError):
+            except (EOFError, FileNotFoundError, ConnectionRefusedError, OSError, UnicodeError):
                 time.sleep(0.1)
         return False
+
+    def wait_for_primary_exit(self, timeout_seconds: float) -> bool:
+        """Wait for the acknowledged primary process, not merely the command sender."""
+
+        if os.name != "nt" or self._last_primary_pid is None:
+            return False
+        kernel32 = ctypes.windll.kernel32
+        kernel32.OpenProcess.argtypes = [ctypes.c_uint32, ctypes.c_bool, ctypes.c_uint32]
+        kernel32.OpenProcess.restype = ctypes.c_void_p
+        kernel32.WaitForSingleObject.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+        kernel32.WaitForSingleObject.restype = ctypes.c_uint32
+        kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+        kernel32.CloseHandle.restype = ctypes.c_bool
+        kernel32.GetLastError.restype = ctypes.c_uint32
+        process_handle = kernel32.OpenProcess(
+            _SYNCHRONIZE, False, self._last_primary_pid
+        )
+        if not process_handle:
+            return kernel32.GetLastError() == _ERROR_INVALID_PARAMETER
+        try:
+            timeout_ms = max(0, min(int(timeout_seconds * 1000), 0xFFFFFFFE))
+            return kernel32.WaitForSingleObject(process_handle, timeout_ms) == _WAIT_OBJECT_0
+        finally:
+            kernel32.CloseHandle(process_handle)
 
     def listen(
         self,
@@ -214,6 +250,8 @@ class WindowsInstanceCoordinator:
                     connection = self._listener.accept()
                     try:
                         command = connection.recv_bytes(16).decode("ascii")
+                        if command in _COMMANDS:
+                            connection.send_bytes(str(os.getpid()).encode("ascii"))
                     finally:
                         connection.close()
                 except (EOFError, OSError, UnicodeError):
@@ -241,7 +279,10 @@ class WindowsInstanceCoordinator:
             self._listener_thread.join(1.0)
             self._listener_thread = None
         if self._mutex_handle and os.name == "nt":
-            ctypes.windll.kernel32.CloseHandle(self._mutex_handle)
+            kernel32 = ctypes.windll.kernel32
+            kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+            kernel32.CloseHandle.restype = ctypes.c_bool
+            kernel32.CloseHandle(self._mutex_handle)
             self._mutex_handle = None
 
 
@@ -249,7 +290,7 @@ def run_windows_application(
     arguments: WindowsLaunchArguments,
     *,
     runtime_builder=build_runtime,
-    server_factory=serve,
+    server_factory=build_server,
     coordinator: WindowsInstanceCoordinator | None = None,
     browser_opener: Callable[[str], object] | None = None,
     tray_factory: Callable[[], TraySurface] = WindowsTraySurface,
@@ -263,7 +304,13 @@ def run_windows_application(
     try:
         if not instance.primary:
             command = "exit" if arguments.request_exit else "open"
-            return 0 if instance.send(command) else 3
+            if not instance.send(command):
+                return 3
+            if arguments.request_exit and not instance.wait_for_primary_exit(
+                _PRIMARY_EXIT_TIMEOUT_SECONDS
+            ):
+                return 4
+            return 0
         if arguments.request_exit:
             return 0
 

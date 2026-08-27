@@ -65,8 +65,33 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
         return {"system::ST-INSTALL-001", "system::ST-OFFLINE-001", "system::ST-CLI-001"}
     if path.name == "windows-installer.json":
         value = _json(path)
-        if value.get("tool", {}).get("name") != "verify_windows_installer.py" or value.get("status") != "pass":
+        if value.get("tool", {}).get("name") != "verify_windows_installer.py":
             raise ValueError("Windows installer evidence failed")
+        if value.get("status") == "blocked":
+            blocked = (
+                value.get("subject_sha256") == subject
+                and value.get("installer", {}).get("sha256")
+                and value.get("upgrade", {}).get("status") == "pass"
+                and value.get("uninstall", {}).get("status") == "blocked"
+                and value.get("uninstall", {}).get("blocked_before_process_start")
+                and value.get("uninstall", {}).get("blocker_evidence") == "windows-publication-gate.json"
+            )
+            if not blocked:
+                raise ValueError("Windows installer blocker record is incomplete")
+            return set()
+        if value.get("status") != "pass":
+            raise ValueError("Windows installer evidence failed")
+        exercised = value.get("exercised_installer", {})
+        if not exercised.get("same_as_release"):
+            isolated = (
+                exercised.get("identity_only_isolation")
+                and str(exercised.get("app_name", "")).startswith("MarkdownLLM Explorer Verification ")
+                and exercised.get("instance_identity")
+                and value.get("installer", {}).get("sha256")
+                and exercised.get("sha256")
+            )
+            if not isolated:
+                raise ValueError("Windows installer isolation is not identity-only and subject-bound")
         environment = value.get("environment", {})
         if not environment.get("per_user") or environment.get("administrator_required"):
             raise ValueError("Windows installer is not verified as per-user")
@@ -75,6 +100,10 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
         stages = ("bundle", "install", "launch", "upgrade", "uninstall")
         if not all(value.get(stage, {}).get("status") == "pass" for stage in stages):
             raise ValueError("Windows installer lifecycle is incomplete")
+        for stage in ("upgrade", "uninstall"):
+            observation = value.get(stage, {})
+            if not observation.get("active_process_stopped") or not observation.get("active_request_drain_bounded"):
+                raise ValueError(f"Windows {stage} did not prove bounded active-process shutdown")
         if value.get("source_before_sha256") != value.get("source_after_sha256") or value.get("outside_before_sha256") != value.get("outside_after_sha256"):
             raise ValueError("Windows installer changed substrate or outside data")
         return {
@@ -94,7 +123,26 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
         return {"analysis::PT-SCALE-001"}
     if path.name == "adapter-swap.json":
         value = _json(path)
-        if value.get("status") != "pass" or value.get("changed_paths") != ["adapters/swap_presenter.py", "composition.py"] or value.get("forbidden_inner_changes"):
+        swaps = value.get("swaps", [])
+        expected = {
+            "HTTP server": ["composition.py", "delivery/swap_http_server.py"],
+            "Git reader": ["adapters/swap_git_commit_history.py", "composition.py"],
+            "Filesystem reader": ["adapters/swap_confined_source_reader.py", "composition.py"],
+            "Markdown renderer": ["adapters/swap_presenter.py", "composition.py"],
+        }
+        observed = {item.get("adapter"): item for item in swaps if isinstance(item, dict)}
+        valid = (
+            value.get("schema") == 2
+            and value.get("status") == "pass"
+            and set(observed) == set(expected)
+            and all(
+                observed[name].get("changed_paths") == paths
+                and not observed[name].get("forbidden_inner_changes")
+                and observed[name].get("runtime_probe") == "pass"
+                for name, paths in expected.items()
+            )
+        )
+        if not valid:
             raise ValueError("adapter swap changed-path proof failed")
         return {"analysis::AT-SWAP-001"}
     if path.name == "immutability.json":
@@ -104,6 +152,19 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
         if len(value.get("helper_classes", [])) < 8 or value.get("source_entries", 0) < 1:
             raise ValueError("immutability helper/snapshot coverage incomplete")
         return {"analysis::GT-IMMUTABLE-001"}
+    if path.name == "operator-acceptance.json":
+        value = _json(path)
+        if (
+            value.get("schema") != 1
+            or value.get("status") != "accepted"
+            or value.get("accepted_by") != "Janosh Moshiri"
+            or value.get("accepted_at") != "2026-08-27"
+            or not value.get("statement")
+            or not value.get("scope")
+            or not isinstance(value.get("requirement_ids"), list)
+        ):
+            raise ValueError("operator acceptance evidence is incomplete")
+        return set()
     if path.name == "browser-runtime.json":
         value = _json(path)
         if value.get("subject_sha256") != subject or value.get("tool", {}).get("name") != "in-app-browser":
@@ -168,16 +229,33 @@ def main() -> int:
         passed |= external; locations.update(external_locations)
     except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
         index = {}; evidence_errors.append(str(error))
+    pending_human = {
+        requirement_id
+        for requirement_id, row in manifest["requirements"].items()
+        if row["human_disposition"] == "pending-human"
+    }
+    accepted_human: set[str] = set()
+    if index:
+        try:
+            acceptance = _json(arguments.evidence_dir.resolve() / "operator-acceptance.json")
+            accepted_human = set(acceptance.get("requirement_ids", []))
+            if accepted_human != pending_human:
+                raise ValueError("operator acceptance scope does not match the human-owned trace rows")
+        except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+            evidence_errors.append(str(error))
     rows: dict[str, dict[str, object]] = {}; unresolved: list[str] = []
     for requirement_id, row in manifest["requirements"].items():
         expected = row["evidence"]
         missing = [item for item in expected if item not in passed]
         misplaced = [item for item in expected if item in locations and locations[item] not in row["evidence_location"]]
         status = "pass" if not missing and not misplaced else "fail"
+        human_disposition = row["human_disposition"]
+        if human_disposition == "pending-human" and requirement_id in accepted_human:
+            human_disposition = "accepted"
         rows[requirement_id] = {
             "status": status, "expected": expected, "missing": missing, "misplaced": misplaced,
             "technical_owner": row["technical_owner"], "acceptance_owner": row["acceptance_owner"],
-            "human_disposition": row["human_disposition"], "method": row["method"], "fixture": row["fixture"],
+            "human_disposition": human_disposition, "method": row["method"], "fixture": row["fixture"],
             "observable_pass_condition": row["observable_pass_condition"], "evidence_location": row["evidence_location"],
         }
         if status == "fail": unresolved.append(requirement_id)
@@ -189,7 +267,9 @@ def main() -> int:
         "resolved_evidence_count": len(passed), "requirements": rows,
         "summary": {
             "requirements": len(rows), "technical_passed": sum(row["status"] == "pass" for row in rows.values()),
-            "technical_failed": len(unresolved), "human_pending": sum(row["human_disposition"] == "pending-human" for row in rows.values()),
+            "technical_failed": len(unresolved),
+            "human_accepted": sum(row["human_disposition"] == "accepted" for row in rows.values()),
+            "human_pending": sum(row["human_disposition"] == "pending-human" for row in rows.values()),
         },
         "unresolved_requirements": unresolved, "unresolved_mutants": mutation_missing,
     }

@@ -1,19 +1,19 @@
 {
   "schema": 2,
   "id": "TRACE-001",
-  "status": "pass",
+  "status": "fail",
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "30c3ef82cf871f695473cba6649310b09ca873be8b3ccc48b1002f3a2e34f86a"
+    "sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad"
   },
   "junit": {
-    "tests": 111,
+    "tests": 114,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
   "evidence_errors": [],
-  "resolved_evidence_count": 126,
+  "resolved_evidence_count": 121,
   "requirements": {
     "FR-EST-001": {
       "status": "pass",
@@ -25,7 +25,7 @@
       "misplaced": [],
       "technical_owner": "runtime-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Explicit valid root works and invalid root fails from any cwd",
@@ -44,7 +44,7 @@
       "misplaced": [],
       "technical_owner": "catalogue-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "First source is labelled Substrate independent of folder name",
@@ -63,7 +63,7 @@
       "misplaced": [],
       "technical_owner": "catalogue-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Only one-level admitted domains appear in stable specified order",
@@ -116,7 +116,7 @@
       "misplaced": [],
       "technical_owner": "catalogue-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-IMPERFECT",
       "observable_pass_condition": "Valid sources remain usable beside rejected and non-git candidates",
@@ -171,7 +171,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Persistent rail exposes Substrate above Domain estate and a file tree",
@@ -189,7 +189,7 @@
       "misplaced": [],
       "technical_owner": "navigation-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Source changes without reload and visible content belongs to the selected source",
@@ -208,7 +208,7 @@
       "misplaced": [],
       "technical_owner": "tree-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Nested tree loads one directory page at a time without reading file bodies",
@@ -226,7 +226,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Eligible tree selection opens the document and retains selected context",
@@ -244,7 +244,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "URL, back, forward and refresh restore source/tab/path/mode and ancestors",
@@ -262,7 +262,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration+inspection",
       "fixture": "F-UI",
       "observable_pass_condition": "Desktop, narrow and zoom layouts retain every capability and correct focus",
@@ -280,7 +280,7 @@
       "misplaced": [],
       "technical_owner": "overview-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Overview exposes identity, counts, repository state, first commits and partial labels",
@@ -299,7 +299,7 @@
       "misplaced": [],
       "technical_owner": "git-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-GIT-SHAPES",
       "observable_pass_condition": "Commit fields, newest-first order, stable pagination and repository states are exact",
@@ -318,7 +318,7 @@
       "misplaced": [],
       "technical_owner": "collection-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Skills lists Markdown items or an explicit empty state without error",
@@ -337,7 +337,7 @@
       "misplaced": [],
       "technical_owner": "collection-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-IMPERFECT",
       "observable_pass_condition": "Memory recursion, grouping, metadata issues, duplicates and empty state follow contract",
@@ -356,7 +356,7 @@
       "misplaced": [],
       "technical_owner": "settings-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Settings shows only authorised read-only facts and theme with no write controls",
@@ -394,7 +394,7 @@
       "misplaced": [],
       "technical_owner": "markdown-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-MARKDOWN-GOLDEN",
       "observable_pass_condition": "Every required Markdown construct matches independently inspected safe output",
@@ -413,7 +413,7 @@
       "misplaced": [],
       "technical_owner": "frontmatter-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-MARKDOWN-GOLDEN",
       "observable_pass_condition": "Frontmatter is separately structured and invalid metadata is never inferred",
@@ -432,7 +432,7 @@
       "misplaced": [],
       "technical_owner": "document-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Raw/rendered switch fetches and displays exactly one representation",
@@ -450,7 +450,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Context panel shows only factual source/document metadata",
@@ -543,7 +543,7 @@
       "misplaced": [],
       "technical_owner": "search-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Case-insensitive filename search returns only eligible owned paths with bounded pagination",
@@ -562,7 +562,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Search remains reachable in desktop and narrow layouts with loading/empty/error states",
@@ -571,14 +571,16 @@
       ]
     },
     "FR-RUN-001": {
-      "status": "pass",
+      "status": "fail",
       "expected": [
         "pytest::tests/test_cli.py::test_cli_launches_from_arbitrary_cwd_with_packaged_assets",
         "system::ST-INSTALL-001",
         "system::ST-OFFLINE-001",
         "system::ST-WIN-BUNDLE-001"
       ],
-      "missing": [],
+      "missing": [
+        "system::ST-WIN-BUNDLE-001"
+      ],
       "misplaced": [],
       "technical_owner": "runtime-suite",
       "acceptance_owner": "Technical run",
@@ -629,17 +631,21 @@
       ]
     },
     "FR-RUN-004": {
-      "status": "pass",
+      "status": "fail",
       "expected": [
         "system::ST-WIN-BUNDLE-001",
         "system::ST-WIN-INSTALL-001",
         "system::AJ-08"
       ],
-      "missing": [],
+      "missing": [
+        "system::ST-WIN-BUNDLE-001",
+        "system::ST-WIN-INSTALL-001",
+        "system::AJ-08"
+      ],
       "misplaced": [],
       "technical_owner": "windows-distribution-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "One setup executable installs per user without elevation/Python/network, validates root and creates singleton shortcuts plus uninstaller",
@@ -648,17 +654,20 @@
       ]
     },
     "FR-RUN-005": {
-      "status": "pass",
+      "status": "fail",
       "expected": [
         "pytest::tests/test_windows_app.py::test_desktop_session_opens_browser_and_shuts_down_cleanly",
         "system::ST-WIN-LAUNCH-001",
         "system::AJ-09"
       ],
-      "missing": [],
+      "missing": [
+        "system::ST-WIN-LAUNCH-001",
+        "system::AJ-09"
+      ],
       "misplaced": [],
       "technical_owner": "windows-distribution-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "Shortcut opens browser and tray; reactivation leaves one server; Open and Exit terminate in bounded time without capability persistence",
@@ -668,17 +677,21 @@
       ]
     },
     "FR-RUN-006": {
-      "status": "pass",
+      "status": "fail",
       "expected": [
         "system::ST-WIN-UPGRADE-001",
         "system::ST-WIN-UNINSTALL-001",
         "system::AJ-10"
       ],
-      "missing": [],
+      "missing": [
+        "system::ST-WIN-UPGRADE-001",
+        "system::ST-WIN-UNINSTALL-001",
+        "system::AJ-10"
+      ],
       "misplaced": [],
       "technical_owner": "windows-distribution-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "Reinstall preserves selected root and singleton owned surfaces; uninstall removes only owned surfaces with source/outside snapshots unchanged",
@@ -736,7 +749,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Calm three-region shell follows the approved spatial hierarchy without copied branding",
@@ -753,7 +766,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Every view renders in light, dark and system themes",
@@ -787,7 +800,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "Explicit theme persists reload without losing route or capability",
@@ -805,7 +818,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "inspection",
       "fixture": "F-UI",
       "observable_pass_condition": "Selection, action, empty and error states are distinct in both themes",
@@ -822,7 +835,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "inspection+demonstration",
       "fixture": "F-UI",
       "observable_pass_condition": "No placeholder or irrelevant control is visible and every shown control operates",
@@ -879,7 +892,7 @@
       "human_disposition": "none",
       "method": "test+analysis",
       "fixture": "F-SOURCE",
-      "observable_pass_condition": "Executable adapter swap changes composition and outer adapter only; no core/application file",
+      "observable_pass_condition": "HTTP, Git, filesystem and Markdown swaps each change composition plus one outer adapter only; no core/application file",
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/adapter-swap.json"
@@ -897,7 +910,7 @@
       "misplaced": [],
       "technical_owner": "browser-runtime",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+inspection",
       "fixture": "F-UI",
       "observable_pass_condition": "Named WCAG interaction, contrast, focus, target, zoom and reflow checks are evidenced with limitations",
@@ -983,7 +996,7 @@
       ]
     },
     "NFR-SAFE-001C": {
-      "status": "pass",
+      "status": "fail",
       "expected": [
         "pytest::tests/test_safety.py::test_http_acceptance_journeys_leave_sources_git_acl_and_outside_state_immutable",
         "system::ST-INSTALL-001",
@@ -992,7 +1005,11 @@
         "system::AJ-07",
         "system::AJ-10"
       ],
-      "missing": [],
+      "missing": [
+        "system::ST-WIN-INSTALL-001",
+        "system::ST-WIN-UNINSTALL-001",
+        "system::AJ-10"
+      ],
       "misplaced": [],
       "technical_owner": "safety-suite",
       "acceptance_owner": "Technical run",
@@ -1069,6 +1086,7 @@
       "status": "pass",
       "expected": [
         "pytest::tests/test_adapters.py::test_directory_scan_limit_n_minus_one_n_n_plus_one",
+        "pytest::tests/test_adapters.py::test_directory_depth_is_inclusive_and_consistent_across_tree_search_counts_and_collections",
         "pytest::tests/test_adapters.py::test_file_size_limit_enforces_n_minus_one_n_and_n_plus_one",
         "pytest::tests/test_parsing.py::test_frontmatter_collection_budget_n_minus_one_n_n_plus_one",
         "pytest::tests/test_adapters.py::test_bounded_process_runner_repeated_floods_leave_no_threads_or_children",
@@ -1111,7 +1129,7 @@
       ]
     },
     "NFR-OFF-001": {
-      "status": "pass",
+      "status": "fail",
       "expected": [
         "system::ST-OFFLINE-001",
         "system::ST-WIN-INSTALL-001",
@@ -1120,7 +1138,10 @@
         "system::AJ-03",
         "system::AJ-08"
       ],
-      "missing": [],
+      "missing": [
+        "system::ST-WIN-INSTALL-001",
+        "system::AJ-08"
+      ],
       "misplaced": [],
       "technical_owner": "runtime-suite",
       "acceptance_owner": "Technical run",
@@ -1135,14 +1156,16 @@
       ]
     },
     "NFR-PORT-001": {
-      "status": "pass",
+      "status": "fail",
       "expected": [
         "pytest::tests/test_meta.py::test_supported_python_range_is_declared",
         "system::ST-INSTALL-001",
         "system::ST-WIN-BUNDLE-001",
         "browser::BT-A11Y-001"
       ],
-      "missing": [],
+      "missing": [
+        "system::ST-WIN-BUNDLE-001"
+      ],
       "misplaced": [],
       "technical_owner": "portability-suite",
       "acceptance_owner": "Technical run",
@@ -1215,10 +1238,19 @@
   },
   "summary": {
     "requirements": 63,
-    "technical_passed": 63,
-    "technical_failed": 0,
-    "human_pending": 30
+    "technical_passed": 56,
+    "technical_failed": 7,
+    "human_accepted": 30,
+    "human_pending": 0
   },
-  "unresolved_requirements": [],
+  "unresolved_requirements": [
+    "FR-RUN-001",
+    "FR-RUN-004",
+    "FR-RUN-005",
+    "FR-RUN-006",
+    "NFR-SAFE-001C",
+    "NFR-OFF-001",
+    "NFR-PORT-001"
+  ],
   "unresolved_mutants": []
 }

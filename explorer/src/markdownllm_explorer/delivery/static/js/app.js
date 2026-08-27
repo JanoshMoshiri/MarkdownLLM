@@ -1,5 +1,8 @@
 import {captureCapability, get} from "./api.js";
 import {abortAllRequests, beginRequest, completeRequest, isCurrent, state} from "./state.js";
+import {routeFromHash, routeFromText, validView, writeRoute} from "./routing.js";
+import {applyThemeChoice as applyTheme, cycleThemeChoice} from "./theme.js";
+import {activeOverlay, closeOverlays, openOverlay, visibleFocusable} from "./overlays.js";
 import {renderSources, renderTree} from "./views/navigation.js";
 import {appendCommit, refreshCommitAbbreviations, renderOverview} from "./views/overview.js";
 import {appendItem, renderCollection} from "./views/collection.js";
@@ -35,7 +38,7 @@ async function initialise() {
     state.view = validView(routed.tab);
     state.documentMode = routed.mode === "raw" ? "raw" : "rendered";
     await selectSource(requested || estate.sources[0], false);
-    if (routed.path) { await expandAncestors(routed.path); await openDocument(routed.path, state.documentMode, false); }
+    if (routed.path) await restoreDocumentRoute(routed.path, state.documentMode, true);
     else updateRoute(true);
   } catch (error) {
     if (error.name !== "AbortError" && isCurrent(request)) showError(error);
@@ -76,7 +79,10 @@ function bindChrome() {
     const anchor = event.target.closest?.('a[href^="#source="]');
     if (!anchor) return;
     event.preventDefault(); const route = routeFromText(anchor.getAttribute("href"));
-    if (route.path) openDocument(route.path, "rendered");
+    if (route.path) {
+      const opener = state.view === "skills" || state.view === "memory" ? openCollectionDocument : openDocument;
+      opener(route.path, "rendered");
+    }
   });
   window.addEventListener("popstate", restoreRoute);
   matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => { if (state.themeChoice === "system") applyThemeChoice("system"); });
@@ -87,6 +93,7 @@ async function chooseTab(view) {
   state.view = validView(view); state.selectedPath = null;
   state.search = {query: "", items: [], cursor: null, partial: false};
   document.querySelector("#search-input").value = "";
+  renderSourceContext(contextContent, state.source, state.sourceSettings, state.repository);
   activateTab(); updateRoute(); await loadView();
 }
 
@@ -95,7 +102,7 @@ async function selectSource(source, pushRoute = true) {
   abortAllRequests();
   clearTimeout(searchTimer);
   state.source = source; state.selectedPath = null; state.sourceSettings = null; state.repository = null;
-  state.treeEntries.clear(); state.treeCursors.clear(); state.openDirectories = new Set([""]);
+  state.treeEntries.clear(); state.treeCursors.clear(); state.treePartials.clear(); state.openDirectories = new Set([""]);
   state.search = {query: "", items: [], cursor: null, partial: false};
   document.querySelector("#search-input").value = "";
   document.querySelector("#source-name").textContent = source.display_name;
@@ -118,6 +125,7 @@ async function loadTreePage(path, cursor = null, append = false) {
     const known = new Set(prior.map(item => item.path));
     state.treeEntries.set(path, [...prior, ...page.items.filter(item => !known.has(item.path))]);
     state.treeCursors.set(path, page.next_cursor || null);
+    state.treePartials.set(path, page.partial);
     renderCurrentTree();
     return true;
   } catch (error) {
@@ -129,7 +137,7 @@ async function loadTreePage(path, cursor = null, append = false) {
 async function loadRootTree(force = false) {
   if (!state.source) return;
   if (!force && state.treeEntries.has("")) { renderCurrentTree(); return; }
-  if (force) { state.treeEntries.clear(); state.treeCursors.clear(); state.openDirectories = new Set([""]); }
+  if (force) { state.treeEntries.clear(); state.treeCursors.clear(); state.treePartials.clear(); state.openDirectories = new Set([""]); }
   await loadTreePage("");
 }
 
@@ -172,7 +180,7 @@ async function expandAncestors(path) {
 }
 
 function renderCurrentTree() {
-  renderTree(fileTree, state.treeEntries, state.treeCursors, state.openDirectories, state.selectedPath, toggleDirectory, openDocument, loadMoreTree);
+  renderTree(fileTree, state.treeEntries, state.treeCursors, state.treePartials, state.openDirectories, state.selectedPath, toggleDirectory, openDocument, loadMoreTree);
 }
 
 function focusTreePath(path) {
@@ -240,10 +248,13 @@ async function loadMoreCollection(cursor, list, button) {
   finally { completeRequest(request); }
 }
 
-async function openCollectionDocument(path, mode = "rendered") {
+async function openCollectionDocument(path, mode = "rendered", pushRoute = true) {
+  content.querySelectorAll(".collection-item").forEach(item => {
+    item.classList.toggle("active", item.dataset.path === path);
+  });
   const reader = content.querySelector(".reader");
   if (reader) showLoading(reader);
-  await fetchDocument(path, mode, true, true);
+  await fetchDocument(path, mode, true, pushRoute);
 }
 
 async function openDocument(path, mode = "rendered", pushRoute = true) {
@@ -331,57 +342,36 @@ async function loadSourceContext() {
 }
 
 function applyThemeChoice(choice) {
-  state.themeChoice = ["system", "light", "dark"].includes(choice) ? choice : "system";
-  const actual = state.themeChoice === "system" ? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark") : state.themeChoice;
-  document.documentElement.dataset.theme = actual; document.documentElement.dataset.themeChoice = state.themeChoice;
-  localStorage.setItem("mdllm-explorer-theme", state.themeChoice);
-  const button = document.querySelector("#theme-toggle");
-  button.textContent = state.themeChoice === "system" ? "◐" : actual === "dark" ? "☀" : "☾";
-  button.setAttribute("aria-label", `Colour theme: ${state.themeChoice}. Activate to change.`);
-  const settingsSelect = content.querySelector('select[aria-label="Colour theme"]'); if (settingsSelect) settingsSelect.value = state.themeChoice;
+  applyTheme(state, content, choice);
 }
-function cycleTheme() { const choices = ["system", "light", "dark"]; applyThemeChoice(choices[(choices.indexOf(state.themeChoice) + 1) % choices.length]); }
+function cycleTheme() { cycleThemeChoice(state, content); }
 
 function updateRoute(replace = false) {
-  if (!state.source) return;
-  const params = new URLSearchParams({source: state.source.id, tab: state.view, mode: state.documentMode});
-  if (state.selectedPath) params.set("path", state.selectedPath);
-  history[replace ? "replaceState" : "pushState"](null, "", `#${params}`);
+  writeRoute(state, replace);
 }
-function routeFromHash() { return routeFromText(location.hash); }
-function routeFromText(text) { const params = new URLSearchParams(String(text || "").replace(/^#/, "")); return {source: params.get("source"), tab: params.get("tab"), mode: params.get("mode"), path: params.get("path")}; }
-function validView(view) { return ["overview", "skills", "memory", "settings"].includes(view) ? view : "overview"; }
 
 async function restoreRoute() {
   if (!state.estate) return;
   abortAllRequests(); clearTimeout(searchTimer);
   const route = routeFromHash(); const source = state.estate.sources.find(item => item.id === route.source) || state.estate.sources[0];
-  if (source.id !== state.source?.id) await selectSource(source, false);
   state.view = validView(route.tab); state.documentMode = route.mode === "raw" ? "raw" : "rendered";
+  const sourceChanged = source.id !== state.source?.id;
+  if (sourceChanged) await selectSource(source, false);
   state.selectedPath = route.path || null; state.search = {query: "", items: [], cursor: null, partial: false}; activateTab();
-  if (route.path) { await expandAncestors(route.path); await openDocument(route.path, state.documentMode, false); }
+  if (route.path) await restoreDocumentRoute(route.path, state.documentMode, sourceChanged);
   else { state.selectedPath = null; await loadView(); }
 }
 
-function openOverlay(kind) {
-  closeOverlays(false);
-  const nav = kind === "nav"; document.body.classList.add(nav ? "nav-open" : "context-open");
-  const panel = document.querySelector(nav ? ".sidebar" : ".context-panel");
-  panel.setAttribute("role", "dialog"); panel.setAttribute("aria-modal", "true");
-  [...document.querySelector(".shell").children].filter(node => node !== panel).forEach(node => { node.inert = true; node.setAttribute("aria-hidden", "true"); });
-  visibleFocusable(panel)[0]?.focus();
+async function restoreDocumentRoute(path, mode, collectionLoaded = false) {
+  await expandAncestors(path);
+  if (state.view === "skills" || state.view === "memory") {
+    if (!collectionLoaded) await loadView();
+    await openCollectionDocument(path, mode, false);
+    return;
+  }
+  await openDocument(path, mode, false);
 }
 
-function closeOverlays(returnFocus = true) {
-  const navWasOpen = document.body.classList.contains("nav-open"); const contextWasOpen = document.body.classList.contains("context-open");
-  document.body.classList.remove("nav-open", "context-open");
-  document.querySelectorAll(".sidebar,.context-panel").forEach(panel => { panel.removeAttribute("role"); panel.removeAttribute("aria-modal"); });
-  [...document.querySelector(".shell").children].forEach(node => { node.inert = false; node.removeAttribute("aria-hidden"); });
-  if (returnFocus && navWasOpen) document.querySelector("#sidebar-open").focus();
-  else if (returnFocus && contextWasOpen) document.querySelector("#context-open").focus();
-}
-function activeOverlay() { return document.body.classList.contains("nav-open") ? document.querySelector(".sidebar") : document.body.classList.contains("context-open") ? document.querySelector(".context-panel") : null; }
-function visibleFocusable(panel) { return [...panel.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])')].filter(node => node.offsetParent !== null); }
 function moreButton(label, action) { const button = document.createElement("button"); button.className = "load-more"; button.textContent = label; button.addEventListener("click", action); return button; }
 function appendPartialNote(target) { const note = document.createElement("p"); note.className = "partial-note"; note.textContent = "This collection is partial because the source reached its scan limit."; target.append(note); }
 

@@ -1,16 +1,47 @@
 {
-  "schema": 1,
+  "schema": 2,
   "id": "AT-SWAP-001",
   "status": "pass",
-  "adapter": "Markdown presenter",
   "tool": {
     "name": "pytest-adapter-swap-oracle",
-    "version": "1"
+    "version": "2"
   },
-  "changed_paths": [
-    "adapters/swap_presenter.py",
-    "composition.py"
-  ],
-  "forbidden_inner_changes": [],
-  "runtime_probe": "pass"
+  "swaps": [
+    {
+      "adapter": "HTTP server",
+      "changed_paths": [
+        "composition.py",
+        "delivery/swap_http_server.py"
+      ],
+      "forbidden_inner_changes": [],
+      "runtime_probe": "pass"
+    },
+    {
+      "adapter": "Git reader",
+      "changed_paths": [
+        "adapters/swap_git_commit_history.py",
+        "composition.py"
+      ],
+      "forbidden_inner_changes": [],
+      "runtime_probe": "pass"
+    },
+    {
+      "adapter": "Filesystem reader",
+      "changed_paths": [
+        "adapters/swap_confined_source_reader.py",
+        "composition.py"
+      ],
+      "forbidden_inner_changes": [],
+      "runtime_probe": "pass"
+    },
+    {
+      "adapter": "Markdown renderer",
+      "changed_paths": [
+        "adapters/swap_presenter.py",
+        "composition.py"
+      ],
+      "forbidden_inner_changes": [],
+      "runtime_probe": "pass"
+    }
+  ]
 }

@@ -96,6 +96,59 @@ def test_directory_scan_limit_n_minus_one_n_n_plus_one(tmp_path, eligible_files,
 
 
 @pytest.mark.contract
+def test_directory_depth_is_inclusive_and_consistent_across_tree_search_counts_and_collections(tmp_path):
+    root = tmp_path / "depth-estate"; root.mkdir()
+    (root / "AGENTS.md").write_text("# Depth fixture\n", encoding="utf-8")
+    at_one = root / "level-one"; at_one.mkdir()
+    (at_one / "at-one.md").write_text("# N-1\n", encoding="utf-8")
+    at_two = at_one / "level-two"; at_two.mkdir()
+    (at_two / "at-two.md").write_text("# N\n", encoding="utf-8")
+    at_three = at_two / "level-three"; at_three.mkdir()
+    (at_three / "at-three.md").write_text("# N+1\n", encoding="utf-8")
+    skill_at_two = root / "skills" / "nested"; skill_at_two.mkdir(parents=True)
+    (skill_at_two / "at-two.skill.md").write_text("# Boundary skill\n", encoding="utf-8")
+    skill_at_three = skill_at_two / "too-deep"; skill_at_three.mkdir()
+    (skill_at_three / "at-three.skill.md").write_text("# Hidden skill\n", encoding="utf-8")
+    memory_at_two = root / "things" / "insights"; memory_at_two.mkdir(parents=True)
+    (memory_at_two / "at-two.md").write_text("---\nid: at-two\ntype: insight\n---\n# Boundary memory\n", encoding="utf-8")
+
+    runtime = build_runtime(
+        root,
+        limits=ExplorerLimits(directory_depth=2, directory_page=50, search_page=50),
+    )
+    boundary_tree = runtime.routes.dispatch(
+        "/api/v1/tree", {"source": ["substrate"], "path": ["level-one/level-two"]}
+    )
+    assert {item.path.value for item in boundary_tree.items} == {"level-one/level-two/at-two.md"}
+    assert boundary_tree.partial
+    with pytest.raises(ExplorerError) as caught:
+        runtime.routes.dispatch(
+            "/api/v1/tree", {"source": ["substrate"], "path": ["level-one/level-two/level-three"]}
+        )
+    assert caught.value.code == "directory_limit"
+
+    search = runtime.routes.dispatch(
+        "/api/v1/search", {"source": ["substrate"], "q": ["at-"]}
+    )
+    paths = {item.path.value for item in search.items}
+    assert "level-one/at-one.md" in paths and "level-one/level-two/at-two.md" in paths
+    assert not any("at-three" in path for path in paths)
+    assert search.partial
+    overview = runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]})
+    assert overview.counts.partial
+    skills = runtime.routes.dispatch(
+        "/api/v1/collection", {"source": ["substrate"], "kind": ["skills"]}
+    )
+    memory = runtime.routes.dispatch(
+        "/api/v1/collection", {"source": ["substrate"], "kind": ["memory"]}
+    )
+    assert [item.path.value for item in skills.items] == ["skills/nested/at-two.skill.md"]
+    assert skills.partial
+    assert [item.path.value for item in memory.items] == ["things/insights/at-two.md"]
+    assert memory.partial
+
+
+@pytest.mark.contract
 def test_search_returns_only_eligible_owned_paths(estate):
     runtime = build_runtime(estate)
     page = runtime.routes.dispatch("/api/v1/search", {"source": ["substrate"], "q": ["demo"]})

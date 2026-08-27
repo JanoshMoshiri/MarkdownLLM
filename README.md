@@ -108,11 +108,13 @@ an LLM, invoke skills, edit files, synchronise repositories, validate,
 reconcile or publish. The framework remains usable without it, and the files
 and Git history remain authoritative.
 
-The current public position is a **working Windows preview** while the remaining
-independent-review findings and operator UAT are completed. The source and
-installer build recipe are tracked here; the built `.exe` is produced from the
-final candidate and attached separately as a release asset rather than
-committed to the repository. See the [installation
+The current public position is an **operator-accepted Windows preview
+candidate**. The independent-review corrections are implemented, but public
+Windows publication remains gated by Authenticode signing and a final native
+lifecycle run on the signed bytes. The source and installer build recipe are
+tracked here; the eventual verified `.exe` is attached separately as a release
+asset rather than committed to the repository.
+See the [installation
 guide](explorer/docs/installation-guide.md), [user
 guide](explorer/docs/user-guide.md), and [source/build
 notes](explorer/README.md).

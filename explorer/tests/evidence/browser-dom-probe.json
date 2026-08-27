@@ -5,12 +5,12 @@
     "name": "Codex in-app Browser",
     "version": "26.818.61809"
   },
-  "executed_at": "2026-08-27T06:14:00+01:00",
+  "executed_at": "2026-08-27T19:01:38+01:00",
   "shell": {
     "regions": ["source navigation", "main content", "context"],
     "tabs": ["Overview", "Skills", "Memory", "Settings"],
-    "source_count": 14,
-    "domain_count": 13,
+    "source_count": 4,
+    "domain_count": 3,
     "substrate_first": true,
     "irrelevant_controls": []
   },
@@ -19,12 +19,18 @@
     "nested_directory_disclosure": true,
     "selected_document_retained": true,
     "back_restored_source_tab_path_and_mode": true,
-    "refresh_restored_source_tab_path_and_mode": true
+    "forward_restored_source_tab_path_and_mode": true,
+    "refresh_restored_source_tab_path_and_mode": true,
+    "skills_refresh_preserved_collection_reader": true,
+    "memory_refresh_preserved_collection_reader": true,
+    "collection_item_selection_restored": true
   },
   "collections": {
     "skills_populated": true,
-    "memory_group_headings": ["Conflicts", "Decisions", "Insights", "Retrospectives"],
-    "context_populated_from_selected_document": true
+    "memory_group_headings": ["Insights"],
+    "context_populated_from_selected_document": true,
+    "skills_route_item_count_after_reload": 1,
+    "memory_route_item_count_after_reload": 1
   },
   "document": {
     "rendered_and_raw_on_demand": true,

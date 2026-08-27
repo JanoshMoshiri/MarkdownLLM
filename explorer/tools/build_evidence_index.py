@@ -24,6 +24,8 @@ def evidence_ids(path: Path) -> list[str]:
         if value.get("lifecycle", {}).get("status") == "pass": ids.append("system::ST-CLI-001")
         return ids
     if path.name == "windows-installer.json":
+        if value.get("status") != "pass":
+            return []
         return [
             "system::ST-WIN-BUNDLE-001", "system::ST-WIN-INSTALL-001",
             "system::ST-WIN-LAUNCH-001", "system::ST-WIN-UPGRADE-001",

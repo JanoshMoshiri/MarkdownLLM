@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import base64
+import json
+
 import pytest
 
 from markdownllm_explorer.adapters.cursors import CursorCodec, CursorState
@@ -51,10 +54,17 @@ def test_only_explicit_extensions_and_names_are_eligible():
 def test_cursor_is_signed_and_bound_to_operation_source_and_context():
     codec = CursorCodec(b"k" * 32)
     value = codec.encode(CursorState("tree", "substrate", "skills", 10, "revision"))
+    raw = base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+    assert json.loads(raw[:-16]) == {
+        "context": "skills",
+        "offset": 10,
+        "operation": "tree",
+        "revision": "revision",
+        "source": "substrate",
+    }
     assert codec.decode(value, operation="tree", source="substrate", context="skills").offset == 10
     for operation, source, context in [("search", "substrate", "skills"), ("tree", "domain/x", "skills"), ("tree", "substrate", "things")]:
         with pytest.raises(ExplorerError, match="cursor"):
             codec.decode(value, operation=operation, source=source, context=context)
     with pytest.raises(ExplorerError):
         codec.decode(value[:-2] + "xx", operation="tree", source="substrate", context="skills")
-
