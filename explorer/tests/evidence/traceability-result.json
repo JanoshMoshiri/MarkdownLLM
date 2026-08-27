@@ -4,16 +4,16 @@
   "status": "pass",
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "bedd2d8c44698179f54eaed999d4145ffc3c41143d6617369eee6e845a8082ea"
+    "sha256": "0fcd785db0b6d3f53645eaa43eab8184d121f4130f2cebdf65bf8ac781b5d071"
   },
   "junit": {
-    "tests": 109,
+    "tests": 111,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
   "evidence_errors": [],
-  "resolved_evidence_count": 124,
+  "resolved_evidence_count": 126,
   "requirements": {
     "FR-EST-001": {
       "status": "pass",

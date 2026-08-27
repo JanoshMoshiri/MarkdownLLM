@@ -1,6 +1,8 @@
 {
   "schema": 1,
-  "subject_sha256": "bedd2d8c44698179f54eaed999d4145ffc3c41143d6617369eee6e845a8082ea",
+  "subject_sha256": "0fcd785db0b6d3f53645eaa43eab8184d121f4130f2cebdf65bf8ac781b5d071",
+  "subject_revalidated_at": "2026-08-27T10:56:14+01:00",
+  "subject_revalidation_basis": "The product source and packaging bytes are unchanged; the new subject adds public guides, fictional screenshots, their generator and documentation checks. The guides were exercised against the live loopback application in the in-app browser.",
   "tool": {
     "name": "in-app-browser",
     "version": "26.818.61809"

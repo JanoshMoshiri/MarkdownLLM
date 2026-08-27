@@ -2,6 +2,11 @@
 
 MarkdownLLM Explorer is a standalone, read-only browser for a MarkdownLLM substrate and its nested domain estate. It shows each repository's commits, file tree, skills and memory, and renders Markdown as a styled document.
 
+## Start here
+
+- [Install Explorer on Windows](docs/installation-guide.md)
+- [Explore a MarkdownLLM estate](docs/user-guide.md)
+
 ## Windows install and run
 
 Run `MarkdownLLM-Explorer-Installer-0.2.0.exe`. The installer asks for the
@@ -56,4 +61,4 @@ python -m pip install -e C:\path\to\MarkdownLLM\explorer
 python -m pytest C:\path\to\MarkdownLLM\explorer\tests
 ```
 
-The governing requirements, design and test ledger live in `docs/`.
+The governing requirements, design and test ledger also live in `docs/`.
