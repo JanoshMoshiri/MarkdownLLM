@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tools.verify_evidence import pytest_evidence
+
 
 EXPLORER = Path(__file__).parents[1]
 
@@ -73,3 +75,23 @@ def test_test_spec_trace_table_has_one_row_per_requirement():
     specification = (EXPLORER / "docs" / "test-specification.md").read_text(encoding="utf-8")
     rows = re.findall(r"^\| ((?:FR|NFR)-[A-Z]+-\d{3}[A-Z]?) \|", specification, re.MULTILINE)
     assert len(rows) == len(set(rows)) == 63
+
+
+@pytest.mark.meta
+def test_pytest_evidence_reads_the_testsuites_container_emitted_by_pytest(tmp_path):
+    junit = tmp_path / "pytest.xml"
+    junit.write_text(
+        '<testsuites><testsuite tests="2" failures="0" errors="0" skipped="0">'
+        '<testcase classname="tests.test_alpha" name="test_one" />'
+        '<testcase classname="tests.test_alpha" name="test_two" />'
+        '</testsuite></testsuites>',
+        encoding="utf-8",
+    )
+
+    passed, counts = pytest_evidence(junit)
+
+    assert counts == {"tests": 2, "failures": 0, "errors": 0, "skipped": 0}
+    assert passed == {
+        "pytest::tests/test_alpha.py::test_one",
+        "pytest::tests/test_alpha.py::test_two",
+    }

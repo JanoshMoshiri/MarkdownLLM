@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import re
 import shutil
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from markdownllm_explorer.core.limits import ExplorerLimits
 from markdownllm_explorer.core.models import BoundaryToken, CommitRecord, Page, RepositoryState
 
 from .cursors import CursorCodec, CursorState
-from .filesystem_catalogue import BoundaryRegistry
+from .filesystem_catalogue import BoundaryRegistry, _is_reparse
 from .process_runner import BoundedProcessRunner, ProcessRequest
 
 
@@ -45,17 +46,29 @@ class GitCommitHistory:
         boundary = self._registry.by_token(token)
         if validate_store:
             self._validate_store(boundary.root)
-        head = head_hint or self._optional(boundary.root, ["rev-parse", "--verify", "HEAD"])
-        if not head:
-            return Page((), None, False, datetime.now(timezone.utc).isoformat())
         state = self._cursors.decode(cursor, operation="commits", source=boundary.source.id.value, context="HEAD")
-        pinned_head = state.revision or head
-        if state.revision and not self._commit_exists(boundary.root, pinned_head):
-            raise ExplorerError("source_changed")
+        if state.revision:
+            if not self._commit_exists(boundary.root, state.revision):
+                raise ExplorerError("source_changed")
+            pinned_head = state.revision
+        else:
+            pinned_head = head_hint or self._optional(boundary.root, ["rev-parse", "--verify", "HEAD"])
+            if not pinned_head:
+                return Page((), None, False, datetime.now(timezone.utc).isoformat())
+        return self._commit_page(boundary.root, boundary.source.id.value, state, pinned_head, pinned_head)
+
+    def _commit_page(
+        self,
+        root: Path,
+        source_id: str,
+        state: CursorState,
+        query_revision: str,
+        pinned_head: str | None,
+    ) -> Page[CommitRecord]:
         count = self._limits.commit_page + 1
         output = self._run(
-            boundary.root,
-            ["log", pinned_head, "--topo-order", f"--skip={state.offset}", f"--max-count={count}", "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"],
+            root,
+            ["log", query_revision, "--topo-order", f"--skip={state.offset}", f"--max-count={count}", "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"],
         )
         records: list[CommitRecord] = []
         for raw_record in output.split("\x1e"):
@@ -66,7 +79,10 @@ class GitCommitHistory:
         records = records[: self._limits.commit_page]
         next_cursor = None
         if more:
-            next_cursor = self._cursors.encode(CursorState("commits", boundary.source.id.value, "HEAD", state.offset + self._limits.commit_page, pinned_head))
+            effective_head = pinned_head or (records[0].sha if records else "")
+            if not re.fullmatch(r"[0-9a-f]{40}", effective_head):
+                raise ExplorerError("source_changed")
+            next_cursor = self._cursors.encode(CursorState("commits", source_id, "HEAD", state.offset + self._limits.commit_page, effective_head))
         return Page(tuple(records), next_cursor, False, datetime.now(timezone.utc).isoformat())
 
     def snapshot(self, token: BoundaryToken, cursor: str | None) -> tuple[RepositoryState, Page[CommitRecord]]:
@@ -76,8 +92,35 @@ class GitCommitHistory:
         boundary = self._registry.by_token(token)
         try:
             self._validate_store(boundary.root)
-            repository = self._state_from_status(boundary.root)
-            commits = self.commits(token, cursor, repository.head_sha, validate_store=False) if repository.kind == "repository" else empty
+            if cursor:
+                commit_reader = lambda: self.commits(token, cursor, validate_store=False)
+            else:
+                state = CursorState("commits", boundary.source.id.value, "HEAD", 0, "")
+                commit_reader = lambda: self._commit_page(
+                    boundary.root, boundary.source.id.value, state, "HEAD", None
+                )
+            with ThreadPoolExecutor(max_workers=2, thread_name_prefix="explorer-git-snapshot") as executor:
+                repository_future = executor.submit(self._state_from_status, boundary.root)
+                commits_future = executor.submit(commit_reader)
+                repository = repository_future.result()
+                try:
+                    commits = commits_future.result()
+                except ExplorerError:
+                    if repository.kind == "unborn":
+                        commits = empty
+                    else:
+                        raise
+            if repository.kind != "repository":
+                commits = empty
+            elif not cursor and (
+                not commits.items or commits.items[0].sha != repository.head_sha
+            ):
+                # HEAD moved between the concurrent reads. Re-run against the
+                # full SHA reported by status so repository metadata and page
+                # identity remain one coherent snapshot.
+                commits = self.commits(
+                    token, None, repository.head_sha, validate_store=False
+                )
             return repository, commits
         except ExplorerError as error:
             kind = "external-store" if error.code == "git_store_external" else "unavailable"
@@ -99,18 +142,45 @@ class GitCommitHistory:
         return RepositoryState("repository" if head else "unborn", head, branch, dirty if head else None)
 
     def _validate_store(self, root: Path) -> None:
-        if not (root / ".git").exists():
+        git_entry = root / ".git"
+        if not git_entry.exists():
             raise ExplorerError("git_unavailable")
-        values = self._run(root, ["rev-parse", "--path-format=absolute", "--show-toplevel", "--git-dir", "--git-common-dir"]).splitlines()
-        if len(values) < 3:
-            raise ExplorerError("git_unavailable")
+        # A source-owned ordinary repository has a real .git directory at its
+        # registered root. Worktree pointer files and reparse points can lead
+        # outside that source and are intentionally unavailable in v1.
+        if _is_reparse(git_entry) or not git_entry.is_dir():
+            raise ExplorerError("git_store_external")
         try:
-            top = Path(values[0]).resolve(strict=True)
-            git_dir = Path(values[1]).resolve(strict=True)
-            common = Path(values[2]).resolve(strict=True)
+            registered_root = root.resolve(strict=True)
+            git_dir = git_entry.resolve(strict=True)
         except OSError:
             raise ExplorerError("git_unavailable") from None
-        if top != root.resolve(strict=True) or not _inside(git_dir, root) or not _inside(common, root):
+        if not _inside(git_dir, registered_root):
+            raise ExplorerError("git_store_external")
+
+        common = git_dir
+        common_pointer = git_dir / "commondir"
+        if common_pointer.exists():
+            try:
+                if (
+                    _is_reparse(common_pointer)
+                    or not common_pointer.is_file()
+                    or common_pointer.stat().st_size > 64 * 1024
+                ):
+                    raise ExplorerError("git_store_external")
+                lines = common_pointer.read_text(encoding="utf-8").splitlines()
+            except (OSError, UnicodeError):
+                raise ExplorerError("git_store_external") from None
+            if len(lines) != 1 or not lines[0].strip():
+                raise ExplorerError("git_store_external")
+            candidate = Path(lines[0].strip())
+            if not candidate.is_absolute():
+                candidate = git_dir / candidate
+            try:
+                common = candidate.resolve(strict=True)
+            except OSError:
+                raise ExplorerError("git_store_external") from None
+        if _is_reparse(common) or not common.is_dir() or not _inside(common, registered_root):
             raise ExplorerError("git_store_external")
         self._validate_object_store(common / "objects", root, set(), 0)
 
@@ -129,7 +199,7 @@ class GitCommitHistory:
             resolved = store.resolve(strict=True)
         except OSError:
             raise ExplorerError("git_unavailable") from None
-        if not resolved.is_dir() or not _inside(resolved, root):
+        if _is_reparse(store) or not resolved.is_dir() or not _inside(resolved, root):
             raise ExplorerError("git_store_external")
         if resolved in seen:
             return
@@ -281,7 +351,7 @@ def _allowed_arguments(arguments: list[str]) -> bool:
         return bool(re.fullmatch(r"[0-9a-f]{40}\^\{commit\}", arguments[2]))
     if len(arguments) == 6 and arguments[0] == "log":
         return bool(
-            re.fullmatch(r"[0-9a-f]{40}", arguments[1])
+            (arguments[1] == "HEAD" or re.fullmatch(r"[0-9a-f]{40}", arguments[1]))
             and arguments[2] == "--topo-order"
             and re.fullmatch(r"--skip=\d+", arguments[3])
             and re.fullmatch(r"--max-count=\d+", arguments[4])

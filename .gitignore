@@ -27,3 +27,9 @@ WORKLOG.md
 
 # Explorer's private synthetic/runtime evidence never enters the release surface.
 explorer/.test-tmp/
+explorer/build/
+explorer/dist/
+explorer/*.egg-info/
+explorer/src/*.egg-info/
+explorer/.windows-build-venv/
+explorer/.windows-build-tools/

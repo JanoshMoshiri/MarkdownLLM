@@ -9,12 +9,19 @@ from pathlib import Path
 
 import yaml
 
-from evidence_common import SUBJECT_ALGORITHM, file_sha256, subject_sha256
+try:
+    from .evidence_common import SUBJECT_ALGORITHM, file_sha256, subject_sha256
+except ImportError:  # Direct script execution keeps tools/ on sys.path.
+    from evidence_common import SUBJECT_ALGORITHM, file_sha256, subject_sha256
 
 
 def pytest_evidence(junit: Path) -> tuple[set[str], dict[str, int]]:
     root = ET.parse(junit).getroot()
-    counts = {name: int(root.attrib.get(name, 0)) for name in ("tests", "failures", "errors", "skipped")}
+    suites = [root] if root.tag == "testsuite" else list(root.findall("./testsuite"))
+    counts = {
+        name: sum(int(suite.attrib.get(name, 0)) for suite in suites)
+        for name in ("tests", "failures", "errors", "skipped")
+    }
     passed: set[str] = set()
     for case in root.iter("testcase"):
         if any(case.find(kind) is not None for kind in ("failure", "error", "skipped")):
@@ -56,6 +63,26 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
             raise ValueError("clean install route/cwd probe incomplete")
         if value.get("lifecycle", {}).get("status") != "pass": raise ValueError("CLI lifecycle probe incomplete")
         return {"system::ST-INSTALL-001", "system::ST-OFFLINE-001", "system::ST-CLI-001"}
+    if path.name == "windows-installer.json":
+        value = _json(path)
+        if value.get("tool", {}).get("name") != "verify_windows_installer.py" or value.get("status") != "pass":
+            raise ValueError("Windows installer evidence failed")
+        environment = value.get("environment", {})
+        if not environment.get("per_user") or environment.get("administrator_required"):
+            raise ValueError("Windows installer is not verified as per-user")
+        if environment.get("system_python_required") or environment.get("system_node_required") or environment.get("network_required_after_setup_obtained"):
+            raise ValueError("Windows installer retains an external runtime dependency")
+        stages = ("bundle", "install", "launch", "upgrade", "uninstall")
+        if not all(value.get(stage, {}).get("status") == "pass" for stage in stages):
+            raise ValueError("Windows installer lifecycle is incomplete")
+        if value.get("source_before_sha256") != value.get("source_after_sha256") or value.get("outside_before_sha256") != value.get("outside_after_sha256"):
+            raise ValueError("Windows installer changed substrate or outside data")
+        return {
+            "system::ST-WIN-BUNDLE-001", "system::ST-WIN-INSTALL-001",
+            "system::ST-WIN-LAUNCH-001", "system::ST-WIN-UPGRADE-001",
+            "system::ST-WIN-UNINSTALL-001", "system::AJ-08",
+            "system::AJ-09", "system::AJ-10",
+        }
     if path.name == "performance-20-run.json":
         value = _json(path)
         if value.get("tool", {}).get("name") != "run_performance.py" or value.get("runs") != 20:

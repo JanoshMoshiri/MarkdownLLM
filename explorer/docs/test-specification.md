@@ -2,7 +2,7 @@
 
 **Status:** implementation gate approved when the coverage checks in §11 pass
 
-**Version:** 0.2
+**Version:** 0.3
 
 **Date:** 2026-08-27
 
@@ -251,10 +251,11 @@ No unavailable platform/browser receives a synthetic pass. The validation report
 
 1. Record fixture manifest/hash and machine CPU/RAM/storage/OS/Python.
 2. Build F-ESTATE-SCALE-V1 outside timed intervals.
-3. For each measured route, start a fresh server process, perform one discarded warm-up, then one timed request; repeat until 20 retained samples exist. This avoids silently measuring one long-lived cache state.
-4. Measure client request start to terminal complete body with `perf_counter_ns`; validate response correctness during every sample.
-5. Retain all raw timings, median, p95-like order statistic (19th of 20), max and threshold verdict. The deterministic floor or a script computes figures; narrative never hand-adds them.
-6. Run PT-REAL-001 separately and retain only privacy-safe aggregate evidence.
+3. Before each retained run on Windows, require two consecutive 500 ms system CPU samples at or below 60%, bounded by a 30-second wait; on the minimum four-core reference profile this leaves at least one logical core of headroom, while an unavailable window fails the profile instead of silently measuring saturation. Run the measured server and inherited Git children at high scheduling priority. Record the observed gate samples and policy in the profile.
+4. For each measured route, start a fresh server process, perform one discarded warm-up, then one timed request; repeat until 20 retained samples exist. This avoids silently measuring one long-lived cache state.
+5. Measure client request start to terminal complete body with `perf_counter_ns`; validate response correctness during every sample.
+6. Retain all raw timings, median, p95-like order statistic (19th of 20), max and threshold verdict. The deterministic floor or a script computes figures; narrative never hand-adds them.
+7. Run PT-REAL-001 separately and retain only privacy-safe aggregate evidence.
 
 ## 10. Visual and acceptance procedure
 

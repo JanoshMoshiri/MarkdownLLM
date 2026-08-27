@@ -400,7 +400,7 @@ Startup prints product/version, resolved root and fragment-capability URL. `Keyb
 
 ### Windows packaging and launch
 
-`packaging/windows/build.ps1` is the reproducible build boundary. It invokes an exactly pinned PyInstaller build environment, produces a one-folder `MarkdownLLM Explorer.exe`, then invokes NSIS 3.12+ to produce `MarkdownLLM-Explorer-Setup-<version>.exe`. Build outputs live under ignored `explorer/build/` and `explorer/dist/`; the source definitions, hashes and verification evidence are committed, while publication of the installer remains a separate release act.
+`packaging/windows/build.ps1` is the reproducible build boundary. It invokes an exactly pinned PyInstaller build environment, produces a one-folder `MarkdownLLM Explorer.exe`, then invokes NSIS 3.12+ to produce `MarkdownLLM-Explorer-Installer-<version>.exe`. Build outputs live under ignored `explorer/build/` and `explorer/dist/`; the source definitions, hashes and verification evidence are committed, while publication of the installer remains a separate release act.
 
 The setup runs per user (`RequestExecutionLevel user`) into `%LOCALAPPDATA%\Programs\MarkdownLLM Explorer`, so installation needs no elevation. A custom page selects a directory containing `AGENTS.md`; silent verification supplies `/SUBSTRATEROOT=<path>`. Setup stores only that root under `HKCU\Software\MarkdownLLM Explorer`, writes one Desktop and one Start Menu shortcut with quoted `--root`, registers the uninstaller, and offers to launch the app on completion. Reinstallation reads the previous root, overwrites the application directory and recreates singleton shortcuts. Uninstall removes those exact owned surfaces and no source-root path.
 

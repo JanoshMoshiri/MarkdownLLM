@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
 import hashlib
 import http.client
 import json
@@ -18,6 +19,49 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 
 
 THRESHOLDS_MS = {"estate_overview": 2000, "tree": 300, "search": 500, "document": 500, "commits": 500}
+
+
+class _WindowsFileTime(ctypes.Structure):
+    _fields_ = [("low", ctypes.c_uint32), ("high", ctypes.c_uint32)]
+
+    @property
+    def ticks(self) -> int:
+        return (self.high << 32) | self.low
+
+
+def _windows_cpu_times() -> tuple[int, int, int]:
+    idle = _WindowsFileTime(); kernel = _WindowsFileTime(); user = _WindowsFileTime()
+    if not ctypes.windll.kernel32.GetSystemTimes(
+        ctypes.byref(idle), ctypes.byref(kernel), ctypes.byref(user)
+    ):
+        raise OSError("GetSystemTimes failed")
+    return idle.ticks, kernel.ticks, user.ticks
+
+
+def wait_for_reference_load(*, maximum_busy: float = 0.60, timeout: float = 30.0) -> float | None:
+    """Wait for a bounded quiet window so wall-clock evidence describes Explorer."""
+    if os.name != "nt":
+        return None
+    deadline = time.monotonic() + timeout
+    previous = _windows_cpu_times()
+    consecutive = 0
+    last_busy = 1.0
+    while time.monotonic() < deadline:
+        time.sleep(0.5)
+        current = _windows_cpu_times()
+        idle_delta = current[0] - previous[0]
+        total_delta = (current[1] - previous[1]) + (current[2] - previous[2])
+        previous = current
+        if total_delta <= 0:
+            continue
+        last_busy = max(0.0, min(1.0, 1.0 - (idle_delta / total_delta)))
+        consecutive = consecutive + 1 if last_busy <= maximum_busy else 0
+        if consecutive >= 2:
+            return last_busy
+    raise RuntimeError(
+        f"reference profile unavailable: ambient CPU remained above {maximum_busy:.0%} "
+        f"(last sample {last_busy:.0%})"
+    )
 
 
 def git(executable: str, root: Path, *arguments: str) -> None:
@@ -76,9 +120,16 @@ def request(port: int, capability: str, path: str, parameters: dict[str, str] | 
 
 def start_server(python: str, explorer: Path, root: Path) -> tuple[subprocess.Popen, int, str]:
     environment = dict(os.environ); environment["PYTHONPATH"] = str(explorer / "src")
+    process_options = {}
+    if os.name == "nt":
+        # Route measurements should describe Explorer, not whether unrelated
+        # desktop applications happened to win the scheduler during a run.
+        # Child Git processes inherit this priority class on Windows.
+        process_options["creationflags"] = subprocess.HIGH_PRIORITY_CLASS
     process = subprocess.Popen(
         [python, "-m", "markdownllm_explorer", "--root", str(root), "--port", "0"], cwd=explorer,
         env=environment, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        **process_options,
     )
     assert process.stdout is not None
     deadline = time.monotonic() + 10; launch_url = ""
@@ -139,7 +190,13 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="mdllm-explorer-scale-") as temporary:
         fixture = Path(temporary) / "estate-scale-v1"
         fixture_hash = build_fixture(fixture, git_executable)
-        samples = [one_run(sys.executable, explorer, fixture) for _ in range(arguments.runs)]
+        samples = []
+        ambient_busy = []
+        for _ in range(arguments.runs):
+            observed_busy = wait_for_reference_load()
+            if observed_busy is not None:
+                ambient_busy.append(round(observed_busy, 4))
+            samples.append(one_run(sys.executable, explorer, fixture))
     summaries = {}
     for operation, threshold in THRESHOLDS_MS.items():
         values = sorted(sample[operation] for sample in samples)
@@ -147,8 +204,8 @@ def main() -> int:
         summaries[operation] = {"threshold_ms": threshold, "passes": passes, "required": max(0, arguments.runs - 1), "median_ms": values[len(values) // 2], "order_19_ms": values[min(18, len(values) - 1)], "max_ms": values[-1], "status": "pass" if passes >= max(0, arguments.runs - 1) else "fail"}
     document = {
         "schema": 1, "id": "PT-SCALE-001", "fixture": "estate-scale-v1", "fixture_sha256": fixture_hash,
-        "tool": {"name": "run_performance.py", "version": "1", "python": platform.python_version()},
-        "profile": {"os": platform.platform(), "python": platform.python_version(), "logical_cpu": os.cpu_count(), "storage": "workspace filesystem", "cache": "fresh server process; one discarded route warm-up per process"},
+        "tool": {"name": "run_performance.py", "version": "2", "python": platform.python_version()},
+        "profile": {"os": platform.platform(), "python": platform.python_version(), "logical_cpu": os.cpu_count(), "storage": "workspace filesystem", "cache": "fresh server process; one discarded route warm-up per process", "measurement_priority": "high on Windows (inherited by Git children); default elsewhere", "ambient_cpu_gate": "two consecutive 500 ms samples at or below 60% before each run; 30 s maximum wait", "ambient_busy_samples": ambient_busy},
         "runs": arguments.runs, "raw_ms": samples, "summary": summaries,
     }
     output.parent.mkdir(parents=True, exist_ok=True); output.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")

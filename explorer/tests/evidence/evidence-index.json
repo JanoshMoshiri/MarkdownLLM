@@ -2,13 +2,13 @@
   "schema": 1,
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "af49173b4388a5e4f4447e6ee84d43e7aabadba286738792108e424aed9e3f24"
+    "sha256": "bedd2d8c44698179f54eaed999d4145ffc3c41143d6617369eee6e845a8082ea"
   },
-  "generated_at": "2026-08-27T05:21:04.375670+00:00",
+  "generated_at": "2026-08-27T08:18:09.908951+00:00",
   "tool": {
     "name": "build_evidence_index.py",
     "version": "1",
-    "python": "3.12.13",
+    "python": "3.12.4",
     "platform": "Windows-11-10.0.26200-SP0"
   },
   "artifacts": [
@@ -34,7 +34,7 @@
     },
     {
       "path": "tests/evidence/browser-runtime.json",
-      "sha256": "fd12d6ddbaf87bf21984115e7a612fa9cd58ebbad182fc0410ec15bd7fbd4a2a",
+      "sha256": "b760e4f58791e2059fe8a921805841c0c93a189393d625e1108df7ca14d0ed64",
       "bytes": 7921,
       "evidence_ids": [
         "browser::BT-SHELL-001",
@@ -59,8 +59,8 @@
     },
     {
       "path": "tests/evidence/clean-install.json",
-      "sha256": "ddb4c2f0d9c5a950741d57c6a62697fdac3134db64b460e899ad8309cd268c64",
-      "bytes": 1736,
+      "sha256": "3e64e3abb5637f7f7c3812eb38b5332ba87530fcbeb5fbd1c73a97a4d03d61c6",
+      "bytes": 1769,
       "evidence_ids": [
         "system::ST-INSTALL-001",
         "system::ST-OFFLINE-001",
@@ -77,8 +77,8 @@
     },
     {
       "path": "tests/evidence/mutation-kill-matrix.json",
-      "sha256": "4f642997227b48010f5fa21da2bd536aa581d5dbb71e49be636f5e635dec2a6d",
-      "bytes": 47653,
+      "sha256": "24eb0af55c2f797a67aeb1f689702ebc12eb54b58133dd05c6e0a2f14f545159",
+      "bytes": 47658,
       "evidence_ids": [
         "analysis::MT-MUTATION-001",
         "mutation::M01",
@@ -101,16 +101,16 @@
     },
     {
       "path": "tests/evidence/performance-20-run.json",
-      "sha256": "8124c95f4f3ee494aa9022324cdfc891380389f492e5dab57514347733cf2678",
-      "bytes": 4749,
+      "sha256": "3730905aed478a08058a0a2f98f34e0d768f966b828bb2cbbc6a1dff53a268cc",
+      "bytes": 5349,
       "evidence_ids": [
         "analysis::PT-SCALE-001"
       ]
     },
     {
       "path": "tests/evidence/pytest.xml",
-      "sha256": "f8cb645e86302d71b02ae2d0541eae35259cee5d9e8e5e4268cb99c63421ad85",
-      "bytes": 12810,
+      "sha256": "7666dff7d59030e2e66280b5761c212dea3f76d25c7864cf5bb069f050127398",
+      "bytes": 13984,
       "evidence_ids": []
     },
     {
@@ -130,6 +130,21 @@
       "sha256": "dabb0950343943f82de95d61ac53ccd8dbfd3e2a7c72d4b302ec93b4be91518e",
       "bytes": 26614,
       "evidence_ids": []
+    },
+    {
+      "path": "tests/evidence/windows-installer.json",
+      "sha256": "edf4d1a5f19df419e5e1958ff2d5cd1c8b6fdcfc928e7d32e98d5550bc93f248",
+      "bytes": 1577,
+      "evidence_ids": [
+        "system::ST-WIN-BUNDLE-001",
+        "system::ST-WIN-INSTALL-001",
+        "system::ST-WIN-LAUNCH-001",
+        "system::ST-WIN-UPGRADE-001",
+        "system::ST-WIN-UNINSTALL-001",
+        "system::AJ-08",
+        "system::AJ-09",
+        "system::AJ-10"
+      ]
     }
   ]
 }

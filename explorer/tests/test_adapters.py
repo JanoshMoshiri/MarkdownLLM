@@ -271,6 +271,21 @@ def test_git_history_rejects_external_or_lazy_object_stores(estate, tmp_path, st
 
 
 @pytest.mark.gitfs
+def test_git_history_rejects_worktree_pointer_before_invoking_git(tmp_path):
+    root = tmp_path / "pointer-source"; root.mkdir()
+    (root / "AGENTS.md").write_text("# Pointer source\n", encoding="utf-8")
+    outside = tmp_path / "outside-git"; outside.mkdir()
+    (root / ".git").write_text(f"gitdir: {outside}\n", encoding="utf-8")
+
+    runtime = build_runtime(root)
+    overview = runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]})
+
+    assert overview.repository.kind == "external-store"
+    assert overview.repository.issue == "git_store_external"
+    assert not overview.commits.items
+
+
+@pytest.mark.gitfs
 def test_symlink_escape_is_not_discoverable(estate, tmp_path):
     outside = tmp_path / "outside.md"; outside.write_text("outside", encoding="utf-8")
     link = estate / "escape.md"

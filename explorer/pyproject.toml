@@ -4,12 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "markdownllm-explorer"
-version = "0.1.0"
+version = "0.2.0"
 description = "A read-only local browser for a MarkdownLLM substrate and domain estate"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["PyYAML==6.0.3"]
 license = {text = "MIT"}
+
+[project.optional-dependencies]
+windows-build = [
+  "Pillow==12.3.0",
+  "PyInstaller==6.22.2",
+  "pystray==0.19.5",
+]
 
 [project.scripts]
 mdllm-explorer = "markdownllm_explorer.__main__:main"
@@ -25,6 +32,7 @@ where = ["src"]
 markdownllm_explorer = [
   "delivery/static/*.html",
   "delivery/static/*.css",
+  "delivery/static/*.png",
   "delivery/static/js/*.js",
   "delivery/static/js/views/*.js",
 ]
@@ -40,4 +48,3 @@ markers = [
   "performance: generated scale benchmark",
   "meta: traceability and deliberate-mutant tests",
 ]
-

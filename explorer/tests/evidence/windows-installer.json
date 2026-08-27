@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "tool": {
+    "name": "verify_windows_installer.py",
+    "version": "1"
+  },
+  "installer": {
+    "name": "MarkdownLLM-Explorer-Installer-0.2.0.exe",
+    "bytes": 10507714,
+    "sha256": "acde4921c9eacefc6ef6e9f3b5a7d4591214a3f74e492d83d4bc441c03064d37"
+  },
+  "environment": {
+    "per_user": true,
+    "administrator_required": false,
+    "system_python_required": false,
+    "system_node_required": false,
+    "network_required_after_setup_obtained": false
+  },
+  "bundle": {
+    "status": "pass",
+    "version": "0.2.0",
+    "path_empty_launch": true
+  },
+  "install": {
+    "status": "pass",
+    "desktop_shortcut": true,
+    "start_menu_shortcut": true,
+    "remembered_root": true
+  },
+  "launch": {
+    "status": "pass",
+    "health": {
+      "status": "ok",
+      "version": "0.2.0"
+    },
+    "single_instance_exit": true,
+    "capability_persisted": false
+  },
+  "upgrade": {
+    "status": "pass",
+    "root_preserved": true,
+    "shortcut_count": 2
+  },
+  "uninstall": {
+    "status": "pass",
+    "owned_state_removed": true,
+    "substrate_unchanged": true,
+    "outside_unchanged": true
+  },
+  "source_before_sha256": "84ac76047cecdd014773b131ac3b76b98c7d9b8885e5ed49ccde49856993c277",
+  "source_after_sha256": "84ac76047cecdd014773b131ac3b76b98c7d9b8885e5ed49ccde49856993c277",
+  "outside_before_sha256": "a316144ad83dcac2b86229338e12f942d930f0d6d9cc944b3cc65d409e03d1a1",
+  "outside_after_sha256": "a316144ad83dcac2b86229338e12f942d930f0d6d9cc944b3cc65d409e03d1a1"
+}

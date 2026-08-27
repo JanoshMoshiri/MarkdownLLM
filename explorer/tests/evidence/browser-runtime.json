@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "subject_sha256": "af49173b4388a5e4f4447e6ee84d43e7aabadba286738792108e424aed9e3f24",
+  "subject_sha256": "bedd2d8c44698179f54eaed999d4145ffc3c41143d6617369eee6e845a8082ea",
   "tool": {
     "name": "in-app-browser",
     "version": "26.818.61809"
@@ -117,7 +117,7 @@
       "id": "system::AJ-05",
       "status": "pass",
       "checks": ["wheel installs offline in a clean environment and launches from an unrelated working directory"],
-      "artifacts": [{"path": "tests/evidence/clean-install.json", "sha256": "ddb4c2f0d9c5a950741d57c6a62697fdac3134db64b460e899ad8309cd268c64"}]
+      "artifacts": [{"path": "tests/evidence/clean-install.json", "sha256": "3e64e3abb5637f7f7c3812eb38b5332ba87530fcbeb5fbd1c73a97a4d03d61c6"}]
     },
     {
       "id": "system::AJ-06",

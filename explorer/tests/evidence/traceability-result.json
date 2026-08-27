@@ -4,16 +4,16 @@
   "status": "pass",
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "af49173b4388a5e4f4447e6ee84d43e7aabadba286738792108e424aed9e3f24"
+    "sha256": "bedd2d8c44698179f54eaed999d4145ffc3c41143d6617369eee6e845a8082ea"
   },
   "junit": {
-    "tests": 0,
+    "tests": 109,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
   "evidence_errors": [],
-  "resolved_evidence_count": 107,
+  "resolved_evidence_count": 124,
   "requirements": {
     "FR-EST-001": {
       "status": "pass",
@@ -575,7 +575,8 @@
       "expected": [
         "pytest::tests/test_cli.py::test_cli_launches_from_arbitrary_cwd_with_packaged_assets",
         "system::ST-INSTALL-001",
-        "system::ST-OFFLINE-001"
+        "system::ST-OFFLINE-001",
+        "system::ST-WIN-BUNDLE-001"
       ],
       "missing": [],
       "misplaced": [],
@@ -583,11 +584,12 @@
       "acceptance_owner": "Technical run",
       "human_disposition": "none",
       "method": "test",
-      "fixture": "F-CLEAN-INSTALL",
-      "observable_pass_condition": "Wheel installs offline and launches from arbitrary cwd without Node/build step",
+      "fixture": "F-CLEAN-INSTALL+F-WINDOWS-INSTALL",
+      "observable_pass_condition": "Portable package and frozen Windows runtime both launch offline with packaged assets and no Node; native form resolves no system Python",
       "evidence_location": [
         "tests/evidence/pytest.xml",
-        "tests/evidence/clean-install.json"
+        "tests/evidence/clean-install.json",
+        "tests/evidence/windows-installer.json"
       ]
     },
     "FR-RUN-002": {
@@ -624,6 +626,64 @@
       "observable_pass_condition": "Health is unauthenticated and reveals static status/version only",
       "evidence_location": [
         "tests/evidence/pytest.xml"
+      ]
+    },
+    "FR-RUN-004": {
+      "status": "pass",
+      "expected": [
+        "system::ST-WIN-BUNDLE-001",
+        "system::ST-WIN-INSTALL-001",
+        "system::AJ-08"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "windows-distribution-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-WINDOWS-INSTALL",
+      "observable_pass_condition": "One setup executable installs per user without elevation/Python/network, validates root and creates singleton shortcuts plus uninstaller",
+      "evidence_location": [
+        "tests/evidence/windows-installer.json"
+      ]
+    },
+    "FR-RUN-005": {
+      "status": "pass",
+      "expected": [
+        "pytest::tests/test_windows_app.py::test_desktop_session_opens_browser_and_shuts_down_cleanly",
+        "system::ST-WIN-LAUNCH-001",
+        "system::AJ-09"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "windows-distribution-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-WINDOWS-INSTALL",
+      "observable_pass_condition": "Shortcut opens browser and tray; reactivation leaves one server; Open and Exit terminate in bounded time without capability persistence",
+      "evidence_location": [
+        "tests/evidence/pytest.xml",
+        "tests/evidence/windows-installer.json"
+      ]
+    },
+    "FR-RUN-006": {
+      "status": "pass",
+      "expected": [
+        "system::ST-WIN-UPGRADE-001",
+        "system::ST-WIN-UNINSTALL-001",
+        "system::AJ-10"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "windows-distribution-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-WINDOWS-INSTALL",
+      "observable_pass_condition": "Reinstall preserves selected root and singleton owned surfaces; uninstall removes only owned surfaces with source/outside snapshots unchanged",
+      "evidence_location": [
+        "tests/evidence/windows-installer.json"
       ]
     },
     "FR-ERR-001": {
@@ -927,7 +987,10 @@
       "expected": [
         "pytest::tests/test_safety.py::test_http_acceptance_journeys_leave_sources_git_acl_and_outside_state_immutable",
         "system::ST-INSTALL-001",
-        "system::AJ-07"
+        "system::ST-WIN-INSTALL-001",
+        "system::ST-WIN-UNINSTALL-001",
+        "system::AJ-07",
+        "system::AJ-10"
       ],
       "missing": [],
       "misplaced": [],
@@ -935,11 +998,12 @@
       "acceptance_owner": "Technical run",
       "human_disposition": "none",
       "method": "test+inspection",
-      "fixture": "F-CLEAN-INSTALL",
-      "observable_pass_condition": "Product creates no persistent log/cache/token/database in source or launch cwd",
+      "fixture": "F-CLEAN-INSTALL+F-WINDOWS-INSTALL",
+      "observable_pass_condition": "Runtime persists no content/capability; installer writes and uninstall removes only declared per-user files, root setting and shortcuts",
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
+        "tests/evidence/windows-installer.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1050,9 +1114,11 @@
       "status": "pass",
       "expected": [
         "system::ST-OFFLINE-001",
+        "system::ST-WIN-INSTALL-001",
         "system::AJ-01",
         "system::AJ-02",
-        "system::AJ-03"
+        "system::AJ-03",
+        "system::AJ-08"
       ],
       "missing": [],
       "misplaced": [],
@@ -1060,10 +1126,11 @@
       "acceptance_owner": "Technical run",
       "human_disposition": "none",
       "method": "test",
-      "fixture": "F-CLEAN-INSTALL",
-      "observable_pass_condition": "Core journeys run after offline install with no CDN, network, Node or extension dependency",
+      "fixture": "F-CLEAN-INSTALL+F-WINDOWS-INSTALL",
+      "observable_pass_condition": "Portable and native journeys run after offline install with no system Python, CDN, network, Node or extension dependency",
       "evidence_location": [
         "tests/evidence/clean-install.json",
+        "tests/evidence/windows-installer.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1072,6 +1139,7 @@
       "expected": [
         "pytest::tests/test_meta.py::test_supported_python_range_is_declared",
         "system::ST-INSTALL-001",
+        "system::ST-WIN-BUNDLE-001",
         "browser::BT-A11Y-001"
       ],
       "missing": [],
@@ -1080,11 +1148,12 @@
       "acceptance_owner": "Technical run",
       "human_disposition": "none",
       "method": "test+inspection",
-      "fixture": "F-PLATFORM-MATRIX",
-      "observable_pass_condition": "Python range and Windows/Chromium execution are proven; unavailable profiles are explicitly unexecuted",
+      "fixture": "F-PLATFORM-MATRIX+F-WINDOWS-INSTALL",
+      "observable_pass_condition": "Python portability and Windows x64 frozen runtime/Chromium execution are proven; unavailable native profiles remain explicitly unexecuted",
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
+        "tests/evidence/windows-installer.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1145,10 +1214,10 @@
     }
   },
   "summary": {
-    "requirements": 60,
-    "technical_passed": 60,
+    "requirements": 63,
+    "technical_passed": 63,
     "technical_failed": 0,
-    "human_pending": 27
+    "human_pending": 30
   },
   "unresolved_requirements": [],
   "unresolved_mutants": []

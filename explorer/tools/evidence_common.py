@@ -20,7 +20,7 @@ def file_sha256(path: Path) -> str:
 def subject_sha256(explorer: Path) -> str:
     """Hash the reviewable product/spec/test subject, excluding generated evidence."""
     explorer = explorer.resolve()
-    roots = [explorer / "src", explorer / "tests", explorer / "tools", explorer / "docs"]
+    roots = [explorer / "src", explorer / "tests", explorer / "tools", explorer / "docs", explorer / "packaging"]
     files: list[Path] = [explorer / "pyproject.toml", explorer / "README.md"]
     for root in roots:
         if root.is_dir():

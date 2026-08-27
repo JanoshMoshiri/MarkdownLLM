@@ -23,6 +23,13 @@ def evidence_ids(path: Path) -> list[str]:
         if value.get("offline_install"): ids.append("system::ST-OFFLINE-001")
         if value.get("lifecycle", {}).get("status") == "pass": ids.append("system::ST-CLI-001")
         return ids
+    if path.name == "windows-installer.json":
+        return [
+            "system::ST-WIN-BUNDLE-001", "system::ST-WIN-INSTALL-001",
+            "system::ST-WIN-LAUNCH-001", "system::ST-WIN-UPGRADE-001",
+            "system::ST-WIN-UNINSTALL-001", "system::AJ-08",
+            "system::AJ-09", "system::AJ-10",
+        ]
     if path.name == "performance-20-run.json": return ["analysis::PT-SCALE-001"]
     if path.name == "adapter-swap.json": return ["analysis::AT-SWAP-001"]
     if path.name == "immutability.json": return ["analysis::GT-IMMUTABLE-001"]
