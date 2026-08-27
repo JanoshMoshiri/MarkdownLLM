@@ -2,7 +2,7 @@
 id: operating-layer-quality-loop
 type: plan
 status: not-started
-version: 1.0
+version: 1.1
 created: 2026-08-18
 priority: medium
 tags: [coherence, skills, retrospective, quality-loop, parked]
@@ -21,16 +21,25 @@ linked_things:
     notes: "Deliberate sequencing, not a hard dependency: parked until the vendor-adapter workstream is put to bed, to avoid mixing workstreams"
   - id: vendor-harness-adapter-foundation
     relation: references
-    notes: "Same sequencing note as cowork-adapter"
+    notes: "Same sequencing note as cowork-adapter — superseded 2026-08-27 by the derivation-shape hold below"
+  - id: workflow-reconciliation-precedes-new-definitions
+    relation: references
+    notes: "The standing hold since 2026-08-27: the operator ruled that settling how existing workflows derive from the universal-workflow atom precedes minting any new definition — this plan's included. Supersedes the adapter-workstream sequencing."
 ---
 
 # Operating-Layer Quality Loop
 
-**Parked by the operator, 2026-08-18** — deliberately sequenced behind the
-vendor-adapter workstream (Codex enablement, Claude Code hardening, Cowork
-correctness). The reasoning lives in
-`the-operating-layer-has-no-quality-loop`; this plan exists only so the
-orient view carries the return path. Resume when the adapter work closes.
+**Parked by the operator, 2026-08-18** — originally sequenced behind the
+vendor-adapter workstream. **Hold re-pointed 2026-08-27** by
+`workflow-reconciliation-precedes-new-definitions`: the universal-workflow
+atom (v3.35) postdates every workflow-definition in the estate, and the
+operator ruled that settling how existing workflows derive from the atom
+precedes minting any new definition — this loop's included. The reasoning
+lives in `the-operating-layer-has-no-quality-loop`; this plan exists only so
+the orient view carries the return path. Resume when the derivation shape is
+settled — and reshape before executing: the deliverables below predate
+workflow-state v0.6 revision binding, the dispatch design, and the
+conditions-met pass taking retrospective scan slot 6.
 
 ## Deliverables (from the insight's remedy shape)
 

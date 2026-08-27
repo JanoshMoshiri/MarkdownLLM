@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T14:42:39
-generated_from: HEAD@1e4171f
-coverage: 64
+generated: 2026-08-27T15:50:25
+generated_from: HEAD@df6f1af
+coverage: 67
 framework_version: 3.36.0
 ---
 
@@ -91,6 +91,8 @@ framework_version: 3.36.0
 
 ## estate-retrospective-synthesis-2026-08
 - a-well-kept-record-reads-as-a-governed-world (derived-from)
+- workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
+- workflow-reconciliation-precedes-new-definitions (derived-from)
 
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
@@ -191,6 +193,9 @@ framework_version: 3.36.0
 ## operating-is-programming
 - operating-scope-promotion (pinned @604dfc4)
 
+## operating-layer-quality-loop
+- workflow-reconciliation-precedes-new-definitions (pinned @11a0b981ec4cfc7764507dff6da05040c9876d02)
+
 ## operating-model-seams-scope-2026-08-26
 - operating-model-seams-design-2026-08 (pinned @8a88c40449f2e00d6d4d1574de4d276446d76ca2)
 
@@ -234,11 +239,17 @@ framework_version: 3.36.0
 - floor-block-requirements-2026-08 (derived-from)
 - floor-sprint-1-scope-2026-08-21 (pinned @1209f646767c16dfff2a36c574095aca3f97a0a1)
 
+## the-operating-layer-has-no-quality-loop
+- workflow-reconciliation-precedes-new-definitions (pinned @7ceb757ff4e3c11ab2023391eb39f98fdc3febe9)
+
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)
 
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## universal-workflow-methodology
+- workflow-reconciliation-precedes-new-definitions (pinned @3af254117c771488898b861a9e9a30ef934c4794)
 
 ## validate-thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)

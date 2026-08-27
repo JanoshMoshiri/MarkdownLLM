@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T14:42:37
-generated_from: HEAD@1e4171f
-coverage: 299
+generated: 2026-08-27T15:50:24
+generated_from: HEAD@df6f1af
+coverage: 300
 framework_version: 3.36.0
 ---
 
@@ -791,6 +791,7 @@ framework_version: 3.36.0
 - operating-layer-quality-loop --references--> retrospective-specification
 - operating-layer-quality-loop --references--> cowork-adapter
 - operating-layer-quality-loop --references--> vendor-harness-adapter-foundation
+- operating-layer-quality-loop --references--> workflow-reconciliation-precedes-new-definitions
 - operating-model-seams-design-2026-08 --informs--> run-operating-model-seams-2026-08
 - operating-model-seams-design-2026-08 --references--> floor-block-requirements-2026-08
 - operating-model-seams-design-2026-08 --implements--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
@@ -1145,6 +1146,11 @@ framework_version: 3.36.0
 - withholding-is-not-isolation --supports--> hook-compliance-correlates-with-scope-not-awareness
 - withholding-is-not-isolation --supports--> portability-claims-need-execution-tests
 - withholding-is-not-isolation --complements--> structure-decides-figures-scale-decides-convention
+- workflow-reconciliation-precedes-new-definitions --references--> universal-workflow-methodology
+- workflow-reconciliation-precedes-new-definitions --informs--> operating-layer-quality-loop
+- workflow-reconciliation-precedes-new-definitions --derived-from--> estate-retrospective-synthesis-2026-08
+- workflow-reconciliation-precedes-new-definitions --references--> the-operating-layer-has-no-quality-loop
+- workflow-reconciliation-precedes-new-definitions --informs--> closed-loop-operating-state
 - workflow-run-is-the-decomposition-principle-applied-to-processes --informs--> workflow-state-specification
 - workflow-run-is-the-decomposition-principle-applied-to-processes --supports--> composition-is-the-inverse-of-decomposition
 - workflow-run-is-the-decomposition-principle-applied-to-processes --supports--> the-notation-changed-not-the-primitives
