@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-08-27
 priority: high
 tags: [operating-model, closed-loop, human-seats, dispatcher, gates-census, vision]
@@ -34,6 +34,9 @@ linked_things:
   - id: agents-cannot-self-install-permission-bearing-hooks
     relation: implements
     notes: "The doctrinal basis for the operator's irreducible list below: the dispatcher is a permission-bearing installation, so granting its authority is the one constructive act only the human can perform."
+  - id: a-dispatch-layer-outside-the-corpus-is-a-second-brain
+    relation: implements
+    notes: "Phase 2's governing design commitment: the schedule is things, the tick is dumb. This plan keeps the insight in live circulation until Phase 5 absorbs it into doctrine."
 ---
 
 # The Closed-Loop Operating State
@@ -196,14 +199,18 @@ Two honesty clauses, so the picture cannot be over-read:
       `a-dispatch-layer-outside-the-corpus-is-a-second-brain` — the schedule
       is things; the second-brain future is refused at birth. The phase
       splits accordingly and shrinks.)*
-  - [ ] **2a — Declare the schedule (corpus work, agent-runnable now).** A
+  - [x] **2a — Declare the schedule (corpus work, agent-runnable now).** A
         design session through the universal workflow produces: the
         estate's operating-schedule declaration (which loops, which radii,
         what cadences — as things), the standing dispatch prompt as a
         versioned `type: prompt`, and the guards as declared state per the
         insight's corollaries (depth, rates, serialization, the dead-man
         trigger) — pointers to the insight, never restatements. Reviewed at
-        the push like everything else at the root.
+        the push like everything else at the root. *Done 2026-08-27 →
+        `dispatch-design-2026-08` (the light traversal and four decisions)
+        + `templates/prompts/dispatch-loop.md` (the standing prompt, guards
+        in frontmatter). Decision 1 dissolved the central declaration: the
+        repos' own triggers are the schedule; the walk is the estate's.*
   - [ ] **2b — Install the tick (adapter work + the one human grant).** The
         outside half is one generated scheduled-task entry per seat —
         written by the adapter pattern, doctor-checked against the declared

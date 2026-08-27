@@ -4,13 +4,16 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T10:37:55
-generated_from: HEAD@926622b
-coverage: 60
+generated: 2026-08-27T10:40:42
+generated_from: HEAD@47f7090
+coverage: 61
 framework_version: 3.36.0
 ---
 
 # Provenance Index (reverse) — framework
+
+## a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- dispatch-design-2026-08 (pinned @f1fade782df3a6707bf5257f5794ba8f6a512264)
 
 ## a-well-kept-record-reads-as-a-governed-world
 - estate-retrospective-synthesis-2026-08 (derived-from)
@@ -55,6 +58,7 @@ framework_version: 3.36.0
 - harness-capability-evidence-matrix-2026-08-20 (derived-from)
 
 ## closed-loop-operating-state
+- dispatch-design-2026-08 (pinned @926622b64dc3e7a203ba51b548748861b82ff826)
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - gates-census-2026-08 (pinned @8f6d92c2b498ce18c2314fd7001c97a2ddcf5ca0)
 

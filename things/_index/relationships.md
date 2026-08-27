@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T10:15:17
-generated_from: HEAD@f235ce2
-coverage: 295
+generated: 2026-08-27T10:40:42
+generated_from: HEAD@47f7090
+coverage: 296
 framework_version: 3.36.0
 ---
 
@@ -264,6 +264,7 @@ framework_version: 3.36.0
 - closed-loop-operating-state --references--> operating-layer-quality-loop
 - closed-loop-operating-state --supports--> a-true-primitive-is-discovered-not-authored
 - closed-loop-operating-state --implements--> agents-cannot-self-install-permission-bearing-hooks
+- closed-loop-operating-state --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - code-architect-governs-substrate-code --informs--> vendor-harness-adapter-foundation
 - codex-5r3-migration-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - codex-5r4-root-reconciliation-2026-08-13 --documents--> vendor-harness-adapter-foundation
@@ -400,6 +401,10 @@ framework_version: 3.36.0
 - directional-graph-reads-come-in-inbound-outbound-pairs --supports--> derived-index-is-attention-cache-not-search-layer
 - directional-graph-reads-come-in-inbound-outbound-pairs --supports--> structural-pointers-need-reverse-edge-indexing
 - directional-graph-reads-come-in-inbound-outbound-pairs --informs--> derived-index-specification
+- dispatch-design-2026-08 --implements--> closed-loop-operating-state
+- dispatch-design-2026-08 --implements--> universal-workflow-methodology
+- dispatch-design-2026-08 --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- dispatch-design-2026-08 --informs--> orchestration-specification
 - dissolve-continuity-into-reconciliation --implements--> change-reconciliation-specification
 - dissolve-continuity-into-reconciliation --references--> session-memory-specification
 - dissolve-continuity-into-reconciliation --references--> retrospective-specification
