@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T15:50:24
-generated_from: HEAD@df6f1af
-coverage: 300
+generated: 2026-08-27T17:19:54
+generated_from: HEAD@f52b930
+coverage: 301
 framework_version: 3.36.0
 ---
 
@@ -374,6 +374,10 @@ framework_version: 3.36.0
 - cumulative-drift-is-invisible-to-per-change-walks --derived-from--> substrate-currency-sweep
 - decision-status-vocabulary-domain-owned --informs--> thing-specification
 - decision-status-vocabulary-domain-owned --informs--> validate-thing-specification
+- derivation-shape-brief-2026-08 --implements--> workflow-reconciliation-precedes-new-definitions
+- derivation-shape-brief-2026-08 --references--> universal-workflow-methodology
+- derivation-shape-brief-2026-08 --references--> estate-retrospective-synthesis-2026-08
+- derivation-shape-brief-2026-08 --references--> the-operating-layer-has-no-quality-loop
 - derived-index-is-attention-cache-not-search-layer --informs--> derived-index-specification
 - derived-index-is-attention-cache-not-search-layer --challenges--> scalability-guide
 - derived-index-is-attention-cache-not-search-layer --supports--> tracking-artifacts-can-drift-from-reality

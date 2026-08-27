@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T15:50:25
-generated_from: HEAD@df6f1af
-coverage: 67
+generated: 2026-08-27T17:19:59
+generated_from: HEAD@f52b930
+coverage: 68
 framework_version: 3.36.0
 ---
 
@@ -91,6 +91,7 @@ framework_version: 3.36.0
 
 ## estate-retrospective-synthesis-2026-08
 - a-well-kept-record-reads-as-a-governed-world (derived-from)
+- derivation-shape-brief-2026-08 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - workflow-reconciliation-precedes-new-definitions (derived-from)
 
@@ -249,6 +250,7 @@ framework_version: 3.36.0
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## universal-workflow-methodology
+- derivation-shape-brief-2026-08 (pinned @3af254117c771488898b861a9e9a30ef934c4794)
 - workflow-reconciliation-precedes-new-definitions (pinned @3af254117c771488898b861a9e9a30ef934c4794)
 
 ## validate-thing-specification
@@ -263,4 +265,7 @@ framework_version: 3.36.0
 - an-interface-is-what-its-consumers-call-not-what-it-declares (derived-from)
 - installation-is-not-activation (derived-from)
 - live-eval-scope-bounded-to-claude (pinned @c199002)
+
+## workflow-reconciliation-precedes-new-definitions
+- derivation-shape-brief-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 
