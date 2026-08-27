@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-08-27
 priority: high
 tags: [operating-model, closed-loop, human-seats, dispatcher, gates-census, vision]
@@ -190,15 +190,29 @@ Two honesty clauses, so the picture cannot be over-read:
       Output: one small decision per gate, or one batch decision with a
       table — verdicts, not homework. This is the 08c retrospective's
       closing question executed.
-- [ ] **Phase 2 — The dispatcher.** Wire fired triggers to session launch.
-      Doctrinally this is adapter territory — `harness-session` anchor,
-      per-harness, optional hardening; the portable floor remains
-      chase-triggers-read-at-session-start, which Phase 1 of the 08b arc
-      already proved works. Launch discipline is non-negotiable: every
-      automated run carries an exogenous stop condition at launch (budget,
-      marginal-value test, or decay threshold) — the loop-optimisation
-      insight's own dismissal condition, built in rather than owed. Building
-      it promotes that insight.
+- [ ] **Phase 2 — The dispatcher** *(reshaped v1.3, before its design
+      session ran: the operator saw the scheduling logic becoming a program
+      in itself, and the design commitment landed as
+      `a-dispatch-layer-outside-the-corpus-is-a-second-brain` — the schedule
+      is things; the second-brain future is refused at birth. The phase
+      splits accordingly and shrinks.)*
+  - [ ] **2a — Declare the schedule (corpus work, agent-runnable now).** A
+        design session through the universal workflow produces: the
+        estate's operating-schedule declaration (which loops, which radii,
+        what cadences — as things), the standing dispatch prompt as a
+        versioned `type: prompt`, and the guards as declared state per the
+        insight's corollaries (depth, rates, serialization, the dead-man
+        trigger) — pointers to the insight, never restatements. Reviewed at
+        the push like everything else at the root.
+  - [ ] **2b — Install the tick (adapter work + the one human grant).** The
+        outside half is one generated scheduled-task entry per seat —
+        written by the adapter pattern, doctor-checked against the declared
+        schedule, never hand-authored. It carries no judgment: *start a
+        session; the session asks the floor what is due.* Launch discipline
+        stays non-negotiable: every automated run carries an exogenous stop
+        condition at launch — the loop-optimisation insight's own dismissal
+        condition, built in rather than owed; building it promotes that
+        insight. The installation grant is the operator's (census row 7).
 - [ ] **Phase 3 — The seat protocol.** Define how the system presents work
       at each seat: dissemination briefs that carry options with evidence;
       conflicts that carry proposed directions; approvals as a queue the
@@ -210,7 +224,15 @@ Two honesty clauses, so the picture cannot be over-read:
       and run its loop end to end with the dispatcher live: trigger → run →
       outputs → seats. Measure interventions by seat class. Any intervention
       outside the four seats is a defect — route it as a finding into the
-      next retrospective, which is the loop debugging itself.
+      next retrospective, which is the loop debugging itself. *Proposed
+      pilot (v1.3): the estate's smallest domain in real weekly use — low
+      stakes, live cadence, retrospectives already running; named at the
+      ratification sitting, not in this public-root file.*
+
+**Critical path, as of 2026-08-27:** the only human-side blocker is the
+ratification sitting (census verdicts + the Phase 2b grant, one sitting).
+Phase 2a is agent-runnable immediately and in parallel; 2b installs in
+minutes once granted; Phase 4's pilot starts the first morning after.
 - [ ] **Phase 5 — Seal.** On the census's and cycle's evidence, the seat
       taxonomy and the closed-loop doctrine enter `operating-model.md`
       (operator-gated change to a draft spec expecting exactly this kind of
