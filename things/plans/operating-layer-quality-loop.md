@@ -24,7 +24,10 @@ linked_things:
     notes: "Same sequencing note as cowork-adapter — superseded 2026-08-27 by the derivation-shape hold below"
   - id: workflow-reconciliation-precedes-new-definitions
     relation: references
-    notes: "The standing hold since 2026-08-27: the operator ruled that settling how existing workflows derive from the universal-workflow atom precedes minting any new definition — this plan's included. Supersedes the adapter-workstream sequencing."
+    notes: "The hold that ran 2026-08-27 and is now spent — settled the same day by derivation-shape-settled-2026-08. Superseded the adapter-workstream sequencing."
+  - id: estate-workflow-derivation
+    relation: references
+    notes: "The current sequencing: this loop's definition is minted following the settled shape, behind that programme's MVP gate — not behind the shape decision, which is closed."
 ---
 
 # Operating-Layer Quality Loop
@@ -36,8 +39,11 @@ atom (v3.35) postdates every workflow-definition in the estate, and the
 operator ruled that settling how existing workflows derive from the atom
 precedes minting any new definition — this loop's included. The reasoning
 lives in `the-operating-layer-has-no-quality-loop`; this plan exists only so
-the orient view carries the return path. Resume when the derivation shape is
-settled — and reshape before executing: the deliverables below predate
+the orient view carries the return path. **Shape settled 2026-08-27**
+(`derivation-shape-settled-2026-08`), so the hold is spent; the sequencing is
+now `estate-workflow-derivation`'s MVP gate — this loop's definition is minted
+following the settled shape, not ahead of it. Reshape before executing: the
+deliverables below predate
 workflow-state v0.6 revision binding, the dispatch design, and the
 conditions-met pass taking retrospective scan slot 6.
 

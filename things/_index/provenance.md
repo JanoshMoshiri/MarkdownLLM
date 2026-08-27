@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T17:19:59
-generated_from: HEAD@f52b930
-coverage: 68
+generated: 2026-08-27T23:53:14
+generated_from: HEAD@812bfeb
+coverage: 69
 framework_version: 3.36.0
 ---
 
@@ -83,6 +83,12 @@ framework_version: 3.36.0
 ## cross-domain-handoff-is-verified-external-input
 - phase-3-run-domain-task-reverted (pinned @2d4f6d4)
 
+## derivation-shape-brief-2026-08
+- derivation-shape-settled-2026-08 (pinned @016150e76f1ae69aefd41331f9da1aa7fed471e6)
+- derivation-shape-settled-2026-08 (derived-from)
+- estate-workflow-derivation (pinned @016150e76f1ae69aefd41331f9da1aa7fed471e6)
+- estate-workflow-derivation (derived-from)
+
 ## divergence-is-an-unrouted-decision
 - divergence-primitive-promotion (pinned @aae0712)
 
@@ -92,6 +98,8 @@ framework_version: 3.36.0
 ## estate-retrospective-synthesis-2026-08
 - a-well-kept-record-reads-as-a-governed-world (derived-from)
 - derivation-shape-brief-2026-08 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
+- estate-workflow-derivation (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
+- estate-workflow-derivation (derived-from)
 - workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - workflow-reconciliation-precedes-new-definitions (derived-from)
 
@@ -268,4 +276,6 @@ framework_version: 3.36.0
 
 ## workflow-reconciliation-precedes-new-definitions
 - derivation-shape-brief-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
+- derivation-shape-settled-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
+- estate-workflow-derivation (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T20:04:40
-generated_from: HEAD@016150e
-coverage: 302
+generated: 2026-08-27T23:53:11
+generated_from: HEAD@812bfeb
+coverage: 304
 framework_version: 3.36.0
 ---
 
@@ -378,6 +378,10 @@ framework_version: 3.36.0
 - derivation-shape-brief-2026-08 --references--> universal-workflow-methodology
 - derivation-shape-brief-2026-08 --references--> estate-retrospective-synthesis-2026-08
 - derivation-shape-brief-2026-08 --references--> the-operating-layer-has-no-quality-loop
+- derivation-shape-settled-2026-08 --implements--> workflow-reconciliation-precedes-new-definitions
+- derivation-shape-settled-2026-08 --derived-from--> derivation-shape-brief-2026-08
+- derivation-shape-settled-2026-08 --references--> universal-workflow-methodology
+- derivation-shape-settled-2026-08 --informs--> operating-layer-quality-loop
 - derived-index-is-attention-cache-not-search-layer --informs--> derived-index-specification
 - derived-index-is-attention-cache-not-search-layer --challenges--> scalability-guide
 - derived-index-is-attention-cache-not-search-layer --supports--> tracking-artifacts-can-drift-from-reality
@@ -478,6 +482,12 @@ framework_version: 3.36.0
 - estate-retrospective-synthesis-2026-08 --references--> framework-retrospective-2026-08c
 - estate-wide-autopush-2026-08-22 --implements--> autopush-requires-explicit-authority
 - estate-wide-autopush-2026-08-22 --references--> estate-cadence-cluster
+- estate-workflow-derivation --implements--> derivation-shape-settled-2026-08
+- estate-workflow-derivation --implements--> universal-workflow-methodology
+- estate-workflow-derivation --informs--> closed-loop-operating-state
+- estate-workflow-derivation --derived-from--> derivation-shape-brief-2026-08
+- estate-workflow-derivation --informs--> operating-layer-quality-loop
+- estate-workflow-derivation --derived-from--> estate-retrospective-synthesis-2026-08
 - every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated
 - every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
 - every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose
@@ -800,6 +810,7 @@ framework_version: 3.36.0
 - operating-layer-quality-loop --references--> cowork-adapter
 - operating-layer-quality-loop --references--> vendor-harness-adapter-foundation
 - operating-layer-quality-loop --references--> workflow-reconciliation-precedes-new-definitions
+- operating-layer-quality-loop --references--> estate-workflow-derivation
 - operating-model-seams-design-2026-08 --informs--> run-operating-model-seams-2026-08
 - operating-model-seams-design-2026-08 --references--> floor-block-requirements-2026-08
 - operating-model-seams-design-2026-08 --implements--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs

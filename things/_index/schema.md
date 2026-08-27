@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-27
-generated: 2026-08-27T20:04:38
-generated_from: HEAD@016150e
-coverage: 302
+generated: 2026-08-27T23:53:09
+generated_from: HEAD@812bfeb
+coverage: 304
 framework_version: 3.36.0
 ---
 
@@ -14,24 +14,24 @@ framework_version: 3.36.0
 
 | field | things using it |
 |---|---|
-| id | 302 |
-| type | 302 |
-| status | 302 |
-| created | 302 |
-| linked_things | 293 |
-| version | 236 |
-| tags | 208 |
+| id | 304 |
+| type | 304 |
+| status | 304 |
+| created | 304 |
+| linked_things | 295 |
+| version | 238 |
+| tags | 210 |
 | origin | 148 |
 | confidence | 147 |
 | session | 145 |
 | source | 122 |
-| priority | 46 |
+| priority | 47 |
 | disposition | 41 |
 | disposition_reason | 41 |
-| informed_by | 23 |
+| informed_by | 25 |
 | exposed | 22 |
 | promoted_to | 19 |
-| decided_by | 17 |
+| decided_by | 18 |
 | completed | 8 |
 | period_start | 8 |
 | period_end | 8 |
@@ -41,11 +41,11 @@ framework_version: 3.36.0
 | generated_from | 5 |
 | coverage | 5 |
 | framework_version | 5 |
+| triggers | 4 |
 | definition | 4 |
 | current_stage | 4 |
 | verified | 3 |
 | verified_by | 3 |
-| triggers | 3 |
 | parties | 3 |
 | resolution | 2 |
 | resolved_by | 2 |
