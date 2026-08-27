@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T01:44:40
-generated_from: HEAD@01f26d1
-coverage: 55
+generated: 2026-08-27T08:54:34
+generated_from: HEAD@469b06d
+coverage: 56
 framework_version: 3.36.0
 ---
 
@@ -50,6 +50,9 @@ framework_version: 3.36.0
 
 ## claude-phase6-no-adapter-and-root-2026-08-16
 - harness-capability-evidence-matrix-2026-08-20 (derived-from)
+
+## closed-loop-operating-state
+- gates-census-2026-08 (pinned @8f6d92c1a29c7038a0448df1893a70762be6742d)
 
 ## codex-desktop-session-start-negative-2026-08-14
 - harness-capability-evidence-matrix-2026-08-20 (derived-from)
@@ -117,6 +120,8 @@ framework_version: 3.36.0
 
 ## framework-retrospective-2026-08c
 - closed-loop-operating-state (derived-from)
+- gates-census-2026-08 (pinned @7bffcb1170448eae0d18775e19adfae262a95c53)
+- gates-census-2026-08 (derived-from)
 - hard-hook-vocabulary-contradicts-observable-trigger-insight (derived-from)
 
 ## framework-v3-transformation-plan

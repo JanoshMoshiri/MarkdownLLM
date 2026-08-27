@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T01:44:40
-generated_from: HEAD@01f26d1
-coverage: 287
+generated: 2026-08-27T08:54:34
+generated_from: HEAD@469b06d
+coverage: 291
 framework_version: 3.36.0
 ---
 
@@ -586,6 +586,10 @@ framework_version: 3.36.0
 - framework-v3-transformation-plan --references--> session-memory-specification
 - framework-v3-transformation-plan --references--> derived-index-specification
 - framework-v3-transformation-plan --implements--> llm-driven-systems-manifesto
+- gates-census-2026-08 --implements--> closed-loop-operating-state
+- gates-census-2026-08 --derived-from--> framework-retrospective-2026-08c
+- gates-census-2026-08 --implements--> consequence-is-recoverable-only-in-retrospect
+- gates-census-2026-08 --references--> agents-cannot-self-install-permission-bearing-hooks
 - git-workflow-specification --implements--> llm-driven-systems-manifesto
 - git-workflow-specification --informs--> estate-git-sync
 - git-workflow-specification --references--> divergence-is-an-unrouted-decision

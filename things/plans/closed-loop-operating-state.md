@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-08-27
 priority: high
 tags: [operating-model, closed-loop, human-seats, dispatcher, gates-census, vision]
@@ -177,7 +177,12 @@ Two honesty clauses, so the picture cannot be over-read:
 - [x] **Phase 0 — Define it.** This document. The goal is written, dated,
       and linked into the graph; the vision can now drift-check its
       restatements against one owner.
-- [ ] **Phase 1 — The gates census.** Walk every point where a session
+- [x] **Phase 1 — The gates census.** *Run 2026-08-27 →
+      `gates-census-2026-08`: twenty gate classes, each with a proposed
+      verdict — eight consequence-permanent, six designed seats confirmed,
+      six familiarity-shaped (four already moved in practice). Ratification
+      queued at the operator's next sitting; the Done-When box stays open
+      until then.* Walk every point where a session
       currently waits on the operator (the commit stream and the plans'
       human-gated holds are the source material). Classify each:
       consequence-gated (stays, and is named as a seat-3 gate) or
