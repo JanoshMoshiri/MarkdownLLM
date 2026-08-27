@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T08:54:34
-generated_from: HEAD@469b06d
-coverage: 291
+generated: 2026-08-27T09:35:43
+generated_from: HEAD@3c1b449
+coverage: 293
 framework_version: 3.36.0
 ---
 
@@ -116,6 +116,11 @@ framework_version: 3.36.0
 - a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - a-verifier-assumes-the-inputs-it-did-not-observe --extends--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - a-verifier-assumes-the-inputs-it-did-not-observe --complements--> a-transcribed-identifier-is-unverifiable-by-reading
+- a-well-kept-record-reads-as-a-governed-world --derived-from--> estate-retrospective-synthesis-2026-08
+- a-well-kept-record-reads-as-a-governed-world --extends--> tracking-artifacts-can-drift-from-reality
+- a-well-kept-record-reads-as-a-governed-world --complements--> a-stated-dismissal-condition-needs-a-reader
+- a-well-kept-record-reads-as-a-governed-world --complements--> a-uniform-answer-is-a-dead-judgment
+- a-well-kept-record-reads-as-a-governed-world --supports--> shared-domain-failures-are-a-framework-signal-without-a-path
 - a-wrong-sum-is-indistinguishable-from-a-right-one --informs--> deterministic-calculation
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> divergence-is-an-unrouted-decision
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -450,6 +455,12 @@ framework_version: 3.36.0
 - estate-migration-record-2026-08-14 --documents--> vendor-harness-adapter-foundation
 - estate-migration-record-2026-08-14 --derived-from--> claude-gate-5r3-acceptance-2026-08-13
 - estate-migration-record-2026-08-14 --implements--> assistant-register-does-not-graduate
+- estate-retrospective-synthesis-2026-08 --informs--> closed-loop-operating-state
+- estate-retrospective-synthesis-2026-08 --complements--> gates-census-2026-08
+- estate-retrospective-synthesis-2026-08 --implements--> retrospective-specification
+- estate-retrospective-synthesis-2026-08 --implements--> shared-domain-failures-are-a-framework-signal-without-a-path
+- estate-retrospective-synthesis-2026-08 --derived-from--> a-well-kept-record-reads-as-a-governed-world
+- estate-retrospective-synthesis-2026-08 --references--> framework-retrospective-2026-08c
 - estate-wide-autopush-2026-08-22 --implements--> autopush-requires-explicit-authority
 - estate-wide-autopush-2026-08-22 --references--> estate-cadence-cluster
 - every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated

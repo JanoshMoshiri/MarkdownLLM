@@ -4,13 +4,16 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T08:54:34
-generated_from: HEAD@469b06d
-coverage: 56
+generated: 2026-08-27T09:35:43
+generated_from: HEAD@3c1b449
+coverage: 60
 framework_version: 3.36.0
 ---
 
 # Provenance Index (reverse) — framework
+
+## a-well-kept-record-reads-as-a-governed-world
+- estate-retrospective-synthesis-2026-08 (derived-from)
 
 ## assistant-register
 - operating-is-programming (derived-from)
@@ -52,6 +55,7 @@ framework_version: 3.36.0
 - harness-capability-evidence-matrix-2026-08-20 (derived-from)
 
 ## closed-loop-operating-state
+- estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - gates-census-2026-08 (pinned @8f6d92c1a29c7038a0448df1893a70762be6742d)
 
 ## codex-desktop-session-start-negative-2026-08-14
@@ -80,6 +84,9 @@ framework_version: 3.36.0
 
 ## domain-specification-guide
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## estate-retrospective-synthesis-2026-08
+- a-well-kept-record-reads-as-a-governed-world (derived-from)
 
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
@@ -120,12 +127,16 @@ framework_version: 3.36.0
 
 ## framework-retrospective-2026-08c
 - closed-loop-operating-state (derived-from)
+- estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - gates-census-2026-08 (pinned @7bffcb1170448eae0d18775e19adfae262a95c53)
 - gates-census-2026-08 (derived-from)
 - hard-hook-vocabulary-contradicts-observable-trigger-insight (derived-from)
 
 ## framework-v3-transformation-plan
 - decision-status-vocabulary-domain-owned (pinned @da5d31d)
+
+## gates-census-2026-08
+- estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
@@ -171,6 +182,9 @@ framework_version: 3.36.0
 ## posix-floor-record-2026-08-13
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - posix-live-dispatch-record-2026-08-14 (derived-from)
+
+## retrospective-specification
+- estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 
 ## review-independent-operating-model-2026-08-26-codex
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
