@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T01:31:14
-generated_from: HEAD@e1ef1bf
+generated: 2026-08-27T01:44:40
+generated_from: HEAD@01f26d1
 coverage: 287
 framework_version: 3.36.0
 ---
@@ -253,6 +253,7 @@ framework_version: 3.36.0
 - closed-loop-operating-state --implements--> coherence-is-a-maintained-rate-not-a-state
 - closed-loop-operating-state --references--> operating-layer-quality-loop
 - closed-loop-operating-state --supports--> a-true-primitive-is-discovered-not-authored
+- closed-loop-operating-state --implements--> agents-cannot-self-install-permission-bearing-hooks
 - code-architect-governs-substrate-code --informs--> vendor-harness-adapter-foundation
 - codex-5r3-migration-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - codex-5r4-root-reconciliation-2026-08-13 --documents--> vendor-harness-adapter-foundation

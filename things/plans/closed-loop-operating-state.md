@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-08-27
 priority: high
 tags: [operating-model, closed-loop, human-seats, dispatcher, gates-census, vision]
@@ -31,6 +31,9 @@ linked_things:
   - id: a-true-primitive-is-discovered-not-authored
     relation: supports
     notes: "Nothing below is a new mechanism. Every phase wires or classifies primitives that already exist; the only genuinely new artifact is the census's verdicts."
+  - id: agents-cannot-self-install-permission-bearing-hooks
+    relation: implements
+    notes: "The doctrinal basis for the operator's irreducible list below: the dispatcher is a permission-bearing installation, so granting its authority is the one constructive act only the human can perform."
 ---
 
 # The Closed-Loop Operating State
@@ -117,6 +120,57 @@ that are questions are the system reporting thin self-description — each
 should leave a residue (a surface, an insight, a lens) so its successor is a
 read, not a prompt. The measurable trend: operator inputs shift from
 explanations toward rulings.
+
+### What It Looks Like, Lived (added v1.1 — the operator asked, so it leaves residue)
+
+The operator does not open sessions; sessions open themselves. Retrospectives
+fire on their clocks in each domain, read their current state, write their
+findings, birth or advance plans; workflow-runs execute those plans against
+pinned definitions; reviews verify; findings feed the next cycle's
+current-state assessment. All of it lands in committed state while the
+operator is elsewhere.
+
+What reaches the operator is **a queue, and only a queue**: conflicts
+carrying proposed directions, option briefs where a loop produced genuine
+alternatives, approval requests idling at the irreversible, and — rarely —
+a breakage report with its evidence attached. Every item is a
+verdict-in-waiting: options with evidence, never homework. Each ruling
+becomes a committed decision the loops absorb. The operator's questions
+become reads — orient, worklog, retrospectives — surfaces the system
+maintains because it knows they will be read. And **silence is a report,
+not an absence**: a heartbeat digest says what ran and that nothing needs a
+human, because a quiet system must be distinguishable from a blind one
+(the null-result discipline: "nothing found" is never "could not look").
+
+Two honesty clauses, so the picture cannot be over-read:
+
+- **The rolling does not stop — it idles at the gates, by design.**
+  Everything reversible rolls; everything irreversible waits. Throughput at
+  the desired state is bounded by the operator's seat latency, and that is
+  the feature: stepping out of the loop does not mean the loop runs away.
+  It also means the operator declares a seat cadence — an undated human
+  wait is exactly the drift the estate already learned to chase.
+- **The loops learn to maintain and refine; they never learn to want.**
+  Intent is the one input that never automates. The operator's role at the
+  desired state, in one line: **source of intent, judge at gates, reader
+  of digests.**
+
+### The Operator's Irreducible List (what "getting there" asks of the human)
+
+1. **Say go on Phase 1.** The census runs without the operator; the verdict
+   table comes back for ratification in one sitting. This is the decisive
+   act: it converts habits-of-presence into named gates.
+2. **Grant the dispatcher its authority — once per harness.** The corpus
+   already proved this seat: `agents-cannot-self-install-permission-bearing-hooks`.
+   Scheduling autonomous launches is permission-bearing, so the grant is
+   the one constructive act only the human can perform. After it, launches
+   are structure.
+3. **Declare the seat cadence.** When the queue gets drained is the
+   operator's choice; *that* it has a date is the system's requirement.
+4. **Stop supplying the middle.** Getting out of the loop is mostly
+   subtraction — stop dispatching by hand, stop pre-empting sessions, route
+   understanding-questions into surfaces. The census legitimises the
+   not-doing.
 
 ## Route
 
