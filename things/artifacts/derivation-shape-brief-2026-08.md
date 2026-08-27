@@ -2,7 +2,7 @@
 id: derivation-shape-brief-2026-08
 type: artifact
 status: evolving
-version: 1.0
+version: 1.1
 created: 2026-08-27
 session: 2026-08-27
 tags: [derivation-shape, universal-workflow, workflow-definitions, options-brief, sitting-input]
@@ -100,16 +100,45 @@ strongest argument that reconciliation is declaration, not rebuild.
 
 ## The Three Routes, Applied
 
-**Route A — declare (link and map).** Add the `implements →
-universal-workflow-methodology` edge; add a short Derivation section to the
-definition body carrying the table above — including, explicitly, which
-decisions are collapsed and why that is proportionate. Stage ids stay as they
-are. Live runs untouched. Cost: minutes per definition, run by each domain's
-own session. What it buys: every definition's relation to the base becomes
-readable and auditable estate-wide; the atom's specialisation clause is
-honoured rather than fought ("keeps the decisions and re-names or subdivides
-the stages as its context demands"). What it does not buy: uniform stage
-vocabulary across domains.
+**Route A — declare (map, and link corpus-locally).** Add a short Derivation
+section to the definition body carrying the table above — including,
+explicitly, which decisions are collapsed and why that is proportionate — and
+name the framework version the mapping was made against. Stage ids stay as
+they are. Live runs untouched. Cost: minutes per definition, run by each
+domain's own session. What it buys: the definition's relation to the base
+becomes readable and auditable; the atom's specialisation clause is honoured
+rather than fought ("keeps the decisions and re-names or subdivides the stages
+as its context demands"). What it does not buy: uniform stage vocabulary
+across domains, or a mechanically queryable estate-wide derivation set (see
+the asymmetry below).
+
+> **Correction, v1.1 — the edge does not travel.** v1.0 of this brief
+> prescribed adding an `implements → universal-workflow-methodology` edge to
+> the definition. That is correct **only at the framework root**, where
+> `substrate-floor-development` already carries it in the same corpus. In a
+> domain it is an Error: the referential check makes a `linked_things` target
+> outside the corpus `references unknown id` (`validation.py`), so the
+> prescription would have blocked the first commit in every domain that
+> followed it. Zero domains carry such an edge today. Foundation reaches a
+> domain by refresh, and the porch/import machinery is explicitly the wrong
+> channel for it (`universal-workflow.md` → Distribution), so **there is no
+> edge to add** — the domain keeps its existing corpus-local edge to its own
+> workflow skill (regulated-qms's practice, right all along) and declares the
+> derivation in the body against the framework version its AGENTS.md already
+> pins in `framework_version_seen`. Prose plus a version pin, zero new
+> mechanism.
+>
+> **The asymmetry is the finding, and it is general:** a pattern authored and
+> validated at the framework root can be invalid in every domain, because the
+> root's corpus *contains* the specs a domain can only name across a boundary.
+> The root is not a representative domain. Sibling of
+> `a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it`;
+> candidate for harvest at session end rather than minted here.
+>
+> If estate-wide mechanical readability of the derivation set is later felt,
+> that is a deploy-when-felt floor question — a registered structural field
+> resolving framework ids from the domain's known framework root. Recorded,
+> not built, and not needed for any route below.
 
 **Route B — restructure.** Re-mint the definition with stages renamed or
 re-cut to the atom's vocabulary; live runs stay-pinned to the old revision by
@@ -156,18 +185,46 @@ the definition links `implements` to the skill. Different grains, both doing
 work, hierarchically related. Offered as the resolution direction for the
 folded conflict; not ruled here.
 
-## Open Questions for the Sitting
+## The Four Questions — answered (v1.1)
 
-1. **Edge target:** does a definition implement the atom directly (the atom's
-   own text), through the domain workflow skill (the specimen's current
-   practice), or both? Rule it once; the mapping section carries it either way.
-2. **Mapping completeness:** must the Derivation section name all seven
-   decisions even when collapsed? Proposed: yes — naming the collapse is what
-   makes proportionality auditable, and it is one line per decision.
-3. **The zero-run set:** first-run-or-retire, ruled per definition in each
-   domain's own pass — does the operator want those verdicts proposed in
-   advance (synthesis F4 lists the candidates), or left to each domain's next
-   session?
-4. **Where the worked example lives:** as a framework `type: example` thing
-   derived from the ratified specimen pass, or as a section in
-   `domain-refresh.md`'s next version.
+The operator's verdict, in session 2026-08-27: **the domain holds this
+discretion already.** Worked through, that is right on all four, and three of
+them turn out to be settled by doctrine already in the corpus rather than
+needing any new ruling.
+
+1. **Edge target — dissolved, not ruled.** There is no edge for a domain to
+   choose. The floor forbids the cross-corpus target and foundation travels by
+   refresh, so the definition keeps its corpus-local `implements` edge to the
+   domain's own workflow skill and declares the derivation in prose against the
+   pinned framework version. The specimen was already doing the right thing.
+   See the v1.1 correction above.
+2. **Mapping completeness — the domain's lenses already decide.** Not a
+   framework rule. In a regulated domain the regulator lens forces it: an
+   assessor must see which decisions were collapsed and why, without the author
+   in the room, so all seven get named there. In a low-stakes domain a partial
+   map is a legitimate proportionality call under the atom's own working rule
+   (process weight set by what failure would cost). The framework's worked
+   example names all seven and teaches by showing, not by mandating —
+   `example-things.md`'s whole premise.
+3. **The zero-run set — the domain's, unambiguously.** Membrane doctrine plus
+   the estate retrospective's own boundary: the vantage never becomes
+   everyone's editor. Only the domain knows whether the demand behind a
+   definition still exists. The substrate ships the pattern and the question;
+   the verdict is local. Synthesis F4's candidate list is a prompt, not a
+   docket.
+4. **Where the worked example lives — routine framework work, not a ruling.**
+   Both, in their proper roles: a `type: example` thing at the framework root
+   (the type's declared purpose is exactly this — a worked pattern distilled
+   from verified execution), and a pointer step in `domain-refresh.md` so it
+   reaches domains through the channel foundation already uses. One owner,
+   pointers not restatements. Additive to a draft and an evolving spec, so it
+   flows under census row 15 with the root push as the review seat.
+
+**The meta-finding.** None of the four needed the operator, and the strongest
+evidence for that is what happened to this brief: the one question that looked
+most like a framework-level ruling (Q1) was resolved by *checking the floor* —
+and the check found the framework-level answer was wrong and the domain's own
+practice was right. A ruling issued from the root would have shipped a
+commit-blocking instruction estate-wide. The competent authority for how a
+domain's definitions declare themselves is the domain, its floor, and its
+lenses.
