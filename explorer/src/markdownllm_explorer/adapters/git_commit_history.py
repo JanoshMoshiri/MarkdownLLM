@@ -112,6 +112,51 @@ class GitCommitHistory:
             raise ExplorerError("git_unavailable") from None
         if top != root.resolve(strict=True) or not _inside(git_dir, root) or not _inside(common, root):
             raise ExplorerError("git_store_external")
+        self._validate_object_store(common / "objects", root, set(), 0)
+
+    def _validate_object_store(self, store: Path, root: Path, seen: set[Path], depth: int) -> None:
+        """Validate the effective object database and every local alternate.
+
+        Git resolves relative alternates from the object database containing the
+        ``info/alternates`` file.  We mirror that rule without asking repository
+        configuration to execute anything, bound the graph, and fail closed on
+        HTTP/promisor stores because their complete object set is not owned by
+        the selected source snapshot.
+        """
+        if depth > 8 or len(seen) >= 32:
+            raise ExplorerError("git_store_external")
+        try:
+            resolved = store.resolve(strict=True)
+        except OSError:
+            raise ExplorerError("git_unavailable") from None
+        if not resolved.is_dir() or not _inside(resolved, root):
+            raise ExplorerError("git_store_external")
+        if resolved in seen:
+            return
+        seen.add(resolved)
+        if any((resolved / "pack").glob("*.promisor")):
+            raise ExplorerError("git_store_external")
+        http_alternates = resolved / "info" / "http-alternates"
+        if _nonempty_bounded_file(http_alternates):
+            raise ExplorerError("git_store_external")
+        alternates = resolved / "info" / "alternates"
+        if not alternates.exists():
+            return
+        try:
+            if alternates.stat().st_size > 64 * 1024:
+                raise ExplorerError("git_store_external")
+            lines = alternates.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeError):
+            raise ExplorerError("git_store_external") from None
+        if len(lines) > 32:
+            raise ExplorerError("git_store_external")
+        for value in lines:
+            if not value.strip():
+                continue
+            candidate = Path(value.strip())
+            if not candidate.is_absolute():
+                candidate = resolved / candidate
+            self._validate_object_store(candidate, root, seen, depth + 1)
 
     def _optional(self, root: Path, arguments: list[str]) -> str:
         try:
@@ -167,6 +212,7 @@ class GitCommitHistory:
             "-c", "core.preloadIndex=false",
             "-c", "diff.external=",
             "-c", "credential.helper=",
+            "-c", "core.alternateRefsCommand=",
             "-c", "filter.lfs.smudge=",
             "-c", "filter.lfs.process=",
             "-c", "protocol.file.allow=never",
@@ -207,6 +253,17 @@ def _inside(candidate: Path, root: Path) -> bool:
         return True
     except ValueError:
         return False
+
+
+def _nonempty_bounded_file(path: Path) -> bool:
+    try:
+        if not path.exists():
+            return False
+        if not path.is_file() or path.stat().st_size > 64 * 1024:
+            raise ExplorerError("git_store_external")
+        return bool(path.read_bytes().strip())
+    except OSError:
+        raise ExplorerError("git_store_external") from None
 
 
 def _allowed_arguments(arguments: list[str]) -> bool:

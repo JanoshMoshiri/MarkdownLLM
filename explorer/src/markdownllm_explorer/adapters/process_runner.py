@@ -49,8 +49,20 @@ class BoundedProcessRunner:
         except OSError:
             raise ExplorerError("git_unavailable") from None
         # Two fixed-size chunks bound the producer even when a child writes faster
-        # than the consumer can validate the configured capture budget.
+        # than the consumer can validate the configured capture budget.  The
+        # cancellation event also makes every producer offer interruptible: a
+        # full queue must never outlive the process invocation that owns it.
         chunks: queue.Queue[bytes | BaseException | None] = queue.Queue(maxsize=2)
+        cancelled = threading.Event()
+
+        def offer(item: bytes | BaseException | None) -> bool:
+            while not cancelled.is_set():
+                try:
+                    chunks.put(item, timeout=0.02)
+                    return True
+                except queue.Full:
+                    continue
+            return False
 
         def drain() -> None:
             try:
@@ -59,11 +71,12 @@ class BoundedProcessRunner:
                     chunk = process.stdout.read(64 * 1024)
                     if not chunk:
                         break
-                    chunks.put(chunk)
+                    if not offer(chunk):
+                        break
             except BaseException as error:  # pragma: no cover - OS pipe failure
-                chunks.put(error)
+                offer(error)
             finally:
-                chunks.put(None)
+                offer(None)
 
         reader = threading.Thread(target=drain, name="explorer-process-capture", daemon=True)
         reader.start()
@@ -110,5 +123,25 @@ class BoundedProcessRunner:
                 pass
             raise ExplorerError("git_timeout") from None
         finally:
+            cancelled.set()
+            if process.poll() is None:
+                process.kill()
+                try:
+                    process.wait(timeout=1)
+                except subprocess.TimeoutExpired:  # pragma: no cover - exceptional OS failure
+                    pass
+            # Free queue capacity while the reader observes cancellation/EOF,
+            # then join it.  Closing stdout is a final unblock for exceptional
+            # platform pipe behaviour; no capture daemon survives this method.
+            deadline = time.monotonic() + 1.0
+            while reader.is_alive() and time.monotonic() < deadline:
+                try:
+                    chunks.get_nowait()
+                except queue.Empty:
+                    pass
+                reader.join(0.02)
             if process.stdout is not None:
                 process.stdout.close()
+            reader.join(1.0)
+            if reader.is_alive():  # pragma: no cover - defensive OS failure
+                raise ExplorerError("git_unavailable", detail="git capture did not terminate")

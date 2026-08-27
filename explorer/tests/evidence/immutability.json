@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "GT-IMMUTABLE-001",
+  "status": "pass",
+  "tool": {
+    "name": "pytest-immutability-oracle",
+    "version": "1"
+  },
+  "oracle": "independent relative path/type/mode-or-ACL/size/mtime/content plus complete .git tree snapshot",
+  "platform": "nt",
+  "source_entries": 165,
+  "outside_entries": 0,
+  "before_sha256": "8f9106147c17e47b1fdfc685fa4fa6f24f9488bfd4861ddee55aa6fa81ff486d",
+  "after_sha256": "8f9106147c17e47b1fdfc685fa4fa6f24f9488bfd4861ddee55aa6fa81ff486d",
+  "outside_before_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "outside_after_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "journeys": [
+    "estate",
+    "overview",
+    "tree",
+    "search",
+    "skills",
+    "memory",
+    "settings",
+    "document-rendered",
+    "document-raw"
+  ],
+  "helper_classes": [
+    "fsmonitor",
+    "pager",
+    "editor",
+    "external-diff",
+    "credential",
+    "alternate-refs",
+    "alias",
+    "hook"
+  ],
+  "excluded": [
+    "atime",
+    "OS read telemetry"
+  ]
+}

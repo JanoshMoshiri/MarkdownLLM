@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 import ast
+import hashlib
+import json
 import os
 import re
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -18,6 +23,13 @@ def imports(path: Path) -> set[str]:
         if isinstance(node, ast.Import): found.update(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module: found.add(node.module)
     return found
+
+
+def source_hashes(root: Path) -> dict[str, str]:
+    return {
+        path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in root.rglob("*.py")
+    }
 
 
 @pytest.mark.architecture
@@ -70,6 +82,42 @@ def test_use_cases_depend_on_focused_ports_and_public_encoding_is_explicit():
     assert "asdict" not in encoder and "is_dataclass" not in encoder and "unsupported response value" in encoder
     routes = (SOURCE / "delivery" / "api_routes.py").read_text(encoding="utf-8")
     assert ": object" not in routes
+
+
+@pytest.mark.architecture
+def test_adapter_swap_changes_only_composition_and_outer_adapter(tmp_path):
+    copied_src = tmp_path / "src"; package = copied_src / "markdownllm_explorer"
+    shutil.copytree(SOURCE, package)
+    before = source_hashes(package)
+    (package / "adapters" / "swap_presenter.py").write_text(
+        "from .document_presenter import DocumentPresenter\n\nclass SwapPresenter(DocumentPresenter):\n    pass\n",
+        encoding="utf-8",
+    )
+    composition = package / "composition.py"
+    value = composition.read_text(encoding="utf-8").replace(
+        "from .adapters.document_presenter import DocumentPresenter",
+        "from .adapters.swap_presenter import SwapPresenter",
+    ).replace("presenter = DocumentPresenter()", "presenter = SwapPresenter()")
+    composition.write_text(value, encoding="utf-8")
+    after = source_hashes(package)
+    changed = sorted(path for path in set(before) | set(after) if before.get(path) != after.get(path))
+    assert changed == ["adapters/swap_presenter.py", "composition.py"]
+    assert not any(path.startswith(("core/", "application/")) for path in changed)
+    environment = {"PYTHONPATH": str(copied_src), "PYTHONDONTWRITEBYTECODE": "1"}
+    for name in ("SYSTEMROOT", "WINDIR", "COMSPEC", "TEMP", "TMP"):
+        if value := os.environ.get(name): environment[name] = value
+    probe = subprocess.run(
+        [sys.executable, "-c", "from pathlib import Path; from markdownllm_explorer.composition import build_runtime; r=build_runtime(Path(__import__('sys').argv[1])); assert r.routes.dispatch('/api/v1/estate', {}).sources[0].id.value == 'substrate'", str(tmp_path)],
+        env=environment, cwd=tmp_path, capture_output=True, text=True, timeout=15,
+    )
+    assert probe.returncode == 0, probe.stderr
+    if evidence_path := os.environ.get("EXPLORER_SWAP_EVIDENCE"):
+        output = Path(evidence_path); output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps({
+            "schema": 1, "id": "AT-SWAP-001", "status": "pass", "adapter": "Markdown presenter",
+            "tool": {"name": "pytest-adapter-swap-oracle", "version": "1"},
+            "changed_paths": changed, "forbidden_inner_changes": [], "runtime_probe": "pass",
+        }, indent=2) + "\n", encoding="utf-8")
 
 
 @pytest.mark.architecture

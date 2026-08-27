@@ -67,9 +67,41 @@ def test_authenticated_api_has_public_dto_without_boundary_token(live_server):
     assert b"boundary_token" not in body and b"SourceBoundary" not in body
     envelope = json.loads(body); payload = envelope["data"]
     assert payload["sources"][0]["id"] == "substrate"
+    assert set(envelope) == {"data", "meta"} and set(envelope["meta"]) == {"request_id", "observed_at"}
+    assert "observed_at" not in payload
     assert len(envelope["meta"]["request_id"]) == 32 and envelope["meta"]["observed_at"].endswith("+00:00")
     second = request(server, "GET", "/api/v1/estate", {"X-Explorer-Capability": runtime.capability})
     assert json.loads(second[2])["meta"]["request_id"] != envelope["meta"]["request_id"]
+
+
+@pytest.mark.system
+def test_pagination_metadata_has_one_exact_wire_location_and_omits_absent_cursor(live_server):
+    server, runtime, _ = live_server
+    headers = {"X-Explorer-Capability": runtime.capability}
+    for target in ("/api/v1/tree?source=substrate", "/api/v1/search?source=substrate&q=md", "/api/v1/collection?source=substrate&kind=skills"):
+        status, _, body = request(server, "GET", target, headers)
+        envelope = json.loads(body)
+        assert status == 200 and set(envelope["data"]) == {"items"}
+        assert "partial" in envelope["meta"] and "observed_at" in envelope["meta"]
+        assert "next_cursor" not in envelope["data"] and "partial" not in envelope["data"] and "observed_at" not in envelope["data"]
+        if not envelope["meta"].get("next_cursor"):
+            assert "next_cursor" not in envelope["meta"]
+    status, _, body = request(server, "GET", "/api/v1/overview?source=substrate", headers)
+    envelope = json.loads(body)
+    assert status == 200 and set(envelope["data"]["commits"]) == {"items"}
+    assert "partial" in envelope["meta"] and "next_cursor" not in envelope["data"]["commits"]
+
+
+@pytest.mark.system
+def test_error_dto_is_exact_contextual_and_redacted(live_server):
+    server, runtime, _ = live_server; headers = {"X-Explorer-Capability": runtime.capability}
+    status, _, body = request(server, "GET", "/api/v1/document?source=substrate&path=secret-token.md", headers)
+    envelope = json.loads(body)
+    assert status == 403 and set(envelope) == {"error", "meta"}
+    assert set(envelope["error"]) == {"code", "message", "retryable", "source_id", "relative_path"}
+    assert envelope["error"]["source_id"] == "substrate" and envelope["error"]["relative_path"] == "secret-token.md"
+    assert set(envelope["meta"]) == {"request_id", "observed_at"}
+    assert not any("Jamos" in str(value) for value in envelope.values())
 
 
 @pytest.mark.system
@@ -105,6 +137,8 @@ def test_document_api_returns_exactly_one_mode_representation(live_server):
 def test_only_get_and_head_are_allowed(live_server):
     server, runtime, _ = live_server
     headers = {"X-Explorer-Capability": runtime.capability}
+    assert json.loads(request(server, "POST", "/api/v1/estate")[2])["error"]["code"] == "capability_required"
+    assert json.loads(request(server, "POST", "/api/v1/estate", {"X-Explorer-Capability": "wrong"})[2])["error"]["code"] == "capability_invalid"
     for method in ("POST", "PUT", "PATCH", "DELETE", "OPTIONS"):
         status, _, body = request(server, method, "/api/v1/estate", headers)
         assert status == 405 and json.loads(body)["error"]["code"] == "method_not_allowed"

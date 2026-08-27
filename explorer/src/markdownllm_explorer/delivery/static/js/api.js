@@ -38,5 +38,15 @@ export async function get(path, params = {}, signal) {
     error.retryable = Boolean(payload.error?.retryable);
     throw error;
   }
-  return payload.data;
+  const data = payload.data;
+  const meta = payload.meta || {};
+  // HTTP pagination metadata has one canonical home.  The browser adapts it
+  // into its internal page model without requiring duplicate wire fields.
+  if (data && Array.isArray(data.items)) {
+    return {...data, next_cursor: meta.next_cursor ?? null, partial: Boolean(meta.partial), observed_at: meta.observed_at};
+  }
+  if (data?.commits && Array.isArray(data.commits.items)) {
+    return {...data, commits: {...data.commits, next_cursor: meta.next_cursor ?? null, partial: Boolean(meta.partial), observed_at: meta.observed_at}};
+  }
+  return data;
 }

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "AT-SWAP-001",
+  "status": "pass",
+  "adapter": "Markdown presenter",
+  "tool": {
+    "name": "pytest-adapter-swap-oracle",
+    "version": "1"
+  },
+  "changed_paths": [
+    "adapters/swap_presenter.py",
+    "composition.py"
+  ],
+  "forbidden_inner_changes": [],
+  "runtime_probe": "pass"
+}

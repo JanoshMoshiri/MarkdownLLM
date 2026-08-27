@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "subject": {
+    "algorithm": "explorer-subject-tree-sha256-v1",
+    "sha256": "af49173b4388a5e4f4447e6ee84d43e7aabadba286738792108e424aed9e3f24"
+  },
+  "generated_at": "2026-08-27T05:21:04.375670+00:00",
+  "tool": {
+    "name": "build_evidence_index.py",
+    "version": "1",
+    "python": "3.12.13",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "artifacts": [
+    {
+      "path": "tests/evidence/adapter-swap.json",
+      "sha256": "00c73b4ad31941bab3869d9142cfff3e36e0a551c5d746b1b96219f25745c198",
+      "bytes": 331,
+      "evidence_ids": [
+        "analysis::AT-SWAP-001"
+      ]
+    },
+    {
+      "path": "tests/evidence/browser-dom-probe.json",
+      "sha256": "7bcd179a958dcf927f30e49a6730d60bdd8001c9dae7361938a7e37a8f96fa7f",
+      "bytes": 1915,
+      "evidence_ids": []
+    },
+    {
+      "path": "tests/evidence/browser-layout-probe.json",
+      "sha256": "f9aab5d40e496e2a7b99941860a9a6eff4a3e3637ecb8500d8ed0dd228eca094",
+      "bytes": 2728,
+      "evidence_ids": []
+    },
+    {
+      "path": "tests/evidence/browser-runtime.json",
+      "sha256": "fd12d6ddbaf87bf21984115e7a612fa9cd58ebbad182fc0410ec15bd7fbd4a2a",
+      "bytes": 7921,
+      "evidence_ids": [
+        "browser::BT-SHELL-001",
+        "browser::BT-NAV-001",
+        "browser::BT-TABS-001",
+        "browser::BT-DOCUMENT-001",
+        "browser::BT-SEARCH-001",
+        "browser::BT-THEME-001",
+        "browser::BT-ASYNC-001",
+        "browser::BT-RESPONSIVE-001",
+        "browser::BT-KEYBOARD-001",
+        "browser::BT-A11Y-001",
+        "browser::BT-VISUAL-001",
+        "system::AJ-01",
+        "system::AJ-02",
+        "system::AJ-03",
+        "system::AJ-04",
+        "system::AJ-05",
+        "system::AJ-06",
+        "system::AJ-07"
+      ]
+    },
+    {
+      "path": "tests/evidence/clean-install.json",
+      "sha256": "ddb4c2f0d9c5a950741d57c6a62697fdac3134db64b460e899ad8309cd268c64",
+      "bytes": 1736,
+      "evidence_ids": [
+        "system::ST-INSTALL-001",
+        "system::ST-OFFLINE-001",
+        "system::ST-CLI-001"
+      ]
+    },
+    {
+      "path": "tests/evidence/immutability.json",
+      "sha256": "9702df9f34de77f9458b490c6756bbfc565924b4b02a6dc190321734b7eefe1f",
+      "bytes": 1106,
+      "evidence_ids": [
+        "analysis::GT-IMMUTABLE-001"
+      ]
+    },
+    {
+      "path": "tests/evidence/mutation-kill-matrix.json",
+      "sha256": "4f642997227b48010f5fa21da2bd536aa581d5dbb71e49be636f5e635dec2a6d",
+      "bytes": 47653,
+      "evidence_ids": [
+        "analysis::MT-MUTATION-001",
+        "mutation::M01",
+        "mutation::M02",
+        "mutation::M03",
+        "mutation::M04",
+        "mutation::M05",
+        "mutation::M06",
+        "mutation::M07",
+        "mutation::M08",
+        "mutation::M09",
+        "mutation::M10",
+        "mutation::M11",
+        "mutation::M12",
+        "mutation::M13",
+        "mutation::M14",
+        "mutation::M15",
+        "mutation::M16"
+      ]
+    },
+    {
+      "path": "tests/evidence/performance-20-run.json",
+      "sha256": "8124c95f4f3ee494aa9022324cdfc891380389f492e5dab57514347733cf2678",
+      "bytes": 4749,
+      "evidence_ids": [
+        "analysis::PT-SCALE-001"
+      ]
+    },
+    {
+      "path": "tests/evidence/pytest.xml",
+      "sha256": "f8cb645e86302d71b02ae2d0541eae35259cee5d9e8e5e4268cb99c63421ad85",
+      "bytes": 12810,
+      "evidence_ids": []
+    },
+    {
+      "path": "tests/evidence/visual-dark.png",
+      "sha256": "7784ed962a0aeb495eaf3ef90b7b92be93ab3996214b220dba6cccaa9a7d147a",
+      "bytes": 61620,
+      "evidence_ids": []
+    },
+    {
+      "path": "tests/evidence/visual-light.png",
+      "sha256": "11a1cc7ccd46f955fa819d18e0340ce53029eb6114f63e0ac7d31872408f84e5",
+      "bytes": 59972,
+      "evidence_ids": []
+    },
+    {
+      "path": "tests/evidence/visual-narrow.png",
+      "sha256": "dabb0950343943f82de95d61ac53ccd8dbfd3e2a7c72d4b302ec93b4be91518e",
+      "bytes": 26614,
+      "evidence_ids": []
+    }
+  ]
+}

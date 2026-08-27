@@ -14,6 +14,7 @@ const sourceNav = document.querySelector("#source-nav");
 const fileTree = document.querySelector("#file-tree");
 const contextContent = document.querySelector("#context-content");
 const tabs = [...document.querySelectorAll('[role="tab"]')];
+let searchTimer;
 
 async function initialise() {
   applyThemeChoice(localStorage.getItem("mdllm-explorer-theme") || "system");
@@ -56,10 +57,9 @@ function bindChrome() {
   document.querySelector("#sidebar-close").addEventListener("click", closeOverlays);
   document.querySelector("#context-open").addEventListener("click", () => openOverlay("context"));
   document.querySelector("#context-close").addEventListener("click", closeOverlays);
-  let timer;
   document.querySelector("#search-input").addEventListener("input", event => {
-    clearTimeout(timer); const query = event.target.value.trim();
-    timer = setTimeout(() => query ? search(query) : clearSearch(), 220);
+    clearTimeout(searchTimer); const query = event.target.value.trim();
+    searchTimer = setTimeout(() => query ? search(query) : clearSearch(), 220);
   });
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") closeOverlays();
@@ -83,13 +83,17 @@ function bindChrome() {
 }
 
 async function chooseTab(view) {
+  abortAllRequests(); clearTimeout(searchTimer);
   state.view = validView(view); state.selectedPath = null;
+  state.search = {query: "", items: [], cursor: null, partial: false};
+  document.querySelector("#search-input").value = "";
   activateTab(); updateRoute(); await loadView();
 }
 
 async function selectSource(source, pushRoute = true) {
   if (!source) throw new Error("No discoverable source is available.");
   abortAllRequests();
+  clearTimeout(searchTimer);
   state.source = source; state.selectedPath = null; state.sourceSettings = null; state.repository = null;
   state.treeEntries.clear(); state.treeCursors.clear(); state.openDirectories = new Set([""]);
   state.search = {query: "", items: [], cursor: null, partial: false};
@@ -129,19 +133,26 @@ async function loadRootTree(force = false) {
   await loadTreePage("");
 }
 
-async function toggleDirectory(path) {
-  if (state.openDirectories.has(path)) { state.openDirectories.delete(path); renderCurrentTree(); return; }
+async function toggleDirectory(path, focusMode = "self") {
+  if (state.openDirectories.has(path)) {
+    state.openDirectories.delete(path); renderCurrentTree(); focusTreePath(path); return;
+  }
   state.openDirectories.add(path); renderCurrentTree();
   if (!state.treeEntries.has(path)) await loadTreePage(path);
+  if (focusMode === "child") {
+    const child = (state.treeEntries.get(path) || [])[0];
+    focusTreePath(child?.path || path);
+  } else focusTreePath(path);
 }
 
 async function loadMoreTree(path, cursor, button) {
   button.disabled = true;
   const before = (state.treeEntries.get(path) || []).length;
   const loaded = await loadTreePage(path, cursor, true);
-  if (!loaded) { button.disabled = false; return; }
+  if (!loaded) { document.querySelector(`.tree-more[data-parent="${CSS.escape(path)}"]`)?.focus(); return; }
   const appended = (state.treeEntries.get(path) || [])[before];
-  if (appended) [...fileTree.querySelectorAll('[role="treeitem"]')].find(node => node.dataset.path === appended.path)?.focus();
+  if (appended) focusTreePath(appended.path);
+  else document.querySelector(`.tree-more[data-parent="${CSS.escape(path)}"]`)?.focus();
 }
 
 async function expandAncestors(path) {
@@ -162,6 +173,14 @@ async function expandAncestors(path) {
 
 function renderCurrentTree() {
   renderTree(fileTree, state.treeEntries, state.treeCursors, state.openDirectories, state.selectedPath, toggleDirectory, openDocument, loadMoreTree);
+}
+
+function focusTreePath(path) {
+  const rows = [...fileTree.querySelectorAll('[role="treeitem"]')];
+  const target = rows.find(node => node.dataset.path === path);
+  if (!target) return;
+  rows.forEach(node => { node.tabIndex = node === target ? 0 : -1; });
+  target.focus();
 }
 
 async function loadView(cursor = null) {
@@ -206,7 +225,14 @@ async function loadMoreCollection(cursor, list, button) {
     const value = await get("/api/v1/collection", {source: identity.source, kind: identity.tab, cursor}, request.signal);
     if (!isCurrent(request)) return;
     button.remove(); const appended = [];
-    value.items.forEach(item => appended.push(appendItem(list, item, openCollectionDocument)));
+    let group = [...list.querySelectorAll(".collection-group")].at(-1)?.textContent || "";
+    value.items.forEach(item => {
+      if (item.group !== group) {
+        group = item.group; const heading = document.createElement("div");
+        heading.className = "collection-group"; heading.textContent = group; list.append(heading);
+      }
+      appended.push(appendItem(list, item, openCollectionDocument));
+    });
     if (value.next_cursor) { const next = moreButton("Load more", () => loadMoreCollection(value.next_cursor, list, next)); list.append(next); }
     if (value.partial) appendPartialNote(list);
     appended[0]?.focus();
@@ -221,11 +247,14 @@ async function openCollectionDocument(path, mode = "rendered") {
 }
 
 async function openDocument(path, mode = "rendered", pushRoute = true) {
-  state.selectedPath = path; state.documentMode = mode; renderCurrentTree(); showLoading();
+  abortAllRequests(); state.selectedPath = path; state.documentMode = mode; renderCurrentTree(); showLoading();
   await fetchDocument(path, mode, false, pushRoute);
 }
 
 async function fetchDocument(path, mode, embedded, pushRoute) {
+  if (state.selectedPath !== path || state.documentMode !== mode) {
+    abortAllRequests(); state.selectedPath = path; state.documentMode = mode;
+  }
   const identity = {source: state.source.id, tab: state.view, path, mode};
   const request = beginRequest("document", identity);
   try {
@@ -241,6 +270,10 @@ async function fetchDocument(path, mode, embedded, pushRoute) {
 }
 
 async function search(query, cursor = null, append = false) {
+  if (!append) {
+    abortAllRequests(); state.selectedPath = null;
+    state.search = {query, items: [], cursor: null, partial: false};
+  }
   const identity = {source: state.source.id, tab: state.view, query, cursor};
   const request = beginRequest("search", identity);
   if (!append) showLoading();
@@ -263,7 +296,7 @@ async function loadMoreSearch(cursor, section, button) {
   const rows = content.querySelectorAll(".collection-item"); rows[before]?.focus();
 }
 
-function clearSearch() { state.search = {query: "", items: [], cursor: null, partial: false}; loadView(); }
+function clearSearch() { abortAllRequests(); state.search = {query: "", items: [], cursor: null, partial: false}; loadView(); }
 
 function activateTab() {
   tabs.forEach(button => {
@@ -321,9 +354,11 @@ function validView(view) { return ["overview", "skills", "memory", "settings"].i
 
 async function restoreRoute() {
   if (!state.estate) return;
+  abortAllRequests(); clearTimeout(searchTimer);
   const route = routeFromHash(); const source = state.estate.sources.find(item => item.id === route.source) || state.estate.sources[0];
   if (source.id !== state.source?.id) await selectSource(source, false);
-  state.view = validView(route.tab); state.documentMode = route.mode === "raw" ? "raw" : "rendered"; activateTab();
+  state.view = validView(route.tab); state.documentMode = route.mode === "raw" ? "raw" : "rendered";
+  state.selectedPath = route.path || null; state.search = {query: "", items: [], cursor: null, partial: false}; activateTab();
   if (route.path) { await expandAncestors(route.path); await openDocument(route.path, state.documentMode, false); }
   else { state.selectedPath = null; await loadView(); }
 }

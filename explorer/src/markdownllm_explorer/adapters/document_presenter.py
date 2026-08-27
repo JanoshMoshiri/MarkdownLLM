@@ -49,7 +49,9 @@ class DocumentPresenter:
                     external = ' target="_blank" rel="noopener noreferrer external"' if link.kind.value == "external" else ""
                     parts.append(f'<a href="{html.escape(link.href, quote=True)}"{external}>{text}</a>')
                 else:
-                    parts.append(f'<span class="inert-link">{text}</span>')
+                    # Inert candidates are plain escaped text.  No repository-
+                    # supplied class or tag falls outside the presenter allowlist.
+                    parts.append(text)
             else:
                 parts.append(text)
         return "".join(parts)

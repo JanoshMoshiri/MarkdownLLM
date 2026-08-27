@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "fixture": "F-UI plus F-MARKDOWN-HOSTILE",
+  "tool": {
+    "name": "Codex in-app Browser",
+    "version": "26.818.61809"
+  },
+  "executed_at": "2026-08-27T06:14:00+01:00",
+  "shell": {
+    "regions": ["source navigation", "main content", "context"],
+    "tabs": ["Overview", "Skills", "Memory", "Settings"],
+    "source_count": 14,
+    "domain_count": 13,
+    "substrate_first": true,
+    "irrelevant_controls": []
+  },
+  "navigation": {
+    "tree_first_page_items": 49,
+    "nested_directory_disclosure": true,
+    "selected_document_retained": true,
+    "back_restored_source_tab_path_and_mode": true,
+    "refresh_restored_source_tab_path_and_mode": true
+  },
+  "collections": {
+    "skills_populated": true,
+    "memory_group_headings": ["Conflicts", "Decisions", "Insights", "Retrospectives"],
+    "context_populated_from_selected_document": true
+  },
+  "document": {
+    "rendered_and_raw_on_demand": true,
+    "frontmatter_separate": true,
+    "hostile_heading": "Hostile content corpus",
+    "forbidden_tag_count": 0,
+    "forbidden_attribute_count": 0,
+    "unsafe_script_executed": false,
+    "raw_script_remained_literal_text": true,
+    "image_syntax_remained_inert_text": true,
+    "active_links": [
+      {
+        "label": "canonical web",
+        "scheme": "https",
+        "target": "_blank",
+        "rel": "noopener noreferrer external"
+      }
+    ]
+  },
+  "search": {
+    "reachable_desktop": true,
+    "reachable_narrow": true,
+    "populated_state": true,
+    "terminal_state": true
+  },
+  "theme": {
+    "system_rendered": true,
+    "light_rendered": true,
+    "dark_rendered": true,
+    "explicit_dark_survived_reload": true,
+    "route_and_capability_survived_theme_change": true
+  },
+  "async": {
+    "late_A_after_B_ignored": true,
+    "operation_slots_isolated": true,
+    "terminal_states_observed": true
+  },
+  "console": {
+    "errors": 0,
+    "warnings": 0
+  }
+}

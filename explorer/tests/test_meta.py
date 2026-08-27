@@ -32,10 +32,17 @@ def test_traceability_manifest_is_exact_and_well_formed():
     traced = manifest()["requirements"]
     assert set(traced) == requirement_ids and len(requirement_ids) == 60
     tests = collected_test_functions()
-    allowed_dispositions = {"automated", "browser", "mixed", "analysis", "human_pending"}
+    allowed_dispositions = {"automated", "browser", "mixed", "analysis"}
     allowed_prefixes = ("pytest::", "browser::", "system::", "analysis::", "human::")
+    required_fields = {
+        "method", "fixture", "observable_pass_condition", "evidence", "evidence_location",
+        "technical_owner", "acceptance_owner", "disposition", "human_disposition",
+    }
     for requirement_id, row in traced.items():
-        assert row["disposition"] in allowed_dispositions and row["owner"] and row["evidence"], requirement_id
+        assert set(row) == required_fields, (requirement_id, set(row) ^ required_fields)
+        assert row["disposition"] in allowed_dispositions and row["technical_owner"] and row["acceptance_owner"] and row["evidence"], requirement_id
+        assert row["method"] and row["fixture"] and row["observable_pass_condition"] and row["evidence_location"]
+        assert row["human_disposition"] in {"none", "pending-human"}
         assert all(item.startswith(allowed_prefixes) for item in row["evidence"]), requirement_id
         for item in row["evidence"]:
             if item.startswith("pytest::"):

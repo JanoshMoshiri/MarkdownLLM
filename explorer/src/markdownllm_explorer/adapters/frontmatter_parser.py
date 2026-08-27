@@ -67,6 +67,8 @@ class FrontmatterParser:
                 if len(event.value.encode("utf-8")) > self._limits.frontmatter_scalar_bytes:
                     raise ValueError("frontmatter scalar limit exceeded")
                 self._validate_tag(event.tag)
+                if event.tag == "tag:yaml.org,2002:timestamp":
+                    raise ValueError("explicit timestamps are not supported")
                 if collection_counts:
                     collection_counts[-1][1] += 1
                     if collection_counts[-1][1] > collection_counts[-1][0]:

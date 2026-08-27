@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 import subprocess
+import threading
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,15 @@ def test_catalogue_discovers_substrate_and_only_marked_one_level_domains(estate)
     assert snapshot.sources[0].id.value == "substrate"
     assert [source.id.value for source in snapshot.sources[1:]] == ["domain/demo", "domain/marked-non-git"]
     assert all("unmarked" not in source.id.value for source in snapshot.sources)
+    assert "domain_marker_missing" in {issue.code for issue in snapshot.issues}
+
+
+@pytest.mark.contract
+def test_catalogue_reports_invalid_marker_shape_without_hiding_valid_sources(estate):
+    invalid = estate / "domain" / "invalid-marker" / "AGENTS.md"; invalid.mkdir(parents=True)
+    snapshot = build_runtime(estate).routes.dispatch("/api/v1/estate", {})
+    assert [source.id.value for source in snapshot.sources[1:]] == ["domain/demo", "domain/marked-non-git"]
+    assert "domain_marker_invalid" in {issue.code for issue in snapshot.issues}
 
 
 @pytest.mark.unit
@@ -115,6 +125,7 @@ def test_document_raw_and_rendered_modes_have_one_representation(estate):
     assert styled.mode.value == "rendered" and "<h1>Demo Skill</h1>" in styled.content and "---" not in styled.content
     plain = runtime.routes.dispatch("/api/v1/document", {"source": ["substrate"], "path": ["script.py"], "mode": ["rendered"]})
     assert plain.mode.value == "raw" and plain.content.splitlines() == ["print('plain text only')"] and "<" not in plain.content
+    assert "rendered_mode_unsupported" in plain.issues
 
 
 @pytest.mark.contract
@@ -128,7 +139,8 @@ def test_document_links_are_same_source_markdown_or_labelled_https_only(estate):
     rendered = runtime.routes.dispatch("/api/v1/document", {"source": ["substrate"], "path": ["links.md"], "mode": ["rendered"]}).content
     assert '#source=substrate&amp;path=skills/demo.md' in rendered
     assert 'href="https://example.invalid/path" target="_blank" rel="noopener noreferrer external"' in rendered
-    assert "mailto:" not in rendered and "javascript:" not in rendered and 'class="inert-link">plain</span>' in rendered
+    assert "mailto:" not in rendered and "javascript:" not in rendered
+    assert "plain" in rendered and "inert-link" not in rendered
 
 
 @pytest.mark.contract
@@ -191,6 +203,22 @@ def test_bounded_process_runner_enforces_output_and_deadline(tmp_path):
     with pytest.raises(ExplorerError) as timeout_error:
         runner.run(ProcessRequest(arguments=("-c", "import time; time.sleep(1)"), timeout_seconds=0.05, **base))
     assert timeout_error.value.code == "git_timeout"
+    assert not [thread for thread in threading.enumerate() if thread.name == "explorer-process-capture"]
+
+
+@pytest.mark.contract
+def test_bounded_process_runner_repeated_floods_leave_no_threads_or_children(tmp_path):
+    runner = BoundedProcessRunner()
+    base = dict(executable=sys.executable, cwd=tmp_path, environment=dict(os.environ), output_limit=8)
+    for _ in range(5):
+        with pytest.raises(ExplorerError):
+            runner.run(ProcessRequest(arguments=("-c", "import sys; sys.stdout.buffer.write(b'x' * 4000000)"), timeout_seconds=2, **base))
+        assert not [thread for thread in threading.enumerate() if thread.name == "explorer-process-capture"]
+    for _ in range(3):
+        with pytest.raises(ExplorerError) as caught:
+            runner.run(ProcessRequest(arguments=("-c", "import time; time.sleep(2)"), timeout_seconds=0.03, **base))
+        assert caught.value.code == "git_timeout"
+        assert not [thread for thread in threading.enumerate() if thread.name == "explorer-process-capture"]
 
 
 @pytest.mark.contract
@@ -221,6 +249,25 @@ def test_git_adapter_supplies_fixed_argv_environment_and_limits(estate):
         assert request.environment["GIT_OPTIONAL_LOCKS"] == "0" and request.environment["GIT_CONFIG_GLOBAL"] == os.devnull
         assert "core.hooksPath=" + os.devnull in request.arguments
         assert "core.fsmonitor=false" in request.arguments and "protocol.file.allow=never" in request.arguments
+        assert "core.alternateRefsCommand=" in request.arguments
+
+
+@pytest.mark.gitfs
+@pytest.mark.parametrize("store_shape", ["alternates", "http-alternates", "promisor"])
+def test_git_history_rejects_external_or_lazy_object_stores(estate, tmp_path, store_shape):
+    outside = tmp_path / "outside-objects"; outside.mkdir()
+    info = estate / ".git" / "objects" / "info"; info.mkdir(exist_ok=True)
+    pack = estate / ".git" / "objects" / "pack"; pack.mkdir(exist_ok=True)
+    if store_shape == "alternates":
+        (info / "alternates").write_text(str(outside), encoding="utf-8")
+    elif store_shape == "http-alternates":
+        (info / "http-alternates").write_text("https://example.invalid/objects", encoding="utf-8")
+    else:
+        (pack / "pack-probe.promisor").write_bytes(b"")
+    overview = build_runtime(estate).routes.dispatch("/api/v1/overview", {"source": ["substrate"]})
+    assert overview.repository.kind == "external-store"
+    assert overview.repository.issue == "git_store_external"
+    assert not overview.commits.items
 
 
 @pytest.mark.gitfs

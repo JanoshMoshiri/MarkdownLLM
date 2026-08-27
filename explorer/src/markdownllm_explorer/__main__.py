@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import signal
 import sys
 from pathlib import Path
 
@@ -39,6 +40,11 @@ def main() -> int:
     print(f"Root: {resolved_root}", flush=True)
     print(f"MarkdownLLM Explorer: {url}", flush=True)
     print("Read-only local service. Press Ctrl+C to stop.", flush=True)
+    if hasattr(signal, "SIGBREAK"):
+        # Windows process-group CTRL_BREAK is the testable equivalent of an
+        # interactive console interrupt.  Convert it to the same controlled
+        # shutdown path as Ctrl+C/SIGINT instead of accepting STATUS_CONTROL_C_EXIT.
+        signal.signal(signal.SIGBREAK, _raise_keyboard_interrupt)
     try:
         server.serve_forever(poll_interval=0.2)
     except KeyboardInterrupt:
@@ -47,6 +53,10 @@ def main() -> int:
         server.server_close()
         server.join_active(4.5)
     return 0
+
+
+def _raise_keyboard_interrupt(signum, frame) -> None:
+    raise KeyboardInterrupt
 
 
 if __name__ == "__main__":

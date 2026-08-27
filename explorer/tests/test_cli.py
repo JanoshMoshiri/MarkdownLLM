@@ -3,6 +3,7 @@ from __future__ import annotations
 import http.client
 import json
 import os
+import signal
 import socket
 import subprocess
 import sys
@@ -14,6 +15,15 @@ import pytest
 
 
 EXPLORER = Path(__file__).parents[1]
+
+
+def process_group_options() -> dict:
+    return {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" else {"start_new_session": True}
+
+
+def interrupt(process: subprocess.Popen) -> None:
+    if os.name == "nt": process.send_signal(signal.CTRL_BREAK_EVENT)
+    else: os.killpg(process.pid, signal.SIGINT)
 
 
 def cli_environment() -> dict[str, str]:
@@ -37,6 +47,7 @@ def test_cli_launches_from_arbitrary_cwd_with_packaged_assets(estate, tmp_path):
     process = subprocess.Popen(
         [sys.executable, "-m", "markdownllm_explorer", "--root", str(estate), "--port", "0"],
         cwd=tmp_path, env=cli_environment(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        **process_group_options(),
     )
     try:
         assert process.stdout is not None
@@ -54,9 +65,14 @@ def test_cli_launches_from_arbitrary_cwd_with_packaged_assets(estate, tmp_path):
         connection.request("GET", "/", headers={"Host": f"127.0.0.1:{parsed.port}"})
         response = connection.getresponse(); body = response.read(); connection.close()
         assert response.status == 200 and b"/js/app.js" in body
+        active = socket.create_connection(("127.0.0.1", parsed.port), timeout=3)
+        active.sendall(f"GET /health HTTP/1.1\r\nHost: 127.0.0.1:{parsed.port}\r\n".encode())
+        started = time.monotonic(); interrupt(process); assert process.wait(timeout=6) == 0
+        assert time.monotonic() - started <= 5.5
+        active.close()
     finally:
-        process.terminate()
-        process.wait(timeout=5)
+        if process.poll() is None:
+            process.kill(); process.wait(timeout=5)
 
 
 @pytest.mark.system

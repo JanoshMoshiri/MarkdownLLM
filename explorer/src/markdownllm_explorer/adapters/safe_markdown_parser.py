@@ -9,7 +9,8 @@ from markdownllm_explorer.core.models import InlineNode, LinkCandidate, LinkKind
 
 
 _LINK = re.compile(r"\[([^\]]+)]\(([^)]+)\)")
-_INLINE = re.compile(r"(`[^`]+`|\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_|\[[^\]]+]\([^)]+\))")
+_IMAGE = re.compile(r"!\[[^\]]*]\([^)]+\)")
+_INLINE = re.compile(r"(!\[[^\]]*]\([^)]+\)|`[^`]+`|\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_|\[[^\]]+]\([^)]+\))")
 
 
 class SafeMarkdownParser:
@@ -94,6 +95,11 @@ class SafeMarkdownParser:
             if match.start() > cursor:
                 nodes.append(InlineNode("text", text[cursor:match.start()]))
             token = match.group(0)
+            if _IMAGE.fullmatch(token):
+                # Repository images/subresources are deliberately text-only.
+                nodes.append(InlineNode("text", token))
+                cursor = match.end()
+                continue
             link = _LINK.fullmatch(token)
             if link:
                 target = link.group(2).strip()
@@ -101,15 +107,17 @@ class SafeMarkdownParser:
                     decoded_target = unquote(target, errors="strict")
                 except (UnicodeDecodeError, ValueError):
                     decoded_target = "\x00"
-                parsed_url = urlsplit(decoded_target)
+                raw_url = urlsplit(target)
+                decoded_url = urlsplit(decoded_target)
                 if (
-                    parsed_url.scheme.casefold() in {"http", "https"}
-                    and parsed_url.netloc
+                    raw_url.scheme.casefold() in {"http", "https"}
+                    and raw_url.netloc
+                    and decoded_url.scheme.casefold() == raw_url.scheme.casefold()
                     and not any(ord(character) < 32 or ord(character) == 127 for character in decoded_target)
                     and not target.startswith("//")
                 ):
                     kind = LinkKind.EXTERNAL
-                elif ":" in target.split("/", 1)[0] or target.startswith(("/", "//", "#")):
+                elif decoded_url.scheme or ":" in decoded_target.split("/", 1)[0] or decoded_target.startswith(("/", "//", "#")):
                     kind = LinkKind.INERT
                 else:
                     kind = LinkKind.RELATIVE

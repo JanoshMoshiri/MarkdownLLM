@@ -32,5 +32,10 @@ class ReadDocument:
             tree = self._markdown.parse(parsed.body if parsed else raw.text)
             resolved = self._links.resolve(source.boundary_token, relative, tree.links)
             content = self._presenter.render(tree, resolved)
-        issues = (frontmatter.error_code,) if frontmatter.error_code else ()
-        return DocumentRecord(source.id, relative, actual_mode, content, frontmatter, raw.size, raw.modified_at, tuple(issue for issue in issues if issue))
+        issues = tuple(
+            issue for issue in (
+                frontmatter.error_code,
+                "rendered_mode_unsupported" if document_mode is DocumentMode.RENDERED and not is_markdown else None,
+            ) if issue
+        )
+        return DocumentRecord(source.id, relative, actual_mode, content, frontmatter, raw.size, raw.modified_at, issues)

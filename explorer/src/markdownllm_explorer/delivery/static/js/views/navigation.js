@@ -72,13 +72,13 @@ function installTreeKeyboard(container, onDirectory, onFile) {
     const visible = [...container.querySelectorAll('[role="treeitem"]')].filter(node => node.offsetParent !== null);
     const index = visible.indexOf(row);
     const focus = target => { if (!target) return; visible.forEach(node => { node.tabIndex = node === target ? 0 : -1; }); target.focus(); };
-    if (event.key === "ArrowDown") { event.preventDefault(); focus(visible[index + 1] || visible[0]); }
-    else if (event.key === "ArrowUp") { event.preventDefault(); focus(visible[index - 1] || visible.at(-1)); }
+    if (event.key === "ArrowDown") { event.preventDefault(); focus(visible[Math.min(index + 1, visible.length - 1)]); }
+    else if (event.key === "ArrowUp") { event.preventDefault(); focus(visible[Math.max(index - 1, 0)]); }
     else if (event.key === "Home") { event.preventDefault(); focus(visible[0]); }
     else if (event.key === "End") { event.preventDefault(); focus(visible.at(-1)); }
     else if (event.key === "ArrowRight" && row.dataset.kind === "directory") {
       event.preventDefault();
-      if (row.getAttribute("aria-expanded") === "false") onDirectory(row.dataset.path); else focus(visible[index + 1]);
+      if (row.getAttribute("aria-expanded") === "false") onDirectory(row.dataset.path, "child"); else focus(visible[index + 1]);
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
       if (row.dataset.kind === "directory" && row.getAttribute("aria-expanded") === "true") onDirectory(row.dataset.path);

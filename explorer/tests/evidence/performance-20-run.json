@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "id": "PT-SCALE-001",
+  "fixture": "estate-scale-v1",
+  "fixture_sha256": "341a9b6a8dd386221e03960c313649c9ed282c9d6baa5df14635e24401173e35",
+  "tool": {
+    "name": "run_performance.py",
+    "version": "1",
+    "python": "3.12.13"
+  },
+  "profile": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "logical_cpu": 8,
+    "storage": "workspace filesystem",
+    "cache": "fresh server process; one discarded route warm-up per process"
+  },
+  "runs": 20,
+  "raw_ms": [
+    {
+      "estate_overview": 355.0933,
+      "tree": 24.5416,
+      "search": 60.3536,
+      "document": 28.9496,
+      "commits": 270.4317
+    },
+    {
+      "estate_overview": 281.0844,
+      "tree": 22.2083,
+      "search": 61.3437,
+      "document": 23.3338,
+      "commits": 298.2067
+    },
+    {
+      "estate_overview": 281.2166,
+      "tree": 15.1116,
+      "search": 57.3818,
+      "document": 32.4848,
+      "commits": 254.6442
+    },
+    {
+      "estate_overview": 326.8807,
+      "tree": 27.2866,
+      "search": 39.5612,
+      "document": 35.5428,
+      "commits": 288.0315
+    },
+    {
+      "estate_overview": 332.901,
+      "tree": 13.9348,
+      "search": 64.6096,
+      "document": 21.48,
+      "commits": 292.7534
+    },
+    {
+      "estate_overview": 291.5427,
+      "tree": 21.5115,
+      "search": 48.7123,
+      "document": 19.8577,
+      "commits": 275.2237
+    },
+    {
+      "estate_overview": 302.0107,
+      "tree": 14.355,
+      "search": 58.7675,
+      "document": 31.3177,
+      "commits": 265.1572
+    },
+    {
+      "estate_overview": 315.877,
+      "tree": 25.2579,
+      "search": 45.0302,
+      "document": 11.521,
+      "commits": 232.7376
+    },
+    {
+      "estate_overview": 293.55019999999996,
+      "tree": 20.5291,
+      "search": 48.8006,
+      "document": 23.1472,
+      "commits": 246.0084
+    },
+    {
+      "estate_overview": 315.45189999999997,
+      "tree": 17.1482,
+      "search": 37.105,
+      "document": 36.7584,
+      "commits": 298.9985
+    },
+    {
+      "estate_overview": 318.6854,
+      "tree": 14.989,
+      "search": 54.3913,
+      "document": 32.2426,
+      "commits": 242.9993
+    },
+    {
+      "estate_overview": 336.59349999999995,
+      "tree": 26.2544,
+      "search": 60.0603,
+      "document": 24.7948,
+      "commits": 296.0511
+    },
+    {
+      "estate_overview": 338.2483,
+      "tree": 27.7156,
+      "search": 61.4659,
+      "document": 25.0041,
+      "commits": 295.384
+    },
+    {
+      "estate_overview": 311.6472,
+      "tree": 2.2643,
+      "search": 59.9799,
+      "document": 41.4589,
+      "commits": 265.0582
+    },
+    {
+      "estate_overview": 314.0928,
+      "tree": 12.7043,
+      "search": 50.1294,
+      "document": 20.0543,
+      "commits": 277.0616
+    },
+    {
+      "estate_overview": 331.1559,
+      "tree": 2.9847,
+      "search": 41.6262,
+      "document": 28.7176,
+      "commits": 284.2157
+    },
+    {
+      "estate_overview": 310.9865,
+      "tree": 19.7203,
+      "search": 44.8386,
+      "document": 23.877,
+      "commits": 304.0585
+    },
+    {
+      "estate_overview": 291.9353,
+      "tree": 14.0755,
+      "search": 30.2082,
+      "document": 23.8156,
+      "commits": 274.1662
+    },
+    {
+      "estate_overview": 239.2147,
+      "tree": 2.7004,
+      "search": 60.4023,
+      "document": 50.0565,
+      "commits": 339.7629
+    },
+    {
+      "estate_overview": 240.71550000000002,
+      "tree": 16.4703,
+      "search": 64.428,
+      "document": 8.1364,
+      "commits": 282.8595
+    }
+  ],
+  "summary": {
+    "estate_overview": {
+      "threshold_ms": 2000,
+      "passes": 20,
+      "required": 19,
+      "median_ms": 314.0928,
+      "order_19_ms": 338.2483,
+      "max_ms": 355.0933,
+      "status": "pass"
+    },
+    "tree": {
+      "threshold_ms": 300,
+      "passes": 20,
+      "required": 19,
+      "median_ms": 17.1482,
+      "order_19_ms": 27.2866,
+      "max_ms": 27.7156,
+      "status": "pass"
+    },
+    "search": {
+      "threshold_ms": 500,
+      "passes": 20,
+      "required": 19,
+      "median_ms": 57.3818,
+      "order_19_ms": 64.428,
+      "max_ms": 64.6096,
+      "status": "pass"
+    },
+    "document": {
+      "threshold_ms": 500,
+      "passes": 20,
+      "required": 19,
+      "median_ms": 25.0041,
+      "order_19_ms": 41.4589,
+      "max_ms": 50.0565,
+      "status": "pass"
+    },
+    "commits": {
+      "threshold_ms": 500,
+      "passes": 20,
+      "required": 19,
+      "median_ms": 282.8595,
+      "order_19_ms": 304.0585,
+      "max_ms": 339.7629,
+      "status": "pass"
+    }
+  }
+}

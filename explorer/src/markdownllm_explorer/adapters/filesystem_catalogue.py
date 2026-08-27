@@ -100,11 +100,16 @@ class FilesystemSourceCatalogue:
                         continue
                     if not entry.is_dir(follow_symlinks=False):
                         continue
-                    markers = tuple(marker for marker in ("AGENTS.md", ".markdownllm") if (path / marker).is_file())
+                    marker_paths = tuple(path / marker for marker in ("AGENTS.md", ".markdownllm"))
+                    if any(marker.exists() and not marker.is_file() for marker in marker_paths):
+                        issues.append(SourceIssue("domain_marker_invalid", "A domain candidate has an invalid marker shape."))
+                        continue
+                    markers = tuple(marker.name for marker in marker_paths if marker.is_file())
                 except OSError:
                     issues.append(SourceIssue("domain_candidate_unreadable", "A domain candidate could not be inspected."))
                     continue
                 if not markers:
+                    issues.append(SourceIssue("domain_marker_missing", "A domain candidate has no readable admission marker."))
                     continue
                 folded = unicodedata.normalize("NFC", entry.name).casefold()
                 source_id = _normalised_domain_id(entry.name)

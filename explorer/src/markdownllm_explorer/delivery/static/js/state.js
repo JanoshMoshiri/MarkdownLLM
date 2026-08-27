@@ -19,21 +19,45 @@ function identityKey(identity) {
   return JSON.stringify(Object.keys(identity).sort().map(key => [key, identity[key] ?? null]));
 }
 
+export function liveLocationIdentity() {
+  return {
+    source: state.source?.id ?? null,
+    tab: state.view,
+    path: state.selectedPath,
+    mode: state.documentMode,
+    query: state.search.query,
+  };
+}
+
 export function beginRequest(operation, identity) {
   state.requests.get(operation)?.controller.abort();
   const controller = new AbortController();
-  const request = {operation, id: ++state.requestSerial, identity: identityKey(identity), controller, signal: controller.signal};
+  const request = {
+    operation,
+    id: ++state.requestSerial,
+    identity: identityKey(identity),
+    liveIdentity: identityKey(liveLocationIdentity()),
+    controller,
+    signal: controller.signal,
+  };
   state.requests.set(operation, request);
   return request;
 }
 
 export function isCurrent(request) {
   const current = state.requests.get(request.operation);
-  return Boolean(current && current.id === request.id && current.identity === request.identity && !request.signal.aborted);
+  return Boolean(
+    current
+    && current.id === request.id
+    && current.identity === request.identity
+    && request.liveIdentity === identityKey(liveLocationIdentity())
+    && !request.signal.aborted
+  );
 }
 
 export function completeRequest(request) {
-  if (isCurrent(request)) state.requests.delete(request.operation);
+  const current = state.requests.get(request.operation);
+  if (current?.id === request.id) state.requests.delete(request.operation);
 }
 
 export function abortAllRequests() {

@@ -147,6 +147,7 @@ def main() -> int:
         summaries[operation] = {"threshold_ms": threshold, "passes": passes, "required": max(0, arguments.runs - 1), "median_ms": values[len(values) // 2], "order_19_ms": values[min(18, len(values) - 1)], "max_ms": values[-1], "status": "pass" if passes >= max(0, arguments.runs - 1) else "fail"}
     document = {
         "schema": 1, "id": "PT-SCALE-001", "fixture": "estate-scale-v1", "fixture_sha256": fixture_hash,
+        "tool": {"name": "run_performance.py", "version": "1", "python": platform.python_version()},
         "profile": {"os": platform.platform(), "python": platform.python_version(), "logical_cpu": os.cpu_count(), "storage": "workspace filesystem", "cache": "fresh server process; one discarded route warm-up per process"},
         "runs": arguments.runs, "raw_ms": samples, "summary": summaries,
     }

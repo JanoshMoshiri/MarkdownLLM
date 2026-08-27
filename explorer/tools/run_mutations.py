@@ -31,18 +31,15 @@ CASES: dict[str, tuple[Replacement, ...]] = {
     "M03": (Replacement("adapters/confined_source_reader.py", "        self._reject_reparse_components(boundary, relative)\n", "        # MUTANT: follow a reparse/symlink parent\n", 1),),
     "M04": (Replacement("adapters/confined_source_reader.py", "if len(payload) > self._limits.file_bytes:", "if len(payload) >= self._limits.file_bytes:"),),
     "M05": (Replacement("adapters/frontmatter_parser.py", "            self._validate_event_stream(yaml_text)\n", "            # MUTANT: skip YAML event validation\n"),),
-    "M06": (Replacement("adapters/safe_markdown_parser.py", "                elif \":\" in target.split(\"/\", 1)[0] or target.startswith((\"/\", \"//\", \"#\")):\n", "                elif False:\n"),),
+    "M06": (Replacement("adapters/safe_markdown_parser.py", "                elif decoded_url.scheme or \":\" in decoded_target.split(\"/\", 1)[0] or decoded_target.startswith((\"/\", \"//\", \"#\")):\n", "                elif False:\n"),),
     "M07": (Replacement("delivery/response_encoding.py", '"content": value.content,', '"content": {"raw": value.content, "rendered": value.content},'),),
     "M08": (Replacement("adapters/cursors.py", "            if not hmac.compare_digest(signature, expected):", "            if False:"),),
     "M09": (Replacement("composition.py", "resolve_trusted_git(root)", '"git"'),),
     "M10": (Replacement("adapters/git_commit_history.py", '                "GIT_OPTIONAL_LOCKS": "0",\n', ""),),
-    "M11": (Replacement("delivery/http_server.py", "                if not supplied:\n", "                if False:\n"),),
+    "M11": (Replacement("delivery/http_server.py", "            if target.path.startswith(\"/api/\"):\n                supplied = self.headers.get(\"X-Explorer-Capability\", \"\")\n                if not supplied:\n", "            if target.path.startswith(\"/api/\"):\n                supplied = self.headers.get(\"X-Explorer-Capability\", \"\")\n                if False:  # MUTANT: accept missing capability\n"),),
     "M12": (Replacement("delivery/http_server.py", 'print(f"{level} operation={operation} source={source_id or \'-\'} code={error.code}"', 'print(f"{level} operation={operation} source={source_id or \'-\'} target={self.path} code={error.code}"'),),
     "M13": (Replacement("delivery/http_server.py", "        if not self.capacity.acquire(blocking=False):\n", "        if False:\n"),),
-    "M14": (
-        Replacement("delivery/static/js/state.js", "  state.requests.get(operation)?.controller.abort();", "  void state.requests.get(operation);"),
-        Replacement("delivery/static/js/state.js", "current.id === request.id", "true"),
-    ),
+    "M14": (Replacement("delivery/static/js/state.js", "    && request.liveIdentity === identityKey(liveLocationIdentity())", "    && true  // MUTANT: accept obsolete live UI context"),),
     "M15": (Replacement("delivery/static/js/views/navigation.js", "  label.textContent = source.display_name;", "  label.innerHTML = source.display_name;"),),
     "M16": (Replacement("delivery/static/js/views/navigation.js", "export function renderSources", 'fetch("/api/v1/estate");\n\nexport function renderSources'),),
 }
@@ -104,6 +101,7 @@ def main() -> int:
             })
     document = {
         "schema": 1,
+        "tool": {"name": "run_mutations.py", "version": "1"},
         "subject": "actual copied Explorer source with one deliberate defect per run",
         "started_at_epoch": started,
         "duration_seconds": round(time.time() - started, 3),

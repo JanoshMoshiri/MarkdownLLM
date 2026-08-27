@@ -3,12 +3,28 @@
   "id": "ST-INSTALL-001",
   "status": "pass",
   "offline_install": true,
+  "tool": {
+    "name": "verify_install.py",
+    "version": "1"
+  },
   "install_flags": [
     "--no-index",
     "--find-links"
   ],
   "arbitrary_cwd": true,
   "console_script": "mdllm-explorer.exe",
+  "python_executed": "3.12.13",
+  "python_3_10": "unexecuted-no-runtime-available",
+  "lifecycle": {
+    "status": "pass",
+    "real_interrupt": true,
+    "active_request_at_interrupt": true,
+    "shutdown_seconds": 4.75,
+    "invalid_root_exit": 2,
+    "port_collision_exit": 2,
+    "fixture_immutable": true,
+    "launch_cwd_immutable": true
+  },
   "package_probe": {
     "version": "0.1.0",
     "yaml": "6.0.3",
@@ -24,7 +40,7 @@
   ],
   "explorer_wheel": {
     "name": "markdownllm_explorer-0.1.0-py3-none-any.whl",
-    "sha256": "dcbb059b18f775f697320abfe9dba0b0a114826cc5426ce291633ac0a0145e76"
+    "sha256": "0bae311a49d6a498485f45deb2433c9feb5627c99d07c7ba1639adaacdfee348"
   },
   "dependency_wheel": {
     "name": "pyyaml-6.0.3-cp312-cp312-win_amd64.whl",

@@ -126,6 +126,12 @@ class ExplorerHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         try:
             self._validate_web_boundary()
+            if urlsplit(self.path).path.startswith("/api/"):
+                supplied = self.headers.get("X-Explorer-Capability", "")
+                if not supplied:
+                    raise ExplorerError("capability_required")
+                if not hmac.compare_digest(supplied, self.runtime.capability):
+                    raise ExplorerError("capability_invalid")
             self._error(ExplorerError("method_not_allowed"), False)
         except ExplorerError as error:
             self._error(error, False)
@@ -155,6 +161,10 @@ class ExplorerHandler(BaseHTTPRequestHandler):
                 candidate_source = query.get("source", [None])[0]
                 if isinstance(candidate_source, str) and re.fullmatch(r"(?:substrate|domain/[A-Za-z0-9._~%\-]{1,240})", candidate_source):
                     source_id = candidate_source
+                    self.request_source_id = source_id
+                candidate_path = query.get("path", [None])[0]
+                if isinstance(candidate_path, str) and _safe_relative_context(candidate_path):
+                    self.request_relative_path = candidate_path
                 result = self.runtime.routes.dispatch(target.path, query)
                 self._json(200, {"data": to_wire(result), "meta": self._success_meta(result)}, head)
                 return
@@ -187,7 +197,9 @@ class ExplorerHandler(BaseHTTPRequestHandler):
         meta: dict[str, object] = {"request_id": self.request_id, "observed_at": getattr(result, "observed_at", _observed_at())}
         page = result if hasattr(result, "next_cursor") else getattr(result, "commits", None)
         if page is not None:
-            meta["next_cursor"] = getattr(page, "next_cursor", None)
+            next_cursor = getattr(page, "next_cursor", None)
+            if next_cursor is not None:
+                meta["next_cursor"] = next_cursor
             meta["partial"] = bool(getattr(page, "partial", False))
         return meta
 
@@ -199,10 +211,12 @@ class ExplorerHandler(BaseHTTPRequestHandler):
 
     def _error(self, error: ExplorerError, head: bool) -> None:
         details: dict[str, object] = {"code": error.code, "message": error.public_message, "retryable": error.retryable}
-        if error.source_id:
-            details["source_id"] = error.source_id
-        if error.relative_path and error.code not in {"path_excluded", "path_outside_source"}:
-            details["relative_path"] = error.relative_path
+        source_id = error.source_id or getattr(self, "request_source_id", None)
+        relative_path = error.relative_path or getattr(self, "request_relative_path", None)
+        if source_id:
+            details["source_id"] = source_id
+        if relative_path and error.code != "path_outside_source":
+            details["relative_path"] = relative_path
         self._json(error.status, {"error": details, "meta": {"request_id": self.request_id, "observed_at": _observed_at()}}, head)
 
     def _send(self, status: int, payload: bytes, content_type: str, head: bool) -> None:
@@ -236,6 +250,16 @@ def serve(runtime: ExplorerRuntime, port: int = 0) -> tuple[BoundedHTTPServer, s
 
 def _observed_at() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _safe_relative_context(value: str) -> bool:
+    return bool(
+        0 < len(value) <= 4096
+        and not value.startswith(("/", "\\"))
+        and "\x00" not in value
+        and ":" not in value
+        and all(part not in {"", ".", ".."} for part in value.replace("\\", "/").split("/"))
+    )
 
 
 def _raw_security_headers(length: int, content_type: str) -> bytes:
