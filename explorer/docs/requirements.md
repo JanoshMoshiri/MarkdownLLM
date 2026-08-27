@@ -1,8 +1,8 @@
 # MarkdownLLM Explorer — Requirements Specification
 
-**Status:** design-ready; cold-read findings reconciled; acceptance approval remains gated by the test trace ledger
+**Status:** design-ready; requirements and design cold-read findings reconciled; acceptance approval remains gated by the test trace ledger
 
-**Version:** 0.2
+**Version:** 0.3
 
 **Date:** 2026-08-27
 
@@ -195,15 +195,15 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **NFR-ARCH-003 — Replaceability.** A controlled adapter-swap test shall show that replacing the HTTP server, git reader, filesystem reader or Markdown renderer changes no core/application file—only composition, the adapter and its adapter tests. The changed-file set is retained as evidence.
 
-**NFR-SAFE-001A — Observable source immutability.** Explorer shall not alter any byte or metadata under a source root, including worktree, index, refs, objects and repository config. Acceptance compares recursive metadata/content hashes and git/index/ref snapshots before and after all journeys.
+**NFR-SAFE-001A — Observable source immutability.** Explorer shall not alter source bytes or mutation-relevant metadata: names, types, size, content, mtime, mode/ACL where observable, worktree content, index checksum, refs, object set and repository config. Acceptance compares those pre/post snapshots. Access-time and OS-maintained read telemetry are explicitly excluded because ordinary reads may update them outside Explorer's control.
 
 **NFR-SAFE-001B — Constrained git.** The git adapter shall expose an argument-vector allowlist of read-only operations and fixed arguments; set fixed source cwd, non-interactive environment, `GIT_OPTIONAL_LOCKS=0`, no pager/editor/hooks/external diff, bounded timeout/output and no shell; and prevent global/system/repository configuration from broadening execution. Mutation verbs and arbitrary options are not representable through its port.
 
-**NFR-SAFE-001C — Outside-root writes.** The default runtime writes no persistent application state. It may write diagnostic lines to stdout/stderr and ephemeral socket/process state managed by the operating system; browser theme state belongs to browser-local storage. It shall not create log, cache, token or database files.
+**NFR-SAFE-001C — Outside-root writes.** The default runtime writes no Explorer-owned persistent state. It may write diagnostic lines to stdout/stderr, ephemeral socket/process state managed by the operating system, and interpreter/package bytecode caches outside every source root; browser theme state belongs to browser-local storage. Explorer shall not create its own log, content cache, token or database files.
 
 **NFR-SAFE-002A — Root configuration confinement.** The launch root shall be an existing readable directory. The configured domain directory shall be source-relative, resolve beneath the launch root and reject absolute, UNC/device or escaping input.
 
-**NFR-SAFE-002B — Per-I/O confinement.** Immediately before and after every directory enumeration or file read, the final native target and every parent component shall be checked against the selected exclusive canonical boundary. Traversal, separator/case/encoding variants, symlinks, junctions/reparse points, UNC/device paths and link replacement fail closed. Tests cover the native link mechanisms available on each validated operating system.
+**NFR-SAFE-002B — Per-I/O confinement.** Every directory enumeration and file read shall validate source-relative syntax, canonical ownership and non-link/reparse parent components immediately before I/O, then compare final directory/file identity and mutation metadata after I/O. File reads shall validate the opened native handle's final target where the validated OS exposes that evidence. Traversal, separator/case/encoding variants, symlinks, junctions/reparse points, UNC/device paths and detected replacement fail closed. Evidence names the executed filesystem/OS profiles and the residual race: v1 does not claim protection from a fully privileged local process that can replace path components between all checks.
 
 **NFR-SAFE-003 — Content safety.** All repository strings shall be inserted as text or passed through an allowlist renderer. Raw mode is non-executable text; active repository HTML is never retained. Rendered documents load no repository subresource. Tests include script/event attributes, encoded schemes, SVG/data URLs, remote images and malformed markup.
 
@@ -238,6 +238,7 @@ These values are requirements, not implementation hints.
 | Directory depth below source root | 32 components |
 | Directory entries per page | 500 |
 | Search results per page | 200 |
+| Eligible paths inspected by one count/search/collection operation | 10,000; result becomes partial at the cap |
 | Memory candidates per source | 10,000 |
 | Commits per page | 50 |
 | Git process duration / captured output | 3 seconds / 1 MiB |
@@ -287,7 +288,7 @@ The tester attempts missing/wrong capabilities, hostile Host and Origin values, 
 
 ### AJ-07 — Read-only observation
 
-The tester snapshots fixture worktrees, file metadata, git index, refs, objects and config; runs AJ-01–06 plus commit browsing; and compares the post-run snapshot. Source state is byte/metadata identical and no git helper, hook, pager, editor or shell was invoked.
+The tester snapshots fixture source contents and mutation-relevant metadata from NFR-SAFE-001A, git index, refs, object set and config; runs AJ-01–06 plus commit browsing; and compares the post-run snapshot. Those values are identical and no git helper, hook, pager, editor, lazy fetch or shell was invoked. Access-time and OS-managed read telemetry are recorded as excluded rather than falsely asserted unchanged.
 
 ## 12. Verification and acceptance ownership
 

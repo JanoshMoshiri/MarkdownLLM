@@ -1,12 +1,12 @@
 # MarkdownLLM Explorer — Design Specification
 
-**Status:** draft awaiting cold design review
+**Status:** design cold review reconciled; implementation remains gated by the test trace ledger
 
-**Version:** 0.1
+**Version:** 0.2
 
 **Date:** 2026-08-27
 
-**Requirements:** `explorer/docs/requirements.md` v0.2 at repository view `e276ac3b2430a0f0d1844a0806bb155a5bb9620d`
+**Requirements:** `explorer/docs/requirements.md` v0.3 in the same reconciled change set
 
 **Architectural sources:** MarkdownLLM framework `7bffcb162f01c5cc6afb98756eca58bc5c5f79fe`; Code Architect domain `c711d2a46225aaca471100e1eec2afceb02e751a`
 
@@ -31,9 +31,9 @@ Python 3.10+ is the v1 delivery language. It aligns with the deterministic floor
 
 The delivery adapter uses `http.server.ThreadingHTTPServer` with a bounded-request mixin and explicit routing. FastAPI/Flask would improve routing convenience but introduce a framework and server dependency for six GET APIs. HTTP stays outside the application boundary, so a later framework swap changes only delivery/composition and its tests.
 
-### D-003 — PyYAML is the only runtime package dependency
+### D-003 — Exactly pinned PyYAML is the only runtime package dependency
 
-Frontmatter must support the YAML shapes real things use. The package therefore pins PyYAML, already exercised by the floor. YAML is parsed through a constrained `SafeLoader` with byte, alias and node limits. Markdown rendering is an Explorer-owned safe-subset adapter: raw HTML is always escaped, and only required Markdown constructs are emitted. This avoids a CDN and avoids making active HTML somebody else's default.
+Frontmatter must support the YAML shapes real things use. The package therefore pins `PyYAML==6.0.3`, already exercised by the floor. YAML is parsed and normalised through constrained stages with byte, depth, scalar, collection and result-size limits. Markdown parsing and HTML presentation are separate Explorer-owned adapters: raw HTML is always escaped, and only required Markdown constructs are emitted. This avoids a CDN and avoids making active HTML somebody else's default.
 
 ### D-004 — Native browser modules, no build chain
 
@@ -41,7 +41,7 @@ Packaged ES modules provide state, routing, API access and focused view componen
 
 ### D-005 — Capability-bearing loopback session
 
-Loopback is necessary but insufficient. Each process generates a 256-bit capability and prints `http://127.0.0.1:<port>/?cap=<value>`. Bootstrap stores it in `sessionStorage`, removes it from the visible URL with `history.replaceState`, and sends it only in `X-MDLLM-Capability`. APIs also validate exact Host and Origin. The capability is in memory only and dies with the process/browser session.
+Loopback is necessary but insufficient. Each process generates a 256-bit capability and prints `http://127.0.0.1:<port>/#cap=<value>`. URL fragments never reach the HTTP request line or access logs. Bootstrap stores the value in `sessionStorage`, removes it from the visible URL with `history.replaceState`, and sends it only in `X-MDLLM-Capability`. APIs also validate exact Host and Origin and compare the bounded header with `hmac.compare_digest`. Capability and cursor-HMAC keys are independent, in memory only and die with the process/browser session.
 
 ### D-006 — Shipped together, installed independently
 
@@ -100,7 +100,9 @@ explorer/
 │   │   ├── filesystem_catalogue.py
 │   │   ├── confined_source_reader.py
 │   │   ├── git_commit_history.py
-│   │   └── safe_markdown.py
+│   │   ├── frontmatter_parser.py
+│   │   ├── safe_markdown_parser.py
+│   │   └── document_presenter.py
 │   └── delivery/
 │       ├── http_server.py
 │       ├── api_routes.py
@@ -116,7 +118,10 @@ explorer/
 │               ├── theme.js
 │               └── views/
 │                   ├── navigation.js
-│                   ├── content.js
+│                   ├── overview.js
+│                   ├── collection.js
+│                   ├── document.js
+│                   ├── settings.js
 │                   └── context_panel.js
 └── tests/
     ├── unit/
@@ -137,18 +142,20 @@ All core values are immutable dataclasses or enums.
 |---|---|---|
 | `SourceId` | Validated opaque UI/API identity | `value` |
 | `RelativePath` | Normalised source-relative POSIX path | `parts`, `display` |
-| `Source` | One exclusive source boundary | `id`, `kind`, `display_name`, `canonical_root`, `markers`, `git_kind`, `excluded_roots` |
-| `EstateSnapshot` | Catalogue result at one observation | `sources`, `issues`, `observed_at` |
+| `BoundaryToken` | Opaque reference resolved only by outer adapters | `value` |
+| `Source` | Source identity and public facts, with no native path | `id`, `kind`, `display_name`, `boundary_token`, `markers`, `git_kind` |
+| `EstateSnapshot` | One atomic ownership/catalogue observation | `sources`, `issues`, `revision`, `observed_at` |
 | `SourceIssue` | Non-fatal source discovery fact | `code`, `source_id?`, `message` |
 | `TreeNode` | One eligible directory/file row | `path`, `name`, `kind`, `size?`, `modified_at?`, `expandable` |
 | `Page[T]` | Bounded deterministic page | `items`, `next_cursor`, `partial`, `observed_at` |
 | `RepositoryState` | Git availability/state | `kind`, `head_sha?`, `branch?`, `dirty?`, `issue?` |
 | `CommitRecord` | Read-only commit evidence | `sha`, `subject`, `author_name`, `authored_at` |
-| `FrontmatterResult` | Parsed or explicitly invalid metadata | `state`, `values`, `error_code?` |
-| `DocumentRecord` | Safe document result | `source_id`, `path`, `media_kind`, `raw_text?`, `rendered_html?`, `frontmatter`, `size`, `modified_at`, `issues` |
+| `FrontmatterResult` | Parsed JSON-safe or explicitly invalid metadata | `state`, `values`, `error_code?` |
+| `LinkCandidate` | Parsed, inactive document link | `label`, `raw_target`, `kind` |
+| `DocumentRecord` | One requested document representation | `source_id`, `path`, `mode`, `content`, `frontmatter`, `links`, `size`, `modified_at`, `issues` |
 | `CollectionItem` | Skill/memory route to a document | `path`, `title`, `group`, `thing_id?`, `thing_type?`, `issues` |
 
-`Source.canonical_root` is infrastructure-sensitive data carried as an opaque `Path` value for adapters; it is never embedded in `SourceId` or default error output.
+An adapter-owned `BoundaryRegistry` maps `BoundaryToken` to canonical roots, excluded/candidate roots and native git stores. Native paths never enter core/public DTOs; authenticated Settings obtains an explicitly redacted path field from a dedicated outer query.
 
 ## 6. Application-owned ports
 
@@ -157,22 +164,41 @@ class SourceCatalogue(Protocol):
     def snapshot(self) -> EstateSnapshot: ...
     def source(self, source_id: SourceId) -> Source: ...
 
-class ConfinedSourceView(Protocol):
+class SourceMetrics(Protocol):
     def overview_counts(self, source: Source) -> SourceCounts: ...
+
+class DirectoryBrowser(Protocol):
     def list_directory(self, source: Source, path: RelativePath,
                        cursor: str | None) -> Page[TreeNode]: ...
+
+class PathSearch(Protocol):
     def search(self, source: Source, query: str,
                cursor: str | None) -> Page[TreeNode]: ...
+
+class CollectionReader(Protocol):
     def collection(self, source: Source, kind: CollectionKind,
                    cursor: str | None) -> Page[CollectionItem]: ...
+
+class DocumentReader(Protocol):
     def read(self, source: Source, path: RelativePath) -> RawDocument: ...
+
+class LinkResolver(Protocol):
+    def resolve(self, source: Source, document: RelativePath,
+                candidate: LinkCandidate) -> ResolvedLink: ...
 
 class CommitHistory(Protocol):
     def repository_state(self, source: Source) -> RepositoryState: ...
     def commits(self, source: Source, cursor: str | None) -> Page[CommitRecord]: ...
 
-class DocumentRenderer(Protocol):
-    def render(self, raw: RawDocument) -> RenderedDocument: ...
+class FrontmatterParser(Protocol):
+    def parse(self, raw: RawDocument) -> ParsedDocument: ...
+
+class MarkdownParser(Protocol):
+    def parse(self, body: str) -> MarkdownTree: ...
+
+class DocumentPresenter(Protocol):
+    def present(self, tree: MarkdownTree,
+                links: tuple[ResolvedLink, ...]) -> str: ...
 ```
 
 The protocols contain domain nouns and bounded operations only. They do not expose arbitrary command arguments, filesystem handles, HTML templates or HTTP types.
@@ -182,28 +208,28 @@ The protocols contain domain nouns and bounded operations only. They do not expo
 | Use case | One reason to change | Ports used |
 |---|---|---|
 | `DiscoverEstate` | Estate response semantics | `SourceCatalogue` |
-| `GetOverview` | Source summary composition | catalogue, source view, history |
-| `BrowseTree` | Directory-page semantics | catalogue, source view |
-| `SearchPaths` | Query validation and result semantics | catalogue, source view |
-| `ListCollection` | Skills/memory grouping contract | catalogue, source view |
-| `ReadDocument` | Document read + render orchestration | catalogue, source view, renderer |
+| `GetOverview` | Source summary composition | catalogue, metrics, history |
+| `BrowseTree` | Directory-page semantics | catalogue, directory browser |
+| `SearchPaths` | Query validation and result semantics | catalogue, path search |
+| `ListCollection` | Skills/memory grouping contract | catalogue, collection reader |
+| `ReadDocument` | Mode-specific read/parse/link/present orchestration | catalogue, document reader, frontmatter parser, Markdown parser, link resolver, presenter |
 
 Use cases validate IDs/query shapes, call ports and return models. They do not catch generic exceptions. Expected core/application errors are typed; the single delivery boundary maps unknown failures to `internal_error` and logs only operation/request/source identity.
 
 ## 8. Exclusive source discovery
 
-`FilesystemSourceCatalogue` is constructed with an explicit launch root and source-relative domain directory.
+`FilesystemSourceCatalogue` and its adapter-owned `BoundaryRegistry` are constructed with an explicit launch root and source-relative domain directory.
 
 1. Validate the root is an existing readable directory and not a reparse point/symlink.
 2. Validate the domain directory input is relative, contains no `..`, drive, UNC or device prefix, and resolves beneath root.
-3. Inspect exactly one child level using `os.scandir`; never follow links.
-4. Admit readable directories carrying `AGENTS.md` or `.markdownllm`.
+3. Register the entire configured domain-directory canonical root as an unconditional substrate exclusion before inspecting any child. Substrate tree/search/read never enters it, so new, collided, unreadable and rejected domain candidates cannot fall through to substrate ownership.
+4. Inspect exactly one child level using bounded non-following enumeration. Apply ignored/secret rules to directory names, not file-extension rules. Record candidate outcomes as `admitted`, `marker_missing`, `unreadable`, `reparse_rejected`, `id_collision` or `invalid_marker`; only readable directories carrying `AGENTS.md` or `.markdownllm` are navigable.
 5. Derive source IDs using the requirements algorithm; report normalisation collisions.
-6. Create domain `Source` values first.
-7. Create the substrate `Source` with every admitted domain canonical root in `excluded_roots`.
-8. Detect git by a local `.git` directory or worktree file; never infer a domain repository from a parent `.git`.
+6. Sort admitted sources by NFC/case-folded display name and original relative path; create domain identity values and private boundary-registry entries.
+7. Create the substrate identity value and its private boundary entry carrying the unconditional domain-directory exclusion.
+8. Detect git only from a local `.git` directory or worktree file and validate the resolved top-level/store policy in §10; never infer a domain repository from a parent `.git`.
 
-The catalogue snapshot is built at process start and immutable for that process. A restart is the v1 refresh mechanism. Files and git content remain live reads, stamped `observed_at`; there is no shadow content cache.
+The catalogue snapshot and boundary registry are built together and published atomically at process start. Every request receives the same revision; a restart is the v1 domain-add/remove refresh. The unconditional domain-directory exclusion remains safe while the process lives. Files and git content remain live reads, stamped `observed_at`; there is no shadow content cache.
 
 ## 9. Path eligibility and confinement
 
@@ -212,49 +238,55 @@ The catalogue snapshot is built at process start and immutable for that process.
 For each adapter operation, `ConfinedSourceReader`:
 
 1. Parses only percent-decoded source-relative POSIX paths; rejects backslashes, empty/internal `.` segments, `..`, drive/UNC/device syntax and NUL.
-2. Applies depth, ignored-name, secret-name and extension policy to every component.
-3. Walks components with non-following metadata calls, rejecting symlinks, junctions/reparse points and non-regular final types.
-4. Resolves the candidate and proves it is within `canonical_root` and outside every `excluded_root`.
+2. Applies depth, ignored-name and secret-name policy to every component; extension/name allowlisting applies only to the final regular file.
+3. Uses adapter-private boundary data to walk components with non-following metadata calls, rejecting symlinks, junctions/reparse points and non-regular final types.
+4. Resolves the candidate and proves it is within the token's canonical root and outside its excluded roots (for substrate, the entire configured domain directory).
 5. Captures parent/final identity and metadata immediately before I/O.
-6. For file reads, opens read-only with no-follow semantics where the OS exposes them, validates the final native handle path/identity against the source boundary, reads at most limit+1 bytes, and compares identity/size/mtime after read. Platform adapters use `O_NOFOLLOW`/`fstat` on POSIX and reparse-point attributes plus final-handle path validation on Windows.
-7. For directory enumeration, compares directory identity/mtime before and after the bounded scan.
+6. For file reads, POSIX uses `os.open(..., O_RDONLY|O_NOFOLLOW)` plus `fstat`; Windows uses a small `ctypes` wrapper around `CreateFileW` with sharing-for-read, reparse-point rejection, `GetFileInformationByHandle` identity and `GetFinalPathNameByHandleW` ownership validation. Both read at most limit+1 and compare identity/size/mtime after read.
+7. For directory enumeration, captures non-following directory identity/mtime, performs a bounded `os.scandir` without following children, and compares identity/mtime after the scan. A detected rename/replacement returns `source_changed`.
 8. Fails with `source_changed` when stable identity cannot be demonstrated.
 
-This is defence in depth for a local read surface. A process with authority to replace directories at the exact instant of every check is outside the v1 trust boundary; the adapter still detects ordinary replacement races and fails closed whenever the native evidence disagrees.
+This is defence in depth for a local read surface and matches requirements v0.3. Directory enumeration remains path-based: a fully privileged local process able to win every check/use race is outside the v1 trust boundary. Tests record the executed filesystem/OS profile and prove ordinary link/reparse/replacement cases fail closed without claiming portable `openat`-style race elimination.
 
-Pagination cursors are canonical JSON (`version`, source ID, operation, relative path/query, offset and directory/result fingerprint), base64url encoded and HMAC-signed with a per-process cursor key. A changed fingerprint returns `source_changed`; client-supplied offsets or paths cannot be smuggled in a cursor.
+Cursors are operation-specific canonical JSON, base64url encoded and HMAC-signed with a cursor-only process key:
+
+- tree: `{v,source,path,offset,fingerprint}` over at most 10,000 sorted eligible immediate entries;
+- search/collection: `{v,source,query_or_kind,offset,fingerprint}` over a deterministic traversal capped at 10,000 eligible candidates, with `partial: true` at the cap; and
+- commits: the pinned-head schema in §10.
+
+Directory/search fingerprints hash the bounded ordered identity fields actually paged, not file bodies. A changed fingerprint returns `source_changed`; malformed/tampered cursors return `invalid_cursor` and cannot inject paths or offsets.
 
 ## 10. Git adapter
 
-`GitCommitHistory` owns the only subprocess use. It accepts a `Source`, never a command from a controller.
+`GitCommitHistory` owns the only subprocess use. At process start, before adopting any source cwd, composition resolves `git` with the trusted launch environment, requires a regular executable outside every source root, stores its absolute canonical path and passes that path to the adapter. The adapter accepts a `Source`, never a command from a controller.
 
 Allowed operations are fixed internal templates:
 
-- repository root and `HEAD` verification;
+- repository top-level, absolute git-dir/common-dir and `HEAD` verification;
 - branch/detached/unborn state;
 - porcelain-v2 status with untracked enumeration disabled; and
-- a 51-record, NUL-delimited `git log HEAD --topo-order` page (50 returned, one look-ahead).
+- a 51-record, NUL-delimited `git log <pinned-head> --topo-order --skip=<cursor-skip>` page (50 returned, one look-ahead).
 
-Every process uses an argument list with `shell=False`, exact source cwd, three-second timeout and 1 MiB combined-output cap. The environment is a minimal copy containing required OS execution variables plus `GIT_TERMINAL_PROMPT=0`, `GIT_OPTIONAL_LOCKS=0`, `GIT_PAGER=cat`, `PAGER=cat`, `GIT_EXTERNAL_DIFF=` and null global/system config paths; command-line config disables hooks path, fsmonitor, untracked cache, index preload, external diff and pager. The adapter validates `rev-parse --show-toplevel` equals the source canonical root before any history call. It never invokes an alias or accepts repository-derived executable paths.
+Every process invokes that exact executable with an argument list, `shell=False`, exact adapter-registry cwd, three-second timeout and 1 MiB combined-output cap. The environment is built from an OS execution allowlist, not copied wholesale, and includes `GIT_TERMINAL_PROMPT=0`, `GIT_OPTIONAL_LOCKS=0`, `GIT_NO_LAZY_FETCH=1`, `GIT_PAGER=cat`, `PAGER=cat`, `GIT_EXTERNAL_DIFF=`, null global/system config paths and no `GIT_DIR`, worktree, object, replace-ref, SSH/askpass or optional-lock variables. Command-line config disables hooks path, fsmonitor, untracked cache, index preload, external diff and pager.
 
-Commit parsing uses full SHA as identity, displays at least 10 characters and expands colliding abbreviations within the returned page. Cursor state carries the last full SHA and query fingerprint, not a numeric offset into changing history.
+Before adopting a source as git-backed, the adapter validates top-level equals the registered source root and both absolute git-dir and common-dir remain inside it; external worktree/common/object stores are reported as `git_store_external` and history is unavailable in v1. That keeps every git-read target inside AJ-07's snapshot. No aliases or repository-derived executable paths are used, and a process-spawn probe proves only the trusted executable is invoked.
 
-## 11. Markdown/frontmatter adapter
+Commit parsing uses full SHA as identity and displays 12 characters (full SHA remains in the DTO). The signed cursor is `{v,source,pinned_head,skip}`. First page pins the current full `HEAD`; later pages rerun the same topological order at that pinned head with an increasing skip, so new commits do not reorder the walk. A missing pinned commit yields `source_changed`.
 
-`SafeMarkdownRenderer` receives bounded UTF-8 text and returns HTML from an allowlist it owns.
+## 11. Frontmatter, Markdown and link pipeline
 
-- Frontmatter is recognised only as a leading `---` block terminated by a standalone `---` within 128 KiB.
-- `BoundedSafeLoader` rejects more than 100 aliases, 10,000 composed nodes, duplicate mapping keys and non-mapping top-level metadata.
-- Invalid frontmatter yields `frontmatter_invalid`, empty inferred metadata and escaped raw access; the Markdown body is not rendered as if metadata were trustworthy.
-- Raw HTML is escaped before block parsing. Emitted tags are limited to document structure (`h1`–`h6`, `p`, `strong`, `em`, `code`, `pre`, `ul`, `ol`, `li`, `blockquote`, `table`, `thead`, `tbody`, `tr`, `th`, `td`, `hr`, `a`). No `style`, `class` from content, `img`, `iframe`, SVG, form or event attribute is emitted.
-- Link parsing normalises/decodes the scheme. Source-relative Markdown links are rewritten to Explorer route data; `http`/`https` links receive `target="_blank" rel="noopener noreferrer external"`; every other link is rendered inert.
-- Fenced code, headings, paragraphs, emphasis, lists, blockquotes, pipe tables and horizontal rules are covered by golden fixtures drawn from real substrate documents.
+Three focused adapters and one confined resolver form the document pipeline.
 
-The browser inserts returned rendered HTML only into the dedicated document container. Every other repository value uses DOM `textContent`; raw mode always uses a `<pre><code>` text node.
+1. `BoundedFrontmatterParser` recognises only a leading `---` block terminated by a standalone `---` within 128 KiB. It rejects aliases entirely, duplicate/merge keys, unsupported tags, recursive structures, depth >20, scalar >64 KiB, sequence/mapping cardinality >2,000 and composed nodes >10,000. It normalises only JSON values (`null`, bool, bounded integer/finite float, string, list, string-keyed map) and caps the compact UTF-8 JSON form at 256 KiB. Dates, sets, binary and custom values become bounded strings only when they originated from plain YAML scalars; explicit unsupported tags fail. Invalid input yields `frontmatter_invalid`, empty inferred metadata and escaped raw access.
+2. `SafeSubsetMarkdownParser` produces an inert tree containing text, block nodes and `LinkCandidate` values. Raw HTML is text, not a node type. Fenced code, headings, paragraphs, emphasis, lists, blockquotes, pipe tables and horizontal rules are covered by corpus-derived goldens.
+3. `ConfinedLinkResolver` resolves relative candidates against the source document through the same eligibility/ownership adapter. Only an existing eligible same-source Markdown file becomes an Explorer route. `http`/`https` candidates become labelled external links; encoded/control-character schemes, images/subresources, every other scheme and unresolved/excluded targets remain inert. Navigation repeats confinement; rendering grants no authority.
+4. `AllowlistDocumentPresenter` emits only `h1`–`h6`, `p`, `strong`, `em`, `code`, `pre`, `ul`, `ol`, `li`, `blockquote`, `table`, `thead`, `tbody`, `tr`, `th`, `td`, `hr` and validated `a`. It emits no content-supplied style/class, image, iframe, SVG, form or event attribute; external anchors receive `target="_blank" rel="noopener noreferrer external"`.
+
+`ReadDocument(mode=raw)` skips Markdown parsing and returns escaped text data; `mode=rendered` runs the pipeline and returns HTML. Exactly one representation is serialised. The browser inserts rendered HTML only into the dedicated document container. Every other repository value uses DOM `textContent`; raw mode always uses a `<pre><code>` text node.
 
 ## 12. HTTP API
 
-Static assets are source-insensitive. `/health` is unauthenticated and returns only `{status, version}`. All `/api/v1/*` routes require the capability and boundary checks.
+Static assets are source-insensitive. `/health` is unauthenticated and returns only `{status, version}`. Exact `Host: 127.0.0.1:<bound-port>` is required on static, health and API routes. Static/health navigation allows absent Origin or the exact launch origin; APIs allow absent Origin for direct tools or the exact launch origin and always require the capability. No route emits CORS headers.
 
 | Method/path | Use case | Key query |
 |---|---|---|
@@ -263,9 +295,17 @@ Static assets are source-insensitive. `/health` is unauthenticated and returns o
 | `GET /api/v1/tree` | `BrowseTree` | `source`, `path?`, `cursor?` |
 | `GET /api/v1/search` | `SearchPaths` | `source`, `q`, `cursor?` |
 | `GET /api/v1/collection` | `ListCollection` | `source`, `kind=skills|memory`, `cursor?` |
-| `GET /api/v1/document` | `ReadDocument` | `source`, `path` |
+| `GET /api/v1/document` | `ReadDocument` | `source`, `path`, `mode=raw|rendered` |
 
-Success uses `{data, meta: {request_id, observed_at}}`. Errors use the requirements shape.
+Success uses `{data, meta: {request_id, observed_at, next_cursor?, partial?}}`. Public DTOs are defined in `response_encoding.py`; conversion is explicit and never serialises core/adaptor dataclasses directly. Common shapes are:
+
+```json
+{"data":{"sources":[{"id":"substrate","kind":"substrate","display_name":"Substrate","markers":["AGENTS.md"],"git_kind":"repository"}],"issues":[]},"meta":{"request_id":"…","observed_at":"…"}}
+{"data":{"source_id":"substrate","path":"thing.md","mode":"rendered","content":"<h1>…</h1>","frontmatter":{"state":"valid","values":{"id":"thing-specification"}},"size":123,"modified_at":"…","issues":[]},"meta":{"request_id":"…","observed_at":"…"}}
+{"error":{"code":"path_excluded","message":"The requested path is not available.","retryable":false,"source_id":"substrate","relative_path":".env"},"meta":{"request_id":"…"}}
+```
+
+Tree/search/collection/commit page DTOs carry `items`, with `next_cursor`/`partial` in `meta`; absent optional values are omitted rather than `null`. Settings alone may include `source_path` after capability/Host/Origin checks. Error mapping is one typed exception to one status/code/retryability value; absolute paths and document bodies are never accepted by the encoder.
 
 | HTTP | Stable codes |
 |---:|---|
@@ -273,16 +313,19 @@ Success uses `{data, meta: {request_id, observed_at}}`. Errors use the requireme
 | 401 | `capability_required`, `capability_invalid` |
 | 403 | `host_forbidden`, `origin_forbidden`, `path_excluded`, `path_outside_source` |
 | 404 | `route_not_found`, `source_not_found`, `file_not_found` |
+| 405 | `method_not_allowed` |
 | 409 | `source_changed`, `source_id_collision`, `path_type_changed` |
 | 413 | `file_too_large`, `response_too_large`, `directory_limit` |
 | 415 | `binary_unsupported`, `encoding_unsupported` |
 | 429 | `server_busy` |
-| 503 | `source_unreadable`, `git_unavailable`, `git_timeout` |
+| 503 | `source_unreadable`, `git_unavailable`, `git_timeout`, `git_store_external` |
 | 500 | `internal_error` |
 
-`frontmatter_invalid` is a 200 document result with an issue because raw inspection remains available. All responses carry CSP, no-store, nosniff, no-referrer and frame-denial headers. API responses use `application/json; charset=utf-8`; assets use fixed MIME types. Unsupported methods return 405 without invoking a use case.
+`frontmatter_invalid` is a 200 document result with an issue because raw inspection remains available. Invalid/auth/path/limit/unsupported failures are non-retryable; `source_changed`, `server_busy`, `git_timeout` and transient `source_unreadable` are retryable; unknown/internal and external-store policy failures are non-retryable. Before JSON serialisation, response encoding estimates the compact UTF-8 representation and returns `response_too_large` without a partial document when it would exceed 2 MiB. All responses carry CSP, no-store, nosniff, no-referrer and frame-denial headers. API responses use `application/json; charset=utf-8`; assets use fixed MIME types. Unsupported methods return HTTP 405/`method_not_allowed` without invoking a use case.
 
-The server limits in-flight requests with a 16-permit semaphore acquired before dispatch. It sets socket/request timeouts and catches errors once at the request boundary; application/adapters own only failures they can classify meaningfully.
+`BoundedThreadingHTTPServer` overrides `process_request`: it acquires one of 16 permits non-blockingly before creating a thread; when full it sends a fixed bounded HTTP 429 JSON response directly and closes the socket. The handler subclasses `BaseHTTPRequestHandler`, never `SimpleHTTPRequestHandler`, and maps only `/`, `/health`, `/api/v1/*` plus an exact immutable `importlib.resources` asset manifest. Request-line/header limits and controllable parse failures produce bounded errors; access/error logging emits structured redacted method/route/status/request ID and never the fragment, capability header, query string or document values.
+
+Socket/request deadlines and browser-side 10-second aborts guarantee a visible client terminal state. Python cannot cancel a thread blocked inside an arbitrary filesystem syscall; that residual is bounded by the 16-request ceiling and is not misreported as server-side cancellation. Application/adapters own only failures they can classify meaningfully; the request boundary handles the rest once.
 
 ## 13. Browser application
 
@@ -292,7 +335,7 @@ The single state object contains `estate`, `sourceId`, `tab`, `relativePath`, `d
 
 The hash route contains only source ID, tab, mode and percent-encoded relative path. `router.js` round-trips it and handles back/forward. Ancestors of the selected path are derived as expanded; additional expansions live in session state.
 
-Each API operation owns an `AbortController` and monotonically increasing request ID. A source/tab/path change aborts obsolete work. A response mutates state only when its ID is still current, closing the stale-response race.
+Each API operation and document mode owns an `AbortController` and monotonically increasing request ID. A source/tab/path/mode change aborts obsolete work. A response mutates state only when its full operation/source/path/mode identity is still current, closing the stale-response race. A 401 after process restart becomes a distinct `session_expired` view with relaunch guidance; it never clears the last safe location.
 
 ### Visual composition
 
@@ -308,32 +351,39 @@ Below 900 px, header buttons open rail/context as modal overlays with labelled d
 
 ### Accessibility and theme
 
-The source tree uses semantic nested lists with disclosure buttons and roving keyboard focus supporting Arrow Up/Down, Left/Right, Home and End. Tabs use `tablist`/`tab`/`tabpanel`; async status uses a restrained `aria-live` region. Focus is never removed without being restored.
+The source tree is one `role="tree"` with nested `role="group"`/`treeitem` rows, `aria-expanded` on directories, `aria-selected` on the active document and one roving `tabindex=0`. Arrow Up/Down moves visible rows; Right expands or enters; Left collapses or moves to parent; Home/End move bounds; Enter activates. Collapsing/removing the focused descendant moves focus to the owning directory. A paginated “Load more” keeps focus on the first added item or the button when no item is added.
+
+Tabs use `tablist`/`tab`/`tabpanel` with Arrow/Home/End and stable focus. Responsive overlays are labelled dialogs; the background becomes `inert`, focus is trapped, Escape closes, and focus returns to the opener. Async status uses one de-duplicating `aria-live="polite"` region; fatal/load errors use `role="alert"` once. View modules render DOM and dispatch intents only: `overview.js`, `collection.js`, `document.js`, `settings.js`, `navigation.js` and `context_panel.js` do not fetch or own cross-view state.
 
 CSS custom properties define light/dark tokens. `theme.js` applies `light`, `dark` or `system`, listens for system changes only in system mode, and persists only the explicit mode in `localStorage`. Reduced-motion preference removes non-essential transitions.
 
 ## 14. Distribution and composition
 
-`pyproject.toml` uses a `src/` package, includes static assets as package data, pins `PyYAML>=6.0.3,<7`, requires Python `>=3.10`, and exposes:
+`pyproject.toml` uses a `src/` package, includes static assets as package data, pins `PyYAML==6.0.3`, requires Python `>=3.10`, and exposes:
 
 ```toml
 [project.scripts]
 mdllm-explorer = "markdownllm_explorer.__main__:main"
 ```
 
-`__main__.py` parses `--root`, `--domain-dir` (default `domain`) and `--port` (default 0), validates configuration, and calls `composition.build_runtime`. Composition constructs limits/policy, the catalogue, confined reader, git adapter, renderer, use cases and HTTP adapter. No global singleton is created at import time.
+`__main__.py` parses `--root`, `--domain-dir` (default `domain`) and `--port` (default 0), validates configuration, and calls `composition.build_runtime`. Composition constructs limits/policy, catalogue/boundary registry, focused filesystem ports, git adapter, frontmatter/Markdown/presenter pipeline, use cases and HTTP adapter. No global singleton is created at import time.
 
-Startup prints product/version, resolved root and capability URL. `KeyboardInterrupt` initiates `shutdown`, closes the listening socket and joins active request threads up to five seconds. Runtime writes no files.
+Startup prints product/version, resolved root and fragment-capability URL. `KeyboardInterrupt` initiates `shutdown`, closes the listening socket and joins active request threads up to five seconds. Explorer creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.3 and a read-only installed-package system test proves launch does not depend on writing them.
+
+### Performance allocation
+
+The benchmark owns one overall deadline per request rather than allowing each adapter its full timeout serially. Estate discovery + first overview allocates 400 ms catalogue/count scan, 500 ms repository state, 500 ms commit page and 300 ms encoding/HTTP, with 300 ms margin; overview runs independent metrics/state/history work concurrently through a bounded three-task executor and cancels/labels unavailable work at the overall two-second deadline. Tree lists one directory only. Search/collection stop at 10,000 candidates and return `partial`. Git's three-second process timeout is a safety ceiling; the performance fixture expects the tighter 500 ms page budget and records failure when it misses.
 
 ## 15. Test seams and fitness rules
 
 - Core eligibility, identity and models use no filesystem/git/browser and receive exhaustive unit/property-like tables.
-- Each use case is constructed with fake ports; a test runs with git absent from `PATH` and network disabled.
+- Each use case is constructed with its smallest fake port; a test runs with git absent from `PATH` and network disabled.
 - Filesystem and git adapters are contract-tested against temporary captured-real repositories.
-- Renderer golden tests include safe and hostile documents; an independent safety oracle asserts forbidden tags/attributes/schemes are absent.
+- Frontmatter, Markdown-tree, link-resolution and presentation contract tests are independent; corpus goldens cover fidelity, and a separate safety oracle asserts forbidden tags/attributes/schemes are absent.
 - HTTP system tests start a real loopback server and exercise capability, Host/Origin, headers, limits and error shapes.
 - Browser runtime validation uses the available in-app Chromium surface at required viewports and captures screenshots/DOM/accessibility evidence.
-- An architecture fitness test parses imports and rejects any `core`/`application` import from `adapters` or `delivery`, and any browser view module that calls `fetch` directly.
+- Architecture fitness parses imports and rejects `pathlib`, `os`, `subprocess`, HTTP or renderer implementations in `core/`/`application/`; rejects any inner import from `adapters`/`delivery`; permits concrete adapter imports only in `composition.py`; runs shared contracts against fake/real ports; and rejects browser view modules that call `fetch` or mutate the global state directly.
+- An adapter-swap fixture substitutes fake catalogue, metrics, directory, search, collection, document, link, history, parser and presenter ports, asserts no inner file changes, and retains the changed-path manifest required by NFR-ARCH-003.
 - A mutation/misconfiguration suite proves tests fail when ownership checks, capability checks, escaping, git no-lock environment, size limits or stale-response guards are deliberately removed.
 
 ## 16. Requirement allocation
