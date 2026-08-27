@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-27
-generated: 2026-08-27T00:45:55
-generated_from: HEAD@b97d92e
-coverage: 286
+generated: 2026-08-27T01:31:14
+generated_from: HEAD@e1ef1bf
+coverage: 287
 framework_version: 3.36.0
 ---
 
@@ -245,6 +245,14 @@ framework_version: 3.36.0
 - claude-phase6-no-adapter-and-root-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
 - claude-platform-surface-narrowed --informs--> vendor-harness-adapter-foundation
 - claude-platform-surface-narrowed --derived-from--> claude-phase5r0-matrix-completion-2026-08-13
+- closed-loop-operating-state --implements--> operating-model-specification
+- closed-loop-operating-state --implements--> universal-workflow-methodology
+- closed-loop-operating-state --derived-from--> framework-retrospective-2026-08c
+- closed-loop-operating-state --implements--> consequence-is-recoverable-only-in-retrospect
+- closed-loop-operating-state --implements--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- closed-loop-operating-state --implements--> coherence-is-a-maintained-rate-not-a-state
+- closed-loop-operating-state --references--> operating-layer-quality-loop
+- closed-loop-operating-state --supports--> a-true-primitive-is-discovered-not-authored
 - code-architect-governs-substrate-code --informs--> vendor-harness-adapter-foundation
 - codex-5r3-migration-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - codex-5r4-root-reconciliation-2026-08-13 --documents--> vendor-harness-adapter-foundation

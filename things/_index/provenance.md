@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-27
-generated: 2026-08-27T00:45:55
-generated_from: HEAD@b97d92e
+generated: 2026-08-27T01:31:14
+generated_from: HEAD@e1ef1bf
 coverage: 55
 framework_version: 3.36.0
 ---
@@ -116,6 +116,7 @@ framework_version: 3.36.0
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
 
 ## framework-retrospective-2026-08c
+- closed-loop-operating-state (derived-from)
 - hard-hook-vocabulary-contradicts-observable-trigger-insight (derived-from)
 
 ## framework-v3-transformation-plan
