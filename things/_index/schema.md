@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-27
-generated: 2026-08-27T14:49:34
-generated_from: HEAD@1e4171f
+generated: 2026-08-27T15:27:49
+generated_from: HEAD@9cc3da4
 coverage: 299
 framework_version: 3.36.0
 ---
@@ -28,8 +28,8 @@ framework_version: 3.36.0
 | priority | 46 |
 | disposition | 41 |
 | disposition_reason | 41 |
+| exposed | 21 |
 | informed_by | 21 |
-| exposed | 20 |
 | promoted_to | 19 |
 | decided_by | 16 |
 | completed | 8 |
