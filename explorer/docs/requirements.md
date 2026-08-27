@@ -2,13 +2,13 @@
 
 **Status:** design-ready; requirements and design cold-read findings reconciled; acceptance approval remains gated by the test trace ledger
 
-**Version:** 0.3
+**Version:** 0.4
 
 **Date:** 2026-08-27
 
 **Product name:** MarkdownLLM Explorer
 
-**Delivery shape:** standalone, read-only local web application shipped with the MarkdownLLM substrate
+**Delivery shape:** standalone, read-only local web application; native Windows installer first, source/Python package retained for development and future platforms
 
 ## 1. Purpose
 
@@ -23,6 +23,7 @@ This is an exploration surface, not a second source of truth. Markdown files and
 This specification is derived from:
 
 - The operator's problem statement and requested workflow on 2026-08-27.
+- The observed Windows launch failure on 2026-08-27: `mdllm-explorer` was not installed or on `PATH`, and installing the repository root failed because the installable package lives under `explorer/`. This is the captured current-state evidence for the native-distribution increment.
 - The user-supplied Perplexity screenshot `codex-clipboard-a7e4fac0-b4c0-4ffe-b907-ccd6b8e1adf2.png` (SHA-256 `9423dc8c66b6ed004c3ba0ba1fae58a20489dbbf1b014b06f24688b5f0bd81e3`), used as a visual vocabulary for a calm three-pane shell, compact navigation, tabs and dark styling. It is not a pixel-copy requirement and contains no governing instructions.
 - MarkdownLLM framework sources pinned at `7bffcb162f01c5cc6afb98756eca58bc5c5f79fe`, especially the manifesto and universal workflow.
 - Code Architect domain sources pinned at `c711d2a46225aaca471100e1eec2afceb02e751a`, especially the solution-delivery workflow, Clean Architecture rules, traceability lens, captured-reality principle and UI god-object anti-pattern.
@@ -65,7 +66,8 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 - Local substrate and nested-domain discovery.
 - Read-only estate, tree, commit, skill, memory and Markdown views.
 - A responsive browser interface with light and dark themes.
-- A standalone Python launch surface.
+- A self-contained Windows installer and desktop launch surface that does not require an end user to install, update or configure Python.
+- The existing Python package and command-line launch surface for development, automation and later non-Windows distribution work.
 - Safe operation against real, heterogeneous domains in the local estate.
 
 ### Explicitly out of scope for v1
@@ -177,11 +179,17 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 ### Runtime and error behaviour
 
-**FR-RUN-001 — Standalone distribution.** v1 shall ship as the `explorer/` Python package with all browser assets included and a pinned PyYAML dependency. From any working directory, `python -m pip install <checkout>/explorer` (network permitted only to obtain declared install dependencies) shall install `mdllm-explorer`; `mdllm-explorer --root <substrate>` shall then launch and explore without internet or Node. It shall print the resolved root and capability-bearing loopback URL, reject invalid configuration with non-zero exit, and terminate within five seconds of interrupt.
+**FR-RUN-001 — Standalone distribution.** v1 shall retain the installable `explorer/` Python package for development and automation, and shall add a native Windows installer as the primary operator-facing distribution. Both forms include all browser assets and the pinned YAML runtime. The Windows-installed application shall contain its own Python runtime and dependencies; no system Python, `pip`, Node, CDN or internet access is required after the installer artefact has been obtained. The command-line form shall continue to print the resolved root and capability-bearing loopback URL, reject invalid configuration with non-zero exit, and terminate within five seconds of interrupt.
 
 **FR-RUN-002 — Safe bind and lifecycle.** The server shall bind only to `127.0.0.1` by default, accept `--port` or choose an available port, print the actual URL, reject a non-loopback bind, isolate concurrent instances by launch capability, and never expose itself on all interfaces. A port collision shall exit non-zero rather than selecting a different requested port.
 
 **FR-RUN-003 — Health.** A health endpoint shall report application availability without enumerating private estate contents.
+
+**FR-RUN-004 — Native Windows installation.** Windows v1 shall be delivered as one double-clickable setup `.exe`. It shall install per user without administrator rights, register an uninstaller, validate and retain the selected MarkdownLLM substrate root, and create working Start Menu and Desktop shortcuts. The normal interactive path shall require no command line and shall offer to launch Explorer when setup completes.
+
+**FR-RUN-005 — Desktop application launch.** Activating either installed shortcut shall start the bundled local service without a console window, open the capability-bearing URL in the user's default browser, and expose a notification-area icon with **Open Explorer** and **Exit Explorer** actions. A second activation while the same user instance is running shall ask the existing process to open its browser rather than creating a second server or persisting the capability outside process memory.
+
+**FR-RUN-006 — Upgrade and uninstall.** Re-running the same-or-newer installer shall replace the installed application in place, preserve the selected substrate root and maintain one shortcut of each requested kind. Uninstall shall stop/remove the application, shortcuts, uninstaller registration and Explorer-owned installation settings while leaving the selected substrate and all of its repositories byte-identical.
 
 **FR-ERR-001 — Structured failures.** API failures shall use `{code, message, retryable, source_id?, relative_path?}` and the error/status table in the design, with no document body or absolute path by default. The UI shall render recoverable contextual messages, and retry shall preserve location.
 
@@ -199,7 +207,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **NFR-SAFE-001B — Constrained git.** The git adapter shall expose an argument-vector allowlist of read-only operations and fixed arguments; set fixed source cwd, non-interactive environment, `GIT_OPTIONAL_LOCKS=0`, no pager/editor/hooks/external diff, bounded timeout/output and no shell; and prevent global/system/repository configuration from broadening execution. Mutation verbs and arbitrary options are not representable through its port.
 
-**NFR-SAFE-001C — Outside-root writes.** The default runtime writes no Explorer-owned persistent state. It may write diagnostic lines to stdout/stderr, ephemeral socket/process state managed by the operating system, and interpreter/package bytecode caches outside every source root; browser theme state belongs to browser-local storage. Explorer shall not create its own log, content cache, token or database files.
+**NFR-SAFE-001C — Outside-root writes.** The exploration runtime writes no Explorer-owned persistent content state. It may write diagnostic lines to stdout/stderr, ephemeral socket/process state managed by the operating system, interpreter/package bytecode caches outside every source root, and browser theme state in browser-local storage. The Windows installer may write only its per-user application files, uninstall registration, selected substrate-root setting and requested shortcuts. No capability, document content, frontmatter, source path below the configured root, content cache, token, log or database shall be persisted by the application.
 
 **NFR-SAFE-002A — Root configuration confinement.** The launch root shall be an existing readable directory. The configured domain directory shall be source-relative, resolve beneath the launch root and reject absolute, UNC/device or escaping input.
 
@@ -211,9 +219,9 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **NFR-SAFE-005 — Local web boundary.** Estate APIs shall require an unguessable per-launch 256-bit capability delivered in the printed launch URL and then sent in a header. Requests shall accept only the launch-selected loopback Host and same Origin (or no Origin), emit no permissive CORS, use CSP `default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` and deny framing. Unauthenticated health returns only static availability/version data.
 
-**NFR-PORT-001 — Portability.** Runtime code shall support Python 3.10+ on Windows 10+, macOS 13+ and maintained Linux distributions without assuming POSIX separators. The browser compatibility floor is Chromium 128+, Firefox 128+ and Safari 18+; this implementation run must execute runtime UI evidence in available Chromium and record standards/static inspection, rather than falsely claiming human acceptance on unavailable browsers.
+**NFR-PORT-001 — Portability.** Runtime code shall support Python 3.10+ on Windows 10+, macOS 13+ and maintained Linux distributions without assuming POSIX separators. This increment shall execute and retain a Windows 10+ x64 native bundle/installer profile; Linux and macOS native packaging are explicitly deferred rather than synthetically passed. The browser compatibility floor is Chromium 128+, Firefox 128+ and Safari 18+; this implementation run must execute runtime UI evidence in available Chromium and record standards/static inspection, rather than falsely claiming human acceptance on unavailable browsers.
 
-**NFR-OFF-001 — Local-first.** Core exploration shall require no internet connection, third-party service, CDN, Node runtime or browser extension.
+**NFR-OFF-001 — Local-first.** Core exploration and Windows installation from the obtained setup artefact shall require no internet connection, separately installed Python, third-party service, CDN, Node runtime or browser extension.
 
 **NFR-PERF-001 — Reproducible budgets.** Against fixture manifest `estate-scale-v1` (1 substrate, 13 independent domains, 2,500 eligible paths, 50 commits per repository) on a reference profile of at least 4 logical CPU, 8 GiB RAM, SSD and Python 3.10+, measure request start to terminal response in isolated fresh server processes. After one discarded warm-up, at least 19 of 20 runs shall meet: estate + first overview ≤2.0 s; directory page ≤300 ms; filename search ≤500 ms; 1 MiB document ≤500 ms; 50-commit page ≤500 ms. The evidence register records fixture hash, machine/OS/Python, cache conditions and raw timings. The private 2026-08-27 estate is an additional observational probe, not the reproducibility oracle.
 
@@ -290,6 +298,18 @@ The tester attempts missing/wrong capabilities, hostile Host and Origin values, 
 
 The tester snapshots fixture source contents and mutation-relevant metadata from NFR-SAFE-001A, git index, refs, object set and config; runs AJ-01–06 plus commit browsing; and compares the post-run snapshot. Those values are identical and no git helper, hook, pager, editor, lazy fetch or shell was invoked. Access-time and OS-managed read telemetry are recorded as excluded rather than falsely asserted unchanged.
 
+### AJ-08 — Windows first installation
+
+On a Windows profile with no usable `mdllm-explorer` command and with network blocked, the tester double-clicks the setup artefact, selects a temporary conforming substrate, completes a per-user install without elevation, and observes exactly one Desktop shortcut, one Start Menu shortcut and one Add/Remove Programs entry. Launching from the completion page opens the working Explorer in the default browser without consulting system Python.
+
+### AJ-09 — Desktop relaunch and single instance
+
+With Explorer installed, the tester activates the Desktop shortcut, observes the browser open and the notification-area icon appear, uses **Open Explorer**, then activates the Desktop shortcut again. The existing instance opens the UI and the listening-process count remains one. **Exit Explorer** closes the server and notification-area icon within five seconds.
+
+### AJ-10 — Upgrade and uninstall
+
+The tester installs the same build over itself, verifies the selected substrate root and singleton shortcuts are preserved, then uninstalls. Installed files, shortcuts, registration and Explorer-owned settings are removed; the substrate and an unrelated outside directory match independent pre/post snapshots.
+
 ## 12. Verification and acceptance ownership
 
 The test specification is the approval ledger and must contain one row for every individual `FR-*` and `NFR-*` ID: verification method (`test`, `inspection`, `analysis` or `demonstration`), fixture, observable pass condition, test/evidence identifier, evidence location and acceptance owner. Journey ranges or a green suite alone do not establish coverage. Any compound clause that needs separate evidence receives separate test cases or is split here before implementation.
@@ -300,7 +320,7 @@ Technical verification is owned by the implementation run and its retained evide
 
 ## 13. Assumptions and open hypotheses
 
-- **H1 — Python is the right delivery language.** It maximises reuse of the substrate's runtime knowledge and enables a one-command local server. This remains subject to implementation evidence; Go is not justified unless Python fails a measured distribution or performance requirement.
+- **H1 — Python remains the implementation language, not an end-user prerequisite.** It maximises reuse of the substrate's runtime knowledge. The Windows installer must bundle that runtime behind a native application boundary; Go remains unjustified unless the bundled result fails measured distribution, startup or support requirements.
 - **H2 — Read-only is sufficient for first value.** Visibility is the named business problem; editing would introduce authority, validation and concurrency concerns before the visibility hypothesis is tested.
 - **H3 — Perplexity's spatial model transfers.** The familiar rail/tabs/context layout should lower orientation cost, but user acceptance must judge this rather than visual similarity alone.
 - **H4 — `domain/` plus markers describes the estate.** Discovery must be configurable because public adopters may use another directory name.
@@ -314,8 +334,8 @@ The v1 increment is done only when:
 - every requirement is implemented, explicitly deferred, or rejected with rationale;
 - automated unit, contract, integration, security and UI tests pass;
 - runtime tests exercise the captured real estate and temporary independent estates;
-- the seven acceptance journeys have recorded technical pass/fail evidence and human-owned judgements are labelled accepted or pending;
+- the ten acceptance journeys have recorded technical pass/fail evidence and human-owned judgements are labelled accepted or pending;
 - visual inspection has been completed in light and dark themes at desktop and narrow viewports;
 - two cold code-review passes have been reconciled;
-- launch and usage documentation works from a clean process; and
+- the Windows setup artefact installs offline, creates valid shortcuts, opens the browser, handles reactivation, upgrades and uninstalls from a clean process; and
 - the working tree is committed with no unexplained changes.

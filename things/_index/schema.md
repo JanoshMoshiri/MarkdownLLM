@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-08-27
-generated: 2026-08-27T06:23:06
-generated_from: HEAD@024ab73
-coverage: 289
+generated: 2026-08-27T07:26:27
+generated_from: HEAD@f6ff5ca
+coverage: 290
 framework_version: 3.36.0
 ---
 
@@ -14,14 +14,14 @@ framework_version: 3.36.0
 
 | field | things using it |
 |---|---|
-| id | 289 |
-| type | 289 |
-| status | 289 |
-| created | 289 |
+| id | 290 |
+| type | 290 |
+| status | 290 |
+| created | 290 |
 | linked_things | 281 |
-| version | 223 |
-| tags | 195 |
-| origin | 142 |
+| version | 224 |
+| tags | 196 |
+| origin | 143 |
 | confidence | 142 |
 | session | 139 |
 | source | 120 |
@@ -29,9 +29,9 @@ framework_version: 3.36.0
 | disposition | 40 |
 | disposition_reason | 40 |
 | promoted_to | 19 |
-| exposed | 17 |
+| exposed | 18 |
 | informed_by | 17 |
-| decided_by | 14 |
+| decided_by | 15 |
 | period_start | 8 |
 | period_end | 8 |
 | domain | 8 |

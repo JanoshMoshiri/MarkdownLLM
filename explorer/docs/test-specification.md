@@ -2,13 +2,13 @@
 
 **Status:** implementation gate approved when the coverage checks in §11 pass
 
-**Version:** 0.1
+**Version:** 0.2
 
 **Date:** 2026-08-27
 
-**Requirements:** `explorer/docs/requirements.md` v0.3
+**Requirements:** `explorer/docs/requirements.md` v0.4
 
-**Design:** `explorer/docs/design.md` v0.3
+**Design:** `explorer/docs/design.md` v0.4
 
 ## 1. Test position
 
@@ -80,6 +80,10 @@ Generated from a versioned manifest: one substrate, 13 independent domains, 2,50
 
 Read-only observational probe of the private local estate (substrate + 13 discovered domains). Evidence contains counts, timings, status codes and hashes only—no document bodies, absolute paths, domain names or screenshots. It is never the reproducibility oracle.
 
+### F-WINDOWS-INSTALL
+
+A clean ignored build root, Windows x64, no `mdllm-explorer` on `PATH`, an empty per-user install directory, a temporary conforming substrate and an unrelated sentinel directory. Network access is disabled for installer/runtime execution. Independent probes inspect PE/version metadata, process modules, package assets, HKCU uninstall/application keys, Desktop/Start Menu `.lnk` target/arguments, listener/process counts and pre/post tree hashes. The real user installation is a final separate acceptance target, never the reproducibility oracle.
+
 ### Visual reference
 
 The Perplexity screenshot oracle is SHA-256 `9423dc8c66b6ed004c3ba0ba1fae58a20489dbbf1b014b06f24688b5f0bd81e3`. Inspection uses spatial principles (calm three-region shell, density, hierarchy), not pixel identity or brand copying.
@@ -92,7 +96,7 @@ Build a path-to-source map directly from fixture construction, independent of th
 
 ### O-IMMUTABILITY
 
-Before and after AJ-01–07, independently snapshot source-relative names/types, content SHA-256, size, mtime, mode/ACL where available; raw `.git/index`, config and packed refs; loose-ref bytes; and object-name/content inventory. Exclude atime/read telemetry explicitly. No production adapter is used to compute the oracle.
+Before and after AJ-01–10, independently snapshot source-relative names/types, content SHA-256, size, mtime, mode/ACL where available; raw `.git/index`, config and packed refs; loose-ref bytes; object-name/content inventory; the unrelated sentinel directory; and Windows installation-owned registry/shortcut paths where applicable. Exclude atime/read telemetry explicitly. No production adapter or uninstaller manifest is used to compute the oracle.
 
 ### O-HTML-SAFETY
 
@@ -155,6 +159,11 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 
 - `ST-INSTALL-001` — build/install package from outside checkout into a clean supported Python environment; no Node; post-install offline launch from arbitrary cwd.
 - `ST-CLI-001` — root/domain-dir/port validation, printed fragment-capability URL, requested-port collision, non-zero invalid exits and ≤5-second interrupt shutdown.
+- `ST-WIN-BUNDLE-001` — clean PyInstaller one-folder build; executable PE/version/icon metadata, embedded interpreter/dependencies/static assets, no system-Python/Node resolution at runtime, and manifest/hash retained.
+- `ST-WIN-INSTALL-001` — NSIS setup is one executable; per-user/no-elevation and offline; valid-root gate; exact install files, selected-root registry value, uninstall registration and singleton Desktop/Start Menu shortcuts with quoted arguments.
+- `ST-WIN-LAUNCH-001` — frozen shortcut target starts with no console, reaches health, invokes the browser-opening port, exposes Open/Exit tray commands, reactivation routes `open` to the original process, and exits within five seconds without persisting capability material.
+- `ST-WIN-UPGRADE-001` — same-build reinstall preserves root, replaces files and leaves one owned shortcut/registration instance.
+- `ST-WIN-UNINSTALL-001` — silent and interactive uninstall remove only owned files, keys and shortcuts; source/outside O-IMMUTABILITY snapshots remain identical.
 - `ST-HTTP-AUTH-001` — exact Host on all routes; Origin policy; missing/wrong/right capability; no CORS; constant-time comparison seam; session-expiry state.
 - `ST-HTTP-HEADERS-001` — CSP, frame denial, nosniff, no-referrer, no-store and fixed MIME types on success/error/static/health.
 - `ST-HEALTH-001` — unauthenticated health returns only static status/version.
@@ -229,7 +238,8 @@ Seeds and generated cases are recorded on failure and fixed in CI for reproducib
 
 | Surface | Required evidence in this run | Claim rule |
 |---|---|---|
-| Windows 11 / NTFS / Python 3.12 | Executed unit→system, native reparse/symlink where permitted | May claim executed |
+| Windows 11 / NTFS / Python 3.12 development runtime | Executed unit→system, native reparse/symlink where permitted | May claim executed development profile |
+| Windows 10+ x64 frozen runtime / NSIS setup | Clean bundle, install, launch, reactivation, upgrade and uninstall; no system Python/Node/network | May claim executed native-distribution profile |
 | Python 3.10 syntax/runtime floor | Compile/AST check plus clean runtime if interpreter available | Otherwise standards-backed, not executed |
 | Linux/macOS path adapters | Pure path vectors + code inspection in this run | Must remain unexecuted until CI/profile runs |
 | Chromium | In-app runtime interaction and screenshots | May claim executed browser/version recorded |
@@ -302,9 +312,12 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | FR-UI-002C | test+demo | UI | BT-THEME-001 | Explicit choice persists reload without location loss | Technical run / Janosh |
 | FR-UI-003 | inspection | UI | BT-VISUAL-001, BT-A11Y-001 | Selection/action/empty/error distinct in both themes | Janosh |
 | FR-UI-004 | inspection+demo | UI | BT-SHELL-001 | No placeholder/irrelevant control; every shown control works | Technical run / Janosh |
-| FR-RUN-001 | test | CLEAN | ST-INSTALL-001, ST-CLI-001, ST-OFFLINE-001 | Exact install/command works any cwd/offline post-install/no Node | Technical run |
+| FR-RUN-001 | test | CLEAN/WINDOWS | ST-INSTALL-001, ST-CLI-001, ST-OFFLINE-001, ST-WIN-BUNDLE-001 | Portable package and frozen runtime both launch offline with packaged assets and no Node/system Python | Technical run |
 | FR-RUN-002 | test | WEB | ST-CLI-001, ST-SERVER-BOUND-001 | Loopback only, port policy, capability isolation, clean shutdown | Technical run |
 | FR-RUN-003 | test | WEB | ST-HEALTH-001 | Health available with static values only | Technical run |
+| FR-RUN-004 | test+demo | WINDOWS | ST-WIN-BUNDLE-001, ST-WIN-INSTALL-001, AJ-08 | One setup exe performs valid per-user install with root selection, shortcuts and uninstaller, no command line or Python | Technical run / Janosh |
+| FR-RUN-005 | test+demo | WINDOWS | ST-WIN-LAUNCH-001, AJ-09 | Shortcut opens browser/tray; reactivation keeps one service; Exit terminates within five seconds | Technical run / Janosh |
+| FR-RUN-006 | test+demo | WINDOWS | ST-WIN-UPGRADE-001, ST-WIN-UNINSTALL-001, AJ-10 | Upgrade preserves root/singletons; uninstall removes owned state and no source/outside bytes | Technical run / Janosh |
 | FR-ERR-001 | contract+demo | IMPERFECT | ST-API-SCHEMA-001, BT-ASYNC-001 | Exact redacted shape/status/retry and contextual UI | Technical run |
 | FR-ERR-002 | test+mutation | WEB | BT-ASYNC-001, MT-MUTATION-001 | Every request terminates and stale responses cannot win | Technical run |
 | NFR-ARCH-001 | inspection+test | SOURCE | AT-IMPORT-001 | No outer/native implementation dependency in core/application | Technical run |
@@ -312,14 +325,14 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | NFR-ARCH-003 | test+analysis | SOURCE | AT-SWAP-001 | Adapter swap changed-path evidence touches no inner file | Technical run |
 | NFR-SAFE-001A | test+analysis | IMPERFECT | GT-IMMUTABLE-001, AJ-07 | O-IMMUTABILITY unchanged for all in-scope values | Technical run |
 | NFR-SAFE-001B | test+mutation | GIT | GT-GIT-SAFE-001, MT-MUTATION-001 | Exact executable/argv/env/cwd/time/output; no helper/lazy fetch/lock | Technical run |
-| NFR-SAFE-001C | test+inspection | CLEAN | ST-INSTALL-001, AJ-07 | No Explorer-owned persistent log/cache/token/database state | Technical run |
+| NFR-SAFE-001C | test+inspection | CLEAN/WINDOWS | ST-INSTALL-001, ST-WIN-INSTALL-001, ST-WIN-UNINSTALL-001, AJ-07, AJ-10 | Runtime persists no content/capability; installer writes/removes only declared per-user surfaces | Technical run |
 | NFR-SAFE-002A | test | IMPERFECT | UT-PATH-001, CT-CATALOG-001 | Root/domain config rejects absolute/escaping/invalid inputs | Technical run |
 | NFR-SAFE-002B | test+analysis | IMPERFECT | GT-CONFINE-001 | Executed native profiles reject detected links/replacements; residual labelled | Technical run |
 | NFR-SAFE-003 | test+mutation | HOSTILE | CT-HTML-001, CT-LINK-001, MT-MUTATION-001, AJ-06 | O-HTML-SAFETY passes server response and final DOM | Technical run |
 | NFR-SAFE-004 | test+mutation | BOUNDARY | UT-LIMIT-001, ST-SERVER-BOUND-001, MT-MUTATION-001 | Every N−1/N/N+1 limit and stable error/partial state holds | Technical run |
 | NFR-SAFE-005 | test+mutation | WEB | ST-HTTP-AUTH-001, ST-HTTP-HEADERS-001, ST-HEALTH-001, MT-MUTATION-001, AJ-06 | Capability/Host/Origin/CORS/headers/health boundary exact | Technical run |
-| NFR-PORT-001 | test+inspection | MATRIX | ST-INSTALL-001, GT-CONFINE-001 | Windows/Chromium executed; unavailable profiles explicitly unexecuted | Technical run |
-| NFR-OFF-001 | test | CLEAN | ST-OFFLINE-001 | AJ-01–03 pass with network blocked and no CDN/Node/extension | Technical run |
+| NFR-PORT-001 | test+inspection | MATRIX/WINDOWS | ST-INSTALL-001, ST-WIN-BUNDLE-001, GT-CONFINE-001 | Windows native profile and Chromium executed; unavailable native profiles explicitly unexecuted | Technical run |
+| NFR-OFF-001 | test | CLEAN/WINDOWS | ST-OFFLINE-001, ST-WIN-INSTALL-001 | AJ-01–03 and AJ-08 pass with network blocked and no Python/CDN/Node/extension | Technical run |
 | NFR-PERF-001 | analysis | SCALE | PT-SCALE-001 | Manifest/profile/raw timings and 19/20 thresholds all pass | Technical run |
 | NFR-PERF-002 | contract | MIN | ST-API-INCREMENTAL-001 | Separate APIs; initial payload no bodies/history; one doc mode | Technical run |
 | NFR-ACC-001 | test+inspection | UI | BT-A11Y-001, BT-RESPONSIVE-001, BT-KEYBOARD-001, AJ-04 | Full named WCAG interaction checklist evidenced, limitations labelled | Technical run / Janosh |
@@ -329,7 +342,7 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 
 Gate checks:
 
-1. exactly 60 unique requirements rows exist;
+1. exactly 63 unique requirements rows exist;
 2. extracted requirements IDs equal trace rows exactly;
 3. every evidence/test ID exists in collected tests or the browser/inspection manifest;
 4. every row has an observable pass condition and owner;
@@ -343,10 +356,11 @@ Gate checks:
 3. Adapter contracts + mutation kills.
 4. Git/filesystem captured-reality tests.
 5. Installed-package HTTP/system/security tests.
-6. Performance on synthetic fixture.
-7. Browser runtime, visual and accessibility evidence.
-8. AJ-01–07 and final trace disposition.
-9. Full suite again from the committed candidate.
+6. Clean Windows bundle → setup → launch/reactivation → upgrade → uninstall lifecycle.
+7. Performance on synthetic fixture.
+8. Browser runtime, visual and accessibility evidence.
+9. AJ-01–10 and final trace disposition.
+10. Full suite again from the committed candidate.
 
 Stop and loop back to requirements/design when:
 
@@ -364,6 +378,7 @@ Public, privacy-safe evidence is written to `explorer/tests/evidence/`:
 - `validation-report.md` — environment, suite counts, trace dispositions and limitations;
 - `performance.json` — fixture/profile/raw timings and computed verdicts;
 - `mutation-kills.json` — mutant → killer outcome;
+- `windows-installer.json` — frozen-build/setup hashes, environment, install/shortcut/launch/upgrade/uninstall observations and AJ-08–10 dispositions;
 - `visual-light.png`, `visual-dark.png`, `visual-narrow.png` — synthetic estate only; and
 - `traceability-result.json` — coverage and evidence-ID audit.
 

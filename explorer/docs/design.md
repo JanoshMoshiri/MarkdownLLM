@@ -2,24 +2,24 @@
 
 **Status:** design cold review reconciled; implementation remains gated by the test trace ledger
 
-**Version:** 0.3
+**Version:** 0.4
 
 **Date:** 2026-08-27
 
-**Requirements:** `explorer/docs/requirements.md` v0.3 in the same reconciled change set
+**Requirements:** `explorer/docs/requirements.md` v0.4 in the same reconciled change set
 
 **Architectural sources:** MarkdownLLM framework `7bffcb162f01c5cc6afb98756eca58bc5c5f79fe`; Code Architect domain `c711d2a46225aaca471100e1eec2afceb02e751a`
 
 ## 1. Position
 
-MarkdownLLM Explorer is a read-only local projection of an existing substrate and its nested domain repositories. It does not import domain state into a database, reinterpret git as application state, or put business rules into the browser. The product is one installable Python package containing:
+MarkdownLLM Explorer is a read-only local projection of an existing substrate and its nested domain repositories. It does not import domain state into a database, reinterpret git as application state, or put business rules into the browser. The product core remains one installable Python package containing:
 
 - a pure domain/application core that models sources, ownership, documents, collections and commits;
 - replaceable filesystem, git and Markdown adapters;
 - a loopback HTTP delivery adapter; and
 - a build-free browser client made from packaged HTML, CSS and native JavaScript modules.
 
-The substrate remains Markdown + YAML + directories + git. Explorer is a replaceable outside adapter.
+On Windows that package is frozen into a self-contained application directory and wrapped in one native setup executable. End users see a Desktop application, not a Python environment. The substrate remains Markdown + YAML + directories + git. Explorer is a replaceable outside adapter.
 
 ## 2. Architectural decisions
 
@@ -45,13 +45,27 @@ Loopback is necessary but insufficient. Each process generates a 256-bit capabil
 
 ### D-006 — Shipped together, installed independently
 
-`explorer/` lives in the public substrate repository and owns its own `pyproject.toml`, package assets, tests and console entry point. It neither imports `tools/mdllm.py` nor assumes a checkout-relative cwd. `pip install <checkout>/explorer` produces `mdllm-explorer` usable against any conforming root.
+`explorer/` lives in the public substrate repository and owns its own `pyproject.toml`, package assets, tests, console entry point and native packaging definitions. It neither imports `tools/mdllm.py` nor assumes a checkout-relative cwd. `pip install <checkout>/explorer` remains the developer/automation route; the Windows installer is the human route. Both target any conforming root selected at launch/install time.
+
+### D-007 — One-folder frozen runtime inside one NSIS setup executable
+
+PyInstaller freezes the Windows application as a one-folder bundle; NSIS packages that folder into the single setup `.exe` the user receives. A raw one-file PyInstaller executable was rejected because it must expand itself to a temporary directory on every launch, slows desktop startup and still provides no root selection, shortcuts, upgrade identity or uninstaller. NSIS is build-time infrastructure only. The installed runtime contains Python, PyYAML, browser assets and the Windows desktop adapter and requires no system interpreter.
+
+### D-008 — The desktop launcher is an outer driver
+
+The existing CLI remains a console driver. `windows_app.py` is a separate Frameworks/Drivers entry point: it validates launch arguments, composes the existing runtime, owns browser and notification-area adapters, and coordinates shutdown. It adds no estate/domain policy and does not change application ports. PyInstaller/NSIS files live under `packaging/windows/` and never enter core/application packages.
+
+### D-009 — Single-instance command channel, capability never persisted
+
+The Windows launcher owns a per-user named mutex and named pipe. The first process keeps the capability-bearing URL only in memory and listens for the command `open`. A second shortcut activation sends only that command and exits; the existing process opens its own URL. The URL/capability is never written to registry, shortcut, disk or pipe. The only retained launch setting is the selected substrate root, stored by the installer under the current user's application key and repeated in shortcut arguments.
 
 ## 3. System context
 
 ```mermaid
 flowchart LR
-    Human[Human explorer] --> Browser[Packaged browser client]
+    Human[Human explorer] --> Shortcut[Desktop / Start Menu shortcut]
+    Shortcut --> WinApp[Windows launcher + tray]
+    WinApp -->|opens in default browser| Browser[Packaged browser client]
     Browser -->|capability-authenticated GET| HTTP[HTTP delivery adapter]
     HTTP --> UC[Application use cases]
     UC --> CAT[Source catalogue port]
@@ -75,6 +89,12 @@ All dependency arrows in source code point from outer adapters toward applicatio
 explorer/
 ├── pyproject.toml
 ├── README.md
+├── packaging/windows/
+│   ├── build.ps1
+│   ├── explorer.nsi
+│   ├── launcher.py
+│   ├── version-info.txt
+│   └── assets/markdownllm-explorer.ico
 ├── docs/
 │   ├── requirements.md
 │   ├── design.md
@@ -82,6 +102,7 @@ explorer/
 ├── src/markdownllm_explorer/
 │   ├── __init__.py
 │   ├── __main__.py
+│   ├── windows_app.py
 │   ├── composition.py
 │   ├── core/
 │   │   ├── models.py
@@ -375,7 +396,17 @@ mdllm-explorer = "markdownllm_explorer.__main__:main"
 
 `__main__.py` parses `--root`, `--domain-dir` (default `domain`) and `--port` (default 0), validates configuration, and calls `composition.build_runtime`. Composition constructs limits/policy, catalogue/boundary registry, focused filesystem ports, git adapter, frontmatter/Markdown/presenter pipeline, use cases and HTTP adapter. No global singleton is created at import time.
 
-Startup prints product/version, resolved root and fragment-capability URL. `KeyboardInterrupt` initiates `shutdown`, closes the listening socket and joins active request threads up to five seconds. Explorer creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.3 and a read-only installed-package system test proves launch does not depend on writing them.
+Startup prints product/version, resolved root and fragment-capability URL. `KeyboardInterrupt` initiates `shutdown`, closes the listening socket and joins active request threads up to five seconds. The portable runtime creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.4 and a read-only installed-package system test proves launch does not depend on writing them.
+
+### Windows packaging and launch
+
+`packaging/windows/build.ps1` is the reproducible build boundary. It invokes an exactly pinned PyInstaller build environment, produces a one-folder `MarkdownLLM Explorer.exe`, then invokes NSIS 3.12+ to produce `MarkdownLLM-Explorer-Setup-<version>.exe`. Build outputs live under ignored `explorer/build/` and `explorer/dist/`; the source definitions, hashes and verification evidence are committed, while publication of the installer remains a separate release act.
+
+The setup runs per user (`RequestExecutionLevel user`) into `%LOCALAPPDATA%\Programs\MarkdownLLM Explorer`, so installation needs no elevation. A custom page selects a directory containing `AGENTS.md`; silent verification supplies `/SUBSTRATEROOT=<path>`. Setup stores only that root under `HKCU\Software\MarkdownLLM Explorer`, writes one Desktop and one Start Menu shortcut with quoted `--root`, registers the uninstaller, and offers to launch the app on completion. Reinstallation reads the previous root, overwrites the application directory and recreates singleton shortcuts. Uninstall removes those exact owned surfaces and no source-root path.
+
+`windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser` and `--no-tray` verification switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. Exit calls server shutdown, closes the listener/socket and joins active requests within the existing five-second budget. Startup failures surface one bounded native message box because a windowed executable has no console.
+
+The frozen application imports `pystray`/Pillow only at this outer Windows delivery edge; those packages are bundled build inputs, not dependencies of core/application or of the portable CLI package. The application icon is the Explorer `M` mark supplied as a multi-resolution `.ico` and used consistently by the executable, setup, Desktop shortcut and tray.
 
 ### Performance allocation
 
@@ -389,6 +420,7 @@ The benchmark owns one overall deadline per request rather than allowing each ad
 - Frontmatter, Markdown-tree, link-resolution and presentation contract tests are independent; corpus goldens cover fidelity, and a separate safety oracle asserts forbidden tags/attributes/schemes are absent.
 - HTTP system tests start a real loopback server and exercise capability, Host/Origin, headers, limits and error shapes.
 - Browser runtime validation uses the available in-app Chromium surface at required viewports and captures screenshots/DOM/accessibility evidence.
+- Windows distribution validation builds from a clean ignored directory, inspects the PE/version/data manifest, installs silently without network or Python discovery, checks exact shortcut target/arguments and uninstall registration, launches the frozen executable against a temporary substrate, tests reactivation and tray-driven shutdown, reinstalls over itself, then uninstalls and compares source/outside snapshots.
 - Architecture fitness parses imports and rejects `pathlib`, `os`, `subprocess`, HTTP or renderer implementations in `core/`/`application/`; rejects any inner import from `adapters`/`delivery`; permits concrete adapter imports only in `composition.py`; runs shared contracts against fake/real ports; and rejects browser view modules that call `fetch` or mutate the global state directly.
 - An adapter-swap fixture substitutes fake catalogue, metrics, directory, search, collection, document, link, history, parser and presenter ports, asserts no inner file changes, and retains the changed-path manifest required by NFR-ARCH-003.
 - A mutation/misconfiguration suite proves tests fail when ownership checks, capability checks, escaping, git no-lock environment, size limits or stale-response guards are deliberately removed.
@@ -419,3 +451,5 @@ The test specification must turn this allocation into one row per requirement ID
 - The standard-library server is intentionally small. If route/protocol complexity grows beyond this seven-GET surface, the HTTP adapter should be replaced, not expanded into application logic.
 - Full adversarial filesystem race resistance is OS-specific. v1 uses native handle/identity evidence and fails closed on disagreement; it does not claim protection from a fully privileged local attacker controlling the same machine.
 - Chromium runtime evidence is achievable in this environment. Firefox/Safari compatibility remains standards-backed and must be described as unexecuted until those browsers are actually exercised.
+- The Windows setup and application are structurally ready for Authenticode signing but this repository has no signing certificate. Local/test builds therefore show an unknown-publisher warning; a public Windows release must sign both executable and setup in a separately authorised release process.
+- Linux and macOS native installers are deliberately outside this increment. The portable Python package remains their verified execution route until each platform earns its own packaging design and runtime evidence.
