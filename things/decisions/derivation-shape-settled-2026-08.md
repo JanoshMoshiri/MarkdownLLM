@@ -2,7 +2,7 @@
 id: derivation-shape-settled-2026-08
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-08-27
 decided_by: Janosh Moshiri
 tags: [derivation-shape, universal-workflow, workflow-definitions, domain-discretion, hold-lifted]
@@ -59,6 +59,30 @@ validated there can be invalid in every domain, and this one was.
   names.
 - **Retire** — zero runs and no live demand: retire honestly with the
   reasoning recorded, rather than keeping dead vocabulary.
+
+## The two-homes question, closed (v1.1)
+
+`workflow-reconciliation-precedes-new-definitions` folded the two-homes
+question into this settlement — process knowledge living in both the
+scaffolded workflow *skill* (Layer 2) and the `workflow-definition` *thing*
+(Layer 3), named as a candidate conflict in
+`the-operating-layer-has-no-quality-loop` and never opened. v1.0 ruled the
+mechanics without saying the question was answered. It is, and the edge
+asymmetry is what answers it:
+
+**A domain definition cannot anchor to the atom, so it must anchor
+corpus-locally — and the workflow skill is that anchor.** The skill is not a
+redundant second home competing with the definition; it is the local end of
+the lineage chain. The chain reads: definition →(declared edge) domain
+workflow skill →(prose, against the pinned framework version) the atom. Remove
+the skill and a domain definition has nothing in its own corpus to declare
+lineage against.
+
+So the two homes are different jobs, and both stay: the skill holds doctrine
+(trust semantics, boundaries, the domain's loop) and carries framework
+lineage; the definition holds the executable, stage-gated process. No conflict
+is opened, and the insight's candidate is dismissed on this reasoning rather
+than left standing.
 
 ## What stays the domain's
 
