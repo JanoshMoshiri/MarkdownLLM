@@ -171,16 +171,49 @@ Docs and tests move with each phase; evidence reseals once.
 - [x] `tests/traceability.yaml` — new rows; existing rows whose dispositions
       this increment invalidates are reopened rather than left reading as passed.
 - [x] Test suites extended alongside each phase, not after all of them.
-- [ ] Full evidence re-run and reseal against the final source.
-- [ ] Operator re-dispositions the affected acceptance journeys.
+- [x] Technical evidence re-run at 0.3.0: pytest 144, mutation 21/21, adapter
+      swap, immutability, performance 5/5 budgets, clean offline install.
+- [x] The Windows lifecycle record describes 0.2.0 bytes and was never exercised
+      on this source. Re-stamping it with the new subject hash would assert an
+      observation nobody made, so it is retained under a superseded name where
+      it carries no evidence, and the seven requirements resting on it are
+      reopened as owed at the signed build.
+- [x] The public demo estate now carries structural references, so the reference
+      feature has a fictional fixture to be demonstrated and evidenced against —
+      including one cross-domain reference that legitimately does not resolve.
+- [x] Public user guide describes region collapse, commit contents, historical
+      reading and reference navigation.
+- [ ] Browser evidence re-executed and recorded against the final subject.
+- [ ] Evidence index resealed; `verify_evidence` run and its result reported
+      honestly, including what it reports as unmet.
+- [ ] Operator re-dispositions the affected acceptance journeys (19 reopened).
 
 ## Phase 7 — Version and handback
 
-- [ ] Version to 0.3.0; changelog generated from the increment's commit range.
+- [x] Version to 0.3.0 across pyproject, package, packaging and the install
+      oracle.
+- [ ] Changelog and the framework version decision — deferred to the signed
+      release boundary by `explorer-publication-readiness`, and the operator's.
 - [ ] Rebuild the unsigned candidate from final source; record its hash.
 - [ ] Hand the signing gate back to `explorer-publication-readiness` — the
       credentials and timestamp service remain the operator's to supply, and
       that plan closes on the signed bytes.
+
+## Found while building, not while planning
+
+Three defects in my own work that the plan did not anticipate, recorded because
+each is a class rather than an incident:
+
+1. **Duplicate mutant identities.** M15–M19 were appended to a manifest that
+   already held M15 and M16; YAML last-key-wins hid the originals. Appending to
+   a keyed manifest without reading it is the same mistake as restating an enum.
+2. **A mutant that stopped testing its claim.** M07's anchor string became
+   ambiguous when a new encoder branch introduced a second occurrence, silently
+   retargeting the mutation at a branch its oracle does not cover. A mutation
+   anchor is a coupling to source text, and it decays without saying so.
+3. **A field used for two purposes.** Recording evidence invalidation by
+   overwriting `disposition` conflated *how a requirement is verified* with
+   *whether its evidence still stands*. The reopening needed its own field.
 
 ## What would make this plan wrong
 

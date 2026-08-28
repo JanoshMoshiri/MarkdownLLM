@@ -245,6 +245,11 @@ status: active
 version: 1.0
 created: 2026-08-19
 tags: [discovery, evidence]
+linked_things:
+  - id: discovery-interview
+    relation: implements
+  - id: show-the-whole-first
+    relation: informs
 ---
 
 # Evidence before roadmap
@@ -269,6 +274,13 @@ type: retrospective
 status: completed
 version: 1.0
 created: 2026-08-25
+linked_things:
+  - id: prototype-review
+    relation: validates
+  - id: evidence-before-roadmap
+    relation: derived-from
+  - id: keep-source-and-inference-apart
+    relation: references
 ---
 
 # First prototype retrospective
