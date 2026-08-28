@@ -2,7 +2,7 @@
 id: operator-queue-2026-08-28
 type: artifact
 status: evolving
-version: 1.0
+version: 1.1
 created: 2026-08-28
 session: 2026-08-28
 tags: [operator-queue, seat-protocol, verdicts, closed-loop, one-sitting]
@@ -47,6 +47,29 @@ what exists, not to ask for attention.
 
 The proposals are the agent's. Flipping one is not a defeat: the line between a
 gate and a habit is the operator's to draw.
+
+> **Ruling update, v1.1 (2026-08-28, same day).** The operator ruled
+> `settled-reasoning-is-standing-authority`: where the corpus already holds
+> the evidence and the decided direction, the agent acts without per-row
+> assent. Applied to this queue:
+>
+> - **Executing now:** row 10 (skill orientation exclusion), row 11 (dark
+>   obligations), row 12 (zero-run sensor) — launched as one floor wave; the
+>   structural-pin check was already building when the ruling was given.
+> - **Authorised, sequenced behind the running wave:** row 9 (serve-side
+>   freshness counterpart — design-first arc, four sightings), row 15
+>   (un-park the operating-layer quality loop), row 16 (author the JMTM
+>   write skill from its fifteen months of earned practice — the park
+>   precedent applies only where there is nothing to fill from), row 13's
+>   reduced list (the two owed domain retrospectives, run as those domains'
+>   agents).
+> - **Unchanged — still the operator's:** rows 1–5 (the census flip, the
+>   dispatcher grant, the push, the verified re-flips, the pilot choice) and
+>   every gate that names a human. Rows 6–8 also stay: each is a same-day,
+>   single-sighting proposal — below the settled bar, and each is its
+>   domain's judgement (row 6 additionally sits behind that domain's own
+>   declared approval gate). The bar holding there is the ruling working,
+>   not hesitancy returning.
 
 ---
 

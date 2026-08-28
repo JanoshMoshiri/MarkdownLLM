@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-28
-generated: 2026-08-28T14:12:11
-generated_from: HEAD@3cea465
-coverage: 71
+generated: 2026-08-28T15:00:35
+generated_from: HEAD@779db04
+coverage: 73
 framework_version: 3.36.0
 ---
 
@@ -177,6 +177,7 @@ framework_version: 3.36.0
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - operator-queue-2026-08-28 (pinned @cc86f4568c8e591cfaed9897916a8f2b0b1e88cc)
 - operator-queue-2026-08-28 (derived-from)
+- settled-reasoning-is-standing-authority (pinned @47f709099f6551ba6b1968ca1da26a2b5a0618c6)
 
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
@@ -204,6 +205,9 @@ framework_version: 3.36.0
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
 
+## llm-driven-systems-manifesto
+- settled-reasoning-is-standing-authority (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
+
 ## markdownllm-explorer-comprehensive-review-2026-08-27
 - explorer-publication-position (pinned @a8f4034dffd84df1196160ef07d68516f47bf3fb)
 
@@ -224,6 +228,9 @@ framework_version: 3.36.0
 
 ## operating-model-seams-scope-2026-08-26
 - operating-model-seams-design-2026-08 (pinned @8a88c40449f2e00d6d4d1574de4d276446d76ca2)
+
+## operator-queue-2026-08-28
+- settled-reasoning-is-standing-authority (pinned @779db04b681549336a0709933ce1ced5323ca042)
 
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)

@@ -7,7 +7,7 @@ tags: [home, renovation]
 informed_by:
   - id: task-get-contractor-quotes
     # Always the full 40-hex id — never abbreviated (full-SHA pin rule)
-    commit: bdb95714c3a7e2f08d61b95a2f4ee90c1d2a4f6b
+    commit: 219c62e5bcb61d189c57dc9a0deddcf4f3cac09c
 linked_things:
   - id: project-kitchen-renovation
     relation: references
@@ -34,6 +34,11 @@ field pins the quote-gathering task **at the commit where its figures were
 current**. `mdllm provenance` verifies the pin mechanically: the commit must
 exist, the input must exist at it, and if the input changes in later commits
 the tool reports the decision as possibly dated rather than silently stale.
+The pin above is a real commit in this repository — `git show` it — because
+`mdllm validate` now resolves every structural pin at the commit boundary, and
+a pin that names no commit is an Error there. A plausible-looking SHA is not a
+pin; it only looks like one, which is exactly why the floor resolves it rather
+than reading it.
 If this decision is ever revisited, the new choice gets its own decision
 thing that `supersedes` this one — decisions are not edited, they are
 replaced.

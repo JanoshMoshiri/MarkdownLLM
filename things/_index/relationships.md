@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T14:12:08
-generated_from: HEAD@3cea465
-coverage: 308
+generated: 2026-08-28T15:00:30
+generated_from: HEAD@779db04
+coverage: 309
 framework_version: 3.36.0
 ---
 
@@ -1017,6 +1017,13 @@ framework_version: 3.36.0
 - session-start-loses-to-the-first-request --supports--> agents-md-discovery-is-harness-dependent
 - session-start-loses-to-the-first-request --informs--> orchestration-specification
 - session-start-loses-to-the-first-request --references--> emitted-content-is-read-instructed-content-is-economised
+- settled-reasoning-is-standing-authority --implements--> llm-driven-systems-manifesto
+- settled-reasoning-is-standing-authority --implements--> consequence-is-recoverable-only-in-retrospect
+- settled-reasoning-is-standing-authority --references--> gates-census-2026-08
+- settled-reasoning-is-standing-authority --informs--> closed-loop-operating-state
+- settled-reasoning-is-standing-authority --references--> agents-cannot-self-install-permission-bearing-hooks
+- settled-reasoning-is-standing-authority --implements--> repeated-drift-promotes-a-fact-into-the-floor
+- settled-reasoning-is-standing-authority --informs--> operator-queue-2026-08-28
 - shared-domain-failures-are-a-framework-signal-without-a-path --references--> divergence-is-an-unrouted-decision
 - shared-domain-failures-are-a-framework-signal-without-a-path --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - some-changes-are-verifiable-only-by-publishing --extends--> portability-claims-need-execution-tests
