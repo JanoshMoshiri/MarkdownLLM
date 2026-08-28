@@ -11,7 +11,9 @@ import pytest
 from markdownllm_explorer.composition import build_runtime
 from markdownllm_explorer.adapters.cursors import CursorCodec
 from markdownllm_explorer.adapters.filesystem_catalogue import BoundaryRegistry, FilesystemSourceCatalogue, _collision_ids, _normalised_domain_id
-from markdownllm_explorer.adapters.git_commit_history import GitCommitHistory
+from markdownllm_explorer.adapters.git_commit_history import (
+    GitCommitHistory, _added_lines_arguments, _allowed_arguments, _is_object_spec, _is_tree_path,
+)
 from markdownllm_explorer.adapters.process_runner import BoundedProcessRunner, ProcessRequest, ProcessResult
 from markdownllm_explorer.core.eligibility import EligibilityPolicy
 from markdownllm_explorer.core.errors import ExplorerError
@@ -23,6 +25,7 @@ def test_catalogue_discovers_substrate_and_only_marked_one_level_domains(estate)
     runtime = build_runtime(estate)
     snapshot = runtime.routes.dispatch("/api/v1/estate", {})
     assert snapshot.sources[0].id.value == "substrate"
+    assert snapshot.sources[0].display_name == "MarkdownLLM"
     assert [source.id.value for source in snapshot.sources[1:]] == ["domain/demo", "domain/marked-non-git"]
     assert all("unmarked" not in source.id.value for source in snapshot.sources)
     assert "domain_marker_missing" in {issue.code for issue in snapshot.issues}
@@ -375,3 +378,96 @@ def test_reparse_or_symlink_parent_is_rejected_even_when_target_stays_inside_sou
     finally:
         if link.is_symlink() or getattr(link, "is_junction", lambda: False)():
             link.unlink()
+
+def _head_sha(runtime) -> str:
+    return runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]}).commits.items[0].sha
+
+
+@pytest.mark.contract
+def test_commit_detail_lists_changed_paths_and_marks_unopenable_ones(estate):
+    runtime = build_runtime(estate)
+    detail = runtime.routes.dispatch("/api/v1/commit", {"source": ["substrate"], "sha": [_head_sha(runtime)]})
+    openable = {file.path.value: file.openable for file in detail.files}
+    assert detail.subject == "fixture: initial"
+    assert all(file.change == "added" for file in detail.files)
+    assert openable["AGENTS.md"] is True
+    # Git reports every path the commit touched. Source admission, not git,
+    # decides which of them this source may show.
+    assert openable[".env"] is False
+    assert openable["secret-token.md"] is False
+    assert openable["domain/demo/AGENTS.md"] is False
+
+
+@pytest.mark.contract
+def test_historical_read_returns_commit_content_with_added_ranges(estate):
+    runtime = build_runtime(estate)
+    sha = _head_sha(runtime)
+    record = runtime.routes.dispatch(
+        "/api/v1/commit-file", {"source": ["substrate"], "sha": [sha], "path": ["AGENTS.md"]}
+    )
+    assert "Fixture substrate" in record.content
+    assert record.sha == sha
+    # A root commit adds every line of every file it introduces.
+    assert record.added_ranges == ((1, len(record.content.splitlines())),)
+
+
+@pytest.mark.contract
+@pytest.mark.parametrize(
+    ("path", "code"),
+    [
+        (".env", "path_excluded"),
+        ("secret-token.md", "path_excluded"),
+        ("domain/demo/AGENTS.md", "path_excluded"),
+        ("binary.md", "binary_unsupported"),
+        ("latin.md", "encoding_unsupported"),
+    ],
+)
+def test_historical_read_applies_the_same_refusals_as_a_live_read(estate, path, code):
+    runtime = build_runtime(estate)
+    with pytest.raises(ExplorerError) as caught:
+        runtime.routes.dispatch(
+            "/api/v1/commit-file",
+            {"source": ["substrate"], "sha": [_head_sha(runtime)], "path": [path]},
+        )
+    assert caught.value.code == code
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "path",
+    [
+        "../outside.md", "a/../../b.md", "/absolute.md", "", ".", "a//b.md",
+        "--upload-pack=touch", "-x", "a:b.md", "a" * 1025,
+    ],
+)
+def test_tree_path_gate_rejects_traversal_option_and_spec_injection(path):
+    assert _is_tree_path(path) is False
+    assert _is_object_spec("0" * 40 + ":" + path) is False
+    assert _allowed_arguments(["cat-file", "blob", "0" * 40 + ":" + path]) is False
+    assert _allowed_arguments(_added_lines_arguments("0" * 40, path)) is False
+
+
+@pytest.mark.unit
+def test_git_argument_allowlist_admits_only_the_declared_history_templates():
+    sha = "0" * 40
+    assert _allowed_arguments(_added_lines_arguments(sha, "things/insights/one.md")) is True
+    assert _allowed_arguments(["cat-file", "blob", f"{sha}:things/insights/one.md"]) is True
+    assert _allowed_arguments(["cat-file", "-s", f"{sha}:things/insights/one.md"]) is True
+    # A short or non-hex revision is not a commit this adapter will name.
+    assert _allowed_arguments(["cat-file", "blob", "abc:one.md"]) is False
+    assert _allowed_arguments(["cat-file", "blob", f"{sha}:"]) is False
+    assert _allowed_arguments(["cat-file", "blob", "HEAD:one.md"]) is False
+    # Nothing outside the templates, however harmless it looks.
+    assert _allowed_arguments(["cat-file", "-p", f"{sha}:one.md"]) is False
+    assert _allowed_arguments(["show", sha]) is False
+    assert _allowed_arguments(["fetch", "origin"]) is False
+    assert _allowed_arguments(["diff-tree", "-p", sha]) is False
+
+
+@pytest.mark.contract
+def test_commit_routes_reject_a_revision_that_is_not_a_full_sha(estate):
+    runtime = build_runtime(estate)
+    for sha in ["HEAD", "abc1234", "0" * 39, "z" * 40]:
+        with pytest.raises(ExplorerError) as caught:
+            runtime.routes.dispatch("/api/v1/commit", {"source": ["substrate"], "sha": [sha]})
+        assert caught.value.code in {"invalid_request", "source_changed"}

@@ -18,6 +18,7 @@ class ExplorerLimits:
     candidate_scan: int = 10_000
     memory_candidates: int = 10_000
     commit_page: int = 50
+    commit_files: int = 500
     git_seconds: float = 3.0
     git_output_bytes: int = 1024 * 1024
     response_bytes: int = 2 * 1024 * 1024

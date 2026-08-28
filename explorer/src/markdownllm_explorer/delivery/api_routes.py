@@ -6,7 +6,10 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from markdownllm_explorer.core.errors import ExplorerError
-from markdownllm_explorer.core.models import CollectionItem, DocumentRecord, EstateSnapshot, OverviewRecord, Page, SourceSettingsRecord, TreeNode
+from markdownllm_explorer.core.models import (
+    CollectionItem, CommitDetail, DocumentRecord, EstateSnapshot, HistoricalDocument, OverviewRecord, Page,
+    SourceSettingsRecord, TreeNode,
+)
 
 
 class DiscoverEstateUseCase(Protocol):
@@ -37,6 +40,14 @@ class DocumentUseCase(Protocol):
     def execute(self, source_id: str, path: str, mode: str) -> DocumentRecord: ...
 
 
+class CommitUseCase(Protocol):
+    def execute(self, source_id: str, sha: str) -> CommitDetail: ...
+
+
+class HistoricalDocumentUseCase(Protocol):
+    def execute(self, source_id: str, sha: str, path: str) -> HistoricalDocument: ...
+
+
 @dataclass(frozen=True)
 class ExplorerUseCases:
     discover_estate: DiscoverEstateUseCase
@@ -46,6 +57,8 @@ class ExplorerUseCases:
     list_collection: CollectionUseCase
     get_settings: SettingsUseCase
     read_document: DocumentUseCase
+    get_commit: CommitUseCase
+    read_historical_document: HistoricalDocumentUseCase
 
 
 class ApiRoutes:
@@ -74,6 +87,14 @@ class ApiRoutes:
         if path == "/api/v1/document":
             self._only(query, {"source", "path", "mode"})
             return self._use_cases.read_document.execute(self._required(query, "source"), self._required(query, "path"), self._optional(query, "mode") or "rendered")
+        if path == "/api/v1/commit":
+            self._only(query, {"source", "sha"})
+            return self._use_cases.get_commit.execute(self._required(query, "source"), self._required(query, "sha"))
+        if path == "/api/v1/commit-file":
+            self._only(query, {"source", "sha", "path"})
+            return self._use_cases.read_historical_document.execute(
+                self._required(query, "source"), self._required(query, "sha"), self._required(query, "path")
+            )
         raise ExplorerError("route_not_found")
 
     @staticmethod

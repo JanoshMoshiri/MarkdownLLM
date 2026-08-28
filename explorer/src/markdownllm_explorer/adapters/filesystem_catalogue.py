@@ -75,7 +75,10 @@ class FilesystemSourceCatalogue:
     def discover(self) -> EstateSnapshot:
         boundaries: list[SourceBoundary] = []
         issues: list[SourceIssue] = []
-        substrate = self._make_source("substrate", "Substrate", SourceKind.SUBSTRATE, self._root)
+        # The substrate is the MarkdownLLM framework in every estate, so it is
+        # named rather than described.  The navigation group heading above it
+        # already carries the role (FR-EST-002, amended 2026-08-28).
+        substrate = self._make_source("substrate", "MarkdownLLM", SourceKind.SUBSTRATE, self._root)
         boundaries.append(SourceBoundary(substrate, self._root, self._domain_root))
         candidates: list[tuple[str, Path, str]] = []
         if self._domain_root.exists() and self._domain_root.is_dir() and not _is_reparse(self._domain_root):

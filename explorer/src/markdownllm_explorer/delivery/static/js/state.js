@@ -9,6 +9,8 @@ export const state = {
   treeCursors: new Map(),
   treePartials: new Map(),
   selectedPath: null,
+  commit: null,
+  commitFiles: [],
   documentMode: "rendered",
   themeChoice: "system",
   sourceSettings: null,
@@ -25,6 +27,7 @@ export function liveLocationIdentity() {
     source: state.source?.id ?? null,
     tab: state.view,
     path: state.selectedPath,
+    commit: state.commit,
     mode: state.documentMode,
     query: state.search.query,
   };

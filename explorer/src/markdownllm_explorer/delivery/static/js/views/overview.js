@@ -1,4 +1,6 @@
-export function renderOverview(container, overview, onMore) {
+import {formatMoment} from "../format.js";
+
+export function renderOverview(container, overview, onMore, onCommit) {
   const repo = overview.repository;
   const dirty = repo.dirty === true ? " · working tree changed" : "";
   container.innerHTML = `
@@ -7,7 +9,7 @@ export function renderOverview(container, overview, onMore) {
       <span class="badge">${escapeText(repo.kind)}${escapeText(dirty)}</span>
     </section>
     <section class="metric-grid">
-      ${metric(overview.counts.eligible_files, "Eligible files", overview.counts.partial)}
+      ${metric(overview.counts.eligible_files, "Files", overview.counts.partial)}
       ${metric(overview.counts.skills, "Skills", overview.counts.partial)}
       ${metric(overview.counts.memory, "Memory things", overview.counts.partial)}
       ${metric(overview.commits.items.length, "Commits shown")}
@@ -17,7 +19,7 @@ export function renderOverview(container, overview, onMore) {
   container.querySelector(".hero h2").textContent = overview.source.display_name;
   const list = container.querySelector("#commit-list");
   if (!overview.commits.items.length) list.innerHTML = '<div class="empty">No reachable commits for this source.</div>';
-  for (const commit of overview.commits.items) appendCommit(list, commit);
+  for (const commit of overview.commits.items) appendCommit(list, commit, onCommit);
   refreshCommitAbbreviations(list);
   if (overview.commits.next_cursor) {
     const button = document.createElement("button"); button.className = "load-more"; button.textContent = "Load more commits";
@@ -26,8 +28,10 @@ export function renderOverview(container, overview, onMore) {
   }
 }
 
-export function appendCommit(list, commit) {
-  const row = document.createElement("article"); row.className = "list-row";
+export function appendCommit(list, commit, onCommit) {
+  const row = document.createElement("button"); row.type = "button"; row.className = "list-row commit-row";
+  row.dataset.sha = commit.sha;
+  row.addEventListener("click", () => onCommit(commit.sha));
   const info = document.createElement("div");
   const title = document.createElement("h3");
   const sha = document.createElement("span"); sha.className = "commit-sha"; sha.textContent = commit.sha.slice(0, 12);
@@ -35,8 +39,8 @@ export function appendCommit(list, commit) {
   title.append(sha, document.createTextNode(` ${commit.subject}`));
   const author = document.createElement("p"); author.textContent = commit.author_name;
   info.append(title, author);
-  const time = document.createElement("time"); time.dateTime = commit.authored_at; time.textContent = new Date(commit.authored_at).toLocaleString();
-  row.append(info, time); list.append(row); row.tabIndex = -1; return row;
+  const time = document.createElement("time"); time.dateTime = commit.authored_at; time.textContent = formatMoment(commit.authored_at);
+  row.append(info, time); list.append(row); return row;
 }
 
 export function refreshCommitAbbreviations(list) {

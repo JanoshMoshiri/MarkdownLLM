@@ -5,3 +5,22 @@
 .quiet-button,.search-box input{min-height:24px}
 .brand .icon-button{margin-left:auto;flex:0 0 auto}
 .icon-button:focus-visible,.quiet-button:focus-visible,.tabs button:focus-visible,.source-button:focus-visible,.tree-row:focus-visible,.collection-item:focus-visible,.reader-actions button:focus-visible,.load-more:focus-visible,.tree-more:focus-visible,.list-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+:root{--added:#1b6b40;--added-bg:#dcf1e4}
+[data-theme="dark"]{--added:#8fd6a8;--added-bg:#1e3529}
+.commit-row{width:100%;font:inherit;color:inherit;background:transparent;border:0;border-bottom:1px solid var(--line);text-align:left;cursor:pointer}
+.commit-row:last-child{border-bottom:0}
+.commit-row:hover{background:var(--soft)}
+.commit-head{margin-bottom:18px}
+.commit-back{padding:4px 0;color:var(--accent);cursor:pointer}
+.commit-head h2{font-size:20px;margin:10px 0 5px}
+.commit-meta{margin:0;color:var(--muted);font-size:12px}
+.change-flag{display:inline-block;margin-top:6px;padding:1px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);color:var(--muted)}
+.change-added{color:var(--added);border-color:var(--added)}
+.change-deleted{color:var(--danger);border-color:var(--danger)}
+.collection-item:disabled{cursor:not-allowed;opacity:.65}
+.historical-legend{margin:0;padding:10px 20px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12px}
+.historical{display:grid;grid-template-columns:auto minmax(0,1fr);overflow:auto;max-height:72vh}
+.historical pre{margin:0;padding:16px 12px;font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}
+.historical-gutter{position:sticky;left:0;z-index:1;background:var(--code);color:var(--muted);text-align:right;border-right:1px solid var(--line);-webkit-user-select:none;user-select:none}
+.historical-code{padding-left:16px}
+.historical-code mark{background:var(--added-bg);color:inherit;-webkit-box-decoration-break:clone;box-decoration-break:clone;box-shadow:inset 3px 0 0 var(--added)}

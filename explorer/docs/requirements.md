@@ -97,7 +97,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-EST-001 — Configured root.** The application shall accept an explicit substrate root at launch and shall not depend on the current working directory after configuration.
 
-**FR-EST-002 — Substrate identity.** The configured root shall appear first in navigation as **Substrate**, regardless of its folder name.
+**FR-EST-002 — Substrate identity.** The configured root shall appear first in navigation, named **MarkdownLLM** regardless of its folder name, beneath the group heading that names its role. Amended 2026-08-28: the source is the MarkdownLLM framework in every estate, so the item names the thing while the heading above it (FR-NAV-001) carries the role. The prior wording spent the item's label on a word already on screen.
 
 **FR-EST-003 — Domain estate.** The application shall discover one directory level of domains from a configurable domain directory, defaulting to `domain/`, and present them by NFC/case-folded display name with original-path tie-breaking under **Domains**.
 

@@ -11,7 +11,9 @@ from pathlib import Path
 
 from markdownllm_explorer.core.errors import ExplorerError
 from markdownllm_explorer.core.limits import ExplorerLimits
-from markdownllm_explorer.core.models import BoundaryToken, CommitRecord, Page, RepositoryState
+from markdownllm_explorer.core.models import (
+    BoundaryToken, CommitDetail, CommitFile, CommitRecord, HistoricalDocument, Page, RelativePath, RepositoryState,
+)
 
 from .cursors import CursorCodec, CursorState
 from .filesystem_catalogue import BoundaryRegistry, _is_reparse
@@ -125,6 +127,97 @@ class GitCommitHistory:
         except ExplorerError as error:
             kind = "external-store" if error.code == "git_store_external" else "unavailable"
             return RepositoryState(kind, issue=error.code), empty
+
+    def detail(self, token: BoundaryToken, sha: str) -> CommitDetail:
+        """The paths one commit touched, against its first parent.
+
+        Renames are off, so a rename reads as a delete beside an add. That is
+        the honest shape here: this view never renders removed content, so a
+        rename presented as one row would claim a continuity the reader cannot
+        open.
+        """
+        root = self._prepared_root(token, sha)
+        header = self._run(
+            root,
+            ["log", sha, "--topo-order", "--skip=0", "--max-count=1", "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"],
+        )
+        record = next(iter(self._records(header)), None)
+        if record is None:
+            raise ExplorerError("source_changed")
+        output = self._run(root, _name_status_arguments(sha))
+        fields = output.split("\x00")
+        files: list[CommitFile] = []
+        partial = False
+        for index in range(0, len(fields) - 1, 2):
+            status, raw = fields[index].strip("\r\n"), fields[index + 1]
+            if not status or not raw:
+                continue
+            if len(files) >= self._limits.commit_files:
+                partial = True
+                break
+            try:
+                relative = RelativePath.parse(raw)
+            except ExplorerError:
+                # A path this source cannot even express is not shown; it is
+                # never handed onward as a git argument.
+                continue
+            files.append(CommitFile(relative, _CHANGE.get(status[:1], "modified")))
+        files.sort(key=lambda item: (item.path.value.casefold(), item.path.value))
+        return CommitDetail(record.sha, record.subject, record.author_name, record.authored_at, tuple(files), partial)
+
+    def historical(self, token: BoundaryToken, sha: str, path: RelativePath) -> HistoricalDocument:
+        """A file's bytes at one commit, with that commit's added line ranges.
+
+        The caller has already decided this source admits the path.  The size
+        is checked before the content is fetched so an oversized blob is
+        refused by the same limit as a live read rather than by the process
+        runner's output ceiling.
+        """
+        boundary = self._registry.by_token(token)
+        root = self._prepared_root(token, sha)
+        spec = f"{sha}:{path.value}"
+        size = self._object_size(root, spec)
+        if size is None:
+            raise ExplorerError("file_not_found")
+        if size > self._limits.file_bytes:
+            raise ExplorerError("file_too_large")
+        payload = self._run_bytes(root, ["cat-file", "blob", spec])
+        if b"\x00" in payload:
+            raise ExplorerError("binary_unsupported")
+        try:
+            text = payload.decode("utf-8-sig")
+        except UnicodeDecodeError:
+            raise ExplorerError("encoding_unsupported") from None
+        diff = self._run(root, _added_lines_arguments(sha, path.value))
+        return HistoricalDocument(boundary.source.id, path, sha, text, _added_ranges(diff), len(payload))
+
+    def _prepared_root(self, token: BoundaryToken, sha: str) -> Path:
+        if not self._git:
+            raise ExplorerError("git_unavailable")
+        if not re.fullmatch(r"[0-9a-f]{40}", sha):
+            raise ExplorerError("invalid_request")
+        boundary = self._registry.by_token(token)
+        self._validate_store(boundary.root)
+        if not self._commit_exists(boundary.root, sha):
+            raise ExplorerError("source_changed")
+        return boundary.root
+
+    def _object_size(self, root: Path, spec: str) -> int | None:
+        try:
+            return int(self._run(root, ["cat-file", "-s", spec]).strip())
+        except ExplorerError as error:
+            if error.code == "git_unavailable":
+                return None
+            raise
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _records(output: str):
+        for raw_record in output.split("\x1e"):
+            fields = raw_record.strip("\r\n\x00").split("\x00")
+            if len(fields) >= 4 and len(fields[0]) == 40:
+                yield CommitRecord(fields[0], fields[1], fields[2], fields[3])
 
     def _state_from_status(self, root: Path) -> RepositoryState:
         output = self._run(root, ["status", "--porcelain=v2", "--branch", "--untracked-files=no"])
@@ -245,7 +338,7 @@ class GitCommitHistory:
                 return False
             raise
 
-    def _run(self, root: Path, arguments: list[str]) -> str:
+    def _run_bytes(self, root: Path, arguments: list[str]) -> bytes:
         if not self._git:
             raise ExplorerError("git_unavailable")
         if not _allowed_arguments(arguments):
@@ -295,10 +388,14 @@ class GitCommitHistory:
         )
         if result.returncode:
             raise ExplorerError("git_unavailable")
+        return result.output
+
+    def _run(self, root: Path, arguments: list[str]) -> str:
+        payload = self._run_bytes(root, arguments)
         try:
-            return result.output.decode("utf-8")
+            return payload.decode("utf-8")
         except UnicodeDecodeError:
-            return result.output.decode("utf-8", errors="replace")
+            return payload.decode("utf-8", errors="replace")
 
 
 def resolve_trusted_git(source_root: Path) -> str | None:
@@ -336,6 +433,69 @@ def _nonempty_bounded_file(path: Path) -> bool:
         raise ExplorerError("git_store_external") from None
 
 
+_CHANGE = {"A": "added", "D": "deleted"}
+
+_NAME_STATUS_FLAGS = ["--no-commit-id", "--name-status", "-r", "--no-renames", "--first-parent", "--root", "-z"]
+# --ignore-cr-at-eol is required, not cosmetic. The hardened environment
+# deliberately removes Git for Windows' system core.autocrlf, and without it a
+# text blob's end-of-line form is derived differently during the diff, so a
+# one-line change reports as a whole-file rewrite and every line of the file
+# would be highlighted as added. The flag can only ever ignore a carriage
+# return immediately before a newline, which is a representation difference and
+# never a content one, so hunk boundaries describe what actually changed.
+_ADDED_LINES_FLAGS = [
+    "-p", "--unified=0", "--ignore-cr-at-eol", "--no-commit-id", "--no-renames", "--first-parent", "--root", "-r",
+]
+
+# --unified=0 makes every hunk header describe exactly the lines this commit
+# put on its own side of the file, so the added ranges are read from the
+# headers alone and no removed line is ever parsed, stored or transported.
+_HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+
+
+def _name_status_arguments(sha: str) -> list[str]:
+    return ["diff-tree", *_NAME_STATUS_FLAGS, sha]
+
+
+def _added_lines_arguments(sha: str, path: str) -> list[str]:
+    return ["diff-tree", *_ADDED_LINES_FLAGS, sha, "--", path]
+
+
+def _added_ranges(diff: str) -> tuple[tuple[int, int], ...]:
+    ranges: list[tuple[int, int]] = []
+    for line in diff.splitlines():
+        match = _HUNK.match(line)
+        if not match:
+            continue
+        start = int(match.group(1))
+        count = 1 if match.group(2) is None else int(match.group(2))
+        if count:
+            ranges.append((start, start + count - 1))
+    return tuple(ranges)
+
+
+def _is_tree_path(value: str) -> bool:
+    """The independent path gate for arguments that carry one.
+
+    Every path reaching here has already passed RelativePath.parse and source
+    admission.  This gate does not trust that: it is the check that stops an
+    option-looking, traversing or control-bearing path from ever becoming a
+    git argument, and it is deliberately stricter than the parse it repeats.
+    """
+    if not value or len(value) > 1024 or value.startswith("-"):
+        return False
+    if any(character in value for character in ("\x00", "\\", ":")):
+        return False
+    if any(ord(character) < 0x20 or ord(character) == 0x7F for character in value):
+        return False
+    return all(part and part not in {".", ".."} for part in value.split("/"))
+
+
+def _is_object_spec(value: str) -> bool:
+    head, separator, path = value.partition(":")
+    return bool(separator) and bool(re.fullmatch(r"[0-9a-f]{40}", head)) and _is_tree_path(path)
+
+
 def _allowed_arguments(arguments: list[str]) -> bool:
     exact = {
         ("rev-parse", "--path-format=absolute", "--show-toplevel", "--git-dir", "--git-common-dir"),
@@ -357,4 +517,16 @@ def _allowed_arguments(arguments: list[str]) -> bool:
             and re.fullmatch(r"--max-count=\d+", arguments[4])
             and arguments[5] == "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"
         )
+    if len(arguments) == 3 and arguments[0] == "cat-file" and arguments[1] in {"blob", "-s"}:
+        return _is_object_spec(arguments[2])
+    if arguments[:1] == ["diff-tree"]:
+        if len(arguments) == len(_NAME_STATUS_FLAGS) + 2:
+            return arguments[1:-1] == _NAME_STATUS_FLAGS and bool(re.fullmatch(r"[0-9a-f]{40}", arguments[-1]))
+        if len(arguments) == len(_ADDED_LINES_FLAGS) + 4:
+            return (
+                arguments[1:-3] == _ADDED_LINES_FLAGS
+                and bool(re.fullmatch(r"[0-9a-f]{40}", arguments[-3]))
+                and arguments[-2] == "--"
+                and _is_tree_path(arguments[-1])
+            )
     return False

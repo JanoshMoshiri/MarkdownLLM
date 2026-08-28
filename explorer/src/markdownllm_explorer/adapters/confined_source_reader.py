@@ -122,6 +122,21 @@ class ConfinedSourceReader:
         text, size, modified = self._read_text(boundary, path)
         return RawDocument(boundary.source.id, path, text, size, modified)
 
+    def admits(self, token: BoundaryToken, path: RelativePath) -> bool:
+        """Answer the admission question without requiring the file to exist.
+
+        The historical reader asks about paths a commit touched, which may have
+        been deleted since.  This is the same secret, ignored-directory and
+        owned-domain exclusion the live read applies, lifted so both callers
+        share one implementation rather than two copies of a security rule.
+        """
+        boundary = self._registry.by_token(token)
+        return bool(
+            path.name
+            and self._policy.is_eligible_file(path.name)
+            and not self._excluded(boundary, path, path.name)
+        )
+
     def iter_files(self, token: BoundaryToken):
         boundary = self._registry.by_token(token)
         yield from self._walk(boundary)

@@ -17,10 +17,12 @@ from .adapters.git_commit_history import GitCommitHistory, resolve_trusted_git
 from .adapters.safe_markdown_parser import SafeMarkdownParser
 from .application.browse_tree import BrowseTree
 from .application.discover_estate import DiscoverEstate
+from .application.get_commit import GetCommit
 from .application.get_overview import GetOverview
 from .application.get_settings import GetSettings
 from .application.list_collection import ListCollection
 from .application.read_document import ReadDocument
+from .application.read_historical_document import ReadHistoricalDocument
 from .application.search_paths import SearchPaths
 from .core.eligibility import EligibilityPolicy
 from .core.limits import ExplorerLimits
@@ -54,6 +56,8 @@ def build_runtime(root: Path, domain_dir: str = "domain", *, limits: ExplorerLim
         BrowseTree(catalogue, source_browser), SearchPaths(catalogue, source_browser),
         ListCollection(catalogue, collections), GetSettings(catalogue, source_browser),
         ReadDocument(catalogue, source_browser, frontmatter, markdown, link_resolver, presenter),
+        GetCommit(catalogue, history, source_browser),
+        ReadHistoricalDocument(catalogue, history, source_browser),
     )
     return ExplorerRuntime(ApiRoutes(use_cases), secrets.token_urlsafe(32), active_limits)
 

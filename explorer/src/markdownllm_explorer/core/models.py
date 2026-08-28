@@ -175,6 +175,49 @@ class CommitRecord:
 
 
 @dataclass(frozen=True)
+class CommitFile:
+    """One path a commit touched, with whether this source may open it.
+
+    `openable` is decided by source admission, not by git: a path git reports
+    can still be a secret, live under an ignored directory, or belong to a
+    nested domain that owns its own history.
+    """
+
+    path: RelativePath
+    change: str
+    openable: bool = False
+
+
+@dataclass(frozen=True)
+class CommitDetail:
+    sha: str
+    subject: str
+    author_name: str
+    authored_at: str
+    files: tuple[CommitFile, ...]
+    partial: bool
+
+
+@dataclass(frozen=True)
+class HistoricalDocument:
+    """A file as one commit left it, plus the line ranges that commit added.
+
+    Raw text only.  Rendering historical content would put the markdown parser
+    and its link resolver on a path whose targets are resolved against the
+    working tree rather than the commit, so this record carries no rendered
+    form and no resolved links.  Removed lines are never transported: the
+    ranges describe the commit's own side of the file.
+    """
+
+    source_id: SourceId
+    path: RelativePath
+    sha: str
+    content: str
+    added_ranges: tuple[tuple[int, int], ...]
+    size: int
+
+
+@dataclass(frozen=True)
 class FrontmatterResult:
     state: FrontmatterState
     values: Mapping[str, object] = field(default_factory=dict)

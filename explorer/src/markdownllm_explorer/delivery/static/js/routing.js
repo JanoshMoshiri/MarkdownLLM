@@ -9,6 +9,7 @@ export function routeFromText(text) {
     tab: params.get("tab"),
     mode: params.get("mode"),
     path: params.get("path"),
+    commit: params.get("commit"),
   };
 }
 
@@ -23,6 +24,7 @@ export function writeRoute(state, replace = false) {
     tab: state.view,
     mode: state.documentMode,
   });
+  if (state.commit) params.set("commit", state.commit);
   if (state.selectedPath) params.set("path", state.selectedPath);
   history[replace ? "replaceState" : "pushState"](null, "", `#${params}`);
 }

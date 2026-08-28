@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import Protocol
 
 from markdownllm_explorer.core.models import (
-    BoundaryToken, CollectionItem, CommitRecord, EstateSnapshot, FrontmatterResult, LinkCandidate,
+    BoundaryToken, CollectionItem, CommitDetail, CommitRecord, EstateSnapshot, FrontmatterResult,
+    HistoricalDocument, LinkCandidate,
     MarkdownTree, Page, ParsedDocument, RawDocument, RelativePath, RepositoryState, ResolvedLink,
     Source, SourceCounts, SourceSettingsRecord, TreeNode,
 )
@@ -58,3 +59,19 @@ class MarkdownPresenter(Protocol):
 
 class CommitHistory(Protocol):
     def snapshot(self, token: BoundaryToken, cursor: str | None) -> tuple[RepositoryState, Page[CommitRecord]]: ...
+
+
+class CommitDetails(Protocol):
+    def detail(self, token: BoundaryToken, sha: str) -> CommitDetail: ...
+    def historical(self, token: BoundaryToken, sha: str, path: RelativePath) -> HistoricalDocument: ...
+
+
+class PathAdmission(Protocol):
+    """Whether a source would admit a path, decided without touching disk.
+
+    The historical read needs this exact question about files that no longer
+    exist in the working tree, so admission cannot be inferred from a
+    successful filesystem read.  One implementation answers it for both.
+    """
+
+    def admits(self, token: BoundaryToken, path: RelativePath) -> bool: ...

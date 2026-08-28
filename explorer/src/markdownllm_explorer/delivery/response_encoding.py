@@ -6,9 +6,9 @@ from enum import Enum
 from typing import Mapping
 
 from markdownllm_explorer.core.models import (
-    BoundaryToken, CollectionItem, CommitRecord, DocumentRecord, EstateSnapshot, FrontmatterResult,
-    OverviewRecord, Page, RelativePath, RepositoryState, Source, SourceCounts, SourceId, SourceIssue,
-    SourceSettingsRecord, TreeNode,
+    BoundaryToken, CollectionItem, CommitDetail, CommitFile, CommitRecord, DocumentRecord, EstateSnapshot,
+    FrontmatterResult, HistoricalDocument, OverviewRecord, Page, RelativePath, RepositoryState, Source,
+    SourceCounts, SourceId, SourceIssue, SourceSettingsRecord, TreeNode,
 )
 
 
@@ -43,6 +43,19 @@ def to_wire(value):
         return {"source": to_wire(value.source), "counts": to_wire(value.counts), "repository": to_wire(value.repository), "commits": to_wire(value.commits)}
     if isinstance(value, TreeNode):
         return _compact({"path": value.path.value, "name": value.name, "kind": value.kind.value, "size": value.size, "modified_at": value.modified_at, "expandable": value.expandable})
+    if isinstance(value, CommitFile):
+        return {"path": value.path.value, "change": value.change, "openable": value.openable}
+    if isinstance(value, CommitDetail):
+        return {
+            "sha": value.sha, "subject": value.subject, "author_name": value.author_name,
+            "authored_at": value.authored_at, "files": to_wire(value.files), "partial": value.partial,
+        }
+    if isinstance(value, HistoricalDocument):
+        return {
+            "source_id": value.source_id.value, "path": value.path.value, "sha": value.sha,
+            "content": value.content, "added_ranges": [list(item) for item in value.added_ranges],
+            "size": value.size,
+        }
     if isinstance(value, CommitRecord):
         return {"sha": value.sha, "subject": value.subject, "author_name": value.author_name, "authored_at": value.authored_at}
     if isinstance(value, FrontmatterResult):

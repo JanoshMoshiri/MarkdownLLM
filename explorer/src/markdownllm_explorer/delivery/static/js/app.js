@@ -8,6 +8,7 @@ import {renderSources, renderTree} from "./views/navigation.js";
 import {appendCommit, refreshCommitAbbreviations, renderOverview} from "./views/overview.js";
 import {appendItem, renderCollection} from "./views/collection.js";
 import {renderDocument} from "./views/document.js";
+import {renderCommit, renderCommitDocument} from "./views/commit.js";
 import {renderSettings} from "./views/settings.js";
 import {appendSearchResult, renderSearchResults} from "./views/tree.js";
 import {renderDocumentContext, renderSourceContext} from "./views/context.js";
@@ -38,8 +39,10 @@ async function initialise() {
     const requested = routed.source && estate.sources.find(item => item.id === routed.source);
     state.view = validView(routed.tab);
     state.documentMode = routed.mode === "raw" ? "raw" : "rendered";
+    state.commit = routed.commit || null;
     await selectSource(requested || estate.sources[0], false);
-    if (routed.path) await restoreDocumentRoute(routed.path, state.documentMode, true);
+    if (state.commit) { if (routed.path) await openCommitFile(routed.path, false); else updateRoute(true); }
+    else if (routed.path) await restoreDocumentRoute(routed.path, state.documentMode, true);
     else updateRoute(true);
   } catch (error) {
     if (error.name !== "AbortError" && isCurrent(request)) showError(error);
@@ -90,7 +93,7 @@ function bindChrome() {
 
 async function chooseTab(view) {
   abortAllRequests(); clearTimeout(searchTimer);
-  state.view = validView(view); state.selectedPath = null;
+  state.view = validView(view); state.selectedPath = null; state.commit = null;
   state.search = {query: "", items: [], cursor: null, partial: false};
   document.querySelector("#search-input").value = "";
   renderSourceContext(contextContent, state.source, state.sourceSettings, state.repository);
@@ -108,7 +111,7 @@ async function selectSource(source, pushRoute = true) {
   document.querySelector("#source-name").textContent = source.display_name;
   document.querySelector("#source-kind").textContent = source.kind === "substrate" ? "Framework source" : "Domain source";
   document.querySelector("#source-icon").textContent = source.display_name.slice(0, 1).toUpperCase();
-  renderSources(sourceNav, state.estate, source.id, selectSource);
+  renderSources(sourceNav, state.estate, source.id, chosen => { state.commit = null; selectSource(chosen); });
   closeOverlays(false);
   if (pushRoute) updateRoute();
   await Promise.all([loadRootTree(), loadView(), loadSourceContext()]);
@@ -194,12 +197,13 @@ function focusTreePath(path) {
 async function loadView(cursor = null) {
   if (!state.source) return;
   activateTab(); showLoading();
+  if (state.view === "overview" && state.commit) { await loadCommit(); return; }
   const identity = {source: state.source.id, tab: state.view, cursor};
   const request = beginRequest("view", identity);
   try {
     if (state.view === "overview") {
       const value = await get("/api/v1/overview", {source: identity.source, cursor}, request.signal);
-      if (isCurrent(request)) { state.repository = value.repository; renderOverview(content, value, loadMoreCommits); renderSourceContext(contextContent, state.source, state.sourceSettings, state.repository); }
+      if (isCurrent(request)) { state.repository = value.repository; renderOverview(content, value, loadMoreCommits, openCommit); renderSourceContext(contextContent, state.source, state.sourceSettings, state.repository); }
     } else if (state.view === "skills" || state.view === "memory") {
       const value = await get("/api/v1/collection", {source: identity.source, kind: identity.tab, cursor}, request.signal);
       if (isCurrent(request)) renderCollection(content, value, identity.tab, openCollectionDocument, loadMoreCollection);
@@ -218,7 +222,7 @@ async function loadMoreCommits(cursor, list, button) {
   try {
     const value = await get("/api/v1/overview", {source: identity.source, cursor}, request.signal);
     if (!isCurrent(request)) return;
-    const appended = value.commits.items.map(item => appendCommit(list, item));
+    const appended = value.commits.items.map(item => appendCommit(list, item, openCommit));
     refreshCommitAbbreviations(list); button.remove();
     if (value.commits.next_cursor) { const next = moreButton("Load more commits", () => loadMoreCommits(value.commits.next_cursor, list, next)); list.after(next); }
     appended[0]?.focus?.();
@@ -246,6 +250,50 @@ async function loadMoreCollection(cursor, list, button) {
     appended[0]?.focus();
   } catch (error) { if (error.name !== "AbortError" && isCurrent(request)) { button.disabled = false; showError(error, true); } }
   finally { completeRequest(request); }
+}
+
+async function openCommit(sha) {
+  abortAllRequests(); clearTimeout(searchTimer);
+  state.commit = sha; state.selectedPath = null; state.commitFiles = [];
+  updateRoute(); showLoading();
+  await loadCommit();
+}
+
+async function closeCommit() {
+  abortAllRequests();
+  state.commit = null; state.selectedPath = null; state.commitFiles = [];
+  updateRoute();
+  await loadView();
+}
+
+async function loadCommit() {
+  const identity = {source: state.source.id, tab: "overview", commit: state.commit};
+  const request = beginRequest("commit", identity);
+  try {
+    const detail = await get("/api/v1/commit", {source: identity.source, sha: state.commit}, request.signal);
+    if (!isCurrent(request)) return;
+    state.commitFiles = detail.files;
+    renderCommit(content, detail, openCommitFile, closeCommit);
+  } catch (error) {
+    if (error.name !== "AbortError" && isCurrent(request)) showError(error);
+  } finally { completeRequest(request); }
+}
+
+async function openCommitFile(path, pushRoute = true) {
+  state.selectedPath = path;
+  const reader = content.querySelector(".reader");
+  if (reader) showLoading(reader);
+  const identity = {source: state.source.id, tab: "overview", commit: state.commit, path};
+  const request = beginRequest("commit-file", identity);
+  try {
+    const value = await get("/api/v1/commit-file", {source: identity.source, sha: state.commit, path}, request.signal);
+    if (!isCurrent(request)) return;
+    const known = state.commitFiles.find(item => item.path === path);
+    renderCommitDocument(content, value, known ? known.change : "modified");
+    if (pushRoute) updateRoute();
+  } catch (error) {
+    if (error.name !== "AbortError" && isCurrent(request)) showDocumentError(error, true);
+  } finally { completeRequest(request); }
 }
 
 async function openCollectionDocument(path, mode = "rendered", pushRoute = true) {
@@ -356,8 +404,15 @@ async function restoreRoute() {
   const route = routeFromHash(); const source = state.estate.sources.find(item => item.id === route.source) || state.estate.sources[0];
   state.view = validView(route.tab); state.documentMode = route.mode === "raw" ? "raw" : "rendered";
   const sourceChanged = source.id !== state.source?.id;
+  const previousCommit = state.commit;
+  state.commit = route.commit || null;
   if (sourceChanged) await selectSource(source, false);
   state.selectedPath = route.path || null; state.search = {query: "", items: [], cursor: null, partial: false}; activateTab();
+  if (state.commit) {
+    if (sourceChanged || state.commit !== previousCommit || !content.querySelector(".split-view")) await loadCommit();
+    if (route.path) await openCommitFile(route.path, false);
+    return;
+  }
   if (route.path) await restoreDocumentRoute(route.path, state.documentMode, sourceChanged);
   else { state.selectedPath = null; await loadView(); }
 }
