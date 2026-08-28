@@ -2385,6 +2385,40 @@ def test_orientation_open_loops_respect_declared_terminal_statuses(tmp_path):
     assert "`wip`" in lines and "`live`" not in lines
 
 
+def test_orientation_excludes_every_reserved_knowledge_sibling():
+    # Estate synthesis 2026-08, F6 defect 1: `skill` shares the exact
+    # knowledge-lifecycle vocabulary of specification/guide/manifesto/prompt/
+    # workflow-definition, yet was the one sibling absent from the orientation
+    # exclusion set — four domains carried twelve phantom open loops for 16+
+    # days. Keyed to RESERVED_STATUSES (the tool's own authority) so the next
+    # reserved type born with this vocabulary fails here, not in the field.
+    from markdownllm.model import RESERVED_STATUSES
+    from markdownllm.session import _ORIENT_KNOWLEDGE_TYPES
+    knowledge_vocab = set(RESERVED_STATUSES["specification"])
+    family = {typ for typ, vocab in RESERVED_STATUSES.items()
+              if set(vocab) == knowledge_vocab}
+    assert "skill" in family          # the defect's own member, pinned
+    missing = family - _ORIENT_KNOWLEDGE_TYPES
+    assert not missing, (
+        f"reserved knowledge-lifecycle type(s) {sorted(missing)} are absent "
+        f"from _ORIENT_KNOWLEDGE_TYPES — each non-terminal one becomes a "
+        f"phantom open loop in every domain that carries it")
+
+
+def test_orientation_spares_skills_as_knowledge_not_open_work(tmp_path):
+    # The lived shape of the same defect: a domain's authored skill files sit
+    # at `evolving` as a steady state; before the fix each one surfaced as an
+    # open loop the next session was told to close.
+    write(tmp_path, "things/skill.md", thing_text(
+        "id: my-skill\ntype: skill\nstatus: evolving\ncreated: 2026-06-01"))
+    write(tmp_path, "things/wip.md", thing_text(
+        "id: wip\ntype: task\nstatus: in-progress\ncreated: 2026-06-01"))
+    from markdownllm.session import _orient_forward
+    lines = "\n".join(_orient_forward(tmp_path))
+    assert "Open loops (1)" in lines
+    assert "`wip`" in lines and "`my-skill`" not in lines
+
+
 def test_orientation_watched_is_not_owned(tmp_path):
     # v3.27.0 (vantage-brief-cluster Ask 1): a mirror's status is the source's
     # state restated — not a loop here. The estate measurement: landing 27

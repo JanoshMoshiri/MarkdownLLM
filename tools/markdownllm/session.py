@@ -112,8 +112,16 @@ def _velocity_signal(domain: Path,
 
 # Types that sit at a non-terminal status as a steady state (knowledge/reference),
 # so they are NOT "open work" — excluded from the forward orientation view.
-_ORIENT_KNOWLEDGE_TYPES = {"specification", "guide", "manifesto", "insight",
-                           "retrospective", "index", "continuity-brief", "prompt",
+# Membership rule: every reserved type whose whole vocabulary is the
+# knowledge lifecycle (draft/evolving/stable/deprecated) belongs here —
+# `skill` was the one sibling missing while specification/guide/manifesto/
+# prompt/workflow-definition were present, and four domains carried twelve
+# phantom open loops for 16+ days on that gap (estate synthesis 2026-08,
+# F6 defect 1; raised by a domain on 2026-08-10). A regression test keys
+# this set to RESERVED_STATUSES so the next reserved sibling cannot repeat it.
+_ORIENT_KNOWLEDGE_TYPES = {"specification", "guide", "manifesto", "skill",
+                           "insight", "retrospective", "index",
+                           "continuity-brief", "prompt",
                            "workflow-definition", "decision", "artifact"}
 
 # The stall line the velocity prompt reasons from (default 21 days), now
