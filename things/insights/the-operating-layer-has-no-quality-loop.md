@@ -1,14 +1,18 @@
 ---
 id: the-operating-layer-has-no-quality-loop
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-08-18
 session: 2026-08-18
 source: both
 confidence: high
 origin: synthesised
+promoted_to: retrospective-specification
 linked_things:
+  - id: operating-layer-quality-loop
+    relation: implements
+    notes: "The carrier that built the remedy, 2026-08-28. It records what shipped and where the built shape departs from the shape captured below"
   - id: cumulative-drift-is-invisible-to-per-change-walks
     relation: extends
     notes: "Names the drift class and extends it to a whole layer: skills sit outside every individual blast radius because the thing that moves — practice — is not a thing with edges"
@@ -123,3 +127,43 @@ what breaks that circularity: it runs at every commit and keeps the fact in
 view until the retrospective happens. And `retrospective.md`'s "triggered by
 volume" clause has an obvious sibling waiting: *skills untouched while the
 domain crossed N commits* as a trigger to write one.
+
+## Promoted — 2026-08-28
+
+Built by [[operating-layer-quality-loop]], which holds the build record. The
+title claim no longer holds: the operating layer now has a quality loop at
+both cadences — a Warning at every commit, `review-skill-coherence` as
+reflexive scan **7** (not 6; the conditions-met pass took that slot at the 08c
+retrospective), and the cadence trigger this file's last paragraph called for,
+landed in `retrospective.md` → When To Write One at ~25 `things/` commits.
+
+**The floor half is not the one captured above, and the difference is the
+point.** Five defects found by hand on 2026-08-28 across three domains were
+mostly not age-shaped — they were *schema-vocabulary* drift, which is keyed to
+a declared authority and therefore mechanically decidable. So the floor half
+shipped as a vocabulary check (a type, status, or field a skill instructs that
+`_schema.yaml` and the tool's reserved sets never declared) rather than as the
+skill-age proxy. It says *wrong* where age says *possibly stale*, and it needs
+no suppression list for the same reason age didn't.
+
+**Skill-age was declined as a floor Info, and its signal re-homed rather than
+dropped.** Measured: at threshold 25 it fires on 12 of the estate's 58 skills
+at every commit, permanently, with no honest way for a correct-and-rarely-
+edited skill to say "walked, still current". It ships instead as the
+retrospective trigger, where a recurring line is the agenda. And the evidence
+cut against it twice: the low-activity instance — six undeclared types
+standing for weeks — sat at five `things/` commits, so age would have missed
+it while the vocabulary check names it outright. The lifting condition is
+recorded on the plan.
+
+**The Latent Conflict above was resolved before this built**, on 2026-08-27 by
+`derivation-shape-settled-2026-08`: both homes stay, doing different jobs, and
+the workflow skill is the corpus-local anchor for framework lineage. The
+bidirectional question survives into the prompt; the conflict was never opened
+and does not need to be.
+
+**What did not land.** The backlogged skills-directory-vs-artifacts stub check
+remains open in `mechanical-coherence-checks-backlog`, and cases 4–5 of the
+2026-08-28 set (a skill instructing an edge to a foreign id; a skill
+instructing a commit of a deleted file) are reference drift, not vocabulary
+drift — the broken-body-reference item is their home.

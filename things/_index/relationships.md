@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T18:15:18
-generated_from: HEAD@c5b3d4e
+generated: 2026-08-28T18:17:40
+generated_from: HEAD@d92d0f9
 coverage: 313
 framework_version: 3.36.0
 ---
@@ -826,10 +826,10 @@ framework_version: 3.36.0
 - operating-layer-quality-loop --implements--> the-operating-layer-has-no-quality-loop
 - operating-layer-quality-loop --references--> mechanical-coherence-checks-backlog
 - operating-layer-quality-loop --references--> retrospective-specification
-- operating-layer-quality-loop --references--> cowork-adapter
-- operating-layer-quality-loop --references--> vendor-harness-adapter-foundation
-- operating-layer-quality-loop --references--> workflow-reconciliation-precedes-new-definitions
+- operating-layer-quality-loop --references--> derivation-shape-settled-2026-08
 - operating-layer-quality-loop --references--> estate-workflow-derivation
+- operating-layer-quality-loop --implements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
+- operating-layer-quality-loop --implements--> an-advisory-is-scoped-by-who-can-perform-its-remedy
 - operating-model-seams-design-2026-08 --informs--> run-operating-model-seams-2026-08
 - operating-model-seams-design-2026-08 --references--> floor-block-requirements-2026-08
 - operating-model-seams-design-2026-08 --implements--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
@@ -1124,6 +1124,7 @@ framework_version: 3.36.0
 - the-notation-changed-not-the-primitives --references--> thing-specification
 - the-notation-changed-not-the-primitives --references--> orchestration-specification
 - the-notation-changed-not-the-primitives --references--> git-workflow-specification
+- the-operating-layer-has-no-quality-loop --implements--> operating-layer-quality-loop
 - the-operating-layer-has-no-quality-loop --extends--> cumulative-drift-is-invisible-to-per-change-walks
 - the-operating-layer-has-no-quality-loop --extends--> coherence-is-a-maintained-rate-not-a-state
 - the-operating-layer-has-no-quality-loop --references--> mechanical-coherence-checks-backlog

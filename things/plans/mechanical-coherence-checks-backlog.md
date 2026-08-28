@@ -2,7 +2,7 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -39,6 +39,13 @@ linked_things:
 > Structural-pin resolution shipped 2026-08-28 (see the item below); the
 > evidence that promoted it was five hand-catches in three days, not the two
 > the item was filed on.
+>
+> The operating-layer vocabulary check shipped the same day, off five
+> hand-caught operating-layer defects in three domains — an item that was
+> never filed here, because the class was assumed to be judgement-shaped until
+> the instances showed three of the five keyed to a declared authority. The
+> skill-age Info this backlog was asked to host was declined in the same pass,
+> with its lifting condition; both entries are below.
 
 Small, deferred floor checks — each a generated-artifact freshness or
 prose↔mechanical consistency check that belongs in `mdllm coherence`. Migrated from
@@ -167,6 +174,75 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   the ask (2026-08-06: `_classify_fetch_failure` undiagnosed state,
   `_where_you_left_off` stated search); the ask's dismissal condition is the
   instrument, not the fixes.
+
+- ~~**Skill-age-vs-domain-velocity Info** (routed here by
+  `operating-layer-quality-loop`, 2026-08-18).~~ **Declined 2026-08-28, and
+  replaced by a sharper check in the same sprint.** The proposal was: a skill
+  untouched since its birth commit while `things/` moved N commits. It passes
+  the suppression-list gate (pure git) but fails on the *other* standing
+  hazard: measured across the estate, at threshold 25 it fires on 12 of 58
+  skills at every commit forever, and one specification skill sitting 142
+  `things/` commits behind its last touch would never go quiet again. A
+  git-derived pin has no way to record "walked, still correct" — the same
+  limitation the perimeter currency check accepted for four files at *release*
+  cadence, which is a different bargain from a fifth of every domain's
+  operating layer at *commit* cadence
+  (`a-check-that-always-fires-teaches-the-operator-to-ignore-it`). The signal
+  was re-homed rather than dropped: `retrospective.md` → When To Write One now
+  carries it as a trigger, where recurrence is the agenda. **Lift when** a
+  skill acquires an honest "walked, still current" marker that is not itself a
+  hand-maintained surface, or when the retrospective trigger is observed being
+  ignored.
+
+- ~~**Operating-layer vocabulary drift (added and built 2026-08-28, felt —
+  five hand-catches in three domains in one day).**~~ **Built 2026-08-28** —
+  `skill_vocabulary_findings` (`tools/markdownllm/skill_vocabulary.py`),
+  joined to `coherence_findings` in the corpus-general section, so every
+  domain inherits it through the same pre-commit hook. A skill or entry file
+  that instructs a thing type, a status value, or a frontmatter field the
+  corpus never declared is naming an instruction whose product the floor
+  rejects; Warning severity, one class, one severity.
+
+  Why it passes this backlog's gate where the retired-vocabulary check did
+  not: it is keyed to `_schema.yaml`, the tool's reserved sets, and
+  `CORE_FIELDS` — the same builder it polices. The skill is *prose about* the
+  schema, so no allow-list exists or could: the only way to quiet a finding is
+  to make the two agree. And it passes the standing scoping test by scoping
+  the population — `deprecated` skills are out (instructions withdrawn),
+  `draft` skills are in (the archetype defect was `draft` and read daily), and
+  generated managed blocks are stripped before reading so no finding can name
+  a remedy that belongs to a generator.
+
+  Three design points worth carrying:
+
+  1. **Precision was bought at the price of recall, deliberately.** Only
+     three positions count as an instruction — a frontmatter template inside a
+     fenced block, a heading/list-step/table-cell naming a type, and a
+     `status`/**Key fields** list beneath one. Inline prose that *mentions* a
+     type is never a finding, and a parenthetical never is: `(e.g.,
+     \`type: migration-plan\`)` is correct writing about a type that need not
+     exist, and it was the estate's one would-be false positive.
+  2. **Every leg stays silent where the corpus declares no authority.** No
+     types declared, no `known_fields` registered (field registration is
+     opt-in and this check inherits that), or a type whose statuses are the
+     universal default — each is "could not look", not "nothing wrong".
+  3. **`valid_statuses_for` moved into `model.py`** beside
+     `terminal_statuses_for`, so the vocabulary authority has one definition
+     and two readers. A second copy in the coherence module would have been
+     this backlog's own restatement class, introduced by the check meant to
+     end it.
+
+  First run across the estate: three domains, ten findings — including one
+  no hand pass had found (a write skill's supplier frontmatter template
+  instructing `status: active` while the schema declares the universal
+  vocabulary). Replayed against the pre-fix blobs it reproduces the promoting
+  evidence exactly: the 13 unregistered fields, the four contradicted status
+  vocabularies with `income-record` first, and the six undeclared types.
+
+  Two of the five 2026-08-28 instances are **out of scope and stay open**: a
+  skill instructing a `linked_things` edge to a framework spec id, and a skill
+  instructing a commit of a file the domain deleted. Both are reference drift,
+  not vocabulary drift — the broken-body-reference item above is their home.
 
 - **Skills-directory-vs-artifacts check (added 2026-08-08, three instances in
   one day).** A domain kernel's Skills Directory claiming "unfilled stubs — the
