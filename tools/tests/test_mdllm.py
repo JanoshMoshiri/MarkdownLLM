@@ -1187,6 +1187,40 @@ def test_coherence_stable_staleness_is_info(tmp_path):
     assert any("marked `stable` but changed" in m for m in infos)
 
 
+def test_coherence_zero_run_definition_sensor(tmp_path):
+    # Estate synthesis 2026-08, F4 / queue row 4: a workflow-definition past
+    # `draft` with no run pointing at it via `definition:` — "a defined
+    # process with no run governs nothing." Three found by hand across the
+    # estate; a nine-domain census re-found the class manually on 2026-08-28,
+    # which is the walk this Info retires. Population scoped by who can still
+    # perform the remedy (an-advisory-is-scoped-by-who-can-perform-its-remedy):
+    # draft stays silent (draft-until-first-run is a legitimate declared
+    # pattern) and deprecated is retired, its remedy spent.
+    def wfd(status):
+        return thing_text(
+            f"id: proc\ntype: workflow-definition\nstatus: {status}\n"
+            f"created: 2026-06-01\nstages:\n  - id: only\n    to: []")
+
+    write(tmp_path, "things/proc.md", wfd("evolving"))
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert any("zero workflow-runs" in m for m in infos)      # evolving+0 fires
+    write(tmp_path, "things/proc.md", wfd("stable"))
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert any("zero workflow-runs" in m for m in infos)      # settled text, no run
+    write(tmp_path, "things/proc.md", wfd("draft"))
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert not any("zero workflow-runs" in m for m in infos)  # draft-until-first-run
+    write(tmp_path, "things/proc.md", wfd("deprecated"))
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert not any("zero workflow-runs" in m for m in infos)  # retired: remedy spent
+    write(tmp_path, "things/proc.md", wfd("evolving"))
+    write(tmp_path, "things/run.md", thing_text(
+        "id: run-1\ntype: workflow-run\nstatus: completed\ncreated: 2026-06-02\n"
+        "definition: proc\ncurrent_stage: only"))
+    infos = messages(mdllm.coherence_findings(tmp_path, 15), mdllm.SEV_INFO)
+    assert not any("zero workflow-runs" in m for m in infos)  # one run: governed
+
+
 def test_coherence_index_drift_errors(tmp_path):
     write(tmp_path, "things/a.md", thing_text(
         GOOD + "linked_things:\n  - id: b\n    relation: relates-to"))

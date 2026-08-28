@@ -1,10 +1,11 @@
 """Dark-region coherence checks — generated-artifact freshness and
 catalog/filesystem integrity.
 
-Corpus-general by design: stable-staleness, unused vocabulary, derived-index
-and domain-kernel drift run on any corpus; the foundational-spec / TIERS /
-kernel-drift / example-staleness / framework-map checks switch on only at a
-framework root. Runs in the pre-commit hook.
+Corpus-general by design: stable-staleness, unused vocabulary, zero-run
+workflow definitions, derived-index and domain-kernel drift run on any
+corpus; the foundational-spec / TIERS / kernel-drift / example-staleness /
+framework-map checks switch on only at a framework root. Runs in the
+pre-commit hook.
 """
 
 from __future__ import annotations
@@ -583,7 +584,8 @@ def coherence_findings(root: Path, window: int,
                        view: RepositoryView | None = None) -> list[Finding]:
     """Mechanical checks over the 'dark region' a hand-walk currently guards
     (AGENTS.md -> Walking the Dark Region). Corpus-general by design: the
-    stable-staleness, unused-vocabulary, and derived-index-drift checks run on
+    stable-staleness, unused-vocabulary, zero-run-definition, and
+    derived-index-drift checks run on
     ANY corpus, so a domain inherits them through the same pre-commit hook; the
     foundational-spec / TIERS / kernel-drift checks switch on only at a framework
     root (where `.markdownllm` is present). None of this is judgment — staleness
@@ -614,6 +616,37 @@ def coherence_findings(root: Path, window: int,
         for typ in sorted(declared - used):
             findings.append(Finding(SEV_INFO, "_schema.yaml",
                 f"declared type `{typ}` is used by no thing — dead vocabulary?"))
+
+    # --- general: zero-run workflow definition (Info) --------------------
+    # A defined process with no run governs nothing (estate synthesis
+    # 2026-08, F4 / queue row 4): three corpora wrote their method down and
+    # then worked beside it, and a nine-domain census re-found the class by
+    # hand on 2026-08-28 — exactly the walk this sensor retires. Population
+    # is scoped by who can still perform the remedy
+    # (an-advisory-is-scoped-by-who-can-perform-its-remedy): `draft` stays
+    # silent — draft-until-first-run is a legitimate declared pattern — and
+    # `deprecated` is retired, its remedy spent. `stable` is deliberately IN
+    # the population although RESERVED_TERMINAL settles it for the
+    # *authoring* lifecycle: a definition settled as text with zero runs is
+    # the archetype instance ("documentation, not process"), and giving it
+    # its first run is still performable. Quiet when healthy: one run of any
+    # status, ever, answers it.
+    run_targets = {str(t.meta.get("definition")) for t in corpus.things
+                   if str(t.meta.get("type")) == "workflow-run"
+                   and t.meta.get("definition") is not None}
+    for t in corpus.things:
+        if str(t.meta.get("type")) != "workflow-definition":
+            continue
+        status = str(t.meta.get("status"))
+        if status not in ("evolving", "stable"):
+            continue
+        if t.id is not None and str(t.id) in run_targets:
+            continue
+        findings.append(Finding(SEV_INFO, t.id or t.path.name,
+            f"workflow-definition is `{status}` with zero workflow-runs "
+            f"pointing at it via `definition:` — a defined process with no "
+            f"run governs nothing; give it its first run, or retire/park it "
+            f"with the reason recorded"))
 
     # --- general: a domain registering the framework's own vocabulary ----
     findings.extend(_redundant_known_fields_findings(corpus))
