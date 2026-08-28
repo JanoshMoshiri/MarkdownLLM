@@ -51,13 +51,55 @@ skipping it has already cost a real sprint.
 **Not exposed — and no longer the generalisation candidate.** The general
 form now lives in the `universal-workflow.md` spec, which reaches every
 domain with the framework via domain-refresh; a domain adopting this
-discipline specialises that, not this. This
-definition stays unexposed as the substrate's own specialisation: its
-stage mapping onto the general form is roughly problems+requirements ≈
-define-need/assess-current/define-prioritise, analysis ≈ set-mvp-target,
-design ≈ design-plan, build ≈ execute, verify+seal ≈ review-verify — with
-reconcile and seal's human gates as the floor-specific additions the
-general form leaves to proportionate application.
+discipline specialises that, not this. This definition stays unexposed as
+the substrate's own specialisation.
+
+## Derivation from the universal workflow
+
+This definition specialises `universal-workflow.md` (framework v3.36.0). Being
+a framework-root thing it can carry the structural `implements` edge to the
+methodology directly, in its `linked_things` — **a domain definition cannot**,
+because a cross-corpus reference target is a validation Error; a domain
+declares the same lineage in prose, anchored through its own workflow skill
+(`things/worked-examples/declaring-derivation-from-the-atom.md`). Stated here
+because the root is the reference implementation and must not read as the
+general case.
+
+| Decision | Stage | How it is realised |
+| --- | --- | --- |
+| define-need | `problems` | The evidence-backed inventory: a review finding, a measured bottleneck, a lived failure. No aspirational entries. |
+| assess-current | `problems` | Same stage: each problem carries its evidence — a review row, a measurement, a commit — which *is* the current-state assessment for the floor. |
+| define-prioritise | `requirements` + `analysis` | Requirements restate the problem set (non-functional budgets first-class, with numbers and a named reference machine); analysis prioritises necessity / should / stretch. |
+| set-mvp-target | `analysis` | The cut: one sprint deliberately scoped smaller than the requirement set, recorded as a `type: decision` with inputs pinned. |
+| design-plan | `design` | Components touched, budget proofs, focused test set, commit granularity, risks and mitigations. |
+| execute | `build` | Meaning-boundary commits against the design; deviations recorded as they happen. |
+| review-verify | `verify` + `seal` | Focused suites and measured budgets, then the full suite as a stage gate; seal closes against truth and reports publication debt. |
+
+**Two departures, both deliberate.**
+
+*define-need and assess-current share one stage.* For floor work the need and
+the current state arrive together — a problem is admissible here only when it
+carries its evidence, so a separate assessment gate would restate what
+admission already proved. Named rather than left silent.
+
+*One stage is added:* `reconcile` — the dark-region walk over specs, docs,
+kernel and generated surfaces after a change. The methodology leaves
+consistency maintenance to proportionate application; on a substrate whose
+subject is its own definitions it is load-bearing enough to be a gate, and it
+is where `consistency-is-maintained-at-change-not-by-sweeping` is enforced.
+`seal` additionally carries the human gates — push, public claim, anything
+irreversible — which is the gate-authority boundary made a stage rather than
+left to discipline.
+
+All four progression outcomes are declared and exercised: *continuing* along
+the forward edges; *revising* along the declared backward edges (analysis →
+requirements, design → analysis, verify → build, reconcile → build);
+*deferring* and *stopping* as run `status: paused` / `abandoned`.
+
+**Shape: repeatable.** Each sprint is a sibling run of a stable definition,
+instanced by a demand, and a review improves the definition for later sprints
+rather than feeding the next sprint's assessment — three floor sprints and the
+seams run are that series.
 
 ## Stages
 
