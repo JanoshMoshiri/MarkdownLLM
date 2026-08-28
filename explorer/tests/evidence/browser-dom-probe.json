@@ -1,75 +1,126 @@
 {
   "schema": 1,
-  "fixture": "F-UI plus F-MARKDOWN-HOSTILE",
+  "fixture": "F-UI synthetic publication fixture (tools/build_public_demo_estate.py)",
   "tool": {
-    "name": "Codex in-app Browser",
-    "version": "26.818.61809"
+    "name": "Claude in-app Browser",
+    "version": "26.828.0"
   },
-  "executed_at": "2026-08-27T19:01:38+01:00",
+  "executed_at": "2026-08-28T13:05:00+01:00",
   "shell": {
-    "regions": ["source navigation", "main content", "context"],
-    "tabs": ["Overview", "Skills", "Memory", "Settings"],
+    "regions": [
+      "source navigation",
+      "main content",
+      "context"
+    ],
+    "tabs": [
+      "Overview",
+      "Skills",
+      "Memory",
+      "Settings"
+    ],
     "source_count": 4,
     "domain_count": 3,
     "substrate_first": true,
+    "substrate_display_name": "MarkdownLLM",
+    "desktop_tracks": "270px 920px 250px",
     "irrelevant_controls": []
   },
   "navigation": {
-    "tree_first_page_items": 49,
+    "tree_first_page_items": 4,
     "nested_directory_disclosure": true,
+    "expanded_directory_children": 2,
     "selected_document_retained": true,
     "back_restored_source_tab_path_and_mode": true,
     "forward_restored_source_tab_path_and_mode": true,
-    "refresh_restored_source_tab_path_and_mode": true,
-    "skills_refresh_preserved_collection_reader": true,
-    "memory_refresh_preserved_collection_reader": true,
-    "collection_item_selection_restored": true
+    "commit_parameter_cleared_when_a_live_document_is_opened": true
+  },
+  "overview": {
+    "metric_labels": [
+      "Files",
+      "Skills",
+      "Memory things",
+      "Commits shown"
+    ],
+    "commit_rows_are_activatable_buttons": true,
+    "commit_abbreviations_unique": true,
+    "commit_date_rendering": "21 Aug 2026, 14:15"
+  },
+  "commit_view": {
+    "activating_a_commit_routes_with_full_sha": true,
+    "changed_paths_listed_with_classification": true,
+    "selection_marked_on_open_not_only_on_click": true,
+    "historical_badge": "added in 4cd43cde352b",
+    "historical_legend": "Marked lines are what this commit added or changed — lines 1–19. Removed lines are not part of this view.",
+    "gutter_rows": 19,
+    "code_rows": 19,
+    "gutter_and_code_aligned": true,
+    "marked_runs": 1,
+    "gutter_plus_markers": 19,
+    "removed_lines_absent_from_rendered_content": true,
+    "back_returns_to_history_and_clears_commit_from_route": true
   },
   "collections": {
-    "skills_populated": true,
-    "memory_group_headings": ["Insights"],
-    "context_populated_from_selected_document": true,
-    "skills_route_item_count_after_reload": 1,
-    "memory_route_item_count_after_reload": 1
+    "memory_group_order": [
+      "Retrospectives",
+      "Insights",
+      "Decisions"
+    ],
+    "group_headings_carry_aria_expanded": true,
+    "collapsed_group_hides_items": true,
+    "collapsed_group_keeps_its_count_visible": true
   },
   "document": {
-    "rendered_and_raw_on_demand": true,
-    "frontmatter_separate": true,
-    "hostile_heading": "Hostile content corpus",
-    "forbidden_tag_count": 0,
-    "forbidden_attribute_count": 0,
-    "unsafe_script_executed": false,
-    "raw_script_remained_literal_text": true,
-    "image_syntax_remained_inert_text": true,
-    "active_links": [
+    "styled_and_raw_switch_on_demand": true,
+    "raw_mode_repeats_frontmatter_disclosure": false,
+    "styled_mode_offers_frontmatter_disclosure": true,
+    "context_frontmatter_entries_shown": 5,
+    "context_frontmatter_truncated": false
+  },
+  "references": {
+    "declared_fields_rendered_as_controls": true,
+    "resolved": [
       {
-        "label": "canonical web",
-        "scheme": "https",
-        "target": "_blank",
-        "rel": "noopener noreferrer external"
+        "id": "prototype-review",
+        "relation": "validates",
+        "path": "skills/prototype-review.skill.md"
+      },
+      {
+        "id": "evidence-before-roadmap",
+        "relation": "derived-from",
+        "path": "things/insights/evidence-before-roadmap.md"
       }
-    ]
+    ],
+    "unresolved": [
+      {
+        "id": "keep-source-and-inference-apart",
+        "relation": "references",
+        "reason": "the named thing belongs to another domain, so this source cannot resolve it",
+        "activatable": false
+      }
+    ],
+    "following_a_reference_opens_the_named_thing": true,
+    "no_reference_left_pending": true
   },
   "search": {
-    "reachable_desktop": true,
-    "reachable_narrow": true,
-    "populated_state": true,
-    "terminal_state": true
+    "path_filter_results": 2,
+    "all_results_match_the_query": true,
+    "empty_state_shown_for_no_match": true
   },
   "theme": {
-    "system_rendered": true,
-    "light_rendered": true,
-    "dark_rendered": true,
-    "explicit_dark_survived_reload": true,
-    "route_and_capability_survived_theme_change": true
+    "cycle_observed": [
+      "light",
+      "dark",
+      "system"
+    ],
+    "persisted_choice_key": "mdllm-explorer-theme",
+    "location_preserved_across_theme_change": true
   },
-  "async": {
-    "late_A_after_B_ignored": true,
-    "operation_slots_isolated": true,
-    "terminal_states_observed": true
+  "keyboard": {
+    "tablist_arrow_navigation": true,
+    "region_collapse_controls_in_tab_order": true
   },
-  "console": {
-    "errors": 0,
-    "warnings": 0
+  "diagnostics": {
+    "console_errors_after_load": 0,
+    "server_unknown_route_lines_for_favicon": 0
   }
 }

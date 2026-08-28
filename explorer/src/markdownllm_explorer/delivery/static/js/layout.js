@@ -84,9 +84,19 @@ export function initialiseLayout(onOverlay, onLeaveOverlayWidth) {
   }
   // Crossing into desktop leaves the overlay mechanism behind. Its modal state
   // — inert siblings, dialog roles, a trapped focus ring — would otherwise
-  // survive into a layout that has no dialog in it.
-  matchMedia(DESKTOP).addEventListener?.("change", event => {
-    if (event.matches) onLeaveOverlayWidth();
+  // survive into a layout that has no dialog in it, leaving the workspace
+  // inert and nothing on the page operable.
+  //
+  // Reconciled from the current width rather than from the crossing event.
+  // A media-query change event is the natural signal but is not reliably
+  // delivered under every emulated or non-compositing viewport, and the cost
+  // of missing it is a page the reader cannot use. Resize is the coarser
+  // signal that always arrives.
+  const reconcile = () => {
+    const drawerOpen = document.body.classList.contains("nav-open") || document.body.classList.contains("context-open");
+    if (atDesktop() && drawerOpen) onLeaveOverlayWidth();
     syncRegionState();
-  });
+  };
+  matchMedia(DESKTOP).addEventListener?.("change", reconcile);
+  window.addEventListener("resize", reconcile);
 }

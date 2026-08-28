@@ -183,9 +183,14 @@ Docs and tests move with each phase; evidence reseals once.
       including one cross-domain reference that legitimately does not resolve.
 - [x] Public user guide describes region collapse, commit contents, historical
       reading and reference navigation.
-- [ ] Browser evidence re-executed and recorded against the final subject.
-- [ ] Evidence index resealed; `verify_evidence` run and its result reported
-      honestly, including what it reports as unmet.
+- [x] Browser evidence re-executed against the final subject on the fictional
+      fixture: eleven BT journeys including the three new ones, plus AJ-01 to
+      AJ-07. The observing pane does not composite frames, so it delivers no
+      resize or media-query events of its own; that limitation is recorded in
+      the evidence rather than worked around silently.
+- [x] Evidence index resealed at `8ee4f125`. `verify_evidence` reports 63 of 70
+      requirements technically met. The seven it reports unmet are exactly the
+      Windows lifecycle ones, owed at the signed build — nothing else fails.
 - [ ] Operator re-dispositions the affected acceptance journeys (19 reopened).
 
 ## Phase 7 — Version and handback
@@ -195,6 +200,8 @@ Docs and tests move with each phase; evidence reseals once.
 - [ ] Changelog and the framework version decision — deferred to the signed
       release boundary by `explorer-publication-readiness`, and the operator's.
 - [ ] Rebuild the unsigned candidate from final source; record its hash.
+      (The 0.3.0 wheel is built and its clean offline install is proven; the
+      Windows installer is deliberately not rebuilt until signing.)
 - [ ] Hand the signing gate back to `explorer-publication-readiness` — the
       credentials and timestamp service remain the operator's to supply, and
       that plan closes on the signed bytes.

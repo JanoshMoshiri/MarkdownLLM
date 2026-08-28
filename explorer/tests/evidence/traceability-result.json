@@ -4,16 +4,18 @@
   "status": "fail",
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad"
+    "sha256": "8ee4f125021bb43c6d2d9a320b443c992f9ad7aa22f5d3a91687252db7be00b7"
   },
   "junit": {
-    "tests": 114,
+    "tests": 155,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
-  "evidence_errors": [],
-  "resolved_evidence_count": 121,
+  "evidence_errors": [
+    "operator acceptance scope does not match the human-owned trace rows"
+  ],
+  "resolved_evidence_count": 148,
   "requirements": {
     "FR-EST-001": {
       "status": "pass",
@@ -47,7 +49,7 @@
       "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
-      "observable_pass_condition": "First source is labelled Substrate independent of folder name",
+      "observable_pass_condition": "First source is named MarkdownLLM independent of folder name",
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/browser-runtime.json"
@@ -591,7 +593,7 @@
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer.json"
+        "tests/evidence/windows-installer-0.2.0-superseded.json"
       ]
     },
     "FR-RUN-002": {
@@ -650,7 +652,7 @@
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "One setup executable installs per user without elevation/Python/network, validates root and creates singleton shortcuts plus uninstaller",
       "evidence_location": [
-        "tests/evidence/windows-installer.json"
+        "tests/evidence/windows-installer-0.2.0-superseded.json"
       ]
     },
     "FR-RUN-005": {
@@ -673,7 +675,7 @@
       "observable_pass_condition": "Shortcut opens browser and tray; reactivation leaves one server; Open and Exit terminate in bounded time without capability persistence",
       "evidence_location": [
         "tests/evidence/pytest.xml",
-        "tests/evidence/windows-installer.json"
+        "tests/evidence/windows-installer-0.2.0-superseded.json"
       ]
     },
     "FR-RUN-006": {
@@ -696,7 +698,7 @@
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "Reinstall preserves selected root and singleton owned surfaces; uninstall removes only owned surfaces with source/outside snapshots unchanged",
       "evidence_location": [
-        "tests/evidence/windows-installer.json"
+        "tests/evidence/windows-installer-0.2.0-superseded.json"
       ]
     },
     "FR-ERR-001": {
@@ -945,7 +947,7 @@
       "misplaced": [],
       "technical_owner": "http-suite",
       "acceptance_owner": "Technical run",
-      "human_disposition": "none",
+      "human_disposition": "pending-human",
       "method": "contract",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Separate APIs keep initial payload free of file bodies/full history and return one document mode",
@@ -986,7 +988,7 @@
       "misplaced": [],
       "technical_owner": "git-suite",
       "acceptance_owner": "Technical run",
-      "human_disposition": "none",
+      "human_disposition": "pending-human",
       "method": "test+mutation",
       "fixture": "F-GIT-SHAPES",
       "observable_pass_condition": "Git uses trusted executable/fixed argv/env/cwd/deadline/output and no helper, lazy fetch or external store",
@@ -1020,7 +1022,7 @@
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer.json",
+        "tests/evidence/windows-installer-0.2.0-superseded.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1151,7 +1153,7 @@
       "observable_pass_condition": "Portable and native journeys run after offline install with no system Python, CDN, network, Node or extension dependency",
       "evidence_location": [
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer.json",
+        "tests/evidence/windows-installer-0.2.0-superseded.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1176,7 +1178,7 @@
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer.json",
+        "tests/evidence/windows-installer-0.2.0-superseded.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1234,14 +1236,145 @@
       "evidence_location": [
         "tests/evidence/pytest.xml"
       ]
+    },
+    "FR-NAV-007": {
+      "status": "pass",
+      "expected": [
+        "browser::BT-COLLAPSE-001"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "browser-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-ESTATE-MIN",
+      "observable_pass_condition": "Either side region collapses and restores at desktop, persists across reload, and takes no dialog/modal/inert/focus-trap semantics",
+      "evidence_location": [
+        "tests/evidence/browser-runtime.json"
+      ]
+    },
+    "FR-NAV-008": {
+      "status": "pass",
+      "expected": [
+        "browser::BT-COLLAPSE-001",
+        "browser::BT-RESPONSIVE-001"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "browser-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-ESTATE-MIN",
+      "observable_pass_condition": "Centre region scrolls horizontally when squeezed and the page body never does",
+      "evidence_location": [
+        "tests/evidence/browser-runtime.json",
+        "tests/evidence/browser-layout-probe.json"
+      ]
+    },
+    "FR-TAB-007": {
+      "status": "pass",
+      "expected": [
+        "pytest::tests/test_adapters.py::test_commit_detail_lists_changed_paths_and_marks_unopenable_ones",
+        "browser::BT-COMMIT-001"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "git-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-ESTATE-MIN",
+      "observable_pass_condition": "A commit lists its changed paths against first parent, classified, with openability decided by source admission not by git",
+      "evidence_location": [
+        "tests/evidence/pytest.xml",
+        "tests/evidence/browser-runtime.json"
+      ]
+    },
+    "FR-TAB-008": {
+      "status": "pass",
+      "expected": [
+        "pytest::tests/test_adapters.py::test_historical_read_returns_commit_content_with_added_ranges",
+        "browser::BT-COMMIT-001"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "git-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-ESTATE-MIN",
+      "observable_pass_condition": "An openable path reads as the commit left it with added ranges marked and named, and no removed line present",
+      "evidence_location": [
+        "tests/evidence/pytest.xml",
+        "tests/evidence/browser-runtime.json"
+      ]
+    },
+    "FR-TAB-009": {
+      "status": "pass",
+      "expected": [
+        "pytest::tests/test_adapters.py::test_memory_groups_run_z_to_a_with_titles_ascending_inside",
+        "browser::BT-TABS-001"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "collection-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-ESTATE-MIN",
+      "observable_pass_condition": "Memory groups descend with titles ascending inside, each collapsible, state surviving pagination, count visible while collapsed",
+      "evidence_location": [
+        "tests/evidence/pytest.xml",
+        "tests/evidence/browser-runtime.json"
+      ]
+    },
+    "FR-DOC-009": {
+      "status": "pass",
+      "expected": [
+        "pytest::tests/test_adapters.py::test_references_resolve_identifiers_to_paths_and_report_the_rest",
+        "browser::BT-REFERENCE-001"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "reference-suite",
+      "acceptance_owner": "Technical run / Janosh",
+      "human_disposition": "pending-human",
+      "method": "test+demonstration",
+      "fixture": "F-ESTATE-MIN",
+      "observable_pass_condition": "Declared references open the thing they name; unresolved, contested and failed lookups settle explicitly and never stay pending",
+      "evidence_location": [
+        "tests/evidence/pytest.xml",
+        "tests/evidence/browser-runtime.json"
+      ]
+    },
+    "NFR-SAFE-001D": {
+      "status": "pass",
+      "expected": [
+        "pytest::tests/test_adapters.py::test_historical_read_applies_the_same_refusals_as_a_live_read",
+        "pytest::tests/test_adapters.py::test_tree_path_gate_rejects_traversal_option_and_spec_injection"
+      ],
+      "missing": [],
+      "misplaced": [],
+      "technical_owner": "git-suite",
+      "acceptance_owner": "Technical run",
+      "human_disposition": "none",
+      "method": "test+mutation",
+      "fixture": "F-ESTATE-MIN",
+      "observable_pass_condition": "Object-store reads apply working-tree admission, eligibility, ownership, size, binary and encoding rules, decided before any git invocation",
+      "evidence_location": [
+        "tests/evidence/pytest.xml",
+        "tests/evidence/mutation-kill-matrix.json"
+      ]
     }
   },
   "summary": {
-    "requirements": 63,
-    "technical_passed": 56,
+    "requirements": 70,
+    "technical_passed": 63,
     "technical_failed": 7,
     "human_accepted": 30,
-    "human_pending": 0
+    "human_pending": 8
   },
   "unresolved_requirements": [
     "FR-RUN-001",

@@ -2,9 +2,9 @@
   "schema": 1,
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad"
+    "sha256": "8ee4f125021bb43c6d2d9a320b443c992f9ad7aa22f5d3a91687252db7be00b7"
   },
-  "generated_at": "2026-08-27T19:23:43.265451+00:00",
+  "generated_at": "2026-08-28T12:15:49.935395+00:00",
   "tool": {
     "name": "build_evidence_index.py",
     "version": "1",
@@ -22,25 +22,28 @@
     },
     {
       "path": "tests/evidence/browser-dom-probe.json",
-      "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481",
-      "bytes": 2178,
+      "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf",
+      "bytes": 3667,
       "evidence_ids": []
     },
     {
       "path": "tests/evidence/browser-layout-probe.json",
-      "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5",
-      "bytes": 2728,
+      "sha256": "a90122cb873b86dccfa3f79d272b16b2197475081d778c82d55ffa32d7b2156a",
+      "bytes": 3687,
       "evidence_ids": []
     },
     {
       "path": "tests/evidence/browser-runtime.json",
-      "sha256": "093e395142a96690cf7b5822d8017253b44d24fcfd03e75cd108dd16341f4714",
-      "bytes": 8687,
+      "sha256": "136e14bf60e854ce139c4e407005579ea39a265b2aebaece435345952be0081e",
+      "bytes": 16248,
       "evidence_ids": [
         "browser::BT-SHELL-001",
         "browser::BT-NAV-001",
         "browser::BT-TABS-001",
         "browser::BT-DOCUMENT-001",
+        "browser::BT-COMMIT-001",
+        "browser::BT-COLLAPSE-001",
+        "browser::BT-REFERENCE-001",
         "browser::BT-SEARCH-001",
         "browser::BT-THEME-001",
         "browser::BT-ASYNC-001",
@@ -59,8 +62,8 @@
     },
     {
       "path": "tests/evidence/clean-install.json",
-      "sha256": "0759917fa41bd986bfa192c28bca985455da51228564b5f132f94f9281244f3f",
-      "bytes": 1769,
+      "sha256": "8f2c9645f03de0c70d89c4e85e4ba95859f24d33b828436bed596dc02be21281",
+      "bytes": 1697,
       "evidence_ids": [
         "system::ST-INSTALL-001",
         "system::ST-OFFLINE-001",
@@ -69,7 +72,7 @@
     },
     {
       "path": "tests/evidence/immutability.json",
-      "sha256": "9702df9f34de77f9458b490c6756bbfc565924b4b02a6dc190321734b7eefe1f",
+      "sha256": "1917a4f5e18847e5ca0e631e57bb40a13d28f7a60ba93df2ba255c1e03c9ee65",
       "bytes": 1106,
       "evidence_ids": [
         "analysis::GT-IMMUTABLE-001"
@@ -77,8 +80,8 @@
     },
     {
       "path": "tests/evidence/mutation-kill-matrix.json",
-      "sha256": "a2efedf0cf6a6c7dcf86475c9bb1e34defea6f573780756b00c7479d2f0befd6",
-      "bytes": 48332,
+      "sha256": "820bb4d9ba6a82376da99ee06fb7f3a23bfa221fdc364da200cdc92021e9bd28",
+      "bytes": 66957,
       "evidence_ids": [
         "analysis::MT-MUTATION-001",
         "mutation::M01",
@@ -96,7 +99,12 @@
         "mutation::M13",
         "mutation::M14",
         "mutation::M15",
-        "mutation::M16"
+        "mutation::M16",
+        "mutation::M17",
+        "mutation::M18",
+        "mutation::M19",
+        "mutation::M20",
+        "mutation::M21"
       ]
     },
     {
@@ -107,38 +115,38 @@
     },
     {
       "path": "tests/evidence/performance-20-run.json",
-      "sha256": "e0408631e20451d5e164c9e348dce6346e8af564336ca43f1907b452cb475fdd",
-      "bytes": 5352,
+      "sha256": "e2ff399287fa2e22871f52ea39ffbe67e6a86e5ba2c3ff508263aee2b8042822",
+      "bytes": 5286,
       "evidence_ids": [
         "analysis::PT-SCALE-001"
       ]
     },
     {
       "path": "tests/evidence/pytest.xml",
-      "sha256": "62ae9184a774da3255c8dd536c15bf4d34164ebf288a2ecb4091df9abb0612cb",
-      "bytes": 14663,
+      "sha256": "b1a45f602326e6013d708e362423078623c84897fedfd428f3e6d94f0643bdda",
+      "bytes": 21535,
       "evidence_ids": []
     },
     {
       "path": "tests/evidence/visual-dark.png",
-      "sha256": "7784ed962a0aeb495eaf3ef90b7b92be93ab3996214b220dba6cccaa9a7d147a",
-      "bytes": 61620,
+      "sha256": "f54cbefa707eefccb72c44e8d5c6ca2342937161904c40e3712a74c8d82a58c6",
+      "bytes": 72855,
       "evidence_ids": []
     },
     {
       "path": "tests/evidence/visual-light.png",
-      "sha256": "11a1cc7ccd46f955fa819d18e0340ce53029eb6114f63e0ac7d31872408f84e5",
-      "bytes": 59972,
+      "sha256": "3d092620db36b0fcfd104d92408a23878269dec0b8390a9503e5f7fa18b6513e",
+      "bytes": 73519,
       "evidence_ids": []
     },
     {
       "path": "tests/evidence/visual-narrow.png",
-      "sha256": "dabb0950343943f82de95d61ac53ccd8dbfd3e2a7c72d4b302ec93b4be91518e",
-      "bytes": 26614,
+      "sha256": "65d9df6752f1c639e17dbccdc9337c53df8221be38227b46b74124d73644649e",
+      "bytes": 31114,
       "evidence_ids": []
     },
     {
-      "path": "tests/evidence/windows-installer.json",
+      "path": "tests/evidence/windows-installer-0.2.0-superseded.json",
       "sha256": "a1df462295dd88613becacedf9173a68523c04e900b2c72f231444a10bdd7d33",
       "bytes": 2026,
       "evidence_ids": []

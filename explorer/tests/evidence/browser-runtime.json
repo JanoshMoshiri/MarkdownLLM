@@ -1,137 +1,398 @@
 {
   "schema": 1,
-  "subject_sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad",
-  "subject_revalidated_at": "2026-08-27T20:23:04+01:00",
-  "subject_revalidation_basis": "The browser-facing package bytes are unchanged from the 19:01 executed run. Subsequent subject changes are confined to Windows process termination, installer replacement/signing, verification tooling/tests and failure cleanup, blocked-evidence accounting and release wording; the final 114-test Explorer suite rechecked the browser asset and architecture contracts. The retained run had already re-executed route restoration, depth, responsive overlays, theme persistence, hostile Markdown safety, search activation, accessibility and zero browser diagnostics after the UI corrections.",
+  "subject_sha256": "8ee4f125021bb43c6d2d9a320b443c992f9ad7aa22f5d3a91687252db7be00b7",
   "tool": {
     "name": "in-app-browser",
-    "version": "26.818.61809"
+    "version": "26.828.0"
   },
   "runtime": {
-    "browser": "Codex in-app Browser for interaction; Google Chrome headless for retained synthetic screenshots",
-    "browser_version": "in-app Browser plugin 26.818.61809 (embedded Chromium build not exposed); Chrome 151.0.7922.174",
-    "os": "Windows",
-    "executed_at": "2026-08-27T19:01:38+01:00"
+    "browser": "Claude in-app Browser for interaction; Google Chrome headless for retained screenshots",
+    "browser_version": "in-app Browser plugin 26.828.0 (embedded Chromium build not exposed); Chrome headless 141",
+    "os": "Windows 11 Pro 10.0.26200",
+    "executed_at": "2026-08-28T13:05:00+01:00"
   },
+  "fixture": "F-UI synthetic publication fixture built by tools/build_public_demo_estate.py. The imperfect-estate journey uses a purpose-built temporary estate, and the independent-launch journey uses the clean-install artefact produced the same day.",
+  "limitations": [
+    "The in-app browser pane does not composite frames. It therefore delivers neither media-query change nor resize events from its own viewport emulation, and CSS transitions never advance. Viewport-dependent behaviour was measured by setting the viewport and reading computed layout, and the breakpoint reconciliation was exercised by dispatching the event the pane does not deliver. This is a limitation of the observing tool, recorded rather than worked around silently."
+  ],
   "evidence": [
     {
       "id": "browser::BT-SHELL-001",
       "status": "pass",
-      "checks": ["Substrate precedes the Domain estate", "three-region shell and four product tabs are present", "no irrelevant or write control is exposed"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "three-region desktop composition present with Substrate above the Domain estate",
+        "the substrate is named MarkdownLLM and appears first",
+        "four product tabs present; no share, account, edit or chat control is exposed"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        },
+        {
+          "path": "tests/evidence/visual-light.png",
+          "sha256": "3d092620db36b0fcfd104d92408a23878269dec0b8390a9503e5f7fa18b6513e"
+        }
+      ]
     },
     {
       "id": "browser::BT-NAV-001",
       "status": "pass",
-      "checks": ["source and nested tree navigation work", "URL refresh, Back and Forward restore source, tab, path and mode", "Skills and Memory deep links retain their collection-reader shell and selected item", "tree selection retains context"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "nested directory disclosure expands in place without loading file bodies",
+        "selecting a file opens it and retains the source and tree context",
+        "refresh, back and forward restore source, tab, path and mode",
+        "opening a live document clears any commit from the route"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
     },
     {
       "id": "browser::BT-TABS-001",
       "status": "pass",
-      "checks": ["Overview, Skills, Memory and Settings all render", "commit abbreviations are 12 characters", "Skills and grouped Memory open the same document reader"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "Overview shows counts labelled Files, Skills, Memory things and Commits shown",
+        "Memory groups descend Retrospectives, Insights, Decisions and each is a disclosure",
+        "a collapsed group hides its items and keeps its count visible",
+        "Settings shows read-only path, markers and theme control"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        },
+        {
+          "path": "tests/evidence/visual-light.png",
+          "sha256": "3d092620db36b0fcfd104d92408a23878269dec0b8390a9503e5f7fa18b6513e"
+        }
+      ]
     },
     {
       "id": "browser::BT-DOCUMENT-001",
       "status": "pass",
-      "checks": ["styled and raw representations load on demand", "frontmatter and factual context are separate", "final hostile DOM contains no active unsafe content"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "styled and raw switch fetch on demand",
+        "raw mode does not repeat the frontmatter disclosure; styled mode offers it",
+        "the context panel lists every frontmatter entry rather than a fixed number"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
+    },
+    {
+      "id": "browser::BT-COMMIT-001",
+      "status": "pass",
+      "checks": [
+        "activating a commit routes with its full identifier and lists the paths it changed, classified",
+        "an openable path opens as the commit left it, with added lines marked and named in text",
+        "the gutter and the code pane stay in step; no removed line appears in the rendered content",
+        "returning to the history clears the commit from the route"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
+    },
+    {
+      "id": "browser::BT-COLLAPSE-001",
+      "status": "pass",
+      "checks": [
+        "either side region collapses at desktop and yields its grid track to the centre",
+        "a collapsed region holds no focusable control and takes no dialog role or inert siblings",
+        "focus moves to the control that replaces the one being hidden, and the choice persists",
+        "no collapse state produces page-level horizontal overflow"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-layout-probe.json",
+          "sha256": "a90122cb873b86dccfa3f79d272b16b2197475081d778c82d55ffa32d7b2156a"
+        }
+      ]
+    },
+    {
+      "id": "browser::BT-REFERENCE-001",
+      "status": "pass",
+      "checks": [
+        "declared reference fields render as controls carrying their relation",
+        "a reference that resolves opens the thing it names",
+        "a reference to a thing outside this source settles as explicitly unresolved and is not activatable",
+        "no reference is left pending"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
     },
     {
       "id": "browser::BT-SEARCH-001",
       "status": "pass",
-      "checks": ["search is reachable in desktop and narrow layouts", "populated and terminal states render", "result activation opens an eligible document"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "the path filter returns only matching paths",
+        "a query with no match ends in an explicit empty state"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
     },
     {
       "id": "browser::BT-THEME-001",
       "status": "pass",
-      "checks": ["system, explicit light and explicit dark render", "explicit preference survives reload", "theme changes retain route and capability"],
+      "checks": [
+        "light, dark and system are all reachable and each renders the shell",
+        "the explicit choice persists in browser-local storage",
+        "changing the theme does not change the source, tab or document"
+      ],
       "artifacts": [
-        {"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"},
-        {"path": "tests/evidence/visual-light.png", "sha256": "11a1cc7ccd46f955fa819d18e0340ce53029eb6114f63e0ac7d31872408f84e5"},
-        {"path": "tests/evidence/visual-dark.png", "sha256": "7784ed962a0aeb495eaf3ef90b7b92be93ab3996214b220dba6cccaa9a7d147a"}
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        },
+        {
+          "path": "tests/evidence/visual-light.png",
+          "sha256": "3d092620db36b0fcfd104d92408a23878269dec0b8390a9503e5f7fa18b6513e"
+        },
+        {
+          "path": "tests/evidence/visual-dark.png",
+          "sha256": "f54cbefa707eefccb72c44e8d5c6ca2342937161904c40e3712a74c8d82a58c6"
+        }
       ]
     },
     {
       "id": "browser::BT-ASYNC-001",
       "status": "pass",
-      "checks": ["late A-after-B response cannot change the live B location", "operation slots are isolated", "loading, content, empty and error paths terminate"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "a missing document ends in a terminal error state with no skeleton left behind",
+        "the failure is announced once and the source context is retained",
+        "the estate remains usable immediately afterwards"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
     },
     {
       "id": "browser::BT-RESPONSIVE-001",
       "status": "pass",
-      "checks": ["1440x900, 390x844 and 320 CSS-pixel layouts retain every capability", "900-pixel breakpoint is continuous", "page-level horizontal overflow is absent"],
+      "checks": [
+        "1440x900 three-region, 375x812 drawers and 320 CSS-pixel single-column reflow",
+        "no page-level horizontal overflow at any width",
+        "a closed drawer holds no focusable control; an open one is a dialog with inert siblings and focus inside",
+        "Escape dismisses the drawer, releases inert and returns focus to its opener",
+        "modal state left by a drawer is released once the layout is no longer an overlay"
+      ],
       "artifacts": [
-        {"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"},
-        {"path": "tests/evidence/visual-narrow.png", "sha256": "dabb0950343943f82de95d61ac53ccd8dbfd3e2a7c72d4b302ec93b4be91518e"}
+        {
+          "path": "tests/evidence/browser-layout-probe.json",
+          "sha256": "a90122cb873b86dccfa3f79d272b16b2197475081d778c82d55ffa32d7b2156a"
+        },
+        {
+          "path": "tests/evidence/visual-narrow.png",
+          "sha256": "65d9df6752f1c639e17dbccdc9337c53df8221be38227b46b74124d73644649e"
+        }
       ]
     },
     {
       "id": "browser::BT-KEYBOARD-001",
       "status": "pass",
-      "checks": ["tree arrows follow non-wrapping tree semantics", "collapse retains valid focus", "tabs use arrow navigation and paginated content receives focus"],
-      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"}]
+      "checks": [
+        "the tablist moves by arrow key and keeps a single tab stop",
+        "the region collapse controls are in the tab order",
+        "at 320 CSS pixels every primary control is still reachable by keyboard"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        },
+        {
+          "path": "tests/evidence/browser-layout-probe.json",
+          "sha256": "a90122cb873b86dccfa3f79d272b16b2197475081d778c82d55ffa32d7b2156a"
+        }
+      ]
     },
     {
       "id": "browser::BT-A11Y-001",
       "status": "pass",
-      "checks": ["roles, names, states, focus return and background inertness were inspected", "all measured contrast ratios pass", "visible controls meet the 24 CSS-pixel target minimum", "unavailable accessibility-tree and native zoom capabilities are explicitly recorded"],
-      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"}]
+      "checks": [
+        "23 interactive controls, none without an accessible name",
+        "no control below the 24 CSS-pixel target minimum",
+        "tablist and tree roles present; disclosures carry aria-expanded",
+        "one polite live region for async status and an alert role for failures",
+        "the added-line mark measures 11.39:1 in dark and 14.27:1 in light, is also marked in the gutter, and its line numbers are named in text",
+        "a reduced-motion rule is present"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        },
+        {
+          "path": "tests/evidence/browser-layout-probe.json",
+          "sha256": "a90122cb873b86dccfa3f79d272b16b2197475081d778c82d55ffa32d7b2156a"
+        }
+      ]
     },
     {
       "id": "browser::BT-VISUAL-001",
       "status": "pass",
-      "checks": ["synthetic light desktop, dark desktop and narrow captures are retained", "no clipping, overlap or unintended page scroll is visible", "the result follows the reference hierarchy without copied branding"],
+      "checks": [
+        "desktop light, desktop dark and narrow screenshots captured from the fictional fixture",
+        "no clipping or overlap observed in the captured views"
+      ],
       "artifacts": [
-        {"path": "tests/evidence/visual-light.png", "sha256": "11a1cc7ccd46f955fa819d18e0340ce53029eb6114f63e0ac7d31872408f84e5"},
-        {"path": "tests/evidence/visual-dark.png", "sha256": "7784ed962a0aeb495eaf3ef90b7b92be93ab3996214b220dba6cccaa9a7d147a"},
-        {"path": "tests/evidence/visual-narrow.png", "sha256": "dabb0950343943f82de95d61ac53ccd8dbfd3e2a7c72d4b302ec93b4be91518e"}
+        {
+          "path": "tests/evidence/visual-light.png",
+          "sha256": "3d092620db36b0fcfd104d92408a23878269dec0b8390a9503e5f7fa18b6513e"
+        },
+        {
+          "path": "tests/evidence/visual-dark.png",
+          "sha256": "f54cbefa707eefccb72c44e8d5c6ca2342937161904c40e3712a74c8d82a58c6"
+        },
+        {
+          "path": "tests/evidence/visual-narrow.png",
+          "sha256": "65d9df6752f1c639e17dbccdc9337c53df8221be38227b46b74124d73644649e"
+        }
       ]
     },
     {
       "id": "system::AJ-01",
       "status": "pass",
-      "checks": ["substrate overview and commit history render from the running loopback process"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "from the launch URL alone: Substrate above Domains, a domain selected, its own commit shown",
+        "a styled skill read, and an insight read from Memory",
+        "files and git identified as the read-only authority from the context panel"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        },
+        {
+          "path": "tests/evidence/visual-light.png",
+          "sha256": "3d092620db36b0fcfd104d92408a23878269dec0b8390a9503e5f7fa18b6513e"
+        }
+      ]
     },
     {
       "id": "system::AJ-02",
       "status": "pass",
-      "checks": ["domain Skills document opens rendered and raw with route restoration"],
-      "artifacts": [{"path": "tests/evidence/visual-light.png", "sha256": "11a1cc7ccd46f955fa819d18e0340ce53029eb6114f63e0ac7d31872408f84e5"}]
+      "checks": [
+        "nested directories expanded, a Markdown document opened, raw source shown",
+        "browser back and forward return to the same selected and expanded context"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
     },
     {
       "id": "system::AJ-03",
       "status": "pass",
-      "checks": ["imperfect and hostile fixture outcomes remain bounded and contextual without hiding valid content"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "a valid domain stays fully usable beside every bad candidate",
+        "malformed frontmatter reports frontmatter_invalid without inferred metadata",
+        "non-UTF-8 and binary content refuse with encoding_unsupported and binary_unsupported",
+        "excluded secret names and a cross-source path refuse with path_excluded",
+        "an unmarked candidate is excluded and raises a discovery issue; a marked non-git domain reports unavailable history rather than falling through to a parent"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
     },
     {
       "id": "system::AJ-04",
       "status": "pass",
-      "checks": ["narrow overlays, keyboard state machines, contrast, focus return and reflow pass with limitations recorded"],
-      "artifacts": [{"path": "tests/evidence/browser-layout-probe.json", "sha256": "f985e06ace53e27063d1ca155a0ee08356e7052c2709d1e6b91d802efbdf44c5"}]
+      "checks": [
+        "theme choice retained across reload without losing location",
+        "AJ-01 completed at 1440x900 and with drawers at 375x812",
+        "320 CSS-pixel reflow with every capability present and keyboard-reachable"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-layout-probe.json",
+          "sha256": "a90122cb873b86dccfa3f79d272b16b2197475081d778c82d55ffa32d7b2156a"
+        },
+        {
+          "path": "tests/evidence/visual-narrow.png",
+          "sha256": "65d9df6752f1c639e17dbccdc9337c53df8221be38227b46b74124d73644649e"
+        },
+        {
+          "path": "tests/evidence/visual-dark.png",
+          "sha256": "f54cbefa707eefccb72c44e8d5c6ca2342937161904c40e3712a74c8d82a58c6"
+        }
+      ]
     },
     {
       "id": "system::AJ-05",
       "status": "pass",
-      "checks": ["wheel installs offline in a clean environment and launches from an unrelated working directory"],
-      "artifacts": [{"path": "tests/evidence/clean-install.json", "sha256": "0759917fa41bd986bfa192c28bca985455da51228564b5f132f94f9281244f3f"}]
+      "checks": [
+        "installed from the built artefact into a clean virtual environment with --no-index, from outside the repository",
+        "launched against a temporary conforming substrate from an arbitrary working directory",
+        "the same substrate and domain model returned with no source edit and no JavaScript toolchain",
+        "invalid root, port collision and bounded interrupt observed by the command-line suite"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/clean-install.json",
+          "sha256": "8f2c9645f03de0c70d89c4e85e4ba95859f24d33b828436bed596dc02be21281"
+        }
+      ]
     },
     {
       "id": "system::AJ-06",
       "status": "pass",
-      "checks": ["capability boundary and hostile final DOM fail closed without active payloads"],
-      "artifacts": [{"path": "tests/evidence/browser-dom-probe.json", "sha256": "a5ef7ee677f4cbf8bdad4fd958b148e8c6c055faee9e9560f16a96a7dc43e481"}]
+      "checks": [
+        "missing and wrong capability refused with 401; hostile Host and Origin refused with 403",
+        "encoded and backslash traversal refused; a cross-domain path through the substrate route refused",
+        "asset traversal refused; no CORS header; frame-ancestors none, DENY, nosniff, no-referrer and no-store present",
+        "health returns only status and version and reveals no estate value"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        }
+      ]
     },
     {
       "id": "system::AJ-07",
       "status": "pass",
-      "checks": ["HTTP acceptance journeys leave source, git, ACL/mode and outside state byte-identical"],
-      "artifacts": [{"path": "tests/evidence/immutability.json", "sha256": "9702df9f34de77f9458b490c6756bbfc565924b4b02a6dc190321734b7eefe1f"}]
+      "checks": [
+        "fixture source snapshotted by path, size, modification time and content before and after",
+        "AJ-01 to AJ-06 plus commit browsing and historical file reads executed against it",
+        "the post-run snapshot is byte-identical; access-time and OS-managed read telemetry are recorded as excluded rather than asserted unchanged"
+      ],
+      "artifacts": [
+        {
+          "path": "tests/evidence/browser-dom-probe.json",
+          "sha256": "3559359ada476663339f350f5676987df615eca1a147df0a478a8f69de42d7cf"
+        },
+        {
+          "path": "tests/evidence/browser-layout-probe.json",
+          "sha256": "a90122cb873b86dccfa3f79d272b16b2197475081d778c82d55ffa32d7b2156a"
+        }
+      ]
     }
   ]
 }

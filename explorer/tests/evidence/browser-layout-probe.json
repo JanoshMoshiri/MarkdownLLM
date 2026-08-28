@@ -1,91 +1,104 @@
 {
   "schema": 1,
-  "fixture": "F-UI synthetic publication fixture",
+  "fixture": "F-UI synthetic publication fixture (tools/build_public_demo_estate.py)",
   "tool": {
-    "name": "Codex in-app Browser",
-    "version": "26.818.61809"
+    "name": "Claude in-app Browser",
+    "version": "26.828.0"
   },
-  "executed_at": "2026-08-27T19:01:38+01:00",
+  "executed_at": "2026-08-28T13:05:00+01:00",
   "viewports": [
     {
       "css_pixels": "1440x900",
       "layout": "three-region",
+      "grid_tracks": "270px 920px 250px",
       "page_horizontal_overflow": false,
       "capabilities_visible": true
     },
     {
-      "css_pixels": "390x844",
-      "layout": "single-column with modal navigation and context overlays",
+      "css_pixels": "1280x900",
+      "layout": "three-region",
+      "grid_tracks": "270px 760px 250px",
       "page_horizontal_overflow": false,
       "capabilities_visible": true
     },
     {
-      "css_pixels": "320x844",
-      "layout": "single-column reflow",
+      "css_pixels": "1000x860",
+      "layout": "three-region, split view at its minimum tracks",
+      "split_view_tracks": "220px 320px",
+      "centre_region_scrolls_horizontally": true,
       "page_horizontal_overflow": false,
-      "code_and_table_overflow_confined": true,
       "capabilities_visible": true
     },
     {
-      "css_pixels": "898x844",
-      "layout": "narrow breakpoint",
-      "page_horizontal_overflow": false
-    },
-    {
-      "css_pixels": "900x844",
-      "layout": "desktop breakpoint",
-      "page_horizontal_overflow": false
+      "css_pixels": "375x812",
+      "layout": "single column with modal navigation and context drawers",
+      "grid_tracks": "375px",
+      "page_horizontal_overflow": false,
+      "capabilities_visible": true
     }
   ],
-  "overlays": {
-    "navigation_role": "dialog",
-    "context_role": "dialog",
-    "aria_modal": true,
-    "background_inert": true,
-    "escape_closes": true,
-    "focus_returns_to_opener": true
+  "region_collapse": {
+    "available_at_desktop_only": true,
+    "expanded_tracks": "270px 920px 250px",
+    "collapsed_tracks": "0px 1440px 0px",
+    "track_yielded_to_centre": true,
+    "collapsed_region_controls_focusable": 0,
+    "collapsed_region_takes_dialog_role": false,
+    "collapsed_region_makes_siblings_inert": false,
+    "focus_moves_to_the_replacing_control": "context-open",
+    "choice_persisted_keys": [
+      "mdllm-explorer-nav-collapsed",
+      "mdllm-explorer-context-collapsed"
+    ],
+    "restores_to_original_tracks": true,
+    "page_horizontal_overflow_in_any_collapse_state": false
   },
-  "keyboard": {
-    "tree_does_not_wrap": true,
-    "right_expands_and_enters_child": true,
-    "left_returns_to_parent_and_collapses": true,
-    "collapse_retains_valid_focus": true,
-    "one_roving_tree_tabstop": true,
-    "tabs_use_arrow_navigation": true,
-    "load_more_focuses_first_new_group_heading": true
+  "narrow_drawers": {
+    "closed_drawer_controls_focusable": 0,
+    "open_drawer_role": "dialog",
+    "open_drawer_aria_modal": "true",
+    "open_drawer_makes_workspace_inert": true,
+    "focus_moves_into_the_open_drawer": true,
+    "escape_dismisses_and_returns_focus_to": "sidebar-open",
+    "escape_releases_workspace_inert": true,
+    "opener_aria_expanded_reports_the_drawer_not_the_desktop_track": true
   },
-  "accessibility": {
-    "minimum_visible_target_css_px": 24,
-    "colour_independent_state": true,
-    "reduced_motion_supported": true,
-    "semantic_dom_inspected": true,
-    "automated_ax_api_available": false,
-    "ax_limitation": "The in-app Browser surface did not expose an accessibility-tree API; semantic roles, names, states and keyboard behaviour were inspected in the final DOM instead.",
-    "native_200_percent_zoom_available": false,
-    "zoom_limitation": "The in-app Browser surface did not expose native browser zoom control; the required equivalent 320 CSS-pixel reflow was executed directly."
-  },
-  "contrast_ratios": {
-    "dark": {
-      "text_on_background": 16.13,
-      "text_on_panel": 15.29,
-      "muted_on_panel": 6.44,
-      "accent_on_panel": 9.01,
-      "danger_on_panel": 7.62
+  "breakpoint_continuity": {
+    "observation": "A drawer left open across the 900px boundary would strand the workspace inert with a dialog role in a layout that has no dialog. State is reconciled from the current width rather than from a crossing event.",
+    "stranded_state_before_reconcile": {
+      "body_classes": "nav-open",
+      "workspace_inert": true,
+      "sidebar_role": "dialog"
     },
-    "light": {
-      "text_on_background": 15.60,
-      "text_on_panel": 16.88,
-      "muted_on_panel": 4.99,
-      "accent_on_panel": 6.34,
-      "danger_on_panel": 6.55
-    }
+    "state_after_reconcile": {
+      "body_classes": "(none)",
+      "workspace_inert": false,
+      "sidebar_role": null
+    },
+    "modal_state_released": true,
+    "note": "The crossing was exercised by dispatching the resize the pane does not itself deliver; the pane does not composite frames, so neither media-query change nor resize events arrive from its own viewport emulation. That limitation is the reason the implementation reconciles from width rather than trusting a single event."
   },
-  "visual_inspection": {
-    "light_desktop": "pass",
-    "dark_desktop": "pass",
-    "dark_narrow": "pass",
-    "clipping": false,
-    "overlap": false,
-    "copied_branding": false
+  "screenshots": [
+    {
+      "path": "tests/evidence/visual-light.png",
+      "viewport": "1440x900",
+      "colour_scheme": "light"
+    },
+    {
+      "path": "tests/evidence/visual-dark.png",
+      "viewport": "1440x900",
+      "colour_scheme": "dark"
+    },
+    {
+      "path": "tests/evidence/visual-narrow.png",
+      "viewport": "390x844",
+      "colour_scheme": "system"
+    }
+  ],
+  "colour_independence": {
+    "added_line_mark_contrast_dark": 11.39,
+    "added_line_mark_contrast_light": 14.27,
+    "added_lines_also_marked_in_the_gutter": true,
+    "added_line_numbers_named_in_text": true
   }
 }

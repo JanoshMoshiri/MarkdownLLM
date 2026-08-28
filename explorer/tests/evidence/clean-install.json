@@ -19,7 +19,7 @@
     "status": "pass",
     "real_interrupt": true,
     "active_request_at_interrupt": true,
-    "shutdown_seconds": 4.797,
+    "shutdown_seconds": 4.562,
     "invalid_root_exit": 2,
     "port_collision_exit": 2,
     "fixture_immutable": true,
@@ -40,7 +40,7 @@
   ],
   "explorer_wheel": {
     "name": "markdownllm_explorer-0.3.0-py3-none-any.whl",
-    "sha256": "eaa0b4a3724c1289c5bf4a4b778726ae9efef57a0010fd1ae8d999ac0f0c173c"
+    "sha256": "e4891f7ff837a1504518baeb2176b4e7e75a333208af360effe47057a1652f18"
   },
   "dependency_wheel": {
     "name": "pyyaml-6.0.3-cp312-cp312-win_amd64.whl",
