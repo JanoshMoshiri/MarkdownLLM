@@ -30,6 +30,7 @@ from markdownllm.model import (
     SEV_ERROR, SEV_WARNING, SEV_INFO,
     Thing, Finding, Corpus, parse_frontmatter, load_schema, scan,
     terminal_statuses_for, is_terminal,
+    declared_field_names, declared_type_names,
 )
 from markdownllm.repository_view import (
     RepositoryHeadMoved, RepositoryView, RepositoryViewError,
@@ -78,6 +79,9 @@ from markdownllm.domain_kernel import (
 )
 from markdownllm.session import _velocity_signal, _orient_forward, cmd_session_start
 from markdownllm.coherence import _changed_files_recent, coherence_findings, cmd_coherence
+from markdownllm.skill_vocabulary import (
+    VocabularyUse, skill_vocabulary_findings, vocabulary_uses,
+)
 from markdownllm.hook_contract import (
     HOOK_BODY, COMMIT_MSG_HOOK_BODY, FLOOR_DEPENDENCY, SH_RESOLVE,
     InterpreterCandidate,

@@ -130,6 +130,40 @@ def is_terminal(schema: dict | None, meta: dict | None) -> bool:
     return status in terminal_statuses_for(schema, meta.get("type"))
 
 
+def valid_statuses_for(typ: str, schema: dict | None) -> tuple[list[str] | None, bool]:
+    """Returns (allowed_statuses, declared). declared=False means default vocabulary.
+
+    Lives here, beside `terminal_statuses_for`, because it is the same
+    resolution — the tool's reserved vocabulary first, then the domain's own
+    declaration, then the universal default — and it now has two readers:
+    `validate` (adjudicating a thing's own status) and `coherence`
+    (adjudicating a status a skill's prose *instructs*). A second copy would
+    be the restatement class the floor exists to end.
+    """
+    if typ in RESERVED_STATUSES:
+        return RESERVED_STATUSES[typ], True
+    if schema:
+        tdef = (schema.get("types") or {}).get(typ)
+        if isinstance(tdef, dict) and isinstance(tdef.get("statuses"), list):
+            return [str(s) for s in tdef["statuses"]], True
+    return DEFAULT_STATUSES, False
+
+
+def declared_type_names(schema: dict | None) -> set[str] | None:
+    """Every type a thing in this corpus may carry, or None when unknowable.
+
+    The domain's own declarations plus the framework-reserved set. None means
+    the corpus declares no types at all, so there is no authority to key to
+    and every reader must stay silent rather than invent one.
+    """
+    if not isinstance(schema, dict):
+        return None
+    declared = schema.get("types")
+    if not isinstance(declared, dict) or not declared:
+        return None
+    return {str(t) for t in declared} | set(RESERVED_STATUSES)
+
+
 def origin_is_external(meta: dict | None) -> bool:
     """The quarantine-class membership test, spelled once.
 
@@ -213,7 +247,29 @@ CORE_FIELDS = {
     "priority", "tags", "confidence", "version",
 } | structural_field_names()
 
-DEFAULT_EXCLUDES = {".git", ".claude", ".codex", "node_modules", "templates", "examples",
+
+def declared_field_names(schema: dict | None) -> set[str] | None:
+    """Every frontmatter key this corpus admits, or None when it has not opted in.
+
+    Field registration is opt-in: a domain that declares no `known_fields`
+    list has no field authority, and None says exactly that — "could not
+    look", never "nothing wrong". CORE_FIELDS (the tool's universal set) plus
+    the domain's registrations plus every type's `required_fields`, which are
+    admitted by being required.
+    """
+    if not isinstance(schema, dict):
+        return None
+    known = schema.get("known_fields")
+    if not isinstance(known, list):
+        return None
+    allow = set(CORE_FIELDS) | {str(k) for k in known}
+    for tdef in (schema.get("types") or {}).values():
+        if isinstance(tdef, dict):
+            allow |= {str(r) for r in (tdef.get("required_fields") or [])}
+    return allow
+
+
+DEFAULT_EXCLUDES ={".git", ".claude", ".codex", "node_modules", "templates", "examples",
                     "domain", "domains", "tools", "adapters", "evals", "outputs",
                     "deliverables"}
 NON_THING_FILES = {"AGENTS.md", "CLAUDE.md", "README.md", "CONTRIBUTING.md",

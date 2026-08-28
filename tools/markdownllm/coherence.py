@@ -24,6 +24,7 @@ from .model import (CORE_FIELDS, Finding, RESERVED_STATUSES, SEV_ERROR,
                     SEV_INFO, SEV_WARNING, parse_frontmatter, scan)
 from .repo import TIERS
 from .repository_view import RepositoryView, RepositoryViewError
+from .skill_vocabulary import skill_vocabulary_findings
 from .yaml_loader import load_yaml
 
 # The framework-map count check reads the file that registers the subparsers
@@ -672,6 +673,15 @@ def coherence_findings(root: Path, window: int,
                 findings.append(Finding(SEV_ERROR, "AGENTS.md",
                     f"domain-kernel block `{name}` drifted from a fresh build — "
                     f"run `mdllm domain-kernel .` and commit the result"))
+
+    # --- general: operating-layer vocabulary drift (Warning) --------------
+    # The skills and the entry file, read against the schema they claim to
+    # describe. The one slice of operating-layer drift that is not judgement:
+    # a type, status, or field a skill instructs and the corpus never
+    # declared is an instruction whose product the floor rejects. Keyed to
+    # `_schema.yaml` and the tool's reserved sets, so no suppression list
+    # exists or could — see skill_vocabulary.py for the full reasoning.
+    findings.extend(skill_vocabulary_findings(corpus, atext))
 
     # --- framework root only ---------------------------------------------
     if _view_is_file(root / ".markdownllm", view):

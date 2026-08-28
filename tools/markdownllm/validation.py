@@ -19,8 +19,9 @@ from pathlib import Path, PurePosixPath
 import yaml
 
 from .model import (
-    RESERVED_STATUSES, DEFAULT_STATUSES, TERMINAL_STATUSES, CORE_FIELDS,
-    is_terminal, origin_is_external, terminal_statuses_for,
+    RESERVED_STATUSES, TERMINAL_STATUSES,
+    declared_field_names, declared_type_names,
+    is_terminal, origin_is_external, terminal_statuses_for, valid_statuses_for,
     ID_RE, ISO_RE, SEV_ERROR, SEV_WARNING, SEV_INFO,
     Thing, Finding, Corpus, parse_frontmatter, scan,
 )
@@ -34,15 +35,11 @@ from .structural_refs import (
 from .structural_pins import structural_pin_findings
 from .session_contract import contract_fingerprint
 
-def valid_statuses_for(typ: str, schema: dict | None) -> tuple[list[str] | None, bool]:
-    """Returns (allowed_statuses, declared). declared=False means default vocabulary."""
-    if typ in RESERVED_STATUSES:
-        return RESERVED_STATUSES[typ], True
-    if schema:
-        tdef = (schema.get("types") or {}).get(typ)
-        if isinstance(tdef, dict) and isinstance(tdef.get("statuses"), list):
-            return [str(s) for s in tdef["statuses"]], True
-    return DEFAULT_STATUSES, False
+# `valid_statuses_for` moved to model.py (2026-08-28) so the vocabulary
+# authority has one definition and two readers — validate, which adjudicates
+# a thing's own status, and coherence, which adjudicates a status a skill's
+# prose instructs. It stays importable from here: `mdllm.valid_statuses_for`
+# is a pinned name in the floor's public face.
 
 
 def validate_level1(t: Thing, schema: dict | None) -> list[Finding]:
@@ -734,7 +731,7 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
     schema = corpus.schema
     if not schema:
         return f
-    declared_types = set(schema.get("types") or {}) | set(RESERVED_STATUSES)
+    declared_types = declared_type_names(schema) or set(RESERVED_STATUSES)
     relations = schema.get("relations")
 
     # `terminal_statuses` coherence: a declared terminal status that is not in
@@ -773,13 +770,7 @@ def validate_level3(corpus: Corpus) -> list[Finding]:
     # known_fields gets no field check (no false alarms until it opts in). The
     # descriptive companion is `mdllm index <path> rebuild --signal schema`,
     # which enumerates every field in use — the bootstrap source for the list.
-    known_fields = schema.get("known_fields")
-    field_allow: set[str] | None = None
-    if isinstance(known_fields, list):
-        field_allow = set(CORE_FIELDS) | {str(k) for k in known_fields}
-        for tdef in (schema.get("types") or {}).values():
-            if isinstance(tdef, dict):
-                field_allow |= {str(r) for r in (tdef.get("required_fields") or [])}
+    field_allow = declared_field_names(schema)
 
     for t in corpus.things:
         name = t.id or t.path.name
