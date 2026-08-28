@@ -1,8 +1,8 @@
 ---
 id: gates-census-2026-08
 type: artifact
-status: evolving
-version: 1.0
+status: stable
+version: 1.1
 created: 2026-08-27
 session: 2026-08-27
 tags: [gates-census, closed-loop, human-seats, phase-1, verdicts]
@@ -105,7 +105,20 @@ becomes: **four seats, one push, one feel.**
 
 **Seat 4 (breakage):** empty. The floor reports zero findings at 287 things.
 
-## What Ratification Looks Like
+## Ratified — 2026-08-28
+
+**All twenty verdicts confirmed as proposed; no row flipped.** Recorded in
+`gates-census-ratified-2026-08-28`, which also rules Phase 4's pilot domain.
+This artifact is `stable`: the table below is now the estate's ratified seat
+map rather than a proposal, and the eight consequence-permanent rows are the
+confirmed exclusion list that `settled-reasoning-is-standing-authority` had
+been resting on by reference.
+
+Three Tier-1 items were deliberately *not* ratified here and stay the
+operator's: the dispatcher authority grant (row 7's own class), the release
+push, and the two stale mirrors' `verified` re-flips.
+
+## What Ratification Looked Like
 
 One sitting, three acts: confirm or flip each verdict in the table (a batch
 `decision` thing records the result and this artifact goes `stable`); rule

@@ -244,7 +244,13 @@ Two honesty clauses, so the picture cannot be over-read:
       options, never raw homework. (Much of this exists piecemeal — orient,
       conflict things, publication debt reports; the phase names the
       protocol and closes the gaps the census finds.)
-- [ ] **Phase 4 — One full cycle, hands-off, at one radius.** Pick a domain
+- [ ] **Phase 4 — One full cycle, hands-off, at one radius.** *Pilot ruled
+      2026-08-28 (`gates-census-ratified-2026-08-28`): `regulated-qms`, on the
+      stated criterion — declared, gap-free, two real runs behind it, one
+      closed with attributable acceptance. The dispatcher installs there
+      first, tied to a scheduled run in the harness already taking real work
+      off the operator. Cross-harness exercise intended immediately after,
+      recorded as intent rather than evidence.* Pick a domain
       and run its loop end to end with the dispatcher live: trigger → run →
       outputs → seats. Measure interventions by seat class. Any intervention
       outside the four seats is a defect — route it as a finding into the
@@ -276,8 +282,10 @@ minutes once granted; Phase 4's pilot starts the first morning after.
 
 ## Done When
 
-- [ ] The census exists, every gate carries a verdict, and the operator has
-      ratified the seat-3 list.
+- [x] The census exists, every gate carries a verdict, and the operator has
+      ratified the seat-3 list. *Done 2026-08-28: all twenty verdicts
+      confirmed as proposed, no row flipped; the census is `stable`. The
+      standing surface is four seats, one push, one feel.*
 - [ ] The dispatcher launches at least one loop from its own trigger with a
       stated stop condition, in at least one harness.
 - [ ] One radius has run one full cycle with zero out-of-seat interventions,

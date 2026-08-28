@@ -86,6 +86,16 @@ gate and a habit is the operator's to draw.
 **If time is short, rows 1 and 2 are the two that matter.** Row 1 collapses the
 queue; row 2 starts the loop.
 
+> **Ruled 2026-08-28 (`gates-census-ratified-2026-08-28`).**
+> **Row 1 — done.** All twenty census verdicts confirmed as proposed, no row
+> flipped; the census is `stable`. Rows 15, 17 and 18 are agent execution from
+> today with the push as the review seat, which is what collapses much of
+> Tier 2 below.
+> **Row 5 — done.** The Phase 4 pilot is `regulated-qms`.
+> **Rows 2, 3 and 4 remain open and remain the operator's**: the dispatcher
+> authority grant, the release push, and the two `verified` re-flips. Row 2 is
+> the one now standing between the built loop and a running one.
+
 ---
 
 ## Tier 2 — assent or overrule

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-28
-generated: 2026-08-28T15:00:35
-generated_from: HEAD@779db04
-coverage: 73
+generated: 2026-08-28T17:18:37
+generated_from: HEAD@e5c97da
+coverage: 74
 framework_version: 3.36.0
 ---
 
@@ -61,6 +61,7 @@ framework_version: 3.36.0
 - dispatch-design-2026-08 (pinned @926622b64dc3e7a203ba51b548748861b82ff826)
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - gates-census-2026-08 (pinned @8f6d92c2b498ce18c2314fd7001c97a2ddcf5ca0)
+- gates-census-ratified-2026-08-28 (pinned @d818697185cdece9e50f8ad98fc93455ae81531c)
 
 ## codex-desktop-session-start-negative-2026-08-14
 - harness-capability-evidence-matrix-2026-08-20 (derived-from)
@@ -175,6 +176,7 @@ framework_version: 3.36.0
 
 ## gates-census-2026-08
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
+- gates-census-ratified-2026-08-28 (pinned @47f709099f6551ba6b1968ca1da26a2b5a0618c6)
 - operator-queue-2026-08-28 (pinned @cc86f4568c8e591cfaed9897916a8f2b0b1e88cc)
 - operator-queue-2026-08-28 (derived-from)
 - settled-reasoning-is-standing-authority (pinned @47f709099f6551ba6b1968ca1da26a2b5a0618c6)
@@ -230,6 +232,7 @@ framework_version: 3.36.0
 - operating-model-seams-design-2026-08 (pinned @8a88c40449f2e00d6d4d1574de4d276446d76ca2)
 
 ## operator-queue-2026-08-28
+- gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 - settled-reasoning-is-standing-authority (pinned @779db04b681549336a0709933ce1ced5323ca042)
 
 ## orchestration-specification
@@ -261,6 +264,9 @@ framework_version: 3.36.0
 - operating-model-seams-scope-2026-08-26 (pinned @bc4aabcf140445baae2c824e17fcf1249e0eda09)
 - operating-model-seams-self-application (pinned @45a582b3fc424cb3bf812e235be3cc576615098d)
 - operating-model-seams-self-application (derived-from)
+
+## settled-reasoning-is-standing-authority
+- gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

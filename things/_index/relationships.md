@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T16:17:51
-generated_from: HEAD@fefe721
-coverage: 310
+generated: 2026-08-28T17:18:32
+generated_from: HEAD@e5c97da
+coverage: 311
 framework_version: 3.36.0
 ---
 
@@ -647,6 +647,11 @@ framework_version: 3.36.0
 - gates-census-2026-08 --derived-from--> framework-retrospective-2026-08c
 - gates-census-2026-08 --implements--> consequence-is-recoverable-only-in-retrospect
 - gates-census-2026-08 --references--> agents-cannot-self-install-permission-bearing-hooks
+- gates-census-ratified-2026-08-28 --implements--> gates-census-2026-08
+- gates-census-ratified-2026-08-28 --implements--> closed-loop-operating-state
+- gates-census-ratified-2026-08-28 --informs--> operator-queue-2026-08-28
+- gates-census-ratified-2026-08-28 --complements--> settled-reasoning-is-standing-authority
+- gates-census-ratified-2026-08-28 --implements--> consequence-is-recoverable-only-in-retrospect
 - git-workflow-specification --implements--> llm-driven-systems-manifesto
 - git-workflow-specification --informs--> estate-git-sync
 - git-workflow-specification --references--> divergence-is-an-unrouted-decision
