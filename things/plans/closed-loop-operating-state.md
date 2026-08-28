@@ -2,8 +2,11 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-08-27
+informed_by:
+  - id: estate-workflow-derivation
+    commit: cb68dfb8468021db2a2a99b7ff889546b4d8bda4
 priority: high
 tags: [operating-model, closed-loop, human-seats, dispatcher, gates-census, vision]
 linked_things:
@@ -37,6 +40,9 @@ linked_things:
   - id: a-dispatch-layer-outside-the-corpus-is-a-second-brain
     relation: implements
     notes: "Phase 2's governing design commitment: the schedule is things, the tick is dumb. This plan keeps the insight in live circulation until Phase 5 absorbs it into doctrine."
+  - id: estate-workflow-derivation
+    relation: derived-from
+    notes: "The operator-declared precondition for Phase 2b, met 2026-08-28 and pinned above: unattended sessions must not execute undeclared process. Seven of seven definitions declared; three carry recorded process gaps, which the gate did not ask about."
 ---
 
 # The Closed-Loop Operating State
@@ -211,6 +217,17 @@ Two honesty clauses, so the picture cannot be over-read:
         + `templates/prompts/dispatch-loop.md` (the standing prompt, guards
         in frontmatter). Decision 1 dissolved the central declaration: the
         repos' own triggers are the schedule; the walk is the estate's.*
+  - [x] **2b precondition — the derivation gate, met 2026-08-28.**
+        `estate-workflow-derivation` (pinned in `informed_by`): every owned
+        workflow-definition in the estate now declares its relation to the
+        universal workflow, so an unattended session cannot execute an
+        *undeclared* process. Honestly bounded — the gate did not ask that
+        every declared process be gap-free, and three of the seven carry
+        recorded gaps their domains must rule. Two consequences land here:
+        the pilot in Phase 4 should avoid a definition with an open gap, and
+        the estate's mirror-freshness instrument was found blind
+        (`imports-check` coverage 0/101 and 0/43), which matters to any loop
+        that will rest on imported state.
   - [ ] **2b — Install the tick (adapter work + the one human grant).** The
         outside half is one generated scheduled-task entry per seat —
         written by the adapter pattern, doctor-checked against the declared

@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-28
-generated: 2026-08-28T02:19:49
-generated_from: HEAD@f96bb58
+generated: 2026-08-28T02:23:25
+generated_from: HEAD@cb68dfb
 coverage: 71
 framework_version: 3.36.0
 ---
@@ -108,6 +108,8 @@ framework_version: 3.36.0
 - workflow-reconciliation-precedes-new-definitions (derived-from)
 
 ## estate-workflow-derivation
+- closed-loop-operating-state (pinned @cb68dfb8468021db2a2a99b7ff889546b4d8bda4)
+- closed-loop-operating-state (derived-from)
 - declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
 - the-root-is-not-a-representative-domain (derived-from)
 
