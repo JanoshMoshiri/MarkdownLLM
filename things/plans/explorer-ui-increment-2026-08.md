@@ -1,7 +1,7 @@
 ---
 id: explorer-ui-increment-2026-08
 type: plan
-status: in-progress
+status: completed
 version: 1.0
 created: 2026-08-28
 priority: high
@@ -191,7 +191,11 @@ Docs and tests move with each phase; evidence reseals once.
 - [x] Evidence index resealed at `8ee4f125`. `verify_evidence` reports 63 of 70
       requirements technically met. The seven it reports unmet are exactly the
       Windows lifecycle ones, owed at the signed build — nothing else fails.
-- [ ] Operator re-dispositions the affected acceptance journeys (19 reopened).
+- [x] Operator acceptance recorded 2026-08-28 after exercising the running
+      0.3.0 build: thirty-three dispositions, including the six requirements
+      this increment introduced. Three are held back — the Windows install,
+      launch and upgrade journeys, which he exercised on the 0.2.0 installed
+      application before a 0.3.0 installer existed.
 
 ## Phase 7 — Version and handback
 
@@ -199,12 +203,29 @@ Docs and tests move with each phase; evidence reseals once.
       oracle.
 - [ ] Changelog and the framework version decision — deferred to the signed
       release boundary by `explorer-publication-readiness`, and the operator's.
-- [ ] Rebuild the unsigned candidate from final source; record its hash.
+- [x] Unsigned 0.3.0 candidate rebuilt and its hash recorded
+      (`cfee85faff1751ce…`). The full lifecycle passes under identity-isolated
+      verification, including the uninstall that Smart App Control blocked on
+      0.2.0. The artefacts remain unsigned.
       (The 0.3.0 wheel is built and its clean offline install is proven; the
       Windows installer is deliberately not rebuilt until signing.)
-- [ ] Hand the signing gate back to `explorer-publication-readiness` — the
-      credentials and timestamp service remain the operator's to supply, and
-      that plan closes on the signed bytes.
+- [x] Signing gate handed back to `explorer-publication-readiness`. Everything
+      that can be proven without a certificate is proven: 70 of 70 requirements
+      technically met, sealed at subject `51aac9bd`. The credentials and the
+      timestamp service remain the operator's to supply, and that plan closes on
+      the signed bytes.
+
+## Where this increment ends
+
+Technically complete and accepted. What is left is not this plan's work:
+
+- **Signing.** An Authenticode thumbprint, a SignTool path and an HTTPS RFC 3161
+  timestamp URL. With them the build route already signs the frozen application,
+  the generated uninstaller and the setup, and the lifecycle is re-run on the
+  signed bytes.
+- **Three Windows dispositions**, which the operator can take once he installs
+  the 0.3.0 setup.
+- **The framework version and changelog**, which belong to the push.
 
 ## Found while building, not while planning
 
