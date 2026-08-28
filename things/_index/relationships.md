@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T18:17:40
-generated_from: HEAD@d92d0f9
-coverage: 313
-framework_version: 3.36.0
+generated: 2026-08-28T23:51:50
+generated_from: HEAD@b0708ea
+coverage: 317
+framework_version: 3.37.0
 ---
 
 # Relationships Index — framework
@@ -119,6 +119,8 @@ framework_version: 3.36.0
 - a-stated-dismissal-condition-needs-a-reader --challenges--> session-memory-specification
 - a-stated-dismissal-condition-needs-a-reader --references--> trigger-specification
 - a-stated-dismissal-condition-needs-a-reader --supports--> a-uniform-answer-is-a-dead-judgment
+- a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity --complements--> a-verifier-assumes-the-inputs-it-did-not-observe
+- a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity --derived-from--> explorer-ui-increment-2026-08
 - a-transcribed-identifier-is-unverifiable-by-reading --informs--> workflow-state-specification
 - a-transcribed-identifier-is-unverifiable-by-reading --supports--> a-wrong-sum-is-indistinguishable-from-a-right-one
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
@@ -150,9 +152,14 @@ framework_version: 3.36.0
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --supports--> consequence-is-recoverable-only-in-retrospect
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --complements--> operator-gated-work-is-scheduled-on-the-operators-calendar
 - an-agent-in-a-loop-optimises-the-loop-not-the-goal --informs--> coherence-mechanism-build
+- an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction --complements--> some-changes-are-verifiable-only-by-publishing
+- an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction --derived-from--> explorer-ui-increment-2026-08
 - an-environments-reachable-set-is-not-an-architecture --complements--> a-layered-harness-is-a-co-author-not-a-substrate
 - an-environments-reachable-set-is-not-an-architecture --informs--> mcp-domain-server-design
 - an-environments-reachable-set-is-not-an-architecture --extends--> portability-claims-need-execution-tests
+- an-explanation-committed-to-a-specification-outlives-the-doubt-that-made-it --extends--> a-layered-harness-is-a-co-author-not-a-substrate
+- an-explanation-committed-to-a-specification-outlives-the-doubt-that-made-it --complements--> the-harness-bound-path-is-the-least-tested-path
+- an-explanation-committed-to-a-specification-outlives-the-doubt-that-made-it --derived-from--> explorer-ui-increment-2026-08
 - an-honest-ledger-replicates-full-compliance-does-not --informs--> cowork-integrity-estate-sweep
 - an-honest-ledger-replicates-full-compliance-does-not --supports--> assistant-register
 - an-honest-ledger-replicates-full-compliance-does-not --references--> emitted-content-is-read-instructed-content-is-economised
@@ -521,6 +528,11 @@ framework_version: 3.36.0
 - explorer-extraction-and-hosting --references--> markdownllm-explorer-windows-distribution
 - explorer-extraction-and-hosting --references--> code-architect-governs-substrate-code
 - explorer-extraction-and-hosting --dependencies--> explorer-publication-readiness
+- explorer-macos-support --complements--> explorer-publication-readiness
+- explorer-macos-support --references--> explorer-ui-increment-2026-08
+- explorer-macos-support --informs--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
+- explorer-macos-support --informs--> an-explanation-committed-to-a-specification-outlives-the-doubt-that-made-it
+- explorer-macos-support --informs--> a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity
 - explorer-publication-position --informs--> interface-specification
 - explorer-publication-position --informs--> explorer-publication-readiness
 - explorer-publication-position --informs--> explorer-extraction-and-hosting
@@ -528,6 +540,8 @@ framework_version: 3.36.0
 - explorer-publication-readiness --references--> markdownllm-explorer-comprehensive-review-2026-08-27
 - explorer-publication-readiness --references--> markdownllm-explorer-windows-distribution
 - explorer-publication-readiness --references--> markdownllm-explorer-comprehensive-review-remediation-2026-08-27
+- explorer-publication-readiness --references--> explorer-ui-increment-2026-08
+- explorer-publication-readiness --informs--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
 - explorer-ui-increment-2026-08 --complements--> explorer-publication-readiness
 - explorer-ui-increment-2026-08 --references--> explorer-publication-position
 - explorer-ui-increment-2026-08 --references--> explorer-extraction-and-hosting

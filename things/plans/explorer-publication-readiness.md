@@ -15,9 +15,46 @@ linked_things:
     relation: references
   - id: markdownllm-explorer-comprehensive-review-remediation-2026-08-27
     relation: references
+  - id: explorer-ui-increment-2026-08
+    relation: references
+    notes: "The increment this plan now gates: 0.3.0, accepted, trace green, lifecycle proven unsigned."
+  - id: an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
+    relation: informs
+    notes: "Signing reseals the bundle. The signed build is a tree change, so the seal must follow it and nothing may follow the seal."
 ---
 
 # Explorer publication readiness
+
+## Position at 2026-08-28
+
+The candidate this plan gates is no longer 0.2.0. The 0.3.0 interface increment
+landed, was accepted by the operator, and the trace passes at 70 of 70, sealed
+at subject `51aac9bd`. The Windows installer was rebuilt on 0.3.0 bytes and the
+**full lifecycle now passes** under identity-isolated verification — bundle,
+install, launch, upgrade and uninstall, with the substrate byte-identical.
+
+That is a material change to this plan's blocker. On 0.2.0 the unsigned
+uninstaller was blocked before process start by Smart App Control, so the
+lifecycle could not even be observed. It can now. What remains is *only* the
+signature: the artefacts are unsigned, and a machine whose policy is stricter
+than this one will still refuse them.
+
+Also settled since v1.1: the changelog and the framework version decision, which
+this plan deferred to the release boundary, are done — 3.37.0, with the sentinel
+moved in all three places the floor requires together.
+
+**One blocker, one shape:** an Authenticode certificate. It is a purchased,
+identity-verified credential, not a change anyone can make to this repository.
+The build route already signs the frozen application, the generated uninstaller
+and the setup, with SHA-256 digests and RFC 3161 timestamping, failing closed on
+partial inputs. Three routes were put to the operator — Azure Trusted Signing,
+an OV certificate, or an EV certificate — and the choice is his.
+
+Three human dispositions also stand open (`FR-RUN-004`, `FR-RUN-005`,
+`FR-RUN-006`): the operator exercised those journeys on the 0.2.0 installed
+application, and no 0.3.0 installer existed when he gave acceptance. Installing
+the 0.3.0 setup settles all three.
+
 
 This plan is the single carrier for publishing the current in-repository
 Windows preview. It closes only when the reviewed release candidate, its
@@ -56,7 +93,7 @@ installer and the public claims all describe the same state.
 - [ ] Execute active install, upgrade and uninstall against the signed release
   bytes, reseal the seven dependent technical requirements and record the final
   signed hash.
-- [ ] At the final signed release boundary, generate the complete changelog
+- [x] At the final signed release boundary, generate the complete changelog
   from the unpushed commit range and make the framework version decision.
 - [x] Preserve push and publication as a separate explicit operator act; no
   publication was performed in this session.

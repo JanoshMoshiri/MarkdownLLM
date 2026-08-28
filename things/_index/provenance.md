@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-28
-generated: 2026-08-28T18:15:18
-generated_from: HEAD@c5b3d4e
-coverage: 75
-framework_version: 3.36.0
+generated: 2026-08-28T23:51:41
+generated_from: HEAD@b0708ea
+coverage: 76
+framework_version: 3.37.0
 ---
 
 # Provenance Index (reverse) — framework
@@ -129,6 +129,11 @@ framework_version: 3.36.0
 - first-hour-guide (derived-from)
 - interface-specification (derived-from)
 - operator-guide (derived-from)
+
+## explorer-ui-increment-2026-08
+- a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity (derived-from)
+- an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction (derived-from)
+- an-explanation-committed-to-a-specification-outlives-the-doubt-that-made-it (derived-from)
 
 ## external-review-2026-08-10
 - floor-sprint-3-scope-2026-08-23 (pinned @5425f29437e94240c60ce0032ca3c424fa7c1ef9)
