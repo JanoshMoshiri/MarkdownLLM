@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T15:00:30
-generated_from: HEAD@779db04
-coverage: 309
+generated: 2026-08-28T16:17:51
+generated_from: HEAD@fefe721
+coverage: 310
 framework_version: 3.36.0
 ---
 
@@ -1096,6 +1096,10 @@ framework_version: 3.36.0
 - substrate-totality-residue --references--> trigger-specification
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
+- the-first-retrospective-is-the-one-the-floor-cannot-chase --informs--> retrospective-specification
+- the-first-retrospective-is-the-one-the-floor-cannot-chase --extends--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- the-first-retrospective-is-the-one-the-floor-cannot-chase --complements--> a-uniform-answer-is-a-dead-judgment
+- the-first-retrospective-is-the-one-the-floor-cannot-chase --supports--> existence-is-not-currency
 - the-harness-bound-path-is-the-least-tested-path --supports--> portability-claims-need-execution-tests
 - the-harness-bound-path-is-the-least-tested-path --derived-from--> field-report-2026-08-13-domain-session
 - the-harness-bound-path-is-the-least-tested-path --derived-from--> claude-gate-5r4-acceptance-2026-08-13
