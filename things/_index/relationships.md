@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T02:23:22
-generated_from: HEAD@cb68dfb
-coverage: 307
+generated: 2026-08-28T14:12:08
+generated_from: HEAD@3cea465
+coverage: 308
 framework_version: 3.36.0
 ---
 
@@ -848,6 +848,10 @@ framework_version: 3.36.0
 - operator-guide --implements--> an-honest-ledger-replicates-full-compliance-does-not
 - operator-guide --references--> session-start-hardening
 - operator-guide --derived-from--> explorer-publication-position
+- operator-queue-2026-08-28 --implements--> closed-loop-operating-state
+- operator-queue-2026-08-28 --derived-from--> gates-census-2026-08
+- operator-queue-2026-08-28 --derived-from--> estate-retrospective-synthesis-2026-08
+- operator-queue-2026-08-28 --derived-from--> estate-workflow-derivation
 - orchestration-specification --extends--> thing-specification
 - orchestration-specification --informs--> estate-git-sync
 - orchestration-specification --complements--> write-thing-specification

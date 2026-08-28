@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-28
-generated: 2026-08-28T02:23:25
-generated_from: HEAD@cb68dfb
+generated: 2026-08-28T14:12:11
+generated_from: HEAD@3cea465
 coverage: 71
 framework_version: 3.36.0
 ---
@@ -104,6 +104,8 @@ framework_version: 3.36.0
 - derivation-shape-brief-2026-08 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - estate-workflow-derivation (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - estate-workflow-derivation (derived-from)
+- operator-queue-2026-08-28 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
+- operator-queue-2026-08-28 (derived-from)
 - workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - workflow-reconciliation-precedes-new-definitions (derived-from)
 
@@ -111,6 +113,8 @@ framework_version: 3.36.0
 - closed-loop-operating-state (pinned @cb68dfb8468021db2a2a99b7ff889546b4d8bda4)
 - closed-loop-operating-state (derived-from)
 - declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
+- operator-queue-2026-08-28 (pinned @cb68dfb8468021db2a2a99b7ff889546b4d8bda4)
+- operator-queue-2026-08-28 (derived-from)
 - the-root-is-not-a-representative-domain (derived-from)
 
 ## expertise-is-an-output-not-a-prerequisite
@@ -164,12 +168,15 @@ framework_version: 3.36.0
 - gates-census-2026-08 (pinned @7bffcb162f01c5cc6afb98756eca58bc5c5f79fe)
 - gates-census-2026-08 (derived-from)
 - hard-hook-vocabulary-contradicts-observable-trigger-insight (derived-from)
+- operator-queue-2026-08-28 (pinned @7bffcb162f01c5cc6afb98756eca58bc5c5f79fe)
 
 ## framework-v3-transformation-plan
 - decision-status-vocabulary-domain-owned (pinned @da5d31d)
 
 ## gates-census-2026-08
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
+- operator-queue-2026-08-28 (pinned @cc86f4568c8e591cfaed9897916a8f2b0b1e88cc)
+- operator-queue-2026-08-28 (derived-from)
 
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)

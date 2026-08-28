@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: triggers
 created: 2026-08-28
-generated: 2026-08-28T02:19:22
-generated_from: HEAD@f96bb58
-coverage: 4
+generated: 2026-08-28T14:12:01
+generated_from: HEAD@3cea465
+coverage: 5
 framework_version: 3.36.0
 ---
 
@@ -23,6 +23,10 @@ framework_version: 3.36.0
 ## framework-retrospective-2026-08b
 - status: completed  due_date: —
 - trigger: type=time, condition=2026-08-27 reached, action=Chase: if the 2026-08b retrospective has not been written, surface the wait itself — the debt is now three weeks past its own volume and milestone triggers
+
+## operator-queue-2026-08-28
+- status: evolving  due_date: —
+- trigger: type=time, condition=2026-09-10 reached, action=If this queue has not been ruled, report which tier-1 rows remain open and what each is blocking. The queue idles at the operator's seat by design; an undated idle is the drift the estate already learned to chase.
 
 ## workflow-reconciliation-precedes-new-definitions
 - status: made  due_date: —
