@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-28
-generated: 2026-08-28T23:51:50
-generated_from: HEAD@b0708ea
-coverage: 317
+created: 2026-08-29
+generated: 2026-08-29T00:46:29
+generated_from: HEAD@b319d7e
+coverage: 318
 framework_version: 3.37.0
 ---
 
@@ -429,6 +429,12 @@ framework_version: 3.37.0
 - dispatch-design-2026-08 --implements--> universal-workflow-methodology
 - dispatch-design-2026-08 --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - dispatch-design-2026-08 --informs--> orchestration-specification
+- dispatch-host-design-2026-08-29 --implements--> closed-loop-operating-state
+- dispatch-host-design-2026-08-29 --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- dispatch-host-design-2026-08-29 --implements--> emitted-content-is-read-instructed-content-is-economised
+- dispatch-host-design-2026-08-29 --references--> portability-claims-need-execution-tests
+- dispatch-host-design-2026-08-29 --implements--> coordination-claim-specification
+- dispatch-host-design-2026-08-29 --implements--> consequence-is-recoverable-only-in-retrospect
 - dissolve-continuity-into-reconciliation --implements--> change-reconciliation-specification
 - dissolve-continuity-into-reconciliation --references--> session-memory-specification
 - dissolve-continuity-into-reconciliation --references--> retrospective-specification
