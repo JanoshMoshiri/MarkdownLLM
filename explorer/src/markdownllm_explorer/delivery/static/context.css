@@ -91,4 +91,5 @@
 .reference-chip:disabled { cursor: default; }
 .reference-chip.resolving { opacity: .55; }
 .reference-chip.unresolved { opacity: .7; border-style: dashed; color: var(--muted); }
+.reference-chip.uncertain { opacity: .7; border-style: dotted; color: var(--muted); }
 .reference-note { color: var(--muted); font-size: 11px; }

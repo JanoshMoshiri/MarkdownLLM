@@ -306,13 +306,15 @@ Allowed operations are fixed internal templates:
 - branch/detached/unborn state;
 - porcelain-v2 status with untracked enumeration disabled; and
 - a 51-record, NUL-delimited `git log <pinned-head> --topo-order --skip=<cursor-skip>` page (50 returned, one look-ahead);
-- a NUL-delimited `diff-tree --name-status` of one commit against its first parent, renames disabled, root commits included;
-- a `diff-tree --unified=0 --ignore-cr-at-eol` patch of one commit restricted to one path, read for its hunk headers only; and
+- a NUL-delimited `diff-tree --raw` of one commit, renames disabled, carrying each entry's destination file mode;
+- a `diff-tree --unified=0` patch of one commit restricted to one path, read for its hunk headers only; and
 - `cat-file -s` and `cat-file blob` against a `<40-hex>:<path>` object specification.
 
-The last three carry a parameter the earlier templates do not: a source-relative path. Each is re-validated at the allowlist against traversal, absolute form, option-leading form, backslash, colon and control characters, independently of the `RelativePath` parse and the source admission that already ran upstream — two copies of one check, because the allowlist must not inherit its caller's confidence. The patch template terminates option parsing with `--` before the path.
+The two `diff-tree` templates take an explicit **revision pair**: the commit's first parent and the commit, or the `--root` marker and the commit where there is no parent. `--first-parent` is not used, because `diff-tree --first-parent` on a *merge* prints nothing at all — a merge commit reported zero changed files until this was corrected. The marker is admitted only in the leading position of the pair, so it cannot be smuggled in where a revision is expected.
 
-`--ignore-cr-at-eol` on the patch template is load-bearing rather than cosmetic. The hardened environment deliberately nulls system configuration, which on Git for Windows removes `core.autocrlf`; without the flag a one-line change to a text file reports as a whole-file rewrite, and every line of the file would be presented as added. The flag can only ignore a carriage return immediately preceding a newline, which is a representation difference and never a content one.
+`--raw` rather than `--name-status`: the raw record carries the destination mode, which is the only thing that distinguishes an ordinary file from a symlink (`120000`) or a gitlink (`160000`). Serving one of those as a document would publish a target the live reader refuses to follow, so an irregular entry is listed and unopenable.
+
+The path-carrying templates take a parameter the earlier ones do not. Each path is re-validated at the allowlist against traversal, absolute form, option-leading form, backslash, colon and control characters, independently of the `RelativePath` parse and the source admission that already ran upstream — two copies of one check, because the allowlist must not inherit its caller's confidence. The patch template terminates option parsing with `--` before the path, and the environment sets `GIT_LITERAL_PATHSPECS=1` so a filename containing `[`, `]`, `*` or `?` is a path rather than a pattern matching other files.
 
 Every process invokes that exact executable with an argument list, `shell=False`, exact adapter-registry cwd, three-second timeout and 1 MiB combined-output cap. The environment is built from an OS execution allowlist, not copied wholesale, and includes `GIT_TERMINAL_PROMPT=0`, `GIT_OPTIONAL_LOCKS=0`, `GIT_NO_LAZY_FETCH=1`, `GIT_PAGER=cat`, `PAGER=cat`, `GIT_EXTERNAL_DIFF=`, null global/system config paths and no `GIT_DIR`, worktree, object, replace-ref, SSH/askpass or optional-lock variables. Command-line config disables hooks path, fsmonitor, untracked cache, index preload, external diff and pager.
 
@@ -324,7 +326,11 @@ Commit parsing uses full SHA as identity and displays 12 characters (full SHA re
 
 `GetCommit` and `ReadHistoricalDocument` decide admission through the same `PathAdmission` port the working-tree reader implements, and they decide it *before* any git invocation. The object store retains every path the repository has ever held, so a path the live reader excludes today — a secret name, an ignored directory, a nested domain's file — would otherwise be reachable through history. Admission is answered without touching disk, because the file in question need not still exist.
 
-Historical content is raw-only. Rendering it would resolve its links against a working tree that is not the tree the commit describes, so the Markdown parser, the link resolver and the presenter are all absent from this path. Added-line ranges come from `--unified=0` hunk headers alone: no removed line is parsed, stored or transported, and the reader is told so rather than being allowed to read their absence as an absence of removals.
+Historical content is raw-only. Rendering it would resolve its links against a working tree that is not the tree the commit describes, so the Markdown parser, the link resolver and the presenter are all absent from this path. Added-line ranges come from `--unified=0` hunk headers alone: no removed line is parsed, stored or returned, and the reader is told so rather than being allowed to read their absence as an absence of removals.
+
+A patch is not a payload. It carries both sides of every change, so it is roughly twice the size of the file it describes, and it is read for its hunk headers and discarded. Budgeting it as though it were a response body refused a 565 KB file — well inside the 1 MiB read limit — with `git_unavailable`, blaming git for a ceiling of ours. It has its own, larger budget; beyond that the file is still served and only the marking is unavailable, which the reader is told, because "not determined" must not read as "nothing changed".
+
+The blob read is checked against the size `cat-file -s` already reported. The process runner merges stderr into stdout, so a warning git prints on an otherwise successful read would otherwise be served as file content.
 
 ## 11. Frontmatter, Markdown and link pipeline
 

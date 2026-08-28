@@ -21,6 +21,11 @@ class ExplorerLimits:
     commit_files: int = 500
     git_seconds: float = 3.0
     git_output_bytes: int = 1024 * 1024
+    # A patch carries both sides of every change, so it is roughly twice the
+    # file it describes. It is parsed for hunk headers and discarded, never
+    # served, so budgeting it as if it were a response body refused files well
+    # inside the read limit.
+    diff_output_bytes: int = 8 * 1024 * 1024
     response_bytes: int = 2 * 1024 * 1024
     concurrent_requests: int = 16
     browser_seconds: float = 10.0

@@ -95,10 +95,15 @@ export function renderCommitDocument(container, document_, change) {
   // Say what is not here. A reader who sees only additions highlighted could
   // otherwise take the absence of removals as "nothing was removed". Naming
   // the line numbers also puts the change locations somewhere that does not
-  // depend on seeing a colour, or on reading the gutter at all.
-  legend.textContent = document_.added_ranges.length
-    ? `Marked lines are what this commit added or changed — ${describeRanges(document_.added_ranges)}. Removed lines are not part of this view.`
-    : "This commit added no lines to this file. Removed lines are not part of this view.";
+  // depend on seeing a colour, or on reading the gutter at all. And "not
+  // determined" is never allowed to read as "nothing changed".
+  if (document_.ranges_known === false) {
+    legend.textContent = "This commit's change to this file is too large to mark line by line, so the file is shown as the commit left it without marking. Removed lines are not part of this view.";
+  } else {
+    legend.textContent = document_.added_ranges.length
+      ? `Marked lines are what this commit added or changed — ${describeRanges(document_.added_ranges)}. Removed lines are not part of this view.`
+      : "This commit added no lines to this file. Removed lines are not part of this view.";
+  }
 
   target.append(head, legend, historicalBody(document_));
 }

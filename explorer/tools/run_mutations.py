@@ -71,7 +71,7 @@ CASES: dict[str, tuple[Replacement, ...]] = {
     ),),
     "M21": (Replacement(
         "adapters/thing_index.py",
-        "        if line.strip() in FRONTMATTER_FENCES:\n            return None\n",
+        "        if line.strip() in FRONTMATTER_FENCES:\n            return found\n",
         "        # MUTANT: keep scanning past the closing frontmatter fence\n",
     ),),
 }

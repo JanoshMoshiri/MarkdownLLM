@@ -25,7 +25,13 @@ class GetCommit:
             CommitFile(
                 entry.path,
                 entry.change,
-                entry.change != "deleted" and self._admission.admits(source.boundary_token, entry.path),
+                # Deleted paths have no content at this commit; irregular entries
+                # (symlink, gitlink) carry a target rather than content, and the
+                # live reader refuses to follow them.
+                entry.change != "deleted"
+                and entry.regular
+                and self._admission.admits(source.boundary_token, entry.path),
+                entry.regular,
             )
             for entry in detail.files
         )

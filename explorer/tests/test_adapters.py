@@ -12,7 +12,8 @@ from markdownllm_explorer.composition import build_runtime
 from markdownllm_explorer.adapters.cursors import CursorCodec
 from markdownllm_explorer.adapters.filesystem_catalogue import BoundaryRegistry, FilesystemSourceCatalogue, _collision_ids, _normalised_domain_id
 from markdownllm_explorer.adapters.git_commit_history import (
-    GitCommitHistory, _added_lines_arguments, _allowed_arguments, _is_object_spec, _is_tree_path,
+    GitCommitHistory, _RAW_FLAGS, _added_lines_arguments, _allowed_arguments, _detail_arguments,
+    _is_object_spec, _is_tree_path, _raw_arguments,
 )
 from markdownllm_explorer.adapters.process_runner import BoundedProcessRunner, ProcessRequest, ProcessResult
 from markdownllm_explorer.adapters.thing_index import thing_identifier
@@ -445,19 +446,28 @@ def test_tree_path_gate_rejects_traversal_option_and_spec_injection(path):
     assert _is_tree_path(path) is False
     assert _is_object_spec("0" * 40 + ":" + path) is False
     assert _allowed_arguments(["cat-file", "blob", "0" * 40 + ":" + path]) is False
-    assert _allowed_arguments(_added_lines_arguments("0" * 40, path)) is False
+    assert _allowed_arguments(_added_lines_arguments("1" * 40, "0" * 40, path)) is False
+    assert _allowed_arguments(_added_lines_arguments(None, "0" * 40, path)) is False
 
 
 @pytest.mark.unit
 def test_git_argument_allowlist_admits_only_the_declared_history_templates():
-    sha = "0" * 40
-    assert _allowed_arguments(_added_lines_arguments(sha, "things/insights/one.md")) is True
+    sha, parent = "0" * 40, "1" * 40
+    assert _allowed_arguments(_added_lines_arguments(parent, sha, "things/insights/one.md")) is True
+    assert _allowed_arguments(_added_lines_arguments(None, sha, "things/insights/one.md")) is True
+    assert _allowed_arguments(_raw_arguments(parent, sha)) is True
+    assert _allowed_arguments(_raw_arguments(None, sha)) is True
+    assert _allowed_arguments(_detail_arguments(sha)) is True
     assert _allowed_arguments(["cat-file", "blob", f"{sha}:things/insights/one.md"]) is True
     assert _allowed_arguments(["cat-file", "-s", f"{sha}:things/insights/one.md"]) is True
     # A short or non-hex revision is not a commit this adapter will name.
     assert _allowed_arguments(["cat-file", "blob", "abc:one.md"]) is False
     assert _allowed_arguments(["cat-file", "blob", f"{sha}:"]) is False
     assert _allowed_arguments(["cat-file", "blob", "HEAD:one.md"]) is False
+    # The empty-tree marker is admitted only where a first parent belongs.
+    assert _allowed_arguments(["diff-tree", *_RAW_FLAGS, sha, "--root"]) is False
+    assert _allowed_arguments(["diff-tree", *_RAW_FLAGS, "--root", "--root"]) is False
+    assert _allowed_arguments(["diff-tree", *_RAW_FLAGS, "HEAD", sha]) is False
     # Nothing outside the templates, however harmless it looks.
     assert _allowed_arguments(["cat-file", "-p", f"{sha}:one.md"]) is False
     assert _allowed_arguments(["show", sha]) is False

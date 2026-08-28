@@ -256,16 +256,21 @@ async function resolveReferences(frontmatter, path) {
   if (!ids.length) return;
   const request = beginRequest("references", {source: state.source.id, tab: state.view, path});
   let resolved = {};
+  let partial = false;
   try {
     const value = await get("/api/v1/references", {source: state.source.id, ids: ids.join(",")}, request.signal);
     resolved = value.resolved;
+    partial = Boolean(value.partial);
   } catch (error) {
-    // Timed out, aborted or refused: the chips settle inert rather than sitting
-    // in a pending state no later event will ever clear.
+    // Timed out or refused: the chips settle inert rather than sitting in a
+    // pending state no later event will ever clear.
     resolved = {};
   } finally {
+    // A superseded request must not settle the chips a newer one is already
+    // resolving, or a re-render mid-flight leaves them permanently unresolved.
+    const superseded = request.signal.aborted;
     completeRequest(request);
-    applyReferenceResolution(contextContent, resolved, path);
+    if (!superseded) applyReferenceResolution(contextContent, resolved, path, partial);
   }
 }
 
@@ -328,7 +333,8 @@ async function openCollectionDocument(path, mode = "rendered", pushRoute = true)
 }
 
 async function openDocument(path, mode = "rendered", pushRoute = true) {
-  abortAllRequests(); state.selectedPath = path; state.documentMode = mode; renderCurrentTree(); showLoading();
+  abortAllRequests(); state.commit = null; state.commitFiles = [];
+  state.selectedPath = path; state.documentMode = mode; renderCurrentTree(); showLoading();
   await fetchDocument(path, mode, false, pushRoute);
 }
 
@@ -353,7 +359,7 @@ async function fetchDocument(path, mode, embedded, pushRoute) {
 
 async function search(query, cursor = null, append = false) {
   if (!append) {
-    abortAllRequests(); state.selectedPath = null;
+    abortAllRequests(); state.selectedPath = null; state.commit = null; state.commitFiles = [];
     state.search = {query, items: [], cursor: null, partial: false};
   }
   const identity = {source: state.source.id, tab: state.view, query, cursor};

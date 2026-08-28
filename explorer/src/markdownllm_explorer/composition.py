@@ -52,7 +52,7 @@ def build_runtime(root: Path, domain_dir: str = "domain", *, limits: ExplorerLim
     collections = CuratedCollectionReader(source_browser, registry, frontmatter, cursors, active_limits)
     link_resolver = ConfinedLinkResolver(source_browser, registry)
     history = GitCommitHistory(registry, cursors, active_limits, resolve_trusted_git(root))
-    things = ThingIndex(source_browser, active_limits)
+    things = ThingIndex(source_browser, registry, active_limits)
     catalogue.discover()
     use_cases = ExplorerUseCases(
         DiscoverEstate(catalogue), GetOverview(catalogue, source_browser, history),

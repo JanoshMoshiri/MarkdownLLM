@@ -70,7 +70,7 @@ class GitCommitHistory:
         count = self._limits.commit_page + 1
         output = self._run(
             root,
-            ["log", query_revision, "--topo-order", f"--skip={state.offset}", f"--max-count={count}", "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"],
+            ["log", query_revision, "--topo-order", f"--skip={state.offset}", f"--max-count={count}", _COMMIT_FORMAT],
         )
         records: list[CommitRecord] = []
         for raw_record in output.split("\x1e"):
@@ -131,27 +131,25 @@ class GitCommitHistory:
     def detail(self, token: BoundaryToken, sha: str) -> CommitDetail:
         """The paths one commit touched, against its first parent.
 
+        The comparison is an explicit two-tree diff between the first parent and
+        the commit, because `diff-tree --first-parent` on a *merge* prints
+        nothing at all: a merge commit reported zero changed files until this
+        was corrected. A commit with no parent is compared against the empty
+        tree with `--root` instead.
+
         Renames are off, so a rename reads as a delete beside an add. That is
         the honest shape here: this view never renders removed content, so a
         rename presented as one row would claim a continuity the reader cannot
         open.
         """
         root = self._prepared_root(token, sha)
-        header = self._run(
-            root,
-            ["log", sha, "--topo-order", "--skip=0", "--max-count=1", "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"],
-        )
-        record = next(iter(self._records(header)), None)
-        if record is None:
-            raise ExplorerError("source_changed")
-        output = self._run(root, _name_status_arguments(sha))
-        fields = output.split("\x00")
+        header = self._run(root, _detail_arguments(sha))
+        record, parents = self._detail_record(header)
+        parent = parents[0] if parents else None
+        output = self._run(root, _raw_arguments(parent, sha))
         files: list[CommitFile] = []
         partial = False
-        for index in range(0, len(fields) - 1, 2):
-            status, raw = fields[index].strip("\r\n"), fields[index + 1]
-            if not status or not raw:
-                continue
+        for mode, status, raw in _raw_entries(output):
             if len(files) >= self._limits.commit_files:
                 partial = True
                 break
@@ -161,7 +159,7 @@ class GitCommitHistory:
                 # A path this source cannot even express is not shown; it is
                 # never handed onward as a git argument.
                 continue
-            files.append(CommitFile(relative, _CHANGE.get(status[:1], "modified")))
+            files.append(CommitFile(relative, _CHANGE.get(status[:1], "modified"), regular=mode in _REGULAR_MODES))
         files.sort(key=lambda item: (item.path.value.casefold(), item.path.value))
         return CommitDetail(record.sha, record.subject, record.author_name, record.authored_at, tuple(files), partial)
 
@@ -182,14 +180,45 @@ class GitCommitHistory:
         if size > self._limits.file_bytes:
             raise ExplorerError("file_too_large")
         payload = self._run_bytes(root, ["cat-file", "blob", spec])
+        if len(payload) != size:
+            # The runner merges stderr into stdout, so a warning git prints on a
+            # successful read would otherwise be served as file content. The
+            # size git already reported is the check that catches it.
+            raise ExplorerError("source_changed")
         if b"\x00" in payload:
             raise ExplorerError("binary_unsupported")
         try:
             text = payload.decode("utf-8-sig")
         except UnicodeDecodeError:
             raise ExplorerError("encoding_unsupported") from None
-        diff = self._run(root, _added_lines_arguments(sha, path.value))
-        return HistoricalDocument(boundary.source.id, path, sha, text, _added_ranges(diff), len(payload))
+        ranges, ranges_known = self._added_lines(root, sha, path)
+        return HistoricalDocument(boundary.source.id, path, sha, text, ranges, len(payload), ranges_known)
+
+    def _added_lines(self, root: Path, sha: str, path: RelativePath) -> tuple[tuple[tuple[int, int], ...], bool]:
+        """Which lines this commit put on its own side of the file.
+
+        A patch is not a payload: it is read for its hunk headers and discarded,
+        and it is roughly twice the size of the file because it carries both
+        sides. Budgeting it like a response body made a 565 KB file — well
+        inside the documented 1 MiB read limit — fail with `git_unavailable`,
+        blaming git for a ceiling of ours. It gets its own, larger budget, and
+        beyond that the file is still served: only the marking is unavailable,
+        which is the proportionate loss.
+        """
+        parent = self._first_parent(root, sha)
+        try:
+            diff = self._run(
+                root,
+                _added_lines_arguments(parent, sha, path.value),
+                output_limit=self._limits.diff_output_bytes,
+            )
+        except ExplorerError:
+            return (), False
+        return _added_ranges(diff), True
+
+    def _first_parent(self, root: Path, sha: str) -> str | None:
+        record, parents = self._detail_record(self._run(root, _detail_arguments(sha)))
+        return parents[0] if parents else None
 
     def _prepared_root(self, token: BoundaryToken, sha: str) -> Path:
         if not self._git:
@@ -213,11 +242,18 @@ class GitCommitHistory:
             return None
 
     @staticmethod
-    def _records(output: str):
+    def _detail_record(output: str) -> tuple[CommitRecord, tuple[str, ...]]:
         for raw_record in output.split("\x1e"):
-            fields = raw_record.strip("\r\n\x00").split("\x00")
-            if len(fields) >= 4 and len(fields[0]) == 40:
-                yield CommitRecord(fields[0], fields[1], fields[2], fields[3])
+            # Only newlines are stripped. A root commit's parent field is empty,
+            # and stripping NUL from the right would eat it, leaving the record
+            # one field short and the commit unreadable.
+            fields = raw_record.strip("\r\n").lstrip("\x00").split("\x00")
+            if len(fields) >= 5 and len(fields[0]) == 40:
+                parents = tuple(
+                    item for item in fields[4].split(" ") if re.fullmatch(r"[0-9a-f]{40}", item)
+                )
+                return CommitRecord(fields[0], fields[1], fields[2], fields[3]), parents
+        raise ExplorerError("source_changed")
 
     def _state_from_status(self, root: Path) -> RepositoryState:
         output = self._run(root, ["status", "--porcelain=v2", "--branch", "--untracked-files=no"])
@@ -338,7 +374,7 @@ class GitCommitHistory:
                 return False
             raise
 
-    def _run_bytes(self, root: Path, arguments: list[str]) -> bytes:
+    def _run_bytes(self, root: Path, arguments: list[str], output_limit: int | None = None) -> bytes:
         if not self._git:
             raise ExplorerError("git_unavailable")
         if not _allowed_arguments(arguments):
@@ -358,6 +394,10 @@ class GitCommitHistory:
                 "GIT_SEQUENCE_EDITOR": "true",
                 "GIT_EXTERNAL_DIFF": "",
                 "GIT_NO_REPLACE_OBJECTS": "1",
+                # A path is a path, never a glob. Without this a filename
+                # containing [ ] * or ? is read by git as a pattern, and the
+                # ranges returned describe whichever other files it matched.
+                "GIT_LITERAL_PATHSPECS": "1",
                 "GIT_ASKPASS": "",
                 "SSH_ASKPASS": "",
                 "GIT_CONFIG_NOSYSTEM": "1",
@@ -383,15 +423,15 @@ class GitCommitHistory:
         result = self._runner.run(
             ProcessRequest(
                 self._git, (*fixed, *arguments), root, environment,
-                self._limits.git_seconds, self._limits.git_output_bytes,
+                self._limits.git_seconds, output_limit or self._limits.git_output_bytes,
             )
         )
         if result.returncode:
             raise ExplorerError("git_unavailable")
         return result.output
 
-    def _run(self, root: Path, arguments: list[str]) -> str:
-        payload = self._run_bytes(root, arguments)
+    def _run(self, root: Path, arguments: list[str], output_limit: int | None = None) -> str:
+        payload = self._run_bytes(root, arguments, output_limit)
         try:
             return payload.decode("utf-8")
         except UnicodeDecodeError:
@@ -435,30 +475,60 @@ def _nonempty_bounded_file(path: Path) -> bool:
 
 _CHANGE = {"A": "added", "D": "deleted"}
 
-_NAME_STATUS_FLAGS = ["--no-commit-id", "--name-status", "-r", "--no-renames", "--first-parent", "--root", "-z"]
-# --ignore-cr-at-eol is required, not cosmetic. The hardened environment
-# deliberately removes Git for Windows' system core.autocrlf, and without it a
-# text blob's end-of-line form is derived differently during the diff, so a
-# one-line change reports as a whole-file rewrite and every line of the file
-# would be highlighted as added. The flag can only ever ignore a carriage
-# return immediately before a newline, which is a representation difference and
-# never a content one, so hunk boundaries describe what actually changed.
-_ADDED_LINES_FLAGS = [
-    "-p", "--unified=0", "--ignore-cr-at-eol", "--no-commit-id", "--no-renames", "--first-parent", "--root", "-r",
-]
+# Only an ordinary file has content this reader can serve. A symlink (120000)
+# or a gitlink (160000) entry carries a path or a commit id, and serving one as
+# a document would publish a target the live reader refuses to follow.
+_REGULAR_MODES = {"100644", "100755"}
 
-# --unified=0 makes every hunk header describe exactly the lines this commit
-# put on its own side of the file, so the added ranges are read from the
-# headers alone and no removed line is ever parsed, stored or transported.
+_COMMIT_FORMAT = "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"
+# The detail read needs the parent too, because the comparison is an explicit
+# two-tree diff rather than --first-parent, which prints nothing at all for a
+# merge commit.
+_DETAIL_FORMAT = "--format=%H%x00%s%x00%an%x00%aI%x00%P%x00%x1e"
+
+# --raw rather than --name-status: the raw record carries the destination file
+# mode, which is what distinguishes an ordinary file from a symlink or gitlink.
+_RAW_FLAGS = ["--no-commit-id", "-r", "--no-renames", "-z", "--raw"]
+_ADDED_LINES_FLAGS = ["-p", "--unified=0", "--no-commit-id", "--no-renames", "-r"]
+
+# --unified=0 makes every hunk header describe exactly the lines this commit put
+# on its own side of the file, so the added ranges are read from the headers
+# alone and no removed line is ever parsed, stored or returned.
 _HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
 
-def _name_status_arguments(sha: str) -> list[str]:
-    return ["diff-tree", *_NAME_STATUS_FLAGS, sha]
+def _revision_pair(parent: str | None, sha: str) -> list[str]:
+    """Compare against the first parent, or against the empty tree at a root."""
+    return [parent, sha] if parent else ["--root", sha]
 
 
-def _added_lines_arguments(sha: str, path: str) -> list[str]:
-    return ["diff-tree", *_ADDED_LINES_FLAGS, sha, "--", path]
+def _detail_arguments(sha: str) -> list[str]:
+    return ["log", sha, "--topo-order", "--skip=0", "--max-count=1", _DETAIL_FORMAT]
+
+
+def _raw_arguments(parent: str | None, sha: str) -> list[str]:
+    return ["diff-tree", *_RAW_FLAGS, *_revision_pair(parent, sha)]
+
+
+def _added_lines_arguments(parent: str | None, sha: str, path: str) -> list[str]:
+    return ["diff-tree", *_ADDED_LINES_FLAGS, *_revision_pair(parent, sha), "--", path]
+
+
+def _raw_entries(output: str):
+    """Yield (destination mode, status, path) from `diff-tree --raw -z` records.
+
+    Each record is `:<srcmode> <dstmode> <srcsha> <dstsha> <status>` followed by
+    the path, both NUL-terminated.
+    """
+    fields = output.split("\x00")
+    for index in range(0, len(fields) - 1, 2):
+        meta, raw = fields[index].strip("\r\n"), fields[index + 1]
+        if not meta.startswith(":") or not raw:
+            continue
+        parts = meta[1:].split(" ")
+        if len(parts) < 5:
+            continue
+        yield parts[1], parts[4], raw
 
 
 def _added_ranges(diff: str) -> tuple[tuple[int, int], ...]:
@@ -515,18 +585,30 @@ def _allowed_arguments(arguments: list[str]) -> bool:
             and arguments[2] == "--topo-order"
             and re.fullmatch(r"--skip=\d+", arguments[3])
             and re.fullmatch(r"--max-count=\d+", arguments[4])
-            and arguments[5] == "--format=%H%x00%s%x00%an%x00%aI%x00%x1e"
+            and arguments[5] in {_COMMIT_FORMAT, _DETAIL_FORMAT}
         )
     if len(arguments) == 3 and arguments[0] == "cat-file" and arguments[1] in {"blob", "-s"}:
         return _is_object_spec(arguments[2])
     if arguments[:1] == ["diff-tree"]:
-        if len(arguments) == len(_NAME_STATUS_FLAGS) + 2:
-            return arguments[1:-1] == _NAME_STATUS_FLAGS and bool(re.fullmatch(r"[0-9a-f]{40}", arguments[-1]))
-        if len(arguments) == len(_ADDED_LINES_FLAGS) + 4:
+        if len(arguments) == len(_RAW_FLAGS) + 3:
+            return arguments[1:-2] == _RAW_FLAGS and _is_revision_pair(arguments[-2:])
+        if len(arguments) == len(_ADDED_LINES_FLAGS) + 5:
             return (
-                arguments[1:-3] == _ADDED_LINES_FLAGS
-                and bool(re.fullmatch(r"[0-9a-f]{40}", arguments[-3]))
+                arguments[1:-4] == _ADDED_LINES_FLAGS
+                and _is_revision_pair(arguments[-4:-2])
                 and arguments[-2] == "--"
                 and _is_tree_path(arguments[-1])
             )
     return False
+
+
+def _is_revision_pair(pair: list[str]) -> bool:
+    """Either two full object ids, or the empty-tree marker and one id.
+
+    The marker is admitted only in the leading position, so `--root` can never
+    be smuggled in where a revision is expected.
+    """
+    left, right = pair
+    if not re.fullmatch(r"[0-9a-f]{40}", right):
+        return False
+    return left == "--root" or bool(re.fullmatch(r"[0-9a-f]{40}", left))

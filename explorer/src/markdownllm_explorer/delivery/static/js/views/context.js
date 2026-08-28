@@ -58,7 +58,7 @@ export function referencedIds(frontmatter) {
   return seen;
 }
 
-export function applyReferenceResolution(container, resolved, documentPath) {
+export function applyReferenceResolution(container, resolved, documentPath, partial = false) {
   if (documentPath !== undefined && container.dataset.documentPath !== documentPath) return;
   for (const chip of container.querySelectorAll(".reference-chip")) {
     const path = resolved[chip.dataset.id];
@@ -67,13 +67,19 @@ export function applyReferenceResolution(container, resolved, documentPath) {
       chip.dataset.path = path;
       chip.disabled = false;
       chip.title = path;
-    } else {
-      // Never a dead control: a chip that cannot lead anywhere says so rather
-      // than looking identical to one that can.
-      chip.disabled = true;
-      chip.title = "No thing with this identifier was found in this source.";
-      chip.classList.add("unresolved");
+      chip.classList.remove("unresolved", "uncertain");
+      continue;
     }
+    // Never a dead control: a chip that cannot lead anywhere says so rather
+    // than looking identical to one that can. And absence found in a complete
+    // index is a different claim from absence found in a truncated one, so a
+    // partial index is never allowed to assert "not found".
+    chip.disabled = true;
+    chip.classList.remove("unresolved", "uncertain");
+    chip.classList.add(partial ? "uncertain" : "unresolved");
+    chip.title = partial
+      ? "This source's index was truncated, so this reference could not be checked."
+      : "No thing with this identifier was found in this source.";
   }
 }
 

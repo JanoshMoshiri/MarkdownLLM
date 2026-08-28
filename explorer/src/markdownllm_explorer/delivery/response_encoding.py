@@ -51,7 +51,7 @@ def to_wire(value):
             "partial": value.partial,
         }
     if isinstance(value, CommitFile):
-        return {"path": value.path.value, "change": value.change, "openable": value.openable}
+        return {"path": value.path.value, "change": value.change, "openable": value.openable, "regular": value.regular}
     if isinstance(value, CommitDetail):
         return {
             "sha": value.sha, "subject": value.subject, "author_name": value.author_name,
@@ -61,7 +61,7 @@ def to_wire(value):
         return {
             "source_id": value.source_id.value, "path": value.path.value, "sha": value.sha,
             "content": value.content, "added_ranges": [list(item) for item in value.added_ranges],
-            "size": value.size,
+            "size": value.size, "ranges_known": value.ranges_known,
         }
     if isinstance(value, CommitRecord):
         return {"sha": value.sha, "subject": value.subject, "author_name": value.author_name, "authored_at": value.authored_at}

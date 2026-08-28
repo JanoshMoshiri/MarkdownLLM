@@ -186,6 +186,7 @@ class CommitFile:
     path: RelativePath
     change: str
     openable: bool = False
+    regular: bool = True
 
 
 @dataclass(frozen=True)
@@ -215,6 +216,9 @@ class HistoricalDocument:
     content: str
     added_ranges: tuple[tuple[int, int], ...]
     size: int
+    # False when the commit's patch exceeded its budget: the file is still
+    # served, but which lines it changed is unknown rather than "none".
+    ranges_known: bool = True
 
 
 @dataclass(frozen=True)
