@@ -60,9 +60,9 @@ def test_traceability_manifest_is_exact_and_well_formed():
 @pytest.mark.meta
 def test_mutation_manifest_is_complete_and_targets_real_tests():
     specification = (EXPLORER / "docs" / "test-specification.md").read_text(encoding="utf-8")
-    expected = set(re.findall(r"\bM(?:0[1-9]|1[0-9])\b", specification))
+    expected = set(re.findall(r"\bM(?:0[1-9]|1[0-9]|2[01])\b", specification))
     mutants = manifest()["mutants"]
-    assert set(mutants) == expected == {f"M{index:02}" for index in range(1, 20)}
+    assert set(mutants) == expected == {f"M{index:02}" for index in range(1, 22)}
     tests = collected_test_functions()
     for mutant_id, row in mutants.items():
         assert row["subject"] and row["evidence"] == f"mutation::{mutant_id}" and row["tests"]
@@ -80,7 +80,7 @@ def test_supported_python_range_is_declared():
 def test_test_spec_trace_table_has_one_row_per_requirement():
     specification = (EXPLORER / "docs" / "test-specification.md").read_text(encoding="utf-8")
     rows = re.findall(r"^\| ((?:FR|NFR)-[A-Z]+-\d{3}[A-Z]?) \|", specification, re.MULTILINE)
-    assert len(rows) == len(set(rows)) == 63
+    assert len(rows) == len(set(rows)) == 70
 
 
 @pytest.mark.meta

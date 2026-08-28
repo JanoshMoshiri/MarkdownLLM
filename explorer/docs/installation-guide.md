@@ -13,7 +13,7 @@ Python, Node or a browser extension.
 
 ### 1. Open the installer
 
-Get `MarkdownLLM-Explorer-Installer-0.2.0.exe` from your trusted MarkdownLLM
+Get `MarkdownLLM-Explorer-Installer-0.3.0.exe` from your trusted MarkdownLLM
 release source, then double-click it.
 
 Windows may warn about or, under Smart App Control or enterprise code-integrity

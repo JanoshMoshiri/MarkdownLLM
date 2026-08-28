@@ -1,4 +1,4 @@
-"""Execute the 16 specified deliberate mutants against their focused oracles."""
+"""Execute the 21 specified deliberate mutants against their focused oracles."""
 
 from __future__ import annotations
 
@@ -32,7 +32,14 @@ CASES: dict[str, tuple[Replacement, ...]] = {
     "M04": (Replacement("adapters/confined_source_reader.py", "if len(payload) > self._limits.file_bytes:", "if len(payload) >= self._limits.file_bytes:"),),
     "M05": (Replacement("adapters/frontmatter_parser.py", "            self._validate_event_stream(yaml_text)\n", "            # MUTANT: skip YAML event validation\n"),),
     "M06": (Replacement("adapters/safe_markdown_parser.py", "                elif decoded_url.scheme or \":\" in decoded_target.split(\"/\", 1)[0] or decoded_target.startswith((\"/\", \"//\", \"#\")):\n", "                elif False:\n"),),
-    "M07": (Replacement("delivery/response_encoding.py", '"content": value.content,', '"content": {"raw": value.content, "rendered": value.content},'),),
+    # Anchored on the DocumentRecord branch specifically: the historical-document
+    # encoder also carries a "content": value.content pair, and a shorter anchor
+    # silently retargeted this mutant at a branch its oracle does not cover.
+    "M07": (Replacement(
+        "delivery/response_encoding.py",
+        '"content": value.content, "frontmatter": to_wire(value.frontmatter), "size": value.size,',
+        '"content": {"raw": value.content, "rendered": value.content}, "frontmatter": to_wire(value.frontmatter), "size": value.size,',
+    ),),
     "M08": (Replacement("adapters/cursors.py", "            if not hmac.compare_digest(signature, expected):", "            if False:"),),
     "M09": (Replacement("composition.py", "resolve_trusted_git(root)", '"git"'),),
     "M10": (Replacement("adapters/git_commit_history.py", '                "GIT_OPTIONAL_LOCKS": "0",\n', ""),),
@@ -42,6 +49,31 @@ CASES: dict[str, tuple[Replacement, ...]] = {
     "M14": (Replacement("delivery/static/js/state.js", "    && request.liveIdentity === identityKey(liveLocationIdentity())", "    && true  // MUTANT: accept obsolete live UI context"),),
     "M15": (Replacement("delivery/static/js/views/navigation.js", "  label.textContent = source.display_name;", "  label.innerHTML = source.display_name;"),),
     "M16": (Replacement("delivery/static/js/views/navigation.js", "export function renderSources", 'fetch("/api/v1/estate");\n\nexport function renderSources'),),
+    "M17": (Replacement(
+        "application/read_historical_document.py",
+        '        if not self._admission.admits(source.boundary_token, relative):\n            raise ExplorerError("path_excluded")\n',
+        "        # MUTANT: read history without asking whether the source admits the path\n",
+    ),),
+    "M18": (Replacement(
+        "adapters/git_commit_history.py",
+        '    return all(part and part not in {".", ".."} for part in value.split("/"))',
+        "    return True  # MUTANT: trust the caller to have validated the path",
+    ),),
+    "M19": (Replacement(
+        "adapters/git_commit_history.py",
+        "                and _is_tree_path(arguments[-1])\n            )\n    return False\n",
+        "                and _is_tree_path(arguments[-1])\n            )\n    return True  # MUTANT: admit any argument vector\n",
+    ),),
+    "M20": (Replacement(
+        "adapters/thing_index.py",
+        "        for identifier in contested:\n            mapping.pop(identifier, None)\n",
+        "        # MUTANT: keep whichever file first claimed a contested identifier\n",
+    ),),
+    "M21": (Replacement(
+        "adapters/thing_index.py",
+        "        if line.strip() in FRONTMATTER_FENCES:\n            return None\n",
+        "        # MUTANT: keep scanning past the closing frontmatter fence\n",
+    ),),
 }
 
 

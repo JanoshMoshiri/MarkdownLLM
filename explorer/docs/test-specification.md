@@ -223,13 +223,13 @@ Shared oracle functions accept a subject implementation. Production subjects mus
 | `M12` | Log raw request target/header/query | `ST-LOG-001` |
 | `M13` | Acquire semaphore after creating thread | `ST-SERVER-BOUND-001` |
 | `M14` | Accept stale response A after current B | `BT-ASYNC-001` |
-| `M15` | Resolve a commit path without source admission | `GT-GIT-HISTORY-READ-001` |
-| `M16` | Accept a path argument the allowlist has not re-validated | `GT-GIT-ARGS-001` |
-| `M17` | Admit a git template outside the declared set | `GT-GIT-ARGS-001` |
-| `M18` | Resolve a contested identifier to its first match | `CT-REFERENCE-001` |
-| `M19` | Read an identifier from outside the frontmatter block | `CT-REFERENCE-001` |
 | `M15` | Insert repository metadata with `innerHTML` | `CT-HTML-001`, browser DOM safety check |
 | `M16` | Let a browser view call `fetch` directly | `AT-VIEW-001` |
+| `M17` | Resolve a commit path without source admission | `GT-GIT-HISTORY-READ-001` |
+| `M18` | Accept a path argument the allowlist has not re-validated | `GT-GIT-ARGS-001` |
+| `M19` | Admit a git template outside the declared set | `GT-GIT-ARGS-001` |
+| `M20` | Resolve a contested identifier to its first match | `CT-REFERENCE-001` |
+| `M21` | Read an identifier from outside the frontmatter block | `CT-REFERENCE-001` |
 
 Gate: all 16 mutants must be killed. A surviving mutant is evidence of a weak oracle or missing test and blocks implementation acceptance even when production tests are green.
 
@@ -306,12 +306,17 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | FR-NAV-004 | demo | UI | BT-NAV-001 | Eligible selection opens document and retains context | Technical run / Janosh |
 | FR-NAV-005 | demo | UI | BT-NAV-001, AJ-02 | URL/back/forward/refresh restore specified location and ancestors | Technical run / Janosh |
 | FR-NAV-006 | demo+inspection | UI | BT-RESPONSIVE-001, AJ-04 | Exact desktop/narrow/zoom layouts retain all capabilities/focus | Technical run / Janosh |
+| FR-NAV-007 | test+demo | MIN | BT-COLLAPSE-001 | Both side regions collapse, restore, persist, and take no dialog semantics at desktop | Technical run / Janosh |
+| FR-NAV-008 | test+demo | MIN | BT-COLLAPSE-001, BT-RESPONSIVE-001 | Centre scrolls horizontally when squeezed; page body never does | Technical run / Janosh |
 | FR-TAB-001 | test+demo | MIN | ST-API-SCHEMA-001, BT-TABS-001 | Overview has identity/counts/state/first commits and partial labels | Technical run / Janosh |
 | FR-TAB-002 | test+demo | GIT | GT-GIT-STATE-001, GT-GIT-PAGE-001, BT-TABS-001 | Required commit fields/order/page/states are exact | Technical run / Janosh |
 | FR-TAB-003 | test+demo | MIN | CT-COLLECTION-001, BT-TABS-001 | Skills lists Markdown or explicit empty without error | Technical run / Janosh |
 | FR-TAB-004 | test+demo | IMPERFECT | CT-COLLECTION-001, BT-TABS-001 | Memory recursion/group/issues/duplicates/empty follow contract | Technical run / Janosh |
 | FR-TAB-005 | test+demo | MIN | ST-API-SCHEMA-001, BT-TABS-001 | Settings shows authorised read-only facts/theme, no write controls | Technical run / Janosh |
 | FR-TAB-006 | test+demo | MIN | BT-NAV-001 | Tree/Skills/Memory resolve same document identity/reader | Technical run |
+| FR-TAB-007 | test+demo | MIN | GT-GIT-COMMIT-001, BT-COMMIT-001 | Commit lists first-parent changed paths, classified, with openability from admission | Technical run / Janosh |
+| FR-TAB-008 | test+demo | MIN | GT-GIT-HISTORY-READ-001, BT-COMMIT-001 | File reads as the commit left it with added ranges marked and named; no removed line | Technical run / Janosh |
+| FR-TAB-009 | test+demo | MIN | CT-COLLECTION-002, BT-TABS-001 | Descending groups, ascending titles, collapsible with surviving state and live count | Technical run / Janosh |
 | FR-DOC-001 | test+demo | GOLDEN | CT-MARKDOWN-001, BT-DOCUMENT-001 | All required constructs match independent safe goldens | Technical run / Janosh |
 | FR-DOC-002 | test+demo | GOLDEN | CT-FRONTMATTER-001, BT-DOCUMENT-001 | Frontmatter separately structured; invalid never inferred | Technical run / Janosh |
 | FR-DOC-003 | test+demo | UI | CT-DOCUMENT-001, BT-DOCUMENT-001 | Raw/rendered switch fetches and shows exactly one mode | Technical run / Janosh |
@@ -320,6 +325,7 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | FR-DOC-006 | test+demo | HOSTILE | CT-LINK-001, BT-DOCUMENT-001 | Only confined local + labelled HTTP(S) active with protections | Technical run |
 | FR-DOC-007 | test+mutation | IMPERFECT | UT-ELIG-001, GT-OWNERSHIP-001, MT-MUTATION-001 | Eligibility/secret precedence holds on every exposure route | Technical run |
 | FR-DOC-008 | test | IMPERFECT | CT-DOCUMENT-001, GT-CONFINE-001 | Every encoding/frontmatter/change outcome has stable terminal state | Technical run |
+| FR-DOC-009 | test+demo | MIN | CT-REFERENCE-001, BT-REFERENCE-001 | Declared references open their thing; absent, contested and failed lookups settle explicitly | Technical run / Janosh |
 | FR-SRCH-001 | test+demo | SCALE | CT-SEARCH-001, BT-SEARCH-001 | Case-insensitive eligible path filter/pages/partial, no bodies | Technical run / Janosh |
 | FR-SRCH-002 | demo+inspection | UI | BT-KEYBOARD-001 | Search/tabs/tree/theme/mode fully keyboard operable | Technical run / Janosh |
 | FR-UI-001 | inspection+demo | UI | BT-SHELL-001, BT-VISUAL-001 | Restrained three-region hierarchy matches reference principles | Janosh |
@@ -342,6 +348,7 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | NFR-SAFE-001A | test+analysis | IMPERFECT | GT-IMMUTABLE-001, AJ-07 | O-IMMUTABILITY unchanged for all in-scope values | Technical run |
 | NFR-SAFE-001B | test+mutation | GIT | GT-GIT-SAFE-001, MT-MUTATION-001 | Exact executable/argv/env/cwd/time/output; no helper/lazy fetch/lock | Technical run |
 | NFR-SAFE-001C | test+inspection | CLEAN/WINDOWS | ST-INSTALL-001, ST-WIN-INSTALL-001, ST-WIN-UNINSTALL-001, AJ-07, AJ-10 | Runtime persists no content/capability; installer writes/removes only declared per-user surfaces | Technical run |
+| NFR-SAFE-001D | test+mutation | MIN | GT-GIT-HISTORY-READ-001, GT-GIT-ARGS-001, MT-MUTATION-001 | Object-store reads apply working-tree rules, admission decided before any git call | Technical run |
 | NFR-SAFE-002A | test | IMPERFECT | UT-PATH-001, CT-CATALOG-001 | Root/domain config rejects absolute/escaping/invalid inputs | Technical run |
 | NFR-SAFE-002B | test+analysis | IMPERFECT | GT-CONFINE-001 | Executed native profiles reject detected links/replacements; residual labelled | Technical run |
 | NFR-SAFE-003 | test+mutation | HOSTILE | CT-HTML-001, CT-LINK-001, MT-MUTATION-001, AJ-06 | O-HTML-SAFETY passes server response and final DOM | Technical run |

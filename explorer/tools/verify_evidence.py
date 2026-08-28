@@ -45,7 +45,7 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
     """Apply content-specific oracles; IDs are never trusted on declaration alone."""
     if path.name == "mutation-kill-matrix.json":
         value = _json(path); summary = value.get("summary", {})
-        if value.get("tool", {}).get("name") != "run_mutations.py" or summary.get("total") != 16 or summary.get("survived") != 0 or summary.get("killed") != 16:
+        if value.get("tool", {}).get("name") != "run_mutations.py" or summary.get("total") != 21 or summary.get("survived") != 0 or summary.get("killed") != 21:
             raise ValueError("mutation matrix is incomplete")
         ids = {
             item.get("id") for item in value.get("mutants", [])
@@ -53,7 +53,7 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
             and item.get("changes")
             and all(change.get("before_sha256") and change.get("after_sha256") and change["before_sha256"] != change["after_sha256"] for change in item["changes"])
         }
-        if ids != {f"M{index:02}" for index in range(1, 17)}: raise ValueError("mutation identities/source hashes are incomplete")
+        if ids != {f"M{index:02}" for index in range(1, 22)}: raise ValueError("mutation identities/source hashes are incomplete")
         return {"analysis::MT-MUTATION-001", *(f"mutation::{item}" for item in ids)}
     if path.name == "clean-install.json":
         value = _json(path)

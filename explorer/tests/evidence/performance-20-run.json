@@ -17,169 +17,169 @@
     "measurement_priority": "high on Windows (inherited by Git children); default elsewhere",
     "ambient_cpu_gate": "two consecutive 500 ms samples at or below 60% before each run; 30 s maximum wait",
     "ambient_busy_samples": [
-      0.087,
-      0.3,
-      0.1929,
-      0.1128,
-      0.2609,
-      0.2355,
-      0.1245,
-      0.1829,
-      0.1992,
-      0.1294,
-      0.246,
-      0.1608,
-      0.2717,
-      0.1446,
-      0.102,
-      0.1195,
-      0.4348,
-      0.1278,
-      0.1434,
-      0.1047
+      0.4648,
+      0.3574,
+      0.2366,
+      0.4747,
+      0.1899,
+      0.2695,
+      0.5076,
+      0.1373,
+      0.4225,
+      0.418,
+      0.3281,
+      0.2146,
+      0.3672,
+      0.1969,
+      0.278,
+      0.5866,
+      0.1328,
+      0.1602,
+      0.1931,
+      0.3665
     ]
   },
   "runs": 20,
   "raw_ms": [
     {
-      "estate_overview": 401.3474,
-      "tree": 9.4981,
-      "search": 139.4168,
-      "document": 44.8237,
-      "commits": 382.4685
+      "estate_overview": 336.3302,
+      "tree": 15.0805,
+      "search": 60.6012,
+      "document": 25.0796,
+      "commits": 172.039
     },
     {
-      "estate_overview": 397.7057,
-      "tree": 20.0982,
-      "search": 149.6229,
-      "document": 31.2835,
-      "commits": 399.2502
+      "estate_overview": 1312.4367000000002,
+      "tree": 5.3958,
+      "search": 92.3155,
+      "document": 17.2581,
+      "commits": 506.4026
     },
     {
-      "estate_overview": 424.3237,
-      "tree": 10.0537,
-      "search": 161.3204,
-      "document": 47.0761,
-      "commits": 379.2838
+      "estate_overview": 250.2654,
+      "tree": 4.5618,
+      "search": 49.3507,
+      "document": 12.98,
+      "commits": 206.5077
     },
     {
-      "estate_overview": 450.0519,
-      "tree": 28.3807,
-      "search": 158.5665,
-      "document": 58.6044,
-      "commits": 367.1721
+      "estate_overview": 228.19639999999998,
+      "tree": 23.7037,
+      "search": 96.7583,
+      "document": 45.7667,
+      "commits": 242.0479
     },
     {
-      "estate_overview": 468.3508,
-      "tree": 30.1518,
-      "search": 160.5004,
-      "document": 45.1065,
-      "commits": 380.1579
+      "estate_overview": 262.04769999999996,
+      "tree": 19.8022,
+      "search": 88.344,
+      "document": 23.8481,
+      "commits": 197.6751
     },
     {
-      "estate_overview": 392.58840000000004,
-      "tree": 24.5654,
-      "search": 122.8949,
-      "document": 28.6866,
-      "commits": 364.9593
+      "estate_overview": 270.1867,
+      "tree": 6.86,
+      "search": 77.28,
+      "document": 46.2114,
+      "commits": 196.1988
     },
     {
-      "estate_overview": 409.13399999999996,
-      "tree": 8.8096,
-      "search": 143.6689,
-      "document": 31.5215,
-      "commits": 341.9617
+      "estate_overview": 280.4593,
+      "tree": 22.1506,
+      "search": 67.7041,
+      "document": 20.495,
+      "commits": 209.5568
     },
     {
-      "estate_overview": 417.2868,
-      "tree": 24.1371,
-      "search": 140.2459,
-      "document": 74.9188,
-      "commits": 365.1141
+      "estate_overview": 455.4403,
+      "tree": 7.9584,
+      "search": 83.1348,
+      "document": 19.9664,
+      "commits": 261.9143
     },
     {
-      "estate_overview": 374.2705,
-      "tree": 32.3595,
-      "search": 145.1031,
-      "document": 29.7339,
-      "commits": 333.3733
+      "estate_overview": 203.2398,
+      "tree": 6.0205,
+      "search": 75.8381,
+      "document": 49.2527,
+      "commits": 212.9861
     },
     {
-      "estate_overview": 396.80879999999996,
-      "tree": 8.6199,
-      "search": 159.9266,
-      "document": 63.7126,
-      "commits": 361.2303
+      "estate_overview": 233.662,
+      "tree": 6.0128,
+      "search": 77.8992,
+      "document": 50.0822,
+      "commits": 173.3063
     },
     {
-      "estate_overview": 452.68739999999997,
-      "tree": 26.5775,
-      "search": 161.6608,
-      "document": 45.4992,
-      "commits": 363.1563
+      "estate_overview": 226.2849,
+      "tree": 5.1578,
+      "search": 90.0774,
+      "document": 49.5266,
+      "commits": 202.9658
     },
     {
-      "estate_overview": 389.8107,
-      "tree": 9.5522,
-      "search": 123.022,
-      "document": 54.991,
-      "commits": 406.893
+      "estate_overview": 263.2309,
+      "tree": 27.226,
+      "search": 47.2555,
+      "document": 41.5553,
+      "commits": 216.246
     },
     {
-      "estate_overview": 433.34590000000003,
-      "tree": 31.19,
-      "search": 156.508,
-      "document": 55.2671,
-      "commits": 393.4999
+      "estate_overview": 232.8311,
+      "tree": 6.0061,
+      "search": 70.8137,
+      "document": 51.7137,
+      "commits": 226.2948
     },
     {
-      "estate_overview": 415.1227,
-      "tree": 9.7186,
-      "search": 186.581,
-      "document": 34.4159,
-      "commits": 370.2049
+      "estate_overview": 315.7032,
+      "tree": 4.7446,
+      "search": 67.6006,
+      "document": 18.4649,
+      "commits": 193.0569
     },
     {
-      "estate_overview": 396.06280000000004,
-      "tree": 7.4795,
-      "search": 159.1766,
-      "document": 53.9331,
-      "commits": 330.8301
+      "estate_overview": 248.75570000000002,
+      "tree": 7.7968,
+      "search": 128.1868,
+      "document": 45.6761,
+      "commits": 182.0254
     },
     {
-      "estate_overview": 448.9075,
-      "tree": 29.8055,
-      "search": 163.3129,
-      "document": 46.7208,
-      "commits": 388.9397
+      "estate_overview": 299.2329,
+      "tree": 22.2819,
+      "search": 58.6071,
+      "document": 38.7984,
+      "commits": 240.626
     },
     {
-      "estate_overview": 412.22659999999996,
-      "tree": 31.7424,
-      "search": 134.5102,
-      "document": 51.2855,
-      "commits": 348.4585
+      "estate_overview": 266.0723,
+      "tree": 19.5601,
+      "search": 145.8075,
+      "document": 15.6273,
+      "commits": 178.7715
     },
     {
-      "estate_overview": 412.8981,
-      "tree": 23.464,
-      "search": 147.9538,
-      "document": 31.7509,
-      "commits": 388.3094
+      "estate_overview": 270.784,
+      "tree": 16.1546,
+      "search": 96.4959,
+      "document": 43.2618,
+      "commits": 232.6375
     },
     {
-      "estate_overview": 416.69509999999997,
-      "tree": 7.7694,
-      "search": 168.464,
-      "document": 48.6103,
-      "commits": 355.1698
+      "estate_overview": 272.1912,
+      "tree": 5.2989,
+      "search": 62.9317,
+      "document": 40.3732,
+      "commits": 195.7226
     },
     {
-      "estate_overview": 427.5929,
-      "tree": 31.7045,
-      "search": 129.0324,
-      "document": 47.0044,
-      "commits": 344.784
+      "estate_overview": 308.0271,
+      "tree": 4.9367,
+      "search": 117.3217,
+      "document": 22.0297,
+      "commits": 192.6421
     }
   ],
   "summary": {
@@ -187,45 +187,45 @@
       "threshold_ms": 2000,
       "passes": 20,
       "required": 19,
-      "median_ms": 415.1227,
-      "order_19_ms": 452.68739999999997,
-      "max_ms": 468.3508,
+      "median_ms": 270.1867,
+      "order_19_ms": 455.4403,
+      "max_ms": 1312.4367000000002,
       "status": "pass"
     },
     "tree": {
       "threshold_ms": 300,
       "passes": 20,
       "required": 19,
-      "median_ms": 24.1371,
-      "order_19_ms": 31.7424,
-      "max_ms": 32.3595,
+      "median_ms": 7.7968,
+      "order_19_ms": 23.7037,
+      "max_ms": 27.226,
       "status": "pass"
     },
     "search": {
       "threshold_ms": 500,
       "passes": 20,
       "required": 19,
-      "median_ms": 156.508,
-      "order_19_ms": 168.464,
-      "max_ms": 186.581,
+      "median_ms": 77.8992,
+      "order_19_ms": 128.1868,
+      "max_ms": 145.8075,
       "status": "pass"
     },
     "document": {
       "threshold_ms": 500,
       "passes": 20,
       "required": 19,
-      "median_ms": 47.0044,
-      "order_19_ms": 63.7126,
-      "max_ms": 74.9188,
+      "median_ms": 40.3732,
+      "order_19_ms": 50.0822,
+      "max_ms": 51.7137,
       "status": "pass"
     },
     "commits": {
       "threshold_ms": 500,
-      "passes": 20,
+      "passes": 19,
       "required": 19,
-      "median_ms": 367.1721,
-      "order_19_ms": 399.2502,
-      "max_ms": 406.893,
+      "median_ms": 206.5077,
+      "order_19_ms": 261.9143,
+      "max_ms": 506.4026,
       "status": "pass"
     }
   }

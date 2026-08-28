@@ -64,7 +64,7 @@ def main() -> int:
         executable = environment / ("Scripts/mdllm-explorer.exe" if os.name == "nt" else "bin/mdllm-explorer")
         install = run([
             str(installed_python), "-m", "pip", "install", "--no-index", "--find-links", str(arguments.wheelhouse),
-            "markdownllm-explorer==0.2.0", "PyYAML==6.0.3",
+            "markdownllm-explorer==0.3.0", "PyYAML==6.0.3",
         ], cwd=arbitrary)
         probe = run([
             str(installed_python), "-c",
@@ -97,7 +97,7 @@ def main() -> int:
                 return response.status, body
             health = request("/health"); shell = request("/"); asset = request("/js/app.js"); estate = request("/api/v1/estate", True)
             assert health[0] == shell[0] == asset[0] == estate[0] == 200
-            assert json.loads(health[1])["version"] == "0.2.0"
+            assert json.loads(health[1])["version"] == "0.3.0"
             assert json.loads(estate[1])["data"]["sources"][0]["id"] == "substrate"
             active = socket.create_connection(("127.0.0.1", port), timeout=3)
             active.sendall(f"GET /health HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n".encode())

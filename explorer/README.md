@@ -14,7 +14,7 @@ MarkdownLLM Explorer is a standalone, read-only browser for a MarkdownLLM substr
 
 ## Windows install and run
 
-Run `MarkdownLLM-Explorer-Installer-0.2.0.exe`. The installer asks for the
+Run `MarkdownLLM-Explorer-Installer-0.3.0.exe`. The installer asks for the
 MarkdownLLM folder, installs the complete application for the current user,
 and creates Desktop and Start Menu shortcuts. No separate Python or Node
 installation is required.
