@@ -3,6 +3,7 @@ import {abortAllRequests, beginRequest, completeRequest, isCurrent, state} from 
 import {routeFromHash, routeFromText, validView, writeRoute} from "./routing.js";
 import {applyThemeChoice as applyTheme, cycleThemeChoice} from "./theme.js";
 import {activeOverlay, closeOverlays, openOverlay, visibleFocusable} from "./overlays.js";
+import {initialiseLayout} from "./layout.js";
 import {renderSources, renderTree} from "./views/navigation.js";
 import {appendCommit, refreshCommitAbbreviations, renderOverview} from "./views/overview.js";
 import {appendItem, renderCollection} from "./views/collection.js";
@@ -56,9 +57,8 @@ function bindChrome() {
   });
   document.querySelector("#tree-refresh").addEventListener("click", () => loadRootTree(true));
   document.querySelector("#theme-toggle").addEventListener("click", cycleTheme);
-  document.querySelector("#sidebar-open").addEventListener("click", () => openOverlay("nav"));
+  initialiseLayout(openOverlay);
   document.querySelector("#sidebar-close").addEventListener("click", closeOverlays);
-  document.querySelector("#context-open").addEventListener("click", () => openOverlay("context"));
   document.querySelector("#context-close").addEventListener("click", closeOverlays);
   document.querySelector("#search-input").addEventListener("input", event => {
     clearTimeout(searchTimer); const query = event.target.value.trim();

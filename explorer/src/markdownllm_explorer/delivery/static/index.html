@@ -14,7 +14,8 @@
       <header class="brand">
         <span class="brand-mark" aria-hidden="true">M</span>
         <span><strong>MarkdownLLM</strong><small>Explorer</small></span>
-        <button id="sidebar-close" class="icon-button mobile-only" aria-label="Close navigation">×</button>
+        <button id="sidebar-collapse" class="icon-button region-collapse" aria-label="Collapse navigation" aria-expanded="true" aria-controls="sidebar">‹</button>
+        <button id="sidebar-close" class="icon-button overlay-only" aria-label="Close navigation">×</button>
       </header>
       <div class="sidebar-scroll">
         <nav id="source-nav" aria-label="Sources"></nav>
@@ -27,7 +28,7 @@
     </aside>
     <main id="main" class="workspace" tabindex="-1">
       <header class="topbar">
-        <button id="sidebar-open" class="icon-button mobile-only" aria-label="Open navigation">☰</button>
+        <button id="sidebar-open" class="icon-button region-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">☰</button>
         <div class="source-title">
           <span id="source-icon" class="source-icon">S</span>
           <div><h1 id="source-name">Substrate</h1><p id="source-kind">Framework source</p></div>
@@ -35,7 +36,7 @@
         <div class="top-actions">
           <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search source paths</span><input id="search-input" type="search" placeholder="Search files" autocomplete="off"></label>
           <button id="theme-toggle" class="icon-button" aria-label="Change colour theme">◐</button>
-          <button id="context-open" class="icon-button mobile-only" aria-label="Open context panel">ⓘ</button>
+          <button id="context-open" class="icon-button region-toggle" aria-label="Open context panel" aria-expanded="false" aria-controls="context-panel">ⓘ</button>
         </div>
       </header>
       <nav class="tabs" aria-label="Source views" role="tablist">
@@ -48,7 +49,7 @@
       <section id="content" class="content" role="tabpanel" aria-labelledby="tab-overview" aria-live="polite" tabindex="0"></section>
     </main>
     <aside id="context-panel" class="context-panel" aria-label="Source and document context">
-      <header class="context-head"><strong>Context</strong><button id="context-close" class="icon-button mobile-only" aria-label="Close context panel">×</button></header>
+      <header class="context-head"><strong>Context</strong><button id="context-collapse" class="icon-button region-collapse" aria-label="Collapse context panel" aria-expanded="true" aria-controls="context-panel">›</button><button id="context-close" class="icon-button overlay-only" aria-label="Close context panel">×</button></header>
       <div id="context-content" class="context-content"></div>
     </aside>
   </div>

@@ -36,6 +36,7 @@ _ASSETS = {
     "/js/routing.js": ("js/routing.js", "text/javascript; charset=utf-8"),
     "/js/theme.js": ("js/theme.js", "text/javascript; charset=utf-8"),
     "/js/overlays.js": ("js/overlays.js", "text/javascript; charset=utf-8"),
+    "/js/layout.js": ("js/layout.js", "text/javascript; charset=utf-8"),
     "/js/views/navigation.js": ("js/views/navigation.js", "text/javascript; charset=utf-8"),
     "/js/views/overview.js": ("js/views/overview.js", "text/javascript; charset=utf-8"),
     "/js/views/tree.js": ("js/views/tree.js", "text/javascript; charset=utf-8"),
