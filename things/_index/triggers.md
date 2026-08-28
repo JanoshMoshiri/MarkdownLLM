@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: triggers
 created: 2026-08-28
-generated: 2026-08-28T18:11:38
-generated_from: HEAD@e27240d
+generated: 2026-08-28T18:15:17
+generated_from: HEAD@c5b3d4e
 coverage: 5
 framework_version: 3.36.0
 ---
@@ -14,7 +14,7 @@ framework_version: 3.36.0
 
 ## estate-retrospective-synthesis-2026-08
 - status: evolving  due_date: —
-- trigger: type=time, condition=2026-09-10 reached, action=If the verdict table below has not been ratified, surface it — the queue idles at the operator's seat by design, and an undated human wait is the drift the estate already learned to chase. If the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) has run, check that it consumed this synthesis as its layer-below input.
+- trigger: type=time, condition=2026-09-10 reached, action=Defer to `operator-queue-2026-08-28`, which now carries this synthesis's undischarged rows and chases the same date — report only what is unique to this artifact: whether the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) ran and consumed this synthesis as its layer-below input, and whether the standing aggregation read (row 6) has been ruled. Do not double-chase the rows the queue holds.
 
 ## estate-workflow-derivation
 - status: in-progress  due_date: —

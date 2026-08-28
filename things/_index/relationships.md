@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T18:11:38
-generated_from: HEAD@e27240d
-coverage: 312
+generated: 2026-08-28T18:15:18
+generated_from: HEAD@c5b3d4e
+coverage: 313
 framework_version: 3.36.0
 ---
 
@@ -489,6 +489,8 @@ framework_version: 3.36.0
 - estate-retrospective-synthesis-2026-08 --implements--> shared-domain-failures-are-a-framework-signal-without-a-path
 - estate-retrospective-synthesis-2026-08 --derived-from--> a-well-kept-record-reads-as-a-governed-world
 - estate-retrospective-synthesis-2026-08 --references--> framework-retrospective-2026-08c
+- estate-retrospective-synthesis-2026-08 --informs--> operator-queue-2026-08-28
+- estate-retrospective-synthesis-2026-08 --derived-from--> session-end-is-the-least-current-read-of-the-session
 - estate-wide-autopush-2026-08-22 --implements--> autopush-requires-explicit-authority
 - estate-wide-autopush-2026-08-22 --references--> estate-cadence-cluster
 - estate-workflow-derivation --implements--> derivation-shape-settled-2026-08
@@ -1007,6 +1009,11 @@ framework_version: 3.36.0
 - scalability-guide --complements--> thing-lifecycle-specification
 - scalability-guide --complements--> derived-index-specification
 - scalability-guide --references--> example-things-specification
+- session-end-is-the-least-current-read-of-the-session --extends--> a-session-harvest-must-read-the-commit-stream
+- session-end-is-the-least-current-read-of-the-session --supports--> existence-is-not-currency
+- session-end-is-the-least-current-read-of-the-session --implements--> a-well-kept-record-reads-as-a-governed-world
+- session-end-is-the-least-current-read-of-the-session --complements--> session-start-loses-to-the-first-request
+- session-end-is-the-least-current-read-of-the-session --derived-from--> estate-retrospective-synthesis-2026-08
 - session-memory-specification --extends--> thing-specification
 - session-memory-specification --complements--> orchestration-specification
 - session-memory-specification --complements--> write-thing-specification

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-28
-generated: 2026-08-28T18:11:38
-generated_from: HEAD@e27240d
-coverage: 74
+generated: 2026-08-28T18:15:18
+generated_from: HEAD@c5b3d4e
+coverage: 75
 framework_version: 3.36.0
 ---
 
@@ -107,6 +107,7 @@ framework_version: 3.36.0
 - estate-workflow-derivation (derived-from)
 - operator-queue-2026-08-28 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - operator-queue-2026-08-28 (derived-from)
+- session-end-is-the-least-current-read-of-the-session (derived-from)
 - workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - workflow-reconciliation-precedes-new-definitions (derived-from)
 
@@ -264,6 +265,9 @@ framework_version: 3.36.0
 - operating-model-seams-scope-2026-08-26 (pinned @bc4aabcf140445baae2c824e17fcf1249e0eda09)
 - operating-model-seams-self-application (pinned @45a582b3fc424cb3bf812e235be3cc576615098d)
 - operating-model-seams-self-application (derived-from)
+
+## session-end-is-the-least-current-read-of-the-session
+- estate-retrospective-synthesis-2026-08 (derived-from)
 
 ## settled-reasoning-is-standing-authority
 - gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)

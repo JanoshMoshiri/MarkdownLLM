@@ -2,7 +2,7 @@
 id: estate-retrospective-synthesis-2026-08
 type: artifact
 status: evolving
-version: 1.0
+version: 1.1
 created: 2026-08-27
 session: 2026-08-27
 tags: [retrospectives, estate, synthesis, aggregation-read, closed-loop, upward-signal]
@@ -34,13 +34,57 @@ linked_things:
   - id: framework-retrospective-2026-08c
     relation: references
     notes: "The substrate's own layer-below contribution, and the origin of the census question this synthesis runs parallel to."
+  - id: operator-queue-2026-08-28
+    relation: informs
+    notes: "The live carrier of this synthesis's undischarged rows: the ten-row table was folded into that queue's Tier 2 (rows 9-14) rather than restated, and the queue is where the residue is now ruled. Added at v1.1 — see the discharge record below."
+  - id: session-end-is-the-least-current-read-of-the-session
+    relation: derived-from
+    notes: "Harvested at this synthesis's own session close, when the ritual was handed a base 40+ commits stale. The reason this discharge record exists rather than a ratification claim."
 triggers:
   - type: time
     condition: "2026-09-10 reached"
-    action: "If the verdict table below has not been ratified, surface it — the queue idles at the operator's seat by design, and an undated human wait is the drift the estate already learned to chase. If the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) has run, check that it consumed this synthesis as its layer-below input."
+    action: "Defer to `operator-queue-2026-08-28`, which now carries this synthesis's undischarged rows and chases the same date — report only what is unique to this artifact: whether the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) ran and consumed this synthesis as its layer-below input, and whether the standing aggregation read (row 6) has been ruled. Do not double-chase the rows the queue holds."
 ---
 
 # Estate Retrospective Synthesis — August 2026
+
+> **Discharge record, v1.1 (2026-08-28, ~31 hours after v1.0).** Written at
+> this synthesis's own session close, after a direct read established that the
+> estate had moved 40+ commits and the ritual's inherited digest had not
+> (`session-end-is-the-least-current-read-of-the-session`). Recorded here
+> rather than left to drift, because a queue asserting "awaiting ratification"
+> over discharged rows is `a-well-kept-record-reads-as-a-governed-world`
+> operating inside the document that minted it.
+>
+> **Ruled and executed by other sessions (2026-08-28):**
+> - **Row 1 — done.** `skill` joined the orientation exclusion set (`d5e281b`).
+>   The estate's twelve phantom loops across four domains are closed.
+> - **Row 2 — done.** Matured obligations on terminal carriers now surface
+>   instead of vanishing (`855b678`).
+> - **Row 4 — done.** The zero-run definition sensor shipped as an Info
+>   finding (`0d8974a`); today's census is recorded as its argument.
+> - **Row 7 — substantially done.** Both domains this synthesis named as
+>   owing one now have their first retrospective; two of the remaining four
+>   were ruled dormant with recorded parks, which is the correct disposition
+>   this table asked for rather than a skip.
+> - **The gates census ratified in full** (`e27240d`) — all twenty verdicts as
+>   proposed, none flipped, census now `stable`. Its row 15 is what converts
+>   several rows below from operator seat to agent execution.
+> - **Row 3 authorised and sequenced** ahead of the dispatcher, on a fourth
+>   sighting measured the same day (COVERAGE 0/101 and 0/43 on a cross-mirrored
+>   pair). It is the queue's hardest-pushed recommendation.
+>
+> **Still open, and now carried by `operator-queue-2026-08-28`** (Tier 2, rows
+> 9–14): rows 3 (build), 5, 6, 8, 9 and 10 of the table below. This artifact
+> stays `evolving`: its stated ratification condition is the whole table ruled,
+> and it is not. The residue is ruled *there*, not here — one carrier, per this
+> synthesis's own F1.
+>
+> **What this discharge is evidence of.** F1 predicted that findings ride
+> committed carriers and prose findings do not. Every row above that closed was
+> a numbered verdict with evidence attached; it closed within a day, executed
+> by sessions this one never met. That is the loop this document analysed,
+> observed closing on the document itself.
 
 The operator asked the substrate for a full analysis of the estate's
 retrospective layer. This document is that analysis: a **direct-read audit**
