@@ -24,3 +24,12 @@
 .historical-gutter{position:sticky;left:0;z-index:1;background:var(--code);color:var(--muted);text-align:right;border-right:1px solid var(--line);-webkit-user-select:none;user-select:none}
 .historical-code{padding-left:16px}
 .historical-code mark{background:var(--added-bg);color:inherit;-webkit-box-decoration-break:clone;box-decoration-break:clone;box-shadow:inset 3px 0 0 var(--added)}
+.collection-section{border-top:1px solid var(--line)}
+.collection-section:first-child{border-top:0}
+.collection-group{display:flex;align-items:center;gap:8px;width:100%;padding:11px 14px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-align:left}
+.collection-group:hover{background:var(--soft);color:var(--text)}
+.collection-group .chevron{width:12px;color:var(--muted)}
+.collection-group .group-name{flex:1}
+.collection-group .group-count{font-weight:600;letter-spacing:0;color:var(--muted)}
+.collection-section.collapsed .collection-items{display:none}
+.collection-items .collection-item:first-child{border-top:0}

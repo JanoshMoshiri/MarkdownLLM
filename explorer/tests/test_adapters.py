@@ -471,3 +471,38 @@ def test_commit_routes_reject_a_revision_that_is_not_a_full_sha(estate):
         with pytest.raises(ExplorerError) as caught:
             runtime.routes.dispatch("/api/v1/commit", {"source": ["substrate"], "sha": [sha]})
         assert caught.value.code in {"invalid_request", "source_changed"}
+
+_THING = """---
+id: {identifier}
+type: {kind}
+---
+# {title}
+"""
+
+
+@pytest.mark.contract
+def test_memory_groups_run_z_to_a_with_titles_ascending_inside(tmp_path):
+    root = tmp_path / "ordered"
+    root.mkdir()
+    (root / "AGENTS.md").write_text("# Ordered fixture", encoding="utf-8")
+    layout = {
+        "conflicts": ("conflict", ["Beta clash", "Alpha clash"]),
+        "decisions": ("decision", ["Delta call"]),
+        "insights": ("insight", ["Gamma note"]),
+        "retrospectives": ("retrospective", ["Epsilon review"]),
+    }
+    for folder, (kind, titles) in layout.items():
+        directory = root / "things" / folder
+        directory.mkdir(parents=True)
+        for index, title in enumerate(titles):
+            body = _THING.format(identifier=f"{folder}-{index}", kind=kind, title=title)
+            (directory / f"{folder}-{index}.md").write_text(body, encoding="utf-8")
+
+    page = build_runtime(root).routes.dispatch(
+        "/api/v1/collection", {"source": ["substrate"], "kind": ["memory"]}
+    )
+    groups = [item.group for item in page.items]
+    ordered = [group for index, group in enumerate(groups) if index == 0 or groups[index - 1] != group]
+    assert ordered == ["Retrospectives", "Insights", "Decisions", "Conflicts"]
+    conflicts = [item.title for item in page.items if item.group == "Conflicts"]
+    assert conflicts == ["Alpha clash", "Beta clash"]

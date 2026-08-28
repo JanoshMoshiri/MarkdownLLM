@@ -11,6 +11,7 @@ export const state = {
   selectedPath: null,
   commit: null,
   commitFiles: [],
+  collapsedGroups: new Set(),
   documentMode: "rendered",
   themeChoice: "system",
   sourceSettings: null,

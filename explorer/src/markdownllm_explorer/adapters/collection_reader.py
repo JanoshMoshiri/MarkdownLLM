@@ -56,7 +56,12 @@ class CuratedCollectionReader:
                 for item_index in indexes:
                     item = candidates[item_index]
                     candidates[item_index] = CollectionItem(item.path, item.title, item.group, item.thing_id, item.thing_type, (*item.issues, "duplicate_id"))
-        candidates.sort(key=lambda item: (item.group.casefold(), item.title.casefold(), item.path.value))
+        # Groups run Z to A so the sections a reader reaches for most are not
+        # buried by an accident of the alphabet; titles inside a group stay A to Z.
+        # Two stable passes rather than one key, because a descending string key
+        # cannot be expressed by negation the way a numeric one can.
+        candidates.sort(key=lambda item: (item.title.casefold(), item.path.value))
+        candidates.sort(key=lambda item: item.group.casefold(), reverse=True)
         revision = hashlib.sha256("\n".join(repr(item) for item in candidates).encode()).hexdigest() + ("-partial" if partial else "")
         state = self._cursors.decode(cursor, operation="collection", source=boundary.source.id.value, context=kind)
         if state.revision and state.revision != revision:

@@ -206,7 +206,7 @@ async function loadView(cursor = null) {
       if (isCurrent(request)) { state.repository = value.repository; renderOverview(content, value, loadMoreCommits, openCommit); renderSourceContext(contextContent, state.source, state.sourceSettings, state.repository); }
     } else if (state.view === "skills" || state.view === "memory") {
       const value = await get("/api/v1/collection", {source: identity.source, kind: identity.tab, cursor}, request.signal);
-      if (isCurrent(request)) renderCollection(content, value, identity.tab, openCollectionDocument, loadMoreCollection);
+      if (isCurrent(request)) renderCollection(content, value, identity.tab, openCollectionDocument, loadMoreCollection, state.collapsedGroups);
     } else {
       const value = await get("/api/v1/settings", {source: identity.source}, request.signal);
       if (isCurrent(request)) renderSettings(content, value, state.themeChoice, applyThemeChoice);
@@ -236,18 +236,14 @@ async function loadMoreCollection(cursor, list, button) {
   try {
     const value = await get("/api/v1/collection", {source: identity.source, kind: identity.tab, cursor}, request.signal);
     if (!isCurrent(request)) return;
-    button.remove(); const appended = [];
-    let group = [...list.querySelectorAll(".collection-group")].at(-1)?.textContent || "";
-    value.items.forEach(item => {
-      if (item.group !== group) {
-        group = item.group; const heading = document.createElement("div");
-        heading.className = "collection-group"; heading.textContent = group; list.append(heading);
-      }
-      appended.push(appendItem(list, item, openCollectionDocument));
-    });
+    button.remove();
+    const appended = value.items.map(item => appendItem(list, item, openCollectionDocument, state.collapsedGroups));
     if (value.next_cursor) { const next = moreButton("Load more", () => loadMoreCollection(value.next_cursor, list, next)); list.append(next); }
     if (value.partial) appendPartialNote(list);
-    appended[0]?.focus();
+    // An item appended into a collapsed section cannot take focus; its heading
+    // can, and the heading's count is where the arrival is visible.
+    const landing = appended[0];
+    (landing?.offsetParent ? landing : landing?.closest(".collection-section")?.querySelector(".collection-group"))?.focus();
   } catch (error) { if (error.name !== "AbortError" && isCurrent(request)) { button.disabled = false; showError(error, true); } }
   finally { completeRequest(request); }
 }
