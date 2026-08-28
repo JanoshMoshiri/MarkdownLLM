@@ -734,9 +734,17 @@ def test_scaffold_birth_sequence(tmp_path, capsys):
         findings.extend(mdllm.validate_level1(t, corpus.schema))
     findings.extend(mdllm.validate_level2(corpus))
     findings.extend(mdllm.validate_level3(corpus))
-    # 4 skills + 9 reasoning prompts (delivered since v3.24.0 — the generated
-    # session-start block names them, so birth must include them)
-    assert findings == [] and len(corpus.things) == 13
+    # Every shipped skill template + every shipped reasoning prompt, and
+    # nothing else. DERIVED from the templates directory rather than pinned as
+    # a number: the literal 13 here went stale the first time a prompt was
+    # added, which is the restated-fact class the floor exists to end. Prompts
+    # have been delivered since v3.24.0 — the generated session-start block
+    # names them, so birth must include them.
+    templates = Path(__file__).resolve().parents[2] / "templates"
+    expected = (len(list(templates.glob("domain-*.skill.md.template")))
+                + len(list((templates / "prompts").glob("*.md"))))
+    assert expected > 4, "the template source itself must be readable"
+    assert findings == [] and len(corpus.things) == expected
 
 
 def test_domain_kernel_regeneration_preserves_authored_launch_contract(

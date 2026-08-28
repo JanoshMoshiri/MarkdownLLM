@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.20
+version: 1.21
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -125,7 +125,7 @@ accepted state unverifiable. That is a recovery property, not proof it ran.
 | `post-write` | interpretation (act) — git-fs is only the pre-commit drift net | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
 | `post-commit` | git/fs | ⚙️ git hook invokes `mdllm autopush`; a send occurs only under literal `git.autopush: true` | Low — publication debt, surfaced by `estate-sync --status` |
 | `on-create`, `on-status-change`, `on-error`, `retrospective` | interpretation (semantic) | interpretation — no mechanical detector possible | Moderate — downstream not cascaded |
-| reasoning prompts (`cascade-completion`, `evaluate-triggers`, `surface-attention`, `detect-conflicts`, `session-orientation`, `domain-velocity`, `review-schema-coherence`, `session-end-continuity`) | interpretation | interpretation — they *are* reasoning | Low–Moderate |
+| reasoning prompts (`cascade-completion`, `evaluate-triggers`, `surface-attention`, `detect-conflicts`, `session-orientation`, `domain-velocity`, `review-schema-coherence`, `review-skill-coherence`, `session-end-continuity`) | interpretation | interpretation — they *are* reasoning | Low–Moderate |
 
 Two consequences fall out:
 
@@ -474,8 +474,9 @@ These are prompts that ship with the framework and apply to any domain:
 - **session-end-continuity** — At session end, reconstruct the logical session from both surviving dialogue and its commit range (compaction is not a session boundary), extract any additional insights, disposition the standing insights, check for contradictions, manage open-loop things, commit with a rich `session-end:` message (the backward record is git; `mdllm worklog` is an on-demand view, not a committed file), then report publication debt (`estate-sync --status` — after the commit, never elided from this summary: two summaries ended at the commit while every operative surface carried the debt step)
 - **domain-velocity** — At session start, read git history as telemetry to surface stalled, churning, or untouched work the current-state snapshot can't see
 - **review-schema-coherence** — At retrospective, audit the domain's emergent frontmatter vocabulary (via the schema registry) for fields that have drifted apart in name but converged in meaning
+- **review-skill-coherence** — At retrospective, read the skills and the entry file against the commit stream since the last one and force a per-skill disposition (confirm-current / update / park / retire). The operating layer's sibling to the scan above: Layer 3's vocabulary is audited at every commit, Layers 1 and 2 are audited here or nowhere
 
-The reflexive prompts — `domain-velocity`, `evaluate-triggers` (against the triggers index), `detect-conflicts` (scan mode), and `review-schema-coherence` — let the agent reason *about* the domain, not just *within* it. Three of the four read a derived index rather than scanning every thing; see `derived-index.md`.
+The reflexive prompts — `domain-velocity`, `evaluate-triggers` (against the triggers index), `detect-conflicts` (scan mode), `review-schema-coherence`, and `review-skill-coherence` — let the agent reason *about* the domain, not just *within* it. Three of the five read a derived index rather than scanning every thing; see `derived-index.md`. The other two read git: velocity asks what *should* have moved and didn't, skill coherence asks whether the definitions still describe what moved.
 
 ### Domain Prompts
 
@@ -543,6 +544,7 @@ bindings:
     invoke:
       - detect-conflicts          # scan mode: full-domain sweep via the relationships index
       - review-schema-coherence   # audit emergent field vocabulary via the schema registry
+      - review-skill-coherence    # read the skills against the period's commits; disposition each
 ```
 
 Index *maintenance* is not bound here — it rides the `post-write` hard hook (above).
@@ -716,7 +718,8 @@ framework-root/
 │   │   ├── detect-conflicts.md
 │   │   ├── session-end-continuity.md
 │   │   ├── domain-velocity.md
-│   │   └── review-schema-coherence.md
+│   │   ├── review-schema-coherence.md
+│   │   └── review-skill-coherence.md
 │   └── indexes/                  ← starting-point derived-index templates
 │       ├── triggers.md.template
 │       └── schema.md.template
