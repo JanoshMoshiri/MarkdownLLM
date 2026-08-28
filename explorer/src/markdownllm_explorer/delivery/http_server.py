@@ -28,6 +28,8 @@ if TYPE_CHECKING:
 _ASSETS = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
+    "/favicon.ico": ("markdownllm-explorer.png", "image/png"),
+    "/markdownllm-explorer.png": ("markdownllm-explorer.png", "image/png"),
     "/app.css": ("app.css", "text/css; charset=utf-8"),
     "/context.css": ("context.css", "text/css; charset=utf-8"),
     "/js/api.js": ("js/api.js", "text/javascript; charset=utf-8"),

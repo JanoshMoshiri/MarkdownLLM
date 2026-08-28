@@ -44,13 +44,27 @@ export function appendCommit(list, commit, onCommit) {
 }
 
 export function refreshCommitAbbreviations(list) {
-  const nodes = [...list.querySelectorAll(".commit-sha")];
-  const values = nodes.map(node => node.dataset.sha);
-  nodes.forEach(node => {
-    const value = node.dataset.sha; let length = 12;
-    while (length < value.length && values.some(other => other !== value && other.startsWith(value.slice(0, length)))) length += 1;
-    node.textContent = value.slice(0, length);
+  // Only neighbours in sorted order can share a longest common prefix, so one
+  // sort replaces comparing every loaded commit against every other — the old
+  // shape grew quadratically as pages were loaded.
+  const ordered = [...list.querySelectorAll(".commit-sha")]
+    .sort((left, right) => (left.dataset.sha < right.dataset.sha ? -1 : left.dataset.sha > right.dataset.sha ? 1 : 0));
+  const shared = ordered.map(() => 0);
+  for (let index = 1; index < ordered.length; index += 1) {
+    const overlap = commonPrefix(ordered[index - 1].dataset.sha, ordered[index].dataset.sha);
+    shared[index - 1] = Math.max(shared[index - 1], overlap);
+    shared[index] = Math.max(shared[index], overlap);
+  }
+  ordered.forEach((node, index) => {
+    const value = node.dataset.sha;
+    node.textContent = value.slice(0, Math.min(value.length, Math.max(12, shared[index] + 1)));
   });
+}
+
+function commonPrefix(left, right) {
+  let index = 0;
+  while (index < left.length && index < right.length && left[index] === right[index]) index += 1;
+  return index;
 }
 
 function metric(value, label, partial = false) { return `<article class="metric"><strong>${partial ? "≥" : ""}${Number(value).toLocaleString()}</strong><span>${escapeText(label)}${partial ? " (partial)" : ""}</span></article>`; }

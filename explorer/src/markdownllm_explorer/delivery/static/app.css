@@ -4,7 +4,7 @@
 .tree-more{width:calc(100% - 10px);margin:5px;border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:6px 10px;border-radius:8px;cursor:pointer}.partial-note{margin:10px;padding:10px;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:8px}
 .quiet-button,.search-box input{min-height:24px}
 .brand .icon-button{margin-left:auto;flex:0 0 auto}
-.icon-button:focus-visible,.quiet-button:focus-visible,.tabs button:focus-visible,.source-button:focus-visible,.tree-row:focus-visible,.collection-item:focus-visible,.reader-actions button:focus-visible,.load-more:focus-visible,.tree-more:focus-visible,.list-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.icon-button:focus-visible,.quiet-button:focus-visible,.tabs button:focus-visible,.source-button:focus-visible,.tree-row:focus-visible,.collection-item:focus-visible,.reader-actions button:focus-visible,.load-more:focus-visible,.tree-more:focus-visible,.list-row:focus-visible,.collection-group:focus-visible,.commit-back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 :root{--added:#1b6b40;--added-bg:#dcf1e4}
 [data-theme="dark"]{--added:#8fd6a8;--added-bg:#1e3529}
 .commit-row{width:100%;font:inherit;color:inherit;background:transparent;border:0;border-bottom:1px solid var(--line);text-align:left;cursor:pointer}

@@ -93,9 +93,11 @@ export function renderCommitDocument(container, document_, change) {
 
   const legend = node("p", "historical-legend");
   // Say what is not here. A reader who sees only additions highlighted could
-  // otherwise take the absence of removals as "nothing was removed".
+  // otherwise take the absence of removals as "nothing was removed". Naming
+  // the line numbers also puts the change locations somewhere that does not
+  // depend on seeing a colour, or on reading the gutter at all.
   legend.textContent = document_.added_ranges.length
-    ? "Marked lines are what this commit added or changed. Removed lines are not part of this view."
+    ? `Marked lines are what this commit added or changed — ${describeRanges(document_.added_ranges)}. Removed lines are not part of this view.`
     : "This commit added no lines to this file. Removed lines are not part of this view.";
 
   target.append(head, legend, historicalBody(document_));
@@ -141,6 +143,17 @@ function historicalBody(document_) {
 
   body.append(gutter, code);
   return body;
+}
+
+const NAMED_RANGES = 8;
+
+function describeRanges(ranges) {
+  const named = ranges.slice(0, NAMED_RANGES)
+    .map(([start, end]) => (start === end ? `${start}` : `${start}–${end}`))
+    .join(", ");
+  const remainder = ranges.length - NAMED_RANGES;
+  const places = `line${ranges.length === 1 && ranges[0][0] === ranges[0][1] ? "" : "s"} ${named}`;
+  return remainder > 0 ? `${places} and ${remainder} more` : places;
 }
 
 function gutterText(total, ranges) {

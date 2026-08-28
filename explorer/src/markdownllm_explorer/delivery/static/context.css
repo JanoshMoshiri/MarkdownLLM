@@ -82,7 +82,7 @@
 .reference-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .reference-chip {
   display: flex; flex-direction: column; gap: 1px; max-width: 100%;
-  padding: 5px 9px; border: 1px solid var(--line); border-radius: 9px;
+  padding: 6px 10px; min-height: 26px; border: 1px solid var(--line); border-radius: 9px;
   background: var(--bg); color: var(--text); font: inherit; font-size: 12px;
   text-align: left; cursor: pointer; overflow-wrap: anywhere;
 }
