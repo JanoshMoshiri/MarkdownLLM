@@ -1294,7 +1294,64 @@ def test_free_text_time_condition_with_date_is_evaluated(tmp_path, capsys):
     assert "fires in" in out and "renew" in out                    # within 30d
     assert out.index("renew by") > out.index("Upcoming")           # in that section
     assert "archive" in out and "Horizon" in out                   # beyond 30d
-    assert out.count("escalate") == 1                              # d is settled
+    # d is settled AND its date has matured: since the dark-obligations fix
+    # (estate synthesis 2026-08, F6.2) that obligation surfaces labelled with
+    # its terminal carrier instead of falling into no bucket at all.
+    assert out.count("escalate") == 2
+    assert "TERMINAL carrier (status `completed`)" in out
+
+
+def test_matured_obligation_on_terminal_carrier_surfaces(tmp_path, capsys):
+    # Estate synthesis 2026-08, F6 defect 2 / queue row 2: future-dated
+    # triggers on terminal things reported as upcoming while matured ones fell
+    # into NO bucket — a dated obligation went dark on exactly the day it
+    # fired, precisely because its carrier had settled. The no-silent-default
+    # law rules the direction: the matured obligation surfaces in the fired
+    # bucket, labelled with its terminal carrier, on BOTH rendering surfaces.
+    import datetime as dt
+    soon = (dt.date.today() + dt.timedelta(days=10)).isoformat()
+    write(tmp_path, "things/dark.md", thing_text(
+        "id: dark\ntype: task\nstatus: completed\ncreated: 2026-01-01\n"
+        "triggers:\n  - type: time\n    condition: 2026-02-01 reached\n"
+        "    action: hand the obligation to a live carrier\n"))
+    write(tmp_path, "things/ahead.md", thing_text(
+        f"id: ahead\ntype: task\nstatus: completed\ncreated: 2026-01-01\n"
+        f"triggers:\n  - type: time\n    condition: renew by {soon}\n"
+        f"    action: renew\n"))
+    write(tmp_path, "things/done-due.md", thing_text(
+        "id: done-due\ntype: task\nstatus: completed\ncreated: 2026-01-01\n"
+        "due_date: 2026-02-01\n"
+        "triggers:\n  - type: time\n    condition: due_date_passed\n"
+        "    action: escalate\n"))
+    from markdownllm.triggers import TriggerOutcome, evaluate, evaluate_results
+
+    fired, upcoming, horizon, skipped, _ = evaluate(tmp_path)
+    # 1. The matured obligation surfaces, labelled with its settled carrier.
+    assert any("dark" in l and "TERMINAL carrier (status `completed`)" in l
+               for l in fired)
+    # 2. Future-dated on the same carrier class reports exactly as before.
+    assert any("ahead" in l and "fires in" in l for _, l in upcoming)
+    assert not any("ahead" in l for l in fired)
+    # 3. Nothing else moves buckets: a passed due_date on a settled thing is
+    #    the deadline satisfied by completion, not a dark obligation — silent
+    #    in every rendered bucket, NOT_FIRED (never dropped) in the typed one.
+    assert not any("done-due" in l for l in fired)
+    assert not any("done-due" in l for l in skipped)
+    assert not any("done-due" in l for _, l in upcoming + horizon)
+    results = {r.thing_id: r for r in evaluate_results(tmp_path)}
+    assert results["dark"].outcome is TriggerOutcome.FIRED
+    assert results["done-due"].outcome is TriggerOutcome.NOT_FIRED
+    assert "terminal" in results["done-due"].reason
+
+    # Both surfaces carry the same labelled line: the CLI...
+    mdllm.cmd_triggers(_ns(path=str(tmp_path)))
+    out = capsys.readouterr().out
+    assert "TERMINAL carrier (status `completed`)" in out
+    # ...and the session-start digest, which consumes the same evaluator.
+    from markdownllm.session import _fired_by_thing
+    fired_map, *_ = _fired_by_thing(tmp_path)
+    assert "dark" in fired_map
+    assert any("TERMINAL carrier" in reason for reason in fired_map["dark"])
 
 
 def test_free_text_time_condition_without_date_is_skipped_loudly(tmp_path, capsys):

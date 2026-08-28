@@ -189,7 +189,10 @@ def _evaluate_typed_impl(root: Path,
     """Evaluate every declaration to one typed result without input throws.
 
     `fired` holds only conditions that are TRUE NOW (a date reached, a
-    dependency satisfied, a threshold crossed). `upcoming` holds conditions
+    dependency satisfied, a threshold crossed) — including a matured free-text
+    date whose carrier has settled, explicitly labelled with its TERMINAL
+    carrier so the obligation cannot go dark the day it fires (estate
+    synthesis 2026-08, F6 defect 2). `upcoming` holds conditions
     maturing within 30 days — look-aheads, deliberately a separate bucket:
     v3.29.0 and earlier mixed both into one `hits` list that session-start
     labelled "Triggers fired", so a quiet domain with a busy fortnight ahead
@@ -305,6 +308,10 @@ def _evaluate_typed_impl(root: Path,
                         hits.append(f"{name}: due_date {due} passed "
                                     f"({(today - due).days}d ago) -> {action}")
                     elif due < today:
+                        # Deliberate silence, unlike the matured free-text
+                        # date branch below: a due_date belongs to the work
+                        # itself, so the carrier settling IS the deadline
+                        # satisfied — nothing outlives it to surface.
                         reason = f"due_date {due} passed but the thing is terminal"
                     else:
                         reason = f"due_date {due} has not passed"
@@ -369,7 +376,25 @@ def _evaluate_typed_impl(root: Path,
                         hits.append(f"{name}: time condition {cond!r} - date {d} "
                                     f"reached ({(today - d).days}d ago) -> {action}")
                     elif d <= today:
-                        reason = f"date {d} was reached but the thing is terminal"
+                        # A matured obligation on a settled carrier. Until
+                        # v3.36.x this branch set a reason and appended to NO
+                        # bucket, so the obligation vanished from `mdllm
+                        # triggers` and the session-start digest on the day it
+                        # fired — while the same carrier's FUTURE dates kept
+                        # reporting as upcoming/horizon below (estate synthesis
+                        # 2026-08 F6 defect 2, read out of this source by an
+                        # operating domain: a dated obligation goes dark when
+                        # its carrier settles). No-silent-default: it surfaces
+                        # in the fired bucket, labelled with its terminal
+                        # carrier; whether the obligation transfers to a live
+                        # carrier, dies with this one, or disarms is the
+                        # agent's judgement — possible only when it is seen.
+                        reason = (f"date {d} reached on a terminal carrier "
+                                  f"(status `{status}`) — surfaced, not dropped")
+                        hits.append(f"{name}: time condition {cond!r} - date {d} "
+                                    f"reached ({(today - d).days}d ago) on "
+                                    f"TERMINAL carrier (status `{status}`) "
+                                    f"-> {action}")
                     elif (d - today).days <= 30:
                         reason = f"date {d} is {(d - today).days}d away"
                         upcoming.append(((d - today).days,
