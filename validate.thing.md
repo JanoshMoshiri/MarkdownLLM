@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 3.1
+version: 3.2
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -25,7 +25,7 @@ linked_things:
 # Validate Thing
 
 <!-- kernel -->
-**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, and mechanically-declared state transitions. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
+**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, mechanically-declared state transitions, and structural-pin resolution (every local commit pin must name a commit git can resolve; Error). **Never transcribe a SHA** — a wrong one is byte-indistinguishable from a right one to any reader, so read it from `git rev-parse` and let the floor resolve it. A pin into another domain's repository (`source_commit`) is `imports-check`'s, not this check's. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
 
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as orphaned from session memory — no inbound edge from a live thing (promote/dismiss/link from live work/keep-active). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 
@@ -83,6 +83,23 @@ The tool enforces, deterministically:
   field is a deliberate act (decide it belongs, add it to `known_fields` in the
   same write); the tool never auto-syncs. Enumerate the in-use set to bootstrap
   or audit the list with `mdllm index <path> rebuild --signal schema`.
+- **Structural-pin resolution (Error):** every commit pin the structural-reference
+  registry declares as *local* — today `informed_by[].commit` — must name a commit
+  that resolves in the owning repository. A pin is a **transcribed** identifier, the
+  one class of field no reader can check by reading: a wrong SHA looks exactly like a
+  right one. The whole corpus is resolved by one batched `git cat-file --batch-check`,
+  so the check costs one process however many pins there are. `definition_commit` is
+  resolved by the workflow revision binding above and is not reported twice.
+  `source_commit` pins a commit in the *source domain's* repository and is deliberately
+  out of scope — resolving it here would report "missing" for a correct pin, and its
+  remedy would be one no honest author could perform (`mdllm imports-check` owns it).
+  Where git cannot be consulted at all the check says so at Warning severity rather
+  than reporting a clean corpus it never read
+  (`a-check-run-where-it-cannot-see-mints-a-false-finding`); a corpus declaring no pin
+  is silent either way. Severity is deliberately stricter than `mdllm provenance`'s
+  graded report: provenance asks whether an already-committed chain is still traceable,
+  this asks whether the candidate's pin is a commit at all — where the overwhelmingly
+  likely cause is a transcription error the author can fix in the same edit.
 - **Index integrity:** `mdllm index <path> check` performs the rebuild-and-diff
   drift detection for derived indexes (`derived-index.md`).
 - **Workflow transition integrity:** for an existing `workflow-run`, the index

@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-26
-generated: 2026-08-26T10:30:22
-generated_from: HEAD@fe0c091
+created: 2026-08-28
+generated: 2026-08-28T15:46:01
+generated_from: HEAD@0d8974a
 coverage: 6
 framework_version: 3.36.0
 ---
@@ -61,7 +61,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 ## validate.thing.md
 
-**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, and mechanically-declared state transitions. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
+**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, mechanically-declared state transitions, and structural-pin resolution (every local commit pin must name a commit git can resolve; Error). **Never transcribe a SHA** — a wrong one is byte-indistinguishable from a right one to any reader, so read it from `git rev-parse` and let the floor resolve it. A pin into another domain's repository (`source_commit`) is `imports-check`'s, not this check's. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
 
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as orphaned from session memory — no inbound edge from a live thing (promote/dismiss/link from live work/keep-active). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
 

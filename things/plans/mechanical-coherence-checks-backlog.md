@@ -2,7 +2,7 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -34,8 +34,11 @@ linked_things:
 > leg — while the frontmatter still said `not-started`. That is the
 > tracking-drift class this backlog itself polices, standing in its own
 > header. Open items remain: broken-body-reference, install-hook self-test,
-> structural-pin resolution at the commit boundary, the primitive sweep, the
-> skills-directory-vs-artifacts check.
+> the primitive sweep, the skills-directory-vs-artifacts check.
+>
+> Structural-pin resolution shipped 2026-08-28 (see the item below); the
+> evidence that promoted it was five hand-catches in three days, not the two
+> the item was filed on.
 
 Small, deferred floor checks — each a generated-artifact freshness or
 prose↔mechanical consistency check that belongs in `mdllm coherence`. Migrated from
@@ -81,12 +84,65 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
 > shipped one cue that failed this test and one that passed it, in the same
 > file, on the same day.
 
-- **Structural-pin resolution at the commit boundary (added 2026-08-26, felt —
-  twice in one sprint).** Every structural pin is a full SHA a human may
-  transcribe, and the seams sprint mistranscribed two in two days: the run's
-  `informed_by` pin (wrong tail, caught by hand the same day) and the design's
-  `informed_by` pin (nonexistent commit, caught by the builder at reconcile —
-  it survived five commits). `definition_commit` is now floor-resolved at
+- ~~**Structural-pin resolution at the commit boundary (added 2026-08-26, felt —
+  twice in one sprint).**~~ **Built 2026-08-28** — `structural_pin_findings`
+  (`tools/markdownllm/structural_pins.py`), joined to `validate_corpus`, so it
+  runs on the pre-commit `validate --view index` leg against the frozen
+  candidate and on every example corpus. **Five instances promoted it, not
+  two:** the two the item was filed on (2026-08-26 — the run's `informed_by`
+  pin with a wrong tail, caught by hand the same day; the design's
+  `informed_by` pin naming a nonexistent commit, which survived five commits
+  before the builder caught it at reconcile), plus at least three more on
+  2026-08-28, every one caught by hand or narrowly before the commit. A class
+  that reaches five hand-catches in three days is not being caught by
+  diligence; it is being caught by luck.
+
+  Three design points worth carrying:
+
+  1. **`source_commit` was scoped OUT, and that is the check working.** The
+     first run fired on `divergence-is-an-unrouted-decision`, whose
+     `source_commit: bd8fc48` names a commit in the **code-architect domain's**
+     repository — where it resolves cleanly. Resolving a foreign pin against
+     the local object database reports "missing" for a *correct* pin, and its
+     remedy written as an imperative — "re-pin to a local commit" — is one no
+     honest author could perform. That is this backlog's own standing scoping
+     test, and the INCOMPLETE-bucket conflation the skills-directory item names
+     (*unpinnable by design* vs *defectively unpinned*), met in the first hour.
+     `mdllm imports-check` keeps that resolution.
+  2. **The registry states the pin set once.** `structural_refs.py` now
+     declares every commit-bearing field with its scope and its resolving
+     owner, so the check cannot drift from the fields that exist and
+     `definition_commit` (already resolved by the workflow revision binding) is
+     recorded rather than silently omitted — one wrong pin cannot yield two
+     Errors saying the same thing.
+  3. **`git cat-file --batch-check`, not a literal batched `rev-parse`.** The
+     one-process constraint holds either way, but rev-parse over many revisions
+     aborts at the first unresolvable argument and never reports the rest — a
+     corpus with three bad pins would have surfaced one. `--batch-check` emits
+     one answer line per input line and exits 0 whatever it finds. The
+     degradation is honest: where git cannot be consulted the check says it
+     could not look (Warning), and a corpus declaring no pin is silent either
+     way.
+
+  The cost the design accepts, recorded at build time rather than discovered
+  later: a history rewrite re-hashes every commit, invalidating every pin in
+  the corpus at once — terminal things included — and the floor then blocks
+  until each is re-pinned. The remedy stays performable on a terminal thing (a
+  pin is a factual reference, not a state claim — you look the commit up and
+  correct it), which is what keeps this inside the standing scoping test. A
+  check that stayed quiet after a rewrite would be asserting a traceability
+  the repository no longer has.
+
+  One live defect found: `examples/life-manager` taught the provenance rule
+  with a **fabricated** 40-hex pin, while its own body asserted "the commit
+  must exist". Re-pinned to the real commit that carries the input. Example
+  corpora were never reached by `mdllm provenance` (they are excluded from its
+  corpus walk), which is why a teaching fixture could contradict its own
+  lesson for eleven weeks.
+
+  Original item, for the record: Every structural pin is a full SHA a human may
+  transcribe, and the seams sprint mistranscribed two in two days.
+  `definition_commit` is now floor-resolved at
   validation; `informed_by` commits are resolved only when `mdllm provenance`
   is run on demand, so the hook path accepts a pin that names no commit.
   Candidate: resolve every structural pin's commit against the frozen candidate

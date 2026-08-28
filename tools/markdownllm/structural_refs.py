@@ -59,12 +59,126 @@ REFERENCE_FIELDS: tuple[ReferenceField, ...] = (
 REFERENCE_BY_FIELD = {spec.field: spec for spec in REFERENCE_FIELDS}
 
 
+# ------------------------------------------------------- commit pins
+# A structural pin is a *transcribed* identifier: a human copies a SHA from
+# one terminal into another file, and nothing in reading it back can tell a
+# correct pin from a wrong one
+# (`a-transcribed-identifier-is-unverifiable-by-reading`).  The set of fields
+# that carry such a pin is stated ONCE here so the floor's pin-resolution
+# check cannot drift from the fields that actually exist — the same
+# state-once-and-derive discipline the reference registry above exists for.
+
+
+class CommitPinScope(str, Enum):
+    """Which repository a pin names a commit in.
+
+    The distinction is load-bearing, not decorative: resolving a FOREIGN pin
+    against the local object database reports "missing" for a *correct* pin
+    and mints a false finding
+    (`a-check-run-where-it-cannot-see-mints-a-false-finding`), and its remedy
+    written as an imperative — "re-pin to a local commit" — is one no honest
+    author could perform.
+    """
+
+    LOCAL = "local"
+    FOREIGN = "foreign"
+
+
+class CommitPinShape(str, Enum):
+    #: A scalar frontmatter key whose value is the pin (``definition_commit``).
+    SCALAR = "commit-scalar"
+    #: The ``commit`` key of each entry of a PIN_OBJECTS reference field.
+    PIN_OBJECT = "pin-object-commit"
+
+
+@dataclass(frozen=True)
+class CommitPinField:
+    field: str
+    shape: CommitPinShape
+    scope: CommitPinScope
+    #: Who resolves this pin — named so a reader can see the whole set and
+    #: which part of the floor owns each one, rather than inferring it from
+    #: an absence.
+    resolved_by: str
+    #: True when the pin is already resolved by another floor check; the
+    #: commit-boundary check skips it rather than reporting it twice.
+    resolved_elsewhere: bool = False
+
+
+@dataclass(frozen=True)
+class CommitPin:
+    #: Display label including any index, e.g. ``informed_by[0].commit``.
+    field: str
+    pin: str
+    scope: CommitPinScope
+    resolved_elsewhere: bool
+
+
+COMMIT_PIN_FIELDS: tuple[CommitPinField, ...] = (
+    CommitPinField("informed_by", CommitPinShape.PIN_OBJECT,
+                   CommitPinScope.LOCAL,
+                   "validate (structural-pin resolution)"),
+    # Resolved — with stage membership read at the pinned revision — by the
+    # workflow revision binding in validation.py.  Registered here so the set
+    # is complete; excluded from the boundary check so one wrong pin cannot
+    # produce two Errors saying the same thing.
+    CommitPinField("definition_commit", CommitPinShape.SCALAR,
+                   CommitPinScope.LOCAL,
+                   "validate (workflow revision binding)",
+                   resolved_elsewhere=True),
+    # The cross-domain reference triple pins a commit in the SOURCE domain's
+    # repository (`source_domain`), which the consuming repository need not
+    # hold at all.  `mdllm imports-check` resolves it where the source clone
+    # is reachable and buckets it as could-not-check where it is not.
+    CommitPinField("source_commit", CommitPinShape.SCALAR,
+                   CommitPinScope.FOREIGN, "mdllm imports-check"),
+)
+
+COMMIT_PIN_BY_FIELD = {spec.field: spec for spec in COMMIT_PIN_FIELDS}
+
+
 def structural_field_names() -> set[str]:
     return set(REFERENCE_BY_FIELD)
 
 
 def egress_private_fields() -> set[str]:
     return {s.field for s in REFERENCE_FIELDS if s.egress_private}
+
+
+def commit_pin_field_names() -> set[str]:
+    return set(COMMIT_PIN_BY_FIELD)
+
+
+def iter_commit_pins(meta: dict) -> Iterable[CommitPin]:
+    """Yield every declared commit pin in ``meta``, with its scope.
+
+    Extraction only: this decides nothing about resolvability, and — like
+    :func:`iter_structural_references` — is total, never raising on a
+    malformed edit.  A pin whose value is neither a string nor an integer is
+    omitted; its shape is reported by the checks that own field shape.  (The
+    integer arm is not defensive padding: an unquoted all-digit short SHA is
+    valid YAML for an int, and roughly one abbreviation in sixteen is all
+    digits.)
+    """
+
+    if not isinstance(meta, dict):
+        return
+    for spec in COMMIT_PIN_FIELDS:
+        value = meta.get(spec.field)
+        if spec.shape is CommitPinShape.SCALAR:
+            if isinstance(value, (str, int)) and not isinstance(value, bool):
+                yield CommitPin(spec.field, str(value), spec.scope,
+                                spec.resolved_elsewhere)
+        elif spec.shape is CommitPinShape.PIN_OBJECT:
+            if not isinstance(value, list):
+                continue
+            for i, entry in enumerate(value):
+                if not isinstance(entry, dict):
+                    continue
+                pin = entry.get("commit")
+                if isinstance(pin, (str, int)) and not isinstance(pin, bool):
+                    yield CommitPin(f"{spec.field}[{i}].commit", str(pin),
+                                    spec.scope, spec.resolved_elsewhere)
 
 
 def iter_structural_references(

@@ -31,6 +31,7 @@ from .repository_view import (
 from .structural_refs import (
     iter_structural_references, structural_field_names, structural_shape_errors,
 )
+from .structural_pins import structural_pin_findings
 from .session_contract import contract_fingerprint
 
 def valid_statuses_for(typ: str, schema: dict | None) -> tuple[list[str] | None, bool]:
@@ -1032,6 +1033,10 @@ def validate_corpus(root: Path,
         root, corpus, view, workflow_resolver))
     findings.extend(validate_level3(corpus))
     findings.extend(derivation_findings(corpus))
+    # Structural pins resolve against git, not against the candidate tree, so
+    # this runs on whatever view produced the corpus: the pre-commit leg
+    # checks the frozen candidate's pins against the repository's history.
+    findings.extend(structural_pin_findings(root, corpus))
     return corpus, findings
 
 
