@@ -2,7 +2,7 @@
 id: estate-workflow-derivation
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-08-27
 priority: high
 tags: [derivation, universal-workflow, workflow-definitions, estate, closed-loop-gate]
@@ -35,7 +35,7 @@ linked_things:
 triggers:
   - type: time
     condition: "2026-09-10 reached"
-    action: "If the MVP is not met, report which definitions remain undispositioned and whether the closed-loop gate should hold or be re-scoped. An undated programme wait is the drift the estate learned to chase."
+    action: "The MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered."
 ---
 
 # Estate Workflow Derivation
@@ -86,7 +86,7 @@ HEADs; domains named by their established substitutions).
 | regulated-overview | `weekly-estate-agenda` | evolving, `exposed` | 1 (closed 08-11) | No |
 | regulated-overview | `operating-model-evolution` | draft | 1 (active) | No |
 | code-architect | `refactoring-process` | evolving | has runs | No |
-| code-architect | `solution-delivery-process` | evolving | 0 | No |
+| code-architect | `solution-delivery-process` | evolving | ~~0~~ **2 active** | No |
 
 **Seven owned definitions across five corpora; ~15 runs; one declared.**
 
@@ -106,6 +106,22 @@ engineering's lifecycle. A cross-mirroring pair, both properly pinned.
 > `origin` never entered the computation — *watched is not owned*, re-learned
 > by hand one radius out. The inventory above is the corrected read; the
 > duplicate-ownership work package is withdrawn.
+
+> **Correction 2, v1.2 — the zero-run premise was stale.** v1.0/v1.1 recorded
+> `solution-delivery-process` at zero runs on the estate synthesis's authority
+> (F4). That finding was overtaken the day after it was written: two runs pin
+> the definition, both `active`. The domain pass refused to write "zero runs to
+> date" because it would have been false, and wrote the true residual instead —
+> *instanced but never exercised end to end*, since no run has passed `design`.
+>
+> **Both of this plan's inventory errors have one shape:** a dated report was
+> read as current state instead of re-derived from the graph
+> (`existence-is-not-currency`). The mirror-as-duplicate error read `type:`
+> without `origin:`; this one read a two-day-old synthesis without re-counting
+> runs. A synthesis is evidence of what was true when it was written, and an
+> inventory is a graph query — the two are not interchangeable, and the cost
+> of confusing them here was two false premises, one of which was handed to a
+> subagent as an instruction.
 
 Two findings survive, which the passes must carry rather than rediscover:
 
@@ -218,39 +234,111 @@ than passes, that resolution returns.
 
 ## 6. execute — how will we deliver it under control?
 
-Not started. Each work package lands as commits in its owning repo, with the
-domain's own floor as the boundary. Evidence is the declarations themselves
-plus each pass's commit.
+**Complete, 2026-08-28.** Seven definitions across five corpora, each pass run
+inside its owning repo by that corpus's own agent (session-start gate, the
+domain's specification and write skills, then the definition), validated to
+zero Errors and committed there; the four domain repos autopushed under their
+standing authority.
+
+| Corpus | Definition | Shape | Outcome |
+|---|---|---|---|
+| framework root | `substrate-floor-development` | repeatable | Upgraded from a hedged prose mapping to the full declaration |
+| regulated-qms | `qms-template-document-authoring` | repeatable | Declared — the worked specimen |
+| regulated-engineering | `software-development-lifecycle` | accumulative | Declared, with two gaps and zero runs named |
+| regulated-overview | `weekly-estate-agenda` | repeatable | Declared, with one gap named |
+| regulated-overview | `operating-model-evolution` | accumulative | Declared; adopts the reference graph unchanged |
+| code-architect | `refactoring-process` | repeatable | Declared, no gap |
+| code-architect | `solution-delivery-process` | accumulative | Declared, with one gap named |
+
+Plus WP1 (the worked example + the `domain-refresh.md` backfill line) and one
+unplanned repair: code-architect's write skill instructed the next author to
+mint a cross-corpus `implements` edge to the methodology — a hard validation
+Error. Nothing had broken because no definition had yet followed it; the next
+one would have. Fixed in the same sweep.
 
 ## 7. review-verify — did we reach the target state?
 
-Run when the MVP criteria are met: re-count the inventory, confirm every owned
-definition is dispositioned, confirm no live run sits against an undeclared
-definition, and record residual gaps. The outcome assessment feeds
-`closed-loop-operating-state`'s current-state assessment as the gate evidence
-— pinned, not asserted.
+**The MVP is met.** Seven of seven owned definitions carry a derivation
+declaration; none is silent about its relation to the base. No live or paused
+run now executes against an undeclared definition. The pattern exists as a
+worked example and reaches domains through the refresh channel. The
+duplicate-ownership criterion dissolved with correction 1 — there was no
+duplicate.
 
-The same four longevity questions get re-asked of the delivered state, and the
-honest one to watch is **monitorable**: if coverage still cannot be read
-without a manual count, that is the residual gap WP4 must either fix or record.
+**The finding that justifies the exercise: declaring surfaced process gaps in
+three of seven definitions, invisible while undeclared.**
+
+- `software-development-lifecycle` — operability and monitorability are asked
+  by no stage, on the very track reserved for changes that *create*
+  operational surface; and the run-to-run evidence hand-off runs through a
+  shared artefact with no declared pin.
+- `weekly-estate-agenda` — `review-verify` is realised by no stage. The input
+  is guarded; the output is not. An agenda that silently dropped its coverage
+  header would read exactly as confident as a compliant one.
+- `solution-delivery-process` — `set-mvp-target` is made nowhere, at the
+  radius (whole-system delivery) where leaving the target implicit costs most,
+  while its own acceptance stage demands criteria that must have been set
+  earlier to be met.
+
+A fourth, weaker pattern: **progression outcomes are under-declared almost
+everywhere.** Only the two mature definitions declare all four; two declare
+just continuing and revising, leaving a dropped run with no declared exit.
+
+**Residual gaps, carried not closed:**
+
+1. The three process gaps above are *recorded*, not repaired. Each is a
+   judgement for its domain — new stage, sub-gate, or accepted deviation.
+2. **Two mirrors are now stale and nothing will detect it.** Both sides of a
+   cross-mirrored pair changed today; `imports-check` returned **COVERAGE
+   0/101** (overview) and **0/43** (engineering) — every route unreachable, so
+   the floor correctly asserted nothing. Direct read confirms overview pins
+   the lifecycle at `85f6a78` while it has moved to `26d102f`. The re-flip is
+   the operator's attributed act, so this pass adopts nothing. This is estate
+   synthesis F5 confirmed live: the membrane's return paths are the untooled
+   half, and a declaration-only change is exactly the case where a consumer
+   most needs the update and least justifies spending a human flip.
+3. **Declaring an exposed definition is a publication event.** This programme
+   was scoped on "reconciliation never crosses the membrane" — true of the
+   *pass*, false of the *effect*. Two of the seven are `exposed: true`, and
+   both fired the porch advisory on commit. The scope boundary needs that
+   qualification.
+
+**The four longevity qualities, re-asked of the delivered state.**
+*Maintainable* and *manageable* held: each declaration lives in the definition
+it describes, and each domain ruled its own departures. *Extendable* is
+untested until a new definition is minted — though the code-architect repair
+suggests the birth path was actively hostile to it. **Monitorable failed, as
+predicted at target-setting:** derivation coverage still cannot be read
+without a manual count, and residual 2 shows the same blindness on the
+membrane. That is WP4's question, and it now has three independent sightings
+behind it.
 
 ## Route
 
 - [x] Stages 1–4 — need, current state, priorities, MVP target. This document.
-- [ ] **WP1 — the pattern.** QMS declaration written as the worked specimen;
-      example thing + `domain-refresh.md` pointer.
-- [ ] **WP2 — per-domain passes.** qms → overview → code-architect →
-      engineering; each in its own corpus.
-- [ ] **WP3 — structural finding.** Directory convention noted per domain,
-      including mirrors filed outside `things/imports/`.
-- [ ] **WP4 — seal.** Spec changes and sensor question, on convergence only.
-- [ ] **review-verify** — MVP criteria confirmed, outcome pinned into the
-      closed-loop plan.
+- [x] **WP1 — the pattern.** QMS declaration written as the worked specimen;
+      `declaring-derivation-from-the-atom` + the `domain-refresh.md`
+      pre-v3.35.0 backfill line.
+- [x] **WP2 — per-domain passes.** All seven definitions declared across five
+      corpora, each run in its own repo as that corpus's agent.
+- [x] **WP3 — structural finding.** Recorded: convention varies by corpus, and
+      one domain files a mirror outside `things/imports/`, which is what made
+      correction 1's false finding easy to mint. Left to each domain; the
+      estate does not standardise paths.
+- [ ] **WP4 — seal.** Two questions now carrying three sightings each: a
+      derivation-coverage sensor, and the serve-side counterpart to
+      `imports-check` (residual 2). Admitted only on convergence — which is
+      now arguably met for the second.
+- [x] **review-verify** — MVP met; three process gaps and three residuals
+      recorded above.
 
 ## Done When
 
-- [ ] All seven owned definitions carry a derivation declaration or a recorded
+- [x] All seven owned definitions carry a derivation declaration or a recorded
       retire/park ruling.
-- [ ] No live or paused run executes against an undeclared definition.
-- [ ] The closed-loop plan's Phase 2b can proceed against pinned evidence that
-      this gate is met.
+- [x] No live or paused run executes against an undeclared definition.
+- [x] The closed-loop plan's Phase 2b can proceed against pinned evidence that
+      this gate is met — **met 2026-08-28**, with the three residuals above
+      named rather than closed. The gate asked that no unattended session
+      execute an *undeclared* process; it did not ask that every declared
+      process be gap-free, and three are not.

@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: triggers
 created: 2026-08-28
-generated: 2026-08-28T01:51:31
-generated_from: HEAD@a67673c
+generated: 2026-08-28T02:19:22
+generated_from: HEAD@f96bb58
 coverage: 4
 framework_version: 3.36.0
 ---
@@ -18,7 +18,7 @@ framework_version: 3.36.0
 
 ## estate-workflow-derivation
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-09-10 reached, action=If the MVP is not met, report which definitions remain undispositioned and whether the closed-loop gate should hold or be re-scoped. An undated programme wait is the drift the estate learned to chase.
+- trigger: type=time, condition=2026-09-10 reached, action=The MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered.
 
 ## framework-retrospective-2026-08b
 - status: completed  due_date: —

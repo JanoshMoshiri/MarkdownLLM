@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T01:51:41
-generated_from: HEAD@a67673c
-coverage: 306
+generated: 2026-08-28T02:19:39
+generated_from: HEAD@f96bb58
+coverage: 307
 framework_version: 3.36.0
 ---
 
@@ -1098,6 +1098,11 @@ framework_version: 3.36.0
 - the-operating-layer-has-no-quality-loop --references--> session-memory-specification
 - the-operating-layer-has-no-quality-loop --references--> workflow-run-is-the-decomposition-principle-applied-to-processes
 - the-operating-layer-has-no-quality-loop --references--> reflexive-behaviors-are-indexes-plus-prompts
+- the-root-is-not-a-representative-domain --derived-from--> estate-workflow-derivation
+- the-root-is-not-a-representative-domain --informs--> derivation-shape-settled-2026-08
+- the-root-is-not-a-representative-domain --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
+- the-root-is-not-a-representative-domain --informs--> declaring-derivation-from-the-atom
+- the-root-is-not-a-representative-domain --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - the-rough-true-account-is-generative-infrastructure --references--> llm-driven-systems-manifesto
 - the-rough-true-account-is-generative-infrastructure --complements--> belief-revision-specification
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
