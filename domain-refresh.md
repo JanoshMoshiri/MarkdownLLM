@@ -132,6 +132,15 @@ The refresh process reads these framework files in order:
        reconciliation) — diff the domain's prompts/ against
        templates/prompts/ and re-adopt; the tier-routing managed block now
        routes prompts/, so the domain-kernel regen above is not optional
+     · pre-v3.35.0 births: any workflow-definition authored before the
+       universal workflow methodology entered the foundation predates the
+       atom it specialises. Declare the derivation — one body section per
+       definition, per the worked example
+       `things/worked-examples/declaring-derivation-from-the-atom.md`. This
+       is declaration, not rebuild: never rename stages to match the atom's
+       vocabulary, and never add a `linked_things` edge to a framework spec
+       id (a cross-corpus target is a validation Error — the anchor is the
+       definition's existing edge to the domain's own workflow skill).
 ```
 
 ### Refreshing The Estate: Per Domain, Embodied

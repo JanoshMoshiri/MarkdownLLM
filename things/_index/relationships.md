@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T00:48:10
-generated_from: HEAD@1a278dd
-coverage: 305
+generated: 2026-08-28T01:51:41
+generated_from: HEAD@a67673c
+coverage: 306
 framework_version: 3.36.0
 ---
 
@@ -374,6 +374,9 @@ framework_version: 3.36.0
 - cumulative-drift-is-invisible-to-per-change-walks --derived-from--> substrate-currency-sweep
 - decision-status-vocabulary-domain-owned --informs--> thing-specification
 - decision-status-vocabulary-domain-owned --informs--> validate-thing-specification
+- declaring-derivation-from-the-atom --implements--> universal-workflow-methodology
+- declaring-derivation-from-the-atom --derived-from--> derivation-shape-settled-2026-08
+- declaring-derivation-from-the-atom --implements--> estate-workflow-derivation
 - derivation-shape-brief-2026-08 --implements--> workflow-reconciliation-precedes-new-definitions
 - derivation-shape-brief-2026-08 --references--> universal-workflow-methodology
 - derivation-shape-brief-2026-08 --references--> estate-retrospective-synthesis-2026-08

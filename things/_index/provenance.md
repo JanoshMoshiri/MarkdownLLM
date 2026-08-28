@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-27
-generated: 2026-08-27T23:53:14
-generated_from: HEAD@812bfeb
-coverage: 69
+created: 2026-08-28
+generated: 2026-08-28T01:51:46
+generated_from: HEAD@a67673c
+coverage: 71
 framework_version: 3.36.0
 ---
 
@@ -89,6 +89,10 @@ framework_version: 3.36.0
 - estate-workflow-derivation (pinned @016150e76f1ae69aefd41331f9da1aa7fed471e6)
 - estate-workflow-derivation (derived-from)
 
+## derivation-shape-settled-2026-08
+- declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
+- declaring-derivation-from-the-atom (derived-from)
+
 ## divergence-is-an-unrouted-decision
 - divergence-primitive-promotion (pinned @aae0712)
 
@@ -102,6 +106,9 @@ framework_version: 3.36.0
 - estate-workflow-derivation (derived-from)
 - workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - workflow-reconciliation-precedes-new-definitions (derived-from)
+
+## estate-workflow-derivation
+- declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
 
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
