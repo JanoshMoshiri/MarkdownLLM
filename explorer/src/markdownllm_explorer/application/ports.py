@@ -66,6 +66,12 @@ class CommitDetails(Protocol):
     def historical(self, token: BoundaryToken, sha: str, path: RelativePath) -> HistoricalDocument: ...
 
 
+class ReferenceIndex(Protocol):
+    def resolve(
+        self, token: BoundaryToken, ids: tuple[str, ...]
+    ) -> tuple[dict[str, RelativePath], tuple[str, ...], bool]: ...
+
+
 class PathAdmission(Protocol):
     """Whether a source would admit a path, decided without touching disk.
 

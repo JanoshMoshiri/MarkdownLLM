@@ -8,7 +8,7 @@ from typing import Mapping
 from markdownllm_explorer.core.models import (
     BoundaryToken, CollectionItem, CommitDetail, CommitFile, CommitRecord, DocumentRecord, EstateSnapshot,
     FrontmatterResult, HistoricalDocument, OverviewRecord, Page, RelativePath, RepositoryState, Source,
-    SourceCounts, SourceId, SourceIssue, SourceSettingsRecord, TreeNode,
+    ReferenceResolution, SourceCounts, SourceId, SourceIssue, SourceSettingsRecord, TreeNode,
 )
 
 
@@ -43,6 +43,13 @@ def to_wire(value):
         return {"source": to_wire(value.source), "counts": to_wire(value.counts), "repository": to_wire(value.repository), "commits": to_wire(value.commits)}
     if isinstance(value, TreeNode):
         return _compact({"path": value.path.value, "name": value.name, "kind": value.kind.value, "size": value.size, "modified_at": value.modified_at, "expandable": value.expandable})
+    if isinstance(value, ReferenceResolution):
+        return {
+            "source_id": value.source_id.value,
+            "resolved": {key: path.value for key, path in value.resolved.items()},
+            "unresolved": list(value.unresolved),
+            "partial": value.partial,
+        }
     if isinstance(value, CommitFile):
         return {"path": value.path.value, "change": value.change, "openable": value.openable}
     if isinstance(value, CommitDetail):

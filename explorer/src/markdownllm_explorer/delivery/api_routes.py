@@ -8,7 +8,7 @@ from typing import Protocol
 from markdownllm_explorer.core.errors import ExplorerError
 from markdownllm_explorer.core.models import (
     CollectionItem, CommitDetail, DocumentRecord, EstateSnapshot, HistoricalDocument, OverviewRecord, Page,
-    SourceSettingsRecord, TreeNode,
+    ReferenceResolution, SourceSettingsRecord, TreeNode,
 )
 
 
@@ -48,6 +48,10 @@ class HistoricalDocumentUseCase(Protocol):
     def execute(self, source_id: str, sha: str, path: str) -> HistoricalDocument: ...
 
 
+class ReferenceUseCase(Protocol):
+    def execute(self, source_id: str, ids: str) -> ReferenceResolution: ...
+
+
 @dataclass(frozen=True)
 class ExplorerUseCases:
     discover_estate: DiscoverEstateUseCase
@@ -59,6 +63,7 @@ class ExplorerUseCases:
     read_document: DocumentUseCase
     get_commit: CommitUseCase
     read_historical_document: HistoricalDocumentUseCase
+    resolve_references: ReferenceUseCase
 
 
 class ApiRoutes:
@@ -95,6 +100,9 @@ class ApiRoutes:
             return self._use_cases.read_historical_document.execute(
                 self._required(query, "source"), self._required(query, "sha"), self._required(query, "path")
             )
+        if path == "/api/v1/references":
+            self._only(query, {"source", "ids"})
+            return self._use_cases.resolve_references.execute(self._required(query, "source"), self._required(query, "ids"))
         raise ExplorerError("route_not_found")
 
     @staticmethod

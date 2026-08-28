@@ -15,6 +15,7 @@ from .adapters.filesystem_catalogue import BoundaryRegistry, FilesystemSourceCat
 from .adapters.frontmatter_parser import FrontmatterParser
 from .adapters.git_commit_history import GitCommitHistory, resolve_trusted_git
 from .adapters.safe_markdown_parser import SafeMarkdownParser
+from .adapters.thing_index import ThingIndex
 from .application.browse_tree import BrowseTree
 from .application.discover_estate import DiscoverEstate
 from .application.get_commit import GetCommit
@@ -23,6 +24,7 @@ from .application.get_settings import GetSettings
 from .application.list_collection import ListCollection
 from .application.read_document import ReadDocument
 from .application.read_historical_document import ReadHistoricalDocument
+from .application.resolve_references import ResolveReferences
 from .application.search_paths import SearchPaths
 from .core.eligibility import EligibilityPolicy
 from .core.limits import ExplorerLimits
@@ -50,6 +52,7 @@ def build_runtime(root: Path, domain_dir: str = "domain", *, limits: ExplorerLim
     collections = CuratedCollectionReader(source_browser, registry, frontmatter, cursors, active_limits)
     link_resolver = ConfinedLinkResolver(source_browser, registry)
     history = GitCommitHistory(registry, cursors, active_limits, resolve_trusted_git(root))
+    things = ThingIndex(source_browser, active_limits)
     catalogue.discover()
     use_cases = ExplorerUseCases(
         DiscoverEstate(catalogue), GetOverview(catalogue, source_browser, history),
@@ -58,6 +61,7 @@ def build_runtime(root: Path, domain_dir: str = "domain", *, limits: ExplorerLim
         ReadDocument(catalogue, source_browser, frontmatter, markdown, link_resolver, presenter),
         GetCommit(catalogue, history, source_browser),
         ReadHistoricalDocument(catalogue, history, source_browser),
+        ResolveReferences(catalogue, things),
     )
     return ExplorerRuntime(ApiRoutes(use_cases), secrets.token_urlsafe(32), active_limits)
 

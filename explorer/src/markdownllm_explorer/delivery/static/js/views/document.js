@@ -11,7 +11,9 @@ export function renderDocument(container, document, onMode, embedded = false) {
     button.addEventListener("click", () => onMode(mode)); actions.append(button);
   }
   head.append(title, actions); target.append(head);
-  if (document.frontmatter?.state !== "absent") {
+  // Raw mode puts the frontmatter block on screen already, so folding a
+  // second copy above it is duplication the reader has to dismiss.
+  if (document.mode !== "raw" && document.frontmatter?.state !== "absent") {
     const details = documentNode("details", "frontmatter"); const summary = documentNode("summary"); summary.textContent = `Frontmatter · ${document.frontmatter.state}`;
     const pre = documentNode("pre"); pre.textContent = JSON.stringify(document.frontmatter.values || {}, null, 2); details.append(summary, pre); target.append(details);
   }

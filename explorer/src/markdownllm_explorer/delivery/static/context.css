@@ -78,3 +78,17 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+.reference-label { margin: 12px 0 6px; color: var(--muted); font-size: 11px; }
+.reference-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.reference-chip {
+  display: flex; flex-direction: column; gap: 1px; max-width: 100%;
+  padding: 5px 9px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--bg); color: var(--text); font: inherit; font-size: 12px;
+  text-align: left; cursor: pointer; overflow-wrap: anywhere;
+}
+.reference-chip:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.reference-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.reference-chip:disabled { cursor: default; }
+.reference-chip.resolving { opacity: .55; }
+.reference-chip.unresolved { opacity: .7; border-style: dashed; color: var(--muted); }
+.reference-note { color: var(--muted); font-size: 11px; }

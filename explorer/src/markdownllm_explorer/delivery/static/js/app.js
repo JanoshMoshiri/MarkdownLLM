@@ -11,7 +11,7 @@ import {renderDocument} from "./views/document.js";
 import {renderCommit, renderCommitDocument} from "./views/commit.js";
 import {renderSettings} from "./views/settings.js";
 import {appendSearchResult, renderSearchResults} from "./views/tree.js";
-import {renderDocumentContext, renderSourceContext} from "./views/context.js";
+import {applyReferenceResolution, referencedIds, renderDocumentContext, renderSourceContext} from "./views/context.js";
 
 const content = document.querySelector("#content");
 const notice = document.querySelector("#notice");
@@ -248,6 +248,32 @@ async function loadMoreCollection(cursor, list, button) {
   finally { completeRequest(request); }
 }
 
+// Reference resolution runs after the document is on screen. It is a
+// whole-source question, so making the reader wait for it would put a
+// source-sized cost in front of every document they open.
+async function resolveReferences(frontmatter, path) {
+  const ids = referencedIds(frontmatter);
+  if (!ids.length) return;
+  const request = beginRequest("references", {source: state.source.id, tab: state.view, path});
+  let resolved = {};
+  try {
+    const value = await get("/api/v1/references", {source: state.source.id, ids: ids.join(",")}, request.signal);
+    resolved = value.resolved;
+  } catch (error) {
+    // Timed out, aborted or refused: the chips settle inert rather than sitting
+    // in a pending state no later event will ever clear.
+    resolved = {};
+  } finally {
+    completeRequest(request);
+    applyReferenceResolution(contextContent, resolved, path);
+  }
+}
+
+function openReference(path) {
+  const opener = state.view === "skills" || state.view === "memory" ? openCollectionDocument : openDocument;
+  opener(path, "rendered");
+}
+
 async function openCommit(sha) {
   abortAllRequests(); clearTimeout(searchTimer);
   state.commit = sha; state.selectedPath = null; state.commitFiles = [];
@@ -317,7 +343,8 @@ async function fetchDocument(path, mode, embedded, pushRoute) {
     if (!isCurrent(request)) return;
     state.selectedPath = path; state.documentMode = value.mode;
     renderDocument(content, value, nextMode => fetchDocument(path, nextMode, embedded, true), embedded);
-    renderDocumentContext(contextContent, state.source, value); renderCurrentTree();
+    renderDocumentContext(contextContent, state.source, value, openReference); renderCurrentTree();
+    resolveReferences(value.frontmatter, value.path);
     if (pushRoute) updateRoute();
   } catch (error) {
     if (error.name !== "AbortError" && isCurrent(request)) showDocumentError(error, embedded);

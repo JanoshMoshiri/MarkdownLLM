@@ -218,6 +218,14 @@ class HistoricalDocument:
 
 
 @dataclass(frozen=True)
+class ReferenceResolution:
+    source_id: SourceId
+    resolved: Mapping[str, RelativePath]
+    unresolved: tuple[str, ...]
+    partial: bool
+
+
+@dataclass(frozen=True)
 class FrontmatterResult:
     state: FrontmatterState
     values: Mapping[str, object] = field(default_factory=dict)

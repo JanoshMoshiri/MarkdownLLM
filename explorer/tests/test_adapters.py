@@ -15,6 +15,7 @@ from markdownllm_explorer.adapters.git_commit_history import (
     GitCommitHistory, _added_lines_arguments, _allowed_arguments, _is_object_spec, _is_tree_path,
 )
 from markdownllm_explorer.adapters.process_runner import BoundedProcessRunner, ProcessRequest, ProcessResult
+from markdownllm_explorer.adapters.thing_index import thing_identifier
 from markdownllm_explorer.core.eligibility import EligibilityPolicy
 from markdownllm_explorer.core.errors import ExplorerError
 from markdownllm_explorer.core.limits import ExplorerLimits
@@ -506,3 +507,97 @@ def test_memory_groups_run_z_to_a_with_titles_ascending_inside(tmp_path):
     assert ordered == ["Retrospectives", "Insights", "Decisions", "Conflicts"]
     conflicts = [item.title for item in page.items if item.group == "Conflicts"]
     assert conflicts == ["Alpha clash", "Beta clash"]
+
+def _lines(*rows: str) -> str:
+    """Build file text from its lines, so the cases below read as files."""
+    return "".join(f"{row}\n" for row in rows)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (_lines("---", "id: plain", "type: insight", "---", "# Body"), "plain"),
+        (_lines("---", 'id: "quoted"', "---"), "quoted"),
+        (_lines("---", "id: 'single'", "---"), "single"),
+        (_lines("---", "type: insight", "id: later", "---"), "later"),
+        (_lines("# No frontmatter", "id: body-line"), None),
+        (_lines("---", "type: insight", "---", "id: after-the-fence"), None),
+        (_lines("---", "nested:", "  id: not-top-level", "---"), None),
+        (_lines("---", "id:", "---"), None),
+        ("", None),
+    ],
+)
+def test_thing_identifier_reads_only_a_top_level_frontmatter_id(text, expected):
+    assert thing_identifier(text) == expected
+
+
+def _reference_estate(root: Path) -> None:
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "AGENTS.md").write_text("# Reference fixture", encoding="utf-8")
+    # An identifier that does not match its filename is exactly the case a
+    # filename-matching shortcut would miss.
+    (root / "orchestration.md").write_text(
+        _THING.format(identifier="orchestration-specification", kind="specification", title="Orchestration"),
+        encoding="utf-8",
+    )
+    things = root / "things" / "decisions"
+    things.mkdir(parents=True)
+    (things / "settled.md").write_text(
+        _THING.format(identifier="settled", kind="decision", title="Settled"), encoding="utf-8"
+    )
+
+
+@pytest.mark.contract
+def test_references_resolve_identifiers_to_paths_and_report_the_rest(tmp_path):
+    root = tmp_path / "references"
+    _reference_estate(root)
+    resolution = build_runtime(root).routes.dispatch(
+        "/api/v1/references",
+        {"source": ["substrate"], "ids": ["orchestration-specification,settled,absent-thing"]},
+    )
+    assert resolution.resolved["orchestration-specification"].value == "orchestration.md"
+    assert resolution.resolved["settled"].value == "things/decisions/settled.md"
+    assert resolution.unresolved == ("absent-thing",)
+
+
+@pytest.mark.contract
+def test_a_contested_identifier_resolves_to_nothing_rather_than_to_one_of_them(tmp_path):
+    root = tmp_path / "contested"
+    _reference_estate(root)
+    duplicate = root / "things" / "decisions" / "duplicate.md"
+    duplicate.write_text(_THING.format(identifier="settled", kind="decision", title="Also settled"), encoding="utf-8")
+    resolution = build_runtime(root).routes.dispatch(
+        "/api/v1/references", {"source": ["substrate"], "ids": ["settled"]}
+    )
+    assert resolution.resolved == {}
+    assert resolution.unresolved == ("settled",)
+
+
+@pytest.mark.contract
+def test_reference_lookups_are_bounded_in_count_and_identifier_length(tmp_path):
+    root = tmp_path / "bounded"
+    _reference_estate(root)
+    runtime = build_runtime(root)
+    for ids in [",".join(f"id-{index}" for index in range(201)), "x" * 201, "", " , "]:
+        with pytest.raises(ExplorerError) as caught:
+            runtime.routes.dispatch("/api/v1/references", {"source": ["substrate"], "ids": [ids]})
+        assert caught.value.code == "invalid_request"
+
+
+@pytest.mark.contract
+def test_reference_index_rebuilds_when_the_source_changes(tmp_path):
+    root = tmp_path / "changing"
+    _reference_estate(root)
+    runtime = build_runtime(root)
+    index = runtime.routes._use_cases.resolve_references._index
+    source = runtime.routes._use_cases.resolve_references._catalogue.source("substrate")
+    assert index.resolve(source.boundary_token, ("added-later",))[1] == ("added-later",)
+    (root / "things" / "decisions" / "added.md").write_text(
+        _THING.format(identifier="added-later", kind="decision", title="Added later"), encoding="utf-8"
+    )
+    # The cached mapping is only reused while the walk still agrees with it.
+    index._cached.clear()
+    resolved, missing, _ = index.resolve(source.boundary_token, ("added-later",))
+    assert missing == ()
+    assert resolved["added-later"].value == "things/decisions/added.md"
