@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-28
-generated: 2026-08-28T17:18:32
-generated_from: HEAD@e5c97da
-coverage: 311
+generated: 2026-08-28T18:11:38
+generated_from: HEAD@e27240d
+coverage: 312
 framework_version: 3.36.0
 ---
 
@@ -42,6 +42,11 @@ framework_version: 3.36.0
 - a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --complements--> existence-is-not-currency
 - a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --supports--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - a-controls-guarantee-can-rest-on-a-coincidence-of-its-birth-environment --complements--> a-consumers-defect-report-names-the-surface-it-met-not-the-one-that-owns-it
+- a-converged-shape-carries-borrowable-scars --informs--> closed-loop-operating-state
+- a-converged-shape-carries-borrowable-scars --supports--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- a-converged-shape-carries-borrowable-scars --extends--> a-true-primitive-is-discovered-not-authored
+- a-converged-shape-carries-borrowable-scars --references--> llm-driven-systems-manifesto
+- a-converged-shape-carries-borrowable-scars --informs--> operating-model-specification
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-built-inbound-only
 - a-crossing-thing-carries-its-producers-private-graph --supports--> cross-domain-handoff-is-verified-external-input
 - a-crossing-thing-carries-its-producers-private-graph --informs--> provenance-specification
