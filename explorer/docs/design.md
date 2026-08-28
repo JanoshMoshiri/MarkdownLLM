@@ -252,6 +252,9 @@ The protocols contain domain nouns and bounded operations only. They do not expo
 | `ListCollection` | Skills/memory grouping contract | catalogue, collection reader |
 | `GetSettings` | Authenticated read-only source-path facts | catalogue, source settings |
 | `ReadDocument` | Mode-specific read/parse/link/present orchestration | catalogue, document reader, frontmatter parser, Markdown parser, link resolver, presenter |
+| `GetCommit` | Which paths a commit touched, and which of them this source may open | catalogue, commit details, path admission |
+| `ReadHistoricalDocument` | Admission before history, then a commit's own bytes | catalogue, commit details, path admission |
+| `ResolveReferences` | Turning declared identifiers into openable paths | catalogue, reference index |
 
 Use cases validate IDs/query shapes, call ports and return models. They do not catch generic exceptions. Expected core/application errors are typed; the single delivery boundary maps unknown failures to `internal_error` and logs only operation/request/source identity.
 
@@ -302,13 +305,26 @@ Allowed operations are fixed internal templates:
 - repository top-level, absolute git-dir/common-dir and `HEAD` verification;
 - branch/detached/unborn state;
 - porcelain-v2 status with untracked enumeration disabled; and
-- a 51-record, NUL-delimited `git log <pinned-head> --topo-order --skip=<cursor-skip>` page (50 returned, one look-ahead).
+- a 51-record, NUL-delimited `git log <pinned-head> --topo-order --skip=<cursor-skip>` page (50 returned, one look-ahead);
+- a NUL-delimited `diff-tree --name-status` of one commit against its first parent, renames disabled, root commits included;
+- a `diff-tree --unified=0 --ignore-cr-at-eol` patch of one commit restricted to one path, read for its hunk headers only; and
+- `cat-file -s` and `cat-file blob` against a `<40-hex>:<path>` object specification.
+
+The last three carry a parameter the earlier templates do not: a source-relative path. Each is re-validated at the allowlist against traversal, absolute form, option-leading form, backslash, colon and control characters, independently of the `RelativePath` parse and the source admission that already ran upstream — two copies of one check, because the allowlist must not inherit its caller's confidence. The patch template terminates option parsing with `--` before the path.
+
+`--ignore-cr-at-eol` on the patch template is load-bearing rather than cosmetic. The hardened environment deliberately nulls system configuration, which on Git for Windows removes `core.autocrlf`; without the flag a one-line change to a text file reports as a whole-file rewrite, and every line of the file would be presented as added. The flag can only ignore a carriage return immediately preceding a newline, which is a representation difference and never a content one.
 
 Every process invokes that exact executable with an argument list, `shell=False`, exact adapter-registry cwd, three-second timeout and 1 MiB combined-output cap. The environment is built from an OS execution allowlist, not copied wholesale, and includes `GIT_TERMINAL_PROMPT=0`, `GIT_OPTIONAL_LOCKS=0`, `GIT_NO_LAZY_FETCH=1`, `GIT_PAGER=cat`, `PAGER=cat`, `GIT_EXTERNAL_DIFF=`, null global/system config paths and no `GIT_DIR`, worktree, object, replace-ref, SSH/askpass or optional-lock variables. Command-line config disables hooks path, fsmonitor, untracked cache, index preload, external diff and pager.
 
 Before adopting a source as git-backed, the adapter validates top-level equals the registered source root and both absolute git-dir and common-dir remain inside it; external worktree/common/object stores are reported as `git_store_external` and history is unavailable in v1. That keeps every git-read target inside AJ-07's snapshot. No aliases or repository-derived executable paths are used, and a process-spawn probe proves only the trusted executable is invoked.
 
 Commit parsing uses full SHA as identity and displays 12 characters (full SHA remains in the DTO). The signed cursor is `{v,source,pinned_head,skip}`. First page pins the current full `HEAD`; later pages rerun the same topological order at that pinned head with an increasing skip, so new commits do not reorder the walk. A missing pinned commit yields `source_changed`.
+
+### Reading history
+
+`GetCommit` and `ReadHistoricalDocument` decide admission through the same `PathAdmission` port the working-tree reader implements, and they decide it *before* any git invocation. The object store retains every path the repository has ever held, so a path the live reader excludes today — a secret name, an ignored directory, a nested domain's file — would otherwise be reachable through history. Admission is answered without touching disk, because the file in question need not still exist.
+
+Historical content is raw-only. Rendering it would resolve its links against a working tree that is not the tree the commit describes, so the Markdown parser, the link resolver and the presenter are all absent from this path. Added-line ranges come from `--unified=0` hunk headers alone: no removed line is parsed, stored or transported, and the reader is told so rather than being allowed to read their absence as an absence of removals.
 
 ## 11. Frontmatter, Markdown and link pipeline
 
@@ -320,6 +336,16 @@ Three focused adapters and one confined resolver form the document pipeline.
 4. `AllowlistDocumentPresenter` emits only `h1`–`h6`, `p`, `strong`, `em`, `code`, `pre`, `ul`, `ol`, `li`, `blockquote`, `table`, `thead`, `tbody`, `tr`, `th`, `td`, `hr` and validated `a`. It emits no content-supplied style/class, image, iframe, SVG, form or event attribute; external anchors receive `target="_blank" rel="noopener noreferrer external"`.
 
 `ReadDocument(mode=raw)` skips Markdown parsing and returns escaped text data; `mode=rendered` runs the pipeline and returns HTML. Exactly one representation is serialised. The browser inserts rendered HTML only into the dedicated document container. Every other repository value uses DOM `textContent`; raw mode always uses a `<pre><code>` text node.
+
+### Resolving declared references
+
+Structural frontmatter fields name identifiers, not paths, so answering "where is this id" is a whole-source question. Three measured facts set the shape, taken over a 1,519-file source:
+
+- parsing 1,076 markdown files' frontmatter as YAML cost ~2.9s, more than reading them (~2.3s), so the identifier is lifted from the frontmatter block's own `id:` line, bounded to the file head, and never by parsing YAML;
+- walking the source to revalidate the mapping measured 0.3–2.2s on the same machine run to run, so the walk is spaced rather than repeated per lookup; and
+- resolution runs after the document is on screen, one request per document rather than one per reference.
+
+The mapping is therefore allowed to be briefly stale. That is a deliberate trade: its worst failure is a reference that will not open, which is visible to the reader and recovered by reopening — unlike a pagination cursor, whose drift would silently return a wrong page and which accordingly still revalidates every time. Two files claiming one identifier resolve to neither, since choosing whichever the walk reached first would be an arbitrary answer presented as a definite one.
 
 ## 12. HTTP API
 
@@ -334,6 +360,9 @@ Static assets are source-insensitive. `/health` is unauthenticated and returns o
 | `GET /api/v1/collection` | `ListCollection` | `source`, `kind=skills|memory`, `cursor?` |
 | `GET /api/v1/settings` | `GetSettings` | `source` |
 | `GET /api/v1/document` | `ReadDocument` | `source`, `path`, `mode=raw|rendered` |
+| `GET /api/v1/commit` | `GetCommit` | `source`, `sha` |
+| `GET /api/v1/commit-file` | `ReadHistoricalDocument` | `source`, `sha`, `path` |
+| `GET /api/v1/references` | `ResolveReferences` | `source`, `ids` |
 
 Success uses `{data, meta: {request_id, observed_at, next_cursor?, partial?}}`. Public DTOs are defined in `response_encoding.py`; conversion is explicit and never serialises core/adaptor dataclasses directly. Common shapes are:
 
@@ -385,13 +414,17 @@ Desktop (≥900 CSS px) is a grid with:
 
 The aesthetic follows the reference's quiet density: near-black/near-white surfaces, hairline borders, 8/12/16 px spacing rhythm, rounded but restrained controls, one teal accent, and system font stack. It carries no Perplexity branding or irrelevant share/account/session controls.
 
+At desktop widths either side region collapses under an explicit control, yielding its grid track to the evidence pane, with the choice persisted per region in `localStorage`. This is a different mechanism from the sub-900 overlay and deliberately shares none of its semantics: a collapsed region covers nothing, so it takes no dialog role, no modal state, no sibling inertness and no focus trap. Its rules are scoped above 900 px so a desktop collapse cannot leak downward and hide a drawer. Focus follows the collapse to the control that replaces the one being hidden. The grid track snaps rather than animating; `grid-template-columns` transitions were not relied upon.
+
+The evidence pane scrolls horizontally within itself and the page body never does. The split view carries minimum track widths rather than a fixed first column, so it squeezes to a floor and then scrolls, and metric cards auto-fit rather than asking a media query to reflow them.
+
 Below 900 px, header buttons open rail/context as modal overlays with labelled dialogs, focus trap, Escape close and focus return. At 320 CSS px/200% zoom, content is one column and tables/code scroll within their own region rather than widening the page.
 
 ### Accessibility and theme
 
 The source tree is one `role="tree"` with nested `role="group"`/`treeitem` rows, `aria-expanded` on directories, `aria-selected` on the active document and one roving `tabindex=0`. Arrow Up/Down moves visible rows; Right expands or enters; Left collapses or moves to parent; Home/End move bounds; Enter activates. Collapsing/removing the focused descendant moves focus to the owning directory. A paginated “Load more” keeps focus on the first added item or the button when no item is added.
 
-Tabs use `tablist`/`tab`/`tabpanel` with Arrow/Home/End and stable focus. Responsive overlays are labelled dialogs; the background becomes `inert`, focus is trapped, Escape closes, and focus returns to the opener. Async status uses one de-duplicating `aria-live="polite"` region; fatal/load errors use `role="alert"` once. Routing, theme and responsive-overlay state machines are isolated in `routing.js`, `theme.js` and `overlays.js`. View modules render DOM and dispatch intents only: `overview.js`, `collection.js`, `document.js`, `settings.js`, `navigation.js` and `context.js` do not fetch or own cross-view state.
+Tabs use `tablist`/`tab`/`tabpanel` with Arrow/Home/End and stable focus. Responsive overlays are labelled dialogs; the background becomes `inert`, focus is trapped, Escape closes, and focus returns to the opener. Async status uses one de-duplicating `aria-live="polite"` region; fatal/load errors use `role="alert"` once. Routing, theme and responsive-overlay state machines are isolated in `routing.js`, `theme.js` and `overlays.js`. View modules render DOM and dispatch intents only: `overview.js`, `collection.js`, `commit.js`, `document.js`, `settings.js`, `navigation.js` and `context.js` do not fetch or own cross-view state. `layout.js` owns desktop region collapse and `format.js` the one date rendering, both free of view state.
 
 CSS custom properties define light/dark tokens. `theme.js` applies `light`, `dark` or `system`, listens for system changes only in system mode, and persists only the explicit mode in `localStorage`. Reduced-motion preference removes non-essential transitions.
 

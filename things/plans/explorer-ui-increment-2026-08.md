@@ -69,75 +69,75 @@ Recorded rather than rediscovered mid-build:
 
 The three regions are fixed at `270px | 1fr | 250px` and nothing can give.
 
-- [ ] Left navigation collapses to a rail via a chevron control; `aria-expanded`
+- [x] Left navigation collapses to a rail via a chevron control; `aria-expanded`
       carried, state persisted in `localStorage` beside the theme choice.
-- [ ] Right context panel collapses to the right via its own chevron, same
+- [x] Right context panel collapses to the right via its own chevron, same
       contract.
-- [ ] Collapse is a desktop mechanism: no `role="dialog"`, no `aria-modal`, no
+- [x] Collapse is a desktop mechanism: no `role="dialog"`, no `aria-modal`, no
       focus trap, no `inert` siblings. The narrow-viewport overlay keeps all four.
-- [ ] Centre region gains a horizontal scroll container so wide content scrolls
+- [x] Centre region gains a horizontal scroll container so wide content scrolls
       inside itself and the page body never scrolls sideways.
-- [ ] The mid-width band (roughly 900–1240px) squeezes the split view rather
+- [x] The mid-width band (roughly 900–1240px) squeezes the split view rather
       than dropping it: collection list narrows to a usable minimum before the
       layout stacks.
-- [ ] Both collapse controls reachable and operable by keyboard, with a visible
+- [x] Both collapse controls reachable and operable by keyboard, with a visible
       focus ring in both themes.
 
 ## Phase 2 — Overview earns its commits
 
-- [ ] `Eligible files` metric relabels to `Files`. The DTO field
+- [x] `Eligible files` metric relabels to `Files`. The DTO field
       `counts.eligible_files` is unchanged — this is a display label, and
       eligibility stays the normative term in the requirements.
-- [ ] Commit rows become activatable (button semantics, keyboard, focus ring).
-- [ ] Activating a commit opens the collection master/detail pattern already
+- [x] Commit rows become activatable (button semantics, keyboard, focus ring).
+- [x] Activating a commit opens the collection master/detail pattern already
       used by Skills and Memory: changed paths on the left, selected file on
       the right.
-- [ ] **Backend — file list.** New `CommitDetail` port + use case + route
+- [x] **Backend — file list.** New `CommitDetail` port + use case + route
       (`/api/v1/commit`). Adapter runs `diff-tree` against the first parent,
       renames off, so each path appears once with a plain add/modify/delete
       status. Merge commits read against first parent.
-- [ ] **Backend — historical content.** Blob read at `<sha>:<path>`, bounded by
+- [x] **Backend — historical content.** Blob read at `<sha>:<path>`, bounded by
       the same `file_bytes` limit as live reads, binary-sniffed and refused
       rather than rendered, returned raw.
-- [ ] **Backend — changed lines.** Unified-zero hunk headers give the added-line
+- [x] **Backend — changed lines.** Unified-zero hunk headers give the added-line
       ranges on the new side directly; no diff body is parsed and no removed
       line is transported.
-- [ ] **Safety envelope.** The git argument allowlist currently admits only
+- [x] **Safety envelope.** The git argument allowlist currently admits only
       fixed templates. Admitting a path argument is the sharp edge of this
       phase: paths are validated through `RelativePath.parse` and the
       eligibility rules *before* reaching a git invocation, `--` terminates
       option parsing, and length is bounded. New mutation entries cover
       option-injection and boundary-escape attempts.
-- [ ] Deleted paths list with their status and state plainly that the file was
+- [x] Deleted paths list with their status and state plainly that the file was
       deleted in this commit, instead of failing to load.
-- [ ] Green highlighting is not carried by colour alone — a gutter marker keeps
+- [x] Green highlighting is not carried by colour alone — a gutter marker keeps
       it readable under colour-independence review.
 
 ## Phase 3 — Memory reads the way it is used
 
-- [ ] Group order reverses to Z→A in the collection reader's sort. The
+- [x] Group order reverses to Z→A in the collection reader's sort. The
       pagination revision hash is computed from the ordered candidate list, so
       the cursor contract stays coherent.
-- [ ] Each group heading becomes a collapsible section with a chevron and
+- [x] Each group heading becomes a collapsible section with a chevron and
       `aria-expanded`.
-- [ ] Collapse state survives re-render and pagination — loading more into a
+- [x] Collapse state survives re-render and pagination — loading more into a
       collapsed group must not silently expand it, and must not hide newly
       appended items with no indication.
 
 ## Phase 4 — The document and its context
 
-- [ ] Raw view drops the frontmatter disclosure entirely. The header is already
+- [x] Raw view drops the frontmatter disclosure entirely. The header is already
       on screen in raw; the fold is duplication. Styled view keeps it.
-- [ ] Structural references become navigable. `informed_by`, `linked_things`,
+- [x] Structural references become navigable. `informed_by`, `linked_things`,
       `dependencies`, `parent`, `blocks` and `definition` render as labelled
       chips rather than JSON, each activating to open the referenced thing.
-- [ ] **Backend — id resolution.** References carry thing *ids*, not paths, and
+- [x] **Backend — id resolution.** References carry thing *ids*, not paths, and
       point outside the memory collection (plans, artifacts, specs). A bounded
       id→path index over the source, built with the same scan limits as the
       collection reader, resolves them in one request rather than one per chip.
-- [ ] Unresolvable ids render as inert chips that say so, never as dead controls.
-- [ ] Context panel stops silently truncating frontmatter at twelve entries.
-- [ ] Long values stop breaking one character per line in the narrow panel —
+- [x] Unresolvable ids render as inert chips that say so, never as dead controls.
+- [x] Context panel stops silently truncating frontmatter at twelve entries.
+- [x] Long values stop breaking one character per line in the narrow panel —
       the current `overflow-wrap: anywhere` against a too-narrow column is what
       turns a path into a vertical stack of letters.
 
@@ -146,31 +146,31 @@ The three regions are fixed at `270px | 1fr | 250px` and nothing can give.
 Found while reading, not requested — actioned under the operator's standing
 instruction to fix what is noticed.
 
-- [ ] Commit timestamps render unambiguously rather than in ambiguous
+- [x] Commit timestamps render unambiguously rather than in ambiguous
       month/day order.
-- [ ] The `.mobile-only` class name stops describing the collapse controls once
+- [x] The `.mobile-only` class name stops describing the collapse controls once
       they exist at desktop; naming follows behaviour.
-- [ ] `renderDocument` shadows the global `document` with its parameter; it
+- [x] `renderDocument` shadows the global `document` with its parameter; it
       works only because the body reaches for `window.document`. Renamed.
-- [ ] Commit SHA abbreviation is quadratic in page size — bounded rewrite while
+- [x] Commit SHA abbreviation is quadratic in page size — bounded rewrite while
       the code is open.
-- [ ] Every new control audited for role, name, state, focus order and target
+- [x] Every new control audited for role, name, state, focus order and target
       size, in both themes and at 200% zoom.
 
 ## Phase 6 — Governance reconciliation
 
 Docs and tests move with each phase; evidence reseals once.
 
-- [ ] `docs/requirements.md` — amend `FR-EST-002`; add functional requirements
+- [x] `docs/requirements.md` — amend `FR-EST-002`; add functional requirements
       for region collapse, commit detail, historical read, reference navigation
       and memory section state; add the historical-read safety requirement.
-- [ ] `docs/design.md` — new endpoints, the collapse mechanism and its
+- [x] `docs/design.md` — new endpoints, the collapse mechanism and its
       separation from the overlay, the historical-read boundary.
-- [ ] `docs/test-specification.md` — new and amended CT/BT/ST identifiers and
+- [x] `docs/test-specification.md` — new and amended CT/BT/ST identifiers and
       mutation matrix entries.
-- [ ] `tests/traceability.yaml` — new rows; existing rows whose dispositions
+- [x] `tests/traceability.yaml` — new rows; existing rows whose dispositions
       this increment invalidates are reopened rather than left reading as passed.
-- [ ] Test suites extended alongside each phase, not after all of them.
+- [x] Test suites extended alongside each phase, not after all of them.
 - [ ] Full evidence re-run and reseal against the final source.
 - [ ] Operator re-dispositions the affected acceptance journeys.
 

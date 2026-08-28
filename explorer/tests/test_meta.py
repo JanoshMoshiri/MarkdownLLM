@@ -32,7 +32,7 @@ def test_traceability_manifest_is_exact_and_well_formed():
     requirement_text = (EXPLORER / "docs" / "requirements.md").read_text(encoding="utf-8")
     requirement_ids = set(re.findall(r"(?:FR|NFR)-[A-Z]+-\d{3}[A-Z]?", requirement_text))
     traced = manifest()["requirements"]
-    assert set(traced) == requirement_ids and len(requirement_ids) == 63
+    assert set(traced) == requirement_ids and len(requirement_ids) == 70
     tests = collected_test_functions()
     allowed_dispositions = {"automated", "browser", "mixed", "analysis"}
     allowed_prefixes = ("pytest::", "browser::", "system::", "analysis::", "human::")
@@ -40,8 +40,14 @@ def test_traceability_manifest_is_exact_and_well_formed():
         "method", "fixture", "observable_pass_condition", "evidence", "evidence_location",
         "technical_owner", "acceptance_owner", "disposition", "human_disposition",
     }
+    # A requirement whose recorded evidence describes a tree that no longer
+    # exists carries a dated reopening note. `disposition` stays the category of
+    # verification; it is not the place to record that the evidence is stale.
+    optional_fields = {"reopened_2026_08_28"}
     for requirement_id, row in traced.items():
-        assert set(row) == required_fields, (requirement_id, set(row) ^ required_fields)
+        assert required_fields <= set(row) <= required_fields | optional_fields, (
+            requirement_id, set(row) ^ required_fields,
+        )
         assert row["disposition"] in allowed_dispositions and row["technical_owner"] and row["acceptance_owner"] and row["evidence"], requirement_id
         assert row["method"] and row["fixture"] and row["observable_pass_condition"] and row["evidence_location"]
         assert row["human_disposition"] in {"none", "pending-human"}
@@ -54,9 +60,9 @@ def test_traceability_manifest_is_exact_and_well_formed():
 @pytest.mark.meta
 def test_mutation_manifest_is_complete_and_targets_real_tests():
     specification = (EXPLORER / "docs" / "test-specification.md").read_text(encoding="utf-8")
-    expected = set(re.findall(r"\bM(?:0[1-9]|1[0-6])\b", specification))
+    expected = set(re.findall(r"\bM(?:0[1-9]|1[0-9])\b", specification))
     mutants = manifest()["mutants"]
-    assert set(mutants) == expected == {f"M{index:02}" for index in range(1, 17)}
+    assert set(mutants) == expected == {f"M{index:02}" for index in range(1, 20)}
     tests = collected_test_functions()
     for mutant_id, row in mutants.items():
         assert row["subject"] and row["evidence"] == f"mutation::{mutant_id}" and row["tests"]

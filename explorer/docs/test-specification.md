@@ -140,6 +140,8 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 - `CT-TREE-001` — lazy immediate-directory pages, sorting, cursor signature/fingerprint, inclusive depth/entry N−1/N/N+1 boundaries and visible partial state shared with aggregate traversal.
 - `CT-SEARCH-001` — case-insensitive path search, 10,000-candidate cap, pagination and no file-body load.
 - `CT-COLLECTION-001` — Skills/Memory folder/type precedence, malformed/mismatch/duplicate ID and empty groups.
+- `CT-COLLECTION-002` — descending group order with ascending titles inside a group, and cursor revision computed over the ordered candidates.
+- `CT-REFERENCE-001` — identifier lifted only from a top-level frontmatter `id:` before the closing fence; quoted, absent, nested and post-fence vectors; identifier-to-path resolution including an identifier that does not match its filename; contested identifiers resolving to neither; request count and length bounds; rebuild when the source changes.
 - `GT-CONFINE-001` — traversal/case/separator/encoding/link/junction/reparse/replacement tests for the executed OS/filesystem profile.
 - `CT-DOCUMENT-001` — UTF-8/BOM/text/binary classification, mode-specific payload, malformed frontmatter and changing-file errors.
 - `CT-FRONTMATTER-001` — duplicate/alias/merge/tag/depth/scalar/cardinality/node/normalised-size boundaries.
@@ -153,7 +155,10 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 - `GT-GIT-STATE-001` — normal/unborn/detached/empty/corrupt/timeout states and ISO timestamp/author fields.
 - `GT-GIT-PAGE-001` — pinned-head/skip topological pagination with merge history, new commits between pages and 12/full SHA identity.
 - `GT-GIT-SAFE-001` — O-GIT-PROCESS, malicious config, no lazy fetch/locks/helpers and absolute executable.
+- `GT-GIT-ARGS-001` — the argument allowlist admits only the declared templates; path-bearing templates reject traversal, absolute, option-leading, separator, colon and control-character paths, and reject short or non-hex revisions.
 - `GT-IMMUTABLE-001` — O-IMMUTABILITY around every git route.
+- `GT-GIT-COMMIT-001` — first-parent name-status listing for ordinary, root and merge commits; add/modify/delete classification; renames reported as delete-and-add; file-list limit and partial labelling.
+- `GT-GIT-HISTORY-READ-001` — object-store content at a commit under the working-tree rules: admission before invocation, eligibility, exclusive ownership, size, binary and encoding refusals with the live error codes; added-line ranges from `--unified=0` hunk headers with no removed line transported; whole-file-rewrite regression when `--ignore-cr-at-eol` is absent.
 
 ### HTTP/runtime/distribution
 
@@ -185,7 +190,10 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 - `BT-THEME-001` — light/dark/system, system default and local persistence without location loss.
 - `BT-ASYNC-001` — O-ASYNC-CURRENT plus timeout, retry, abort and terminal content/empty/error states.
 - `BT-RESPONSIVE-001` — 1440×900 three-region and 390×844 overlays; 320 CSS px/200% zoom; focus trap/Escape/return; no lost capability.
-- `BT-KEYBOARD-001` — tree/tab/search/mode/theme keyboard state machines, collapse focus and paginated focus.
+- `BT-COMMIT-001` — activating a commit lists its changed paths with classification and openability; an openable path opens as the commit left it with the added lines marked and named in text; unopenable paths state why; back, browser history and deep-link restore of commit and file.
+- `BT-COLLAPSE-001` — desktop collapse and restore of both side regions, persistence across reload, absence of dialog/modal/inert/focus-trap semantics above 900 px, focus moving to the replacing control, centre horizontal scroll and no page-level horizontal scroll in any state.
+- `BT-REFERENCE-001` — reference chips render per declared field with relation or commit, are not activatable before resolution answers, open the thing they name, and settle into an explicitly unresolved state on absence, contest, failure or timeout.
+- `BT-KEYBOARD-001` — tree/tab/search/mode/theme keyboard state machines, collapse focus, memory-section disclosure focus and paginated focus.
 - `BT-A11Y-001` — roles/states/names/live announcements, contrast/colour independence, target size, reduced motion and automated accessibility scan where available.
 - `BT-VISUAL-001` — synthetic-fixture screenshots in light/dark desktop and narrow views; inspection against visual-reference principles and clipping/overlap oracle.
 
@@ -215,6 +223,11 @@ Shared oracle functions accept a subject implementation. Production subjects mus
 | `M12` | Log raw request target/header/query | `ST-LOG-001` |
 | `M13` | Acquire semaphore after creating thread | `ST-SERVER-BOUND-001` |
 | `M14` | Accept stale response A after current B | `BT-ASYNC-001` |
+| `M15` | Resolve a commit path without source admission | `GT-GIT-HISTORY-READ-001` |
+| `M16` | Accept a path argument the allowlist has not re-validated | `GT-GIT-ARGS-001` |
+| `M17` | Admit a git template outside the declared set | `GT-GIT-ARGS-001` |
+| `M18` | Resolve a contested identifier to its first match | `CT-REFERENCE-001` |
+| `M19` | Read an identifier from outside the frontmatter block | `CT-REFERENCE-001` |
 | `M15` | Insert repository metadata with `innerHTML` | `CT-HTML-001`, browser DOM safety check |
 | `M16` | Let a browser view call `fetch` directly | `AT-VIEW-001` |
 

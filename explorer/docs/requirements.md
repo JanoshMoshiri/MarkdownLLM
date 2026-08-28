@@ -125,6 +125,10 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-NAV-006 — Responsive navigation.** At viewport widths of 900 CSS pixels or more the three regions shall be simultaneously available. Below 900 pixels the estate rail and context panel shall become labelled overlays with focus containment, Escape dismissal and focus return; every desktop capability shall remain reachable at 390×844 and at 320 CSS pixels with 200% zoom.
 
+**FR-NAV-007 — Region collapse.** At viewport widths of 900 CSS pixels or more, the estate rail and the context panel shall each collapse and restore under an explicit control, yielding their width to the centre region, and the choice shall persist across reload. Collapse is not the sub-900 overlay: a collapsed region covers nothing and shall not adopt dialog role, modal state, sibling inertness or focus containment. Focus shall move to the control that replaces the one being hidden.
+
+**FR-NAV-008 — Centre region overflow.** Content too wide for the centre region shall scroll horizontally within that region; the page body shall not scroll horizontally at any supported width. The split view shall reduce its columns to a declared minimum before the centre begins to scroll.
+
 ### Source tabs
 
 **FR-TAB-001 — Overview.** Every source shall have an **Overview** tab showing source identity; counts of eligible files, skills and memory items under the same ownership/eligibility policy; repository state; and the first commit page from that source repository. Counts that hit a limit or cannot be computed shall be labelled partial or unavailable, never presented as complete.
@@ -135,6 +139,12 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-TAB-004 — Memory.** Every source shall have a **Memory** tab that recursively scans eligible Markdown files only beneath `things/insights/`, `things/conflicts/`, `things/retrospectives/` and `things/decisions/`. Folder is the initial group; a valid frontmatter `type` may refine the label. Missing, malformed or mismatched type is shown as an issue on the item rather than silently moving or dropping it. Duplicate IDs remain separate path-addressed documents and receive a visible warning. Absent groups are omitted; no memory things produces an explicit empty state.
 
+**FR-TAB-007 — Commit contents.** Activating a commit shall list the paths that commit changed against its first parent, each classified as added, modified or deleted, ordered by path. Renames shall be reported as a delete beside an add. Each path shall be marked with whether this source may open it; a path git reports but the source excludes shall be listed and unopenable, never silently omitted and never openable. A commit whose file list exceeds the limits table shall be labelled partial.
+
+**FR-TAB-008 — Historical document.** Selecting an openable path within a commit shall present that file as that commit left it, as raw text, with the line ranges the commit added marked. The marking shall not depend on colour alone, and the changed line numbers shall be stated in text. Removed lines shall be neither rendered nor transported, and the view shall say so rather than allowing their absence to read as an absence of removals. Historical content is raw-only: it shall not be rendered as Markdown, and no link within it shall be resolved.
+
+**FR-TAB-009 — Memory grouping and disclosure.** Memory groups shall be presented in descending group order with titles ascending inside a group. Each group shall be an independently collapsible disclosure carrying its expanded state, and that state shall survive re-render and pagination. A collapsed group shall display a live count of its items so that items paged into it remain evidenced.
+
 **FR-TAB-005 — Settings.** Every source shall expose a minimal **Settings** tab showing read-only source path, source kind, detected markers and theme controls. No write-capable repository settings are permitted in v1.
 
 **FR-TAB-006 — Consistent opening.** Selecting a skill or memory item shall open the same document reader used by the file tree; these tabs are curated routes into source files, not duplicated content stores.
@@ -143,11 +153,13 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-DOC-001 — Styled Markdown.** Markdown shall render as a readable document with headings, paragraphs, emphasis, links, lists, blockquotes, tables, horizontal rules and fenced code blocks.
 
-**FR-DOC-002 — Frontmatter.** YAML frontmatter shall be parsed separately and shown as structured metadata; it shall not be rendered as an undifferentiated code block.
+**FR-DOC-002 — Frontmatter.** YAML frontmatter shall be parsed separately and shown as structured metadata; it shall not be rendered as an undifferentiated code block. Metadata shall be shown in full: a fixed display cap is not permitted, because it leaves a reader unable to distinguish a short frontmatter from a truncated one. Raw mode shall not repeat the frontmatter disclosure, the block being already on screen in the source itself.
 
 **FR-DOC-003 — Source visibility.** The reader shall provide a user-controlled switch between rendered Markdown and raw source.
 
 **FR-DOC-004 — Context panel.** The right context panel shall summarise the selected source or document using factual metadata: path, file size, modified time, frontmatter fields and source/repository identity. It shall not invent a semantic summary.
+
+**FR-DOC-009 — Reference navigation.** Frontmatter fields that name other things rather than describe this one shall be presented as controls that open the thing they name, carrying the relation or commit the reference declares. Resolution shall not delay the document: it shall run after the document is displayed, and a reference shall not be activatable before its resolution is known. A reference that resolves to nothing, to more than one thing, or whose lookup fails, times out or is abandoned shall settle into an explicitly unresolved state; no reference shall remain pending indefinitely.
 
 **FR-DOC-005 — Unsupported files.** Eligible non-Markdown files shall receive a non-executable raw-text view when UTF-8 text and an explicit unsupported state when binary or non-UTF-8.
 
@@ -205,7 +217,9 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **NFR-SAFE-001A — Observable source immutability.** Explorer shall not alter source bytes or mutation-relevant metadata: names, types, size, content, mtime, mode/ACL where observable, worktree content, index checksum, refs, object set and repository config. Acceptance compares those pre/post snapshots. Access-time and OS-maintained read telemetry are explicitly excluded because ordinary reads may update them outside Explorer's control.
 
-**NFR-SAFE-001B — Constrained git.** The git adapter shall expose an argument-vector allowlist of read-only operations and fixed arguments; set fixed source cwd, non-interactive environment, `GIT_OPTIONAL_LOCKS=0`, no pager/editor/hooks/external diff, bounded timeout/output and no shell; and prevent global/system/repository configuration from broadening execution. Mutation verbs and arbitrary options are not representable through its port.
+**NFR-SAFE-001B — Constrained git.** The git adapter shall expose an argument-vector allowlist of read-only operations whose arguments are fixed except for a full 40-character object identifier and, where a template requires one, a single source-relative path; a template carrying a path shall re-validate that path against traversal, absolute form, option-leading form, separator and control characters independently of any validation performed by its caller, and shall terminate option parsing before it;  set fixed source cwd, non-interactive environment, `GIT_OPTIONAL_LOCKS=0`, no pager/editor/hooks/external diff, bounded timeout/output and no shell; and prevent global/system/repository configuration from broadening execution. Mutation verbs and arbitrary options are not representable through its port.
+
+**NFR-SAFE-001D — Historical read boundary.** Content read from the repository object store shall be governed by the same rules as a working-tree read: source admission, name eligibility, exclusive ownership, the file-size limit, binary classification and encoding support, reported with the same error codes. Admission shall be decided before any git invocation, because the object store retains every path the repository has ever contained, including paths the working-tree reader excludes today. Historical content shall not be rendered, and its links shall not be resolved, since a link in a historical file resolves against a tree that no longer exists.
 
 **NFR-SAFE-001C — Outside-root writes.** The exploration runtime writes no Explorer-owned persistent content state. It may write diagnostic lines to stdout/stderr, ephemeral socket/process state managed by the operating system, interpreter/package bytecode caches outside every source root, and browser theme state in browser-local storage. The Windows installer may write only its per-user application files, uninstall registration, selected substrate-root setting and requested shortcuts. No capability, document content, frontmatter, source path below the configured root, content cache, token, log or database shall be persisted by the application.
 
