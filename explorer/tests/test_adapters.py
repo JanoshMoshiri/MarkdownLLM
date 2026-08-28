@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 import threading
+import time
 from pathlib import Path
 
 import pytest
@@ -611,3 +612,221 @@ def test_reference_index_rebuilds_when_the_source_changes(tmp_path):
     resolved, missing, _ = index.resolve(source.boundary_token, ("added-later",))
     assert missing == ()
     assert resolved["added-later"].value == "things/decisions/added.md"
+
+
+def _repo(tmp_path: Path, name: str):
+    root = tmp_path / name
+    root.mkdir(parents=True)
+
+    def run(*arguments: str) -> str:
+        result = subprocess.run(
+            ["git", "-c", f"safe.directory={root}", *arguments],
+            cwd=root, capture_output=True, text=True, check=True,
+        )
+        return result.stdout.strip()
+
+    (root / "AGENTS.md").write_text("# fixture", encoding="utf-8")
+    run("init", "-b", "main")
+    run("config", "user.name", "Fixture")
+    run("config", "user.email", "fixture@example.invalid")
+    return root, run
+
+
+@pytest.mark.gitfs
+def test_commit_detail_reports_merges_roots_and_deletions_against_the_first_parent(tmp_path):
+    """A merge reported zero changed files until the comparison became a pair.
+
+    `diff-tree --first-parent` prints nothing at all for a merge commit, so the
+    whole view was blank on exactly the commits that join work together.
+    """
+    root, run = _repo(tmp_path, "merges")
+    (root / "base.md").write_text("base\n", encoding="utf-8")
+    run("add", "."); run("commit", "-m", "base")
+    run("checkout", "-b", "side")
+    (root / "from-side.md").write_text("side\nlines\n", encoding="utf-8")
+    run("add", "."); run("commit", "-m", "side")
+    run("checkout", "main")
+    (root / "from-main.md").write_text("main\n", encoding="utf-8")
+    run("add", "."); run("commit", "-m", "main")
+    run("merge", "--no-ff", "side", "-m", "merge")
+    (root / "base.md").unlink()
+    run("add", "--all"); run("commit", "-m", "remove base")
+
+    runtime = build_runtime(root)
+    by_subject = {
+        item.subject: runtime.routes.dispatch("/api/v1/commit", {"source": ["substrate"], "sha": [item.sha]})
+        for item in runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]}).commits.items
+    }
+    assert [(f.change, f.path.value) for f in by_subject["merge"].files] == [("added", "from-side.md")]
+    assert [(f.change, f.path.value) for f in by_subject["base"].files] == [
+        ("added", "AGENTS.md"), ("added", "base.md"),
+    ]
+    assert [(f.change, f.path.value, f.openable) for f in by_subject["remove base"].files] == [
+        ("deleted", "base.md", False),
+    ]
+
+
+@pytest.mark.gitfs
+def test_commit_file_list_is_bounded_and_labelled_partial(tmp_path):
+    root, run = _repo(tmp_path, "many")
+    for index in range(6):
+        (root / f"file-{index}.md").write_text(f"# {index}\n", encoding="utf-8")
+    run("add", "."); run("commit", "-m", "many files")
+    runtime = build_runtime(root, limits=ExplorerLimits(commit_files=3))
+    sha = runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]}).commits.items[0].sha
+    detail = runtime.routes.dispatch("/api/v1/commit", {"source": ["substrate"], "sha": [sha]})
+    assert len(detail.files) == 3 and detail.partial is True
+
+
+@pytest.mark.gitfs
+def test_historical_read_survives_a_rewrite_larger_than_the_patch_budget(tmp_path):
+    """A 565 KB file failed with `git_unavailable` before the patch had a budget.
+
+    The blob is inside the 1 MiB read limit; the patch describing its rewrite is
+    not, because a patch carries both sides of every change.
+    """
+    root, run = _repo(tmp_path, "rewrite")
+    big = root / "big.md"
+    big.write_text("".join(f"original line {index}\n" for index in range(24000)), encoding="utf-8")
+    run("add", "."); run("commit", "-m", "first")
+    big.write_text("".join(f"replacement line {index}\n" for index in range(24000)), encoding="utf-8")
+    run("add", "."); run("commit", "-m", "rewrite")
+    assert big.stat().st_size < 1024 * 1024
+
+    runtime = build_runtime(root)
+    sha = runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]}).commits.items[0].sha
+    record = runtime.routes.dispatch(
+        "/api/v1/commit-file", {"source": ["substrate"], "sha": [sha], "path": ["big.md"]}
+    )
+    assert record.ranges_known is True and record.added_ranges == ((1, 24000),)
+
+    # With a budget too small for the patch, the file is still served and the
+    # marking is reported unavailable rather than as "nothing changed".
+    starved = build_runtime(root, limits=ExplorerLimits(diff_output_bytes=2048))
+    degraded = starved.routes.dispatch(
+        "/api/v1/commit-file", {"source": ["substrate"], "sha": [sha], "path": ["big.md"]}
+    )
+    assert degraded.ranges_known is False and degraded.added_ranges == ()
+    assert degraded.content.startswith("replacement line 0")
+
+
+@pytest.mark.gitfs
+def test_a_filename_holding_glob_characters_is_a_path_not_a_pattern(tmp_path):
+    root, run = _repo(tmp_path, "globs")
+    (root / "notes[draft].md").write_text("a\nb\n", encoding="utf-8")
+    (root / "notesd.md").write_text("x\n", encoding="utf-8")
+    run("add", "."); run("commit", "-m", "one")
+    (root / "notesd.md").write_text("x\ny\nz\n", encoding="utf-8")
+    run("add", "."); run("commit", "-m", "two")
+
+    runtime = build_runtime(root)
+    sha = runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]}).commits.items[0].sha
+    untouched = runtime.routes.dispatch(
+        "/api/v1/commit-file", {"source": ["substrate"], "sha": [sha], "path": ["notes[draft].md"]}
+    )
+    # Read as a pattern, this matched notesd.md and reported its added lines.
+    assert untouched.added_ranges == ()
+
+
+@pytest.mark.contract
+@pytest.mark.parametrize("path", ["node_modules./pkg.js", "node_modules../pkg.js"])
+def test_an_ignored_directory_resists_a_spelling_the_filesystem_settles(tmp_path, path):
+    """Windows discards trailing dots when resolving a component, so the
+    spelling a caller supplies and the path that is opened are not the same."""
+    root = tmp_path / "settled"
+    root.mkdir()
+    (root / "AGENTS.md").write_text("# fixture", encoding="utf-8")
+    modules = root / "node_modules"
+    modules.mkdir()
+    (modules / "pkg.js").write_text("ignored\n", encoding="utf-8")
+    runtime = build_runtime(root)
+    with pytest.raises(ExplorerError) as caught:
+        runtime.routes.dispatch("/api/v1/document", {"source": ["substrate"], "path": [path], "mode": ["raw"]})
+    assert caught.value.code in {"path_excluded", "file_not_found"}
+
+
+@pytest.mark.contract
+def test_reference_index_survives_a_source_written_while_it_is_read(tmp_path):
+    """An agent session edits the estate while an operator browses it.
+
+    A walk interrupted by that must yield an incomplete index, never an error
+    the browser would render as every reference being absent.
+    """
+    root = tmp_path / "churn"
+    root.mkdir()
+    (root / "AGENTS.md").write_text("# fixture", encoding="utf-8")
+    decisions = root / "things" / "decisions"
+    decisions.mkdir(parents=True)
+    for index in range(120):
+        (decisions / f"thing-{index}.md").write_text(
+            _THING.format(identifier=f"thing-{index}", kind="decision", title=f"Thing {index}"), encoding="utf-8"
+        )
+    runtime = build_runtime(root)
+    stop = threading.Event()
+
+    def churn() -> None:
+        index = 0
+        while not stop.is_set():
+            (decisions / f"new-{index}.md").write_text(
+                _THING.format(identifier=f"new-{index}", kind="decision", title=f"New {index}"), encoding="utf-8"
+            )
+            index += 1
+            time.sleep(0.002)
+
+    writer = threading.Thread(target=churn, daemon=True)
+    writer.start()
+    try:
+        outcomes = [
+            runtime.routes.dispatch("/api/v1/references", {"source": ["substrate"], "ids": ["thing-1"]})
+            for _ in range(8)
+        ]
+    finally:
+        stop.set(); writer.join(timeout=2)
+    # Never an error, and never a bare "not found": a walk the writer cut short
+    # yields an incomplete index, and an incomplete index reports an unfound
+    # reference as unchecked rather than as absent.
+    assert all(item.resolved or item.partial for item in outcomes)
+
+
+@pytest.mark.contract
+def test_reference_index_is_keyed_on_source_identity_not_the_boundary_token(tmp_path):
+    """Estate discovery mints fresh tokens, and a browser reload triggers it."""
+    root = tmp_path / "keyed"
+    _reference_estate(root)
+    runtime = build_runtime(root)
+    index = runtime.routes._use_cases.resolve_references._index
+    runtime.routes.dispatch("/api/v1/references", {"source": ["substrate"], "ids": ["settled"]})
+    for _ in range(3):
+        runtime.routes.dispatch("/api/v1/estate", {})
+        runtime.routes.dispatch("/api/v1/references", {"source": ["substrate"], "ids": ["settled"]})
+    assert len(index._cached) == 1
+
+
+@pytest.mark.contract
+def test_concurrent_cold_reference_lookups_share_one_build(tmp_path):
+    root = tmp_path / "single-flight"
+    _reference_estate(root)
+    runtime = build_runtime(root)
+    index = runtime.routes._use_cases.resolve_references._index
+    builds: list[int] = []
+    original = index._build
+
+    def counted(token, listing):
+        builds.append(1)
+        time.sleep(0.05)
+        return original(token, listing)
+
+    index._build = counted
+    threads = [
+        threading.Thread(
+            target=lambda: runtime.routes.dispatch(
+                "/api/v1/references", {"source": ["substrate"], "ids": ["settled"]}
+            )
+        )
+        for _ in range(6)
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert len(builds) == 1

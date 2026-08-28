@@ -160,8 +160,10 @@ class ConfinedSourceReader:
             raise ExplorerError("path_type_changed")
         try:
             resolved = candidate.resolve(strict=True)
-            resolved.relative_to(boundary.root)
+            settled = resolved.relative_to(boundary.root)
             if boundary.excluded_root is not None and _inside(resolved, boundary.excluded_root):
+                raise ExplorerError("path_excluded")
+            if self._policy_excludes(settled.parts):
                 raise ExplorerError("path_excluded")
         except ValueError:
             raise ExplorerError("path_outside_source") from None
@@ -210,8 +212,10 @@ class ConfinedSourceReader:
             if _is_reparse(candidate) or not candidate.is_dir():
                 raise ExplorerError("file_not_found")
             resolved = candidate.resolve(strict=True)
-            resolved.relative_to(boundary.root)
+            settled = resolved.relative_to(boundary.root)
             if boundary.excluded_root is not None and _inside(resolved, boundary.excluded_root):
+                raise ExplorerError("path_excluded")
+            if self._policy_excludes(settled.parts):
                 raise ExplorerError("path_excluded")
             return resolved
         except ValueError:
@@ -265,12 +269,30 @@ class ConfinedSourceReader:
         return entries
 
     def _excluded(self, boundary: SourceBoundary, relative: RelativePath, name: str) -> bool:
-        if self._policy.is_secret_name(name) or any(self._policy.is_ignored_directory(part) for part in relative.parts[:-1]):
+        if self._policy.is_secret_name(_settled(name)) or any(
+            self._policy.is_ignored_directory(_settled(part)) for part in relative.parts[:-1]
+        ):
             return True
         if boundary.excluded_root is not None:
             candidate = boundary.root.joinpath(*relative.parts)
             return _inside(candidate, boundary.excluded_root)
         return False
+
+    def _policy_excludes(self, parts: tuple[str, ...]) -> bool:
+        """Apply the name policy to the path the filesystem settled on.
+
+        The spelling a caller supplies and the path Windows opens are not always
+        the same: a trailing dot or space on a component is discarded during
+        resolution, so `node_modules./pkg.js` reached the bytes that
+        `node_modules/pkg.js` is refused. Checking the resolved components as
+        well closes that, and does not depend on predicting every variant a
+        filesystem might accept.
+        """
+        if not parts:
+            return False
+        return self._policy.is_secret_name(parts[-1]) or any(
+            self._policy.is_ignored_directory(part) for part in parts[:-1]
+        )
 
     def _reject_reparse_components(self, boundary: SourceBoundary, relative: RelativePath) -> None:
         current = boundary.root
@@ -327,6 +349,11 @@ class ConfinedSourceReader:
     def _revision(items) -> str:
         content = "\n".join(repr(item) for item in items).encode()
         return hashlib.sha256(content).hexdigest()
+
+def _settled(part: str) -> str:
+    """Windows discards trailing dots and spaces when it resolves a component."""
+    return part.rstrip(". ") or part
+
 
 def _same_file(left: os.stat_result, right: os.stat_result) -> bool:
     return (left.st_dev, left.st_ino, stat.S_IFMT(left.st_mode)) == (right.st_dev, right.st_ino, stat.S_IFMT(right.st_mode))

@@ -173,3 +173,66 @@ def test_unknown_static_assets_are_not_directory_served(live_server):
     for target in ("/../pyproject.toml", "/js/../app.css", "/.git/config", "/missing.js"):
         status, _, body = request(server, "GET", target)
         assert status == 404 and json.loads(body)["error"]["code"] == "route_not_found"
+
+@pytest.mark.system
+def test_commit_reference_and_historical_routes_cross_the_http_boundary(live_server):
+    """The three new routes and every DTO branch they publish, over real HTTP.
+
+    Exercised end to end rather than through the use cases, because the wire
+    encoding is where a field is silently dropped or a boundary token could
+    escape, and neither is visible from inside the application layer.
+    """
+    server, runtime, _ = live_server
+    capability = {"X-Explorer-Capability": runtime.capability}
+
+    status, _, body = request(server, "GET", "/api/v1/overview?source=substrate", capability)
+    assert status == 200
+    sha = json.loads(body)["data"]["commits"]["items"][0]["sha"]
+    assert len(sha) == 40
+
+    status, _, body = request(server, "GET", f"/api/v1/commit?source=substrate&sha={sha}", capability)
+    assert status == 200
+    detail = json.loads(body)["data"]
+    assert set(detail) == {"sha", "subject", "author_name", "authored_at", "files", "partial"}
+    assert detail["sha"] == sha and detail["partial"] is False
+    files = {item["path"]: item for item in detail["files"]}
+    assert set(files["AGENTS.md"]) == {"path", "change", "openable", "regular"}
+    assert files["AGENTS.md"]["openable"] is True and files["AGENTS.md"]["regular"] is True
+    # Git reports these; source admission is what refuses them.
+    assert files[".env"]["openable"] is False
+    assert files["domain/demo/AGENTS.md"]["openable"] is False
+
+    status, _, body = request(server, "GET", f"/api/v1/commit-file?source=substrate&sha={sha}&path=AGENTS.md", capability)
+    assert status == 200
+    record = json.loads(body)["data"]
+    assert set(record) == {"source_id", "path", "sha", "content", "added_ranges", "size", "ranges_known"}
+    assert record["ranges_known"] is True and record["added_ranges"] == [[1, len(record["content"].splitlines())]]
+    assert "Fixture substrate" in record["content"]
+
+    status, _, body = request(server, "GET", "/api/v1/references?source=substrate&ids=demo,shared,absent-thing", capability)
+    assert status == 200
+    resolution = json.loads(body)["data"]
+    assert set(resolution) == {"source_id", "resolved", "unresolved", "partial"}
+    assert resolution["resolved"] == {"demo": "skills/demo.md"}
+    # `shared` is claimed by two fixture files, so it resolves to neither rather
+    # than to whichever the walk reached first.
+    assert sorted(resolution["unresolved"]) == ["absent-thing", "shared"]
+
+    # No response may carry an internal boundary token.
+    for target in (f"/api/v1/commit?source=substrate&sha={sha}", "/api/v1/references?source=substrate&ids=shared"):
+        assert b"boundary_token" not in request(server, "GET", target, capability)[2]
+
+
+@pytest.mark.system
+def test_new_routes_reject_unknown_parameters_and_missing_capability(live_server):
+    server, runtime, _ = live_server
+    capability = {"X-Explorer-Capability": runtime.capability}
+    sha = "0" * 40
+    for target in (
+        f"/api/v1/commit?source=substrate&sha={sha}&extra=1",
+        f"/api/v1/commit-file?source=substrate&sha={sha}",
+        "/api/v1/references?source=substrate",
+    ):
+        assert request(server, "GET", target, capability)[0] == 400
+    for target in (f"/api/v1/commit?source=substrate&sha={sha}", "/api/v1/references?source=substrate&ids=shared"):
+        assert request(server, "GET", target)[0] == 401

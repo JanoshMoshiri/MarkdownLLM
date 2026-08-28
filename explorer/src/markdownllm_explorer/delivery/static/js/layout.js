@@ -13,12 +13,14 @@ const DESKTOP = "(min-width: 900px)";
 const REGIONS = {
   nav: {
     className: "nav-collapsed",
+    overlayClass: "nav-open",
     storageKey: "mdllm-explorer-nav-collapsed",
     collapse: "#sidebar-collapse",
     open: "#sidebar-open",
   },
   context: {
     className: "context-collapsed",
+    overlayClass: "context-open",
     storageKey: "mdllm-explorer-context-collapsed",
     collapse: "#context-collapse",
     open: "#context-open",
@@ -47,9 +49,12 @@ function remember(key, value) {
 }
 
 function sync(region) {
-  const expanded = document.body.classList.contains(region.className) ? "false" : "true";
-  document.querySelector(region.collapse).setAttribute("aria-expanded", expanded);
-  document.querySelector(region.open).setAttribute("aria-expanded", expanded);
+  const collapsed = document.body.classList.contains(region.className);
+  document.querySelector(region.collapse).setAttribute("aria-expanded", collapsed ? "false" : "true");
+  // Below the breakpoint this control opens a drawer, so it must report the
+  // drawer's state rather than the desktop track's.
+  const open = atDesktop() ? !collapsed : document.body.classList.contains(region.overlayClass);
+  document.querySelector(region.open).setAttribute("aria-expanded", open ? "true" : "false");
 }
 
 function setCollapsed(region, collapsed) {
@@ -61,7 +66,11 @@ function setCollapsed(region, collapsed) {
   document.querySelector(collapsed ? region.open : region.collapse).focus();
 }
 
-export function initialiseLayout(onOverlay) {
+export function syncRegionState() {
+  for (const region of Object.values(REGIONS)) sync(region);
+}
+
+export function initialiseLayout(onOverlay, onLeaveOverlayWidth) {
   for (const [kind, region] of Object.entries(REGIONS)) {
     document.body.classList.toggle(region.className, stored(region.storageKey));
     document.querySelector(region.collapse).addEventListener("click", () => setCollapsed(region, true));
@@ -73,4 +82,11 @@ export function initialiseLayout(onOverlay) {
     });
     sync(region);
   }
+  // Crossing into desktop leaves the overlay mechanism behind. Its modal state
+  // — inert siblings, dialog roles, a trapped focus ring — would otherwise
+  // survive into a layout that has no dialog in it.
+  matchMedia(DESKTOP).addEventListener?.("change", event => {
+    if (event.matches) onLeaveOverlayWidth();
+    syncRegionState();
+  });
 }

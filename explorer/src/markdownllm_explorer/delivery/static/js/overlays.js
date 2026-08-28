@@ -1,3 +1,5 @@
+import {syncRegionState} from "./layout.js";
+
 export function openOverlay(kind) {
   closeOverlays(false);
   const navigation = kind === "nav";
@@ -8,6 +10,7 @@ export function openOverlay(kind) {
   [...document.querySelector(".shell").children]
     .filter(node => node !== panel)
     .forEach(node => { node.inert = true; node.setAttribute("aria-hidden", "true"); });
+  syncRegionState();
   visibleFocusable(panel)[0]?.focus();
 }
 
@@ -23,6 +26,7 @@ export function closeOverlays(returnFocus = true) {
     node.inert = false;
     node.removeAttribute("aria-hidden");
   });
+  syncRegionState();
   if (returnFocus && navigationWasOpen) document.querySelector("#sidebar-open").focus();
   else if (returnFocus && contextWasOpen) document.querySelector("#context-open").focus();
 }

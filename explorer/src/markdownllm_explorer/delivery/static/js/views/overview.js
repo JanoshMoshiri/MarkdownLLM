@@ -14,7 +14,7 @@ export function renderOverview(container, overview, onMore, onCommit) {
       ${metric(overview.counts.memory, "Memory things", overview.counts.partial)}
       ${metric(overview.commits.items.length, "Commits shown")}
     </section>
-    <div class="section-title"><h2>Commit history</h2><span class="badge">${repo.branch ? escapeText(repo.branch) : repo.kind}</span></div>
+    <div class="section-title"><h2>Commit history</h2><span class="badge">${escapeText(repo.branch || repo.kind)}</span></div>
     <section class="list" id="commit-list"></section>`;
   container.querySelector(".hero h2").textContent = overview.source.display_name;
   const list = container.querySelector("#commit-list");
@@ -33,7 +33,7 @@ export function appendCommit(list, commit, onCommit) {
   row.dataset.sha = commit.sha;
   row.addEventListener("click", () => onCommit(commit.sha));
   const info = document.createElement("div");
-  const title = document.createElement("h3");
+  const title = document.createElement("span"); title.className = "list-row-title";
   const sha = document.createElement("span"); sha.className = "commit-sha"; sha.textContent = commit.sha.slice(0, 12);
   sha.dataset.sha = commit.sha; sha.title = commit.sha; sha.setAttribute("aria-label", `Commit ${commit.sha}`);
   title.append(sha, document.createTextNode(` ${commit.subject}`));

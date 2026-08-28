@@ -60,7 +60,7 @@ function bindChrome() {
   });
   document.querySelector("#tree-refresh").addEventListener("click", () => loadRootTree(true));
   document.querySelector("#theme-toggle").addEventListener("click", cycleTheme);
-  initialiseLayout(openOverlay);
+  initialiseLayout(openOverlay, () => closeOverlays(false));
   document.querySelector("#sidebar-close").addEventListener("click", closeOverlays);
   document.querySelector("#context-close").addEventListener("click", closeOverlays);
   document.querySelector("#search-input").addEventListener("input", event => {
@@ -279,6 +279,19 @@ function openReference(path) {
   opener(path, "rendered");
 }
 
+function revealCollectionItem(path) {
+  const item = content.querySelector(`.collection-item[data-path="${CSS.escape(path)}"]`);
+  const section = item?.closest(".collection-section");
+  if (!section || !section.classList.contains("collapsed")) return;
+  // Opening an item inside a folded group must show it, rather than leave the
+  // reader with a document whose place in the list they cannot see.
+  section.classList.remove("collapsed");
+  const heading = section.querySelector(".collection-group");
+  heading.setAttribute("aria-expanded", "true");
+  heading.querySelector(".chevron").textContent = "⌄";
+  state.collapsedGroups.delete(section.dataset.group);
+}
+
 async function openCommit(sha) {
   abortAllRequests(); clearTimeout(searchTimer);
   state.commit = sha; state.selectedPath = null; state.commitFiles = [];
@@ -308,6 +321,11 @@ async function loadCommit() {
 
 async function openCommitFile(path, pushRoute = true) {
   state.selectedPath = path;
+  // Selection belongs to opening the file, not to the click that happened to
+  // cause it: a restored deep link opened the file with nothing marked.
+  content.querySelectorAll(".split-view .collection-item").forEach(item => {
+    item.classList.toggle("active", item.dataset.path === path);
+  });
   const reader = content.querySelector(".reader");
   if (reader) showLoading(reader);
   const identity = {source: state.source.id, tab: "overview", commit: state.commit, path};
@@ -316,7 +334,7 @@ async function openCommitFile(path, pushRoute = true) {
     const value = await get("/api/v1/commit-file", {source: identity.source, sha: state.commit, path}, request.signal);
     if (!isCurrent(request)) return;
     const known = state.commitFiles.find(item => item.path === path);
-    renderCommitDocument(content, value, known ? known.change : "modified");
+    renderCommitDocument(content, value, known ? known.change : null);
     if (pushRoute) updateRoute();
   } catch (error) {
     if (error.name !== "AbortError" && isCurrent(request)) showDocumentError(error, true);
@@ -327,6 +345,7 @@ async function openCollectionDocument(path, mode = "rendered", pushRoute = true)
   content.querySelectorAll(".collection-item").forEach(item => {
     item.classList.toggle("active", item.dataset.path === path);
   });
+  revealCollectionItem(path);
   const reader = content.querySelector(".reader");
   if (reader) showLoading(reader);
   await fetchDocument(path, mode, true, pushRoute);

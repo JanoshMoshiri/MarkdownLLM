@@ -231,7 +231,7 @@ Shared oracle functions accept a subject implementation. Production subjects mus
 | `M20` | Resolve a contested identifier to its first match | `CT-REFERENCE-001` |
 | `M21` | Read an identifier from outside the frontmatter block | `CT-REFERENCE-001` |
 
-Gate: all 16 mutants must be killed. A surviving mutant is evidence of a weak oracle or missing test and blocks implementation acceptance even when production tests are green.
+Gate: all 21 mutants must be killed. A surviving mutant is evidence of a weak oracle or missing test and blocks implementation acceptance even when production tests are green.
 
 ## 7. Property/metamorphic checks
 

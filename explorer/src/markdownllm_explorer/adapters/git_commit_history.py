@@ -179,6 +179,11 @@ class GitCommitHistory:
             raise ExplorerError("file_not_found")
         if size > self._limits.file_bytes:
             raise ExplorerError("file_too_large")
+        if self._entry_mode(root, sha, path.value) not in _REGULAR_MODES:
+            # A symlink or gitlink entry carries a target, not content. The live
+            # reader refuses to follow one, and this route must not become the
+            # way to read what it points at.
+            raise ExplorerError("path_type_changed")
         payload = self._run_bytes(root, ["cat-file", "blob", spec])
         if len(payload) != size:
             # The runner merges stderr into stdout, so a warning git prints on a
@@ -230,6 +235,11 @@ class GitCommitHistory:
         if not self._commit_exists(boundary.root, sha):
             raise ExplorerError("source_changed")
         return boundary.root
+
+    def _entry_mode(self, root: Path, sha: str, path: str) -> str | None:
+        record = self._run(root, _entry_arguments(sha, path)).split("\x00")[0]
+        head = record.split(" ", 1)[0].strip()
+        return head if re.fullmatch(r"[0-7]{6}", head) else None
 
     def _object_size(self, root: Path, spec: str) -> int | None:
         try:
@@ -506,6 +516,10 @@ def _detail_arguments(sha: str) -> list[str]:
     return ["log", sha, "--topo-order", "--skip=0", "--max-count=1", _DETAIL_FORMAT]
 
 
+def _entry_arguments(sha: str, path: str) -> list[str]:
+    return ["ls-tree", "-z", sha, "--", path]
+
+
 def _raw_arguments(parent: str | None, sha: str) -> list[str]:
     return ["diff-tree", *_RAW_FLAGS, *_revision_pair(parent, sha)]
 
@@ -589,6 +603,13 @@ def _allowed_arguments(arguments: list[str]) -> bool:
         )
     if len(arguments) == 3 and arguments[0] == "cat-file" and arguments[1] in {"blob", "-s"}:
         return _is_object_spec(arguments[2])
+    if len(arguments) == 5 and arguments[0] == "ls-tree":
+        return (
+            arguments[1] == "-z"
+            and bool(re.fullmatch(r"[0-9a-f]{40}", arguments[2]))
+            and arguments[3] == "--"
+            and _is_tree_path(arguments[4])
+        )
     if arguments[:1] == ["diff-tree"]:
         if len(arguments) == len(_RAW_FLAGS) + 3:
             return arguments[1:-2] == _RAW_FLAGS and _is_revision_pair(arguments[-2:])

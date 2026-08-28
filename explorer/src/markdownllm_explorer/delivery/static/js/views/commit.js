@@ -70,11 +70,7 @@ function fileButton(file, list, onOpen) {
       : "not readable in this source";
     button.append(why);
   } else {
-    button.addEventListener("click", () => {
-      list.querySelectorAll(".active").forEach(item => item.classList.remove("active"));
-      button.classList.add("active");
-      onOpen(file.path);
-    });
+    button.addEventListener("click", () => onOpen(file.path));
   }
   return button;
 }
@@ -88,7 +84,12 @@ export function renderCommitDocument(container, document_, change) {
   const title = node("h2");
   title.textContent = document_.path;
   const badge = node("span", "badge");
-  badge.textContent = `${CHANGE_LABEL[change] || change} in ${document_.sha.slice(0, 12)}`;
+  // A path reached by a link rather than from this commit's own list was not
+  // necessarily touched by it, so "changed in <sha>" there would be a claim
+  // nobody checked.
+  badge.textContent = change
+    ? `${CHANGE_LABEL[change] || change} in ${document_.sha.slice(0, 12)}`
+    : `as at ${document_.sha.slice(0, 12)}`;
   head.append(title, badge);
 
   const legend = node("p", "historical-legend");
@@ -108,6 +109,24 @@ export function renderCommitDocument(container, document_, change) {
   target.append(head, legend, historicalBody(document_));
 }
 
+function normalisedRanges(ranges, total) {
+  const clamped = [];
+  for (const pair of Array.isArray(ranges) ? ranges : []) {
+    const start = Math.max(1, Math.min(Number(pair[0]) || 0, total));
+    const end = Math.max(start, Math.min(Number(pair[1]) || 0, total));
+    if (start > total) continue;
+    clamped.push([start, end]);
+  }
+  clamped.sort((left, right) => left[0] - right[0]);
+  const merged = [];
+  for (const [start, end] of clamped) {
+    const last = merged[merged.length - 1];
+    if (last && start <= last[1] + 1) last[1] = Math.max(last[1], end);
+    else merged.push([start, end]);
+  }
+  return merged;
+}
+
 function historicalBody(document_) {
   const lines = document_.content.split("\n");
   // A file ending in a newline splits to a trailing empty element. Numbering it
@@ -116,16 +135,20 @@ function historicalBody(document_) {
   if (lines.length > 1 && lines[lines.length - 1] === "") lines.pop();
   const body = node("div", "historical");
 
+  // One normalisation feeding both panes. The gutter walked the ranges assuming
+  // they arrive sorted and disjoint while the code pane clamped them, so a
+  // malformed pair would have put the two columns out of step with each other.
+  const ranges = normalisedRanges(document_.added_ranges, lines.length);
   const gutter = node("pre", "historical-gutter");
   gutter.setAttribute("aria-hidden", "true");
-  gutter.textContent = gutterText(lines.length, document_.added_ranges);
+  gutter.textContent = gutterText(lines.length, ranges);
 
   // Contiguous added ranges become one <mark> each rather than one element per
   // line: a megabyte-sized file is a few marks, not tens of thousands of nodes.
   const code = node("pre", "historical-code");
   const segments = [];
   let cursor = 1;
-  for (const [start, end] of document_.added_ranges) {
+  for (const [start, end] of ranges) {
     const from = Math.max(cursor, start);
     const to = Math.min(end, lines.length);
     if (to < from) continue;
