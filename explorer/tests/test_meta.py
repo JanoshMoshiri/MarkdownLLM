@@ -43,7 +43,7 @@ def test_traceability_manifest_is_exact_and_well_formed():
     # A requirement whose recorded evidence describes a tree that no longer
     # exists carries a dated reopening note. `disposition` stays the category of
     # verification; it is not the place to record that the evidence is stale.
-    optional_fields = {"reopened_2026_08_28"}
+    optional_fields = {"reopened_2026_08_28", "reclosed_2026_08_28"}
     for requirement_id, row in traced.items():
         assert required_fields <= set(row) <= required_fields | optional_fields, (
             requirement_id, set(row) ^ required_fields,

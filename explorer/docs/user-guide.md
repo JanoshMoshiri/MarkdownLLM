@@ -11,7 +11,7 @@ and read them without using the command line.
 All images in this guide come from **Northstar Studio**, a completely fictional
 estate created for public demonstrations.
 
-![The fictional Northstar estate with Product Studio selected](images/estate-overview.jpg)
+![The fictional Northstar estate with Product Studio selected](images/estate-overview.png)
 
 ## Start with the whole
 
@@ -49,7 +49,7 @@ Use **Source files** on the left to open folders and files. Markdown opens as a
 styled document by default, with its frontmatter kept separately and clearly
 labelled.
 
-![A domain AGENTS file opened as a styled document](images/file-reader.jpg)
+![A domain AGENTS file opened as a styled document](images/file-reader.png)
 
 Choose **Raw** when you need to see the exact Markdown source. Choose
 **Styled** to return to the reading view. Explorer never edits the file.
@@ -70,7 +70,7 @@ Open **Skills** to see the Markdown files in the active source's `skills`
 folder. Choose a skill to read it without losing the estate around you. Refresh,
 Back and Forward restore both the skill and the surrounding Skills collection.
 
-![A fictional discovery skill rendered inside Explorer](images/styled-skill.jpg)
+![A fictional discovery skill rendered inside Explorer](images/styled-skill.png)
 
 ## Follow the memory
 
@@ -81,7 +81,7 @@ the count stays visible so a folded group still tells you how much is in it. A
 refreshed or restored Memory link keeps the grouped collection visible beside
 the selected item.
 
-![Fictional decisions, insights and retrospectives in the Memory view](images/memory-view.jpg)
+![Fictional decisions, insights and retrospectives in the Memory view](images/memory-view.png)
 
 Memory is not a chat transcript. It is the durable Markdown that helps a domain
 carry reasoning across sessions.
@@ -98,7 +98,7 @@ back. Explorer remembers each choice, and the buttons in the header bring the
 panel back. On a narrow screen the same buttons open the panels as overlays
 instead.
 
-![The same fictional domain in the light theme](images/light-theme.jpg)
+![The same fictional domain in the light theme](images/light-theme.png)
 
 ## A useful first journey
 

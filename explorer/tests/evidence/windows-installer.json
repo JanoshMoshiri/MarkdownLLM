@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "tool": {
+    "name": "verify_windows_installer.py",
+    "version": "2"
+  },
+  "installer": {
+    "name": "MarkdownLLM-Explorer-Installer-0.3.0.exe",
+    "bytes": 10539119,
+    "sha256": "cfee85faff1751ce017511b6289c5206aa2c4464ca0be8c7d585d3b45049f4d1"
+  },
+  "exercised_installer": {
+    "name": "MarkdownLLM-Explorer-Verification-release20260828-0.3.0.exe",
+    "bytes": 10534737,
+    "sha256": "c685b6573c7d5b179487eda0c6f188b898e56c9404591c9c6bb4f97230c0008b",
+    "same_as_release": false,
+    "identity_only_isolation": true,
+    "app_name": "MarkdownLLM Explorer Verification release20260828",
+    "instance_identity": "MarkdownLLMExplorerVerifier-release20260828"
+  },
+  "environment": {
+    "per_user": true,
+    "administrator_required": false,
+    "system_python_required": false,
+    "system_node_required": false,
+    "network_required_after_setup_obtained": false
+  },
+  "bundle": {
+    "status": "pass",
+    "version": "0.3.0",
+    "path_empty_launch": true
+  },
+  "install": {
+    "status": "pass",
+    "desktop_shortcut": true,
+    "start_menu_shortcut": true,
+    "remembered_root": true
+  },
+  "launch": {
+    "status": "pass",
+    "health": {
+      "status": "ok",
+      "version": "0.3.0"
+    },
+    "single_instance_exit": true,
+    "capability_persisted": false
+  },
+  "upgrade": {
+    "status": "pass",
+    "root_preserved": true,
+    "shortcut_count": 2,
+    "active_process_stopped": true,
+    "active_request_drain_bounded": true,
+    "shutdown_seconds": 9.562
+  },
+  "uninstall": {
+    "status": "pass",
+    "owned_state_removed": true,
+    "substrate_unchanged": true,
+    "outside_unchanged": true,
+    "active_process_stopped": true,
+    "active_request_drain_bounded": true,
+    "shutdown_seconds": 2.219
+  },
+  "source_before_sha256": "84ac76047cecdd014773b131ac3b76b98c7d9b8885e5ed49ccde49856993c277",
+  "source_after_sha256": "84ac76047cecdd014773b131ac3b76b98c7d9b8885e5ed49ccde49856993c277",
+  "outside_before_sha256": "a316144ad83dcac2b86229338e12f942d930f0d6d9cc944b3cc65d409e03d1a1",
+  "outside_after_sha256": "a316144ad83dcac2b86229338e12f942d930f0d6d9cc944b3cc65d409e03d1a1"
+}

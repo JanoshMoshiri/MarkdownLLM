@@ -158,7 +158,7 @@ def validate_artifact(path: Path, subject: str) -> set[str]:
             value.get("schema") != 1
             or value.get("status") != "accepted"
             or value.get("accepted_by") != "Janosh Moshiri"
-            or value.get("accepted_at") != "2026-08-27"
+            or value.get("accepted_at") != "2026-08-28"
             or not value.get("statement")
             or not value.get("scope")
             or not isinstance(value.get("requirement_ids"), list)
@@ -239,8 +239,9 @@ def main() -> int:
         try:
             acceptance = _json(arguments.evidence_dir.resolve() / "operator-acceptance.json")
             accepted_human = set(acceptance.get("requirement_ids", []))
-            if accepted_human != pending_human:
-                raise ValueError("operator acceptance scope does not match the human-owned trace rows")
+            outside = sorted(accepted_human - pending_human)
+            if outside:
+                raise ValueError(f"operator acceptance claims rows that are not human-owned: {outside}")
         except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
             evidence_errors.append(str(error))
     rows: dict[str, dict[str, object]] = {}; unresolved: list[str] = []

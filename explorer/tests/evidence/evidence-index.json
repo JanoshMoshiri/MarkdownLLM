@@ -2,9 +2,9 @@
   "schema": 1,
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "8ee4f125021bb43c6d2d9a320b443c992f9ad7aa22f5d3a91687252db7be00b7"
+    "sha256": "51aac9bd9c77dedf98d84bf986965464e791890aca6cefd048ef0f4206617ff3"
   },
-  "generated_at": "2026-08-28T12:15:49.935395+00:00",
+  "generated_at": "2026-08-28T18:20:22.046535+00:00",
   "tool": {
     "name": "build_evidence_index.py",
     "version": "1",
@@ -34,8 +34,8 @@
     },
     {
       "path": "tests/evidence/browser-runtime.json",
-      "sha256": "136e14bf60e854ce139c4e407005579ea39a265b2aebaece435345952be0081e",
-      "bytes": 16248,
+      "sha256": "c97248dafee999fe155e08ac038f694b0db9c48eaf90845edba43350f846ec6c",
+      "bytes": 16818,
       "evidence_ids": [
         "browser::BT-SHELL-001",
         "browser::BT-NAV-001",
@@ -72,7 +72,7 @@
     },
     {
       "path": "tests/evidence/immutability.json",
-      "sha256": "1917a4f5e18847e5ca0e631e57bb40a13d28f7a60ba93df2ba255c1e03c9ee65",
+      "sha256": "38298e18c877e3e0fe58f3370d10b273c5fe49c3129f152eba964e9edf010964",
       "bytes": 1106,
       "evidence_ids": [
         "analysis::GT-IMMUTABLE-001"
@@ -109,8 +109,8 @@
     },
     {
       "path": "tests/evidence/operator-acceptance.json",
-      "sha256": "87dae1c917472691e61e038a8ae63b0b5a2f94826062cb6305d40aa00232c537",
-      "bytes": 1278,
+      "sha256": "8d930938e47e3bf845f26c6f1afddc13b8798927eb096525a848edb957762cdc",
+      "bytes": 2755,
       "evidence_ids": []
     },
     {
@@ -123,8 +123,8 @@
     },
     {
       "path": "tests/evidence/pytest.xml",
-      "sha256": "b1a45f602326e6013d708e362423078623c84897fedfd428f3e6d94f0643bdda",
-      "bytes": 21535,
+      "sha256": "d638bccc502810ba4ead02dc820b58c5d8834053651fb38cdab8fd372f6da6de",
+      "bytes": 21536,
       "evidence_ids": []
     },
     {
@@ -146,15 +146,24 @@
       "evidence_ids": []
     },
     {
-      "path": "tests/evidence/windows-installer-0.2.0-superseded.json",
-      "sha256": "a1df462295dd88613becacedf9173a68523c04e900b2c72f231444a10bdd7d33",
-      "bytes": 2026,
-      "evidence_ids": []
+      "path": "tests/evidence/windows-installer.json",
+      "sha256": "0ada49f8cfdaf106526d846bccd2becbf9dfdfd2a7d4f2d0aadc420c0ad75e5f",
+      "bytes": 2229,
+      "evidence_ids": [
+        "system::ST-WIN-BUNDLE-001",
+        "system::ST-WIN-INSTALL-001",
+        "system::ST-WIN-LAUNCH-001",
+        "system::ST-WIN-UPGRADE-001",
+        "system::ST-WIN-UNINSTALL-001",
+        "system::AJ-08",
+        "system::AJ-09",
+        "system::AJ-10"
+      ]
     },
     {
       "path": "tests/evidence/windows-publication-gate.json",
-      "sha256": "0c21ce9b42115f6c83b1664fc47078a4db0c5f6604b05ac88cc7a8d1961ccfec",
-      "bytes": 2315,
+      "sha256": "cad70dbcb70a51c2d9216dffc9a48a983874610388b4e3973981577764fe5679",
+      "bytes": 2848,
       "evidence_ids": []
     }
   ]

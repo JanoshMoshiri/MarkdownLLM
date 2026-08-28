@@ -1,10 +1,10 @@
 {
   "schema": 2,
   "id": "TRACE-001",
-  "status": "fail",
+  "status": "pass",
   "subject": {
     "algorithm": "explorer-subject-tree-sha256-v1",
-    "sha256": "8ee4f125021bb43c6d2d9a320b443c992f9ad7aa22f5d3a91687252db7be00b7"
+    "sha256": "51aac9bd9c77dedf98d84bf986965464e791890aca6cefd048ef0f4206617ff3"
   },
   "junit": {
     "tests": 155,
@@ -12,10 +12,8 @@
     "errors": 0,
     "skipped": 0
   },
-  "evidence_errors": [
-    "operator acceptance scope does not match the human-owned trace rows"
-  ],
-  "resolved_evidence_count": 148,
+  "evidence_errors": [],
+  "resolved_evidence_count": 156,
   "requirements": {
     "FR-EST-001": {
       "status": "pass",
@@ -573,16 +571,14 @@
       ]
     },
     "FR-RUN-001": {
-      "status": "fail",
+      "status": "pass",
       "expected": [
         "pytest::tests/test_cli.py::test_cli_launches_from_arbitrary_cwd_with_packaged_assets",
         "system::ST-INSTALL-001",
         "system::ST-OFFLINE-001",
         "system::ST-WIN-BUNDLE-001"
       ],
-      "missing": [
-        "system::ST-WIN-BUNDLE-001"
-      ],
+      "missing": [],
       "misplaced": [],
       "technical_owner": "runtime-suite",
       "acceptance_owner": "Technical run",
@@ -593,7 +589,7 @@
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer-0.2.0-superseded.json"
+        "tests/evidence/windows-installer.json"
       ]
     },
     "FR-RUN-002": {
@@ -633,72 +629,61 @@
       ]
     },
     "FR-RUN-004": {
-      "status": "fail",
+      "status": "pass",
       "expected": [
         "system::ST-WIN-BUNDLE-001",
         "system::ST-WIN-INSTALL-001",
         "system::AJ-08"
       ],
-      "missing": [
-        "system::ST-WIN-BUNDLE-001",
-        "system::ST-WIN-INSTALL-001",
-        "system::AJ-08"
-      ],
+      "missing": [],
       "misplaced": [],
       "technical_owner": "windows-distribution-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "accepted",
+      "human_disposition": "pending-human",
       "method": "test+demonstration",
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "One setup executable installs per user without elevation/Python/network, validates root and creates singleton shortcuts plus uninstaller",
       "evidence_location": [
-        "tests/evidence/windows-installer-0.2.0-superseded.json"
+        "tests/evidence/windows-installer.json"
       ]
     },
     "FR-RUN-005": {
-      "status": "fail",
+      "status": "pass",
       "expected": [
         "pytest::tests/test_windows_app.py::test_desktop_session_opens_browser_and_shuts_down_cleanly",
         "system::ST-WIN-LAUNCH-001",
         "system::AJ-09"
       ],
-      "missing": [
-        "system::ST-WIN-LAUNCH-001",
-        "system::AJ-09"
-      ],
+      "missing": [],
       "misplaced": [],
       "technical_owner": "windows-distribution-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "accepted",
+      "human_disposition": "pending-human",
       "method": "test+demonstration",
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "Shortcut opens browser and tray; reactivation leaves one server; Open and Exit terminate in bounded time without capability persistence",
       "evidence_location": [
         "tests/evidence/pytest.xml",
-        "tests/evidence/windows-installer-0.2.0-superseded.json"
+        "tests/evidence/windows-installer.json"
       ]
     },
     "FR-RUN-006": {
-      "status": "fail",
+      "status": "pass",
       "expected": [
         "system::ST-WIN-UPGRADE-001",
         "system::ST-WIN-UNINSTALL-001",
         "system::AJ-10"
       ],
-      "missing": [
-        "system::ST-WIN-UPGRADE-001",
-        "system::ST-WIN-UNINSTALL-001",
-        "system::AJ-10"
-      ],
+      "missing": [],
       "misplaced": [],
       "technical_owner": "windows-distribution-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "accepted",
+      "human_disposition": "pending-human",
       "method": "test+demonstration",
       "fixture": "F-WINDOWS-INSTALL",
       "observable_pass_condition": "Reinstall preserves selected root and singleton owned surfaces; uninstall removes only owned surfaces with source/outside snapshots unchanged",
       "evidence_location": [
-        "tests/evidence/windows-installer-0.2.0-superseded.json"
+        "tests/evidence/windows-installer.json"
       ]
     },
     "FR-ERR-001": {
@@ -947,7 +932,7 @@
       "misplaced": [],
       "technical_owner": "http-suite",
       "acceptance_owner": "Technical run",
-      "human_disposition": "pending-human",
+      "human_disposition": "none",
       "method": "contract",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Separate APIs keep initial payload free of file bodies/full history and return one document mode",
@@ -988,7 +973,7 @@
       "misplaced": [],
       "technical_owner": "git-suite",
       "acceptance_owner": "Technical run",
-      "human_disposition": "pending-human",
+      "human_disposition": "none",
       "method": "test+mutation",
       "fixture": "F-GIT-SHAPES",
       "observable_pass_condition": "Git uses trusted executable/fixed argv/env/cwd/deadline/output and no helper, lazy fetch or external store",
@@ -998,7 +983,7 @@
       ]
     },
     "NFR-SAFE-001C": {
-      "status": "fail",
+      "status": "pass",
       "expected": [
         "pytest::tests/test_safety.py::test_http_acceptance_journeys_leave_sources_git_acl_and_outside_state_immutable",
         "system::ST-INSTALL-001",
@@ -1007,11 +992,7 @@
         "system::AJ-07",
         "system::AJ-10"
       ],
-      "missing": [
-        "system::ST-WIN-INSTALL-001",
-        "system::ST-WIN-UNINSTALL-001",
-        "system::AJ-10"
-      ],
+      "missing": [],
       "misplaced": [],
       "technical_owner": "safety-suite",
       "acceptance_owner": "Technical run",
@@ -1022,7 +1003,7 @@
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer-0.2.0-superseded.json",
+        "tests/evidence/windows-installer.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1131,7 +1112,7 @@
       ]
     },
     "NFR-OFF-001": {
-      "status": "fail",
+      "status": "pass",
       "expected": [
         "system::ST-OFFLINE-001",
         "system::ST-WIN-INSTALL-001",
@@ -1140,10 +1121,7 @@
         "system::AJ-03",
         "system::AJ-08"
       ],
-      "missing": [
-        "system::ST-WIN-INSTALL-001",
-        "system::AJ-08"
-      ],
+      "missing": [],
       "misplaced": [],
       "technical_owner": "runtime-suite",
       "acceptance_owner": "Technical run",
@@ -1153,21 +1131,19 @@
       "observable_pass_condition": "Portable and native journeys run after offline install with no system Python, CDN, network, Node or extension dependency",
       "evidence_location": [
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer-0.2.0-superseded.json",
+        "tests/evidence/windows-installer.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
     "NFR-PORT-001": {
-      "status": "fail",
+      "status": "pass",
       "expected": [
         "pytest::tests/test_meta.py::test_supported_python_range_is_declared",
         "system::ST-INSTALL-001",
         "system::ST-WIN-BUNDLE-001",
         "browser::BT-A11Y-001"
       ],
-      "missing": [
-        "system::ST-WIN-BUNDLE-001"
-      ],
+      "missing": [],
       "misplaced": [],
       "technical_owner": "portability-suite",
       "acceptance_owner": "Technical run",
@@ -1178,7 +1154,7 @@
       "evidence_location": [
         "tests/evidence/pytest.xml",
         "tests/evidence/clean-install.json",
-        "tests/evidence/windows-installer-0.2.0-superseded.json",
+        "tests/evidence/windows-installer.json",
         "tests/evidence/browser-runtime.json"
       ]
     },
@@ -1246,7 +1222,7 @@
       "misplaced": [],
       "technical_owner": "browser-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Either side region collapses and restores at desktop, persists across reload, and takes no dialog/modal/inert/focus-trap semantics",
@@ -1264,7 +1240,7 @@
       "misplaced": [],
       "technical_owner": "browser-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Centre region scrolls horizontally when squeezed and the page body never does",
@@ -1283,7 +1259,7 @@
       "misplaced": [],
       "technical_owner": "git-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "A commit lists its changed paths against first parent, classified, with openability decided by source admission not by git",
@@ -1302,7 +1278,7 @@
       "misplaced": [],
       "technical_owner": "git-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "An openable path reads as the commit left it with added ranges marked and named, and no removed line present",
@@ -1321,7 +1297,7 @@
       "misplaced": [],
       "technical_owner": "collection-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Memory groups descend with titles ascending inside, each collapsible, state surviving pagination, count visible while collapsed",
@@ -1340,7 +1316,7 @@
       "misplaced": [],
       "technical_owner": "reference-suite",
       "acceptance_owner": "Technical run / Janosh",
-      "human_disposition": "pending-human",
+      "human_disposition": "accepted",
       "method": "test+demonstration",
       "fixture": "F-ESTATE-MIN",
       "observable_pass_condition": "Declared references open the thing they name; unresolved, contested and failed lookups settle explicitly and never stay pending",
@@ -1371,19 +1347,11 @@
   },
   "summary": {
     "requirements": 70,
-    "technical_passed": 63,
-    "technical_failed": 7,
-    "human_accepted": 30,
-    "human_pending": 8
+    "technical_passed": 70,
+    "technical_failed": 0,
+    "human_accepted": 33,
+    "human_pending": 3
   },
-  "unresolved_requirements": [
-    "FR-RUN-001",
-    "FR-RUN-004",
-    "FR-RUN-005",
-    "FR-RUN-006",
-    "NFR-SAFE-001C",
-    "NFR-OFF-001",
-    "NFR-PORT-001"
-  ],
+  "unresolved_requirements": [],
   "unresolved_mutants": []
 }

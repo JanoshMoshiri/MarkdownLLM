@@ -45,7 +45,7 @@ Menu for the current Windows user.
 Double-click **MarkdownLLM Explorer** on the Desktop. Explorer starts quietly
 in the notification area and opens in your default browser.
 
-![MarkdownLLM Explorer showing a fictional Product Studio domain](images/estate-overview.jpg)
+![MarkdownLLM Explorer showing a fictional Product Studio domain](images/estate-overview.png)
 
 The screenshot uses **Northstar Studio**, a fictional estate made only for
 public demonstrations.

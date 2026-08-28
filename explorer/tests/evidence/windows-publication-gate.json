@@ -2,41 +2,37 @@
   "schema": 1,
   "id": "ST-WIN-PUBLICATION-GATE-001",
   "status": "blocked",
-  "recorded_at": "2026-08-27T19:57:18+01:00",
-  "subject_sha256": "faab2f2cd91daea6dd0d39e358d506795d8e085a69cda7e6a1021820b74628ad",
+  "recorded_at": "2026-08-28T19:20:00+01:00",
   "release_candidate": {
-    "name": "MarkdownLLM-Explorer-Installer-0.2.0.exe",
-    "bytes": 10509386,
-    "sha256": "a963d146e40e9813c522b2f87bb67dde4e48a3aa14f3d5a3516b3dd27ddf4c27",
+    "name": "MarkdownLLM-Explorer-Installer-0.3.0.exe",
+    "bytes": 10539119,
+    "sha256": "cfee85faff1751ce017511b6289c5206aa2c4464ca0be8c7d585d3b45049f4d1",
     "authenticode": "not-signed"
   },
   "frozen_application": {
     "name": "MarkdownLLM Explorer.exe",
-    "bytes": 3032565,
-    "sha256": "999edffeedd47d7285c7acbf60a599510849d2761820d354bbc71e8ba775eff8",
+    "bytes": 3055401,
+    "sha256": "c99ee8f1c9d824b451effd0e24fcf39ff666043b0305a34d1a22e285b984f834",
     "authenticode": "not-signed"
   },
   "identity_isolated_candidate": {
-    "name": "MarkdownLLM-Explorer-Verification-review-20260827-0.2.0.exe",
-    "bytes": 10508893,
-    "sha256": "d1259730caace21e10c914201b995ecfd00e2f9b0d55189f3a81c541a36d6a36"
+    "name": "MarkdownLLM-Explorer-Verification-release20260828-0.3.0.exe",
+    "bytes": 10534737,
+    "sha256": "c685b6573c7d5b179487eda0c6f188b898e56c9404591c9c6bb4f97230c0008b",
+    "authenticode": "not-signed"
   },
   "observations": {
     "clean_unsigned_build": "pass",
-    "release_invalid_root_exit": 2,
     "isolated_install": "pass",
     "isolated_active_upgrade": "pass",
-    "isolated_active_uninstall": "blocked-before-process-start",
+    "isolated_active_uninstall": "pass",
     "operator_installation_touched": false,
     "test_owned_residue_removed": true
   },
+  "change_since_0_2_0": "On 0.2.0 the generated unsigned Uninstall.exe was blocked before process start by Windows Smart App Control (event 3077, 2026-08-27T19:51:26+01:00) and the uninstall stage could not be observed. On this 0.3.0 run the same unsigned uninstaller ran and the full lifecycle passed. The earlier block is recorded rather than deleted: it was a real machine-policy outcome, it was not reproduced here, and an unsigned artefact remains liable to it on any machine whose policy is stricter than this one.",
   "blocker": {
     "kind": "external-release-credential",
-    "policy": "Windows Smart App Control / Code Integrity",
-    "policy_id": "0283ac0f-fff1-49ae-ada1-8a933130cad6",
-    "event_id": 3077,
-    "event_time": "2026-08-27T19:51:26+01:00",
-    "message": "The generated unsigned Uninstall.exe did not meet the Enterprise signing level and was blocked before process start."
+    "statement": "The release candidate, the frozen application and the generated uninstaller are all unsigned. A public Windows release must be signed: an unsigned setup shows an unknown-publisher warning and can be blocked outright by Smart App Control or enterprise code-integrity policy, as it was on the 0.2.0 run. The lifecycle is now proven on 0.3.0 bytes; the signature is not."
   },
   "implemented_release_path": {
     "frozen_application_signing": true,
@@ -49,8 +45,8 @@
   },
   "required_to_close": [
     "Provide an authorised Authenticode certificate thumbprint, SignTool path and HTTPS RFC 3161 timestamp URL.",
-    "Build the frozen application, generated uninstaller and setup through the signed build route.",
-    "Run the full active install, upgrade and uninstall verifier on the signed release installer.",
+    "Rebuild the frozen application, generated uninstaller and setup through the signed build route.",
+    "Re-run the full active install, upgrade and uninstall verifier on the signed release installer.",
     "Reseal the technical trace and record the signed release installer SHA-256."
   ]
 }

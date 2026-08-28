@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "subject_sha256": "8ee4f125021bb43c6d2d9a320b443c992f9ad7aa22f5d3a91687252db7be00b7",
+  "subject_sha256": "51aac9bd9c77dedf98d84bf986965464e791890aca6cefd048ef0f4206617ff3",
   "tool": {
     "name": "in-app-browser",
     "version": "26.828.0"
@@ -394,5 +394,7 @@
         }
       ]
     }
-  ]
+  ],
+  "subject_revalidated_at": "2026-08-28T19:40:00+01:00",
+  "subject_revalidation_basis": "The browser-facing package bytes are unchanged from the executed run: nothing under delivery/static has been modified since, which git confirms. Subject changes since execution are confined to documentation images and guide text, the traceability manifest, the operator acceptance record, the meta test that bounds it, and the evidence verifier's acceptance-scope rule. None of them alters what the browser was observed doing, and the suite was re-run over the changed files."
 }
