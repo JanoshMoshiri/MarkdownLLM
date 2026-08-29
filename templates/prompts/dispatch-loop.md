@@ -63,8 +63,10 @@ schedule — the repos do. You make no rulings — the seats do.
 ## The loop
 
 1. **Confirm the launch is valid.** You were given a stop condition and a
-   launch context. If either is missing, write the digest saying so and
-   end. Do nothing else.
+   launch context. If either is missing, **print** the digest saying so and
+   end — an invalid launch writes to no repo, because it has no standing to.
+   Do nothing else. (`mdllm dispatch-payload` refuses such a launch at
+   composition; this step catches the hand-assembled one.)
 2. **Sync, then orient.** Estate-sync runs at session start; read the
    digest. A repo reported DIVERGED or dirty is **skipped and reported** —
    divergence is routed by the operator, never resolved here, and a dirty
@@ -79,8 +81,10 @@ schedule — the repos do. You make no rulings — the seats do.
    evaluate mechanically are listed for the digest, not judged in bulk.
 5. **One repo at a time, and claim it before you work it.** Serialize
    strictly. On entering a repo, open its dispatch digest thing with
-   `held_by` naming this run and `held_until` set to a lease that expires
-   inside your turn budget, and commit that before doing any work: the
+   `held_by` naming this run and `held_until` set to a lease shorter than
+   the gap to the next tick — long enough to cover this run, short enough
+   that a run that dies does not block tomorrow's — and commit that before
+   doing any work: the
    host's queue serializes its own jobs, but the operator's laptop shares
    no scheduler with it, and an advisory claim is the only signal that
    crosses machines. If the repo already carries an unreleased claim from
