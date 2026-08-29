@@ -2,7 +2,7 @@
 id: operator-queue-2026-08-28
 type: artifact
 status: evolving
-version: 1.1
+version: 1.2
 created: 2026-08-28
 session: 2026-08-28
 tags: [operator-queue, seat-protocol, verdicts, closed-loop, one-sitting]
@@ -71,6 +71,69 @@ gate and a habit is the operator's to draw.
 >   declared approval gate). The bar holding there is the ruling working,
 >   not hesitancy returning.
 
+> **Reconciliation update, v1.2 (2026-08-29).** Written by a
+> change-reconciliation pass over the framework root, at the operator's cue.
+> **This is a status pass, not a ruling pass** — no row below is ruled here;
+> rows are moved only where the framework root holds the evidence, and every
+> row whose evidence lives in a domain repository is left exactly where v1.1
+> put it. Read base: `commit:85d1ac408ea4fcc2909ea364228aca1cda1eb537`.
+>
+> **Closed, with the evidence named:**
+>
+> - **Row 2 — the dispatcher authority grant. Done.** The operator performed
+>   the grant and registered the job: daily 08:00 Europe/London, scoped to
+>   the pilot, stop condition stated as work. It has fired twice, and both
+>   runs filed digests in the pilot repo. This was the row standing between
+>   a built loop and a running one, and it no longer is — which does **not**
+>   mean the loop works: both firings stopped fail-closed before touching a
+>   fired trigger, so the launch is proven and the work is not
+>   (`closed-loop-operating-state`, Phase 4).
+> - **Row 3 — the release push. Done.** `mdllm estate-sync . --status`
+>   reports no unpublished commits across fourteen repos, and the root sits
+>   at parity with its remote. The nineteen-commit stack this row was
+>   written about is published; row 15's verdict now has the review seat it
+>   leans on.
+> - **Rows 10, 11, 12 — the floor wave. Shipped**, as the v1.1 block said
+>   they would be: the `skill` orientation exclusion, matured obligations on
+>   terminal carriers, and the zero-run definition sensor. The structural-pin
+>   resolution check that occasioned the standing-authority ruling shipped in
+>   the same wave.
+> - **Row 15 — un-park the operating-layer quality loop. Done.**
+>   `operating-layer-quality-loop` is `completed`; its floor half — the
+>   skill-vocabulary check — ships in `mdllm coherence`, and the judgement
+>   half landed as a reflexive scan in `retrospective.md`. The skill-age Info
+>   it originally proposed was declined, with its lifting condition recorded
+>   rather than dropped.
+>
+> **Still open, and evidenced as still open:**
+>
+> - **Row 4 — the two stale mirrors.** Not closed. The consuming side still
+>   pins the superseded source commit; nothing has been re-synced and no
+>   `verified` flip has happened. This remains consequence-permanent and the
+>   operator's, and it remains the row nothing mechanical will chase while
+>   `imports-check` coverage sits at zero.
+> - **Row 9 — the serve-side counterpart to `imports-check`.** Not built.
+>   Recorded plainly because the queue's own recommendation was *"build it,
+>   and put it ahead of the dispatcher"* — and the dispatcher shipped first.
+>   That is a real divergence between what this queue advised and what
+>   happened, not an oversight to be quietly re-ordered: every autonomous
+>   loop now running rests on the blindness this row names. It is the
+>   agent's strongest standing recommendation, unchanged and now overdue by
+>   its own argument.
+>
+> **Not evidenced from this pass, and therefore not moved:** rows 6, 7 and 8
+> (the three process gaps — each its domain's judgement), row 13 (the reduced
+> retrospective list), row 16 (the write skill), and row 17 (the memory-vs-stream
+> question, which is the operator's to answer). This pass is scoped to the
+> framework root and deliberately did not reach into domain repositories to
+> settle them. **Absence of movement here is absence of evidence, not evidence
+> of absence.**
+>
+> **Tier 3, re-dated:** the three stalls are now 32d, 28d and 24d past their
+> last touch. `framework-retrospective-2026-08b`'s dated trigger has fired on
+> a terminal carrier — visible only because the matured-obligations fix in
+> row 11 shipped, which is that fix earning its keep on its first week.
+
 ---
 
 ## Tier 1 — the five that gate the loop
@@ -84,7 +147,9 @@ gate and a habit is the operator's to draw.
 | 5 | **Pilot domain for Phase 4** (one full hands-off cycle) | `regulated-qms` or code-architect's refactoring process | Both are declared *and* gap-free, with real runs behind them. Do not pilot on engineering, overview's agenda, or code-architect's delivery process — each carries an open process gap (Tier 2, rows 6–8). |
 
 **If time is short, rows 1 and 2 are the two that matter.** Row 1 collapses the
-queue; row 2 starts the loop.
+queue; row 2 starts the loop. *(Both done. As of 2026-08-29 the sentence reads:
+row 4 is the only Tier-1 row left, and row 9 in Tier 2 is the one the agent
+would still push hardest.)*
 
 > **Ruled 2026-08-28 (`gates-census-ratified-2026-08-28`).**
 > **Row 1 — done.** All twenty census verdicts confirmed as proposed, no row
@@ -95,6 +160,11 @@ queue; row 2 starts the loop.
 > **Rows 2, 3 and 4 remain open and remain the operator's**: the dispatcher
 > authority grant, the release push, and the two `verified` re-flips. Row 2 is
 > the one now standing between the built loop and a running one.
+>
+> *Superseded the next day for two of the three — see the v1.2 block above:
+> rows 2 and 3 were performed on 2026-08-29. **Row 4 alone still stands.**
+> This paragraph is left as written because it is the dated record of what
+> was true at the ratification sitting.*
 
 ---
 
