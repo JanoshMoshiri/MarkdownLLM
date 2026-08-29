@@ -106,7 +106,29 @@ schedule — the repos do. You make no rulings — the seats do.
 8. **Stop on surprise.** Anything unexpected — a floor error, a failed
    hook, state that contradicts the digest — ends work in that repo: fail
    closed, commit nothing further there, file the evidence as a breakage
-   item.
+   item. **Always leave the tree clean**: remove your own uncommitted
+   attempt before you go. A file left behind makes the repo dirty, and a
+   dirty repo is skipped at step 2 — so one failure you tidy is one
+   incident, and one failure you leave behind silences every run after it.
+   Never commit past a refusal, and never `--no-verify`: the floor refusing
+   you *is* the finding.
+
+   **The one exception, and it is narrow.** If the block is a stale
+   *generated artifact* — a derived index or the kernel — and the floor has
+   printed the exact regeneration command, run that command, commit it
+   alone with a message naming the run that repaired it, and continue.
+   Nothing else qualifies. This is not judgement: the artifact is
+   same-builder, the remedy is deterministic, and the floor supplied the
+   command. Any block you would have to *reason* about is a surprise, and
+   surprises end the run.
+
+   **When the corpus cannot take the record.** If you cannot commit at all,
+   the digest cannot be filed, and that is not a reason to force it — the
+   delivered report becomes the record for that run. Say so explicitly in
+   what you deliver, including what you would have filed, because a run
+   that leaves no corpus trace is otherwise indistinguishable from a run
+   that never fired, and that is the exact distinction this digest exists
+   to make.
 9. **Stop on the stop condition.** Budget reached or queue drained ends
    the run even mid-list; remaining work stays for the next tick — the
    chase pattern is the fallback, and it is proven.
