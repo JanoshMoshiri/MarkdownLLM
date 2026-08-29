@@ -101,6 +101,18 @@ The Seat 1 queue (the lifecycle ruling, the calculation-plan closure, the two
 stalls, the three process gaps) is likewise unruled by this decision and stays
 in the operator queue.
 
+> **Postscript, 2026-08-29 — not part of the ruling.** Added by a
+> change-reconciliation pass because this section reads as current and is not.
+> The ruling above stands unchanged and unre-decided; what moved is the world
+> it described. Of the three items listed as open, **the operator performed
+> the first two the next day**: the dispatcher authority grant (the job is
+> registered and has fired twice) and the release push (the root is at parity
+> with its remote). **Item 3 — the two stale mirrors' `verified` re-flips —
+> is still open** and still consequence-permanent. Row 16's move onto the
+> dispatcher, noted above as waiting on the grant, is therefore no longer
+> waiting; it is running, and has not yet completed a single ritual
+> (`closed-loop-operating-state`, Phase 4).
+
 ## Cross-harness evidence, recorded as intent
 
 The operator stated the intent to exercise the dispatched shape in **two
