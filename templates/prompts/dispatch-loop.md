@@ -2,7 +2,7 @@
 id: dispatch-loop
 type: prompt
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-08-27
 dispatch_guards:
   depth_limit: 1
@@ -122,6 +122,14 @@ schedule — the repos do. You make no rulings — the seats do.
    command. Any block you would have to *reason* about is a surprise, and
    surprises end the run.
 
+   **Repair to convergence, in one commit.** Regenerating an index can
+   itself move another index — a new index thing changes the schema the
+   schema-index reports — so rebuild, re-check, and rebuild again until the
+   floor is quiet, then commit the whole repair once. Two repair commits in
+   a row for one block means you committed mid-convergence; that is noise
+   in the event stream, not a second defect. Bound it: if the floor is still
+   unquiet after three passes it is not converging, which is a surprise.
+
    **When the corpus cannot take the record.** If you cannot commit at all,
    the digest cannot be filed, and that is not a reason to force it — the
    delivered report becomes the record for that run. Say so explicitly in
@@ -140,6 +148,15 @@ schedule — the repos do. You make no rulings — the seats do.
     transcript. An empty run still files the digest: the dead-man watch
     reads its existence, and the operator reads its one line. A digest left
     open with a live claim is itself the report that this run died mid-work.
+
+    **Your own digest is `origin: stated`.** You witnessed the run you are
+    reporting, so it is a first-hand contemporaneous record. Only a digest
+    written *about* a run by someone who did not perform it — reconstructed
+    afterwards from a delivered report — takes `origin: inferred`, and it
+    must then name the authoritative source it was reconstructed from. Do
+    not copy `inferred` from such a record: understating your own record's
+    authority is a provenance defect, and in a regulated corpus it is the
+    kind that survives by looking modest.
 
 ## The digest thing
 
