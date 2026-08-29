@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-29
-generated: 2026-08-29T14:42:20
-generated_from: HEAD@7c5bb14
+generated: 2026-08-29T14:46:02
+generated_from: HEAD@0371dc5
 coverage: 320
 framework_version: 3.37.0
 ---
@@ -349,6 +349,7 @@ framework_version: 3.37.0
 - coordination-claim-specification --extends--> thing-specification
 - coordination-claim-specification --complements--> git-workflow-specification
 - coordination-claim-specification --complements--> workflow-state-specification
+- coordination-claim-specification --references--> dispatch-digest-home-2026-08-29
 - cowork-adapter --references--> cowork-remote-phase5-evidence-2026-08-19
 - cowork-adapter --references--> harness-capability-evidence-matrix-2026-08-20
 - cowork-adapter --extends--> vendor-harness-adapter-foundation

@@ -167,7 +167,7 @@ flowchart TD
         PROV["provenance"]
         CRECON["change-reconciliation"]
         WSTATE["workflow-state (evolving)"]
-        COORD["coordination-claim (draft)"]
+        COORD["coordination-claim (evolving)"]
         UWORK["universal-workflow (draft)"]
         OPMODEL["operating-model (draft)"]
         SMEM["session-memory"]

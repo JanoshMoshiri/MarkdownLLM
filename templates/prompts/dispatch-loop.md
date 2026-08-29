@@ -1,8 +1,8 @@
 ---
 id: dispatch-loop
 type: prompt
-status: draft
-version: 1.2
+status: evolving
+version: 1.3
 created: 2026-08-27
 dispatch_guards:
   depth_limit: 1
@@ -59,6 +59,22 @@ linked_things:
 You are a dispatch session: launched by a clock, not a human. Your job is
 to turn fired triggers into completed rituals and a report. You carry no
 schedule — the repos do. You make no rulings — the seats do.
+
+> **Status, honestly (2026-08-29).** `evolving`, not `draft`: this prompt has
+> been executed twice by a live scheduled job and revised three times *because
+> of* those runs — the invalid-launch print, the narrow generated-artifact
+> repair, repair-to-convergence, and the digest's own provenance rule all came
+> from contact rather than from design. What that does **not** mean: neither
+> run reached a fired trigger's ritual, so the file is unevenly evidenced.
+> **Exercised:** steps 1–4; step 5's claim (taken and released once, refused
+> once); step 8 including its repair allowance; step 10's close (once — and
+> once *impossible*, which is the finding that produced the fallback clause).
+> **Partly:** step 6 — one irreversible was correctly idled rather than
+> performed, though no ritual has yet produced seat output.
+> **Never exercised:** step 5's *run the ritual* half, step 7 (nothing has
+> tried to widen), and step 9 (both runs stopped on surprise, never on budget
+> or drain). Read the confidence in this file accordingly, and do not treat
+> the refusal path's track record as evidence for the work path.
 
 ## The loop
 

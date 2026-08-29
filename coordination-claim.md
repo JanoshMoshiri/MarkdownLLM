@@ -1,8 +1,8 @@
 ---
 id: coordination-claim-specification
 type: specification
-status: draft
-version: 0.1
+status: evolving
+version: 0.2
 created: 2026-06-16
 linked_things:
   - id: thing-specification
@@ -11,6 +11,9 @@ linked_things:
     relation: complements
   - id: workflow-state-specification
     relation: complements
+  - id: dispatch-digest-home-2026-08-29
+    relation: references
+    notes: "The first live deployment: the dispatch digest doubles as the run's advisory claim on the repo it works. Ruled there, recorded here, not restated."
 ---
 
 # Coordination Claim
@@ -50,6 +53,39 @@ The claim itself is committed state, so taking or releasing it is an ordinary wr
 ## Deploy When Felt
 
 This convention is **reserved, not mandatory**. Deploy it on a thing only once that thing is actually contended — most things in most domains are touched by one writer and need no claim. `workflow-run` carries it because multi-operator, multi-session runs are its motivating case. A shared derived index is the next-most-likely adopter (a single-writer singleton that becomes a merge-conflict magnet the moment two sessions run), but it does not carry the fields until a domain feels the collision.
+
+### First Live Deployment (2026-08-29) — why this spec is now `evolving`
+
+It was felt, and not by the motivating consumer. The estate's dispatcher — a
+scheduled run that works one repo unattended — takes an advisory claim on each
+repo it enters, because the host's own job queue serialises the host's jobs and
+nothing at all serialises them against the operator's laptop. Two machines,
+no shared scheduler, one contended corpus: exactly the irreducible remainder
+this spec was written for. The ruling that placed it lives in
+`dispatch-digest-home-2026-08-29`; what it settled is that the run's **digest
+and its claim are one artifact** — opened held before any work, released when
+closed — so a digest left open with a live lease *is itself* the report that
+the run died mid-work, with no additional mechanism.
+
+Two things the deployment taught, kept here as observations rather than new
+convention:
+
+- **Size the lease against the cadence that will retry it, not against the
+  work.** An unattended holder cannot notice its own death. A lease long
+  enough to cover the run and shorter than the gap to the next tick means a
+  run that dies frees its repo before the next one arrives; a longer lease
+  converts one dead run into an indefinitely blocked repo. The dispatch prompt
+  carries this as launch discipline.
+- **The asymmetry is real and stays.** The scheduled side takes claims; the
+  operator's own session does not. The claim therefore coordinates in one
+  direction only, and the practical guard in the other remains "a dirty tree
+  means someone may be live here — skip it". That is the honest limit of an
+  advisory marker, stated rather than papered over.
+
+The status moves `draft` → `evolving` on this: the convention has now been
+validated by real use rather than only reserved for it. It has not yet been
+*refined* by that use — nothing above changes the two fields or their
+semantics — which is precisely why it is `evolving` and not `stable`.
 
 ## Related, Not Yet Specified: Working-Tree Contention
 
