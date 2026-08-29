@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-29
-generated: 2026-08-29T01:06:56
-generated_from: HEAD@c964b2e
-coverage: 77
+generated: 2026-08-29T14:39:04
+generated_from: HEAD@85d1ac4
+coverage: 78
 framework_version: 3.37.0
 ---
 
@@ -93,6 +93,9 @@ framework_version: 3.37.0
 ## derivation-shape-settled-2026-08
 - declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
 - declaring-derivation-from-the-atom (derived-from)
+
+## dispatch-digest-home-2026-08-29
+- a-records-home-must-not-sit-behind-the-gate-it-reports-on (derived-from)
 
 ## dispatch-host-design-2026-08-29
 - dispatch-digest-home-2026-08-29 (pinned @c964b2ebf607dc233b8cd4ea358e274335e08a63)

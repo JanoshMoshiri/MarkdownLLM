@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.6
+version: 1.7
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -46,6 +46,9 @@ linked_things:
   - id: dispatch-digest-home-2026-08-29
     relation: implements
     notes: "Phase 2b's corpus half: where the digest lands, why the root loses, and the dead-man armed below — with its coverage limit stated rather than implied."
+  - id: a-records-home-must-not-sit-behind-the-gate-it-reports-on
+    relation: informs
+    notes: "The pilot's first firing paid for this one. It is the standing design lens on Phase 4's remaining runs: a fail-closed loop that cannot file its own refusal is silent exactly where it is meant to speak."
 triggers:
   - type: time
     condition: "2026-09-05 reached"
@@ -82,10 +85,25 @@ answer is Phase 5 completing.
   The universal workflow has carried three floor sprints and a seams run as
   pinned workflow-runs, independently verified. Review loops, refresh,
   reconciliation, publication-under-authority: all real, all exercised.
-- **There is no dispatcher.** A fired trigger reaches a session only when a
-  session exists to read it. The floor chases; nothing launches. This is the
-  single missing mechanical piece between "loops that run when invoked" and
-  "loops that run".
+- **The dispatcher exists and has fired twice — and has done no loop work
+  yet.** *(Corrected 2026-08-29; this bullet read "There is no dispatcher"
+  until that morning.)* The corpus half shipped
+  (`mdllm dispatch-payload`, the standing prompt at v1.2), the operator
+  registered the job (daily 08:00 Europe/London, scoped to the Phase 4
+  pilot), and the pilot repo declared `dispatch-digest` in its own schema.
+  Two runs have fired. **Both stopped fail-closed before working a single
+  fired trigger** — the first refused at the pilot's pre-commit boundary by
+  pre-existing generated-index drift, the second by a missing
+  execution-supplied staging location its workflow forbids substituting.
+  Both are filed as digests in the pilot repo; seventeen fired carriers
+  remain unworked after both.
+  What that evidences and what it does not, kept apart deliberately: the
+  **refusal path is proven twice** — launch validity, payload integrity,
+  scope, the advisory claim, the narrow generated-artifact repair, and the
+  leave-the-tree-clean discipline all held on contact. The **work path is
+  proven zero times.** A safety property demonstrated is not a liveness
+  property demonstrated, and no restatement of this plan may read the two
+  firings as a working loop.
 - **Judgment beats are invocation-bound by design** — orient, session-end,
   the retrospective's residue — because un-pulled judgment at t=0 does not
   happen on any model tier. Automation must therefore schedule the
@@ -173,20 +191,36 @@ Two honesty clauses, so the picture cannot be over-read:
 
 ### The Operator's Irreducible List (what "getting there" asks of the human)
 
-1. **Say go on Phase 1.** The census runs without the operator; the verdict
-   table comes back for ratification in one sitting. This is the decisive
-   act: it converts habits-of-presence into named gates.
-2. **Grant the dispatcher its authority — once per harness.** The corpus
+1. **Say go on Phase 1.** ✅ *Done 2026-08-28.* The census runs without the
+   operator; the verdict table comes back for ratification in one sitting.
+   This is the decisive act: it converts habits-of-presence into named
+   gates. *(All twenty verdicts confirmed as proposed —
+   `gates-census-ratified-2026-08-28`.)*
+2. **Grant the dispatcher its authority — once per harness.** ✅ *Done
+   2026-08-29, for one harness.* The corpus
    already proved this seat: `agents-cannot-self-install-permission-bearing-hooks`.
    Scheduling autonomous launches is permission-bearing, so the grant is
    the one constructive act only the human can perform. After it, launches
-   are structure.
-3. **Declare the seat cadence.** When the queue gets drained is the
+   are structure. *(The pilot harness's job is registered and has ticked
+   twice. "Once per harness" means exactly that: this item re-opens
+   unspent at every further harness, and the recorded cross-harness intent
+   is intent.)*
+3. **Declare the seat cadence.** ⬜ *Still owed, and now the sharpest of the
+   four.* When the queue gets drained is the
    operator's choice; *that* it has a date is the system's requirement.
-4. **Stop supplying the middle.** Getting out of the loop is mostly
+   *(The dispatcher now generates seat items on a clock while nothing
+   declares when they are read. `operator-queue-2026-08-28` carries a dated
+   chase for 2026-09-10 — a chase on the queue, which is not the same as a
+   declared cadence for the seat.)*
+4. **Stop supplying the middle.** ◐ *Structurally enacted 2026-08-28,
+   behaviourally unmeasured.* Getting out of the loop is mostly
    subtraction — stop dispatching by hand, stop pre-empting sessions, route
    understanding-questions into surfaces. The census legitimises the
-   not-doing.
+   not-doing. *(`settled-reasoning-is-standing-authority` converted the
+   subtraction from per-instance restraint into a standing grant. Whether
+   the behaviour followed the grant is a trend nothing measures yet; the
+   plan's own stated metric — operator inputs shifting from explanations
+   toward rulings — has no instrument.)*
 
 ## Route
 
@@ -235,15 +269,26 @@ Two honesty clauses, so the picture cannot be over-read:
         the estate's mirror-freshness instrument was found blind
         (`imports-check` coverage 0/101 and 0/43), which matters to any loop
         that will rest on imported state.
-  - [ ] **2b — Install the tick (adapter work + the one human grant).**
+  - [x] **2b — Install the tick (adapter work + the one human grant).**
         *Corpus half landed 2026-08-29: `mdllm dispatch-payload` composes the
         launch text read-only (emit, never point), the standing prompt gained
         a `scope` input and the per-repo advisory claim, the digest's home is
         ruled by `dispatch-digest-home-2026-08-29`, and the dead-man is armed
-        as this thing's own dated trigger — with its coverage limit stated.
-        Two acts remain, neither the build's: the operator registers the job
-        (census row 7), and the pilot repo declares `dispatch-digest` in its
-        own `_schema.yaml` before dispatch can file anything there.* The
+        as this thing's own dated trigger — with its coverage limit stated.*
+        **Closed the same day: the operator performed the grant (census row
+        7) and registered the job — daily 08:00 Europe/London, scoped to the
+        pilot, stop condition stated as work — and the pilot repo declared
+        `dispatch-digest` in its own `_schema.yaml`, which was its own act
+        as the digest-home ruling requires. The tick is installed and has
+        ticked twice.** What 2b does *not* claim: that a launched run
+        completes a ritual. That is Phase 4's evidence, and it does not yet
+        exist. One further honesty: this single tick was registered **by
+        hand** at the host, not generated. The doctor-checked generated-entry
+        shape below is therefore owed by any *widening* beyond this one job,
+        and is carried forward as a condition on that widening rather than
+        left behind as unfinished 2b work — one hand-registered job is an
+        install; a hand-maintained fleet of them is the second brain this
+        phase refused at birth. The
         outside half is one generated scheduled-task entry per seat —
         written by the adapter pattern, doctor-checked against the declared
         schedule, never hand-authored. It carries no judgment: *start a
@@ -259,6 +304,17 @@ Two honesty clauses, so the picture cannot be over-read:
       options, never raw homework. (Much of this exists piecemeal — orient,
       conflict things, publication debt reports; the phase names the
       protocol and closes the gaps the census finds.)
+      *Prototyped by hand 2026-08-28 as `operator-queue-2026-08-28`: three
+      tiers, every row carrying a proposed verdict and its evidence, and it
+      worked — two Tier-1 rows were ruled in one sitting and one ruling
+      collapsed much of Tier 2. What that prototype does **not** supply is
+      the protocol: the queue was assembled by a session that happened to
+      look, from sources it happened to hold, and nothing regenerates it or
+      notices when a row goes stale. Two dispatch runs have since produced
+      seat-shaped output (a breakage item, an unsent irreversible) that
+      reached the operator through the digests rather than through any
+      queue. The phase stays open on exactly that gap — assembly, not
+      shape.*
 - [ ] **Phase 4 — One full cycle, hands-off, at one radius.** *Pilot ruled
       2026-08-28 (`gates-census-ratified-2026-08-28`): `regulated-qms`, on the
       stated criterion — declared, gap-free, two real runs behind it, one
@@ -273,16 +329,50 @@ Two honesty clauses, so the picture cannot be over-read:
       pilot (v1.3): the estate's smallest domain in real weekly use — low
       stakes, live cadence, retrospectives already running; named at the
       ratification sitting, not in this public-root file.*
+      **Started 2026-08-29, no cycle yet completed.** The dispatcher is live
+      on the pilot and has fired twice; neither run reached a ritual, so the
+      cycle count is zero and the intervention-by-seat measurement has no
+      data. What the two firings *did* buy is the first real reading of the
+      seat classes under automation: run 1 produced one seat-4 breakage
+      (generated-index drift in the pilot, since repaired) and run 2
+      produced one seat-4 breakage plus one **idled irreversible** — an
+      outbound message the run declined to send, which is seat 3 behaving
+      exactly as designed. Zero out-of-seat interventions so far, from a
+      sample that did no work: the number is true and means almost nothing
+      yet, and must not be quoted as if it did.
 
-**Critical path, as of 2026-08-27:** the only human-side blocker is the
-ratification sitting (census verdicts + the Phase 2b grant, one sitting).
-Phase 2a is agent-runnable immediately and in parallel; 2b installs in
-minutes once granted; Phase 4's pilot starts the first morning after.
+**Critical path, as of 2026-08-29** *(the 2026-08-27 reading — "the only
+human-side blocker is the ratification sitting" — is spent: the sitting
+happened, the census was ratified, the grant was given, and the tick was
+registered)*: the blocker is no longer human. It is that **no dispatch run
+has yet reached a ritual.** Both firings were consumed by preconditions in
+the worked repo, one of which the contract has since absorbed (the narrow
+generated-artifact repair) and one of which is the pilot domain's own to
+supply. Phase 4's evidence begins at the first run that works a fired
+trigger and closes its digest having done something; everything downstream
+of that — the seat measurements, and Phase 5 — waits on it.
 - [ ] **Phase 5 — Seal.** On the census's and cycle's evidence, the seat
       taxonomy and the closed-loop doctrine enter `operating-model.md`
       (operator-gated change to a draft spec expecting exactly this kind of
       convergence). Exposure happens here. Claims stay bounded — routed,
       never eliminated.
+      **Judged 2026-08-29: not ready, and the condition is named rather than
+      felt.** `operating-model.md` admits doctrine "only on convergence:
+      felt independently in more than one live corpus" — its own stated
+      razor, which exists precisely to stop a spec growing by design. What
+      the last 48 hours produced is one pilot, in one domain, on one host,
+      in one harness, whose work path has not executed. That is a *first
+      sighting*, not convergence, and a seal taken now would be this spec
+      admitting a dimension on the strength of the corpus that invented it.
+      **The seal condition, stated so the next session need not re-derive
+      it:** the seat taxonomy enters `operating-model.md` when the
+      closed-loop shape has been felt in at least one corpus that did not
+      author it — a second domain running its own loop and hitting the same
+      seat classes, or a second harness exercising the dispatched shape
+      (the cross-harness intent already recorded in
+      `gates-census-ratified-2026-08-28` as intent, not evidence). Until
+      then this plan holds the doctrine and `operating-model.md` stays as it
+      is. Recording the non-seal *is* this phase's output for now.
 
 ## What This Plan Refuses
 
@@ -303,7 +393,21 @@ minutes once granted; Phase 4's pilot starts the first morning after.
       standing surface is four seats, one push, one feel.*
 - [ ] The dispatcher launches at least one loop from its own trigger with a
       stated stop condition, in at least one harness.
+      *Half-met 2026-08-29 and deliberately left unticked. The **launch**
+      half is evidenced twice: a clock started a session in one harness, the
+      stop condition was stated at launch and is refused at composition when
+      absent (`mdllm dispatch-payload`), and the payload arrived whole. The
+      **loop** half is evidenced zero times: no fired trigger's bound ritual
+      has run. The box says "launches at least one loop", and a launch that
+      reaches no loop does not tick it. Ticking on the launch alone would be
+      the tracking artifact drifting from the reality it tracks.*
 - [ ] One radius has run one full cycle with zero out-of-seat interventions,
       or every out-of-seat intervention is routed as a finding.
+      *Untouched at 2026-08-29: cycles completed = 0. The two firings are
+      not a partial cycle — they are two runs that stopped before the cycle
+      began. The "zero out-of-seat interventions" reading of those runs is
+      vacuously true and is not evidence for this box.*
 - [ ] `operating-model.md` carries the sealed doctrine and this plan's
       remaining content is pointers, not restatements.
+      *Judged not ready 2026-08-29 — see Phase 5 for the seal condition:
+      the shape must be felt in a corpus that did not author it.*

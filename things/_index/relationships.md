@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-29
-generated: 2026-08-29T01:06:53
-generated_from: HEAD@c964b2e
-coverage: 319
+generated: 2026-08-29T14:39:00
+generated_from: HEAD@85d1ac4
+coverage: 320
 framework_version: 3.37.0
 ---
 
@@ -97,6 +97,12 @@ framework_version: 3.37.0
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --supports--> source-behind-mirror-is-still-a-consumer-side-read
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --references--> estate-git-sync
+- a-records-home-must-not-sit-behind-the-gate-it-reports-on --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- a-records-home-must-not-sit-behind-the-gate-it-reports-on --supports--> consequence-is-recoverable-only-in-retrospect
+- a-records-home-must-not-sit-behind-the-gate-it-reports-on --complements--> existence-is-not-currency
+- a-records-home-must-not-sit-behind-the-gate-it-reports-on --supports--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- a-records-home-must-not-sit-behind-the-gate-it-reports-on --derived-from--> dispatch-digest-home-2026-08-29
+- a-records-home-must-not-sit-behind-the-gate-it-reports-on --informs--> closed-loop-operating-state
 - a-ruling-triages-more-cheaply-than-a-mechanism --informs--> membrane-attention-cluster
 - a-ruling-triages-more-cheaply-than-a-mechanism --supports--> a-true-primitive-is-discovered-not-authored
 - a-ruling-triages-more-cheaply-than-a-mechanism --supports--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
@@ -279,6 +285,7 @@ framework_version: 3.37.0
 - closed-loop-operating-state --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - closed-loop-operating-state --derived-from--> estate-workflow-derivation
 - closed-loop-operating-state --implements--> dispatch-digest-home-2026-08-29
+- closed-loop-operating-state --informs--> a-records-home-must-not-sit-behind-the-gate-it-reports-on
 - code-architect-governs-substrate-code --informs--> vendor-harness-adapter-foundation
 - codex-5r3-migration-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - codex-5r4-root-reconciliation-2026-08-13 --documents--> vendor-harness-adapter-foundation
