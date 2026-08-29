@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-29
-generated: 2026-08-29T00:46:29
-generated_from: HEAD@b319d7e
-coverage: 318
+generated: 2026-08-29T01:06:53
+generated_from: HEAD@c964b2e
+coverage: 319
 framework_version: 3.37.0
 ---
 
@@ -278,6 +278,7 @@ framework_version: 3.37.0
 - closed-loop-operating-state --implements--> agents-cannot-self-install-permission-bearing-hooks
 - closed-loop-operating-state --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - closed-loop-operating-state --derived-from--> estate-workflow-derivation
+- closed-loop-operating-state --implements--> dispatch-digest-home-2026-08-29
 - code-architect-governs-substrate-code --informs--> vendor-harness-adapter-foundation
 - codex-5r3-migration-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - codex-5r4-root-reconciliation-2026-08-13 --documents--> vendor-harness-adapter-foundation
@@ -429,6 +430,11 @@ framework_version: 3.37.0
 - dispatch-design-2026-08 --implements--> universal-workflow-methodology
 - dispatch-design-2026-08 --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - dispatch-design-2026-08 --informs--> orchestration-specification
+- dispatch-digest-home-2026-08-29 --extends--> dispatch-host-design-2026-08-29
+- dispatch-digest-home-2026-08-29 --implements--> closed-loop-operating-state
+- dispatch-digest-home-2026-08-29 --implements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- dispatch-digest-home-2026-08-29 --implements--> coordination-claim-specification
+- dispatch-digest-home-2026-08-29 --implements--> consequence-is-recoverable-only-in-retrospect
 - dispatch-host-design-2026-08-29 --implements--> closed-loop-operating-state
 - dispatch-host-design-2026-08-29 --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - dispatch-host-design-2026-08-29 --implements--> emitted-content-is-read-instructed-content-is-economised

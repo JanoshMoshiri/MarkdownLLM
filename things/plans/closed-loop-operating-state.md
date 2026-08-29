@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -43,6 +43,13 @@ linked_things:
   - id: estate-workflow-derivation
     relation: derived-from
     notes: "The operator-declared precondition for Phase 2b, met 2026-08-28 and pinned above: unattended sessions must not execute undeclared process. Seven of seven definitions declared; three carry recorded process gaps, which the gate did not ask about."
+  - id: dispatch-digest-home-2026-08-29
+    relation: implements
+    notes: "Phase 2b's corpus half: where the digest lands, why the root loses, and the dead-man armed below — with its coverage limit stated rather than implied."
+triggers:
+  - type: time
+    condition: "2026-09-05 reached"
+    action: "Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29)."
 ---
 
 # The Closed-Loop Operating State
@@ -228,7 +235,15 @@ Two honesty clauses, so the picture cannot be over-read:
         the estate's mirror-freshness instrument was found blind
         (`imports-check` coverage 0/101 and 0/43), which matters to any loop
         that will rest on imported state.
-  - [ ] **2b — Install the tick (adapter work + the one human grant).** The
+  - [ ] **2b — Install the tick (adapter work + the one human grant).**
+        *Corpus half landed 2026-08-29: `mdllm dispatch-payload` composes the
+        launch text read-only (emit, never point), the standing prompt gained
+        a `scope` input and the per-repo advisory claim, the digest's home is
+        ruled by `dispatch-digest-home-2026-08-29`, and the dead-man is armed
+        as this thing's own dated trigger — with its coverage limit stated.
+        Two acts remain, neither the build's: the operator registers the job
+        (census row 7), and the pilot repo declares `dispatch-digest` in its
+        own `_schema.yaml` before dispatch can file anything there.* The
         outside half is one generated scheduled-task entry per seat —
         written by the adapter pattern, doctor-checked against the declared
         schedule, never hand-authored. It carries no judgment: *start a

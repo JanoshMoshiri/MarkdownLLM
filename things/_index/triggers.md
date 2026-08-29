@@ -3,14 +3,18 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-08-28
-generated: 2026-08-28T23:51:44
-generated_from: HEAD@b0708ea
-coverage: 5
+created: 2026-08-29
+generated: 2026-08-29T01:06:48
+generated_from: HEAD@c964b2e
+coverage: 6
 framework_version: 3.37.0
 ---
 
 # Triggers Index — framework
+
+## closed-loop-operating-state
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-09-05 reached, action=Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29).
 
 ## estate-retrospective-synthesis-2026-08
 - status: evolving  due_date: —
