@@ -30,6 +30,12 @@ unqualified heading — a hand list drifts; argparse does not):
                        freshness, foundational_specs<->filesystem, stale labels.
                        Corpus-general; framework-only checks switch on at a root
                        with .markdownllm. Runs in the pre-commit hook.
+  dispatch-payload [path] --stop-condition T --launch-context T [--scope REPO]
+                       Compose the dispatch launch TEXT for a scheduler tick:
+                       resolved inputs + the standing dispatch prompt emitted
+                       whole, with an integrity trailer. Read-only — prints
+                       and exits, so every host is one line:
+                       `<runtime> --oneshot "$(mdllm dispatch-payload ...)"`.
   tokens   [path]      Measure spec token costs by loading tier.
   doctor   [path]      Probe the environment: floor prerequisites, hook
                        execution (not just presence), framework version drift.
@@ -71,6 +77,7 @@ from .adapter_install import run_adapter_install
 from .calc import cmd_calc
 from .cascade import cmd_cascade
 from .coherence import cmd_coherence
+from .dispatch_payload import cmd_dispatch_payload
 from .doctor import cmd_doctor
 from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
@@ -213,6 +220,27 @@ def build_cli() -> argparse.ArgumentParser:
                          "assert that its emitted full base commit is still HEAD; "
                          "moved HEAD exits nonzero and requires reconciliation")
     ss.set_defaults(fn=cmd_session_start)
+
+    dp = sub.add_parser("dispatch-payload",
+                        help="compose the dispatch launch TEXT for a scheduler "
+                             "tick: resolved inputs + the standing dispatch "
+                             "prompt emitted whole, with an integrity trailer. "
+                             "Read-only — prints and exits, writes nothing, so "
+                             "it is safe inside a shell substitution on any host")
+    dp.add_argument("path", nargs="?", default=".",
+                    help="the estate root (the framework root whose "
+                         "templates/prompts/dispatch-loop.md governs the run)")
+    dp.add_argument("--scope", action="append", metavar="REPO",
+                    help="a repository this run may work, relative to the "
+                         "estate root; repeatable. Omit for the estate-wide "
+                         "walk (root + domain(s)/*) — the default")
+    dp.add_argument("--stop-condition", metavar="TEXT",
+                    help="the exogenous stop supplied at launch; required — "
+                         "the prompt declares a launch without one invalid")
+    dp.add_argument("--launch-context", metavar="TEXT",
+                    help="who ticked: scheduled job id and cadence, so the "
+                         "digest can attribute the run; required")
+    dp.set_defaults(fn=cmd_dispatch_payload)
 
     co = sub.add_parser("coherence", help="dark-region checks: generated-artifact "
                                           "freshness, catalog/filesystem, stale labels")

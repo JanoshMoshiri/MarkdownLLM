@@ -62,6 +62,11 @@ from markdownllm.calc import (
 from markdownllm.touchpoints import cmd_touchpoints
 from markdownllm.cascade import cmd_cascade
 from markdownllm.tokens import cmd_tokens
+from markdownllm.dispatch_payload import (
+    DispatchLaunch, DispatchPayloadRefused, build_launch, compose_payload,
+    declared_input_names, read_dispatch_prompt, resolve_scope,
+    cmd_dispatch_payload,
+)
 from markdownllm.provenance import cmd_provenance
 from markdownllm.history import cmd_changelog, cmd_worklog
 from markdownllm.refresh import _changelog_versions_since, cmd_refresh
