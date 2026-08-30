@@ -1755,7 +1755,15 @@ def test_mcp_get_deliverable_stamps_triple(tmp_path):
     assert "linked_things" not in d["frontmatter"]
     assert "informed_by" not in d["frontmatter"]
     assert "parties" not in d["frontmatter"]
-    assert d["frontmatter"]["type"] == "deliverable" and d["frontmatter"]["exposed"] is True
+    assert d["frontmatter"]["type"] == "deliverable"
+    # `exposed` is the producer's face-membership flag, not a descriptive
+    # field — a consumer landing the render verbatim must not inherit
+    # re-exposure (2026-08-30, first mirror re-sync). The wire needs no such
+    # proof anyway: only an exposed id resolves here at all. This line
+    # previously asserted the opposite — the leak encoded as expectation,
+    # the exact "built from the symptom, not from the rule" class the June
+    # egress fix warned about in its own comment.
+    assert "exposed" not in d["frontmatter"]
 
 
 def test_mcp_egress_strips_producer_graph(tmp_path):
