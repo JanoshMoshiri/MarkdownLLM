@@ -2,7 +2,7 @@
 id: serve-side-blindness-dissolves-into-composition
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-08-30
 session: 2026-08-30
 decided_by: agent (under the 2026-08-30 sprint grant; settled-reasoning-is-standing-authority)
@@ -54,6 +54,18 @@ What was actually missing, measured live this session, was never a tool:
    bare `python`, the exact interpreter the launch doctrine warns may lack
    the floor dependency). Both repaired this sprint; the grants are staged
    for the operator.
+
+   *Amended same session, after a live probe of the repaired route:* even
+   granted, every read would still have failed — two latency defects sat
+   behind the trust gate, invisible until something actually crossed it. The
+   launcher's per-spawn interpreter probe cost ~12s against the membrane
+   client's 10s deadline (fixed: the floor fast-paths entries resolving to
+   its own installation through `sys.executable`), and the face manifest
+   spawned three git processes per exposed thing — ~33s for one 46-thing
+   manifest (fixed: one shared head view, two batch spawns). End-to-end
+   after both: 4.3s. **A gate that has never been crossed hides every defect
+   behind it** — the zero-coverage measurement was reporting the first
+   obstacle, not the only one.
 2. **The convention is undeclared.** The consuming domain whose
    retrospective named "serve-side discharge blindness" had four chases
    hunting work the producer had shipped five days earlier — four asks, none

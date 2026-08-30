@@ -23,6 +23,7 @@ Offline = `unreachable` (sync state unknown), never a silent `fresh`.
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 import threading
 import time
@@ -365,6 +366,47 @@ def _addressed(cfg) -> bool:
     return bool(isinstance(cfg, dict) and ("command" in cfg or "url" in cfg))
 
 
+# The books carry the portable launch route (`pwsh …/mdllm.ps1 mcp-serve ../x`
+# or `python …/mdllm.py mcp-serve ../x`) so that any MCP client can mount a
+# porch from the committed entry. For the floor's own reads that route is
+# paying the launcher's interpreter probe on every spawn — measured at ~13.6s
+# to first response on 2026-08-30, past the 10s membrane deadline, so every
+# route read as `unreachable` even after the trust grant. The process running
+# this check IS the dependency-probed runtime the launcher exists to select,
+# so when — and only when — the entry resolves to THIS installation's own
+# entry script, spawn `sys.executable` on our own `mdllm.py` directly. The
+# substitution is authority-reducing (our interpreter, our code, the reviewed
+# target), never a general rewrite: a foreign mdllm path, a different
+# subcommand, or any unrecognised shape falls through to the entry verbatim.
+_LAUNCHER_COMMANDS = {"pwsh", "powershell", "python", "python3", "py"}
+
+
+def _fast_path_launcher(cfg: dict, cwd: Path) -> tuple[str, list] | None:
+    command = str(cfg.get("command", "")).lower()
+    base = command.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+    if base.endswith(".exe"):
+        base = base[:-4]
+    if base not in _LAUNCHER_COMMANDS:
+        return None
+    args = [str(a) for a in (cfg.get("args") or [])]
+    script = next((a for a in args
+                   if a.replace("\\", "/").rsplit("/", 1)[-1]
+                   in ("mdllm.ps1", "mdllm.py")), None)
+    if script is None:
+        return None
+    tail = args[args.index(script) + 1:]
+    if len(tail) != 2 or tail[0] != "mcp-serve":
+        return None
+    own_tools = Path(__file__).resolve().parents[1]
+    try:
+        named = (Path(cwd) / script).resolve(strict=True)
+    except OSError:
+        return None
+    if named.parent != own_tools:
+        return None
+    return (sys.executable, [str(own_tools / "mdllm.py"), "mcp-serve", tail[1]])
+
+
 def _mcp_face_read(cfg: dict, cwd: Path, uris: list[str], server: str,
                    policy: ExternalTrustPolicy | None = None
                    ) -> tuple[str, dict | None]:
@@ -379,7 +421,12 @@ def _mcp_face_read(cfg: dict, cwd: Path, uris: list[str], server: str,
         # how a tunnelled probe carries its per-run bearer token.
         got = _mcp_http_read(cfg["url"], uris, headers=cfg.get("headers"))
     else:
-        got = _mcp_client_read(cfg["command"], cfg.get("args", []), cwd, uris)
+        fast = _fast_path_launcher(cfg, cwd)
+        if fast is not None:
+            got = _mcp_client_read(fast[0], fast[1], cwd, uris)
+        else:
+            got = _mcp_client_read(cfg["command"], cfg.get("args", []), cwd,
+                                   uris)
     return ("ok", got) if got is not None else ("unreachable", None)
 
 

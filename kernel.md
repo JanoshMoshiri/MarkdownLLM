@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-29
-generated: 2026-08-29T14:45:55
-generated_from: HEAD@0371dc5
+created: 2026-08-30
+generated: 2026-08-30T18:58:22
+generated_from: HEAD@2233117
 coverage: 6
 framework_version: 3.37.0
 ---
@@ -25,7 +25,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Required fields:** `id` (kebab-case, stable, unique), `type`, `status`, `created` (ISO 8601).
 
-**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, structural references, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). The tool's structural-reference registry is the authority for reference shape and behaviour across validation, reverse indexes, reconciliation cues, and egress; its current public fields include `parent`, `linked_things`, `dependencies`, `blocks`, `parties`, `definition`, trigger `watch`, and `informed_by`. Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; the commit is a full SHA and all three fields are required or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false, structural references stripped on egress). Emergent fields: add only when they serve reasoning.
+**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, structural references, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). The tool's structural-reference registry is the authority for reference shape and behaviour across validation, reverse indexes, reconciliation cues, and egress; its current public fields include `parent`, `linked_things`, `dependencies`, `blocks`, `parties`, `definition`, trigger `watch`, and `informed_by`. Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; the commit is a full SHA and all three fields are required or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false; on egress the floor strips structural references *and the flag itself* — exposure marks the producer's face, and a consumer landing the render verbatim must not re-export by copy). Emergent fields: add only when they serve reasoning.
 
 **Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned. A type may also declare `terminal_statuses` — which of its own statuses mean *settled*; the declaration replaces the universal terminal set for that type, and every forward-work check (orientation, triggers, cascade) reads it through one `is_terminal`. Not declarable on reserved types (the tool owns their settled sets).
 

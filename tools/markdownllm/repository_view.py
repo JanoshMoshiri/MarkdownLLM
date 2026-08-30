@@ -354,6 +354,9 @@ class RepositoryView:
     def last_commit_for(self, path: str | Path | PurePosixPath) -> str | None:
         """Return the full last-touch commit for ``path`` in this view's history."""
         logical = _logical(path)
+        cached = self._tree_blobs.get("last-commits")
+        if cached is not None:
+            return cached.get(logical.as_posix())
         at = self.commit_sha if self.mode is RepositoryViewMode.COMMIT else "HEAD"
         try:
             out = str(_git(
@@ -363,6 +366,39 @@ class RepositoryView:
         except RepositoryViewError:
             return None
         return out.lower() if _FULL_OBJECT_ID.fullmatch(out) else None
+
+    def prefetch_last_commits(self) -> None:
+        """One history walk answering `last_commit_for` for every path at once.
+
+        The per-path form spawns one `git log -1` per call — the same
+        process-spawn cost class `prefetch` retired for blob reads (and the
+        perimeter check retired for its dating, F12). A face serving N exposed
+        things pays it N times per client session; measured 2026-08-30 at
+        ~33s for one 46-thing manifest on a cold Windows machine, past the
+        membrane client's own 10s deadline. One `--name-only` walk newest-first
+        answers all of them: the first block naming a path is that path's last
+        touch. Memoised on the view; `last_commit_for` reads through it."""
+        if "last-commits" in self._tree_blobs:
+            return
+        at = self.commit_sha if self.mode is RepositoryViewMode.COMMIT else "HEAD"
+        try:
+            raw = str(_git(self.root, "log", "--format=%x01%H", "--name-only",
+                           str(at), text=True))
+        except RepositoryViewError:
+            return
+        last_touch: dict[str, str] = {}
+        for block in raw.split("\x01")[1:]:
+            lines = block.splitlines()
+            if not lines:
+                continue
+            sha = lines[0].strip().lower()
+            if not _FULL_OBJECT_ID.fullmatch(sha):
+                continue
+            for name in lines[1:]:
+                name = name.strip()
+                if name and name not in last_touch:
+                    last_touch[name] = sha
+        self._tree_blobs["last-commits"] = last_touch
 
     def assert_head_unchanged(self) -> str:
         """Optimistic concurrency check for a commit-pinned significant read.

@@ -70,8 +70,17 @@ def _mcp_summary(t: Thing) -> str:
 # just as much as `linked_things` does — they leaked for two versions because
 # the list was built from the road test's symptom, not from the rule (review 6,
 # finding 2).
+# `exposed` is not structural, but it is equally the producer's: it marks
+# membership of the *producer's* served face. A consumer that lands the face
+# render verbatim would inherit `exposed: true` and silently re-export the
+# import onto its own face — exposure decided by copy, not by the consumer's
+# own exposure call. Surfaced live 2026-08-30: both mirrors of the first
+# mirror re-sync arrived carrying the producer's flag.
+_EGRESS_PRODUCER_MARKERS = frozenset({"exposed"})
+
+
 def _mcp_egress_meta(meta: dict) -> dict:
-    private = egress_private_fields()
+    private = egress_private_fields() | _EGRESS_PRODUCER_MARKERS
     return {k: v for k, v in meta.items() if k not in private}
 
 
@@ -86,6 +95,30 @@ def _mcp_logical_path(view: RepositoryView, t: Thing) -> Path:
         return t.path.relative_to(view.root)
     except ValueError:
         return t.path
+
+
+# One head view per served root per process, its blob and last-commit reads
+# prefetched in two batch spawns. The per-thing form re-created the commit
+# view and spawned `git show` + `git log -1` for every thing in a manifest —
+# measured 2026-08-30 at ~33s for one 46-thing manifest on Windows, past the
+# membrane client's 10s deadline, so a granted route still read as
+# unreachable. A server process serves one client session, so the head is a
+# session snapshot by construction — the same atomicity the per-thing reads
+# only pretended to have (each created its own view, so a mid-session HEAD
+# move already produced a mixed answer; one shared view removes that too).
+_SHARED_HEADS: dict[str, RepositoryView] = {}
+
+
+def _shared_head(root: Path, corpus: Corpus) -> RepositoryView:
+    key = str(Path(root).resolve())
+    head = _SHARED_HEADS.get(key)
+    if head is None:
+        head = RepositoryView.commit(root)
+        head.prefetch(_mcp_logical_path(corpus.view or head, t)
+                      for t in corpus.things)
+        head.prefetch_last_commits()
+        _SHARED_HEADS[key] = head
+    return head
 
 
 def _mcp_source(root: Path, corpus: Corpus, t: Thing) -> tuple[Thing, dict]:
@@ -105,6 +138,7 @@ def _mcp_source(root: Path, corpus: Corpus, t: Thing) -> tuple[Thing, dict]:
         if source is None or not view.exists(logical) or view.read_bytes(logical) != source:
             return t, {"state": "unknown", "source_commit": "unknown",
                        "view": view.identifier}
+        view.prefetch_last_commits()   # memoised: one walk serves every thing
         commit = view.last_commit_for(logical)
         if commit:
             return t, {"state": "committed", "source_commit": commit,
@@ -113,7 +147,7 @@ def _mcp_source(root: Path, corpus: Corpus, t: Thing) -> tuple[Thing, dict]:
                    "view": view.identifier}
 
     try:
-        head = RepositoryView.commit(root)
+        head = _shared_head(root, corpus)
     except RepositoryViewError:
         return t, {"state": "unknown", "source_commit": "unknown",
                    "view": view.identifier}

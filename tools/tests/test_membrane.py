@@ -3,6 +3,7 @@ species, estate-check clone-walk discovery, and type: import triggers.
 Lifted from test_mdllm.py along its banner (sprint 2, F6;
 floor-structure-residue item 4)."""
 
+import os
 import sys
 from pathlib import Path
 
@@ -196,3 +197,52 @@ def test_estate_check_no_args_walks_local_clones(tmp_path, capsys, monkeypatch):
     assert "alpha" in out
 
 
+
+
+def test_fast_path_substitutes_only_this_installations_launcher(tmp_path):
+    # The books carry the portable launch route; the floor's own reads
+    # substitute sys.executable + our own mdllm.py — but ONLY when the entry
+    # resolves to this installation's entry script. Anything else runs
+    # verbatim (2026-08-30: the launcher's per-spawn probe exceeded the 10s
+    # membrane deadline, so every granted route still read unreachable).
+    import sys as _sys
+    from markdownllm.imports_check import _fast_path_launcher
+    own_tools = Path(__file__).resolve().parents[1]
+
+    cfg = {"command": "pwsh",
+           "args": ["-NoProfile", "-File", str(own_tools / "mdllm.ps1"),
+                    "mcp-serve", "../src"]}
+    fast = _fast_path_launcher(cfg, tmp_path)
+    assert fast is not None
+    exe, args = fast
+    assert exe == _sys.executable
+    assert args == [str(own_tools / "mdllm.py"), "mcp-serve", "../src"]
+
+    # python-shaped entry, relative to the consumer root
+    consumer = tmp_path / "domain" / "consumer"
+    consumer.mkdir(parents=True)
+    rel = Path(os.path.relpath(own_tools / "mdllm.py", consumer)).as_posix()
+    fast = _fast_path_launcher(
+        {"command": "python", "args": [rel, "mcp-serve", "../src"]}, consumer)
+    assert fast is not None and fast[0] == _sys.executable
+
+    # a foreign mdllm.ps1 is NOT ours to substitute
+    foreign = tmp_path / "elsewhere" / "tools"
+    foreign.mkdir(parents=True)
+    (foreign / "mdllm.ps1").write_text("# not ours\n")
+    assert _fast_path_launcher(
+        {"command": "pwsh",
+         "args": ["-File", str(foreign / "mdllm.ps1"),
+                  "mcp-serve", "../src"]}, tmp_path) is None
+
+    # a different subcommand runs verbatim
+    assert _fast_path_launcher(
+        {"command": "pwsh",
+         "args": ["-File", str(own_tools / "mdllm.ps1"),
+                  "validate", "."]}, tmp_path) is None
+
+    # an unrecognised command shape runs verbatim
+    assert _fast_path_launcher(
+        {"command": "node",
+         "args": [str(own_tools / "mdllm.py"), "mcp-serve", "../s"]},
+        tmp_path) is None

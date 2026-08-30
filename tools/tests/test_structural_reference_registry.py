@@ -49,7 +49,7 @@ def _corpus(spec) -> Corpus:
 def test_registry_owns_schema_and_egress_field_sets():
     fields = structural_field_names()
     assert fields <= CORE_FIELDS
-    assert fields == egress_private_fields()
+    assert fields == egress_private_fields()  # registry owns the structural set; producer markers ride beside it
     meta = {field: "private" for field in fields} | {"id": "public"}
     assert _mcp_egress_meta(meta) == {"id": "public"}
 
@@ -121,3 +121,12 @@ def test_commit_pin_extraction_covers_both_shapes_and_is_total():
     # Total: a malformed frontmatter must never raise out of extraction.
     assert list(iter_commit_pins({"informed_by": "not-a-list"})) == []
     assert list(iter_commit_pins(["not", "a", "mapping"])) == []
+
+
+def test_exposed_is_stripped_on_egress_so_a_copied_face_cannot_re_export():
+    # The producer's face-membership flag must not survive the crossing: a
+    # consumer landing the face verbatim would re-export the import onto its
+    # own face without ever making the exposure call (2026-08-30, first
+    # mirror re-sync — both mirrors arrived carrying the producer's flag).
+    meta = {"id": "public", "exposed": True}
+    assert _mcp_egress_meta(meta) == {"id": "public"}

@@ -95,7 +95,13 @@ staleness floor verified watertight for workflow-driven domains.
   launcher, committed and autopublished per repo; all 12 entries reviewed —
   each spawns the estate's own tool against the operator's own clones; the
   hash-bound grant block is assembled and staged. Coverage >0 becomes true at
-  the operator's grant.)* Fix the engineering-side address book launch
+  the operator's grant. Amended after a live probe of the repaired route:
+  two latency defects hid behind the never-crossed trust gate — the
+  launcher's ~12s per-spawn probe vs the client's 10s deadline, and a
+  3-git-spawns-per-thing manifest build (~33s for 46 things). Both fixed in
+  the floor — fast-path substitution through `sys.executable` for entries
+  resolving to this installation, and batched head-view reads — end-to-end
+  4.3s, proven live.)* Fix the engineering-side address book launch
   route (bare `python` → the doctrine launcher). Run `external-trust review`
   for each consumer×source entry actually used; confirm each entry spawns the
   estate's own tool against the operator's own clones and nothing else;
