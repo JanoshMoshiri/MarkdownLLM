@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-30
-generated: 2026-08-30T10:18:36
-generated_from: HEAD@301926c
+generated: 2026-08-30T18:34:34
+generated_from: HEAD@67d7816
 coverage: 78
 framework_version: 3.37.0
 ---
@@ -114,6 +114,7 @@ framework_version: 3.37.0
 - operator-queue-2026-08-28 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - operator-queue-2026-08-28 (derived-from)
 - session-end-is-the-least-current-read-of-the-session (derived-from)
+- watertight-membrane-sprint-2026-08-30 (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
 - workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - workflow-reconciliation-precedes-new-definitions (derived-from)
 
@@ -246,6 +247,8 @@ framework_version: 3.37.0
 ## operator-queue-2026-08-28
 - gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 - settled-reasoning-is-standing-authority (pinned @779db04b681549336a0709933ce1ced5323ca042)
+- watertight-membrane-sprint-2026-08-30 (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
+- watertight-membrane-sprint-2026-08-30 (derived-from)
 
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)

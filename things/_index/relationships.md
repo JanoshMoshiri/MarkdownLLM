@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-30
-generated: 2026-08-30T16:22:21
-generated_from: HEAD@26b0777
-coverage: 324
+generated: 2026-08-30T18:34:06
+generated_from: HEAD@67d7816
+coverage: 325
 framework_version: 3.37.0
 ---
 
@@ -1258,6 +1258,11 @@ framework_version: 3.37.0
 - version-mismatch-triggers-validation-cascade --informs--> domain-refresh-specification
 - version-mismatch-triggers-validation-cascade --extends--> hard-hooks-require-observable-agent-caused-triggers
 - version-mismatch-triggers-validation-cascade --complements--> tiered-loading-is-tiered-reading-applied-to-specs
+- watertight-membrane-sprint-2026-08-30 --implements--> closed-loop-operating-state
+- watertight-membrane-sprint-2026-08-30 --derived-from--> operator-queue-2026-08-28
+- watertight-membrane-sprint-2026-08-30 --informs--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
+- watertight-membrane-sprint-2026-08-30 --informs--> source-behind-mirror-is-still-a-consumer-side-read
+- watertight-membrane-sprint-2026-08-30 --references--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - withholding-is-not-isolation --supports--> hook-compliance-correlates-with-scope-not-awareness
 - withholding-is-not-isolation --supports--> portability-claims-need-execution-tests
 - withholding-is-not-isolation --complements--> structure-decides-figures-scale-decides-convention
