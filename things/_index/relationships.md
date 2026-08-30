@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-30
-generated: 2026-08-30T10:18:25
-generated_from: HEAD@301926c
-coverage: 323
+generated: 2026-08-30T16:22:21
+generated_from: HEAD@26b0777
+coverage: 324
 framework_version: 3.37.0
 ---
 
@@ -859,6 +859,12 @@ framework_version: 3.37.0
 - modeling-cognition-yields-a-learning-loop-not-a-coherence-loop --informs--> session-memory-specification
 - modeling-cognition-yields-a-learning-loop-not-a-coherence-loop --supports--> the-notation-changed-not-the-primitives
 - modeling-cognition-yields-a-learning-loop-not-a-coherence-loop --complements--> consequence-is-recoverable-only-in-retrospect
+- nested-isolation-is-declared-upward-and-silent-downward --extends--> a-prerequisite-declared-only-inside-its-target-cannot-gate-it
+- nested-isolation-is-declared-upward-and-silent-downward --extends--> boundary-respect-was-interpretation-not-enforcement
+- nested-isolation-is-declared-upward-and-silent-downward --complements--> the-root-is-not-a-representative-domain
+- nested-isolation-is-declared-upward-and-silent-downward --complements--> isolation-must-contain-writes-not-just-reads
+- nested-isolation-is-declared-upward-and-silent-downward --informs--> session-start-hardening
+- nested-isolation-is-declared-upward-and-silent-downward --references--> read-thing-specification
 - operating-is-programming --extends--> the-notation-changed-not-the-primitives
 - operating-is-programming --supports--> asks-travel-as-exposed-things
 - operating-is-programming --derived-from--> assistant-register
@@ -1070,6 +1076,7 @@ framework_version: 3.37.0
 - session-start-hardening --references--> vendor-harness-adapter-foundation
 - session-start-hardening --references--> orchestration-specification
 - session-start-hardening --references--> partial-coverage-quiets-the-uncovered-steps
+- session-start-hardening --references--> nested-isolation-is-declared-upward-and-silent-downward
 - session-start-loses-to-the-first-request --supports--> hook-enforcement-has-three-anchors
 - session-start-loses-to-the-first-request --supports--> agents-md-discovery-is-harness-dependent
 - session-start-loses-to-the-first-request --informs--> orchestration-specification

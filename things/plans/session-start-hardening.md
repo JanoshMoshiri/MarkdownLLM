@@ -2,7 +2,7 @@
 id: session-start-hardening
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-08-19
 priority: high
 tags: [session-start, tier-0, emission, kernel, gates, adapters, hardening, evidence]
@@ -29,6 +29,9 @@ linked_things:
     relation: references
   - id: partial-coverage-quiets-the-uncovered-steps
     relation: references
+  - id: nested-isolation-is-declared-upward-and-silent-downward
+    relation: references
+    notes: "Second limb of the 2026-08-20 tripwire below, sighted live on 2026-08-30 before Phase 5 ran: at the root the lifted read gate does not merely name an absent surface for the root's own corpus — it has no trigger at all for the root→domain step, so a root session reads a domain's things under no contract. Unplanned evidence ahead of the planned ladder."
 ---
 
 # Session-Start Hardening
@@ -117,6 +120,17 @@ semantics and remains historical.
   framework's own thin specification skill plus a stated read/write collapse
   (`a-scaffold-cannot-birth-its-own-author`); a new inflection, sequenced
   AFTER the acceptance runs so the baseline stays comparable.
+- [ ] **Tripwire, second limb (2026-08-30):** the same gate has no trigger for
+  the root→domain step. A root session stepping into `domain/x/things/` is
+  doing domain read work, but the gate's grammar ("load *the* domain's read
+  skill") addresses an agent already inside one domain, and the root is inside
+  none. Sighted live: a framework-root session read another domain's things
+  under no contract with the kernel emitted whole. Note the direction — this is
+  not the absent-surface limb above, and the fix is not the same one: the
+  framework's own specification skill would not have caught it. See
+  `nested-isolation-is-declared-upward-and-silent-downward`, which also records
+  what this does *not* claim (the root's access to its own subdirectories is
+  not in question — only which contract governs the read).
 - [ ] Decide from evidence whether any per-domain skill emission is earned.
   Do not build it merely because the mechanism is imaginable.
 - [ ] Reconcile specs/docs/generated kernel, add the release changelog/version,
