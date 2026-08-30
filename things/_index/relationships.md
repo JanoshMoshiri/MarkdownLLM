@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-08-30
-generated: 2026-08-30T18:34:06
-generated_from: HEAD@67d7816
-coverage: 325
+generated: 2026-08-30T19:02:59
+generated_from: HEAD@2233117
+coverage: 327
 framework_version: 3.37.0
 ---
 
@@ -876,6 +876,9 @@ framework_version: 3.37.0
 - operating-layer-quality-loop --references--> estate-workflow-derivation
 - operating-layer-quality-loop --implements--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - operating-layer-quality-loop --implements--> an-advisory-is-scoped-by-who-can-perform-its-remedy
+- operating-layer-staleness-review-2026-08-30 --implements--> watertight-membrane-sprint-2026-08-30
+- operating-layer-staleness-review-2026-08-30 --derived-from--> operating-layer-quality-loop
+- operating-layer-staleness-review-2026-08-30 --informs--> mechanical-coherence-checks-backlog
 - operating-model-seams-design-2026-08 --informs--> run-operating-model-seams-2026-08
 - operating-model-seams-design-2026-08 --references--> floor-block-requirements-2026-08
 - operating-model-seams-design-2026-08 --implements--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
@@ -1055,6 +1058,10 @@ framework_version: 3.37.0
 - scalability-guide --complements--> thing-lifecycle-specification
 - scalability-guide --complements--> derived-index-specification
 - scalability-guide --references--> example-things-specification
+- serve-side-blindness-dissolves-into-composition --implements--> watertight-membrane-sprint-2026-08-30
+- serve-side-blindness-dissolves-into-composition --derived-from--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
+- serve-side-blindness-dissolves-into-composition --derived-from--> source-behind-mirror-is-still-a-consumer-side-read
+- serve-side-blindness-dissolves-into-composition --implements--> a-true-primitive-is-discovered-not-authored
 - session-end-is-the-least-current-read-of-the-session --extends--> a-session-harvest-must-read-the-commit-stream
 - session-end-is-the-least-current-read-of-the-session --supports--> existence-is-not-currency
 - session-end-is-the-least-current-read-of-the-session --implements--> a-well-kept-record-reads-as-a-governed-world

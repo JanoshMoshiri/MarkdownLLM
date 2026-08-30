@@ -2,7 +2,7 @@
 id: operator-queue-2026-08-28
 type: artifact
 status: evolving
-version: 1.2
+version: 1.3
 created: 2026-08-28
 session: 2026-08-28
 tags: [operator-queue, seat-protocol, verdicts, closed-loop, one-sitting]
@@ -133,6 +133,29 @@ gate and a habit is the operator's to draw.
 > last touch. `framework-retrospective-2026-08b`'s dated trigger has fired on
 > a terminal carrier — visible only because the matured-obligations fix in
 > row 11 shipped, which is that fix earning its keep on its first week.
+
+> **Sprint update, v1.3 (2026-08-30).** Written by the watertight-membrane
+> sprint (`watertight-membrane-sprint-2026-08-30`), run under the operator's
+> same-day grant: "sort the mirror issue and the blindness issue."
+>
+> - **Row 4 — worked to its gate.** Both mirrors re-synced from their
+>   sources' current per-thing commits and landed `verified: false` in their
+>   owning repos (both sources had moved 2026-08-28 in the same derivation
+>   pass). What remains is exactly the consequence-permanent half the census
+>   assigned the operator: the two attributable `verified` flips, staged
+>   with diff summaries.
+> - **Row 9 — closed, by design rather than by build.** The design arc ruled
+>   no new tool exists to build: every blindness facet lands on shipped
+>   primitives (`serve-side-blindness-dissolves-into-composition`). The
+>   zero coverage this row leaned on was an unperformed clone-local trust
+>   act plus five address books launching routes through bare `python` —
+>   books fixed and published, all 12 entries reviewed, the hash-bound
+>   grant block staged. **The one remaining act is the operator's grants**,
+>   after which `estate-check` coverage goes live. The pilot's 76 short-SHA
+>   pins were also expanded to full form, making its imports checkable.
+>
+> The queue's Tier-1 sentence now reads: **row 4's flips and row 9's grants
+> are the two acts left, and both are one sitting at the operator's seat.**
 
 ---
 

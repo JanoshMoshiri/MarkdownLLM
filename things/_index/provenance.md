@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-08-30
-generated: 2026-08-30T18:34:34
-generated_from: HEAD@67d7816
-coverage: 78
+generated: 2026-08-30T19:03:01
+generated_from: HEAD@2233117
+coverage: 80
 framework_version: 3.37.0
 ---
 
@@ -84,6 +84,9 @@ framework_version: 3.37.0
 ## cross-domain-handoff-is-verified-external-input
 - phase-3-run-domain-task-reverted (pinned @2d4f6d4)
 
+## cross-domain-readiness-is-a-shared-signal-not-a-producer-push
+- serve-side-blindness-dissolves-into-composition (derived-from)
+
 ## derivation-shape-brief-2026-08
 - derivation-shape-settled-2026-08 (pinned @016150e76f1ae69aefd41331f9da1aa7fed471e6)
 - derivation-shape-settled-2026-08 (derived-from)
@@ -113,6 +116,7 @@ framework_version: 3.37.0
 - estate-workflow-derivation (derived-from)
 - operator-queue-2026-08-28 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - operator-queue-2026-08-28 (derived-from)
+- serve-side-blindness-dissolves-into-composition (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
 - session-end-is-the-least-current-read-of-the-session (derived-from)
 - watertight-membrane-sprint-2026-08-30 (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
 - workflow-reconciliation-precedes-new-definitions (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
@@ -239,6 +243,7 @@ framework_version: 3.37.0
 - operating-scope-promotion (pinned @604dfc4)
 
 ## operating-layer-quality-loop
+- operating-layer-staleness-review-2026-08-30 (derived-from)
 - workflow-reconciliation-precedes-new-definitions (pinned @11a0b981ec4cfc7764507dff6da05040c9876d02)
 
 ## operating-model-seams-scope-2026-08-26
@@ -246,6 +251,7 @@ framework_version: 3.37.0
 
 ## operator-queue-2026-08-28
 - gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
+- serve-side-blindness-dissolves-into-composition (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
 - settled-reasoning-is-standing-authority (pinned @779db04b681549336a0709933ce1ced5323ca042)
 - watertight-membrane-sprint-2026-08-30 (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
 - watertight-membrane-sprint-2026-08-30 (derived-from)
@@ -285,6 +291,9 @@ framework_version: 3.37.0
 
 ## settled-reasoning-is-standing-authority
 - gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
+
+## source-behind-mirror-is-still-a-consumer-side-read
+- serve-side-blindness-dissolves-into-composition (derived-from)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)

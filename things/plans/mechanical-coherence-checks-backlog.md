@@ -2,7 +2,7 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -83,6 +83,19 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
 - **install-hook self-test.** Have `install-hook` self-test its emitted script so a
   portability break is caught at install, not at first commit
   (`portability-claims-need-execution-tests`).
+- **Workflow-stage vocabulary in skills (added 2026-08-30, routed by
+  `operating-layer-staleness-review-2026-08-30`).** The skill-vocabulary check
+  keys skills to `_schema.yaml` and the reserved sets — but not to
+  workflow-definition `stages`. A domain whose skills instruct stages by name
+  (one regulated domain carries five per-stage skills) gets no check that
+  those names match the definition's declared stage ids: rename a stage and
+  every instructing skill drifts silently, exactly where workflow-driven
+  operation concentrates change. Same-builder shaped: stage ids are declared
+  data in the definition's own frontmatter, the skill text is scannable, and
+  no suppression list is conceivable — a stage name a skill instructs either
+  is in the governing definition's declared set or is not. Scoping test:
+  the remedy ("rename the stage reference in the skill") is executable by the
+  domain that owns both files; population is live skills only.
 > **Standing scoping test for every item below (added 2026-08-26).** Before
 > shipping any advisory here, write its remedy as an imperative and ask who
 > must execute it; if the population includes things that are finished or
