@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-29
-generated: 2026-08-29T14:46:02
-generated_from: HEAD@0371dc5
-coverage: 320
+created: 2026-08-30
+generated: 2026-08-30T10:18:25
+generated_from: HEAD@301926c
+coverage: 323
 framework_version: 3.37.0
 ---
 
@@ -97,6 +97,9 @@ framework_version: 3.37.0
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --supports--> source-behind-mirror-is-still-a-consumer-side-read
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --references--> estate-git-sync
+- a-probe-and-a-ruling-enter-the-corpus-in-the-same-shape --informs--> settled-reasoning-is-standing-authority
+- a-probe-and-a-ruling-enter-the-corpus-in-the-same-shape --complements--> existence-is-not-currency
+- a-probe-and-a-ruling-enter-the-corpus-in-the-same-shape --complements--> a-uniform-answer-is-a-dead-judgment
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --supports--> consequence-is-recoverable-only-in-retrospect
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --complements--> existence-is-not-currency
@@ -537,6 +540,9 @@ framework_version: 3.37.0
 - evidence-and-eval-backlog --implements--> operator-gated-work-is-scheduled-on-the-operators-calendar
 - example-things-specification --extends--> thing-specification
 - example-things-specification --complements--> domain-specification-guide
+- execution-independence-is-not-judgement-independence --extends--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
+- execution-independence-is-not-judgement-independence --complements--> portability-claims-need-execution-tests
+- execution-independence-is-not-judgement-independence --references--> consequence-is-recoverable-only-in-retrospect
 - existence-is-not-currency --supports--> derived-index-is-attention-cache-not-search-layer
 - existence-is-not-currency --supports--> tracking-artifacts-can-drift-from-reality
 - existence-is-not-currency --informs--> hook-enforcement-has-three-anchors
@@ -1166,6 +1172,10 @@ framework_version: 3.37.0
 - the-operating-layer-has-no-quality-loop --references--> session-memory-specification
 - the-operating-layer-has-no-quality-loop --references--> workflow-run-is-the-decomposition-principle-applied-to-processes
 - the-operating-layer-has-no-quality-loop --references--> reflexive-behaviors-are-indexes-plus-prompts
+- the-orchestrators-premises-are-the-least-reliable-input --implements--> existence-is-not-currency
+- the-orchestrators-premises-are-the-least-reliable-input --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
+- the-orchestrators-premises-are-the-least-reliable-input --complements--> the-root-is-not-a-representative-domain
+- the-orchestrators-premises-are-the-least-reliable-input --references--> consequence-is-recoverable-only-in-retrospect
 - the-root-is-not-a-representative-domain --derived-from--> estate-workflow-derivation
 - the-root-is-not-a-representative-domain --informs--> derivation-shape-settled-2026-08
 - the-root-is-not-a-representative-domain --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it

@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.7
+version: 1.8
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -340,6 +340,26 @@ Two honesty clauses, so the picture cannot be over-read:
       exactly as designed. Zero out-of-seat interventions so far, from a
       sample that did no work: the number is true and means almost nothing
       yet, and must not be quoted as if it did.
+      **Two build findings the pilot has already paid for** (2026-08-30,
+      from the estate reconciliation; neither has a carrier of its own and
+      both are small):
+      · **The framework's own reasoning prompts address a human reader.**
+      `templates/prompts/surface-attention.md` and `session-orientation.md`
+      are written throughout for a person who will read and decide — and a
+      dispatched session now runs them with nobody there. Raised by the
+      pilot domain, which correctly declined to re-author framework
+      templates from a domain seat. The question is not cosmetic: a prompt
+      that says *surface this to the user* has no addressee in an unattended
+      run, and the honest options are a dual-audience rewrite, an
+      unattended variant, or a ruling that dispatched runs do not invoke
+      them. One sighting; direction genuinely unsettled, so recorded rather
+      than built.
+      · **A digest pins its definition and launch context but not its
+      runtime.** For a qualification record the question "what performed
+      this act" wants the agent runtime, model and provider alongside the
+      identity — the host already reports all three, so this is a capture
+      gap, not a discovery one. Cheap, and worth doing before the record it
+      would strengthen is the one an assessor reads.
 
 **Critical path, as of 2026-08-29** *(the 2026-08-27 reading — "the only
 human-side blocker is the ratification sitting" — is spent: the sitting
