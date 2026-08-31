@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-30
-generated: 2026-08-30T19:02:59
-generated_from: HEAD@2233117
-coverage: 327
+created: 2026-08-31
+generated: 2026-08-31T07:06:12
+generated_from: HEAD@e72b7af
+coverage: 328
 framework_version: 3.37.0
 ---
 
@@ -87,6 +87,11 @@ framework_version: 3.37.0
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --derived-from--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --complements--> mis-keyed-links-pass-the-floor-silently
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --supports--> the-harness-bound-path-is-the-least-tested-path
+- a-never-crossed-gate-hides-the-defects-behind-it --derived-from--> watertight-membrane-sprint-2026-08-30
+- a-never-crossed-gate-hides-the-defects-behind-it --informs--> serve-side-blindness-dissolves-into-composition
+- a-never-crossed-gate-hides-the-defects-behind-it --extends--> the-harness-bound-path-is-the-least-tested-path
+- a-never-crossed-gate-hides-the-defects-behind-it --complements--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- a-never-crossed-gate-hides-the-defects-behind-it --supports--> portability-claims-need-execution-tests
 - a-performance-requirement-inherits-its-measurement-context --informs--> floor-block-requirements-2026-08
 - a-performance-requirement-inherits-its-measurement-context --derived-from--> run-floor-sprint-2-2026-08
 - a-performance-requirement-inherits-its-measurement-context --complements--> an-incident-seeded-list-encodes-the-symptom-not-the-rule
@@ -1270,6 +1275,7 @@ framework_version: 3.37.0
 - watertight-membrane-sprint-2026-08-30 --informs--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - watertight-membrane-sprint-2026-08-30 --informs--> source-behind-mirror-is-still-a-consumer-side-read
 - watertight-membrane-sprint-2026-08-30 --references--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- watertight-membrane-sprint-2026-08-30 --references--> a-never-crossed-gate-hides-the-defects-behind-it
 - withholding-is-not-isolation --supports--> hook-compliance-correlates-with-scope-not-awareness
 - withholding-is-not-isolation --supports--> portability-claims-need-execution-tests
 - withholding-is-not-isolation --complements--> structure-decides-figures-scale-decides-convention

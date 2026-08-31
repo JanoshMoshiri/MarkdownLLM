@@ -3,9 +3,9 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-08-30
-generated: 2026-08-30T18:34:31
-generated_from: HEAD@67d7816
+created: 2026-08-31
+generated: 2026-08-31T07:07:15
+generated_from: HEAD@e72b7af
 coverage: 7
 framework_version: 3.37.0
 ---
@@ -33,7 +33,7 @@ framework_version: 3.37.0
 - trigger: type=time, condition=2026-09-10 reached, action=If this queue has not been ruled, report which tier-1 rows remain open and what each is blocking. The queue idles at the operator's seat by design; an undated idle is the drift the estate already learned to chase.
 
 ## watertight-membrane-sprint-2026-08-30
-- status: in-progress  due_date: —
+- status: blocked  due_date: —
 - trigger: type=time, condition=2026-09-05 reached, action=If Phase A/B operator gates (verified flips, trust grants) are still unruled, surface them alongside the dispatcher dead-man — the same date, deliberately: both are the closed loop waiting on its human seats.
 
 ## workflow-reconciliation-precedes-new-definitions

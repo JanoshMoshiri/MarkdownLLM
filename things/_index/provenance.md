@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-08-30
-generated: 2026-08-30T19:03:01
-generated_from: HEAD@2233117
-coverage: 80
+created: 2026-08-31
+generated: 2026-08-31T07:07:17
+generated_from: HEAD@e72b7af
+coverage: 81
 framework_version: 3.37.0
 ---
 
@@ -330,6 +330,9 @@ framework_version: 3.37.0
 - an-interface-is-what-its-consumers-call-not-what-it-declares (derived-from)
 - installation-is-not-activation (derived-from)
 - live-eval-scope-bounded-to-claude (pinned @c199002)
+
+## watertight-membrane-sprint-2026-08-30
+- a-never-crossed-gate-hides-the-defects-behind-it (derived-from)
 
 ## workflow-reconciliation-precedes-new-definitions
 - derivation-shape-brief-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)

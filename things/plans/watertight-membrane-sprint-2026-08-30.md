@@ -1,8 +1,8 @@
 ---
 id: watertight-membrane-sprint-2026-08-30
 type: plan
-status: in-progress
-version: 1.0
+status: blocked
+version: 1.1
 created: 2026-08-30
 session: 2026-08-30
 priority: critical
@@ -28,6 +28,9 @@ linked_things:
   - id: an-agent-in-a-loop-optimises-the-loop-not-the-goal
     relation: references
     notes: "Stop condition: this sprint ends when the phases below are done or gated; gates are listed for the operator, never worked around."
+  - id: a-never-crossed-gate-hides-the-defects-behind-it
+    relation: references
+    notes: "The sprint's own generalisation: four defects stacked behind one unperformed trust act, and the accurate zero-coverage measurement pointed four sightings at the wrong remedy. Kept live here because Phase B's gate is still open — the insight's own rule (prove the path before spending the human act) is what this plan is currently doing."
 triggers:
   - type: time
     condition: "2026-09-05 reached"
@@ -139,7 +142,18 @@ staleness floor verified watertight for workflow-driven domains.
   skills instructing workflow *stage* vocabulary that no check keys to the
   definitions' declared stages. Produce the review as an artifact; route
   check candidates through the backlog's gate; fix what is mechanical now.
-- [ ] **F — Report.** Sprint summary with the operator's gate list (flips,
+- [x] **F — Report.** *(Delivered 2026-08-30/31 — findings, disposition,
+  end state and the gate list given to the operator in session.)*
+
+**Status `blocked` (2026-08-31): blocked on the operator, not on work.**
+Every agent-executable phase is done and proven; what remains is two acts
+only the human can perform — the 12 trust grants and the two `verified`
+flips. Recorded as `blocked` rather than `completed` because the sprint's
+desired state (coverage > 0, mirrors attributably re-verified) is not yet
+true, and rather than `in-progress` because no further agent work advances
+it. The 2026-09-05 trigger co-fires with the dispatcher dead-man.
+
+*(original F: report.)* Sprint summary with the operator's gate list (flips,
   grants, docs Phase 8 note), publication debt, and the queue rows moved.
 
 ## Not in this sprint

@@ -2,7 +2,7 @@
 id: a-crossing-thing-carries-its-producers-private-graph
 type: insight
 status: promoted
-version: 1.1
+version: 1.2
 created: 2026-06-26
 promoted_to: mcp-domain-server-design
 session: 2026-06-26
@@ -37,6 +37,36 @@ links obey, applied to serialization.
 The general rule, beyond MCP: **at any boundary where a thing is serialized into a
 foreign id-space, its internal references do not cross as live links** — they are
 either dropped or made visibly foreign.
+
+### The third category (added v1.2, 2026-08-30)
+
+The original split was binary — the producer's *relationship graph* (stripped)
+versus *descriptive frontmatter* (crosses). One field belongs to neither, and
+sat on the wrong side for two months: **`exposed` is the producer's
+face-membership flag.** It is not a relationship and not a description of the
+thing; it is a statement about *this producer's* served face. Crossing, it
+told the consumer "publish this" — so a consumer landing the render verbatim
+re-exported the import without ever making its own exposure call. Exposure by
+copy, which is exactly the decision `write.thing.md` asks each author to make
+deliberately.
+
+Found live when the estate's first mirror re-sync landed both mirrors carrying
+the flag. Now stripped beside the structural set
+(`_EGRESS_PRODUCER_MARKERS`), with `thing.md` v2.22 stating the rule.
+
+Two lessons ride with it, both sharper than the fix:
+
+- **The test asserted the leak.** `test_mcp_get_deliverable_stamps_triple`
+  *required* `exposed: true` to cross — written into this insight's own
+  originating fix, where the binary split made `exposed` look descriptive by
+  elimination. A test built from the symptom encodes the symptom as the
+  contract, and then defends it. This insight's own commit comment warned
+  about a list "built from the road test's symptom, not from the rule"; the
+  same commit did it again, one field over.
+- **So the operative question is not "is this a relationship?"** but
+  ***whose* fact is this?** Any field asserting something about the producer's
+  own configuration — its face, its policy, its local state — belongs to the
+  producer and does not cross, whether or not it names an id.
 
 ## Why It Matters
 
