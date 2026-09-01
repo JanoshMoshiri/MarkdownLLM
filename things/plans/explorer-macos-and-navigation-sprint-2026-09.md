@@ -2,7 +2,7 @@
 id: explorer-macos-and-navigation-sprint-2026-09
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-09-01
 priority: high
 tags: [explorer, macos, navigation, memory, portability, release, sprint]
@@ -177,50 +177,50 @@ The sequence tests the hardest external premise first but packages only once.
 
 - [x] Choose the agent-invoked portable launcher as the first Mac route and
       defer native packaging until a local Mac build host is available.
-- [ ] Complete the UI corrections, shared idle lifecycle and launcher before
+- [x] Complete the UI corrections, shared idle lifecycle and launcher before
       asking Aaron to spend time on an actual-host run.
 - [ ] If the corrected candidate does not start on Aaron's Mac, retain its real
       diagnostic and return the run to modelling; do not patch by guesswork.
 
 ### I1 — Reconcile requirements, design and traceability
 
-- [ ] Amend `explorer/docs/requirements.md` for dynamic Memory groups, surface-
+- [x] Amend `explorer/docs/requirements.md` for dynamic Memory groups, surface-
       stable related navigation, agent-invoked macOS launch and idle expiry.
-- [ ] Amend `explorer/docs/design.md` with the shared group policy, explicit
+- [x] Amend `explorer/docs/design.md` with the shared group policy, explicit
       document-surface state/route and macOS final-path boundary.
-- [ ] Add exact automated and human journeys to the test specification and
+- [x] Add exact automated and human journeys to the test specification and
       traceability manifest before production changes.
 
 ### I2 — Dynamic Memory groups
 
-- [ ] Replace both static maps with one shared first-level `things/` grouping
+- [x] Replace both static maps with one shared first-level `things/` grouping
       policy and make Overview counts consume it.
-- [ ] Remove folder/type singularisation while retaining real metadata issues.
-- [ ] Cover arbitrary folder names, nested files, empty/ineligible folders,
+- [x] Remove folder/type singularisation while retaining real metadata issues.
+- [x] Cover arbitrary folder names, nested files, empty/ineligible folders,
       pagination, ordering and count/collection agreement.
 
 ### I3 — Stable related-document navigation
 
-- [ ] Add explicit reader-surface state and route round-tripping.
-- [ ] Make body links and structural reference chips use that surface.
-- [ ] Cover tree→reference, tree→body-link, collection→reference, mode switch,
+- [x] Add explicit reader-surface state and route round-tripping.
+- [x] Make body links and structural reference chips use that surface.
+- [x] Cover tree→reference, tree→body-link, collection→reference, mode switch,
       refresh and back/forward in browser runtime evidence.
 
 ### I4 — macOS confinement parity
 
-- [ ] Implement `F_GETPATH` final-path recovery and fail-closed error handling.
+- [x] Implement `F_GETPATH` final-path recovery and fail-closed error handling.
 - [ ] Exercise normal, symlink/rebinding and unavailable-path vectors on macOS;
       retain Windows and non-macOS behaviour.
 
 ### I5 — One candidate, one evidence pass
 
 - [ ] Run the unit, contract, architecture, HTTP, safety and browser suites.
-- [ ] Run mutation and traceability verification required by the Explorer's
+- [x] Run mutation and traceability verification required by the Explorer's
       current release process.
-- [ ] Build one final `0.4.0` wheel after all implementation and documentation
+- [x] Build one final `0.4.0` wheel after all implementation and documentation
       changes; record its cryptographic hash and prove the launcher installs the
       same checked-out package contract.
-- [ ] Execute the launcher's non-Mac rejection and safe process-ownership paths
+- [x] Execute the launcher's non-Mac rejection and safe process-ownership paths
       locally; reserve successful macOS execution for Aaron's actual host.
 
 ### I6 — Aaron acceptance and handoff
@@ -245,6 +245,26 @@ The sequence tests the hardest external premise first but packages only once.
 - [ ] If yes, design and build `.app`/DMG on a Mac and verify its full lifecycle.
 - [ ] If public distribution is required, obtain Developer ID authority, sign,
       notarize and staple the exact accepted native candidate.
+
+## Build verification — 2026-09-01
+
+Implementation commit `8c7d30a` contains the `0.4.0` portable candidate.
+
+- The complete Python suite passed: **166 passed**.
+- Every one of the **21 deliberate safety mutations was killed**.
+- A clean offline install of the built wheel passed from an arbitrary working
+  directory. The verified wheel SHA-256 is
+  `df5086e750451f275d3238c29ca63e1fa4704e84d0cfb5f479a3ab8666c015fb`.
+- Targeted live-browser verification on the real local estate showed every
+  populated first-level `things/` group and closed both reported navigation
+  failures: a tree-opened document followed a resolved reference and a rendered
+  body link, with URL, heading, tree selection and back/reload state agreeing.
+- The traceability verifier was run and deliberately did **not** reuse the
+  `0.3.0` whole-candidate evidence index. Its fail-closed result leaves the full
+  browser, performance, Windows-native and human acceptance seal pending for
+  this new subject; this is release evidence debt, not a passed release claim.
+- Successful launcher execution, Darwin `F_GETPATH` behaviour and inactivity
+  expiry on a real Mac remain Aaron's I6 acceptance work.
 
 ## Acceptance matrix
 
