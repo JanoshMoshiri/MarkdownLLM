@@ -284,7 +284,7 @@ For each adapter operation, `ConfinedSourceReader`:
 3. Uses adapter-private boundary data to walk components with non-following metadata calls, rejecting symlinks, junctions/reparse points and non-regular final types.
 4. Resolves the candidate and proves it is within the token's canonical root and outside its excluded roots (for substrate, the entire configured domain directory).
 5. Captures final non-following identity and metadata immediately before I/O.
-6. Opens the already-confined candidate in binary read mode, compares the open handle's `fstat` identity with the pre-open identity, reads at most limit+1, and compares open-handle and final path identity/size/mtime after the read. On Windows, `GetFinalPathNameByHandleW` resolves the native open handle and repeats source/exclusion ownership checks before any content is returned. A fully privileged process able to replace a path between these checks remains outside the local v1 trust boundary; the adapter does not claim portable `openat`/`O_NOFOLLOW` race elimination.
+6. Opens the already-confined candidate in binary read mode, compares the open handle's `fstat` identity with the pre-open identity, reads at most limit+1, and compares open-handle and final path identity/size/mtime after the read. On Windows, `GetFinalPathNameByHandleW` resolves the native open handle; on macOS, `fcntl(fd, F_GETPATH)` fills a bounded native path buffer. The corresponding native profile fails closed when final-path evidence is unavailable, and repeats source/exclusion ownership checks before any content is returned. Linux retains its current identity/metadata checks without claiming a native final-path primitive. A fully privileged process able to replace a path between these checks remains outside the local v1 trust boundary; the adapter does not claim portable `openat`/`O_NOFOLLOW` race elimination.
 7. For directory enumeration, captures non-following directory identity/mtime, performs a bounded `os.scandir` without following children, and compares identity/mtime after the scan. A detected rename/replacement returns `source_changed`.
 8. Fails with `source_changed` when stable identity cannot be demonstrated.
 
@@ -295,6 +295,19 @@ Directory depth counts directories below the source root and is inclusive. A dir
 Cursors are one exact operation-bound canonical JSON shape, base64url encoded with a truncated HMAC-SHA256 signature from a cursor-only process key: `{context,offset,operation,revision,source}`. Tree uses the relative directory as `context`; search uses the case-folded query; collection uses its kind; commits use `HEAD`. `revision` is the bounded result fingerprint for filesystem operations and the pinned full commit SHA for history. Traversal is capped at 10,000 eligible candidates and reports `partial: true` when the candidate or depth boundary truncates visibility.
 
 Directory/search fingerprints hash the bounded ordered identity fields actually paged, not file bodies. A changed fingerprint returns `source_changed`; malformed/tampered cursors return `invalid_cursor` and cannot inject paths or offsets.
+
+### Curated Memory grouping
+
+`core.collection_policy.memory_group_for` is the one pure rule used by both
+`CuratedCollectionReader` and `ConfinedSourceReader.counts`. It admits an
+eligible Markdown path only when its first component is `things` and it has a
+first-level directory plus a descendant filename. That directory becomes the
+group after `-`/`_` replacement and title-casing. The filesystem adapter already
+owns eligibility, depth and confinement, so the grouping policy neither walks
+the tree nor carries a second exclusion list. Empty groups cannot enter the
+result. Frontmatter remains document metadata and never overrides or disputes
+the directory-derived group. This keeps the Overview count and visible Memory
+collection mathematically identical for any emergent domain folder.
 
 ## 10. Git adapter
 
@@ -355,10 +368,11 @@ The mapping is therefore allowed to be briefly stale. That is a deliberate trade
 
 ## 12. HTTP API
 
-Static assets are source-insensitive. `/health` is unauthenticated and returns only `{status, version}`. Exact `Host: 127.0.0.1:<bound-port>` is required on static, health and API routes. Static/health navigation allows absent Origin or the exact launch origin; APIs allow absent Origin for direct tools or the exact launch origin and always require the capability. No route emits CORS headers.
+Static assets are source-insensitive. `/health` is unauthenticated and returns only `{status, version}`; an exact capability supplied on `HEAD /health` may renew the in-memory activity lease without changing that public representation. Missing or wrong capabilities on health do not renew it. Exact `Host: 127.0.0.1:<bound-port>` is required on static, health and API routes. Static/health navigation allows absent Origin or the exact launch origin; APIs allow absent Origin for direct tools or the exact launch origin and always require the capability. No route emits CORS headers.
 
 | Method/path | Use case | Key query |
 |---|---|---|
+| `GET /api/v1/session` | authenticated runtime configuration | — |
 | `GET /api/v1/estate` | `DiscoverEstate` | — |
 | `GET /api/v1/overview` | `GetOverview` | `source`, `cursor?` |
 | `GET /api/v1/tree` | `BrowseTree` | `source`, `path?`, `cursor?` |
@@ -396,7 +410,7 @@ Tree/search/collection/commit page DTOs carry `items`, with `next_cursor`/`parti
 
 `frontmatter_invalid` is a 200 document result with an issue because raw inspection remains available. Invalid/auth/path/limit/unsupported failures are non-retryable; `source_changed`, `server_busy`, `git_timeout` and transient `source_unreadable` are retryable; unknown/internal and external-store policy failures are non-retryable. Before JSON serialisation, response encoding estimates the compact UTF-8 representation and returns `response_too_large` without a partial document when it would exceed 2 MiB. All responses carry CSP, no-store, nosniff, no-referrer and frame-denial headers. API responses use `application/json; charset=utf-8`; assets use fixed MIME types. Unsupported methods return HTTP 405/`method_not_allowed` without invoking a use case.
 
-`BoundedThreadingHTTPServer` overrides `process_request`: it acquires one of 16 permits non-blockingly before creating a thread; when full it sends a fixed bounded HTTP 429 JSON response directly and closes the socket. The handler subclasses `BaseHTTPRequestHandler`, never `SimpleHTTPRequestHandler`, and maps only `/`, `/health`, `/api/v1/*` plus an exact immutable `importlib.resources` asset manifest. Request-line/header limits and controllable parse failures produce bounded errors; access/error logging emits structured redacted method/route/status/request ID and never the fragment, capability header, query string or document values.
+`BoundedThreadingHTTPServer` overrides `process_request`: it acquires one of 16 permits non-blockingly before creating a thread; when full it sends a fixed bounded HTTP 429 JSON response directly and closes the socket. It also owns one monotonic last-activity instant and a daemon lease monitor. Successful capability-authenticated API requests and exact-capability health touches call `note_activity`; the monitor calls `shutdown` from its own thread after the configured 1,800 seconds. Shutdown never joins that calling monitor, avoiding a serve-loop deadlock. The handler subclasses `BaseHTTPRequestHandler`, never `SimpleHTTPRequestHandler`, and maps only `/`, `/health`, `/api/v1/*` plus an exact immutable `importlib.resources` asset manifest. Request-line/header limits and controllable parse failures produce bounded errors; access/error logging emits structured redacted method/route/status/request ID and never the fragment, capability header, query string or document values.
 
 Socket/request deadlines and browser-side 10-second aborts guarantee a visible client terminal state. Python cannot cancel a thread blocked inside an arbitrary filesystem syscall; that residual is bounded by the 16-request ceiling and is not misreported as server-side cancellation. Application/adapters own only failures they can classify meaningfully; the request boundary handles the rest once.
 
@@ -404,11 +418,22 @@ Socket/request deadlines and browser-side 10-second aborts guarantee a visible c
 
 ### State and routing
 
-The single state object contains the estate/current source, active view/path/mode/theme, search state, open directories, paged tree entries/cursors/partial flags, source context, repository context and current-request records. `state.js` owns request identity, abort and stale-response checks; workflow coordinators mutate only that explicit object and passive view modules receive the values and callbacks they render.
+The single state object contains the estate/current source, active view/path/mode/document surface/theme, search state, open directories, paged tree entries/cursors/partial flags, source context, repository context and current-request records. `state.js` owns request identity, abort and stale-response checks; workflow coordinators mutate only that explicit object and passive view modules receive the values and callbacks they render.
 
-The hash route contains only source ID, tab, mode and percent-encoded relative path. `routing.js` round-trips it and `app.js` applies back/forward restoration. Ancestors of the selected path are derived as expanded; additional expansions live in session state. Skills and Memory restoration first reloads the curated collection shell, then opens the routed document in its embedded reader so refresh/back/forward preserve the visible collection mental model.
+The hash route contains only source ID, tab, mode, document surface and percent-encoded relative path, plus commit only for history. `routing.js` validates and round-trips it and `app.js` applies back/forward restoration. Tree/search openings set `standalone`; Skills/Memory items set `collection`; body links, structural references and mode switches preserve the current value. A route without surface uses the legacy tab-derived default. Ancestors of the selected path are derived as expanded; additional expansions live in session state. Collection restoration first reloads the curated shell, while standalone restoration replaces the evidence pane even if Memory or Skills remains the selected tab. Reader target selection therefore follows explicit surface rather than tab identity, so route, heading, context and tree selection cannot split.
 
-Each API operation and document mode owns an `AbortController` and monotonically increasing request ID. A source/tab/path/mode change aborts obsolete work. A response mutates state only when its full operation/source/path/mode identity is still current, closing the stale-response race. A 401 after process restart becomes a distinct `session_expired` view with relaunch guidance; it never clears the last safe location.
+Each API operation and document mode owns an `AbortController` and monotonically increasing request ID. A source/tab/path/mode/surface change aborts obsolete work. A response mutates state only when its full operation/source/path/mode/surface identity is still current, closing the stale-response race. A 401 after process restart becomes a distinct `session_expired` view with relaunch guidance; it never clears the last safe location.
+
+### Activity lease
+
+After capability capture, the browser fetches `/api/v1/session` and passes its
+`idle_timeout_seconds` to `activity.js`. The controller resets a local expiry
+timer on pointer, keyboard, touch and scroll activity and sends a throttled
+authenticated `HEAD /health` touch. It does not poll or create a background
+heartbeat: an untouched tab expires. Local expiry aborts outstanding work and
+shows “Explorer stopped after 30 minutes of inactivity. Ask Claude Code to open
+it again.” A failed touch does not prematurely erase the page; either the local
+timer or the next normal request establishes expiry.
 
 ### Visual composition
 
@@ -443,9 +468,28 @@ CSS custom properties define light/dark tokens. `theme.js` applies `light`, `dar
 mdllm-explorer = "markdownllm_explorer.__main__:main"
 ```
 
-`__main__.py` parses `--root`, `--domain-dir` (default `domain`) and `--port` (default 0), validates configuration, and calls `composition.build_runtime` followed by `composition.build_server`. Composition constructs limits/policy, catalogue/boundary registry, focused filesystem ports, Git adapter, frontmatter/Markdown/presenter pipeline, use cases and the selected HTTP adapter. No global singleton is created at import time.
+`__main__.py` parses `--root`, `--domain-dir` (default `domain`), `--port` (default 0) and `--open-browser`, validates configuration, and calls `composition.build_runtime` followed by `composition.build_server`. Composition constructs limits/policy, catalogue/boundary registry, focused filesystem ports, Git adapter, frontmatter/Markdown/presenter pipeline, use cases and the selected HTTP adapter. No global singleton is created at import time.
 
-Startup prints product/version, resolved root and fragment-capability URL. `KeyboardInterrupt` initiates `shutdown`, closes the listening socket and joins active request threads up to five seconds. The portable runtime creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.4 and a read-only installed-package system test proves launch does not depend on writing them.
+Startup prints product/version, resolved root and fragment-capability URL. `--open-browser` hands that URL directly to the system browser without writing it. `KeyboardInterrupt` or idle lease expiry closes the listening socket and joins active request threads up to five seconds. The portable runtime creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.4 and a read-only installed-package system test proves launch does not depend on writing them.
+
+### Agent-invoked macOS launch
+
+`tools/open-explorer.sh` is a framework-root driver for Claude Code rather than
+a platform fork of Explorer. It resolves the root from its own path, accepts
+only Darwin, selects Python 3.10+, and owns
+`~/Library/Application Support/MarkdownLLM Explorer/portable`. It creates the
+virtual environment there, installs the current checkout's `explorer/`, and
+starts `mdllm-explorer --root <resolved-root> --open-browser` detached. Standard
+output is discarded so the capability URL is never persisted. A temporary
+stderr file is retained only long enough to diagnose immediate startup and is
+then unlinked. The only durable coordination value is a PID.
+
+Before stopping or replacing a recorded PID, the script requires a numeric live
+PID whose command line contains both `mdllm-explorer` and the exact framework
+root. A mismatch removes only the stale PID file and never signals the process.
+`--stop` exposes the same verified path. The environment and PID are outside
+every served source; no `sudo`, LaunchAgent, `.app`, DMG or capability file is
+introduced. Native Mac packaging remains a later separately evidenced lane.
 
 ### Windows packaging and launch
 
@@ -453,7 +497,7 @@ Startup prints product/version, resolved root and fragment-capability URL. `Keyb
 
 The setup runs per user (`RequestExecutionLevel user`) into `%LOCALAPPDATA%\Programs\MarkdownLLM Explorer`, so installation needs no elevation. A custom page selects a directory containing `AGENTS.md`; silent verification supplies `/SUBSTRATEROOT=<path>`. Setup stores only that root under `HKCU\Software\MarkdownLLM Explorer`, writes one Desktop and one Start Menu shortcut with quoted `--root`, registers the uninstaller, and offers to launch the app on completion. Before reinstallation or uninstall mutates installed files, it invokes `--request-exit` and aborts on any non-zero result. Reinstallation then reads the previous root, replaces the application directory and recreates singleton shortcuts. Uninstall removes those exact owned surfaces and no source-root path.
 
-`windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser`, `--no-tray` and `--request-exit` verification/lifecycle switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. For `exit`, the primary acknowledges its PID before beginning shutdown; the secondary opens that process with synchronisation rights and waits up to 15 seconds for process termination. Exit calls server shutdown, closes the listener/socket and joins active requests within the existing five-second budget. Setup therefore waits for positive primary-process termination, not merely the short-lived command sender. Startup failures surface one bounded native message box because a windowed executable has no console.
+`windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser`, `--no-tray` and `--request-exit` verification/lifecycle switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. For `exit`, the primary acknowledges its PID before beginning shutdown; the secondary opens that process with synchronisation rights and waits up to 15 seconds for process termination. Manual Exit calls server shutdown; idle server return stops the tray from the server worker. Both paths close the listener/socket and join active requests within the existing five-second budget. Setup therefore waits for positive primary-process termination, not merely the short-lived command sender. Startup failures surface one bounded native message box because a windowed executable has no console.
 
 The frozen application imports `pystray`/Pillow only at this outer Windows delivery edge; those packages are bundled build inputs, not dependencies of core/application or of the portable CLI package. The application icon is the Explorer `M` mark supplied as a multi-resolution `.ico` and used consistently by the executable, setup, Desktop shortcut and tray.
 

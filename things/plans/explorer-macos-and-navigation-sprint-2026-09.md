@@ -1,8 +1,8 @@
 ---
 id: explorer-macos-and-navigation-sprint-2026-09
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-09-01
 priority: high
 tags: [explorer, macos, navigation, memory, portability, release, sprint]
@@ -34,8 +34,8 @@ linked_things:
 
 ## Outcome
 
-Deliver one Explorer candidate Aaron can install and use against his existing
-MarkdownLLM substrate and domains on macOS, containing both operator-requested
+Deliver one Explorer candidate Aaron can open through Claude Code against his
+existing MarkdownLLM substrate and domains on macOS, containing both operator-requested
 navigation corrections:
 
 1. **Memory discovers the domain rather than naming four folders in code.** Every
@@ -44,9 +44,11 @@ navigation corrections:
    opened from the left file tree can follow a rendered Markdown link or a
    resolved frontmatter reference without the URL and reader disagreeing.
 
-The usable-today target is the platform-independent Python wheel and CLI. A
-double-click `.app`/DMG is a second delivery lane inside the same product effort,
-but it is not allowed to block Aaron's first use or the two corrections above.
+The usable-today target is a framework-carried `tools/open-explorer.sh` route
+that bootstraps the platform-independent Python package in an isolated user
+environment, opens the browser and needs no remembered terminal command. A
+double-click `.app`/DMG is a later delivery lane, but it is not allowed to block
+Aaron's first use or the two corrections above.
 Public native distribution is a later release gate because signing and
 notarization require Apple credentials and a Mac build host.
 
@@ -141,9 +143,21 @@ confinement requirement is honestly evidenced there.
 
 ### macOS delivery contract
 
-- **Immediate route:** build the final portable wheel after the UI and security
-  changes; install it into a clean virtual environment on Aaron's Mac; launch
-  it with the existing CLI against his substrate root.
+- **Immediate route:** carry `tools/open-explorer.sh` in the framework. Claude
+  Code runs it from the framework root; the script validates macOS and Python
+  3.10+, creates or refreshes an Explorer-only virtual environment beneath the
+  user's Application Support directory, installs the current checked-out
+  `explorer/` package, starts it against that framework root and opens the
+  capability URL in the default browser. It requires no administrator rights.
+- The launcher persists only its owned environment and a verified process ID.
+  It never persists the capability URL, source-derived content or an Explorer
+  log. `--stop` terminates only a process whose command line proves it is the
+  Explorer instance for this framework root.
+- The shared server lease is 30 minutes since the last successful authenticated
+  request or authenticated touch caused by real pointer, keyboard, touch or
+  scroll activity. Public health checks and an idle open tab do not renew it.
+  Expiry closes the server on both portable/macOS and Windows launch paths; the
+  browser explains that Aaron can ask Claude to open Explorer again.
 - Implement and execute the macOS post-open final-path check. Failure to obtain
   the opened path fails closed as `source_unreadable`, matching Windows.
 - Record Python version, macOS version and CPU architecture in the Mac evidence.
@@ -159,19 +173,19 @@ confinement requirement is honestly evidenced there.
 
 The sequence tests the hardest external premise first but packages only once.
 
-### I0 — Mac runtime spike
+### I0 — Corrected candidate before scarce Mac time
 
-- [ ] On Aaron's actual Mac, create a clean virtual environment from the current
-      source/wheel and launch Explorer against his substrate.
-- [ ] Record macOS/Python/architecture, discovered sources, one document read,
-      clean quit and source hashes before/after.
-- [ ] If the runtime does not start, capture the real failure and return the run
-      to modelling; do not continue from the "installer only" hypothesis.
+- [x] Choose the agent-invoked portable launcher as the first Mac route and
+      defer native packaging until a local Mac build host is available.
+- [ ] Complete the UI corrections, shared idle lifecycle and launcher before
+      asking Aaron to spend time on an actual-host run.
+- [ ] If the corrected candidate does not start on Aaron's Mac, retain its real
+      diagnostic and return the run to modelling; do not patch by guesswork.
 
 ### I1 — Reconcile requirements, design and traceability
 
 - [ ] Amend `explorer/docs/requirements.md` for dynamic Memory groups, surface-
-      stable related navigation and executed macOS portability.
+      stable related navigation, agent-invoked macOS launch and idle expiry.
 - [ ] Amend `explorer/docs/design.md` with the shared group policy, explicit
       document-surface state/route and macOS final-path boundary.
 - [ ] Add exact automated and human journeys to the test specification and
@@ -204,20 +218,23 @@ The sequence tests the hardest external premise first but packages only once.
 - [ ] Run mutation and traceability verification required by the Explorer's
       current release process.
 - [ ] Build one final `0.4.0` wheel after all implementation and documentation
-      changes; record its cryptographic hash.
-- [ ] Install that exact wheel in a fresh Mac environment and repeat the full
-      acceptance walk. Seal evidence only after this point.
+      changes; record its cryptographic hash and prove the launcher installs the
+      same checked-out package contract.
+- [ ] Execute the launcher's non-Mac rejection and safe process-ownership paths
+      locally; reserve successful macOS execution for Aaron's actual host.
 
 ### I6 — Aaron acceptance and handoff
 
-- [ ] Aaron can launch Explorer from a documented command against his existing
-      substrate without editing domain files.
+- [ ] Aaron can ask Claude Code to open Explorer; the agent runs the tracked
+      launcher against his existing substrate without editing domain files.
 - [ ] He sees every populated first-level `things/` folder in Memory for an
       agreed domain and can open at least one formerly omitted group.
 - [ ] From a file opened in the left tree while Memory is selected, a related
       reference and a valid rendered Markdown link each open their target visibly.
 - [ ] Refresh and browser back/forward preserve the expected reader surface.
 - [ ] Overview, Skills, Git history, Settings and quit/relaunch still work.
+- [ ] Thirty minutes without real browser activity stops the local server; real
+      activity renews it, and asking Claude again opens a fresh session.
 - [ ] Before/after estate and Git observations show no Explorer-authored writes.
 - [ ] Aaron reports the candidate usable or names a reproducible failing journey.
 
@@ -235,7 +252,8 @@ The sequence tests the hardest external premise first but packages only once.
 |---|---|---|---|
 | All populated first-level `things/` folders appear | Adapter, count and browser tests | Aaron checks a real multi-folder domain | Technical run / Aaron |
 | Related links visibly change document from any origin | State/route oracle and browser journeys | Aaron follows tree-origin links | Technical run / Aaron |
-| Runtime works on macOS 13+ | Platform-specific confinement and CLI tests | Clean install, launch, read, quit on Aaron's Mac | Aaron |
+| Agent-invoked route works on macOS 13+ | Launcher, CLI and platform-specific confinement tests | Claude launch, read, idle expiry/relaunch and quit on Aaron's Mac | Aaron |
+| Idle Explorer releases resources | Authenticated-activity and server-lifecycle tests | Inactivity expiry and active-session renewal | Technical run / Aaron |
 | Read-only boundary remains true | Safety suite and source hash comparison | Before/after estate observation | Technical run / Aaron |
 | Final artefact is the evidenced artefact | Trace/evidence verifier and wheel hash | Install the recorded hash | Technical run |
 | Native package is publishable, if selected | Lifecycle verifier | Gatekeeper launch on a clean account | Technical run / Janosh |
@@ -244,8 +262,8 @@ The sequence tests the hardest external premise first but packages only once.
 
 | Assumption | Disposition |
 |---|---|
-| Core runtime works on macOS | **Unresolved until I0.** Strong static evidence, no runtime claim yet. |
-| Aaron has Python 3.10+ | **Measure in I0.** His working domains make it likely; do not infer the version. |
+| Core runtime works on macOS | **Unresolved until I6.** Strong static evidence, no runtime claim yet. |
+| Aaron has Python 3.10+ | **Launcher checks and explains failure.** His working domains make it likely; do not infer the version. |
 | Aaron uses Apple Silicon | **Not needed for the wheel.** Record architecture before native packaging. |
 | A native installer is required for first use | **No.** The wheel/CLI is the fastest adequate handoff. Revisit after use. |
 | Apple Developer credentials exist | **Unknown and non-blocking.** Required only for public native delivery. |
@@ -258,7 +276,9 @@ The sequence tests the hardest external premise first but packages only once.
 
 | Risk | Response |
 |---|---|
-| The current runtime fails on macOS for an unobserved reason | I0 precedes design claims and final packaging; capture the failure as the new model input. |
+| The corrected runtime fails on macOS for an unobserved reason | I6 is the first honest runtime claim; capture Aaron's failure as new model input rather than guessing remotely. |
+| An idle tab accidentally keeps the service alive forever | Only authenticated API success or throttled real-user activity renews the server lease; public health checks do not. |
+| A stale PID points at an unrelated process | Verify the PID's command contains both `mdllm-explorer` and this framework root before sending a signal; otherwise discard only the stale PID file. |
 | Case-sensitive filesystems expose path assumptions hidden on Windows | Include mixed-case and POSIX path vectors and execute the real estate journey on Mac. |
 | `F_GETPATH` availability or semantics differ by macOS/Python build | Feature-detect narrowly and fail closed; prove against the supported Mac profile. |
 | Dynamic collection enumeration diverges from Overview count | One shared policy and an agreement test; no second folder map. |
@@ -277,13 +297,10 @@ The sequence tests the hardest external premise first but packages only once.
 - Opportunistic refactoring unrelated to the shared group policy, reader state or
   macOS boundary.
 
-## Gate to start
+## Gate to start — closed 2026-09-01
 
-The sprint may move from scoping into implementation when the operator agrees
-to these two defaults:
-
-1. **Aaron's first deliverable is the portable wheel/CLI, not a notarized `.app`.**
-2. **Memory means every populated first-level folder directly under `things/`.**
-
-Everything else above is a consequence of those defaults or an evidence gate,
-not a hidden product choice.
+The operator selected the agent-invoked portable route, deferred native Mac
+packaging, confirmed that Memory means every populated first-level folder below
+`things/`, and authorised the UI corrections plus shared 30-minute activity
+lease. Implementation may proceed; successful macOS execution and Aaron's
+usability ruling remain acceptance gates rather than inferred facts.

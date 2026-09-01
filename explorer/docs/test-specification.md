@@ -163,7 +163,9 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 ### HTTP/runtime/distribution
 
 - `ST-INSTALL-001` — build/install package from outside checkout into a clean supported Python environment; no Node; post-install offline launch from arbitrary cwd.
-- `ST-CLI-001` — root/domain-dir/port validation, printed fragment-capability URL, requested-port collision, non-zero invalid exits and ≤5-second interrupt shutdown.
+- `ST-CLI-001` — root/domain-dir/port validation, printed fragment-capability URL, optional browser-open handoff, requested-port collision, non-zero invalid exits and ≤5-second interrupt or idle shutdown.
+- `ST-IDLE-001` — authenticated session configuration, successful API/touch renewal, no renewal from static/public-health/wrong-capability traffic, automatic server exit and Windows tray stop at a short deterministic test lease.
+- `ST-MAC-LAUNCHER-001` — tracked launcher resolves its own root, rejects non-Darwin/old Python without mutation, uses an Application Support virtual environment without elevation, installs the current checkout, opens the browser, verifies PID ownership before stop/replace, and persists no capability or log.
 - `ST-WIN-BUNDLE-001` — clean PyInstaller one-folder build; executable PE/version/icon metadata, embedded interpreter/dependencies/static assets, no system-Python/Node resolution at runtime, and manifest/hash retained.
 - `ST-WIN-INSTALL-001` — NSIS setup is one executable; per-user/no-elevation and offline; valid-root gate; exact install files, selected-root registry value, uninstall registration and singleton Desktop/Start Menu shortcuts with quoted arguments.
 - `ST-WIN-LAUNCH-001` — frozen shortcut target starts with no console, reaches health, invokes the browser-opening port, exposes Open/Exit tray commands, reactivation routes `open` to the original process, and exits within five seconds without persisting capability material.
@@ -183,16 +185,17 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 ### Browser, visual and accessibility
 
 - `BT-SHELL-001` — desktop three-region composition, Substrate above Domains, tabs/context and absence of false controls.
-- `BT-NAV-001` — source/tree selection, nested disclosure, document opening, URL refresh/back/forward and same identity from tree/Skills/Memory.
+- `BT-NAV-001` — source/tree selection, nested disclosure, document opening, explicit standalone/collection surface, URL refresh/back/forward and same identity from tree/Skills/Memory.
 - `BT-TABS-001` — Overview commits/counts/partial labels; Skills/Memory empty/populated/issues; Settings read-only path/markers/theme.
-- `BT-DOCUMENT-001` — styled/raw switch fetches on demand, context metadata, safe external/internal links and unsupported states.
+- `BT-DOCUMENT-001` — styled/raw switch fetches on demand, context metadata, safe external/internal links, surface-preserving tree-origin navigation and unsupported states.
 - `BT-SEARCH-001` — path filter results, empty state and keyboard activation.
 - `BT-THEME-001` — light/dark/system, system default and local persistence without location loss.
 - `BT-ASYNC-001` — O-ASYNC-CURRENT plus timeout, retry, abort and terminal content/empty/error states.
 - `BT-RESPONSIVE-001` — 1440×900 three-region and 390×844 overlays; 320 CSS px/200% zoom; focus trap/Escape/return; no lost capability.
 - `BT-COMMIT-001` — activating a commit lists its changed paths with classification and openability; an openable path opens as the commit left it with the added lines marked and named in text; unopenable paths state why; back, browser history and deep-link restore of commit and file.
 - `BT-COLLAPSE-001` — desktop collapse and restore of both side regions, persistence across reload, absence of dialog/modal/inert/focus-trap semantics above 900 px, focus moving to the replacing control, centre horizontal scroll and no page-level horizontal scroll in any state.
-- `BT-REFERENCE-001` — reference chips render per declared field with relation or commit, are not activatable before resolution answers, open the thing they name, and settle into an explicitly unresolved state on absence, contest, failure or timeout.
+- `BT-REFERENCE-001` — reference chips render per declared field with relation or commit, are not activatable before resolution answers, open the thing they name on the current document surface, and settle into an explicitly unresolved state on absence, contest, failure or timeout.
+- `BT-IDLE-001` — a real interaction resets local expiry and sends a throttled authenticated touch, an untouched tab creates no heartbeat, and expiry presents the exact Claude relaunch guidance.
 - `BT-KEYBOARD-001` — tree/tab/search/mode/theme keyboard state machines, collapse focus, memory-section disclosure focus and paginated focus.
 - `BT-A11Y-001` — roles/states/names/live announcements, contrast/colour independence, target size, reduced motion and automated accessibility scan where available.
 - `BT-VISUAL-001` — synthetic-fixture screenshots in light/dark desktop and narrow views; inspection against visual-reference principles and clipping/overlap oracle.
@@ -201,7 +204,7 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 
 - `PT-SCALE-001` — F-ESTATE-SCALE-V1, one discarded warm-up + 20 isolated runs, raw timings and 19/20 thresholds for all five budgets.
 - `PT-REAL-001` — privacy-safe observation on F-REAL-ESTATE-2026-08-27; never substitutes for PT-SCALE-001.
-- `AJ-01` through `AJ-10` — execute the exact requirements journeys and retain technical pass/fail evidence; human owners remain pending unless attributable operator acceptance is supplied.
+- `AJ-01` through `AJ-11` — execute the exact requirements journeys and retain technical pass/fail evidence; AJ-11 remains `unexecuted-platform` until Aaron's Mac runs it, and human owners remain pending unless attributable operator acceptance is supplied.
 
 ## 6. Test-the-tests mutation programme
 
@@ -256,7 +259,8 @@ Seeds and generated cases are recorded on failure and fixed in CI for reproducib
 | Windows 11 / NTFS / Python 3.12 development runtime | Executed unit→system, native reparse/symlink where permitted | May claim executed development profile |
 | Windows 10+ x64 frozen runtime / NSIS setup | Clean bundle, install, launch, reactivation, upgrade and uninstall; no system Python/Node/network | May claim executed native-distribution profile |
 | Python 3.10 syntax/runtime floor | Compile/AST check plus clean runtime if interpreter available | Otherwise standards-backed, not executed |
-| Linux/macOS path adapters | Pure path vectors + code inspection in this run | Must remain unexecuted until CI/profile runs |
+| macOS 13+ portable launcher and path adapter | Launcher/process tests + `F_GETPATH` seam in this run; AJ-11 on Aaron's host | Structure may pass off-host; successful Mac launch remains unexecuted until AJ-11 |
+| Linux path adapter | Pure path vectors + code inspection in this run | Must remain unexecuted until CI/profile runs |
 | Chromium | In-app runtime interaction and screenshots | May claim executed browser/version recorded |
 | Firefox/Safari | Standards/static inspection only | Must remain unexecuted |
 
@@ -282,7 +286,7 @@ Use the in-app browser against the real loopback process; no pasted static mocku
 4. Execute keyboard-only tree, tabs, search, document mode and theme.
 5. Inspect text clipping, overlap, unintended horizontal page scrolling, selected/hover/focus contrast and empty/error states.
 6. Execute hostile payloads through the real document/API route and inspect the final DOM, not only server HTML.
-7. Record AJ-01–10 technical dispositions. Keep human dispositions pending unless an attributable human actually rules; when supplied, retain that ruling as subject-bound evidence rather than inferring it from a technical walkthrough.
+7. Record AJ-01–11 technical dispositions. Keep AJ-11 unexecuted until an actual Mac run and human dispositions pending unless an attributable human actually rules; when supplied, retain that ruling as subject-bound evidence rather than inferring it from a technical walkthrough.
 
 Synthetic fixture screenshots may be committed. Private-estate screenshots/content must remain in gitignored `.test-tmp/explorer-evidence/` and are never publication evidence.
 
@@ -304,16 +308,16 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | FR-NAV-002 | demo | UI | BT-NAV-001 | Source changes without page reload and content matches source | Technical run / Janosh |
 | FR-NAV-003 | test+demo | MIN | CT-TREE-001, BT-NAV-001 | Nested tree loads per directory without reading bodies | Technical run / Janosh |
 | FR-NAV-004 | demo | UI | BT-NAV-001 | Eligible selection opens document and retains context | Technical run / Janosh |
-| FR-NAV-005 | demo | UI | BT-NAV-001, AJ-02 | URL/back/forward/refresh restore specified location and ancestors | Technical run / Janosh |
+| FR-NAV-005 | test+demo | UI | BT-NAV-001, AJ-02 | URL/back/forward/refresh restore location, surface and ancestors | Technical run / Janosh |
 | FR-NAV-006 | demo+inspection | UI | BT-RESPONSIVE-001, AJ-04 | Exact desktop/narrow/zoom layouts retain all capabilities/focus | Technical run / Janosh |
 | FR-NAV-007 | test+demo | MIN | BT-COLLAPSE-001 | Both side regions collapse, restore, persist, and take no dialog semantics at desktop | Technical run / Janosh |
 | FR-NAV-008 | test+demo | MIN | BT-COLLAPSE-001, BT-RESPONSIVE-001 | Centre scrolls horizontally when squeezed; page body never does | Technical run / Janosh |
 | FR-TAB-001 | test+demo | MIN | ST-API-SCHEMA-001, BT-TABS-001 | Overview has identity/counts/state/first commits and partial labels | Technical run / Janosh |
 | FR-TAB-002 | test+demo | GIT | GT-GIT-STATE-001, GT-GIT-PAGE-001, BT-TABS-001 | Required commit fields/order/page/states are exact | Technical run / Janosh |
 | FR-TAB-003 | test+demo | MIN | CT-COLLECTION-001, BT-TABS-001 | Skills lists Markdown or explicit empty without error | Technical run / Janosh |
-| FR-TAB-004 | test+demo | IMPERFECT | CT-COLLECTION-001, BT-TABS-001 | Memory recursion/group/issues/duplicates/empty follow contract | Technical run / Janosh |
+| FR-TAB-004 | test+demo | IMPERFECT | CT-COLLECTION-001, BT-TABS-001 | Every populated first-level `things/` group appears and Overview agrees | Technical run / Janosh |
 | FR-TAB-005 | test+demo | MIN | ST-API-SCHEMA-001, BT-TABS-001 | Settings shows authorised read-only facts/theme, no write controls | Technical run / Janosh |
-| FR-TAB-006 | test+demo | MIN | BT-NAV-001 | Tree/Skills/Memory resolve same document identity/reader | Technical run |
+| FR-TAB-006 | test+demo | MIN | BT-NAV-001, BT-DOCUMENT-001 | Tree/search and collections use explicit stable surfaces with one document pipeline | Technical run |
 | FR-TAB-007 | test+demo | MIN | GT-GIT-COMMIT-001, BT-COMMIT-001 | Commit lists first-parent changed paths, classified, with openability from admission | Technical run / Janosh |
 | FR-TAB-008 | test+demo | MIN | GT-GIT-HISTORY-READ-001, BT-COMMIT-001 | File reads as the commit left it with added ranges marked and named; no removed line | Technical run / Janosh |
 | FR-TAB-009 | test+demo | MIN | CT-COLLECTION-002, BT-TABS-001 | Descending groups, ascending titles, collapsible with surviving state and live count | Technical run / Janosh |
@@ -322,10 +326,10 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | FR-DOC-003 | test+demo | UI | CT-DOCUMENT-001, BT-DOCUMENT-001 | Raw/rendered switch fetches and shows exactly one mode | Technical run / Janosh |
 | FR-DOC-004 | demo | UI | BT-DOCUMENT-001 | Context shows only factual specified metadata | Technical run / Janosh |
 | FR-DOC-005 | test+demo | IMPERFECT | CT-DOCUMENT-001, BT-DOCUMENT-001 | UTF-8 text raw; binary/non-UTF-8 explicit unsupported | Technical run |
-| FR-DOC-006 | test+demo | HOSTILE | CT-LINK-001, BT-DOCUMENT-001 | Only confined local + labelled HTTP(S) active with protections | Technical run |
+| FR-DOC-006 | test+demo | HOSTILE | CT-LINK-001, BT-DOCUMENT-001 | Confined local links preserve visible surface; labelled HTTP(S) remain protected | Technical run |
 | FR-DOC-007 | test+mutation | IMPERFECT | UT-ELIG-001, GT-OWNERSHIP-001, MT-MUTATION-001 | Eligibility/secret precedence holds on every exposure route | Technical run |
 | FR-DOC-008 | test | IMPERFECT | CT-DOCUMENT-001, GT-CONFINE-001 | Every encoding/frontmatter/change outcome has stable terminal state | Technical run |
-| FR-DOC-009 | test+demo | MIN | CT-REFERENCE-001, BT-REFERENCE-001 | Declared references open their thing; absent, contested and failed lookups settle explicitly | Technical run / Janosh |
+| FR-DOC-009 | test+demo | MIN | CT-REFERENCE-001, BT-REFERENCE-001 | References open visibly on current surface; other outcomes settle explicitly | Technical run / Janosh |
 | FR-SRCH-001 | test+demo | SCALE | CT-SEARCH-001, BT-SEARCH-001 | Case-insensitive eligible path filter/pages/partial, no bodies | Technical run / Janosh |
 | FR-SRCH-002 | demo+inspection | UI | BT-KEYBOARD-001 | Search/tabs/tree/theme/mode fully keyboard operable | Technical run / Janosh |
 | FR-UI-001 | inspection+demo | UI | BT-SHELL-001, BT-VISUAL-001 | Restrained three-region hierarchy matches reference principles | Janosh |
@@ -334,12 +338,13 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | FR-UI-002C | test+demo | UI | BT-THEME-001 | Explicit choice persists reload without location loss | Technical run / Janosh |
 | FR-UI-003 | inspection | UI | BT-VISUAL-001, BT-A11Y-001 | Selection/action/empty/error distinct in both themes | Janosh |
 | FR-UI-004 | inspection+demo | UI | BT-SHELL-001 | No placeholder/irrelevant control; every shown control works | Technical run / Janosh |
-| FR-RUN-001 | test | CLEAN/WINDOWS | ST-INSTALL-001, ST-CLI-001, ST-OFFLINE-001, ST-WIN-BUNDLE-001 | Portable package and frozen runtime both launch offline with packaged assets and no Node/system Python | Technical run |
-| FR-RUN-002 | test | WEB | ST-CLI-001, ST-SERVER-BOUND-001 | Loopback only, port policy, capability isolation, clean shutdown | Technical run |
+| FR-RUN-001 | test | CLEAN/WINDOWS | ST-INSTALL-001, ST-CLI-001, ST-OFFLINE-001, ST-WIN-BUNDLE-001 | Portable package and frozen runtime launch with packaged assets; CLI may open browser and exits cleanly | Technical run |
+| FR-RUN-002 | test | WEB | ST-CLI-001, ST-SERVER-BOUND-001, ST-IDLE-001, BT-IDLE-001 | Loopback/capability policy and authenticated-activity lease stop every launch surface | Technical run |
 | FR-RUN-003 | test | WEB | ST-HEALTH-001 | Health available with static values only | Technical run |
 | FR-RUN-004 | test+demo | WINDOWS | ST-WIN-BUNDLE-001, ST-WIN-INSTALL-001, AJ-08 | One setup exe performs valid per-user install with root selection, shortcuts and uninstaller, no command line or Python | Technical run / Janosh |
 | FR-RUN-005 | test+demo | WINDOWS | ST-WIN-LAUNCH-001, AJ-09 | Shortcut opens browser/tray; reactivation keeps one service; Exit terminates within five seconds | Technical run / Janosh |
 | FR-RUN-006 | test+demo | WINDOWS | ST-WIN-UPGRADE-001, ST-WIN-UNINSTALL-001, AJ-10 | Upgrade preserves root/singletons; uninstall removes owned state and no source/outside bytes | Technical run / Janosh |
+| FR-RUN-007 | test+demo | MAC | ST-MAC-LAUNCHER-001, AJ-11 | Claude-invoked launcher safely bootstraps, opens, replaces/stops and persists no secret | Technical run / Aaron |
 | FR-ERR-001 | contract+demo | IMPERFECT | ST-API-SCHEMA-001, BT-ASYNC-001 | Exact redacted shape/status/retry and contextual UI | Technical run |
 | FR-ERR-002 | test+mutation | WEB | BT-ASYNC-001, MT-MUTATION-001 | Every request terminates and stale responses cannot win | Technical run |
 | NFR-ARCH-001 | inspection+test | SOURCE | AT-IMPORT-001 | No outer/native implementation dependency in core/application | Technical run |
@@ -347,14 +352,14 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | NFR-ARCH-003 | test+analysis | SOURCE | AT-SWAP-001 | Adapter swap changed-path evidence touches no inner file | Technical run |
 | NFR-SAFE-001A | test+analysis | IMPERFECT | GT-IMMUTABLE-001, AJ-07 | O-IMMUTABILITY unchanged for all in-scope values | Technical run |
 | NFR-SAFE-001B | test+mutation | GIT | GT-GIT-SAFE-001, MT-MUTATION-001 | Exact executable/argv/env/cwd/time/output; no helper/lazy fetch/lock | Technical run |
-| NFR-SAFE-001C | test+inspection | CLEAN/WINDOWS | ST-INSTALL-001, ST-WIN-INSTALL-001, ST-WIN-UNINSTALL-001, AJ-07, AJ-10 | Runtime persists no content/capability; installer writes/removes only declared per-user surfaces | Technical run |
+| NFR-SAFE-001C | test+inspection | CLEAN/WINDOWS/MAC | ST-INSTALL-001, ST-WIN-INSTALL-001, ST-WIN-UNINSTALL-001, ST-MAC-LAUNCHER-001, AJ-07, AJ-10 | Runtime persists no content/capability; platform drivers write only declared owned surfaces | Technical run |
 | NFR-SAFE-001D | test+mutation | MIN | GT-GIT-HISTORY-READ-001, GT-GIT-ARGS-001, MT-MUTATION-001 | Object-store reads apply working-tree rules, admission decided before any git call | Technical run |
 | NFR-SAFE-002A | test | IMPERFECT | UT-PATH-001, CT-CATALOG-001 | Root/domain config rejects absolute/escaping/invalid inputs | Technical run |
-| NFR-SAFE-002B | test+analysis | IMPERFECT | GT-CONFINE-001 | Executed native profiles reject detected links/replacements; residual labelled | Technical run |
+| NFR-SAFE-002B | test+analysis | IMPERFECT/MAC | GT-CONFINE-001 | Windows and macOS final-handle seams reject unavailable/rebound evidence; actual profiles labelled | Technical run |
 | NFR-SAFE-003 | test+mutation | HOSTILE | CT-HTML-001, CT-LINK-001, MT-MUTATION-001, AJ-06 | O-HTML-SAFETY passes server response and final DOM | Technical run |
 | NFR-SAFE-004 | test+mutation | BOUNDARY | UT-LIMIT-001, ST-SERVER-BOUND-001, MT-MUTATION-001 | Every N−1/N/N+1 limit and stable error/partial state holds | Technical run |
 | NFR-SAFE-005 | test+mutation | WEB | ST-HTTP-AUTH-001, ST-HTTP-HEADERS-001, ST-HEALTH-001, MT-MUTATION-001, AJ-06 | Capability/Host/Origin/CORS/headers/health boundary exact | Technical run |
-| NFR-PORT-001 | test+inspection | MATRIX/WINDOWS | ST-INSTALL-001, ST-WIN-BUNDLE-001, GT-CONFINE-001 | Windows native profile and Chromium executed; unavailable native profiles explicitly unexecuted | Technical run |
+| NFR-PORT-001 | test+inspection | MATRIX/WINDOWS/MAC | ST-INSTALL-001, ST-WIN-BUNDLE-001, ST-MAC-LAUNCHER-001, GT-CONFINE-001, AJ-11 | Windows executes; Mac route is structurally proven and actual-host state explicit | Technical run / Aaron |
 | NFR-OFF-001 | test | CLEAN/WINDOWS | ST-OFFLINE-001, ST-WIN-INSTALL-001 | AJ-01–03 and AJ-08 pass with network blocked and no Python/CDN/Node/extension | Technical run |
 | NFR-PERF-001 | analysis | SCALE | PT-SCALE-001 | Manifest/profile/raw timings and 19/20 thresholds all pass | Technical run |
 | NFR-PERF-002 | contract | MIN | ST-API-INCREMENTAL-001 | Separate APIs; initial payload no bodies/history; one doc mode | Technical run |
@@ -365,7 +370,7 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 
 Gate checks:
 
-1. exactly 63 unique requirements rows exist;
+1. exactly 71 unique requirements rows exist;
 2. extracted requirements IDs equal trace rows exactly;
 3. every evidence/test ID exists in collected tests or the browser/inspection manifest;
 4. every row has an observable pass condition and owner;
@@ -384,7 +389,7 @@ For the 2026-08-27 candidate, `tests/evidence/operator-acceptance.json` records 
 6. Clean Windows bundle → setup → launch/reactivation → upgrade → uninstall lifecycle.
 7. Performance on synthetic fixture.
 8. Browser runtime, visual and accessibility evidence.
-9. AJ-01–10 and final trace disposition.
+9. AJ-01–11 and final trace disposition, with actual-host Mac state explicit.
 10. Full suite again from the committed candidate.
 
 Stop and loop back to requirements/design when:
@@ -404,6 +409,7 @@ Public, privacy-safe evidence is written to `explorer/tests/evidence/`:
 - `performance.json` — fixture/profile/raw timings and computed verdicts;
 - `mutation-kills.json` — mutant → killer outcome;
 - `windows-installer.json` — frozen-build/setup hashes, environment, install/shortcut/launch/upgrade/uninstall observations and AJ-08–10 dispositions;
+- `macos-portable.json` — launcher/package hash and static evidence; macOS/Python/architecture and AJ-11 observations only after Aaron's actual-host run;
 - `visual-light.png`, `visual-dark.png`, `visual-narrow.png` — synthetic estate only; and
 - `traceability-result.json` — coverage and evidence-ID audit.
 - `operator-acceptance.json` — attributable human UAT decision and exact human-owned requirement scope.
