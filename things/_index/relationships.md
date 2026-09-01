@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-08-31
-generated: 2026-08-31T07:06:12
-generated_from: HEAD@e72b7af
-coverage: 328
+created: 2026-09-01
+generated: 2026-09-01T12:07:57
+generated_from: HEAD@4a630f7
+coverage: 329
 framework_version: 3.37.0
 ---
 
@@ -559,6 +559,14 @@ framework_version: 3.37.0
 - explorer-extraction-and-hosting --references--> markdownllm-explorer-windows-distribution
 - explorer-extraction-and-hosting --references--> code-architect-governs-substrate-code
 - explorer-extraction-and-hosting --dependencies--> explorer-publication-readiness
+- explorer-macos-and-navigation-sprint-2026-09 --supersedes--> explorer-macos-support
+- explorer-macos-and-navigation-sprint-2026-09 --references--> explorer-ui-increment-2026-08
+- explorer-macos-and-navigation-sprint-2026-09 --complements--> explorer-publication-readiness
+- explorer-macos-and-navigation-sprint-2026-09 --references--> explorer-extraction-and-hosting
+- explorer-macos-and-navigation-sprint-2026-09 --informs--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
+- explorer-macos-and-navigation-sprint-2026-09 --informs--> an-explanation-committed-to-a-specification-outlives-the-doubt-that-made-it
+- explorer-macos-and-navigation-sprint-2026-09 --informs--> a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity
+- explorer-macos-support --superseded-by--> explorer-macos-and-navigation-sprint-2026-09
 - explorer-macos-support --complements--> explorer-publication-readiness
 - explorer-macos-support --references--> explorer-ui-increment-2026-08
 - explorer-macos-support --informs--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction

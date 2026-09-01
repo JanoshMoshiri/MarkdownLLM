@@ -1,12 +1,15 @@
 ---
 id: explorer-macos-support
 type: plan
-status: not-started
-version: 1.0
+status: cancelled
+version: 1.1
 created: 2026-08-28
 priority: medium
 tags: [explorer, macos, packaging, portability, notarization]
 linked_things:
+  - id: explorer-macos-and-navigation-sprint-2026-09
+    relation: superseded-by
+    notes: "The operator chose one delivery sprint that combines the Mac handoff with the two navigation corrections Aaron should evaluate in the same candidate."
   - id: explorer-publication-readiness
     relation: complements
     notes: "Same shape of blocker at the end: Windows needs Authenticode, macOS needs Apple notarization. Neither is a code change."
@@ -24,6 +27,12 @@ linked_things:
 ---
 
 # Explorer on macOS
+
+> **Superseded 2026-09-01.** The measured platform analysis below remains the
+> input, but the executable work now lives in
+> `explorer-macos-and-navigation-sprint-2026-09`. This plan is cancelled as a
+> separate delivery unit so Mac packaging is not built and evidenced before the
+> candidate's navigation behaviour changes.
 
 The operator needs the Explorer running on a Mac. This plan records what that
 actually costs, measured rather than estimated, so the decision to start it is
