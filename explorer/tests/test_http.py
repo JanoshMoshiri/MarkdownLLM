@@ -3,11 +3,13 @@ from __future__ import annotations
 import http.client
 import json
 import threading
+import time
 
 import pytest
 
 from markdownllm_explorer import __version__
 from markdownllm_explorer.composition import build_runtime
+from markdownllm_explorer.core.limits import ExplorerLimits
 from markdownllm_explorer.delivery.http_server import serve
 
 
@@ -42,6 +44,41 @@ def test_health_is_minimal_and_static_shell_contains_no_estate_data(live_server)
     assert headers["Cache-Control"] == "no-store"
     assert request(server, "GET", "/context.css")[0] == 200
     assert request(server, "GET", "/js/views/context.js")[0] == 200
+
+
+@pytest.mark.system
+def test_idle_lease_requires_authenticated_activity(estate):
+    def start_server():
+        runtime = build_runtime(estate, limits=ExplorerLimits(idle_seconds=0.35))
+        server, _ = serve(runtime)
+        thread = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.02}, daemon=True)
+        thread.start()
+        return server, runtime, thread
+
+    server, runtime, thread = start_server()
+    try:
+        headers = {"X-Explorer-Capability": runtime.capability}
+        status, _, body = request(server, "GET", "/api/v1/session", headers)
+        assert status == 200 and json.loads(body)["data"] == {"idle_timeout_seconds": 0.35}
+        assert request(server, "GET", "/api/v1/session?unexpected=1", headers)[0] == 400
+        time.sleep(0.18)
+        assert request(server, "GET", "/health")[0] == 200
+        assert request(server, "HEAD", "/health", {"X-Explorer-Capability": "wrong"})[0] == 200
+        thread.join(timeout=0.35)
+        assert not thread.is_alive() and server.idle_expired.is_set()
+    finally:
+        server.server_close()
+
+    server, runtime, thread = start_server()
+    try:
+        time.sleep(0.2)
+        assert request(server, "HEAD", "/health", {"X-Explorer-Capability": runtime.capability})[0] == 200
+        time.sleep(0.2)
+        assert thread.is_alive(), "authenticated browser activity did not renew the lease"
+        thread.join(timeout=0.4)
+        assert not thread.is_alive() and server.idle_expired.is_set()
+    finally:
+        server.server_close()
 
 
 @pytest.mark.system

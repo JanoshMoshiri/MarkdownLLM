@@ -13,6 +13,8 @@ from urllib.parse import urlsplit
 
 import pytest
 
+from markdownllm_explorer import __main__ as cli
+
 
 EXPLORER = Path(__file__).parents[1]
 
@@ -87,3 +89,30 @@ def test_cli_requested_port_collision_is_controlled(estate, tmp_path):
         assert result.returncode == 2 and "startup failed" in result.stderr.casefold()
     finally:
         listener.close()
+
+
+@pytest.mark.unit
+def test_cli_open_browser_hands_off_capability_url(estate, monkeypatch):
+    class FinishedServer:
+        def __init__(self):
+            self.idle_expired = type("Flag", (), {"is_set": lambda self: False})()
+            self.closed = False
+            self.joined = None
+
+        def serve_forever(self, poll_interval=0.2):
+            return
+
+        def server_close(self):
+            self.closed = True
+
+        def join_active(self, timeout):
+            self.joined = timeout
+
+    runtime = object(); server = FinishedServer(); opened = []
+    monkeypatch.setattr(cli, "build_runtime", lambda root, domain: runtime)
+    monkeypatch.setattr(cli, "build_server", lambda value, port: (server, "http://127.0.0.1:43121/#cap=opaque"))
+
+    result = cli.main(["--root", str(estate), "--open-browser"], browser_opener=lambda url: opened.append(url) or True)
+
+    assert result == 0 and opened == ["http://127.0.0.1:43121/#cap=opaque"]
+    assert server.closed and server.joined == 4.5

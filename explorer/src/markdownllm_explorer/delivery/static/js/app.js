@@ -1,6 +1,7 @@
-import {captureCapability, get} from "./api.js";
+import {captureCapability, get, touch} from "./api.js";
+import {installActivityLease} from "./activity.js";
 import {abortAllRequests, beginRequest, completeRequest, isCurrent, state} from "./state.js";
-import {routeFromHash, routeFromText, validView, writeRoute} from "./routing.js";
+import {routeFromHash, routeFromText, validDocumentSurface, validView, writeRoute} from "./routing.js";
 import {applyThemeChoice as applyTheme, cycleThemeChoice} from "./theme.js";
 import {activeOverlay, closeOverlays, openOverlay, visibleFocusable} from "./overlays.js";
 import {initialiseLayout} from "./layout.js";
@@ -20,12 +21,24 @@ const fileTree = document.querySelector("#file-tree");
 const contextContent = document.querySelector("#context-content");
 const tabs = [...document.querySelectorAll('[role="tab"]')];
 let searchTimer;
+let stopActivityLease;
 
 async function initialise() {
   applyThemeChoice(localStorage.getItem("mdllm-explorer-theme") || "system");
   bindChrome();
   if (!captureCapability()) {
     showError({message: "Open Explorer using the launch URL printed by mdllm-explorer.", code: "capability_required"});
+    return;
+  }
+  try {
+    const session = await get("/api/v1/session");
+    stopActivityLease = installActivityLease({
+      timeoutSeconds: session.idle_timeout_seconds,
+      sendTouch: touch,
+      onExpire: () => showIdleExpired(session.idle_timeout_seconds),
+    });
+  } catch (error) {
+    showError(error);
     return;
   }
   showLoading();
@@ -41,8 +54,9 @@ async function initialise() {
     state.documentMode = routed.mode === "raw" ? "raw" : "rendered";
     state.commit = routed.commit || null;
     await selectSource(requested || estate.sources[0], false);
+    state.documentSurface = routed.path && !state.commit ? restoredSurface(routed) : null;
     if (state.commit) { if (routed.path) await openCommitFile(routed.path, false); else updateRoute(true); }
-    else if (routed.path) await restoreDocumentRoute(routed.path, state.documentMode, true);
+    else if (routed.path) await restoreDocumentRoute(routed.path, state.documentMode, state.documentSurface, true);
     else updateRoute(true);
   } catch (error) {
     if (error.name !== "AbortError" && isCurrent(request)) showError(error);
@@ -83,7 +97,7 @@ function bindChrome() {
     if (!anchor) return;
     event.preventDefault(); const route = routeFromText(anchor.getAttribute("href"));
     if (route.path) {
-      const opener = state.view === "skills" || state.view === "memory" ? openCollectionDocument : openDocument;
+      const opener = state.documentSurface === "collection" ? openCollectionDocument : openDocument;
       opener(route.path, "rendered");
     }
   });
@@ -93,7 +107,7 @@ function bindChrome() {
 
 async function chooseTab(view) {
   abortAllRequests(); clearTimeout(searchTimer);
-  state.view = validView(view); state.selectedPath = null; state.commit = null;
+  state.view = validView(view); state.selectedPath = null; state.documentSurface = null; state.commit = null;
   state.search = {query: "", items: [], cursor: null, partial: false};
   document.querySelector("#search-input").value = "";
   renderSourceContext(contextContent, state.source, state.sourceSettings, state.repository);
@@ -104,7 +118,7 @@ async function selectSource(source, pushRoute = true) {
   if (!source) throw new Error("No discoverable source is available.");
   abortAllRequests();
   clearTimeout(searchTimer);
-  state.source = source; state.selectedPath = null; state.sourceSettings = null; state.repository = null;
+  state.source = source; state.selectedPath = null; state.documentSurface = null; state.sourceSettings = null; state.repository = null;
   state.treeEntries.clear(); state.treeCursors.clear(); state.treePartials.clear(); state.openDirectories = new Set([""]);
   state.search = {query: "", items: [], cursor: null, partial: false};
   document.querySelector("#search-input").value = "";
@@ -275,7 +289,7 @@ async function resolveReferences(frontmatter, path) {
 }
 
 function openReference(path) {
-  const opener = state.view === "skills" || state.view === "memory" ? openCollectionDocument : openDocument;
+  const opener = state.documentSurface === "collection" ? openCollectionDocument : openDocument;
   opener(path, "rendered");
 }
 
@@ -294,14 +308,14 @@ function revealCollectionItem(path) {
 
 async function openCommit(sha) {
   abortAllRequests(); clearTimeout(searchTimer);
-  state.commit = sha; state.selectedPath = null; state.commitFiles = [];
+  state.commit = sha; state.selectedPath = null; state.documentSurface = null; state.commitFiles = [];
   updateRoute(); showLoading();
   await loadCommit();
 }
 
 async function closeCommit() {
   abortAllRequests();
-  state.commit = null; state.selectedPath = null; state.commitFiles = [];
+  state.commit = null; state.selectedPath = null; state.documentSurface = null; state.commitFiles = [];
   updateRoute();
   await loadView();
 }
@@ -321,6 +335,7 @@ async function loadCommit() {
 
 async function openCommitFile(path, pushRoute = true) {
   state.selectedPath = path;
+  state.documentSurface = null;
   // Selection belongs to opening the file, not to the click that happened to
   // cause it: a restored deep link opened the file with nothing marked.
   content.querySelectorAll(".split-view .collection-item").forEach(item => {
@@ -348,26 +363,27 @@ async function openCollectionDocument(path, mode = "rendered", pushRoute = true)
   revealCollectionItem(path);
   const reader = content.querySelector(".reader");
   if (reader) showLoading(reader);
-  await fetchDocument(path, mode, true, pushRoute);
+  await fetchDocument(path, mode, "collection", pushRoute);
 }
 
 async function openDocument(path, mode = "rendered", pushRoute = true) {
   abortAllRequests(); state.commit = null; state.commitFiles = [];
-  state.selectedPath = path; state.documentMode = mode; renderCurrentTree(); showLoading();
-  await fetchDocument(path, mode, false, pushRoute);
+  state.selectedPath = path; state.documentMode = mode; state.documentSurface = "standalone"; renderCurrentTree(); showLoading();
+  await fetchDocument(path, mode, "standalone", pushRoute);
 }
 
-async function fetchDocument(path, mode, embedded, pushRoute) {
-  if (state.selectedPath !== path || state.documentMode !== mode) {
-    abortAllRequests(); state.selectedPath = path; state.documentMode = mode;
+async function fetchDocument(path, mode, surface, pushRoute) {
+  const embedded = surface === "collection";
+  if (state.selectedPath !== path || state.documentMode !== mode || state.documentSurface !== surface) {
+    abortAllRequests(); state.selectedPath = path; state.documentMode = mode; state.documentSurface = surface;
   }
-  const identity = {source: state.source.id, tab: state.view, path, mode};
+  const identity = {source: state.source.id, tab: state.view, path, mode, surface};
   const request = beginRequest("document", identity);
   try {
     const value = await get("/api/v1/document", {source: identity.source, path, mode}, request.signal);
     if (!isCurrent(request)) return;
-    state.selectedPath = path; state.documentMode = value.mode;
-    renderDocument(content, value, nextMode => fetchDocument(path, nextMode, embedded, true), embedded);
+    state.selectedPath = path; state.documentMode = value.mode; state.documentSurface = surface;
+    renderDocument(content, value, nextMode => fetchDocument(path, nextMode, surface, true), embedded);
     renderDocumentContext(contextContent, state.source, value, openReference); renderCurrentTree();
     resolveReferences(value.frontmatter, value.path);
     if (pushRoute) updateRoute();
@@ -378,7 +394,7 @@ async function fetchDocument(path, mode, embedded, pushRoute) {
 
 async function search(query, cursor = null, append = false) {
   if (!append) {
-    abortAllRequests(); state.selectedPath = null; state.commit = null; state.commitFiles = [];
+    abortAllRequests(); state.selectedPath = null; state.documentSurface = null; state.commit = null; state.commitFiles = [];
     state.search = {query, items: [], cursor: null, partial: false};
   }
   const identity = {source: state.source.id, tab: state.view, query, cursor};
@@ -455,24 +471,38 @@ async function restoreRoute() {
   const previousCommit = state.commit;
   state.commit = route.commit || null;
   if (sourceChanged) await selectSource(source, false);
-  state.selectedPath = route.path || null; state.search = {query: "", items: [], cursor: null, partial: false}; activateTab();
+  state.selectedPath = route.path || null;
+  state.documentSurface = route.path && !state.commit ? restoredSurface(route) : null;
+  state.search = {query: "", items: [], cursor: null, partial: false}; activateTab();
   if (state.commit) {
     if (sourceChanged || state.commit !== previousCommit || !content.querySelector(".split-view")) await loadCommit();
     if (route.path) await openCommitFile(route.path, false);
     return;
   }
-  if (route.path) await restoreDocumentRoute(route.path, state.documentMode, sourceChanged);
-  else { state.selectedPath = null; await loadView(); }
+  if (route.path) await restoreDocumentRoute(route.path, state.documentMode, state.documentSurface, sourceChanged);
+  else { state.selectedPath = null; state.documentSurface = null; await loadView(); }
 }
 
-async function restoreDocumentRoute(path, mode, collectionLoaded = false) {
+async function restoreDocumentRoute(path, mode, surface, collectionLoaded = false) {
   await expandAncestors(path);
-  if (state.view === "skills" || state.view === "memory") {
+  if (surface === "collection") {
     if (!collectionLoaded) await loadView();
     await openCollectionDocument(path, mode, false);
     return;
   }
   await openDocument(path, mode, false);
+}
+
+function restoredSurface(route) {
+  return validDocumentSurface(route.surface) || (["skills", "memory"].includes(validView(route.tab)) ? "collection" : "standalone");
+}
+
+function showIdleExpired(timeoutSeconds) {
+  abortAllRequests();
+  stopActivityLease?.();
+  notice.hidden = false; notice.className = "notice error"; notice.setAttribute("role", "alert");
+  const minutes = Math.max(1, Math.round(timeoutSeconds / 60));
+  notice.textContent = `Explorer stopped after ${minutes} minutes of inactivity. Ask Claude Code to open it again.`;
 }
 
 function moreButton(label, action) { const button = document.createElement("button"); button.className = "load-more"; button.textContent = label; button.addEventListener("click", action); return button; }

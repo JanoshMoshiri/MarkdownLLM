@@ -9,6 +9,7 @@ export const state = {
   treeCursors: new Map(),
   treePartials: new Map(),
   selectedPath: null,
+  documentSurface: null,
   commit: null,
   commitFiles: [],
   collapsedGroups: new Set(),
@@ -30,6 +31,7 @@ export function liveLocationIdentity() {
     path: state.selectedPath,
     commit: state.commit,
     mode: state.documentMode,
+    surface: state.documentSurface,
     query: state.search.query,
   };
 }

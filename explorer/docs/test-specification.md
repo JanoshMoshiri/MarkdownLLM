@@ -96,7 +96,7 @@ Build a path-to-source map directly from fixture construction, independent of th
 
 ### O-IMMUTABILITY
 
-Before and after AJ-01–10, independently snapshot source-relative names/types, content SHA-256, size, mtime, mode/ACL where available; raw `.git/index`, config and packed refs; loose-ref bytes; object-name/content inventory; the unrelated sentinel directory; and Windows installation-owned registry/shortcut paths where applicable. Exclude atime/read telemetry explicitly. No production adapter or uninstaller manifest is used to compute the oracle.
+Before and after AJ-01–11, independently snapshot source-relative names/types, content SHA-256, size, mtime, mode/ACL where available; raw `.git/index`, config and packed refs; loose-ref bytes; object-name/content inventory; the unrelated sentinel directory; and platform-launcher-owned state where applicable. Exclude atime/read telemetry explicitly. No production adapter, launcher PID file or uninstaller manifest is used to compute the oracle.
 
 ### O-HTML-SAFETY
 

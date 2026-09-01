@@ -62,8 +62,9 @@ The notification-area icon has two commands:
 - **Open Explorer** — reopen the browser.
 - **Exit Explorer** — stop the local service.
 
-Closing the browser tab does not stop Explorer. Use **Exit Explorer** when you
-are finished.
+Closing the browser tab does not immediately stop Explorer. Use **Exit Explorer**
+when you are finished, or leave it idle: the local service and tray stop after
+30 minutes without authenticated activity.
 
 ## Update or remove it
 

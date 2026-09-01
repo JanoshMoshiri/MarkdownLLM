@@ -5,12 +5,14 @@ import sys
 import subprocess
 import threading
 import time
+import types
 from pathlib import Path
 
 import pytest
 
 from markdownllm_explorer.composition import build_runtime
 from markdownllm_explorer.adapters.cursors import CursorCodec
+from markdownllm_explorer.adapters import confined_source_reader as confined_reader
 from markdownllm_explorer.adapters.filesystem_catalogue import BoundaryRegistry, FilesystemSourceCatalogue, _collision_ids, _normalised_domain_id
 from markdownllm_explorer.adapters.git_commit_history import (
     GitCommitHistory, _RAW_FLAGS, _added_lines_arguments, _allowed_arguments, _detail_arguments,
@@ -172,7 +174,8 @@ def test_skills_and_memory_share_document_paths_and_report_metadata_issues(estat
     assert len(memory.items) == 2
     assert all("duplicate_id" in item.issues for item in memory.items)
     mismatch = next(item for item in memory.items if item.path.value.endswith("two.md"))
-    assert "frontmatter_type_mismatch" in mismatch.issues
+    assert mismatch.thing_type == "conflict"
+    assert "frontmatter_type_mismatch" not in mismatch.issues
 
 
 @pytest.mark.contract
@@ -382,6 +385,28 @@ def test_reparse_or_symlink_parent_is_rejected_even_when_target_stays_inside_sou
         if link.is_symlink() or getattr(link, "is_junction", lambda: False)():
             link.unlink()
 
+
+@pytest.mark.unit
+def test_macos_open_handle_final_path_is_validated(tmp_path, monkeypatch):
+    target = tmp_path / "opened.md"
+    target.write_text("opened", encoding="utf-8")
+
+    def fcntl_success(file_descriptor, operation, buffer):
+        assert file_descriptor >= 0 and operation == 50
+        encoded = os.fsencode(target)
+        buffer[:len(encoded)] = encoded
+        return 0
+
+    monkeypatch.setattr(confined_reader, "sys", types.SimpleNamespace(platform="darwin"))
+    monkeypatch.setitem(sys.modules, "fcntl", types.SimpleNamespace(fcntl=fcntl_success, F_GETPATH=50))
+    with target.open("rb") as handle:
+        assert confined_reader._opened_final_path(handle) == target.resolve()
+
+    monkeypatch.setitem(sys.modules, "fcntl", types.SimpleNamespace(fcntl=lambda *_: (_ for _ in ()).throw(OSError())))
+    with target.open("rb") as handle, pytest.raises(ExplorerError) as caught:
+        confined_reader._opened_final_path(handle)
+    assert caught.value.code == "source_unreadable"
+
 def _head_sha(runtime) -> str:
     return runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]}).commits.items[0].sha
 
@@ -518,6 +543,37 @@ def test_memory_groups_run_z_to_a_with_titles_ascending_inside(tmp_path):
     assert ordered == ["Retrospectives", "Insights", "Decisions", "Conflicts"]
     conflicts = [item.title for item in page.items if item.group == "Conflicts"]
     assert conflicts == ["Alpha clash", "Beta clash"]
+
+
+@pytest.mark.contract
+def test_memory_groups_are_dynamic_and_overview_count_matches(tmp_path):
+    root = tmp_path / "dynamic-groups"
+    root.mkdir()
+    (root / "AGENTS.md").write_text("# Dynamic groups", encoding="utf-8")
+    documents = {
+        "things/working-documents/nested/draft.md": _THING.format(identifier="draft", kind="artifact", title="Draft"),
+        "things/requirement_specs/current.md": _THING.format(identifier="requirement", kind="specification", title="Requirement"),
+        "things/plans/roadmap.markdown": _THING.format(identifier="roadmap", kind="plan", title="Roadmap"),
+    }
+    for relative, body in documents.items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+    (root / "things" / "empty").mkdir(parents=True)
+    (root / "things" / "not-markdown" / "note.txt").parent.mkdir(parents=True)
+    (root / "things" / "not-markdown" / "note.txt").write_text("not curated", encoding="utf-8")
+
+    runtime = build_runtime(root)
+    page = runtime.routes.dispatch("/api/v1/collection", {"source": ["substrate"], "kind": ["memory"]})
+    overview = runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]})
+
+    assert [(item.group, item.path.value) for item in page.items] == [
+        ("Working Documents", "things/working-documents/nested/draft.md"),
+        ("Requirement Specs", "things/requirement_specs/current.md"),
+        ("Plans", "things/plans/roadmap.markdown"),
+    ]
+    assert overview.counts.memory == len(page.items) == 3
+    assert not any("frontmatter_type_mismatch" in item.issues for item in page.items)
 
 def _lines(*rows: str) -> str:
     """Build file text from its lines, so the cases below read as files."""

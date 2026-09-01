@@ -164,9 +164,11 @@ surfaces, then one command to install the hook.
 ### 7. Seeing the estate without opening a coding harness
 
 You want to understand what exists before asking an agent to change anything.
-The optional [MarkdownLLM Explorer](../explorer/README.md) Windows preview opens
-the substrate and nested domain estate as a read-only visual surface: repository
-commits, the file tree, skills and memory, with Markdown rendered as a document.
+The optional [MarkdownLLM Explorer](../explorer/README.md) opens the substrate
+and nested domain estate as a read-only visual surface: repository commits, the
+file tree, skills and memory, with Markdown rendered as a document. Windows has
+an installer preview. On macOS, ask the framework agent to **open MarkdownLLM
+Explorer**; it runs the tracked portable launcher and opens the browser.
 
 Explorer is a viewer, not an agent route. It cannot accept instructions, invoke
 skills, edit files, run `estate-sync`, validate, reconcile or publish. If its
@@ -174,6 +176,10 @@ view is stale, synchronise the underlying repositories through the normal
 operator/agent workflow and refresh Explorer. Start with the [installation
 guide](../explorer/docs/installation-guide.md) and then the [user
 guide](../explorer/docs/user-guide.md).
+
+The local service stops after 30 minutes without authenticated browser activity.
+Ask the agent to open it again when needed; no server-management command needs
+to be remembered.
 
 *Boundary: `interface.md`; release position: `explorer-publication-position`.*
 

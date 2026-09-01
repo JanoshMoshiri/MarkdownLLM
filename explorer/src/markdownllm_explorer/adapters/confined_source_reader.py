@@ -5,10 +5,12 @@ from __future__ import annotations
 import hashlib
 import os
 import stat
+import sys
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from urllib.parse import unquote
 
+from markdownllm_explorer.core.collection_policy import memory_group_for
 from markdownllm_explorer.core.eligibility import EligibilityPolicy
 from markdownllm_explorer.core.errors import ExplorerError
 from markdownllm_explorer.core.limits import ExplorerLimits
@@ -39,7 +41,7 @@ class ConfinedSourceReader:
                 eligible += 1
                 if relative.parts and relative.parts[0].casefold() == "skills" and relative.name.casefold().endswith((".md", ".markdown")):
                     skills += 1
-                if self._memory_group(relative):
+                if memory_group_for(relative):
                     memory += 1
                 if eligible >= self._limits.candidate_scan:
                     partial = True
@@ -301,12 +303,6 @@ class ConfinedSourceReader:
             if _is_reparse(current):
                 raise ExplorerError("path_outside_source")
 
-    def _memory_group(self, relative: RelativePath) -> str | None:
-        if len(relative.parts) < 3 or relative.parts[0].casefold() != "things" or not relative.name.casefold().endswith((".md", ".markdown")):
-            return None
-        groups = {"insights": "Insights", "conflicts": "Conflicts", "retrospectives": "Retrospectives", "decisions": "Decisions"}
-        return groups.get(relative.parts[1].casefold())
-
     def resolve_markdown_target(self, token: BoundaryToken, document: RelativePath, raw_target: str) -> RelativePath | None:
         boundary = self._registry.by_token(token)
         target_text = unquote(raw_target.split("#", 1)[0].split("?", 1)[0], errors="strict")
@@ -372,6 +368,18 @@ def _iso(timestamp: float) -> str:
 
 
 def _opened_final_path(handle) -> Path | None:
+    if sys.platform == "darwin":
+        try:
+            import fcntl
+
+            buffer = bytearray(1024)
+            fcntl.fcntl(handle.fileno(), getattr(fcntl, "F_GETPATH", 50), buffer)
+            raw = bytes(buffer).split(b"\x00", 1)[0]
+            if not raw:
+                raise OSError
+            return Path(os.fsdecode(raw)).resolve(strict=True)
+        except (AttributeError, OSError, ValueError):
+            raise ExplorerError("source_unreadable") from None
     if os.name != "nt":
         return None
     try:

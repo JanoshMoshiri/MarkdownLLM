@@ -50,3 +50,21 @@ export async function get(path, params = {}, signal) {
   }
   return data;
 }
+
+export async function touch() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(new URL("/health", location.origin), {
+      method: "HEAD",
+      headers: {"X-Explorer-Capability": capability},
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}

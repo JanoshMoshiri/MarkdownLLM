@@ -19,14 +19,14 @@
     "status": "pass",
     "real_interrupt": true,
     "active_request_at_interrupt": true,
-    "shutdown_seconds": 4.562,
+    "shutdown_seconds": 4.812,
     "invalid_root_exit": 2,
     "port_collision_exit": 2,
     "fixture_immutable": true,
     "launch_cwd_immutable": true
   },
   "package_probe": {
-    "version": "0.3.0",
+    "version": "0.4.0",
     "yaml": "6.0.3",
     "index": true,
     "app": true,
@@ -39,12 +39,12 @@
     "/api/v1/estate"
   ],
   "explorer_wheel": {
-    "name": "markdownllm_explorer-0.3.0-py3-none-any.whl",
-    "sha256": "e4891f7ff837a1504518baeb2176b4e7e75a333208af360effe47057a1652f18"
+    "name": "markdownllm_explorer-0.4.0-py3-none-any.whl",
+    "sha256": "df5086e750451f275d3238c29ca63e1fa4704e84d0cfb5f479a3ab8666c015fb"
   },
   "dependency_wheel": {
     "name": "pyyaml-6.0.3-cp312-cp312-win_amd64.whl",
     "sha256": "5fcd34e47f6e0b794d17de1b4ff496c00986e1c83f7ab2fb8fcfe9616ff7477b"
   },
-  "installer_output_tail": "Looking in links: c:\\Users\\Jamos\\AppData\\Local\\Temp\\explorer-wheelhouse\nProcessing c:\\users\\jamos\\appdata\\local\\temp\\explorer-wheelhouse\\markdownllm_explorer-0.3.0-py3-none-any.whl\nProcessing c:\\users\\jamos\\appdata\\local\\temp\\explorer-wheelhouse\\pyyaml-6.0.3-cp312-cp312-win_amd64.whl\nInstalling collected packages: PyYAML, markdownllm-explorer\nSuccessfully installed PyYAML-6.0.3 markdownllm-explorer-0.3.0\n"
+  "installer_output_tail": "Looking in links: c:\\Users\\Jamos\\Projects\\MarkdownLLM\\.test-tmp\\explorer-wheelhouse-040\nProcessing c:\\users\\jamos\\projects\\markdownllm\\.test-tmp\\explorer-wheelhouse-040\\markdownllm_explorer-0.4.0-py3-none-any.whl\nProcessing c:\\users\\jamos\\projects\\markdownllm\\.test-tmp\\explorer-wheelhouse-040\\pyyaml-6.0.3-cp312-cp312-win_amd64.whl\nInstalling collected packages: PyYAML, markdownllm-explorer\nSuccessfully installed PyYAML-6.0.3 markdownllm-explorer-0.4.0\n"
 }

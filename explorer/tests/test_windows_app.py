@@ -45,6 +45,22 @@ class FakeTraySurface:
         return
 
 
+class BlockingTraySurface:
+    def __init__(self):
+        self.stopped = threading.Event()
+
+    def run(self, open_explorer, exit_explorer):
+        self.stopped.wait(timeout=2)
+
+    def stop(self):
+        self.stopped.set()
+
+
+class ExpiredServer(FakeServer):
+    def serve_forever(self, poll_interval=0.2):
+        self.started.set()
+
+
 class FakeInstanceCoordinator:
     def __init__(self, primary: bool, *, primary_exits: bool = True):
         self.primary = primary
@@ -82,6 +98,18 @@ def test_desktop_session_opens_browser_and_shuts_down_cleanly():
     assert opened == ["http://127.0.0.1:7123/#cap=opaque"] * 2
     assert tray.labels == ["Open Explorer", "Exit Explorer"]
     assert server.stopped.is_set() and server.closed and server.join_timeout == 4.5
+    assert not any(thread.name == "explorer-desktop-server" for thread in threading.enumerate())
+
+
+@pytest.mark.unit
+def test_desktop_session_idle_server_exit_stops_tray():
+    server = ExpiredServer(); tray = BlockingTraySurface()
+    session = DesktopExplorerSession(server, "http://127.0.0.1:7123/#cap=opaque", lambda _: None, tray)
+
+    session.run(open_on_start=False)
+
+    assert server.started.is_set() and tray.stopped.is_set()
+    assert server.closed and server.join_timeout == 4.5
     assert not any(thread.name == "explorer-desktop-server" for thread in threading.enumerate())
 
 

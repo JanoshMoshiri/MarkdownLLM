@@ -33,6 +33,7 @@ _ASSETS = {
     "/app.css": ("app.css", "text/css; charset=utf-8"),
     "/context.css": ("context.css", "text/css; charset=utf-8"),
     "/js/api.js": ("js/api.js", "text/javascript; charset=utf-8"),
+    "/js/activity.js": ("js/activity.js", "text/javascript; charset=utf-8"),
     "/js/app.js": ("js/app.js", "text/javascript; charset=utf-8"),
     "/js/state.js": ("js/state.js", "text/javascript; charset=utf-8"),
     "/js/routing.js": ("js/routing.js", "text/javascript; charset=utf-8"),
@@ -59,7 +60,41 @@ class BoundedHTTPServer(ThreadingHTTPServer):
         self.capacity = threading.BoundedSemaphore(runtime.limits.concurrent_requests)
         self.active_threads: set[threading.Thread] = set()
         self.active_lock = threading.Lock()
+        self.activity_lock = threading.Lock()
+        self.last_activity = time.monotonic()
+        self.idle_stop = threading.Event()
+        self.idle_expired = threading.Event()
         super().__init__(address, handler)
+
+    def note_activity(self) -> None:
+        with self.activity_lock:
+            self.last_activity = time.monotonic()
+
+    def serve_forever(self, poll_interval: float = 0.5) -> None:
+        monitor = threading.Thread(target=self._monitor_idle, name="explorer-idle-monitor", daemon=True)
+        monitor.start()
+        try:
+            super().serve_forever(poll_interval=poll_interval)
+        finally:
+            self.idle_stop.set()
+
+    def shutdown(self) -> None:
+        self.idle_stop.set()
+        super().shutdown()
+
+    def server_close(self) -> None:
+        self.idle_stop.set()
+        super().server_close()
+
+    def _monitor_idle(self) -> None:
+        interval = min(1.0, max(0.01, self.runtime.limits.idle_seconds / 4))
+        while not self.idle_stop.wait(interval):
+            with self.activity_lock:
+                expired = time.monotonic() - self.last_activity >= self.runtime.limits.idle_seconds
+            if expired:
+                self.idle_expired.set()
+                super().shutdown()
+                return
 
     def get_request(self):
         request, address = super().get_request()
@@ -160,6 +195,9 @@ class ExplorerHandler(BaseHTTPRequestHandler):
             target = urlsplit(self.path)
             operation = target.path.rsplit("/", 1)[-1] or "shell"
             if target.path == "/health":
+                supplied = self.headers.get("X-Explorer-Capability", "")
+                if head and supplied and hmac.compare_digest(supplied, self.runtime.capability):
+                    self.server.note_activity()  # type: ignore[attr-defined]
                 self._json(200, {"status": "ok", "version": __version__}, head)
                 return
             if target.path.startswith("/api/"):
@@ -168,6 +206,16 @@ class ExplorerHandler(BaseHTTPRequestHandler):
                     raise ExplorerError("capability_required")
                 if not hmac.compare_digest(supplied, self.runtime.capability):
                     raise ExplorerError("capability_invalid")
+                if target.path == "/api/v1/session":
+                    if target.query:
+                        raise ExplorerError("invalid_request")
+                    self.server.note_activity()  # type: ignore[attr-defined]
+                    self._json(
+                        200,
+                        {"data": {"idle_timeout_seconds": self.runtime.limits.idle_seconds}, "meta": {"request_id": self.request_id, "observed_at": _observed_at()}},
+                        head,
+                    )
+                    return
                 query = parse_qs(target.query, keep_blank_values=True, strict_parsing=False, max_num_fields=8)
                 candidate_source = query.get("source", [None])[0]
                 if isinstance(candidate_source, str) and re.fullmatch(r"(?:substrate|domain/[A-Za-z0-9._~%\-]{1,240})", candidate_source):
@@ -177,6 +225,7 @@ class ExplorerHandler(BaseHTTPRequestHandler):
                 if isinstance(candidate_path, str) and _safe_relative_context(candidate_path):
                     self.request_relative_path = candidate_path
                 result = self.runtime.routes.dispatch(target.path, query)
+                self.server.note_activity()  # type: ignore[attr-defined]
                 self._json(200, {"data": to_wire(result), "meta": self._success_meta(result)}, head)
                 return
             if target.query or target.path not in _ASSETS:

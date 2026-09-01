@@ -9,10 +9,11 @@ State lives as plain markdown files — atomic, explicitly linked, version-contr
 A framework discovered by agents, directed by you, and grown together. Its entry contract, markdown state, and Git floor are portable to file-aware LLM tools; discovery and lifecycle support are verified per harness rather than inferred from a product name. A domain is a plain Markdown folder and can be opened in tools such as Obsidian; full vault-compatibility remains an execution-test claim, not an assumption.
 
 **Want to see the estate before opening an agent harness?** [MarkdownLLM
-Explorer](explorer/README.md) is the optional, read-only Windows preview. It
-turns the substrate, domains, commits, files, skills and memory into a visual
-local interface without changing the files or becoming a second source of
-truth.
+Explorer](explorer/README.md) is the optional, read-only local viewer. Windows
+has an installer preview; on macOS the framework agent can bootstrap and open
+the portable route directly. It turns the substrate, domains, commits, files,
+skills and memory into a visual local interface without changing the files or
+becoming a second source of truth.
 
 ---
 
@@ -93,7 +94,7 @@ The human-facing guides and visual surfaces:
 | [framework-map.md](docs/framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping, the estate seam |
 | [estate-mechanics.md](docs/estate-mechanics.md) | Running more than one domain — the three radii of a change, sync and publication across repos |
 | [calculation-reference.md](docs/calculation-reference.md) | The `computed:` expression grammar — declared derivations the floor evaluates |
-| [Explorer installation guide](explorer/docs/installation-guide.md) | Install the read-only Windows preview without installing Python |
+| [Explorer installation guide](explorer/docs/installation-guide.md) | Install the read-only Windows preview |
 | [Explorer user guide](explorer/docs/user-guide.md) | Look through the substrate, domains, commits, files, skills and memory |
 
 ### Explore the estate visually
@@ -113,7 +114,10 @@ candidate**. The independent-review corrections are implemented, but public
 Windows publication remains gated by Authenticode signing and a final native
 lifecycle run on the signed bytes. The source and installer build recipe are
 tracked here; the eventual verified `.exe` is attached separately as a release
-asset rather than committed to the repository.
+asset rather than committed to the repository. On macOS, ask the framework
+agent to **open MarkdownLLM Explorer**; `tools/open-explorer.sh` creates its
+owned portable environment, opens the browser and stops after 30 minutes of
+inactivity. Native Mac packaging remains a later actual-Mac lane.
 See the [installation
 guide](explorer/docs/installation-guide.md), [user
 guide](explorer/docs/user-guide.md), and [source/build

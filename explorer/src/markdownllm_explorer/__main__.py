@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import signal
 import sys
+import webbrowser
 from pathlib import Path
 
 from .composition import build_runtime, build_server
@@ -21,12 +22,13 @@ def _port(value: str) -> int:
     return port
 
 
-def main() -> int:
+def main(argv: list[str] | None = None, *, browser_opener=webbrowser.open) -> int:
     parser = argparse.ArgumentParser(description="Explore a MarkdownLLM substrate and domain estate")
     parser.add_argument("--root", type=Path, required=True, help="substrate root")
     parser.add_argument("--domain-dir", default="domain", help="one-level domain directory relative to root")
     parser.add_argument("--port", type=_port, default=0, help="loopback port (default: choose an available port)")
-    arguments = parser.parse_args()
+    parser.add_argument("--open-browser", action="store_true", help="open Explorer in the default browser")
+    arguments = parser.parse_args(argv)
     try:
         resolved_root = arguments.root.expanduser().resolve(strict=True)
         runtime = build_runtime(resolved_root, arguments.domain_dir)
@@ -39,6 +41,15 @@ def main() -> int:
     print(f"Root: {resolved_root}", flush=True)
     print(f"MarkdownLLM Explorer: {url}", flush=True)
     print("Read-only local service. Press Ctrl+C to stop.", flush=True)
+    if arguments.open_browser:
+        try:
+            opened = browser_opener(url)
+        except Exception:
+            opened = False
+        if opened is False:
+            server.server_close()
+            print("Explorer startup failed [browser_unavailable]: Explorer could not open the default browser.", file=sys.stderr)
+            return 2
     if hasattr(signal, "SIGBREAK"):
         # Windows process-group CTRL_BREAK is the testable equivalent of an
         # interactive console interrupt.  Convert it to the same controlled
@@ -51,6 +62,8 @@ def main() -> int:
     finally:
         server.server_close()
         server.join_active(4.5)
+    if server.idle_expired.is_set():
+        print("Explorer stopped after 30 minutes of inactivity.", flush=True)
     return 0
 
 

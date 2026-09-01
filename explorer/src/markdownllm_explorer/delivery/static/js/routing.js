@@ -8,6 +8,7 @@ export function routeFromText(text) {
     source: params.get("source"),
     tab: params.get("tab"),
     mode: params.get("mode"),
+    surface: params.get("surface"),
     path: params.get("path"),
     commit: params.get("commit"),
   };
@@ -15,6 +16,10 @@ export function routeFromText(text) {
 
 export function validView(view) {
   return ["overview", "skills", "memory", "settings"].includes(view) ? view : "overview";
+}
+
+export function validDocumentSurface(surface) {
+  return ["standalone", "collection"].includes(surface) ? surface : null;
 }
 
 export function writeRoute(state, replace = false) {
@@ -25,6 +30,9 @@ export function writeRoute(state, replace = false) {
     mode: state.documentMode,
   });
   if (state.commit) params.set("commit", state.commit);
-  if (state.selectedPath) params.set("path", state.selectedPath);
+  if (state.selectedPath) {
+    params.set("path", state.selectedPath);
+    if (!state.commit && validDocumentSurface(state.documentSurface)) params.set("surface", state.documentSurface);
+  }
   history[replace ? "replaceState" : "pushState"](null, "", `#${params}`);
 }

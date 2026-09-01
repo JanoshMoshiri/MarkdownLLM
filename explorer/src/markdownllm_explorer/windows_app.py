@@ -89,9 +89,14 @@ class DesktopExplorerSession:
         self._tray_surface.stop()
 
     def run(self, *, open_on_start: bool) -> None:
+        def serve_until_stopped() -> None:
+            self._server.serve_forever(poll_interval=0.2)
+            if not self._stopping.is_set():
+                self._stopping.set()
+                self._tray_surface.stop()
+
         self._server_thread = threading.Thread(
-            target=self._server.serve_forever,
-            kwargs={"poll_interval": 0.2},
+            target=serve_until_stopped,
             name="explorer-desktop-server",
             daemon=False,
         )

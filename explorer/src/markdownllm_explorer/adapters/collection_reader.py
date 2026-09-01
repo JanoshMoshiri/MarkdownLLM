@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 from datetime import datetime, timezone
 
+from markdownllm_explorer.core.collection_policy import memory_group_for
 from markdownllm_explorer.core.errors import ExplorerError
 from markdownllm_explorer.core.limits import ExplorerLimits
 from markdownllm_explorer.core.models import BoundaryToken, CollectionItem, FrontmatterState, Page, RelativePath
@@ -83,8 +84,6 @@ class CuratedCollectionReader:
                 thing_id = _string(parsed.frontmatter.values.get("id"))
                 thing_type = _string(parsed.frontmatter.values.get("type"))
                 title = _title(parsed.body) or title
-                if kind == "memory" and thing_type and thing_type.casefold() != group.rstrip("s").casefold():
-                    issues.append("frontmatter_type_mismatch")
             elif parsed.frontmatter.state is FrontmatterState.INVALID:
                 issues.append("frontmatter_invalid")
             elif kind == "memory":
@@ -97,9 +96,7 @@ class CuratedCollectionReader:
     def _group(relative: RelativePath, kind: str) -> str | None:
         if kind == "skills":
             return "Skills" if relative.parts and relative.parts[0].casefold() == "skills" and relative.name.casefold().endswith((".md", ".markdown")) else None
-        if len(relative.parts) < 3 or relative.parts[0].casefold() != "things" or not relative.name.casefold().endswith((".md", ".markdown")):
-            return None
-        return {"insights": "Insights", "conflicts": "Conflicts", "retrospectives": "Retrospectives", "decisions": "Decisions"}.get(relative.parts[1].casefold())
+        return memory_group_for(relative)
 
 
 def _string(value: object) -> str | None:

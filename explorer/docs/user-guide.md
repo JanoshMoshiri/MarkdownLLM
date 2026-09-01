@@ -74,7 +74,9 @@ Back and Forward restore both the skill and the surrounding Skills collection.
 
 ## Follow the memory
 
-Open **Memory** to see decisions, insights, conflicts and retrospectives. Items
+Open **Memory** to see every populated first-level folder beneath the source's
+`things/` directory, such as decisions, insights, plans, working documents or
+domain-specific groups. Items
 are grouped by kind, so you can move from a decision to the learning that
 informed it. Each group can be folded away with the arrow beside its name, and
 the count stays visible so a folded group still tells you how much is in it. A

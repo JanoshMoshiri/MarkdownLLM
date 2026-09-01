@@ -146,6 +146,15 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 2. **Load examples if needed** — Reference `examples/` for concrete demonstrations
 3. **Execute** — Reason within the framework's own principles while helping the user
 
+### Opening MarkdownLLM Explorer on macOS
+
+When the operator asks to open or launch MarkdownLLM Explorer on a Mac, run
+`bash tools/open-explorer.sh` from this framework checkout. The tracked launcher
+owns environment bootstrap, safe replacement of an earlier owned process,
+default-browser opening and the shared 30-minute inactivity shutdown; do not ask
+the operator to remember the underlying Python commands. Use
+`bash tools/open-explorer.sh --stop` when the operator asks to stop it explicitly.
+
 ### On Output
 
 > **[HARD HOOK: `post-write:commit`]** After creating or modifying any `.md` file with YAML frontmatter, commit it to the **owning repo** before completing the response. Walk up the directory tree from the modified file to find the correct `.git` root — never assume it is the framework repo. Full spec: `orchestration.md` → Hard Hooks.

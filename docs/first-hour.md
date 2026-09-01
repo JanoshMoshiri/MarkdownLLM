@@ -75,11 +75,12 @@ PowerShell use `./tools/mdllm.ps1 <command>`; elsewhere use
    get one of these, written for you.
 
 **Optional visual route.** If you have installed the [MarkdownLLM Explorer
-Windows preview](../explorer/docs/installation-guide.md), open it now and use
-the substrate and domain lists to look around. It is a read-only orientation
-aid, not part of installing the floor and not a replacement for the agent that
-will create or change a domain. Nothing in the rest of this first hour depends
-on it.
+Windows preview](../explorer/docs/installation-guide.md), open it now. On a Mac,
+ask the framework agent to **open MarkdownLLM Explorer** and it will bootstrap
+the portable viewer. Use the substrate and domain lists to look around. It is a
+read-only orientation aid, not part of installing the floor and not a
+replacement for the agent that will create or change a domain. Nothing in the
+rest of this first hour depends on it.
 
 The README is the one-page overview if you want the *why*; skip
 `domain-specification-guide.md` entirely — that one is your *agent's* reading,
