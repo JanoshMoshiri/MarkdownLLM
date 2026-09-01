@@ -10,8 +10,9 @@ MarkdownLLM Explorer is a standalone, read-only browser for a MarkdownLLM substr
 ## Start here
 
 - [Install Explorer on Windows](docs/installation-guide.md)
-- [Open Explorer on macOS](#macos-quick-route)
+- [Open Explorer on macOS](docs/macos-quick-start.md)
 - [Explore a MarkdownLLM estate](docs/user-guide.md)
+- [See all Explorer documentation](docs/README.md)
 
 ## macOS quick route
 
