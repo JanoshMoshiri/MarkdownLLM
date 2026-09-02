@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-02
-generated: 2026-09-02T17:45:52
-generated_from: HEAD@9d77c57
-coverage: 330
+generated: 2026-09-02T18:06:29
+generated_from: HEAD@8df56e0
+coverage: 331
 framework_version: 3.37.0
 ---
 
@@ -838,6 +838,7 @@ framework_version: 3.37.0
 - markdownllm-explorer-comprehensive-review-remediation-2026-08-27 --extends--> markdownllm-explorer-comprehensive-review-2026-08-27
 - markdownllm-explorer-comprehensive-review-remediation-2026-08-27 --documents--> explorer-publication-readiness
 - markdownllm-explorer-comprehensive-review-remediation-2026-08-27 --implements--> code-architect-governs-substrate-code
+- markdownllm-explorer-white-label-requirements-cold-review --validates--> explorer-white-label-presentation-2026-09
 - mcp-domain-server-design --extends--> interface-specification
 - mcp-domain-server-design --complements--> provenance-specification
 - mcp-domain-server-design --complements--> orchestration-specification
