@@ -1,12 +1,12 @@
 # MarkdownLLM Explorer — Design Specification
 
-**Status:** implementation-reconciled, operator-accepted candidate; public Windows release remains gated by signing and signed-byte native verification
+**Status:** the white-label presentation increment (v0.6) is designed and awaits its cold-read cycle; the 0.4.0 design beneath it is implementation-reconciled and operator-accepted; public Windows release remains gated by signing and signed-byte native verification
 
-**Version:** 0.5
+**Version:** 0.6
 
-**Date:** 2026-08-27
+**Date:** 2026-09-02
 
-**Requirements:** `explorer/docs/requirements.md` v0.4 in the same reconciled change set
+**Requirements:** `explorer/docs/requirements.md` v0.5
 
 **Architectural sources:** MarkdownLLM framework v3.36.0; Code Architect domain `c711d2a46225aaca471100e1eec2afceb02e751a`
 
@@ -61,6 +61,18 @@ The existing CLI remains a console driver. `windows_app.py` is a separate Framew
 
 The Windows launcher owns a per-user named mutex and named pipe. The first process keeps the capability-bearing URL only in memory and listens for the command `open`. A second shortcut activation sends only that command and exits; the existing process opens its own URL. The URL/capability is never written to registry, shortcut, disk or pipe. The only retained launch setting is the selected substrate root, stored by the installer under the current user's application key and repeated in shortcut arguments.
 
+### D-010 — Presentation is data at the install radius
+
+An organisation's brand is a property of its checkout, not of any domain and not of an Explorer control. It is one install-local file, `presentation.md` at the substrate root, in the same family as the ignored `domain/` directory and the floor's `.boundary-terms`: read by the product, never tracked by the framework. Explorer reads it through the confined reader like any other file and validates every field in a pure core policy; a domain's own identity is read the same way from the `name` and `description` its entry file already declares. A plugin-style extension point was rejected because anything loaded from the estate would execute or render inside a product whose safety case is that estate bytes cannot; a domain-owned claim with an exactly-one rule was withdrawn because for an adopter every domain is the organisation's and the rule served nobody.
+
+### D-011 — Images are package data, and the manifest is the only image route
+
+The content security policy moves from `img-src 'none'` to `img-src 'self'`, and nothing else. The only same-origin URLs that answer with an image content type are entries of the immutable packaged asset manifest: the product icon and, when a build profile placed one, a single packaged mark. No API route serves bytes with an image type, the document presenter emits no image element, and the root presentation file has no field that can name, enable or replace an image. "Repository bytes never render as an image" therefore stays literally true; the boundary moved one step outward and did not open.
+
+### D-012 — A build profile parameterises the outer packaging only
+
+One profile names the product, publisher, installer output, icon, mark image and embedded default presentation. A build applies it by writing package data and passing NSIS defines; it changes no core or application module and no source policy, and the default profile reproduces today's build inputs byte for byte. The frozen executable filename and the per-user mutex and pipe identities stay the product's in this increment, so for one Windows user only one frozen Explorer runs at a time whatever its brand or root, and a second brand's activation opens the running instance's browser; two brands may be installed side by side, each under its own directory, registry key and shortcuts, and neither upgrades nor uninstalls the other. Renaming the executable is deferred to the Windows publication lane, which owns the lifecycle evidence that change would need.
+
 ## 3. System context
 
 ```mermaid
@@ -75,13 +87,51 @@ flowchart LR
     UC --> HIST[Commit-history port]
     UC --> RENDER[Document-renderer port]
     CAT --> FS1[Filesystem catalogue adapter]
+    FS1 --> PRES[Confined presentation reader]
+    PRES --> FS2
     FILE --> FS2[Confined filesystem adapter]
     HIST --> GIT[Constrained git CLI adapter]
     RENDER --> MD[Safe Markdown adapter]
     FS1 --> Estate[(Substrate + domain roots)]
     FS2 --> Estate
+    PRES --> Pkg[(Packaged default presentation + mark)]
     GIT --> Repos[(Independent git repositories)]
 ```
+
+Presentation enters through the catalogue: the same discovery that admits sources reads each source's declared identity and the substrate's root presentation file through the confined reader, applies the pure presentation policy, and publishes identity and presentation inside the one atomic estate snapshot. The packaged default and mark are package data read once at composition.
+
+### Model views for the presentation increment
+
+```mermaid
+flowchart LR
+    PM[presentation.md at the substrate root] --> CSR[ConfinedSourceReader]
+    AG[AGENTS.md in each domain boundary] --> CSR
+    CSR --> FP[FrontmatterParser]
+    EMB[presentation/embedded.md, package data] --> FP
+    FP --> POL[PresentationPolicy, core]
+    POL -->|record and rejected fields| CAT[Catalogue discovery]
+    CAT --> SNAP[EstateSnapshot with presentation]
+    SNAP --> JS[presentation.js]
+    JS -->|textContent| TXT[Shell text and labels]
+    JS -->|style.setProperty| TOK[Accent tokens]
+    MARK[presentation/mark.png, package data] -->|asset manifest| IMG[Brand mark image]
+    POL -.->|rejected field| ISSUE[Estate issue]
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> ReadRoot
+    ReadRoot --> RootApplied: valid file
+    ReadRoot --> ReadPackaged: absent, unreadable, oversized or malformed
+    ReadPackaged --> PackagedApplied: embedded default present
+    ReadPackaged --> ProductDefault: none embedded
+    ReadRoot --> ReadPackaged: parses but declares no field, reported empty
+    RootApplied --> [*]: invalid fields dropped and reported, each filled from the next source
+    PackagedApplied --> [*]
+    ProductDefault --> [*]
+```
+
+The state view is per field: the identity group (name, tagline, text mark) takes the first source with a valid name; each accent and each label walks the chain on its own; the mark image never leaves the packaged source.
 
 All dependency arrows in source code point from outer adapters toward application-owned ports and pure models. Core/application modules import no HTTP, browser, subprocess, filesystem or YAML/HTML implementation.
 
@@ -97,6 +147,11 @@ explorer/
 │   ├── launcher.py
 │   ├── version-info.txt
 │   └── assets/markdownllm-explorer.ico
+├── packaging/apply_profile.py
+├── packaging/profiles/
+│   ├── default.yaml
+│   ├── reverb.yaml
+│   └── reverb/ (presentation.md, reverb-256.png, reverb.ico)
 ├── docs/
 │   ├── requirements.md
 │   ├── design.md
@@ -110,7 +165,12 @@ explorer/
 │   │   ├── models.py
 │   │   ├── errors.py
 │   │   ├── limits.py
-│   │   └── eligibility.py
+│   │   ├── eligibility.py
+│   │   └── presentation.py
+│   ├── presentation/            ← package data written only by a build profile
+│   │   ├── embedded.md          ← optional embedded default presentation
+│   │   ├── mark.png             ← optional packaged mark image
+│   │   └── product.json         ← optional product name and publisher for native surfaces
 │   ├── application/
 │   │   ├── ports.py
 │   │   ├── discover_estate.py
@@ -125,6 +185,7 @@ explorer/
 │   │   ├── confined_link_resolver.py
 │   │   ├── filesystem_catalogue.py
 │   │   ├── confined_source_reader.py
+│   │   ├── presentation_reader.py
 │   │   ├── cursors.py
 │   │   ├── git_commit_history.py
 │   │   ├── process_runner.py
@@ -145,6 +206,7 @@ explorer/
 │               ├── state.js
 │               ├── routing.js
 │               ├── theme.js
+│               ├── presentation.js
 │               ├── overlays.js
 │               └── views/
 │                   ├── navigation.js
@@ -161,6 +223,7 @@ explorer/
     ├── test_http.py
     ├── test_architecture.py
     ├── test_browser_state.py
+    ├── test_presentation.py
     ├── test_windows_app.py
     ├── traceability.yaml
     └── evidence/
@@ -177,8 +240,14 @@ All core values are immutable dataclasses or enums.
 | `SourceId` | Validated opaque UI/API identity | `value` |
 | `RelativePath` | Normalised source-relative POSIX path | `parts`, `display` |
 | `BoundaryToken` | Opaque reference resolved only by outer adapters | `value` |
-| `Source` | Source identity and public facts, with no native path | `id`, `kind`, `display_name`, `boundary_token`, `markers`, `git_kind` |
-| `EstateSnapshot` | One atomic ownership/catalogue observation | `sources`, `issues`, `revision`, `observed_at` |
+| `Source` | Source identity and public facts, with no native path | `id`, `kind`, `display_name`, `description?`, `identity`, `identity_reason?`, `boundary_token`, `markers`, `git_kind` |
+| `EstateSnapshot` | One atomic ownership/catalogue observation | `sources`, `issues`, `revision`, `observed_at`, `presentation` |
+| `DeclaredIdentity` | What a domain's entry file says about itself, after the policy | `name?`, `description?`, `reason?` (`entry_missing` · `frontmatter_invalid` · `frontmatter_too_large` · `name_invalid`) |
+| `PresentationRecord` | One source's contribution before resolution | `source`, `name?`, `tagline?`, `mark?`, `mark_asset?`, `accent?`, `accent_dark?`, `labels` (partial), `rejected`, `empty` |
+| `Presentation` | The shell identity resolved for this process | `name`, `tagline?`, `mark`, `mark_asset?`, `accent`, `accent_soft`, `accent_dark`, `accent_soft_dark`, `labels`, `sources` (field → source), `rejected` |
+| `PresentationLabels` | The shell vocabulary, every key defaulted | `substrate`, `domains`, `substrate_kind`, `domain_kind`, `skills`, `memory` |
+| `PresentationSource` | Where a field came from | `root_file` · `packaged_default` · `product_default` |
+| `RejectedField` | One presentation field the policy refused | `source`, `field`, `reason`, `ratio?`, `surface?` |
 | `SourceIssue` | Non-fatal source discovery fact | `code`, `source_id?`, `message` |
 | `SourceSettingsRecord` | Authenticated outer source facts | `source_id`, `source_path`, `markers`, `kind`, `git_kind` |
 | `TreeNode` | One eligible directory/file row | `path`, `name`, `kind`, `size?`, `modified_at?`, `expandable` |
@@ -237,7 +306,16 @@ class MarkdownParser(Protocol):
 class DocumentPresenter(Protocol):
     def present(self, tree: MarkdownTree,
                 links: tuple[ResolvedLink, ...]) -> str: ...
+
+class IdentityReader(Protocol):
+    def declared_identity(self, boundary: SourceBoundary) -> DeclaredIdentity: ...
+
+class PresentationReader(Protocol):
+    def root_presentation(self, boundary: SourceBoundary
+                          ) -> tuple[PresentationRecord | None, tuple[SourceIssue, ...]]: ...
 ```
+
+`IdentityReader` and `PresentationReader` are adapter-to-adapter seams consumed by the catalogue during discovery, not by use cases: the catalogue is the one component that holds native boundaries, and the readers answer questions about a boundary through the confined reader without touching the public registry. Use cases still see only the atomic snapshot.
 
 The protocols contain domain nouns and bounded operations only. They do not expose arbitrary command arguments, filesystem handles, HTML templates or HTTP types.
 
@@ -245,7 +323,7 @@ The protocols contain domain nouns and bounded operations only. They do not expo
 
 | Use case | One reason to change | Ports used |
 |---|---|---|
-| `DiscoverEstate` | Estate response semantics | `SourceCatalogue` |
+| `DiscoverEstate` | Estate response semantics, including the resolved presentation carried by the snapshot | `SourceCatalogue` |
 | `GetOverview` | Source summary composition | catalogue, metrics, history |
 | `BrowseTree` | Directory-page semantics | catalogue, directory browser |
 | `SearchPaths` | Query validation and result semantics | catalogue, path search |
@@ -267,9 +345,11 @@ Use cases validate IDs/query shapes, call ports and return models. They do not c
 3. Register the entire configured domain-directory canonical root as an unconditional substrate exclusion before inspecting any child. Substrate tree/search/read never enters it, so new, collided, unreadable and rejected domain candidates cannot fall through to substrate ownership.
 4. Inspect exactly one child level using bounded non-following enumeration. Apply ignored/secret rules to directory names, not file-extension rules. Record candidate outcomes as `admitted`, `marker_missing`, `unreadable`, `reparse_rejected`, `id_collision` or `invalid_marker`; only readable directories carrying `AGENTS.md` or `.markdownllm` are navigable.
 5. Derive source IDs using the requirements algorithm; report normalisation collisions.
-6. Sort admitted sources by NFC/case-folded display name and original relative path; create domain identity values and private boundary-registry entries.
-7. Create the substrate identity value and its private boundary entry carrying the unconditional domain-directory exclusion.
-8. Detect git only from a local `.git` directory or worktree file and validate the resolved top-level/store policy in §10; never infer a domain repository from a parent `.git`.
+6. Read each admitted domain's declared identity: the `IdentityReader` reads `AGENTS.md` inside the candidate's own boundary through the confined reader, parses its frontmatter with the bounded parser, and the core policy admits `name` and `description` or returns nothing for each. The displayed name is the admitted `name`, else the folder name with a reason the Settings tab can show — `entry_missing`, `frontmatter_invalid`, `frontmatter_too_large` or `name_invalid`; the description is the admitted `description`, else none. Identity never touches the source ID, route or ownership, and an entry file that cannot be read or parsed costs nothing but the fallback.
+7. Sort admitted sources by NFC/case-folded *displayed* name and original relative path. Where two displayed names fold equal, or a domain's folds equal to the substrate's, mark each such domain so the rail and overview append its folder name after the declared name. Create domain identity values and private boundary-registry entries.
+8. Create the substrate identity value and its private boundary entry carrying the unconditional domain-directory exclusion. The substrate keeps its rule-given name; its entry file is never read for identity.
+9. Read the root presentation: the `PresentationReader` reads `presentation.md`, matched exactly under the filesystem's own case rule, directly inside the substrate boundary through the confined reader, so the file is subject to eligibility, size, reparse and encoding rules like any document, and a `presentation.md` beneath any domain root is simply that domain's file and has no presentation meaning. The parsed frontmatter goes through the core policy into a `PresentationRecord`; the catalogue then resolves that record, the packaged record and the product default field by field (§11a) into the snapshot's `presentation`, with every rejected field, an empty file and any unreadable file reported as estate issues.
+10. Detect git only from a local `.git` directory or worktree file and validate the resolved top-level/store policy in §10; never infer a domain repository from a parent `.git`.
 
 The catalogue snapshot and boundary registry are built together and published atomically at process start. Every request receives the same revision; a restart is the v1 domain-add/remove refresh. The unconditional domain-directory exclusion remains safe while the process lives. Files and git content remain live reads, stamped `observed_at`; there is no shadow content cache.
 
@@ -366,6 +446,41 @@ Structural frontmatter fields name identifiers, not paths, so answering "where i
 
 The mapping is therefore allowed to be briefly stale. That is a deliberate trade: its worst failure is a reference that will not open, which is visible to the reader and recovered by reopening — unlike a pagination cursor, whose drift would silently return a wrong page and which accordingly still revalidates every time. Two files claiming one identifier resolve to neither, since choosing whichever the walk reached first would be an arbitrary answer presented as a definite one.
 
+## 11a. Presentation and declared identity
+
+### The policy is pure
+
+`core/presentation.py` owns `PresentationPolicy`, the product default, the theme surfaces, the soft-accent mix and the contrast arithmetic. It imports nothing outside core. Its operations:
+
+- `declared_identity(values)` — admits `name` (1–60 code points) and `description` (1–200) from parsed entry-file frontmatter, each independently under the string grammar, returning `None` and a reason for anything that fails.
+- `record_from_frontmatter(values, source, mark_asset)` — builds a `PresentationRecord` from parsed frontmatter for the given source. Each field is validated independently; a failing field goes into `rejected` with its reason (and, for a colour, the measured ratio and the failing surface) and contributes nothing; unknown keys are ignored; `labels` must be a mapping, admitting only the six known keys, and a non-mapping `labels` is one rejected field; a record that declares none of the presentation fields is `empty`. Any of the image keys (`mark_asset`, `mark_image`, `logo`, `image`) is reported as rejected so an operator learns where images come from.
+- `resolve(root, packaged)` — field-by-field resolution. The identity group — `name`, `tagline` and the text `mark` — comes whole from the first record that declares a valid `name`: its tagline (possibly none) and its mark, which defaults to the first code point of the name when that code point satisfies the mark grammar and to the product mark otherwise. Each accent and each label comes from the first record declaring it validly, in the order root, packaged, product. The mark image comes from the packaged record alone. The resolved `Presentation` carries, for every field, the source that supplied it, plus the soft accents the policy derives.
+- `contrast_ratio(colour, surface)` — WCAG 2.x relative luminance over sRGB.
+
+The string grammar: a YAML string scalar, NFC-normalised, trimmed, non-empty, measured in Unicode code points within the field's limit, with no code point of general category `Cc`, `Cf`, `Cs`, `Co`, `Cn`, `Zl` or `Zp` and no whitespace other than U+0020. The mark grammar: one or two code points after NFC normalisation, each in a letter, number, punctuation or symbol category; a combining mark, a zero-width character or a bidirectional control fails. The colour grammar: exactly `#` and six hexadecimal digits, and a contrast ratio of at least 4.5:1 against every surface on which the accent is rendered as text in its theme — the page, the panel, the hover surface and the derived soft accent — and at least 3:1 against the rail surface, where it is a non-text indicator. The surfaces are constants in core: light page `#f6f6f4`, panel `#ffffff`, hover `#e8e8e4`, rail `#efefec`; dark page `#121311`, panel `#181916`, hover `#252622`, rail `#1d1e1b`. An architecture test asserts they equal the `--bg`, `--panel`, `--soft` and `--sidebar` tokens in `app.css`, so the contrast the policy proves is the contrast the shell renders. The soft accent is derived, never supplied: the accent mixed into the theme's panel colour at 14% (light) or 16% (dark), computed in core and carried in the DTO so the browser applies rather than derives it; the accent must reach the text floor against that derived surface too. A colour that fails on any surface is rejected with the ratio and the surface named.
+
+`mark_asset` is set only by composition for the packaged record and only when the package carries `presentation/mark.png`; the policy refuses to take it from frontmatter, which is what makes the root file unable to name, enable, replace or suppress an image. The product default is normative: name `MarkdownLLM`, tagline `Explorer`, mark `M`, accent `#2d6a57`, accent_dark `#8dc5ad`, the default labels.
+
+### The reader is confined
+
+`adapters/presentation_reader.py` implements both `IdentityReader` and `PresentationReader` over the existing `ConfinedSourceReader` and `FrontmatterParser`. It reads by boundary — `AGENTS.md` inside a source's boundary, `presentation.md` inside the substrate's — through a boundary-scoped read on the confined reader, so eligibility, size, reparse-component rejection, encoding and the post-read identity comparison apply unchanged and no second read path exists. For identity, a missing entry file, an unreadable or oversized one, a frontmatter the parser rejects, or a name the policy rejects each yield the folder name with the matching reason, never an estate issue. For the root file, an absent file contributes nothing silently; an entry that is not a regular, readable, eligible file, or a frontmatter the parser rejects as a whole (duplicate or merge keys, aliases, unsupported tags, exceeded limits, a non-mapping), yields a `presentation_unavailable` issue and contributes nothing; a file that parses but declares none of the presentation fields yields a `presentation_empty` issue; only field-level failures yield `presentation_field_rejected`. Neither reader ever returns a native path or writes anything.
+
+### Resolution and issues
+
+The catalogue resolves presentation once per discovery, so every use case and every request in a process sees the same record; restart is the refresh, exactly as for the source catalogue, and an edit to the root file or an entry file made while Explorer runs is visible through the document route before it is visible in the shell. Issues use the existing `SourceIssue` shape: `presentation_field_rejected` carries the source, the field name and the reason in its message and, for a colour, the measured ratio and the failing surface; `presentation_empty` and `presentation_unavailable` name the file and the failure. They ride in the estate snapshot's `issues`, so the browser's existing discovery-issue notice counts them and Settings lists them beside the per-field sources.
+
+### Packaged default and mark
+
+`markdownllm_explorer/presentation/` is a package-data directory that the checkout leaves empty apart from its marker. A build profile may write `embedded.md`, a presentation file in the same frontmatter contract as the root file; `mark.png`, a PNG of at most 256 KiB and 512×512 pixels; and `product.json`, the product name and publisher for the native surfaces. The build validates the embedded presentation against the grammar and the contrast floor and fails closed on any rejected field; composition validates it again at load through the same parser and policy with `source = packaged_default`, so a field rejected at load is reported under that source. Composition sets `mark_asset = "/brand-mark.png"` only if `mark.png` is present and hands the packaged record to the catalogue. The HTTP asset manifest is computed once at import from package contents: `/brand-mark.png` exists in the manifest only when the file exists in the package and otherwise returns `route_not_found`; `/favicon.ico` answers with the packaged mark when present and the product icon otherwise; both are manifest entries, and they are the only image routes. There is no route that maps a request to a repository path with an image type. Only a build made with a profile embeds these files; the framework-carried macOS launcher installs the unprofiled checkout and is branded by a root file alone.
+
+### Vocabulary
+
+Labels are pure presentation, and their reach is exact: the two rail group headings; the topbar kind line beneath the source name; the overview subtitle where no description is declared; the Skills and Memory tab buttons and count cards; and the Skills and Memory empty-state sentences, which name the label rather than the product word. Routes, `data-view` identifiers, API identifiers, ARIA roles and every other piece of product copy are unchanged, so a relabelled tab still routes as `skills` or `memory`; the accessible name of a relabelled element is its visible text and no `aria-label` restates it. Every heading and caption always carries a non-empty label because the policy never admits an empty one. The document title is the presentation name on the estate and `<source display name> — <presentation name>` when a source is selected; it never carries a document path.
+
+### Build profile
+
+`packaging/profiles/<name>.yaml` names `product_name`, `publisher`, `output_name`, `icon`, `mark_image` and `embedded_presentation`, with paths relative to the profile and confined to its directory. `packaging/apply_profile.py` validates the profile under the profile grammar — names of 1–60 printable code points with no path separator, none of the characters `" ' $ \ / : * ? < >` or the vertical bar, no leading or trailing dot or space and no reserved Windows device name; an `.ico` by magic bytes; a PNG by magic bytes within the mark limits; an embedded presentation that passes the grammar and the contrast floor — and fails closed before writing anything. It then writes `presentation/embedded.md`, `presentation/mark.png` and `presentation/product.json` into the package and prints the NSIS defines (`APP_NAME`, `APP_REGISTRY`, `UNINSTALL_REGISTRY`, `OUTPUT_NAME`, `APP_ICON`) and the version-info strings (`ProductName`, `CompanyName`, `FileDescription`; `OriginalFilename` and `InternalName` stay the product's) the Windows build consumes. `default.yaml` names the product itself and writes nothing, so the generated defines and version-info are byte-identical to the committed ones. `reverb.yaml` is the committed worked example: the Reverb name and tagline, the Reverb mark image and icon from the Reverb project's assets, and an embedded default with the product vocabulary. The install directory, Start Menu folder, shortcut names and registry keys derive from `product_name` only through this grammar; installer copy keeps the product's words. The executable filename, mutex and pipe identities are not profile fields (D-012).
+
 ## 12. HTTP API
 
 Static assets are source-insensitive. `/health` is unauthenticated and returns only `{status, version}`; an exact capability supplied on `HEAD /health` may renew the in-memory activity lease without changing that public representation. Missing or wrong capabilities on health do not renew it. Exact `Host: 127.0.0.1:<bound-port>` is required on static, health and API routes. Static/health navigation allows absent Origin or the exact launch origin; APIs allow absent Origin for direct tools or the exact launch origin and always require the capability. No route emits CORS headers.
@@ -387,7 +502,7 @@ Static assets are source-insensitive. `/health` is unauthenticated and returns o
 Success uses `{data, meta: {request_id, observed_at, next_cursor?, partial?}}`. Public DTOs are defined in `response_encoding.py`; conversion is explicit and never serialises core/adaptor dataclasses directly. Common shapes are:
 
 ```json
-{"data":{"sources":[{"id":"substrate","kind":"substrate","display_name":"MarkdownLLM","markers":["AGENTS.md"],"git_kind":"repository"}],"issues":[]},"meta":{"request_id":"…","observed_at":"…"}}
+{"data":{"sources":[{"id":"substrate","kind":"substrate","display_name":"MarkdownLLM","identity":"product","markers":["AGENTS.md"],"git_kind":"repository"},{"id":"domain/fleet","kind":"domain","display_name":"Fleet Operations","description":"Vehicles, drivers and routes as one graph","identity":"declared","markers":["AGENTS.md"],"git_kind":"repository"},{"id":"domain/legacy","kind":"domain","display_name":"legacy","identity":"folder","identity_reason":"entry_missing","markers":[".markdownllm"],"git_kind":"non-git"}],"issues":[{"code":"presentation_field_rejected","message":"root_file accent: contrast 1.2:1 against the light panel; 4.5:1 is required"}],"presentation":{"name":"Reverb","tagline":"Operations estate","mark":"R","mark_asset":"/brand-mark.png","accent":"#2d6a57","accent_soft":"#e1eae8","accent_dark":"#e3a651","accent_soft_dark":"#38312a","labels":{"substrate":"Platform","domains":"Operations","substrate_kind":"Framework source","domain_kind":"Business area","skills":"Playbooks","memory":"Records"},"sources":{"name":"root_file","tagline":"root_file","mark":"root_file","mark_asset":"packaged_default","accent":"product_default","accent_dark":"root_file","labels.substrate":"root_file","labels.domains":"root_file","labels.substrate_kind":"product_default","labels.domain_kind":"root_file","labels.skills":"root_file","labels.memory":"root_file"},"rejected":[{"source":"root_file","field":"accent","reason":"contrast 1.2:1 against the light panel; 4.5:1 is required","ratio":1.2,"surface":"panel"}]},"revision":"…"},"meta":{"request_id":"…","observed_at":"…"}}
 {"data":{"source_id":"substrate","path":"thing.md","mode":"rendered","content":"<h1>…</h1>","frontmatter":{"state":"valid","values":{"id":"thing-specification"}},"size":123,"modified_at":"…","issues":[]},"meta":{"request_id":"…","observed_at":"…"}}
 {"error":{"code":"path_excluded","message":"The requested path is not available.","retryable":false,"source_id":"substrate","relative_path":".env"},"meta":{"request_id":"…"}}
 ```
@@ -408,9 +523,11 @@ Tree/search/collection/commit page DTOs carry `items`, with `next_cursor`/`parti
 | 503 | `source_unreadable`, `git_unavailable`, `git_timeout`, `git_store_external` |
 | 500 | `internal_error` |
 
-`frontmatter_invalid` is a 200 document result with an issue because raw inspection remains available. Invalid/auth/path/limit/unsupported failures are non-retryable; `source_changed`, `server_busy`, `git_timeout` and transient `source_unreadable` are retryable; unknown/internal and external-store policy failures are non-retryable. Before JSON serialisation, response encoding estimates the compact UTF-8 representation and returns `response_too_large` without a partial document when it would exceed 2 MiB. All responses carry CSP, no-store, nosniff, no-referrer and frame-denial headers. API responses use `application/json; charset=utf-8`; assets use fixed MIME types. Unsupported methods return HTTP 405/`method_not_allowed` without invoking a use case.
+`frontmatter_invalid` is a 200 document result with an issue because raw inspection remains available. Invalid/auth/path/limit/unsupported failures are non-retryable; `source_changed`, `server_busy`, `git_timeout` and transient `source_unreadable` are retryable; unknown/internal and external-store policy failures are non-retryable. Before JSON serialisation, response encoding estimates the compact UTF-8 representation and returns `response_too_large` without a partial document when it would exceed 2 MiB. All responses carry CSP, no-store, nosniff, no-referrer and frame-denial headers. The CSP is `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'; connect-src 'self'`; `img-src 'self'` is satisfiable only by the two image entries of the packaged asset manifest (D-011). API responses use `application/json; charset=utf-8`; assets use fixed MIME types. Unsupported methods return HTTP 405/`method_not_allowed` without invoking a use case.
 
-`BoundedThreadingHTTPServer` overrides `process_request`: it acquires one of 16 permits non-blockingly before creating a thread; when full it sends a fixed bounded HTTP 429 JSON response directly and closes the socket. It also owns one monotonic last-activity instant and a daemon lease monitor. Successful capability-authenticated API requests and exact-capability health touches call `note_activity`; the monitor calls `shutdown` from its own thread after the configured 1,800 seconds. Shutdown never joins that calling monitor, avoiding a serve-loop deadlock. The handler subclasses `BaseHTTPRequestHandler`, never `SimpleHTTPRequestHandler`, and maps only `/`, `/health`, `/api/v1/*` plus an exact immutable `importlib.resources` asset manifest. Request-line/header limits and controllable parse failures produce bounded errors; access/error logging emits structured redacted method/route/status/request ID and never the fragment, capability header, query string or document values.
+The estate DTO carries `presentation` (name, optional tagline, mark, optional `mark_asset`, the four accent values, the six labels, the per-field `sources` map and the rejected fields) and each source carries an optional `description`, an `identity` of `declared`, `folder` or `product` and, for a folder fallback, an `identity_reason`; absent optional values are omitted. `mark_asset`, when present, is the fixed manifest route `/brand-mark.png`.
+
+`BoundedThreadingHTTPServer` overrides `process_request`: it acquires one of 16 permits non-blockingly before creating a thread; when full it sends a fixed bounded HTTP 429 JSON response directly and closes the socket. It also owns one monotonic last-activity instant and a daemon lease monitor. Successful capability-authenticated API requests and exact-capability health touches call `note_activity`; the monitor calls `shutdown` from its own thread after the configured 1,800 seconds. Shutdown never joins that calling monitor, avoiding a serve-loop deadlock. The handler subclasses `BaseHTTPRequestHandler`, never `SimpleHTTPRequestHandler`, and maps only `/`, `/health`, `/api/v1/*` plus an exact immutable `importlib.resources` asset manifest computed once at import from package contents, whose only image entries are the product icon and, when the package carries one, the packaged mark. Request-line/header limits and controllable parse failures produce bounded errors; access/error logging emits structured redacted method/route/status/request ID and never the fragment, capability header, query string or document values.
 
 Socket/request deadlines and browser-side 10-second aborts guarantee a visible client terminal state. Python cannot cancel a thread blocked inside an arbitrary filesystem syscall; that residual is bounded by the 16-request ceiling and is not misreported as server-side cancellation. Application/adapters own only failures they can classify meaningfully; the request boundary handles the rest once.
 
@@ -443,7 +560,7 @@ Desktop (≥900 CSS px) is a grid with:
 - **Evidence pane (minmax 0/1fr):** source header, Overview/Skills/Memory/Settings tabs, commit/collection/document content.
 - **Context panel (320 px):** factual source or document metadata and theme control.
 
-The aesthetic follows the reference's quiet density: near-black/near-white surfaces, hairline borders, 8/12/16 px spacing rhythm, rounded but restrained controls, one teal accent, and system font stack. It carries no Perplexity branding or irrelevant share/account/session controls.
+The aesthetic follows the reference's quiet density: near-black/near-white surfaces, hairline borders, 8/12/16 px spacing rhythm, rounded but restrained controls, one accent (the product's teal unless a presentation supplies another), and system font stack. It carries no Perplexity branding or irrelevant share/account/session controls.
 
 At desktop widths either side region collapses under an explicit control, yielding its grid track to the evidence pane, with the choice persisted per region in `localStorage`. This is a different mechanism from the sub-900 overlay and deliberately shares none of its semantics: a collapsed region covers nothing, so it takes no dialog role, no modal state, no sibling inertness and no focus trap. Its rules are scoped above 900 px so a desktop collapse cannot leak downward and hide a drawer. Focus follows the collapse to the control that replaces the one being hidden. The grid track snaps rather than animating; `grid-template-columns` transitions were not relied upon.
 
@@ -458,6 +575,10 @@ The source tree is one `role="tree"` with nested `role="group"`/`treeitem` rows,
 Tabs use `tablist`/`tab`/`tabpanel` with Arrow/Home/End and stable focus. Responsive overlays are labelled dialogs; the background becomes `inert`, focus is trapped, Escape closes, and focus returns to the opener. Async status uses one de-duplicating `aria-live="polite"` region; fatal/load errors use `role="alert"` once. Routing, theme and responsive-overlay state machines are isolated in `routing.js`, `theme.js` and `overlays.js`. View modules render DOM and dispatch intents only: `overview.js`, `collection.js`, `commit.js`, `document.js`, `settings.js`, `navigation.js` and `context.js` do not fetch or own cross-view state. `layout.js` owns desktop region collapse and `format.js` the one date rendering, both free of view state.
 
 CSS custom properties define light/dark tokens. `theme.js` applies `light`, `dark` or `system`, listens for system changes only in system mode, and persists only the explicit mode in `localStorage`. Reduced-motion preference removes non-essential transitions.
+
+### Presentation in the shell
+
+`presentation.js` is a pure module in the same family as `theme.js`. `applyPresentation(presentation)` writes the brand mark (a text node, or an `<img>` whose `src` is the manifest route when `mark_asset` is present), the brand name and small line through `textContent`, and sets four custom properties on the root element — `--accent-brand-light`, `--accent-soft-brand-light`, `--accent-brand-dark`, `--accent-soft-brand-dark` — through `style.setProperty`, taking every value from the DTO; nothing is derived in the browser. The stylesheet resolves `--accent` and `--accent-soft` per theme as `var(--accent-brand-<theme>, <product default>)`, so a presentation accent applies in the theme it was validated for. `documentTitle(presentation, source)` returns the presentation name on the estate and `<source display name> — <presentation name>` once a source is selected. The function returns the label map, which `app.js` keeps on state and passes as values to `navigation.js` (headings, and the folder-name suffix for a colliding declared name), the topbar kind line, the tab captions, `overview.js` (hero subtitle from the source description, else the kind label; count captions), `collection.js` (empty-state sentences naming the label) and `settings.js` (a read-only Presentation section listing every field with its source, every rejected field with its reason, and the source's identity fact). The source glyph in the topbar is the first grapheme cluster of the displayed name, via `Intl.Segmenter` where available and the first code point otherwise. No view reads presentation from a global; setting custom properties through the CSSOM is permitted by `style-src 'self'`, and no presentation value is ever placed in an inline style attribute or in `innerHTML` — the overview hero, which today builds through an escaping template, writes its name and subtitle through `textContent`.
 
 ## 14. Distribution and composition
 
@@ -499,7 +620,11 @@ The setup runs per user (`RequestExecutionLevel user`) into `%LOCALAPPDATA%\Prog
 
 `windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser`, `--no-tray` and `--request-exit` verification/lifecycle switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. For `exit`, the primary acknowledges its PID before beginning shutdown; the secondary opens that process with synchronisation rights and waits up to 15 seconds for process termination. Manual Exit calls server shutdown; idle server return stops the tray from the server worker. Both paths close the listener/socket and join active requests within the existing five-second budget. Setup therefore waits for positive primary-process termination, not merely the short-lived command sender. Startup failures surface one bounded native message box because a windowed executable has no console.
 
-The frozen application imports `pystray`/Pillow only at this outer Windows delivery edge; those packages are bundled build inputs, not dependencies of core/application or of the portable CLI package. The application icon is the Explorer `M` mark supplied as a multi-resolution `.ico` and used consistently by the executable, setup, Desktop shortcut and tray.
+The frozen application imports `pystray`/Pillow only at this outer Windows delivery edge; those packages are bundled build inputs, not dependencies of core/application or of the portable CLI package. The application icon is the Explorer `M` mark supplied as a multi-resolution `.ico` and used consistently by the executable, setup, Desktop shortcut and tray; a build profile's icon replaces it in all four places at build time, and the tray tooltip and the native error-dialog title read the product name from the packaged `product.json`, while the menu verbs and the executable filename stay the product's.
+
+### Build profiles
+
+`build.ps1 -Profile <path>` runs `packaging/apply_profile.py` before freezing. The script writes the profile's embedded presentation and mark into `markdownllm_explorer/presentation/` so they freeze as package data, and emits the NSIS defines (`APP_NAME`, `APP_REGISTRY`, `UNINSTALL_REGISTRY`, `OUTPUT_NAME`, `APP_ICON`) and the version-info company, description and product strings the build passes on. The default profile reproduces the current inputs; the committed `reverb.yaml` produces a Reverb-titled installer carrying the Reverb icon, embedded identity and mark. The frozen executable name and the single-instance identities are not profile fields, so the install, upgrade and uninstall sections and their lifecycle evidence are unchanged by a profile. The portable package takes a profile the same way: `apply_profile.py` then `pip install`, which is how the Reverb identity is exercised against a live estate without a Windows build.
 
 ### Performance allocation
 
@@ -517,6 +642,7 @@ The benchmark owns one overall deadline per request rather than allowing each ad
 - Architecture fitness parses imports and rejects `pathlib`, `os`, `subprocess`, HTTP or renderer implementations in `core/`/`application/`; rejects any inner import from `adapters`/`delivery`; permits concrete adapter imports only in `composition.py`; runs shared contracts against fake/real ports; and rejects browser view modules that call `fetch` or mutate the global state directly.
 - A retained adapter-swap fixture independently substitutes the HTTP server, Git reader, confined filesystem reader and Markdown renderer, runs a runtime probe for each, and proves every changed-path set is exactly composition plus one outer adapter with no core/application change.
 - A mutation/misconfiguration suite proves tests fail when ownership checks, capability checks, escaping, git no-lock environment, size limits or stale-response guards are deliberately removed.
+- The presentation policy receives exhaustive unit vectors (the code-point grammar and forbidden categories, NFC, the mark categories, the colour grammar, contrast on every surface of both themes and the derived soft accent, label keys, unknown keys, the identity group and the per-field merge with sources, the empty record, the refusal to take `mark_asset` from frontmatter); the readers are contract-tested against fixtures with declared, missing, invalid and colliding identity and with a valid, empty, malformed, oversized, link and absent root file; the HTTP suite proves the DTO shape, the exact CSP string, that the mark route exists only when the package carries a mark, that the favicon follows the mark, and that no route outside the manifest answers with an image type; the architecture suite proves the core surfaces equal the stylesheet tokens and that `presentation.js` neither fetches nor uses `innerHTML`; four deliberate mutants remove the colour grammar, the contrast check and the text-only brand rendering, and add a source-backed route with an image content type.
 
 ## 16. Requirement allocation
 
@@ -527,6 +653,7 @@ The benchmark owns one overall deadline per request rather than allowing each ad
 | FR-DOC | confined reader, Markdown renderer, document/context views |
 | FR-SRCH | search use case, reader and navigation view |
 | FR-UI | browser shell, theme and CSS |
+| FR-PRES, NFR-SAFE-006 | presentation policy, presentation reader, catalogue discovery, estate DTO, `presentation.js`, build profiles |
 | FR-RUN | packaging, CLI, composition and HTTP runtime |
 | FR-ERR | typed errors, response encoding and async state |
 | NFR-ARCH | ports, package rules and fitness tests |
@@ -546,3 +673,6 @@ The test specification must turn this allocation into one row per requirement ID
 - Chromium runtime evidence is achievable in this environment. Firefox/Safari compatibility remains standards-backed and must be described as unexecuted until those browsers are actually exercised.
 - The Windows setup and application are structurally ready for Authenticode signing but this repository has no signing certificate. Local/test builds can show an unknown-publisher warning or be blocked completely by Smart App Control / enterprise code-integrity policy. A public Windows release must sign both executable and setup in a separately authorised release process, then repeat the native lifecycle proof on those exact signed bytes.
 - Linux and macOS native installers are deliberately outside this increment. The portable Python package remains their verified execution route until each platform earns its own packaging design and runtime evidence.
+- `img-src 'self'` is wider than `img-src 'none'`. The claim that it is safe rests on one fact that tests must keep true: the packaged asset manifest is the only image route. A future route that served repository bytes with an image type would silently reopen the boundary, so the HTTP suite asserts the manifest's image entries by name.
+- The root presentation file is install-local and untracked. An organisation that runs several machines must carry it itself until the bootstrap bundle does; losing it costs the default chrome and nothing else.
+- Presentation is fixed per process like the catalogue. An operator who edits the root file restarts Explorer; the Refresh control in the tree reloads files, not presentation.
