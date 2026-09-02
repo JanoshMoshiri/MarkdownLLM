@@ -443,12 +443,12 @@ types block in `AGENTS.md`.
 **In Code Architect.** The run `run-markdownllm-explorer-white-label-presentation`
 is paused at `design`; the gate decision stands.
 
-**The design cold review.** Launched against `8828f9b` before the park. Its
-record is committed on `main` when it lands, unreconciled; its findings are the
-first thing to read on resumption.
+**The design cold review.** Launched against `8828f9b` before the park and
+stopped by the operator before it wrote anything. Design v0.6 is therefore
+unreviewed; no record exists and none should be assumed.
 
-**To resume.** Read the design review and reconcile the design to v0.7 on
-`main`. Merge the parked branch onto `main` and reconcile the test
+**To resume.** Re-run an independent cold review of design v0.6 at `8828f9b`
+against requirements v0.6, then reconcile the design to v0.7 on `main`. Merge the parked branch onto `main` and reconcile the test
 specification against the reconciled design; commit at the `decompose` stage
 and send the specification for its cold review. Then `build-verify` in the
 increment order above, removing each `deferred` entry as its trace row gains

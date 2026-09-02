@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-02
-generated: 2026-09-02T21:57:22
-generated_from: HEAD@8828f9b
+generated: 2026-09-02T22:00:26
+generated_from: HEAD@f0e0806
 coverage: 331
 framework_version: 3.37.0
 ---
