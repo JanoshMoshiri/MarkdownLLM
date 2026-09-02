@@ -158,3 +158,14 @@ Reviewed `explorer/docs/requirements.md` version 0.5 as committed at `8df56e0db0
 - **Section 5 exclusions, invariants 8 and 9, H6 and H7.** Consistent with the decision and honestly stated, subject to MUST-07's profile grammar.
 - **Scope discipline.** Nothing in the delta belongs to a later increment; the deferred list matches plan I4 except the Mac launcher naming (COULD-08). The decision's six rulings are each carried by a requirement; the omissions the plan promises are the default mark rule (SHOULD-06) and the framework-side prerequisites (SHOULD-08).
 - **Marks and bidirectional text.** Strong right-to-left letters are admissible and harmless; format characters that could reorder neighbouring text are excluded; the remaining gaps are separators, private-use and normalisation (SHOULD-07).
+
+## Disposition — 2026-09-02, requirements v0.6
+
+Every finding was actioned in requirements v0.6. Two were adapted rather than adopted verbatim, and two decisions the review left open were taken:
+
+- **MUST-01** — adopted as field-by-field resolution with one refinement taken from SHOULD-06: `name`, `tagline` and the text `mark` form an identity group that resolves together from the first source declaring a valid `name`, so a root name is never shown beside a packaged tagline or mark. Accents and labels resolve field by field; the mark image is packaged-only and never displaced. `presentation_empty` and per-field source naming added.
+- **MUST-08** — adopted; the mutant numbering differs from the suggestion while covering the same defects: M22 removes the colour grammar, M23 the contrast check, M24 the text-only brand rendering, M25 adds a source-backed route with an image content type.
+- **SHOULD-12** — adopted; the route is `/brand-mark.png`.
+- **COULD-07** — decided: installer copy keeps the product's words; the version strings that carry the profile are named.
+- **COULD-08** — adapted: the portable package build accepts a profile as the Windows build does; only the framework-carried macOS launcher, which installs the unprofiled checkout, is branded by a root file alone.
+- All other MUST, SHOULD and COULD findings — adopted with the quoted corrections, including the four-surface contrast floor with the declared soft-accent mix (MUST-03), the manifest-bounded image oracle and favicon assignment (MUST-04, SHOULD-04), the AJ-12 snapshot procedure (MUST-05), the description and profile grammars (MUST-06, MUST-07), substrate identity never read (SHOULD-01), collision and fallback facts (SHOULD-02), the **Domain estate** wording (SHOULD-03), the vocabulary reach and title format (SHOULD-05), the normative product default (SHOULD-06), the code-point grammar (SHOULD-07), the framework prerequisites as H8 (SHOULD-08), per-user single-instance wording (SHOULD-09), the performance fixture (SHOULD-11) and the branded accessibility check (COULD-10). SHOULD-10's design and plan corrections land in design v0.6 and plan revision 1.3.

@@ -2,7 +2,7 @@
 id: explorer-white-label-presentation-2026-09
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-09-02
 priority: high
 exposed: false
@@ -235,7 +235,10 @@ no new route is needed. `GET /api/v1/settings` gains read-only presentation
 facts. The Windows and macOS launch surfaces are untouched at this radius.
 
 Setting a CSS custom property through the CSSOM is permitted under
-`style-src 'self'`; the CSP header does not change. Nothing from the estate is
+`style-src 'self'`. The CSP widens from `img-src 'none'` to `img-src 'self'`
+on one condition the tests keep true: the immutable packaged asset manifest is
+the only image route, so a same-origin image can only ever be the packaged
+mark or the favicon (the gate decision's ruling 2). Nothing from the estate is
 ever placed in an inline style attribute, a `<style>` element or an image
 request.
 
@@ -246,11 +249,13 @@ request.
   image tag with an event handler must render as those literal characters.
 - **Colour grammar and contrast in core.** Removing the regex or the contrast
   check must fail a test; both are deliberate-mutant targets.
-- **No image from the estate.** `img-src 'none'` stays. A logo enters only as
-  **package data through the distribution profile**, which keeps the invariant
-  "repository bytes never render as an image" literally true. If an
-  organisation requires a logo at the estate radius, that is a CSP decision for
-  the operator, not a default of this plan.
+- **No image from the estate.** A logo enters only as **package data through
+  the distribution profile**, served as an entry of the immutable packaged
+  asset manifest; the CSP admits same-origin images only because that manifest
+  is the sole image route, which keeps the invariant "repository bytes never
+  render as an image" literally true. If an organisation requires a logo at
+  the estate radius, that is a separate CSP decision for the operator, not a
+  default of this plan.
 - **Confinement inherited.** The reader reuses `ConfinedSourceReader.read`, so
   reparse points, secrets, depth, size and encoding rules apply without a
   second implementation.
@@ -266,8 +271,9 @@ package data, so a branded build is branded against any checkout; a root
 `presentation.md` still wins when present. The NSIS defines, `version-info.txt`
 strings and the frozen executable name are generated from the profile; the
 default profile reproduces today's bytes exactly. The single-instance mutex
-and pipe names stay keyed on the substrate root, not the product name, so two
-differently branded builds against one root cannot run two servers.
+and pipe names stay the product's and are keyed per Windows user, so for one
+user only one frozen Explorer runs at a time whatever its brand or root, and a
+second brand's activation opens the running instance's browser.
 `tools/open-explorer.sh` follows the same profile in a later lane; the Mac
 route is not blocked by it.
 
@@ -283,7 +289,8 @@ New requirements the design stage writes into `requirements.md`, `design.md`,
 | FR-PRES-003 | Fallback chain | With no root file the packaged default applies; with neither, the product default; a malformed or oversized file yields the next source and an issue, never a failed estate |
 | FR-PRES-004 | Vocabulary labels | Rail headings, kind labels, hero subtitle and tab names follow the label map; unknown label keys are ignored |
 | FR-PRES-005 | Presentation facts in Settings | Settings shows which source the presentation came from and any rejected fields; no control can change them |
-| FR-PRES-006 | Distribution profile | A non-default profile produces an installer, executable, shortcuts, registry key, version strings and embedded default carrying the profile; the default profile reproduces the current bytes |
+| FR-PRES-006 | Packaged presentation and mark image | The packaged mark is served only from the immutable manifest and shown in the brand slot; a root file cannot supply, enable or displace an image |
+| FR-PRES-007 | Distribution profile | A non-default profile produces an installer, shortcuts, registry key, version strings and embedded default carrying the profile under its grammar; the default profile reproduces the current bytes; the executable name is unchanged |
 | NFR-SAFE-006 | Presentation safety | Text-only rendering, colour grammar, contrast rejection and unchanged CSP are each proven by a deliberate mutant that the suite kills |
 | Amendments | FR-EST-002, FR-EST-003, FR-NAV-001, FR-TAB-001, FR-TAB-005, FR-UI-001, FR-RUN-004 | Reworded to name presentation as the source of the labels they fix today |
 
