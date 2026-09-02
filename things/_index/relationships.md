@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-01
-generated: 2026-09-01T14:50:53
-generated_from: HEAD@8c7d30a
-coverage: 329
+created: 2026-09-02
+generated: 2026-09-02T09:19:21
+generated_from: HEAD@27ffd99
+coverage: 330
 framework_version: 3.37.0
 ---
 
@@ -584,6 +584,10 @@ framework_version: 3.37.0
 - explorer-ui-increment-2026-08 --complements--> explorer-publication-readiness
 - explorer-ui-increment-2026-08 --references--> explorer-publication-position
 - explorer-ui-increment-2026-08 --references--> explorer-extraction-and-hosting
+- explorer-white-label-presentation-2026-09 --references--> explorer-macos-and-navigation-sprint-2026-09
+- explorer-white-label-presentation-2026-09 --complements--> explorer-extraction-and-hosting
+- explorer-white-label-presentation-2026-09 --references--> explorer-publication-position
+- explorer-white-label-presentation-2026-09 --references--> code-architect-governs-substrate-code
 - external-review-2026-08-10 --informs--> external-review-response-2026-08-10
 - external-review-2026-08-10 --informs--> coherence-is-a-maintained-rate-not-a-state
 - external-review-2026-08-10 --informs--> hook-enforcement-has-three-anchors
