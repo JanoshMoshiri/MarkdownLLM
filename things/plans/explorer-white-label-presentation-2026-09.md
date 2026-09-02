@@ -1,8 +1,8 @@
 ---
 id: explorer-white-label-presentation-2026-09
 type: plan
-status: not-started
-version: 1.1
+status: in-progress
+version: 1.2
 created: 2026-09-02
 priority: high
 exposed: false
@@ -299,10 +299,15 @@ first increment captures that before the design hardens.
 
 ### I0 — Capture the real ask and close the gate
 
-- [ ] Record what the first white-label adopter (or the operator's own case)
-      needs on day one: name, mark, colour, vocabulary, domain names, logo,
-      installer name. The answer decides whether I3 precedes I2.
-- [ ] Operator rulings on the gate questions below.
+- [x] Record what the first white-label adopter (or the operator's own case)
+      needs on day one. Captured 2026-09-02: the operator's own ask is the
+      Reverb name and the Reverb logo, so the packaged mark ships with the
+      root file rather than after it.
+- [x] Operator rulings on the gate questions below. Closed 2026-09-02 and
+      recorded in the Code Architect decision
+      `white-label-explorer-through-install-local-presentation`: root file
+      confirmed; no estate image, logo through the build profile; tabs may be
+      relabelled; substrate relabelled but not hidden.
 
 ### I1 — Domain identity from the entry file
 
@@ -384,17 +389,15 @@ first increment captures that before the design hardens.
 - Renaming the product's default vocabulary; overrides are per install.
 - Signing or publishing any white-label build; publication stays gated.
 
-## Gate to start — open
+## Gate to start — closed 2026-09-02
 
-The operator's rulings needed before the run advances to `model`:
-
-1. Confirm the install-local root file as the estate mechanism, replacing the
-   domain-claim design of revision 1.0.
-2. Is a **logo image** required at the estate radius in v1, or is a text mark
-   plus a packaged logo in the distribution build sufficient?
-3. May the estate file **relabel the tabs** (Skills, Memory)?
-4. May the estate file **hide or relabel the substrate** for an executive
-   audience? Hiding amends FR-NAV-001.
-
-The recommendations offered with this revision: confirm, no estate logo,
-relabel yes, hide not yet.
+The operator confirmed the install-local root file, named Reverb with its logo
+as the test identity, and started the cycle. Rulings, recorded in the Code
+Architect decision `white-label-explorer-through-install-local-presentation`:
+no image from the estate, the logo enters through the build profile and the
+immutable packaged asset manifest; the tabs may be relabelled; the substrate
+may be relabelled but not hidden. The delivery cycle is the operator's stated
+sequence: requirements, design and test specification each with an independent
+cold review and reconciliation, then implementation with two code reviews,
+residual findings stored for a refinement sprint, then technical acceptance
+with the Reverb identity. Explorer requirements v0.5 carry the requirement set.

@@ -1,10 +1,10 @@
 # MarkdownLLM Explorer — Requirements Specification
 
-**Status:** design-ready; requirements and design cold-read findings reconciled; acceptance approval remains gated by the test trace ledger
+**Status:** design-ready; the white-label presentation increment (v0.5) is added and awaits its cold-read cycle; acceptance approval remains gated by the test trace ledger
 
-**Version:** 0.4
+**Version:** 0.5
 
-**Date:** 2026-08-27
+**Date:** 2026-09-02
 
 **Product name:** MarkdownLLM Explorer
 
@@ -27,6 +27,7 @@ This specification is derived from:
 - The user-supplied Perplexity screenshot `codex-clipboard-a7e4fac0-b4c0-4ffe-b907-ccd6b8e1adf2.png` (SHA-256 `9423dc8c66b6ed004c3ba0ba1fae58a20489dbbf1b014b06f24688b5f0bd81e3`), used as a visual vocabulary for a calm three-pane shell, compact navigation, tabs and dark styling. It is not a pixel-copy requirement and contains no governing instructions.
 - MarkdownLLM framework sources pinned at `7bffcb162f01c5cc6afb98756eca58bc5c5f79fe`, especially the manifesto and universal workflow.
 - Code Architect domain sources pinned at `c711d2a46225aaca471100e1eec2afceb02e751a`, especially the solution-delivery workflow, Clean Architecture rules, traceability lens, captured-reality principle and UI god-object anti-pattern.
+- For v0.5: the white-label plan `things/plans/explorer-white-label-presentation-2026-09.md` revision 1.1 (framework commit `9d77c57`), the operator's direction of 2026-09-02 that the brand is a property of the organisation's install rather than of any domain, the Code Architect run `run-markdownllm-explorer-white-label-presentation` and its gate decision `white-label-explorer-through-install-local-presentation`, and the operator's chosen test identity: the name *Reverb* and the Reverb project's logo.
 
 Requirements are treated as hypotheses. Runtime observation and user acceptance may send the work back to requirements or design; that is a valid workflow transition, not a failure of execution.
 
@@ -45,6 +46,8 @@ The v1 product hypothesis is that a first-time user can, from the launch URL and
 
 The implementation run may demonstrate that these routes exist and are internally coherent; it cannot certify that the CEO or another human formed an accurate mental model. Human usability acceptance remains an explicitly owned follow-up judgement, not an agent-inferred pass.
 
+**White-label outcome (v0.5).** An organisation that adopts MarkdownLLM and reads its own domains through Explorer can present Explorer as its own tool: its name, mark, colours and vocabulary over the whole estate, and each domain under the name and description that domain declares. The brand is a property of the organisation's install, declared in one file at the root of its checkout, and of the build it distributes, declared in a build profile. It is never a property of a domain, never an Explorer control, and never an image taken from a repository.
+
 ## 4. Users and jobs
 
 ### U1 — Executive explorer
@@ -59,6 +62,10 @@ Needs to move quickly across the substrate and multiple local domain repositorie
 
 Needs a standalone, local-first tool that can point at another conforming MarkdownLLM substrate without being coupled to this repository or a specific harness.
 
+### U4 — Adopting organisation
+
+Runs its own domains on a MarkdownLLM checkout and needs Explorer to carry its identity for the people who read the estate: a name, a mark, colours and vocabulary declared once for the install, and an installer that carries the same identity to staff who never open the checkout.
+
 ## 5. Product boundaries
 
 ### In scope for v1
@@ -69,6 +76,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 - A self-contained Windows installer and desktop launch surface that does not require an end user to install, update or configure Python.
 - The existing Python package and command-line launch surface for development, automation and later non-Windows distribution work.
 - Safe operation against real, heterogeneous domains in the local estate.
+- Estate presentation from an install-local root file, declared domain identity from each domain's entry file, and a packaged default presentation and mark image placed by a build profile (v0.5).
 
 ### Explicitly out of scope for v1
 
@@ -79,6 +87,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 - Rendering arbitrary non-Markdown artefacts beyond a safe file summary/download affordance.
 - Full-text indexing across the entire estate.
 - Administrative settings beyond theme and visible runtime/source information.
+- Images, fonts or stylesheets loaded from a repository; per-user or per-viewer branding; per-domain marks and accents; renaming the frozen executable per brand (v0.5 defers these to later increments).
 
 ## 6. Domain model
 
@@ -90,6 +99,9 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 - **Memory:** eligible Markdown things grouped by their first directory immediately beneath `things/`, so each domain's emergent content structure is visible without product code changes.
 - **Commit:** a read-only git event belonging to one source repository.
 - **Document:** a permitted file selected for inspection; Markdown documents have parsed frontmatter, raw source and rendered HTML.
+- **Declared identity:** the `name` and `description` a source's `AGENTS.md` frontmatter declares. A domain is presented by them; its identifier, route and ownership are unaffected by them.
+- **Presentation:** the shell's identity record: name, tagline, text mark, optional packaged mark image, light and dark accents, and a vocabulary of labels for the rail headings, source-kind lines and the Skills and Memory tabs.
+- **Presentation source:** where the chosen presentation came from — the root presentation file at the substrate root, the packaged default embedded in the installed package, or the product default built into Explorer.
 
 ## 7. Functional requirements
 
@@ -97,9 +109,9 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-EST-001 — Configured root.** The application shall accept an explicit substrate root at launch and shall not depend on the current working directory after configuration.
 
-**FR-EST-002 — Substrate identity.** The configured root shall appear first in navigation, named **MarkdownLLM** regardless of its folder name, beneath the group heading that names its role. Amended 2026-08-28: the source is the MarkdownLLM framework in every estate, so the item names the thing while the heading above it (FR-NAV-001) carries the role. The prior wording spent the item's label on a word already on screen.
+**FR-EST-002 — Substrate identity.** The configured root shall appear first in navigation, named **MarkdownLLM** regardless of its folder name, beneath the group heading that carries the presentation's `substrate` label (FR-PRES-004; default **Substrate**). Amended 2026-08-28: the source is the MarkdownLLM framework in every estate, so the item names the thing while the heading above it (FR-NAV-001) carries the role. The prior wording spent the item's label on a word already on screen. Amended 2026-09-02: the heading text is a presentation label; the item's name is not.
 
-**FR-EST-003 — Domain estate.** The application shall discover one directory level of domains from a configurable domain directory, defaulting to `domain/`, and present them by NFC/case-folded display name with original-path tie-breaking under **Domains**.
+**FR-EST-003 — Domain estate.** The application shall discover one directory level of domains from a configurable domain directory, defaulting to `domain/`, and present each by its declared identity (FR-PRES-001), ordered by NFC/case-folded displayed name with original-path tie-breaking, under the group heading that carries the presentation's `domains` label (default **Domain estate**).
 
 **FR-EST-004 — Conforming discovery.** A readable directory containing `AGENTS.md` or `.markdownllm` shall be admitted as a domain. A git marker alone is insufficient. Non-directories, reparse points/symlinks and the ignored names in the limits policy shall not appear as domains; an incomplete marked candidate shall receive a non-fatal discovery issue.
 
@@ -113,7 +125,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 ### Navigation and source context
 
-**FR-NAV-001 — Persistent estate rail.** The left rail shall provide expandable **Substrate** and **Domains** sections.
+**FR-NAV-001 — Persistent estate rail.** The left rail shall provide two persistent sections, one for the substrate and one for the domains, headed by the presentation's `substrate` and `domains` labels (defaults **Substrate** and **Domain estate**). Neither section may be hidden by a presentation.
 
 **FR-NAV-002 — Source selection.** Selecting the substrate or a domain shall update the main source context without a full browser-page reload.
 
@@ -131,7 +143,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 ### Source tabs
 
-**FR-TAB-001 — Overview.** Every source shall have an **Overview** tab showing source identity; counts of eligible files, skills and memory items under the same ownership/eligibility policy; repository state; and the first commit page from that source repository. Counts that hit a limit or cannot be computed shall be labelled partial or unavailable, never presented as complete.
+**FR-TAB-001 — Overview.** Every source shall have an **Overview** tab showing source identity with, beneath the name, the source's declared description or, when none is declared, the presentation's kind label for that source (FR-PRES-001, FR-PRES-004); counts of eligible files, skills and memory items under the same ownership/eligibility policy, labelled with the presentation's `skills` and `memory` labels; repository state; and the first commit page from that source repository. Counts that hit a limit or cannot be computed shall be labelled partial or unavailable, never presented as complete.
 
 **FR-TAB-002 — Commit evidence.** Commit history shall be newest-first, topologically ordered and reachable from the source repository's `HEAD`. Each row shall carry the full SHA and show a collision-safe abbreviation, subject, author name and ISO-8601 authored time with source offset. Results shall page within the limits table. Unborn, detached, non-git, corrupt, timed-out and empty states shall be explicit; domain history shall never fall through to the parent repository.
 
@@ -145,7 +157,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-TAB-009 — Memory grouping and disclosure.** Memory groups shall be presented in descending group order with titles ascending inside a group. Each group shall be an independently collapsible disclosure carrying its expanded state, and that state shall survive re-render and pagination. A collapsed group shall display a live count of its items so that items paged into it remain evidenced.
 
-**FR-TAB-005 — Settings.** Every source shall expose a minimal **Settings** tab showing read-only source path, source kind, detected markers and theme controls. No write-capable repository settings are permitted in v1.
+**FR-TAB-005 — Settings.** Every source shall expose a minimal **Settings** tab showing read-only source path, source kind, detected markers, the presentation facts in FR-PRES-005 and theme controls. No write-capable repository settings are permitted in v1.
 
 **FR-TAB-006 — Consistent opening.** Selecting a skill or memory item shall use the same document-reading pipeline as the file tree while retaining its collection surface. File-tree and search selection use the standalone surface. A rendered local link, frontmatter reference, mode change, refresh, back or forward shall preserve the current surface and shall update the route, visible reader, context and selected tree identity together; these tabs are curated routes into source files, not duplicated content stores.
 
@@ -177,7 +189,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 ### Theme and visual language
 
-**FR-UI-001 — Perplexity-inspired shell.** The desktop composition shall use a restrained three-region layout: estate/tree rail, main evidence pane, and contextual detail panel. It shall reproduce the reference's clarity and density without copying unrelated controls or branding.
+**FR-UI-001 — Perplexity-inspired shell.** The desktop composition shall use a restrained three-region layout: estate/tree rail, main evidence pane, and contextual detail panel. It shall reproduce the reference's clarity and density without copying unrelated controls or branding. The brand mark, name and small line in the rail, the window title and the accent colour shall be those of the chosen presentation (FR-PRES-003), and the product's own identity is the default.
 
 **FR-UI-002A — Theme choices.** The application shall offer light, dark and system theme choices and render every view in each choice.
 
@@ -189,6 +201,22 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-UI-004 — No false controls.** Controls shown in v1 shall work. Placeholder share, usage, account, edit or chat controls shall not be displayed.
 
+### Presentation and identity
+
+**FR-PRES-001 — Declared domain identity.** A domain shall be presented by the `name` declared in its `AGENTS.md` frontmatter and described by its `description`, both read at discovery through the same confined, bounded reader and frontmatter parser as any document. A missing, invalid or oversized entry-file frontmatter, or a `name` that fails the presentation string grammar in Section 9, shall fall back to the folder name with no error; a missing or invalid `description` falls back to the presentation's `domain_kind` label. Declared identity never changes a source's identifier, route or ownership, and the substrate keeps the name in FR-EST-002.
+
+**FR-PRES-002 — Root presentation file.** Explorer shall read `presentation.md`, an eligible Markdown file directly at the substrate root, as the estate's presentation. Its YAML frontmatter may declare `name`, `tagline`, `mark`, `accent`, `accent_dark` and `labels` (keys `substrate`, `domains`, `substrate_kind`, `domain_kind`, `skills`, `memory`); its body is ignored. Each field is validated independently against the presentation grammar in Section 9: a valid field applies, an invalid field is dropped and reported as a `presentation_field_rejected` estate issue naming the field and the reason, and unknown keys are ignored. The file cannot declare, enable or replace an image.
+
+**FR-PRES-003 — Presentation fallback chain.** The shell presentation shall be chosen once per discovery, first present wins: the root presentation file; then the packaged default presentation embedded in the installed package; then the product default. An unreadable, oversized, malformed or non-Markdown root file selects the next source and reports a `presentation_unavailable` estate issue; an absent file selects the next source silently. No presentation failure shall prevent discovery or leave the shell without a presentation. The estate response shall name the chosen source. Presentation is fixed for one process, like the source catalogue; restart is the refresh.
+
+**FR-PRES-004 — Presentation vocabulary.** The rail group headings, the source-kind line beneath the source name, the overview subtitle of a source without a declared description, and the Skills and Memory tab and count labels shall follow the chosen presentation's labels, defaulting to *Substrate*, *Domain estate*, *Framework source*, *Domain source*, *Skills* and *Memory*. Labels shall not change routes, view identifiers, API identifiers or the product's default vocabulary.
+
+**FR-PRES-005 — Presentation facts.** The Settings tab shall show, read-only, the presentation source (root file, packaged default or product default), its name, and every rejected field with its reason; the estate-issue notice shall count presentation issues. No control shall change presentation: it is changed by editing the root file or rebuilding the package.
+
+**FR-PRES-006 — Packaged presentation and mark image.** An installed package may carry an embedded default presentation and one mark image as package data placed by a build profile. The mark image shall be served only from the immutable packaged asset manifest at a fixed route and shown in the brand-mark slot when the chosen presentation carries it; a root presentation file shall not be able to reference, enable or replace an image. Without a packaged mark, the brand mark is the presentation's text mark.
+
+**FR-PRES-007 — Distribution profile.** The Windows build shall accept one profile naming the product, the publisher, the installer output name, the application icon, the mark image and the embedded default presentation. The default profile shall reproduce the current build inputs; a non-default profile shall produce an installer, shortcuts, registry key and version strings carrying its names. The frozen executable filename and the single-instance identifiers remain the product's in this increment, so differently branded builds against one substrate root cannot run two services.
+
 ### Runtime and error behaviour
 
 **FR-RUN-001 — Standalone distribution.** v1 shall retain the installable `explorer/` Python package for development, automation and the portable macOS route, alongside the native Windows installer. Both forms include all browser assets and the pinned YAML runtime. The Windows-installed application shall contain its own Python runtime and dependencies; no system Python, `pip`, Node, CDN or internet access is required after the installer artefact has been obtained. The command-line form shall continue to print the resolved root and capability-bearing loopback URL, shall optionally open that URL without persisting it, shall reject invalid configuration with non-zero exit, and shall terminate within five seconds of interrupt or after its inactivity lease expires.
@@ -197,7 +225,7 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **FR-RUN-003 — Health.** A health endpoint shall report application availability without enumerating private estate contents.
 
-**FR-RUN-004 — Native Windows installation.** Windows v1 shall be delivered as one double-clickable setup `.exe`. It shall install per user without administrator rights, register an uninstaller, validate and retain the selected MarkdownLLM substrate root, and create working Start Menu and Desktop shortcuts. The normal interactive path shall require no command line and shall offer to launch Explorer when setup completes.
+**FR-RUN-004 — Native Windows installation.** Windows v1 shall be delivered as one double-clickable setup `.exe`. It shall install per user without administrator rights, register an uninstaller, validate and retain the selected MarkdownLLM substrate root, and create working Start Menu and Desktop shortcuts. The normal interactive path shall require no command line and shall offer to launch Explorer when setup completes. The product name, publisher and output name come from the build profile (FR-PRES-007).
 
 **FR-RUN-005 — Desktop application launch.** Activating either installed shortcut shall start the bundled local service without a console window, open the capability-bearing URL in the user's default browser, and expose a notification-area icon with **Open Explorer** and **Exit Explorer** actions. A second activation while the same user instance is running shall ask the existing process to open its browser rather than creating a second server or persisting the capability outside process memory.
 
@@ -223,17 +251,19 @@ Needs a standalone, local-first tool that can point at another conforming Markdo
 
 **NFR-SAFE-001D — Historical read boundary.** Content read from the repository object store shall be governed by the same rules as a working-tree read: source admission, name eligibility, exclusive ownership, the file-size limit, binary classification and encoding support, reported with the same error codes. Admission shall be decided before any git invocation, because the object store retains every path the repository has ever contained, including paths the working-tree reader excludes today. Historical content shall not be rendered, and its links shall not be resolved, since a link in a historical file resolves against a tree that no longer exists.
 
-**NFR-SAFE-001C — Outside-root writes.** The exploration runtime writes no Explorer-owned persistent content state. It may write diagnostic lines to stdout/stderr, ephemeral socket/process state managed by the operating system, interpreter/package bytecode caches outside every source root, and browser-local storage holding only presentation choices — the colour theme and whether each side region is folded away. It may hold a source-derived index in memory for the life of the process; nothing derived from a source is written to disk. The Windows installer may write only its per-user application files, uninstall registration, selected substrate-root setting and requested shortcuts. The macOS launcher may write only its Explorer-owned virtual environment and PID beneath the user's Application Support directory; its transient diagnostic file shall be unlinked after launch and no capability-bearing output shall be persisted. No capability, document content, frontmatter, source path below the configured root, content cache, token, durable log or database shall be persisted by the application.
+**NFR-SAFE-001C — Outside-root writes.** The exploration runtime writes no Explorer-owned persistent content state. It may write diagnostic lines to stdout/stderr, ephemeral socket/process state managed by the operating system, interpreter/package bytecode caches outside every source root, and browser-local storage holding only presentation choices — the colour theme and whether each side region is folded away. It may hold a source-derived index in memory for the life of the process; nothing derived from a source is written to disk. The Windows installer may write only its per-user application files, uninstall registration, selected substrate-root setting and requested shortcuts. The macOS launcher may write only its Explorer-owned virtual environment and PID beneath the user's Application Support directory; its transient diagnostic file shall be unlinked after launch and no capability-bearing output shall be persisted. No capability, document content, frontmatter, source path below the configured root, content cache, token, durable log or database shall be persisted by the application. Presentation is derived on every discovery and never persisted; the packaged default presentation and mark image are package data written only by the build.
 
 **NFR-SAFE-002A — Root configuration confinement.** The launch root shall be an existing readable directory. The configured domain directory shall be source-relative, resolve beneath the launch root and reject absolute, UNC/device or escaping input.
 
 **NFR-SAFE-002B — Per-I/O confinement.** Every directory enumeration and file read shall validate source-relative syntax, canonical ownership and non-link/reparse parent components immediately before I/O, then compare final directory/file identity and mutation metadata after I/O. File reads shall validate the opened native handle's final target using `GetFinalPathNameByHandleW` on Windows and `fcntl(fd, F_GETPATH)` on macOS; inability to obtain required evidence on either native profile fails closed. Traversal, separator/case/encoding variants, symlinks, junctions/reparse points, UNC/device paths and detected replacement fail closed. Evidence names the executed filesystem/OS profiles and the residual race: v1 does not claim protection from a fully privileged local process that can replace path components between all checks.
 
-**NFR-SAFE-003 — Content safety.** All repository strings shall be inserted as text or passed through an allowlist renderer. Raw mode is non-executable text; active repository HTML is never retained. Rendered documents load no repository subresource. Tests include script/event attributes, encoded schemes, SVG/data URLs, remote images and malformed markup.
+**NFR-SAFE-003 — Content safety.** All repository strings shall be inserted as text or passed through an allowlist renderer. Raw mode is non-executable text; active repository HTML is never retained. Rendered documents load no repository subresource. The only image the application ever loads is a packaged mark served from its immutable asset manifest (FR-PRES-006). Tests include script/event attributes, encoded schemes, SVG/data URLs, remote images and malformed markup.
 
 **NFR-SAFE-004 — Resource limits.** Every traversal/read/process/response shall enforce the normative limits in Section 9. Limit failures have stable error codes; N−1, N and N+1 are tested.
 
-**NFR-SAFE-005 — Local web boundary.** Estate APIs shall require an unguessable per-launch 256-bit capability delivered in the printed launch URL and then sent in a header. Requests shall accept only the launch-selected loopback Host and same Origin (or no Origin), emit no permissive CORS, use CSP `default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` and deny framing. Unauthenticated health returns only static availability/version data.
+**NFR-SAFE-005 — Local web boundary.** Estate APIs shall require an unguessable per-launch 256-bit capability delivered in the printed launch URL and then sent in a header. Requests shall accept only the launch-selected loopback Host and same Origin (or no Origin), emit no permissive CORS, use CSP `default-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` and deny framing. Same-origin image loads shall be satisfiable only by the immutable packaged asset manifest: no route shall serve repository bytes with an image content type, and the rendered document pipeline emits no image element. Unauthenticated health returns only static availability/version data.
+
+**NFR-SAFE-006 — Presentation safety.** Every presentation and declared-identity string shall reach the DOM as text. Colours shall be accepted only in the exact `#rrggbb` grammar and only when they reach the contrast floor in Section 9 against the theme's panel and page surfaces; the derived soft accent is computed, never supplied. Marks shall be one or two characters from the letter, number, punctuation or symbol categories with no whitespace, control, format or separator characters. Images shall never originate from a repository. Deliberate mutants that remove the text-only rendering, the colour grammar or the contrast check shall be killed by the suite.
 
 **NFR-PORT-001 — Portability.** Runtime code shall support Python 3.10+ on Windows 10+, macOS 13+ and maintained Linux distributions without assuming POSIX separators. This increment shall retain the Windows 10+ x64 native bundle/installer profile, add the portable agent-invoked macOS route and keep Linux/macOS native packaging deferred. Launcher structure and macOS confinement behaviour may be proven off-host, but successful macOS launch remains `unexecuted-platform` until Aaron's actual machine runs it. The browser compatibility floor is Chromium 128+, Firefox 128+ and Safari 18+; this implementation run must execute runtime UI evidence in available Chromium and record standards/static inspection, rather than falsely claiming human acceptance on unavailable browsers.
 
@@ -271,6 +301,11 @@ These values are requirements, not implementation hints.
 | JSON API response body | 2 MiB |
 | Concurrent in-flight HTTP requests | 16; excess receives `server_busy` |
 | Symlink/junction/reparse traversal | 0 hops; never followed |
+| Presentation `name` / `tagline` / each label | 60 / 120 / 32 characters after trimming; no control or format characters |
+| Presentation `mark` | 1 or 2 characters from the letter, number, punctuation or symbol categories |
+| Presentation `accent` / `accent_dark` | exactly `#rrggbb`; contrast ratio ≥ 4.5:1 against the theme's panel and page surfaces |
+| Root presentation file | the eligible file body limit above; frontmatter limits as for any document |
+| Packaged mark image | 256 KiB PNG, package data only |
 
 Ignored directory names are `.git`, `.hg`, `.svn`, `.venv`, `venv`, `node_modules`, `.next`, `dist`, `build`, `coverage`, `.coverage`, `.pytest_cache`, `.mypy_cache`, `.ruff_cache`, `__pycache__`, `.bundle-build`, `.test-tmp` and `.uv-cache`. Excluded secret-bearing basename patterns, matched case-insensitively, include `.env` and `.env.*`, `*.pem`, `*.key`, `*.p12`, `*.pfx`, `id_rsa*`, `id_ed25519*`, `*credential*`, `*secret*`, `*token*` and `*.kdbx`. An excluded name is never returned merely because its extension would otherwise be eligible.
 
@@ -285,6 +320,8 @@ The tree/history/search protocols use explicit `cursor` values and return `next_
 5. Curated Skills and Memory views point to the same document identity as the general file tree.
 6. Every asynchronous browser request terminates visibly as content, empty or error.
 7. Rendering untrusted repository text cannot execute repository-supplied HTML or JavaScript.
+8. Presentation is data: an estate can change Explorer's words and colours, never its code, its images or its routes.
+9. A brand cannot broaden authority: single-instance behaviour, root selection, ownership and confinement are independent of any profile or presentation.
 
 ## 11. Acceptance journeys
 
@@ -332,6 +369,10 @@ The tester installs the same build over itself, verifies the selected substrate 
 
 On Aaron's macOS 13+ machine with the current framework checkout, the tester asks Claude Code to open MarkdownLLM Explorer. Claude runs `bash tools/open-explorer.sh`; the default browser opens without elevation, Aaron selects a real domain, sees every populated first-level `things/` group, opens a formerly omitted item and follows both a body link and reference from a tree-origin document. Real browser activity keeps the service available; after 30 minutes without pointer, keyboard, touch, scroll or authenticated API activity the local service and any Windows-style lifecycle surface are gone, the browser explains how to relaunch, and the same request opens a new session. The tester records macOS/Python/architecture, before/after source observations and any actionable launcher failure; successful Mac execution is not inferred before this journey occurs.
 
+### AJ-12 — White-label journey
+
+Against a conforming substrate whose domains declare names and descriptions, the tester first observes the default chrome and the declared domain names. The tester then places a root `presentation.md` carrying the Reverb identity — name, tagline, text mark, light and dark accents and a relabelled vocabulary — restarts Explorer, and sees the window title, brand mark and name, rail headings, source-kind lines, overview labels and tab names follow it in both themes, with Settings naming the root file as the source. The tester replaces the accent with a colour that fails the contrast floor, restarts, and sees the default accent retained beside a rejected-field issue that names the field and ratio, with every other field still applied. The tester removes the file, restarts, and sees the default chrome. The tester installs a package built with the Reverb profile against a checkout that carries no root file and sees the embedded Reverb identity and the packaged Reverb mark image in the brand slot. Throughout, a document containing an image tag renders no image, no request other than the packaged mark route returns an image content type, and the AJ-07 snapshot of every source is unchanged.
+
 ## 12. Verification and acceptance ownership
 
 The test specification is the approval ledger and must contain one row for every individual `FR-*` and `NFR-*` ID: verification method (`test`, `inspection`, `analysis` or `demonstration`), fixture, observable pass condition, test/evidence identifier, evidence location and acceptance owner. Journey ranges or a green suite alone do not establish coverage. Any compound clause that needs separate evidence receives separate test cases or is split here before implementation.
@@ -347,6 +388,8 @@ Technical verification is owned by the implementation run and its retained evide
 - **H3 — Perplexity's spatial model transfers.** The familiar rail/tabs/context layout should lower orientation cost, but user acceptance must judge this rather than visual similarity alone.
 - **H4 — `domain/` plus markers describes the estate.** Discovery must be configurable because public adopters may use another directory name.
 - **H5 — Lightweight Markdown support is enough only if it renders the substrate's real documents faithfully.** The renderer shall be tested against captured representative files, including tables, fenced code and frontmatter.
+- **H6 — An install-local root file is an acceptable home for an organisation's brand.** It has the same status as the domain directory: not tracked by the framework, carried by the organisation's own bootstrap. If organisations lose it across machines, the bootstrap bundle carries it in a later increment.
+- **H7 — A packaged mark image satisfies the logo need.** The first captured ask (the operator's own, with the Reverb logo) is met by the build profile. If an adopter requires a logo from the estate, that is a separate content-security ruling, not a default of this increment.
 
 ## 14. Definition of done
 
@@ -356,7 +399,8 @@ The v1 increment is done only when:
 - every requirement is implemented, explicitly deferred, or rejected with rationale;
 - automated unit, contract, integration, security and UI tests pass;
 - runtime tests exercise the captured real estate and temporary independent estates;
-- the ten acceptance journeys have recorded technical pass/fail evidence and human-owned judgements are labelled accepted or pending;
+- the twelve acceptance journeys have recorded technical pass/fail evidence and human-owned judgements are labelled accepted or pending;
+- the presentation requirements have trace rows, executed evidence in both themes, and killed mutants for the text-only rendering, colour grammar and contrast check;
 - visual inspection has been completed in light and dark themes at desktop and narrow viewports;
 - two cold code-review passes have been reconciled;
 - the Windows setup artefact installs offline, creates valid shortcuts, opens the browser, handles reactivation, upgrades and uninstalls from a clean process; and
