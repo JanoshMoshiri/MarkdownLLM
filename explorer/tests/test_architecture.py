@@ -128,6 +128,10 @@ def test_windows_packaging_waits_before_replacement_and_keeps_supply_chain_pinne
     assert all(token in build for token in ("curl.exe", "--fail", "--location", "nsis-3.12.zip.part"))
     assert build.index("$downloadedNsisHash -ne $expectedNsisHash") < build.index("Move-Item -LiteralPath $nsisDownload")
     assert all(token in build for token in ("SignToolPath", "SignCertificateThumbprint", "TimestampUrl", "SIGN_CERTIFICATE_THUMBPRINT"))
+    assert '[string]$Version = ""' in build and "tomllib" in build
+    assert '$Version -ne $projectVersion' in build
+    assert '$buildTarget = $explorerRoot + "[windows-build]"' in build
+    assert '".[windows-build]"' not in build
 
 
 @pytest.mark.architecture

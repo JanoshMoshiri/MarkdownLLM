@@ -2,7 +2,7 @@
 id: explorer-macos-and-navigation-sprint-2026-09
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-09-01
 priority: high
 tags: [explorer, macos, navigation, memory, portability, release, sprint]
@@ -259,6 +259,12 @@ Implementation commit `8c7d30a` contains the `0.4.0` portable candidate.
   populated first-level `things/` group and closed both reported navigation
   failures: a tree-opened document followed a resolved reference and a rendered
   body link, with URL, heading, tree selection and back/reload state agreeing.
+- The Windows `0.4.0` installer was rebuilt from this checkout and passed its
+  isolated per-user install, active upgrade, launch and uninstall lifecycle.
+  The installed bundle reported `0.4.0`; the release installer SHA-256 is
+  `f37da6d23376536fa668d8cc5eb4580d04c2d998be48a72c7e0ec96786a28e6c`.
+  The bytes remain unsigned, so this closes local Windows currency rather than
+  the public Windows publication gate.
 - The traceability verifier was run and deliberately did **not** reuse the
   `0.3.0` whole-candidate evidence index. Its fail-closed result leaves the full
   browser, performance, Windows-native and human acceptance seal pending for

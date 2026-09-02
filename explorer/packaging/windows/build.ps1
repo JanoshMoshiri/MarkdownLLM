@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = "0.4.0",
+    [string]$Version = "",
     [string]$VerificationIdentity = "",
     [string]$SignToolPath = "",
     [string]$SignCertificateThumbprint = "",
@@ -31,6 +31,7 @@ $buildRoot = Join-Path $explorerRoot "build\windows"
 $outputRoot = Join-Path $explorerRoot "dist"
 $buildEnvironment = Join-Path $explorerRoot ".windows-build-venv"
 $buildTools = Join-Path $explorerRoot ".windows-build-tools"
+$pyprojectPath = Join-Path $explorerRoot "pyproject.toml"
 $sourcePng = Join-Path $explorerRoot "src\markdownllm_explorer\delivery\static\markdownllm-explorer.png"
 $sourceIco = Join-Path $scriptRoot "assets\markdownllm-explorer.ico"
 
@@ -53,7 +54,18 @@ if (-not (Test-Path -LiteralPath (Join-Path $buildEnvironment "Scripts\python.ex
     & $bootstrapPython -m venv $buildEnvironment
 }
 $buildPython = Join-Path $buildEnvironment "Scripts\python.exe"
-& $buildPython -m pip install --disable-pip-version-check ".[windows-build]"
+$projectVersion = (& $buildPython -c "import pathlib, sys, tomllib; print(tomllib.loads(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))['project']['version'])" $pyprojectPath).Trim()
+if ($LASTEXITCODE -ne 0 -or -not $projectVersion) {
+    throw "The Explorer version could not be read from pyproject.toml."
+}
+if (-not $Version) {
+    $Version = $projectVersion
+}
+elseif ($Version -ne $projectVersion) {
+    throw "Requested installer version '$Version' does not match the Explorer source version '$projectVersion'."
+}
+$buildTarget = $explorerRoot + "[windows-build]"
+& $buildPython -m pip install --disable-pip-version-check $buildTarget
 if ($LASTEXITCODE -ne 0) { throw "The isolated Windows build dependencies could not be installed." }
 
 & $buildPython (Join-Path $scriptRoot "generate_icons.py") --png $sourcePng --ico $sourceIco
