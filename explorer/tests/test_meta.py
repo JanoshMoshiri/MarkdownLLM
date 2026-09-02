@@ -32,7 +32,13 @@ def test_traceability_manifest_is_exact_and_well_formed():
     requirement_text = (EXPLORER / "docs" / "requirements.md").read_text(encoding="utf-8")
     requirement_ids = set(re.findall(r"(?:FR|NFR)-[A-Z]+-\d{3}[A-Z]?", requirement_text))
     traced = manifest()["requirements"]
-    assert set(traced) == requirement_ids and len(requirement_ids) == 71
+    # A requirement that is specified but parked carries a dated reason under
+    # `deferred` instead of a row: the gate stays exact without pretending
+    # evidence exists. An id may not be both traced and deferred.
+    deferred = manifest().get("deferred", {})
+    assert not set(deferred) & set(traced), set(deferred) & set(traced)
+    assert all(row.get("parked") and row.get("reason") for row in deferred.values()), deferred
+    assert set(traced) | set(deferred) == requirement_ids and len(requirement_ids) == 79
     tests = collected_test_functions()
     allowed_dispositions = {"automated", "browser", "mixed", "analysis"}
     allowed_prefixes = ("pytest::", "browser::", "system::", "analysis::", "human::")
@@ -80,7 +86,8 @@ def test_supported_python_range_is_declared():
 def test_test_spec_trace_table_has_one_row_per_requirement():
     specification = (EXPLORER / "docs" / "test-specification.md").read_text(encoding="utf-8")
     rows = re.findall(r"^\| ((?:FR|NFR)-[A-Z]+-\d{3}[A-Z]?) \|", specification, re.MULTILINE)
-    assert len(rows) == len(set(rows)) == 71
+    deferred = manifest().get("deferred", {})
+    assert len(rows) == len(set(rows)) == 79 - len(deferred)
 
 
 @pytest.mark.meta

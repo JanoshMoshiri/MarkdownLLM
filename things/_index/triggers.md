@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: triggers
 created: 2026-09-02
-generated: 2026-09-02T21:33:33
-generated_from: HEAD@7b8efef
-coverage: 7
+generated: 2026-09-02T21:57:22
+generated_from: HEAD@8828f9b
+coverage: 8
 framework_version: 3.37.0
 ---
 
@@ -23,6 +23,10 @@ framework_version: 3.37.0
 ## estate-workflow-derivation
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-09-10 reached, action=The MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered.
+
+## explorer-white-label-presentation-2026-09
+- status: paused  due_date: —
+- trigger: type=time, condition=2026-10-01 reached, action=Ask the operator whether the standalone-app direction is decided. If Explorer resumes, resume from branch parked/explorer-white-label-presentation at the design review as the Parked section describes; if a standalone app supersedes Explorer, disposition this plan and the parked branch deliberately and carry the presentation contract into the new product's requirements.
 
 ## framework-retrospective-2026-08b
 - status: completed  due_date: —

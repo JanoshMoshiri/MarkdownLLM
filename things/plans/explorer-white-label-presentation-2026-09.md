@@ -1,12 +1,16 @@
 ---
 id: explorer-white-label-presentation-2026-09
 type: plan
-status: in-progress
-version: 1.3
+status: paused
+version: 1.4
 created: 2026-09-02
-priority: high
+priority: medium
 exposed: false
-tags: [explorer, white-label, presentation, branding, estate, install-local, distribution, sprint]
+tags: [explorer, white-label, presentation, branding, estate, install-local, distribution, sprint, parked]
+triggers:
+  - type: time
+    condition: "2026-10-01 reached"
+    action: "Ask the operator whether the standalone-app direction is decided. If Explorer resumes, resume from branch parked/explorer-white-label-presentation at the design review as the Parked section describes; if a standalone app supersedes Explorer, disposition this plan and the parked branch deliberately and carry the presentation contract into the new product's requirements."
 linked_things:
   - id: explorer-macos-and-navigation-sprint-2026-09
     relation: references
@@ -408,3 +412,52 @@ sequence: requirements, design and test specification each with an independent
 cold review and reconciliation, then implementation with two code reviews,
 residual findings stored for a refinement sprint, then technical acceptance
 with the Reverb identity. Explorer requirements v0.5 carry the requirement set.
+
+## Parked — 2026-09-02
+
+The operator parked this increment the same day, after the requirements had
+been reviewed and reconciled and the design had been drafted and sent for
+review: a local standalone MarkdownLLM app is under consideration, and the
+direction is undecided. Nothing is discarded. The state is held in three
+places so it can be resumed or dispositioned without reconstruction.
+
+**On `main`.** Requirements v0.6 (`35844db`) with FR-PRES-001 to FR-PRES-007
+and NFR-SAFE-006 and their cold review and disposition (`7b8efef`,
+`35844db`); design v0.6 (`8828f9b`); this plan. The eight parked requirement
+ids are declared `deferred` in `explorer/tests/traceability.yaml` with the
+date and reason, and the meta gate counts them as deferred rather than traced,
+so main's suite stays green and exact while the ids exist. The Explorer
+product is unchanged at `0.4.0`; nothing of the increment ships.
+
+**On branch `parked/explorer-white-label-presentation` (`120d275`).** Every
+draft that had not reached its stage gate: the test specification v0.5
+reconciled to requirements v0.6 (fixtures, oracles, tests, mutants M22 to
+M25, trace rows, evidence files), the trace manifest rows and mutant entries,
+the meta-gate and evidence-verifier counts, `core/presentation.py` with the
+reconciled grammar and field-by-field resolution (exercised by hand, unit
+tests not yet written), the Reverb build profile with its mark, icon and
+embedded presentation, the default profile, the user-guide section, and the
+`presentation` type declared in the framework schema with the regenerated
+types block in `AGENTS.md`.
+
+**In Code Architect.** The run `run-markdownllm-explorer-white-label-presentation`
+is paused at `design`; the gate decision stands.
+
+**The design cold review.** Launched against `8828f9b` before the park. Its
+record is committed on `main` when it lands, unreconciled; its findings are the
+first thing to read on resumption.
+
+**To resume.** Read the design review and reconcile the design to v0.7 on
+`main`. Merge the parked branch onto `main` and reconcile the test
+specification against the reconciled design; commit at the `decompose` stage
+and send the specification for its cold review. Then `build-verify` in the
+increment order above, removing each `deferred` entry as its trace row gains
+real evidence, then the two code reviews and the Reverb acceptance journey.
+
+**If a standalone app supersedes Explorer.** Disposition this plan
+`cancelled` with the reason, keep or delete the parked branch deliberately,
+and carry the presentation contract — the value object, the grammar, the
+contrast rules and the field-by-field resolution across an install-local file,
+a packaged default and a product default — into the new product's
+requirements, because a standalone app will need the same white-label
+mechanism and this one has already been reviewed.

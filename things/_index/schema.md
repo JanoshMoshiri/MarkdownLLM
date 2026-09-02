@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-09-02
-generated: 2026-09-02T21:33:33
-generated_from: HEAD@7b8efef
+generated: 2026-09-02T21:57:22
+generated_from: HEAD@8828f9b
 coverage: 331
 framework_version: 3.37.0
 ---
@@ -32,11 +32,11 @@ framework_version: 3.37.0
 | exposed | 25 |
 | decided_by | 23 |
 | promoted_to | 20 |
+| triggers | 8 |
 | completed | 8 |
 | period_start | 8 |
 | period_end | 8 |
 | domain | 8 |
-| triggers | 7 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |

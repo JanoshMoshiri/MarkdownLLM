@@ -93,3 +93,15 @@ mutants:
   M19: {subject: admit a git template outside the declared set, evidence: mutation::M19, tests: [tests/test_adapters.py::test_git_argument_allowlist_admits_only_the_declared_history_templates]}
   M20: {subject: resolve a contested identifier to its first match, evidence: mutation::M20, tests: [tests/test_adapters.py::test_a_contested_identifier_resolves_to_nothing_rather_than_to_one_of_them]}
   M21: {subject: read an identifier from outside the frontmatter block, evidence: mutation::M21, tests: [tests/test_adapters.py::test_thing_identifier_reads_only_a_top_level_frontmatter_id]}
+# Requirements that are specified and designed but parked carry a dated reason
+# here instead of a row, so the gate stays exact without pretending evidence
+# exists. Remove an entry when its row gains real evidence.
+deferred:
+  FR-PRES-001: {parked: "2026-09-02", reason: "White-label increment parked pending the operator's decision on a local standalone MarkdownLLM app; specified in requirements v0.6, designed in design v0.6; test rows, policy and profile drafts on branch parked/explorer-white-label-presentation"}
+  FR-PRES-002: {parked: "2026-09-02", reason: "As FR-PRES-001"}
+  FR-PRES-003: {parked: "2026-09-02", reason: "As FR-PRES-001"}
+  FR-PRES-004: {parked: "2026-09-02", reason: "As FR-PRES-001"}
+  FR-PRES-005: {parked: "2026-09-02", reason: "As FR-PRES-001"}
+  FR-PRES-006: {parked: "2026-09-02", reason: "As FR-PRES-001"}
+  FR-PRES-007: {parked: "2026-09-02", reason: "As FR-PRES-001"}
+  NFR-SAFE-006: {parked: "2026-09-02", reason: "As FR-PRES-001"}
