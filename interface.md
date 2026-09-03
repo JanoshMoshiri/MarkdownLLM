@@ -1,8 +1,8 @@
 ---
 id: interface-specification
 type: specification
-status: stable
-version: 1.5
+status: evolving
+version: 1.6
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -21,6 +21,9 @@ linked_things:
   - id: explorer-publication-position
     relation: derived-from
     notes: "v1.5 distinguishes an optional read-only inspection surface from the human-to-agent I/O contract this specification owns."
+  - id: markdownllm-desktop-is-primary-accessible-product
+    relation: derived-from
+    notes: "v1.6 distinguishes substrate route-agnosticism from a first-party product choosing to implement one accessible route."
 ---
 
 # Interface
@@ -33,16 +36,23 @@ This document defines the I/O layer of the LLM-driven systems framework — how 
 - **Processing** — `read.thing.md` / `write.thing.md` (how the LLM reasons within domains)
 - **Interface** — this file (how input gets in and output gets delivered)
 
-## The Core Principle: Use Existing Routes
+## The Core Principle: The Substrate Does Not Require One Route
 
-The framework does not define a new interface protocol. It does not require you to build a client, a web app, a chat widget, or a custom API.
+The framework does not require one interface protocol, client, web app, chat widget or custom API
+in order to be valid. A Domain remains operable through any compatible route that can receive its
+entry contract and bounded context.
 
-Instead, it leverages whatever route already exists between you and a capable LLM. The interface is a thin, replaceable pipe. Any channel that can deliver natural language to an LLM and receive structured output back is a valid interface.
+That contract does not forbid a product from supplying a route. MarkdownLLM Desktop is the
+first-party accessible route: a local application that deliberately owns setup, Domain and
+Session journeys while leaving Markdown and Git authoritative. It is still a replaceable pipe;
+Claude Code, Codex, Copilot, Obsidian-assisted workflows and other compatible clients can operate
+the same Domain without it.
 
 This is a deliberate design choice:
 
 - Interface technology changes faster than anything else in the stack
-- Building a custom interface couples you to a platform and creates maintenance burden
+- A first-party interface creates a platform and maintenance boundary that must earn itself
+  through accessibility and acceptance evidence
 - Existing routes are already optimised for the interaction patterns you need
 - The framework's value is in the domain definition and data layer, not in the I/O mechanism
 
@@ -70,6 +80,7 @@ An input route is any channel through which a human can communicate intent to th
 | Route | How It Works | Discovery / evidence boundary |
 |-------|-------------|-------------------------------|
 | **VS Code + GitHub Copilot** | Configurable AGENTS.md support; chat or voice input via editor. | Designed/configured route; lifecycle compatibility is unverified and is not inferred from Claude's `.claude` projection or shortcut files. |
+| **MarkdownLLM Desktop (Engineering Preview)** | Local setup, Domain/Session management, Explorer and a context-only provider route over ordinary Markdown/Git state. | Windows Preview A is in acceptance; no public-release or live-provider claim is made until its pinned UAT closes. |
 | **Claude Code (CLI + desktop)** | `CLAUDE.md` entry pointer imports `AGENTS.md` (`@AGENTS.md`). Core scaffold surface — born with every domain in every `--harness` selection, `none` included. | Automatic pointer route verified 2026-08-17; named lifecycle evidence is separate. |
 | **OpenAI Codex CLI / desktop** | Reads AGENTS.md; the optional project adapter binds lifecycle events. | Automatic on the named tested Windows surfaces; CLI lifecycle and Desktop/runtime/Git claims are recorded separately rather than generalized. |
 | **Cursor / Windsurf** | Intended AGENTS.md workspace route; editor-based chat. | Designed-for; no framework execution record yet. |

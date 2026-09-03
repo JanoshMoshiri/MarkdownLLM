@@ -181,7 +181,7 @@ The framework defines itself through these interconnected specifications:
 - **read.thing.md** — How LLMs read and reason about things without modification. (`type: specification`, `status: stable`)
 - **write.thing.md** — How LLMs create, update, and manage things. (`type: specification`, `status: stable`)
 - **validate.thing.md** — How to validate thing integrity (structural, referential, semantic). (`type: specification`, `status: stable`)
-- **interface.md** — The I/O layer: input routes, output types, deliverables vs things. (`type: specification`, `status: stable`)
+- **interface.md** — The I/O layer: route-agnostic substrate contract, first-party Desktop boundary, input routes, output types, and deliverables vs things. (`type: specification`, `status: evolving`)
 - **git-workflow.md** — Git as state machine: commit points, conventions, event stream, autocommit mode. (`type: specification`, `status: evolving`)
 - **orchestration.md** — Hook points, prompts, and bindings: an opt-in pattern for domains that need structured orchestration. (`type: specification`, `status: evolving`)
 - **session-memory.md** — How sessions preserve generative knowledge: `type: insight` things (kept live by the thing graph) and the generated **orient** view of open loops that replaces the retired `continuity.md`. Defines the session-end extraction ritual (invoked via the `session-end-continuity` bound prompt — explicit, not automatic). (`type: specification`, `status: evolving`)

@@ -1,17 +1,16 @@
 ---
 id: explorer-white-label-presentation-2026-09
 type: plan
-status: paused
-version: 1.4
+status: cancelled
+version: 1.5
 created: 2026-09-02
 priority: medium
 exposed: false
-tags: [explorer, white-label, presentation, branding, estate, install-local, distribution, sprint, parked]
-triggers:
-  - type: time
-    condition: "2026-10-01 reached"
-    action: "Ask the operator whether the standalone-app direction is decided. If Explorer resumes, resume from branch parked/explorer-white-label-presentation at the design review as the Parked section describes; if a standalone app supersedes Explorer, disposition this plan and the parked branch deliberately and carry the presentation contract into the new product's requirements."
+tags: [explorer, white-label, presentation, branding, estate, install-local, distribution, sprint, parked, cancelled]
 linked_things:
+  - id: markdownllm-desktop-is-primary-accessible-product
+    relation: derived-from
+    notes: "The standalone Desktop decision is the human disposition cue that cancelled this Explorer-specific increment."
   - id: explorer-macos-and-navigation-sprint-2026-09
     relation: references
     notes: "The 0.4.0 candidate is the behavioural baseline this plan changes; its Mac acceptance is not a prerequisite, but its shell, routing and safety contracts are the ones amended here."
@@ -27,6 +26,19 @@ linked_things:
 ---
 
 # Explorer white-label presentation
+
+## Disposition — 2026-09-03
+
+**Cancelled.** The operator chose MarkdownLLM Desktop as the primary accessible product. New
+interaction and presentation work now belongs to that separately owned application rather than
+to the read-only Explorer. The parked branch
+`parked/explorer-white-label-presentation` is deliberately retained: it is recoverable design
+provenance and contains reviewed requirements and an unreviewed implementation draft, not
+accepted product state. Nothing from it is merged into Explorer.
+
+The field value object, grammar, contrast constraints and field-by-field precedence across an
+install-local file, packaged default and product default are preserved as deferred Desktop
+requirements input. They do not enter Desktop Preview A or its first provider acceptance gate.
 
 ## Outcome
 

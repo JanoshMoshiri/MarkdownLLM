@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.5
+version: 1.6
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -17,6 +17,9 @@ linked_things:
   - id: explorer-publication-position
     relation: derived-from
     notes: "v1.5 offers Explorer as an optional visual orientation path, never as a prerequisite or agent route."
+  - id: markdownllm-desktop-is-primary-accessible-product
+    relation: derived-from
+    notes: "v1.6 names the eventual guided route while retaining the current published first-hour path until acceptance."
 ---
 
 # The First Hour
@@ -81,6 +84,11 @@ the portable viewer. Use the substrate and domain lists to look around. It is a
 read-only orientation aid, not part of installing the floor and not a
 replacement for the agent that will create or change a domain. Nothing in the
 rest of this first hour depends on it.
+
+MarkdownLLM Desktop is being built as the eventual guided first-use route—setup, Domains,
+Sessions, provider connection and this visual inspection in one local application. It remains an
+Engineering Preview under acceptance, so this guide does not silently substitute it for the
+published framework installation route yet.
 
 The README is the one-page overview if you want the *why*; skip
 `domain-specification-guide.md` entirely — that one is your *agent's* reading,

@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-02
-generated: 2026-09-02T22:00:26
-generated_from: HEAD@f0e0806
-coverage: 331
+created: 2026-09-03
+generated: 2026-09-03T03:25:06
+generated_from: HEAD@d2e1b4e
+coverage: 332
 framework_version: 3.37.0
 ---
 
@@ -554,11 +554,11 @@ framework_version: 3.37.0
 - expertise-is-an-output-not-a-prerequisite --supports--> provenance-specification
 - expertise-is-an-output-not-a-prerequisite --complements--> the-substrate-is-a-discipline-prosthesis
 - expertise-is-an-output-not-a-prerequisite --informs--> llm-driven-systems-manifesto
+- explorer-extraction-and-hosting --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - explorer-extraction-and-hosting --derived-from--> explorer-publication-position
 - explorer-extraction-and-hosting --references--> interface-specification
 - explorer-extraction-and-hosting --references--> markdownllm-explorer-windows-distribution
 - explorer-extraction-and-hosting --references--> code-architect-governs-substrate-code
-- explorer-extraction-and-hosting --dependencies--> explorer-publication-readiness
 - explorer-macos-and-navigation-sprint-2026-09 --supersedes--> explorer-macos-support
 - explorer-macos-and-navigation-sprint-2026-09 --references--> explorer-ui-increment-2026-08
 - explorer-macos-and-navigation-sprint-2026-09 --complements--> explorer-publication-readiness
@@ -572,6 +572,7 @@ framework_version: 3.37.0
 - explorer-macos-support --informs--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
 - explorer-macos-support --informs--> an-explanation-committed-to-a-specification-outlives-the-doubt-that-made-it
 - explorer-macos-support --informs--> a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity
+- explorer-publication-position --superseded-by--> markdownllm-desktop-is-primary-accessible-product
 - explorer-publication-position --informs--> interface-specification
 - explorer-publication-position --informs--> explorer-publication-readiness
 - explorer-publication-position --informs--> explorer-extraction-and-hosting
@@ -584,6 +585,7 @@ framework_version: 3.37.0
 - explorer-ui-increment-2026-08 --complements--> explorer-publication-readiness
 - explorer-ui-increment-2026-08 --references--> explorer-publication-position
 - explorer-ui-increment-2026-08 --references--> explorer-extraction-and-hosting
+- explorer-white-label-presentation-2026-09 --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - explorer-white-label-presentation-2026-09 --references--> explorer-macos-and-navigation-sprint-2026-09
 - explorer-white-label-presentation-2026-09 --complements--> explorer-extraction-and-hosting
 - explorer-white-label-presentation-2026-09 --references--> explorer-publication-position
@@ -609,6 +611,7 @@ framework_version: 3.37.0
 - first-hour-guide --references--> framework-map
 - first-hour-guide --references--> framework-discovery-specification
 - first-hour-guide --derived-from--> explorer-publication-position
+- first-hour-guide --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
 - floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08
@@ -803,6 +806,7 @@ framework_version: 3.37.0
 - interface-specification --complements--> read-thing-specification
 - interface-specification --complements--> write-thing-specification
 - interface-specification --derived-from--> explorer-publication-position
+- interface-specification --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - isolation-must-contain-writes-not-just-reads --extends--> withholding-is-not-isolation
 - isolation-must-contain-writes-not-just-reads --complements--> committed-state-carries-defects-as-faithfully-as-facts
 - isolation-must-contain-writes-not-just-reads --informs--> evidence-and-eval-backlog
@@ -832,6 +836,10 @@ framework_version: 3.37.0
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> session-memory-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> orchestration-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --references--> git-workflow-specification
+- markdownllm-desktop-is-primary-accessible-product --supersedes--> explorer-publication-position
+- markdownllm-desktop-is-primary-accessible-product --informs--> interface-specification
+- markdownllm-desktop-is-primary-accessible-product --informs--> explorer-white-label-presentation-2026-09
+- markdownllm-desktop-is-primary-accessible-product --informs--> explorer-extraction-and-hosting
 - markdownllm-explorer-comprehensive-review-2026-08-27 --implements--> code-architect-governs-substrate-code
 - markdownllm-explorer-comprehensive-review-2026-08-27 --extends--> markdownllm-explorer-code-cold-review-2
 - markdownllm-explorer-comprehensive-review-2026-08-27 --references--> markdownllm-explorer-windows-distribution
@@ -927,6 +935,7 @@ framework_version: 3.37.0
 - operator-guide --implements--> an-honest-ledger-replicates-full-compliance-does-not
 - operator-guide --references--> session-start-hardening
 - operator-guide --derived-from--> explorer-publication-position
+- operator-guide --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - operator-queue-2026-08-28 --implements--> closed-loop-operating-state
 - operator-queue-2026-08-28 --derived-from--> gates-census-2026-08
 - operator-queue-2026-08-28 --derived-from--> estate-retrospective-synthesis-2026-08

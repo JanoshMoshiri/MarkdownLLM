@@ -1,14 +1,16 @@
 ---
 id: explorer-extraction-and-hosting
 type: plan
-status: not-started
-version: 1.1
+status: cancelled
+version: 1.2
 created: 2026-08-27
 priority: medium
-dependencies: [explorer-publication-readiness]
 exposed: false
 tags: [explorer, extraction, hosting, architecture, distribution, vercel, local-connector]
 linked_things:
+  - id: markdownllm-desktop-is-primary-accessible-product
+    relation: derived-from
+    notes: "The local-first Desktop direction replaces this hosted-Explorer hypothesis."
   - id: explorer-publication-position
     relation: derived-from
   - id: interface-specification
@@ -20,6 +22,14 @@ linked_things:
 ---
 
 # Extract and host MarkdownLLM Explorer
+
+## Disposition — 2026-09-03
+
+**Cancelled as the preferred product path.** The operator chose a local-first MarkdownLLM Desktop
+and deferred remote access until a later paired mobile client can prove its boundary against a
+live local application. The read-only Explorer and this plan remain historical evidence; no
+source move, hosted control plane or cloud resource is authorised. Any future remote design starts
+from the Desktop's accepted local boundary rather than resuming this plan by inertia.
 
 ## Intent
 

@@ -15,6 +15,13 @@ the portable route directly. It turns the substrate, domains, commits, files,
 skills and memory into a visual local interface without changing the files or
 becoming a second source of truth.
 
+**The next accessible route is MarkdownLLM Desktop.** The local Windows application brings setup,
+Domain and Session management, provider connection, exploration and diagnostics into one guided
+surface while keeping Markdown and Git authoritative. It is currently an Engineering Preview in
+acceptance, not a published release. Explorer remains the usable read-only companion; the
+Desktop becomes the default first-use route only after its pinned live and accessibility UAT
+closes.
+
 ---
 
 ## The Partnership

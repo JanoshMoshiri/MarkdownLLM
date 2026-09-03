@@ -16,6 +16,9 @@ informed_by:
   - id: markdownllm-explorer-windows-distribution
     commit: 3c1b449acf2c927cad3850d55c7b393f3a67f569
 linked_things:
+  - id: markdownllm-desktop-is-primary-accessible-product
+    relation: superseded-by
+    notes: "The 2026-09-03 product decision preserves this preview as an optional viewer but replaces it as the primary accessibility direction."
   - id: interface-specification
     relation: informs
     notes: "Distinguishes the optional read-only inspection surface from the human-to-agent I/O contract."

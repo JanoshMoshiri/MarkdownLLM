@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.8
+version: 1.9
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -26,6 +26,9 @@ linked_things:
   - id: explorer-publication-position
     relation: derived-from
     notes: "v1.8 adds the optional read-only visual route while preserving the distinction between inspection and agent operation."
+  - id: markdownllm-desktop-is-primary-accessible-product
+    relation: derived-from
+    notes: "v1.9 records the Desktop direction without advertising an acceptance-pending candidate as released."
 ---
 
 # The Operator's Guide — Working In A Domain Since v3
@@ -182,6 +185,20 @@ Ask the agent to open it again when needed; no server-management command needs
 to be remembered.
 
 *Boundary: `interface.md`; release position: `explorer-publication-position`.*
+
+### 8. The accessible application direction
+
+MarkdownLLM Desktop is now the primary product direction for people who should not need to learn
+the framework's command-line operating sequence. It is a local application for setup, Domain and
+Session management, provider connection, exploration and diagnostics over the same ordinary
+Markdown and Git repositories. The substrate does not depend on it: existing harnesses and the
+read-only Explorer remain valid routes and integrations.
+
+The Windows application is currently an **Engineering Preview in acceptance**, not a published
+release. Its provider route and installed keyboard/accessibility journey must close against one
+pinned candidate before this guide can offer it as the default first-use path.
+
+*Direction: `markdownllm-desktop-is-primary-accessible-product`; contract: `interface.md`.*
 
 ## The Toolbox
 

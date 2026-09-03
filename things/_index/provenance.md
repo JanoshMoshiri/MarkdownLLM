@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-02
-generated: 2026-09-02T22:00:26
-generated_from: HEAD@f0e0806
-coverage: 81
+created: 2026-09-03
+generated: 2026-09-03T03:25:07
+generated_from: HEAD@d2e1b4e
+coverage: 82
 framework_version: 3.37.0
 ---
 
@@ -226,6 +226,13 @@ framework_version: 3.37.0
 
 ## llm-driven-systems-manifesto
 - settled-reasoning-is-standing-authority (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
+
+## markdownllm-desktop-is-primary-accessible-product
+- explorer-extraction-and-hosting (derived-from)
+- explorer-white-label-presentation-2026-09 (derived-from)
+- first-hour-guide (derived-from)
+- interface-specification (derived-from)
+- operator-guide (derived-from)
 
 ## markdownllm-explorer-comprehensive-review-2026-08-27
 - explorer-publication-position (pinned @a8f4034dffd84df1196160ef07d68516f47bf3fb)
