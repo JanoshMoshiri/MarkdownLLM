@@ -1,0 +1,30 @@
+{
+  "version": "0.4.2",
+  "date": "2026-09-06",
+  "code_commit": "f098f2aec2c06e2126957f035e1567da1af07037",
+  "checks": {
+    "targeted_pytest": "32 passed, 1 POSIX skip",
+    "framework_validation": "0 errors, 0 warnings",
+    "browser": "Dark/light rendering, persistent theme choice, desktop at 1440px and drawer at 390px; no horizontal document overflow",
+    "minimum_text_contrast": {
+      "light": 4.63,
+      "dark": 4.72
+    },
+    "installed_asset_bytes_match": true,
+    "installed_version": "0.4.2",
+    "selected_root_preserved": true,
+    "installed_runtime_health": "ok, 0.4.2"
+  },
+  "installed_assets_sha256": {
+    "context.css": "64064db0897c9f3ea075a2ef4531aae9bb4520d95bd37caf247df8f32ef4d69a",
+    "markdownllm-explorer.png": "29e336c58ffbc76ff00a05af823b8fb2cf38a84a966dcecfc4035f83bff7d022",
+    "app.css": "1f6c7759c5b34d67508cece6f940e76088286fa15a15393d5012666d0241e4e2",
+    "index.html": "66384ccb339b8f534e71834e502bd93b3d131fb368b8657897729c8ff7c25ff2"
+  },
+  "installer_sha256": "555f79f5fa5c2484d65052476dddc398c3750cbf0964217ef6027b8720c1eb9c",
+  "limits": [
+    "Actual macOS acceptance remains open.",
+    "Unsigned local preview; public release not claimed.",
+    "Earlier full release evidence is historical and has not been resealed."
+  ]
+}
