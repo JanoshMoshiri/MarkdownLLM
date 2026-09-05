@@ -21,6 +21,10 @@ surface while keeping Markdown and Git authoritative. It is currently an Enginee
 acceptance, not a published release. Explorer remains the usable read-only companion; the
 Desktop becomes the default first-use route only after its pinned live and accessibility UAT
 closes.
+The current product increment specifies both ChatGPT/Codex and Claude Code subscription
+connections, while the available preview remains API-only. Branding, dark-theme and setup
+repairs do not imply those subscription routes have shipped; the [Desktop direction record](things/decisions/markdownllm-desktop-is-primary-accessible-product.md)
+keeps that distinction explicit.
 
 ---
 
