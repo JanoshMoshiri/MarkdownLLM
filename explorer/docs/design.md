@@ -6,17 +6,23 @@
 
 **Date:** 2026-09-05
 
-**Implemented appearance baseline — 0.4.2 (2026-09-06):** the packaged shell
+**Implemented appearance baseline — 0.4.3 (2026-09-06):** the packaged shell
 shares Desktop's authored six-path MarkdownLLM mark, drawn inline with CSS
-colours for each theme. The dark palette uses workspace `#191919`, navigation
-`#261F23`, panels `#232323`, text `#F4F1F3` and accent `#34B7DF`. Light mode
+colours for each theme. The dark palette uses workspace `#191919`, matching
+navigation/context panels `#232323`, text `#F4F1F3` and accent `#34B7DF`. Light mode
 uses a pale plum palette with `#006584` for readable accent text. The native
 icon is the same multi-resolution mark used by Desktop; the build derives its
-tray PNG from that committed ICO. This changes the product's own appearance.
+tray PNG from that committed ICO. Both Windows launch shortcuts and the installed
+application registration point at a versioned copy of that icon to avoid the old
+shell cache. This changes the product's own appearance.
 The presentation-file/profile design below remains deferred, including its
-earlier M/green default examples and proposed image routes. The running 0.4.2
-server retains `img-src 'none'`; the inline mark contains only authored paths
-and does not enable repository images or alter the safe Markdown renderer.
+earlier M/green default examples and proposed image routes. The running server's
+image policy permits only its exact loopback origin and port at
+`/brand-icon-<version>.png` and `/favicon.ico`. The shell explicitly links the
+versioned PNG as its tab icon; both URLs serve the same packaged mark. The policy
+is shared by normal and busy responses, with the origin built from the listener
+rather than request headers. Other images remain blocked. The inline mark
+contains only authored paths, and the safe Markdown renderer remains unchanged.
 
 **Requirements:** `explorer/docs/requirements.md` v0.7
 

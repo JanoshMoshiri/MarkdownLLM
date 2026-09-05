@@ -2,7 +2,7 @@
 id: explorer-macos-and-navigation-sprint-2026-09
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-09-01
 priority: high
 tags: [explorer, macos, navigation, memory, portability, release, sprint]
@@ -376,3 +376,19 @@ provide the crisp small-size rendering. This is a product appearance update;
 the deferred white-label capability remains deferred. The 0.4.1 evidence above
 is historical for those exact bytes. Actual Mac acceptance and signed public
 Windows publication remain open for the current candidate.
+
+Janosh's follow-up rejected the plum navigation surface: 0.4.3 makes both side
+panels identical, with neutral hover/selection colours. It also gives the browser
+an explicit versioned logo URL with an icon-only content-policy exception;
+0.4.2's blanket image prohibition had prevented the browser tab from adopting
+the new mark. Windows shortcuts use a versioned copy of the same application
+icon to avoid reusing a cached earlier icon. These presentation corrections do
+not close the outstanding Mac runtime or signed-publication acceptance loops.
+
+The 0.4.3 browser and targeted HTTP/security checks pass, including an observed
+successful browser request for the packaged favicon. Native verification could
+not start: Windows Smart App Control rejected the isolated verification
+installer with WinError 4551 (Code Integrity event 3077). The existing installed
+0.4.2 copy is therefore unchanged. The new shortcut icon routing is built but
+awaits a permitted native installer run; neither native acceptance nor an
+installed upgrade is claimed for 0.4.3.

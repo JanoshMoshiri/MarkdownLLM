@@ -2,9 +2,9 @@
 
 MarkdownLLM Explorer is a standalone, read-only browser for a MarkdownLLM substrate and its nested domain estate. It shows each repository's commits, file tree, skills and memory, and renders Markdown as a styled document.
 
-Version 0.4.2 shares MarkdownLLM Desktop's logo, charcoal and plum dark palette,
-and cyan accents. Light mode uses the dark-ink logo and a matching pale palette;
-the existing light, dark and system choices remain available.
+Version 0.4.3 uses matching neutral side panels and cyan accents, with the
+MarkdownLLM mark in the app, browser tab and Windows shortcuts. Light mode uses
+the dark-ink logo; the existing light, dark and system choices remain available.
 
 > **Current release position — operator-accepted Windows preview candidate.**
 > Independent review corrections are implemented. Public Windows publication

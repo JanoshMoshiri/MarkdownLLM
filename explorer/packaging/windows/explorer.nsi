@@ -167,6 +167,8 @@ Section "Install" SEC_INSTALL
   Delete "$INSTDIR\MarkdownLLM Explorer.exe"
   SetOutPath "$INSTDIR"
   File /r "${FROZEN_DIR}\*.*"
+  ; A versioned icon path avoids reusing the shell's cached pre-branding icon.
+  File /oname=brand-icon-${APP_VERSION}.ico "${APP_ICON}"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   WriteRegStr HKCU "${APP_REGISTRY}" "InstallDir" "$INSTDIR"
@@ -174,15 +176,15 @@ Section "Install" SEC_INSTALL
   WriteRegStr HKCU "${UNINSTALL_REGISTRY}" "DisplayName" "${APP_NAME}"
   WriteRegStr HKCU "${UNINSTALL_REGISTRY}" "DisplayVersion" "${APP_VERSION}"
   WriteRegStr HKCU "${UNINSTALL_REGISTRY}" "Publisher" "MarkdownLLM"
-  WriteRegStr HKCU "${UNINSTALL_REGISTRY}" "DisplayIcon" "$INSTDIR\MarkdownLLM Explorer.exe"
+  WriteRegStr HKCU "${UNINSTALL_REGISTRY}" "DisplayIcon" "$INSTDIR\brand-icon-${APP_VERSION}.ico"
   WriteRegStr HKCU "${UNINSTALL_REGISTRY}" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKCU "${UNINSTALL_REGISTRY}" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
   WriteRegDWORD HKCU "${UNINSTALL_REGISTRY}" "NoModify" 1
   WriteRegDWORD HKCU "${UNINSTALL_REGISTRY}" "NoRepair" 1
 
   CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-  CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\MarkdownLLM Explorer.exe" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
-  CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\MarkdownLLM Explorer.exe" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
+  CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\brand-icon-${APP_VERSION}.ico" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\MarkdownLLM Explorer.exe" '--root "$SubstrateRoot"' "$INSTDIR\brand-icon-${APP_VERSION}.ico" 0 SW_SHOWNORMAL "" "Explore this MarkdownLLM substrate"
   CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall ${APP_NAME}.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
 

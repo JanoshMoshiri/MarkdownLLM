@@ -29,6 +29,7 @@ _ASSETS = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/favicon.ico": ("markdownllm-explorer.png", "image/png"),
+    f"/brand-icon-{__version__}.png": ("markdownllm-explorer.png", "image/png"),
     "/markdownllm-explorer.png": ("markdownllm-explorer.png", "image/png"),
     "/app.css": ("app.css", "text/css; charset=utf-8"),
     "/context.css": ("context.css", "text/css; charset=utf-8"),
@@ -71,7 +72,7 @@ class BoundedHTTPServer(ThreadingHTTPServer):
             try:
                 request_id = secrets.token_hex(16)
                 body = json.dumps({"error":{"code":"server_busy","message":"Explorer is busy. Try again.","retryable":True},"meta":{"request_id":request_id,"observed_at":_observed_at()}}, separators=(",", ":")).encode()
-                headers = _raw_security_headers(len(body), "application/json; charset=utf-8")
+                headers = _raw_security_headers(len(body), "application/json; charset=utf-8", self.server_port)
                 request.sendall(
                     b"HTTP/1.1 429 Too Many Requests\r\nConnection: close\r\n" + headers + b"\r\n" + body
                 )
@@ -235,7 +236,7 @@ class ExplorerHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))
         self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'; connect-src 'self'")
+        self.send_header("Content-Security-Policy", _content_security_policy(self.server.server_port))
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Referrer-Policy", "no-referrer")
@@ -273,10 +274,22 @@ def _safe_relative_context(value: str) -> bool:
     )
 
 
-def _raw_security_headers(length: int, content_type: str) -> bytes:
+def _content_security_policy(port: int) -> str:
+    # The listener supplies the origin, never an untrusted Host header. Permit
+    # only the two packaged icon URLs, not arbitrary same-origin images.
+    origin = f"http://127.0.0.1:{port}"
+    return (
+        "default-src 'self'; script-src 'self'; style-src 'self'; "
+        f"img-src {origin}/brand-icon-{__version__}.png {origin}/favicon.ico; "
+        "object-src 'none'; base-uri 'none'; frame-ancestors 'none'; "
+        "form-action 'none'; connect-src 'self'"
+    )
+
+
+def _raw_security_headers(length: int, content_type: str, port: int) -> bytes:
     values = [
         f"Content-Type: {content_type}", f"Content-Length: {length}", "Cache-Control: no-store",
-        "Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'; connect-src 'self'",
+        f"Content-Security-Policy: {_content_security_policy(port)}",
         "X-Content-Type-Options: nosniff", "X-Frame-Options: DENY", "Referrer-Policy: no-referrer",
         "Permissions-Policy: camera=(), microphone=(), geolocation=()", "Cross-Origin-Resource-Policy: same-origin",
     ]

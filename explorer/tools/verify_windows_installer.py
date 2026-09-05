@@ -63,7 +63,7 @@ def shortcut_details(path: Path) -> dict[str, str]:
     script = (
         "$p=[Environment]::GetEnvironmentVariable('MDLLM_SHORTCUT');"
         "$s=(New-Object -ComObject WScript.Shell).CreateShortcut($p);"
-        "[pscustomobject]@{Target=$s.TargetPath;Arguments=$s.Arguments}|ConvertTo-Json -Compress"
+        "[pscustomobject]@{Target=$s.TargetPath;Arguments=$s.Arguments;Icon=$s.IconLocation}|ConvertTo-Json -Compress"
     )
     environment = os.environ.copy()
     environment["MDLLM_SHORTCUT"] = str(path)
@@ -194,6 +194,15 @@ def main() -> int:
                 raise RuntimeError("shortcut target does not resolve to the installed application")
             if expected_root not in desktop["Arguments"] or expected_root not in start["Arguments"]:
                 raise RuntimeError("shortcut does not remember the selected substrate root")
+            version = registry_value(arguments.uninstall_key, "DisplayVersion")
+            brand_icon = install_dir / f"brand-icon-{version}.ico"
+            source_icon = Path(__file__).resolve().parents[1] / "packaging/windows/assets/markdownllm-explorer.ico"
+            if not brand_icon.is_file() or brand_icon.read_bytes() != source_icon.read_bytes():
+                raise RuntimeError("installed brand icon differs from the authored application icon")
+            if any(Path(shortcut["Icon"].rsplit(",", 1)[0]).resolve() != brand_icon.resolve() for shortcut in (desktop, start)):
+                raise RuntimeError("shortcut does not use the versioned brand icon")
+            if registry_value(arguments.uninstall_key, "DisplayIcon") != str(brand_icon):
+                raise RuntimeError("application registration does not use the brand icon")
             if registry_value(arguments.app_key, "SubstrateRoot") != expected_root:
                 raise RuntimeError("installer did not remember the selected substrate root")
 

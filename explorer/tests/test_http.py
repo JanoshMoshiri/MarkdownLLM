@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import http.client
 import json
+import re
 import threading
 import time
 import types
@@ -46,6 +47,27 @@ def test_health_is_minimal_and_static_shell_contains_no_estate_data(live_server)
     assert headers["Cache-Control"] == "no-store"
     assert request(server, "GET", "/context.css")[0] == 200
     assert request(server, "GET", "/js/views/context.js")[0] == 200
+
+
+@pytest.mark.system
+def test_browser_icon_is_packaged_and_csp_allows_only_its_exact_urls(live_server):
+    server, _, _ = live_server
+    _, headers, shell = request(server, "GET", "/")
+    icon = re.search(rb'<link rel="icon" type="image/png" href="([^"]+)">', shell)
+    assert icon is not None
+    path = icon[1].decode()
+    assert path == f"/brand-icon-{__version__}.png"
+    origin = f"http://127.0.0.1:{server.server_port}"
+    image_policy = next(part.strip() for part in headers["Content-Security-Policy"].split(";") if part.strip().startswith("img-src "))
+    assert image_policy.split()[1:] == [origin + path, origin + "/favicon.ico"]
+    status, icon_headers, image = request(server, "GET", path)
+    assert status == 200 and icon_headers["Content-Type"] == "image/png"
+    assert image.startswith(b"\x89PNG\r\n\x1a\n")
+    assert image == request(server, "GET", "/favicon.ico")[2]
+    assert icon_headers["X-Content-Type-Options"] == "nosniff"
+    for other in (path + "/../README.md", "/domain/demo/logo.png", path + "?path=README.md"):
+        status, other_headers, _ = request(server, "GET", other)
+        assert status == 404 and not other_headers["Content-Type"].startswith("image/")
 
 
 @pytest.mark.system
@@ -184,6 +206,7 @@ def test_all_method_and_busy_responses_validate_boundary_and_share_security_head
     security = {"Cache-Control", "Content-Security-Policy", "X-Content-Type-Options", "X-Frame-Options", "Referrer-Policy", "Permissions-Policy", "Cross-Origin-Resource-Policy"}
     status, headers, body = request(server, "POST", "/api/v1/estate", {"Origin": "https://evil.invalid"})
     assert status == 403 and json.loads(body)["error"]["code"] == "origin_forbidden" and security <= set(headers)
+    policy = headers["Content-Security-Policy"]
     server.join_active(1)
     acquired = 0
     try:
@@ -193,6 +216,7 @@ def test_all_method_and_busy_responses_validate_boundary_and_share_security_head
         payload = json.loads(body)
         assert status == 429 and payload["error"]["code"] == "server_busy" and len(payload["meta"]["request_id"]) == 32
         assert security <= set(headers)
+        assert headers["Content-Security-Policy"] == policy
     finally:
         for _ in range(acquired): server.capacity.release()
 
