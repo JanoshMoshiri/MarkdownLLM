@@ -1,0 +1,29 @@
+{
+  "version": "0.4.3",
+  "date": "2026-09-06",
+  "code_commit": "c1a1f6f2dd91b032b4e4196cf47011d5ff0dfdf2",
+  "checks": {
+    "targeted_pytest": "32 passed; 1 POSIX skip on Windows",
+    "framework_validation": "0 errors, 0 warnings",
+    "dark_panels": {
+      "left": "#232323",
+      "right": "#232323",
+      "selection": "#303030"
+    },
+    "light_panels": {
+      "left": "#ffffff",
+      "right": "#ffffff"
+    },
+    "browser_favicon": "Observed Chromium request: /brand-icon-0.4.3.png returned HTTP 200, image/png",
+    "browser_console": "No warnings or errors",
+    "native_build": "Normal and isolated verification installers built",
+    "native_verification": "Blocked before process creation: Smart App Control, WinError 4551, Code Integrity event 3077",
+    "installed_upgrade": "Not performed; installed version remains 0.4.2"
+  },
+  "installer_sha256": "c8c0f744b52bc6af86d076bc4b7c4173d0c1ed069dc34eccd4c782cc0d39fd8d",
+  "verification_installer_sha256": "5ac3638df6f00beebfc1ccf0f57c07ea2f5281aa05e0adcfd97b15c981b048b9",
+  "limits": [
+    "Versioned desktop shortcut icon routing is built but native lifecycle acceptance is pending.",
+    "Mac acceptance and public signing remain open."
+  ]
+}
