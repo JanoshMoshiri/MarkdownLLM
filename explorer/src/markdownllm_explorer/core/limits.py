@@ -29,4 +29,3 @@ class ExplorerLimits:
     response_bytes: int = 2 * 1024 * 1024
     concurrent_requests: int = 16
     browser_seconds: float = 10.0
-    idle_seconds: float = 30 * 60

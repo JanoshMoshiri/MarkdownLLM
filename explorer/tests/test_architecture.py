@@ -100,11 +100,9 @@ def test_static_assets_are_native_and_local_only():
     assert 'aria-label="Source and document context"' in index
     app = (SOURCE / "delivery" / "static" / "js" / "app.js").read_text(encoding="utf-8")
     routing = (SOURCE / "delivery" / "static" / "js" / "routing.js").read_text(encoding="utf-8")
-    activity = (SOURCE / "delivery" / "static" / "js" / "activity.js").read_text(encoding="utf-8")
     theme = (SOURCE / "delivery" / "static" / "js" / "theme.js").read_text(encoding="utf-8")
     assert '["system", "light", "dark"]' in theme
     assert "pushState" in routing and "popstate" in app and "documentSurface" in app
-    assert "createActivityController" in activity and "setInterval" not in activity
     assert not (SOURCE / "delivery" / "static" / "node_modules").exists()
 
 
@@ -243,7 +241,6 @@ def test_browser_state_declares_current_request_pagination_and_accessibility_alg
     static = SOURCE / "delivery" / "static"
     state_js = (static / "js" / "state.js").read_text(encoding="utf-8")
     app_js = (static / "js" / "app.js").read_text(encoding="utf-8")
-    activity_js = (static / "js" / "activity.js").read_text(encoding="utf-8")
     overlays_js = (static / "js" / "overlays.js").read_text(encoding="utf-8")
     nav_js = (static / "js" / "views" / "navigation.js").read_text(encoding="utf-8")
     index = (static / "index.html").read_text(encoding="utf-8")
@@ -252,8 +249,6 @@ def test_browser_state_declares_current_request_pagination_and_accessibility_alg
     assert all(key in nav_js for key in ("aria-expanded", "aria-selected", "aria-level", "ArrowRight", "ArrowLeft", "Home", "End"))
     assert 'role="tablist"' in index and 'role="tabpanel"' in index
     assert 'aria-modal", "true"' in overlays_js and ".inert = true" in overlays_js
-    assert all(event in activity_js for event in ("pointerdown", "keydown", "touchstart", "scroll"))
-    assert "setInterval" not in activity_js and "sendTouch" in activity_js
     for view in (static / "js" / "views").glob("*.js"):
         source = view.read_text(encoding="utf-8")
         assert "fetch(" not in source, view

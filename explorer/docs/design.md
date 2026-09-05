@@ -1,12 +1,12 @@
 # MarkdownLLM Explorer — Design Specification
 
-**Status:** the white-label presentation increment (v0.6) is designed and awaits its cold-read cycle; the 0.4.0 design beneath it is implementation-reconciled and operator-accepted; public Windows release remains gated by signing and signed-byte native verification
+**Status:** 0.4.1 maintenance correction: persistent service and repaired macOS file reading/stop. The white-label increment remains deferred under the Desktop product decision; actual Mac acceptance and public Windows signing remain open.
 
-**Version:** 0.6
+**Version:** 0.7
 
-**Date:** 2026-09-02
+**Date:** 2026-09-05
 
-**Requirements:** `explorer/docs/requirements.md` v0.5
+**Requirements:** `explorer/docs/requirements.md` v0.7
 
 **Architectural sources:** MarkdownLLM framework v3.36.0; Code Architect domain `c711d2a46225aaca471100e1eec2afceb02e751a`
 
@@ -364,7 +364,7 @@ For each adapter operation, `ConfinedSourceReader`:
 3. Uses adapter-private boundary data to walk components with non-following metadata calls, rejecting symlinks, junctions/reparse points and non-regular final types.
 4. Resolves the candidate and proves it is within the token's canonical root and outside its excluded roots (for substrate, the entire configured domain directory).
 5. Captures final non-following identity and metadata immediately before I/O.
-6. Opens the already-confined candidate in binary read mode, compares the open handle's `fstat` identity with the pre-open identity, reads at most limit+1, and compares open-handle and final path identity/size/mtime after the read. On Windows, `GetFinalPathNameByHandleW` resolves the native open handle; on macOS, `fcntl(fd, F_GETPATH)` fills a bounded native path buffer. The corresponding native profile fails closed when final-path evidence is unavailable, and repeats source/exclusion ownership checks before any content is returned. Linux retains its current identity/metadata checks without claiming a native final-path primitive. A fully privileged process able to replace a path between these checks remains outside the local v1 trust boundary; the adapter does not claim portable `openat`/`O_NOFOLLOW` race elimination.
+6. Opens the already-confined candidate in binary read mode, compares the open handle's `fstat` identity with the pre-open identity, reads at most limit+1, and compares open-handle and final path identity/size/mtime after the read. On Windows, `GetFinalPathNameByHandleW` resolves the native open handle; on macOS, `fcntl(fd, F_GETPATH, bytes(1024))` returns the bounded native path buffer as bytes. The adapter reads that return value rather than expecting in-place mutation of a bytearray. Python’s `fcntl` contract differs from `ioctl`; the previous mock incorrectly modelled mutation and concealed the failure on macOS. The corresponding native profile fails closed when final-path evidence is unavailable, and repeats source/exclusion ownership checks before any content is returned. Linux retains its current identity/metadata checks without claiming a native final-path primitive. A fully privileged process able to replace a path between these checks remains outside the local v1 trust boundary; the adapter does not claim portable `openat`/`O_NOFOLLOW` race elimination.
 7. For directory enumeration, captures non-following directory identity/mtime, performs a bounded `os.scandir` without following children, and compares identity/mtime after the scan. A detected rename/replacement returns `source_changed`.
 8. Fails with `source_changed` when stable identity cannot be demonstrated.
 
@@ -483,7 +483,7 @@ Labels are pure presentation, and their reach is exact: the two rail group headi
 
 ## 12. HTTP API
 
-Static assets are source-insensitive. `/health` is unauthenticated and returns only `{status, version}`; an exact capability supplied on `HEAD /health` may renew the in-memory activity lease without changing that public representation. Missing or wrong capabilities on health do not renew it. Exact `Host: 127.0.0.1:<bound-port>` is required on static, health and API routes. Static/health navigation allows absent Origin or the exact launch origin; APIs allow absent Origin for direct tools or the exact launch origin and always require the capability. No route emits CORS headers.
+Static assets are source-insensitive. `/health` is unauthenticated and returns only `{status, version}`. No request renews or expires a session based on inactivity. Exact `Host: 127.0.0.1:<bound-port>` is required on static, health and API routes. Static/health navigation allows absent Origin or the exact launch origin; APIs allow absent Origin for direct tools or the exact launch origin and always require the capability. No route emits CORS headers.
 
 | Method/path | Use case | Key query |
 |---|---|---|
@@ -527,7 +527,7 @@ Tree/search/collection/commit page DTOs carry `items`, with `next_cursor`/`parti
 
 The estate DTO carries `presentation` (name, optional tagline, mark, optional `mark_asset`, the four accent values, the six labels, the per-field `sources` map and the rejected fields) and each source carries an optional `description`, an `identity` of `declared`, `folder` or `product` and, for a folder fallback, an `identity_reason`; absent optional values are omitted. `mark_asset`, when present, is the fixed manifest route `/brand-mark.png`.
 
-`BoundedThreadingHTTPServer` overrides `process_request`: it acquires one of 16 permits non-blockingly before creating a thread; when full it sends a fixed bounded HTTP 429 JSON response directly and closes the socket. It also owns one monotonic last-activity instant and a daemon lease monitor. Successful capability-authenticated API requests and exact-capability health touches call `note_activity`; the monitor calls `shutdown` from its own thread after the configured 1,800 seconds. Shutdown never joins that calling monitor, avoiding a serve-loop deadlock. The handler subclasses `BaseHTTPRequestHandler`, never `SimpleHTTPRequestHandler`, and maps only `/`, `/health`, `/api/v1/*` plus an exact immutable `importlib.resources` asset manifest computed once at import from package contents, whose only image entries are the product icon and, when the package carries one, the packaged mark. Request-line/header limits and controllable parse failures produce bounded errors; access/error logging emits structured redacted method/route/status/request ID and never the fragment, capability header, query string or document values.
+`BoundedThreadingHTTPServer` overrides `process_request`: it acquires one of 16 permits non-blockingly before creating a thread; when full it sends a fixed bounded HTTP 429 JSON response directly and closes the socket. The serve loop has no inactivity monitor and runs until an explicit shutdown. The handler subclasses `BaseHTTPRequestHandler`, never `SimpleHTTPRequestHandler`, and maps only `/`, `/health`, `/api/v1/*` plus an exact immutable `importlib.resources` asset manifest computed once at import from package contents, whose only image entries are the product icon and, when the package carries one, the packaged mark. Request-line/header limits and controllable parse failures produce bounded errors; access/error logging emits structured redacted method/route/status/request ID and never the fragment, capability header, query string or document values.
 
 Socket/request deadlines and browser-side 10-second aborts guarantee a visible client terminal state. Python cannot cancel a thread blocked inside an arbitrary filesystem syscall; that residual is bounded by the 16-request ceiling and is not misreported as server-side cancellation. Application/adapters own only failures they can classify meaningfully; the request boundary handles the rest once.
 
@@ -541,16 +541,13 @@ The hash route contains only source ID, tab, mode, document surface and percent-
 
 Each API operation and document mode owns an `AbortController` and monotonically increasing request ID. A source/tab/path/mode/surface change aborts obsolete work. A response mutates state only when its full operation/source/path/mode/surface identity is still current, closing the stale-response race. A 401 after process restart becomes a distinct `session_expired` view with relaunch guidance; it never clears the last safe location.
 
-### Activity lease
+### Persistent service
 
-After capability capture, the browser fetches `/api/v1/session` and passes its
-`idle_timeout_seconds` to `activity.js`. The controller resets a local expiry
-timer on pointer, keyboard, touch and scroll activity and sends a throttled
-authenticated `HEAD /health` touch. It does not poll or create a background
-heartbeat: an untouched tab expires. Local expiry aborts outstanding work and
-shows “Explorer stopped after 30 minutes of inactivity. Ask Claude Code to open
-it again.” A failed touch does not prematurely erase the page; either the local
-timer or the next normal request establishes expiry.
+The 2026-09-05 operator correction removes the server lease, activity touches,
+`/api/v1/session` timeout configuration and browser expiry timer. After capability
+capture the browser loads the estate directly. It can remain untouched without
+aborting requests or presenting a false expiry notice. Capability checks remain
+in force, and an actual process restart still requires its new launch URL.
 
 ### Visual composition
 
@@ -591,7 +588,7 @@ mdllm-explorer = "markdownllm_explorer.__main__:main"
 
 `__main__.py` parses `--root`, `--domain-dir` (default `domain`), `--port` (default 0) and `--open-browser`, validates configuration, and calls `composition.build_runtime` followed by `composition.build_server`. Composition constructs limits/policy, catalogue/boundary registry, focused filesystem ports, Git adapter, frontmatter/Markdown/presenter pipeline, use cases and the selected HTTP adapter. No global singleton is created at import time.
 
-Startup prints product/version, resolved root and fragment-capability URL. `--open-browser` hands that URL directly to the system browser without writing it. `KeyboardInterrupt` or idle lease expiry closes the listening socket and joins active request threads up to five seconds. The portable runtime creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.4 and a read-only installed-package system test proves launch does not depend on writing them.
+Startup prints product/version, resolved root and fragment-capability URL. `--open-browser` hands that URL directly to the system browser without writing it. Explicit SIGINT/SIGTERM (and Windows SIGBREAK) closes the listening socket and joins active request threads up to five seconds. The CLI explicitly registers SIGINT even if the detached shell job inherited it as ignored; it restores earlier signal handlers on return. There is no inactivity shutdown. The portable runtime creates no persistent state; interpreter-managed package bytecode caches outside source roots are permitted by requirements v0.4 and a read-only installed-package system test proves launch does not depend on writing them.
 
 ### Agent-invoked macOS launch
 
@@ -618,7 +615,7 @@ introduced. Native Mac packaging remains a later separately evidenced lane.
 
 The setup runs per user (`RequestExecutionLevel user`) into `%LOCALAPPDATA%\Programs\MarkdownLLM Explorer`, so installation needs no elevation. A custom page selects a directory containing `AGENTS.md`; silent verification supplies `/SUBSTRATEROOT=<path>`. Setup stores only that root under `HKCU\Software\MarkdownLLM Explorer`, writes one Desktop and one Start Menu shortcut with quoted `--root`, registers the uninstaller, and offers to launch the app on completion. Before reinstallation or uninstall mutates installed files, it invokes `--request-exit` and aborts on any non-zero result. Reinstallation then reads the previous root, replaces the application directory and recreates singleton shortcuts. Uninstall removes those exact owned surfaces and no source-root path.
 
-`windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser`, `--no-tray` and `--request-exit` verification/lifecycle switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. For `exit`, the primary acknowledges its PID before beginning shutdown; the secondary opens that process with synchronisation rights and waits up to 15 seconds for process termination. Manual Exit calls server shutdown; idle server return stops the tray from the server worker. Both paths close the listener/socket and join active requests within the existing five-second budget. Setup therefore waits for positive primary-process termination, not merely the short-lived command sender. Startup failures surface one bounded native message box because a windowed executable has no console.
+`windows_app.py` parses the same root/domain/port contract plus packaging-only `--no-browser`, `--no-tray` and `--request-exit` verification/lifecycle switches. On first instance it acquires a current-user mutex, starts the existing bounded HTTP server on a worker thread, creates the tray menu (**Open Explorer**, **Exit Explorer**) and opens the URL through the Windows default-browser association. On reactivation it sends `open` to the first process over the current-user named pipe and exits. For `exit`, the primary acknowledges its PID before beginning shutdown; the secondary opens that process with synchronisation rights and waits up to 15 seconds for process termination. Manual Exit calls server shutdown; any server return stops the tray from the server worker. Both paths close the listener/socket and join active requests within the existing five-second budget. Setup therefore waits for positive primary-process termination, not merely the short-lived command sender. Startup failures surface one bounded native message box because a windowed executable has no console.
 
 The frozen application imports `pystray`/Pillow only at this outer Windows delivery edge; those packages are bundled build inputs, not dependencies of core/application or of the portable CLI package. The application icon is the Explorer `M` mark supplied as a multi-resolution `.ico` and used consistently by the executable, setup, Desktop shortcut and tray; a build profile's icon replaces it in all four places at build time, and the tray tooltip and the native error-dialog title read the product name from the packaged `product.json`, while the menu verbs and the executable filename stay the product's.
 

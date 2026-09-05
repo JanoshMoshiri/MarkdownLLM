@@ -393,9 +393,11 @@ def test_macos_open_handle_final_path_is_validated(tmp_path, monkeypatch):
 
     def fcntl_success(file_descriptor, operation, buffer):
         assert file_descriptor >= 0 and operation == 50
+        # fcntl returns bytes; unlike ioctl it does not mutate the argument.
+        # This matches Python 3.10+ including versions rejecting bytearray.
+        assert isinstance(buffer, bytes) and len(buffer) == 1024
         encoded = os.fsencode(target)
-        buffer[:len(encoded)] = encoded
-        return 0
+        return encoded + b"\x00" * (len(buffer) - len(encoded))
 
     monkeypatch.setattr(confined_reader, "sys", types.SimpleNamespace(platform="darwin"))
     monkeypatch.setitem(sys.modules, "fcntl", types.SimpleNamespace(fcntl=fcntl_success, F_GETPATH=50))
@@ -406,6 +408,28 @@ def test_macos_open_handle_final_path_is_validated(tmp_path, monkeypatch):
     with target.open("rb") as handle, pytest.raises(ExplorerError) as caught:
         confined_reader._opened_final_path(handle)
     assert caught.value.code == "source_unreadable"
+
+
+@pytest.mark.unit
+def test_macos_empty_final_path_fails_closed(tmp_path, monkeypatch):
+    target = tmp_path / "opened.md"
+    target.write_text("opened", encoding="utf-8")
+    monkeypatch.setattr(confined_reader, "sys", types.SimpleNamespace(platform="darwin"))
+    monkeypatch.setitem(sys.modules, "fcntl", types.SimpleNamespace(fcntl=lambda *_: bytes(1024)))
+    with target.open("rb") as handle, pytest.raises(ExplorerError) as caught:
+        confined_reader._opened_final_path(handle)
+    assert caught.value.code == "source_unreadable"
+
+
+@pytest.mark.system
+@pytest.mark.skipif(sys.platform != "darwin", reason="requires the actual macOS F_GETPATH syscall")
+def test_native_macos_open_handle_and_document_read(estate):
+    target = estate / "AGENTS.md"
+    with target.open("rb") as handle:
+        assert confined_reader._opened_final_path(handle) == target.resolve()
+    runtime = build_runtime(estate)
+    document = runtime.routes.dispatch("/api/v1/document", {"source": ["substrate"], "path": ["AGENTS.md"]})
+    assert "Fixture substrate" in document.content
 
 def _head_sha(runtime) -> str:
     return runtime.routes.dispatch("/api/v1/overview", {"source": ["substrate"]}).commits.items[0].sha

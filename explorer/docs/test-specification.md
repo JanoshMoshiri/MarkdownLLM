@@ -2,13 +2,13 @@
 
 **Status:** release-candidate gate approved when the coverage and evidence checks in §11 pass
 
-**Version:** 0.4
+**Version:** 0.5
 
-**Date:** 2026-08-27
+**Date:** 2026-09-05
 
-**Requirements:** `explorer/docs/requirements.md` v0.4
+**Requirements:** `explorer/docs/requirements.md` v0.7
 
-**Design:** `explorer/docs/design.md` v0.5
+**Design:** `explorer/docs/design.md` v0.7
 
 ## 1. Test position
 
@@ -163,9 +163,9 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 ### HTTP/runtime/distribution
 
 - `ST-INSTALL-001` — build/install package from outside checkout into a clean supported Python environment; no Node; post-install offline launch from arbitrary cwd.
-- `ST-CLI-001` — root/domain-dir/port validation, printed fragment-capability URL, optional browser-open handoff, requested-port collision, non-zero invalid exits and ≤5-second interrupt or idle shutdown.
-- `ST-IDLE-001` — authenticated session configuration, successful API/touch renewal, no renewal from static/public-health/wrong-capability traffic, automatic server exit and Windows tray stop at a short deterministic test lease.
-- `ST-MAC-LAUNCHER-001` — tracked launcher resolves its own root, rejects non-Darwin/old Python without mutation, uses an Application Support virtual environment without elevation, installs the current checkout, opens the browser, verifies PID ownership before stop/replace, and persists no capability or log.
+- `ST-CLI-001` — root/domain-dir/port validation, printed fragment-capability URL, optional browser-open handoff, requested-port collision, non-zero invalid exits and ≤5-second explicit interrupt/stop shutdown, including an inherited ignored SIGINT on POSIX.
+- `ST-PERSIST-001` — advance the server clock beyond the former 30-minute lease without requests; it remains available with the same capability, unauthenticated access remains denied, and explicit shutdown closes the serve loop.
+- `ST-MAC-LAUNCHER-001` — tracked launcher resolves its own root, rejects non-Darwin/old Python without mutation, uses an Application Support virtual environment without elevation, installs the current checkout, opens the browser, verifies PID ownership before stop/replace, and persists no capability or log. `F_GETPATH` adapter tests model returned immutable bytes, reject empty/unavailable paths, and include a real macOS syscall/document test that remains skipped on other platforms.
 - `ST-WIN-BUNDLE-001` — clean PyInstaller one-folder build; executable PE/version/icon metadata, embedded interpreter/dependencies/static assets, no system-Python/Node resolution at runtime, and manifest/hash retained.
 - `ST-WIN-INSTALL-001` — NSIS setup is one executable; per-user/no-elevation and offline; valid-root gate; exact install files, selected-root registry value, uninstall registration and singleton Desktop/Start Menu shortcuts with quoted arguments.
 - `ST-WIN-LAUNCH-001` — frozen shortcut target starts with no console, reaches health, invokes the browser-opening port, exposes Open/Exit tray commands, reactivation routes `open` to the original process, and exits within five seconds without persisting capability material.
@@ -195,7 +195,7 @@ Extract all `FR-*`/`NFR-*` IDs from requirements, all rows from `tests/traceabil
 - `BT-COMMIT-001` — activating a commit lists its changed paths with classification and openability; an openable path opens as the commit left it with the added lines marked and named in text; unopenable paths state why; back, browser history and deep-link restore of commit and file.
 - `BT-COLLAPSE-001` — desktop collapse and restore of both side regions, persistence across reload, absence of dialog/modal/inert/focus-trap semantics above 900 px, focus moving to the replacing control, centre horizontal scroll and no page-level horizontal scroll in any state.
 - `BT-REFERENCE-001` — reference chips render per declared field with relation or commit, are not activatable before resolution answers, open the thing they name on the current document surface, and settle into an explicitly unresolved state on absence, contest, failure or timeout.
-- `BT-IDLE-001` — a real interaction resets local expiry and sends a throttled authenticated touch, an untouched tab creates no heartbeat, and expiry presents the exact Claude relaunch guidance.
+- `BT-PERSIST-001` — leave the page untouched beyond the former 30-minute lease; no expiry notice or activity heartbeat appears, and the same tab can load a document afterwards.
 - `BT-KEYBOARD-001` — tree/tab/search/mode/theme keyboard state machines, collapse focus, memory-section disclosure focus and paginated focus.
 - `BT-A11Y-001` — roles/states/names/live announcements, contrast/colour independence, target size, reduced motion and automated accessibility scan where available.
 - `BT-VISUAL-001` — synthetic-fixture screenshots in light/dark desktop and narrow views; inspection against visual-reference principles and clipping/overlap oracle.
@@ -339,7 +339,7 @@ The implementation shall include `explorer/tests/traceability.yaml` mirroring th
 | FR-UI-003 | inspection | UI | BT-VISUAL-001, BT-A11Y-001 | Selection/action/empty/error distinct in both themes | Janosh |
 | FR-UI-004 | inspection+demo | UI | BT-SHELL-001 | No placeholder/irrelevant control; every shown control works | Technical run / Janosh |
 | FR-RUN-001 | test | CLEAN/WINDOWS | ST-INSTALL-001, ST-CLI-001, ST-OFFLINE-001, ST-WIN-BUNDLE-001 | Portable package and frozen runtime launch with packaged assets; CLI may open browser and exits cleanly | Technical run |
-| FR-RUN-002 | test | WEB | ST-CLI-001, ST-SERVER-BOUND-001, ST-IDLE-001, BT-IDLE-001 | Loopback/capability policy and authenticated-activity lease stop every launch surface | Technical run |
+| FR-RUN-002 | test | WEB | ST-CLI-001, ST-SERVER-BOUND-001, ST-PERSIST-001, BT-PERSIST-001 | Loopback/capability policy and persistent service with explicit stop | Technical run |
 | FR-RUN-003 | test | WEB | ST-HEALTH-001 | Health available with static values only | Technical run |
 | FR-RUN-004 | test+demo | WINDOWS | ST-WIN-BUNDLE-001, ST-WIN-INSTALL-001, AJ-08 | One setup exe performs valid per-user install with root selection, shortcuts and uninstaller, no command line or Python | Technical run / Janosh |
 | FR-RUN-005 | test+demo | WINDOWS | ST-WIN-LAUNCH-001, AJ-09 | Shortcut opens browser/tray; reactivation keeps one service; Exit terminates within five seconds | Technical run / Janosh |

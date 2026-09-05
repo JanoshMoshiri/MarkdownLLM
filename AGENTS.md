@@ -151,7 +151,8 @@ Note: This agent operates in **autocommit mode** (`git.autocommit: true`). All s
 When the operator asks to open or launch MarkdownLLM Explorer on a Mac, run
 `bash tools/open-explorer.sh` from this framework checkout. The tracked launcher
 owns environment bootstrap, safe replacement of an earlier owned process,
-default-browser opening and the shared 30-minute inactivity shutdown; do not ask
+default-browser opening and explicit stop/relaunch; Explorer stays running until
+stopped. Do not ask
 the operator to remember the underlying Python commands. Use
 `bash tools/open-explorer.sh --stop` when the operator asks to stop it explicitly.
 

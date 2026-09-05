@@ -30,9 +30,8 @@ The script checks for macOS and Python 3.10+, creates an Explorer-only virtual
 environment in the user's Application Support directory, installs the Explorer
 from the current checkout, starts the loopback service and opens the default
 browser. It needs no administrator rights and never writes into a served
-repository. The service stops after 30 minutes without real browser or
-authenticated API activity. Ask Claude to open it again, or stop it explicitly
-with `bash tools/open-explorer.sh --stop`.
+repository. The service keeps running until explicitly stopped, including when
+the browser is idle or closed. Stop it with `bash tools/open-explorer.sh --stop`.
 
 This portable route is the immediate Mac handoff. A native `.app`/DMG remains a
 later lane requiring an actual Mac build host and separate signing/notarization
@@ -40,7 +39,7 @@ evidence.
 
 ## Windows install and run
 
-Run `MarkdownLLM-Explorer-Installer-0.4.0.exe`. The installer asks for the
+Run `MarkdownLLM-Explorer-Installer-0.4.1.exe`. The installer asks for the
 MarkdownLLM folder, installs the complete application for the current user,
 and creates Desktop and Start Menu shortcuts. No separate Python or Node
 installation is required.
@@ -100,8 +99,8 @@ Options:
 --open-browser      open the capability URL in the default browser
 ```
 
-Press Ctrl+C to stop the server. Every launch surface also stops automatically
-after 30 minutes without authenticated activity.
+Press Ctrl+C to stop the server. Explorer has no inactivity timeout on any
+launch surface; use the Mac stop command or Windows tray Exit when finished.
 
 ## Development
 

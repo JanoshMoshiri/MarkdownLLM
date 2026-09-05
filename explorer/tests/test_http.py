@@ -4,12 +4,14 @@ import http.client
 import json
 import threading
 import time
+import types
 
 import pytest
 
 from markdownllm_explorer import __version__
 from markdownllm_explorer.composition import build_runtime
 from markdownllm_explorer.core.limits import ExplorerLimits
+from markdownllm_explorer.delivery import http_server
 from markdownllm_explorer.delivery.http_server import serve
 
 
@@ -47,38 +49,29 @@ def test_health_is_minimal_and_static_shell_contains_no_estate_data(live_server)
 
 
 @pytest.mark.system
-def test_idle_lease_requires_authenticated_activity(estate):
-    def start_server():
-        runtime = build_runtime(estate, limits=ExplorerLimits(idle_seconds=0.35))
-        server, _ = serve(runtime)
-        thread = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.02}, daemon=True)
-        thread.start()
-        return server, runtime, thread
-
-    server, runtime, thread = start_server()
+def test_server_survives_inactivity_until_explicit_shutdown(estate, monkeypatch):
+    clock = [time.monotonic()]
+    monkeypatch.setattr(http_server, "time", types.SimpleNamespace(monotonic=lambda: clock[0]))
+    runtime = build_runtime(estate)
+    server, _ = serve(runtime)
+    thread = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.02}, daemon=True)
+    thread.start()
     try:
         headers = {"X-Explorer-Capability": runtime.capability}
-        status, _, body = request(server, "GET", "/api/v1/session", headers)
-        assert status == 200 and json.loads(body)["data"] == {"idle_timeout_seconds": 0.35}
-        assert request(server, "GET", "/api/v1/session?unexpected=1", headers)[0] == 400
-        time.sleep(0.18)
-        assert request(server, "GET", "/health")[0] == 200
-        assert request(server, "HEAD", "/health", {"X-Explorer-Capability": "wrong"})[0] == 200
-        thread.join(timeout=0.35)
-        assert not thread.is_alive() and server.idle_expired.is_set()
+        assert request(server, "GET", "/api/v1/estate", headers)[0] == 200
+        # Advance the server clock beyond the former lease without any traffic.
+        # Wait long enough for the former monitor to have shut down the loop.
+        clock[0] += 3601
+        thread.join(timeout=1.2)
+        assert thread.is_alive(), "idle time stopped Explorer"
+        assert request(server, "GET", "/api/v1/estate", headers)[0] == 200
+        assert request(server, "GET", "/api/v1/estate")[0] == 401
     finally:
+        if thread.is_alive():
+            server.shutdown()
         server.server_close()
-
-    server, runtime, thread = start_server()
-    try:
-        time.sleep(0.2)
-        assert request(server, "HEAD", "/health", {"X-Explorer-Capability": runtime.capability})[0] == 200
-        time.sleep(0.2)
-        assert thread.is_alive(), "authenticated browser activity did not renew the lease"
-        thread.join(timeout=0.4)
-        assert not thread.is_alive() and server.idle_expired.is_set()
-    finally:
-        server.server_close()
+        thread.join(timeout=2)
+    assert not thread.is_alive()
 
 
 @pytest.mark.system

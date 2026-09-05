@@ -372,9 +372,10 @@ def _opened_final_path(handle) -> Path | None:
         try:
             import fcntl
 
-            buffer = bytearray(1024)
-            fcntl.fcntl(handle.fileno(), getattr(fcntl, "F_GETPATH", 50), buffer)
-            raw = bytes(buffer).split(b"\x00", 1)[0]
+            # fcntl copies its bytes argument and returns the resulting buffer.
+            # In-place mutation belongs to ioctl, not fcntl (Python 3.10+).
+            result = fcntl.fcntl(handle.fileno(), getattr(fcntl, "F_GETPATH", 50), bytes(1024))
+            raw = result.split(b"\x00", 1)[0]
             if not raw:
                 raise OSError
             return Path(os.fsdecode(raw)).resolve(strict=True)

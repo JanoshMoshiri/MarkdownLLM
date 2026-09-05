@@ -18,7 +18,7 @@ owned_process() {
   [[ "${pid}" =~ ^[0-9]+$ ]] || return 1
   kill -0 "${pid}" 2>/dev/null || return 1
   local command_line
-  command_line="$(ps -p "${pid}" -o command= 2>/dev/null || true)"
+  command_line="$(ps -ww -p "${pid}" -o command= 2>/dev/null || true)"
   [[ "${command_line}" == *"mdllm-explorer"* && "${command_line}" == *"${framework_root}"* ]]
 }
 
@@ -90,5 +90,5 @@ if ! owned_process "${explorer_pid}"; then
 fi
 
 rm -f "${error_file}"
-echo "MarkdownLLM Explorer is open. It will stop after 30 minutes without activity."
+echo "MarkdownLLM Explorer is open. It will keep running until you stop it."
 echo "To stop it now: bash tools/open-explorer.sh --stop"

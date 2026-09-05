@@ -21,7 +21,7 @@ def test_macos_launcher_contract_is_safe_and_agent_friendly():
     assert "sys.version_info >= (3, 10)" in text
     assert '"${framework_root}/explorer"' in text
     assert "mdllm-explorer" in text and "--open-browser" in text and "--stop" in text
-    assert 'ps -p "${pid}" -o command=' in text
+    assert 'ps -ww -p "${pid}" -o command=' in text
     assert '"${command_line}" == *"${framework_root}"*' in text
     assert ">/dev/null" in text and 'rm -f "${error_file}"' in text
     assert "sudo" not in text and "LaunchAgent" not in text

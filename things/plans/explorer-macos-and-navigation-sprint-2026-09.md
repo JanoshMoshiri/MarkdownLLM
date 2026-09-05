@@ -2,7 +2,7 @@
 id: explorer-macos-and-navigation-sprint-2026-09
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-09-01
 priority: high
 tags: [explorer, macos, navigation, memory, portability, release, sprint]
@@ -30,7 +30,7 @@ linked_things:
     notes: "Any new platform mutation anchor must remain unique and must not multiply ambiguous source-text probes across the Windows and Mac launchers."
 ---
 
-# Explorer macOS and navigation sprint (0.4.0 candidate)
+# Explorer macOS and navigation sprint (0.4.1 maintenance candidate)
 
 ## Outcome
 
@@ -153,11 +153,10 @@ confinement requirement is honestly evidenced there.
   It never persists the capability URL, source-derived content or an Explorer
   log. `--stop` terminates only a process whose command line proves it is the
   Explorer instance for this framework root.
-- The shared server lease is 30 minutes since the last successful authenticated
-  request or authenticated touch caused by real pointer, keyboard, touch or
-  scroll activity. Public health checks and an idle open tab do not renew it.
-  Expiry closes the server on both portable/macOS and Windows launch paths; the
-  browser explains that Aaron can ask Claude to open Explorer again.
+- **Revised 2026-09-05 by Janosh:** remove the 30-minute lease on all launch
+  surfaces. Explorer stays available until explicitly stopped or the host/process
+  exits. No browser expiry timer or activity heartbeat remains. Windows tray Exit,
+  CLI interrupt and the Mac launcher stop/relaunch remain the lifecycle controls.
 - Implement and execute the macOS post-open final-path check. Failure to obtain
   the opened path fails closed as `source_unreadable`, matching Windows.
 - Record Python version, macOS version and CPU architecture in the Mac evidence.
@@ -233,8 +232,8 @@ The sequence tests the hardest external premise first but packages only once.
       reference and a valid rendered Markdown link each open their target visibly.
 - [ ] Refresh and browser back/forward preserve the expected reader surface.
 - [ ] Overview, Skills, Git history, Settings and quit/relaunch still work.
-- [ ] Thirty minutes without real browser activity stops the local server; real
-      activity renews it, and asking Claude again opens a fresh session.
+- [ ] More than thirty minutes without browser/API activity leaves the same
+      session usable; explicit stop and relaunch work on the actual Mac.
 - [ ] Before/after estate and Git observations show no Explorer-authored writes.
 - [ ] Aaron reports the candidate usable or names a reproducible failing journey.
 
@@ -278,8 +277,8 @@ Implementation commit `8c7d30a` contains the `0.4.0` portable candidate.
 |---|---|---|---|
 | All populated first-level `things/` folders appear | Adapter, count and browser tests | Aaron checks a real multi-folder domain | Technical run / Aaron |
 | Related links visibly change document from any origin | State/route oracle and browser journeys | Aaron follows tree-origin links | Technical run / Aaron |
-| Agent-invoked route works on macOS 13+ | Launcher, CLI and platform-specific confinement tests | Claude launch, read, idle expiry/relaunch and quit on Aaron's Mac | Aaron |
-| Idle Explorer releases resources | Authenticated-activity and server-lifecycle tests | Inactivity expiry and active-session renewal | Technical run / Aaron |
+| Agent-invoked route works on macOS 13+ | Launcher, CLI and platform-specific confinement tests | Claude launch, read, persistent idle session, explicit stop/relaunch on Aaron's Mac | Aaron |
+| Explorer remains usable while idle | Clock-advance HTTP and manual-stop tests | Same tab loads after >30 minutes; explicit stop releases resources | Technical run / Aaron |
 | Read-only boundary remains true | Safety suite and source hash comparison | Before/after estate observation | Technical run / Aaron |
 | Final artefact is the evidenced artefact | Trace/evidence verifier and wheel hash | Install the recorded hash | Technical run |
 | Native package is publishable, if selected | Lifecycle verifier | Gatekeeper launch on a clean account | Technical run / Janosh |
@@ -303,7 +302,7 @@ Implementation commit `8c7d30a` contains the `0.4.0` portable candidate.
 | Risk | Response |
 |---|---|
 | The corrected runtime fails on macOS for an unobserved reason | I6 is the first honest runtime claim; capture Aaron's failure as new model input rather than guessing remotely. |
-| An idle tab accidentally keeps the service alive forever | Only authenticated API success or throttled real-user activity renews the server lease; public health checks do not. |
+| An operator leaves Explorer running when resources are scarce | Persistent service is now deliberate; document explicit stop and keep request concurrency bounded. |
 | A stale PID points at an unrelated process | Verify the PID's command contains both `mdllm-explorer` and this framework root before sending a signal; otherwise discard only the stale PID file. |
 | Case-sensitive filesystems expose path assumptions hidden on Windows | Include mixed-case and POSIX path vectors and execute the real estate journey on Mac. |
 | `F_GETPATH` availability or semantics differ by macOS/Python build | Feature-detect narrowly and fail closed; prove against the supported Mac profile. |
@@ -330,3 +329,29 @@ packaging, confirmed that Memory means every populated first-level folder below
 `things/`, and authorised the UI corrections plus shared 30-minute activity
 lease. Implementation may proceed; successful macOS execution and Aaron's
 usability ruling remain acceptance gates rather than inferred facts.
+
+
+## Operator correction — 2026-09-05
+
+Janosh withdrew the resource-saving inactivity shutdown and reported that the
+Mac trial showed a failure. The exact error and Mac/Python profile were not yet
+provided, so the reported incident is not treated as causally closed.
+
+The 0.4.1 correction removes the server monitor and browser activity/expiry
+machinery. It also repairs a definite Mac bug: `fcntl.fcntl` returns a bytes
+buffer; the implementation and its fake had incorrectly assumed `ioctl`-style
+in-place mutation. A contract-correct regression failed against the previous
+implementation before the production fix. The native Mac test exercises the
+real syscall and a document read when run on macOS; it must remain skipped on
+Windows, never reported as a Mac pass. Source confinement still fails closed
+on unavailable or empty final-path evidence.
+
+Detached shell jobs can inherit SIGINT as ignored. The CLI now explicitly
+handles SIGINT/SIGTERM, and the launcher uses untruncated process arguments when
+checking ownership. Background stop/relaunch has a POSIX regression test and
+still needs actual Mac execution. Earlier 0.4.0 build/idle evidence above is
+historical and does not attest to 0.4.1.
+
+The existing Mac acceptance loop remains open for exact error capture, launch,
+file reading, persistent idle use and explicit stop/relaunch. This correction
+does not reopen the deferred white-label, hosting or native Mac packaging lanes.

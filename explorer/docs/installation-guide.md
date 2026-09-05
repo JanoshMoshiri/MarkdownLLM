@@ -13,7 +13,7 @@ Python, Node or a browser extension.
 
 ### 1. Open the installer
 
-Get `MarkdownLLM-Explorer-Installer-0.4.0.exe` from your trusted MarkdownLLM
+Get `MarkdownLLM-Explorer-Installer-0.4.1.exe` from your trusted MarkdownLLM
 release source, then double-click it.
 
 Windows may warn about or, under Smart App Control or enterprise code-integrity
@@ -62,9 +62,8 @@ The notification-area icon has two commands:
 - **Open Explorer** — reopen the browser.
 - **Exit Explorer** — stop the local service.
 
-Closing the browser tab does not immediately stop Explorer. Use **Exit Explorer**
-when you are finished, or leave it idle: the local service and tray stop after
-30 minutes without authenticated activity.
+Closing the browser tab does not stop Explorer. The local service and tray keep
+running without an inactivity timeout. Use **Exit Explorer** when you are finished.
 
 ## Update or remove it
 

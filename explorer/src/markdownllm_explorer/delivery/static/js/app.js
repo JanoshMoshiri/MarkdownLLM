@@ -1,5 +1,4 @@
-import {captureCapability, get, touch} from "./api.js";
-import {installActivityLease} from "./activity.js";
+import {captureCapability, get} from "./api.js";
 import {abortAllRequests, beginRequest, completeRequest, isCurrent, state} from "./state.js";
 import {routeFromHash, routeFromText, validDocumentSurface, validView, writeRoute} from "./routing.js";
 import {applyThemeChoice as applyTheme, cycleThemeChoice} from "./theme.js";
@@ -21,24 +20,12 @@ const fileTree = document.querySelector("#file-tree");
 const contextContent = document.querySelector("#context-content");
 const tabs = [...document.querySelectorAll('[role="tab"]')];
 let searchTimer;
-let stopActivityLease;
 
 async function initialise() {
   applyThemeChoice(localStorage.getItem("mdllm-explorer-theme") || "system");
   bindChrome();
   if (!captureCapability()) {
     showError({message: "Open Explorer using the launch URL printed by mdllm-explorer.", code: "capability_required"});
-    return;
-  }
-  try {
-    const session = await get("/api/v1/session");
-    stopActivityLease = installActivityLease({
-      timeoutSeconds: session.idle_timeout_seconds,
-      sendTouch: touch,
-      onExpire: () => showIdleExpired(session.idle_timeout_seconds),
-    });
-  } catch (error) {
-    showError(error);
     return;
   }
   showLoading();
@@ -495,14 +482,6 @@ async function restoreDocumentRoute(path, mode, surface, collectionLoaded = fals
 
 function restoredSurface(route) {
   return validDocumentSurface(route.surface) || (["skills", "memory"].includes(validView(route.tab)) ? "collection" : "standalone");
-}
-
-function showIdleExpired(timeoutSeconds) {
-  abortAllRequests();
-  stopActivityLease?.();
-  notice.hidden = false; notice.className = "notice error"; notice.setAttribute("role", "alert");
-  const minutes = Math.max(1, Math.round(timeoutSeconds / 60));
-  notice.textContent = `Explorer stopped after ${minutes} minutes of inactivity. Ask Claude Code to open it again.`;
 }
 
 function moreButton(label, action) { const button = document.createElement("button"); button.className = "load-more"; button.textContent = label; button.addEventListener("click", action); return button; }

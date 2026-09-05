@@ -95,7 +95,6 @@ def test_cli_requested_port_collision_is_controlled(estate, tmp_path):
 def test_cli_open_browser_hands_off_capability_url(estate, monkeypatch):
     class FinishedServer:
         def __init__(self):
-            self.idle_expired = type("Flag", (), {"is_set": lambda self: False})()
             self.closed = False
             self.joined = None
 
@@ -116,3 +115,70 @@ def test_cli_open_browser_hands_off_capability_url(estate, monkeypatch):
 
     assert result == 0 and opened == ["http://127.0.0.1:43121/#cap=opaque"]
     assert server.closed and server.joined == 4.5
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("stop_signal", [signal.SIGINT, signal.SIGTERM])
+def test_cli_restores_background_stop_signals_and_closes_server(estate, monkeypatch, stop_signal):
+    handlers = {signal.SIGINT: signal.SIG_IGN, signal.SIGTERM: signal.SIG_DFL}
+    if hasattr(signal, "SIGBREAK"):
+        handlers[signal.SIGBREAK] = signal.SIG_DFL
+    original = handlers.copy()
+
+    def register(item, handler):
+        previous = handlers[item]
+        handlers[item] = handler
+        return previous
+
+    class InterruptedServer:
+        closed = False
+        joined = None
+
+        def serve_forever(self, poll_interval):
+            handlers[stop_signal](stop_signal, None)
+
+        def server_close(self):
+            self.closed = True
+
+        def join_active(self, timeout):
+            self.joined = timeout
+
+    server = InterruptedServer()
+    monkeypatch.setattr(cli.signal, "signal", register)
+    monkeypatch.setattr(cli, "build_runtime", lambda *_: object())
+    monkeypatch.setattr(cli, "build_server", lambda *_: (server, "http://127.0.0.1:43121/#cap=opaque"))
+    assert cli.main(["--root", str(estate)]) == 0
+    assert server.closed and server.joined == 4.5
+    assert handlers == original
+
+
+@pytest.mark.system
+@pytest.mark.skipif(os.name != "posix", reason="requires POSIX inherited signal dispositions")
+def test_background_cli_accepts_stop_after_inheriting_ignored_sigint(estate, tmp_path):
+    program = (
+        "import signal; signal.signal(signal.SIGINT, signal.SIG_IGN); "
+        "from markdownllm_explorer.__main__ import main; raise SystemExit(main())"
+    )
+    process = subprocess.Popen(
+        [sys.executable, "-c", program, "--root", str(estate)],
+        cwd=tmp_path, env=cli_environment(), stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, text=True, start_new_session=True,
+    )
+    try:
+        assert process.stdout is not None
+        # Wait for readiness over HTTP before interrupting.
+        process.stdout.readline()
+        url = process.stdout.readline().split("MarkdownLLM Explorer:", 1)[1].strip()
+        parsed = urlsplit(url)
+        connection = http.client.HTTPConnection(parsed.hostname, parsed.port, timeout=5)
+        connection.request("GET", "/health")
+        response = connection.getresponse()
+        assert response.status == 200
+        response.read()
+        connection.close()
+        process.send_signal(signal.SIGINT)
+        assert process.wait(timeout=6) == 0
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)

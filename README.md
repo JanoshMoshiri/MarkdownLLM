@@ -127,8 +127,8 @@ lifecycle run on the signed bytes. The source and installer build recipe are
 tracked here; the eventual verified `.exe` is attached separately as a release
 asset rather than committed to the repository. On macOS, ask the framework
 agent to **open MarkdownLLM Explorer**; `tools/open-explorer.sh` creates its
-owned portable environment, opens the browser and stops after 30 minutes of
-inactivity. Native Mac packaging remains a later actual-Mac lane.
+owned portable environment and opens the browser. Explorer keeps running until
+explicitly stopped. Native Mac packaging remains a later actual-Mac lane.
 See the [installation
 guide](explorer/docs/installation-guide.md), [user
 guide](explorer/docs/user-guide.md), and [source/build

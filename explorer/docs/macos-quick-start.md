@@ -74,9 +74,8 @@ framework update followed by another launch also updates Explorer.
 
 ## Stop Explorer
 
-Explorer stops itself after **30 minutes without genuine browser or
-authenticated API activity**. An open but untouched browser tab does not keep
-the server running. If it has stopped, ask Claude to open it again.
+Explorer **keeps running until you stop it**. There is no inactivity timeout,
+and closing or leaving a browser tab untouched does not stop the service.
 
 To stop it immediately, say:
 
@@ -99,6 +98,11 @@ Give Claude this prompt:
 > edit domain files, bypass the launcher's safety checks or invent a workaround.
 > Tell me the exact error, the detected macOS and Python versions, and the
 > smallest safe correction.
+
+Explorer 0.4.1 corrects the Mac file-reading buffer API and background stop
+signal handling. If an older version opens a page but fails to load documents,
+update the framework to a published revision containing that fix and relaunch.
+The exact error still matters: a generic failure alone cannot identify its cause.
 
 Common outcomes are:
 

@@ -56,7 +56,7 @@ class BlockingTraySurface:
         self.stopped.set()
 
 
-class ExpiredServer(FakeServer):
+class FinishedServer(FakeServer):
     def serve_forever(self, poll_interval=0.2):
         self.started.set()
 
@@ -102,8 +102,8 @@ def test_desktop_session_opens_browser_and_shuts_down_cleanly():
 
 
 @pytest.mark.unit
-def test_desktop_session_idle_server_exit_stops_tray():
-    server = ExpiredServer(); tray = BlockingTraySurface()
+def test_desktop_session_server_exit_stops_tray():
+    server = FinishedServer(); tray = BlockingTraySurface()
     session = DesktopExplorerSession(server, "http://127.0.0.1:7123/#cap=opaque", lambda _: None, tray)
 
     session.run(open_on_start=False)

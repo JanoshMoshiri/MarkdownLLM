@@ -1,10 +1,10 @@
 # MarkdownLLM Explorer — Requirements Specification
 
-**Status:** design-ready; the white-label presentation increment is reconciled against its independent cold review (8 MUST, 12 SHOULD, 11 COULD, every finding dispositioned in `explorer/reviews/white-label-requirements-cold-review-2026-09-02.md`); acceptance approval remains gated by the test trace ledger
+**Status:** 0.4.1 maintenance correction: persistent service and repaired macOS file reading/stop. The white-label increment remains deferred under the Desktop product decision; actual Mac acceptance and public Windows signing remain open.
 
-**Version:** 0.6
+**Version:** 0.7
 
-**Date:** 2026-09-02
+**Date:** 2026-09-05
 
 **Product name:** MarkdownLLM Explorer
 
@@ -220,9 +220,9 @@ Runs its own domains on a MarkdownLLM checkout and needs Explorer to carry its i
 
 ### Runtime and error behaviour
 
-**FR-RUN-001 — Standalone distribution.** v1 shall retain the installable `explorer/` Python package for development, automation and the portable macOS route, alongside the native Windows installer. Both forms include all browser assets and the pinned YAML runtime. The Windows-installed application shall contain its own Python runtime and dependencies; no system Python, `pip`, Node, CDN or internet access is required after the installer artefact has been obtained. The command-line form shall continue to print the resolved root and capability-bearing loopback URL, shall optionally open that URL without persisting it, shall reject invalid configuration with non-zero exit, and shall terminate within five seconds of interrupt or after its inactivity lease expires.
+**FR-RUN-001 — Standalone distribution.** v1 shall retain the installable `explorer/` Python package for development, automation and the portable macOS route, alongside the native Windows installer. Both forms include all browser assets and the pinned YAML runtime. The Windows-installed application shall contain its own Python runtime and dependencies; no system Python, `pip`, Node, CDN or internet access is required after the installer artefact has been obtained. The command-line form shall continue to print the resolved root and capability-bearing loopback URL, shall optionally open that URL without persisting it, shall reject invalid configuration with non-zero exit, and shall terminate within five seconds of an explicit interrupt or stop signal.
 
-**FR-RUN-002 — Safe bind and lifecycle.** The server shall bind only to `127.0.0.1` by default, accept `--port` or choose an available port, print the actual URL, reject a non-loopback bind, isolate concurrent instances by launch capability, and never expose itself on all interfaces. A port collision shall exit non-zero rather than selecting a different requested port. The server shall stop after 1,800 seconds without a successful capability-authenticated API request or an authenticated browser touch caused by real pointer, keyboard, touch or scroll activity. Public health checks, static requests and an idle open tab shall not renew the lease. The browser shall obtain the configured duration from an authenticated session endpoint, throttle activity touches, and explain expiry/relaunch. The same lifecycle shall stop the Windows tray surface as well as portable processes.
+**FR-RUN-002 — Safe bind and lifecycle.** The server shall bind only to `127.0.0.1` by default, accept `--port` or choose an available port, print the actual URL, reject a non-loopback bind, isolate concurrent instances by launch capability, and never expose itself on all interfaces. A port collision shall exit non-zero rather than selecting a different requested port. The server shall remain available until explicitly stopped or its host/process exits, with no inactivity shutdown. Closing a tab or leaving it untouched shall not expire the server or browser session. No activity heartbeat or browser expiry timer is required. Windows tray Exit, CLI interrupt and the Mac launcher stop/relaunch shall close their owned service cleanly. This supersedes the 30-minute lease at the operator’s request on 2026-09-05.
 
 **FR-RUN-003 — Health.** A health endpoint shall report application availability without enumerating private estate contents.
 
@@ -372,7 +372,7 @@ The tester installs the same build over itself, verifies the selected substrate 
 
 ### AJ-11 — Agent-invoked Mac session
 
-On Aaron's macOS 13+ machine with the current framework checkout, the tester asks Claude Code to open MarkdownLLM Explorer. Claude runs `bash tools/open-explorer.sh`; the default browser opens without elevation, Aaron selects a real domain, sees every populated first-level `things/` group, opens a formerly omitted item and follows both a body link and reference from a tree-origin document. Real browser activity keeps the service available; after 30 minutes without pointer, keyboard, touch, scroll or authenticated API activity the local service and any Windows-style lifecycle surface are gone, the browser explains how to relaunch, and the same request opens a new session. The tester records macOS/Python/architecture, before/after source observations and any actionable launcher failure; successful Mac execution is not inferred before this journey occurs.
+On Aaron's macOS 13+ machine with the current framework checkout, the tester asks Claude Code to open MarkdownLLM Explorer. Claude runs `bash tools/open-explorer.sh`; the default browser opens without elevation, Aaron selects a real domain, sees every populated first-level `things/` group, opens a formerly omitted item and follows both a body link and reference from a tree-origin document. After more than 30 minutes without browser or API activity, the same page can still load a document. The tester explicitly stops Explorer through the launcher, confirms service exit, then opens it again successfully. The tester records macOS/Python/architecture, before/after source observations and any actionable launcher failure; successful Mac execution is not inferred before this journey occurs.
 
 ### AJ-12 — White-label journey
 
