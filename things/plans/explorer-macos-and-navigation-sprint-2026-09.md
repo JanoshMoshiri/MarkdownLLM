@@ -355,3 +355,13 @@ historical and does not attest to 0.4.1.
 The existing Mac acceptance loop remains open for exact error capture, launch,
 file reading, persistent idle use and explicit stop/relaunch. This correction
 does not reopen the deferred white-label, hosting or native Mac packaging lanes.
+
+
+Maintenance verification is recorded in
+`explorer/tests/evidence/maintenance-0.4.1.json`: the full Windows-hosted suite,
+mutation programme, clean offline wheel install and isolated native Windows
+install/launch/upgrade/uninstall passed. The browser smoke loaded real estate
+documents and followed a related link. The record pins code and artefact hashes;
+it explicitly leaves actual Mac execution and the older full release evidence
+index unclaimed. No separate insight is needed: the fake/API-contract failure
+and its remedy are already preserved in this plan and the corrected regression.

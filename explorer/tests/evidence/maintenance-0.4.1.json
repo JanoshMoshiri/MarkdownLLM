@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "version": "0.4.1",
+  "recorded_at": "2026-09-05T06:42:08.092783+00:00",
+  "source_commit": "8a7a6f8ec3d01da0d2daa34acb2c037de8c913f2",
+  "subject_sha256": "c1f23d0da1c694d6dc1adc30888fc81b5366a1a36433831343ee1aa5f4e87d6f",
+  "launcher_sha256": "b0738cabf555d732abd61ab568c2c3fcb9b5647273a300a18a342685946add99",
+  "scope": "Maintenance correction verification; not a full public-release or native-Mac acceptance seal.",
+  "host": {
+    "os": "Windows",
+    "python": "3.12.4"
+  },
+  "pytest": {
+    "tests": 171,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 2,
+    "passed": 169,
+    "report_sha256": "81a3922ca01c5bbdd4264430b5e31e5f3e77db2b4ef42dc43b0186b7c3cc0eb6"
+  },
+  "mutation": {
+    "total": 21,
+    "killed": 21,
+    "survived": 0
+  },
+  "offline_install": {
+    "status": "pass",
+    "package": {
+      "version": "0.4.1",
+      "yaml": "6.0.3",
+      "index": true,
+      "app": true,
+      "css": true
+    },
+    "lifecycle": {
+      "status": "pass",
+      "real_interrupt": true,
+      "active_request_at_interrupt": true,
+      "shutdown_seconds": 4.578,
+      "invalid_root_exit": 2,
+      "port_collision_exit": 2,
+      "fixture_immutable": true,
+      "launch_cwd_immutable": true
+    }
+  },
+  "windows": {
+    "status": "pass",
+    "bundle": {
+      "status": "pass",
+      "version": "0.4.1",
+      "path_empty_launch": true
+    },
+    "install": {
+      "status": "pass",
+      "desktop_shortcut": true,
+      "start_menu_shortcut": true,
+      "remembered_root": true
+    },
+    "upgrade": {
+      "status": "pass",
+      "root_preserved": true,
+      "shortcut_count": 2,
+      "active_process_stopped": true,
+      "active_request_drain_bounded": true,
+      "shutdown_seconds": 16.25
+    },
+    "uninstall": {
+      "status": "pass",
+      "owned_state_removed": true,
+      "substrate_unchanged": true,
+      "outside_unchanged": true,
+      "active_process_stopped": true,
+      "active_request_drain_bounded": true,
+      "shutdown_seconds": 3.156
+    }
+  },
+  "browser": {
+    "tool": "Codex in-app browser",
+    "status": "pass",
+    "scope": [
+      "Load the real estate with the corrected runtime",
+      "Open README from the file tree",
+      "Follow the Explorer README document link with matching visible heading and route"
+    ],
+    "duration_note": "Interactive smoke only; no actual 30-minute browser wait claimed. Server inactivity is covered by the clock-advance HTTP regression."
+  },
+  "macos": {
+    "status": "unexecuted-platform",
+    "regression": "A returned-bytes fcntl contract test failed against the old implementation and passes after the correction. Empty/unavailable final paths remain refused.",
+    "remaining": "Run the native F_GETPATH/document and inherited-SIGINT tests on macOS, then confirm launcher, persistent idle use and stop/relaunch on the affected Mac. Exact incident error and OS/Python profile were not supplied.",
+    "python_contract": "https://docs.python.org/3.12/library/fcntl.html#fcntl.fcntl"
+  },
+  "artifacts": [
+    {
+      "name": "markdownllm_explorer-0.4.1-py3-none-any.whl",
+      "sha256": "0fe6e2dbe87890833003a9c9d457577fe77c76bbdcf293af2aed181d699ec34a"
+    },
+    {
+      "name": "MarkdownLLM-Explorer-Installer-0.4.1.exe",
+      "sha256": "c87ac1cfca6a5028fb7e339ffdf924cd5f19194521cb76c4c3a901cdad1fe623"
+    }
+  ],
+  "public_release": {
+    "status": "not-claimed",
+    "signed": false,
+    "traceability_errors": [
+      "evidence index is not bound to the current immutable subject"
+    ],
+    "remaining": "The existing evidence index and human acceptance describe older bytes. Full release evidence, native Mac acceptance and Windows signing remain open."
+  }
+}
