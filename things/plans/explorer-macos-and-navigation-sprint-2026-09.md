@@ -2,7 +2,7 @@
 id: explorer-macos-and-navigation-sprint-2026-09
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-09-01
 priority: high
 tags: [explorer, macos, navigation, memory, portability, release, sprint]
@@ -365,3 +365,14 @@ documents and followed a related link. The record pins code and artefact hashes;
 it explicitly leaves actual Mac execution and the older full release evidence
 index unclaimed. No separate insight is needed: the fake/API-contract failure
 and its remedy are already preserved in this plan and the corrected regression.
+
+## Appearance follow-up — 2026-09-06
+
+Janosh requested that Explorer match the current Desktop logo and theme.
+Version 0.4.2 applies the same authored mark, charcoal/plum surfaces and cyan
+accent to Explorer, with a corresponding light theme and native Windows icon.
+The supplied extensionless files were PNGs; the existing Desktop vector marks
+provide the crisp small-size rendering. This is a product appearance update;
+the deferred white-label capability remains deferred. The 0.4.1 evidence above
+is historical for those exact bytes. Actual Mac acceptance and signed public
+Windows publication remain open for the current candidate.

@@ -6,6 +6,18 @@
 
 **Date:** 2026-09-05
 
+**Implemented appearance baseline — 0.4.2 (2026-09-06):** the packaged shell
+shares Desktop's authored six-path MarkdownLLM mark, drawn inline with CSS
+colours for each theme. The dark palette uses workspace `#191919`, navigation
+`#261F23`, panels `#232323`, text `#F4F1F3` and accent `#34B7DF`. Light mode
+uses a pale plum palette with `#006584` for readable accent text. The native
+icon is the same multi-resolution mark used by Desktop; the build derives its
+tray PNG from that committed ICO. This changes the product's own appearance.
+The presentation-file/profile design below remains deferred, including its
+earlier M/green default examples and proposed image routes. The running 0.4.2
+server retains `img-src 'none'`; the inline mark contains only authored paths
+and does not enable repository images or alter the safe Markdown renderer.
+
 **Requirements:** `explorer/docs/requirements.md` v0.7
 
 **Architectural sources:** MarkdownLLM framework v3.36.0; Code Architect domain `c711d2a46225aaca471100e1eec2afceb02e751a`
