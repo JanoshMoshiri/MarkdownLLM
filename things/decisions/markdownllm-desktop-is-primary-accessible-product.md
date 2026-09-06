@@ -2,7 +2,7 @@
 id: markdownllm-desktop-is-primary-accessible-product
 type: decision
 status: made
-version: 1.2
+version: 1.3
 created: 2026-09-03
 session: 2026-09-06
 decided_by: human
@@ -97,6 +97,15 @@ for continued operator testing, not a claim that all acceptance or subscription 
 Reconciliation of the direction's consumers leaves the substrate/CLI contract, optional Explorer,
 first-hour/operator-guide release boundary and parked hosting/white-label dispositions unchanged.
 Concurrent Explorer commits were reconciled as unrelated before this record was changed.
+
+The later 0.1.3 settings-retry candidate addresses a transient startup failure without
+resetting the operator profile. Intact settings and a successful unchanged 0.1.2 restart
+were observed; the incident's original cause remains unknown. A guarded Retry action,
+accurate safe errors, and once-per-startup session recovery now pass core18/adapter30/WPF172.
+Evidence is owned by MarkdownLLMDesktop `commit:de08beeff93d45a4a2232d304ce15540e7384d4a`,
+docs/verification/settings-retry-0.1.3.md. Installer/operator/live-accessibility acceptance
+remains separate. Reconciliation leaves all substrate, CLI, optional Explorer, onboarding,
+hosting and subscription boundaries unchanged; no new framework capability is claimed.
 
 ## Exposure
 
