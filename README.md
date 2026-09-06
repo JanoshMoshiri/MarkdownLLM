@@ -15,16 +15,15 @@ the portable route directly. It turns the substrate, domains, commits, files,
 skills and memory into a visual local interface without changing the files or
 becoming a second source of truth.
 
-**The next accessible route is MarkdownLLM Desktop.** The local Windows application brings setup,
-Domain and Session management, provider connection, exploration and diagnostics into one guided
-surface while keeping Markdown and Git authoritative. It is currently an Engineering Preview in
-acceptance, not a published release. Explorer remains the usable read-only companion; the
-Desktop becomes the default first-use route only after its pinned live and accessibility UAT
-closes.
-The current product increment specifies both ChatGPT/Codex and Claude Code subscription
-connections, while the available preview remains API-only. Branding, dark-theme, setup and domain-discovery
-repairs do not imply those subscription routes have shipped; the [Desktop direction record](things/decisions/markdownllm-desktop-is-primary-accessible-product.md)
-keeps that distinction explicit.
+**The accessible route is harness-native.** You tell the agent you already use — Claude Code,
+Cowork, or another compatible client — what you want to work on, and it performs setup, sync,
+refresh and session start for you, then tells you where things stand in your own words. That
+onramp is being built ([plan](things/plans/operator-seat-and-harness-native-onramp.md)); until
+it lands, the [first hour](docs/first-hour.md) is the published route. MarkdownLLM Desktop, a
+local Windows application tried as this route, is frozen at its 0.1.6 installer as an
+Engineering Preview and is not published; the
+[direction record](things/decisions/harness-native-onramp-supersedes-desktop.md) says why.
+Explorer remains the usable read-only companion.
 
 ---
 
