@@ -2,9 +2,9 @@
 id: markdownllm-desktop-is-primary-accessible-product
 type: decision
 status: made
-version: 1.1
+version: 1.2
 created: 2026-09-03
-session: 2026-09-05
+session: 2026-09-06
 decided_by: human
 confidence: high
 origin: stated
@@ -83,8 +83,20 @@ The product repo owns detailed requirements, independent review records, tests, 
 evidence. This changes the product presentation and setup adapter, not the substrate schema,
 CLI contract or optional Explorer. Subscription implementation and complete live/accessibility
 acceptance remain open. No public-release claim follows from a candidate installer.
-The delivered product increment and detailed verification record are pinned in the separate
-MarkdownLLMDesktop repository at `commit:40918f46d6eb5e725e13b9a31676eae800b7fdd5`.
+That appearance/setup increment is historical at product `40918f46d6eb5e725e13b9a31676eae800b7fdd5`.
+The 2026-09-06 domain-selection repair adds automatic discovery from Home and local MarkdownLLM
+Domain/Domain(s) containers, structural admission of existing framework domains, stable registry
+identity, selection guards and matching left/right charcoal panels. Discovery changes only
+private app state, not the existing domain repositories. Its real-estate probe finds 14/14
+healthy domains with unchanged Git state. The exact candidate/evidence is pinned in the separate
+MarkdownLLMDesktop repository at `commit:5b1d95e609c42a14ac55940f26728bf0d16e5bba`.
+Core18/adapter27 checks pass; the earlier WPF151 run passes but the final153 rerun is host-blocked.
+Native UI click delivery was not reliable enough to certify acceptance. The 0.1.2 installer is
+for continued operator testing, not a claim that all acceptance or subscription gates closed.
+
+Reconciliation of the direction's consumers leaves the substrate/CLI contract, optional Explorer,
+first-hour/operator-guide release boundary and parked hosting/white-label dispositions unchanged.
+Concurrent Explorer commits were reconciled as unrelated before this record was changed.
 
 ## Exposure
 
