@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-06
-generated: 2026-09-06T22:11:56
-generated_from: HEAD@5ebefa7
-coverage: 333
+generated: 2026-09-06T22:17:01
+generated_from: HEAD@64774c5
+coverage: 335
 framework_version: 3.37.0
 ---
 
@@ -612,6 +612,8 @@ framework_version: 3.37.0
 - first-hour-guide --references--> framework-discovery-specification
 - first-hour-guide --derived-from--> explorer-publication-position
 - first-hour-guide --derived-from--> markdownllm-desktop-is-primary-accessible-product
+- first-hour-guide --derived-from--> harness-native-onramp-supersedes-desktop
+- first-hour-guide --references--> the-onramp-is-the-operators-own-sentence
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
 - floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08
@@ -748,6 +750,10 @@ framework_version: 3.37.0
 - harness-capability-evidence-matrix-2026-08-20 --derived-from--> codex-phase6-post-6r-acceptance-2026-08-16
 - harness-capability-evidence-matrix-2026-08-20 --derived-from--> codex-desktop-session-start-negative-2026-08-14
 - harness-capability-evidence-matrix-2026-08-20 --derived-from--> cowork-remote-phase5-evidence-2026-08-19
+- harness-native-onramp-supersedes-desktop --supersedes--> markdownllm-desktop-is-primary-accessible-product
+- harness-native-onramp-supersedes-desktop --derived-from--> the-onramp-is-the-operators-own-sentence
+- harness-native-onramp-supersedes-desktop --informs--> interface-specification
+- harness-native-onramp-supersedes-desktop --references--> closed-loop-operating-state
 - hook-compliance-correlates-with-scope-not-awareness --informs--> orchestration-specification
 - hook-compliance-correlates-with-scope-not-awareness --supports--> tiered-loading-is-tiered-reading-applied-to-specs
 - hook-enforcement-has-three-anchors --informs--> orchestration-specification
@@ -807,6 +813,7 @@ framework_version: 3.37.0
 - interface-specification --complements--> write-thing-specification
 - interface-specification --derived-from--> explorer-publication-position
 - interface-specification --derived-from--> markdownllm-desktop-is-primary-accessible-product
+- interface-specification --derived-from--> harness-native-onramp-supersedes-desktop
 - isolation-must-contain-writes-not-just-reads --extends--> withholding-is-not-isolation
 - isolation-must-contain-writes-not-just-reads --complements--> committed-state-carries-defects-as-faithfully-as-facts
 - isolation-must-contain-writes-not-just-reads --informs--> evidence-and-eval-backlog
@@ -836,6 +843,7 @@ framework_version: 3.37.0
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> session-memory-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> orchestration-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --references--> git-workflow-specification
+- markdownllm-desktop-is-primary-accessible-product --superseded-by--> harness-native-onramp-supersedes-desktop
 - markdownllm-desktop-is-primary-accessible-product --supersedes--> explorer-publication-position
 - markdownllm-desktop-is-primary-accessible-product --informs--> interface-specification
 - markdownllm-desktop-is-primary-accessible-product --informs--> explorer-white-label-presentation-2026-09
@@ -936,10 +944,16 @@ framework_version: 3.37.0
 - operator-guide --references--> session-start-hardening
 - operator-guide --derived-from--> explorer-publication-position
 - operator-guide --derived-from--> markdownllm-desktop-is-primary-accessible-product
+- operator-guide --derived-from--> harness-native-onramp-supersedes-desktop
 - operator-queue-2026-08-28 --implements--> closed-loop-operating-state
 - operator-queue-2026-08-28 --derived-from--> gates-census-2026-08
 - operator-queue-2026-08-28 --derived-from--> estate-retrospective-synthesis-2026-08
 - operator-queue-2026-08-28 --derived-from--> estate-workflow-derivation
+- operator-seat-and-harness-native-onramp --implements--> harness-native-onramp-supersedes-desktop
+- operator-seat-and-harness-native-onramp --informs--> the-onramp-is-the-operators-own-sentence
+- operator-seat-and-harness-native-onramp --references--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
+- operator-seat-and-harness-native-onramp --references--> closed-loop-operating-state
+- operator-seat-and-harness-native-onramp --references--> first-hour-guide
 - orchestration-specification --extends--> thing-specification
 - orchestration-specification --informs--> estate-git-sync
 - orchestration-specification --complements--> write-thing-specification

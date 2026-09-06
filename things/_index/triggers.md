@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: triggers
 created: 2026-09-06
-generated: 2026-09-06T22:11:56
-generated_from: HEAD@5ebefa7
-coverage: 7
+generated: 2026-09-06T22:17:00
+generated_from: HEAD@64774c5
+coverage: 8
 framework_version: 3.37.0
 ---
 
@@ -31,6 +31,10 @@ framework_version: 3.37.0
 ## operator-queue-2026-08-28
 - status: evolving  due_date: —
 - trigger: type=time, condition=2026-09-10 reached, action=If this queue has not been ruled, report which tier-1 rows remain open and what each is blocking. The queue idles at the operator's seat by design; an undated idle is the drift the estate already learned to chase.
+
+## operator-seat-and-harness-native-onramp
+- status: not-started  due_date: —
+- trigger: type=time, condition=2026-09-20 reached, action=If no phase has started, surface it plainly: the direction was ratified on felt evidence and the substrate backlog is also waiting. Ask which goes first — the onramp or the eval backlog — rather than letting both idle.
 
 ## watertight-membrane-sprint-2026-08-30
 - status: blocked  due_date: —

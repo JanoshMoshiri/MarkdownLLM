@@ -2,7 +2,7 @@
 id: explorer-extraction-and-hosting
 type: plan
 status: cancelled
-version: 1.2
+version: 1.3
 created: 2026-08-27
 priority: medium
 exposed: false
@@ -30,6 +30,10 @@ and deferred remote access until a later paired mobile client can prove its boun
 live local application. The read-only Explorer and this plan remain historical evidence; no
 source move, hosted control plane or cloud resource is authorised. Any future remote design starts
 from the Desktop's accepted local boundary rather than resuming this plan by inertia.
+
+**2026-09-06.** The cancellation stands under `harness-native-onramp-supersedes-desktop`. The
+Desktop this plan deferred to is itself frozen, and no application replaces it; any future remote
+design starts from the harness-native onramp's boundary, not from here.
 
 ## Intent
 

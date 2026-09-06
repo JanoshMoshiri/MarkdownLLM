@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -24,6 +24,9 @@ linked_things:
   - id: markdownllm-desktop-is-primary-accessible-product
     relation: derived-from
     notes: "v1.6 distinguishes substrate route-agnosticism from a first-party product choosing to implement one accessible route."
+  - id: harness-native-onramp-supersedes-desktop
+    relation: derived-from
+    notes: "v1.7 records the Desktop route frozen and names the harness-native onramp — the operator's own sentence in a harness they already use — as the accessible route; the substrate stays route-agnostic."
 ---
 
 # Interface
@@ -42,11 +45,15 @@ The framework does not require one interface protocol, client, web app, chat wid
 in order to be valid. A Domain remains operable through any compatible route that can receive its
 entry contract and bounded context.
 
-That contract does not forbid a product from supplying a route. MarkdownLLM Desktop is the
-first-party accessible route: a local application that deliberately owns setup, Domain and
-Session journeys while leaving Markdown and Git authoritative. It is still a replaceable pipe;
-Claude Code, Codex, Copilot, Obsidian-assisted workflows and other compatible clients can operate
-the same Domain without it.
+That contract does not forbid a product from supplying a route, and one was tried: MarkdownLLM
+Desktop, a local application owning setup, Domain and Session journeys. It is frozen at its issued
+0.1.6 installer as an Engineering Preview (`harness-native-onramp-supersedes-desktop`,
+2026-09-06). The accessible route is now **harness-native**: the operator's own intent sentence —
+the domain's ordinary name plus "today" — in a harness they already use, backed by a skill or
+adapter that performs setup, sync, refresh, floor and session-start silently and renders
+orientation in the operator's language. Claude Code, Codex, Cowork, Copilot, Obsidian-assisted
+workflows and other compatible clients operate the same Domain; each route's claim is earned by
+its own execution evidence, never by design intent.
 
 This is a deliberate design choice:
 
@@ -80,8 +87,11 @@ An input route is any channel through which a human can communicate intent to th
 | Route | How It Works | Discovery / evidence boundary |
 |-------|-------------|-------------------------------|
 | **VS Code + GitHub Copilot** | Configurable AGENTS.md support; chat or voice input via editor. | Designed/configured route; lifecycle compatibility is unverified and is not inferred from Claude's `.claude` projection or shortcut files. |
-| **MarkdownLLM Desktop (Engineering Preview)** | Local setup, Domain/Session management, Explorer and a context-only provider route over ordinary Markdown/Git state. | Windows Preview A is in acceptance; no public-release or live-provider claim is made until its pinned UAT closes. |
+| **Harness-native onramp (planned)** | The operator's intent sentence in any route below; a skill/adapter resolves the domain, runs the bootstrap silently and renders the seat. | `operator-seat-and-harness-native-onramp`; no route's onramp is claimed until its execution evidence exists. |
+| **MarkdownLLM Desktop (Engineering Preview, frozen)** | Local setup, Domain/Session management, Explorer and a context-only provider route over ordinary Markdown/Git state. | Frozen at the issued 0.1.6 installer (2026-09-06); the API-key route loads but does not send. Not published; not the first-use path. Its setup-journey requirements are input to the onramp. |
 | **Claude Code (CLI + desktop)** | `CLAUDE.md` entry pointer imports `AGENTS.md` (`@AGENTS.md`). Core scaffold surface — born with every domain in every `--harness` selection, `none` included. | Automatic pointer route verified 2026-08-17; named lifecycle evidence is separate. |
+| **Cowork (Claude desktop chat)** | The `spin-up-domain` bootstrap skill reconstructs a domain from a fresh session and emits its Tier-0 contract. | Bootstrap skill exists; the intent-sentence onramp over it is planned, not evidenced. |
+| **Perplexity** | Candidate route an operator's colleague already uses. | Whether it can receive the entry contract and operate Git is a probe to run, not a claim; no framework execution record. |
 | **OpenAI Codex CLI / desktop** | Reads AGENTS.md; the optional project adapter binds lifecycle events. | Automatic on the named tested Windows surfaces; CLI lifecycle and Desktop/runtime/Git claims are recorded separately rather than generalized. |
 | **Cursor / Windsurf** | Intended AGENTS.md workspace route; editor-based chat. | Designed-for; no framework execution record yet. |
 | **Gemini CLI** | Intended AGENTS.md terminal route. | Designed-for; no framework execution record yet. |

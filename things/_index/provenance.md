@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-06
-generated: 2026-09-06T22:11:56
-generated_from: HEAD@5ebefa7
-coverage: 82
+generated: 2026-09-06T22:17:01
+generated_from: HEAD@64774c5
+coverage: 84
 framework_version: 3.37.0
 ---
 
@@ -201,6 +201,11 @@ framework_version: 3.37.0
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
+## harness-native-onramp-supersedes-desktop
+- first-hour-guide (derived-from)
+- interface-specification (derived-from)
+- operator-guide (derived-from)
+
 ## independent-substrate-current-state-review-2026-08-20-codex
 - floor-sprint-1-scope-2026-08-21 (pinned @35de802608d896e4e533ed6c2990d89966948e17)
 - substrate-review-consolidated-remedy-2026-08-20 (derived-from)
@@ -231,6 +236,7 @@ framework_version: 3.37.0
 - explorer-extraction-and-hosting (derived-from)
 - explorer-white-label-presentation-2026-09 (derived-from)
 - first-hour-guide (derived-from)
+- harness-native-onramp-supersedes-desktop (pinned @5ebefa732c769be99e1e5d2c450c2ba0e5f29572)
 - interface-specification (derived-from)
 - operator-guide (derived-from)
 
@@ -311,6 +317,10 @@ framework_version: 3.37.0
 ## substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 (derived-from)
 - floor-sprint-1-scope-2026-08-21 (pinned @1209f646767c16dfff2a36c574095aca3f97a0a1)
+
+## the-onramp-is-the-operators-own-sentence
+- harness-native-onramp-supersedes-desktop (pinned @64774c5b0ece07063b0354957b5009aa2d34fd0d)
+- harness-native-onramp-supersedes-desktop (derived-from)
 
 ## the-operating-layer-has-no-quality-loop
 - workflow-reconciliation-precedes-new-definitions (pinned @7ceb757ff4e3c11ab2023391eb39f98fdc3febe9)

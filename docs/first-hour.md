@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -20,6 +20,12 @@ linked_things:
   - id: markdownllm-desktop-is-primary-accessible-product
     relation: derived-from
     notes: "v1.6 names the eventual guided route while retaining the current published first-hour path until acceptance."
+  - id: harness-native-onramp-supersedes-desktop
+    relation: derived-from
+    notes: "v1.7 records Desktop frozen, names the harness-native onramp as the guided route being built, and admits the persona this guide lacks."
+  - id: the-onramp-is-the-operators-own-sentence
+    relation: references
+    notes: "The domain-expert newcomer — ten minutes, four ideas — is the guide still to be written."
 ---
 
 # The First Hour
@@ -85,10 +91,18 @@ read-only orientation aid, not part of installing the floor and not a
 replacement for the agent that will create or change a domain. Nothing in the
 rest of this first hour depends on it.
 
-MarkdownLLM Desktop is being built as the eventual guided first-use route—setup, Domains,
-Sessions, provider connection and this visual inspection in one local application. It remains an
-Engineering Preview under acceptance, so this guide does not silently substitute it for the
-published framework installation route yet.
+MarkdownLLM Desktop, a local application tried as a guided first-use route, is frozen as an
+Engineering Preview (2026-09-06) and is not the path this guide describes. The guided route now
+being built is harness-native — you tell your agent what you want to work on and it performs this
+hour's setup for you; see `operator-seat-and-harness-native-onramp`. Until that lands, this is
+the published route.
+
+One honest gap. This guide is written for someone with a harness, a terminal and a healthy
+suspicion. The person the framework most needs to reach — a domain expert who will never open a
+terminal — is not yet written for. When that guide exists it will be ten minutes, not sixty, and
+about four ideas: the agent writes things down in files you can read; nothing is real until it is
+committed, and you can always see what changed; the agent proposes, and some things only you can
+rule on; what you rule on accumulates.
 
 The README is the one-page overview if you want the *why*; skip
 `domain-specification-guide.md` entirely — that one is your *agent's* reading,

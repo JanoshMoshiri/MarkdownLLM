@@ -1,8 +1,8 @@
 ---
 id: markdownllm-desktop-is-primary-accessible-product
 type: decision
-status: made
-version: 1.3
+status: superseded
+version: 1.4
 created: 2026-09-03
 session: 2026-09-06
 decided_by: human
@@ -11,6 +11,9 @@ origin: stated
 exposed: false
 tags: [desktop, product, accessibility, local-first, explorer, interface]
 linked_things:
+  - id: harness-native-onramp-supersedes-desktop
+    relation: superseded-by
+    notes: "2026-09-06: Desktop frozen at 0.1.6 as an Engineering Preview; the accessible route is harness-native — the operator's own intent sentence in a harness they already use, and the seat rendered in their language."
   - id: explorer-publication-position
     relation: supersedes
     notes: "Supersedes Explorer's position as the direction of travel; the accepted read-only preview remains a useful optional viewer and historical proof."
@@ -26,6 +29,14 @@ linked_things:
 ---
 
 # Decision: MarkdownLLM Desktop is the primary accessible product
+
+> **Superseded 2026-09-06** by `harness-native-onramp-supersedes-desktop`. Three days of
+> telemetry (cadence displaced to the product, a repair list where a floor should be), a second
+> onboarding session that landed none of the vocabulary, and the recognition that a
+> vendor-agnostic onramp is a harness — not the moat — reversed this. Desktop is frozen at its
+> issued 0.1.6 installer as an Engineering Preview; its setup-journey, discovery and
+> subscription-route requirements are retained as input to the harness-native onramp. The
+> record below stands as written.
 
 ## Context
 

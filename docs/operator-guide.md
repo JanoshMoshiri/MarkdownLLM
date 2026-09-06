@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 1.9
+version: 2.0
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -29,6 +29,9 @@ linked_things:
   - id: markdownllm-desktop-is-primary-accessible-product
     relation: derived-from
     notes: "v1.9 records the Desktop direction without advertising an acceptance-pending candidate as released."
+  - id: harness-native-onramp-supersedes-desktop
+    relation: derived-from
+    notes: "v2.0 records Desktop frozen and the harness-native onramp as the accessible route; the command-line sequence stays the published route until the onramp lands."
 ---
 
 # The Operator's Guide — Working In A Domain Since v3
@@ -186,19 +189,21 @@ to be remembered.
 
 *Boundary: `interface.md`; release position: `explorer-publication-position`.*
 
-### 8. The accessible application direction
+### 8. The accessible route
 
-MarkdownLLM Desktop is now the primary product direction for people who should not need to learn
-the framework's command-line operating sequence. It is a local application for setup, Domain and
-Session management, provider connection, exploration and diagnostics over the same ordinary
-Markdown and Git repositories. The substrate does not depend on it: existing harnesses and the
-read-only Explorer remain valid routes and integrations.
+The accessible route is harness-native: you say what you want to work on, in the harness you
+already use, and the agent does the rest — sync, refresh, floor, session start — and tells you
+where things stand in your own words. That onramp is being built as a skill for Claude Code and
+Cowork, with Perplexity as a candidate route pending a probe; see
+`operator-seat-and-harness-native-onramp`. Until it lands, this guide's command-line sequence is
+the published route.
 
-The Windows application is currently an **Engineering Preview in acceptance**, not a published
-release. Its provider route and installed keyboard/accessibility journey must close against one
-pinned candidate before this guide can offer it as the default first-use path.
+MarkdownLLM Desktop, the local application tried as this route, is **frozen at its issued 0.1.6
+installer as an Engineering Preview** (2026-09-06). It is not published and is not the first-use
+path; its setup-journey requirements feed the onramp. The substrate never depended on it:
+existing harnesses and the read-only Explorer remain valid routes and integrations.
 
-*Direction: `markdownllm-desktop-is-primary-accessible-product`; contract: `interface.md`.*
+*Direction: `harness-native-onramp-supersedes-desktop`; contract: `interface.md`.*
 
 ## The Toolbox
 
