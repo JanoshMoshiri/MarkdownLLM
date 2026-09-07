@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-06
-generated: 2026-09-06T22:17:01
-generated_from: HEAD@64774c5
-coverage: 335
+created: 2026-09-07
+generated: 2026-09-07T23:21:27
+generated_from: HEAD@6b45b0b
+coverage: 337
 framework_version: 3.37.0
 ---
 
@@ -133,6 +133,9 @@ framework_version: 3.37.0
 - a-stated-dismissal-condition-needs-a-reader --challenges--> session-memory-specification
 - a-stated-dismissal-condition-needs-a-reader --references--> trigger-specification
 - a-stated-dismissal-condition-needs-a-reader --supports--> a-uniform-answer-is-a-dead-judgment
+- a-surface-without-a-floor-accumulates-repairs-not-progress --complements--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
+- a-surface-without-a-floor-accumulates-repairs-not-progress --references--> validate-thing-specification
+- a-surface-without-a-floor-accumulates-repairs-not-progress --references--> git-workflow-specification
 - a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity --complements--> a-verifier-assumes-the-inputs-it-did-not-observe
 - a-test-anchored-in-source-text-fails-loudly-on-drift-and-silently-on-ambiguity --derived-from--> explorer-ui-increment-2026-08
 - a-transcribed-identifier-is-unverifiable-by-reading --informs--> workflow-state-specification
@@ -754,6 +757,8 @@ framework_version: 3.37.0
 - harness-native-onramp-supersedes-desktop --derived-from--> the-onramp-is-the-operators-own-sentence
 - harness-native-onramp-supersedes-desktop --informs--> interface-specification
 - harness-native-onramp-supersedes-desktop --references--> closed-loop-operating-state
+- harness-native-onramp-supersedes-desktop --references--> the-record-answers-the-direction-question-first
+- harness-native-onramp-supersedes-desktop --references--> a-surface-without-a-floor-accumulates-repairs-not-progress
 - hook-compliance-correlates-with-scope-not-awareness --informs--> orchestration-specification
 - hook-compliance-correlates-with-scope-not-awareness --supports--> tiered-loading-is-tiered-reading-applied-to-specs
 - hook-enforcement-has-three-anchors --informs--> orchestration-specification
@@ -954,6 +959,7 @@ framework_version: 3.37.0
 - operator-seat-and-harness-native-onramp --references--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
 - operator-seat-and-harness-native-onramp --references--> closed-loop-operating-state
 - operator-seat-and-harness-native-onramp --references--> first-hour-guide
+- operator-seat-and-harness-native-onramp --informs--> a-surface-without-a-floor-accumulates-repairs-not-progress
 - orchestration-specification --extends--> thing-specification
 - orchestration-specification --informs--> estate-git-sync
 - orchestration-specification --complements--> write-thing-specification
@@ -1235,6 +1241,9 @@ framework_version: 3.37.0
 - the-orchestrators-premises-are-the-least-reliable-input --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - the-orchestrators-premises-are-the-least-reliable-input --complements--> the-root-is-not-a-representative-domain
 - the-orchestrators-premises-are-the-least-reliable-input --references--> consequence-is-recoverable-only-in-retrospect
+- the-record-answers-the-direction-question-first --supports--> llm-driven-systems-manifesto
+- the-record-answers-the-direction-question-first --references--> git-workflow-specification
+- the-record-answers-the-direction-question-first --references--> evidence-and-eval-backlog
 - the-root-is-not-a-representative-domain --derived-from--> estate-workflow-derivation
 - the-root-is-not-a-representative-domain --informs--> derivation-shape-settled-2026-08
 - the-root-is-not-a-representative-domain --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it

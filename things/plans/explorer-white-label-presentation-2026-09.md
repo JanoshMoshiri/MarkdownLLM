@@ -2,7 +2,7 @@
 id: explorer-white-label-presentation-2026-09
 type: plan
 status: cancelled
-version: 1.5
+version: 1.6
 created: 2026-09-02
 priority: medium
 exposed: false
@@ -39,6 +39,12 @@ accepted product state. Nothing from it is merged into Explorer.
 The field value object, grammar, contrast constraints and field-by-field precedence across an
 install-local file, packaged default and product default are preserved as deferred Desktop
 requirements input. They do not enter Desktop Preview A or its first provider acceptance gate.
+
+**2026-09-06.** The Desktop those requirements were deferred to is itself frozen
+(`harness-native-onramp-supersedes-desktop`); there is no longer an application to carry them
+into. The cancellation stands, the parked branch stays recoverable, and if white-labelling ever
+returns it returns to Explorer from the Parked section below — not to a product. Explorer's only
+sanctioned next increment is a vocabulary pass.
 
 ## Outcome
 

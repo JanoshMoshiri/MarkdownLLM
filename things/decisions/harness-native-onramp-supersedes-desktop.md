@@ -2,7 +2,7 @@
 id: harness-native-onramp-supersedes-desktop
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-09-06
 session: 2026-09-06
 decided_by: human
@@ -28,6 +28,12 @@ linked_things:
   - id: closed-loop-operating-state
     relation: references
     notes: "The seat is the human half of the loop that plan is closing. The three triggers that fired on 2026-09-06 all pointed at it."
+  - id: the-record-answers-the-direction-question-first
+    relation: references
+    notes: "How the Context section was reached: telemetry, the prior record's own repair list and the fired triggers answered before judgement did."
+  - id: a-surface-without-a-floor-accumulates-repairs-not-progress
+    relation: references
+    notes: "The diagnosis paragraph is this insight's first instance; the freeze is its first application."
 ---
 
 # Decision: the harness-native onramp supersedes Desktop as the accessible product

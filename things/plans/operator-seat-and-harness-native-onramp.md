@@ -2,7 +2,7 @@
 id: operator-seat-and-harness-native-onramp
 type: plan
 status: not-started
-version: 1.0
+version: 1.1
 created: 2026-09-06
 session: 2026-09-06
 priority: high
@@ -23,6 +23,9 @@ linked_things:
   - id: first-hour-guide
     relation: references
     notes: "Phase 5 gives it the persona it lacks."
+  - id: a-surface-without-a-floor-accumulates-repairs-not-progress
+    relation: informs
+    notes: "Why nothing here is an application: every phase is a skill, a string change or a guide — forms the floor can read."
 triggers:
   - type: time
     condition: "2026-09-20 reached"
