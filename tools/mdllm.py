@@ -41,6 +41,7 @@ from markdownllm.validation import (
     check_version_sync, validate_level3, validate_corpus, example_corpora,
     workflow_transition_findings,
     quarantine_findings, retrospective_findings, derivation_findings,
+    conflict_age_findings, CONFLICT_STALE_DAYS,
     session_gate_findings, SESSION_GATE_WINDOW_HOURS,
     cmd_validate,
 )

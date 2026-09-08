@@ -310,9 +310,22 @@ def validate_level2(corpus: Corpus) -> list[Finding]:
                          "orphaned from session memory; promote, dismiss, link it "
                          "from live work, or mark `disposition: keep-active`"))
         elif typ == "conflict" and status == "open" and t.id not in referenced_by_live:
-            f.append(Finding(SEV_INFO, t.id,
-                     "open conflict with no inbound edge from a live thing — link "
-                     "it from the work it blocks so it returns next session"))
+            # Holding a contradiction in tension is a valid state
+            # (belief-revision.md) — but held *deliberately*: the same marker
+            # that keeps a parked insight live keeps a held conflict open, and
+            # the reason it states is what the retrospective's conditions-met
+            # pass re-reads. Without a reason the hold is nudged, as for insights.
+            if str(t.meta.get("disposition", "")) == "keep-active":
+                if not str(t.meta.get("disposition_reason", "")).strip():
+                    f.append(Finding(SEV_INFO, t.id,
+                             "conflict marked keep-active but has no "
+                             "`disposition_reason` — state what would resolve it"))
+            else:
+                f.append(Finding(SEV_INFO, t.id,
+                         "open conflict with no inbound edge from a live thing — "
+                         "rule on it (superseded / both-valid / dismissed), link it "
+                         "from the work that will resolve it, or mark "
+                         "`disposition: keep-active` with a `disposition_reason`"))
     return f
 
 
@@ -946,6 +959,74 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
     return out
 
 
+CONFLICT_STALE_DAYS = 30
+
+
+def conflict_age_findings(root: Path, corpus: Corpus) -> list[Finding]:
+    """belief-revision.md / validate.thing.md: an open conflict untouched for
+    30+ days is surfaced as Info — the age-based reader for a conflict that an
+    inbound edge keeps *in circulation* without anyone ever *ruling* on it.
+
+    Both specs promised this row from v1.0; the floor carried only the orphan
+    (no-live-inbound-edge) check, so a conflict linked from a live plan could
+    sit indefinitely with nothing but the session-start line, which operators
+    learn to scroll past (external review, 2026-09-08: creation at three
+    cadences, disposition at none). "Untouched" is read from the commit stream,
+    never mtime — one `git log --name-only` walk over `things/`, as
+    session-start's stall lines do; per-file `log -1` spawns blew that hook's
+    budget on a 232-thing corpus.
+
+    Quiet when healthy: a conflict ruled on (resolved), one touched within the
+    window, or one held deliberately — `disposition: keep-active` with a stated
+    `disposition_reason` — draws nothing. The hold is not a suppression list:
+    it is a per-thing reckoning whose stated condition the retrospective's
+    conditions-met pass re-reads. No git history over `things/` → silent."""
+    open_conflicts = [t for t in corpus.things
+                      if str(t.meta.get("type")) == "conflict"
+                      and str(t.meta.get("status")) == "open"
+                      and t.id]
+    if not open_conflicts:
+        return []
+    log = _git_stdout(root, ["log", "--format=%x1e%cs", "--name-only",
+                             "--", "things"])
+    if not log:
+        return []
+    touch: dict[str, dt.date] = {}
+    for record in log.split("\x1e"):
+        header, _, paths = record.partition("\n")
+        try:
+            day = dt.date.fromisoformat(header.strip())
+        except ValueError:
+            continue
+        for line in paths.splitlines():
+            line = line.strip()
+            if line:
+                touch.setdefault(line, day)  # newest-first: first wins
+    today = dt.date.today()
+    out: list[Finding] = []
+    for t in open_conflicts:
+        if (str(t.meta.get("disposition", "")) == "keep-active"
+                and str(t.meta.get("disposition_reason", "")).strip()):
+            continue
+        try:
+            rel = t.path.resolve().relative_to(root.resolve()).as_posix()
+        except ValueError:
+            continue
+        last = touch.get(rel)
+        if last is None:
+            continue  # untracked / no history — creation is its own signal
+        age = (today - last).days
+        if age > CONFLICT_STALE_DAYS:
+            out.append(Finding(SEV_INFO, t.id,
+                       f"open conflict untouched for {age} days (last commit "
+                       f"{last}) — rule on it (superseded / both-valid / "
+                       f"dismissed), or mark `disposition: keep-active` with a "
+                       f"`disposition_reason` naming what would resolve it "
+                       f"(belief-revision.md: stale open conflict >"
+                       f"{CONFLICT_STALE_DAYS}d)"))
+    return out
+
+
 def retrospective_findings(root: Path, corpus: Corpus,
                            things_dates: list[dt.date] | None = None,
                            ) -> list[Finding]:
@@ -1007,7 +1088,7 @@ def retrospective_findings(root: Path, corpus: Corpus,
         return [Finding(SEV_INFO, "retrospective-cadence",
                 f"no retrospective since {newest} ({(today - newest).days} days) "
                 f"with active sessions in the last 60 — the period's aggregate "
-                f"sweeps (conflict scan, schema coherence) have not run")]
+                f"sweeps (retrospective.md → Reflexive Scans) have not run")]
     return []
 
 
@@ -1131,11 +1212,12 @@ def validation_reports(
         findings.extend(quarantine_findings(root, corpus))
         findings.extend(session_gate_findings(root, corpus))
         findings.extend(retrospective_findings(root, corpus))
+        findings.extend(conflict_age_findings(root, corpus))
         return (root, corpus, findings)
 
     def _example_report(sub: Path) -> tuple[Path, Corpus, list[Finding]]:
-        # Example corpora skip retrospective cadence: teaching corpora carry
-        # frozen dates rather than live sessions.
+        # Example corpora skip retrospective cadence and conflict age: teaching
+        # corpora carry frozen dates rather than live sessions.
         sub_corpus, sub_findings = validate_corpus(sub, view)
         history_root = view.root if view is not None else sub
         sub_findings.extend(quarantine_findings(history_root, sub_corpus))

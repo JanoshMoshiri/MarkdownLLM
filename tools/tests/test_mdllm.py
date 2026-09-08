@@ -350,6 +350,71 @@ def test_keep_active_disposition_exempts_orphan(tmp_path):
     assert needs_reason == {"kept-no-reason"}
 
 
+def test_keep_active_disposition_exempts_conflict_orphan(tmp_path):
+    # The conflict twin (belief-revision.md → Who Reads An Open Conflict): a
+    # deliberately held conflict carries the same marker a parked insight does,
+    # and the same rule — with a reason it is exempt, without one it is nudged.
+    write(tmp_path, "things/conflicts/held.md", thing_text(
+        "id: held\ntype: conflict\nstatus: open\ncreated: 2026-06-01\n"
+        "parties: [a, b]\ndisposition: keep-active\n"
+        'disposition_reason: "resolves when the anchor taxonomy is re-read"'))
+    write(tmp_path, "things/conflicts/held-no-reason.md", thing_text(
+        "id: held-no-reason\ntype: conflict\nstatus: open\ncreated: 2026-06-01\n"
+        "parties: [a, b]\ndisposition: keep-active"))
+    write(tmp_path, "things/conflicts/lone.md", thing_text(
+        "id: lone\ntype: conflict\nstatus: open\ncreated: 2026-06-01\n"
+        "parties: [a, b]"))
+    orphaned = {x.thing for x in all_findings(tmp_path)
+                if "open conflict with no inbound edge" in x.message}
+    assert orphaned == {"lone"}
+    needs_reason = {x.thing for x in all_findings(tmp_path)
+                    if "conflict marked keep-active but has no" in x.message}
+    assert needs_reason == {"held-no-reason"}
+
+
+def test_stale_open_conflict_reads_git_history_not_mtime(tmp_path):
+    # belief-revision.md / validate.thing.md promised "open conflict untouched
+    # 30+ days → Info" from v1.0; the floor carried only the orphan check. Age
+    # is the commit stream, never mtime. Deliberately held (keep-active + a
+    # reason), resolved, and recently-touched conflicts draw nothing.
+    import subprocess
+    for n in ("aged", "aged-but-held", "aged-but-live-edge", "fresh"):
+        held = ("\ndisposition: keep-active\ndisposition_reason: \"held until x\""
+                if n == "aged-but-held" else "")
+        write(tmp_path, f"things/conflicts/{n}.md", thing_text(
+            f"id: {n}\ntype: conflict\nstatus: open\ncreated: 2026-01-01\n"
+            f"parties: [a, b]{held}"))
+    write(tmp_path, "things/conflicts/settled.md", thing_text(
+        "id: settled\ntype: conflict\nstatus: resolved\ncreated: 2026-01-01\n"
+        "parties: [a, b]\nresolution: both-valid"))
+    # A live inbound edge keeps a conflict in circulation; it does not rule on
+    # it — the age check must fire through the edge.
+    write(tmp_path, "things/plans/p.md", _links_to("p", "aged-but-live-edge"))
+    corpus, _ = mdllm.scan(tmp_path)
+    assert mdllm.conflict_age_findings(tmp_path, corpus) == []  # no git: silent
+    old = {**os.environ, "GIT_AUTHOR_DATE": "2026-05-01T12:00:00",
+           "GIT_COMMITTER_DATE": "2026-05-01T12:00:00"}
+    git = ["git", "-c", "user.email=t@t", "-c", "user.name=t"]
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    subprocess.run(git + ["add", "."], cwd=tmp_path, check=True)
+    subprocess.run(git + ["commit", "-q", "-m", "x"], cwd=tmp_path,
+                   check=True, env=old)
+    # `fresh` is touched today; its mtime is no fresher than the others'.
+    fresh = tmp_path / "things/conflicts/fresh.md"
+    fresh.write_text(fresh.read_text(encoding="utf-8") + "\nmoved.\n",
+                     encoding="utf-8")
+    subprocess.run(git + ["add", "."], cwd=tmp_path, check=True)
+    subprocess.run(git + ["commit", "-q", "-m", "touch"], cwd=tmp_path, check=True)
+    for n in ("aged", "aged-but-held", "aged-but-live-edge"):
+        os.utime(tmp_path / f"things/conflicts/{n}.md")  # mtime says now
+    corpus, _ = mdllm.scan(tmp_path)
+    found = {x.thing: x for x in mdllm.conflict_age_findings(tmp_path, corpus)}
+    assert set(found) == {"aged", "aged-but-live-edge"}
+    assert all(x.severity == mdllm.SEV_INFO for x in found.values())
+    assert "last commit 2026-05-01" in found["aged"].message
+    assert "keep-active" in found["aged"].message
+
+
 # ---------------------------------------------------------------- touchpoints
 
 
