@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-07
-generated: 2026-09-07T23:21:27
-generated_from: HEAD@6b45b0b
-coverage: 84
+created: 2026-09-08
+generated: 2026-09-08T01:05:11
+generated_from: HEAD@4932c30
+coverage: 85
 framework_version: 3.37.0
 ---
 
@@ -278,6 +278,9 @@ framework_version: 3.37.0
 
 ## retrospective-specification
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
+
+## review-external-conflict-lifecycle-2026-09-08
+- circulation-is-not-disposition (derived-from)
 
 ## review-independent-operating-model-2026-08-26-codex
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)

@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-07
-generated: 2026-09-07T23:21:27
-generated_from: HEAD@6b45b0b
-coverage: 337
+created: 2026-09-08
+generated: 2026-09-08T01:05:10
+generated_from: HEAD@4932c30
+coverage: 339
 framework_version: 3.37.0
 ---
 
@@ -237,6 +237,13 @@ framework_version: 3.37.0
 - change-safety-is-defense-in-depth --supports--> mechanical-assimilation-is-blind-to-prose-dependencies
 - change-safety-is-defense-in-depth --supports--> consistency-is-maintained-at-change-not-by-sweeping
 - change-safety-is-defense-in-depth --supports--> retrospective-specification
+- circulation-is-not-disposition --informs--> belief-revision-specification
+- circulation-is-not-disposition --informs--> session-memory-specification
+- circulation-is-not-disposition --informs--> retrospective-specification
+- circulation-is-not-disposition --informs--> validate-thing-specification
+- circulation-is-not-disposition --supports--> a-stated-dismissal-condition-needs-a-reader
+- circulation-is-not-disposition --supports--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- circulation-is-not-disposition --derived-from--> review-external-conflict-lifecycle-2026-09-08
 - claude-5r2-renderer-acceptance-2026-08-13 --documents--> vendor-harness-adapter-foundation
 - claude-5r2-renderer-acceptance-2026-08-13 --derived-from--> claude-phase5r0-matrix-completion-2026-08-13
 - claude-5r2-renderer-acceptance-2026-08-13 --implements--> code-architect-governs-substrate-code
@@ -1065,6 +1072,10 @@ framework_version: 3.37.0
 - retrospective-specification --complements--> derived-index-specification
 - retrospective-specification --complements--> change-reconciliation-specification
 - retrospective-specification --implements--> llm-driven-systems-manifesto
+- review-external-conflict-lifecycle-2026-09-08 --informs--> circulation-is-not-disposition
+- review-external-conflict-lifecycle-2026-09-08 --references--> belief-revision-specification
+- review-external-conflict-lifecycle-2026-09-08 --references--> retrospective-specification
+- review-external-conflict-lifecycle-2026-09-08 --references--> change-reconciliation-specification
 - review-independent-operating-model-2026-08-26-codex --validates--> operating-model-specification
 - review-independent-operating-model-2026-08-26-codex --validates--> workflow-state-specification
 - review-independent-seams-verification-2026-08-26-claude --validates--> run-operating-model-seams-2026-08
