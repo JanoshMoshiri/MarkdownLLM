@@ -2,7 +2,7 @@
 id: session-end-continuity
 type: prompt
 status: evolving
-version: 1.3
+version: 1.4
 created: 2026-05-28
 inputs:
   - name: session-conversation
@@ -20,6 +20,8 @@ outputs:
     description: "type: insight things created in things/insights/"
   - name: new-conflicts
     description: "type: conflict things created in things/conflicts/ (if contradictions found)"
+  - name: conflict-dispositions
+    description: "Open conflicts the brake ruled on, linked from the work that will resolve them, or deliberately held with a stated reason"
   - name: updated-open-loops
     description: "Open-loop things created or moved to a terminal status this session"
   - name: publication-debt-report
@@ -94,13 +96,15 @@ linked_things:
 ---
 ```
 
-### 3. Disposition The Standing Insights (the brake)
+### 3. Disposition The Standing Insights And Open Conflicts (the brake)
 
-Capture (step 2) grows the insight population every session; this step prunes it, so
-the two stay in balance — every act of capture is paired with an act of pruning.
+Capture (steps 2 and 4) grows the insight and conflict populations every session;
+this step prunes them, so capture and reckoning stay in balance. Conflicts were the
+gap: created at three cadences, ruled on at none, re-listed by orient each session
+until the list was scrolled past (`circulation-is-not-disposition`).
 
 Run `python {framework_root}/tools/mdllm.py validate <domain>` and act on **every
-insight-disposition Info finding** the floor surfaces:
+insight-disposition and conflict-disposition Info finding** the floor surfaces:
 - *"active insight with no inbound edge from a live thing"* — force a disposition:
   **promote** (populate `promoted_to`; the insight's lesson has crystallised into a
   spec/decision/thing), **dismiss** (considered, set aside), **consolidate** (fold a
@@ -109,10 +113,21 @@ insight-disposition Info finding** the floor surfaces:
   (a standing razor or parked insight, deliberately kept).
 - *"insight marked keep-active but has no `disposition_reason`"* — add the reason or
   re-disposition.
+- *"open conflict with no inbound edge from a live thing"* or *"open conflict untouched
+  for N days"* — force a disposition: **rule** (`resolution: superseded | both-valid |
+  dismissed`, `status: resolved`, `resolved_by` where one position survived; update
+  both parties), **link** it from the work that will resolve it (an inbound edge keeps
+  it in circulation — it returns next session — but does not rule on it, which is why
+  the age finding fires through the edge), or **hold** it with `disposition:
+  keep-active` + a `disposition_reason` naming what would resolve it (the
+  retrospective's conditions-met pass re-reads that reason).
+- *"conflict marked keep-active but has no `disposition_reason`"* — add the reason or
+  rule on it.
 
 This is a **forcing function, not a corpus sweep**: the floor already lists exactly the
-insights that need a decision, so none can quietly go dark. The deeper period-scoped
-work (composition/consolidation, conflict + schema scans) stays the retrospective's.
+insights and conflicts that need a decision, so none can quietly go dark. The deeper
+period-scoped work (composition/consolidation, the full conflict scan and whole-set
+triage, schema scans) stays the retrospective's.
 
 ### 4. Check For Contradictions
 
@@ -137,7 +152,8 @@ session-start` → "Open loops"). So at session end:
   thing, so it is tracked, surfaced by orient, and *retired by status* when done.
 - **Resolved this session** → move the relevant thing to a terminal status so orient
   stops surfacing it.
-- **New contradictions** → the `conflict` things from step 4 are open loops already.
+- **New contradictions** → the `conflict` things from step 4 are open loops already;
+  step 3 is what rules on them in the sessions that follow.
 
 Do **not** maintain a continuity brief, list insight IDs, or write a backward
 "decisions made" log — insight liveness is graph-keyed (step 3) and history lives in

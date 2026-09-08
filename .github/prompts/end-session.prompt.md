@@ -9,9 +9,14 @@ when *you* judge the session worth it, never automatically. Follow
 `templates/prompts/session-end-continuity.md`:
 
 1. Scan this session for insights worth preserving → create `type: insight` things.
-2. **Disposition the standing insights (the brake):** run `python tools/mdllm.py
-   validate .` and act on every insight-disposition finding — promote, dismiss,
-   consolidate, link from live work, or mark `disposition: keep-active` + a reason.
+2. **Disposition the standing insights and open conflicts (the brake):** run
+   `python tools/mdllm.py validate .` and act on every
+   insight-disposition *and* conflict-disposition finding — insights: promote,
+   dismiss, consolidate, link from live work, or mark `disposition: keep-active`
+   + a reason; conflicts: rule (superseded / both-valid / dismissed → `status:
+   resolved`), link from the work that will resolve it, or mark `disposition:
+   keep-active` + a reason naming what would resolve it. Capture (steps 1 and 3)
+   grows both populations; this prunes them, so they stay balanced.
 3. Detect contradictions introduced this session → create `type: conflict` things.
 4. Manage **open-loop things** — create/update a `plan` or work thing for new forward
    intent, move resolved ones to a terminal status (orient reads them; `continuity.md`

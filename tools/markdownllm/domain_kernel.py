@@ -257,11 +257,14 @@ def _dk_hooks(domain: Path, meta: dict,
     parts.append(
         "**Deliberate rituals — you invoke these; they never fire automatically:**\n"
         "- Session end → `session-end-continuity` (extract insights, disposition the "
-        "standing insights, detect conflicts, manage open-loop things). Invoke via `/end-session` or natural "
+        "standing insights and open conflicts, detect contradictions, manage open-loop "
+        "things). Invoke via `/end-session` or natural "
         "language *when you judge the session worth harvesting* — the operator decides "
         "when a session is worth it, not the floor.\n"
-        "- Retrospective → `detect-conflicts` (scan) + `review-schema-coherence`, when "
-        "writing a `type: retrospective`.")
+        "- Retrospective → the reflexive scans `retrospective.md` binds to the ritual "
+        "(conflict scan + whole-set triage, change-driven reconciliation, insight "
+        "consolidation + conditions-met, schema + skill coherence), via "
+        "`/retrospective`, when writing a `type: retrospective`.")
     return "\n\n".join(parts)
 
 
