@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-08-30
-generated: 2026-08-30T18:58:22
-generated_from: HEAD@2233117
+created: 2026-09-08
+generated: 2026-09-08T01:05:09
+generated_from: HEAD@4932c30
 coverage: 6
 framework_version: 3.37.0
 ---
@@ -63,7 +63,7 @@ the framework or when the kernel says to. Regenerate after any spec change.
 
 **Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, mechanically-declared state transitions, and structural-pin resolution (every local commit pin must name a commit git can resolve; Error). **Never transcribe a SHA** — a wrong one is byte-indistinguishable from a right one to any reader, so read it from `git rev-parse` and let the floor resolve it. A pin into another domain's repository (`source_commit`) is `imports-check`'s, not this check's. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
 
-**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as orphaned from session memory — no inbound edge from a live thing (promote/dismiss/link from live work/keep-active). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
+**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags — orphaned from session memory (no inbound edge from a live thing) or, for an open conflict, untouched in the commit stream for 30+ days (promote/dismiss/rule/link from live work/keep-active with a stated reason). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0, open-conflict age on 2026-09-08 — Info findings, mechanically computed.)
 
 **Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; exact decimals are evaluated from authored numeric lexemes, not binary-float round trips. Under `options: {computed: strict}`, non-evaluability is an Error, and any quarantined or otherwise excluded inputs are named whenever they change the selected set. You transcribe and reason about the result; you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
 

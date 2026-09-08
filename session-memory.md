@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.5
+version: 1.6
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -190,24 +190,36 @@ discussed but never written.
 
 For each insight worth preserving, create a `type: insight` thing in `things/insights/`.
 
-### Step 3: Disposition The Standing Insights (the brake)
+### Step 3: Disposition The Standing Insights And Open Conflicts (the brake)
 
-Step 2 grows the insight population every session; this step prunes it, so the two stay
-in balance — capture is paired with reckoning, and the population can't outrun the rate
-it's triaged. This is the session-cadence counterpart to the retrospective's deeper
-triage beat (`Insight Lifecycle Management` below).
+Steps 2 and 4 grow the insight and conflict populations every session; this step
+prunes them, so the two stay in balance — capture is paired with reckoning, and
+neither population can outrun the rate it is triaged. This is the session-cadence
+counterpart to the retrospective's deeper triage beats (`Insight Lifecycle Management`
+below; `retrospective.md` → What A Retrospective Produces, items 2 and 3).
 
 Run `python {framework_root}/tools/mdllm.py validate .` and act on **every
-insight-disposition Info finding** the floor surfaces — it lists exactly the insights
-that need a decision, so none can quietly go dark:
+insight-disposition and conflict-disposition Info finding** the floor surfaces — it
+lists exactly the insights and conflicts that need a decision, so none can quietly go
+dark:
 - *"active insight with no inbound edge from a live thing"* — force a disposition:
   **promote** (populate `promoted_to`), **dismiss**, **consolidate** a genuine duplicate
   into a survivor, **link** it from live work, or mark **`disposition: keep-active`** with
   a one-line `disposition_reason`.
 - *"keep-active with no `disposition_reason`"* — add the reason or re-disposition.
+- *"open conflict with no inbound edge from a live thing"* or *"open conflict untouched
+  for N days"* — force a disposition: **rule** (`resolution: superseded | both-valid |
+  dismissed`, `status: resolved`, both parties updated), **link** it from the work that
+  will resolve it, or **hold** it with `disposition: keep-active` + a
+  `disposition_reason` naming what would resolve it. An inbound edge keeps a conflict
+  in circulation; it does not rule on it — which is why the age finding fires through
+  a live edge (`belief-revision.md` → Who Reads An Open Conflict).
+- *"conflict marked keep-active but has no `disposition_reason`"* — add the reason or
+  rule on it.
 
-This is a forcing function, not a corpus sweep: the deeper composition/consolidation and
-conflict/schema scans stay the retrospective's (`retrospective.md`).
+This is a forcing function, not a corpus sweep: the deeper composition/consolidation,
+the full conflict scan and whole-set triage, and the schema scans stay the
+retrospective's (`retrospective.md`).
 
 ### Step 4: Belief Revision — Check For Contradictions
 
@@ -230,8 +242,8 @@ of editing a singleton, reconcile the graph:
 - New forward intent from this session → create or update a `plan` or work thing.
 - Work that resolved this session → move it to a terminal status, so orient stops
   surfacing it.
-- Open conflicts (from Step 4) are already open loops — orient surfaces them; nothing
-  else to record.
+- Open conflicts (from Step 4) are already open loops — orient surfaces them, and
+  Step 3 rules on them in the sessions that follow; nothing else to record.
 - Insight liveness is graph-keyed, not brief-keyed: an `active` insight stays in
   circulation via an inbound edge from a live thing (or a `disposition: keep-active`
   marker), per *Insight Lifecycle Management* below — not by being listed anywhere.
@@ -267,6 +279,8 @@ The lifecycle table above defines the *states* (`active` / `promoted` / `dismiss
 **An active insight must stay in circulation, and circulation is a graph property.** "Live" is defined by **an inbound edge from a non-terminal thing** — something still in play points back to the insight. An `active` insight that nothing live points to is *orphaned*: it returns to no future session and is invisible to the session-start staleness check. The floor surfaces this as a `validate` Info finding ("active insight with no inbound edge from a live thing", the twin of the open-conflict check); triage is where it is reckoned with — linked from live work, or moved to a terminal status. An insight with only **outbound** edges has discharged itself into the things it informed — that is a promotion signal, not a defect (see the worked case: `agents-drop-mechanical-birth-steps-not-semantic-ones` → `orchestration.md`). This replaces the prior "presence in `continuity.md`" definition: file-presence liveness was brittle — a backward-log cleanup could orphan a standing insight — and is being dissolved (`dissolve-continuity-into-reconciliation`).
 
 **The keep-active marker.** Some insights are genuinely live with no active dependant — *standing razors* the framework reasons by, and *parked* insights awaiting a trigger. These are kept live not by a prose mention but by a stated disposition the floor reads: `disposition: keep-active` + a one-line `disposition_reason`. The orphan check honours it (the insight is no longer flagged); a `keep-active` with no reason is itself nudged, because the reason is the reckoning. This is the deliberate counterpart to letting an insight go terminal — "I have considered this and it stays live, and here is why" — and it is what stops the orphan check from nagging about insights that have already been triaged.
+
+**The conflict twin.** Everything above holds for an `open` conflict with one change of verb: the disposition is a *ruling* (`belief-revision.md`'s three outcomes) rather than a promotion. The same inbound-edge test defines circulation, the same `disposition: keep-active` + `disposition_reason` marks a deliberate hold, the same two rituals read it — and one further reader exists because circulation had been standing in for disposition: an open conflict untouched in the commit stream for 30+ days is surfaced as Info whether or not something live points at it (`circulation-is-not-disposition`). Full mechanics: `belief-revision.md` → Who Reads An Open Conflict.
 
 **Consolidation is composition, not a bespoke merge.** As a domain accumulates, several insights commonly fragment a single idea — they are one responsibility wearing several files. Consolidate them per `thing.md` → The Inverse: Composition: fold into the cohesive survivor, redirect inbound links, and tombstone the rest as `dismissed` with `superseded-by` pointing at the survivor. Mechanical candidate detection — insights sharing two or more `linked_things` targets — runs at retrospective cadence; the merge judgement is the agent's, applied conservatively (relate, don't merge). This is *not* contradiction resolution: insights that genuinely disagree are a `conflict` (`belief-revision.md`), not folded together.
 

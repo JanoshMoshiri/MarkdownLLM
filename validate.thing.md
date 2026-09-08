@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 3.2
+version: 3.3
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -27,7 +27,7 @@ linked_things:
 <!-- kernel -->
 **Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, mechanically-declared state transitions, and structural-pin resolution (every local commit pin must name a commit git can resolve; Error). **Never transcribe a SHA** — a wrong one is byte-indistinguishable from a right one to any reader, so read it from `git rev-parse` and let the floor resolve it. A pin into another domain's repository (`source_commit`) is `imports-check`'s, not this check's. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
 
-**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags as orphaned from session memory — no inbound edge from a live thing (promote/dismiss/link from live work/keep-active). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0 — Info findings, mechanically computed.)
+**Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags — orphaned from session memory (no inbound edge from a live thing) or, for an open conflict, untouched in the commit stream for 30+ days (promote/dismiss/rule/link from live work/keep-active with a stated reason). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0, open-conflict age on 2026-09-08 — Info findings, mechanically computed.)
 
 **Arithmetic is mechanical — never perform it by reasoning.** A figure you derive is declared as a derivation (`computed:`, thing.md) and computed by `mdllm calc`; exact decimals are evaluated from authored numeric lexemes, not binary-float round trips. Under `options: {computed: strict}`, non-evaluability is an Error, and any quarantined or otherwise excluded inputs are named whenever they change the selected set. You transcribe and reason about the result; you do not add up the column. A sum you assert cannot be re-checked by anyone, including you.
 
@@ -111,6 +111,14 @@ The tool enforces, deterministically:
   rejected. A candidate therefore cannot authorize its own move by choosing or
   rewriting a friendlier definition. New runs are allowed. Whether the work
   *deserves* to advance remains semantic; whether a declared edge exists is not.
+- **Stale open conflict (Info):** an `open` conflict untouched in the commit stream
+  for 30+ days — read from `git log --name-only`, never mtime — is surfaced with its
+  last-commit date. This is the age-based reader for a conflict that an inbound edge
+  keeps *in circulation* without anyone *ruling* on it, so it fires through a live
+  edge by design; a deliberate hold — `disposition: keep-active` with a
+  `disposition_reason` — exempts it, as it does the orphan check below, and a hold
+  without a reason is nudged. Promised by this spec and `belief-revision.md` from
+  v1.0 and carried only as a semantic row until 2026-09-08 (`conflict_age_findings`).
 - **Session-memory completeness (Info):** an `active` insight or `open` conflict
   with no inbound edge from a live (non-terminal) thing is orphaned from session
   memory — it returns to no future session and is invisible to the session-start
@@ -174,8 +182,7 @@ in this loop. Read things holistically and assess:
 | Narrative completeness | Does the body explain what this is and why it matters, or is it an empty title? | Info |
 | Trigger coherence | Do declared triggers make sense for this thing? Watching relevant things? Appropriate actions? | Info |
 | Duplicate or redundant | Substantial overlap in scope or intent with another thing — a candidate for composition (`thing.md` → The Inverse: Composition) | Info |
-| Disposition of a flagged insight/conflict | The floor flags an `active` insight or `open` conflict with no inbound edge from a live thing (Layer 1); deciding whether to promote, dismiss, link it from live work, or mark `keep-active` is yours, at session-end and retrospective cadence | Info |
-| Stale open conflict | Open conflict untouched for 30+ days | Info |
+| Disposition of a flagged insight/conflict | The floor flags an `active` insight with no inbound edge from a live thing, or an `open` conflict with none or untouched 30+ days (Layer 1); deciding whether to promote, dismiss, rule (a conflict), link it from live work, or mark `keep-active` with a reason is yours, at session-end and retrospective cadence | Info |
 
 *(Retrospective cadence — 60 days active since the last `type: retrospective` —
 is **not** in this table: it moved to the floor in v3.24.0

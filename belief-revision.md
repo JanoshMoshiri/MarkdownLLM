@@ -2,7 +2,7 @@
 id: belief-revision-specification
 type: specification
 status: stable
-version: 1.2
+version: 1.3
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -186,6 +186,9 @@ Detected (open)
     ↓
 Held in tension — surfaces as an open loop (orient reads open conflicts)
     ↓
+Read until ruled — the session-end brake (orphaned / aged) and the retrospective
+triage force a disposition: rule, link from resolving work, or hold with a reason
+    ↓
 Resolution reached (in-session or across sessions)
     ↓
 Resolved — outcome declared (superseded / both-valid / dismissed)
@@ -199,11 +202,71 @@ Resolved conflict things are **not deleted**. They are part of the domain's inte
 
 ---
 
+## Who Reads An Open Conflict
+
+Creation has three entry points — a human stating the clash, the session-end
+check, the retrospective's full-edge scan — and until v1.3 disposition had none.
+`mdllm session-start` listed every open conflict, and a list that re-prints
+unchanged each session is exactly what an operator learns to scroll past
+(`a-check-that-always-fires-teaches-the-operator-to-ignore-it`). The
+framework's higher-stakes object had the weaker lifecycle: insights were
+captured *and* pruned at session cadence and triaged again at period cadence;
+conflicts were captured at both cadences and ruled on at neither (external
+review, 2026-09-08 — `review-external-conflict-lifecycle-2026-09-08`).
+
+An open conflict is therefore read at the same two cadences an insight is, by
+the same two rituals, on the same marker:
+
+- **The session-end brake** (`session-memory.md` → Step 3). The floor lists the
+  conflicts that need a decision — `open` with no inbound edge from a live thing
+  (*orphaned*), or untouched in the commit stream for 30+ days (*aged*) — and
+  the ritual forces one on each: **rule** (`superseded` / `both-valid` /
+  `dismissed` → `status: resolved`, both parties updated), **link** it from the
+  work that will resolve it, or **hold** it deliberately with `disposition:
+  keep-active` and a `disposition_reason` naming what would resolve it. A hold
+  without a reason is nudged, as for insights.
+- **The retrospective triage** (`retrospective.md` → What A Retrospective
+  Produces, item 3). The whole open set, not only what the floor aged: every
+  open conflict gets a disposition once per period, and the conditions-met pass
+  (scan 6) re-reads every held conflict's stated reason and rules on the ones
+  that have come true.
+
+An inbound edge keeps a conflict *in circulation* — it returns next session. It
+does not *rule* on it; only a disposition does. The two are different acts, and
+the age check fires through a live edge precisely because the first had been
+quietly standing in for the second (`circulation-is-not-disposition`).
+
+## Reasoning While A Conflict Is Open
+
+A conflict held in tension is a valid state — but it must be a *defined* one,
+or the consumer's behaviour in the gap becomes whatever the model felt like,
+which is the non-determinism this spec exists to prevent. While a conflict is
+`open`, neither party is authoritative on the contested point. The framework
+default is **proceed and flag**: reason on the position the conflict's body
+marks as the working reading (a *Proposed Resolution*, where one is written) —
+otherwise on the older, previously accepted position — and name the conflict
+in any output that rests on it (a `decision` pins it through `informed_by`;
+prose names its id), so the output is legible as provisional and regenerable
+when the conflict resolves. Never synthesise a middle position from the two
+parties; never pick silently.
+
+A conflict thing may tighten this for its own contested point — *block: nothing
+may rest on either party until ruled* — by saying so in its body, and a domain
+may tighten it for a class of things in its specification skill. Where a party
+is `origin: external` and unverified, the quarantine rule already blocks
+(`provenance.md`): nothing may rest on it until a named human flips `verified`
+in a separate commit. A contradiction arriving through the porch is therefore
+not yet a conflict at all; it becomes one only once the import is trusted, and
+from that moment it is read at both cadences above.
+
+---
+
 ## Relationship To Other Specs
 
 - **thing.md** — `conflict` joins `insight` and `continuity-brief` as a framework-reserved type. `supersedes` and `contradicts` are added as valid `linked_things.relation` values.
-- **validate.thing.md** — A `relation: contradicts` without a corresponding conflict thing is a validation error. Open conflicts older than 30 days without updates are surfaced as Info.
-- **session-memory.md** — The session-end ritual includes a belief revision step: scan for new contradictions, create conflict things where found.
+- **validate.thing.md** — A `relation: contradicts` without a corresponding conflict thing is a validation error. Open conflicts untouched in the commit stream for 30+ days are surfaced as Info (`conflict_age_findings` — promised here from v1.0, implemented 2026-09-08), as are open conflicts with no inbound edge from a live thing; `disposition: keep-active` with a `disposition_reason` exempts a conflict from both, and a hold without a reason is nudged.
+- **session-memory.md** — The session-end ritual includes a belief revision step: scan for new contradictions, create conflict things where found — and its brake (Step 3) rules on the open conflicts the floor flags.
+- **retrospective.md** — The period-cadence reader: item 3 of what a retrospective produces triages every open conflict, and the conditions-met pass (scan 6) re-reads the held ones' reasons.
 - **orchestration.md** — The `session-end` bound prompts encompass belief revision alongside insight extraction. The `detect-conflicts` prompt (scan mode) is bound to `on-status-change` and `retrospective` for systematic detection.
 - **derived-index.md** — The `relationships` derived index makes the full-domain conflict sweep affordable by providing the edge list to walk, so the scan loads full context only for suspect endpoints.
 - **`divergence-is-an-unrouted-decision`** — this spec is the **route-2 face** of that primitive: revising the model with recorded rationale, and the valid *holding* state before resolution. Making "we don't know which is right yet" first-class — rather than synthesising a plausible-but-wrong answer from both — is the anti-blur law in practice.
