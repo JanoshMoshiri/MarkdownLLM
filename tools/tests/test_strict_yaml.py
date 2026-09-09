@@ -76,3 +76,27 @@ def test_yaml_float_retains_exact_decimal_lexeme_for_calculation():
 def test_lexical_float_remains_safe_dumpable():
     value = load_yaml("amount: 1.2300\n")
     assert "amount:" in yaml.safe_dump(value)
+
+
+def test_yaml_int_retains_exact_lexeme():
+    # YAML 1.1 types `0123456` as octal and `0b00101` as binary; `str()` of
+    # the value re-spells them as numbers the source never held. A short
+    # commit pin is one of those roughly one draw in a thousand, and CI
+    # flaked on that draw (2026-09-09). The int keeps its token, as the
+    # float already did for calc; everything else still sees an int.
+    cases = {"0123456": 42798, "0b00101": 5, "0000000": 0,
+             "2399917": 2399917, "1_000": 1000}
+    for lexeme, value in cases.items():
+        v = load_yaml(f"pin: {lexeme}\n")["pin"]
+        assert isinstance(v, int) and v == value, lexeme
+        assert v.yaml_lexeme == lexeme
+    assert load_yaml("pin: 0o17\n")["pin"] == "0o17"  # YAML 1.2 octal: a str in 1.1
+    assert isinstance(load_yaml("b: true\n")["b"], bool)  # own tag, untouched
+    assert not hasattr(load_yaml("b: true\n")["b"], "yaml_lexeme")
+
+
+def test_lexical_int_remains_safe_dumpable():
+    # SafeDumper dispatches by exact type; the subclass must be registered or
+    # every egress render of a thing carrying an int field would raise.
+    value = load_yaml("coverage: 0123456\n")
+    assert yaml.safe_dump(value).strip() == "coverage: 42798"

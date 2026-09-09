@@ -2055,6 +2055,41 @@ def test_pins_match_survives_yaml_int_coercion():
     assert not _pins_match(2399917, None)
 
 
+def test_pins_match_survives_octal_and_binary_yaml_typing():
+    # The other half of the same disease (CI 2026-09-09, 1 in ~1069 draws):
+    # a leading zero makes the short hash YAML *octal* (`0123456` -> 42798)
+    # and `0b` + binary digits makes it binary; no spelling of those ints is
+    # the pin. The loader keeps the token; the comparison reads the token.
+    from markdownllm.imports_check import _pins_match
+    from markdownllm.structural_refs import iter_commit_pins, scalar_lexeme
+    from markdownllm.yaml_loader import load_yaml
+    for short in ("0123456", "0b00101", "0000000", "0777777"):
+        typed = load_yaml(f"source_commit: {short}\n")["source_commit"]
+        assert isinstance(typed, int) and str(typed) != short  # the trap
+        full = short + "0" * 33
+        assert _pins_match(full, typed), short   # producer full vs consumer typed
+        assert _pins_match(typed, short), short   # typed vs its own spelling
+        assert scalar_lexeme(typed) == short
+        assert [p.pin for p in iter_commit_pins({"source_commit": typed})] == [short]
+    assert scalar_lexeme(None) == ""
+    assert not _pins_match(load_yaml("p: 0123456\n")["p"], "0123457" + "0" * 33)
+
+
+def test_zero_short_pin_is_not_reported_incomplete(tmp_path):
+    # `0000000` types as int 0 — falsy — and the presence test `sd and sid
+    # and pin` filed a fully-declared import as "incomplete". Presence is
+    # the lexeme's, not the number's. No address book here, so the honest
+    # state is no-address-book-entry, never incomplete.
+    con = tmp_path / "condom"
+    write(con, "things/imported.md", thing_text(
+        "id: imported-spec\ntype: external-spec\nstatus: ingested\ncreated: 2026-06-02\n"
+        "origin: external\nverified: false\nsource_domain: srcdom\n"
+        "source_id: the-spec\nsource_commit: 0000000"))
+    rows = {r["id"]: r for r in mdllm.imports_freshness(con)}
+    assert rows["imported-spec"]["state"] == "no-address-book-entry"
+    assert rows["imported-spec"]["pin"] == "0000000"
+
+
 def test_imports_check_summary_states_coverage(tmp_path, capsys):
     # "26 import(s); 0 stale." over zero possible comparisons is the count of
     # comparisons never made rendered as assurance (estate audit FW-2). The

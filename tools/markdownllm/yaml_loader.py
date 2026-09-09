@@ -35,6 +35,24 @@ class LexicalFloat(float):
         return obj
 
 
+class LexicalInt(int):
+    """A normal int that also retains the exact YAML source lexeme.
+
+    YAML 1.1 types an unquoted scalar like ``0123456`` as octal and
+    ``0b00101`` as binary; ``str()`` of the value then spells a number the
+    source never contained. A commit pin is such a scalar roughly one draw in
+    a thousand (`0` + six octal digits), and the framework's own CI flaked on
+    exactly that draw (2026-09-09). Consumers that compare spellings — the
+    commit-pin readers — recover the lexeme; everything else still sees an
+    int.
+    """
+
+    def __new__(cls, value: int, lexeme: str):
+        obj = int.__new__(cls, value)
+        obj.yaml_lexeme = lexeme
+        return obj
+
+
 # The C parser (libyaml) is ~10x faster than the pure-Python scanner and
 # produces the same node/mark interface the strict checks below read. The
 # duplicate-key rejection and float-lexeme retention both live on the Python
@@ -89,11 +107,25 @@ def _construct_float(loader: StrictSafeLoader, node: yaml.ScalarNode) -> Lexical
 StrictSafeLoader.add_constructor(
     "tag:yaml.org,2002:float", _construct_float)
 
+
+def _construct_int(loader: StrictSafeLoader, node: yaml.ScalarNode) -> LexicalInt:
+    # Same delegation as floats: PyYAML decides the value under YAML 1.1's
+    # int forms (decimal, 0o/0 octal, 0b, 0x, sexagesimal, underscores); the
+    # token is kept beside it. Booleans arrive under their own tag, untouched.
+    value = yaml.constructor.SafeConstructor.construct_yaml_int(loader, node)
+    return LexicalInt(value, node.value)
+
+
+StrictSafeLoader.add_constructor(
+    "tag:yaml.org,2002:int", _construct_int)
+
 # SafeDumper dispatches by exact type.  Generated YAML does not need to retain
 # the source spelling, but it must continue to accept metadata containing our
 # float subclass.
 yaml.SafeDumper.add_representer(
     LexicalFloat, yaml.representer.SafeRepresenter.represent_float)
+yaml.SafeDumper.add_representer(
+    LexicalInt, yaml.representer.SafeRepresenter.represent_int)
 
 
 def load_yaml(text: str | bytes, *, source: str | Path = "<yaml>") -> Any:

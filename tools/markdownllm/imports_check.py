@@ -32,6 +32,7 @@ from .external_trust import (
     ExternalTrustError, ExternalTrustPolicy, LocalExternalTrustPolicy,
     load_mcp_address_book,
 )
+from .structural_refs import scalar_lexeme
 from .model import origin_is_external, scan
 
 
@@ -455,10 +456,16 @@ def _pins_match(a, b) -> bool:
     STALE against its own pin, prescribing a re-quarantine that spends a
     human's attributed flip on nothing. Two consumer domains hit it
     independently and patched it locally by quoting; the framework's own CI
-    then flaked on it. Normalise here, at the single comparison seam (v3.27.0)."""
+    then flaked on it. Normalise here, at the single comparison seam (v3.27.0).
+
+    `str()` was only half the cure: a leading zero makes the same hash YAML
+    *octal* (`0123456` → 42798) and `0b` + binary digits makes it binary, and
+    no spelling of those integers is the pin. CI flaked again on that draw
+    (2026-09-09, 1 in ~1069). The loader now keeps the source token
+    (`LexicalInt`); compare the token, not the number."""
     if a is None or b is None:
         return False
-    left, right = str(a).strip(), str(b).strip()
+    left, right = scalar_lexeme(a), scalar_lexeme(b)
     if left == right:
         return True
     # v3.33 migration: producers now stamp the immutable full commit while
@@ -487,7 +494,8 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
     by_source: dict[str, list[str]] = {}
     for t in imports:
         m = t.meta
-        sd, sid, pin = m.get("source_domain"), m.get("source_id"), m.get("source_commit")
+        sd, sid = m.get("source_domain"), m.get("source_id")
+        pin = scalar_lexeme(m.get("source_commit"))  # "" when absent; never a falsy int
         if sd and sid and pin:
             by_source.setdefault(str(sd), []).append(str(sid))
     faces: dict[str, tuple[str, tuple[dict, dict] | None]] = {}
@@ -516,7 +524,8 @@ def imports_freshness(consumer_root: Path) -> list[dict]:
     results = []
     for t in imports:
         m = t.meta
-        sd, sid, pin = m.get("source_domain"), m.get("source_id"), m.get("source_commit")
+        sd, sid = m.get("source_domain"), m.get("source_id")
+        pin = scalar_lexeme(m.get("source_commit"))  # "" when absent; never a falsy int
         if not (sd and sid and pin):
             if m.get("source_system") and not sd:
                 # The ingestion species (world -> domain): no face to poll, so

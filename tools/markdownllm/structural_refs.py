@@ -149,6 +149,24 @@ def commit_pin_field_names() -> set[str]:
     return set(COMMIT_PIN_BY_FIELD)
 
 
+def scalar_lexeme(value) -> str:
+    """The spelling a scalar had in its YAML source, as a stripped string.
+
+    A commit pin is compared as text, but an unquoted short hash is valid
+    YAML for an int — decimal (`2399917`), octal (`0123456`), binary
+    (`0b00101`) — and ``str()`` of the typed value re-spells the octal and
+    binary forms as numbers the source never held. The strict loader keeps
+    the token (`LexicalInt`, `LexicalFloat`); this reads it back, and falls
+    back to ``str()`` for values that never passed through YAML. ``None``
+    is the empty string so presence tests keep their meaning (an int pin of
+    zero — `0000000` — is otherwise falsy).
+    """
+    if value is None:
+        return ""
+    lexeme = getattr(value, "yaml_lexeme", None)
+    return (lexeme if isinstance(lexeme, str) else str(value)).strip()
+
+
 def iter_commit_pins(meta: dict) -> Iterable[CommitPin]:
     """Yield every declared commit pin in ``meta``, with its scope.
 
@@ -158,7 +176,8 @@ def iter_commit_pins(meta: dict) -> Iterable[CommitPin]:
     omitted; its shape is reported by the checks that own field shape.  (The
     integer arm is not defensive padding: an unquoted all-digit short SHA is
     valid YAML for an int, and roughly one abbreviation in sixteen is all
-    digits.)
+    digits — and one in a thousand is octal or binary, whose ``str()`` is
+    not the pin at all; the lexeme is, via :func:`scalar_lexeme`.)
     """
 
     if not isinstance(meta, dict):
@@ -167,7 +186,7 @@ def iter_commit_pins(meta: dict) -> Iterable[CommitPin]:
         value = meta.get(spec.field)
         if spec.shape is CommitPinShape.SCALAR:
             if isinstance(value, (str, int)) and not isinstance(value, bool):
-                yield CommitPin(spec.field, str(value), spec.scope,
+                yield CommitPin(spec.field, scalar_lexeme(value), spec.scope,
                                 spec.resolved_elsewhere)
         elif spec.shape is CommitPinShape.PIN_OBJECT:
             if not isinstance(value, list):
