@@ -3,11 +3,11 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-08
-generated: 2026-09-08T01:05:10
-generated_from: HEAD@4932c30
+created: 2026-09-09
+generated: 2026-09-09T07:52:48
+generated_from: HEAD@25852f3
 coverage: 339
-framework_version: 3.37.0
+framework_version: 3.38.0
 ---
 
 # Relationships Index — framework
