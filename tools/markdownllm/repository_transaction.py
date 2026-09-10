@@ -16,7 +16,7 @@ from pathlib import Path, PurePosixPath
 import subprocess
 import tempfile
 
-from .hook_contract import HookByteContract
+from .hook_contract import HookByteContract, rev_parse_path
 from .runtime import run_git_hook
 
 
@@ -89,15 +89,17 @@ class RepositoryTransaction:
         resolved = _run(
             self.root, "rev-parse", "--path-format=absolute", "--git-path",
             f"hooks/{name}")
-        if resolved.returncode != 0 or not resolved.stdout.strip():
+        absolute = rev_parse_path(resolved, "--path-format=absolute")
+        if absolute is None:
             fallback = _run(self.root, "rev-parse", "--git-path", f"hooks/{name}")
-            if fallback.returncode != 0 or not fallback.stdout.strip():
+            relative = rev_parse_path(fallback, "--git-path")
+            if relative is None:
                 return
-            hook_path = Path(fallback.stdout.strip())
+            hook_path = Path(relative)
             if not hook_path.is_absolute():
                 hook_path = self.root / hook_path
         else:
-            hook_path = Path(resolved.stdout.strip())
+            hook_path = Path(absolute)
         if not hook_path.is_file():
             return  # Git commit also treats an absent hook as success.
         if os.name != "nt" and not os.access(hook_path, os.X_OK):

@@ -45,7 +45,7 @@ from pathlib import Path
 # interpreter, and execution-testing installed hooks.
 from .hook_contract import (
     FLOOR_DEPENDENCY, MDLLM_ENTRY, InterpreterCandidate,
-    PATH_CANDIDATES, RELATIVE_CANDIDATES,
+    PATH_CANDIDATES, RELATIVE_CANDIDATES, rev_parse_path,
 )
 
 
@@ -130,13 +130,15 @@ def _hook_path(root: Path, hook: str) -> Path | None:
     resolved = subprocess.run(
         ["git", "rev-parse", "--path-format=absolute", "--git-path",
          f"hooks/{hook}"], cwd=root, capture_output=True, text=True)
-    if resolved.returncode != 0 or not resolved.stdout.strip():
+    line = rev_parse_path(resolved, "--path-format=absolute")
+    if line is None:
         resolved = subprocess.run(
             ["git", "rev-parse", "--git-path", f"hooks/{hook}"], cwd=root,
             capture_output=True, text=True)
-    if resolved.returncode != 0 or not resolved.stdout.strip():
+        line = rev_parse_path(resolved, "--git-path")
+    if line is None:
         return None
-    path = Path(resolved.stdout.strip())
+    path = Path(line)
     return path if path.is_absolute() else root / path
 
 

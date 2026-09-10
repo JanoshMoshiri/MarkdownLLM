@@ -94,9 +94,15 @@ def test_install_hook_resolves_gitfile_worktree_hooks(tmp_path):
     scaffold_mod.install_hook(linked)
 
     hooks = hook_contract.resolve_hooks_dir(linked)
-    reported = _git(linked, "rev-parse", "--path-format=absolute",
-                    "--git-path", "hooks").stdout.strip()
-    assert hooks == Path(reported).resolve()
+    # Build the expectation from `--git-path` alone: `--path-format` is git
+    # >= 2.31, and older git echoes it back as output rather than failing, so
+    # an expectation derived from it is the same garbage the resolver used to
+    # return — mutually consistent, and green over a real defect.
+    reported = _git(linked, "rev-parse", "--git-path", "hooks").stdout.strip()
+    expected = Path(reported)
+    if not expected.is_absolute():
+        expected = linked / expected
+    assert hooks == expected.resolve()
     assert (hooks / "pre-commit").is_file()
     installed = (hooks / "pre-commit").read_text(encoding="utf-8")
     assert f'MDLLM_ROUTE="{hook_contract.MDLLM_ENTRY.as_posix()}"' in installed
@@ -646,3 +652,75 @@ def test_git_transport_has_one_neutral_owner():
     assert sync_mod.redact is transport_mod.redact
     assert assemble_mod.redact is transport_mod.redact
     assert publish_mod.redact is transport_mod.redact
+
+
+# --------------------------------------------------- old-git option echo
+# Git < 2.31 does not know `--path-format`, and `rev-parse` echoes an option it
+# cannot parse back on stdout while exiting 0. Every call site here fell back
+# only on a nonzero return code, so the echo was consumed as a path: the floor
+# reported an installed, byte-current hook set as NOT INSTALLED, and
+# `_run_hook` silently took its "absent hook is success" branch inside a
+# scaffold transaction. Observed on git 2.16.1.windows.4.
+_OLD_GIT_ECHO = "--path-format=absolute\n.git/hooks\n"
+
+
+def test_rev_parse_path_rejects_an_echoed_unsupported_option():
+    echoed = SimpleNamespace(returncode=0, stdout=_OLD_GIT_ECHO)
+    assert hook_contract.rev_parse_path(echoed, "--path-format=absolute") is None
+
+    modern = SimpleNamespace(returncode=0, stdout="/repo/.git/hooks\n")
+    assert (hook_contract.rev_parse_path(modern, "--path-format=absolute")
+            == "/repo/.git/hooks")
+
+    failed = SimpleNamespace(returncode=128, stdout="")
+    assert hook_contract.rev_parse_path(failed, "--path-format=absolute") is None
+
+
+def test_resolve_hooks_dir_falls_back_when_git_echoes_the_option(
+        tmp_path, monkeypatch):
+    repo = _repo(tmp_path / "old-git", commit=True)
+    real = hook_contract._git_path
+
+    def old_git(root, *args):
+        if "--path-format=absolute" in args:
+            return SimpleNamespace(returncode=0, stdout=_OLD_GIT_ECHO,
+                                   stderr="")
+        return real(root, *args)
+
+    monkeypatch.setattr(hook_contract, "_git_path", old_git)
+    assert hook_contract.resolve_hooks_dir(repo) == (repo / ".git" / "hooks")
+
+
+def test_transaction_runs_the_hook_when_git_echoes_the_option(
+        tmp_path, monkeypatch):
+    """The consequential half: a skipped hook here is a skipped floor.
+
+    Before the fix, _run_hook resolved the echo into a path that cannot
+    exist, failed is_file(), and returned down the branch commented "Git
+    commit also treats an absent hook as success" — so a scaffold
+    transaction on old git proceeded with validation silently unrun.
+    """
+    repo = _repo(tmp_path / "old-git-txn", commit=True)
+    scaffold_mod.install_hook(repo)
+    real = transaction_mod._run
+
+    def old_git(root, *args, **kwargs):
+        if "--path-format=absolute" in args:
+            return SimpleNamespace(returncode=0, stdout=_OLD_GIT_ECHO,
+                                   stderr="")
+        return real(root, *args, **kwargs)
+
+    monkeypatch.setattr(transaction_mod, "_run", old_git)
+    executed = []
+
+    def capture(root, name, args, env=None, expected_bytes=None):
+        executed.append(name)
+        return {"supported": True, "passed": True, "detail": ""}
+
+    monkeypatch.setattr(transaction_mod, "run_git_hook", capture)
+    txn = RepositoryTransaction.begin(repo)
+    txn._run_hook("pre-commit", (), dict(os.environ))
+
+    assert executed == ["pre-commit"], (
+        "old git's option echo let the transaction skip the floor hook")
+    scaffold_mod.uninstall_hook(repo)

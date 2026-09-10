@@ -283,6 +283,36 @@ def _git_path(root: Path, *args: str) -> subprocess.CompletedProcess:
                           capture_output=True, text=True)
 
 
+def rev_parse_path(result: subprocess.CompletedProcess,
+                   option: str) -> str | None:
+    """First path line of a `rev-parse`, or None when git rejected `option`.
+
+    Git before 2.31 does not know `--path-format`. Crucially, `rev-parse` does
+    not *fail* on an option it cannot parse: it echoes the option back on
+    stdout and exits 0. A returncode-only fallback therefore never fires, and
+    the caller builds a path out of the echo — on git 2.16 that is a literal
+    `<root>/--path-format=absolute\\n.git/hooks`, which can never exist.
+
+    The consequences were not merely cosmetic. `resolve_hooks_dir` reported an
+    installed, byte-current floor as NOT INSTALLED; `doctor` called the whole
+    machine DEGRADED and advised hand-validation that was not needed; and
+    `repository_transaction._run_hook` took its "absent hook is success" branch
+    and skipped the validation hook inside a scaffold transaction *silently*.
+    The last is why this is a floor bug and not a reporting one: the machine
+    was answering a question about its own enforcement state with an artefact
+    of the question.
+
+    So discard output whose first line is the option itself, and let the
+    caller's existing unsupported-git fallback do its job.
+    """
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    lines = [ln.strip() for ln in result.stdout.splitlines() if ln.strip()]
+    if not lines or lines[0] == option:
+        return None
+    return lines[0]
+
+
 def repository_root(root: Path) -> Path:
     """Resolve the worktree root through git, including a `.git` gitfile."""
     result = _git_path(root, "rev-parse", "--show-toplevel")
@@ -303,8 +333,9 @@ def resolve_hooks_dir(root: Path) -> Path:
     repo = repository_root(root)
     result = _git_path(
         repo, "rev-parse", "--path-format=absolute", "--git-path", "hooks")
-    if result.returncode == 0 and result.stdout.strip():
-        return Path(result.stdout.strip()).resolve()
+    absolute = rev_parse_path(result, "--path-format=absolute")
+    if absolute:
+        return Path(absolute).resolve()
     result = _git_path(repo, "rev-parse", "--git-path", "hooks")
     if result.returncode != 0 or not result.stdout.strip():
         sys.exit(f"mdllm: git could not resolve the hooks directory for {repo}")
