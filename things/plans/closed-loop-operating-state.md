@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.8
+version: 1.9
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -10,6 +10,9 @@ informed_by:
 priority: high
 tags: [operating-model, closed-loop, human-seats, dispatcher, gates-census, vision]
 linked_things:
+  - id: review-external-conflict-lifecycle-2026-09-08
+    relation: references
+    notes: "F5 — who declares an inflection when a dispatch run commits — is the seat-protocol question Phase 3 now carries; the review names the three options and what exists toward the third."
   - id: operating-model-specification
     relation: implements
     notes: "This plan works the estate-radius composition that spec describes toward its target state; Phase 5 seals the discovered doctrine back into it."
@@ -315,6 +318,21 @@ Two honesty clauses, so the picture cannot be over-read:
       reached the operator through the digests rather than through any
       queue. The phase stays open on exactly that gap — assembly, not
       shape.*
+      *Added v1.9 (2026-09-11, from `review-external-conflict-lifecycle-2026-09-08`,
+      F5): the protocol must also say **who declares an inflection when a
+      dispatch run commits**. `change-reconciliation.md` makes the Cue human
+      and assumes a human at the keyboard when the change lands — which a
+      headless run falsifies. Three answers, one to be picked before runs
+      commit unattended: (1) runs cannot inflect — anything that would be one
+      blocks for the seat; (2) run changes are presumed un-reconciled and
+      swept by retrospective reconciliation (scan 4, wired 2026-09-08) as a
+      matter of course; (3) a run may raise the cue but not answer it — the
+      pre-commit `candidates` advisory already fires, the change lands
+      flagged, and the unanswered cue becomes a seat-queue item.
+      Recommendation on the record: (3), with (2)'s net beneath it. What does
+      not yet exist for (3): a persisted place an unanswered cue goes — today
+      it is stdout at 3am. A Phase 3 row because the queue is the seat's; the
+      ruling is the operator's.*
 - [ ] **Phase 4 — One full cycle, hands-off, at one radius.** *Pilot ruled
       2026-08-28 (`gates-census-ratified-2026-08-28`): `regulated-qms`, on the
       stated criterion — declared, gap-free, two real runs behind it, one

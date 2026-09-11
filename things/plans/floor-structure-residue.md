@@ -2,7 +2,7 @@
 id: floor-structure-residue
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-08-20
 priority: medium
 tags: [clean-architecture, solid, tests, ci, perimeter, refactor, review-residue]
@@ -123,6 +123,15 @@ spawning `timeout` + python even when the path cannot exist.~~ **Landed
 348→273ms per invocation at the root, 514→311ms in a venv-less domain
 repo; the change also exposed and fixed live-computed legacy recognition
 data (the v1 fragment is now frozen at `adapters/legacy/sh-resolve-v1.txt`).
+9. **Make the concurrent-hook test's own instrumentation race-free.**
+   `test_real_hook_blocks_index_mutation_between_subchecks` has its four
+   concurrently spawned legs append one line each to a shared log file; on
+   Windows the appends tear (an empty row) or vanish (the `validate` row
+   missing). Reproduced 2026-09-08 at roughly one run in five of the file,
+   and at the same rate on the pre-change commit `4932c30` — the test's
+   race, not the floor's. Fix: one file per leg, or an atomic rename per
+   leg; the invariant it proves (four legs, one frozen candidate, the
+   commit refused) must not change.
 
 ## Perimeter
 

@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-10
-generated: 2026-09-10T09:27:32
-generated_from: HEAD@5701f04
-coverage: 339
+created: 2026-09-11
+generated: 2026-09-11T09:06:31
+generated_from: HEAD@1a404bd
+coverage: 340
 framework_version: 3.39.0
 ---
 
@@ -143,6 +143,8 @@ framework_version: 3.39.0
 - a-true-primitive-is-discovered-not-authored --supports--> divergence-is-an-unrouted-decision
 - a-true-primitive-is-discovered-not-authored --references--> llm-driven-systems-manifesto
 - a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- a-value-cannot-recover-its-own-spelling --informs--> thing-specification
+- a-value-cannot-recover-its-own-spelling --informs--> provenance-specification
 - a-verifier-assumes-the-inputs-it-did-not-observe --extends--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - a-verifier-assumes-the-inputs-it-did-not-observe --complements--> a-transcribed-identifier-is-unverifiable-by-reading
 - a-well-kept-record-reads-as-a-governed-world --derived-from--> estate-retrospective-synthesis-2026-08
@@ -291,6 +293,7 @@ framework_version: 3.39.0
 - claude-phase6-no-adapter-and-root-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
 - claude-platform-surface-narrowed --informs--> vendor-harness-adapter-foundation
 - claude-platform-surface-narrowed --derived-from--> claude-phase5r0-matrix-completion-2026-08-13
+- closed-loop-operating-state --references--> review-external-conflict-lifecycle-2026-09-08
 - closed-loop-operating-state --implements--> operating-model-specification
 - closed-loop-operating-state --implements--> universal-workflow-methodology
 - closed-loop-operating-state --derived-from--> framework-retrospective-2026-08c
