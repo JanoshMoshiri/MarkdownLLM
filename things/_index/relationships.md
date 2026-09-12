@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-11
-generated: 2026-09-11T09:06:31
-generated_from: HEAD@1a404bd
-coverage: 340
+created: 2026-09-12
+generated: 2026-09-12T18:02:20
+generated_from: HEAD@7c5c211
+coverage: 342
 framework_version: 3.39.0
 ---
 
@@ -411,6 +411,10 @@ framework_version: 3.39.0
 - cross-domain-sync-catchup --extends--> provenance-specification
 - cross-domain-sync-catchup --extends--> change-reconciliation-specification
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
+- cue-carrier --implements--> unattended-cue-carrier-2026-09-12
+- cue-carrier --implements--> closed-loop-operating-state
+- cue-carrier --extends--> change-reconciliation-specification
+- cue-carrier --implements--> inflection-candidates-are-computable
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality
@@ -1295,6 +1299,12 @@ framework_version: 3.39.0
 - trigger-specification --complements--> derived-index-specification
 - trigger-specification --informs--> membrane-attention-cluster
 - trigger-specification --references--> provenance-specification
+- unattended-cue-carrier-2026-09-12 --references--> review-external-conflict-lifecycle-2026-09-08
+- unattended-cue-carrier-2026-09-12 --implements--> inflection-candidates-are-computable
+- unattended-cue-carrier-2026-09-12 --implements--> closed-loop-operating-state
+- unattended-cue-carrier-2026-09-12 --extends--> change-reconciliation-specification
+- unattended-cue-carrier-2026-09-12 --implements--> consequence-is-recoverable-only-in-retrospect
+- unattended-cue-carrier-2026-09-12 --implements--> partial-coverage-quiets-the-uncovered-steps
 - universal-workflow-methodology --implements--> workflow-state-specification
 - universal-workflow-methodology --references--> a-true-primitive-is-discovered-not-authored
 - universal-workflow-methodology --references--> the-wrong-distribution-channel-validates-clean

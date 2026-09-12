@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-11
-generated: 2026-09-11T09:06:31
-generated_from: HEAD@1a404bd
-coverage: 85
+created: 2026-09-12
+generated: 2026-09-12T18:02:20
+generated_from: HEAD@7c5c211
+coverage: 86
 framework_version: 3.39.0
 ---
 
@@ -62,6 +62,7 @@ framework_version: 3.39.0
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - gates-census-2026-08 (pinned @8f6d92c2b498ce18c2314fd7001c97a2ddcf5ca0)
 - gates-census-ratified-2026-08-28 (pinned @d818697185cdece9e50f8ad98fc93455ae81531c)
+- unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
 ## codex-desktop-session-start-negative-2026-08-14
 - harness-capability-evidence-matrix-2026-08-20 (derived-from)
@@ -225,6 +226,9 @@ framework_version: 3.39.0
 - substrate-review-phase0-disposition-2026-08-20 (derived-from)
 - substrate-review-retrospective-reconciliation-2026-08-20 (derived-from)
 
+## inflection-candidates-are-computable
+- unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
+
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
@@ -281,6 +285,7 @@ framework_version: 3.39.0
 
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)
+- unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
 ## review-independent-operating-model-2026-08-26-codex
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
