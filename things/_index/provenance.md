@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-12
-generated: 2026-09-12T19:04:22
-generated_from: HEAD@5e48421
-coverage: 86
+generated: 2026-09-12T19:09:31
+generated_from: HEAD@ebad3d5
+coverage: 87
 framework_version: 3.39.0
 ---
 
@@ -338,6 +338,9 @@ framework_version: 3.39.0
 
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## unattended-cue-carrier-2026-09-12
+- feels-automatic-is-persistence-of-the-question (derived-from)
 
 ## universal-workflow-methodology
 - derivation-shape-brief-2026-08 (pinned @3af254117c771488898b861a9e9a30ef934c4794)

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-12
-generated: 2026-09-12T19:04:22
-generated_from: HEAD@5e48421
-coverage: 354
+generated: 2026-09-12T19:09:31
+generated_from: HEAD@ebad3d5
+coverage: 356
 framework_version: 3.39.0
 ---
 
@@ -111,6 +111,8 @@ framework_version: 3.39.0
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --supports--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --derived-from--> dispatch-digest-home-2026-08-29
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --informs--> closed-loop-operating-state
+- a-remote-fetched-before-and-not-found-now-is-a-credential-change --informs--> git-workflow-specification
+- a-remote-fetched-before-and-not-found-now-is-a-credential-change --supports--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - a-ruling-triages-more-cheaply-than-a-mechanism --informs--> membrane-attention-cluster
 - a-ruling-triages-more-cheaply-than-a-mechanism --supports--> a-true-primitive-is-discovered-not-authored
 - a-ruling-triages-more-cheaply-than-a-mechanism --supports--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
@@ -417,6 +419,7 @@ framework_version: 3.39.0
 - cue-carrier --implements--> closed-loop-operating-state
 - cue-carrier --extends--> change-reconciliation-specification
 - cue-carrier --implements--> inflection-candidates-are-computable
+- cue-carrier --implements--> feels-automatic-is-persistence-of-the-question
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
@@ -630,6 +633,11 @@ framework_version: 3.39.0
 - external-review-response-2026-08-10 --references--> hook-enforcement-has-three-anchors
 - external-review-response-2026-08-10 --references--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - external-review-response-2026-08-10 --references--> inbound-edges-decide-which-plan-survives-consolidation
+- feels-automatic-is-persistence-of-the-question --derived-from--> unattended-cue-carrier-2026-09-12
+- feels-automatic-is-persistence-of-the-question --supports--> emitted-content-is-read-instructed-content-is-economised
+- feels-automatic-is-persistence-of-the-question --supports--> partial-coverage-quiets-the-uncovered-steps
+- feels-automatic-is-persistence-of-the-question --informs--> closed-loop-operating-state
+- feels-automatic-is-persistence-of-the-question --informs--> operator-seat-and-harness-native-onramp
 - felt-deployment-lands-in-undisclosable-work --references--> llm-driven-systems-manifesto
 - felt-deployment-lands-in-undisclosable-work --complements--> structure-decides-figures-scale-decides-convention
 - field-report-2026-08-13-domain-session --supports--> the-harness-bound-path-is-the-least-tested-path

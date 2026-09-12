@@ -20,6 +20,9 @@ linked_things:
   - id: inflection-candidates-are-computable
     relation: implements
     notes: "The pre-commit advisory asked the question at the boundary; this plan gives the question somewhere to wait."
+  - id: feels-automatic-is-persistence-of-the-question
+    relation: implements
+    notes: "The session-end harvest of the day this plan was built: what the operator wanted forgotten-proof was the question, and this carrier is that principle's first instance."
 ---
 
 # Plan: The Cue Carrier
@@ -129,6 +132,14 @@ is the seeing.
         net (one verdict per accumulated subject); wrong if the answerer
         only looked at the latest edit. The closed-loop cue was left open
         for exactly this reason rather than answered narrowly.
+      · *A pass raises its own tail.* Walking an inflection modifies its
+        dependants — two guides and the review artifact here — and those
+        modifications are themselves reasoned-from candidates, so the seal
+        commit produced three more cues the next session would have listed
+        (raised and answered in ebad3d5). Whether a `reconcile:` seal
+        should cover its own dependant edits by construction is a design
+        question with one sighting; a commit-prefix rule would be a bypass
+        anyone could label, so not built.
       · *The receipt wants an `answered_by`.* Eight verdicts were recorded
         by an agent under delegated authority and say so in prose; a field
         the floor could read would make that attributable without reading
