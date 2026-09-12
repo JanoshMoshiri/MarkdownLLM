@@ -153,7 +153,7 @@ These are the specs the agent loads and reasons with:
 | [session-memory.md](session-memory.md) | Session memory: `type: insight`, graph-keyed liveness, and the session-end extraction ritual. Forward state is the thing graph, surfaced by the generated **orient** view (`mdllm session-start` → "Open loops") — the hand-maintained `continuity.md` is retired (v3.17) |
 | [belief-revision.md](belief-revision.md) | Contradiction tracking: `type: conflict`, relation types, belief revision process |
 | [retrospective.md](retrospective.md) | Periodic quality reflection: `type: retrospective`, when to write, what it produces — including the estate retrospective |
-| [change-reconciliation.md](change-reconciliation.md) | The blast radius of a consequential change — the cue question (asked mechanically at every commit), the Assimilate pass, the Walk |
+| [change-reconciliation.md](change-reconciliation.md) | The blast radius of a consequential change — the cue question (asked mechanically at every commit, and held as a `type: cue` thing until a human answers it), the Assimilate pass, the Walk |
 | [trigger-specification.md](trigger-specification.md) | Declared triggers: conditions the floor evaluates mechanically and conditions the agent judges |
 | [derived-index.md](derived-index.md) | Generated index things — precomputed attention caches, rebuilt never hand-edited |
 | [workflow-state.md](workflow-state.md) | Processes as things: `type: workflow-definition` and `type: workflow-run` |

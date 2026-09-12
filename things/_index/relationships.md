@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-12
-generated: 2026-09-12T19:09:31
-generated_from: HEAD@ebad3d5
-coverage: 356
+generated: 2026-09-12T20:05:08
+generated_from: HEAD@a18600a
+coverage: 358
 framework_version: 3.39.0
 ---
 
@@ -422,6 +422,7 @@ framework_version: 3.39.0
 - cue-carrier --implements--> feels-automatic-is-persistence-of-the-question
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
+- cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
@@ -432,6 +433,7 @@ framework_version: 3.39.0
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-trigger-specification-2026-09-12 --subject--> trigger-specification
 - cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
+- cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality

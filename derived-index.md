@@ -2,7 +2,7 @@
 id: derived-index-specification
 type: specification
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-06-08
 linked_things:
   - id: thing-specification
@@ -48,7 +48,7 @@ fifth — velocity — is deliberately *not* an index: it reads `git log` (alrea
 ground truth), so caching it would add a drift surface for no benefit. See
 `git-workflow.md` → Git Log As Domain Telemetry.
 
-The `relationships` index aggregates **every declared edge, wherever it lives** — not only `linked_things` relations but the singular structural pointers that earn their own field (`parent`, `definition`, modelled on `parent`). A declared edge in a structural field is no less declared than one in `linked_things`; omitting it would leave a reverse read over the index blind to a parent's children and a definition's runs, which is exactly the recall the change-reconciliation Assimilate beat depends on. The rule is general: any future singular load-bearing pointer added to the schema must also be emitted here, or it becomes an unwalked declared edge. See `structural-pointers-need-reverse-edge-indexing`.
+The `relationships` index aggregates **every declared edge, wherever it lives** — not only `linked_things` relations but the singular structural pointers that earn their own field (`parent`, `definition`, and `subject` — a cue's reasoned-from thing — each modelled on `parent`). A declared edge in a structural field is no less declared than one in `linked_things`; omitting it would leave a reverse read over the index blind to a parent's children and a definition's runs, which is exactly the recall the change-reconciliation Assimilate beat depends on. The rule is general: any future singular load-bearing pointer added to the schema must also be emitted here, or it becomes an unwalked declared edge. See `structural-pointers-need-reverse-edge-indexing`.
 
 ## The Drift Problem This Must Not Repeat
 

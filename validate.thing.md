@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 3.4
+version: 3.5
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -65,7 +65,7 @@ The tool enforces, deterministically:
   reference has its declared shape; body and title presence.
 - **Referential (old Level 2):** all ids named by the canonical structural-
   reference registry exist (`linked_things`, `dependencies`, `blocks`, `parent`,
-  `parties`, `definition`, trigger `watch`, `informed_by`); no duplicate
+  `parties`, `definition`, `subject`, trigger `watch`, `informed_by`); no duplicate
   ids; no circular dependencies; bidirectional consistency; orphan detection;
   a terminal-status thing may not depend on unfinished work (terminal deps count
   as resolved); `contradicts` requires a conflict thing listing both parties;
@@ -84,8 +84,8 @@ The tool enforces, deterministically:
   same write); the tool never auto-syncs. Enumerate the in-use set to bootstrap
   or audit the list with `mdllm index <path> rebuild --signal schema`.
 - **Structural-pin resolution (Error):** every commit pin the structural-reference
-  registry declares as *local* — today `informed_by[].commit` — must name a commit
-  that resolves in the owning repository. A pin is a **transcribed** identifier, the
+  registry declares as *local* — today `informed_by[].commit` and a cue's
+  `raised_at` — must name a commit that resolves in the owning repository. A pin is a **transcribed** identifier, the
   one class of field no reader can check by reading: a wrong SHA looks exactly like a
   right one. The whole corpus is resolved by one batched `git cat-file --batch-check`,
   so the check costs one process however many pins there are. `definition_commit` is

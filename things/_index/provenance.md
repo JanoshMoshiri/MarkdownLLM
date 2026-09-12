@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-12
-generated: 2026-09-12T19:09:31
-generated_from: HEAD@ebad3d5
+generated: 2026-09-12T20:05:08
+generated_from: HEAD@a18600a
 coverage: 87
 framework_version: 3.39.0
 ---
@@ -340,6 +340,8 @@ framework_version: 3.39.0
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## unattended-cue-carrier-2026-09-12
+- cue-derived-index-specification-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
+- cue-validate-thing-specification-dark-region-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - feels-automatic-is-persistence-of-the-question (derived-from)
 
 ## universal-workflow-methodology
