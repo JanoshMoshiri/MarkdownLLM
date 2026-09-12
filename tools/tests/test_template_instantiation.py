@@ -155,6 +155,16 @@ relations: [informs, supports, challenges, contradicts]
                 "[version]": FRAMEWORK_VERSION,
             },
         ),
+        "things/template-cue.md": (
+            FRAMEWORK_ROOT / "templates" / "cue.md.template",
+            common | {
+                "[subject-id]": "support-one",
+                "[YYYY-MM-DD]": "2026-08-20",
+                "[thing-id]": "support-one",
+                "[full-commit-sha]": pinned_commit,
+                "[operator | agent | dispatch:<launch-context>]": "agent",
+            },
+        ),
         "things/_index/template-birth-triggers-index.md": (
             FRAMEWORK_ROOT / "templates" / "indexes" / "triggers.md.template",
             common | {

@@ -192,7 +192,13 @@ def test_session_start_structural_work_is_bounded(tmp_path, capsys,
 
     assert len(scans) == 1, f"session-start scanned the corpus {len(scans)}x"
     history_walks = [c for c in spawns if c[:2] == ("git", "log")]
-    assert len(history_walks) <= 3, (
+    # Four fixed walks: the shared things/ history, the gate's attestation
+    # log, the short-sha lookup, and — since the cue carrier — one
+    # `--since`-bounded walk over the corpus for `mdllm cues` (it needs the
+    # sha and the A/M status the shared walk does not carry, and reaches root
+    # specs the things/ walk does not). None scales with the corpus; the
+    # bound exists to catch a walk per thing, not a fixed fourth.
+    assert len(history_walks) <= 4, (
         f"{len(history_walks)} git-log walks: {history_walks}")
     # 20 high-priority things must NOT mean 20+ spawns. The bound is a
     # deliberate constant far below the corpus size and above the exact

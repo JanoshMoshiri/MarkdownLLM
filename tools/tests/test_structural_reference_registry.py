@@ -64,7 +64,10 @@ def test_every_registered_field_feeds_extraction_validation_indexes_and_cues():
         # unknown-id finding for any registered local-reference shape.
         assert not any("unknown id" in f.message for f in validate_level2(corpus)), spec.field
 
-        assert _inbound_counts(corpus)["target"] == 1, spec.field
+        # The registry says whether a field counts toward its target's fan-in;
+        # `subject` (a cue's) deliberately does not, or raising a cue would
+        # make the next modification more likely to raise another.
+        assert _inbound_counts(corpus)["target"] == (1 if spec.cue_relevant else 0), spec.field
         body, _ = build_index_body(corpus, spec.index_signal)
         assert "target" in body and "source" in body, spec.field
 
