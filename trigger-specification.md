@@ -2,7 +2,7 @@
 id: trigger-specification
 type: specification
 status: stable
-version: 2.0
+version: 2.1
 created: 2026-05-29
 linked_things:
   - id: thing-specification
@@ -228,15 +228,17 @@ each sitting beside a dated partner, has a trustworthy attention surface.
 
 Actions are declarative. They tell the agent what kind of response is appropriate — not how to implement it.
 
-| Action | Meaning |
-|--------|---------|
-| `surface` | Bring to the user's attention at next opportunity. "This needs your eyes." |
-| `re_evaluate` | Load this thing at full context and reason about whether it's still correct (status, priority, scope). |
-| `suggest_completion` | Conditions indicate this thing may be done. Propose marking it complete. |
-| `unblock` | A dependency has been satisfied. Update status from `blocked` to the appropriate active state. |
-| `escalate` | Something has been stuck too long or a risk condition exists. Flag prominently. |
-| `cascade` | Check all things downstream of this one (things that depend on it, things it blocks). |
-| `notify` | Push through output route (calendar update, notification, reminder). |
+**Evaluation and action are two layers, and the table says which.** The floor evaluates conditions and *surfaces* what fired — session start emits the fired set and stops; it performs no action. Every action below is then the agent's to carry out inside the domain — reads, reasoning, and status moves on the domain's own things — *except where the row says seat*: an action that leaves the domain through an output route is an external effect, and external effects belong to whoever holds that route's authority (the consequence-permanent rows of `gates-census-ratified-2026-08-28`). A trigger can *declare* `notify`; declaring it grants nothing.
+
+| Action | Meaning | Who acts |
+|--------|---------|----------|
+| `surface` | Bring to the user's attention at next opportunity. "This needs your eyes." | Agent — a read, surfaced in the digest or the reply. |
+| `re_evaluate` | Load this thing at full context and reason about whether it's still correct (status, priority, scope). | Agent. |
+| `suggest_completion` | Conditions indicate this thing may be done. Propose marking it complete. | Agent proposes; the status move is an ordinary write under `post-write:commit`. |
+| `unblock` | A dependency has been satisfied. Update status from `blocked` to the appropriate active state. | Agent — a status move on this domain's own thing. |
+| `escalate` | Something has been stuck too long or a risk condition exists. Flag prominently. | Agent — flags; nothing leaves the domain. |
+| `cascade` | Check all things downstream of this one (things that depend on it, things it blocks). | Agent — reads downstream (`mdllm cascade`). |
+| `notify` | Push through output route (calendar update, notification, reminder). | **Seat.** The push crosses an output route (`interface.md`); the agent may prepare it, and sending waits for the route's authority holder unless that authority is declared standing. A dispatch run files it as an idled irreversible — never sends. |
 
 ## When Triggers Are Evaluated
 
