@@ -118,6 +118,22 @@ def test_answered_cue_is_quiet_until_the_subject_moves_again(tmp_path, capsys):
     assert "Unraised (1)" in out and "`spine`" in out and "1 commit(s)" in out
 
 
+def test_cue_raised_in_the_same_commit_as_the_change_covers_it(tmp_path, capsys):
+    # The dispatch rule: raise the cue IN the modifying commit. That commit's
+    # sha does not exist yet, so the cue pins the parent — and the commit that
+    # adds the cue file is covered by construction.
+    root = _seed(tmp_path)
+    parent = _head(root)
+    p = root / "things" / "spine.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\nrevised\n", encoding="utf-8")
+    write(root, "things/cue-spine.md", _cue("spine", parent))
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "revise spine and raise its cue together")
+    rc, out = _run_cues(root, capsys)
+    assert rc == 0
+    assert "Unanswered (1)" in out and "Unraised" not in out
+
+
 def test_since_override_narrows_the_walk(tmp_path, capsys):
     import datetime as dt
     root = _seed(tmp_path)

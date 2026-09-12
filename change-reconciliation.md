@@ -100,9 +100,11 @@ digest until a human answers it**:
   reference, validated and reverse-indexed, and deliberately *not* counted
   toward the subject's fan-in, so raising a cue cannot make the next
   modification more likely to raise another. **`raised_at`** pins the commit
-  that modified it (a local pin the structural-pin check resolves).
-  **`raised_by`** says who raised it: the operator, an agent, or a dispatch
-  launch.
+  that modified it (a local pin the structural-pin check resolves) — or, when
+  the cue is raised *in* the modifying commit, the commit that change lands on
+  top of, since the modifying commit's own id does not exist yet; the commit
+  that adds the cue file is covered by construction. **`raised_by`** says who
+  raised it: the operator, an agent, or a dispatch launch.
 - **`status: open`** until a human records **`verdict: inflection |
   not-inflection`** with a **`verdict_reason`**. The pair is the *authority
   receipt*: saying no to a named question is a decision, where not being asked

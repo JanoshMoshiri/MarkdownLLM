@@ -357,7 +357,7 @@ def _modifications_since(root: Path, since: dt.date):
         return None
     if r.returncode != 0 or r.stdout is None:
         return None
-    walk: list[tuple[str, dt.date, list[str]]] = []
+    walk: list[tuple[str, dt.date, list[str], list[str]]] = []
     for record in r.stdout.split("\x1e"):
         header, _, body = record.partition("\n")
         if "\x00" not in header:
@@ -367,14 +367,17 @@ def _modifications_since(root: Path, since: dt.date):
             when = dt.date.fromisoformat(day.strip())
         except ValueError:
             continue
-        paths: list[str] = []
+        modified: list[str] = []
+        added: list[str] = []
         for line in body.splitlines():
             if "\t" not in line:
                 continue
             state, _, rest = line.partition("\t")
             if state.startswith("M"):
-                paths.append(rest)
-        walk.append((sha.strip().lower(), when, paths))
+                modified.append(rest)
+            elif state.startswith("A"):
+                added.append(rest)  # a cue's birth commit — see _covers
+        walk.append((sha.strip().lower(), when, modified, added))
     return walk
 
 
@@ -412,6 +415,10 @@ def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
             created = dt.date.fromisoformat(created[:10])
         elif not isinstance(created, dt.date):
             created = None
+        try:
+            rel_path = t.path.resolve().relative_to(root).as_posix()
+        except ValueError:
+            rel_path = ""
         entry = {
             "id": t.id,
             "subject": str(subj) if subj else "",
@@ -421,6 +428,7 @@ def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
                           else ""),
             "created": created,
             "raised_by": str(t.meta.get("raised_by") or ""),
+            "path": rel_path,
         }
         if entry["status"] == "open":
             open_cues.append(entry)
@@ -429,16 +437,24 @@ def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
 
     unraised: list[dict] = []
     if walk:
-        order = {sha: i for i, (sha, _, _) in enumerate(walk)}
+        order = {sha: i for i, (sha, _, _, _) in enumerate(walk)}
+        # A cue raised IN the same commit as the change it is for cannot pin
+        # that commit (it does not exist yet); it pins the parent, and the
+        # commit that added the cue file is covered by construction.
+        birth: dict[str, int] = {}
+        for i, (_, _, _, added) in enumerate(walk):
+            for rel in added:
+                birth.setdefault(rel, i)
         for cues in by_subject.values():
             for c in cues:
                 pin = c["raised_at"]
                 c["pos"] = (next((order[s] for s in order if s.startswith(pin)), None)
                             if pin else None)
+                c["birth"] = birth.get(c["path"])
         by_path = {t.path.resolve(): t for t in corpus.things if t.id}
         inbound: Counter | None = None
         touched: dict[str, dict] = {}
-        for i, (sha, day, paths) in enumerate(walk):
+        for i, (sha, day, paths, _) in enumerate(walk):
             for rel in paths:
                 t = by_path.get((root / rel).resolve())
                 if t is None or str(t.meta.get("type")) == "cue":
@@ -467,8 +483,11 @@ def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
 
 def _covers(cue: dict, position: int, day: dt.date) -> bool:
     """Does this cue cover a modification at `position` (newest-first) on `day`?
-    At or before its `raised_at` commit when that commit is in the walk;
-    otherwise at or before the cue's own `created` date."""
+    In the commit that added the cue itself (a same-commit raise); else at or
+    before its `raised_at` commit when that commit is in the walk; else at or
+    before the cue's own `created` date."""
+    if cue.get("birth") is not None and position == cue["birth"]:
+        return True
     pos = cue.get("pos")
     if pos is not None:
         return position >= pos

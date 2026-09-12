@@ -2,7 +2,7 @@
 id: review-external-conflict-lifecycle-2026-09-08
 type: artifact
 status: stable
-version: 1.0
+version: 1.1
 created: 2026-09-08
 origin: external
 verified: false
@@ -105,7 +105,7 @@ queues for the operator. What exists today toward option 3: the pre-commit
 `candidates` leg already classifies every staged thing and prints the cue —
 advisory, exit 0, to a terminal nobody reads at 3am. What does not exist: a
 persisted place an unanswered cue goes. With scan 4 now wired, option 2's net
-at least fires each period. Recorded here, not decided.
+at least fires each period. Recorded here, not decided. **Ruled 2026-09-12** (`unattended-cue-carrier-2026-09-12`): option 3, with option 2's net beneath it. Built the same day (`cue-carrier`): `type: cue` persists the question with `subject`, `raised_at` and a human `verdict` + `verdict_reason`; `mdllm cues` computes what is unraised; the session-start digest names both halves every session until answered; the dispatch prompt raises and never answers. The persisted place this finding asked for exists.
 
 **Structural observation, recorded.** `retrospective.md` is `stable`;
 `change-reconciliation.md` is `draft`. The draft carried the tighter reasoning

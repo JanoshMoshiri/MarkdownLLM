@@ -2,7 +2,7 @@
 id: estate-mechanics-guide
 type: guide
 status: evolving
-version: 1.5
+version: 1.6
 created: 2026-08-04
 linked_things:
   - id: git-workflow-specification
@@ -95,7 +95,9 @@ flowchart TD
 
 The mental model: the left rail is mechanical, the right rail is human.
 `candidates` makes the cue *question* unavoidable for all four candidate
-classes while the
+classes, and `cues` keeps it unavoidable — a modified reasoned-from thing
+stays in every session-start digest until a `type: cue` thing carries a human
+verdict — while the
 cue *verdict* stays the driver's. Saying no to a named question is a
 decision; not being asked was drift. Autopush is transport of
 floor-validated state — bounded, never forcing, and enabled only by literal
@@ -218,7 +220,7 @@ misses falls to the net beneath.
 
 | Radius | The floor — asks · gathers · transports | The human — decides · routes |
 |---|---|---|
-| **Commit** | `candidates` asks the cue · `autopush` transports | cue verdict · route rejected pushes |
+| **Commit** | `candidates` asks the cue · `cues` holds it until answered · `autopush` transports | cue verdict (recorded on the cue thing) · route rejected pushes |
 | **Membrane** | `estate-sync` freshens · `imports-check` detects drift | exposure call · verified flip |
 | **Epoch** | cadence clocks (60d domain / 30d estate) · dated triggers | retrospectives · estate rulings, routed home via porch |
 | **Release** | release-walk Assimilate, estate-wide | walk judgement · the deliberate push |

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-12
-generated: 2026-09-12T18:40:38
-generated_from: HEAD@e2bad9f
-coverage: 342
+generated: 2026-09-12T18:59:12
+generated_from: HEAD@1da4bca
+coverage: 351
 framework_version: 3.39.0
 ---
 
@@ -417,6 +417,15 @@ framework_version: 3.39.0
 - cue-carrier --implements--> closed-loop-operating-state
 - cue-carrier --extends--> change-reconciliation-specification
 - cue-carrier --implements--> inflection-candidates-are-computable
+- cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
+- cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
+- cue-framework-map-2026-09-12 --subject--> framework-map
+- cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
+- cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
+- cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
+- cue-thing-specification-2026-09-12 --subject--> thing-specification
+- cue-trigger-specification-2026-09-12 --subject--> trigger-specification
+- cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality

@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 1.9
+version: 2.0
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -333,6 +333,15 @@ Two honesty clauses, so the picture cannot be over-read:
       not yet exist for (3): a persisted place an unanswered cue goes — today
       it is stdout at 3am. A Phase 3 row because the queue is the seat's; the
       ruling is the operator's.*
+      *Ruled v2.0 (2026-09-12, `unattended-cue-carrier-2026-09-12`): (3) with
+      (2)'s net, as recommended. The persisted place now exists — `type: cue`,
+      `mdllm cues`, and a session-start line that re-lists every open or unraised
+      cue until a human answers (`cue-carrier`). This is the first seat-queue
+      item with a floor-readable carrier; the queue's *assembly* — one view over
+      cues, conflicts, options, irreversibles and breakage — is still this
+      phase's open gap, and the cue is the template the others will copy or
+      refute. First live reading on the root: 36 unraised since the 27 August
+      retrospective.*
 - [ ] **Phase 4 — One full cycle, hands-off, at one radius.** *Pilot ruled
       2026-08-28 (`gates-census-ratified-2026-08-28`): `regulated-qms`, on the
       stated criterion — declared, gap-free, two real runs behind it, one

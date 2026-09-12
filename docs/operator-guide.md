@@ -2,7 +2,7 @@
 id: operator-guide
 type: guide
 status: draft
-version: 2.0
+version: 2.1
 created: 2026-06-11
 linked_things:
   - id: domain-specification-guide
@@ -222,6 +222,7 @@ to invoke directly.
 | `touchpoints <id> [path]` | The Assimilate beat: one thing's declared inbound set + literal body references — "what did I just put at risk?" | Before changing a load-bearing thing; during an inflection walk |
 | `autopush [path]` | The post-commit publication leg: pushes a validated commit only when the repo literally declares `git.autopush: true`; false, absent, or malformed is off. Bounded, never forces | Run by the post-commit hook — invoke by hand only when diagnosing publication debt |
 | `candidates [path]` | The cue advisory's derivation: which things are reconciliation cue candidates and why | When a pre-commit cue line surprises you |
+| `cues [path] [--since DATE]` | The cue question, persisted: open `type: cue` things awaiting your verdict, plus reasoned-from things modified since the last retrospective that no cue covers. The same line is in every session-start digest until each is answered | When the digest's *Reconciliation cues* line is long and you want the full list; before a retrospective (it is scan 4's work list) |
 | `cascade <id> [path]` | Mirror of touchpoints: the declared downstream set a completion unblocks — "what did I just unblock?" | After completing a thing with dependants |
 | `eval [path] --fixture <f>` | Asserts a fixture's contracted end state against committed domain state | Regression check after framework or skill changes |
 | `eval --run [--model M --trials N --bare --report]` | Seeds an isolated workspace, runs a headless agent, scores trials | Running the framework-vs-bare experiment |

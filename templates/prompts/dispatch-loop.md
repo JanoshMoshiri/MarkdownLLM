@@ -120,8 +120,10 @@ schedule — the repos do. You make no rulings — the seats do.
    you, and `mdllm cues` will keep telling every session after you — raise
    the cue in the same commit: a `type: cue` thing from
    `templates/cue.md.template`, `status: open`, `subject` naming the thing,
-   `raised_at` from `git rev-parse HEAD` of the modifying commit (never
-   transcribed), `raised_by` naming this launch. Then file it in the digest
+   `raised_at` from `git rev-parse HEAD` at the moment you raise it (never
+   transcribed — this is the commit your change lands on top of; the commit
+   that carries both the change and the cue is covered by construction),
+   `raised_by` naming this launch. Then file it in the digest
    as a seat item. **Never answer it**: no `verdict`, no reconciliation pass
    on your own initiative, no widening of scope to "just walk it". The
    verdict is the operator's receipt

@@ -243,9 +243,11 @@ CORE_FIELDS = {
     # which the tool only records).
     "disposition", "disposition_reason",
     # the cue carrier (change-reconciliation.md → The Cue Persists) — the
-    # receipt fields on a `type: cue` thing; `subject` and `raised_at` are
-    # supplied by the reference and pin registries below
-    "raised_by", "verdict", "verdict_reason",
+    # receipt fields on a `type: cue` thing. `subject` arrives through the
+    # reference registry below; `raised_at` is a commit pin, and the pin
+    # registry is not folded into CORE_FIELDS (`definition_commit` is listed
+    # here by hand for the same reason), so it is named here too.
+    "raised_at", "raised_by", "verdict", "verdict_reason",
     # cross-domain interface (mcp-serve exposure — docs/plans/mcp-domain-server.md)
     "exposed",
     # generated-artifact frontmatter (index / kernel things)

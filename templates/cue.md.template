@@ -4,7 +4,7 @@ type: cue
 status: open                            # open | answered — answered only on a human's verdict
 created: [ISO-date]
 subject: [thing-id]                     # the reasoned-from thing whose modification raised the question
-raised_at: [full-commit-sha]            # the commit that modified it — read from `git rev-parse HEAD`, never transcribed
+raised_at: [full-commit-sha]            # the commit that modified it — `git rev-parse HEAD`, never transcribed; raising IN the modifying commit pins its parent (that commit is covered by construction)
 raised_by: [operator | agent | dispatch:<launch-context>]
 verdict:                                # inflection | not-inflection — populate when answered; a run never does
 verdict_reason:                         # the receipt: why this verdict — required when answered
