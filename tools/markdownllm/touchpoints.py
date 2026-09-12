@@ -234,6 +234,8 @@ def cmd_candidates(args) -> int:
             continue
         if t is None or not t.id:
             continue
+        if str(t.meta.get("type")) == "cue":
+            continue  # a cue IS the answer to a cue question; asking one of it recurses
         semantic_addition = state == "M" and (old is None or not old.id)
         identity_change = bool(
             state == "M" and old and old.id and old.id != t.id)

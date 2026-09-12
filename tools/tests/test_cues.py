@@ -151,6 +151,19 @@ def test_since_must_be_a_date(tmp_path, capsys):
     assert rc == 2 and "YYYY-MM-DD" in out
 
 
+def test_candidates_asks_nothing_of_a_new_cue_thing(tmp_path, capsys):
+    # A cue is the answer to a cue question; the boundary advisory must not
+    # ask "is this new thing a duplicate?" of it, or every raise recurses.
+    from markdownllm.touchpoints import cmd_candidates
+    root = _seed(tmp_path)
+    sha = _modify(root, "things/spine.md", "revise spine")
+    write(root, "things/cue-spine.md", _cue("spine", sha))
+    _sync_git(root, "add", "-A")
+    rc = cmd_candidates(argparse.Namespace(path=str(root)))
+    out = capsys.readouterr().out
+    assert rc == 0 and "cue-spine" not in out
+
+
 # --------------------------------------------------------- the receipt's shape
 
 def test_answered_cue_needs_verdict_and_reason(tmp_path):
