@@ -65,8 +65,10 @@ def test_precommit_blocks_on_staged_validation_error_with_hook_message(
     rc = cmd_precommit(Namespace(path=str(root)))
     out = capsys.readouterr().out
     assert rc == 1
-    assert ("mdllm: validation Errors — commit blocked. Fix or run with "
-            "--no-verify (discouraged).") in out
+    assert ("mdllm: validation Errors — commit blocked. Fix the cause; the "
+            "floor is not bypassed.") in out
+    # The contract says never bypass the hook; the hook must not say otherwise.
+    assert "--no-verify" not in out
 
 
 def test_precommit_repaired_worktree_cannot_excuse_invalid_staged(

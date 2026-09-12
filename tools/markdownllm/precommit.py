@@ -39,13 +39,17 @@ from .repository_view import (
 _LEGS: tuple[tuple[str, tuple[str, ...], bool, str], ...] = (
     ("boundary", ("--quiet",), True,
      "mdllm: staged content crosses the disclosure boundary — commit blocked."),
+    # The block messages name the remedy and nothing else. Until 2026-09-12
+    # both offered `--no-verify (discouraged)` — the one surface a blocked
+    # author reads, contradicting every spec's "never bypass the hook" at
+    # the exact moment the contract matters (external review, finding 6).
     ("validate", ("--quiet", "--view", "index"), True,
-     "mdllm: validation Errors — commit blocked. Fix or run with "
-     "--no-verify (discouraged)."),
+     "mdllm: validation Errors — commit blocked. Fix the cause; the floor "
+     "is not bypassed."),
     ("coherence", ("--quiet", "--view", "index"), True,
      "mdllm: coherence Errors — a generated artifact (kernel/index) or the "
-     "spec catalog is stale. Regenerate and re-commit, or --no-verify "
-     "(discouraged)."),
+     "spec catalog is stale. Regenerate and re-commit; the floor is not "
+     "bypassed."),
     ("candidates", ("--view", "index"), False, ""),
 )
 
