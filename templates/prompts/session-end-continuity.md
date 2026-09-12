@@ -2,7 +2,7 @@
 id: session-end-continuity
 type: prompt
 status: evolving
-version: 1.4
+version: 1.5
 created: 2026-05-28
 inputs:
   - name: session-conversation
@@ -22,6 +22,8 @@ outputs:
     description: "type: conflict things created in things/conflicts/ (if contradictions found)"
   - name: conflict-dispositions
     description: "Open conflicts the brake ruled on, linked from the work that will resolve them, or deliberately held with a stated reason"
+  - name: cue-dispositions
+    description: "Reconciliation cues answered (verdict + reason on the cue thing), raised for this session's own reasoned-from modifications, or left open for the operator — never answered by an unattended session"
   - name: updated-open-loops
     description: "Open-loop things created or moved to a terminal status this session"
   - name: publication-debt-report
@@ -35,6 +37,9 @@ linked_things:
     relation: implements
   - id: belief-revision-specification
     relation: implements
+  - id: change-reconciliation-specification
+    relation: implements
+    notes: "Step 3 reads the cue carrier: answer what this session can, raise what it owes, leave the rest open for the operator"
 ---
 
 # Session-End Continuity
@@ -96,7 +101,7 @@ linked_things:
 ---
 ```
 
-### 3. Disposition The Standing Insights And Open Conflicts (the brake)
+### 3. Disposition The Standing Insights, Open Conflicts And Open Cues (the brake)
 
 Capture (steps 2 and 4) grows the insight and conflict populations every session;
 this step prunes them, so capture and reckoning stay in balance. Conflicts were the
@@ -123,9 +128,17 @@ insight-disposition and conflict-disposition Info finding** the floor surfaces:
   retrospective's conditions-met pass re-reads that reason).
 - *"conflict marked keep-active but has no `disposition_reason`"* — add the reason or
   rule on it.
+- **Reconciliation cues** — the session-start digest's line, or `mdllm cues <domain>`
+  (`change-reconciliation.md` → The Cue Persists). For each: **answer** it if this
+  session can (`verdict: inflection | not-inflection` + `verdict_reason`,
+  `status: answered`; an inflection runs the four beats and seals them with a
+  `reconcile:` commit), **raise** a cue for any reasoned-from thing this session
+  modified that no cue covers (`templates/cue.md.template`, `raised_by` set, `raised_at`
+  from `git rev-parse`), or **leave it open** — the digest re-lists it next session. An
+  unattended session raises and never answers: the verdict is the operator's receipt.
 
 This is a **forcing function, not a corpus sweep**: the floor already lists exactly the
-insights and conflicts that need a decision, so none can quietly go dark. The deeper
+insights, conflicts and cues that need a decision, so none can quietly go dark. The deeper
 period-scoped work (composition/consolidation, the full conflict scan and whole-set
 triage, schema scans) stays the retrospective's.
 

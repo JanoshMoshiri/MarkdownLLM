@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-12
-generated: 2026-09-12T18:27:08
-generated_from: HEAD@9760931
+generated: 2026-09-12T18:40:38
+generated_from: HEAD@e2bad9f
 coverage: 342
 framework_version: 3.39.0
 ---
@@ -223,6 +223,8 @@ framework_version: 3.39.0
 - boundary-respect-was-interpretation-not-enforcement --supports--> phase-3-run-domain-task-reverted
 - boundary-respect-was-interpretation-not-enforcement --challenges--> llm-driven-systems-manifesto
 - change-reconciliation-specification --extends--> thing-specification
+- change-reconciliation-specification --references--> unattended-cue-carrier-2026-09-12
+- change-reconciliation-specification --implements--> inflection-candidates-are-computable
 - change-reconciliation-specification --complements--> belief-revision-specification
 - change-reconciliation-specification --complements--> provenance-specification
 - change-reconciliation-specification --complements--> derived-index-specification

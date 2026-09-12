@@ -2,11 +2,17 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-06-13
 linked_things:
   - id: thing-specification
     relation: extends
+  - id: unattended-cue-carrier-2026-09-12
+    relation: references
+    notes: "The ruling behind The Cue Persists: any session may raise a cue; only a human answers one"
+  - id: inflection-candidates-are-computable
+    relation: implements
+    notes: "The cue question is mechanical and the verdict is human — the carrier is that split, persisted"
   - id: belief-revision-specification
     relation: complements
   - id: provenance-specification
@@ -74,6 +80,62 @@ many dependents — but the decision that a change is consequential enough to
 reconcile belongs to the person defining the domain. Automating the trigger
 would substitute the agent's pattern-following for the expert's knowing, which
 inverts the framework's purpose.
+
+### The Cue Persists — The Carrier
+
+The cue *verdict* is the driver's; the cue *question* is not — it is a
+mechanical predicate (`inflection-candidates-are-computable`), and the floor
+asks it at every commit through the pre-commit `candidates` advisory. Until
+2026-09-12 that was the whole mechanism, and it had a hole the record had
+already felt: the question was printed to a terminal and gone. A human who did
+not act on it at that moment had to *remember* it, and an unattended session
+had nobody to print it to. Both nets — the change-time cue and the
+retrospective beneath it — were observed down together in August 2026.
+
+The cue now **persists as a thing** (`type: cue`, reserved;
+`templates/cue.md.template`), and the question **waits in the session-start
+digest until a human answers it**:
+
+- **`subject`** names the reasoned-from thing that was modified — a structural
+  reference, validated and reverse-indexed, and deliberately *not* counted
+  toward the subject's fan-in, so raising a cue cannot make the next
+  modification more likely to raise another. **`raised_at`** pins the commit
+  that modified it (a local pin the structural-pin check resolves).
+  **`raised_by`** says who raised it: the operator, an agent, or a dispatch
+  launch.
+- **`status: open`** until a human records **`verdict: inflection |
+  not-inflection`** with a **`verdict_reason`**. The pair is the *authority
+  receipt*: saying no to a named question is a decision, where not being asked
+  was drift. The floor checks the receipt's shape — an answered cue without a
+  verdict and a reason is an Error — and never supplies the verdict.
+- **The floor computes what is missing.** `mdllm cues` walks the commit stream
+  since the newest retrospective (thirty days when none exists), keeps
+  modifications of reasoned-from things — the same predicate `candidates`
+  applies, so the two cannot disagree — and subtracts what a cue already
+  covers (a cue covers its subject at and before its `raised_at` commit). What
+  remains is **unraised**; open cue things are **unanswered**. The
+  session-start digest emits both, every session, under one heading. Nothing
+  here depends on anyone's memory.
+- **`verdict: inflection`** means the four beats below run and a `reconcile:`
+  commit seals them; the cue's body names what was walked.
+  **`verdict: not-inflection`** means the dependants hold as written, and the
+  reason says why.
+
+**Who raises, who answers — the unattended rule.** Any session may *raise* a
+cue; only a human *answers* one. An attended session raises it at the moment
+`candidates` asks. An unattended run — a dispatch tick, a scheduled session —
+that modifies a reasoned-from thing raises the cue as part of its own commit,
+files it in its digest as a seat-queue item, and stops there: it does not run
+the pass on its own initiative and does not widen its scope to reconcile.
+This is the ruling of `unattended-cue-carrier-2026-09-12` (option 3 of the
+2026-09-08 review's finding 5), with option 2 as the net beneath: whatever is
+still open at retrospective cadence is answered by scan 4 (`retrospective.md`).
+A cue missed at change time is a cue answered late, never a cue lost.
+
+What this does not change: the Cue verdict stays the driver's, the pass still
+runs only after the human "go", and the retrospective remains the cost of
+reconciliation skipped, not a licence to skip it. What it changes is where the
+question lives while it waits.
 
 ### External Inflections — The Inbound Edge
 
@@ -246,7 +308,11 @@ thereafter. The second is **recurring maintenance**: because the Cue is human
 declaring the inflection, and those changes land un-reconciled. The change-time
 net cannot catch what was never handed to it, so the same backward pass runs
 periodically — bound to the `retrospective` hook (`retrospective.md` →
-Reflexive Scans At Retrospective) — as the net beneath the net.
+Reflexive Scans At Retrospective) — as the net beneath the net. The carrier
+makes that net's contents explicit: every cue still `open`, and every unraised
+modification `mdllm cues` lists since the last retrospective, is this pass's
+work list — answered here, each with its verdict recorded, so the period closes
+with no question outstanding.
 
 The two uses differ only in scope and cadence, not in kind: both freeze a
 baseline, reconstruct the delta from history, walk the affected set, and seal.
@@ -263,6 +329,8 @@ The split follows the framework's standard division of labour:
 | The declared affected set is complete | Deterministic floor | `mdllm touchpoints <id>` (live), over the same edges the `relationships` + `provenance` indexes hold (`derived-index.md`, `provenance.md`) |
 | Prose references the indexes miss | Deterministic floor (textual) | `mdllm touchpoints` literal tier + corpus grep for the thing's canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
+| The cue question waits until it is answered | Deterministic floor | `mdllm cues` — open `type: cue` things plus reasoned-from modifications since the newest retrospective that no cue covers; the same line in every session-start digest (*The Cue Persists*) |
+| The answer carries a receipt | Floor (shape) + **the human** (verdict) | `type: cue` — `verdict` from the two-value set and a `verdict_reason`; Error without them. The verdict itself is never mechanised |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
 | Does each touch point still hold? | **Agent (semantic)** | `validate.thing.md` Layer 2 — the Walk |
 | Is this change an inflection at all? | **The human driver** | judgement; not mechanisable |
@@ -297,7 +365,8 @@ and path-sensitive references remain honest. The cue *verdict* remains the
 driver's, and `touchpoints` remains invoked-never-hooked; what the floor
 guarantees is that the truthful question existed at the exact candidate
 boundary. Saying no to a named question is a decision, where not being asked was
-drift.
+drift. The question now also persists (*The Cue Persists*, above): the boundary
+advisory is the moment it is asked; the carrier is where it waits.
 
 ## Relationship To Other Specs
 

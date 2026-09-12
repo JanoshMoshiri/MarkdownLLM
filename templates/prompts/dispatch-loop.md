@@ -2,7 +2,7 @@
 id: dispatch-loop
 type: prompt
 status: evolving
-version: 1.3
+version: 1.4
 created: 2026-08-27
 dispatch_guards:
   depth_limit: 1
@@ -24,7 +24,7 @@ outputs:
   - name: ritual-outputs
     description: "Whatever the invoked rituals commit, each to its owning repo under that repo's own contract."
   - name: seat-queue-items
-    description: "Conflicts, option briefs, and approval requests filed for the operator — never resolved by this session."
+    description: "Conflicts, option briefs, approval requests, and reconciliation cues filed for the operator — never resolved or answered by this session."
   - name: dispatch-digest
     description: "The mandatory closing report, committed as a thing into the worked repo (never the framework root — the host cannot push it, so a root digest is invisible to the operator). Opened before the work as the run's advisory claim, closed after it. Emitted even when everything is empty, because silence must be a report, not an absence."
 bound_to:
@@ -114,6 +114,19 @@ schedule — the repos do. You make no rulings — the seats do.
    sets, anything irreversible, anything ambiguous across a boundary —
    are filed and queued for the operator, never resolved. The four seats
    are: options, ambiguity, irreversibles, breakage.
+
+   **A cue is seat-shaped, and you raise it yourself.** If a ritual you run
+   modifies a reasoned-from thing — the pre-commit `candidates` leg tells
+   you, and `mdllm cues` will keep telling every session after you — raise
+   the cue in the same commit: a `type: cue` thing from
+   `templates/cue.md.template`, `status: open`, `subject` naming the thing,
+   `raised_at` from `git rev-parse HEAD` of the modifying commit (never
+   transcribed), `raised_by` naming this launch. Then file it in the digest
+   as a seat item. **Never answer it**: no `verdict`, no reconciliation pass
+   on your own initiative, no widening of scope to "just walk it". The
+   verdict is the operator's receipt
+   (`unattended-cue-carrier-2026-09-12`); anything still open at
+   retrospective cadence is answered there.
 7. **Never widen yourself.** Depth limit 1: you do not launch sessions, do
    not install or modify schedules, hooks, or permissions, do not arm or
    edit triggers except as a ritual you are running legitimately writes

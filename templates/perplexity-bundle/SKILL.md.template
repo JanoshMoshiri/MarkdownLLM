@@ -88,8 +88,9 @@ The assembly output is not a log to skim — it contains, per domain:
   to the user in plain words.
 
 Then orient: relay the per-domain orientation in plain language, leading with
-anything time-sensitive (deadlines and fired triggers), then open conflicts,
-then open loops and version state.
+anything time-sensitive (deadlines and fired triggers), then open conflicts and
+reconciliation cues (each waits for a human verdict), then open loops and
+version state.
 
 ## Step 4 — Work, then close every authorised commit
 

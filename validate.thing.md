@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 3.3
+version: 3.4
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -161,6 +161,7 @@ disagreement, the tool wins):
 | `decision` | `made`, `superseded` |
 | `workflow-definition` | `draft`, `evolving`, `stable`, `deprecated` |
 | `workflow-run` | `active`, `paused`, `completed`, `abandoned` |
+| `cue` | `open`, `answered` — answered requires `verdict: inflection \| not-inflection` and a `verdict_reason` (Error); `subject` must resolve; `raised_at` is a local commit pin |
 | `index` | `live`, `stale` |
 
 ### Severity Semantics (unchanged)

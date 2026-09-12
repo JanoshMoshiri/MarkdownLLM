@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.22
+version: 1.23
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -597,7 +597,8 @@ optional. Substrate reconciliation, 2026-08-09.)*
 through an explicitly-invoked **`orient`** bound prompt — session-end's
 symmetry — invoked by the operator or by the agent when intent first
 touches domain state. The digest absorbed the computable cores (velocity
-trend, stall lines, fired triggers, self-answering cues), and five-run
+trend, stall lines, fired triggers, self-answering cues, and — since the cue
+carrier — the reconciliation cues still waiting for a human verdict), and five-run
 evidence showed the un-pulled judgement residue does not run at t=0 on any
 model tier while partial mechanisation quiets what remains. Scaffolded
 domains inherit the re-homing through the versioned managed-block

@@ -14,8 +14,12 @@ when *you* judge the session worth it, never automatically. Follow
    dismiss, consolidate, link from live work, or mark `disposition: keep-active`
    + a reason; conflicts: rule (superseded / both-valid / dismissed → `status:
    resolved`), link from the work that will resolve it, or mark `disposition:
-   keep-active` + a reason naming what would resolve it. Capture (steps 1 and 3)
-   grows both populations; this prunes them, so they stay balanced.
+   keep-active` + a reason naming what would resolve it; **cues** (the digest's
+   *Reconciliation cues* line, or `mdllm cues .`): answer what this session can
+   (`verdict` + `verdict_reason`, `status: answered`), raise one for any
+   reasoned-from thing you modified that no cue covers, leave the rest open —
+   an unattended session never answers. Capture (steps 1 and 3) grows these
+   populations; this prunes them, so they stay balanced.
 3. Detect contradictions introduced this session → create `type: conflict` things.
 4. Manage **open-loop things** — create/update a `plan` or work thing for new forward
    intent, move resolved ones to a terminal status (orient reads them; `continuity.md`

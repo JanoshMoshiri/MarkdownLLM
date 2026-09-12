@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -190,7 +190,7 @@ discussed but never written.
 
 For each insight worth preserving, create a `type: insight` thing in `things/insights/`.
 
-### Step 3: Disposition The Standing Insights And Open Conflicts (the brake)
+### Step 3: Disposition The Standing Insights, Open Conflicts And Open Cues (the brake)
 
 Steps 2 and 4 grow the insight and conflict populations every session; this step
 prunes them, so the two stay in balance — capture is paired with reckoning, and
@@ -199,9 +199,10 @@ counterpart to the retrospective's deeper triage beats (`Insight Lifecycle Manag
 below; `retrospective.md` → What A Retrospective Produces, items 2 and 3).
 
 Run `python {framework_root}/tools/mdllm.py validate .` and act on **every
-insight-disposition and conflict-disposition Info finding** the floor surfaces — it
-lists exactly the insights and conflicts that need a decision, so none can quietly go
-dark:
+insight-disposition and conflict-disposition Info finding** the floor surfaces, and on
+the session-start digest's **Reconciliation cues** line (`mdllm cues .`) — together
+they list exactly the insights, conflicts and cues that need a decision, so none can
+quietly go dark:
 - *"active insight with no inbound edge from a live thing"* — force a disposition:
   **promote** (populate `promoted_to`), **dismiss**, **consolidate** a genuine duplicate
   into a survivor, **link** it from live work, or mark **`disposition: keep-active`** with
@@ -216,6 +217,13 @@ dark:
   a live edge (`belief-revision.md` → Who Reads An Open Conflict).
 - *"conflict marked keep-active but has no `disposition_reason`"* — add the reason or
   rule on it.
+- *Reconciliation cues* — open or unraised (`change-reconciliation.md` → The Cue
+  Persists): **answer** each one the session can (`verdict: inflection |
+  not-inflection` + `verdict_reason`, `status: answered`; an inflection runs the pass
+  and seals it), **raise** a cue for any reasoned-from modification this session made
+  that is still unraised (`templates/cue.md.template`, `raised_by` set), and leave the
+  rest open — the digest re-lists them next session. An unattended session raises and
+  never answers; the operator's verdict is the receipt.
 
 This is a forcing function, not a corpus sweep: the deeper composition/consolidation,
 the full conflict scan and whole-set triage, and the schema scans stay the

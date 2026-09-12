@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.22
+version: 2.23
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -24,11 +24,11 @@ linked_things:
 
 **Required fields:** `id` (kebab-case, stable, unique), `type`, `status`, `created` (ISO 8601).
 
-**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, structural references, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). The tool's structural-reference registry is the authority for reference shape and behaviour across validation, reverse indexes, reconciliation cues, and egress; its current public fields include `parent`, `linked_things`, `dependencies`, `blocks`, `parties`, `definition`, trigger `watch`, and `informed_by`. Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; the commit is a full SHA and all three fields are required or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false; on egress the floor strips structural references *and the flag itself* — exposure marks the producer's face, and a consumer landing the render verbatim must not re-export by copy). Emergent fields: add only when they serve reasoning.
+**Recommended:** `due_date`, `priority` (low/medium/high/critical), `tags[]`, structural references, `confidence` (high/medium/low; default high), `origin` (stated/inferred/synthesised/external; default stated), `verified` (external things only). The tool's structural-reference registry is the authority for reference shape and behaviour across validation, reverse indexes, reconciliation cues, and egress; its current public fields include `parent`, `linked_things`, `dependencies`, `blocks`, `parties`, `definition`, `subject` (a cue's reasoned-from thing; not counted toward fan-in), trigger `watch`, and `informed_by`. Cross-domain: `source_domain`+`source_id`+`source_commit` (the reference triple pinning a cross-domain import; the commit is a full SHA and all three fields are required or the import is uncheckable) · `exposed` (opt-in membership of the domain's served face; default false; on egress the floor strips structural references *and the flag itself* — exposure marks the producer's face, and a consumer landing the render verbatim must not re-export by copy). Emergent fields: add only when they serve reasoning.
 
-**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned. A type may also declare `terminal_statuses` — which of its own statuses mean *settled*; the declaration replaces the universal terminal set for that type, and every forward-work check (orientation, triggers, cascade) reads it through one `is_terminal`. Not declarable on reserved types (the tool owns their settled sets).
+**Status:** the domain declares per-type vocabularies in `_schema.yaml` (enforced by `mdllm validate`); default when undeclared: not-started/in-progress/blocked/paused/completed/cancelled. Reserved types are fixed: specification/guide/manifesto/skill/prompt → draft/evolving/stable/deprecated · insight → active/promoted/dismissed · conflict → open/resolved · retrospective → draft/complete · continuity-brief → live · index → live/stale · decision → made/superseded · workflow-definition → draft/evolving/stable/deprecated · workflow-run → active/paused/completed/abandoned · cue → open/answered. A type may also declare `terminal_statuses` — which of its own statuses mean *settled*; the declaration replaces the universal terminal set for that type, and every forward-work check (orientation, triggers, cascade) reads it through one `is_terminal`. Not declarable on reserved types (the tool owns their settled sets).
 
-**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md). Internal: `guide`/`manifesto`. `specification`: framework specs + a domain's scaffold-delivered specification skill, nothing else. Domain-usable with fixed vocabulary: `skill` (read/write/workflow skills)/`prompt` (lifecycle statuses, tool-owned). Generated: `index`. The tool's `RESERVED_STATUSES` is the authority on this set — restated lists have lagged it on three surfaces at once.
+**Reserved types:** `insight`, `continuity-brief`, `conflict`, `retrospective`, `decision`, `workflow-definition`, `workflow-run`, `cue` (see session-memory.md, belief-revision.md, retrospective.md, provenance.md, workflow-state.md, change-reconciliation.md). Internal: `guide`/`manifesto`. `specification`: framework specs + a domain's scaffold-delivered specification skill, nothing else. Domain-usable with fixed vocabulary: `skill` (read/write/workflow skills)/`prompt` (lifecycle statuses, tool-owned). Generated: `index`. The tool's `RESERVED_STATUSES` is the authority on this set — restated lists have lagged it on three surfaces at once.
 
 **Quarantine:** `origin: external` ⇒ `verified: false` until a human confirms; no decision/calculation/output may rest on an unverified external thing (provenance.md). The flip is an auditable event: commit external things unverified, flip in a *separate* commit naming the human in `verified_by` — the floor rejects born-verified and unattributed flips (Warning; Error under `options: {quarantine: strict}`). Cross-domain imports carry the reference triple; `mdllm imports-check` re-checks pin *and* content against the source's face — `stale` or `diverged` re-opens the quarantine as an external inflection (change-reconciliation.md).
 
@@ -85,7 +85,7 @@ These fields must be present in every thing to do:
 - What kind of thing this is
 - Values are domain-specific. Examples: `thing` (generic catch-all), `task`, `project`, `subtask`, `goal`, `milestone`, `item`, `concept`, `resource`, or any other type that emerges as you use the system
 - Helps the agent understand scope and context
-- Seven types are **framework-reserved** and have fixed semantics regardless of domain:
+- Eight types are **framework-reserved** and have fixed semantics regardless of domain:
   - `insight` — an emerging idea or held view from a session, preserved for future context
   - `continuity-brief` — **retired (v3.17), reserved-but-deprecated**: was the domain's forward-looking session brief, now superseded by the generated orient view (open-loop things); kept reserved only so domains mid-transition still validate
   - `conflict` — a documented contradiction between two other things, held as a first-class thing until resolved
@@ -93,7 +93,8 @@ These fields must be present in every thing to do:
   - `decision` — a judgement made from knowledge, with inputs pinned to git commits via `informed_by`
   - `workflow-definition` — a reusable process skeleton with its stages expressed as data and the transitions allowed between them
   - `workflow-run` — one live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative
-  - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, `provenance.md`, and `workflow-state.md` for full specifications.
+  - `cue` — the change-reconciliation cue question, persisted: `subject` names the reasoned-from thing that was modified, `raised_at` pins the commit, and it stays `open` until a human records a `verdict` (`inflection` / `not-inflection`) with a `verdict_reason` — the receipt. Any session may raise one; only a human answers
+  - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, `provenance.md`, `workflow-state.md`, and `change-reconciliation.md` for full specifications.
 - Two types are **framework-internal**: `guide` and `manifesto`. These are used by the framework's own files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
 - `specification` is framework-defined with the same lifecycle vocabulary and has exactly **two legitimate homes**: the framework's own spec files, and a domain's *specification skill* — the one scaffold-delivered file that states why the domain exists (`templates/domain-specification.skill.md.template` types it `specification`, and every scaffolded domain carries it that way). Any other domain use is misuse. *(The tenth review caught v2.18's "framework-internal only" claim contradicting the scaffold's own delivery — the classification followed neither the template nor the estate; this one follows both.)*
 - Two types are **framework-defined and domain-usable with a fixed vocabulary**: `skill` (a domain's read, write, and workflow skills — the specification skill is `type: specification`, above) and `prompt` (the reasoning prompts in `prompts/`). They carry the same lifecycle vocabulary, built into the tool; domains use them freely but cannot redeclare their statuses.
@@ -115,7 +116,8 @@ These fields must be present in every thing to do:
   `conflict` uses `open`, `resolved`; `retrospective` uses `draft`, `complete`;
   `continuity-brief` uses `live`; `index` uses `live`, `stale`;
   `workflow-definition` uses `draft`, `evolving`, `stable`, `deprecated`;
-  `workflow-run` uses `active`, `paused`, `completed`, `abandoned`
+  `workflow-run` uses `active`, `paused`, `completed`, `abandoned`;
+  `cue` uses `open`, `answered`
 - **A type may declare which of its statuses mean *settled*** — the optional
   per-type `terminal_statuses` list in `_schema.yaml`, alongside `statuses`
   (v3.19.0). A domain whose lifecycle is mostly steady-state needs this so

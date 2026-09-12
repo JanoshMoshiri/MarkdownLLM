@@ -212,7 +212,7 @@ Starting structures the agent uses when scaffolding a new domain:
 - `templates/domain-{specification,read.thing,write.thing,workflow}.skill.md.template` — the four skills
 - `templates/prompts/` — orchestration prompt templates (session-end continuity, cascade, conflict/schema scans)
 - `templates/commands/` + `templates/copilot-prompts/` — the deliberate `end-session` / `retrospective` rituals as slash commands for Claude Code and Copilot
-- `templates/{insight,conflict,decision,retrospective,workflow-definition,workflow-run}.md.template` — reserved-type things
+- `templates/{insight,conflict,cue,decision,retrospective,workflow-definition,workflow-run}.md.template` — reserved-type things
 - `templates/boundary-terms.template` — the local, never-committed disclosure boundary
 
 ---
