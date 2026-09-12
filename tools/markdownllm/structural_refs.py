@@ -48,6 +48,15 @@ REFERENCE_FIELDS: tuple[ReferenceField, ...] = (
     ReferenceField("parent", ReferenceShape.ID_SCALAR, "zero-or-one"),
     ReferenceField("parties", ReferenceShape.ID_LIST, "many"),
     ReferenceField("definition", ReferenceShape.ID_SCALAR, "zero-or-one"),
+    # A cue's subject: the reasoned-from thing whose modification raised the
+    # question (change-reconciliation.md → The Cue Persists). Validated and
+    # reverse-indexed like any structural pointer, but NOT cue-relevant — a
+    # cue must not count toward its own subject's fan-in, or raising one
+    # would make the next modification more likely to raise another. Plain
+    # name by the registry's own precedent (`parties`, `definition`); unused
+    # as free text anywhere in the estate on 2026-09-12.
+    ReferenceField("subject", ReferenceShape.ID_SCALAR, "zero-or-one",
+                   cue_relevant=False),
     ReferenceField("triggers", ReferenceShape.TRIGGER_WATCH, "many"),
     # A provenance pin may legitimately refer to an input that now exists only
     # at its pinned commit, so provenance owns existence semantics.  It still
@@ -126,6 +135,12 @@ COMMIT_PIN_FIELDS: tuple[CommitPinField, ...] = (
                    CommitPinScope.LOCAL,
                    "validate (workflow revision binding)",
                    resolved_elsewhere=True),
+    # The commit whose modification a cue was raised for. Local and resolved
+    # by the ordinary structural-pin check; `mdllm cues` reads it back to
+    # decide which modifications the cue covers (at and before that commit).
+    CommitPinField("raised_at", CommitPinShape.SCALAR,
+                   CommitPinScope.LOCAL,
+                   "validate (structural-pin resolution)"),
     # The cross-domain reference triple pins a commit in the SOURCE domain's
     # repository (`source_domain`), which the consuming repository need not
     # hold at all.  `mdllm imports-check` resolves it where the source clone

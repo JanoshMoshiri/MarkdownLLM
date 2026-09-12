@@ -248,7 +248,7 @@ each type to the spec that owns it, which is where a description belongs.
 - `example` — A worked framework pattern distilled from verified execution, teaching by positive and negative contrast (statuses: draft / evolving / stable / deprecated)
 - `plan` — A phased, multi-session work plan for evolving the framework; phase checkboxes updated as work lands (statuses: not-started / in-progress / blocked / paused / completed / cancelled)
 
-Framework-reserved types (built into the tool, no declaration needed): `conflict`, `continuity-brief`, `decision`, `guide`, `index`, `insight`, `manifesto`, `prompt`, `retrospective`, `skill`, `specification`, `workflow-definition`, `workflow-run`.
+Framework-reserved types (built into the tool, no declaration needed): `conflict`, `continuity-brief`, `cue`, `decision`, `guide`, `index`, `insight`, `manifesto`, `prompt`, `retrospective`, `skill`, `specification`, `workflow-definition`, `workflow-run`.
 <!-- /generated:types -->
 
 ## Key Innovations

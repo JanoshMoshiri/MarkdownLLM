@@ -40,7 +40,17 @@ RESERVED_STATUSES = {
     "decision": ["made", "superseded"],
     "workflow-definition": ["draft", "evolving", "stable", "deprecated"],
     "workflow-run": ["active", "paused", "completed", "abandoned"],
+    # The cue carrier (change-reconciliation.md → The Cue Persists;
+    # unattended-cue-carrier-2026-09-12): the cue question, persisted. Open
+    # until a human records a verdict; the floor checks the receipt's shape
+    # (validation.py) and computes what is unraised (touchpoints.py `cues`),
+    # never the verdict.
+    "cue": ["open", "answered"],
 }
+
+# The two answers a cue can carry. `not-inflection` is a decision — saying no
+# to a named question — where not being asked was drift.
+CUE_VERDICTS = ("inflection", "not-inflection")
 
 # The universal default workflow vocabulary — applies when no domain schema
 # declares a vocabulary for the thing's type.
@@ -66,6 +76,7 @@ RESERVED_TERMINAL = {
     "decision": {"made", "superseded"},
     "index": {"live", "stale"},
     "continuity-brief": {"live"},
+    "cue": {"answered"},
 }
 
 
@@ -231,6 +242,10 @@ CORE_FIELDS = {
     # insight, so these are tool-read and belong in CORE (unlike promoted_to,
     # which the tool only records).
     "disposition", "disposition_reason",
+    # the cue carrier (change-reconciliation.md → The Cue Persists) — the
+    # receipt fields on a `type: cue` thing; `subject` and `raised_at` are
+    # supplied by the reference and pin registries below
+    "raised_by", "verdict", "verdict_reason",
     # cross-domain interface (mcp-serve exposure — docs/plans/mcp-domain-server.md)
     "exposed",
     # generated-artifact frontmatter (index / kernel things)

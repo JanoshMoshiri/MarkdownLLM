@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 2.1
+version: 2.2
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -43,7 +43,7 @@ full-spec load (`mdllm tokens` measures it — never assert); fourteen extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
 paper layer made mechanical, each subcommand mechanising a piece of it (mostly
-one per spec; a few carry several — change-reconciliation has three (`coherence`, `touchpoints`, `candidates` — the cue leg that fires on every commit), git-workflow three (`estate-sync`, `publish`, `autopush`); View 3 is the census and wins — `coherence` for the mechanised slice of the Walk
+one per spec; a few carry several — change-reconciliation has four (`coherence`, `touchpoints`, `candidates` — the cue leg that fires on every commit, `cues` — the same question held until a human answers it), git-workflow three (`estate-sync`, `publish`, `autopush`); View 3 is the census and wins — `coherence` for the mechanised slice of the Walk
 and `touchpoints` for the Assimilate beat).
 
 ## View 1 — Elevation: the five bands
@@ -70,7 +70,7 @@ flowchart TD
         why, thing.md with the core operative specs, and 24 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
-        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 35
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 36
         mechanical subcommands and a git pre-commit hook that, when current and
         runnable, blocks commits with mechanical Errors. At the base, git is
         the accepted-state machine, event stream and inspectable audit aid.
@@ -96,7 +96,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>35 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>36 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks mechanical Errors when active"]
     end
     GIT["git — accepted-state machine,<br/>event stream, inspectable history"]
@@ -225,15 +225,16 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 flowchart LR
     accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
     accDescr {
-        A left column of 35 mdllm subcommands, each with a single edge to the
+        A left column of 36 mdllm subcommands, each with a single edge to the
         spec surface it serves in the right column. The tool is a mapping, not
         a monolith. Solid edges enforce or measure a spec, and dashed edges
         generate an artifact. Enforcing or measuring: validate, triggers,
         index, provenance, eval, tokens, doctor, scaffold, refresh, coherence,
         touchpoints, cascade, imports-check, external-trust, boundary,
-        estate-check, estate-sync, calc, candidates, precommit (the hook's
-        legs composed concurrently against one frozen candidate), and the
-        harness-event dispatcher.
+        estate-check, estate-sync, calc, candidates, cues (the cue question
+        read back off the commit stream and held until a human answers it),
+        precommit (the hook's legs composed concurrently against one frozen
+        candidate), and the harness-event dispatcher.
         Generating: kernel, changelog, install-hook, worklog, domain-kernel,
         session-start, mcp-serve, bundle, autopush, adapter-install and
         dispatch-payload, which composes a scheduler tick's launch text from
@@ -280,6 +281,7 @@ flowchart LR
         C33["external-trust"]
         C34["precommit"]
         C35["dispatch-payload"]
+        C36["cues"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -316,6 +318,7 @@ flowchart LR
         T32["git-workflow.md<br/>guarded outbound publication"]
         T33["clone-local MCP authority<br/>exact entry hash in Git directory"]
         T34["templates/prompts/dispatch-loop.md<br/>the standing dispatch prompt"]
+        T35["change-reconciliation.md<br/>The Cue Persists — the question held until answered"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -353,6 +356,7 @@ flowchart LR
     C33 -->|"authorises exact local definition for"| T33
     C34 -->|"composes the hook's legs concurrently for"| T9
     C35 -.->|"composes the launch text from"| T34
+    C36 -->|"holds the unanswered cue for"| T35
 ```
 
 Notes on this view:

@@ -19,7 +19,7 @@ from pathlib import Path, PurePosixPath
 import yaml
 
 from .model import (
-    RESERVED_STATUSES, TERMINAL_STATUSES,
+    CUE_VERDICTS, RESERVED_STATUSES, TERMINAL_STATUSES,
     declared_field_names, declared_type_names,
     is_terminal, origin_is_external, terminal_statuses_for, valid_statuses_for,
     ID_RE, ISO_RE, SEV_ERROR, SEV_WARNING, SEV_INFO,
@@ -73,6 +73,35 @@ def validate_level1(t: Thing, schema: dict | None) -> list[Finding]:
                                   (isinstance(v, str) and ISO_RE.match(v))):
             sev = SEV_ERROR if fld == "created" else SEV_WARNING
             f.append(Finding(sev, name, f"`{fld}` is not ISO 8601: {v!r}"))
+
+    # The cue carrier (change-reconciliation.md → The Cue Persists): the
+    # receipt's SHAPE is the floor's — an answered cue names its verdict from
+    # the two-value set and gives its reason; an open cue carries no verdict
+    # yet; every cue names its subject (resolved by the reference registry).
+    # The verdict itself is never the floor's. Scoped to the type: `verdict`
+    # is free text on records elsewhere in the estate.
+    if typ == "cue":
+        if not meta.get("subject"):
+            f.append(Finding(SEV_ERROR, name,
+                     "cue has no `subject` — the reasoned-from thing whose "
+                     "modification raised the question"))
+        verdict = meta.get("verdict")
+        reason = str(meta.get("verdict_reason") or "").strip()
+        if str(status) == "answered":
+            if str(verdict) not in CUE_VERDICTS:
+                f.append(Finding(SEV_ERROR, name,
+                         f"answered cue needs `verdict: "
+                         f"{' | '.join(CUE_VERDICTS)}` (got {verdict!r})"))
+            if not reason:
+                f.append(Finding(SEV_ERROR, name,
+                         "answered cue has no `verdict_reason` — the reason is "
+                         "the receipt; without it the answer is a bit, not a "
+                         "ruling"))
+        elif str(status) == "open" and verdict not in (None, ""):
+            f.append(Finding(SEV_WARNING, name,
+                     f"open cue already carries `verdict: {verdict}` — set "
+                     f"`status: answered` (with a `verdict_reason`) or clear "
+                     f"the verdict"))
 
     for field, reason in structural_shape_errors(meta):
         f.append(Finding(SEV_ERROR, name, f"`{field}` {reason}"))

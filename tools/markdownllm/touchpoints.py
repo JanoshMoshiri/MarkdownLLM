@@ -15,13 +15,14 @@ scores, never runs the pass.
 
 from __future__ import annotations
 
+import datetime as dt
 import subprocess
 from collections import Counter
 from pathlib import Path
 
-from .model import scan
+from .model import ISO_RE, scan
 from .repository_view import RepositoryView, RepositoryViewError
-from .structural_refs import iter_structural_references
+from .structural_refs import iter_structural_references, scalar_lexeme
 
 
 def cmd_touchpoints(args) -> int:
@@ -294,4 +295,228 @@ def cmd_candidates(args) -> int:
         print("-- change-reconciliation advisories (never blocking) --")
         for ln in lines:
             print(ln)
+    return 0
+
+
+# ------------------------------------------------------------------- cues
+# The cue carrier (unattended-cue-carrier-2026-09-12; change-reconciliation.md
+# → The Cue Persists). `candidates` asks the cue question at the commit
+# boundary and the answer goes to stdout — at 3am, to nobody. This reads the
+# same question back off the commit stream so it waits in every session-start
+# digest until a human answers it with a `type: cue` thing. Two halves, one
+# heading:
+#   unanswered — cue things still `open`;
+#   unraised   — reasoned-from things (the predicate `candidates` uses:
+#                definition-surface type or fan-in) modified since the
+#                baseline that no cue thing covers.
+# A cue covers its subject's modifications at and before its `raised_at`
+# commit — by position in the walk; by `created` date when the pin lies
+# outside the window. The floor computes and reports. It never raises a cue
+# and never answers one.
+
+CUE_WINDOW_DAYS = 30  # the baseline for a domain that has never written a retrospective
+
+
+def _cue_baseline(corpus) -> tuple[dt.date, str]:
+    """The date the walk starts from: the newest retrospective's period end
+    (scan 4 answered everything before it), else a fixed window."""
+    newest: dt.date | None = None
+    for t in corpus.things:
+        if str(t.meta.get("type")) != "retrospective":
+            continue
+        for fld in ("period_end", "created"):
+            v = t.meta.get(fld)
+            if isinstance(v, dt.datetime):
+                v = v.date()
+            elif isinstance(v, str) and ISO_RE.match(v):
+                v = dt.date.fromisoformat(v[:10])
+            if isinstance(v, dt.date):
+                newest = max(newest, v) if newest else v
+                break
+    if newest is not None:
+        return newest, "the newest retrospective"
+    return (dt.date.today() - dt.timedelta(days=CUE_WINDOW_DAYS),
+            f"{CUE_WINDOW_DAYS} days — no retrospective yet")
+
+
+def _modifications_since(root: Path, since: dt.date):
+    """One git walk: ``[(sha, date, [paths modified])]`` newest-first.
+
+    Modifications only — an addition is new on a clean slate (no dependants
+    yet), and a deletion's dependants already dangle into a validate Error;
+    neither needs a carrier to stay loud.  Returns None when git cannot be
+    read, so the caller can say so rather than report an empty set as clean.
+    """
+    try:
+        r = subprocess.run(
+            ["git", "log", "--format=%x1e%H%x00%cs", "--name-status", "-M",
+             f"--since={since.isoformat()}", "--", "."],
+            cwd=root, capture_output=True, text=True, encoding="utf-8",
+            errors="replace", timeout=60)
+    except Exception:
+        return None
+    if r.returncode != 0 or r.stdout is None:
+        return None
+    walk: list[tuple[str, dt.date, list[str]]] = []
+    for record in r.stdout.split("\x1e"):
+        header, _, body = record.partition("\n")
+        if "\x00" not in header:
+            continue
+        sha, _, day = header.strip().partition("\x00")
+        try:
+            when = dt.date.fromisoformat(day.strip())
+        except ValueError:
+            continue
+        paths: list[str] = []
+        for line in body.splitlines():
+            if "\t" not in line:
+                continue
+            state, _, rest = line.partition("\t")
+            if state.startswith("M"):
+                paths.append(rest)
+        walk.append((sha.strip().lower(), when, paths))
+    return walk
+
+
+def _reasoned_from_reason(t, inbound: Counter) -> str | None:
+    """Why a thing is reasoned-from, or None — the same predicate `candidates`
+    applies at the boundary, so the two surfaces cannot disagree."""
+    typ = str(t.meta.get("type"))
+    if typ in DEFINITION_SURFACE_TYPES:
+        return f"definition surface (`{typ}`)"
+    n = inbound.get(t.id, 0)
+    if n >= FAN_IN_THRESHOLD:
+        return f"{n} inbound edge(s)"
+    return None
+
+
+def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
+    """The two halves the digest and `mdllm cues` both print, computed once."""
+    if since is not None:
+        baseline, why = since, "--since"
+    else:
+        baseline, why = _cue_baseline(corpus)
+    walk = _modifications_since(root, baseline)
+
+    open_cues: list[dict] = []
+    by_subject: dict[str, list[dict]] = {}
+    for t in corpus.things:
+        if str(t.meta.get("type")) != "cue" or not t.id:
+            continue
+        subj = t.meta.get("subject")
+        pin = t.meta.get("raised_at")
+        created = t.meta.get("created")
+        if isinstance(created, dt.datetime):
+            created = created.date()
+        elif isinstance(created, str) and ISO_RE.match(created):
+            created = dt.date.fromisoformat(created[:10])
+        elif not isinstance(created, dt.date):
+            created = None
+        entry = {
+            "id": t.id,
+            "subject": str(subj) if subj else "",
+            "status": str(t.meta.get("status")),
+            "raised_at": (scalar_lexeme(pin).lower()
+                          if isinstance(pin, (str, int)) and not isinstance(pin, bool)
+                          else ""),
+            "created": created,
+            "raised_by": str(t.meta.get("raised_by") or ""),
+        }
+        if entry["status"] == "open":
+            open_cues.append(entry)
+        if entry["subject"]:
+            by_subject.setdefault(entry["subject"], []).append(entry)
+
+    unraised: list[dict] = []
+    if walk:
+        order = {sha: i for i, (sha, _, _) in enumerate(walk)}
+        for cues in by_subject.values():
+            for c in cues:
+                pin = c["raised_at"]
+                c["pos"] = (next((order[s] for s in order if s.startswith(pin)), None)
+                            if pin else None)
+        by_path = {t.path.resolve(): t for t in corpus.things if t.id}
+        inbound: Counter | None = None
+        touched: dict[str, dict] = {}
+        for i, (sha, day, paths) in enumerate(walk):
+            for rel in paths:
+                t = by_path.get((root / rel).resolve())
+                if t is None or str(t.meta.get("type")) == "cue":
+                    continue
+                if inbound is None:
+                    inbound = _inbound_counts(corpus)
+                reason = _reasoned_from_reason(t, inbound)
+                if reason is None:
+                    continue
+                if any(_covers(c, i, day) for c in by_subject.get(t.id, [])):
+                    continue
+                rec = touched.get(t.id)
+                if rec is None:
+                    rec = touched[t.id] = {"subject": t.id, "reason": reason,
+                                           "commits": 0, "latest": day,
+                                           "latest_sha": sha, "earliest": day}
+                rec["commits"] += 1
+                rec["earliest"] = min(rec["earliest"], day)
+        unraised = sorted(touched.values(),
+                          key=lambda r: (-r["commits"], r["subject"]))
+    return {"baseline": baseline, "baseline_why": why,
+            "walk_ok": walk is not None,
+            "open": sorted(open_cues, key=lambda e: e["id"]),
+            "unraised": unraised}
+
+
+def _covers(cue: dict, position: int, day: dt.date) -> bool:
+    """Does this cue cover a modification at `position` (newest-first) on `day`?
+    At or before its `raised_at` commit when that commit is in the walk;
+    otherwise at or before the cue's own `created` date."""
+    pos = cue.get("pos")
+    if pos is not None:
+        return position >= pos
+    created = cue.get("created")
+    return created is not None and day <= created
+
+
+def cmd_cues(args) -> int:
+    """Advisory, exit 0 always: the cue question, read back off the commit
+    stream and held until answered. Reports; never raises or answers."""
+    root = Path(args.path).resolve()
+    try:
+        corpus, _ = scan(root)
+    except Exception as exc:
+        print(f"mdllm: cues cannot scan {root}: {exc}")
+        return 2
+    since = None
+    raw = getattr(args, "since", None)
+    if raw:
+        try:
+            since = dt.date.fromisoformat(str(raw))
+        except ValueError:
+            print("mdllm: --since must be a date, YYYY-MM-DD")
+            return 2
+    rep = cues_report(root, corpus, since)
+    print(f"## Reconciliation cues — {root}")
+    print(f"baseline: {rep['baseline']} ({rep['baseline_why']})")
+    if not rep["walk_ok"]:
+        print("- (no git history readable here — the unraised half cannot be "
+              "computed; only open cue things are listed)")
+    if rep["open"]:
+        print(f"- **Unanswered ({len(rep['open'])}):** open cue things — a human "
+              f"verdict is owed on each (`verdict` + `verdict_reason`, "
+              f"`status: answered`):")
+        for c in rep["open"]:
+            who = f" by {c['raised_by']}" if c["raised_by"] else ""
+            print(f"    - `{c['id']}` on `{c['subject']}` — raised "
+                  f"{c['created'] or '?'}{who}")
+    if rep["unraised"]:
+        print(f"- **Unraised ({len(rep['unraised'])}):** reasoned-from things "
+              f"modified since the baseline with no cue covering the change — "
+              f"raise one (`templates/cue.md.template`) and answer it, or it "
+              f"is answered at the retrospective:")
+        for r in rep["unraised"]:
+            print(f"    - `{r['subject']}` — {r['reason']}; modified in "
+                  f"{r['commits']} commit(s), latest {r['latest']} "
+                  f"({r['latest_sha'][:7]}); `mdllm touchpoints {r['subject']}`")
+    if not rep["open"] and not rep["unraised"]:
+        print("- none — every reasoned-from modification since the baseline is "
+              "covered, and no cue is open.")
     return 0

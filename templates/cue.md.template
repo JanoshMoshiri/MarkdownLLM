@@ -1,0 +1,29 @@
+---
+id: cue-[subject-id]-[YYYY-MM-DD]
+type: cue
+status: open                            # open | answered — answered only on a human's verdict
+created: [ISO-date]
+subject: [thing-id]                     # the reasoned-from thing whose modification raised the question
+raised_at: [full-commit-sha]            # the commit that modified it — read from `git rev-parse HEAD`, never transcribed
+raised_by: [operator | agent | dispatch:<launch-context>]
+verdict:                                # inflection | not-inflection — populate when answered; a run never does
+verdict_reason:                         # the receipt: why this verdict — required when answered
+---
+
+# Cue: `[subject-id]` was modified — inflection?
+
+## The Change
+[What moved, in one paragraph: which commit(s), what changed in the subject,
+and why the subject is reasoned-from — a definition surface, or its fan-in.
+`mdllm touchpoints [subject-id]` lists what depends on it.]
+
+## The Question
+Does this change alter the logical path — a rule, a workflow, a thing the
+domain reasons from — or only how an existing path is expressed?
+(`change-reconciliation.md` → The Driver Names The Inflection.)
+
+## The Answer
+[Populate when answered. `inflection` → the four-beat pass ran: name the touch
+points walked and the commit that sealed them. `not-inflection` → say why the
+dependants still hold as written. Either way this section is the ruling's
+reasoning; `verdict_reason` above is its one-line receipt.]

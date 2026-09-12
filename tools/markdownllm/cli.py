@@ -19,6 +19,10 @@ unqualified heading — a hand list drifts; argparse does not):
   touchpoints <id> [path]  Assimilate beat (change-reconciliation): the declared
                        inbound set + literal references for one thing — "what did
                        I just put at risk?". Human-invoked, never hooked; live.
+  cues     [path]      The cue question, persisted (change-reconciliation): open
+                       `type: cue` things awaiting a human verdict + reasoned-from
+                       things modified since the last retrospective with no cue.
+                       Reports only; session-start emits the same line.
   calc     [path] [--thing ID] [--expr E]  Evaluate declared derivations
                        (`computed:` blocks): the floor does every sum, so a
                        figure is computed rather than asserted. Reports, never
@@ -99,7 +103,7 @@ from .runtime import cmd_runtime_probe
 from .lifecycle_runner import cmd_harness_event
 from .session import cmd_session_start
 from .tokens import cmd_tokens
-from .touchpoints import cmd_candidates, cmd_touchpoints
+from .touchpoints import cmd_candidates, cmd_cues, cmd_touchpoints
 from .triggers import cmd_triggers
 from .validation import cmd_validate
 
@@ -474,6 +478,16 @@ def build_cli() -> argparse.ArgumentParser:
     cd.add_argument("--view", choices=("worktree", "index"), default="worktree",
                     help="source of thing metadata; the pre-commit hook uses index")
     cd.set_defaults(fn=cmd_candidates)
+
+    cu = sub.add_parser("cues", help="the cue question, persisted: open `type: cue` "
+                        "things awaiting a human verdict, plus reasoned-from things "
+                        "modified since the last retrospective that no cue covers; "
+                        "session-start emits the same line every session — reports, "
+                        "never raises or answers; exit 0 always")
+    cu.add_argument("path", nargs="?", default=".")
+    cu.add_argument("--since", help="baseline date (YYYY-MM-DD); default: the newest "
+                    "retrospective's period end, else 30 days")
+    cu.set_defaults(fn=cmd_cues)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
                         "additions, filenames, or a commit message against the "

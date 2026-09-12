@@ -192,6 +192,8 @@ def _orient_forward(domain: Path, corpus=None) -> list[str]:
         typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
         if typ == "conflict" and status == "open":
             conflicts.append(t.id)
+        elif typ == "cue":
+            continue  # its own digest line (_cue_lines): a question, not a loop
         elif typ not in _ORIENT_KNOWLEDGE_TYPES and not is_terminal(corpus.schema, t.meta):
             # Watched, not owned (v3.27.0): a mirror's status is the SOURCE's
             # state restated — this domain cannot advance, close, or edit it,
@@ -220,6 +222,49 @@ def _orient_forward(domain: Path, corpus=None) -> list[str]:
             lines.append(f"    - `{tid}` ({typ}, {status})")
         if len(watched) > 8:
             lines.append(f"    - …and {len(watched) - 8} more.")
+    return lines
+
+
+def _cue_lines(domain: Path, corpus) -> list[str]:
+    """The cue carrier's loud half (unattended-cue-carrier-2026-09-12): every
+    session, until a human answers, the digest names each open cue and each
+    reasoned-from modification no cue covers. The question waits here rather
+    than in anyone's memory — the countermeasure
+    `partial-coverage-quiets-the-uncovered-steps` names (make the seam loud),
+    applied to the one beat of change-reconciliation the floor cannot do.
+    Quiet when healthy; advisory — session start never fails on it."""
+    if corpus is None:
+        return []
+    try:
+        from .touchpoints import cues_report
+        rep = cues_report(domain, corpus)
+    except Exception:
+        return []
+    open_, unraised = rep["open"], rep["unraised"]
+    total = len(open_) + len(unraised)
+    if not total:
+        return []
+    lines = [f"- **Reconciliation cues ({total}):** {len(open_)} raised and "
+             f"unanswered, {len(unraised)} modified-and-unraised since "
+             f"{rep['baseline']} — the question waits here until a human "
+             f"answers it (`mdllm cues .`; a `verdict` + `verdict_reason` on "
+             f"a `type: cue` thing):"]
+    shown = 0
+    for c in open_:
+        if shown >= 8:
+            break
+        who = f" by {c['raised_by']}" if c["raised_by"] else ""
+        lines.append(f"    - `{c['id']}` — open on `{c['subject']}`, raised "
+                     f"{c['created'] or '?'}{who}")
+        shown += 1
+    for r in unraised:
+        if shown >= 8:
+            break
+        lines.append(f"    - `{r['subject']}` — modified {r['commits']}× since "
+                     f"{r['earliest']}, no cue ({r['reason']})")
+        shown += 1
+    if total > shown:
+        lines.append(f"    - …and {total - shown} more (`mdllm cues .` lists all).")
     return lines
 
 
@@ -851,6 +896,7 @@ def cmd_session_start(args) -> int:
             retrospective_due = []  # advisory only — session start never fails on it
 
     out.extend(_orient_forward(domain, session_corpus))
+    out.extend(_cue_lines(domain, session_corpus))
 
     # Trigger evaluation, mechanically — session start is the primary
     # evaluation point (trigger-specification.md); until v3.24.0 this emitter
