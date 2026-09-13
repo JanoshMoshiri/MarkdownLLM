@@ -282,6 +282,12 @@ by intent, session-end invoked, the retrospective called). Dispositions:
   Phase 3's protocol applied to one ritual. Whether that is "automatic" in
   the operator's sense is the question; it is what
   `feels-automatic-is-persistence-of-the-question` predicts they want.
+  *Ruled later the same day, on the operator's delegation, evidence-led:
+  `retrospective-cadence-is-a-dated-chase-2026-09-13` — the chase is a
+  dated trigger this retrospective now carries (2026-10-13), the run is
+  gated on activity, unattended runs draft and file, attended sessions get
+  the mechanical scans first and the rest offered. Building it found the
+  walk's own `--since` defect the moment the baseline moved to today.*
 - **Does the cue count stay near zero?** The carrier is two days old. If
   ordinary sessions leave it near zero with the citation link, the shape is
   right; if it climbs and the climb does not trace to rulings, the
