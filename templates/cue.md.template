@@ -8,6 +8,9 @@ raised_at: [full-commit-sha]            # the commit that modified it — `git r
 raised_by: [operator | agent | dispatch:<launch-context>]
 verdict:                                # inflection | not-inflection — populate when answered; a run never does
 verdict_reason:                         # the receipt: why this verdict — required when answered
+informed_by:                            # the decision already on the record that rules this change — one ruling answers many cues; pin from `git rev-parse`
+  - id: [decision-id]
+    commit: [full-commit-sha]
 ---
 
 # Cue: `[subject-id]` was modified — inflection?

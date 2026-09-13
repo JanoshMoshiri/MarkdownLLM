@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.7
+version: 1.8
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -220,7 +220,8 @@ quietly go dark:
 - *Reconciliation cues* — open or unraised (`change-reconciliation.md` → The Cue
   Persists): **answer** each one the session can (`verdict: inflection |
   not-inflection` + `verdict_reason`, `status: answered`; an inflection runs the pass
-  and seals it), **raise** a cue for any reasoned-from modification this session made
+  and seals it) — by **citation** where a recorded decision covers the change
+  (`informed_by` pins it; one ruling answers many cues), **raise** a cue for any reasoned-from modification this session made
   that is still unraised (`templates/cue.md.template`, `raised_by` set), and leave the
   rest open — the digest re-lists them next session. An unattended session raises and
   never answers; the operator's verdict is the receipt.

@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-12
-generated: 2026-09-12T20:05:08
-generated_from: HEAD@a18600a
-coverage: 87
+created: 2026-09-13
+generated: 2026-09-13T12:49:31
+generated_from: HEAD@589fcbf
+coverage: 90
 framework_version: 3.39.0
 ---
 
@@ -95,6 +95,11 @@ framework_version: 3.39.0
 - estate-workflow-derivation (derived-from)
 
 ## derivation-shape-settled-2026-08
+- cue-derivation-shape-brief-2026-08-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
+- cue-derivation-shape-settled-2026-08-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
+- cue-domain-refresh-specification-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
+- cue-estate-workflow-derivation-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
+- cue-substrate-floor-development-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
 - declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
 - declaring-derivation-from-the-atom (derived-from)
 
@@ -102,6 +107,9 @@ framework_version: 3.39.0
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on (derived-from)
 
 ## dispatch-host-design-2026-08-29
+- cue-closed-loop-operating-state-2026-09-12 (pinned @c964b2ebf607dc233b8cd4ea358e274335e08a63)
+- cue-coordination-claim-specification-2026-09-13 (pinned @c964b2ebf607dc233b8cd4ea358e274335e08a63)
+- cue-gates-census-ratified-2026-08-28-2026-09-13 (pinned @c964b2ebf607dc233b8cd4ea358e274335e08a63)
 - dispatch-digest-home-2026-08-29 (pinned @c964b2ebf607dc233b8cd4ea358e274335e08a63)
 
 ## divergence-is-an-unrouted-decision
@@ -135,6 +143,8 @@ framework_version: 3.39.0
 - operating-scope-promotion (pinned @604dfc4)
 
 ## explorer-publication-position
+- cue-explorer-publication-readiness-2026-09-13 (pinned @006b873255dbfc93a16884549215250ad07f7fb5)
+- cue-explorer-ui-increment-2026-08-2026-09-13 (pinned @006b873255dbfc93a16884549215250ad07f7fb5)
 - estate-mechanics-guide (derived-from)
 - explorer-extraction-and-hosting (derived-from)
 - explorer-publication-readiness (derived-from)
@@ -149,6 +159,9 @@ framework_version: 3.39.0
 
 ## external-review-2026-08-10
 - floor-sprint-3-scope-2026-08-23 (pinned @5425f29437e94240c60ce0032ca3c424fa7c1ef9)
+
+## feels-automatic-is-persistence-of-the-question
+- framework-agent-closes-settled-cues-2026-09-13 (pinned @05c22b26cf978c1faf3f72d047cc27eafe7ebca7)
 
 ## field-report-2026-08-13-domain-session
 - assistant-register-does-not-graduate (derived-from)
@@ -199,10 +212,24 @@ framework_version: 3.39.0
 - operator-queue-2026-08-28 (derived-from)
 - settled-reasoning-is-standing-authority (pinned @47f709099f6551ba6b1968ca1da26a2b5a0618c6)
 
+## gates-census-ratified-2026-08-28
+- cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
+- cue-closed-loop-operating-state-2026-09-12 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
+- cue-estate-retrospective-synthesis-2026-08-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
+- cue-gates-census-2026-08-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
+- cue-operator-queue-2026-08-28-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
+- framework-agent-closes-settled-cues-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
+
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## harness-native-onramp-supersedes-desktop
+- cue-explorer-extraction-and-hosting-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
+- cue-explorer-publication-position-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
+- cue-first-hour-guide-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
+- cue-harness-native-onramp-supersedes-desktop-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
+- cue-interface-specification-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
+- cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
 - first-hour-guide (derived-from)
 - interface-specification (derived-from)
 - operator-guide (derived-from)
@@ -285,6 +312,8 @@ framework_version: 3.39.0
 
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)
+- cue-belief-revision-specification-2026-09-13 (pinned @25852f3f886d411d9c21344d316ff8529eee7d87)
+- cue-floor-structure-residue-2026-09-13 (pinned @25852f3f886d411d9c21344d316ff8529eee7d87)
 - unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
 ## review-independent-operating-model-2026-08-26-codex
@@ -307,10 +336,18 @@ framework_version: 3.39.0
 - operating-model-seams-self-application (pinned @45a582b3fc424cb3bf812e235be3cc576615098d)
 - operating-model-seams-self-application (derived-from)
 
+## serve-side-blindness-dissolves-into-composition
+- cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 (pinned @3e530d4eac0836ba81aa87c0f492239f97773eca)
+- cue-serve-side-blindness-dissolves-into-composition-2026-09-13 (pinned @3e530d4eac0836ba81aa87c0f492239f97773eca)
+- cue-session-start-hardening-2026-09-13 (pinned @3e530d4eac0836ba81aa87c0f492239f97773eca)
+- cue-watertight-membrane-sprint-2026-08-30-2026-09-13 (pinned @3e530d4eac0836ba81aa87c0f492239f97773eca)
+
 ## session-end-is-the-least-current-read-of-the-session
 - estate-retrospective-synthesis-2026-08 (derived-from)
 
 ## settled-reasoning-is-standing-authority
+- cue-mechanical-coherence-checks-backlog-2026-09-13 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
+- framework-agent-closes-settled-cues-2026-09-13 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 - gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 
 ## source-behind-mirror-is-still-a-consumer-side-read
@@ -343,6 +380,7 @@ framework_version: 3.39.0
 - cue-derived-index-specification-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - cue-validate-thing-specification-dark-region-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - feels-automatic-is-persistence-of-the-question (derived-from)
+- framework-agent-closes-settled-cues-2026-09-13 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 
 ## universal-workflow-methodology
 - derivation-shape-brief-2026-08 (pinned @3af254117c771488898b861a9e9a30ef934c4794)
@@ -365,6 +403,8 @@ framework_version: 3.39.0
 - a-never-crossed-gate-hides-the-defects-behind-it (derived-from)
 
 ## workflow-reconciliation-precedes-new-definitions
+- cue-operating-layer-quality-loop-2026-09-13 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
+- cue-the-operating-layer-has-no-quality-loop-2026-09-13 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 - derivation-shape-brief-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 - derivation-shape-settled-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 - estate-workflow-derivation (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)

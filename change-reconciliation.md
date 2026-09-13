@@ -2,14 +2,14 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.2
+version: 1.3
 created: 2026-06-13
 linked_things:
   - id: thing-specification
     relation: extends
   - id: unattended-cue-carrier-2026-09-12
     relation: references
-    notes: "The ruling behind The Cue Persists: any session may raise a cue; only a human answers one"
+    notes: "The ruling behind The Cue Persists: any session may raise a cue; a human answers, or the framework agent by citing the ruling that covers it (framework-agent-closes-settled-cues-2026-09-13)"
   - id: inflection-candidates-are-computable
     relation: implements
     notes: "The cue question is mechanical and the verdict is human — the carrier is that split, persisted"
@@ -122,10 +122,25 @@ digest until a human answers it**:
   commit seals them; the cue's body names what was walked.
   **`verdict: not-inflection`** means the dependants hold as written, and the
   reason says why.
+- **A cue may be answered by citation.** When a decision already on the record
+  covers the change, the cue's `informed_by` pins that decision and the
+  `verdict_reason` says so: the human ruled once, the citation propagates it,
+  and *one ruling answers many cues*. This is what keeps the digest's line
+  from becoming wallpaper — a backlog of unraised modifications almost always
+  traces to a handful of rulings already made
+  (`feels-automatic-is-persistence-of-the-question`). The floor checks the
+  pin resolves; it does not judge whether the decision covers the change.
 
-**Who raises, who answers — the unattended rule.** Any session may *raise* a
-cue; only a human *answers* one. An attended session raises it at the moment
-`candidates` asks. An unattended run — a dispatch tick, a scheduled session —
+**Who raises, who answers.** Any session may *raise* a cue. A cue is
+*answered* by a human — or by the **framework domain agent**, in an attended
+framework session, under its standing authority
+(`framework-agent-closes-settled-cues-2026-09-13`, extending
+`settled-reasoning-is-standing-authority`): by citation where a recorded
+decision covers the change, or on its own walk where the corpus already holds
+the evidence and the direction. A verdict is a commit, overturnable by editing
+the cue, which is why it is grantable; a cue with no covering decision and
+unsettled reasoning stays the operator's. An attended session raises the cue
+at the moment `candidates` asks. An unattended run — a dispatch tick, a scheduled session —
 that modifies a reasoned-from thing raises the cue as part of its own commit,
 files it in its digest as a seat-queue item, and stops there: it does not run
 the pass on its own initiative and does not widen its scope to reconcile.
@@ -332,7 +347,7 @@ The split follows the framework's standard division of labour:
 | Prose references the indexes miss | Deterministic floor (textual) | `mdllm touchpoints` literal tier + corpus grep for the thing's canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
 | The cue question waits until it is answered | Deterministic floor | `mdllm cues` — open `type: cue` things plus reasoned-from modifications since the newest retrospective that no cue covers; the same line in every session-start digest (*The Cue Persists*) |
-| The answer carries a receipt | Floor (shape) + **the human** (verdict) | `type: cue` — `verdict` from the two-value set and a `verdict_reason`; Error without them. The verdict itself is never mechanised |
+| The answer carries a receipt | Floor (shape) + **the human** (verdict), or the framework agent citing the human's decision | `type: cue` — `verdict` from the two-value set and a `verdict_reason`; Error without them; `informed_by` pins the ruling that covers it. The verdict itself is never mechanised |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
 | Does each touch point still hold? | **Agent (semantic)** | `validate.thing.md` Layer 2 — the Walk |
 | Is this change an inflection at all? | **The human driver** | judgement; not mechanisable |

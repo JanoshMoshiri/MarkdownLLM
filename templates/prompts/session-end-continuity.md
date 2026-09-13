@@ -2,7 +2,7 @@
 id: session-end-continuity
 type: prompt
 status: evolving
-version: 1.5
+version: 1.6
 created: 2026-05-28
 inputs:
   - name: session-conversation
@@ -132,7 +132,10 @@ insight-disposition and conflict-disposition Info finding** the floor surfaces:
   (`change-reconciliation.md` → The Cue Persists). For each: **answer** it if this
   session can (`verdict: inflection | not-inflection` + `verdict_reason`,
   `status: answered`; an inflection runs the four beats and seals them with a
-  `reconcile:` commit), **raise** a cue for any reasoned-from thing this session
+  `reconcile:` commit) — and where a decision already on the record covers the
+  change, answer **by citation**: pin it in `informed_by` and say so, since one
+  ruling answers many cues (the framework agent holds standing authority for
+  this; `framework-agent-closes-settled-cues-2026-09-13`); **raise** a cue for any reasoned-from thing this session
   modified that no cue covers (`templates/cue.md.template`, `raised_by` set, `raised_at`
   from `git rev-parse`), or **leave it open** — the digest re-lists it next session. An
   unattended session raises and never answers: the verdict is the operator's receipt.

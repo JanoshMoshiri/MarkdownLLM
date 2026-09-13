@@ -163,6 +163,7 @@ relations: [informs, supports, challenges, contradicts]
                 "[thing-id]": "support-one",
                 "[full-commit-sha]": pinned_commit,
                 "[operator | agent | dispatch:<launch-context>]": "agent",
+                "[decision-id]": "support-two",
             },
         ),
         "things/_index/template-birth-triggers-index.md": (

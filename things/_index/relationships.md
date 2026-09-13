@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-12
-generated: 2026-09-12T20:05:08
-generated_from: HEAD@a18600a
-coverage: 358
+created: 2026-09-13
+generated: 2026-09-13T12:49:31
+generated_from: HEAD@589fcbf
+coverage: 387
 framework_version: 3.39.0
 ---
 
@@ -415,6 +415,9 @@ framework_version: 3.39.0
 - cross-domain-sync-catchup --extends--> provenance-specification
 - cross-domain-sync-catchup --extends--> change-reconciliation-specification
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
+- cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
+- cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
 - cue-carrier --implements--> unattended-cue-carrier-2026-09-12
 - cue-carrier --implements--> closed-loop-operating-state
 - cue-carrier --extends--> change-reconciliation-specification
@@ -422,18 +425,43 @@ framework_version: 3.39.0
 - cue-carrier --implements--> feels-automatic-is-persistence-of-the-question
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
+- cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
+- cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
+- cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
 - cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
+- cue-domain-refresh-specification-2026-09-13 --subject--> domain-refresh-specification
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
+- cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
+- cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
+- cue-explorer-extraction-and-hosting-2026-09-13 --subject--> explorer-extraction-and-hosting
+- cue-explorer-publication-position-2026-09-13 --subject--> explorer-publication-position
+- cue-explorer-publication-readiness-2026-09-13 --subject--> explorer-publication-readiness
+- cue-explorer-ui-increment-2026-08-2026-09-13 --subject--> explorer-ui-increment-2026-08
+- cue-first-hour-guide-2026-09-13 --subject--> first-hour-guide
+- cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
+- cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
+- cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
+- cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
+- cue-interface-specification-2026-09-13 --subject--> interface-specification
+- cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
+- cue-mechanical-coherence-checks-backlog-2026-09-13 --subject--> mechanical-coherence-checks-backlog
+- cue-operating-layer-quality-loop-2026-09-13 --subject--> operating-layer-quality-loop
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
+- cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
+- cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
+- cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
+- cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
+- cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-trigger-specification-2026-09-12 --subject--> trigger-specification
 - cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
 - cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
+- cue-watertight-membrane-sprint-2026-08-30-2026-09-13 --subject--> watertight-membrane-sprint-2026-08-30
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality
@@ -686,6 +714,12 @@ framework_version: 3.39.0
 - floor-structure-residue --references--> mechanical-coherence-checks-backlog
 - floor-structure-residue --supports--> cumulative-drift-is-invisible-to-per-change-walks
 - floor-structure-residue --implements--> a-declaration-is-inert-until-its-mechanism-is-current
+- framework-agent-closes-settled-cues-2026-09-13 --extends--> settled-reasoning-is-standing-authority
+- framework-agent-closes-settled-cues-2026-09-13 --extends--> unattended-cue-carrier-2026-09-12
+- framework-agent-closes-settled-cues-2026-09-13 --implements--> feels-automatic-is-persistence-of-the-question
+- framework-agent-closes-settled-cues-2026-09-13 --implements--> closed-loop-operating-state
+- framework-agent-closes-settled-cues-2026-09-13 --implements--> consequence-is-recoverable-only-in-retrospect
+- framework-agent-closes-settled-cues-2026-09-13 --informs--> cue-carrier
 - framework-discovery-specification --extends--> domain-specification-guide
 - framework-discovery-specification --references--> thing-specification
 - framework-discovery-specification --references--> git-workflow-specification

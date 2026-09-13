@@ -110,3 +110,11 @@ It stays as the net; it is not the primary.
 - Whether the cue's shape survives contact. The operator's own framing:
   *"things might change shape after some time"* — this is deploy-and-see,
   ruled on the record so the seeing has something to compare against.
+
+> **Postscript, 2026-09-13 — not part of the ruling.** It changed shape the
+> next morning, in one direction: "an agent may answer on a person's stated
+> ruling" became "a decision already on the record *is* that stated ruling,
+> and the citation is the receipt" — `framework-agent-closes-settled-cues-
+> 2026-09-13`, which extends this decision and leaves its unattended rule
+> intact. The 27 unraised the first reading found were closed under it the
+> same day.

@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.23
+version: 2.24
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -93,7 +93,7 @@ These fields must be present in every thing to do:
   - `decision` — a judgement made from knowledge, with inputs pinned to git commits via `informed_by`
   - `workflow-definition` — a reusable process skeleton with its stages expressed as data and the transitions allowed between them
   - `workflow-run` — one live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative
-  - `cue` — the change-reconciliation cue question, persisted: `subject` names the reasoned-from thing that was modified, `raised_at` pins the commit, and it stays `open` until a human records a `verdict` (`inflection` / `not-inflection`) with a `verdict_reason` — the receipt. Any session may raise one; only a human answers
+  - `cue` — the change-reconciliation cue question, persisted: `subject` names the reasoned-from thing that was modified, `raised_at` pins the commit, and it stays `open` until a `verdict` (`inflection` / `not-inflection`) is recorded with a `verdict_reason` — the receipt — by a human, or by the framework agent citing in `informed_by` the decision that already ruled the change (`framework-agent-closes-settled-cues-2026-09-13`). Any session may raise one; an unattended run never answers
   - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, `provenance.md`, `workflow-state.md`, and `change-reconciliation.md` for full specifications.
 - Two types are **framework-internal**: `guide` and `manifesto`. These are used by the framework's own files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
 - `specification` is framework-defined with the same lifecycle vocabulary and has exactly **two legitimate homes**: the framework's own spec files, and a domain's *specification skill* — the one scaffold-delivered file that states why the domain exists (`templates/domain-specification.skill.md.template` types it `specification`, and every scaffolded domain carries it that way). Any other domain use is misuse. *(The tenth review caught v2.18's "framework-internal only" claim contradicting the scaffold's own delivery — the classification followed neither the template nor the estate; this one follows both.)*

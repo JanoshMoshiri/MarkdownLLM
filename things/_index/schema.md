@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-09-12
-generated: 2026-09-12T20:05:08
-generated_from: HEAD@a18600a
-coverage: 358
+created: 2026-09-13
+generated: 2026-09-13T12:49:31
+generated_from: HEAD@589fcbf
+coverage: 387
 framework_version: 3.39.0
 ---
 
@@ -14,29 +14,29 @@ framework_version: 3.39.0
 
 | field | things using it |
 |---|---|
-| id | 358 |
-| type | 358 |
-| status | 358 |
-| created | 358 |
-| linked_things | 335 |
-| version | 292 |
-| tags | 258 |
-| origin | 178 |
-| confidence | 175 |
+| id | 387 |
+| type | 387 |
+| status | 387 |
+| created | 387 |
+| linked_things | 336 |
+| version | 321 |
+| tags | 287 |
+| origin | 179 |
+| confidence | 176 |
 | session | 173 |
 | source | 142 |
+| informed_by | 67 |
 | priority | 54 |
 | disposition | 51 |
 | disposition_reason | 51 |
-| informed_by | 37 |
+| subject | 42 |
+| raised_at | 42 |
+| raised_by | 42 |
+| verdict | 42 |
+| verdict_reason | 42 |
 | exposed | 27 |
-| decided_by | 26 |
+| decided_by | 27 |
 | promoted_to | 20 |
-| subject | 14 |
-| raised_at | 14 |
-| raised_by | 14 |
-| verdict | 13 |
-| verdict_reason | 13 |
 | triggers | 8 |
 | completed | 8 |
 | period_start | 8 |

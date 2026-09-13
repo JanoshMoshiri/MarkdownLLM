@@ -2,7 +2,7 @@
 id: cue-carrier
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-09-12
 session: 2026-09-12
 priority: high
@@ -144,18 +144,33 @@ is the seeing.
         by an agent under delegated authority and say so in prose; a field
         the floor could read would make that attributable without reading
         the body. Candidate, not built — one sighting.
-      · *Seeded, not yet seen:* the next session opens with one open cue
-        (`cue-closed-loop-operating-state-2026-09-12`) in its digest; the
-        observation is whether it gets answered, and by whom. A dispatch run
-        raising one: not yet.
+      · *Seen, 2026-09-13 — the loop closed the next morning.* The session
+        opened with the seeded open cue and 27 unraised. The operator's
+        answer was not to rule on 28 cues but to rule once on *who may*
+        (`framework-agent-closes-settled-cues-2026-09-13`): the framework
+        agent answers by citing the decision that already covers a change,
+        or on settled reasoning. Every one of the 28 traced to one of four
+        rulings already on the record, each sealed by its own session at the
+        time; all 28 answered by citation in one commit, the digest's line
+        to zero. The wallpaper risk resolved by *linking*, not by a
+        mechanism — the operator's own formula. The count to watch now
+        starts from zero. A dispatch run raising one: still not seen.
+      · *The `answered_by` candidate is now half-built by `informed_by`:* a
+        cue answered by citation names its authority mechanically; only the
+        no-decision case (settled reasoning) still carries its authority in
+        prose. One more sighting before a field.
 
 ## Done when
 
-- [ ] A modification of a reasoned-from thing with no cue is named in the
+- [x] A modification of a reasoned-from thing with no cue is named in the
       next session-start digest, and keeps being named until a cue covers it.
-- [ ] An open cue is named in every session-start digest until answered, and
-      an answered cue is silent until its subject moves again.
-- [ ] The floor rejects an answered cue without a verdict and reason.
-- [ ] The full suite is green, the kernel and generated blocks are current,
-      and the change is reconciled on the record.
-- [ ] Phase 6 has at least one real observation recorded.
+      *Live: 36 on first reading, 27 the next morning, tests pin the rule.*
+- [x] An open cue is named in every session-start digest until answered, and
+      an answered cue is silent until its subject moves again. *Live: the
+      closed-loop cue held overnight and was answered the next session.*
+- [x] The floor rejects an answered cue without a verdict and reason.
+- [x] The full suite is green (839 passed, 3 skipped at a18600a), the kernel
+      and generated blocks are current, and the change is reconciled on the
+      record (5e48421, 589fcbf).
+- [x] Phase 6 has at least one real observation recorded — five, and the
+      loop's first closure. Phase 6 stays open for the dispatch-run sighting.
