@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: triggers
 created: 2026-09-13
-generated: 2026-09-13T13:50:48
-generated_from: HEAD@396cd0e
-coverage: 8
+generated: 2026-09-13T14:29:02
+generated_from: HEAD@43dc588
+coverage: 9
 framework_version: 3.40.0
 ---
 
@@ -27,6 +27,10 @@ framework_version: 3.40.0
 ## framework-retrospective-2026-08b
 - status: completed  due_date: —
 - trigger: type=time, condition=2026-08-27 reached, action=Chase: if the 2026-08b retrospective has not been written, surface the wait itself — the debt is now three weeks past its own volume and milestone triggers
+
+## framework-retrospective-2026-09
+- status: complete  due_date: —
+- trigger: type=time, condition=2026-10-13 reached, action=Retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own.
 
 ## operator-queue-2026-08-28
 - status: evolving  due_date: —

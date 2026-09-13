@@ -9,6 +9,16 @@ definition and its number; this file is the invocation, and until 2026-09-08 it
 fired three of the seven — the net beneath the net was never wired to the hand
 that casts it.
 
+0. **If the cadence chase fired at session start** (the digest's fired-trigger
+   line on the latest retrospective) — first check the gate: if `things/` has
+   not moved since that retrospective's `period_end`, re-date the chase and
+   stop. Otherwise run the mechanical scans now (3 and 4 below, the orphan
+   findings from `validate`, and the held reasons for 7) and offer the rest as
+   the session's first item; "not now" defers it and the trigger stays fired.
+   An unattended run performs the whole ritual but writes the retrospective
+   as `status: draft`, raises cues for what it modified, and files every
+   ruling to the seat — it never answers a cue and never marks it `complete`
+   (`retrospective-cadence-is-a-dated-chase-2026-09-13`).
 1. `detect-conflicts` (scan mode; spec scan 1) — sweep every `linked_things` edge
    across the domain for contradictions;
    `{framework_root}/templates/prompts/detect-conflicts.md`.
@@ -43,6 +53,12 @@ that casts it.
    against the commit stream since the last retrospective and force a per-skill
    disposition (confirm-current / update / park / retire);
    `{framework_root}/templates/prompts/review-skill-coherence.md`.
+
+9. **Arm the next chase, disarm the one answered** — a `type: time` trigger on
+   the new retrospective, thirty days from its `period_end`, `action: surface`
+   (template in `{framework_root}/templates/retrospective.md.template`); remove
+   or re-date the trigger on the retrospective this one succeeds, since a
+   trigger on a terminal carrier keeps firing until it is.
 
 Commit the retrospective, the conflicts surfaced and the dispositions ruled, the
 reconciled things, and the skill edits the dispositions imply.

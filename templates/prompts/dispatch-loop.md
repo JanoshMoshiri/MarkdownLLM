@@ -2,7 +2,7 @@
 id: dispatch-loop
 type: prompt
 status: evolving
-version: 1.4
+version: 1.5
 created: 2026-08-27
 dispatch_guards:
   depth_limit: 1
@@ -109,7 +109,13 @@ schedule — the repos do. You make no rulings — the seats do.
    Then run each fired trigger's bound ritual **under that repo's own
    contract** — load its entry file and kernel first; the ritual's
    judgment belongs to the session acting as that domain's agent, not to
-   the dispatcher.
+   the dispatcher. The retrospective is such a ritual: when its cadence
+   chase has fired and `things/` moved since the last `period_end`, run the
+   scans, write the retrospective as `status: draft`, raise cues for what
+   you modified, and file every ruling — conflicts, promotions,
+   dispositions — to the seat. Never complete it, never answer a cue
+   (`retrospective-cadence-is-a-dated-chase-2026-09-13`). If nothing moved,
+   re-date the chase and report that you did.
 6. **Respect the seats.** Outputs that are seat-shaped — conflicts, option
    sets, anything irreversible, anything ambiguous across a boundary —
    are filed and queued for the operator, never resolved. The four seats

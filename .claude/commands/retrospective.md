@@ -3,15 +3,25 @@ description: Periodic domain retrospective + the reflexive sweeps it binds — c
 ---
 
 Write a `type: retrospective` thing for this domain (periodic quality reflection;
-see `retrospective.md`), then run the reflexive scans that spec binds to this
+see `{framework_root}/retrospective.md`), then run the reflexive scans that spec binds to this
 ritual. `retrospective.md` → *Reflexive Scans At Retrospective* owns each scan's
 definition and its number; this file is the invocation, and until 2026-09-08 it
 fired three of the seven — the net beneath the net was never wired to the hand
 that casts it.
 
+0. **If the cadence chase fired at session start** (the digest's fired-trigger
+   line on the latest retrospective) — first check the gate: if `things/` has
+   not moved since that retrospective's `period_end`, re-date the chase and
+   stop. Otherwise run the mechanical scans now (3 and 4 below, the orphan
+   findings from `validate`, and the held reasons for 7) and offer the rest as
+   the session's first item; "not now" defers it and the trigger stays fired.
+   An unattended run performs the whole ritual but writes the retrospective
+   as `status: draft`, raises cues for what it modified, and files every
+   ruling to the seat — it never answers a cue and never marks it `complete`
+   (`retrospective-cadence-is-a-dated-chase-2026-09-13`).
 1. `detect-conflicts` (scan mode; spec scan 1) — sweep every `linked_things` edge
    across the domain for contradictions;
-   `templates/prompts/detect-conflicts.md`.
+   `{framework_root}/templates/prompts/detect-conflicts.md`.
 2. **Triage every open conflict** (spec: What A Retrospective Produces, item 3) —
    walk `things/conflicts/` at `status: open`, the whole set and not only what the
    floor aged, and force a disposition on each: rule (superseded / both-valid /
@@ -21,13 +31,13 @@ that casts it.
    brake are the two that read.
 3. `review-schema-coherence` (spec scan 2) — audit the emergent frontmatter
    vocabulary for fields that have drifted apart in name but converged in meaning;
-   `templates/prompts/review-schema-coherence.md`.
-4. **Index rebuild** (spec scan 3) — `python tools/mdllm.py index . rebuild`.
+   `{framework_root}/templates/prompts/review-schema-coherence.md`.
+4. **Index rebuild** (spec scan 3) — `python {framework_root}/tools/mdllm.py index . rebuild`.
    The floor refuses a drifted index at every commit, so this resets the
    provenance anchors to the period's end; content parity never depended on it.
 5. **Change-driven reconciliation** (spec scan 4) — for every change the period
    landed without a declared inflection, run the backward pass
-   (`change-reconciliation.md` → Retrospective Reconciliation): freeze a
+   (`{framework_root}/change-reconciliation.md` → Retrospective Reconciliation): freeze a
    baseline, reconstruct the delta from `git log` over the period, assimilate each
    changed thing's affected set (`mdllm touchpoints`), walk it, and seal
    contradictions as `type: conflict` things. This is the only pass that catches
@@ -42,7 +52,13 @@ that casts it.
 8. `review-skill-coherence` (spec scan 7) — read the skills and the entry file
    against the commit stream since the last retrospective and force a per-skill
    disposition (confirm-current / update / park / retire);
-   `templates/prompts/review-skill-coherence.md`.
+   `{framework_root}/templates/prompts/review-skill-coherence.md`.
+
+9. **Arm the next chase, disarm the one answered** — a `type: time` trigger on
+   the new retrospective, thirty days from its `period_end`, `action: surface`
+   (template in `{framework_root}/templates/retrospective.md.template`); remove
+   or re-date the trigger on the retrospective this one succeeds, since a
+   trigger on a terminal carrier keeps firing until it is.
 
 Commit the retrospective, the conflicts surfaced and the dispositions ruled, the
 reconciled things, and the skill edits the dispositions imply.

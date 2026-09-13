@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-09-13
-generated: 2026-09-13T13:50:49
-generated_from: HEAD@396cd0e
-coverage: 399
+generated: 2026-09-13T14:29:02
+generated_from: HEAD@43dc588
+coverage: 402
 framework_version: 3.40.0
 ---
 
@@ -14,33 +14,33 @@ framework_version: 3.40.0
 
 | field | things using it |
 |---|---|
-| id | 399 |
-| type | 399 |
-| status | 399 |
-| created | 399 |
-| linked_things | 337 |
-| version | 333 |
-| tags | 299 |
-| origin | 179 |
-| confidence | 176 |
+| id | 402 |
+| type | 402 |
+| status | 402 |
+| created | 402 |
+| linked_things | 338 |
+| version | 336 |
+| tags | 302 |
+| origin | 180 |
+| confidence | 177 |
 | session | 173 |
 | source | 142 |
-| informed_by | 78 |
+| informed_by | 81 |
+| subject | 55 |
+| raised_at | 55 |
+| raised_by | 55 |
+| verdict | 55 |
+| verdict_reason | 55 |
 | priority | 54 |
-| subject | 53 |
-| raised_at | 53 |
-| raised_by | 53 |
-| verdict | 53 |
-| verdict_reason | 53 |
-| disposition | 49 |
-| disposition_reason | 49 |
+| disposition | 48 |
+| disposition_reason | 48 |
+| decided_by | 28 |
 | exposed | 27 |
-| decided_by | 27 |
 | promoted_to | 24 |
+| triggers | 9 |
 | period_start | 9 |
 | period_end | 9 |
 | domain | 9 |
-| triggers | 8 |
 | completed | 8 |
 | index_of | 5 |
 | generated | 5 |
@@ -51,8 +51,8 @@ framework_version: 3.40.0
 | definition | 4 |
 | current_stage | 4 |
 | verified_by | 3 |
+| resolution | 3 |
 | parties | 3 |
-| resolution | 2 |
 | resolved_by | 2 |
 | pattern_type | 2 |
 | demonstrates | 2 |

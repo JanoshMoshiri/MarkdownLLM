@@ -2,12 +2,16 @@
 id: framework-retrospective-2026-09
 type: retrospective
 status: complete
-version: 1.0
+version: 1.1
 created: 2026-09-13
 period_start: 2026-08-27
 period_end: 2026-09-13
 domain: markdownllm-framework
 tags: [retrospective, cue-carrier, closed-loop, standing-authority, reconciliation, seat-protocol]
+triggers:
+  - type: time
+    condition: "2026-10-13 reached"
+    action: "Retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own."
 linked_things:
   - id: framework-retrospective-2026-08c
     relation: references
@@ -285,4 +289,4 @@ by intent, session-end invoked, the retrospective called). Dispositions:
 - **When does a dispatch run raise its first cue?** Phase 4 has still not
   reached a ritual. Until it does, the unattended rule is doctrine without
   a data point.
-- **The conflict.** One sentence.
+- **The conflict.** One sentence. *Given later the same day — the operator delegated it, evidence-led; ruled `both-valid`, the insight revised to v1.1 in anchor vocabulary (`hard-hook-vocabulary-contradicts-observable-trigger-insight`).*

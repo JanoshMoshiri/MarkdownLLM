@@ -1,13 +1,12 @@
 ---
 id: hard-hook-vocabulary-contradicts-observable-trigger-insight
 type: conflict
-status: open
+status: resolved
 created: 2026-08-27
 session: 2026-08-27
 confidence: low
 origin: inferred
-disposition: keep-active
-disposition_reason: "Conflict resolution is a designed operator seat (gates-census-ratified-2026-08-28); the proposed resolution below — both-valid via the anchor distinction, the insight revised to v1.1 in anchor vocabulary and marked partially superseded by hook-enforcement-has-three-anchors — is written, the alternative is rejected with its reason, and the 2026-09 retrospective recommends it. Resolved on one sentence from the operator; dismissed if the operator rules the insight's classification test still operative."
+resolution: both-valid
 parties:
   - hard-hooks-require-observable-agent-caused-triggers
   - orchestration-specification
@@ -59,7 +58,32 @@ full-width conflict scan had run between then and the 08c retrospective. Its
 `informs` edge into `orchestration-specification` is precisely the edge class
 scan mode tests — the contradiction sat on a declared edge the whole time.
 
-## Proposed Resolution — for the operator, not decided here
+## Resolution — ruled 2026-09-13, `both-valid`
+
+Ruled by the framework domain agent on the operator's explicit delegation of
+this conflict, in voice, 2026-09-13: *"all of the evidence is accessible by
+you… you make the decision… lead by the evidence."* The evidence is the
+proposal below, written at the 08c retrospective and held through the 2026-09
+retrospective's triage with its alternative rejected and the reason stated;
+nothing in seventeen days moved it. Both positions survive:
+
+- The insight's principle is true of **enforcement**: only a trigger the agent
+  caused and can observe anchors mechanically (`git-fs`); a harness event
+  anchors only where an adapter binds it (`harness-session`); everything else
+  is interpretation. That is the anchor model's own content, anticipated.
+- The contract's vocabulary is true of **classification**: hard is always-on
+  configuration, and a hard hook may be legitimately unenforced where nothing
+  binds it. `session-start:estate-sync` and `session-start:version-check` are
+  hard, and enforced exactly where an adapter runs them.
+
+The insight is revised to v1.1 below (its "two surviving hard hooks" claim was
+a fact about enforcement wearing the word "hard"); `orchestration.md` is
+unchanged. The `contradicts` edges stay on this record as the history of the
+clash. Ruled, not merely proposed, because the operator delegated it — and
+because a proposal that has sat complete for seventeen days with its
+alternative rejected is settled reasoning by the standing-authority bar.
+
+## The Proposal As Written — 2026-08-27
 
 **Both-valid via the anchor distinction**, with a revision to the insight:
 

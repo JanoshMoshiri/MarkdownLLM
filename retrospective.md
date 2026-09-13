@@ -2,7 +2,7 @@
 id: retrospective-specification
 type: specification
 status: stable
-version: 1.7
+version: 1.8
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -91,7 +91,7 @@ view then surfaces each session.]
 
 ## When To Write One
 
-**Triggered by time:** A `type: retrospective` should be written when the domain crosses a monthly boundary with meaningful activity. If a domain is inactive for two months, no retrospective is needed for that gap.
+**Triggered by time:** A `type: retrospective` should be written when the domain crosses a monthly boundary with meaningful activity. If a domain is inactive for two months, no retrospective is needed for that gap. **The monthly boundary is a dated chase the latest retrospective carries** — a `type: time` trigger thirty days from its `period_end`, `action: surface` — so the floor evaluates it at every session start and a dispatch run finds it fired (`retrospective-cadence-is-a-dated-chase-2026-09-13`; the same form the estate retrospective below has used since August, one radius in). The gate on *running* it is activity, not the date: a fired chase with no `things/` movement since `period_end` is re-dated by the session that reads it. When it has fired at an attended session start, the mechanical scans (3, 4, and the enumerable halves of 5 and 6) run first and the judgement half is offered as the session's first item — never silently run before the operator's first request, because un-pulled judgement at t=0 does not happen (`emitted-content-is-read-instructed-content-is-economised`). An unattended run may perform the ritual: it writes the retrospective as `status: draft`, raises cues for what it modified, and files every ruling to the seat; completing it is an attended act. Each retrospective arms the next chase and disarms the one it answered. The floor's sixty-day cadence check remains the late net beneath this.
 
 **Triggered by volume:** If the domain has accumulated more than ~10 new conflicts or more than ~20 new insights since the last retrospective, that volume itself is a signal — something is changing faster than the domain can absorb.
 
@@ -103,7 +103,7 @@ Note that this trigger deliberately lives *here*, at judgement cadence, and not 
 
 **Triggered by a milestone:** After a significant domain event (a major thing completes, a long-running conflict resolves, a domain is restructured), write a retrospective to capture what was learned.
 
-There is no obligation to write one on a fixed schedule. The purpose is reflection, not compliance.
+There is no obligation to write one on a fixed schedule. The purpose is reflection, not compliance — which is why the chase is dated and the *run* is gated on activity: the date makes the question impossible to forget; the activity makes the answer honest.
 
 ---
 

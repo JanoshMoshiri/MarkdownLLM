@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-13
-generated: 2026-09-13T13:50:49
-generated_from: HEAD@396cd0e
-coverage: 91
+generated: 2026-09-13T14:29:03
+generated_from: HEAD@43dc588
+coverage: 93
 framework_version: 3.40.0
 ---
 
@@ -14,6 +14,7 @@ framework_version: 3.40.0
 
 ## a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - dispatch-design-2026-08 (pinned @f1fade782df3a6707bf5257f5794ba8f6a512264)
+- retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 
 ## a-well-kept-record-reads-as-a-governed-world
 - estate-retrospective-synthesis-2026-08 (derived-from)
@@ -112,11 +113,17 @@ framework_version: 3.40.0
 - cue-gates-census-ratified-2026-08-28-2026-09-13 (pinned @c964b2ebf607dc233b8cd4ea358e274335e08a63)
 - dispatch-digest-home-2026-08-29 (pinned @c964b2ebf607dc233b8cd4ea358e274335e08a63)
 
+## dispatch-loop
+- retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
+
 ## divergence-is-an-unrouted-decision
 - divergence-primitive-promotion (pinned @aae0712)
 
 ## domain-specification-guide
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## emitted-content-is-read-instructed-content-is-economised
+- retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 
 ## estate-retrospective-synthesis-2026-08
 - a-well-kept-record-reads-as-a-governed-world (derived-from)
@@ -162,6 +169,7 @@ framework_version: 3.40.0
 
 ## feels-automatic-is-persistence-of-the-question
 - framework-agent-closes-settled-cues-2026-09-13 (pinned @05c22b26cf978c1faf3f72d047cc27eafe7ebca7)
+- retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 
 ## field-report-2026-08-13-domain-session
 - assistant-register-does-not-graduate (derived-from)
@@ -196,7 +204,9 @@ framework_version: 3.40.0
 - cue-change-reconciliation-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-git-workflow-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-session-memory-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-thing-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -232,6 +242,7 @@ framework_version: 3.40.0
 - cue-gates-census-2026-08-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
 - cue-operator-queue-2026-08-28-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
 - framework-agent-closes-settled-cues-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
+- retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
 
 ## git-workflow-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
@@ -322,6 +333,7 @@ framework_version: 3.40.0
 
 ## retrospective-specification
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
+- retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)

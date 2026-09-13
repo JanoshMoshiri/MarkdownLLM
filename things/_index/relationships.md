@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-13
-generated: 2026-09-13T13:50:49
-generated_from: HEAD@396cd0e
-coverage: 399
+generated: 2026-09-13T14:29:02
+generated_from: HEAD@43dc588
+coverage: 402
 framework_version: 3.40.0
 ---
 
@@ -449,6 +449,7 @@ framework_version: 3.40.0
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
+- cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
@@ -459,6 +460,7 @@ framework_version: 3.40.0
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
+- cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
@@ -836,6 +838,8 @@ framework_version: 3.40.0
 - hard-hook-vocabulary-contradicts-observable-trigger-insight --parties--> orchestration-specification
 - hard-hooks-require-observable-agent-caused-triggers --informs--> orchestration-specification
 - hard-hooks-require-observable-agent-caused-triggers --extends--> hook-compliance-correlates-with-scope-not-awareness
+- hard-hooks-require-observable-agent-caused-triggers --references--> hook-enforcement-has-three-anchors
+- hard-hooks-require-observable-agent-caused-triggers --references--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - hard-invariants-encode-a-semantic-assumption --informs--> validate-thing-specification
 - hard-invariants-encode-a-semantic-assumption --references--> thing-specification
 - hard-invariants-encode-a-semantic-assumption --complements--> consistency-is-maintained-at-change-not-by-sweeping
@@ -1153,6 +1157,13 @@ framework_version: 3.40.0
 - response-depth-control --extends--> interface-specification
 - response-depth-control --informs--> hook-compliance-correlates-with-scope-not-awareness
 - response-depth-control --references--> operative-rules-are-a-small-fraction-of-spec-prose
+- retrospective-cadence-is-a-dated-chase-2026-09-13 --extends--> retrospective-specification
+- retrospective-cadence-is-a-dated-chase-2026-09-13 --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- retrospective-cadence-is-a-dated-chase-2026-09-13 --implements--> emitted-content-is-read-instructed-content-is-economised
+- retrospective-cadence-is-a-dated-chase-2026-09-13 --implements--> feels-automatic-is-persistence-of-the-question
+- retrospective-cadence-is-a-dated-chase-2026-09-13 --implements--> closed-loop-operating-state
+- retrospective-cadence-is-a-dated-chase-2026-09-13 --references--> framework-agent-closes-settled-cues-2026-09-13
+- retrospective-cadence-is-a-dated-chase-2026-09-13 --references--> framework-retrospective-2026-09
 - retrospective-specification --extends--> thing-specification
 - retrospective-specification --complements--> session-memory-specification
 - retrospective-specification --complements--> belief-revision-specification

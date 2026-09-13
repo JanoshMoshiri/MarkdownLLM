@@ -6,6 +6,14 @@ created: [ISO-date]
 period_start: [ISO-date]
 period_end: [ISO-date]
 domain: [domain-id]
+# The cadence chase (retrospective.md → When To Write One): date it thirty days
+# from period_end, action surface. A session that meets it fired runs the
+# mechanical scans and offers the rest; a dispatch run drafts and files. The
+# next retrospective disarms this one and arms its own.
+# triggers:
+#   - type: time
+#     condition: "[period_end + 30 days] reached"
+#     action: "Retrospective chase — if things/ moved since [period_end], run the mechanical scans and offer the ritual (or draft it unattended); if not, re-date."
 linked_things:
   - id: [open-loop-or-insight-id]
     relation: informs
