@@ -9,8 +9,6 @@ confidence: high
 origin: stated
 tags: [change-reconciliation, cue, seat-protocol, dispatcher, authority-receipt, closed-loop]
 informed_by:
-  - id: review-external-conflict-lifecycle-2026-09-08
-    commit: 7c5c21111295793ccb50ec41a67545bf62c82f47
   - id: inflection-candidates-are-computable
     commit: 7c5c21111295793ccb50ec41a67545bf62c82f47
   - id: closed-loop-operating-state
@@ -116,5 +114,13 @@ It stays as the net; it is not the primary.
 > ruling" became "a decision already on the record *is* that stated ruling,
 > and the citation is the receipt" — `framework-agent-closes-settled-cues-
 > 2026-09-13`, which extends this decision and leaves its unattended rule
-> intact. The 27 unraised the first reading found were closed under it the
-> same day.
+> intact. The 27 unraised the first reading found were
+> closed under it the same day.
+>
+> **Provenance corrected 2026-09-13 (CI).** This decision briefly pinned the
+> 2026-09-08 external review in `informed_by`, which the quarantine rule
+> refused: nothing may *rest* on an unverified external thing, and verifying
+> one is the operator's row. The pin was an over-claim — the review *raised*
+> F5; this ruling rests on the operator's judgement and on the two internal
+> things still pinned. The `references` edge remains, which is the honest
+> relation.

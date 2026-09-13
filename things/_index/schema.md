@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-09-13
-generated: 2026-09-13T14:48:21
-generated_from: HEAD@f11d58b
+generated: 2026-09-13T15:07:43
+generated_from: HEAD@a7d7521
 coverage: 403
 framework_version: 3.40.0
 ---
@@ -25,7 +25,7 @@ framework_version: 3.40.0
 | confidence | 177 |
 | session | 173 |
 | source | 142 |
-| informed_by | 82 |
+| informed_by | 80 |
 | subject | 56 |
 | raised_at | 56 |
 | raised_by | 56 |

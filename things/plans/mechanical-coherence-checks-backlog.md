@@ -2,7 +2,7 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: in-progress
-version: 1.6
+version: 1.7
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -404,6 +404,39 @@ continuity Open Threads on its retirement (`dissolve-continuity-into-reconciliat
   writes that file), and manual re-removal does not hold — whatever adds
   them is unattributed and outlives the fix, so the invariant has to be the
   thing that speaks, not the operator.
+
+- **`provenance` is not a pre-commit leg (added 2026-09-13, felt once — on a
+  public release).** The hook's blocking legs are boundary, validate and
+  coherence (plus the non-blocking `candidates` advisory); `mdllm provenance`
+  runs only in CI. So the **quarantine rule** — nothing may rest on an
+  unverified external thing, one of the framework's load-bearing safety rules
+  — cannot block a commit. Three violations rode eighteen commits through
+  every local gate and were caught by CI *after* the operator's delegated
+  release push had published them. Cost is not the objection: the CI leg runs
+  in about two seconds on this corpus. The design question is which one, and
+  it is genuinely open: (a) add provenance as a fourth blocking leg, paying
+  its freshness walk at every commit; (b) add an Errors-only variant that
+  skips the freshness pass, which is where nearly all its output lives; or
+  (c) rule deliberately that provenance is a *publication* gate rather than a
+  commit gate and move it into a release pre-flight the operator runs, beside
+  the boundary audit that belongs there too (`floor-structure-residue` item
+  9). One sighting, three candidates, none decided — recorded, not built
+  (`settled-reasoning-is-standing-authority` wants both halves). Note (c)
+  would make the pre-flight a real thing rather than the scratchpad
+  substitute the 3.40.0 release ran on.
+- **A cue's citation is not checked for kind (added 2026-09-13, same
+  instance).** `change-reconciliation.md` → The Cue Persists says a cue may be
+  answered *by citing the decision* that already ruled the change; the floor
+  checks only that the pin resolves. Two of the twenty-eight cues in the
+  close-the-loop batch cited an external **review artifact** — which raises
+  questions and rules nothing — and the quarantine rule caught it only
+  because that artifact happened to be unverified external content. A cue
+  citing an unverified *internal* non-decision would pass everything. The
+  obvious rule (a cue's `informed_by` must target `type: decision`) is
+  plausible but unproven: `informed_by` legitimately targets plans, insights
+  and artifacts elsewhere, so this would be a type-scoped exception, which is
+  the shape `judgement-checks-need-a-suppression-list-which-is-itself-drift`
+  tells us to be slow about. Held for a second sighting.
 
 Build when felt — and as of 2026-08-11 the same-builder items above *are* felt:
 the operator named the v3.30.x defect lump as the felt evidence commissioning

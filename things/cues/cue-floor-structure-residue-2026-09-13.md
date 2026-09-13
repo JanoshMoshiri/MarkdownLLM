@@ -9,9 +9,6 @@ raised_at: 7c5c21111295793ccb50ec41a67545bf62c82f47
 raised_by: "agent — the framework domain agent, 2026-09-13, under framework-agent-closes-settled-cues-2026-09-13: answered by citation of the ruling on the record"
 verdict: not-inflection
 verdict_reason: "A plan touched by the 8–11 September session-end that dispositioned the external review's findings; a link or status note, not a change to what the plan pursues."
-informed_by:
-  - id: review-external-conflict-lifecycle-2026-09-08
-    commit: 25852f3f886d411d9c21344d316ff8529eee7d87
 tags: [cue, close-the-loop, change-reconciliation, retrospective-baseline-2026-08-27]
 ---
 
@@ -29,6 +26,9 @@ alter the logical path — a rule, a workflow, a thing the domain reasons from
 **Not an inflection.** The brake's forward-loop pass touches open plans; this one's residue list did not change shape. Its eight inbound edges are the floor's own structure plans, unaffected.
 
 *Answered by the framework domain agent under
-`framework-agent-closes-settled-cues-2026-09-13`, citing the ruling on the
-record that covers the change. The operator may overturn this verdict by
+`framework-agent-closes-settled-cues-2026-09-13` — on **settled reasoning**, not by citation.
+No decision covers a session-end's forward-loop pass touching an open plan; this is a settled-reasoning answer — the brake touches open plans by design and the plan's residue list did not change shape.
+This cue first carried an `informed_by` pin to the external review, which was both a
+quarantine violation and a category error; the floor refused it in CI and it is
+corrected here. The operator may overturn this verdict by
 editing it — the cue stays on the record either way.*

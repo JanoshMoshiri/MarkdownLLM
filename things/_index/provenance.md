@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-13
-generated: 2026-09-13T14:48:21
-generated_from: HEAD@f11d58b
+generated: 2026-09-13T15:07:43
+generated_from: HEAD@a7d7521
 coverage: 93
 framework_version: 3.40.0
 ---
@@ -338,9 +338,6 @@ framework_version: 3.40.0
 
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)
-- cue-belief-revision-specification-2026-09-13 (pinned @25852f3f886d411d9c21344d316ff8529eee7d87)
-- cue-floor-structure-residue-2026-09-13 (pinned @25852f3f886d411d9c21344d316ff8529eee7d87)
-- unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
 ## review-independent-operating-model-2026-08-26-codex
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
