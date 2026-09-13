@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: 1.7
+version: 1.8
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -165,6 +165,22 @@ Commit messages in this framework are not about files — they're about domain s
 | `validate` | Validation fixes applied | `validate: fixed 3 broken links` |
 | `session-end` | The session-end ritual's closing commit — harvest, dispositions, open-loop updates; the delimiter `mdllm worklog` groups sessions on and the window `session-start`'s flip-surfacing reads from. Stray uncommitted changes found at close are swept into it and named — finding them is a `post-write:commit` breach worth noting, not the row's definition (this row defined session-end as the anomaly case for ten releases while every other surface and the tool treated it as the routine closer — a review-loop finding) | `session-end: 2026-08-09 — the substrate reconciliation sealed and rolled out` |
 | `framework` | Changes to skills, agent, or framework files | `framework: update write.thing.md — add trigger evaluation` |
+| `decide` | A `type: decision` recorded — a ruling, in the operator's words where given | `decide: the framework agent closes settled cues — …` |
+| `plan` | A `type: plan` opened, advanced, or closed; phase checkboxes moved | `plan: cue-carrier — Phases 1–5 ticked, Phase 6 open` |
+| `reconcile` | A change-reconciliation pass sealed — the walk's edits, the cues answered | `reconcile: the dark-region walk — six prose enumerations …` |
+| `fix` | A defect corrected in the floor, a test, or a surface it generates | `fix: the hook's block message stops advertising --no-verify` |
+| `build` | A mechanism landed in the floor — new subcommand, type, or check | `build: the cue carrier — type: cue, mdllm cues, …` |
+| `review` | An independent or external review recorded and dispositioned | `review: external conflict-lifecycle review — F1–F4 fixed, F5 open` |
+| `record` | A fact set down that no other row fits — a postscript, a census, evidence | `record: the ratification's "not ratified" list is no longer current` |
+| `harvest` | Insights extracted mid-session, outside the session-end ritual | `harvest: the insight promotes, and the half of its remedy that was declined says why` |
+| `retrospective` | The retrospective ritual's commit — the thing, the scans, the dispositions | `retrospective: the floor's floor (2026-08-04 → 2026-08-27) — …` |
+| `release` | The version bump — sentinel, CHANGELOG, re-pinned examples; the push is a separate human act | `release: 3.39.0 — a floor that could not see itself …` |
+
+The set is a vocabulary, not a gate: `mdllm worklog` groups by whatever prefix
+the stream uses, and the pre-commit hook does not read it. Rows are added when
+a prefix has earned its place in practice — this table lagged the live stream
+by ten prefixes for weeks (the 2026-09 retrospective's skill-coherence scan
+caught it), which is the drift `review-skill-coherence` exists to read.
 
 ### Multi-Thing Commits
 

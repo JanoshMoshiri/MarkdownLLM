@@ -6,6 +6,8 @@ created: 2026-08-27
 session: 2026-08-27
 confidence: low
 origin: inferred
+disposition: keep-active
+disposition_reason: "Conflict resolution is a designed operator seat (gates-census-ratified-2026-08-28); the proposed resolution below — both-valid via the anchor distinction, the insight revised to v1.1 in anchor vocabulary and marked partially superseded by hook-enforcement-has-three-anchors — is written, the alternative is rejected with its reason, and the 2026-09 retrospective recommends it. Resolved on one sentence from the operator; dismissed if the operator rules the insight's classification test still operative."
 parties:
   - hard-hooks-require-observable-agent-caused-triggers
   - orchestration-specification

@@ -1,11 +1,10 @@
 ---
 id: reconciliation-candidates-are-detectable-from-the-commit-stream
 type: insight
-status: active
-disposition: keep-active
-disposition_reason: "Design hypothesis, deliberately not built — a nice-to-have; reconciliation is manageable without it. Promote to a spec/feature when the manual noticing actually starts to cost."
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-27
+promoted_to: change-reconciliation-specification
 session: 2026-06-27
 source: operator
 confidence: medium
@@ -76,3 +75,7 @@ surface.
 A standing operator idea (~2 weeks). Deliberately **not built** — nice-to-have,
 reconciliation works without it. `keep-active`; promote when the manual noticing
 starts to cost.
+
+## Promoted — 2026-09-13
+
+By `framework-retrospective-2026-09`, scan 6 (conditions met): the held condition was *promote when the manual noticing actually starts to cost*. It cost: 36 reasoned-from modifications had landed un-walked in seventeen days. `mdllm cues` (v3.40) is this insight built — A/M classification from the commit stream, weighted by the same fan-in predicate, held as `type: cue` until answered. The razor's line (raise mechanically, answer humanly) is the carrier's own rule.

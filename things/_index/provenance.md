@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-13
-generated: 2026-09-13T12:51:26
-generated_from: HEAD@e0fb483
+generated: 2026-09-13T13:46:24
+generated_from: HEAD@07648b2
 coverage: 91
 framework_version: 3.39.0
 ---
@@ -189,7 +189,14 @@ framework_version: 3.39.0
 - floor-sprint-3-scope-2026-08-23 (pinned @4cea3aa123c05a5d6c489f767ef08f5c0388fb0c)
 
 ## framework-agent-closes-settled-cues-2026-09-13
+- cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-change-reconciliation-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-change-reconciliation-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-git-workflow-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-session-memory-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-thing-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)

@@ -1,15 +1,14 @@
 ---
 id: a-ruling-triages-more-cheaply-than-a-mechanism
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-07-28
+promoted_to: framework-agent-closes-settled-cues-2026-09-13
 session: 2026-07-28
 source: both
 confidence: high
 origin: synthesised
-disposition: keep-active
-disposition_reason: "One session's evidence, strong but single. Promote when a third ruling resolves a proposal set as cheaply — or dismiss if the next hard question needs a mechanism to settle it after all."
 tags: [rulings, doctrine, design-process, boundaries, restraint]
 linked_things:
   - id: membrane-attention-cluster
@@ -74,3 +73,7 @@ it before proposing it again.
   fresh reader.
 - Rulings are the human's to make. The agent's job is to surface the question
   cleanly enough that one paragraph can settle it.
+
+## Promoted — 2026-09-13
+
+By `framework-retrospective-2026-09`, scan 6 (conditions met): the held condition was *promote when a third ruling resolves a proposal set as cheaply*. First: the two membrane rulings of 2026-08-30 (six proposals). Second: the F5 ruling of 2026-09-12 (three options, and the review's fourth finding). Third: 2026-09-13 — one ruling on *who may answer* closed 28 cues and dissolved the seal-covers-its-tail mechanism the plan had declined to build. The decision it promotes to is that third ruling.

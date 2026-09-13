@@ -7,6 +7,8 @@ created: 2026-08-27
 session: 2026-08-27
 source: both
 confidence: high
+disposition: keep-active
+disposition_reason: "Standing razor for every proposal to automate a ritual: the schedule must be things, the tick must be dumb. Met again 2026-09-13 by the proposal to run the retrospective automatically on its 30-day trigger — which passes the razor only as a dated trigger the session reads, never as a scheduler that decides. Promote into orchestration.md's adapter doctrine when a second automation proposal is shaped by it on the record; dismiss if a scheduler outside the corpus is ever ruled acceptable."
 origin: stated
 tags: [dispatcher, closed-loop, scheduling, control-plane, phase-2, design-commitment]
 linked_things:

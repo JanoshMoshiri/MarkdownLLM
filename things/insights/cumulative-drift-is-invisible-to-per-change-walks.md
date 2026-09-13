@@ -1,15 +1,14 @@
 ---
 id: cumulative-drift-is-invisible-to-per-change-walks
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-08-05
+promoted_to: change-reconciliation-specification
 session: 2026-08-05
 source: both
 confidence: high
 origin: synthesised
-disposition: keep-active
-disposition_reason: "Standing cadence razor — decides when an unscoped sweep is owed; candidate for promotion into change-reconciliation.md or retrospective.md once a second sweep confirms the cadence."
 linked_things:
   - id: change-reconciliation-specification
     relation: informs
@@ -64,3 +63,7 @@ When drift is found on a surface, ask: *was this inside any single change's
 blast radius?* If yes — a walk was missed; tighten the walk. If no — no walk
 would ever have caught it; the surface needs generation or a sweep cadence,
 and blaming the per-change discipline is aiming at the wrong instrument.
+
+## Promoted — 2026-09-13
+
+By `framework-retrospective-2026-09`, scan 6 (conditions met): the held condition was *promote once a second sweep confirms the cadence*. The cue carrier's first live reading was that sweep: every per-change walk in the period had been honest, and 36 accumulated modifications sat outside all of them. The baseline-since-retrospective walk in *The Cue Persists* is the cadence, now mechanised; scan 4 reads its list.

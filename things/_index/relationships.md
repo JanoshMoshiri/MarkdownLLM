@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-13
-generated: 2026-09-13T12:51:26
-generated_from: HEAD@e0fb483
-coverage: 391
+generated: 2026-09-13T13:46:24
+generated_from: HEAD@07648b2
+coverage: 399
 framework_version: 3.39.0
 ---
 
@@ -416,7 +416,10 @@ framework_version: 3.39.0
 - cross-domain-sync-catchup --extends--> change-reconciliation-specification
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
+- cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 --subject--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
 - cue-carrier --implements--> unattended-cue-carrier-2026-09-12
 - cue-carrier --implements--> closed-loop-operating-state
@@ -425,8 +428,10 @@ framework_version: 3.39.0
 - cue-carrier --implements--> feels-automatic-is-persistence-of-the-question
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
+- cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 --subject--> cumulative-drift-is-invisible-to-per-change-walks
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
 - cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
@@ -443,6 +448,7 @@ framework_version: 3.39.0
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
+- cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
@@ -451,6 +457,7 @@ framework_version: 3.39.0
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
+- cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
@@ -783,6 +790,18 @@ framework_version: 3.39.0
 - framework-retrospective-2026-08c --references--> session-start-hardening
 - framework-retrospective-2026-08c --references--> estate-wide-autopush-2026-08-22
 - framework-retrospective-2026-08c --supports--> a-true-primitive-is-discovered-not-authored
+- framework-retrospective-2026-09 --references--> framework-retrospective-2026-08c
+- framework-retrospective-2026-09 --references--> cue-carrier
+- framework-retrospective-2026-09 --references--> unattended-cue-carrier-2026-09-12
+- framework-retrospective-2026-09 --references--> framework-agent-closes-settled-cues-2026-09-13
+- framework-retrospective-2026-09 --references--> review-external-conflict-lifecycle-2026-09-08
+- framework-retrospective-2026-09 --references--> hard-hook-vocabulary-contradicts-observable-trigger-insight
+- framework-retrospective-2026-09 --implements--> reconciliation-candidates-are-detectable-from-the-commit-stream
+- framework-retrospective-2026-09 --implements--> cumulative-drift-is-invisible-to-per-change-walks
+- framework-retrospective-2026-09 --implements--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- framework-retrospective-2026-09 --implements--> a-ruling-triages-more-cheaply-than-a-mechanism
+- framework-retrospective-2026-09 --references--> feels-automatic-is-persistence-of-the-question
+- framework-retrospective-2026-09 --references--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - framework-root-tracks-both-adapters --informs--> vendor-harness-adapter-foundation
 - framework-root-tracks-both-adapters --references--> code-architect-governs-substrate-code
 - framework-upward-signal --implements--> shared-domain-failures-are-a-framework-signal-without-a-path

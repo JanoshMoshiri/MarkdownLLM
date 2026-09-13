@@ -2,7 +2,7 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.3
+version: 1.4
 created: 2026-06-13
 linked_things:
   - id: thing-specification
@@ -71,15 +71,23 @@ longer a refinement but an *inflection* — a change to the logical path itself,
 not merely to how an existing path is expressed — is precisely the judgement
 the framework exists to support, not to replace.
 
-> **The reconciliation pass is entered when the driver declares an inflection.
-> The agent does not initiate it from edit-detection. Everything mechanical runs
-> only after the human "go."**
+> **The reconciliation pass is entered when an inflection is declared — by the
+> driver, or by the framework agent where a recorded ruling or the corpus's
+> settled reasoning already declares it. The agent does not initiate the pass
+> from edit-detection alone; edit-detection raises the question (a cue), and
+> the "go" is a verdict — the human's, given per change or standing in a
+> decision the cue can cite.**
 
 An agent may *offer* to reconcile when it notices it has changed a thing with
 many dependents — but the decision that a change is consequential enough to
-reconcile belongs to the person defining the domain. Automating the trigger
-would substitute the agent's pattern-following for the expert's knowing, which
-inverts the framework's purpose.
+reconcile belongs to the person defining the domain, or to a ruling that
+person has already recorded. Automating the *trigger* would substitute the
+agent's pattern-following for the expert's knowing, which inverts the
+framework's purpose; propagating a verdict the expert already gave does not
+(`framework-agent-closes-settled-cues-2026-09-13`, and *The Cue Persists*
+below). The 2026-09 retrospective's conflict scan found this box and the
+who-answers paragraph below saying different things for one day; this is the
+reconciled reading.
 
 ### The Cue Persists — The Carrier
 

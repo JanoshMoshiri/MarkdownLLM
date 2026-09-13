@@ -1,17 +1,16 @@
 ---
 id: an-agent-in-a-loop-optimises-the-loop-not-the-goal
 type: insight
-status: active
-version: 1.1
+status: promoted
+version: 1.2
 created: 2026-08-11
+promoted_to: dispatch-loop
 session: 2026-08-11
 source: both
 confidence: high
 origin: inferred
 exposed: true
 tags: [operator, autonomy, economics, loops, division-of-labour]
-disposition: keep-active
-disposition_reason: "Dismiss when a long autonomous run carries a stated exogenous stop condition at launch (a budget, a marginal-value test, or a decay threshold the agent must evaluate against) rather than only an internal success criterion — at which point the discipline is designed in rather than owed to the operator mid-run. PARTIALLY MET 2026-08-29 for one class only: dispatcher-launched runs now carry a stop condition mechanically — `mdllm dispatch-payload` refuses to compose a launch without one, and both live firings stated theirs at launch. That is the condition satisfied for runs the dispatcher starts, and for no others. Hand-launched multi-round work — reviews, sweeps, build arcs, this pass — still carries no stop condition by construction, and that is the majority of the estate's long runs today. Stays active; the dismissal needs the discipline general, not one channel of it."
 linked_things:
   - id: an-adversarial-review-loop-converges-on-its-own-fix-residue
     relation: complements
@@ -104,3 +103,7 @@ property of agents in loops rather than of this framework's subject matter.
 It is also the cheapest possible fix — one sentence in a run's launch
 contract — for a failure mode that cost this session five unnecessary rounds
 before a human happened to ask.
+
+## Promoted — 2026-09-13
+
+By `framework-retrospective-2026-09`, scan 6 (conditions met): the held condition was *dismiss when a long autonomous run carries a stated exogenous stop condition at launch*; the closed-loop plan read the same event as promotion, and promotion is the truer lifecycle word — the lesson crystallised into `dispatch-loop.md`'s mandatory `stop-condition` input and `mdllm dispatch-payload`'s refusal of a launch without one. Two real launches have carried it.
