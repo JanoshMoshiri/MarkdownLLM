@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-13
-generated: 2026-09-13T12:49:31
-generated_from: HEAD@589fcbf
-coverage: 387
+generated: 2026-09-13T12:51:26
+generated_from: HEAD@e0fb483
+coverage: 391
 framework_version: 3.39.0
 ---
 
@@ -424,6 +424,7 @@ framework_version: 3.39.0
 - cue-carrier --implements--> inflection-candidates-are-computable
 - cue-carrier --implements--> feels-automatic-is-persistence-of-the-question
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
@@ -454,11 +455,14 @@ framework_version: 3.39.0
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
+- cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
+- cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
 - cue-trigger-specification-2026-09-12 --subject--> trigger-specification
+- cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
 - cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
 - cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
 - cue-watertight-membrane-sprint-2026-08-30-2026-09-13 --subject--> watertight-membrane-sprint-2026-08-30

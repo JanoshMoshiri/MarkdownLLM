@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-13
-generated: 2026-09-13T12:49:31
-generated_from: HEAD@589fcbf
-coverage: 90
+generated: 2026-09-13T12:51:26
+generated_from: HEAD@e0fb483
+coverage: 91
 framework_version: 3.39.0
 ---
 
@@ -187,6 +187,12 @@ framework_version: 3.39.0
 ## floor-structure-residue
 - floor-sprint-2-scope-2026-08-22 (pinned @e98cdd9a8cdcb3f40cc5eed936f7b3c9a485d656)
 - floor-sprint-3-scope-2026-08-23 (pinned @4cea3aa123c05a5d6c489f767ef08f5c0388fb0c)
+
+## framework-agent-closes-settled-cues-2026-09-13
+- cue-change-reconciliation-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-session-memory-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-thing-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 
 ## framework-kernel
 - estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
