@@ -2,7 +2,7 @@
 id: floor-structure-residue
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-08-20
 priority: medium
 tags: [clean-architecture, solid, tests, ci, perimeter, refactor, review-residue]
@@ -150,6 +150,32 @@ Hand-restated facts that a per-change walk did not reach. The
 These are cheap to correct and are also the standing argument for the
 perimeter-currency check: a cold read found them, and a cold read is the
 instrument this class is currently protected by.
+
+## Item 9 — `mdllm boundary --history` cannot run on Windows
+
+**Found 2026-09-13, in the release pre-flight for 3.40.0** — the one moment
+this command exists for. It exits with
+`[WinError 206] The filename or extension is too long`: the argument list it
+composes for its history walk exceeds the Windows command-line limit on a
+repository of this size and a terms file of this length. The per-commit legs
+are unaffected and had passed on all eighteen commits (the `boundary`
+pre-commit leg over staged content, the commit-msg leg over each message),
+so the enforced gate held; what failed is the *audit* — the belt-and-braces
+re-read over a whole range, which is precisely what a human wants before
+publishing to a public repo.
+
+The release went out on a substitute: a range-scoped search of the same
+`.boundary-terms` over `git log --format=%B` plus `git diff` for
+`origin/main..HEAD`, clean over 36 terms, 35,630 characters of message and
+330,335 of diff. That substitute is throwaway scaffolding in a scratchpad,
+not a check — which is the point of recording this.
+
+Direction is **not settled**: batching the walk, streaming paths through
+stdin, or reading the range in-process are all plausible and none is
+decided, so this is recorded rather than fixed
+(`settled-reasoning-is-standing-authority` — the bar wants both halves).
+What is settled is that a release-surface audit that cannot run on the
+release surface's own platform is a defect, not a quirk.
 
 ## Done when
 
