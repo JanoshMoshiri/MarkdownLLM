@@ -350,9 +350,13 @@ def _modifications_since(root: Path, since: dt.date):
     read, so the caller can say so rather than report an empty set as clean.
     """
     try:
+        # Explicit midnight: git reads a bare `--since=YYYY-MM-DD` as that date
+        # at the CURRENT time of day, so on the retrospective's own day the
+        # walk silently skipped every commit that followed it (found 2026-09-13,
+        # the day the baseline moved to today).
         r = subprocess.run(
             ["git", "log", "--format=%x1e%H%x00%cs", "--name-status", "-M",
-             f"--since={since.isoformat()}", "--", "."],
+             f"--since={since.isoformat()}T00:00:00", "--", "."],
             cwd=root, capture_output=True, text=True, encoding="utf-8",
             errors="replace", timeout=60)
     except Exception:

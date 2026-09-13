@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-13
-generated: 2026-09-13T14:29:03
-generated_from: HEAD@43dc588
+generated: 2026-09-13T14:31:50
+generated_from: HEAD@7487ab3
 coverage: 93
 framework_version: 3.40.0
 ---
@@ -204,6 +204,7 @@ framework_version: 3.40.0
 - cue-change-reconciliation-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-git-workflow-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)

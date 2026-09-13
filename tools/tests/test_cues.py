@@ -145,6 +145,17 @@ def test_since_override_narrows_the_walk(tmp_path, capsys):
     assert rc == 0 and "- none" in out and "(--since)" in out
 
 
+def test_a_baseline_of_today_still_sees_todays_modifications(tmp_path, capsys):
+    # git reads a bare `--since=YYYY-MM-DD` as that date at the current time of
+    # day; the walk must pass explicit midnight or the retrospective's own day
+    # goes dark the moment the baseline moves to it.
+    import datetime as dt
+    root = _seed(tmp_path)
+    _modify(root, "things/spine.md", "revise spine today")
+    rc, out = _run_cues(root, capsys, since=dt.date.today().isoformat())
+    assert rc == 0 and "Unraised (1)" in out and "`spine`" in out
+
+
 def test_since_must_be_a_date(tmp_path, capsys):
     root = _seed(tmp_path)
     rc, out = _run_cues(root, capsys, since="yesterday")

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-13
-generated: 2026-09-13T14:29:02
-generated_from: HEAD@43dc588
-coverage: 402
+generated: 2026-09-13T14:31:50
+generated_from: HEAD@7487ab3
+coverage: 403
 framework_version: 3.40.0
 ---
 
@@ -449,6 +449,7 @@ framework_version: 3.40.0
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
+- cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
