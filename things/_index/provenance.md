@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-13
-generated: 2026-09-13T15:07:43
-generated_from: HEAD@a7d7521
-coverage: 93
+generated: 2026-09-13T16:45:46
+generated_from: HEAD@2b12791
+coverage: 94
 framework_version: 3.40.0
 ---
 
@@ -206,11 +206,13 @@ framework_version: 3.40.0
 - cue-git-workflow-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-mechanical-coherence-checks-backlog-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-session-memory-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-thing-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 
 ## framework-kernel
 - estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
@@ -225,6 +227,9 @@ framework_version: 3.40.0
 - gates-census-2026-08 (derived-from)
 - hard-hook-vocabulary-contradicts-observable-trigger-insight (derived-from)
 - operator-queue-2026-08-28 (pinned @7bffcb162f01c5cc6afb98756eca58bc5c5f79fe)
+
+## framework-retrospective-2026-09
+- the-corpus-answers-faster-than-it-is-asked (derived-from)
 
 ## framework-v3-transformation-plan
 - decision-status-vocabulary-domain-owned (pinned @da5d31d)
@@ -369,7 +374,6 @@ framework_version: 3.40.0
 - estate-retrospective-synthesis-2026-08 (derived-from)
 
 ## settled-reasoning-is-standing-authority
-- cue-mechanical-coherence-checks-backlog-2026-09-13 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 - framework-agent-closes-settled-cues-2026-09-13 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 - gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
 

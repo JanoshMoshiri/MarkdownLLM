@@ -2,7 +2,7 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: in-progress
-version: 1.7
+version: 1.8
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -21,6 +21,9 @@ linked_things:
   - id: an-advisory-is-scoped-by-who-can-perform-its-remedy
     relation: implements
     notes: "The standing scoping test every advisory in this backlog must pass before shipping — population is 'everything that can still reach the right state', never 'everything currently in the wrong one'."
+  - id: a-mechanism-fails-at-its-seams-not-in-its-body
+    relation: references
+    notes: "The admission question it adds, on the 2026-09-13 evidence: does a proposal close a seam between existing checks, or add another body with new seams of its own? Three of that day's four defects were seam-shaped and fixable by joining what exists."
   - id: a-check-run-where-it-cannot-see-mints-a-false-finding
     relation: references
     notes: "The reading-discipline half of this backlog's null-result and INCOMPLETE-conflation items: tool-side fixes live here, but the environment question before the content question stays the reader's."

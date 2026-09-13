@@ -5,30 +5,35 @@ status: answered
 version: 1.0
 created: 2026-09-13
 subject: mechanical-coherence-checks-backlog
-raised_at: 3e530d4eac0836ba81aa87c0f492239f97773eca
-raised_by: "agent — the framework domain agent, 2026-09-13, under framework-agent-closes-settled-cues-2026-09-13: answered by citation of the ruling on the record"
+raised_at: 2b12791fcfb2d6eb6c3f971bf444169667fb0815
+raised_by: "agent — the framework domain agent, 2026-09-13, at session end"
 verdict: not-inflection
-verdict_reason: "A backlog whose rows close as their mechanisms land — the structural-pin resolver the standing-authority ruling occasioned (fefe721), an insight promoted (1c05715), row 9 dissolved (3e530d4). Rows moving to done is the backlog working."
+verdict_reason: "Two items added with their evidence and their open questions, and one insight linked as an admission-gate consideration. Nothing built, no gate changed, no existing item re-scoped — the backlog doing what a backlog is for."
 informed_by:
-  - id: settled-reasoning-is-standing-authority
-    commit: c3b357cc1b66f0467f603df01bf5d6578bb9b991
-tags: [cue, close-the-loop, change-reconciliation, retrospective-baseline-2026-08-27]
+  - id: framework-agent-closes-settled-cues-2026-09-13
+    commit: e0fb483b2bed72edcb69f36a3e9fc56e900813d9
+tags: [cue, backlog, session-end]
 ---
 
 # Cue: `mechanical-coherence-checks-backlog` was modified — inflection?
 
 ## The Change
-Three commits: the pin resolver built at the commit boundary, the quality-loop harvest, the membrane sprint's phases A–E.
+Two items added 2026-09-13 (provenance absent from the pre-commit legs; a
+cue's citation unchecked for kind), each with its evidence, its candidate
+fixes, and an explicit statement that none is decided. Then, at session end,
+`a-mechanism-fails-at-its-seams-not-in-its-body` linked as a consideration
+for the backlog's admission gate. Versions 1.6 → 1.8.
 
 ## The Question
-Does the accumulated change to this thing since the 27 August retrospective
-alter the logical path — a rule, a workflow, a thing the domain reasons from
-— or only how an existing path is expressed, or record its progress?
+Does this change alter the logical path — a rule, a workflow, a thing the
+domain reasons from — or only how an existing path is expressed?
 
 ## The Answer
-**Not an inflection.** Seventeen things link to this backlog because it is where mechanism candidates wait; a candidate becoming a mechanism is the intended transition, and each of these three was ruled or built on the record it cites. The backlog's own rule — promote restated enumerations into derived surfaces — is unchanged and, as it happens, is the rule the cue carrier's dark-region walk just obeyed.
+**Not an inflection.** Filing a candidate is the backlog's function; its
+suppression-list gate and its scoping test are unchanged, and both new items
+explicitly decline to choose a direction. The seventeen things that link here
+reason from the gate, not from the item list.
 
 *Answered by the framework domain agent under
-`framework-agent-closes-settled-cues-2026-09-13`, citing the ruling on the
-record that covers the change. The operator may overturn this verdict by
-editing it — the cue stays on the record either way.*
+`framework-agent-closes-settled-cues-2026-09-13`. The operator may overturn
+this verdict by editing it — the cue stays on the record either way.*

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-13
-generated: 2026-09-13T15:07:43
-generated_from: HEAD@a7d7521
-coverage: 403
+generated: 2026-09-13T16:45:46
+generated_from: HEAD@2b12791
+coverage: 406
 framework_version: 3.40.0
 ---
 
@@ -84,6 +84,11 @@ framework_version: 3.40.0
 - a-layered-harness-is-a-co-author-not-a-substrate --informs--> cowork-integrity-estate-sweep
 - a-layered-harness-is-a-co-author-not-a-substrate --supports--> assistant-register
 - a-literal-date-in-a-fixture-is-a-clock-the-suite-does-not-control --complements--> portability-claims-need-execution-tests
+- a-mechanism-fails-at-its-seams-not-in-its-body --informs--> mechanical-coherence-checks-backlog
+- a-mechanism-fails-at-its-seams-not-in-its-body --informs--> floor-structure-residue
+- a-mechanism-fails-at-its-seams-not-in-its-body --extends--> change-safety-is-defense-in-depth
+- a-mechanism-fails-at-its-seams-not-in-its-body --supports--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- a-mechanism-fails-at-its-seams-not-in-its-body --supports--> partial-coverage-quiets-the-uncovered-steps
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --derived-from--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --complements--> mis-keyed-links-pass-the-floor-silently
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --supports--> the-harness-bound-path-is-the-least-tested-path
@@ -473,6 +478,7 @@ framework_version: 3.40.0
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
 - cue-trigger-specification-2026-09-12 --subject--> trigger-specification
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
+- cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
 - cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
 - cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
 - cue-watertight-membrane-sprint-2026-08-30-2026-09-13 --subject--> watertight-membrane-sprint-2026-08-30
@@ -978,6 +984,7 @@ framework_version: 3.40.0
 - mechanical-coherence-checks-backlog --references--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - mechanical-coherence-checks-backlog --implements--> a-control-that-must-stay-local-has-no-floor
 - mechanical-coherence-checks-backlog --implements--> an-advisory-is-scoped-by-who-can-perform-its-remedy
+- mechanical-coherence-checks-backlog --references--> a-mechanism-fails-at-its-seams-not-in-its-body
 - mechanical-coherence-checks-backlog --references--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - mechanism-pairs-come-from-two-reflection-axes --supports--> directional-graph-reads-come-in-inbound-outbound-pairs
 - mechanism-pairs-come-from-two-reflection-axes --supports--> composition-is-the-inverse-of-decomposition
@@ -1323,6 +1330,11 @@ framework_version: 3.40.0
 - substrate-totality-residue --references--> a-wrong-sum-is-indistinguishable-from-a-right-one
 - substrate-totality-residue --implements--> validate-thing-specification
 - substrate-totality-residue --references--> trigger-specification
+- the-corpus-answers-faster-than-it-is-asked --extends--> the-record-answers-the-direction-question-first
+- the-corpus-answers-faster-than-it-is-asked --supports--> a-ruling-triages-more-cheaply-than-a-mechanism
+- the-corpus-answers-faster-than-it-is-asked --supports--> feels-automatic-is-persistence-of-the-question
+- the-corpus-answers-faster-than-it-is-asked --derived-from--> framework-retrospective-2026-09
+- the-corpus-answers-faster-than-it-is-asked --challenges--> the-root-is-not-a-representative-domain
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
 - the-first-retrospective-is-the-one-the-floor-cannot-chase --informs--> retrospective-specification

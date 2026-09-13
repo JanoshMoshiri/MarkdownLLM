@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-09-13
-generated: 2026-09-13T15:07:43
-generated_from: HEAD@a7d7521
-coverage: 403
+generated: 2026-09-13T16:45:46
+generated_from: HEAD@2b12791
+coverage: 406
 framework_version: 3.40.0
 ---
 
@@ -14,26 +14,26 @@ framework_version: 3.40.0
 
 | field | things using it |
 |---|---|
-| id | 403 |
-| type | 403 |
-| status | 403 |
-| created | 403 |
-| linked_things | 338 |
-| version | 337 |
-| tags | 303 |
-| origin | 180 |
-| confidence | 177 |
-| session | 173 |
-| source | 142 |
-| informed_by | 80 |
-| subject | 56 |
-| raised_at | 56 |
-| raised_by | 56 |
-| verdict | 56 |
-| verdict_reason | 56 |
+| id | 406 |
+| type | 406 |
+| status | 406 |
+| created | 406 |
+| version | 340 |
+| linked_things | 340 |
+| tags | 306 |
+| origin | 182 |
+| confidence | 179 |
+| session | 175 |
+| source | 144 |
+| informed_by | 81 |
+| subject | 57 |
+| raised_at | 57 |
+| raised_by | 57 |
+| verdict | 57 |
+| verdict_reason | 57 |
 | priority | 54 |
-| disposition | 48 |
-| disposition_reason | 48 |
+| disposition | 49 |
+| disposition_reason | 49 |
 | decided_by | 28 |
 | exposed | 27 |
 | promoted_to | 24 |
