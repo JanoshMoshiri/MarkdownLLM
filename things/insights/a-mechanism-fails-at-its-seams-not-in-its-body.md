@@ -2,7 +2,7 @@
 id: a-mechanism-fails-at-its-seams-not-in-its-body
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-09-13
 session: 2026-09-13
 source: both
@@ -25,6 +25,12 @@ linked_things:
   - id: partial-coverage-quiets-the-uncovered-steps
     relation: supports
     notes: "Why seams go quiet: the covered steps completing makes the gap between them feel covered too."
+  - id: coherence-is-a-maintained-rate-not-a-state
+    relation: extends
+    notes: "Names a tier that model did not: the seams between mechanical controls are neither prose nor check-internals, and nine reviews could not see them because reviews read content, not gate composition."
+  - id: an-adversarial-review-loop-converges-on-its-own-fix-residue
+    relation: supports
+    notes: "Its corollary 3 — derived surfaces never appeared in any round's findings — is the same observation from the other side: what is composed correctly never fails, so the failures live in what is not composed at all."
 ---
 
 # A Mechanism Fails At Its Seams, Not In Its Body
@@ -66,6 +72,27 @@ The four seams, each with its instance from 2026-09-13:
   quarantine violations because CI runs a leg the hook does not; the
   one-day-old contradiction inside a spec because a scan walks edges no author
   re-reads.
+
+## Where This Sits Against The Rate Model
+
+`coherence-is-a-maintained-rate-not-a-state` (2026-08-11) decomposes defects
+into two tiers: a **mechanical** tier that ran at zero across nine reviews, and
+a **prose** tier that leaks continuously, caught by inspection cadence. Read
+carelessly, "mechanical tier at zero" says the floor has no gaps. It does not
+say that, and 2026-09-13 shows why: **three of the four seams were in
+mechanical territory and none of them was a check computing a wrong answer.**
+
+The reviews measured what the checks *say* — derived surfaces against their
+sources, censuses against their registries — and found them clean, repeatedly
+and correctly. No review ever asked *which checks the commit gate composes*,
+*what platform a check can stand on*, or *whether one mechanism's output is
+the right kind for the next*, because a review reads content and a seam is not
+content. So the rate model's two tiers want a third between them: the
+**composition** tier — mechanically checkable in principle, checked by nobody
+in practice, and invisible to the instrument that certified the tier above it.
+
+This does not weaken the rate model; it sharpens its metric. Confinement is
+measured against the tiers you have named, so an unnamed tier reads as zero.
 
 ## Context
 

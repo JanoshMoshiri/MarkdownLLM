@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-13
-generated: 2026-09-13T16:45:46
-generated_from: HEAD@2b12791
+created: 2026-09-14
+generated: 2026-09-14T23:47:25
+generated_from: HEAD@a6a1dbf
 coverage: 94
 framework_version: 3.40.0
 ---
@@ -198,6 +198,7 @@ framework_version: 3.40.0
 
 ## framework-agent-closes-settled-cues-2026-09-13
 - cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-a-mechanism-fails-at-its-seams-not-in-its-body-2026-09-14 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-change-reconciliation-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)

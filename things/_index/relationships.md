@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-13
-generated: 2026-09-13T16:45:46
-generated_from: HEAD@2b12791
-coverage: 406
+created: 2026-09-14
+generated: 2026-09-14T23:47:25
+generated_from: HEAD@a6a1dbf
+coverage: 407
 framework_version: 3.40.0
 ---
 
@@ -89,6 +89,8 @@ framework_version: 3.40.0
 - a-mechanism-fails-at-its-seams-not-in-its-body --extends--> change-safety-is-defense-in-depth
 - a-mechanism-fails-at-its-seams-not-in-its-body --supports--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - a-mechanism-fails-at-its-seams-not-in-its-body --supports--> partial-coverage-quiets-the-uncovered-steps
+- a-mechanism-fails-at-its-seams-not-in-its-body --extends--> coherence-is-a-maintained-rate-not-a-state
+- a-mechanism-fails-at-its-seams-not-in-its-body --supports--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --derived-from--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --complements--> mis-keyed-links-pass-the-floor-silently
 - a-missing-contract-degrades-to-semantic-drift-not-breakage --supports--> the-harness-bound-path-is-the-least-tested-path
@@ -422,6 +424,7 @@ framework_version: 3.40.0
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
 - cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 --subject--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- cue-a-mechanism-fails-at-its-seams-not-in-its-body-2026-09-14 --subject--> a-mechanism-fails-at-its-seams-not-in-its-body
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
