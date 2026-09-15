@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-14
-generated: 2026-09-14T23:47:25
-generated_from: HEAD@a6a1dbf
-coverage: 407
+created: 2026-09-15
+generated: 2026-09-15T19:59:57
+generated_from: HEAD@81b34e8
+coverage: 409
 framework_version: 3.40.0
 ---
 
@@ -463,6 +463,7 @@ framework_version: 3.40.0
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
 - cue-mechanical-coherence-checks-backlog-2026-09-13 --subject--> mechanical-coherence-checks-backlog
+- cue-mechanical-coherence-checks-backlog-2026-09-15 --subject--> mechanical-coherence-checks-backlog
 - cue-operating-layer-quality-loop-2026-09-13 --subject--> operating-layer-quality-loop
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -1220,6 +1221,9 @@ framework_version: 3.40.0
 - scaffold-declares-visibility --informs--> agents-drop-mechanical-birth-steps-not-semantic-ones
 - scaffold-declares-visibility --references--> hook-enforcement-has-three-anchors
 - scaffold-declares-visibility --references--> repeated-drift-promotes-a-fact-into-the-floor
+- scaffold-harness-is-an-explicit-selection-2026-09-15 --implements--> vendor-harness-adapter-foundation
+- scaffold-harness-is-an-explicit-selection-2026-09-15 --references--> installation-is-not-activation
+- scaffold-harness-is-an-explicit-selection-2026-09-15 --references--> a-generated-contract-change-is-an-estate-migration
 - scalability-guide --extends--> thing-specification
 - scalability-guide --informs--> read-thing-specification
 - scalability-guide --informs--> write-thing-specification

@@ -2,7 +2,7 @@
 id: operator-queue-2026-08-28
 type: artifact
 status: evolving
-version: 1.3
+version: 1.4
 created: 2026-08-28
 session: 2026-08-28
 tags: [operator-queue, seat-protocol, verdicts, closed-loop, one-sitting]
@@ -28,10 +28,6 @@ linked_things:
   - id: estate-workflow-derivation
     relation: derived-from
     notes: "The three process gaps and two stale mirrors this programme surfaced and deliberately did not close."
-triggers:
-  - type: time
-    condition: "2026-09-10 reached"
-    action: "If this queue has not been ruled, report which tier-1 rows remain open and what each is blocking. The queue idles at the operator's seat by design; an undated idle is the drift the estate already learned to chase."
 ---
 
 # Operator Queue — 2026-08-28
@@ -156,6 +152,25 @@ gate and a habit is the operator's to draw.
 >
 > The queue's Tier-1 sentence now reads: **row 4's flips and row 9's grants
 > are the two acts left, and both are one sitting at the operator's seat.**
+
+> **Closing update, v1.4 (2026-09-15).** Written at the operator's seat, in
+> session — the sitting the v1.3 block asked for.
+>
+> - **Row 4 — closed.** The one remaining attributable `verified` flip
+>   performed (the engineering side; the overview side had been flipped in
+>   an interim session), in its own commit naming the operator.
+> - **Row 9 — closed.** The twelve clone-local trust grants performed on
+>   their reviewed hashes. `estate-check` over seven consumers: coverage
+>   271/332, from zero. What the lifted blindness immediately reported —
+>   95 imports needing attention, 61 still uncheckable — is each consuming
+>   domain's disposition, and is now *visible*, which was the row's point.
+>
+> **Tier 1 is empty.** Nothing in this queue gates the loop any longer.
+> Rows 6–8, 13, 16 and 17 remain where v1.2 left them — each a domain's
+> judgement or the operator's answer, none load-bearing for the loop.
+> The 2026-09-10 trigger discharged here and is removed. The closures are
+> recorded in `watertight-membrane-sprint-2026-08-30` (now completed) and,
+> for the dispatcher's silence, in `closed-loop-operating-state` v2.1.
 
 ---
 

@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-14
-generated: 2026-09-14T23:47:25
-generated_from: HEAD@a6a1dbf
+created: 2026-09-15
+generated: 2026-09-15T19:59:57
+generated_from: HEAD@81b34e8
 coverage: 94
 framework_version: 3.40.0
 ---
@@ -208,6 +208,7 @@ framework_version: 3.40.0
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-mechanical-coherence-checks-backlog-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-mechanical-coherence-checks-backlog-2026-09-15 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-session-memory-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -426,6 +427,7 @@ framework_version: 3.40.0
 - an-interface-is-what-its-consumers-call-not-what-it-declares (derived-from)
 - installation-is-not-activation (derived-from)
 - live-eval-scope-bounded-to-claude (pinned @c199002)
+- scaffold-harness-is-an-explicit-selection-2026-09-15 (pinned @81b34e80c4f53922776d7dd2ebab16f74241aee0)
 
 ## watertight-membrane-sprint-2026-08-30
 - a-never-crossed-gate-hides-the-defects-behind-it (derived-from)

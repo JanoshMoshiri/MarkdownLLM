@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.35
+version: 1.36
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -106,12 +106,29 @@ a compatibility claim.
 
 ## Phase 8 — rollout and release decision (operator-owned)
 
-- [ ] Decide whether omission continues to select the historical Claude
-  compatibility default, requires explicit harness selection, or renders more
-  than one project-bound adapter. Until that decision, the default does not
-  change.
-- [ ] Offer existing domains an opt-in `doctor` plus managed-fragment diff.
-  Do not batch-install permission-bearing project configuration.
+- [x] **Decide the harness default.** *Ruled 2026-09-15
+  (`scaffold-harness-is-an-explicit-selection-2026-09-15`): omission no
+  longer selects the historical Claude compatibility default. `scaffold`
+  asks — a selection from the registered list when a human is at the
+  keyboard, a refusal that prints the list when nobody is. The build is a
+  floor change under code-architect's skills, sequenced before the release
+  in the third box; until it lands the shipped default does not change.*
+  - [ ] Build: the prompt, the non-interactive refusal, tests for both, and
+    the `--harness` help text inverted.
+- [ ] **Offer existing domains an opt-in `doctor` plus managed-fragment
+  diff.** Do not batch-install permission-bearing project configuration.
+  *Surveyed 2026-09-15: thirteen of the fourteen domains on this clone
+  report `currency=stale` for both the Claude Code and Codex managed
+  fragments (one is current). The owned diff, as `adapter-install
+  --dry-run` shows it, is the same everywhere: the launcher probe gains
+  existence guards (`-x`, `command -v`) before probing a candidate Python,
+  and the fragment hash moves with it. Both fragments are tracked files, so
+  each refresh is one commit in that domain's repo, autopushed, after which
+  Claude Code re-asks the human to approve the project hooks on the next
+  session there — the human-observed trust the doctor line names. The
+  opt-in is per domain; a pass that runs domain by domain with each diff
+  shown is not a batch install. Awaiting the operator's word: run the pass
+  now, or leave each domain to adopt at its next refresh.*
 - [ ] Version and changelog the settled decision, then perform the deliberate
   framework release/publish act. Root `autopush: false` remains controlling.
 

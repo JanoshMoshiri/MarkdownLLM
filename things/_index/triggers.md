@@ -3,10 +3,10 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-09-14
-generated: 2026-09-14T23:47:25
-generated_from: HEAD@a6a1dbf
-coverage: 9
+created: 2026-09-15
+generated: 2026-09-15T19:59:57
+generated_from: HEAD@81b34e8
+coverage: 7
 framework_version: 3.40.0
 ---
 
@@ -14,7 +14,7 @@ framework_version: 3.40.0
 
 ## closed-loop-operating-state
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-09-05 reached, action=Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29).
+- trigger: type=time, condition=2026-09-30 reached, action=Re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29).
 
 ## estate-retrospective-synthesis-2026-08
 - status: evolving  due_date: —
@@ -32,17 +32,9 @@ framework_version: 3.40.0
 - status: complete  due_date: —
 - trigger: type=time, condition=2026-10-13 reached, action=Retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own.
 
-## operator-queue-2026-08-28
-- status: evolving  due_date: —
-- trigger: type=time, condition=2026-09-10 reached, action=If this queue has not been ruled, report which tier-1 rows remain open and what each is blocking. The queue idles at the operator's seat by design; an undated idle is the drift the estate already learned to chase.
-
 ## operator-seat-and-harness-native-onramp
 - status: not-started  due_date: —
 - trigger: type=time, condition=2026-09-20 reached, action=If no phase has started, surface it plainly: the direction was ratified on felt evidence and the substrate backlog is also waiting. Ask which goes first — the onramp or the eval backlog — rather than letting both idle.
-
-## watertight-membrane-sprint-2026-08-30
-- status: blocked  due_date: —
-- trigger: type=time, condition=2026-09-05 reached, action=If Phase A/B operator gates (verified flips, trust grants) are still unruled, surface them alongside the dispatcher dead-man — the same date, deliberately: both are the closed loop waiting on its human seats.
 
 ## workflow-reconciliation-precedes-new-definitions
 - status: made  due_date: —

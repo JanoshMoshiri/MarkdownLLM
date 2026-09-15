@@ -1,8 +1,8 @@
 ---
 id: watertight-membrane-sprint-2026-08-30
 type: plan
-status: blocked
-version: 1.1
+status: completed
+version: 1.2
 created: 2026-08-30
 session: 2026-08-30
 priority: critical
@@ -30,11 +30,7 @@ linked_things:
     notes: "Stop condition: this sprint ends when the phases below are done or gated; gates are listed for the operator, never worked around."
   - id: a-never-crossed-gate-hides-the-defects-behind-it
     relation: references
-    notes: "The sprint's own generalisation: four defects stacked behind one unperformed trust act, and the accurate zero-coverage measurement pointed four sightings at the wrong remedy. Kept live here because Phase B's gate is still open — the insight's own rule (prove the path before spending the human act) is what this plan is currently doing."
-triggers:
-  - type: time
-    condition: "2026-09-05 reached"
-    action: "If Phase A/B operator gates (verified flips, trust grants) are still unruled, surface them alongside the dispatcher dead-man — the same date, deliberately: both are the closed loop waiting on its human seats."
+    notes: "The sprint's own generalisation: four defects stacked behind one unperformed trust act, and the accurate zero-coverage measurement pointed four sightings at the wrong remedy. Its rule — prove the path before spending the human act — is what this plan did: the path proven 2026-08-30, the human acts spent 2026-09-15."
 ---
 
 # Watertight Membrane Sprint — 2026-08-30
@@ -152,6 +148,42 @@ flips. Recorded as `blocked` rather than `completed` because the sprint's
 desired state (coverage > 0, mirrors attributably re-verified) is not yet
 true, and rather than `in-progress` because no further agent work advances
 it. The 2026-09-05 trigger co-fires with the dispatcher dead-man.
+
+**Completed 2026-09-15 — the two human acts performed, at the operator's
+seat, in one sitting.** The operator's in-session instruction: *"let's do
+the verify flip and the trust."* What was done, and what it found:
+
+- **The grants (Phase B's gate).** `external-trust review` re-run across
+  every consumer address book on this clone: seven books, fifteen entries.
+  The cross-domain overview's three were already trusted — an interim
+  grant — leaving exactly the twelve this sprint staged. All twelve were
+  granted on their reviewed hashes (`body-read`, `command`; each spawns
+  the estate's own launcher against the operator's own clones). Trust is
+  clone-local by design (`.git/markdownllm/external-trust.json`): a
+  second machine performs the same act again, and that is correct.
+- **The flip (Phase A's gate).** One remained, not two: the engineering
+  mirror of the overview's weekly agenda definition, `verified: false` at
+  its 2026-08-30 pin, the source unmoved since (the log over the pin
+  range is empty). Flipped in its own commit naming the operator. The
+  other side of the pair had been flipped in an interim overview session
+  — imports-check reports it fresh. The engineering push was rejected on
+  the way out (an unrelated commit by that domain's development agent had
+  landed on the remote); routed by rebasing the one flip commit onto it,
+  then published.
+- **Coverage — the desired state's own measure.** `estate-check` over the
+  seven consumers: **271/332 checkable**, from 0/43 and 0/120 at this
+  sprint's opening. And the first thing the lifted blindness showed is
+  the backlog it had been hiding: **95 imports need attention** (94
+  stale, 1 diverged — the overview alone carries 23, eleven of them
+  content-changed and so owing re-quarantine and a fresh attributable
+  flip each; the engineering side 41; the pilot 30) and **61 remain
+  uncheckable** — triple-less externals, plus one consumer whose six
+  imports resolve to no route. None of that is this sprint's to work: a
+  watertight membrane is one that *reports* the stale, and it now does.
+  Disposition is each consuming domain's, under its own contract.
+
+The 2026-09-05 trigger discharged with this block and is removed; its
+firing is in the commit stream.
 
 *(original F: report.)* Sprint summary with the operator's gate list (flips,
   grants, docs Phase 8 note), publication debt, and the queue rows moved.

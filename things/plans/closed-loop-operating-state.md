@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 2.0
+version: 2.1
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -54,8 +54,8 @@ linked_things:
     notes: "The pilot's first firing paid for this one. It is the standing design lens on Phase 4's remaining runs: a fail-closed loop that cannot file its own refusal is silent exactly where it is meant to speak."
 triggers:
   - type: time
-    condition: "2026-09-05 reached"
-    action: "Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29)."
+    condition: "2026-09-30 reached"
+    action: "Re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29)."
 ---
 
 # The Closed-Loop Operating State
@@ -387,6 +387,31 @@ Two honesty clauses, so the picture cannot be over-read:
       identity — the host already reports all three, so this is a capture
       gap, not a discovery one. Cheap, and worth doing before the record it
       would strengthen is the one an assessor reads.
+
+      **Dead-man answered 2026-09-15 — the loop was silent because it was
+      switched off, and the switch left no record.** The trigger fired on
+      2026-09-05 and waited ten days for a session at the root. Reading the
+      pilot repo: five digests in all (29 August ×2, 30, 31, 1 September),
+      every one filed fail-closed before touching a fired trigger; nothing
+      since 1 September. Cause, from the operator in session: the job was
+      **deliberately deregistered** — the host agent it ran on was refocused
+      onto development work at the business's request, and the pilot's tick
+      was retired with it. So the trigger's third reading (fired and died
+      mid-run) is not what happened, nor its second. A fourth reading the
+      trigger did not list happened instead: registered, fired five times,
+      then retired by a human act that produced no thing — which is why
+      fourteen days of silence were indistinguishable from failure until
+      someone asked. The deregistration is a seat-3 act (recoverable, but it
+      stops a loop) and it should have left a record the digest home could
+      show; that gap is a finding for the next retrospective, not a rule
+      written here. **Next, as stated by the operator:** re-host the tick
+      on his own machine, launched either by a personal orchestrating agent
+      or by a scheduled Codex or Claude Code session — the outside half of
+      2b performed again on a second host, which is also the cross-harness
+      exercise this phase recorded as intent. The trigger is re-dated to
+      2026-09-30 to ask one question: has the tick been re-registered, and
+      has a digest been filed by it? The critical path below is unchanged —
+      the work path is still proven zero times.
 
 **Critical path, as of 2026-08-29** *(the 2026-08-27 reading — "the only
 human-side blocker is the ratification sitting" — is spent: the sitting
