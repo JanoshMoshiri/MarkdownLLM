@@ -4,33 +4,33 @@ type: index
 status: live
 index_of: schema
 created: 2026-09-15
-generated: 2026-09-15T19:59:57
-generated_from: HEAD@81b34e8
-coverage: 409
-framework_version: 3.40.0
+generated: 2026-09-15T21:31:51
+generated_from: HEAD@8d51b6f
+coverage: 412
+framework_version: 3.41.0
 ---
 
 # Schema Registry — framework
 
 | field | things using it |
 |---|---|
-| id | 409 |
-| type | 409 |
-| status | 409 |
-| created | 409 |
-| version | 343 |
+| id | 412 |
+| type | 412 |
+| status | 412 |
+| created | 412 |
+| version | 346 |
 | linked_things | 341 |
-| tags | 309 |
+| tags | 312 |
 | origin | 182 |
 | confidence | 179 |
 | session | 176 |
 | source | 144 |
-| informed_by | 84 |
-| subject | 59 |
-| raised_at | 59 |
-| raised_by | 59 |
-| verdict | 59 |
-| verdict_reason | 59 |
+| informed_by | 87 |
+| subject | 62 |
+| raised_at | 62 |
+| raised_by | 62 |
+| verdict | 62 |
+| verdict_reason | 62 |
 | priority | 55 |
 | disposition | 49 |
 | disposition_reason | 49 |

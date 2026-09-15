@@ -2,7 +2,7 @@
 id: public-docs-face-build
 type: plan
 status: not-started
-version: 1.1
+version: 1.2
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -74,6 +74,17 @@ The reason is the ruling's own: content waits on evidence. Phase 1 derives the
 toolbox and map views, and Phase 7 owns every harness capability claim that
 flows through them — deriving a surface mid-rewrite is the wasted work this
 plan already declines to do for the compatibility table.
+
+**Narrowed to one act, 2026-09-15.** Vendor Phase 8 is ruled and built:
+the harness default is gone (`scaffold-harness-is-an-explicit-selection-
+2026-09-15`), the adapter-refresh offer stands in `domain-refresh.md` with
+the survey in the vendor plan, and 3.41.0 is versioned and changelogged.
+What remains of the widened gate is the operator's push of that release;
+when it lands, Phase 1 below is unblocked agent work. And the build that
+closed the gate paid the tax this plan meters one more time: one flag's
+semantics, eight hand-restated surfaces (`cli.py`, `AGENTS.md`, `README.md`
+×3, `operator-guide.md`, `domain-specification-guide.md`, `first-hour.md`).
+Phase 1 would have made three of those one.
 
 **What may proceed under the hold, if it is lifted piecemeal:** the generator
 itself is a new module (`docs_blocks.py`, shaped like `kernel_gen.py`, whose

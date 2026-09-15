@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-15
-generated: 2026-09-15T19:59:57
-generated_from: HEAD@81b34e8
-coverage: 409
-framework_version: 3.40.0
+generated: 2026-09-15T21:31:51
+generated_from: HEAD@8d51b6f
+coverage: 412
+framework_version: 3.41.0
 ---
 
 # Relationships Index — framework
@@ -444,6 +444,7 @@ framework_version: 3.40.0
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
 - cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
 - cue-domain-refresh-specification-2026-09-13 --subject--> domain-refresh-specification
+- cue-domain-specification-guide-2026-09-15 --subject--> domain-specification-guide
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
 - cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
 - cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
@@ -452,6 +453,7 @@ framework_version: 3.40.0
 - cue-explorer-publication-readiness-2026-09-13 --subject--> explorer-publication-readiness
 - cue-explorer-ui-increment-2026-08-2026-09-13 --subject--> explorer-ui-increment-2026-08
 - cue-first-hour-guide-2026-09-13 --subject--> first-hour-guide
+- cue-first-hour-guide-2026-09-15 --subject--> first-hour-guide
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
@@ -466,6 +468,7 @@ framework_version: 3.40.0
 - cue-mechanical-coherence-checks-backlog-2026-09-15 --subject--> mechanical-coherence-checks-backlog
 - cue-operating-layer-quality-loop-2026-09-13 --subject--> operating-layer-quality-loop
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
+- cue-operator-guide-2026-09-15 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream

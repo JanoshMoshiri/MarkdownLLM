@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-15
-generated: 2026-09-15T19:59:57
-generated_from: HEAD@81b34e8
-coverage: 94
-framework_version: 3.40.0
+generated: 2026-09-15T21:31:51
+generated_from: HEAD@8d51b6f
+coverage: 95
+framework_version: 3.41.0
 ---
 
 # Provenance Index (reverse) — framework
@@ -365,6 +365,11 @@ framework_version: 3.40.0
 - operating-model-seams-scope-2026-08-26 (pinned @bc4aabcf140445baae2c824e17fcf1249e0eda09)
 - operating-model-seams-self-application (pinned @45a582b3fc424cb3bf812e235be3cc576615098d)
 - operating-model-seams-self-application (derived-from)
+
+## scaffold-harness-is-an-explicit-selection-2026-09-15
+- cue-domain-specification-guide-2026-09-15 (pinned @4d56957223c45678f01709d5731b685899efe3d4)
+- cue-first-hour-guide-2026-09-15 (pinned @4d56957223c45678f01709d5731b685899efe3d4)
+- cue-operator-guide-2026-09-15 (pinned @4d56957223c45678f01709d5731b685899efe3d4)
 
 ## serve-side-blindness-dissolves-into-composition
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 (pinned @3e530d4eac0836ba81aa87c0f492239f97773eca)

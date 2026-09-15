@@ -400,7 +400,7 @@ def test_nested_domain_hook_derives_framework_env(tmp_path):
     # walks up from $MDLLM — the framework venv is reachable by construction.
     _git_repo(tmp_path)
     target = tmp_path / "runtime-probe-check"
-    rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+    rc = mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     assert rc == 0  # the birth commit itself already ran the new pre-commit
     hook = (target / ".git" / "hooks" / "pre-commit").read_text(encoding="utf-8")
     assert hook_contract.SH_RESOLVE in hook
@@ -411,7 +411,7 @@ def test_nested_domain_hook_derives_framework_env(tmp_path):
 def test_install_hook_execution_tests_the_real_hook(tmp_path, capsys):
     _git_repo(tmp_path)
     target = tmp_path / "runtime-exec-check"
-    mdllm.cmd_scaffold(_ns(path=str(target)))
+    mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     # Scaffolded domains are born session_gate: strict — the execution test
     # runs the REAL floor, so satisfy the ritual first, as an operator would.
     mdllm.cmd_session_start(_ns(path=str(target)))
@@ -446,7 +446,7 @@ def test_hook_passes_when_no_path_python_works(tmp_path):
         pytest.skip("git predates `git hook run`")
     _git_repo(tmp_path)
     target = tmp_path / "fw-venv-selection-check"
-    mdllm.cmd_scaffold(_ns(path=str(target)))
+    mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     mdllm.cmd_session_start(_ns(path=str(target)))
     assert not (target / ".venv").exists()
     stubs = tmp_path / "failing-pythons"
@@ -472,7 +472,7 @@ def test_install_hook_reports_a_blocking_floor_honestly(tmp_path, capsys):
     # failed: wired-but-blocking is a floor state, not an install defect.
     _git_repo(tmp_path)
     target = tmp_path / "runtime-gate-check"
-    mdllm.cmd_scaffold(_ns(path=str(target)))
+    mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     capsys.readouterr()
     rc = mdllm.cmd_install_hook(_ns(path=str(target)))
     out = capsys.readouterr().out

@@ -2,7 +2,7 @@
 id: vendor-harness-adapter-foundation
 type: plan
 status: in-progress
-version: 1.36
+version: 1.37
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -113,10 +113,23 @@ a compatibility claim.
   keyboard, a refusal that prints the list when nobody is. The build is a
   floor change under code-architect's skills, sequenced before the release
   in the third box; until it lands the shipped default does not change.*
-  - [ ] Build: the prompt, the non-interactive refusal, tests for both, and
-    the `--harness` help text inverted.
-- [ ] **Offer existing domains an opt-in `doctor` plus managed-fragment
+  - [x] Build: the prompt, the non-interactive refusal, tests for both, and
+    the `--harness` help text inverted. *(Landed 2026-09-15:
+    `resolve_birth_harness` is the scaffold's one route to a selection —
+    `ask_harness` at a keyboard, the refusal with the list otherwise; the
+    registry's `selection(None)` raises `HarnessSelectionRequired`. Six new
+    tests; twenty call sites that leaned on the silent default now name one;
+    eight hand-restated surfaces corrected — `public-docs-face-build`'s
+    per-flag tax, paid on the change that unblocks it.)*
+- [x] **Offer existing domains an opt-in `doctor` plus managed-fragment
   diff.** Do not batch-install permission-bearing project configuration.
+  *Offer made 2026-09-15: the route stands in `domain-refresh.md` (adapter
+  refresh — `doctor . --harness <name>`, then `adapter-install . --harness
+  <name> --dry-run`, apply only after review), and the survey below says
+  which domains it reaches. Adoption is each domain's act at its operator's
+  keyboard — thirteen pending on this clone — and deliberately not this
+  plan's: a batch install is what this box forbids. The operator's word, in
+  session, not at a keyboard: release first, adopt after.*
   *Surveyed 2026-09-15: thirteen of the fourteen domains on this clone
   report `currency=stale` for both the Claude Code and Codex managed
   fragments (one is current). The owned diff, as `adapter-install
@@ -128,9 +141,13 @@ a compatibility claim.
   session there — the human-observed trust the doctor line names. The
   opt-in is per domain; a pass that runs domain by domain with each diff
   shown is not a batch install. Awaiting the operator's word: run the pass
-  now, or leave each domain to adopt at its next refresh.*
+  now, or leave each domain to adopt at its next refresh. — Answered the
+  same day: adopt after the release, domain by domain.*
 - [ ] Version and changelog the settled decision, then perform the deliberate
   framework release/publish act. Root `autopush: false` remains controlling.
+  *Versioned and changelogged as 3.41.0, 2026-09-15. The publish act is the
+  operator's and is still owed — `estate-sync --status` reports the debt
+  until it lands; this box, and the plan, close at the push.*
 
 ## Completion criteria
 

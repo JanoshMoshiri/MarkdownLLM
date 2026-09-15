@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: triggers
 created: 2026-09-15
-generated: 2026-09-15T19:59:57
-generated_from: HEAD@81b34e8
+generated: 2026-09-15T21:31:51
+generated_from: HEAD@8d51b6f
 coverage: 7
-framework_version: 3.40.0
+framework_version: 3.41.0
 ---
 
 # Triggers Index — framework
