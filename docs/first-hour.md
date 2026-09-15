@@ -145,8 +145,8 @@ What should happen next — and what you should do:
   `.gitignore`. This is mandatory, not stylistic — your domain's history
   stays yours. The mechanical half of this is one command
   (`mdllm scaffold <path> --harness <selection>`), which the agent should
-  reach for. Select `claude`, `codex`, `cowork`, `all`, or `none`; omitting
-  the flag preserves the current Claude compatibility default. `none` keeps
+  reach for. Select `claude`, `codex`, `cowork`, `all`, or `none`; omit it and
+  `scaffold` asks — or, with nobody at the keyboard, refuses with the list. `none` keeps
   the entry contract and Git floor but installs no lifecycle adapter, while a
   run-time-bound selection such as Cowork has no project artifact to write.
   Red flag worth catching in hour one: domain files appearing in the

@@ -337,7 +337,7 @@ def test_scaffold_outer_commit_is_exact_and_preserves_unrelated_index(tmp_path):
 
     target = outer / "new-domain"
     rc = scaffold_mod.cmd_scaffold(
-        SimpleNamespace(path=str(target), harness=None))
+        SimpleNamespace(path=str(target), harness="none"))
 
     assert rc == 0
     committed = {
@@ -368,7 +368,7 @@ def test_scaffold_dirty_gitignore_refuses_before_target_write(tmp_path):
 
     with pytest.raises(SystemExit, match="has existing changes"):
         scaffold_mod.cmd_scaffold(
-            SimpleNamespace(path=str(target), harness=None))
+            SimpleNamespace(path=str(target), harness="none"))
 
     assert not target.exists()
     assert gitignore.read_bytes() == before
@@ -392,7 +392,7 @@ def test_scaffold_failed_outer_commit_rolls_back_exactly(tmp_path):
 
     with pytest.raises(SystemExit, match="all pre-birth writes were rolled back"):
         scaffold_mod.cmd_scaffold(
-            SimpleNamespace(path=str(target), harness=None))
+            SimpleNamespace(path=str(target), harness="none"))
 
     assert gitignore.read_bytes() == original
     assert not target.exists()

@@ -772,7 +772,7 @@ def test_provenance_missing_commit_and_missing_input_is_error(tmp_path, capsys):
 def test_scaffold_birth_sequence(tmp_path, capsys):
     _git_repo(tmp_path)
     target = tmp_path / "client-x"
-    rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+    rc = mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     out = capsys.readouterr().out
     assert rc == 0 and "first commit made" in out
     # isolation: outer repo ignores the domain, committed before domain work
@@ -816,7 +816,7 @@ def test_domain_kernel_regeneration_preserves_authored_launch_contract(
         tmp_path, capsys):
     _git_repo(tmp_path)
     target = tmp_path / "manual-launch-contract"
-    assert mdllm.cmd_scaffold(_ns(path=str(target))) == 0
+    assert mdllm.cmd_scaffold(_ns(path=str(target), harness="claude")) == 0
     capsys.readouterr()
     before = (target / "AGENTS.md").read_text(encoding="utf-8")
     marker = "Manual CLI launch — read before Session Start"
@@ -843,7 +843,7 @@ def test_scaffold_isolation_skips_when_blanket_rule_covers(tmp_path, capsys):
     _git_repo(tmp_path)
     (tmp_path / ".gitignore").write_text("domain/\n", encoding="utf-8")
     target = tmp_path / "domain" / "client-y"
-    rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+    rc = mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     out = capsys.readouterr().out
     assert rc == 0 and "first commit made" in out
     assert "client-y" not in (tmp_path / ".gitignore").read_text(encoding="utf-8")
@@ -1726,7 +1726,7 @@ def _agents_drifted(meta_fm: str) -> str:
 def test_scaffold_deploys_slash_commands(tmp_path):
     _git_repo(tmp_path)
     target = tmp_path / "client-y"
-    mdllm.cmd_scaffold(_ns(path=str(target)))
+    mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     assert (target / ".claude" / "commands" / "end-session.md").is_file()
     assert (target / ".claude" / "commands" / "retrospective.md").is_file()
     assert (target / ".github" / "prompts" / "end-session.prompt.md").is_file()
@@ -1736,7 +1736,7 @@ def test_scaffold_writes_hardened_adapter(tmp_path):
     import json
     _git_repo(tmp_path)
     target = tmp_path / "client-z"
-    mdllm.cmd_scaffold(_ns(path=str(target)))
+    mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     settings = json.loads((target / ".claude" / "settings.json").read_text(encoding="utf-8"))
     assert "SessionStart" in settings["hooks"] and "PostToolUse" in settings["hooks"]
     # estate-sync still runs FIRST (hard hook 4 — orientation reads the log,

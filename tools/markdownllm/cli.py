@@ -287,7 +287,8 @@ def build_cli() -> argparse.ArgumentParser:
     sc.add_argument("path", help="folder to create (its name becomes the domain name)")
     sc.add_argument("--harness", choices=selection_choices(),
                     help="outer adapter projection: one harness, all, or none; "
-                         "omitting preserves the compatibility default")
+                         "omitted, scaffold asks at a keyboard and refuses with "
+                         "the list otherwise — never defaulted")
     sc.add_argument("--autopush", choices=("true", "false"), default="false",
                     help="birth-time publication authority (default false); "
                          "only an explicit true enables post-commit sends")

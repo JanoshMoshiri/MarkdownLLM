@@ -8,8 +8,11 @@ and docs — not another conditional in scaffold or doctor control flow
 (Open/Closed, plan requirement: "adding a third harness requires a new
 adapter, tests, and docs").
 
-The scaffold default remains Claude for this compatibility release; changing
-it is a Phase 8 product decision, not architecture cleanup.
+There is no scaffold default (Phase 8, ruled 2026-09-15 —
+`scaffold-harness-is-an-explicit-selection-2026-09-15`): a birth names its
+harness, is asked at a keyboard, or is refused with the list. `DEFAULT_HARNESS`
+survives only as doctor's subject when no project adapter is present —
+which harness to *report on*, never which to render.
 """
 
 from __future__ import annotations
@@ -25,6 +28,16 @@ DEFAULT_HARNESS = "claude-code"
 # canonical adapter identity so diagnostics, attestations, and install plans
 # cannot split between ``claude`` and ``claude-code``.
 ALIASES = {"claude": "claude-code"}
+
+
+class HarnessSelectionRequired(LookupError):
+    """No harness was named where one is required. Carries the registered
+    choices so the edge that catches it can ask, or refuse with the list."""
+
+    def __init__(self, choices: tuple[str, ...]):
+        self.choices = choices
+        super().__init__(
+            "no harness selected; choose one of: " + ", ".join(choices))
 
 _REGISTRY = {
     CLAUDE_CODE.name: CLAUDE_CODE,
@@ -54,12 +67,13 @@ def canonical_name(name: str) -> str:
 def selection(value: str | None) -> tuple[str, ...]:
     """Resolve a CLI selection without embedding vendor branches in callers.
 
-    No value preserves the compatibility default. ``all`` is deterministic;
-    ``none`` is an honest empty projection. Unknown names fail before a caller
-    creates or mutates anything.
+    No value is not a choice: it raises ``HarnessSelectionRequired`` for the
+    edge to ask or refuse — nothing renders until a harness is named. ``all``
+    is deterministic; ``none`` is an honest empty projection. Unknown names
+    fail before a caller creates or mutates anything.
     """
     if value is None:
-        value = DEFAULT_HARNESS
+        raise HarnessSelectionRequired(selection_choices())
     if value == "none":
         return ()
     if value == "all":

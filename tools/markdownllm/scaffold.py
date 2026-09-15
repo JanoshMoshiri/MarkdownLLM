@@ -597,6 +597,68 @@ def _report_recoverable_birth(
     return 1
 
 
+def at_a_keyboard() -> bool:
+    """Whether a human can answer a question here: stdin and stdout are both
+    terminals. A dispatched run, a CI job, or an agent's shell tool is not —
+    and must name its choice instead of being asked."""
+    try:
+        return bool(sys.stdin.isatty() and sys.stdout.isatty())
+    except (AttributeError, ValueError):
+        return False
+
+
+_SELECTION_GLOSS = {
+    "all": "every registered project-bound adapter",
+    "none": "entry contract + Git floor only; no lifecycle adapter",
+}
+
+
+def ask_harness(choices: tuple[str, ...], *, ask=input, out=print) -> str | None:
+    """Offer the registered selections and return the one chosen — by name
+    (aliases included) or by number — or None when the asker gives up (EOF,
+    interrupt). Display and answer-checking only: the registry still resolves
+    whatever comes back, so this cannot select anything it does not know."""
+    menu = tuple(harness_adapters.names()) + ("all", "none")
+    out("Which harness should this domain be born for? Nothing renders until "
+        "one is named.")
+    for index, choice in enumerate(menu, start=1):
+        gloss = _SELECTION_GLOSS.get(choice)
+        out(f"  {index}) {choice}" + (f"  — {gloss}" if gloss else ""))
+    while True:
+        try:
+            answer = ask("harness [name or number]: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            out("")
+            return None
+        if answer.isdigit() and 1 <= int(answer) <= len(menu):
+            return menu[int(answer) - 1]
+        if answer in choices:
+            return answer
+        out(f"  not a registered selection: {answer!r} — choose one of "
+            + ", ".join(menu))
+
+
+def resolve_birth_harness(value: str | None, *,
+                          interactive: bool | None = None) -> tuple[str, ...]:
+    """The scaffold's one route to a selection: named on the command line,
+    asked for at a keyboard, or refused with the list — never defaulted
+    (`scaffold-harness-is-an-explicit-selection-2026-09-15`)."""
+    if value is not None:
+        return harness_adapters.selection(value)
+    if interactive is None:
+        interactive = at_a_keyboard()
+    choices = harness_adapters.selection_choices()
+    if interactive:
+        answer = ask_harness(choices)
+        if answer is not None:
+            return harness_adapters.selection(answer)
+    sys.exit(
+        "mdllm: scaffold requires --harness <choice> — nothing renders until a "
+        "harness is named, and nobody is at the keyboard to be asked. Choices: "
+        + ", ".join(choices)
+        + " (`none` = entry contract + Git floor, no lifecycle adapter).")
+
+
 def cmd_scaffold(args) -> int:
     """Public scaffold boundary with truthful post-isolation recovery."""
     progress = _ScaffoldProgress(Path(args.path).resolve())
@@ -653,10 +715,9 @@ def _cmd_scaffold_impl(args, progress: _ScaffoldProgress) -> int:
                  "to embed an absolute machine-specific adapter command")
 
     # Resolve the complete outer projection before creating the target.  This
-    # makes an unknown selection or a cross-adapter path collision a true
-    # preflight failure rather than a half-scaffolded domain.
-    selected_names = harness_adapters.selection(
-        getattr(args, "harness", None))
+    # makes an unnamed or unknown selection, or a cross-adapter path collision,
+    # a true preflight failure rather than a half-scaffolded domain.
+    selected_names = resolve_birth_harness(getattr(args, "harness", None))
     selected_adapters = tuple(harness_adapters.get(n) for n in selected_names)
     ctx = HarnessContext(framework_root_rel=rel_fw)
     adapter_shortcuts: list[tuple[str, Path]] = []

@@ -343,11 +343,12 @@ def test_port_only_adapter_survives_scaffold_and_doctor(tmp_path, capsys,
         out = capsys.readouterr().out
         assert "port-only-fake absent" in out
 
-        # Scaffold: the fake as DEFAULT harness end-to-end. Every optional
-        # capability is reached exclusively through its declared port.
+        # Scaffold: the fake as the NAMED harness end-to-end (there is no
+        # default to lean on since 2026-09-15). Every optional capability is
+        # reached exclusively through its declared port.
         _git_repo(tmp_path)
         target = tmp_path / "port-only-birth"
-        rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+        rc = mdllm.cmd_scaffold(_ns(path=str(target), harness=fake.name))
         out = capsys.readouterr().out
         assert rc == 0
         assert not (target / ".claude").exists()

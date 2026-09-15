@@ -61,7 +61,7 @@ def pristine(tmp_path_factory) -> Path:
     parent = tmp_path_factory.mktemp("emission")
     _git_repo(parent)
     target = parent / "emission-domain"
-    assert mdllm.cmd_scaffold(_ns(path=str(target))) == 0
+    assert mdllm.cmd_scaffold(_ns(path=str(target), harness="claude")) == 0
     return target
 
 
@@ -70,7 +70,7 @@ def mutable(tmp_path) -> Path:
     """A scaffolded domain the test may mutate."""
     _git_repo(tmp_path)
     target = tmp_path / "emission-domain"
-    assert mdllm.cmd_scaffold(_ns(path=str(target))) == 0
+    assert mdllm.cmd_scaffold(_ns(path=str(target), harness="claude")) == 0
     return target
 
 

@@ -64,7 +64,7 @@ def _git_repo(p: Path) -> None:
 def _scaffold(tmp_path: Path, name: str = "adapter-baseline-probe") -> Path:
     _git_repo(tmp_path)
     target = tmp_path / name
-    rc = mdllm.cmd_scaffold(_ns(path=str(target)))
+    rc = mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
     assert rc == 0
     return target
 

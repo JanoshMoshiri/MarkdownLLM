@@ -36,7 +36,7 @@ def _scaffold(tmp_path: Path, name: str = "born") -> Path:
     """A real domain, born the way `mdllm scaffold` births one."""
     _git_repo(tmp_path)                      # the outer repo the isolation commit needs
     target = tmp_path / name
-    rc = mdllm.cmd_scaffold(_ns(path=str(target), autopush="false"))
+    rc = mdllm.cmd_scaffold(_ns(path=str(target), harness="claude", autopush="false"))
     assert rc == 0, "scaffold must succeed before any probe can mean anything"
     return target
 

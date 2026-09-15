@@ -12,6 +12,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import mdllm  # noqa: E402
 from markdownllm import adapters  # noqa: E402
+from markdownllm import scaffold as scaffold_mod  # noqa: E402
+
+_unwrapped_ask_harness = scaffold_mod.ask_harness
 
 
 _FRAMEWORK_ROOT = Path(mdllm.__file__).resolve().parents[1]
@@ -75,7 +78,6 @@ def _common_tree(root: Path) -> dict[str, bytes]:
 
 def test_scaffold_selection_changes_only_outer_projection(tmp_path):
     targets = {
-        "default": _scaffold(tmp_path / "default"),
         "claude": _scaffold(tmp_path / "claude", "claude"),
         "codex": _scaffold(tmp_path / "codex", "codex"),
         "cowork": _scaffold(tmp_path / "cowork", "cowork"),
@@ -83,11 +85,9 @@ def test_scaffold_selection_changes_only_outer_projection(tmp_path):
         "none": _scaffold(tmp_path / "none", "none"),
     }
 
-    baseline = _common_tree(targets["default"])
+    baseline = _common_tree(targets["claude"])
     assert all(_common_tree(target) == baseline
                for target in targets.values())
-    assert (targets["default"] / ".claude" / "settings.json").is_file()
-    assert not (targets["default"] / ".codex").exists()
     assert (targets["claude"] / ".claude" / "settings.json").is_file()
     assert not (targets["claude"] / ".codex").exists()
     assert (targets["codex"] / ".codex" / "hooks.json").is_file()
@@ -116,8 +116,8 @@ def test_entry_pointers_are_born_in_every_selection(tmp_path):
         .glob("*.template"))
     assert pointers, "templates/entry must declare at least one entry pointer"
 
-    for marker in (Ellipsis, "claude", "codex", "all", "none"):
-        label = "default" if marker is Ellipsis else marker
+    for marker in ("claude", "codex", "all", "none"):
+        label = marker
         target = _scaffold(tmp_path / f"entry-{label}", marker)
         for pointer in pointers:
             body = (target / pointer).read_text(encoding="utf-8")
@@ -161,6 +161,85 @@ def test_root_wrapper_routes_both_positions_and_no_surface_drifts():
         assert "inherited from a parent directory" in body, name
         assert "Do not read or follow the framework" in body, name
         assert "@AGENTS.md" in body, name
+
+
+def test_registry_resolves_no_selection_by_raising_not_defaulting():
+    """Phase 8, 2026-09-15: omission is not a choice. The registry raises
+    with the registered list; the edge decides whether to ask or refuse."""
+    with pytest.raises(adapters.HarnessSelectionRequired) as caught:
+        adapters.selection(None)
+    assert caught.value.choices == adapters.selection_choices()
+    assert "none" in caught.value.choices
+
+
+def test_omitted_selection_with_nobody_at_the_keyboard_refuses_before_creation(
+        tmp_path, monkeypatch):
+    """A dispatched run, a CI job, or an agent's shell tool must name its
+    harness; the refusal prints the list so the caller can rerun."""
+    _git_repo(tmp_path)
+    target = tmp_path / "unnamed-selection"
+    monkeypatch.setattr(scaffold_mod, "at_a_keyboard", lambda: False)
+    with pytest.raises(SystemExit, match="--harness <choice>") as caught:
+        mdllm.cmd_scaffold(argparse.Namespace(path=str(target)))
+    for choice in adapters.selection_choices():
+        assert choice in str(caught.value)
+    assert not target.exists()
+
+
+def test_omitted_selection_at_a_keyboard_asks_and_births_the_answer(
+        tmp_path, monkeypatch, capsys):
+    _git_repo(tmp_path)
+    target = tmp_path / "asked-selection"
+    answers = iter(["codex"])
+    monkeypatch.setattr(scaffold_mod, "at_a_keyboard", lambda: True)
+    monkeypatch.setattr(
+        scaffold_mod, "ask_harness",
+        lambda choices, **_: _unwrapped_ask_harness(
+            choices, ask=lambda _prompt: next(answers), out=print))
+    assert mdllm.cmd_scaffold(argparse.Namespace(path=str(target))) == 0
+    out = capsys.readouterr().out
+    assert "Which harness should this domain be born for?" in out
+    assert (target / ".codex" / "hooks.json").is_file()
+    assert not (target / ".claude").exists()
+
+
+def test_ask_harness_reprompts_on_an_unknown_answer_and_accepts_a_number():
+    answers = iter(["nope", "2"])
+    shown: list[str] = []
+    choice = scaffold_mod.ask_harness(
+        adapters.selection_choices(),
+        ask=lambda _prompt: next(answers), out=shown.append)
+    menu = tuple(adapters.names()) + ("all", "none")
+    assert choice == menu[1]
+    assert any("not a registered selection: 'nope'" in line for line in shown)
+    for name in menu:
+        assert any(f") {name}" in line for line in shown), name
+
+
+def test_ask_harness_accepts_an_alias_by_name():
+    answers = iter(["claude"])
+    choice = scaffold_mod.ask_harness(
+        adapters.selection_choices(),
+        ask=lambda _prompt: next(answers), out=lambda _line: None)
+    assert adapters.selection(choice) == ("claude-code",)
+
+
+def test_ask_harness_giving_up_refuses_the_birth(tmp_path, monkeypatch):
+    """EOF at the prompt is an answer of none-given: refuse, create nothing."""
+    _git_repo(tmp_path)
+    target = tmp_path / "abandoned-prompt"
+
+    def _eof(_prompt):
+        raise EOFError
+
+    monkeypatch.setattr(scaffold_mod, "at_a_keyboard", lambda: True)
+    monkeypatch.setattr(
+        scaffold_mod, "ask_harness",
+        lambda choices, **_: _unwrapped_ask_harness(
+            choices, ask=_eof, out=lambda _line: None))
+    with pytest.raises(SystemExit, match="--harness <choice>"):
+        mdllm.cmd_scaffold(argparse.Namespace(path=str(target)))
+    assert not target.exists()
 
 
 def test_unknown_selection_refuses_before_target_creation(tmp_path):
