@@ -2,7 +2,7 @@
 id: public-docs-face-build
 type: plan
 status: not-started
-version: 1.2
+version: 1.3
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -79,8 +79,12 @@ plan already declines to do for the compatibility table.
 the harness default is gone (`scaffold-harness-is-an-explicit-selection-
 2026-09-15`), the adapter-refresh offer stands in `domain-refresh.md` with
 the survey in the vendor plan, and 3.41.0 is versioned and changelogged.
-What remains of the widened gate is the operator's push of that release;
-when it lands, Phase 1 below is unblocked agent work. And the build that
+**The hold is lifted, 2026-09-18**: that release is published (`origin/main`
+at 7409d992) and `vendor-harness-adapter-foundation` is `completed`. Both
+gates — the 2026-08-13 contention one and the 2026-08-17 widened one — are
+satisfied, and Phase 1 is unblocked agent work from here. Nothing above this
+line is a live constraint any more; it is kept as the dated record of what
+held and why. And the build that
 closed the gate paid the tax this plan meters one more time: one flag's
 semantics, eight hand-restated surfaces (`cli.py`, `AGENTS.md`, `README.md`
 ×3, `operator-guide.md`, `domain-specification-guide.md`, `first-hour.md`).

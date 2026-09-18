@@ -1,8 +1,8 @@
 ---
 id: vendor-harness-adapter-foundation
 type: plan
-status: in-progress
-version: 1.37
+status: completed
+version: 1.38
 created: 2026-08-11
 priority: high
 tags: [harness, adapters, codex, claude-code, diagnostics, portability, clean-architecture]
@@ -143,11 +143,22 @@ a compatibility claim.
   shown is not a batch install. Awaiting the operator's word: run the pass
   now, or leave each domain to adopt at its next refresh. — Answered the
   same day: adopt after the release, domain by domain.*
-- [ ] Version and changelog the settled decision, then perform the deliberate
+- [x] Version and changelog the settled decision, then perform the deliberate
   framework release/publish act. Root `autopush: false` remains controlling.
-  *Versioned and changelogged as 3.41.0, 2026-09-15. The publish act is the
-  operator's and is still owed — `estate-sync --status` reports the debt
-  until it lands; this box, and the plan, close at the push.*
+  *Versioned and changelogged as 3.41.0, 2026-09-15. **Published 2026-09-18**
+  on the operator's explicit instruction for this one event, through
+  `mdllm publish . --authorize-once` — the mechanism that exists so an agent
+  can perform a publish it may never authorise. `origin/main` 81b34e80 →
+  7409d992, verified. The repository's standing policy stayed off, which is
+  the point: authority arrived from the human, for one event, and did not
+  persist.*
+
+**Closed 2026-09-18 at that push.** Every phase is done; nothing in this plan
+is owed. What it leaves live, deliberately and elsewhere: adapter refresh is
+each domain's own act at its operator's keyboard (thirteen pending on this
+clone, the diff everywhere the launcher probe-guard hardening), and the
+harness *capability claims* in the public docs remain Phase 7's fact under
+`public-docs-face-build`'s build.
 
 ## Completion criteria
 
