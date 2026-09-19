@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-15
-generated: 2026-09-15T21:31:51
-generated_from: HEAD@8d51b6f
-coverage: 412
+created: 2026-09-19
+generated: 2026-09-19T17:02:41
+generated_from: HEAD@cb1f86b
+coverage: 413
 framework_version: 3.41.0
 ---
 
@@ -1305,6 +1305,15 @@ framework_version: 3.41.0
 - substrate-floor-development --implements--> prove-identity-before-you-change-bytes
 - substrate-floor-development --implements--> some-changes-are-verifiable-only-by-publishing
 - substrate-floor-development --references--> substrate-review-consolidated-remedy-2026-08-20
+- substrate-native-a2a --extends--> workflow-state-specification
+- substrate-native-a2a --references--> coordination-claim-specification
+- substrate-native-a2a --extends--> trigger-specification
+- substrate-native-a2a --extends--> git-workflow-specification
+- substrate-native-a2a --implements--> transport-follows-corpus-holdability-not-distance
+- substrate-native-a2a --references--> phase-3-run-domain-task-reverted
+- substrate-native-a2a --supports--> a-true-primitive-is-discovered-not-authored
+- substrate-native-a2a --complements--> closed-loop-operating-state
+- substrate-native-a2a --implements--> hook-enforcement-has-three-anchors
 - substrate-reconciliation-2026-08-09 --informs--> orchestration-specification
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate

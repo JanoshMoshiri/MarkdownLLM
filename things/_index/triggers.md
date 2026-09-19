@@ -3,10 +3,10 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-09-15
-generated: 2026-09-15T21:31:51
-generated_from: HEAD@8d51b6f
-coverage: 7
+created: 2026-09-19
+generated: 2026-09-19T17:02:41
+generated_from: HEAD@cb1f86b
+coverage: 8
 framework_version: 3.41.0
 ---
 
@@ -35,6 +35,10 @@ framework_version: 3.41.0
 ## operator-seat-and-harness-native-onramp
 - status: not-started  due_date: —
 - trigger: type=time, condition=2026-09-20 reached, action=If no phase has started, surface it plainly: the direction was ratified on felt evidence and the substrate backlog is also waiting. Ask which goes first — the onramp or the eval backlog — rather than letting both idle.
+
+## substrate-native-a2a
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-10-10 reached, action=Has Phase 4 run one real writer/reviewer turn through `mdllm watch` in the engineering domain? If not, establish which: the command was never armed, was armed and never woke, or woke and the turn was hand-relayed anyway. The third is the interesting failure — it would mean the doorbell rings and nobody rises, which is a seat problem and not a channel problem. Re-date once answered.
 
 ## workflow-reconciliation-precedes-new-definitions
 - status: made  due_date: —

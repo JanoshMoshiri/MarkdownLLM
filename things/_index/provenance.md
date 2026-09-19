@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-15
-generated: 2026-09-15T21:31:51
-generated_from: HEAD@8d51b6f
-coverage: 95
+created: 2026-09-19
+generated: 2026-09-19T17:02:41
+generated_from: HEAD@cb1f86b
+coverage: 98
 framework_version: 3.41.0
 ---
 
@@ -335,6 +335,9 @@ framework_version: 3.41.0
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
+## phase-3-run-domain-task-reverted
+- substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
+
 ## posix-floor-record-2026-08-13
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - posix-live-dispatch-record-2026-08-14 (derived-from)
@@ -410,6 +413,9 @@ framework_version: 3.41.0
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
+## transport-follows-corpus-holdability-not-distance
+- substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
+
 ## unattended-cue-carrier-2026-09-12
 - cue-derived-index-specification-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - cue-validate-thing-specification-dark-region-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
@@ -443,4 +449,7 @@ framework_version: 3.41.0
 - derivation-shape-brief-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 - derivation-shape-settled-2026-08 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 - estate-workflow-derivation (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
+
+## workflow-state-specification
+- substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
 
