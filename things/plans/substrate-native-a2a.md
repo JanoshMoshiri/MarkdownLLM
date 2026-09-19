@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-09-19
 priority: high
 informed_by:
@@ -220,12 +220,35 @@ Deliberately not lifted:
       *Done when:* Tier 0 carries the turn-taking rule and the generated kernel
       matches its source.
 
-- [ ] **Phase 4 — Prove it on one real turn.** In the engineering domain of the regulated deployment:
-      declare `actor` on both definitions, arm `mdllm watch` on both sides, and
-      run **one real writer → reviewer → writer turn** through it. Retire
-      `spec-watcher.sh` only after it has been beaten by the thing replacing it.
-      *Done when:* one turn has crossed with no human relaying it, and the
-      GPT-side instance woke through the PowerShell route.
+- [ ] **Phase 4 — Prove it on one real turn.** *In progress — the domain half
+      landed 2026-09-19; the live turn has not run yet.*
+      - [x] The stage/status disagreement reconciled, ruled by the CTO:
+            `drafting → draft`, `reviewing → review`, `blocked` added to the
+            three spec types' vocabularies. Loop v1.2, cued and walked
+            (inflection; the one live run was checked and instances a
+            different definition, which is what made a rename safe rather
+            than a migration).
+      - [x] `actor` declared on the specification loop, and all three roles
+            arm against the real corpus with exactly the wake sets the loop's
+            own watcher table documented — writer on `cleared|draft`,
+            reviewer on `review`, CTO on `ruling|blocked`. The table now comes
+            from the definition rather than from a shell `case` statement.
+      - [ ] **One real writer → reviewer → writer turn** through `mdllm watch`,
+            with no human relaying it.
+      - [ ] The GPT-side instance woken through the PowerShell route — the
+            portability claim that motivated the lift, and the one this plan
+            must not assert until it is executed
+            (`portability-claims-need-execution-tests`).
+      - [ ] `spec-watcher.sh` retired — **only** after it has been beaten by
+            the thing replacing it. Until then the role table is duplicated in
+            two places, which is the defect that produced this phase; the
+            residual is recorded rather than quietly carried.
+
+      **The sibling was deliberately not touched.** `two-agent-review-loop`
+      keeps its stage ids and gains no `actor`: its board is GitHub's PR
+      primitives, not a thing's `status`, so the field would document a table
+      no watcher here can consume. That loop's channel was chosen on purpose
+      and this plan does not relitigate it.
 
 - [ ] **Phase 5 — Seal.** Harvest what the use taught. Any insight, any
       conflict, any correction to the three artefacts above. `workflow-state.md`
@@ -286,5 +309,6 @@ status-keyed board.
       exercised in Phase 4.
 - [x] The git-workflow kernel carries the turn-taking corollary.
 - [ ] One real turn has crossed in a live domain with no human relay, woken by
-      the command and not by a script.
+      the command and not by a script. *(The board is ready and armed; the turn
+      itself waits on the two instances working.)*
 - [ ] `spec-watcher.sh` is retired in favour of the command — and not before.
