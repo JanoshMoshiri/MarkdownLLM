@@ -1,0 +1,482 @@
+"""`mdllm watch` — the doorbell, as floor rather than as shell.
+
+Two agent instances take turns working one thing to completion. The turn
+itself is already substrate-native: it is a `status` field the floor
+validates, in a repository both clones sync through. What git does not do is
+*wake* the other side. That gap has been filled, in one live domain, by three
+bash watchers polling `git ls-remote`.
+
+This is those watchers, in the floor. It adds no transport and moves no
+domain content over a wire: it reads the same ref the clones already pull,
+and the only thing crossing the network is the question *has the head moved*.
+
+**Why the floor and not a script.** The shell version runs in one session's
+shell. A domain running two model families takes its turns from two
+harnesses, and the second reaches the floor through `mdllm.ps1`, not bash —
+so half the loop could not ring its own doorbell. That is a portability fact,
+not a preference (`portability-claims-need-execution-tests`).
+
+**The five decisions below are inherited, each paid for by a defect in the
+domain that found them first.** They are not re-derived here; they are
+carried, with the failure each prevents named at its site, because a rule
+whose reason is lost is a rule the next author deletes.
+
+**What this never does.** It never writes, never commits, never resolves a
+divergence, and never advances a turn. It reads a ref, reports a change, and
+exits. The turn stays the agent's act and the ruling stays the human's.
+"""
+
+from __future__ import annotations
+
+import json
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from .git_transport import command_token, git_command, redact
+from .model import RESERVED_STATUSES, Corpus, scan
+from .repository_view import RepositoryView, RepositoryViewError
+from .workflow_actors import declared_actors, stages_for_actor
+
+__all__ = [
+    "WatchConfig",
+    "WatchError",
+    "BoardChange",
+    "read_board",
+    "resolve_remote_head",
+    "diff_board",
+    "state_path_for",
+    "cmd_watch",
+]
+
+
+# Losing more than this many board entries in one poll is treated as a bad
+# read rather than as a mass deletion. The sibling recorded a list endpoint
+# returning fifteen rows then seven under a success status; a corpus scan can
+# do the same thing for a less exotic reason (a partial fetch, a tree read
+# against a half-written object).
+BAD_READ_LOSS = 2
+
+DEFAULT_INTERVAL = 60.0
+POLL_TIMEOUT = 30.0
+FETCH_TIMEOUT = 120.0
+
+
+class WatchError(RuntimeError):
+    """A condition that must stop the watcher before it starts.
+
+    Raised only at arming time. Once the loop is running, failures are
+    *emitted* rather than raised — a blind watcher is a finding, and a
+    watcher that exits on a failed poll is indistinguishable from a quiet
+    estate, which is the exact failure this command exists to prevent.
+    """
+
+
+@dataclass(frozen=True)
+class WatchConfig:
+    root: Path
+    role: str
+    definition_id: str
+    remote: str = "origin"
+    branch: str = "main"
+    field_name: str = "status"
+    interval: float = DEFAULT_INTERVAL
+    exit_on_wake: bool = False
+    once: bool = False
+    state_file: Path | None = None
+
+
+@dataclass
+class BoardChange:
+    """One thing's field moving between two board reads."""
+
+    thing_id: str
+    was: str | None
+    now: str
+    wakes: bool
+
+    def line(self, role: str) -> str:
+        if self.wakes:
+            return (f"{role.upper()} UP: {self.thing_id} is at "
+                    f"'{self.now}' (was {self.was or '(new)'}).")
+        return f"moved: {self.thing_id} {self.was or '(new)'} -> {self.now}"
+
+
+@dataclass
+class _Gone:
+    thing_id: str
+    was: str
+
+    def line(self) -> str:
+        return (f"GONE: {self.thing_id} left the board (was {self.was}) — "
+                "deleted, renamed, or moved off this definition. If work on "
+                "it is in flight, stop and check.")
+
+
+@dataclass
+class _LoopState:
+    """Everything that must survive a restart.
+
+    A restart must not re-baseline. A change that landed while the watcher was
+    down has to be *reported*, not absorbed — otherwise the one event the
+    channel exists to carry is the one it silently eats.
+    """
+
+    board: dict[str, str] = field(default_factory=dict)
+    last_head: str | None = None
+    seen: bool = False
+
+
+def state_path_for(config: WatchConfig) -> Path:
+    """Per-role, per-definition state — never shared between two watchers.
+
+    Two watchers sharing one state file is not a theoretical hazard: the
+    sibling found eight orphaned instances racing on one, each absorbing the
+    others' events, so the live watcher saw nothing change and stayed silent.
+    Everything keyed here is keyed on both the role and the definition.
+
+    It lives under `.git/` because it is per-clone, never committed, and it
+    disappears with the clone it describes.
+    """
+    if config.state_file is not None:
+        return Path(config.state_file)
+    slug = f"{config.definition_id}.{config.role}".replace("/", "-")
+    return config.root / ".git" / "mdllm-watch" / f"{slug}.json"
+
+
+def _load_state(path: Path) -> _LoopState:
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return _LoopState()
+    board = raw.get("board")
+    if not isinstance(board, dict):
+        return _LoopState()
+    return _LoopState(
+        board={str(k): str(v) for k, v in board.items()},
+        last_head=raw.get("last_head") or None,
+        seen=bool(raw.get("seen")),
+    )
+
+
+def _save_state(path: Path, state: _LoopState) -> None:
+    """Persist before waking, never after.
+
+    The sibling's first version exited from inside its diff loop, so the poll
+    that woke the reviewer never persisted what it had seen and every restart
+    re-detected the same change — an infinite wake loop. The ordering here is
+    the fix and is load-bearing: record, then signal.
+    """
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({
+            "board": state.board,
+            "last_head": state.last_head,
+            "seen": state.seen,
+        }, indent=2, sort_keys=True), encoding="utf-8")
+    except OSError:
+        # A watcher that cannot persist still watches; it just re-reports on
+        # restart. Losing the doorbell over a read-only temp dir would be a
+        # worse trade than a duplicate line.
+        pass
+
+
+def resolve_remote_head(config: WatchConfig) -> tuple[str | None, str | None]:
+    """One ref read: the whole cost of learning that nothing moved.
+
+    Returns ``(head, error)``. A ref is a single value that is either fetched
+    or not, which is why this is cheaper *and* safer than reading a board over
+    the wire — there is no partial success to mistake for an empty estate.
+    """
+    token = command_token()
+    result = git_command(
+        config.root, "ls-remote", config.remote,
+        f"refs/heads/{config.branch}",
+        token=token, timeout=POLL_TIMEOUT, non_interactive=True,
+    )
+    if result is None:
+        return None, f"ls-remote timed out after {POLL_TIMEOUT:.0f}s"
+    if result.returncode != 0:
+        detail = redact((result.stderr or "").strip(), token).splitlines()
+        return None, (detail[0] if detail else "ls-remote failed")
+    line = (result.stdout or "").strip().splitlines()
+    if not line:
+        return None, (f"{config.remote} has no refs/heads/{config.branch}")
+    return line[0].split()[0], None
+
+
+def _fetch(config: WatchConfig) -> str | None:
+    token = command_token()
+    result = git_command(
+        config.root, "fetch", config.remote, config.branch,
+        token=token, timeout=FETCH_TIMEOUT, non_interactive=True,
+    )
+    if result is None:
+        return f"fetch timed out after {FETCH_TIMEOUT:.0f}s"
+    if result.returncode != 0:
+        detail = redact((result.stderr or "").strip(), token).splitlines()
+        return detail[0] if detail else "fetch failed"
+    return None
+
+
+def read_board(
+    corpus: Corpus, config: WatchConfig, stage_ids: set[str],
+) -> dict[str, str]:
+    """The things currently sitting at one of this definition's stages.
+
+    Deliberately read from an immutable commit view, never the worktree. The
+    worktree is whatever the local session is mid-edit on, and a turn read
+    from it is a turn that has not happened yet — the distinction between a
+    draft and the estate's state.
+
+    **Reserved types are never on a status-keyed board.** A reserved type's
+    status vocabulary is the tool's own lifecycle, and it collides: a
+    `workflow-definition` sitting at `draft` would otherwise appear on the
+    board of a loop whose first stage is also called `draft` — including its
+    own. A tool-owned lifecycle is never a domain's turn token, so the two
+    are separated here rather than left to every definition to avoid by
+    choosing non-colliding stage names.
+    """
+    board: dict[str, str] = {}
+    watching_status = config.field_name == "status"
+    for thing in corpus.things:
+        if not thing.id:
+            continue
+        if watching_status and str(thing.meta.get("type")) in RESERVED_STATUSES:
+            continue
+        value = thing.meta.get(config.field_name)
+        if isinstance(value, str) and value in stage_ids:
+            board[thing.id] = value
+    return board
+
+
+def diff_board(
+    previous: dict[str, str], current: dict[str, str], wake_stages: set[str],
+) -> tuple[list[BoardChange], list[_Gone]]:
+    """What moved, and which of it is this role's turn.
+
+    The *previous* value is the discriminator, not the current one. A thing
+    arriving at `draft` is an author creating it; `review -> draft` is a
+    reviewer sending it back. Those are different events and only one of them
+    is a turn.
+    """
+    changes: list[BoardChange] = []
+    for thing_id, now in sorted(current.items()):
+        was = previous.get(thing_id)
+        if was == now:
+            continue
+        changes.append(BoardChange(
+            thing_id=thing_id, was=was, now=now, wakes=now in wake_stages))
+    gone = [_Gone(thing_id=t, was=v)
+            for t, v in sorted(previous.items()) if t not in current]
+    return changes, gone
+
+
+def _resolve_definition(config: WatchConfig) -> tuple[dict, set[str], set[str]]:
+    """Arm-time resolution: the definition, its stage set, and this role's.
+
+    Every refusal below is a watcher that would otherwise have run forever
+    without ever waking — the silent failure mode, which is worse than a loud
+    one because a hung watcher and a quiet estate look identical.
+    """
+    corpus, _ = scan(config.root, RepositoryView.worktree(config.root))
+    definition = corpus.by_id().get(config.definition_id)
+    if definition is None:
+        raise WatchError(
+            f"no thing with id `{config.definition_id}` in {config.root}")
+    if str(definition.meta.get("type")) != "workflow-definition":
+        raise WatchError(
+            f"`{config.definition_id}` is a "
+            f"`{definition.meta.get('type')}`, not a workflow-definition")
+
+    stage_ids = {
+        str(stage["id"])
+        for stage in definition.meta.get("stages") or []
+        if isinstance(stage, dict) and isinstance(stage.get("id"), str)
+    }
+    if not stage_ids:
+        raise WatchError(
+            f"`{config.definition_id}` declares no stages to watch")
+
+    actors = declared_actors(definition.meta)
+    if not actors:
+        raise WatchError(
+            f"`{config.definition_id}` declares no `stages[].actor`, so there "
+            "is no role to watch for — declare who acts at each stage "
+            "(workflow-state.md)")
+    wake_stages = set(stages_for_actor(definition.meta, config.role))
+    if not wake_stages:
+        raise WatchError(
+            f"`{config.definition_id}` declares no stage with "
+            f"`actor: {config.role}` — declared actors are "
+            f"{sorted(actors)}")
+
+    # The guard that turns a never-waking watcher into a startup error. It
+    # compares the role's wake values against the *declared* status
+    # vocabulary, never against the values things currently hold: a reviewer
+    # arms precisely when nothing is at `review` yet, so an observed-value
+    # guard would refuse the normal case and fire only on the abnormal one.
+    #
+    # What it does catch is a definition whose stage ids and the watched
+    # field's vocabulary disagree — `reviewing` against a vocabulary that
+    # says `review`. That watcher polls forever in silence, which is
+    # indistinguishable from a healthy estate: the mirror of
+    # `a-check-that-always-fires-teaches-the-operator-to-ignore-it`, a check
+    # that can never fire.
+    declarable = _declarable_statuses(corpus, config.field_name)
+    if declarable and not (wake_stages & declarable):
+        raise WatchError(
+            f"no declared `{config.field_name}` vocabulary contains "
+            f"{sorted(wake_stages)} — this watcher could never wake. The "
+            f"definition's stage ids and the domain's declared statuses "
+            f"disagree; reconcile them before arming "
+            f"(declared: {sorted(declarable)[:12]})")
+    return definition.meta, stage_ids, wake_stages
+
+
+def _declarable_statuses(corpus: Corpus, field_name: str) -> set[str]:
+    """Every status value any type in this corpus is permitted to hold.
+
+    Only meaningful for the `status` field. A domain carrying its turn on a
+    `workflow-run` cursor watches `current_stage`, whose permitted values are
+    the definition's own stage ids by construction — the guard would be
+    vacuous, so it stays quiet rather than inventing a vocabulary to check
+    against.
+
+    An empty result also means quiet: absence of a declaration is absence of
+    evidence, not evidence of a mismatch.
+    """
+    if field_name != "status":
+        return set()
+    declared: set[str] = set()
+    for statuses in RESERVED_STATUSES.values():
+        declared.update(statuses)
+    types = ((corpus.schema or {}).get("types") or {})
+    for definition in types.values():
+        if isinstance(definition, dict) and isinstance(
+                definition.get("statuses"), list):
+            declared.update(str(s) for s in definition["statuses"])
+    return declared
+
+
+def cmd_watch(args) -> int:
+    root = Path(getattr(args, "path", ".") or ".").resolve()
+    config = WatchConfig(
+        root=root,
+        role=args.role,
+        definition_id=args.definition,
+        remote=getattr(args, "remote", "origin") or "origin",
+        branch=getattr(args, "branch", "main") or "main",
+        field_name=getattr(args, "field", "status") or "status",
+        interval=float(getattr(args, "interval", DEFAULT_INTERVAL)),
+        exit_on_wake=bool(getattr(args, "exit_on_wake", False)),
+        once=bool(getattr(args, "once", False)),
+        state_file=(Path(args.state) if getattr(args, "state", None) else None),
+    )
+
+    try:
+        _, stage_ids, wake_stages = _resolve_definition(config)
+    except WatchError as exc:
+        print(f"mdllm watch: {exc}")
+        return 2
+    except RepositoryViewError as exc:
+        print(f"mdllm watch: {exc}")
+        return 2
+
+    state_path = state_path_for(config)
+    state = _load_state(state_path)
+    resumed = state.seen
+
+    print(f"watching `{config.definition_id}` as [{config.role}] on "
+          f"{config.remote}/{config.branch} every {config.interval:.0f}s; "
+          f"waking on {config.field_name} in {sorted(wake_stages)}; "
+          "silence means nothing moved")
+    if resumed:
+        print(f"resumed [{config.role}] from {len(state.board)} known "
+              "board entr(ies)")
+
+    failures = 0
+    while True:
+        head, error = resolve_remote_head(config)
+        if head is None:
+            failures += 1
+            # Emitted, never absorbed. A watcher that goes blind and says
+            # nothing is reporting health it cannot see.
+            if failures == 1 or failures % 10 == 0:
+                print(f"WATCHER BLIND [{config.role}] (poll {failures}): {error}")
+            if config.once:
+                return 1
+            time.sleep(config.interval)
+            continue
+        if failures:
+            print(f"WATCHER RECOVERED [{config.role}] after {failures} "
+                  "failed poll(s)")
+            failures = 0
+
+        if state.last_head == head:
+            if config.once:
+                return 0
+            time.sleep(config.interval)
+            continue
+
+        fetch_error = _fetch(config)
+        if fetch_error is not None:
+            print(f"WATCHER BLIND [{config.role}]: {fetch_error} "
+                  f"at head {head[:8]}")
+            if config.once:
+                return 1
+            time.sleep(config.interval)
+            continue
+
+        try:
+            view = RepositoryView.commit(config.root, head)
+            corpus, _ = scan(config.root, view)
+        except RepositoryViewError as exc:
+            print(f"WATCHER BLIND [{config.role}]: {exc}")
+            if config.once:
+                return 1
+            time.sleep(config.interval)
+            continue
+
+        board = read_board(corpus, config, stage_ids)
+        if not board and state.board:
+            print(f"board read empty at {head[:8]} — treating as a bad read, "
+                  "not an empty board")
+            if config.once:
+                return 1
+            time.sleep(config.interval)
+            continue
+
+        lost = len(state.board) - len(board)
+        if state.seen and lost > BAD_READ_LOSS:
+            print(f"BAD READ ignored [{config.role}]: board lost {lost} "
+                  "entr(ies) in one poll — not diffed")
+            if config.once:
+                return 1
+            time.sleep(config.interval)
+            continue
+
+        woke = False
+        if not state.seen:
+            print(f"baseline: {len(board)} thing(s) on the board at {head[:8]}")
+        else:
+            changes, gone = diff_board(state.board, board, wake_stages)
+            for change in changes:
+                print(change.line(config.role))
+                woke = woke or change.wakes
+            for missing in gone:
+                # The analogue of the sibling's vanished line: the event that
+                # must stop anything in flight, for any role.
+                print(missing.line())
+                woke = True
+
+        state.board = board
+        state.last_head = head
+        state.seen = True
+        _save_state(state_path, state)
+
+        if woke and config.exit_on_wake:
+            return 0
+        if config.once:
+            return 0
+        time.sleep(config.interval)

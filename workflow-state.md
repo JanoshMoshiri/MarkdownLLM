@@ -2,7 +2,7 @@
 id: workflow-state-specification
 type: specification
 status: evolving
-version: 0.6
+version: 0.7
 created: 2026-06-15
 linked_things:
   - id: thing-specification
@@ -79,6 +79,7 @@ stages:
     to: [review]
   - id: review
     to: [draft, done]           # rework loop, or finish
+    actor: reviewer             # optional — who ACTS here (see below)
   - id: done
     to: []                      # terminal — see the convention below
 ---
@@ -90,7 +91,50 @@ The definition carries no link back to its runs: a definition has many runs, and
 - **`stages[].to`** — the directed edges out of each stage. Whether an authored edge exists for an old→new cursor move is a mechanical fact; whether the work deserves that move remains semantic.
 - **`to: []` means terminal — by definition.** An empty edge list is the explicit marker of a terminal stage, not "edges not written yet." A definition with a non-terminal stage whose edges are genuinely unfinished is simply a draft the author has not completed; there is no ambiguous third state. (If a future definition-completeness linter is built, this is the rule it enforces.)
 
-The body holds what the stages *mean* — entry/exit criteria, what each stage produces, and who acts. **"Who acts" is two declarations, not one:** who or what *performs* the stage (a person, an agent, deterministic automation, or a hybrid sequence — execution responsibility) is declared separately from who may *authorise* its transition or accept its output (gate authority). A hybrid stage may be machine-executed but human-authorised; an agent may prepare a decision it is forbidden to accept; the same definition may be executed by different modalities over time without its business meaning changing. Both stay proportionate prose in the body — machine-readable modality fields enter only when at least two live modules need automation to consume them. That prose is the definition's reason to change; the run never edits it.
+The body holds what the stages *mean* — entry/exit criteria, what each stage produces, and who acts. **"Who acts" is two declarations, not one:** who or what *performs* the stage (a person, an agent, deterministic automation, or a hybrid sequence — execution responsibility) is declared separately from who may *authorise* its transition or accept its output (gate authority). A hybrid stage may be machine-executed but human-authorised; an agent may prepare a decision it is forbidden to accept; the same definition may be executed by different modalities over time without its business meaning changing. Gate authority stays proportionate prose in the body; the execution half became data on 2026-09-19, when this paragraph's own condition was met (see `stages[].actor`). That prose is the definition's reason to change; the run never edits it.
+
+### `stages[].actor` — execution responsibility, as data
+
+A stage may name the role that acts at it:
+
+```yaml
+stages:
+  - id: drafting
+    to: [reviewing]
+    actor: writer
+  - id: reviewing
+    to: [drafting, cleared]
+    actor: reviewer
+  - id: triage
+    to: [done]
+    actor: [writer, reviewer]   # a stage two roles may act on
+  - id: approved
+    to: []                      # terminal; nobody acts *at* it, so no actor
+```
+
+**Optional, and silent when unused.** A definition that declares no actor is
+untouched by this field and always will be — the field is a promotion of an
+existing fact, not a migration. The floor shape-checks a declaration only
+where one exists: an actor is a role name, or a list of role names, and an
+empty or non-name declaration is an Error because it is a table nothing can
+consume. Membership of a *role argument* against these names belongs to the
+consumer, not here; a definition is not wrong for declaring an actor nothing
+currently watches for.
+
+**Why it earned the promotion.** The condition above is not a formality. It
+was met by two live workflow definitions running a two-instance turn-taking
+loop, where three shell watchers had the role → stage table hardcoded in
+`case` statements. The role was already machine-consumed; it was consumed
+from bash, outside the definition that owns it, on one operating system's
+shell. Naming it here changes nothing an agent must *do* — it moves a table
+that already existed into the thing that already governed it.
+
+**What an actor is not.** It is **not gate authority.** The distinction above
+is the whole reason this field covers only half of "who acts": a stage may be
+executed by an agent and authorised by a human, and collapsing the two would
+let a declaration read as permission. `actor` says who acts; it never says
+who may accept the result. The standing boundary is unchanged — an
+irreversible act stays with the human, and no frontmatter field relocates it.
 
 ## `workflow-run` — The Live Instance
 
@@ -205,6 +249,7 @@ This follows the framework's standard split (`validate.thing.md`):
 | Check | Owner | What |
 |---|---|---|
 | `definition` resolves, and `current_stage` ∈ its stage set | **floor** (mechanical) | Pure referential integrity — the same class as "`linked_things` targets must exist." Enforced now: `mdllm validate` errors on a missing `definition`, an unresolved one, a `definition` that is not a `workflow-definition`, or a `current_stage` the definition does not declare. |
+| `stages[].actor`, where declared, is a role name or list of them | **floor** (mechanical) | Shape only, and only where the optional field is present. A declaration that cannot be consumed is an Error; a definition that declares no actor draws nothing. Whether the named role is the *right* one to act is the definition author's judgement. |
 | Does the prior definition declare this old→new edge? | **floor** (mechanical) | At pre-commit, compares the frozen index candidate with `HEAD`. For an unpinned run the governing edge list comes from the prior committed definition; for a pinned run it comes from the **pinned revision's** definition. Either way the candidate cannot authorize its own move by rewriting the graph. A definition migration and cursor advance must be separate meaning-boundary commits. New runs have no prior transition and are allowed. |
 | `definition_commit` resolves, and its tree carries the definition | **floor** (mechanical) | The pin names a real commit in this repository whose tree contains the governing definition (current path first, id-scan fallback). For a pinned run, `current_stage` membership is read from the pinned revision. |
 | One commit changes both `definition_commit` and `current_stage` | **floor** (mechanical, Error) | The self-authorization guard: rejected outright, regardless of whether the move would be legal under either revision. |

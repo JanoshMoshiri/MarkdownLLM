@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-09-15
-generated: 2026-09-15T21:31:50
-generated_from: HEAD@8d51b6f
+created: 2026-09-19
+generated: 2026-09-19T17:22:21
+generated_from: HEAD@e4a297f
 coverage: 6
 framework_version: 3.41.0
 ---
@@ -78,6 +78,8 @@ the framework or when the kernel says to. Regenerate after any spec change.
 **Multi-machine sync:** sync before orienting — automatic `mdllm estate-sync` is fetch + `pull --ff-only`, bounded, never prompting, and degrades offline to "orienting from last-fetched state" so lifecycle startup does not block. When the operator explicitly asks for fresh manual state, `mdllm estate-sync --require-fresh` turns any cached or unresolved outcome into a nonzero approval/routing signal. Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
 
 **Publication:** the autopush leg (post-commit hook) publishes a floor-validated commit **only** when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off; publication authority never comes from silence. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) declare false, so a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under explicitly enabled autopush, an anomaly report.
+
+**Turn-taking is publication, not commit.** Where two instances take turns through the repository, a turn has not passed until its new state is visible on the remote — confirm from the ref, never from the local clone. A commit can succeed while its push is rejected, and the committing side then holds every local indication that it handed over while the other side sees nothing; neither is wrong and nothing reports an error. That is silence indistinguishable from *nothing moved*. An instance that cannot publish its turn is blocked and says so; it never resolves the divergence to get unstuck.
 
 **Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
 

@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-09-19
 priority: high
 informed_by:
@@ -199,23 +199,23 @@ Deliberately not lifted:
 
 ## Route
 
-- [ ] **Phase 0 — Define it.** This document, committed before the first line
+- [x] **Phase 0 — Define it.** This document, committed before the first line
       of code. The durable-state protocol: plan in repo, per-change commits,
       the plan is the source of truth after compaction.
 
-- [ ] **Phase 1 — `stages[].actor`.** `workflow-state.md` 0.6 → 0.7; the field,
+- [x] **Phase 1 — `stages[].actor`.** `workflow-state.md` 0.6 → 0.7; the field,
       its semantics, and the floor check that a named role resolves. Tests.
       *Done when:* a `workflow-definition` may declare actors, an undeclared
       `--role` is an Error, and a definition without the field is untouched.
 
-- [ ] **Phase 2 — `mdllm watch`.** The command, in its own module, registered
+- [x] **Phase 2 — `mdllm watch`.** The command, in its own module, registered
       in `cli.py`. Remote-ref resolution → `RepositoryView.commit` → trigger
       evaluation for one role → emit-on-change → optional exit-on-wake. Tests
       covering each of the five inherited decisions.
       *Done when:* `mdllm watch` reproduces `spec-watcher.sh`'s behaviour on
       the same board, from Python, on the PowerShell route.
 
-- [ ] **Phase 3 — The kernel corollary.** One sentence into `git-workflow.md`'s
+- [x] **Phase 3 — The kernel corollary.** One sentence into `git-workflow.md`'s
       kernel block; `mdllm kernel` regenerated; `mdllm coherence` clean.
       *Done when:* Tier 0 carries the turn-taking rule and the generated kernel
       matches its source.
@@ -230,6 +230,34 @@ Deliberately not lifted:
 - [ ] **Phase 5 — Seal.** Harvest what the use taught. Any insight, any
       conflict, any correction to the three artefacts above. `workflow-state.md`
       stays `evolving` — a field validated by one turn is not `stable`.
+
+## What The Build Found — Phase 4's First Input
+
+**The engineering definition's stage ids and its own board table disagree.**
+`two-agent-specification-loop` declares stages `drafting` / `reviewing` /
+`cleared` / `ruling` / `blocked` / `approved`, while its *own* "five states,
+one field" table — and the domain's declared `design-spec` status vocabulary —
+say `draft` / `review` / `cleared` / `ruling` / `approved`. Two of the five
+turn tokens do not match the stage that names them.
+
+Nothing was broken by this, because the shell watcher never consulted the
+stages block; it carried its own `case` statement. That is precisely the
+duplication `stages[].actor` retires, and moving the table into the definition
+is what surfaced the disagreement.
+
+`mdllm watch` refuses to arm on it rather than polling in silence: a watcher
+whose wake values cannot appear in the watched field's declared vocabulary
+would be indistinguishable from a healthy estate, which is the failure the
+loop fears most. **Reconciling the two is the domain's call, not the
+framework's** — the stage ids can move to match the statuses, or the loop can
+carry its turn on a `workflow-run` cursor instead. Phase 4 raises it; the
+domain rules on it.
+
+**A second, smaller find, fixed in the floor:** a `workflow-definition` whose
+own `status` collides with one of its stage ids (`draft` is both) appeared on
+the board it defines. A reserved type's status is a tool-owned lifecycle and is
+never a domain's turn token, so reserved types are now excluded from a
+status-keyed board.
 
 ## What This Plan Refuses
 
@@ -253,10 +281,10 @@ Deliberately not lifted:
 
 ## Done When
 
-- [ ] `workflow-definition` carries `stages[].actor`, floor-checked where used.
-- [ ] `mdllm watch` exists, is tested, and runs on both the bash and PowerShell
-      routes.
-- [ ] The git-workflow kernel carries the turn-taking corollary.
+- [x] `workflow-definition` carries `stages[].actor`, floor-checked where used.
+- [x] `mdllm watch` exists and is tested (22 cases); the PowerShell route is
+      exercised in Phase 4.
+- [x] The git-workflow kernel carries the turn-taking corollary.
 - [ ] One real turn has crossed in a live domain with no human relay, woken by
       the command and not by a script.
 - [ ] `spec-watcher.sh` is retired in favour of the command — and not before.

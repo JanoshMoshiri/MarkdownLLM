@@ -106,6 +106,7 @@ from .tokens import cmd_tokens
 from .touchpoints import cmd_candidates, cmd_cues, cmd_touchpoints
 from .triggers import cmd_triggers
 from .validation import cmd_validate
+from .watch import cmd_watch
 
 
 def cmd_adapter_install(args) -> int:
@@ -137,6 +138,31 @@ def build_cli() -> argparse.ArgumentParser:
                    help="batch per-domain evaluation over the local clones the "
                         "estate-sync walk finds — ephemeral, never an index")
     t.set_defaults(fn=cmd_triggers)
+
+    w = sub.add_parser("watch", help="the doorbell: poll the remote ref and "
+                       "report when a watched thing reaches a stage this role "
+                       "acts at; reads only, never writes")
+    w.add_argument("path", nargs="?", default=".")
+    w.add_argument("--role", required=True,
+                   help="the actor to wake for; must be declared as a "
+                        "`stages[].actor` in the definition")
+    w.add_argument("--definition", required=True,
+                   help="id of the workflow-definition whose stages are the board")
+    w.add_argument("--field", default="status",
+                   help="the frontmatter field carrying the turn (default: "
+                        "status; a domain using workflow-run cursors passes "
+                        "current_stage)")
+    w.add_argument("--remote", default="origin")
+    w.add_argument("--branch", default="main")
+    w.add_argument("--interval", type=float, default=60.0,
+                   help="seconds between ref reads (default: 60)")
+    w.add_argument("--exit-on-wake", action="store_true",
+                   help="exit 0 on this role's turn, after state is saved — "
+                        "the contract a harness binds a wake to")
+    w.add_argument("--once", action="store_true",
+                   help="single poll then exit; for arming checks and tests")
+    w.add_argument("--state", help="override the per-role state file")
+    w.set_defaults(fn=cmd_watch)
 
     i = sub.add_parser("index", help="check or rebuild derived indexes")
     i.add_argument("path", nargs="?", default=".")
