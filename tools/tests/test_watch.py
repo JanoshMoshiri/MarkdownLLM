@@ -19,6 +19,7 @@ seams that would, and the loop tests stub them.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -436,3 +437,86 @@ class TestRealRemoteTurn:
 
         assert self._watch(reviewer, "reviewer", exit_on_wake=True) == 0
         assert "REVIEWER UP" not in capsys.readouterr().out
+
+
+class TestSingleInstance:
+    """One watcher per (definition, role), per clone.
+
+    Keying the state file per role stops two *different* roles colliding. It
+    does not stop two instances of the *same* role, and that is the failure
+    the sibling loop actually hit — eight orphaned watchers racing on one
+    state file, each absorbing the others' events, so the live one saw nothing
+    change and stayed silent. These pin the second guarantee.
+    """
+
+    def test_a_second_instance_of_the_same_role_refuses(self, board, capsys):
+        lock_file = watch_mod.lock_path_for(_config(board))
+        lock_file.parent.mkdir(parents=True, exist_ok=True)
+        lock_file.write_text(str(os.getppid()), encoding="utf-8")
+
+        assert watch_mod.cmd_watch(_args(board)) == 3
+        out = capsys.readouterr().out
+        assert "not starting a second" in out
+        assert str(os.getppid()) in out
+
+    def test_the_refusal_is_not_exit_zero(self, board, capsys):
+        """Exit 3, never 0.
+
+        A harness bound to `--exit-on-wake` re-invokes on exit. Returning 0
+        for a double-arm refusal would read as "your turn" and wake an agent
+        for a doorbell that never rang.
+        """
+        lock_file = watch_mod.lock_path_for(_config(board))
+        lock_file.parent.mkdir(parents=True, exist_ok=True)
+        lock_file.write_text(str(os.getppid()), encoding="utf-8")
+        assert watch_mod.cmd_watch(_args(board, exit_on_wake=True)) == 3
+
+    def test_a_stale_lock_is_taken_not_obeyed(self, board, capsys, monkeypatch):
+        """A watcher killed without cleanup must not lock its role out."""
+        lock_file = watch_mod.lock_path_for(_config(board))
+        lock_file.parent.mkdir(parents=True, exist_ok=True)
+        lock_file.write_text("999999999", encoding="utf-8")  # long dead
+        monkeypatch.setattr(watch_mod, "resolve_remote_head",
+                            lambda c: (None, "offline"))
+        assert watch_mod.cmd_watch(_args(board)) == 1
+        assert "not starting a second" not in capsys.readouterr().out
+
+    def test_a_corrupt_lock_does_not_block(self, board, monkeypatch):
+        lock_file = watch_mod.lock_path_for(_config(board))
+        lock_file.parent.mkdir(parents=True, exist_ok=True)
+        lock_file.write_text("not-a-pid", encoding="utf-8")
+        monkeypatch.setattr(watch_mod, "resolve_remote_head",
+                            lambda c: (None, "offline"))
+        assert watch_mod.cmd_watch(_args(board)) == 1
+
+    def test_the_lock_is_released_on_exit(self, board, monkeypatch):
+        monkeypatch.setattr(watch_mod, "resolve_remote_head",
+                            lambda c: (None, "offline"))
+        watch_mod.cmd_watch(_args(board))
+        assert not watch_mod.lock_path_for(_config(board)).exists()
+
+    def test_two_roles_never_share_a_lock(self, tmp_path):
+        a = watch_mod.lock_path_for(
+            _config(tmp_path, role="writer", state_file=None))
+        b = watch_mod.lock_path_for(
+            _config(tmp_path, role="reviewer", state_file=None))
+        assert a != b
+
+    def test_liveness_never_terminates_the_process_it_probes(self):
+        """The Windows trap, pinned.
+
+        `os.kill(pid, 0)` is a liveness probe on POSIX. On Windows, Python's
+        `os.kill` routes to TerminateProcess for any signal that is not a
+        CTRL_* event — so the obvious implementation would kill the very
+        process it was asking about. This asserts our own live pid reads as
+        alive and is still here afterwards.
+        """
+        assert watch_mod._process_alive(os.getpid()) is True
+        assert watch_mod._process_alive(os.getpid()) is True  # still alive
+
+    def test_a_dead_pid_reads_as_dead(self):
+        assert watch_mod._process_alive(999999999) is False
+
+    def test_a_nonsense_pid_reads_as_dead(self):
+        assert watch_mod._process_alive(0) is False
+        assert watch_mod._process_alive(-1) is False

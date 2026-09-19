@@ -29,6 +29,7 @@ exits. The turn stays the agent's act and the ruling stays the human's.
 from __future__ import annotations
 
 import json
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -40,6 +41,8 @@ from .workflow_actors import declared_actors, stages_for_actor
 
 __all__ = [
     "WatchConfig",
+    "lock_path_for",
+    "InstanceLock",
     "WatchError",
     "BoardChange",
     "read_board",
@@ -142,6 +145,112 @@ def state_path_for(config: WatchConfig) -> Path:
         return Path(config.state_file)
     slug = f"{config.definition_id}.{config.role}".replace("/", "-")
     return config.root / ".git" / "mdllm-watch" / f"{slug}.json"
+
+
+def lock_path_for(config: WatchConfig) -> Path:
+    """The single-instance guard, keyed exactly as the state file is."""
+    return state_path_for(config).with_suffix(".pid")
+
+
+def _process_alive(pid: int) -> bool:
+    """Is this pid a live process?
+
+    Deliberately not `os.kill(pid, 0)` on Windows. Python's `os.kill` there
+    does not implement signal 0 as a liveness probe — it routes to
+    TerminateProcess, so the "check" would kill the very process it was asking
+    about. The Win32 path opens a query-only handle instead.
+    """
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        STILL_ACTIVE = 259
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(
+            PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if not handle:
+            return False
+        try:
+            code = ctypes.c_ulong()
+            if kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+                return code.value == STILL_ACTIVE
+            return True
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        # Alive, owned by someone else. Not ours to take.
+        return True
+    return True
+
+
+class InstanceLock:
+    """One watcher per (definition, role), per clone.
+
+    The state file is keyed per role, which stops two *different* roles
+    colliding. It does not stop two instances of the *same* role, and that is
+    the failure the sibling loop actually hit: eight orphaned watchers racing
+    on one state file, each absorbing the others' events, so the live one saw
+    nothing change and stayed silent. State isolation and single-instance are
+    two guarantees, not one.
+
+    A lock whose process is gone is stale and is taken. A watcher killed
+    without cleanup must not lock its own role out forever.
+    """
+
+    def __init__(self, path: Path):
+        self.path = path
+        self.held = False
+
+    def holder(self) -> int | None:
+        """The live pid holding this lock, or None if free or stale."""
+        try:
+            raw = self.path.read_text(encoding="utf-8").strip()
+        except OSError:
+            return None
+        try:
+            pid = int(raw)
+        except ValueError:
+            return None
+        if pid == os.getpid():
+            return None
+        return pid if _process_alive(pid) else None
+
+    def acquire(self) -> int | None:
+        """Take the lock, or return the live pid that already holds it."""
+        other = self.holder()
+        if other is not None:
+            return other
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self.path.write_text(str(os.getpid()), encoding="utf-8")
+            self.held = True
+        except OSError:
+            # A clone whose .git is read-only still deserves a watcher; it
+            # just cannot be guarded. Better an unguarded watch than none.
+            pass
+        return None
+
+    def release(self) -> None:
+        if not self.held:
+            return
+        try:
+            if self.path.read_text(encoding="utf-8").strip() == str(os.getpid()):
+                self.path.unlink()
+        except OSError:
+            pass
+        self.held = False
+
+    def __enter__(self) -> "InstanceLock":
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self.release()
 
 
 def _load_state(path: Path) -> _LoopState:
@@ -383,6 +492,27 @@ def cmd_watch(args) -> int:
         print(f"mdllm watch: {exc}")
         return 2
 
+    lock = InstanceLock(lock_path_for(config))
+    other = lock.acquire()
+    if other is not None:
+        # Exit 3, not 0. A harness bound to `--exit-on-wake` re-invokes on
+        # exit, so returning 0 here would read as "your turn" and wake an
+        # agent for a doorbell that never rang. A refusal to double-arm is
+        # its own outcome and gets its own code.
+        print(f"mdllm watch: already watching `{config.definition_id}` as "
+              f"[{config.role}] in this clone (pid {other}) — not starting a "
+              "second. Two instances of one role race on one state file and "
+              "absorb each other's events.")
+        return 3
+
+    try:
+        return _watch_loop(config, stage_ids, wake_stages)
+    finally:
+        lock.release()
+
+
+def _watch_loop(config: WatchConfig, stage_ids: set[str],
+                wake_stages: set[str]) -> int:
     state_path = state_path_for(config)
     state = _load_state(state_path)
     resumed = state.seen
