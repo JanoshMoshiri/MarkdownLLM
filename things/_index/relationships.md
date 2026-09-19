@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-19
-generated: 2026-09-19T17:02:41
-generated_from: HEAD@cb1f86b
-coverage: 413
+generated: 2026-09-19T17:44:10
+generated_from: HEAD@ce1a1e6
+coverage: 416
 framework_version: 3.41.0
 ---
 
@@ -456,8 +456,10 @@ framework_version: 3.41.0
 - cue-first-hour-guide-2026-09-15 --subject--> first-hour-guide
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
+- cue-framework-map-2026-09-19 --subject--> framework-map
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
+- cue-git-workflow-specification-2026-09-19 --subject--> git-workflow-specification
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
@@ -489,6 +491,7 @@ framework_version: 3.41.0
 - cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
 - cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
 - cue-watertight-membrane-sprint-2026-08-30-2026-09-13 --subject--> watertight-membrane-sprint-2026-08-30
+- cue-workflow-state-specification-2026-09-19 --subject--> workflow-state-specification
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality

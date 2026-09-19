@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-19
-generated: 2026-09-19T17:02:41
-generated_from: HEAD@cb1f86b
+generated: 2026-09-19T17:44:10
+generated_from: HEAD@ce1a1e6
 coverage: 98
 framework_version: 3.41.0
 ---
@@ -204,6 +204,8 @@ framework_version: 3.41.0
 - cue-change-reconciliation-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-change-reconciliation-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-framework-map-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-git-workflow-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-git-workflow-specification-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -215,6 +217,7 @@ framework_version: 3.41.0
 - cue-thing-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-workflow-state-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 
 ## framework-kernel
 - estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
