@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-21
-generated: 2026-09-21T23:30:26
-generated_from: HEAD@e0bc244
-coverage: 102
+created: 2026-09-22
+generated: 2026-09-22T00:28:40
+generated_from: HEAD@dc673b5
+coverage: 104
 framework_version: 3.41.0
 ---
 
@@ -32,6 +32,7 @@ framework_version: 3.41.0
 - estate-wide-autopush-2026-08-22 (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
 
 ## between-sessions-surface-is-real-2026-09-21
+- run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - standing-watch-specification (derived-from)
 
 ## claude-entry-surface-unprovisioned-for-no-adapter-domains
@@ -227,6 +228,7 @@ framework_version: 3.41.0
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-workflow-state-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-workflow-state-specification-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 
 ## framework-kernel
 - estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
@@ -376,6 +378,9 @@ framework_version: 3.41.0
 - run-floor-sprint-3-2026-08 (pinned @4c7383b9221f8dd67748393d49de6d50b8521112)
 - some-changes-are-verifiable-only-by-publishing (derived-from)
 
+## run-membership-is-realisation-2026-09-22
+- cue-workflow-state-specification-2026-09-22 (derived-from)
+
 ## run-operating-model-seams-2026-08
 - operating-model-seams-scope-2026-08-26 (pinned @bc4aabcf140445baae2c824e17fcf1249e0eda09)
 - operating-model-seams-self-application (pinned @45a582b3fc424cb3bf812e235be3cc576615098d)
@@ -401,6 +406,9 @@ framework_version: 3.41.0
 
 ## source-behind-mirror-is-still-a-consumer-side-read
 - serve-side-blindness-dissolves-into-composition (derived-from)
+
+## standing-watch-specification
+- run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
@@ -468,5 +476,6 @@ framework_version: 3.41.0
 
 ## workflow-state-specification
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+- run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
 

@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-21
-generated: 2026-09-21T23:30:26
-generated_from: HEAD@e0bc244
-coverage: 418
+created: 2026-09-22
+generated: 2026-09-22T00:28:40
+generated_from: HEAD@dc673b5
+coverage: 420
 framework_version: 3.41.0
 ---
 
@@ -498,6 +498,8 @@ framework_version: 3.41.0
 - cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
 - cue-watertight-membrane-sprint-2026-08-30-2026-09-13 --subject--> watertight-membrane-sprint-2026-08-30
 - cue-workflow-state-specification-2026-09-19 --subject--> workflow-state-specification
+- cue-workflow-state-specification-2026-09-22 --derived-from--> run-membership-is-realisation-2026-09-22
+- cue-workflow-state-specification-2026-09-22 --subject--> workflow-state-specification
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality
@@ -1222,6 +1224,10 @@ framework_version: 3.41.0
 - run-floor-sprint-3-2026-08 --references--> mechanical-coherence-checks-backlog
 - run-floor-sprint-3-2026-08 --references--> floor-block-requirements-2026-08
 - run-floor-sprint-3-2026-08 --definition--> substrate-floor-development
+- run-membership-is-realisation-2026-09-22 --extends--> between-sessions-surface-is-real-2026-09-21
+- run-membership-is-realisation-2026-09-22 --informs--> workflow-state-specification
+- run-membership-is-realisation-2026-09-22 --informs--> standing-watch-specification
+- run-membership-is-realisation-2026-09-22 --informs--> substrate-native-a2a
 - run-operating-model-seams-2026-08 --references--> review-independent-operating-model-2026-08-26-codex
 - run-operating-model-seams-2026-08 --references--> floor-block-requirements-2026-08
 - run-operating-model-seams-2026-08 --references--> run-floor-sprint-3-2026-08

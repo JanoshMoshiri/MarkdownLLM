@@ -2,7 +2,7 @@
 id: workflow-state-specification
 type: specification
 status: evolving
-version: 0.7
+version: 0.8
 created: 2026-06-15
 linked_things:
   - id: thing-specification
@@ -172,7 +172,7 @@ Field discipline:
 - **`held_by`** — the advisory coordination claim defined in `coordination-claim.md`; not a lock. Omit (or clear) when the instance is unheld.
 - **`status`** — the run's *own* lifecycle, orthogonal to `current_stage`: `active`, `paused`, `completed` (only once a terminal stage is reached), or `abandoned`.
 
-**Blocked-ness lives on the work, not the cursor.** There is deliberately no `blocked` run-status. A run is a *pointer* into a process; it is `active` whenever it is live, even while the underlying work is stuck. Blockage is a property of the *work things* the run coordinates (a `task` blocked on a dependency, a deadline overdue) — read it there, not from the cursor. This keeps the run tiny and stops two things from claiming the same fact.
+**Blocked-ness lives on the work, not the cursor.** There is deliberately no `blocked` run-status. A run is a *pointer* into a process; it is `active` whenever it is live, even while the underlying work is stuck. Blockage is a property of the *work things* the run coordinates — its members, the things that declare they realise it (see Activation and Fulfilment → Membership) — a `task` blocked on a dependency, a deadline overdue. Read it there, not from the cursor. This keeps the run tiny and stops two things from claiming the same fact.
 
 ## Revision Binding
 
@@ -233,6 +233,16 @@ references only, no new artefact type:
   demand is judged at the definition's terminal stage and recorded in
   the run's closing narrative. The floor checks link *presence* at most
   (advisory); adequacy is judgement and stays so.
+- **Membership.** A thing that is this run's realisation declares it with
+  `linked_things: {id: <run>, relation: implements}` — *I am this run's
+  realisation.* That edge, and no other, is what the floor reads when it
+  needs a run's members (`mdllm watch --run`; `standing-watch.md` → Scope).
+  It is distinct from `informed_by` naming the run, which is provenance —
+  where the thing came from — and the two can diverge: a thing produced
+  under one run can be the realisation of another. Membership is function,
+  not origin (`run-membership-is-realisation-2026-09-22`). A thing may
+  realise more than one run; the edge is a relation, not a singular pointer,
+  for that reason.
 
 ## What Not to Duplicate
 
@@ -250,6 +260,7 @@ This follows the framework's standard split (`validate.thing.md`):
 |---|---|---|
 | `definition` resolves, and `current_stage` ∈ its stage set | **floor** (mechanical) | Pure referential integrity — the same class as "`linked_things` targets must exist." Enforced now: `mdllm validate` errors on a missing `definition`, an unresolved one, a `definition` that is not a `workflow-definition`, or a `current_stage` the definition does not declare. |
 | `stages[].actor`, where declared, is a role name or list of them | **floor** (mechanical) | Shape only, and only where the optional field is present. A declaration that cannot be consumed is an Error; a definition that declares no actor draws nothing. Whether the named role is the *right* one to act is the definition author's judgement. |
+| Which things are a run's members | **floor** (read) | The things declaring `linked_things: {id: <run>, relation: implements}`. No new check — the edge is ordinary `linked_things`, already validated for shape and resolution. Consumers read it (`mdllm watch --run`); whether a thing *should* realise a run is the author's judgement. |
 | Does the prior definition declare this old→new edge? | **floor** (mechanical) | At pre-commit, compares the frozen index candidate with `HEAD`. For an unpinned run the governing edge list comes from the prior committed definition; for a pinned run it comes from the **pinned revision's** definition. Either way the candidate cannot authorize its own move by rewriting the graph. A definition migration and cursor advance must be separate meaning-boundary commits. New runs have no prior transition and are allowed. |
 | `definition_commit` resolves, and its tree carries the definition | **floor** (mechanical) | The pin names a real commit in this repository whose tree contains the governing definition (current path first, id-scan fallback). For a pinned run, `current_stage` membership is read from the pinned revision. |
 | One commit changes both `definition_commit` and `current_stage` | **floor** (mechanical, Error) | The self-authorization guard: rejected outright, regardless of whether the move would be legal under either revision. |
