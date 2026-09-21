@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-22
-generated: 2026-09-22T00:28:40
-generated_from: HEAD@dc673b5
-coverage: 420
+generated: 2026-09-22T00:56:34
+generated_from: HEAD@b38a62f
+coverage: 424
 framework_version: 3.41.0
 ---
 
@@ -68,6 +68,11 @@ framework_version: 3.41.0
 - a-domain-local-ruling-is-invisible-from-the-centre --complements--> consistency-is-maintained-at-change-not-by-sweeping
 - a-domain-local-ruling-is-invisible-from-the-centre --complements--> a-generated-contract-change-is-an-estate-migration
 - a-domain-local-ruling-is-invisible-from-the-centre --references--> the-estates-second-clone-is-an-independent-witness
+- a-filter-is-a-missing-instance --derived-from--> substrate-native-a2a
+- a-filter-is-a-missing-instance --derived-from--> run-membership-is-realisation-2026-09-22
+- a-filter-is-a-missing-instance --extends--> workflow-run-is-the-decomposition-principle-applied-to-processes
+- a-filter-is-a-missing-instance --supports--> a-true-primitive-is-discovered-not-authored
+- a-filter-is-a-missing-instance --extends--> an-advisory-is-scoped-by-who-can-perform-its-remedy
 - a-finding-does-not-earn-its-own-type --informs--> thing-specification
 - a-finding-does-not-earn-its-own-type --informs--> session-memory-specification
 - a-finding-does-not-earn-its-own-type --references--> retrospective-specification
@@ -487,7 +492,9 @@ framework_version: 3.41.0
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
+- cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
+- cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
@@ -1015,6 +1022,12 @@ framework_version: 3.41.0
 - membrane-attention-cluster --references--> divergence-is-an-unrouted-decision
 - membrane-attention-cluster --extends--> trigger-specification
 - membrane-attention-cluster --extends--> provenance-specification
+- mesh-safety-is-the-floor-not-the-topology --derived-from--> between-sessions-surface-is-real-2026-09-21
+- mesh-safety-is-the-floor-not-the-topology --informs--> standing-watch-specification
+- mesh-safety-is-the-floor-not-the-topology --extends--> hook-enforcement-has-three-anchors
+- mesh-safety-is-the-floor-not-the-topology --supports--> boundary-respect-was-interpretation-not-enforcement
+- mesh-safety-is-the-floor-not-the-topology --supports--> consequence-is-recoverable-only-in-retrospect
+- mesh-safety-is-the-floor-not-the-topology --supports--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - mis-keyed-links-pass-the-floor-silently --extends--> first-2x2-measured-convention-following-not-reasoning
 - mis-keyed-links-pass-the-floor-silently --supports--> fixture-fixes-correct-bugs-not-difficulty
 - mis-keyed-links-pass-the-floor-silently --complements--> mechanical-assimilation-is-blind-to-prose-dependencies
@@ -1312,6 +1325,8 @@ framework_version: 3.41.0
 - standing-watch-specification --references--> portability-claims-need-execution-tests
 - standing-watch-specification --references--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - standing-watch-specification --informs--> a-mechanism-fails-at-its-seams-not-in-its-body
+- standing-watch-specification --informs--> a-filter-is-a-missing-instance
+- standing-watch-specification --informs--> mesh-safety-is-the-floor-not-the-topology
 - status-vocabulary-universal-vs-domain --references--> validate-thing-specification
 - status-vocabulary-universal-vs-domain --references--> domain-specification-guide
 - status-vocabulary-universal-vs-domain --references--> framework-v3-transformation-plan
@@ -1337,6 +1352,7 @@ framework_version: 3.41.0
 - substrate-floor-development --references--> substrate-review-consolidated-remedy-2026-08-20
 - substrate-native-a2a --extends--> workflow-state-specification
 - substrate-native-a2a --informs--> standing-watch-specification
+- substrate-native-a2a --informs--> a-never-crossed-gate-hides-the-defects-behind-it
 - substrate-native-a2a --references--> coordination-claim-specification
 - substrate-native-a2a --extends--> trigger-specification
 - substrate-native-a2a --extends--> git-workflow-specification

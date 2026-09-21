@@ -8,6 +8,8 @@ session: 2026-08-16
 source: field
 confidence: medium
 origin: stated
+disposition: keep-active
+disposition_reason: "Checklist razor for any multi-dimensional bound (time / characters / count), dispositioned 2026-09-22. One clean instance, none since. Dismiss at the 2026-10-13 retrospective if no second instance has appeared; promote into the lifecycle runner's budget contract if one has."
 linked_things:
   - id: the-harness-bound-path-is-the-least-tested-path
     relation: complements

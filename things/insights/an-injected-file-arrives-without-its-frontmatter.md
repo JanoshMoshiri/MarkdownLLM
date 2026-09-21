@@ -7,6 +7,8 @@ created: 2026-08-17
 tags: [entry-surface, harness, context-loading, claude-code, frontmatter]
 confidence: high
 origin: stated
+disposition: keep-active
+disposition_reason: "Standing authoring razor, dispositioned 2026-09-22: anything an agent must know before its first tool call goes in the entry file's body — frontmatter configures, body instructs. Re-read whenever a t=0 behaviour is proposed as a frontmatter field; dismissed only if the entry route ever delivers frontmatter."
 linked_things:
   - id: claude-no-adapter-entry-probe-2026-08-17
     relation: derived-from

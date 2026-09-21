@@ -20,6 +20,9 @@ linked_things:
   - id: standing-watch-specification
     relation: informs
     notes: "The spec this plan's Phase 2 was carrying in docstrings. Born 2026-09-21 as its own file — the first of the between-sessions band — on the ruling `between-sessions-surface-is-real-2026-09-21`. Phase 6 below is that spec's scope half, recorded here as forward work."
+  - id: a-never-crossed-gate-hides-the-defects-behind-it
+    relation: informs
+    notes: "Phase 4's trigger asks exactly this insight's question — never armed, armed and never woke, or woke and hand-relayed — because a watch that has never rung cannot distinguish broken from never-run. Linked at session end 2026-09-22 so the razor stays live where it is applied."
   - id: coordination-claim-specification
     relation: references
     notes: "`held_by` is the claim half of turn-taking and needs no change. This plan touches only the wake half."

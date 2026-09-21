@@ -49,6 +49,12 @@ linked_things:
   - id: a-mechanism-fails-at-its-seams-not-in-its-body
     relation: informs
     notes: "The seam between sessions had no mechanism at all. This spec is the first one that stands in it."
+  - id: a-filter-is-a-missing-instance
+    relation: informs
+    notes: "The Scope section is this insight's instance: two independent diagnoses reached for a filter, and the scope was a run that already existed unnamed to the mechanism."
+  - id: mesh-safety-is-the-floor-not-the-topology
+    relation: informs
+    notes: "Qualifies the third irreducible. Peers-not-orchestrator is a real property of the shape, and what it buys is a distribution of human authority that holds only where the seat is reached by mechanism."
 ---
 
 # Standing Watch

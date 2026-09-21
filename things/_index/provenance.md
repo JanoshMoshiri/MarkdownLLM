@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-22
-generated: 2026-09-22T00:28:40
-generated_from: HEAD@dc673b5
+generated: 2026-09-22T00:56:34
+generated_from: HEAD@b38a62f
 coverage: 104
 framework_version: 3.41.0
 ---
@@ -32,6 +32,8 @@ framework_version: 3.41.0
 - estate-wide-autopush-2026-08-22 (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
 
 ## between-sessions-surface-is-real-2026-09-21
+- cue-substrate-native-a2a-2026-09-22 (pinned @b38a62f69edf906e1577ef67e51edd2fdb73cc53)
+- mesh-safety-is-the-floor-not-the-topology (derived-from)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - standing-watch-specification (derived-from)
 
@@ -224,6 +226,8 @@ framework_version: 3.41.0
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-session-memory-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-standing-watch-specification-2026-09-22 (pinned @b38a62f69edf906e1577ef67e51edd2fdb73cc53)
+- cue-substrate-native-a2a-2026-09-22 (pinned @b38a62f69edf906e1577ef67e51edd2fdb73cc53)
 - cue-thing-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -379,6 +383,8 @@ framework_version: 3.41.0
 - some-changes-are-verifiable-only-by-publishing (derived-from)
 
 ## run-membership-is-realisation-2026-09-22
+- a-filter-is-a-missing-instance (derived-from)
+- cue-standing-watch-specification-2026-09-22 (pinned @b38a62f69edf906e1577ef67e51edd2fdb73cc53)
 - cue-workflow-state-specification-2026-09-22 (derived-from)
 
 ## run-operating-model-seams-2026-08
@@ -417,6 +423,7 @@ framework_version: 3.41.0
 - cumulative-drift-is-invisible-to-per-change-walks (derived-from)
 
 ## substrate-native-a2a
+- a-filter-is-a-missing-instance (derived-from)
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
 
 ## substrate-review-consolidated-remedy-2026-08-20
