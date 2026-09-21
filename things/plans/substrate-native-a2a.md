@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-09-19
 priority: high
 informed_by:
@@ -267,23 +267,34 @@ Deliberately not lifted:
       two streams already *are* two runs, the artefacts already declare
       membership, and the run already carries the pin and the claim. Specified
       as the direction in `standing-watch.md` → *Scope*.
-      - [ ] **`workflow-state.md` settles the membership edge.** Its *Activation
-            and Fulfilment* section says `informed_by` naming the run; the live
-            domain attaches artefacts with `linked_things: {relation: implements}`
-            and carries no `informed_by`. A scope built before this settles reads
-            whichever edge its author picked. Cue and walk, as an inflection on
-            that spec.
-      - [ ] `--run <id>` on `mdllm watch`: the board becomes the things that
-            belong to that run, read through the settled edge; the governing
-            definition is read at the run's `definition_commit` where pinned.
-            Arming refuses a run that does not resolve or does not instance the
-            named definition.
-      - [ ] Tests: two runs of one definition, two reviewers, each wakes only on
-            its own. The vanished-thing event still fires across runs.
-      - [ ] Until then the engineering domain runs three clones — two writers,
-            one reviewer — which is what the loop already assumes and needs no
-            code. **The floor was deliberately not touched on 2026-09-21**: the
-            watcher was live on current work.
+      - [x] **`workflow-state.md` settles the membership edge** — 0.8, ruled
+            2026-09-22 (`run-membership-is-realisation-2026-09-22`): membership
+            is `linked_things: {relation: implements}` — *I am this run's
+            realisation* — and `informed_by` stays provenance. Cued and walked
+            (`cue-workflow-state-specification-2026-09-22`, seventeen edges; the
+            live corpus was already conformant).
+      - [x] `--run <id>` on `mdllm watch`: the board becomes the things that
+            realise that run, at the named definition's stages. Arming refuses
+            a run that does not resolve or is not a `workflow-run`. **It does
+            not check that the run instances the watched definition** — the
+            line above originally said it should, and building it showed why
+            not: the run is the vertical (`software-development-lifecycle`),
+            the loop is the horizontal (`two-agent-specification-loop`), and a
+            watch reads the horizontal's stages for the vertical's members.
+            Nor is the run's `definition_commit` read for the loop; it pins the
+            lifecycle, and only a vertical watch on `current_stage` reads that.
+            State and lock gain the run as a third key.
+      - [x] Tests: two runs of one definition, two reviewers, each wakes only
+            on its own; provenance is not membership; a thing leaving its run is
+            `GONE` for that run's watch and arrives on the other's. (The line
+            above first said "fires across runs"; it does not, by design — a
+            watch never had the other run's things on its board.)
+      - [ ] The engineering domain chooses its topology — three clones, which
+            the loop already assumes, or four now that the scope is real. That
+            is the domain's call and the operator's; nothing here arms it.
+            **The floor was deliberately not touched on 2026-09-21**; it was on
+            2026-09-22, additively, under the operator's grant — an unscoped
+            watch behaves exactly as before.
 
 ## What The Build Found — Phase 4's First Input
 
@@ -345,5 +356,5 @@ status-keyed board.
 - [ ] `spec-watcher.sh` is retired in favour of the command — and not before.
 - [x] The watch has a specification of its own — `standing-watch.md`, `draft`,
       the first of the between-sessions band (2026-09-21).
-- [ ] A watch can be scoped to one run, and two reviewers on two runs never hear
-      each other's doorbell.
+- [x] A watch can be scoped to one run, and two reviewers on two runs never hear
+      each other's doorbell (2026-09-22, `--run`; tested).

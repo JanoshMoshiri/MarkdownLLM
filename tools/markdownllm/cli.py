@@ -148,6 +148,13 @@ def build_cli() -> argparse.ArgumentParser:
                         "`stages[].actor` in the definition")
     w.add_argument("--definition", required=True,
                    help="id of the workflow-definition whose stages are the board")
+    w.add_argument("--run",
+                   help="scope the board to one workflow-run: only things "
+                        "declaring `linked_things: {id: <run>, relation: "
+                        "implements}` are watched. The run and the definition "
+                        "are two different definitions — the run is the "
+                        "vertical (a subject through its layers), the "
+                        "definition is the horizontal (the turn)")
     w.add_argument("--field", default="status",
                    help="the frontmatter field carrying the turn (default: "
                         "status; a domain using workflow-run cursors passes "

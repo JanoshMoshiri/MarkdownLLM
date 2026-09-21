@@ -2,7 +2,7 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.1
+version: 0.2
 created: 2026-09-21
 linked_things:
   - id: thing-specification
@@ -130,9 +130,9 @@ A standing watch is the wake channel, and only the wake channel.
 
 ## The Contract — `mdllm watch`
 
-`mdllm watch <path> --role <actor> --definition <id> [--field status]
-[--remote origin] [--branch main] [--interval 60] [--exit-on-wake] [--once]
-[--state <file>]`
+`mdllm watch <path> --role <actor> --definition <id> [--run <id>]
+[--field status] [--remote origin] [--branch main] [--interval 60]
+[--exit-on-wake] [--once] [--state <file>]`
 
 **What it does.** Resolves the remote ref (`git ls-remote`) and, when the head
 has moved, fetches and reads the corpus **at that commit** — never the
@@ -190,7 +190,7 @@ because a rule whose reason is lost is a rule the next author deletes.
 | **Single-instance per (definition, role, clone) — a live pid lock, keyed exactly as the state is.** A lock whose process is gone is stale and is taken. | State isolation stops two *different* roles colliding; it does not stop two instances of the *same* role. These are two guarantees, not one, and the second was the one actually hit. |
 | **Wake after state is saved, never from inside the diff loop.** Record, then signal. | The first version exited from inside its loop, so the poll that woke the reviewer never persisted what it had seen, and every restart re-detected the same change — an infinite wake loop. |
 | **A restart resumes from persisted state; it never re-baselines.** | A change that landed while the watch was down must be *reported*, not absorbed — otherwise the one event the channel exists to carry is the one it silently eats. |
-| **A failed poll is an emitted event. A board read that loses more than a threshold of entries in one poll is a bad read, not an empty board.** | A blind watcher that says nothing is reporting health it cannot see. A list endpoint once returned fifteen rows then seven under a success status; a corpus scan can do the same for a less exotic reason. |
+| **A failed poll is an emitted event. A board read that loses more than a threshold of entries in one poll is a bad read, not an empty board.** The guard is the *threshold*, never emptiness alone: a one-thing board emptying is a departure, reported as `GONE`. | A blind watcher that says nothing is reporting health it cannot see. A list endpoint once returned fifteen rows then seven under a success status; a corpus scan can do the same for a less exotic reason. *(The scope refined this on 2026-09-22: an earlier form also refused any populated→empty read, which silenced the one event a one-member run-scoped board exists to carry.)* |
 
 Once armed, failures are **emitted, never raised** — a watch that exits on a
 failed poll is indistinguishable from a quiet estate.
@@ -228,23 +228,45 @@ revision, carrying its claim. A watch follows one run. That is what makes
 concurrency work in both directions — many runs, each with its own watch pair,
 none of them hearing the others' doorbells.
 
-Three things fall out for free when the scope is a run:
+**The run and the definition are two different definitions.** This is the
+point, not a complication. `--run` names the vertical — a run of the
+*lifecycle* definition, a subject at `design` on its way to `test`. `--definition`
+names the horizontal — the *loop* whose stages are the turn tokens on the
+artefact. A watch reads the horizontal's stages for the vertical's members.
+The floor therefore does **not** check that the run instances the watched
+definition; it usually will not, and refusing would refuse the topology the
+scope exists for. It checks only that the run resolves and is a
+`workflow-run`.
 
-- **The pin.** The run carries `definition_commit`. A run-scoped watch reads
-  the governing definition at the pinned revision, so two streams can safely
-  run different revisions of one loop.
+**Membership is one edge.** A thing is on a run's board when it declares
+`linked_things: {id: <run>, relation: implements}` — *I am this run's
+realisation* (`workflow-state.md` → Activation and Fulfilment → Membership;
+ruled in `run-membership-is-realisation-2026-09-22`). Not `informed_by`: that
+says where a thing *came from*, and a thing produced under one run can be the
+realisation of another. Membership is function, not origin. No new field on the
+artefact, no tag convention, no regex — the live domain already declared it
+this way before the spec asked.
+
+Two things fall out for free when the scope is a run, and one that first
+looked free was not:
+
 - **The claim.** The run carries `held_by`. The watch is looking at the thing
   that already knows who holds it.
-- **The membership.** The artefacts already declare which run they belong to.
-  No new field on the artefact, no tag convention, no regex.
+- **The isolation.** State and lock are keyed on the run as well as the
+  definition and role, so two reviewers on two runs in one clone are two
+  watchers — the same collision the per-clone keying prevents, one axis over.
+- **Not the pin — or not the way it first read.** The run's `definition_commit`
+  pins the *lifecycle* it instances, not the loop the watch reads stages from.
+  A horizontal watch reads the loop at the remote head like everything else.
+  Only a *vertical* watch — `--field current_stage --definition <lifecycle>`,
+  a single-thing board that is the run's own cursor — reads the definition
+  the pin governs. Building the scope is what corrected the draft's first
+  claim; that is what `draft` is for.
 
-**The precondition, stated honestly.** Run membership is currently specified one
-way and used another. `workflow-state.md` → *Activation and Fulfilment* says a
-run's produced outputs carry `informed_by` naming the run. The live domain
-attaches artefacts to runs with `linked_things: {relation: implements}`, and
-carries no `informed_by` on them at all. A scope built before that settles
-reads whichever edge its author happened to pick. The reconciliation belongs to
-`workflow-state.md`, not here; this spec waits on it.
+**Leaving a run is an event.** A thing that stops declaring it realises this
+run leaves this watch's board, and the `GONE` line fires exactly as it does for
+a deletion — deleted, renamed, or moved off this definition *or run*. The
+watch for the run it moved *to* sees it arrive.
 
 ## Division of Labour: Floor vs Agent
 
@@ -289,9 +311,9 @@ refusals outlive the plan:
   only in the sense every extension spec does: it adds a way things are
   *consumed*.
 - **`workflow-state.md`** — owns the board (`stages[]`), the role
-  (`stages[].actor`), and the scope (`workflow-run`). This spec consumes all
-  three and amends none. The membership-edge reconciliation is that spec's
-  debt.
+  (`stages[].actor`), the scope (`workflow-run`), and since 0.8 the
+  membership edge (`linked_things: implements`). This spec consumes all four
+  and amends none.
 - **`trigger-specification.md`** — the wake condition is a dependency trigger.
   That spec lists three evaluation points (session start, after every write,
   scheduled invocation); a standing watch is a fourth: continuous, on the
@@ -311,17 +333,20 @@ refusals outlive the plan:
 
 The framework's reserve-but-draft ladder, at its first rung:
 
-1. **`draft` — now.** The command exists (`tools/markdownllm/watch.py`, 22
-   tests), the contract above is what it does, and the five decisions are
-   carried in it. The scope is specified as a direction and not built. The
-   PowerShell route is asserted for nothing until a GPT-side instance has been
-   woken through it.
+1. **`draft` — now.** The command exists (`tools/markdownllm/watch.py`), the
+   contract above is what it does, the five decisions are carried in it, and
+   the scope is built: `--run <id>`, tested against two runs of one loop with
+   two reviewers that wake only on their own. The PowerShell route is asserted
+   for nothing until a GPT-side instance has been woken through it.
 2. **→ `evolving`** when `substrate-native-a2a` Phase 4 crosses one real
    writer → reviewer → writer turn through the command with no human relay.
    A field validated by one turn is not `stable`; it is `evolving`.
-3. **The scope lands** when `workflow-state.md` settles the membership edge.
-   Then `--run <id>` (or whatever invocation the settled edge makes natural),
-   tests, and the four-clone topology becomes real rather than nearly-real.
+3. **The scope landed on 2026-09-22**, one day after it was specified as a
+   direction — because the operator ruled the membership edge
+   (`run-membership-is-realisation-2026-09-22`) and `workflow-state.md` 0.8
+   carries it. Building it corrected the draft's pin claim (above). The
+   four-clone topology is now real rather than nearly-real; whether it is
+   *used* is the domain's call.
 4. **The band fills.** This is the first spec of the between-sessions surface.
    The operator expects others. When a second one arrives, what they share is
    what this section should be rewritten to say — and not before, because a

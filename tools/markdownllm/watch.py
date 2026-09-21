@@ -87,6 +87,11 @@ class WatchConfig:
     exit_on_wake: bool = False
     once: bool = False
     state_file: Path | None = None
+    # The scope: a workflow-run id. When set, the board is only the things
+    # that declare they realise this run. The run and `definition_id` are two
+    # different definitions by design — the run is the vertical (a subject
+    # through its layers), the definition is the horizontal (the turn).
+    run_id: str | None = None
 
 
 @dataclass
@@ -112,8 +117,8 @@ class _Gone:
 
     def line(self) -> str:
         return (f"GONE: {self.thing_id} left the board (was {self.was}) — "
-                "deleted, renamed, or moved off this definition. If work on "
-                "it is in flight, stop and check.")
+                "deleted, renamed, or moved off this definition or run. If "
+                "work on it is in flight, stop and check.")
 
 
 @dataclass
@@ -143,7 +148,13 @@ def state_path_for(config: WatchConfig) -> Path:
     """
     if config.state_file is not None:
         return Path(config.state_file)
-    slug = f"{config.definition_id}.{config.role}".replace("/", "-")
+    slug = f"{config.definition_id}.{config.role}"
+    if config.run_id:
+        # A third key. Two reviewers on two runs in one clone are two
+        # watchers, and they must not share a state file any more than two
+        # roles may — the same collision, one axis over.
+        slug = f"{slug}.{config.run_id}"
+    slug = slug.replace("/", "-")
     return config.root / ".git" / "mdllm-watch" / f"{slug}.json"
 
 
@@ -328,6 +339,23 @@ def _fetch(config: WatchConfig) -> str | None:
     return None
 
 
+def _realises(meta: dict, run_id: str) -> bool:
+    """Does this thing declare itself the realisation of ``run_id``?
+
+    Membership is the edge `linked_things: {id: <run>, relation: implements}`
+    and no other (`workflow-state.md` → Activation and Fulfilment →
+    Membership; ruled in `run-membership-is-realisation-2026-09-22`). It is
+    deliberately not `informed_by`: that says where a thing *came from*, and
+    a thing produced under one run can be the realisation of another.
+    """
+    for link in meta.get("linked_things") or []:
+        if not isinstance(link, dict):
+            continue
+        if link.get("id") == run_id and link.get("relation") == "implements":
+            return True
+    return False
+
+
 def read_board(
     corpus: Corpus, config: WatchConfig, stage_ids: set[str],
 ) -> dict[str, str]:
@@ -352,6 +380,8 @@ def read_board(
         if not thing.id:
             continue
         if watching_status and str(thing.meta.get("type")) in RESERVED_STATUSES:
+            continue
+        if config.run_id and not _realises(thing.meta, config.run_id):
             continue
         value = thing.meta.get(config.field_name)
         if isinstance(value, str) and value in stage_ids:
@@ -397,6 +427,22 @@ def _resolve_definition(config: WatchConfig) -> tuple[dict, set[str], set[str]]:
         raise WatchError(
             f"`{config.definition_id}` is a "
             f"`{definition.meta.get('type')}`, not a workflow-definition")
+
+    if config.run_id:
+        # The scope must be a run that exists. Deliberately *not* checked:
+        # that the run instances `definition_id`. It usually will not — the
+        # run is the vertical (a lifecycle, a subject through its layers) and
+        # the definition is the horizontal (the turn on one artefact), and a
+        # watch reads the horizontal's stages for the vertical's members.
+        run = corpus.by_id().get(config.run_id)
+        if run is None:
+            raise WatchError(
+                f"no thing with id `{config.run_id}` in {config.root} to "
+                "scope to")
+        if str(run.meta.get("type")) != "workflow-run":
+            raise WatchError(
+                f"`{config.run_id}` is a `{run.meta.get('type')}`, not a "
+                "workflow-run — a watch is scoped to a run, never to a thing")
 
     stage_ids = {
         str(stage["id"])
@@ -481,6 +527,7 @@ def cmd_watch(args) -> int:
         exit_on_wake=bool(getattr(args, "exit_on_wake", False)),
         once=bool(getattr(args, "once", False)),
         state_file=(Path(args.state) if getattr(args, "state", None) else None),
+        run_id=(getattr(args, "run", None) or None),
     )
 
     try:
@@ -517,7 +564,9 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
     state = _load_state(state_path)
     resumed = state.seen
 
-    print(f"watching `{config.definition_id}` as [{config.role}] on "
+    scope = (f" scoped to run `{config.run_id}`" if config.run_id
+             else " (unscoped — every stream on this board)")
+    print(f"watching `{config.definition_id}` as [{config.role}]{scope} on "
           f"{config.remote}/{config.branch} every {config.interval:.0f}s; "
           f"waking on {config.field_name} in {sorted(wake_stages)}; "
           "silence means nothing moved")
@@ -569,14 +618,15 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             continue
 
         board = read_board(corpus, config, stage_ids)
-        if not board and state.board:
-            print(f"board read empty at {head[:8]} — treating as a bad read, "
-                  "not an empty board")
-            if config.once:
-                return 1
-            time.sleep(config.interval)
-            continue
 
+        # The bad-read guard is the *threshold*, never emptiness on its own.
+        # An earlier version also refused any board that went from populated
+        # to empty; that was written when a board was a whole corpus. A
+        # run-scoped board is often one thing, and that one thing moving to
+        # another run empties it legitimately — a departure the next watch
+        # sees arrive. Refusing it would silence exactly the event the scope
+        # exists to carry. What a bad read looks like is an implausible
+        # collapse, and the threshold below already catches that.
         lost = len(state.board) - len(board)
         if state.seen and lost > BAD_READ_LOSS:
             print(f"BAD READ ignored [{config.role}]: board lost {lost} "

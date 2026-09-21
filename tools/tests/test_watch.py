@@ -301,8 +301,16 @@ class TestLoopBehaviour:
         assert watch_mod.cmd_watch(_args(board)) == 1
         assert "BAD READ ignored" in capsys.readouterr().out
 
-    def test_an_emptied_board_is_a_bad_read_not_an_empty_estate(
+    def test_a_one_thing_board_emptying_is_a_departure_not_a_bad_read(
             self, board, capsys, monkeypatch):
+        """Changed on 2026-09-22 when the scope landed.
+
+        This test once asserted the opposite: any populated→empty read was a
+        bad read. That was true of a board that is a whole corpus. A
+        run-scoped board is often one thing, and that thing leaving is the
+        event the watch exists to report. The bad-read guard is the
+        threshold (`test_an_implausible_shrink_is_a_bad_read`), not emptiness.
+        """
         self._head(monkeypatch, "a" * 40)
         self._commit_view_over_worktree(monkeypatch, board)
         watch_mod.cmd_watch(_args(board))
@@ -310,8 +318,10 @@ class TestLoopBehaviour:
 
         (board / "things" / "m04-design.md").unlink()
         self._head(monkeypatch, "e" * 40)
-        assert watch_mod.cmd_watch(_args(board)) == 1
-        assert "bad read" in capsys.readouterr().out
+        assert watch_mod.cmd_watch(_args(board, exit_on_wake=True)) == 0
+        out = capsys.readouterr().out
+        assert "GONE: m04-design" in out
+        assert "bad read" not in out
 
     def test_the_definition_is_not_on_its_own_board(
             self, board, capsys, monkeypatch):
@@ -438,6 +448,175 @@ class TestRealRemoteTurn:
         assert self._watch(reviewer, "reviewer", exit_on_wake=True) == 0
         assert "REVIEWER UP" not in capsys.readouterr().out
 
+
+class TestRunScope:
+    """A watch watches a run — the vertical axis, so two streams of one loop
+    stop hearing each other's doorbell.
+
+    The fan-out defect this pins was found in the field on 2026-09-21: two
+    reviewers armed against one definition both woke on either stream's
+    turn. The scope is the `workflow-run`, read through the one membership
+    edge the spec names (`linked_things: {relation: implements}`) — never
+    `informed_by`, which is provenance and can legitimately point elsewhere.
+    """
+
+    LIFECYCLE = {
+        "id": "lifecycle",
+        "type": "workflow-definition",
+        "status": "stable",
+        "created": "2026-09-01",
+        "stages": [
+            {"id": "requirement", "to": ["design"]},
+            {"id": "design", "to": ["test"]},
+            {"id": "test", "to": []},
+        ],
+    }
+
+    @staticmethod
+    def _run(run_id: str) -> dict:
+        return {"id": run_id, "type": "workflow-run", "status": "active",
+                "created": "2026-09-12", "definition": "lifecycle",
+                "current_stage": "design"}
+
+    @staticmethod
+    def _member(thing_id: str, run_id: str, status: str,
+                relation: str = "implements") -> dict:
+        return {**_spec(thing_id, status),
+                "linked_things": [{"id": run_id, "relation": relation}]}
+
+    @pytest.fixture
+    def streams(self, tmp_path: Path) -> Path:
+        _schema(tmp_path)
+        _write(tmp_path, DEFINITION)
+        _write(tmp_path, self.LIFECYCLE)
+        _write(tmp_path, self._run("run-a"))
+        _write(tmp_path, self._run("run-b"))
+        _write(tmp_path, self._member("a-design", "run-a", "draft"))
+        _write(tmp_path, self._member("b-design", "run-b", "draft"))
+        return tmp_path
+
+    @pytest.fixture(autouse=True)
+    def _no_network(self, monkeypatch):
+        monkeypatch.setattr(watch_mod, "_fetch", lambda c: None)
+        from markdownllm.repository_view import RepositoryView
+        monkeypatch.setattr(RepositoryView, "commit",
+                            classmethod(lambda cls, r, rev: cls.worktree(r)))
+
+    def _head(self, monkeypatch, sha):
+        monkeypatch.setattr(watch_mod, "resolve_remote_head",
+                            lambda c: (sha, None))
+
+    def _args_for(self, root, run, **kw):
+        return _args(root, run=run,
+                     state=str(root / f".watch-{run or 'all'}.json"), **kw)
+
+    # -- arming ------------------------------------------------------------
+
+    def test_an_unknown_run_refuses(self, streams, capsys):
+        assert watch_mod.cmd_watch(self._args_for(streams, "run-z")) == 2
+        assert "no thing with id `run-z`" in capsys.readouterr().out
+
+    def test_a_thing_that_is_not_a_run_refuses(self, streams, capsys):
+        assert watch_mod.cmd_watch(self._args_for(streams, "a-design")) == 2
+        assert "not a workflow-run" in capsys.readouterr().out
+
+    def test_the_run_need_not_instance_the_watched_definition(
+            self, streams, capsys, monkeypatch):
+        """The run is the vertical; the definition is the horizontal.
+
+        `run-a` instances `lifecycle`, not `spec-loop`, and that is the
+        normal case — a watch reads the loop's stages for the run's
+        members. Refusing here would refuse the topology the scope exists
+        for.
+        """
+        self._head(monkeypatch, "a" * 40)
+        assert watch_mod.cmd_watch(self._args_for(streams, "run-a")) == 0
+        assert "scoped to run `run-a`" in capsys.readouterr().out
+
+    # -- scope -------------------------------------------------------------
+
+    def test_the_board_is_only_the_runs_members(
+            self, streams, capsys, monkeypatch):
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(streams, "run-a"))
+        assert "baseline: 1 thing(s)" in capsys.readouterr().out
+
+    def test_an_unscoped_watch_still_sees_every_stream(
+            self, streams, capsys, monkeypatch):
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(streams, None))
+        out = capsys.readouterr().out
+        assert "baseline: 2 thing(s)" in out
+        assert "unscoped" in out
+
+    def test_two_reviewers_on_two_runs_wake_only_on_their_own(
+            self, streams, capsys, monkeypatch):
+        """The defect itself, as a test."""
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(streams, "run-a"))
+        watch_mod.cmd_watch(self._args_for(streams, "run-b"))
+        capsys.readouterr()
+
+        _write(streams, self._member("b-design", "run-b", "review"))
+        self._head(monkeypatch, "b" * 40)
+
+        assert watch_mod.cmd_watch(
+            self._args_for(streams, "run-a", exit_on_wake=True)) == 0
+        assert "REVIEWER UP" not in capsys.readouterr().out
+
+        assert watch_mod.cmd_watch(
+            self._args_for(streams, "run-b", exit_on_wake=True)) == 0
+        assert "REVIEWER UP: b-design is at 'review'" in capsys.readouterr().out
+
+    def test_membership_is_implements_never_informed_by(
+            self, streams, capsys, monkeypatch):
+        """Provenance is not membership.
+
+        A thing that names the run in `informed_by` but does not declare it
+        realises the run is not on the run's board. The ruling is that a
+        thing made under one run can be the realisation of another.
+        """
+        _write(streams, {**_spec("c-design", "draft"),
+                         "informed_by": [{"id": "run-a",
+                                          "commit": "f" * 40}]})
+        _write(streams, self._member("d-design", "run-a", "draft",
+                                     relation="references"))
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(streams, "run-a"))
+        assert "baseline: 1 thing(s)" in capsys.readouterr().out
+
+    def test_a_thing_leaving_its_run_is_gone_for_that_watch(
+            self, streams, capsys, monkeypatch):
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(streams, "run-a"))
+        capsys.readouterr()
+
+        # a-design now realises run-b instead: off run-a's board.
+        _write(streams, self._member("a-design", "run-b", "draft"))
+        self._head(monkeypatch, "b" * 40)
+        assert watch_mod.cmd_watch(
+            self._args_for(streams, "run-a", exit_on_wake=True)) == 0
+        out = capsys.readouterr().out
+        assert "GONE: a-design" in out
+        assert "or run" in out
+
+    # -- isolation ---------------------------------------------------------
+
+    def test_state_is_keyed_by_run_as_well(self, tmp_path):
+        a = state_path_for(_config(tmp_path, run_id="run-a", state_file=None))
+        b = state_path_for(_config(tmp_path, run_id="run-b", state_file=None))
+        none = state_path_for(_config(tmp_path, state_file=None))
+        assert len({a, b, none}) == 3
+        assert "run-a" in a.name and "run-b" in b.name
+
+    def test_watch_still_never_writes_to_the_corpus(
+            self, streams, monkeypatch):
+        before = {p: p.read_bytes()
+                  for p in (streams / "things").rglob("*.md")}
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(streams, "run-a"))
+        after = {p: p.read_bytes() for p in (streams / "things").rglob("*.md")}
+        assert before == after
 
 class TestSingleInstance:
     """One watcher per (definition, role), per clone.
