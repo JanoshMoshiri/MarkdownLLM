@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-19
-generated: 2026-09-19T18:24:03
-generated_from: HEAD@b6a9c67
-coverage: 98
+created: 2026-09-21
+generated: 2026-09-21T23:30:26
+generated_from: HEAD@e0bc244
+coverage: 102
 framework_version: 3.41.0
 ---
 
@@ -16,6 +16,12 @@ framework_version: 3.41.0
 - dispatch-design-2026-08 (pinned @f1fade782df3a6707bf5257f5794ba8f6a512264)
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 
+## a-mechanism-fails-at-its-seams-not-in-its-body
+- between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+
+## a-true-primitive-is-discovered-not-authored
+- between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+
 ## a-well-kept-record-reads-as-a-governed-world
 - estate-retrospective-synthesis-2026-08 (derived-from)
 
@@ -24,6 +30,9 @@ framework_version: 3.41.0
 
 ## autopush-requires-explicit-authority
 - estate-wide-autopush-2026-08-22 (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
+
+## between-sessions-surface-is-real-2026-09-21
+- standing-watch-specification (derived-from)
 
 ## claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage (derived-from)
@@ -399,6 +408,9 @@ framework_version: 3.41.0
 ## substrate-currency-sweep
 - cumulative-drift-is-invisible-to-per-change-walks (derived-from)
 
+## substrate-native-a2a
+- between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+
 ## substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 (derived-from)
 - floor-sprint-1-scope-2026-08-21 (pinned @1209f646767c16dfff2a36c574095aca3f97a0a1)
@@ -417,6 +429,7 @@ framework_version: 3.41.0
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## transport-follows-corpus-holdability-not-distance
+- between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
 
 ## unattended-cue-carrier-2026-09-12
@@ -454,5 +467,6 @@ framework_version: 3.41.0
 - estate-workflow-derivation (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)
 
 ## workflow-state-specification
+- between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
 

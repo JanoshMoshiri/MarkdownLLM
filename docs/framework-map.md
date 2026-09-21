@@ -66,8 +66,8 @@ flowchart TD
     accDescr {
         Five stacked bands. The entry band, tier 0, holds AGENTS.md as the
         harness-delivered entry contract and kernel.md as a generated digest. Below
-        it the specification layer holds 31 spec things: the manifesto for the
-        why, thing.md with the core operative specs, and 24 extension and guide
+        it the specification layer holds 32 spec things: the manifesto for the
+        why, thing.md with the core operative specs, and 25 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
         deterministic floor is tools/mdllm.py, providing the mdllm CLI with 37
@@ -84,10 +84,10 @@ flowchart TD
         AGENTS["AGENTS.md<br/>entry contract — harness-delivered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
-    subgraph specs ["specification layer — 31 spec things"]
+    subgraph specs ["specification layer — 32 spec things"]
         MANIFESTO["manifesto<br/>the why"]
         THING["thing.md<br/>+ core operative specs"]
-        EXT["extensions<br/>+ guides — 24 specs"]
+        EXT["extensions<br/>+ guides — 25 specs"]
     end
     subgraph memory ["domain memory — things/"]
         INSIGHTS["insights"]
@@ -144,7 +144,7 @@ flowchart TD
         semantic layer only - all three operating on it. A band of extension
         specs each extends thing.md: trigger-specification, derived-index,
         provenance, change-reconciliation, workflow-state, coordination-claim,
-        universal-workflow, operating-model, session-memory, belief-revision,
+        standing-watch, universal-workflow, operating-model, session-memory, belief-revision,
         retrospective, example-things, reasoning-lenses and thing-lifecycle. A separate band of guides and the
         domain bridge - domain-specification-guide, scalability-guide,
         operator-guide, framework-discovery, domain-refresh, interface,
@@ -168,6 +168,7 @@ flowchart TD
         CRECON["change-reconciliation"]
         WSTATE["workflow-state (evolving)"]
         COORD["coordination-claim (evolving)"]
+        SWATCH["standing-watch (draft)"]
         UWORK["universal-workflow (draft)"]
         OPMODEL["operating-model (draft)"]
         SMEM["session-memory"]
@@ -320,7 +321,7 @@ flowchart LR
         T33["clone-local MCP authority<br/>exact entry hash in Git directory"]
         T34["templates/prompts/dispatch-loop.md<br/>the standing dispatch prompt"]
         T35["change-reconciliation.md<br/>The Cue Persists — the question held until answered"]
-        T36["workflow-state.md<br/>stages[].actor — the turn's declared wake table"]
+        T36["standing-watch.md<br/>the doorbell in the floor — reads workflow-state's actor table"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1

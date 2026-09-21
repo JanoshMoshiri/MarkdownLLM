@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-19
-generated: 2026-09-19T18:24:03
-generated_from: HEAD@b6a9c67
-coverage: 416
+created: 2026-09-21
+generated: 2026-09-21T23:30:26
+generated_from: HEAD@e0bc244
+coverage: 418
 framework_version: 3.41.0
 ---
 
@@ -223,6 +223,12 @@ framework_version: 3.41.0
 - belief-revision-specification --complements--> derived-index-specification
 - belief-revision-specification --implements--> divergence-is-an-unrouted-decision
 - belief-revision-specification --implements--> llm-driven-systems-manifesto
+- between-sessions-surface-is-real-2026-09-21 --informs--> standing-watch-specification
+- between-sessions-surface-is-real-2026-09-21 --informs--> substrate-native-a2a
+- between-sessions-surface-is-real-2026-09-21 --references--> workflow-state-specification
+- between-sessions-surface-is-real-2026-09-21 --implements--> a-mechanism-fails-at-its-seams-not-in-its-body
+- between-sessions-surface-is-real-2026-09-21 --implements--> a-true-primitive-is-discovered-not-authored
+- between-sessions-surface-is-real-2026-09-21 --references--> phase-3-run-domain-task-reverted
 - boundary-disclosure-check --complements--> mechanical-coherence-checks-backlog
 - boundary-disclosure-check --implements--> independent-review-2026-07-14-fable
 - boundary-disclosure-check --extends--> provenance-specification
@@ -1285,6 +1291,21 @@ framework_version: 3.41.0
 - srp-extraction-is-tier-promotion --references--> thing-specification
 - srp-extraction-is-tier-promotion --supports--> example-things-specification
 - srp-extraction-is-tier-promotion --supports--> reasoning-lenses-specification
+- standing-watch-specification --extends--> thing-specification
+- standing-watch-specification --complements--> workflow-state-specification
+- standing-watch-specification --complements--> trigger-specification
+- standing-watch-specification --complements--> orchestration-specification
+- standing-watch-specification --complements--> git-workflow-specification
+- standing-watch-specification --complements--> coordination-claim-specification
+- standing-watch-specification --complements--> session-memory-specification
+- standing-watch-specification --derived-from--> between-sessions-surface-is-real-2026-09-21
+- standing-watch-specification --implements--> substrate-native-a2a
+- standing-watch-specification --implements--> transport-follows-corpus-holdability-not-distance
+- standing-watch-specification --implements--> a-true-primitive-is-discovered-not-authored
+- standing-watch-specification --implements--> hook-enforcement-has-three-anchors
+- standing-watch-specification --references--> portability-claims-need-execution-tests
+- standing-watch-specification --references--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- standing-watch-specification --informs--> a-mechanism-fails-at-its-seams-not-in-its-body
 - status-vocabulary-universal-vs-domain --references--> validate-thing-specification
 - status-vocabulary-universal-vs-domain --references--> domain-specification-guide
 - status-vocabulary-universal-vs-domain --references--> framework-v3-transformation-plan
@@ -1309,6 +1330,7 @@ framework_version: 3.41.0
 - substrate-floor-development --implements--> some-changes-are-verifiable-only-by-publishing
 - substrate-floor-development --references--> substrate-review-consolidated-remedy-2026-08-20
 - substrate-native-a2a --extends--> workflow-state-specification
+- substrate-native-a2a --informs--> standing-watch-specification
 - substrate-native-a2a --references--> coordination-claim-specification
 - substrate-native-a2a --extends--> trigger-specification
 - substrate-native-a2a --extends--> git-workflow-specification

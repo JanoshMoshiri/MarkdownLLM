@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-09-19
 priority: high
 informed_by:
@@ -17,6 +17,9 @@ linked_things:
   - id: workflow-state-specification
     relation: extends
     notes: "Phase 1 fills the slot that spec already reserved: `stages[].actor`, on its own stated condition — two live modules needing automation to consume the modality."
+  - id: standing-watch-specification
+    relation: informs
+    notes: "The spec this plan's Phase 2 was carrying in docstrings. Born 2026-09-21 as its own file — the first of the between-sessions band — on the ruling `between-sessions-surface-is-real-2026-09-21`. Phase 6 below is that spec's scope half, recorded here as forward work."
   - id: coordination-claim-specification
     relation: references
     notes: "`held_by` is the claim half of turn-taking and needs no change. This plan touches only the wake half."
@@ -254,6 +257,34 @@ Deliberately not lifted:
       conflict, any correction to the three artefacts above. `workflow-state.md`
       stays `evolving` — a field validated by one turn is not `stable`.
 
+- [ ] **Phase 6 — Scope: a watch watches a run.** *Added 2026-09-21, from the
+      field.* Two clones of the reviewer on one machine collided; the engineering
+      agent's diagnosis found the `$HOME` state path (already fixed here, per
+      clone by construction) and then the real gap: a watch scoped to the
+      *definition* sees every stream's board as one board, so a reviewer armed
+      for one subject wakes on the other's turn. `mdllm watch` has this gap
+      exactly as `spec-watcher.sh` does. The scope is the `workflow-run` — the
+      two streams already *are* two runs, the artefacts already declare
+      membership, and the run already carries the pin and the claim. Specified
+      as the direction in `standing-watch.md` → *Scope*.
+      - [ ] **`workflow-state.md` settles the membership edge.** Its *Activation
+            and Fulfilment* section says `informed_by` naming the run; the live
+            domain attaches artefacts with `linked_things: {relation: implements}`
+            and carries no `informed_by`. A scope built before this settles reads
+            whichever edge its author picked. Cue and walk, as an inflection on
+            that spec.
+      - [ ] `--run <id>` on `mdllm watch`: the board becomes the things that
+            belong to that run, read through the settled edge; the governing
+            definition is read at the run's `definition_commit` where pinned.
+            Arming refuses a run that does not resolve or does not instance the
+            named definition.
+      - [ ] Tests: two runs of one definition, two reviewers, each wakes only on
+            its own. The vanished-thing event still fires across runs.
+      - [ ] Until then the engineering domain runs three clones — two writers,
+            one reviewer — which is what the loop already assumes and needs no
+            code. **The floor was deliberately not touched on 2026-09-21**: the
+            watcher was live on current work.
+
 ## What The Build Found — Phase 4's First Input
 
 **The engineering definition's stage ids and its own board table disagree.**
@@ -312,3 +343,7 @@ status-keyed board.
       the command and not by a script. *(The board is ready and armed; the turn
       itself waits on the two instances working.)*
 - [ ] `spec-watcher.sh` is retired in favour of the command — and not before.
+- [x] The watch has a specification of its own — `standing-watch.md`, `draft`,
+      the first of the between-sessions band (2026-09-21).
+- [ ] A watch can be scoped to one run, and two reviewers on two runs never hear
+      each other's doorbell.
