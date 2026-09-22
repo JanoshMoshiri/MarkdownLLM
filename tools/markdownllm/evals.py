@@ -130,6 +130,24 @@ def _eval_run_dir(root: Path, run_id: str) -> Path:
         "set MDLLM_EVAL_RUN_ROOT to an isolated directory")
 
 
+def _seed_fingerprint(seed: Path) -> str:
+    """One digest over the seed tree's bytes — the run's input identity.
+
+    Hashes every file's workspace-relative path and content, so an edit,
+    an addition and a deletion all move the digest, committed or not.
+    Git is deliberately not consulted: the 2026-07 contamination was
+    *committed* to the framework repo, so a HEAD comparison would have
+    moved with it and agreed with the damage.
+    """
+    digest = hashlib.sha256()
+    for path in sorted(p for p in seed.rglob("*") if p.is_file()):
+        digest.update(path.relative_to(seed).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 def _results_exit_code(results: list[dict]) -> int:
     return 1 if any(r.get("failed", 0) for r in results) else 0
 
@@ -411,6 +429,16 @@ def cmd_eval(args) -> int:
         res_dir.mkdir(parents=True, exist_ok=True)
         (res_dir / f"{run_id}.json").write_text(payload, encoding="utf-8")
 
+    # The seed is the one input every trial shares.  An agent granted
+    # --add-dir <framework> can reach it and Bash(git:*) can commit the
+    # reach; workspace isolation moved the *copy* out of the repo but did
+    # not withdraw that grant, because the framework condition is defined
+    # by it.  So the seed is watched rather than walled
+    # (isolation-must-contain-writes-not-just-reads).
+    seed_dir = (root / fixture["seed"]) if fixture.get("seed") else None
+    seed_before = (_seed_fingerprint(seed_dir)
+                   if seed_dir and seed_dir.is_dir() else None)
+
     for trial in range(1, args.trials + 1):
         condition = "bare" if args.bare else "fw"
         run_id = _run_id(args.model, condition, trial)
@@ -551,12 +579,18 @@ def cmd_eval(args) -> int:
                 break
         if args.dry_run:
             continue
+        seed_mutated = False
+        if seed_before is not None:
+            seed_after = _seed_fingerprint(seed_dir)
+            seed_mutated = seed_after != seed_before
         walls = [s["wall_s"] for s in sess_records if s.get("wall_s") is not None]
         costs = [s["cost_usd"] for s in sess_records if s.get("cost_usd") is not None]
         turns_ = [s["turns"] for s in sess_records if s.get("turns") is not None]
         res = {"run_id": run_id, "fixture": name, "model": args.model,
                "condition": "bare" if args.bare else "framework",
                "passed": t_passed, "failed": t_failed,
+               "seed_sha256": seed_before,
+               "seed_mutated": seed_mutated,
                "wall_s": sum(walls) if walls else None,
                "cost_usd": round(sum(costs), 6) if costs else None,
                "turns": sum(turns_) if turns_ else None,
@@ -597,6 +631,18 @@ def cmd_eval(args) -> int:
                 res["timeout"] = True
         print(f"  trial score {t_passed}/{t_passed + t_failed}\n")
         record(run_id, run_dir, res)
+        if seed_mutated:
+            # In 2026-07 this went undetected and every subsequent trial
+            # was seeded from the perturbed inputs, voiding a whole arm.
+            # Refuse to seed another trial from bytes an agent moved.
+            print(f"!!! SEED MUTATED during {run_id} — {seed_dir}")
+            print("    This trial's inputs are no longer the inputs it "
+                  "was seeded from, and every later trial would inherit "
+                  "the change. Results from this trial on are not "
+                  "comparable with the arm.")
+            print("    Restore the seed (`git -C <framework> checkout -- "
+                  f"{fixture['seed']}`), confirm it is clean, then re-run.")
+            return 1
     if results:
         ok = sum(1 for r in results if r["failed"] == 0)
         print(f"### {name}: {ok}/{len(results)} trials fully passing "

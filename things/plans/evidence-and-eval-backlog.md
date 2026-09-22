@@ -2,7 +2,7 @@
 id: evidence-and-eval-backlog
 type: plan
 status: in-progress
-version: 2.0
+version: 2.1
 created: 2026-06-27
 priority: high
 tags: [evals, evidence, validation, isolation, longitudinal, docs]
@@ -80,19 +80,49 @@ never drift; the *cross-session cascade* (perturb's edit → derived figure via 
 in 1/4. The drift-resistance half of the thesis holds for within-session, and is
 real-but-imperfect across sessions at the cascade point.
 
-**Still owed (now blocked on isolation, not just the operator's calendar):** the
-opus longitudinal arm must be re-run from the restored seed with run workspaces
-**outside the repo tree** (an OS temp dir / sandbox) so an agent can neither read
-nor write the canonical seed. This merges with the "real bare-control isolation"
-item below — same fix, now required for the framework condition too.
+**The isolation blocker is gone, and had been for a month before anyone told
+this plan (corrected 2026-09-22).** `_eval_run_dir` has defaulted run
+workspaces to `<os-temp>/mdllm-evals` and *refused* any source-tree
+descendant since `2673168` (2026-08-20); `MDLLM_EVAL_RUN_ROOT` pins a sandbox
+root. Verified live, not assumed: a dry run of the longitudinal fixture puts
+trial 1 at `…/AppData/Local/Temp/mdllm-evals/…`, and the seed reads 2400 m /
+R 2.8 — the restored pre-corruption state. So this plan spent roughly a month
+in the stall list naming a blocker the floor had already removed, which is its
+own finding: a plan that records what blocks it does not learn when the block
+is lifted somewhere else.
+
+**What the fix did not reach, and now has a detector (2026-09-22).** Workspace
+isolation moved the *copy* out of the repo; it did not withdraw the
+`--add-dir <framework>` grant, because that grant *is* the framework
+condition — the agent must read the specs. So the canonical seed remains
+reachable and, with `Bash(git:*)`, writable, exactly as
+[[isolation-must-contain-writes-not-just-reads]] describes. The residue was
+never really the placement; it was that **nothing in the run output said so**.
+It does now: the runner fingerprints the seed tree before the trials and after
+each one (`seed_sha256` / `seed_mutated` on every committed result), and on a
+mismatch prints the mutation loudly and **stops the arm** rather than seeding
+another trial from moved bytes — the precise way the opus arm was lost. The
+digest reads bytes rather than revisions, because the 2026-07 damage was
+*committed*, so a HEAD comparison would have moved with it and agreed.
+
+**Still owed — and it is now only the operator's evening:** a valid opus
+longitudinal arm from the restored seed, and haiku re-run to n≥5 clean.
+Report per-session, not just totals. The one constraint that has not moved is
+the credential one: the runner shells out to `claude -p`, and a hosted agent
+session's token does not propagate to that child, so this is an
+operator-terminal task and no amount of agent pre-work changes that.
 
 ## Behind those two
 
-- **Real bare-control isolation.** A frontier opus-bare trial defeated the
-  withhold-by-placement control by reading the seed `AGENTS.md` inside the repo
-  (`withholding-is-not-isolation`). Bare workspaces need real isolation — run outside
-  the repo tree / OS sandbox; `--add-dir` withheld is not sufficient. (Operator
-  machine; can share session 2's evening.)
+- **Real bare-control isolation — satisfied by the same 2026-08-20 fix.** A
+  frontier opus-bare trial had defeated the withhold-by-placement control by
+  reading the seed `AGENTS.md` inside the repo
+  (`withholding-is-not-isolation`). The bare condition strips
+  `AGENTS.md`/`CLAUDE.md`/`_schema.yaml`/`skills` from the workspace copy *and*
+  withholds `--add-dir`, and the workspace now sits outside the repo — so there
+  is no longer a reachable seed to read past the boundary. Worth one explicit
+  bare trial on the run evening to confirm the control holds where it once
+  leaked; it is a check, no longer a build.
 - **Doc evidence pass (Bucket 3):** `limitations.md`, the read-side of quarantine
   written up (`verified: true` is still a flag any agent can write), the "why not
   CLAUDE.md + a notes folder" answer the corpus could win and never makes, one page

@@ -18,6 +18,7 @@ from markdownllm.evals import (  # noqa: E402
     _eval_run_dir,
     _results_exit_code,
     _run_id,
+    _seed_fingerprint,
     _validation_control_failure,
     check_assertions,
 )
@@ -122,3 +123,75 @@ def test_eval_workspace_accepts_a_disjoint_root(tmp_path, monkeypatch):
     source.mkdir()
     monkeypatch.setenv("MDLLM_EVAL_RUN_ROOT", str(isolated))
     assert _eval_run_dir(source, "trial") == (isolated / "trial").resolve()
+
+
+# --- the seed-integrity guard ---------------------------------------------
+# 2026-07-09: a perturb agent edited the shared source seed and committed it to
+# the framework repo; every trial seeded afterward inherited the change and a
+# whole arm was scored against inputs it never had.  Workspace isolation moved
+# the copy out of the repo but the framework condition still grants --add-dir
+# over the framework checkout, so the seed stays reachable.  These pin the
+# detector: the fingerprint sees any mutation, committed or not.
+
+
+def _seed_tree(root: Path) -> Path:
+    seed = root / "seed"
+    (seed / "things").mkdir(parents=True)
+    (seed / "AGENTS.md").write_text("# Agent\n", encoding="utf-8")
+    (seed / "things" / "trip.md").write_text(
+        _thing("id: trip\ntype: note\nstatus: active\ncreated: 2026-09-22\n"
+               "elevation_m: 2400"), encoding="utf-8")
+    return seed
+
+
+def test_seed_fingerprint_is_stable_across_reads(tmp_path):
+    seed = _seed_tree(tmp_path)
+    assert _seed_fingerprint(seed) == _seed_fingerprint(seed)
+
+
+def test_seed_fingerprint_moves_when_a_fact_is_edited_in_place(tmp_path):
+    """The exact 2026-07 mutation: a value changed inside an existing file."""
+    seed = _seed_tree(tmp_path)
+    before = _seed_fingerprint(seed)
+    trip = seed / "things" / "trip.md"
+    trip.write_text(trip.read_text(encoding="utf-8").replace("2400", "3300"),
+                    encoding="utf-8")
+    assert _seed_fingerprint(seed) != before
+
+
+def test_seed_fingerprint_moves_on_addition_and_on_deletion(tmp_path):
+    seed = _seed_tree(tmp_path)
+    before = _seed_fingerprint(seed)
+
+    added = seed / "things" / "extra.md"
+    added.write_text(_thing("id: extra\ntype: note\nstatus: active\n"
+                            "created: 2026-09-22"), encoding="utf-8")
+    assert _seed_fingerprint(seed) != before
+    added.unlink()
+    assert _seed_fingerprint(seed) == before
+
+    (seed / "AGENTS.md").unlink()
+    assert _seed_fingerprint(seed) != before
+
+
+def test_seed_fingerprint_distinguishes_content_from_placement(tmp_path):
+    """Path is hashed alongside content, so moving a file is a mutation —
+    a rename that preserves bytes still changes what a trial was seeded from."""
+    seed = _seed_tree(tmp_path)
+    before = _seed_fingerprint(seed)
+    trip = seed / "things" / "trip.md"
+    trip.rename(seed / "things" / "trip-renamed.md")
+    assert _seed_fingerprint(seed) != before
+
+
+def test_seed_fingerprint_does_not_consult_git(tmp_path):
+    """A HEAD comparison would have moved WITH the 2026-07 damage, because the
+    agent committed it. The digest must read bytes, not revisions."""
+    seed = _seed_tree(tmp_path)
+    before = _seed_fingerprint(seed)
+    (seed / ".git").mkdir()
+    (seed / ".git" / "HEAD").write_text("ref: refs/heads/main\n", encoding="utf-8")
+    after_git_dir = _seed_fingerprint(seed)
+    assert after_git_dir != before, (
+        "files under the seed are hashed wholesale; this documents that a .git "
+        "directory inside a seed would itself count as content")
