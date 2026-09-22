@@ -3,11 +3,11 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-09-21
-generated: 2026-09-21T23:30:05
-generated_from: HEAD@e0bc244
+created: 2026-09-22
+generated: 2026-09-22T19:24:55
+generated_from: HEAD@f29c96e
 coverage: 6
-framework_version: 3.41.0
+framework_version: 3.42.0
 ---
 
 # Framework Operative Kernel

@@ -2,7 +2,7 @@
 id: public-docs-face-build
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -167,7 +167,7 @@ watched its own thesis cost it four edits where one would have done.
 
 **Phase 1 — complete.** `tools/markdownllm/docs_blocks.py`, `mdllm docs`
 (`--check` is the pre-commit coherence leg), `tools/tests/test_docs_blocks.py`
-(eleven tests, one of them the live dogfood: this repository's own docs must
+(thirteen tests, one of them the live dogfood: this repository's own docs must
 pass the same call the hook makes). Where the derive/check line fell, surface
 by surface — the precedent from [[coherence-mechanism-build]] Phase 1 applied,
 not re-argued:
@@ -222,6 +222,15 @@ still restates the subcommand count by hand — it was walked (37 → 38) and it
 remains the accDescr drift check's problem, routed to the backlog below and
 unbuilt. A hand-walked count inside a derived-and-gated view is the last
 restatement standing in Phase 1's two surfaces.
+
+**Versioned and changelogged as 3.42.0, 2026-09-22.** Between the Phase 1
+commit and the release, the full suite's architecture gate refused the
+module's one recorded shortcut — a function-local import back into `cli` for
+the subcommand inventory closes an import cycle — so the seam was inverted
+rather than the scan evaded: the composition root computes the rows once its
+parser is complete and hands them down to `mdllm docs` and to coherence's
+docs leg; a call without them says *could not look*, never clean
+(`f29c96e`; two more tests pin it). The push is the operator's act.
 
 ## Phase 2 — Stand up the build *(owned here; the switch is operator-gated)*
 
