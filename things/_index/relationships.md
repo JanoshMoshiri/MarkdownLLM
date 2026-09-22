@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-22
-generated: 2026-09-22T20:55:34
-generated_from: HEAD@e4a1358
-coverage: 426
+generated: 2026-09-22T21:47:37
+generated_from: HEAD@cdcdb36
+coverage: 427
 framework_version: 3.42.0
 ---
 
@@ -1176,6 +1176,8 @@ framework_version: 3.42.0
 - public-docs-face-is-derived-not-restated --informs--> a-generated-surface-collapses-its-walk
 - public-docs-face-is-derived-not-restated --informs--> premature-publish-manufactures-discipline-eroding-urgency
 - public-docs-face-is-derived-not-restated --references--> vendor-harness-adapter-foundation
+- public-face-links-out-not-hosts-2026-09-22 --extends--> public-docs-face-is-derived-not-restated
+- public-face-links-out-not-hosts-2026-09-22 --informs--> public-docs-face-build
 - read-thing-specification --extends--> thing-specification
 - read-thing-specification --complements--> write-thing-specification
 - read-thing-specification --references--> reasoning-lenses-specification

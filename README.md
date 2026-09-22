@@ -2,6 +2,8 @@
 
 *An operating environment for LLM agents — built from markdown and git.*
 
+**Read the human-facing documents as a site:** https://janoshmoshiri.github.io/MarkdownLLM/ — published from [`docs/`](docs/) on `main` at every push, so the site and this repository are never two versions.
+
 Every agent session starts from scratch, so you have to hand the agent its context back — sensibly, cheaply, without burying it. Plenty of tools already do the storing and the retrieving: Obsidian vaults, LLM wiki, file lookups. What they leave open is what happens after hundreds of sessions and a mountain of saved memory — when the question stops being *how do I retrieve this* and becomes *is any of it still true*. That's what MarkdownLLM is about: not storing more, but keeping what's stored coherent.
 
 State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. A deterministic structural floor — one CLI and an installed three-hook Git boundary — checks declared structure, references, and schema against the candidate commit. When the current hook is installed and runnable, mechanical Errors block that commit. A probabilistic agent still interprets meaning; reconciliation and retrospectives route semantic drift for review rather than pretending code can prove truth. Each session, orientation is rebuilt from the accepted state and history recorded in git — not reloaded from a memory file.
@@ -95,7 +97,7 @@ Things are atomic (self-contained), linked (explicitly related to other things),
 
 ### For Humans
 
-The human-facing guides and visual surfaces:
+The human-facing guides and visual surfaces — also [published as a site](https://janoshmoshiri.github.io/MarkdownLLM/) with navigation, in-page search and rendered diagrams; on the site, a link that leaves `docs/` comes back to this repository's page for the file:
 
 | File | Purpose |
 |------|---------|

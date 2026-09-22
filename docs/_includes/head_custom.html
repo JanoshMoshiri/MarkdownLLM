@@ -1,10 +1,23 @@
 {%- comment -%}
-prefers-color-scheme, at runtime. The theme compiles one sheet per scheme and
-switches by swapping the first stylesheet's href (jtd.setTheme); it has no
-media-query mode of its own, so the reader's OS preference is applied here and
-followed if it changes. just-the-docs.js is loaded above this include, so
-`jtd` exists by now; if it does not, the compiled light sheet stands.
+Two runtime derivations the build cannot do statically.
+
+1. prefers-color-scheme. The theme compiles one sheet per scheme and switches
+   by swapping the first stylesheet's href (jtd.setTheme); it has no
+   media-query mode of its own, so the reader's OS preference is applied here
+   and followed if it changes. just-the-docs.js is loaded above this include,
+   so `jtd` exists by now; if it does not, the compiled light sheet stands.
+
+2. Links that leave docs/. The face is docs/ alone (the selector ruling of
+   2026-09-22: the site links out, it hosts no duplicate), so a relative link
+   to a root file — `../thing.md`, `../README.md#getting-started` — has no
+   target here. Each is resolved to the repository's own page for that file,
+   at main, so the documents keep the relative links that work in the
+   repository and the site derives the destination. Nothing is rewritten in
+   the source.
+
+No `//` comments in the scripts: the theme compresses the page onto one line.
 {%- endcomment -%}
+{%- assign repo_url = "https://github.com/" | append: site.repository -%}
 <script>
   (function () {
     if (!(window.jtd && jtd.setTheme && window.matchMedia)) { return; }
@@ -13,4 +26,13 @@ followed if it changes. just-the-docs.js is loaded above this include, so
     apply(query);
     if (query.addEventListener) { query.addEventListener("change", apply); }
   })();
+  document.addEventListener("DOMContentLoaded", function () {
+    var repo = "{{ repo_url }}/blob/main/";
+    var links = document.querySelectorAll("#main-content a[href^='../']");
+    for (var i = 0; i < links.length; i++) {
+      var rel = links[i].getAttribute("href").replace(/^(\.\.\/)+/, "");
+      links[i].setAttribute("href", repo + rel);
+      links[i].setAttribute("data-leaves-site", "repository");
+    }
+  });
 </script>

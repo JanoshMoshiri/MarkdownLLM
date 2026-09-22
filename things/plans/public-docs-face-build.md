@@ -2,7 +2,7 @@
 id: public-docs-face-build
 type: plan
 status: in-progress
-version: 1.6
+version: 1.7
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -292,6 +292,17 @@ birth. Whoever settles one should read the other; a declared visibility fact in
 frontmatter would serve both, and inventing two vocabularies for one axis is the
 conflation that ruling already warned about.
 
+**State after Phase 3 (2026-09-22) — settled.** Answer (1), with a mechanism
+this plan had not named: **the site links out** — a link that leaves `docs/`
+is resolved on the site to the repository's own page for the file, at `main`,
+so nothing outside `docs/` is rendered twice and the documents keep the
+relative links that work in the repository. Ruled by the operator on seeing
+the live count of ten: [[public-face-links-out-not-hosts-2026-09-22]]. The
+README now carries the site's address at the top and beside its list of the
+human-facing documents, on the same ruling ("a must"). What answer (1) costs —
+a reader following a link out lands on the blob view — is accepted there in
+words, and it is exactly what makes Phase 4 the last door.
+
 ## Phase 4 — The size and entry gap *(owned here; unstarted, deliberately)*
 
 The real accessibility finding is that a build cannot fix a 48KB specification.
@@ -336,7 +347,9 @@ hand-written again?*
       generated edge-list companion, because mermaid cannot host a block)*
 - [x] Phase 2: build configured, diff reviewed, operator has thrown or declined the switch
       *(2026-09-22 — thrown: https://janoshmoshiri.github.io/MarkdownLLM/)*
-- [ ] Phase 3: selector settled — one of the three answers, recorded as a decision
+- [x] Phase 3: selector settled — one of the three answers, recorded as a decision
+      *(2026-09-22 — answer 1, the site links out:
+      [[public-face-links-out-not-hosts-2026-09-22]])*
 - [ ] Phase 4: decomposition-or-digest judged, or consciously declined
 - [ ] accDescr check routed to the backlog and accepted or rejected by its gate
 - [ ] The deferred compatibility-table question asked once Phase 7 closes
