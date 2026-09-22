@@ -2,7 +2,7 @@
 id: public-docs-face-build
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -247,6 +247,28 @@ landmarks, a skip link, in-page search, a sensible measure, and
 `prefers-color-scheme`. These are the accessibility items that are *free from
 structure* — the build derives them from headings that already exist.
 
+**State after Phase 2 (2026-09-22) — thrown.** The operator published 3.42.0
+and the build (`632cd4c`) in one instructed act, and Pages was switched on:
+`main`, `/docs`, the classic builder, live at
+https://janoshmoshiri.github.io/MarkdownLLM/. The build is
+`docs/_config.yml` + `docs/index.html` + three `docs/_includes/` files; no
+document was touched. Nav labels and order and the `plans/` exclusion are the
+build's facts, held in the build. The front door lists every page from its own
+frontmatter at build time, and the footer names the commit it was built from.
+
+The first live build served every page and drew no diagram: the theme
+compresses a page onto one line, and `//` comments in the mermaid config
+swallowed the script. Fixed at `e4a1358` and verified **locally** before
+going up — the operator asked to be able to look before it is public, so
+`tools/pages/` now holds a Pages-pinned preview (`preview.ps1`; Ruby 3.3 with
+the devkit). The preview found a second divergence the live site hid: the
+Pages default plugins are only partly active in a bundle unless named, so
+`_config.yml` names the four the site leans on.
+
+What the build cannot fix, handed to Phase 3: ten links from `docs/` reach
+outside it (README, `kernel.md`, `thing.md`, one insight, the Explorer's
+docs) and do not resolve on the site.
+
 ## Phase 3 — Settle the selector *(operator decision; no build)*
 
 The ruling parked this as "only real once something outside `docs/` wants
@@ -312,7 +334,8 @@ hand-written again?*
 - [x] Phase 1: toolbox and map Views 2–3 carry generated blocks, drift-gated
       *(2026-09-22 — the toolbox generated; the views checked and given a
       generated edge-list companion, because mermaid cannot host a block)*
-- [ ] Phase 2: build configured, diff reviewed, operator has thrown or declined the switch
+- [x] Phase 2: build configured, diff reviewed, operator has thrown or declined the switch
+      *(2026-09-22 — thrown: https://janoshmoshiri.github.io/MarkdownLLM/)*
 - [ ] Phase 3: selector settled — one of the three answers, recorded as a decision
 - [ ] Phase 4: decomposition-or-digest judged, or consciously declined
 - [ ] accDescr check routed to the backlog and accepted or rejected by its gate
