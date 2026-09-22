@@ -207,13 +207,14 @@ existing harnesses and the read-only Explorer remain valid routes and integratio
 
 ## The Toolbox
 
-Everything runs through one entry point: `python {framework_root}/tools/mdllm.py
-<subcommand> [path]` (the implementation lives in the `tools/markdownllm/`
-package beside it — one module per responsibility). Most of these run *for*
-you — via the pre-commit hook, CI, or the agent — but all of them are yours
-to invoke directly.
+Everything runs through one entry point:
+`python {framework_root}/tools/mdllm.py <subcommand> [path]` (the
+implementation lives in the `tools/markdownllm/` package beside it — one
+module per responsibility). Most of these run *for* you — via the pre-commit
+hook, CI, or the agent — but all of them are yours to invoke directly.
 
 <!-- generated:toolbox -->
+
 | Subcommand | Usage | The tool's own description |
 |---|---|---|
 | `adapter-install` | `mdllm adapter-install --harness {all,claude,claude-code,codex,cowork,perplexity} [--dry-run] [--refresh-legacy] [path]` | show and safely apply a project-local harness adapter diff |
@@ -254,6 +255,7 @@ to invoke directly.
 | `validate` | `mdllm validate [--quiet] [--view {worktree,index}] [path]` | Levels 1-3 mechanical validation |
 | `watch` | `mdllm watch --role ROLE --definition DEFINITION [--run RUN] [--field FIELD] [--remote REMOTE] [--branch BRANCH] [--interval INTERVAL] [--exit-on-wake] [--once] [--state STATE] [path]` | the doorbell: poll the remote ref and report when a watched thing reaches a stage this role acts at; reads only, never writes |
 | `worklog` | `mdllm worklog [--write] [path]` | print a session-grouped view of the commit stream (on-demand; not committed) |
+
 <!-- /generated:toolbox -->
 
 ### When you'd type each one yourself

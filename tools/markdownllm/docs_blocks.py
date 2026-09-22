@@ -254,9 +254,19 @@ def build_docs_blocks(root: Path, view: RepositoryView | None = None,
     inventory are omitted when `rows` is None; the check reports that."""
     out: dict[str, dict[str, str]] = {}
     for rel, names in DOCS_BLOCKS.items():
-        out[rel] = {name: _DB_BUILDERS[name](root, view, rows) for name in names
+        out[rel] = {name: _pad(_DB_BUILDERS[name](root, view, rows)) for name in names
                     if rows is not None or name not in _NEEDS_ROWS}
     return out
+
+
+def _pad(body: str) -> str:
+    """A blank line inside each marker. GitHub's renderer ends an HTML
+    comment block at its own line; kramdown (the Pages build) does not, and
+    swallows a table or list that follows the marker directly into one raw
+    paragraph — the first live build of the operator guide showed the whole
+    toolbox as unbroken text. Padding is part of the canonical body, so the
+    same-builder drift check keeps it there."""
+    return f"\n{body}\n"
 
 
 # --------------------------------------------------------------- checks

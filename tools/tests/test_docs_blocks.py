@@ -292,3 +292,20 @@ def test_this_repositorys_own_docs_are_in_sync():
     errors = [f for f in db.docs_block_findings(FW_ROOT, None, ROWS)
               if f.severity == SEV_ERROR]
     assert errors == [], "\n".join(f"{f.thing}: {f.message}" for f in errors)
+
+
+def test_assembled_blocks_are_blank_line_padded_for_the_pages_renderer(tmp_path):
+    """kramdown (GitHub Pages) runs a table or list straight after an HTML
+    comment into one raw paragraph; GitHub's own renderer does not. The
+    padding lives in the canonical body so drift keeps it, and so the live
+    site and the blob view render the same block."""
+    root = _tiny_root(tmp_path)
+    _docs_pair(root)
+    for bodies in db.build_docs_blocks(root, None, ROWS).values():
+        for name, body in bodies.items():
+            assert body.startswith("\n") and body.endswith("\n"), name
+            assert body.strip("\n") == body[1:-1], name   # exactly one each side
+    db.cmd_docs(_ns(path=str(root), check=False), rows=ROWS)
+    text = (root / db.OPERATOR_GUIDE).read_text(encoding="utf-8")
+    assert "<!-- generated:toolbox -->\n\n| Subcommand" in text
+    assert "|\n\n<!-- /generated:toolbox -->" in text

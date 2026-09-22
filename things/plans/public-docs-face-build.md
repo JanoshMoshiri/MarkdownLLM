@@ -2,7 +2,7 @@
 id: public-docs-face-build
 type: plan
 status: in-progress
-version: 1.7
+version: 1.8
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -263,7 +263,15 @@ going up — the operator asked to be able to look before it is public, so
 `tools/pages/` now holds a Pages-pinned preview (`preview.ps1`; Ruby 3.3 with
 the devkit). The preview found a second divergence the live site hid: the
 Pages default plugins are only partly active in a bundle unless named, so
-`_config.yml` names the four the site leans on.
+`_config.yml` names the four the site leans on. The operator's own read of
+the live guide found the third: the toolbox rendered as one unbroken
+paragraph. Two renderer differences, both invisible on GitHub's blob view —
+kramdown opens an HTML block at any line that starts with a tag (a code
+span wrapped onto `<subcommand>`), and it runs a table straight after an
+HTML comment into a paragraph. The first was a reflow; the second is now
+part of the managed blocks' canonical body (a blank line inside each
+marker), so the drift check keeps it. The preview is the check for this
+class; nothing mechanical reads a page the way a renderer does.
 
 What the build cannot fix, handed to Phase 3: ten links from `docs/` reach
 outside it (README, `kernel.md`, `thing.md`, one insight, the Explorer's

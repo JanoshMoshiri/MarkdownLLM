@@ -227,6 +227,7 @@ not named. Each spec's `(type, status)` here is read from its frontmatter, so
 a `(draft)` tag in the drawing above can be checked against it.
 
 <!-- generated:spec-edges -->
+
 - **`belief-revision.md`** (`specification`, `stable`): complements → `validate.thing.md`, `session-memory.md`, `orchestration.md`, `derived-index.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md` · +1 edge(s) outside the spec layer
 - **`change-reconciliation.md`** (`specification`, `draft`): complements → `belief-revision.md`, `provenance.md`, `derived-index.md`, `validate.thing.md`, `retrospective.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md` · +8 edge(s) outside the spec layer
 - **`coordination-claim.md`** (`specification`, `evolving`): complements → `git-workflow.md`, `workflow-state.md`; extends → `thing.md` · +1 edge(s) outside the spec layer
@@ -258,6 +259,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 - **`validate.thing.md`** (`specification`, `stable`): complements → `belief-revision.md`, `domain-specification-guide.md`; validates → `thing.md`, `orchestration.md`, `derived-index.md`, `provenance.md` · +1 edge(s) outside the spec layer
 - **`workflow-state.md`** (`specification`, `evolving`): complements → `coordination-claim.md`, `interface.md`, `git-workflow.md`, `provenance.md`, `orchestration.md`; extends → `thing.md` · +1 edge(s) outside the spec layer
 - **`write.thing.md`** (`specification`, `stable`): complements → `read.thing.md`, `git-workflow.md`; extends → `thing.md`; references → `validate.thing.md`, `reasoning-lenses.md`
+
 <!-- /generated:spec-edges -->
 
 ## View 3 — The deterministic floor: subcommand → spec
