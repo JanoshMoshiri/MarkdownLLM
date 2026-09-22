@@ -2,7 +2,7 @@
 id: coherence-mechanism-build
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-08-11
 priority: high
 tags: [coherence, floor, derivation, probes, sequencing]
@@ -118,11 +118,37 @@ build here; this phase exists so the sequence is visible in one place.
   evidence check, and two of the four review-9 promotions landed; the other
   two are declined on the record at the backlog with the condition that
   would lift each. The unfelt items keep their original hold.
-- **Phase 3 — begun.** Probes 1 and 2 landed as `tools/tests/
-  test_flow_probes.py`, plus a third that exists *because* the sprint's own
-  probes blocked the sprint's own commit and exposed the boundary-terms
-  adder. Probes 3–5 (invariant breach, refresh end-to-end, session close)
-  remain owned here.
+- **Phase 3 — complete (2026-09-22).** Probes 1 and 2 landed at
+  floor-sprint-3 as `tools/tests/test_flow_probes.py`, plus a third that
+  exists *because* the sprint's own probes blocked the sprint's own commit
+  and exposed the boundary-terms adder. Probes 3–5 landed today —
+  invariant breach, refresh end-to-end, session close — in the same file,
+  which keeps them in CI for free (the plan's own "decide at build"
+  question, answered: `tools/tests/`, not a new `mdllm probe` surface, on
+  the grounds that a probe nobody runs is not a probe). Suite: 7 probes,
+  green.
+
+  **One deliberate departure.** Probe 4's text said "version-bump a scratch
+  sentinel"; the sentinel is the *framework's* and is shared with every
+  other test and the running tool. This file already carries a probe that
+  exists because a test mutating a shared framework-root file caused three
+  regressions, so the drift is created from the domain's side instead, by
+  lowering `framework_version_seen`. Same delta, observed from the other
+  end, touching nothing shared.
+
+  **What building them found — and it is not what the phase was for.**
+  Three of the three probes failed on first run, and all three failures
+  were *the probe's model of the contract being wrong*, not the floor:
+  the flip window skips HEAD on purpose (standing on the closer you still
+  see what you are closing — commented since `bf66b12`); the digest names
+  a thing on its Watched line as well as its flip line, so a bare id match
+  asserts on the wrong reader; and `worklog` prints newest-session-first
+  headed by each block's *closer*, so text order carries no meaning and
+  membership is the contract. Zero defects found, three misreadings
+  corrected. That is the phase's thesis arriving from an unexpected
+  direction: an execution probe does not only catch regressions, it
+  catches the *reader* — and every one of these three would have been
+  asserted confidently and wrongly by a cold read of the same code.
 - **Phase 4 — standing, unchanged.** The exit condition below is unmet by
   construction: it needs a post-release cold read, which is an operator act
   after publication, not a sprint deliverable.
@@ -137,7 +163,15 @@ fact this plan already carried was worth more than it claimed.
 ## Sequencing and exit
 
 Order: 1 → 2 → 3 (4 is standing). Phases 1+2 are plausibly one build
-session; Phase 3 a second.
+session; Phase 3 a second. *Held as written: Phase 3 took its second
+session, two sprints later.*
+
+**All three owned phases are now done; the plan stays `in-progress` on
+Phase 4 alone**, which is standing and operator-owned by construction —
+one post-release cold read returning zero fix-residue-class findings. It
+cannot be a sprint deliverable, so nothing agent-side advances this plan
+further. The unfelt half of Phase 2 keeps its original hold at the
+backlog's gate, where it belongs.
 
 **Precondition met 2026-08-22.** This plan was sequenced after the structure
 sprint so its generated blocks derive from a settled module layout rather

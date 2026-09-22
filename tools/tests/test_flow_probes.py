@@ -22,7 +22,7 @@ from pathlib import Path
 import pytest
 
 from corpus_harness import (  # noqa: F401
-    _git_repo, _git_supports_hook_run, _ns, mdllm, write,
+    RECENT, _git_repo, _git_supports_hook_run, _ns, mdllm, write,
 )
 
 
@@ -39,6 +39,26 @@ def _scaffold(tmp_path: Path, name: str = "born") -> Path:
     rc = mdllm.cmd_scaffold(_ns(path=str(target), harness="claude", autopush="false"))
     assert rc == 0, "scaffold must succeed before any probe can mean anything"
     return target
+
+
+def _attest(target: Path, capsys) -> None:
+    """The clone-local Tier-0 attestation a strict-gated domain needs before
+    its second commit. Every probe below commits, so every probe needs it."""
+    mdllm.cmd_session_start(_ns(path=str(target)))
+    capsys.readouterr()
+
+
+def _commit(target: Path, msg: str) -> subprocess.CompletedProcess:
+    subprocess.run(["git", "add", "-A"], cwd=target, check=True)
+    return subprocess.run(["git", "commit", "-m", msg], cwd=target,
+                          capture_output=True, text=True, encoding="utf-8",
+                          errors="replace")
+
+
+def _commit_or_fail(target: Path, msg: str) -> None:
+    done = _commit(target, msg)
+    assert done.returncode == 0, (
+        f"probe setup commit failed ({msg}):\n" + done.stdout + done.stderr)
 
 
 # --------------------------------------------------------------- probe 1
@@ -183,3 +203,290 @@ def test_probe_birth_gate_holds_from_the_second_commit(tmp_path, capsys):
                            encoding="utf-8", errors="replace")
     assert third.returncode == 0, (
         "an attested clone must commit:\n" + third.stdout + third.stderr)
+
+
+# --------------------------------------------------------------- probe 3
+
+
+def test_probe_invariant_breach_is_observable_as_tree_state(tmp_path, capsys):
+    """A trigger can fire on bytes HEAD does not contain — and you can tell.
+
+    Round 8 of the review loop reclassified "triggers read committed state
+    only" from tool mechanics to **discipline guarantee**: the evaluator reads
+    the working tree, and it is the `post-write:commit` invariant that makes
+    tree and HEAD coincide. That correction lives in prose, in one CHANGELOG
+    entry and one kernel sentence, and prose is the tier the loop measured as
+    never holding clean. This probe makes it observable instead.
+
+    What it pins, precisely: an uncommitted edit to a watched thing IS enough
+    to fire a dependency trigger, and the discrepancy IS detectable (the tree
+    is dirty; HEAD still holds the old status). Both halves matter. If the
+    first stopped being true, the evaluator would have quietly become
+    commit-reading and the doctrine would be wrong in the other direction; if
+    the second stopped being true, a discipline breach would be invisible,
+    which is the condition under which a guarantee resting on discipline
+    silently becomes no guarantee at all.
+
+    This probe deliberately does NOT assert that the floor prevents the
+    breach. It must not: the evaluator reading the tree is what makes
+    `mdllm triggers` useful while you work. Prevention is the commit hook's
+    job, and the invariant's.
+    """
+    if not _git_supports_hook_run():
+        pytest.skip("git too old to execute hooks reliably")
+    target = _scaffold(tmp_path)
+    capsys.readouterr()
+    _attest(target, capsys)
+
+    write(target, "things/prerequisite.md",
+          f"---\nid: prerequisite\ntype: note\nstatus: in-progress\n"
+          f"created: {RECENT}\n---\n\n# Prerequisite\n\nNot done yet.\n")
+    write(target, "things/dependent.md",
+          f"---\nid: dependent\ntype: note\nstatus: not-started\n"
+          f"created: {RECENT}\ntriggers:\n  - type: dependency\n"
+          f"    watch: [prerequisite]\n    on: status_changed_to\n"
+          f"    value: completed\n    action: unblock\n---\n\n"
+          f"# Dependent\n\nWaits on the prerequisite.\n")
+    _commit_or_fail(target, "create: the watched pair")
+
+    # Committed state: the prerequisite is not done, so nothing fires.
+    mdllm.cmd_triggers(_ns(path=str(target), estate=False))
+    committed = capsys.readouterr().out
+    assert "dependent" not in committed, (
+        "nothing should fire while the prerequisite is in-progress:\n"
+        + committed)
+
+    # The breach: complete the prerequisite in the WORKING TREE only.
+    prereq = target / "things" / "prerequisite.md"
+    prereq.write_text(
+        prereq.read_text(encoding="utf-8").replace(
+            "status: in-progress", "status: completed"),
+        encoding="utf-8")
+
+    mdllm.cmd_triggers(_ns(path=str(target), estate=False))
+    dirty = capsys.readouterr().out
+    assert "dependent" in dirty, (
+        "the evaluator reads the tree — an uncommitted completion must fire "
+        "the watcher, or the discipline-vs-mechanics correction is wrong:\n"
+        + dirty)
+
+    # ...and the discrepancy is detectable, which is what makes a guarantee
+    # resting on discipline auditable rather than merely hoped for.
+    porcelain = subprocess.run(["git", "status", "--porcelain"], cwd=target,
+                               capture_output=True, text=True,
+                               encoding="utf-8").stdout
+    assert "things/prerequisite.md" in porcelain, (
+        "the breach must be visible in tree state:\n" + porcelain)
+    at_head = subprocess.run(
+        ["git", "show", "HEAD:things/prerequisite.md"], cwd=target,
+        capture_output=True, text=True, encoding="utf-8").stdout
+    assert "status: in-progress" in at_head, (
+        "committed state must still hold the old status — otherwise there "
+        "was no breach to observe")
+
+
+# --------------------------------------------------------------- probe 4
+
+
+def test_probe_refresh_end_to_end_surfaces_seals_and_clears_drift(tmp_path,
+                                                                  capsys):
+    """Version drift surfaces at session start, seals on adoption, and the
+    managed blocks regenerate on the way through.
+
+    Three mechanisms that only mean anything in sequence, and which no unit
+    test composes: the session-start version check (the operator's first
+    sight of drift), `refresh` reporting the unabsorbed CHANGELOG delta (what
+    adoption actually requires), and `--seal` closing it afterwards. The
+    ordering is the contract — sealing before adoption would make the flag a
+    lie, and the floor's half is to refuse to seal silently.
+
+    **Departure from the plan's text, deliberate.** The plan says
+    "version-bump a scratch sentinel". The sentinel is the *framework's*
+    `.markdownllm`, shared by every test in this suite and by the running
+    tool — and this file already carries a probe
+    (`..._leaves_an_out_of_estate_framework_untouched`) that exists because a
+    test mutating a shared framework-root file caused three regressions. So
+    the drift is created from the domain's side instead, by lowering
+    `framework_version_seen`. It is the same delta observed from the other
+    end, and it touches nothing shared.
+
+    The assertions are relational, never literal: no version string is
+    written here, because a probe that names one becomes a release chore.
+    """
+    target = _scaffold(tmp_path)
+    capsys.readouterr()
+
+    agents = target / "AGENTS.md"
+    born = agents.read_text(encoding="utf-8")
+    meta, _, err = mdllm.parse_frontmatter(born)
+    assert not err
+    current = str((meta or {}).get("framework_version_seen") or "")
+    assert current, "a scaffolded domain must record the version it was born at"
+
+    # Born current: refresh has nothing to say.
+    mdllm.cmd_refresh(_ns(path=str(target), seal=False))
+    at_birth = capsys.readouterr().out
+    assert "Up to date" in at_birth, at_birth
+
+    # Drift, from the domain's side.
+    agents.write_text(
+        born.replace(f"framework_version_seen: {current}",
+                     "framework_version_seen: 3.0.0"),
+        encoding="utf-8")
+
+    # 1. Session start surfaces it — the operator's first sight.
+    mdllm.cmd_session_start(_ns(path=str(target)))
+    started = capsys.readouterr().out
+    assert "3.0.0" in started and current in started, (
+        "session start must name both the seen and the live version:\n"
+        + started)
+
+    # 2. Refresh reports what adoption requires, and does NOT seal on its own.
+    mdllm.cmd_refresh(_ns(path=str(target), seal=False))
+    reported = capsys.readouterr().out
+    assert "Up to date" not in reported, reported
+    assert "Versions not yet absorbed" in reported, reported
+    assert "framework_version_seen: 3.0.0" in agents.read_text(
+        encoding="utf-8"), "a report must not seal — adoption is semantic"
+
+    # 3. --seal closes it, once the agent has adopted.
+    mdllm.cmd_refresh(_ns(path=str(target), seal=True))
+    capsys.readouterr()
+    sealed = agents.read_text(encoding="utf-8")
+    assert f"framework_version_seen: {current}" in sealed, (
+        "--seal must bump the domain to the live framework version")
+
+    # 4. And the domain is clean afterwards: blocks regenerated, drift gone.
+    smeta, _, serr = mdllm.parse_frontmatter(sealed)
+    assert not serr
+    blocks = mdllm.build_domain_kernel_blocks(target, smeta or {})
+    present, drifted = mdllm.domain_kernel_status(sealed, blocks)
+    assert present and drifted == [], f"refresh left managed drift: {drifted}"
+
+    mdllm.cmd_refresh(_ns(path=str(target), seal=False))
+    after = capsys.readouterr().out
+    assert "Up to date" in after, after
+
+
+# --------------------------------------------------------------- probe 5
+
+
+def test_probe_session_close_delimits_worklog_and_advances_the_flip_window(
+        tmp_path, capsys):
+    """One `session-end:` commit closes two windows, and they must agree.
+
+    `session-end:` carries a double definition that took ten releases to
+    settle (review-loop rounds 7-8): it is the ritual's routine closer, and
+    it is the mechanical delimiter for two *separate* readers —
+    `worklog`'s session grouping and session-start's verified-flip window.
+    Two consumers reading one convention through two independent
+    implementations is exactly the seam a cold read cannot check and a unit
+    test would stub away: each could be individually correct while silently
+    disagreeing about where a session ends.
+
+    The flip window is the half with teeth. It is the visibility leg of the
+    quarantine discipline — every `verified: true` flip surfaced where the
+    operator already looks, so a wrong or rogue one cannot pass unseen. A
+    window that failed to advance would re-announce old flips until the
+    operator learned to skim them, and a window that advanced too eagerly
+    would hide a live one. Both failures are silent; both are pinned here.
+
+    **The edge is off-by-one on purpose, and this probe was written against
+    the wrong one first.** The window skips HEAD when hunting for its base,
+    so standing *on* the closer the flips are still shown — you are meant to
+    see what you are closing, which is precisely when the session-end ritual
+    reports them. It advances at the next session's first commit. That
+    nuance has carried an explanatory comment since the feature was born
+    (bf66b12), it is one line, and it is the kind of subtlety a refactor
+    drops silently in either direction. So both edges are asserted below.
+    """
+    if not _git_supports_hook_run():
+        pytest.skip("git too old to execute hooks reliably")
+    target = _scaffold(tmp_path)
+    capsys.readouterr()
+    _attest(target, capsys)
+
+    # Quarantine, then the attributable flip — two commits, as the floor
+    # requires: a born-verified external thing is refused outright.
+    write(target, "things/ingested.md",
+          f"---\nid: ingested\ntype: note\nstatus: not-started\n"
+          f"created: {RECENT}\norigin: external\nverified: false\n"
+          f"---\n\n# Ingested\n\nFrom outside.\n")
+    _commit_or_fail(target, "create: ingested under quarantine")
+
+    ingested = target / "things" / "ingested.md"
+    ingested.write_text(
+        ingested.read_text(encoding="utf-8").replace(
+            "verified: false", "verified: true\nverified_by: A Human"),
+        encoding="utf-8")
+    _commit_or_fail(target, "verify: ingested")
+
+    # Open window: the flip is surfaced.
+    # Assert the FLIP line, not the id: the digest also names this thing on
+    # its Watched line (external things it does not own), and a bare id match
+    # would pass on the wrong reader entirely — it did, first time round.
+    mdllm.cmd_session_start(_ns(path=str(target)))
+    open_window = capsys.readouterr().out
+    assert "Verified flips" in open_window, (
+        "a flip inside the open window must be surfaced:\n" + open_window)
+    assert "`ingested` @" in open_window and "A Human" in open_window, (
+        "and surfaced attributably — an unattributed flip is the thing the "
+        "visibility leg exists to expose:\n" + open_window)
+
+    # Close the session.
+    write(target, "things/after.md",
+          f"---\nid: after\ntype: note\nstatus: not-started\n"
+          f"created: {RECENT}\n---\n\n# After\n\nBody.\n")
+    _commit_or_fail(target, "session-end: the probe's session")
+
+    # Edge 1 — standing ON the closer, the flip is still surfaced. This is
+    # the session-end ritual's own view: it reports the flips it is closing
+    # over, so the window must not have advanced out from under it yet.
+    mdllm.cmd_session_start(_ns(path=str(target)))
+    on_the_closer = capsys.readouterr().out
+    assert "Verified flips" in on_the_closer and "A Human" in on_the_closer, (
+        "a session-end at HEAD must still show the session's own flips — "
+        "the ritual reports what it is closing:\n" + on_the_closer)
+
+    # Edge 2 — one commit into the next session, the window has advanced.
+    write(target, "things/next-session.md",
+          f"---\nid: next-session\ntype: note\nstatus: not-started\n"
+          f"created: {RECENT}\n---\n\n# Next\n\nBody.\n")
+    _commit_or_fail(target, "create: the next session's first work")
+
+    mdllm.cmd_session_start(_ns(path=str(target)))
+    closed_window = capsys.readouterr().out
+    assert "Verified flips" not in closed_window, (
+        "the flip window must advance past a session-end commit, or old "
+        "flips are re-announced until the operator skims them:\n"
+        + closed_window)
+    assert "A Human" not in closed_window, closed_window
+    # The thing itself is still watched — advancing the FLIP window must not
+    # drop it from the digest's other readers. Two windows, one delimiter,
+    # separate meanings.
+    assert "`ingested`" in closed_window, (
+        "advancing the flip window must not un-watch the thing:\n"
+        + closed_window)
+
+    # Reader 2 — worklog delimits on the same commit, from its own code path.
+    # Membership is the contract, not text order: the view prints sessions
+    # newest-first and heads each block with its CLOSER's subject, so "appears
+    # earlier in the output" means nothing. Read the block and check who is
+    # in it.
+    mdllm.cmd_worklog(_ns(path=str(target), write=False))
+    log = capsys.readouterr().out
+    header = "session-end: the probe's session"
+    assert header in log, log
+    block = log[log.index(header):]
+    end = block.find("\n## ", 1)
+    if end != -1:
+        block = block[:end]
+
+    assert "verify: ingested" in block, (
+        "the flip commit belongs to the session its closer ends:\n" + block)
+    assert "create: ingested under quarantine" in block, (
+        "so does the quarantine commit that preceded it:\n" + block)
+    assert "create: the next session's first work" not in block, (
+        "a commit made after the closer belongs to the NEXT session — if it "
+        "lands in this block, worklog and the flip window disagree about "
+        "where a session ends:\n" + block)
