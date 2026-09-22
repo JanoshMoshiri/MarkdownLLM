@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-22
-generated: 2026-09-22T00:56:34
-generated_from: HEAD@b38a62f
-coverage: 104
+generated: 2026-09-22T18:49:40
+generated_from: HEAD@042433c
+coverage: 105
 framework_version: 3.41.0
 ---
 
@@ -359,6 +359,10 @@ framework_version: 3.41.0
 ## posix-floor-record-2026-08-13
 - claude-gate-5r1-acceptance-2026-08-13 (derived-from)
 - posix-live-dispatch-record-2026-08-14 (derived-from)
+
+## public-docs-face-is-derived-not-restated
+- cue-framework-map-2026-09-22 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
+- cue-operator-guide-2026-09-22 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
 
 ## retrospective-specification
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)

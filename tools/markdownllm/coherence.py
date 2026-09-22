@@ -17,6 +17,7 @@ from pathlib import Path
 
 import yaml
 
+from .docs_blocks import docs_block_findings
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
 from .indexes import INDEX_FILES, index_drift_findings
 from .kernel_gen import build_kernel, normalize_newlines, token_counter
@@ -696,6 +697,11 @@ def coherence_findings(root: Path, window: int,
         else:
             findings.extend(_catalog_annotation_findings(root, atext, view))
             findings.extend(_tier2_routing_findings(root, atext, view))
+
+        # The human-facing docs' derived blocks and authored halves —
+        # same builder as `mdllm docs`, so the check cannot disagree with
+        # the generator (public-docs-face-build Phase 1).
+        findings.extend(docs_block_findings(root, view))
 
         sentinel = root / ".markdownllm"
         try:

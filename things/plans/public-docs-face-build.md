@@ -1,8 +1,8 @@
 ---
 id: public-docs-face-build
 type: plan
-status: not-started
-version: 1.3
+status: in-progress
+version: 1.4
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -163,6 +163,66 @@ reconciliation cost, metered here in real time). That is a stronger argument
 than the original, and it is evidence rather than projection: the framework
 watched its own thesis cost it four edits where one would have done.
 
+## State after Phase 1 (2026-09-22)
+
+**Phase 1 — complete.** `tools/markdownllm/docs_blocks.py`, `mdllm docs`
+(`--check` is the pre-commit coherence leg), `tools/tests/test_docs_blocks.py`
+(eleven tests, one of them the live dogfood: this repository's own docs must
+pass the same call the hook makes). Where the derive/check line fell, surface
+by surface — the precedent from [[coherence-mechanism-build]] Phase 1 applied,
+not re-argued:
+
+- **The operator guide's toolbox — generated.** The 33-row hand table is now
+  a managed block: subcommand, exact usage, and the tool's own help, straight
+  from argparse, alphabetical (registration order is a code-layout fact a
+  derived surface must not drift on). The authored half — *when a human
+  reaches for it* — lives beneath the block as one line per subcommand and is
+  **checked both ways**: a subcommand with no line, or a line for a vanished
+  subcommand, is a coherence Error. Every sentence from the old "When" column
+  survived; facts from the old "What it does" column that the tool's help did
+  not carry moved into the authored line; the rest is now the tool's to say.
+- **The framework map's views — checked, plus a generated companion.** A
+  mermaid diagram cannot host a managed block (an HTML comment breaks the
+  renderer), so View 2 and View 3 stay drawn and are gated instead: every
+  spec on disk must have a View 2 node and any `(status)` tag must match its
+  frontmatter; every subcommand must have a View 3 node and every node must
+  be a subcommand. What *can* be wholly owned by a block is: the map gained
+  **every declared spec-to-spec edge, generated from frontmatter**, beside
+  the curated drawing — the drawing shows load-bearing edges, the list shows
+  all of them, and the list carries each spec's live `(type, status)` so the
+  drawing's tags can be checked against it. The spec each subcommand *serves*
+  stays judgement and stays drawn.
+
+**What the check found on its first run — the drift the plan predicted, now
+counted.** The hand table listed 33 rows against 37 registered subcommands:
+`assemble`, `bundle`, `harness-event`, `precommit`, `runtime-probe` and
+`watch` had no row at all. View 2 had no node for `docs/estate-mechanics.md`.
+Both were invisible to every cold read since 13 August and are now
+mechanically impossible.
+
+**The tax, re-metered.** Before: a new flag meant four to eight hand edits
+across `cli.py`, the guide, the README and the map, none gated. Now: a new
+flag is one edit to `help=` and the table follows; a new subcommand is the
+tool's help, one authored "when" line, and one View 3 node — three edits,
+all three refused at commit if missed. The 38th subcommand, `docs` itself,
+was the first to pay the new rate, and the gate caught its own missing line
+before this commit.
+
+**Classification of the checks, for the backlog's benefit.** Nothing here is
+a new check *class*: block drift is the same-builder drift check the kernel
+and every domain's AGENTS.md already run; the three completeness checks are
+the one-direction routing check the Tier-2 table already runs, applied to
+three more authored halves. No suppression list, no judgement — the
+[[mechanical-coherence-checks-backlog]] gate is satisfied by construction,
+and no new item is routed there.
+
+**Two things deliberately not touched.** The README's CLI examples are
+vendor Phase 7's fact (capability claims), and the mermaid `accDescr` prose
+still restates the subcommand count by hand — it was walked (37 → 38) and it
+remains the accDescr drift check's problem, routed to the backlog below and
+unbuilt. A hand-walked count inside a derived-and-gated view is the last
+restatement standing in Phase 1's two surfaces.
+
 ## Phase 2 — Stand up the build *(owned here; the switch is operator-gated)*
 
 GitHub Pages from `/docs` on `main`, per the ruling. The agent-side work is the
@@ -240,7 +300,9 @@ hand-written again?*
 
 ## Done when
 
-- [ ] Phase 1: toolbox and map Views 2–3 carry generated blocks, drift-gated
+- [x] Phase 1: toolbox and map Views 2–3 carry generated blocks, drift-gated
+      *(2026-09-22 — the toolbox generated; the views checked and given a
+      generated edge-list companion, because mermaid cannot host a block)*
 - [ ] Phase 2: build configured, diff reviewed, operator has thrown or declined the switch
 - [ ] Phase 3: selector settled — one of the three answers, recorded as a decision
 - [ ] Phase 4: decomposition-or-digest judged, or consciously declined

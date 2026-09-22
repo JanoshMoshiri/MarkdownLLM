@@ -87,6 +87,7 @@ from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
 from .external_trust import CAPABILITY_NAMES, cmd_external_trust
 from .history import cmd_changelog, cmd_worklog
+from .docs_blocks import cmd_docs
 from .harness_ports import LIFECYCLE_BINDINGS
 from .imports_check import cmd_estate_check, cmd_imports_check
 from .assemble import cmd_assemble
@@ -241,6 +242,16 @@ def build_cli() -> argparse.ArgumentParser:
     dk.add_argument("--check", action="store_true",
                     help="drift check: compare managed blocks against a fresh build")
     dk.set_defaults(fn=cmd_domain_kernel)
+
+    dc = sub.add_parser("docs", help="regenerate the derived blocks in docs/ "
+                                       "(the operator-guide toolbox, the "
+                                       "framework-map edge list) from the live "
+                                       "tool and spec frontmatter")
+    dc.add_argument("path", nargs="?", default=".")
+    dc.add_argument("--check", action="store_true",
+                    help="drift + completeness check: what the pre-commit "
+                         "coherence leg runs")
+    dc.set_defaults(fn=cmd_docs)
 
     ss = sub.add_parser("session-start",
                         help="emit the session-start ritual (version + velocity) for a "

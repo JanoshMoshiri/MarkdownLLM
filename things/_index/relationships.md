@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-22
-generated: 2026-09-22T00:56:34
-generated_from: HEAD@b38a62f
-coverage: 424
+generated: 2026-09-22T18:49:39
+generated_from: HEAD@042433c
+coverage: 426
 framework_version: 3.41.0
 ---
 
@@ -468,6 +468,7 @@ framework_version: 3.41.0
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-framework-map-2026-09-19 --subject--> framework-map
+- cue-framework-map-2026-09-22 --subject--> framework-map
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
 - cue-git-workflow-specification-2026-09-19 --subject--> git-workflow-specification
@@ -482,6 +483,7 @@ framework_version: 3.41.0
 - cue-operating-layer-quality-loop-2026-09-13 --subject--> operating-layer-quality-loop
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
 - cue-operator-guide-2026-09-15 --subject--> operator-guide
+- cue-operator-guide-2026-09-22 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
