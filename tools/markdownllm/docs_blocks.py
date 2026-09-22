@@ -16,12 +16,15 @@ block (HTML comments break the renderer), so both map views are checked, not
 generated, and the map gains a generated *companion* — every declared edge,
 as data — beside the curated drawing.
 
-Layer: the generator/adapter edge. Reads argparse (the CLI's own inventory),
-spec frontmatter, and the two docs; writes the two docs. Imports nothing from
-a vendor. The CLI is imported *lazily* in `subcommand_rows`, because `cli.py`
-is the composition root that imports `coherence`, which imports this module —
-an import-time cycle otherwise. A generator asking the composition root for
-its inventory at call time is the accepted shape for that.
+Layer: the generator/adapter edge. Reads spec frontmatter and the two docs;
+writes the two docs. **The CLI's inventory is injected, never imported.**
+`cli.py` is the composition root — it imports `coherence`, which imports this
+module — so this module reaching back for `build_cli` would close a cycle,
+and the architecture gate refuses cycles even through a function-local
+import (initialization order becomes observable). Instead the root hands the
+parser's rows down: `rows_from_parser` is a pure walk over an argparse
+object, and every builder and check that needs the inventory takes `rows`.
+A call without them says so as a Warning ("could not look"), never a pass.
 """
 
 from __future__ import annotations
@@ -45,6 +48,9 @@ DOCS_BLOCKS: dict[str, tuple[str, ...]] = {
     OPERATOR_GUIDE: ("toolbox",),
     FRAMEWORK_MAP: ("spec-edges",),
 }
+
+# Blocks that cannot be built without the CLI inventory.
+_NEEDS_ROWS = {"toolbox"}
 
 # The spec layer the map draws: root + docs/ files whose frontmatter type is
 # one of these. Mirrors the map's own "Keeping This Map Honest" rule for
@@ -116,14 +122,14 @@ def _clean_usage(name: str, raw: str) -> str:
     return f"mdllm {name}" + (f" {tail}" if tail else "")
 
 
-def subcommand_rows() -> tuple[SubcommandRow, ...]:
-    """Every registered subcommand, alphabetically — argparse is the source.
+def rows_from_parser(parser) -> tuple[SubcommandRow, ...]:
+    """Every registered subcommand of an argparse parser, alphabetically.
 
-    Alphabetical rather than registration order: inserting a parser mid-file
-    is a code-layout choice, and a derived surface must not drift on it.
+    A pure walk over the parser object: this module never imports the
+    composition root that builds it. Alphabetical rather than registration
+    order — inserting a parser mid-file is a code-layout choice, and a
+    derived surface must not drift on it.
     """
-    from .cli import build_cli  # composition root; lazy to avoid the cycle
-    parser = build_cli()
     subs = next(a for a in parser._actions
                 if a.__class__.__name__ == "_SubParsersAction")
     helps = {c.dest: (c.help or "") for c in subs._choices_actions}
@@ -137,8 +143,8 @@ def subcommand_rows() -> tuple[SubcommandRow, ...]:
     return tuple(rows)
 
 
-def subcommand_names() -> set[str]:
-    return {r.name for r in subcommand_rows()}
+def subcommand_names(rows: tuple[SubcommandRow, ...]) -> set[str]:
+    return {r.name for r in rows}
 
 
 # --------------------------------------------------------------- the spec layer
@@ -197,18 +203,20 @@ def _cell(text: str) -> str:
     return text.replace("|", "\\|")
 
 
-def _db_toolbox(root: Path, view: RepositoryView | None) -> str:
+def _db_toolbox(root: Path, view: RepositoryView | None,
+                rows: tuple[SubcommandRow, ...]) -> str:
     """The toolbox table, wholly mechanical: name, exact usage, the tool's
     own help. The authored half — when you'd reach for it — lives in the
     bullets below the block and is checked for completeness, not generated."""
     lines = ["| Subcommand | Usage | The tool's own description |",
              "|---|---|---|"]
-    for r in subcommand_rows():
+    for r in rows:
         lines.append(f"| `{r.name}` | `{_cell(r.usage)}` | {_cell(r.help)} |")
     return "\n".join(lines)
 
 
-def _db_spec_edges(root: Path, view: RepositoryView | None) -> str:
+def _db_spec_edges(root: Path, view: RepositoryView | None,
+                   rows: tuple[SubcommandRow, ...] | None) -> str:
     """Every declared edge between specs, from frontmatter — the companion
     to the curated View 2 drawing, which shows load-bearing edges only."""
     specs = spec_set(root, view)
@@ -237,12 +245,18 @@ _DB_BUILDERS = {
 }
 
 
-def build_docs_blocks(root: Path,
-                      view: RepositoryView | None = None) -> dict[str, dict[str, str]]:
-    """Canonical body for every managed block, keyed by doc then block name.
-    Shared by `mdllm docs` and the coherence drift check — one source."""
-    return {rel: {name: _DB_BUILDERS[name](root, view) for name in names}
-            for rel, names in DOCS_BLOCKS.items()}
+def build_docs_blocks(root: Path, view: RepositoryView | None = None,
+                      rows: tuple[SubcommandRow, ...] | None = None,
+                      ) -> dict[str, dict[str, str]]:
+    """Canonical body for every managed block that can be built with what
+    was supplied, keyed by doc then block name. Shared by `mdllm docs` and
+    the coherence drift check — one source. Blocks that need the CLI
+    inventory are omitted when `rows` is None; the check reports that."""
+    out: dict[str, dict[str, str]] = {}
+    for rel, names in DOCS_BLOCKS.items():
+        out[rel] = {name: _DB_BUILDERS[name](root, view, rows) for name in names
+                    if rows is not None or name not in _NEEDS_ROWS}
+    return out
 
 
 # --------------------------------------------------------------- checks
@@ -351,12 +365,15 @@ def _view2_findings(text: str, specs: tuple[SpecRef, ...]) -> list[Finding]:
     return out
 
 
-def docs_block_findings(root: Path,
-                        view: RepositoryView | None = None) -> list[Finding]:
+def docs_block_findings(root: Path, view: RepositoryView | None = None,
+                        rows: tuple[SubcommandRow, ...] | None = None,
+                        ) -> list[Finding]:
     """The coherence leg: block drift (Error) plus the three completeness
-    checks over the authored halves. Framework root only — the caller gates."""
+    checks over the authored halves. Framework root only — the caller gates.
+    Without the CLI inventory the inventory-dependent checks say they could
+    not look; they never pass by omission."""
     findings: list[Finding] = []
-    blocks = build_docs_blocks(root, view)
+    blocks = build_docs_blocks(root, view, rows)
     texts = {rel: _read(root, rel, view) for rel in DOCS_BLOCKS}
     for rel, bodies in blocks.items():
         text = texts[rel]
@@ -375,11 +392,19 @@ def docs_block_findings(root: Path,
             findings.append(Finding(SEV_ERROR, rel,
                 f"managed block `{name}` drifted from a fresh build — run "
                 f"`mdllm docs .` and commit the result"))
-    names = subcommand_names()
-    if texts[OPERATOR_GUIDE] is not None:
-        findings.extend(_toolbox_findings(texts[OPERATOR_GUIDE], names))
+    if rows is None:
+        findings.append(Finding(SEV_WARNING, OPERATOR_GUIDE,
+            "the CLI's subcommand inventory was not supplied to this call — "
+            "the toolbox drift and annotation checks, and View 3's node "
+            "check, could not run (`mdllm coherence` and `mdllm docs --check` "
+            "supply it)"))
+    else:
+        names = subcommand_names(rows)
+        if texts[OPERATOR_GUIDE] is not None:
+            findings.extend(_toolbox_findings(texts[OPERATOR_GUIDE], names))
+        if texts[FRAMEWORK_MAP] is not None:
+            findings.extend(_view3_findings(texts[FRAMEWORK_MAP], names))
     if texts[FRAMEWORK_MAP] is not None:
-        findings.extend(_view3_findings(texts[FRAMEWORK_MAP], names))
         findings.extend(_view2_findings(texts[FRAMEWORK_MAP], spec_set(root, view)))
     return findings
 
@@ -387,15 +412,20 @@ def docs_block_findings(root: Path,
 # --------------------------------------------------------------- the command
 
 
-def cmd_docs(args) -> int:
-    """Regenerate the derived blocks in docs/, or `--check` them for drift."""
+def cmd_docs(args, rows: tuple[SubcommandRow, ...] | None = None) -> int:
+    """Regenerate the derived blocks in docs/, or `--check` them for drift.
+    `rows` is injected by the CLI (the composition root) — see the module
+    docstring for why this module never fetches it."""
     root = Path(args.path).resolve()
     if not (root / ".markdownllm").is_file():
         sys.exit("mdllm: docs requires a framework root (.markdownllm not found)")
-    blocks = build_docs_blocks(root)
+    if rows is None:
+        sys.exit("mdllm: docs needs the CLI's subcommand inventory — run it as "
+                 "`mdllm docs`, which supplies it")
+    blocks = build_docs_blocks(root, None, rows)
 
     if args.check:
-        findings = docs_block_findings(root)
+        findings = docs_block_findings(root, None, rows)
         errors = [f for f in findings if f.severity == SEV_ERROR]
         for f in findings:
             print(f"  {f.severity:<8} {f.thing}: {f.message}")
@@ -404,7 +434,7 @@ def cmd_docs(args) -> int:
                   "for block drift; the completeness findings are authored fixes")
             return 1
         print(f"docs: in sync ({sum(len(b) for b in blocks.values())} block(s), "
-              f"{len(subcommand_names())} subcommands)")
+              f"{len(rows)} subcommands)")
         return 0
 
     total = 0

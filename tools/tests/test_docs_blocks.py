@@ -6,6 +6,10 @@ is exercised against a surface it can be made to fail on. One dogfood test
 runs the live check over this repository's own docs — the same call the
 pre-commit coherence leg makes — because a generator whose own output is
 allowed to drift proves nothing.
+
+The CLI inventory is INJECTED (the module never imports the composition
+root — the architecture gate refuses that cycle), so tests obtain it the way
+`cli.py` does: walk a built parser.
 """
 
 from __future__ import annotations
@@ -19,36 +23,37 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from corpus_harness import _ns  # noqa: E402
 from markdownllm import docs_blocks as db  # noqa: E402
+from markdownllm.cli import build_cli  # noqa: E402
 from markdownllm.model import SEV_ERROR, SEV_WARNING  # noqa: E402
 
 FW_ROOT = Path(__file__).resolve().parents[2]
+ROWS = db.rows_from_parser(build_cli())
+NAMES = db.subcommand_names(ROWS)
 
 
 # --------------------------------------------------------------- the CLI inventory
 
 
-def test_subcommand_rows_cover_the_parser_alphabetically_without_help_flags():
-    from markdownllm.cli import build_cli
+def test_rows_cover_the_parser_alphabetically_without_help_flags():
     parser = build_cli()
     subs = next(a for a in parser._actions
                 if a.__class__.__name__ == "_SubParsersAction")
-    rows = db.subcommand_rows()
-    assert [r.name for r in rows] == sorted(subs.choices), (
+    assert [r.name for r in ROWS] == sorted(subs.choices), (
         "every registered subcommand, alphabetical — registration order is a "
         "code-layout fact a derived surface must not drift on")
-    for r in rows:
+    for r in ROWS:
         assert r.usage.startswith(f"mdllm {r.name}"), r
         assert "[-h]" not in r.usage, r
         assert "\n" not in r.usage and "\n" not in r.help, r
 
 
 def test_toolbox_block_is_deterministic_and_table_safe():
-    one = db._db_toolbox(FW_ROOT, None)
-    two = db._db_toolbox(FW_ROOT, None)
+    one = db._db_toolbox(FW_ROOT, None, ROWS)
+    two = db._db_toolbox(FW_ROOT, None, ROWS)
     assert one == two
     lines = one.splitlines()
     assert lines[0] == "| Subcommand | Usage | The tool's own description |"
-    assert len(lines) == 2 + len(db.subcommand_rows())
+    assert len(lines) == 2 + len(ROWS)
     for line in lines[2:]:
         # a raw pipe inside a cell would split the row; the builder escapes it
         assert line.count("|") - line.count("\\|") == 4, line
@@ -103,7 +108,7 @@ def test_spec_set_reads_frontmatter_type_not_filename_or_location(tmp_path):
 
 def test_spec_edges_block_names_spec_targets_and_counts_the_rest(tmp_path):
     root = _tiny_root(tmp_path)
-    body = db._db_spec_edges(root, None)
+    body = db._db_spec_edges(root, None, None)
     lines = body.splitlines()
     assert lines[0].startswith("- **`docs/first-hour.md`** (`guide`, `draft`): complements → `thing.md`")
     assert "- **`thing.md`** (`specification`, `evolving`): no edges to other specs" in lines
@@ -196,7 +201,7 @@ def test_view2_every_spec_has_a_node_and_status_tags_must_match(tmp_path):
 
 
 def _docs_pair(root: Path) -> None:
-    names = [r.name for r in db.subcommand_rows()]
+    names = [r.name for r in ROWS]
     (root / "docs").mkdir(exist_ok=True)
     (root / db.OPERATOR_GUIDE).write_text(
         "---\nid: operator-guide\ntype: guide\nstatus: draft\ncreated: 2026-09-22\n---\n\n"
@@ -219,13 +224,14 @@ def test_generation_clears_drift_and_a_hand_edit_inside_a_block_restores_it(
     _docs_pair(root)
 
     # Empty blocks: missing bodies are drift.
-    before = [f for f in db.docs_block_findings(root) if f.severity == SEV_ERROR]
+    before = [f for f in db.docs_block_findings(root, None, ROWS)
+              if f.severity == SEV_ERROR]
     assert before and all("drifted" in f.message for f in before), before
 
-    assert db.cmd_docs(_ns(path=str(root), check=False)) == 0
+    assert db.cmd_docs(_ns(path=str(root), check=False), rows=ROWS) == 0
     capsys.readouterr()
-    assert db.docs_block_findings(root) == []
-    assert db.cmd_docs(_ns(path=str(root), check=True)) == 0
+    assert db.docs_block_findings(root, None, ROWS) == []
+    assert db.cmd_docs(_ns(path=str(root), check=True), rows=ROWS) == 0
     out = capsys.readouterr().out
     assert "in sync" in out and "2 block(s)" in out
 
@@ -233,9 +239,10 @@ def test_generation_clears_drift_and_a_hand_edit_inside_a_block_restores_it(
     guide = root / db.OPERATOR_GUIDE
     guide.write_text(guide.read_text(encoding="utf-8").replace(
         "| `validate` |", "| `validate` (please run me) |", 1), encoding="utf-8")
-    drift = [f for f in db.docs_block_findings(root) if f.severity == SEV_ERROR]
+    drift = [f for f in db.docs_block_findings(root, None, ROWS)
+             if f.severity == SEV_ERROR]
     assert len(drift) == 1 and "`toolbox` drifted" in drift[0].message
-    assert db.cmd_docs(_ns(path=str(root), check=True)) == 1
+    assert db.cmd_docs(_ns(path=str(root), check=True), rows=ROWS) == 1
     capsys.readouterr()
 
 
@@ -246,10 +253,34 @@ def test_a_missing_block_marker_is_named_not_skipped(tmp_path, capsys):
     fmap.write_text(fmap.read_text(encoding="utf-8").replace(
         "<!-- generated:spec-edges -->\n\n<!-- /generated:spec-edges -->\n", ""),
         encoding="utf-8")
-    db.cmd_docs(_ns(path=str(root), check=False))
+    db.cmd_docs(_ns(path=str(root), check=False), rows=ROWS)
     capsys.readouterr()
-    findings = [f for f in db.docs_block_findings(root) if f.severity == SEV_ERROR]
+    findings = [f for f in db.docs_block_findings(root, None, ROWS)
+                if f.severity == SEV_ERROR]
     assert any("managed block `spec-edges` is missing" in f.message for f in findings)
+
+
+def test_without_the_inventory_the_check_says_it_could_not_look(tmp_path):
+    """A call that cannot see the CLI must not pass the CLI-dependent checks
+    by omission — the framework's 'could not look' convention, not 'clean'."""
+    root = _tiny_root(tmp_path)
+    _docs_pair(root)
+    db.cmd_docs(_ns(path=str(root), check=False), rows=ROWS)
+    blind = db.docs_block_findings(root)          # no rows
+    assert [f.severity for f in blind] == [SEV_WARNING]
+    assert "inventory was not supplied" in blind[0].message
+    # ...and the blocks that CAN be built without it are still checked:
+    fmap = root / db.FRAMEWORK_MAP
+    fmap.write_text(fmap.read_text(encoding="utf-8").replace(
+        "no edges to other specs", "edited by hand", 1), encoding="utf-8")
+    errs = [f for f in db.docs_block_findings(root) if f.severity == SEV_ERROR]
+    assert len(errs) == 1 and "`spec-edges` drifted" in errs[0].message
+
+
+def test_cmd_docs_refuses_to_run_without_the_inventory(tmp_path):
+    root = _tiny_root(tmp_path)
+    with pytest.raises(SystemExit, match="subcommand inventory"):
+        db.cmd_docs(_ns(path=str(root), check=False))
 
 
 # --------------------------------------------------------------- dogfood
@@ -258,5 +289,6 @@ def test_a_missing_block_marker_is_named_not_skipped(tmp_path, capsys):
 def test_this_repositorys_own_docs_are_in_sync():
     """The same call the pre-commit coherence leg makes, over the live docs.
     A generator whose own output may drift proves nothing."""
-    errors = [f for f in db.docs_block_findings(FW_ROOT) if f.severity == SEV_ERROR]
+    errors = [f for f in db.docs_block_findings(FW_ROOT, None, ROWS)
+              if f.severity == SEV_ERROR]
     assert errors == [], "\n".join(f"{f.thing}: {f.message}" for f in errors)

@@ -69,6 +69,7 @@ Requires: Python 3.10+, PyYAML. tiktoken optional (tokens falls back to heuristi
 from __future__ import annotations
 
 import argparse
+from functools import partial
 import sys
 
 import yaml
@@ -87,7 +88,7 @@ from .domain_kernel import cmd_domain_kernel
 from .evals import cmd_eval
 from .external_trust import CAPABILITY_NAMES, cmd_external_trust
 from .history import cmd_changelog, cmd_worklog
-from .docs_blocks import cmd_docs
+from .docs_blocks import cmd_docs, rows_from_parser
 from .harness_ports import LIFECYCLE_BINDINGS
 from .imports_check import cmd_estate_check, cmd_imports_check
 from .assemble import cmd_assemble
@@ -557,6 +558,14 @@ def build_cli() -> argparse.ArgumentParser:
     pc.add_argument("path", nargs="?", default=".")
     pc.set_defaults(fn=cmd_precommit)
 
+    # The CLI's inventory is a composition-root fact. Hand it DOWN to the
+    # checks that need it (`docs`, and `coherence`'s docs leg) rather than
+    # letting a lower module import this one — that cycle is refused by
+    # the architecture gate, function-local import or not. Computed once
+    # the parser is complete, so the `docs` row itself is in the set.
+    rows = rows_from_parser(p)
+    co.set_defaults(fn=partial(cmd_coherence, cli_rows=rows))
+    dc.set_defaults(fn=partial(cmd_docs, rows=rows))
     return p
 
 

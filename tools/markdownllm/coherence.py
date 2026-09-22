@@ -583,7 +583,8 @@ def _index_signal_enumeration_findings(
 
 
 def coherence_findings(root: Path, window: int,
-                       view: RepositoryView | None = None) -> list[Finding]:
+                       view: RepositoryView | None = None,
+                       cli_rows=None) -> list[Finding]:
     """Mechanical checks over the 'dark region' a hand-walk currently guards
     (AGENTS.md -> Walking the Dark Region). Corpus-general by design: the
     stable-staleness, unused-vocabulary, zero-run-definition, and
@@ -701,7 +702,7 @@ def coherence_findings(root: Path, window: int,
         # The human-facing docs' derived blocks and authored halves —
         # same builder as `mdllm docs`, so the check cannot disagree with
         # the generator (public-docs-face-build Phase 1).
-        findings.extend(docs_block_findings(root, view))
+        findings.extend(docs_block_findings(root, view, cli_rows))
 
         sentinel = root / ".markdownllm"
         try:
@@ -813,7 +814,7 @@ def coherence_findings(root: Path, window: int,
     return findings
 
 
-def cmd_coherence(args) -> int:
+def cmd_coherence(args, cli_rows=None) -> int:
     root = Path(args.path).resolve()
     mode = getattr(args, "view", "worktree")
     try:
@@ -822,7 +823,7 @@ def cmd_coherence(args) -> int:
     except RepositoryViewError as exc:
         print(f"mdllm: cannot construct {mode} coherence view: {exc}")
         return 1
-    findings = coherence_findings(root, args.window, view)
+    findings = coherence_findings(root, args.window, view, cli_rows)
     errors = [x for x in findings if x.severity == SEV_ERROR]
     warnings = [x for x in findings if x.severity == SEV_WARNING]
     infos = [x for x in findings if x.severity == SEV_INFO]
