@@ -1,0 +1,22 @@
+---
+layout: default
+title: Home
+nav_order: 0
+permalink: /
+---
+{%- comment -%}
+The site's front door — generator scaffolding, not a thing. HTML rather than
+markdown so the corpus walk never mistakes it for a document with
+frontmatter. The list below is computed by the build from each page's own
+frontmatter and the nav labels in _config.yml; nothing is restated by hand.
+{%- endcomment -%}
+<h1>MarkdownLLM — the human-facing documents</h1>
+
+<p>The framework's specifications are written for the agents that work within a domain. These pages are the documents written for the <em>people</em> who operate one. They are published from <code>docs/</code> on <code>main</code>, at the same commit as the specifications they describe, so what you read here is derived from the record rather than copied from it. <a href="https://github.com/JanoshMoshiri/MarkdownLLM">The repository</a> holds the specifications themselves.</p>
+
+<ul>
+{%- assign pages = site.html_pages | where_exp: "p", "p.url != page.url" | sort: "nav_order" -%}
+{%- for p in pages %}
+  <li><a href="{{ p.url | relative_url }}">{{ p.title }}</a>{% if p.type %} — <code>{{ p.type }}</code>, <code>{{ p.status }}</code>{% if p.version %}, v{{ p.version }}{% endif %}{% endif %}</li>
+{%- endfor %}
+</ul>

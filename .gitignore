@@ -33,3 +33,8 @@ explorer/*.egg-info/
 explorer/src/*.egg-info/
 explorer/.windows-build-venv/
 explorer/.windows-build-tools/
+
+# Jekyll residue if docs/ is ever built locally (Pages builds it remotely)
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata

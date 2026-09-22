@@ -1,0 +1,16 @@
+{%- comment -%}
+prefers-color-scheme, at runtime. The theme compiles one sheet per scheme and
+switches by swapping the first stylesheet's href (jtd.setTheme); it has no
+media-query mode of its own, so the reader's OS preference is applied here and
+followed if it changes. just-the-docs.js is loaded above this include, so
+`jtd` exists by now; if it does not, the compiled light sheet stands.
+{%- endcomment -%}
+<script>
+  (function () {
+    if (!(window.jtd && jtd.setTheme && window.matchMedia)) { return; }
+    var query = window.matchMedia("(prefers-color-scheme: dark)");
+    var apply = function (q) { jtd.setTheme(q.matches ? "dark" : "light"); };
+    apply(query);
+    if (query.addEventListener) { query.addEventListener("change", apply); }
+  })();
+</script>

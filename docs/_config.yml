@@ -1,0 +1,67 @@
+# The GitHub Pages build of the public docs face — public-docs-face-build,
+# Phase 2. The surface is `docs/` on `main` (the ruling
+# public-docs-face-is-derived-not-restated). This file is the build; the
+# content is the .md files beside it, untouched for the site's sake. What a
+# reader gets here that the blob view cannot give — outline, landmarks, a
+# skip link, in-page search, a measure, prefers-color-scheme — is derived from
+# headings and frontmatter that already exist.
+#
+# Pages builds this with its own Jekyll and its default plugins, three of
+# which do derivation work here: jekyll-titles-from-headings (a page with no
+# `title` takes its H1), jekyll-optional-front-matter (a .md with no
+# frontmatter is still a page — calculation-reference.md), and
+# jekyll-relative-links (`[x](other.md)` becomes the built page's link).
+
+title: MarkdownLLM
+description: >-
+  The human-facing documents of the MarkdownLLM framework, published from
+  the same commit the specifications live in.
+url: "https://janoshmoshiri.github.io"
+baseurl: "/MarkdownLLM"
+repository: JanoshMoshiri/MarkdownLLM   # jekyll-github-metadata: build_revision for the footer
+
+remote_theme: just-the-docs/just-the-docs@v0.12.0
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+  - jekyll-include-cache
+
+# Only the curated human-facing files are the face. plans/ holds an archived
+# execution record and a design draft — in the repository, not on the site.
+# The ruling counted five files; whether the selector widens is Phase 3's.
+exclude:
+  - plans/
+
+search_enabled: true
+search:
+  heading_level: 3
+  previews: 3
+  rel_url: true
+  button: false
+heading_anchors: true
+back_to_top: true
+back_to_top_text: "Back to top"
+aux_links:
+  "Repository":
+    - "https://github.com/JanoshMoshiri/MarkdownLLM"
+aux_links_new_tab: false
+color_scheme: light   # the compiled default; _includes/head_custom.html follows the reader's prefers-color-scheme
+mermaid:
+  version: "11.17.2"  # the theme loads it from jsDelivr as an ES module; accTitle/accDescr need ≥ 9.4
+
+# Nav labels and order are the build's facts, held here so no thing is
+# touched for the site's sake. A file with no entry still appears — it takes
+# its H1 as its label and sorts after the ordered ones.
+defaults:
+  - scope: { path: "" }
+    values: { layout: default }
+  - scope: { path: "first-hour.md" }
+    values: { title: "The First Hour", nav_order: 1 }
+  - scope: { path: "operator-guide.md" }
+    values: { title: "The Operator's Guide", nav_order: 2 }
+  - scope: { path: "framework-map.md" }
+    values: { title: "Framework Map", nav_order: 3 }
+  - scope: { path: "estate-mechanics.md" }
+    values: { title: "Estate Mechanics", nav_order: 4 }
+  - scope: { path: "calculation-reference.md" }
+    values: { title: "Calculation Reference", nav_order: 5 }
