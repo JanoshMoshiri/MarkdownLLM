@@ -1,0 +1,12 @@
+# Local preview of the public docs face (docs/), built the way GitHub Pages
+# builds it: the `github-pages` gem pins the exact Jekyll, plugins and
+# versions Pages runs, and applies Pages' configuration overrides. Kept out of
+# docs/ so the site's source holds only the site. Usage: tools/pages/preview.ps1
+source "https://rubygems.org"
+
+gem "github-pages", "~> 232", group: :jekyll_plugins
+
+# Ruby 3 no longer bundles a web server; Windows has no zoneinfo database.
+gem "webrick", "~> 1.8"
+gem "rake"                 # the remote theme loads it; Pages has it, a bundle must name it
+gem "tzinfo-data", platforms: [:windows]

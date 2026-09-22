@@ -21,10 +21,18 @@ baseurl: "/MarkdownLLM"
 repository: JanoshMoshiri/MarkdownLLM   # jekyll-github-metadata: build_revision for the footer
 
 remote_theme: just-the-docs/just-the-docs@v0.12.0
+# The theme's three, then the four Pages defaults this site leans on. Pages
+# enables the defaults whether listed or not; naming them makes the local
+# preview (tools/pages/) build the same site — unnamed, it silently skipped
+# jekyll-optional-front-matter and served calculation-reference.md raw.
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
   - jekyll-include-cache
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+  - jekyll-relative-links
+  - jekyll-github-metadata
 
 # Only the curated human-facing files are the face. plans/ holds an archived
 # execution record and a design draft — in the repository, not on the site.

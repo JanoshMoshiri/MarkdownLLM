@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "docs-site",
+      "runtimeExecutable": "powershell.exe",
+      "runtimeArgs": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "tools/pages/preview.ps1"],
+      "port": 4000,
+      "url": "http://127.0.0.1:4000"
+    }
+  ]
+}

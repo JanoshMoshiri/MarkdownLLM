@@ -34,7 +34,10 @@ explorer/src/*.egg-info/
 explorer/.windows-build-venv/
 explorer/.windows-build-tools/
 
-# Jekyll residue if docs/ is ever built locally (Pages builds it remotely)
+# Jekyll residue from the local preview (tools/pages/); Pages builds remotely.
+# The lock is platform-specific and the github-pages gem pins every version.
 docs/_site/
 docs/.jekyll-cache/
 docs/.jekyll-metadata
+.sass-cache/
+tools/pages/Gemfile.lock
