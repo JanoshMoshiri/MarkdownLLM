@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-09-22
-generated: 2026-09-22T22:54:26
-generated_from: HEAD@dc66a7d
-coverage: 427
+created: 2026-09-23
+generated: 2026-09-23T20:37:35
+generated_from: HEAD@446155b
+coverage: 430
 framework_version: 3.42.0
 ---
 
@@ -14,18 +14,18 @@ framework_version: 3.42.0
 
 | field | things using it |
 |---|---|
-| id | 427 |
-| type | 427 |
-| status | 427 |
-| created | 427 |
-| version | 361 |
-| linked_things | 349 |
-| tags | 326 |
-| origin | 187 |
-| confidence | 184 |
-| session | 181 |
+| id | 430 |
+| type | 430 |
+| status | 430 |
+| created | 430 |
+| version | 364 |
+| linked_things | 352 |
+| tags | 329 |
+| origin | 190 |
+| confidence | 187 |
+| session | 184 |
 | source | 146 |
-| informed_by | 99 |
+| informed_by | 102 |
 | subject | 70 |
 | raised_at | 70 |
 | raised_by | 70 |
@@ -34,14 +34,14 @@ framework_version: 3.42.0
 | priority | 56 |
 | disposition | 51 |
 | disposition_reason | 51 |
-| decided_by | 32 |
+| decided_by | 35 |
 | exposed | 27 |
 | promoted_to | 24 |
 | period_start | 9 |
 | period_end | 9 |
 | domain | 9 |
-| triggers | 8 |
 | completed | 8 |
+| triggers | 7 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |

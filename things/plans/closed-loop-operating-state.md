@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 2.1
+version: 2.2
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -300,6 +300,13 @@ Two honesty clauses, so the picture cannot be over-read:
         condition at launch — the loop-optimisation insight's own dismissal
         condition, built in rather than owed; building it promotes that
         insight. The installation grant is the operator's (census row 7).
+  - [ ] **2c — Re-host: headless, on the substrate machine.** *Ruled
+        2026-09-23 (`dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23`):
+        one tick per machine — a native scheduled task launching a harness's
+        headless mode (`claude -p`, `codex exec`) with the launch composed by
+        `dispatch-payload`; scope is a flag, not a second dispatcher. The
+        command is `tools/dispatch/tick.ps1`; the registration and the trust
+        grant are the operator's. Closes on the first tick's digest.*
 - [ ] **Phase 3 — The seat protocol.** Define how the system presents work
       at each seat: dissemination briefs that carry options with evidence;
       conflicts that carry proposed directions; approvals as a queue the
@@ -342,6 +349,13 @@ Two honesty clauses, so the picture cannot be over-read:
       phase's open gap, and the cue is the template the others will copy or
       refute. First live reading on the root: 36 unraised since the 27 August
       retrospective.*
+      *Ruled v2.2 (2026-09-23, `open-questions-arrive-as-a-prompt-2026-09-23`):
+      the presentation half — every seat item emitted as a prompt, options
+      with the recommended one first and an explicit skip, a skip deferring
+      to the next session and never dismissing. The assembly half stays this
+      phase's open gap. Same day the raise became mechanical (`mdllm cues
+      --raise`), so the first items rendered in that shape will be
+      machine-raised.*
 - [ ] **Phase 4 — One full cycle, hands-off, at one radius.** *Pilot ruled
       2026-08-28 (`gates-census-ratified-2026-08-28`): `regulated-qms`, on the
       stated criterion — declared, gap-free, two real runs behind it, one

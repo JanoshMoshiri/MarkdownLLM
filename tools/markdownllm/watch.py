@@ -63,6 +63,7 @@ BAD_READ_LOSS = 2
 DEFAULT_INTERVAL = 60.0
 POLL_TIMEOUT = 30.0
 FETCH_TIMEOUT = 120.0
+LOCAL_TIMEOUT = 20.0   # rev-parse / merge-base / rev-list: local reads, never the network
 
 
 class WatchError(RuntimeError):
@@ -133,6 +134,10 @@ class _LoopState:
     board: dict[str, str] = field(default_factory=dict)
     last_head: str | None = None
     seen: bool = False
+    # The local tip this watch last rang its own role for — a turn that
+    # never left. Once per tip: an agent that has not yet acted is not rung
+    # every poll; one that commits again without publishing is rung again.
+    woke_unpublished: str | None = None
 
 
 def state_path_for(config: WatchConfig) -> Path:
@@ -276,6 +281,7 @@ def _load_state(path: Path) -> _LoopState:
         board={str(k): str(v) for k, v in board.items()},
         last_head=raw.get("last_head") or None,
         seen=bool(raw.get("seen")),
+        woke_unpublished=raw.get("woke_unpublished") or None,
     )
 
 
@@ -293,6 +299,7 @@ def _save_state(path: Path, state: _LoopState) -> None:
             "board": state.board,
             "last_head": state.last_head,
             "seen": state.seen,
+            "woke_unpublished": state.woke_unpublished,
         }, indent=2, sort_keys=True), encoding="utf-8")
     except OSError:
         # A watcher that cannot persist still watches; it just re-reports on
@@ -337,6 +344,85 @@ def _fetch(config: WatchConfig) -> str | None:
         detail = redact((result.stderr or "").strip(), token).splitlines()
         return detail[0] if detail else "fetch failed"
     return None
+
+
+def _local_ref(root: Path, ref: str) -> str | None:
+    r = git_command(root, "rev-parse", "--verify", "-q", ref, timeout=LOCAL_TIMEOUT)
+    if r is None or r.returncode != 0:
+        return None
+    return r.stdout.strip() or None
+
+
+def _object_known(root: Path, sha: str) -> bool:
+    r = git_command(root, "cat-file", "-e", f"{sha}^{{commit}}", timeout=LOCAL_TIMEOUT)
+    return r is not None and r.returncode == 0
+
+
+def _is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
+    r = git_command(root, "merge-base", "--is-ancestor", ancestor, descendant,
+                    timeout=LOCAL_TIMEOUT)
+    return r is not None and r.returncode == 0
+
+
+def local_publication_state(config: WatchConfig,
+                            remote_head: str) -> tuple[str, str | None]:
+    """Where this clone's own branch stands against the ref it watches.
+
+    `published` (equal), `behind`, `unpublished` (local ahead: a turn that
+    never left), `diverged` (both moved), `absent` (no local branch of that
+    name), or `unknown` (the remote head is not in this clone's objects yet,
+    so ancestry cannot be read — never guessed as divergence). The one local
+    read the watch makes, and it reads refs, never the worktree. It exists
+    for the one failure the remote ref cannot show: a commit that succeeded
+    while its push was rejected leaves this side holding every local sign of
+    a handover and the other side seeing nothing
+    (loop-turns-self-heal-2026-09-23).
+    """
+    local = _local_ref(config.root, f"refs/heads/{config.branch}")
+    if local is None:
+        return "absent", None
+    if local == remote_head:
+        return "published", local
+    if not _object_known(config.root, remote_head):
+        return "unknown", local
+    if _is_ancestor(config.root, remote_head, local):
+        return "unpublished", local
+    if _is_ancestor(config.root, local, remote_head):
+        return "behind", local
+    return "diverged", local
+
+
+def _self_wake(config: WatchConfig, head: str, state: _LoopState,
+               state_path: Path) -> bool:
+    """Ring this role for its own turn that never left — once per local tip.
+
+    The floor reports and never resolves: the pull, the merge and the push
+    are the agent's, and a merge it cannot make cleanly is filed to the seat.
+    Record, then signal: the state is saved before the line is printed, so a
+    restart does not ring twice for one tip.
+    """
+    kind, local = local_publication_state(config, head)
+    if kind in ("unpublished", "diverged"):
+        if state.woke_unpublished == local:
+            return False
+        r = git_command(config.root, "rev-list", "--count", f"{head}..{local}",
+                        timeout=LOCAL_TIMEOUT)
+        ahead = r.stdout.strip() if r is not None and r.returncode == 0 else "?"
+        state.woke_unpublished = local
+        _save_state(state_path, state)
+        moved = " and the remote moved under it" if kind == "diverged" else ""
+        print(f"{config.role.upper()} UP: your last turn never left — local "
+              f"{config.branch} is {ahead} commit(s) ahead of "
+              f"{config.remote}/{config.branch}{moved} ({kind}). Pull, merge, "
+              f"push again; a merge you cannot make cleanly goes to the seat, "
+              f"not to a guess. (loop-turns-self-heal-2026-09-23)")
+        return True
+    if state.woke_unpublished is not None and kind in ("published", "behind"):
+        state.woke_unpublished = None
+        _save_state(state_path, state)
+        print(f"published [{config.role}]: the turn that had not left is on "
+              f"{config.remote}/{config.branch} now")
+    return False
 
 
 def _realises(meta: dict, run_id: str) -> bool:
@@ -593,6 +679,10 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             failures = 0
 
         if state.last_head == head:
+            # Nothing moved on the ref — the one case where this clone's own
+            # turn that never left would otherwise be silence.
+            if _self_wake(config, head, state, state_path) and config.exit_on_wake:
+                return 0
             if config.once:
                 return 0
             time.sleep(config.interval)
@@ -636,7 +726,7 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             time.sleep(config.interval)
             continue
 
-        woke = False
+        woke = _self_wake(config, head, state, state_path)
         if not state.seen:
             print(f"baseline: {len(board)} thing(s) on the board at {head[:8]}")
         else:

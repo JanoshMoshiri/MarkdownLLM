@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-22
-generated: 2026-09-22T22:54:26
-generated_from: HEAD@dc66a7d
-coverage: 427
+created: 2026-09-23
+generated: 2026-09-23T20:37:35
+generated_from: HEAD@446155b
+coverage: 430
 framework_version: 3.42.0
 ---
 
@@ -568,6 +568,10 @@ framework_version: 3.42.0
 - dispatch-host-design-2026-08-29 --references--> portability-claims-need-execution-tests
 - dispatch-host-design-2026-08-29 --implements--> coordination-claim-specification
 - dispatch-host-design-2026-08-29 --implements--> consequence-is-recoverable-only-in-retrospect
+- dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 --informs--> closed-loop-operating-state
+- dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 --extends--> dispatch-design-2026-08
+- dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 --informs--> retrospective-cadence-is-a-dated-chase-2026-09-13
+- dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 --references--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - dissolve-continuity-into-reconciliation --implements--> change-reconciliation-specification
 - dissolve-continuity-into-reconciliation --references--> session-memory-specification
 - dissolve-continuity-into-reconciliation --references--> retrospective-specification
@@ -981,6 +985,10 @@ framework_version: 3.42.0
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> session-memory-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --informs--> orchestration-specification
 - long-running-tasks-lack-pre-compaction-checkpoint --references--> git-workflow-specification
+- loop-turns-self-heal-2026-09-23 --informs--> standing-watch-specification
+- loop-turns-self-heal-2026-09-23 --informs--> git-workflow-specification
+- loop-turns-self-heal-2026-09-23 --informs--> substrate-native-a2a
+- loop-turns-self-heal-2026-09-23 --extends--> between-sessions-surface-is-real-2026-09-21
 - markdownllm-desktop-is-primary-accessible-product --superseded-by--> harness-native-onramp-supersedes-desktop
 - markdownllm-desktop-is-primary-accessible-product --supersedes--> explorer-publication-position
 - markdownllm-desktop-is-primary-accessible-product --informs--> interface-specification
@@ -1044,6 +1052,10 @@ framework_version: 3.42.0
 - nested-isolation-is-declared-upward-and-silent-downward --complements--> isolation-must-contain-writes-not-just-reads
 - nested-isolation-is-declared-upward-and-silent-downward --informs--> session-start-hardening
 - nested-isolation-is-declared-upward-and-silent-downward --references--> read-thing-specification
+- open-questions-arrive-as-a-prompt-2026-09-23 --informs--> closed-loop-operating-state
+- open-questions-arrive-as-a-prompt-2026-09-23 --extends--> unattended-cue-carrier-2026-09-12
+- open-questions-arrive-as-a-prompt-2026-09-23 --informs--> cue-carrier
+- open-questions-arrive-as-a-prompt-2026-09-23 --references--> emitted-content-is-read-instructed-content-is-economised
 - operating-is-programming --extends--> the-notation-changed-not-the-primitives
 - operating-is-programming --supports--> asks-travel-as-exposed-things
 - operating-is-programming --derived-from--> assistant-register

@@ -501,9 +501,75 @@ def _covers(cue: dict, position: int, day: dt.date) -> bool:
     return created is not None and day <= created
 
 
+CUE_RAISED_BODY = """---
+id: {cue_id}
+type: cue
+status: open
+version: 1.0
+created: {today}
+subject: {subject}
+raised_at: {sha}
+raised_by: "floor — mdllm cues --raise"
+verdict:
+verdict_reason:
+tags: [cue, raised-mechanically]
+---
+
+# Cue: `{subject}` was modified — inflection?
+
+## The Change
+Raised by the floor on {today}: `{subject}` is reasoned-from ({reason}) and
+was modified in {commits} commit(s) since the baseline {baseline} — latest
+{latest} (`{sha7}`) — with no cue covering the change. `mdllm touchpoints
+{subject}` lists what depends on it; `git log -p {sha7}` shows what moved.
+The raise is mechanical (`inflection-candidates-are-computable`); the
+verdict never is (`unattended-cue-carrier-2026-09-12`).
+
+## The Question
+Does this change alter the logical path — a rule, a workflow, a thing the
+domain reasons from — or only how an existing path is expressed?
+(`change-reconciliation.md` → The Driver Names The Inflection.)
+
+## The Answer
+Open. Two verdicts, for a human or for the framework agent citing the ruling
+that already covers it (`framework-agent-closes-settled-cues-2026-09-13`);
+set `verdict`, `verdict_reason` and `status: answered` in one commit:
+
+1. `not-inflection` — the dependants still hold as written; say why.
+2. `inflection` — run the four beats (cue → assimilate → walk → seal) and
+   name the touch points walked and the commit that sealed them.
+"""
+
+
+def raise_cues(root: Path, rep: dict) -> list[Path]:
+    """Write one open `type: cue` thing per unraised subject — the mechanical
+    half of the carrier (`inflection-candidates-are-computable`). The verdict
+    is left empty: a raise is a question, and only a human, or the framework
+    agent citing a ruling, answers it. Never overwrites — a cue already on
+    disk today for that subject is kept, whoever raised it."""
+    today = dt.date.today().isoformat()
+    cues_dir = root / "things" / "cues"
+    written: list[Path] = []
+    for r in rep["unraised"]:
+        cue_id = f"cue-{r['subject']}-{today}"
+        path = cues_dir / f"{cue_id}.md"
+        if path.exists():
+            continue
+        cues_dir.mkdir(parents=True, exist_ok=True)
+        sha = str(r["latest_sha"])
+        path.write_text(CUE_RAISED_BODY.format(
+            cue_id=cue_id, today=today, subject=r["subject"], sha=sha,
+            sha7=sha[:7], reason=r["reason"], commits=r["commits"],
+            baseline=rep["baseline"], latest=r["latest"]),
+            encoding="utf-8", newline="\n")
+        written.append(path)
+    return written
+
+
 def cmd_cues(args) -> int:
     """Advisory, exit 0 always: the cue question, read back off the commit
-    stream and held until answered. Reports; never raises or answers."""
+    stream and held until answered. Reports; with `--raise` writes the open
+    cue for each unraised modification — never the verdict."""
     root = Path(args.path).resolve()
     try:
         corpus, _ = scan(root)
@@ -544,4 +610,17 @@ def cmd_cues(args) -> int:
     if not rep["open"] and not rep["unraised"]:
         print("- none — every reasoned-from modification since the baseline is "
               "covered, and no cue is open.")
+    if getattr(args, "raise_", False):
+        if rep["unraised"]:
+            written = raise_cues(root, rep)
+            print(f"- **Raised ({len(written)}):** open cue thing(s) written — the "
+                  f"verdict is still owed on each; rebuild the indexes "
+                  f"(`mdllm index . rebuild`) and commit them together:")
+            for p in written:
+                print(f"    - {p.relative_to(root).as_posix()}")
+            if len(written) < len(rep["unraised"]):
+                print("    - (a cue already on disk today for a subject was kept, "
+                      "not overwritten)")
+        else:
+            print("- nothing to raise")
     return 0

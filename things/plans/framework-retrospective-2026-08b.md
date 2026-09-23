@@ -2,15 +2,11 @@
 id: framework-retrospective-2026-08b
 type: plan
 status: completed
-version: 1.1
+version: 1.2
 completed: 2026-08-27
 created: 2026-08-20
 priority: high
 tags: [retrospective, cadence, insight-triage, consolidation, reflexive-scans]
-triggers:
-  - type: time
-    condition: "2026-08-27 reached"
-    action: "Chase: if the 2026-08b retrospective has not been written, surface the wait itself — the debt is now three weeks past its own volume and milestone triggers"
 linked_things:
   - id: framework-retrospective-2026-08a
     relation: extends

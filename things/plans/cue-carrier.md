@@ -2,7 +2,7 @@
 id: cue-carrier
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-09-12
 session: 2026-09-12
 priority: high
@@ -112,6 +112,9 @@ is the seeing.
       and files it. Record both as evidence, including what the shape got
       wrong. Then decide whether the cue stays a thing, becomes a computed
       view only, or grows an age finding like conflicts have.
+      *2026-09-23: the raise is mechanical now (`mdllm cues --raise`, run by
+      a tick or offered at session start), so the dispatch half of this box
+      reads "one dispatch run that runs the raise and files what it raised".*
       *First observations, 2026-09-12, from the build itself:*
       · *The loud half is loud.* First live reading on this root: **36
         unraised** reasoned-from modifications since the 27 August

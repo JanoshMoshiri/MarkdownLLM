@@ -2,7 +2,7 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.4
+version: 1.5
 created: 2026-06-13
 linked_things:
   - id: thing-specification
@@ -354,7 +354,7 @@ The split follows the framework's standard division of labour:
 | The declared affected set is complete | Deterministic floor | `mdllm touchpoints <id>` (live), over the same edges the `relationships` + `provenance` indexes hold (`derived-index.md`, `provenance.md`) |
 | Prose references the indexes miss | Deterministic floor (textual) | `mdllm touchpoints` literal tier + corpus grep for the thing's canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
-| The cue question waits until it is answered | Deterministic floor | `mdllm cues` — open `type: cue` things plus reasoned-from modifications since the newest retrospective that no cue covers; the same line in every session-start digest (*The Cue Persists*) |
+| The cue question waits until it is answered | Deterministic floor | `mdllm cues` — open `type: cue` things plus reasoned-from modifications since the newest retrospective that no cue covers; the same line in every session-start digest (*The Cue Persists*); `mdllm cues --raise` writes the open cue thing for every unraised modification — the raise is mechanical, the verdict never is |
 | The answer carries a receipt | Floor (shape) + **the human** (verdict), or the framework agent citing the human's decision | `type: cue` — `verdict` from the two-value set and a `verdict_reason`; Error without them; `informed_by` pins the ruling that covers it. The verdict itself is never mechanised |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
 | Does each touch point still hold? | **Agent (semantic)** | `validate.thing.md` Layer 2 — the Walk |

@@ -2,7 +2,7 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.2
+version: 0.3
 created: 2026-09-21
 linked_things:
   - id: thing-specification
@@ -182,7 +182,10 @@ domain's turn token.
 
 **What it never does.** It never writes, never commits, never resolves a
 divergence, and never advances a turn. It reads a ref, reports a change, and
-exits. The turn stays the agent's act and the ruling stays the human's.
+exits; it also reads its own clone's branch against that ref, because the one
+failure the ref cannot show — a turn that never left — is visible only there
+(`loop-turns-self-heal-2026-09-23`). The turn stays the agent's act and the
+ruling stays the human's.
 
 ## The Five Inherited Decisions
 
@@ -285,7 +288,8 @@ watch for the run it moved *to* sees it arrive.
 | Diff, emit, persist, then exit on this role's entry | **floor** (running) | Record, then signal — the ordering is load-bearing. |
 | Rise on exit 0 | **harness** | The wake itself. `--exit-on-wake` is the contract; what rises is the adapter's act. Optional, and never the difference between the substrate working and not. |
 | Take the turn — read the thing, do the work, move the token, publish | **agent** | Everything after the doorbell. The watch never advances anything. |
-| Confirm the turn has *passed* — from the ref, never the local clone | **agent** | A commit can succeed while its push is rejected; the committing side then holds every local indication that it handed over while the other side sees nothing. An instance that cannot publish its turn is blocked and says so. |
+| Report this clone's own turn that never left — the local branch ahead of, or diverged from, the ref — and wake this role, once per local tip | **floor** (running) | A commit can succeed while its push is rejected; the committing side then holds every local indication that it handed over while the other side sees nothing. The ref cannot show it; the local branch can, and only on this side (`loop-turns-self-heal-2026-09-23`). |
+| Take that wake: pull, merge, push again — and file a merge it cannot make cleanly to the seat | **agent** | The decision a rejected push owes belongs to whoever holds the turn. The floor rings and never merges; an instance that still cannot publish is blocked and says so. |
 | Rule | **human** | The loop exists to make one act better-informed, not to remove it. |
 
 ## What This Refuses

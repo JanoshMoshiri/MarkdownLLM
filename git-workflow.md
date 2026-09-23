@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: 1.8
+version: 1.9
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -37,7 +37,7 @@ linked_things:
 
 **Publication:** the autopush leg (post-commit hook) publishes a floor-validated commit **only** when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off; publication authority never comes from silence. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) declare false, so a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under explicitly enabled autopush, an anomaly report.
 
-**Turn-taking is publication, not commit.** Where two instances take turns through the repository, a turn has not passed until its new state is visible on the remote — confirm from the ref, never from the local clone. A commit can succeed while its push is rejected, and the committing side then holds every local indication that it handed over while the other side sees nothing; neither is wrong and nothing reports an error. That is silence indistinguishable from *nothing moved*. An instance that cannot publish its turn is blocked and says so; it never resolves the divergence to get unstuck.
+**Turn-taking is publication, not commit.** Where two instances take turns through the repository, a turn has not passed until its new state is visible on the remote — confirm from the ref, never from the local clone. A commit can succeed while its push is rejected, and the committing side then holds every local indication that it handed over while the other side sees nothing; neither is wrong and nothing reports an error. That is silence indistinguishable from *nothing moved*. An instance that cannot publish its turn is blocked and says so; it never resolves the divergence to get unstuck. The watch says so on the side that can see it: `mdllm watch` reads its own clone's branch against the ref and wakes that role for a turn that never left — pull, merge, push again — while the floor itself never merges (`loop-turns-self-heal-2026-09-23`).
 
 **Commit at meaning boundaries:** thing created · status transition · write-session unit · validation fixes · session end (nothing left uncommitted across sessions).
 

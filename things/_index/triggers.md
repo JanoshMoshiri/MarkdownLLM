@@ -3,10 +3,10 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-09-22
-generated: 2026-09-22T22:54:25
-generated_from: HEAD@dc66a7d
-coverage: 8
+created: 2026-09-23
+generated: 2026-09-23T20:37:35
+generated_from: HEAD@446155b
+coverage: 7
 framework_version: 3.42.0
 ---
 
@@ -23,10 +23,6 @@ framework_version: 3.42.0
 ## estate-workflow-derivation
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-09-10 reached, action=The MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered.
-
-## framework-retrospective-2026-08b
-- status: completed  due_date: —
-- trigger: type=time, condition=2026-08-27 reached, action=Chase: if the 2026-08b retrospective has not been written, surface the wait itself — the debt is now three weeks past its own volume and milestone triggers
 
 ## framework-retrospective-2026-09
 - status: complete  due_date: —

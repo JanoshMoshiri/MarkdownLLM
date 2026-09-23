@@ -184,24 +184,13 @@ For a domain in production use, the framework's own repository is the working ex
 Since v3.0, the framework pairs its specifications with a small CLI (one entry file, a package of single-responsibility modules behind it — Python 3.10+ with PyYAML is the runtime requirement, and the shared launcher described below handles managed shells where `python` or PyYAML is not otherwise available). It deterministically evaluates the structural invariants each command declares; it does not certify semantic truth or agent adherence. In the examples, `mdllm` is route-neutral notation: use `./tools/mdllm.ps1` on Windows PowerShell, or `python tools/mdllm.py` elsewhere only with an interpreter that can import PyYAML:
 
 ```bash
-mdllm validate <domain>      # structure, references, schema, declared derivations — exit 1 on Errors
-mdllm install-hook <domain>  # git hooks: pre-commit validation + cue, commit-msg boundary, post-commit publication
-mdllm doctor <domain> --harness codex  # independent adapter/runtime/trust/execution facts
-mdllm adapter-install <domain> --harness codex --dry-run  # exact owned diff, no write
-# Exact recognised legacy only: add --refresh-legacy; review with --dry-run first
-mdllm scaffold <new-domain> --harness codex  # deterministic birth + selected outer adapter
-mdllm triggers <domain>      # deadline & trigger evaluation + horizon; --estate rolls up every local domain
-mdllm provenance <domain>    # decision pins resolve; no output rests on unverified content
-mdllm calc <domain>          # declared derivations (`computed:`) — the floor does every sum
-mdllm estate-sync            # fetch + ff-only pull; --require-fresh = strict manual state; --status = publication debt
-mdllm imports-check <domain> # cross-domain imports re-checked against the source's face
-mdllm external-trust review <server> --path <domain> # inspect exact .mcp.json authority before command/network use
-mdllm eval <domain> --fixture evals/x.yaml   # golden-scenario assertions
-mdllm kernel                 # regenerate the operative kernel from spec blocks
-mdllm session-start <domain> # emit the startup ritual + orient view (open loops) for a SessionStart hook to inject at t=0
+mdllm scaffold <path> --harness <choice>         # a domain's deterministic birth — asks for the harness at a keyboard
+mdllm validate <domain>                          # structure, references, schema, declared derivations — exit 1 on Errors
+mdllm install-hook <domain>                      # the git floor: pre-commit validation + cue, commit-msg boundary, post-commit publication
+mdllm session-start <domain>                     # the startup ritual + orient view, for a SessionStart hook to inject at t=0
 ```
 
-That's the working core — `mdllm --help` lists the full command surface (coherence checks, blast-radius reads, the disclosure boundary, MCP serving, and more; [framework-map.md](docs/framework-map.md) View 3 maps each subcommand to the spec it mechanises). The commit boundary carries three legs: **pre-commit** validates and asks the change-reconciliation cue question, **commit-msg** enforces the local disclosure boundary, and **post-commit** publishes a floor-validated commit (`mdllm autopush`) only when the repo literally declares `git.autopush: true`. False, absent, or malformed values do not publish; this release surface declares false, so a public release stays a deliberate human act.
+Those are the four a first hour types. The full toolbox — every subcommand with its exact usage and the tool's own description — is generated from `--help` into [the operator's guide](https://janoshmoshiri.github.io/MarkdownLLM/operator-guide.html#the-toolbox) and drift-gated at every commit; [framework-map.md](docs/framework-map.md) View 3 maps each subcommand to the spec it mechanises. The commit boundary carries three legs: **pre-commit** validates and asks the change-reconciliation cue question, **commit-msg** enforces the local disclosure boundary, and **post-commit** publishes a floor-validated commit (`mdllm autopush`) only when the repo literally declares `git.autopush: true`. False, absent, or malformed values do not publish; this release surface declares false, so a public release stays a deliberate human act.
 
 Each domain declares its thing types, **its own status vocabularies**, and which of those statuses mean *settled* in a normative schema (`things/_schema.yaml`) — the validator enforces what the domain declares. Agents load the generated [kernel.md](kernel.md) — the operative rules at a small fraction of the full-spec cost (`mdllm tokens` measures the live split; figures are not restated in prose, where they have drifted four times) — at session start; the full specs remain the canonical elaboration, loaded on demand. A harness can deliver that startup ritual *mechanically*: `mdllm session-start` feeds a lifecycle hook so the agent runs version-check + velocity and reads the generated **orient** view — the open loops (non-terminal owned work + open conflicts; imported mirrors file under a separate Watched line) that replace the retired `continuity.md` — at t=0 rather than hoping it surfaces from a long entry file. `scaffold --harness <registered>|all|none` selects the outer adapter projection; omitted, `scaffold` asks at a keyboard and refuses with the list otherwise (no default since 3.41.0), while a run-time-bound selection may have no project artifact to render (see *Vendor setup*). Requires Python 3.10+ and PyYAML; `tiktoken` optional for token measurement.
 

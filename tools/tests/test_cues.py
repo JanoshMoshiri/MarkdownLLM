@@ -270,3 +270,68 @@ def test_session_start_is_quiet_when_every_cue_is_answered(tmp_path, capsys):
     cmd_session_start(argparse.Namespace(path=str(root)))
     out = capsys.readouterr().out
     assert "Reconciliation cues" not in out
+
+
+# ------------------------------------------------------------ the mechanical raise
+
+def _run_raise(root: Path, capsys):
+    from markdownllm.touchpoints import cmd_cues
+    rc = cmd_cues(argparse.Namespace(path=str(root), since=None, raise_=True))
+    return rc, capsys.readouterr().out
+
+
+def test_raise_writes_an_open_cue_that_covers_the_change(tmp_path, capsys):
+    """`mdllm cues --raise`: the raise is mechanical, the verdict is not. The
+    written cue pins the modifying commit, carries no verdict, and the next
+    read lists it as unanswered rather than the change as unraised."""
+    import datetime as dt
+    root = _seed(tmp_path)
+    sha = _modify(root, "things/spine.md", "revise spine")
+    rc, out = _run_raise(root, capsys)
+    assert rc == 0 and "Raised (1)" in out
+    path = root / "things" / "cues" / f"cue-spine-{dt.date.today().isoformat()}.md"
+    assert path.exists() and path.as_posix().endswith(out.split("- things/")[-1].split("\n")[0])
+    text = path.read_text(encoding="utf-8")
+    assert "status: open" in text and "subject: spine" in text
+    assert f"raised_at: {sha}" in text
+    assert "raised_by: \"floor — mdllm cues --raise\"" in text
+    assert "verdict:\n" in text and "verdict: inflection" not in text
+    assert "3 inbound edge(s)" in text and sha[:7] in text
+
+    rc, out = _run_cues(root, capsys)
+    assert "Unanswered (1)" in out and "cue-spine-" in out
+    assert "Unraised" not in out
+
+
+def test_raise_leaves_a_cue_the_validator_accepts(tmp_path, capsys):
+    root = _seed(tmp_path)
+    _modify(root, "things/spine.md", "revise spine")
+    _run_raise(root, capsys)
+    errs = [m for m in messages(all_findings(root), "Error") if "cue" in m]
+    assert errs == [], errs
+
+
+def test_raise_never_overwrites_a_cue_already_on_disk_today(tmp_path, capsys):
+    import datetime as dt
+    root = _seed(tmp_path)
+    sha = _modify(root, "things/spine.md", "revise spine")
+    cues = root / "things" / "cues"
+    cues.mkdir()
+    hand = cues / f"cue-spine-{dt.date.today().isoformat()}.md"
+    hand.write_text(_cue("spine", sha, created=dt.date.today().isoformat()),
+                    encoding="utf-8")
+    before = hand.read_text(encoding="utf-8")
+    rc, out = _run_raise(root, capsys)
+    assert rc == 0
+    assert hand.read_text(encoding="utf-8") == before
+    # The hand-raised cue already covers the change, so there is nothing
+    # unraised to write: the raise respects a cover, whoever made it.
+    assert "nothing to raise" in out
+
+
+def test_raise_with_nothing_unraised_says_so(tmp_path, capsys):
+    root = _seed(tmp_path)
+    _modify(root, "things/leaf0.md", "tweak leaf")
+    rc, out = _run_raise(root, capsys)
+    assert rc == 0 and "nothing to raise" in out
+    assert not (root / "things" / "cues").exists()

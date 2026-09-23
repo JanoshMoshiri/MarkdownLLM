@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-09-19
 priority: high
 informed_by:
@@ -353,6 +353,9 @@ status-keyed board.
 - [x] `mdllm watch` exists and is tested (22 cases); the PowerShell route is
       exercised in Phase 4.
 - [x] The git-workflow kernel carries the turn-taking corollary.
+- [x] A turn that never left wakes its own side — the silent drop-off seen in
+      the field is loud where it can be seen (`loop-turns-self-heal-2026-09-23`,
+      built 2026-09-23; the heal itself stays the agent's).
 - [ ] One real turn has crossed in a live domain with no human relay, woken by
       the command and not by a script. *(The board is ready and armed; the turn
       itself waits on the two instances working.)*

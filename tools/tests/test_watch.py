@@ -699,3 +699,127 @@ class TestSingleInstance:
     def test_a_nonsense_pid_reads_as_dead(self):
         assert watch_mod._process_alive(0) is False
         assert watch_mod._process_alive(-1) is False
+
+
+class TestSelfHeal:
+    """`loop-turns-self-heal-2026-09-23`: a turn that never left wakes its own
+    side. The ref cannot show it — `test_an_unpushed_handover_is_not_a_turn`
+    pins that the other side sees nothing — so the watch reads its own
+    clone's branch against the ref, and rings this role once per local tip.
+    The floor rings; the merge stays the agent's.
+    """
+
+    STAGES = TestRealRemoteTurn.STAGES
+
+    @pytest.fixture
+    def clones(self, tmp_path):
+        bare = tmp_path / "origin.git"
+        _sync_git(tmp_path, "init", "-q", "--bare", str(bare))
+        _sync_git(tmp_path, "--git-dir", str(bare),
+                  "symbolic-ref", "HEAD", "refs/heads/main")
+        writer = tmp_path / "writer"
+        _sync_git(tmp_path, "clone", "-q", str(bare), str(writer))
+        _sync_git(writer, "checkout", "-q", "-b", "main")
+        _schema(writer)
+        _write(writer, {**DEFINITION, "stages": self.STAGES})
+        _write(writer, _spec("m04-design", "draft"))
+        _sync_git(writer, "add", "-A")
+        _sync_git(writer, "commit", "-q", "-m", "create: the board")
+        _sync_git(writer, "push", "-q", "-u", "origin", "main")
+        reviewer = tmp_path / "reviewer"
+        _sync_git(tmp_path, "clone", "-q", str(bare), str(reviewer))
+        _sync_git(reviewer, "checkout", "-q", "-b", "main", "origin/main")
+        return writer, reviewer
+
+    def _watch(self, root, role, **kw):
+        return watch_mod.cmd_watch(_args(root, role=role, **kw))
+
+    def _handover_unpublished(self, writer, msg="handover (unpublished)"):
+        spec = writer / "things" / "m04-design.md"
+        spec.write_text(spec.read_text(encoding="utf-8")
+                        .replace("status: draft", "status: review"),
+                        encoding="utf-8")
+        _sync_git(writer, "commit", "-qam", msg)
+
+    def test_an_unpushed_handover_wakes_its_own_side(self, clones, capsys):
+        writer, reviewer = clones
+        assert self._watch(writer, "writer") == 0
+        capsys.readouterr()
+
+        self._handover_unpublished(writer)
+
+        assert self._watch(writer, "writer", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "WRITER UP: your last turn never left" in out
+        assert "1 commit(s) ahead of origin/main (unpublished)" in out
+        assert "Pull, merge, push again" in out
+        # And still nothing on the other side: the ref did not move.
+        assert self._watch(reviewer, "reviewer") == 0
+        capsys.readouterr()
+        assert self._watch(reviewer, "reviewer", exit_on_wake=True) == 0
+        assert "REVIEWER UP" not in capsys.readouterr().out
+
+    def test_the_wake_is_once_per_local_tip(self, clones, capsys):
+        writer, _ = clones
+        assert self._watch(writer, "writer") == 0
+        self._handover_unpublished(writer)
+        assert self._watch(writer, "writer") == 0
+        assert "WRITER UP: your last turn never left" in capsys.readouterr().out
+
+        # Same tip, next poll: the agent has been told; do not ring again.
+        assert self._watch(writer, "writer") == 0
+        assert "WRITER UP" not in capsys.readouterr().out
+
+        # A further unpublished commit is a new tip: ring again.
+        (writer / "things" / "note.md").write_text(
+            "---\nid: note\ntype: design-spec\nstatus: draft\ncreated: 2026-09-23\n---\n\n# n\n",
+            encoding="utf-8")
+        _sync_git(writer, "add", "-A")
+        _sync_git(writer, "commit", "-qm", "another unpublished commit")
+        assert self._watch(writer, "writer") == 0
+        assert "2 commit(s) ahead of origin/main" in capsys.readouterr().out
+
+    def test_a_diverged_clone_is_told_the_remote_moved(self, clones, capsys):
+        writer, reviewer = clones
+        assert self._watch(writer, "writer") == 0
+        self._handover_unpublished(writer)
+        capsys.readouterr()
+
+        # The other side publishes meanwhile: the writer's push would now be
+        # rejected — exactly the field failure.
+        (reviewer / "things" / "r-note.md").write_text(
+            "---\nid: r-note\ntype: design-spec\nstatus: draft\ncreated: 2026-09-23\n---\n\n# r\n",
+            encoding="utf-8")
+        _sync_git(reviewer, "add", "-A")
+        _sync_git(reviewer, "commit", "-qm", "reviewer publishes")
+        _sync_git(reviewer, "push", "-q", "origin", "main")
+
+        assert self._watch(writer, "writer") == 0
+        out = capsys.readouterr().out
+        assert "WRITER UP: your last turn never left" in out
+        assert "the remote moved under it (diverged)" in out
+
+    def test_publication_clears_the_debt_and_says_so(self, clones, capsys):
+        writer, _ = clones
+        assert self._watch(writer, "writer") == 0
+        self._handover_unpublished(writer)
+        assert self._watch(writer, "writer") == 0
+        capsys.readouterr()
+
+        _sync_git(writer, "push", "-q", "origin", "main")
+        assert self._watch(writer, "writer") == 0
+        out = capsys.readouterr().out
+        assert "published [writer]: the turn that had not left is on origin/main now" in out
+        assert "WRITER UP" not in out
+
+    def test_the_watch_still_never_writes_or_merges(self, clones):
+        writer, reviewer = clones
+        assert self._watch(writer, "writer") == 0
+        self._handover_unpublished(writer)
+        before = _sync_git(writer, "rev-parse", "HEAD").stdout.strip()
+        remote = _sync_git(writer, "rev-parse", "origin/main").stdout.strip()
+        assert self._watch(writer, "writer") == 0
+        assert _sync_git(writer, "rev-parse", "HEAD").stdout.strip() == before
+        assert _sync_git(writer, "rev-parse", "origin/main").stdout.strip() == remote
+        # The corpus is untouched (the fixture keeps its state file in the clone root).
+        assert _sync_git(writer, "status", "--porcelain", "--", "things").stdout.strip() == ""

@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-22
-generated: 2026-09-22T22:54:26
-generated_from: HEAD@dc66a7d
-coverage: 106
+created: 2026-09-23
+generated: 2026-09-23T20:37:35
+generated_from: HEAD@446155b
+coverage: 109
 framework_version: 3.42.0
 ---
 
@@ -72,9 +72,11 @@ framework_version: 3.42.0
 
 ## closed-loop-operating-state
 - dispatch-design-2026-08 (pinned @926622b64dc3e7a203ba51b548748861b82ff826)
+- dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - gates-census-2026-08 (pinned @8f6d92c2b498ce18c2314fd7001c97a2ddcf5ca0)
 - gates-census-ratified-2026-08-28 (pinned @d818697185cdece9e50f8ad98fc93455ae81531c)
+- open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
 ## codex-desktop-session-start-negative-2026-08-14
@@ -101,6 +103,9 @@ framework_version: 3.42.0
 ## cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - serve-side-blindness-dissolves-into-composition (derived-from)
 
+## cue-carrier
+- open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+
 ## derivation-shape-brief-2026-08
 - derivation-shape-settled-2026-08 (pinned @016150e76f1ae69aefd41331f9da1aa7fed471e6)
 - derivation-shape-settled-2026-08 (derived-from)
@@ -115,6 +120,9 @@ framework_version: 3.42.0
 - cue-substrate-floor-development-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
 - declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
 - declaring-derivation-from-the-atom (derived-from)
+
+## dispatch-design-2026-08
+- dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 
 ## dispatch-digest-home-2026-08-29
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on (derived-from)
@@ -271,6 +279,7 @@ framework_version: 3.42.0
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @e27240d35c954ee43c3b4f5af2998afee51155c6)
 
 ## git-workflow-specification
+- loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## harness-native-onramp-supersedes-desktop
@@ -368,6 +377,9 @@ framework_version: 3.42.0
 - cue-operator-guide-2026-09-22 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
 - public-face-links-out-not-hosts-2026-09-22 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
 
+## retrospective-cadence-is-a-dated-chase-2026-09-13
+- dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+
 ## retrospective-specification
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
@@ -422,6 +434,7 @@ framework_version: 3.42.0
 - serve-side-blindness-dissolves-into-composition (derived-from)
 
 ## standing-watch-specification
+- loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 
 ## status-vocabulary-universal-vs-domain
@@ -433,6 +446,7 @@ framework_version: 3.42.0
 ## substrate-native-a2a
 - a-filter-is-a-missing-instance (derived-from)
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+- loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 
 ## substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 (derived-from)
@@ -460,6 +474,7 @@ framework_version: 3.42.0
 - cue-validate-thing-specification-dark-region-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - feels-automatic-is-persistence-of-the-question (derived-from)
 - framework-agent-closes-settled-cues-2026-09-13 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
+- open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 
 ## universal-workflow-methodology
 - derivation-shape-brief-2026-08 (pinned @3af254117c771488898b861a9e9a30ef934c4794)

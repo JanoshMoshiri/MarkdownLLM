@@ -528,9 +528,13 @@ def build_cli() -> argparse.ArgumentParser:
     cu = sub.add_parser("cues", help="the cue question, persisted: open `type: cue` "
                         "things awaiting a human verdict, plus reasoned-from things "
                         "modified since the last retrospective that no cue covers; "
-                        "session-start emits the same line every session — reports, "
-                        "never raises or answers; exit 0 always")
+                        "session-start emits the same line every session — reports; "
+                        "--raise writes the open cue, never the verdict; exit 0 always")
     cu.add_argument("path", nargs="?", default=".")
+    cu.add_argument("--raise", dest="raise_", action="store_true",
+                    help="write an open `type: cue` thing for every unraised "
+                         "modification — the raise is mechanical, the verdict is "
+                         "not; then rebuild indexes and commit them together")
     cu.add_argument("--since", help="baseline date (YYYY-MM-DD); default: the newest "
                     "retrospective's period end, else 30 days")
     cu.set_defaults(fn=cmd_cues)
