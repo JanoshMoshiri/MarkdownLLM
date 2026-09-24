@@ -39,6 +39,12 @@ an agent. An OpenClaw failure stops the bridge without an automatic retry
 because transport loss can be ambiguous and replaying a turn can duplicate
 work.
 
+The bridge relays MarkdownLLM watch output to its own console and includes a
+bounded copy in the exact-session wake as labelled observed data. An
+unpublished or diverged local turn therefore carries the framework's
+reconciliation observation to the responsible domain agent while Git
+resolution remains outside the adapter.
+
 Both child commands use argv arrays with `shell: false`. On Windows, point
 `--mdllm-command` at Python with `--mdllm-arg` naming `tools/mdllm.py`,
 and point `--openclaw-command` at Node with `--openclaw-arg` naming

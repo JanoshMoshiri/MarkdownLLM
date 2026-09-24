@@ -115,7 +115,7 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 - [x] Target exact agentId and sessionKey through supported CLI or Gateway
   session surfaces.
 - [x] Exercise watch exit codes 0/1/2/3 without advancing workflow state.
-- [ ] Exercise unpublished/diverged local-turn recovery end to end without
+- [x] Exercise unpublished/diverged local-turn recovery end to end without
   resolving Git in the adapter.
 
 ### Phase 4 - deterministic acceptance
@@ -160,7 +160,6 @@ their public semantics have execution evidence.
 
 ## Immediate next move
 
-Complete Phase 3 with deterministic end-to-end evidence that unpublished and
-diverged local turns wake the exact OpenClaw session while the adapter leaves
-Git resolution to the agent. Then begin the OCA-01 through OCA-10 acceptance
-matrix.
+Begin Phase 4 by mapping OCA-01 through OCA-10 to deterministic evidence, then
+close the missing fitness and portability rows before clean-profile live
+acceptance.

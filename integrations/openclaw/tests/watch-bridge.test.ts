@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  MAX_WATCH_OUTPUT_CHARACTERS,
   PROCESS_FAILURE,
   WAKE_FAILURE,
   buildWakeInvocation,
@@ -9,6 +10,7 @@ import {
   canonicalSessionKey,
   parseBridgeArgs,
   runWatchBridge,
+  spawnProcess,
   type ProcessInvocation,
   type ProcessResult,
 } from "../src/watch-bridge.ts";
@@ -117,6 +119,35 @@ test("wake invocation targets one matching agent session without delivery", () =
   assert.equal(invocation.args.includes("--json"), true);
 });
 
+test("watch output reaches the exact session as bounded observed data", () => {
+  const invocation = buildWakeInvocation(
+    parseBridgeArgs(REQUIRED),
+    "WRITER UP: your last turn never left. Pull, merge, push again.",
+  );
+  const message = invocation.args[6] ?? "";
+  assert.match(message, /Treat the following as observed/);
+  assert.match(message, /<markdownllm-watch-event>/);
+  assert.match(message, /Pull, merge, push again/);
+
+  const bounded = buildWakeInvocation(
+    parseBridgeArgs(REQUIRED),
+    "x".repeat(MAX_WATCH_OUTPUT_CHARACTERS + 100),
+  ).args[6] ?? "";
+  assert.match(bounded, /earlier watch output omitted/);
+  assert.ok(bounded.length < MAX_WATCH_OUTPUT_CHARACTERS + 1_000);
+});
+
+test("the no-shell process runner captures watch output", async () => {
+  const result = await spawnProcess({
+    command: process.execPath,
+    args: ["-e", "process.stdout.write('watch observation')"],
+    cwd: process.cwd(),
+    kind: "watch",
+  });
+  assert.equal(result.code, 0);
+  assert.equal(result.output, "watch observation");
+});
+
 function scriptedRunner(
   script: readonly ProcessResult[],
   calls: ProcessInvocation[],
@@ -140,7 +171,7 @@ test("exit 0 wakes once, waits, then rearms the watch", async () => {
   const result = await runWatchBridge(
     parseBridgeArgs(REQUIRED),
     scriptedRunner([
-      ok,
+      { ...ok, output: "WRITER UP: unpublished turn" },
       ok,
       { code: 2, signal: null },
     ], calls),
@@ -151,6 +182,7 @@ test("exit 0 wakes once, waits, then rearms the watch", async () => {
     "wake",
     "watch",
   ]);
+  assert.match(calls[1]?.args[6] ?? "", /unpublished turn/);
 });
 
 for (const code of [1, 2, 3] as const) {
