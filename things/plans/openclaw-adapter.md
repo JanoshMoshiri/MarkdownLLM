@@ -111,11 +111,12 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 
 ### Phase 3 - wake and recovery slice
 
-- [ ] Implement the external bridge around mdllm watch --exit-on-wake.
-- [ ] Target exact agentId and sessionKey through supported CLI or Gateway
+- [x] Implement the external bridge around mdllm watch --exit-on-wake.
+- [x] Target exact agentId and sessionKey through supported CLI or Gateway
   session surfaces.
-- [ ] Exercise every exit code and unpublished/diverged local-turn recovery
-  without resolving Git in the adapter.
+- [x] Exercise watch exit codes 0/1/2/3 without advancing workflow state.
+- [ ] Exercise unpublished/diverged local-turn recovery end to end without
+  resolving Git in the adapter.
 
 ### Phase 4 - deterministic acceptance
 
@@ -159,7 +160,7 @@ their public semantics have execution evidence.
 
 ## Immediate next move
 
-Build Phase 3 around the existing `mdllm watch --exit-on-wake` contract:
-translate one exit-0 result into one exact OpenClaw agent/session continuation,
-restart the watch after the turn and prove exit codes 0/1/2/3 without advancing
-workflow state inside the adapter.
+Complete Phase 3 with deterministic end-to-end evidence that unpublished and
+diverged local turns wake the exact OpenClaw session while the adapter leaves
+Git resolution to the agent. Then begin the OCA-01 through OCA-10 acceptance
+matrix.

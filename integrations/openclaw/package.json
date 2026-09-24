@@ -2,6 +2,9 @@
   "name": "@markdownllm/openclaw-adapter",
   "version": "0.1.0-dev.0",
   "description": "Bind OpenClaw agent sessions to MarkdownLLM domain lifecycle contracts",
+  "bin": {
+    "markdownllm-openclaw-watch": "./dist/cli.js"
+  },
   "type": "module",
   "license": "MIT",
   "files": [

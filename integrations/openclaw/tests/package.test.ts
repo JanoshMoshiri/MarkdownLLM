@@ -11,6 +11,10 @@ async function json(name: string): Promise<Record<string, any>> {
 test("package points at built JavaScript and pins experimental compatibility", async () => {
   const pkg = await json("package.json");
   assert.deepEqual(pkg.openclaw.extensions, ["./dist/index.js"]);
+  assert.equal(
+    pkg.bin["markdownllm-openclaw-watch"],
+    "./dist/cli.js",
+  );
   assert.equal(pkg.peerDependencies.openclaw, ">=2026.9.3 <2026.10.0");
   assert.equal(
     pkg.openclaw.compat.pluginApi,

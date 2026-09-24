@@ -22,3 +22,18 @@ when the floor is launched through an interpreter; for example, configure the
 Python executable as command and the absolute tools/mdllm.py path as the first
 commandArgs item. Paths are passed as argv values, so spaces do not require
 shell quoting.
+
+## Standing watch bridge
+
+The package also builds the `markdownllm-openclaw-watch` command. It runs the
+framework-owned `mdllm watch --exit-on-wake` process, targets one explicit
+OpenClaw `agentId` and canonical `sessionKey` when the watch exits 0, waits
+for that turn to finish, then rearms the watch. Exit codes 1, 2 and 3 never wake
+an agent. An OpenClaw failure stops the bridge without an automatic retry
+because transport loss can be ambiguous and replaying a turn can duplicate
+work.
+
+Both child commands use argv arrays with `shell: false`. On Windows, point
+`--mdllm-command` at Python with `--mdllm-arg` naming `tools/mdllm.py`,
+and point `--openclaw-command` at Node with `--openclaw-arg` naming
+OpenClaw's `openclaw.mjs` entry.
