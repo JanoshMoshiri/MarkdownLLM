@@ -1,0 +1,48 @@
+{
+  "id": "markdownllm",
+  "name": "MarkdownLLM",
+  "description": "Binds designated OpenClaw agents to MarkdownLLM domain lifecycle context",
+  "activation": {
+    "onStartup": true,
+    "onCapabilities": [
+      "hook"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "agentIds"
+    ],
+    "properties": {
+      "agentIds": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "command": {
+        "type": "string",
+        "minLength": 1,
+        "default": "mdllm"
+      },
+      "commandArgs": {
+        "type": "array",
+        "default": [],
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1000,
+        "maximum": 120000,
+        "default": 115000
+      }
+    }
+  }
+}

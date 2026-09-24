@@ -51,8 +51,9 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
    typed hooks, invokes the neutral MarkdownLLM lifecycle runner, and adds
    bounded output through before_prompt_build.
 3. **Session identity stays native.** OpenClaw's agentId and sessionKey remain
-   the runtime identifiers. A compact extension records binding, lifecycle
-   definition hash and last satisfied session generation.
+   the runtime identifiers. A plugin-owned runtime gate records only the
+   lifecycle fingerprint satisfied for that process generation. Restart,
+   reset and compaction invalidate or recreate that bounded state.
 4. **The existing runner owns order.** estate-sync then session-start remains
    one neutral lifecycle intent. The plugin does not duplicate the order or
    invent a second prompt source.
@@ -72,7 +73,7 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 | OCA-02 | Invoke the framework-owned session-start lifecycle intent in declared order through shared launch policy. | Spy-runner tests prove estate-sync precedes session-start and no vendor order enters neutral services. |
 | OCA-03 | Satisfy startup once per logical session generation and re-evaluate on reset, compaction, plugin restart or changed contract fingerprint. | State-transition tests cover duplicate suppression and recovery. |
 | OCA-04 | Deliver bounded, integrity-marked context additively and preserve deferred-read obligations when the full kernel does not fit. | Hook tests prove bounds, section retention, integrity facts and no system-prompt replacement. |
-| OCA-05 | Preserve OpenClaw session ownership while storing only compact binding and provenance metadata in a registered extension. | Session tests prove canonical reuse and reject direct store mutation. |
+| OCA-05 | Preserve OpenClaw session ownership and keep only bounded plugin-owned lifecycle state; never edit OpenClaw session or transcript storage directly. | State-machine tests prove once-per-generation behavior, invalidation and canonical session reuse. |
 | OCA-06 | Surface lifecycle failures honestly, keep advisory failures distinct from enforcement and retain definition-hash-bound evidence. | Matrix covers timeout, missing runtime, stale framework, malformed output and attestation. |
 | OCA-07 | Bind mdllm watch outcomes to the exact agent/session, honour exit codes 0/1/2/3 and never duplicate state or advancement. | Two-role loop tests cover wake, quiet/blind polls, refusals, duplicate watch and unpublished-turn recovery. |
 | OCA-08 | Isolate domains, agents, sessions and plugin state so concurrent loops cannot cross-load or cross-wake. | Multi-domain concurrency tests use distinct fixtures and session keys. |
@@ -92,20 +93,21 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 
 ### Phase 1 - executable contract
 
-- [ ] Add a minimal public fixture domain with deterministic discovery and
+- [x] Add a minimal public fixture domain with deterministic discovery and
   lifecycle output.
-- [ ] Add failing acceptance tests for binding, ordered startup, idempotence,
+- [x] Add failing acceptance tests for binding, ordered startup, idempotence,
   context projection, failure behaviour and isolation.
-- [ ] Freeze plugin manifest, configuration and package goldens.
+- [x] Freeze plugin manifest, configuration and package goldens.
 
 ### Phase 2 - thin lifecycle slice
 
-- [ ] Register openclaw in the MarkdownLLM adapter registry without adding
+- [x] Register openclaw in the MarkdownLLM adapter registry without adding
   vendor conditionals to neutral lifecycle services.
-- [ ] Implement the public plugin entry, strict manifest and typed config.
-- [ ] Project the existing session-start result through additive
+- [x] Implement the public plugin entry, strict manifest and typed config.
+- [x] Project the existing session-start result through additive
   before_prompt_build context.
-- [ ] Register compact session-extension state and invalidation rules.
+- [x] Keep lifecycle state bounded and plugin-owned; add a projected session
+  extension only when a public writable SDK route can support it.
 
 ### Phase 3 - wake and recovery slice
 
@@ -157,6 +159,7 @@ their public semantics have execution evidence.
 
 ## Immediate next move
 
-Build Phase 1 as tests first: a fixture domain, package/manifest goldens and a
-failing OCA-01 to OCA-06 lifecycle suite. Production code follows those tests
-and makes the smallest vertical path pass before wake work begins.
+Build Phase 3 around the existing `mdllm watch --exit-on-wake` contract:
+translate one exit-0 result into one exact OpenClaw agent/session continuation,
+restart the watch after the turn and prove exit codes 0/1/2/3 without advancing
+workflow state inside the adapter.
