@@ -14,6 +14,7 @@ from markdownllm.adapters.openclaw import OPENCLAW  # noqa: E402
 from markdownllm.harness_ports import (  # noqa: E402
     HarnessContext,
     InspectPort,
+    LifecycleAdmissionPort,
     LifecycleOutputPort,
     RenderPort,
 )
@@ -33,6 +34,80 @@ FIXTURE_DOMAIN = (
 def test_public_fixture_domain_discovers_framework_and_emits_start(capsys):
     assert mdllm.cmd_session_start(
         SimpleNamespace(path=str(FIXTURE_DOMAIN))) == 0
+    output = capsys.readouterr().out
+    assert "Session Start" in output
+    assert "Version: in sync" in output
+
+    admission = OPENCLAW.admit_lifecycle(
+        FIXTURE_DOMAIN, CTX, "session-start")
+    assert admission.allowed is True
+    assert "OpenClaw Adapter Fixture" in admission.text
+    assert 'outcome="passed"' in admission.text
+
+def _framework(root: Path) -> None:
+    root.mkdir(parents=True, exist_ok=True)
+    (root / ".markdownllm").write_text(
+        "framework: Fixture\nversion: 1.0\n", encoding="utf-8")
+    (root / "kernel.md").write_text("# Kernel\n", encoding="utf-8")
+
+
+def test_binding_refuses_missing_entry_and_missing_sentinel(tmp_path):
+    missing_entry = OPENCLAW.admit_lifecycle(
+        tmp_path, CTX, "session-start")
+    assert missing_entry.allowed is False
+    assert "no domain AGENTS.md" in missing_entry.text
+
+    domain = tmp_path / "domain"
+    domain.mkdir()
+    (domain / "AGENTS.md").write_text(
+        "---\nname: Broken\nframework_root: ../missing\n---\n",
+        encoding="utf-8",
+    )
+    missing_sentinel = OPENCLAW.admit_lifecycle(
+        domain, CTX, "session-start")
+    assert missing_sentinel.allowed is False
+    assert "does not resolve" in missing_sentinel.text
+
+
+def test_binding_supports_declared_and_ancestor_framework_roots(tmp_path):
+    framework = tmp_path / "framework"
+    _framework(framework)
+
+    declared = tmp_path / "declared"
+    declared.mkdir()
+    (declared / "AGENTS.md").write_text(
+        "---\nname: Declared\nframework_root: ../framework\n---\n",
+        encoding="utf-8",
+    )
+    result = OPENCLAW.admit_lifecycle(
+        declared, CTX, "session-start")
+    assert result.allowed is True
+    assert f"framework_root: {framework.resolve()}" in result.text
+
+    nested = framework / "domains" / "nested"
+    nested.mkdir(parents=True)
+    (nested / "AGENTS.md").write_text(
+        "---\nname: Nested\n---\n", encoding="utf-8")
+    fallback = OPENCLAW.admit_lifecycle(
+        nested, CTX, "session-start")
+    assert fallback.allowed is True
+    assert "domain: Nested" in fallback.text
+
+
+def test_binding_rejects_absolute_framework_root(tmp_path):
+    framework = tmp_path / "framework"
+    _framework(framework)
+    domain = tmp_path / "domain"
+    domain.mkdir()
+    (domain / "AGENTS.md").write_text(
+        "---\nname: Mismatch\nframework_root: "
+        + framework.as_posix()
+        + "\n---\n",
+        encoding="utf-8",
+    )
+    result = OPENCLAW.admit_lifecycle(domain, CTX, "session-start")
+    assert result.allowed is False
+    assert "must be relative" in result.text
 
 
 def test_registered_as_runtime_bound_session_start_adapter():
@@ -40,6 +115,7 @@ def test_registered_as_runtime_bound_session_start_adapter():
     assert isinstance(OPENCLAW, RenderPort)
     assert isinstance(OPENCLAW, InspectPort)
     assert isinstance(OPENCLAW, LifecycleOutputPort)
+    assert isinstance(OPENCLAW, LifecycleAdmissionPort)
     assert OPENCLAW.capabilities().lifecycle_moments == ("session-start",)
 
 

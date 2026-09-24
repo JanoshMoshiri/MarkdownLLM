@@ -24,6 +24,8 @@ from .harness_diagnostics import record_execution_attestation
 from .harness_ports import (
     DOMAIN_ROOT_ARG,
     HarnessContext,
+    LifecycleAdmission,
+    LifecycleAdmissionPort,
     LifecycleBinding,
     LifecycleOutputPort,
 )
@@ -321,9 +323,41 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
         print(f"mdllm: harness {harness!r} has no lifecycle output port")
         return 2
 
-    execution = execute_lifecycle(root, binding)
-    detail = ", ".join(
-        f"{step.operation}={step.returncode}" for step in execution.steps)
+    admission: LifecycleAdmission | None = None
+    if isinstance(adapter, LifecycleAdmissionPort):
+        try:
+            admission = adapter.admit_lifecycle(
+                root, HarnessContext("."), binding.moment)
+        except Exception as exc:  # admission bugs fail closed but stay advisory
+            admission = LifecycleAdmission(
+                allowed=False,
+                text=(
+                    "MarkdownLLM lifecycle admission failed: "
+                    f"{type(exc).__name__}."
+                ),
+            )
+
+    if admission is not None and not admission.allowed:
+        execution = LifecycleExecution(
+            moment=binding.moment, steps=(), text=admission.text, passed=False)
+    else:
+        execution = execute_lifecycle(root, binding)
+        if admission is not None and admission.text:
+            execution = LifecycleExecution(
+                moment=execution.moment,
+                steps=execution.steps,
+                text=_bounded_structurally(
+                    admission.text + "\n\n" + execution.text,
+                    binding.output_limit_characters),
+                passed=execution.passed,
+            )
+
+    details = [
+        f"{step.operation}={step.returncode}" for step in execution.steps]
+    if admission is not None:
+        details.insert(
+            0, "admission=" + ("passed" if admission.allowed else "refused"))
+    detail = ", ".join(details)
 
     # Successful lifecycle commands are not a successful harness event until
     # their output can be serialized into that harness's documented channel.

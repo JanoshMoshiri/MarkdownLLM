@@ -6,7 +6,7 @@ export const DEFAULT_TIMEOUT_MS = 115_000;
 export const MAX_OUTPUT_BYTES = 512 * 1024;
 
 export const LIFECYCLE_CONTRACT = Object.freeze({
-  version: 1,
+  version: 2,
   harness: "openclaw",
   moment: "session-start",
   delivery: "prependContext",

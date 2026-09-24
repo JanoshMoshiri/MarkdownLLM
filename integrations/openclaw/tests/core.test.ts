@@ -38,7 +38,7 @@ test("definition fingerprint is stable and version-sensitive", () => {
   const current = contractFingerprint();
   assert.match(current, /^sha256:[0-9a-f]{64}$/);
   assert.equal(contractFingerprint(), current);
-  assert.notEqual(contractFingerprint({ version: 2 }), current);
+  assert.notEqual(contractFingerprint({ version: 3 }), current);
 });
 
 test("invocation is an argv vector with no shell command", () => {

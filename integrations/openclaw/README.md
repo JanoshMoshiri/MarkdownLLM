@@ -11,6 +11,12 @@ experimental.
 
 ## Configuration
 
+Before any lifecycle step runs, MarkdownLLM verifies that the resolved workspace
+contains a domain `AGENTS.md`, that its relative `framework_root` (or the
+specified ancestor fallback) reaches a valid `.markdownllm` sentinel and
+`kernel.md`, and that the entry declares a domain name. A refusal is injected
+as failed advisory context; it never certifies or runs the ordered startup.
+
 Configure the plugin with an explicit list of OpenClaw agent ids. Each selected
 agent's configured OpenClaw workspace must be the entry for exactly one
 MarkdownLLM domain.

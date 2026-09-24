@@ -25,6 +25,7 @@ from markdownllm.harness_ports import (  # noqa: E402
     DOMAIN_ROOT_ARG,
     HarnessContext,
     LifecycleBinding,
+    LifecycleAdmission,
     LifecycleStep,
 )
 
@@ -273,6 +274,20 @@ class _OutputAdapter:
         return f"envelope:{moment}:{passed}:{text}"
 
 
+class _AdmissionAdapter(_OutputAdapter):
+    def __init__(self, allowed):
+        super().__init__()
+        self.allowed = allowed
+
+    def admit_lifecycle(self, domain_root, context, moment):
+        del domain_root, context, moment
+        return LifecycleAdmission(
+            allowed=self.allowed,
+            text="binding passed" if self.allowed else "binding refused",
+        )
+
+
+
 class _FormatOnlyAdapter:
     """Exactly the declared LifecycleOutputPort; no accidental attributes."""
 
@@ -302,6 +317,55 @@ def _execution(*, passed=True, text="orientation"):
         text=text,
         passed=passed,
     )
+
+
+def test_lifecycle_admission_refusal_skips_ordered_steps(
+        tmp_path, monkeypatch):
+    adapter = _AdmissionAdapter(False)
+    recorded = []
+
+    def unexpected(*args, **kwargs):  # pragma: no cover - assertion helper
+        raise AssertionError("refused lifecycle must not execute")
+
+    monkeypatch.setattr(lr, "execute_lifecycle", unexpected)
+    monkeypatch.setattr(
+        lr, "record_execution_attestation",
+        lambda *args, **kwargs: recorded.append((args, kwargs)),
+    )
+
+    assert lr.dispatch_lifecycle_event(
+        tmp_path, HarnessContext(".").binding("session-start"),
+        harness="fake-harness", definition_hash="sha256:pinned",
+        output_port=adapter) == 0
+    assert adapter.calls == [
+        ("session-start", "binding refused", False)]
+    assert recorded[0][1]["outcome"] == "failed"
+    assert recorded[0][1]["detail"] == "admission=refused"
+
+
+def test_lifecycle_admission_passes_context_to_ordered_output(
+        tmp_path, monkeypatch):
+    adapter = _AdmissionAdapter(True)
+    recorded = []
+    monkeypatch.setattr(
+        lr, "execute_lifecycle",
+        lambda root, binding: _execution(text="orientation"),
+    )
+    monkeypatch.setattr(
+        lr, "record_execution_attestation",
+        lambda *args, **kwargs: recorded.append((args, kwargs)),
+    )
+
+    assert lr.dispatch_lifecycle_event(
+        tmp_path, HarnessContext(".").binding("session-start"),
+        harness="fake-harness", definition_hash="sha256:pinned",
+        output_port=adapter) == 0
+    _, text, passed = adapter.calls[0]
+    assert passed is True
+    assert "binding passed" in text
+    assert "orientation" in text
+    assert recorded[0][1]["detail"].startswith("admission=passed")
+
 
 
 def test_dispatch_attests_exact_hash_and_formats_through_adapter_port(

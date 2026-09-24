@@ -334,6 +334,28 @@ class DiagnosticPresentationPort(Protocol):
     def diagnostic_presentation(self) -> DiagnosticPresentation: ...
 
 
+@dataclass(frozen=True)
+class LifecycleAdmission:
+    """Adapter-owned admission result before neutral lifecycle execution."""
+
+    allowed: bool
+    text: str
+
+
+@runtime_checkable
+class LifecycleAdmissionPort(Protocol):
+    """Refuse a lifecycle event before any ordered step runs.
+
+    Admission is optional. It verifies a harness-specific binding while the
+    lifecycle service remains vendor-neutral. A refusal is advisory output,
+    not a replacement for the Git enforcement floor.
+    """
+
+    def admit_lifecycle(
+            self, domain_root: Path, context: HarnessContext,
+            moment: str) -> LifecycleAdmission: ...
+
+
 @runtime_checkable
 class LifecycleOutputPort(Protocol):
     """Translate one neutral lifecycle execution into harness stdout.
