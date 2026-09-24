@@ -275,6 +275,19 @@ class InspectPort(Protocol):
 
 
 @runtime_checkable
+class CloudWorkspacePort(Protocol):
+    """Files and UI settings for a host that already clones the domain.
+
+    The renderer is pure; the service owns source pins and file ownership.
+    No method configures an external environment or grants project trust.
+    """
+
+    def cloud_artifacts(self, source_root: Path, config: Mapping) -> dict[str, bytes]: ...
+
+    def cloud_settings(self, config: Mapping) -> Mapping[str, str]: ...
+
+
+@runtime_checkable
 class BundlePort(Protocol):
     """Estate-level distribution bundle for a run-time-bound harness.
 

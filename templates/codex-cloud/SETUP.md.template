@@ -1,0 +1,43 @@
+# MarkdownLLM in Codex Cloud
+
+Generated setup for {{repository}}. Commit these files to the domain repository;
+the default branch must carry them because Codex builds its cache there first.
+
+Configure the GitHub-backed environment once:
+
+| Setting | Value |
+| --- | --- |
+| Workspace directory (base, excluding repository name) | `{{workspace_directory}}` |
+| Setup mode | {{setup_mode}} |
+| Setup command | `{{setup_command}}` |
+| Maintenance command | `{{maintenance_command}}` |
+| Agent internet | {{agent_internet}} |
+
+Setup always has network access. No PAT or API key is required to download the
+public framework; Codex owns the domain checkout and its GitHub authorisation.
+`environment.json` is strict JSON, so the bootstrap needs only Python's standard
+library before it creates the framework virtual environment with PyYAML 6.0.3.
+
+The bootstrap preserves the domain's selected branch/commit, index and files.
+It installs the shared Git floor and a clone-local `mdllm.publication=pr`
+restraint. This reduces automatic publication authority without changing the
+domain's AGENTS.md. Use Codex's PR flow; no setup step commits or pushes.
+
+Fresh setup and cached maintenance check the same full framework commit. A
+changed pin requires Reset cache. Changing repository files alone does not
+invalidate Codex's cache. Commit the revised files and reset it deliberately.
+
+Setup logs are not agent context. At the start of the working task, the agent
+must follow AGENTS.md and run `estate-sync` then `session-start . --contract`
+using the framework runtime, read the complete Tier-0 emission, and load the
+domain skills. Setup reports the session gate as deferred; it neither creates
+an attestation nor claims lifecycle delivery. The first real commit still
+enforces the gate. Existing `.codex/hooks.json` is not modified or trusted by
+setup; inspect it with `mdllm doctor . --harness codex` separately.
+
+The skill in `.agents/skills/configure-codex-cloud/` guides conversational
+configuration through the available browser UI. It does not call an undocumented
+environment API. Confirm actual setup execution and agent contract delivery in
+a real cloud task before claiming this product surface is verified.
+
+Official behaviour: https://learn.chatgpt.com/docs/environments/cloud-environment

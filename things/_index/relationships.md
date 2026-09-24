@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-23
-generated: 2026-09-23T20:37:35
-generated_from: HEAD@446155b
-coverage: 430
+created: 2026-09-24
+generated: 2026-09-24T20:08:16
+generated_from: HEAD@8d3a635
+coverage: 434
 framework_version: 3.42.0
 ---
 
@@ -335,6 +335,10 @@ framework_version: 3.42.0
 - codex-5r4-root-reconciliation-2026-08-13 --implements--> framework-root-tracks-both-adapters
 - codex-5r4-root-reconciliation-2026-08-13 --extends--> codex-5r3-migration-acceptance-2026-08-13
 - codex-cli-live-dispatch-2026-08-14 --documents--> vendor-harness-adapter-foundation
+- codex-cloud-workspace --references--> cowork-adapter
+- codex-cloud-workspace --implements--> framework-discovery-specification
+- codex-cloud-workspace --implements--> git-workflow-specification
+- codex-cloud-workspace --implements--> interface-specification
 - codex-desktop-session-start-negative-2026-08-14 --documents--> vendor-harness-adapter-foundation
 - codex-desktop-session-start-negative-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - codex-final-handoff-audit-2026-08-11 --documents--> vendor-harness-adapter-foundation
@@ -469,8 +473,12 @@ framework_version: 3.42.0
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-framework-map-2026-09-19 --subject--> framework-map
 - cue-framework-map-2026-09-22 --subject--> framework-map
+- cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
+- cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
+- cue-git-workflow-cloud-pr-2026-09-24 --references--> codex-cloud-workspace
+- cue-git-workflow-cloud-pr-2026-09-24 --subject--> git-workflow-specification
 - cue-git-workflow-specification-2026-09-19 --subject--> git-workflow-specification
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
@@ -484,6 +492,8 @@ framework_version: 3.42.0
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
 - cue-operator-guide-2026-09-15 --subject--> operator-guide
 - cue-operator-guide-2026-09-22 --subject--> operator-guide
+- cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
+- cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream

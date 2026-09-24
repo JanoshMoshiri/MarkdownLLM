@@ -311,6 +311,7 @@ class PublicationPolicyState(str, Enum):
     ABSENT = "absent"
     MALFORMED = "malformed"
     UNREADABLE = "unreadable"
+    LOCAL_RESTRAINT = "local-restraint"
 
 
 @dataclass(frozen=True)
@@ -325,11 +326,27 @@ class PublicationPolicy:
 def publication_policy(repo: Path) -> PublicationPolicy:
     """Read the fail-closed publication authority and preserve its reason.
 
-    Only the YAML boolean ``true`` at ``git.autopush`` enables a send.  The
+    Only the YAML boolean ``true`` at ``git.autopush``, with no clone-local
+    restraint, enables a send. The
     distinction between false, absent, malformed, and unreadable is retained
     for diagnostics; collapsing all four to ``False`` made a safe refusal
     operationally opaque.
     """
+    # Definition diagnostics also operate on uninitialised domain directories.
+    # There is no clone-local policy there, and querying Git would either fail
+    # or accidentally read a containing repository's unrelated restraint.
+    if (repo / ".git").exists():
+        restraint = _git(repo, "config", "--local", "--get", "mdllm.publication")
+        if restraint is None or restraint.returncode not in (0, 1):
+            return PublicationPolicy(False, PublicationPolicyState.UNREADABLE,
+                                     "clone-local publication restraint could not be read")
+        if restraint.returncode == 0:
+            value = restraint.stdout.strip()
+            return PublicationPolicy(
+                False, (PublicationPolicyState.LOCAL_RESTRAINT if value == "pr"
+                        else PublicationPolicyState.MALFORMED),
+                ("clone-local mdllm.publication=pr: use the host's PR workflow"
+                 if value == "pr" else "unknown clone-local mdllm.publication value; publication disabled"))
     agents = repo / "AGENTS.md"
     if not agents.is_file():
         return PublicationPolicy(

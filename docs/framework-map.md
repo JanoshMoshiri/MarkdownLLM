@@ -70,7 +70,7 @@ flowchart TD
         why, thing.md with the core operative specs, and 25 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
-        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 38
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 39
         mechanical subcommands and a git pre-commit hook that, when current and
         runnable, blocks commits with mechanical Errors. At the base, git is
         the accepted-state machine, event stream and inspectable audit aid.
@@ -96,7 +96,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>38 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>39 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks mechanical Errors when active"]
     end
     GIT["git — accepted-state machine,<br/>event stream, inspectable history"]
@@ -272,7 +272,7 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 flowchart LR
     accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
     accDescr {
-        A left column of 38 mdllm subcommands, each with a single edge to the
+        A left column of 39 mdllm subcommands, each with a single edge to the
         spec surface it serves in the right column. The tool is a mapping, not
         a monolith. Solid edges enforce or measure a spec, and dashed edges
         generate an artifact. Enforcing or measuring: validate, triggers,
@@ -331,6 +331,7 @@ flowchart LR
         C36["cues"]
         C37["watch"]
         C38["docs"]
+        C39["cloud"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -410,6 +411,7 @@ flowchart LR
     C36 -->|"holds the unanswered cue for"| T35
     C37 -->|"rings the doorbell on the remote ref for"| T36
     C38 -.->|"regenerates and drift-gates"| T37
+    C39 -.->|"prepares a host-owned checkout under"| T30
 ```
 
 Notes on this view:
