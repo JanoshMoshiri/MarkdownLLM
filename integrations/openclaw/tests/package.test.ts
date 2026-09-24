@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
@@ -8,6 +8,18 @@ async function json(name: string): Promise<Record<string, any>> {
   return JSON.parse(await readFile(new URL(name, root), "utf8"));
 }
 
+async function sources(): Promise<Map<string, string>> {
+  const directory = new URL("src/", root);
+  const entries = await readdir(directory);
+  return new Map(await Promise.all(
+    entries
+      .filter((name) => name.endsWith(".ts"))
+      .map(async (name) => [
+        name,
+        await readFile(new URL(name, directory), "utf8"),
+      ] as const),
+  ));
+}
 test("package points at built JavaScript and pins experimental compatibility", async () => {
   const pkg = await json("package.json");
   assert.deepEqual(pkg.openclaw.extensions, ["./dist/index.js"]);
@@ -43,4 +55,34 @@ test("runtime uses additive context and excludes rejected private seams", async 
   assert.doesNotMatch(source, /runtime\.gateway\.request/);
   assert.doesNotMatch(source, /createSessionEntry/);
   assert.doesNotMatch(source, /sessions\.json|transcript/i);
+});
+test("source stays on public seams and has one lifecycle owner", async () => {
+  const sourceMap = await sources();
+  const combined = [...sourceMap.values()].join("\n");
+  const imports = [...combined.matchAll(/from "([^"]+)"/g)]
+    .map((match) => match[1])
+    .filter((name): name is string => name !== undefined)
+    .filter((name) => name.startsWith("openclaw/"));
+  assert.deepEqual(
+    [...new Set(imports)],
+    ["openclaw/plugin-sdk/plugin-entry"],
+  );
+  assert.doesNotMatch(combined, /openclaw\/(?:dist|src)\//);
+  assert.doesNotMatch(
+    combined,
+    /sessions\.pluginPatch|registerSessionExtension|sessions\.json|transcript/i,
+  );
+  assert.doesNotMatch(
+    combined,
+    /runtime\.gateway\.request|createSessionEntry|runWithWorkAdmission/,
+  );
+
+  const lifecycleOwners = [...sourceMap]
+    .filter(([, source]) => source.includes('"harness-event"'))
+    .map(([name]) => name);
+  assert.deepEqual(lifecycleOwners, ["core.ts"]);
+
+  const bridge = sourceMap.get("watch-bridge.ts") ?? "";
+  assert.doesNotMatch(bridge, /from "node:fs"/);
+  assert.doesNotMatch(bridge, /yaml|frontmatter|current_stage|linked_things/i);
 });

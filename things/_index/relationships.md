@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-24
-generated: 2026-09-24T16:51:05
-generated_from: HEAD@8d3a635
-coverage: 432
+generated: 2026-09-24T18:51:21
+generated_from: HEAD@fdf4a25
+coverage: 433
 framework_version: 3.42.0
 ---
 
@@ -1061,6 +1061,9 @@ framework_version: 3.42.0
 - openclaw-adapter --extends--> framework-discovery-specification
 - openclaw-adapter --implements--> standing-watch-specification
 - openclaw-adapter --references--> openclaw-adapter-seam-analysis-2026-09-24
+- openclaw-adapter-acceptance-matrix-2026-09-24 --validates--> openclaw-adapter
+- openclaw-adapter-acceptance-matrix-2026-09-24 --extends--> openclaw-adapter-seam-analysis-2026-09-24
+- openclaw-adapter-acceptance-matrix-2026-09-24 --implements--> standing-watch-specification
 - openclaw-adapter-seam-analysis-2026-09-24 --documents--> openclaw-adapter
 - openclaw-adapter-seam-analysis-2026-09-24 --extends--> vendor-harness-adapter-foundation
 - openclaw-adapter-seam-analysis-2026-09-24 --references--> standing-watch-specification
