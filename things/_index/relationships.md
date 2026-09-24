@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-23
-generated: 2026-09-23T20:37:35
-generated_from: HEAD@446155b
-coverage: 430
+created: 2026-09-24
+generated: 2026-09-24T16:51:05
+generated_from: HEAD@8d3a635
+coverage: 432
 framework_version: 3.42.0
 ---
 
@@ -1056,6 +1056,14 @@ framework_version: 3.42.0
 - open-questions-arrive-as-a-prompt-2026-09-23 --extends--> unattended-cue-carrier-2026-09-12
 - open-questions-arrive-as-a-prompt-2026-09-23 --informs--> cue-carrier
 - open-questions-arrive-as-a-prompt-2026-09-23 --references--> emitted-content-is-read-instructed-content-is-economised
+- openclaw-adapter --extends--> vendor-harness-adapter-foundation
+- openclaw-adapter --implements--> orchestration-specification
+- openclaw-adapter --extends--> framework-discovery-specification
+- openclaw-adapter --implements--> standing-watch-specification
+- openclaw-adapter --references--> openclaw-adapter-seam-analysis-2026-09-24
+- openclaw-adapter-seam-analysis-2026-09-24 --documents--> openclaw-adapter
+- openclaw-adapter-seam-analysis-2026-09-24 --extends--> vendor-harness-adapter-foundation
+- openclaw-adapter-seam-analysis-2026-09-24 --references--> standing-watch-specification
 - operating-is-programming --extends--> the-notation-changed-not-the-primitives
 - operating-is-programming --supports--> asks-travel-as-exposed-things
 - operating-is-programming --derived-from--> assistant-register
