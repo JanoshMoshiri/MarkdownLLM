@@ -2,7 +2,7 @@
 id: operator-seat-and-harness-native-onramp
 type: plan
 status: not-started
-version: 1.1
+version: 1.2
 created: 2026-09-06
 session: 2026-09-06
 priority: high
@@ -28,8 +28,8 @@ linked_things:
     notes: "Why nothing here is an application: every phase is a skill, a string change or a guide — forms the floor can read."
 triggers:
   - type: time
-    condition: "2026-09-20 reached"
-    action: "If no phase has started, surface it plainly: the direction was ratified on felt evidence and the substrate backlog is also waiting. Ask which goes first — the onramp or the eval backlog — rather than letting both idle."
+    condition: "2026-10-08 reached"
+    action: "Answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it."
 ---
 
 # Operator Seat and Harness-Native Onramp
@@ -108,6 +108,17 @@ route, and no phase makes any of this mandatory for a valid Domain.
       files you can read; nothing is real until it is committed and you can
       always see what changed; the agent proposes and some things only you
       can rule on; what you rule on accumulates.
+      *2026-09-22, the operator on the live guide: "I don't like the first
+      hour file at all — it doesn't quite roll that way when you scaffold a
+      domain, from my experience." Read against the tool, three divergences:
+      the guide has the agent design before birth, where `scaffold` births
+      first and then prints the semantic half; it never names the session
+      gate a scaffolded domain is born with (`strict` — the next commit needs
+      `session-start`); and minutes 0–15 are developer onboarding, the wall
+      the 2026-09-06 partner session hit. The rewrite is written from his
+      account, as the script of the route — not from this reading.
+      Sequenced first on 2026-09-23, with the guided birth
+      (`scaffold-carries-the-universal-workflow`) as one arc.*
 
 ## Gates — the human's, listed, never worked around
 

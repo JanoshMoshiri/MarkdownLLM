@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: triggers
 created: 2026-09-24
-generated: 2026-09-24T20:08:16
-generated_from: HEAD@8d3a635
+generated: 2026-09-24T21:44:26
+generated_from: HEAD@75cf830
 coverage: 7
 framework_version: 3.42.0
 ---
@@ -30,7 +30,7 @@ framework_version: 3.42.0
 
 ## operator-seat-and-harness-native-onramp
 - status: not-started  due_date: —
-- trigger: type=time, condition=2026-09-20 reached, action=If no phase has started, surface it plainly: the direction was ratified on felt evidence and the substrate backlog is also waiting. Ask which goes first — the onramp or the eval backlog — rather than letting both idle.
+- trigger: type=time, condition=2026-10-08 reached, action=Answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it.
 
 ## substrate-native-a2a
 - status: in-progress  due_date: —

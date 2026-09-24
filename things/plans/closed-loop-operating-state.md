@@ -10,6 +10,9 @@ informed_by:
 priority: high
 tags: [operating-model, closed-loop, human-seats, dispatcher, gates-census, vision]
 linked_things:
+  - id: a-remembered-step-is-a-missing-actor
+    relation: references
+    notes: "Why this plan's dispatcher is the answer to the operator's coherence question: every hole the 2026-09-23 sweep traced was a check with no actor."
   - id: review-external-conflict-lifecycle-2026-09-08
     relation: references
     notes: "F5 — who declares an inflection when a dispatch run commits — is the seat-protocol question Phase 3 now carries; the review names the three options and what exists toward the third."

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-24
-generated: 2026-09-24T20:08:16
-generated_from: HEAD@8d3a635
-coverage: 434
+generated: 2026-09-24T21:44:26
+generated_from: HEAD@75cf830
+coverage: 450
 framework_version: 3.42.0
 ---
 
@@ -123,6 +123,11 @@ framework_version: 3.42.0
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --supports--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --derived-from--> dispatch-digest-home-2026-08-29
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --informs--> closed-loop-operating-state
+- a-remembered-step-is-a-missing-actor --informs--> closed-loop-operating-state
+- a-remembered-step-is-a-missing-actor --extends--> partial-coverage-quiets-the-uncovered-steps
+- a-remembered-step-is-a-missing-actor --references--> inflection-candidates-are-computable
+- a-remembered-step-is-a-missing-actor --references--> loop-turns-self-heal-2026-09-23
+- a-remembered-step-is-a-missing-actor --references--> dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23
 - a-remote-fetched-before-and-not-found-now-is-a-credential-change --informs--> git-workflow-specification
 - a-remote-fetched-before-and-not-found-now-is-a-credential-change --supports--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - a-ruling-triages-more-cheaply-than-a-mechanism --informs--> membrane-attention-cluster
@@ -147,6 +152,8 @@ framework_version: 3.42.0
 - a-stated-dismissal-condition-needs-a-reader --challenges--> session-memory-specification
 - a-stated-dismissal-condition-needs-a-reader --references--> trigger-specification
 - a-stated-dismissal-condition-needs-a-reader --supports--> a-uniform-answer-is-a-dead-judgment
+- a-surface-checked-in-one-renderer-is-unchecked-in-another --informs--> public-docs-face-build
+- a-surface-checked-in-one-renderer-is-unchecked-in-another --extends--> portability-claims-need-execution-tests
 - a-surface-without-a-floor-accumulates-repairs-not-progress --complements--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
 - a-surface-without-a-floor-accumulates-repairs-not-progress --references--> validate-thing-specification
 - a-surface-without-a-floor-accumulates-repairs-not-progress --references--> git-workflow-specification
@@ -315,6 +322,7 @@ framework_version: 3.42.0
 - claude-phase6-no-adapter-and-root-2026-08-16 --supports--> the-harness-bound-path-is-the-least-tested-path
 - claude-platform-surface-narrowed --informs--> vendor-harness-adapter-foundation
 - claude-platform-surface-narrowed --derived-from--> claude-phase5r0-matrix-completion-2026-08-13
+- closed-loop-operating-state --references--> a-remembered-step-is-a-missing-actor
 - closed-loop-operating-state --references--> review-external-conflict-lifecycle-2026-09-08
 - closed-loop-operating-state --implements--> operating-model-specification
 - closed-loop-operating-state --implements--> universal-workflow-methodology
@@ -443,6 +451,7 @@ framework_version: 3.42.0
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
 - cue-carrier --implements--> unattended-cue-carrier-2026-09-12
 - cue-carrier --implements--> closed-loop-operating-state
@@ -450,10 +459,14 @@ framework_version: 3.42.0
 - cue-carrier --implements--> inflection-candidates-are-computable
 - cue-carrier --implements--> feels-automatic-is-persistence-of-the-question
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-2026-09-24 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
+- cue-closed-loop-operating-state-2026-09-24 --subject--> closed-loop-operating-state
+- cue-coherence-mechanism-build-2026-09-24 --subject--> coherence-mechanism-build
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
+- cue-cue-carrier-2026-09-24 --subject--> cue-carrier
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 --subject--> cumulative-drift-is-invisible-to-per-change-walks
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
@@ -463,6 +476,7 @@ framework_version: 3.42.0
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
 - cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
 - cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
+- cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
 - cue-explorer-extraction-and-hosting-2026-09-13 --subject--> explorer-extraction-and-hosting
 - cue-explorer-publication-position-2026-09-13 --subject--> explorer-publication-position
 - cue-explorer-publication-readiness-2026-09-13 --subject--> explorer-publication-readiness
@@ -475,6 +489,7 @@ framework_version: 3.42.0
 - cue-framework-map-2026-09-22 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
+- cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
 - cue-git-workflow-cloud-pr-2026-09-24 --references--> codex-cloud-workspace
@@ -495,7 +510,10 @@ framework_version: 3.42.0
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
+- cue-operator-queue-2026-08-28-2026-09-24 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
+- cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
+- cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
 - cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
@@ -505,8 +523,10 @@ framework_version: 3.42.0
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-09-24 --subject--> standing-watch-specification
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
+- cue-substrate-native-a2a-2026-09-24 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
@@ -515,7 +535,9 @@ framework_version: 3.42.0
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
 - cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
 - cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
+- cue-vendor-harness-adapter-foundation-2026-09-24 --subject--> vendor-harness-adapter-foundation
 - cue-watertight-membrane-sprint-2026-08-30-2026-09-13 --subject--> watertight-membrane-sprint-2026-08-30
+- cue-watertight-membrane-sprint-2026-08-30-2026-09-24 --subject--> watertight-membrane-sprint-2026-08-30
 - cue-workflow-state-specification-2026-09-19 --subject--> workflow-state-specification
 - cue-workflow-state-specification-2026-09-22 --derived-from--> run-membership-is-realisation-2026-09-22
 - cue-workflow-state-specification-2026-09-22 --subject--> workflow-state-specification
@@ -1184,6 +1206,7 @@ framework_version: 3.42.0
 - provenance-specification --complements--> mcp-domain-server-design
 - provenance-specification --implements--> divergence-is-an-unrouted-decision
 - provenance-specification --implements--> llm-driven-systems-manifesto
+- public-docs-face-build --references--> a-surface-checked-in-one-renderer-is-unchecked-in-another
 - public-docs-face-build --implements--> public-docs-face-is-derived-not-restated
 - public-docs-face-build --implements--> every-reader-class-needs-its-own-kernel
 - public-docs-face-build --implements--> derived-transport-is-not-derived-content
