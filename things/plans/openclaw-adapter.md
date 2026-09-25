@@ -128,10 +128,33 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 ### Phase 5 - live compatibility
 
 - [x] Install into a disposable clean OpenClaw 2026.9.3 profile on Windows.
-- [ ] Prove fresh and continued sessions, reset/compaction recovery,
-  gateway/plugin restart, two-domain isolation and exact-session wake.
-- [ ] Record exact version, platform, commands, observations and exclusions.
+- [x] Prove fresh and continued sessions, reset/compaction recovery and
+  Gateway/plugin restart against Windows OpenClaw 2026.9.3.
+- [ ] Prove live two-domain isolation and exact-session wake.
+- [x] Record exact version, platform, commands, observations and exclusions.
   Static tests earn designed-for; live runs earn verified-on.
+
+#### Live lifecycle evidence — 2026-09-25
+
+The Windows proof ran against OpenClaw 2026.9.3 (1391f7c) on Node.js
+24.21.0 in the disposable adapter profile. The package suite passed 29/29,
+and `npm pack --ignore-scripts --json` contained the 18 intended files.
+The installed managed-generation `dist/index.js` SHA-256 matched the built
+artifact.
+
+Captured model requests carried the MarkdownLLM session-start marker in the
+sequence `true, false, true, false, false, true, true`: fresh, continued,
+post-reset, two compaction-preparation turns, post-compaction and post-Gateway
+restart. OpenClaw compacted the exact session to two lines before the
+post-compaction turn.
+
+The supported Windows archive-update path remains excluded from this proof:
+OpenClaw hit `EPERM` creating its host `openclaw` peer symlink. The lifecycle
+proof used the same tarball in the existing disposable managed npm generation
+and verified byte identity. `npm run test:install` built successfully but did
+not complete within the external 300-second cap on this host. OCA-09 therefore
+remains open for a supported clean-profile Windows install without that
+fallback.
 
 ### Phase 6 - public release gate
 
@@ -160,7 +183,8 @@ their public semantics have execution evidence.
 
 ## Immediate next move
 
-Complete Phase 5 live lifecycle acceptance and observe the configured Windows
-and Ubuntu CI matrix. Reconcile any defects, rerun the deterministic and
-clean-profile gates, then update the matrix before requesting publication
+Close the remaining Phase 5 evidence: pass the supported Windows clean-profile
+installer without a symlink fallback, then prove live two-domain isolation and
+exact-session wake. Observe the configured Windows and Ubuntu CI matrix,
+reconcile any defects, and update the matrix before requesting publication
 authority.
