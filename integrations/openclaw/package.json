@@ -2,6 +2,25 @@
   "name": "@markdownllm/openclaw-adapter",
   "version": "0.1.0-dev.0",
   "description": "Bind OpenClaw agent sessions to MarkdownLLM domain lifecycle contracts",
+  "keywords": [
+    "markdownllm",
+    "openclaw",
+    "agent",
+    "plugin",
+    "lifecycle"
+  ],
+  "homepage": "https://github.com/JanoshMoshiri/MarkdownLLM#readme",
+  "bugs": {
+    "url": "https://github.com/JanoshMoshiri/MarkdownLLM/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JanoshMoshiri/MarkdownLLM.git",
+    "directory": "integrations/openclaw"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "bin": {
     "markdownllm-openclaw-watch": "./dist/cli.js"
   },
@@ -10,11 +29,15 @@
   "files": [
     "dist",
     "openclaw.plugin.json",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --experimental-strip-types --test tests/*.test.ts",
+    "test:install": "npm run build && node tests/install-smoke.mjs",
     "check": "npm run test",
     "prepack": "npm run check"
   },

@@ -121,13 +121,13 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 ### Phase 4 - deterministic acceptance
 
 - [ ] Pass OCA-01 through OCA-10 on Windows and POSIX-supported paths.
-- [ ] Add fitness tests forbidding private imports, direct session-store
+- [x] Add fitness tests forbidding private imports, direct session-store
   mutation and duplicate lifecycle ownership.
-- [ ] Produce a requirement-to-test evidence matrix.
+- [x] Produce a requirement-to-test evidence matrix.
 
 ### Phase 5 - live compatibility
 
-- [ ] Install into a disposable clean OpenClaw profile.
+- [x] Install into a disposable clean OpenClaw 2026.9.3 profile on Windows.
 - [ ] Prove fresh and continued sessions, reset/compaction recovery,
   gateway/plugin restart, two-domain isolation and exact-session wake.
 - [ ] Record exact version, platform, commands, observations and exclusions.
@@ -135,9 +135,9 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 
 ### Phase 6 - public release gate
 
-- [ ] Document install, config, trust, security, compatibility, troubleshooting
+- [x] Document install, config, trust, security, compatibility, troubleshooting
   and removal.
-- [ ] Add CI, package-content checks, licence and contribution guidance.
+- [x] Add CI, package-content checks, licence and contribution guidance.
 - [ ] Version and changelog the accepted contract.
 - [ ] Request the operator's deliberate release/publish authorization. Root
   autopush false remains controlling.
@@ -160,6 +160,7 @@ their public semantics have execution evidence.
 
 ## Immediate next move
 
-Begin Phase 4 by mapping OCA-01 through OCA-10 to deterministic evidence, then
-close the missing fitness and portability rows before clean-profile live
-acceptance.
+Complete Phase 5 live lifecycle acceptance and observe the configured Windows
+and Ubuntu CI matrix. Reconcile any defects, rerun the deterministic and
+clean-profile gates, then update the matrix before requesting publication
+authority.

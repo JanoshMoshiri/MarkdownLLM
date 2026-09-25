@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 const root = new URL("../", import.meta.url);
+const run = promisify(execFile);
 
 async function json(name: string): Promise<Record<string, any>> {
   return JSON.parse(await readFile(new URL(name, root), "utf8"));
@@ -33,6 +37,65 @@ test("package points at built JavaScript and pins experimental compatibility", a
     ">=2026.9.3 <2026.10.0",
   );
   assert.equal(pkg.openclaw.build.openclawVersion, "2026.9.3");
+});
+
+test("package carries public release metadata and notices", async () => {
+  const pkg = await json("package.json");
+  assert.equal(pkg.engines.node, ">=24.0.0");
+  assert.equal(pkg.repository.directory, "integrations/openclaw");
+  assert.deepEqual(pkg.files, [
+    "dist",
+    "openclaw.plugin.json",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+  ]);
+  assert.match(await readFile(new URL("LICENSE", root), "utf8"), /MIT License/);
+  assert.match(await readFile(new URL("CHANGELOG.md", root), "utf8"), /Unreleased/);
+});
+
+test("packed artifact contains only the intended public files", async () => {
+  const npmEntry = process.env.npm_execpath;
+  assert.ok(npmEntry, "npm_execpath is required; run this test through npm");
+  const { stdout } = await run(process.execPath, [
+    npmEntry,
+    "pack",
+    "--ignore-scripts",
+    "--dry-run",
+    "--json",
+  ], {
+    cwd: fileURLToPath(root),
+    encoding: "utf8",
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  const packed = JSON.parse(stdout) as Array<{
+    files: Array<{ path: string }>;
+  }>;
+  assert.equal(packed.length, 1);
+  assert.deepEqual(
+    packed[0]?.files.map(({ path }) => path).sort(),
+    [
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "dist/cli.d.ts",
+      "dist/cli.js",
+      "dist/cli.js.map",
+      "dist/core.d.ts",
+      "dist/core.js",
+      "dist/core.js.map",
+      "dist/index.d.ts",
+      "dist/index.js",
+      "dist/index.js.map",
+      "dist/watch-bridge.d.ts",
+      "dist/watch-bridge.js",
+      "dist/watch-bridge.js.map",
+      "openclaw.plugin.json",
+      "package.json",
+    ],
+  );
 });
 
 test("manifest is strict and requires explicit agent designation", async () => {
