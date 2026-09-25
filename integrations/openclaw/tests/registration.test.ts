@@ -10,7 +10,7 @@ type Hook = {
   options?: Record<string, unknown>;
 };
 
-test("registration binds only designated agents and reruns after compaction", async () => {
+test("registration binds designated sessions and reruns after lifecycle changes", async () => {
   const hooks = new Map<string, Hook[]>();
   const warnings: string[] = [];
   const invocations: any[] = [];
@@ -66,11 +66,16 @@ test("registration binds only designated agents and reruns after compaction", as
   const unbound = await prompt.handler({}, { agentId: "alpha" });
   assert.match((unbound as any).prependContext, /binding was refused/);
 
-  const ctx = { agentId: "alpha", sessionKey: "s1" };
-  assert.deepEqual(await prompt.handler({}, ctx), {
+  const ctx = { agentId: "alpha", sessionKey: "s1", sessionId: "sid-1" };
+  assert.deepEqual(await prompt.handler({ messages: [] }, ctx), {
     prependContext: "fixture orientation",
   });
-  assert.equal(await prompt.handler({}, ctx), undefined);
+  assert.equal(
+    await prompt.handler({
+      messages: [{ role: "user" }, { role: "assistant" }],
+    }, ctx),
+    undefined,
+  );
   assert.equal(invocations.length, 1);
   assert.equal(invocations[0].command, "mdllm-test");
   assert.equal(invocations[0].cwd, "/fixtures/alpha");
@@ -84,10 +89,49 @@ test("registration binds only designated agents and reruns after compaction", as
 
   const compact = hooks.get("after_compaction")?.[0];
   assert.ok(compact);
-  compact.handler({}, ctx);
-  assert.deepEqual(await prompt.handler({}, ctx), {
+  compact.handler(
+    { messageCount: 2, compactedCount: 1 },
+    { sessionId: "sid-1" },
+  );
+  assert.deepEqual(await prompt.handler({ messages: [{ role: "system" }] }, ctx), {
     prependContext: "fixture orientation",
   });
   assert.equal(invocations.length, 2);
+
+  const reset = hooks.get("before_reset")?.[0];
+  assert.ok(reset);
+  reset.handler({ reason: "reset" }, {});
+  assert.deepEqual(await prompt.handler({ messages: [] }, ctx), {
+    prependContext: "fixture orientation",
+  });
+  assert.equal(invocations.length, 3);
+
+  assert.equal(
+    await prompt.handler({
+      messages: [{ role: "user" }, { role: "assistant" }],
+    }, ctx),
+    undefined,
+  );
+  assert.deepEqual(await prompt.handler({ messages: [] }, ctx), {
+    prependContext: "fixture orientation",
+  });
+  assert.equal(invocations.length, 4);
+
+  const rolled = {
+    agentId: "alpha",
+    sessionKey: "s1",
+    sessionId: "sid-2",
+  };
+  assert.deepEqual(await prompt.handler({ messages: [] }, rolled), {
+    prependContext: "fixture orientation",
+  });
+  assert.equal(invocations.length, 5);
+  assert.equal(
+    await prompt.handler({
+      messages: [{ role: "user" }, { role: "assistant" }],
+    }, rolled),
+    undefined,
+  );
+  assert.equal(invocations.length, 5);
   assert.deepEqual(warnings, []);
 });
