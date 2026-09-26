@@ -1,8 +1,8 @@
 ---
 id: operator-seat-and-harness-native-onramp
 type: plan
-status: not-started
-version: 1.2
+status: in-progress
+version: 1.3
 created: 2026-09-06
 session: 2026-09-06
 priority: high
@@ -26,10 +26,16 @@ linked_things:
   - id: a-surface-without-a-floor-accumulates-repairs-not-progress
     relation: informs
     notes: "Why nothing here is an application: every phase is a skill, a string change or a guide — forms the floor can read."
+  - id: claude-code-cloud-first-session-2026-09-24
+    relation: references
+    notes: "Phase 3 route evidence for Claude Code on the web, and the clone defects Phase 2's silent bootstrap must survive."
 triggers:
   - type: time
     condition: "2026-10-08 reached"
     action: "Answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it."
+  - type: time
+    condition: "2026-10-10 reached"
+    action: "Re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead."
 ---
 
 # Operator Seat and Harness-Native Onramp
@@ -46,6 +52,18 @@ phase is a skill, an adapter, a string change or a guide, and each lives in a
 harness the operator already has. **Nothing here changes the substrate** —
 domains stay ordinary Markdown/Git repositories, operable by any compatible
 route, and no phase makes any of this mandatory for a valid Domain.
+
+## Sequencing (2026-09-26)
+
+The 2026-09-20 chase asked which goes first — this plan or the eval backlog.
+The operator delegated the call to the framework agent ("do what you think is
+best"). **Onramp first**, on three grounds: the operator is building the Codex
+cloud route now, so the plan has a live consumer the backlog does not; the
+first cloud session showed the silent bootstrap cannot be silent over a
+degraded clone, and that prerequisite has just landed in the floor
+(`clone_depth`, estate-sync repair); the eval backlog was unblocked on
+2026-09-22 and loses nothing by waiting one chase. This is the agent's
+sequencing judgement under delegated authority, overturnable by editing it.
 
 ## Phases
 
@@ -76,6 +94,12 @@ route, and no phase makes any of this mandatory for a valid Domain.
 - [ ] The skill resolves X to a domain repository, runs the bootstrap
       silently (clone-or-sync, refresh against the current framework,
       floor, session-start), and hands over to the seat rendering.
+      *Prerequisite landed 2026-09-26:* a fresh harness clone is shallow and
+      upstream-less; estate-sync now repairs both and doctor/session-start
+      name what it could not — "silently" is safe only over a whole clone.
+      Still open for every cloud route: `.boundary-terms` never arrive with
+      a clone, so the disclosure boundary is off until the bootstrap
+      supplies them from a secret.
 - [ ] Refresh is part of the sentence, never a separate step. The manual
       substrate update was the ninety minutes.
 
@@ -84,6 +108,9 @@ route, and no phase makes any of this mandatory for a valid Domain.
 - [ ] Claude Code: skill or plugin; execution evidence recorded.
 - [ ] Cowork: extend the existing `spin-up-domain` bootstrap skill; evidence
       recorded.
+- [ ] Codex cloud: the route the operator is building (2026-09); the Claude
+      Code cloud record is the template for its first-hand evidence —
+      entry, lifecycle, runtime, and what the fresh clone lacks.
 - [ ] Perplexity: probe first — can it receive the entry contract and
       operate Git on the operator's behalf? Record the result either way.
       No route claim until the probe earns it.

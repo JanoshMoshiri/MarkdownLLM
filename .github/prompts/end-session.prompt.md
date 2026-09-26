@@ -24,10 +24,11 @@ when *you* judge the session worth it, never automatically. Follow
 5. Commit with a rich `session-end:` message — the commit *is* the backward record
    (no WORKLOG file; `mdllm worklog` prints an on-demand view of git when wanted).
 6. **Report publication debt:** run `python tools/mdllm.py estate-sync . --status`
-   and surface the result. Under autopush (the default) every `ahead +n
-   (unpushed)` line is an anomaly — an offline session, a rejected push owed a
-   routing decision, or an opted-out repo holding work for its deliberate
-   release. Route each line; never resolve a rejection by force, and never push
+   and surface the result. Where a repo declares literal `git.autopush: true`,
+   every `ahead +n (unpushed)` line is an anomaly — an offline session or a
+   rejected push owed a routing decision. Otherwise autopush is off (it is
+   fail-closed) and the line is expected debt awaiting the operator's
+   deliberate push. Route each line; never resolve a rejection by force, and never push
    an opted-out repo yourself (git-workflow.md → The Outbound Rules;
    `autopush-moves-the-deliberate-act`).
 

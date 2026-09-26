@@ -16,6 +16,7 @@ from pathlib import Path
 import yaml
 
 from . import adapters as harness_adapters
+from .clone_depth import clone_depth, shallow_warning_text
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
 from .harness_diagnostics import CapabilityDiagnostic, diagnose_harness
 from .harness_ports import (
@@ -126,6 +127,15 @@ def cmd_doctor(args) -> int:
         report("FAIL", "not a git repository — `git init` first")
         floor_ok = False
     else:
+        # History completeness is a floor prerequisite: every git-reading
+        # check answers from whatever history the clone holds, and a shallow
+        # clone answers wrongly rather than not at all (clone_depth.py).
+        depth = clone_depth(root)
+        if depth.truncated:
+            report("FAIL", shallow_warning_text(depth))
+            floor_ok = False
+        elif depth.shallow is False:
+            report("OK", "full history — git-reading checks see the whole stream")
         hook = resolve_hooks_dir(root) / "pre-commit"
         if not hook.is_file():
             report("FAIL", "pre-commit hook not installed — run `mdllm install-hook .`")

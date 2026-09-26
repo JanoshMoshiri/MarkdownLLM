@@ -3,11 +3,11 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-24
-generated: 2026-09-24T21:44:26
-generated_from: HEAD@75cf830
-coverage: 450
-framework_version: 3.42.0
+created: 2026-09-27
+generated: 2026-09-27T00:52:17
+generated_from: HEAD@44bbf41
+coverage: 475
+framework_version: 3.43.0
 ---
 
 # Relationships Index — framework
@@ -20,6 +20,7 @@ framework_version: 3.42.0
 - a-check-is-only-as-trustworthy-as-who-controls-its-inputs --complements--> consequence-is-recoverable-only-in-retrospect
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> cowork-integrity-estate-sweep
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> mechanical-coherence-checks-backlog
+- a-check-run-where-it-cannot-see-mints-a-false-finding --references--> claude-code-cloud-first-session-2026-09-24
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --supports--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --references--> boundary-disclosure-check
 - a-cleanup-is-scoped-by-lifecycle-not-by-location --extends--> consequence-is-recoverable-only-in-retrospect
@@ -280,6 +281,10 @@ framework_version: 3.42.0
 - claude-5r2-renderer-acceptance-2026-08-13 --implements--> code-architect-governs-substrate-code
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
+- claude-code-cloud-first-session-2026-09-24 --supports--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- claude-code-cloud-first-session-2026-09-24 --informs--> operator-seat-and-harness-native-onramp
+- claude-code-cloud-first-session-2026-09-24 --extends--> lifecycle-output-truncation-2026-08-14
+- claude-code-cloud-first-session-2026-09-24 --supports--> portability-claims-need-execution-tests
 - claude-domain-entry-pointer-observation-2026-08-17 --documents--> vendor-harness-adapter-foundation
 - claude-domain-entry-pointer-observation-2026-08-17 --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - claude-domain-entry-pointer-observation-2026-08-17 --extends--> claude-phase6-no-adapter-and-root-2026-08-16
@@ -445,6 +450,7 @@ framework_version: 3.42.0
 - cross-domain-sync-catchup --extends--> provenance-specification
 - cross-domain-sync-catchup --extends--> change-reconciliation-specification
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
+- cue-a-check-run-where-it-cannot-see-mints-a-false-finding-2026-09-26 --subject--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
 - cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 --subject--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - cue-a-mechanism-fails-at-its-seams-not-in-its-body-2026-09-14 --subject--> a-mechanism-fails-at-its-seams-not-in-its-body
@@ -452,6 +458,7 @@ framework_version: 3.42.0
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter
+- cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
 - cue-carrier --implements--> unattended-cue-carrier-2026-09-12
 - cue-carrier --implements--> closed-loop-operating-state
@@ -460,23 +467,30 @@ framework_version: 3.42.0
 - cue-carrier --implements--> feels-automatic-is-persistence-of-the-question
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-09-24 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-2026-09-26 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
+- cue-claude-code-cloud-first-session-2026-09-24-2026-09-26 --subject--> claude-code-cloud-first-session-2026-09-24
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
 - cue-closed-loop-operating-state-2026-09-24 --subject--> closed-loop-operating-state
+- cue-closed-loop-operating-state-2026-09-26 --subject--> closed-loop-operating-state
 - cue-coherence-mechanism-build-2026-09-24 --subject--> coherence-mechanism-build
+- cue-coherence-mechanism-build-2026-09-26 --subject--> coherence-mechanism-build
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
 - cue-cue-carrier-2026-09-24 --subject--> cue-carrier
+- cue-cue-carrier-2026-09-26 --subject--> cue-carrier
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 --subject--> cumulative-drift-is-invisible-to-per-change-walks
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
 - cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
 - cue-domain-refresh-specification-2026-09-13 --subject--> domain-refresh-specification
 - cue-domain-specification-guide-2026-09-15 --subject--> domain-specification-guide
+- cue-domain-specification-guide-2026-09-26 --subject--> domain-specification-guide
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
 - cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
 - cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
 - cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
+- cue-evidence-and-eval-backlog-2026-09-26 --subject--> evidence-and-eval-backlog
 - cue-explorer-extraction-and-hosting-2026-09-13 --subject--> explorer-extraction-and-hosting
 - cue-explorer-publication-position-2026-09-13 --subject--> explorer-publication-position
 - cue-explorer-publication-readiness-2026-09-13 --subject--> explorer-publication-readiness
@@ -487,19 +501,23 @@ framework_version: 3.42.0
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-framework-map-2026-09-19 --subject--> framework-map
 - cue-framework-map-2026-09-22 --subject--> framework-map
+- cue-framework-map-2026-09-26 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
+- cue-framework-retrospective-2026-08b-2026-09-26 --subject--> framework-retrospective-2026-08b
 - cue-gates-census-2026-08-2026-09-13 --subject--> gates-census-2026-08
 - cue-gates-census-ratified-2026-08-28-2026-09-13 --subject--> gates-census-ratified-2026-08-28
 - cue-git-workflow-cloud-pr-2026-09-24 --references--> codex-cloud-workspace
 - cue-git-workflow-cloud-pr-2026-09-24 --subject--> git-workflow-specification
 - cue-git-workflow-specification-2026-09-19 --subject--> git-workflow-specification
+- cue-git-workflow-specification-2026-09-26 --subject--> git-workflow-specification
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
+- cue-interface-specification-2026-09-26 --subject--> interface-specification
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
 - cue-mechanical-coherence-checks-backlog-2026-09-13 --subject--> mechanical-coherence-checks-backlog
 - cue-mechanical-coherence-checks-backlog-2026-09-15 --subject--> mechanical-coherence-checks-backlog
@@ -507,12 +525,16 @@ framework_version: 3.42.0
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
 - cue-operator-guide-2026-09-15 --subject--> operator-guide
 - cue-operator-guide-2026-09-22 --subject--> operator-guide
+- cue-operator-guide-2026-09-26 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
 - cue-operator-queue-2026-08-28-2026-09-24 --subject--> operator-queue-2026-08-28
+- cue-operator-queue-2026-08-28-2026-09-26 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
+- cue-orchestration-specification-2026-09-26 --subject--> orchestration-specification
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
+- cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
@@ -520,13 +542,16 @@ framework_version: 3.42.0
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
+- cue-session-memory-specification-2026-09-26 --subject--> session-memory-specification
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-24 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-09-24 --subject--> substrate-native-a2a
+- cue-substrate-native-a2a-2026-09-26 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
@@ -534,10 +559,14 @@ framework_version: 3.42.0
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
 - cue-validate-thing-specification-2026-09-12 --subject--> validate-thing-specification
+- cue-validate-thing-specification-2026-09-26 --subject--> validate-thing-specification
 - cue-validate-thing-specification-dark-region-2026-09-12 --subject--> validate-thing-specification
 - cue-vendor-harness-adapter-foundation-2026-09-24 --subject--> vendor-harness-adapter-foundation
+- cue-vendor-harness-adapter-foundation-2026-09-26 --subject--> vendor-harness-adapter-foundation
 - cue-watertight-membrane-sprint-2026-08-30-2026-09-13 --subject--> watertight-membrane-sprint-2026-08-30
 - cue-watertight-membrane-sprint-2026-08-30-2026-09-24 --subject--> watertight-membrane-sprint-2026-08-30
+- cue-watertight-membrane-sprint-2026-08-30-2026-09-26 --subject--> watertight-membrane-sprint-2026-08-30
+- cue-workflow-reconciliation-precedes-new-definitions-2026-09-26 --subject--> workflow-reconciliation-precedes-new-definitions
 - cue-workflow-state-specification-2026-09-19 --subject--> workflow-state-specification
 - cue-workflow-state-specification-2026-09-22 --derived-from--> run-membership-is-realisation-2026-09-22
 - cue-workflow-state-specification-2026-09-22 --subject--> workflow-state-specification
@@ -988,6 +1017,7 @@ framework_version: 3.42.0
 - interface-specification --derived-from--> explorer-publication-position
 - interface-specification --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - interface-specification --derived-from--> harness-native-onramp-supersedes-desktop
+- interface-specification --references--> claude-code-cloud-first-session-2026-09-24
 - isolation-must-contain-writes-not-just-reads --extends--> withholding-is-not-isolation
 - isolation-must-contain-writes-not-just-reads --complements--> committed-state-carries-defects-as-faithfully-as-facts
 - isolation-must-contain-writes-not-just-reads --informs--> evidence-and-eval-backlog
@@ -1144,6 +1174,7 @@ framework_version: 3.42.0
 - operator-seat-and-harness-native-onramp --references--> closed-loop-operating-state
 - operator-seat-and-harness-native-onramp --references--> first-hour-guide
 - operator-seat-and-harness-native-onramp --informs--> a-surface-without-a-floor-accumulates-repairs-not-progress
+- operator-seat-and-harness-native-onramp --references--> claude-code-cloud-first-session-2026-09-24
 - orchestration-specification --extends--> thing-specification
 - orchestration-specification --informs--> estate-git-sync
 - orchestration-specification --complements--> write-thing-specification
