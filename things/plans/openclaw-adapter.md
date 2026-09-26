@@ -65,6 +65,12 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 7. **The package is version-bounded.** OpenClaw Plugin SDK APIs are
    experimental; claims name exact tested host versions.
 
+8. **Domain selection precedes domain startup.** An owner-visible command
+   resolves a registered domain to its dedicated agent and workspace, verifies
+   that workspace's `AGENTS.md`, and reuses or creates a separately routed
+   Telegram topic. It never changes the current agent's working directory or
+   rebinds the current conversation.
+
 ## Adapter contract
 
 | ID | Requirement | Acceptance evidence |
@@ -79,6 +85,7 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 | OCA-08 | Isolate domains, agents, sessions and plugin state so concurrent loops cannot cross-load or cross-wake. | Multi-domain concurrency tests use distinct fixtures and session keys. |
 | OCA-09 | Install publicly without private paths, repositories or trusted-only APIs; publish bounded compatibility. | Clean-profile install, manifest, package-content and host-version CI checks. |
 | OCA-10 | Prove the adapter with public fixtures and supported commands only. | Acceptance evidence has no BookRite or private-estate prerequisite. |
+| OCA-11 | Make the active MarkdownLLM domain visible and selectable before startup without cross-domain workspace or session mutation. | Owner-gated status/list/open command tests prove explicit topic-to-agent routing, target `AGENTS.md` admission, existing-topic reuse, persistence and rollback. |
 
 ## Delivery sequence
 
@@ -89,7 +96,7 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 - [x] Inspect supported OpenClaw plugin, session, context, state and wake
   surfaces at 2026.9.3 (1391f7c).
 - [x] Select the native-plugin seam and record explicit non-seams.
-- [x] Define requirement IDs OCA-01 through OCA-10.
+- [x] Define requirement IDs OCA-01 through OCA-11.
 
 ### Phase 1 - executable contract
 
@@ -108,6 +115,9 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
   before_prompt_build context.
 - [x] Keep lifecycle state bounded and plugin-owned; add a projected session
   extension only when a public writable SDK route can support it.
+- [x] Add owner-gated `/domain`, `/domain list` and `/domain open`
+  commands that establish a dedicated Telegram topic route before the target
+  domain's lifecycle context loads.
 
 ### Phase 3 - wake and recovery slice
 
@@ -120,7 +130,7 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 
 ### Phase 4 - deterministic acceptance
 
-- [ ] Pass OCA-01 through OCA-10 on Windows and POSIX-supported paths.
+- [ ] Pass OCA-01 through OCA-11 on Windows and POSIX-supported paths.
 - [x] Add fitness tests forbidding private imports, direct session-store
   mutation and duplicate lifecycle ownership.
 - [x] Produce a requirement-to-test evidence matrix.
@@ -131,10 +141,12 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 - [x] Prove fresh and continued sessions, reset/compaction recovery and
   Gateway/plugin restart against Windows OpenClaw 2026.9.3.
 - [ ] Prove live two-domain isolation and exact-session wake.
+- [ ] Prove `/domain open` through a live Telegram forum and confirm the
+  first target-topic message starts the selected domain.
 - [x] Record exact version, platform, commands, observations and exclusions.
   Static tests earn designed-for; live runs earn verified-on.
 
-#### Live lifecycle evidence — 2026-09-25
+#### Live lifecycle evidence - 2026-09-25
 
 The Windows proof ran against OpenClaw 2026.9.3 (1391f7c) on Node.js
 24.21.0 in the disposable adapter profile. The package suite passed 29/29,
@@ -155,6 +167,22 @@ and verified byte identity. `npm run test:install` built successfully but did
 not complete within the external 300-second cap on this host. OCA-09 therefore
 remains open for a supported clean-profile Windows install without that
 fallback.
+
+#### Domain-routing increment - 2026-09-27
+
+Commit `96da9d7` adds the explicit domain registry and owner-gated
+`/domain`, `/domain list` and `/domain open` flow. The package suite
+passed 31/31 and its dry-run tarball contained the 21 intended public files.
+Tests cover current-route status, unbound refusal, target-agent and
+`AGENTS.md` admission, existing-topic reuse, topic creation, config
+persistence and rollback.
+
+The current domain-routing build has not yet passed the managed Windows
+clean-profile smoke. The external run timed out after 240 seconds while npm
+was still resolving the OpenClaw peer dependency tree; no plugin-load result
+was produced. No process remained and the exact disposable profile was
+removed. No live Telegram topic was created, so OCA-11 remains deterministic
+only.
 
 ### Phase 6 - public release gate
 
@@ -184,7 +212,7 @@ their public semantics have execution evidence.
 ## Immediate next move
 
 Close the remaining Phase 5 evidence: pass the supported Windows clean-profile
-installer without a symlink fallback, then prove live two-domain isolation and
-exact-session wake. Observe the configured Windows and Ubuntu CI matrix,
-reconcile any defects, and update the matrix before requesting publication
-authority.
+installer without a symlink fallback, prove `/domain open` in a disposable
+Telegram forum, then prove live two-domain isolation and exact-session wake.
+Observe the configured Windows and Ubuntu CI matrix, reconcile any defects,
+and update the matrix before requesting publication authority.
