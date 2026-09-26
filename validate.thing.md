@@ -2,7 +2,7 @@
 id: validate-thing-specification
 type: specification
 status: stable
-version: 3.5
+version: 3.6
 created: 2026-05-19
 linked_things:
   - id: thing-specification
@@ -25,7 +25,7 @@ linked_things:
 # Validate Thing
 
 <!-- kernel -->
-**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, mechanically-declared state transitions, and structural-pin resolution (every local commit pin must name a commit git can resolve; Error). **Never transcribe a SHA** — a wrong one is byte-indistinguishable from a right one to any reader, so read it from `git rev-parse` and let the floor resolve it. A pin into another domain's repository (`source_commit`) is `imports-check`'s, not this check's. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
+**Mechanical validation is the tool's job:** `mdllm validate <path>` through the manual CLI launch route declared in the domain's on-disk AGENTS.md — structure, references, schema conformance, index integrity, mechanically-declared state transitions, and structural-pin resolution (every local commit pin must name a commit git can resolve; Error — except in a shallow clone, where the unresolved remainder is a could-not-look Warning naming `git fetch --unshallow`). **Never transcribe a SHA** — a wrong one is byte-indistinguishable from a right one to any reader, so read it from `git rev-parse` and let the floor resolve it. A pin into another domain's repository (`source_commit`) is `imports-check`'s, not this check's. On Windows PowerShell and Codex managed shells that route is `tools/mdllm.ps1`, even when `python` exists; never substitute a harness-bundled interpreter that has not dependency-probed PyYAML. Interactive validation defaults to the draft worktree; `--view index` freezes and validates the exact Git candidate tree. The pre-commit hook always uses the index view for validation, coherence, examples, indexes, boundary checks, and reconciliation cues, so repaired worktree bytes cannot excuse invalid staged bytes and unrelated worktree damage cannot poison a valid candidate. Exit 1 = Errors; the hook blocks them at the boundary. **Never re-perform mechanical checks by reasoning.** Never bypass the hook (`--no-verify`); if validation blocks a legitimate change, the schema or candidate is wrong — fix it with the human.
 
 **Semantic validation is yours:** metadata–narrative consistency · scope (split/merge per decomposition tests) · staleness · trigger coherence · duplicates · *disposition* of insights/conflicts the floor flags — orphaned from session memory (no inbound edge from a live thing) or, for an open conflict, untouched in the commit stream for 30+ days (promote/dismiss/rule/link from live work/keep-active with a stated reason). Advisory tone ("I noticed…"), never blocking. (Retrospective cadence and quarantine age moved to the floor in v3.24.0, open-conflict age on 2026-09-08 — Info findings, mechanically computed.)
 
@@ -96,7 +96,12 @@ The tool enforces, deterministically:
   Where git cannot be consulted at all the check says so at Warning severity rather
   than reporting a clean corpus it never read
   (`a-check-run-where-it-cannot-see-mints-a-false-finding`); a corpus declaring no pin
-  is silent either way. Severity is deliberately stricter than `mdllm provenance`'s
+  is silent either way. The same holds where git *can* be consulted but the clone is
+  **shallow**: a pin below the boundary is indistinguishable from a wrong one, so the
+  unresolved remainder is one could-not-look Warning naming the remedy
+  (`git fetch --unshallow`), never a per-pin Error; `definition_commit` and the
+  born-verified check follow the same rule, and one `clone-depth` Warning names the
+  checks whose failure is silence. With full history the Error stands unchanged. Severity is deliberately stricter than `mdllm provenance`'s
   graded report: provenance asks whether an already-committed chain is still traceable,
   this asks whether the candidate's pin is a commit at all — where the overwhelmingly
   likely cause is a transcription error the author can fix in the same edit.

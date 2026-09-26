@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: evolving
-version: 1.7
+version: 1.8
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -27,6 +27,9 @@ linked_things:
   - id: harness-native-onramp-supersedes-desktop
     relation: derived-from
     notes: "v1.7 records the Desktop route frozen and names the harness-native onramp — the operator's own sentence in a harness they already use — as the accessible route; the substrate stays route-agnostic."
+  - id: claude-code-cloud-first-session-2026-09-24
+    relation: references
+    notes: "v1.8 adds the Claude Code cloud row from its first-hand record, no wider than that record."
 ---
 
 # Interface
@@ -90,6 +93,7 @@ An input route is any channel through which a human can communicate intent to th
 | **Harness-native onramp (planned)** | The operator's intent sentence in any route below; a skill/adapter resolves the domain, runs the bootstrap silently and renders the seat. | `operator-seat-and-harness-native-onramp`; no route's onramp is claimed until its execution evidence exists. |
 | **MarkdownLLM Desktop (Engineering Preview, frozen)** | Local setup, Domain/Session management, Explorer and a context-only provider route over ordinary Markdown/Git state. | Frozen at the issued 0.1.6 installer (2026-09-06); the API-key route loads but does not send. Not published; not the first-use path. Its setup-journey requirements are input to the onramp. |
 | **Claude Code (CLI + desktop)** | `CLAUDE.md` entry pointer imports `AGENTS.md` (`@AGENTS.md`). Core scaffold surface — born with every domain in every `--harness` selection, `none` included. | Automatic pointer route verified 2026-08-17; named lifecycle evidence is separate. |
+| **Claude Code on the web (cloud container)** | Same pointer route; the checked-in project SessionStart hook fires with no setup. The container is a fresh harness clone — observed shallow, upstream-less, hookless and without `.boundary-terms`. | First-hand record `claude-code-cloud-first-session-2026-09-24` (framework root): entry and lifecycle delivered; the clone defects made the floor mint 148 false Errors until repaired. The floor now repairs history and upstream at estate-sync; the boundary-terms gap stays open. |
 | **Cowork (Claude desktop chat)** | The `spin-up-domain` bootstrap skill reconstructs a domain from a fresh session and emits its Tier-0 contract. | Bootstrap skill exists; the intent-sentence onramp over it is planned, not evidenced. |
 | **Perplexity** | Candidate route an operator's colleague already uses. | Whether it can receive the entry contract and operate Git is a probe to run, not a claim; no framework execution record. |
 | **OpenAI Codex CLI / desktop** | Reads AGENTS.md; the optional project adapter binds lifecycle events. | Automatic on the named tested Windows surfaces; CLI lifecycle and Desktop/runtime/Git claims are recorded separately rather than generalized. |

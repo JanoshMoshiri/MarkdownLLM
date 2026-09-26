@@ -2,7 +2,7 @@
 id: framework-map
 type: guide
 status: draft
-version: 2.3
+version: 2.4
 created: 2026-06-11
 tags: [architecture, orientation, visual]
 linked_things:
@@ -241,7 +241,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 - **`example-things.md`** (`specification`, `stable`): complements → `domain-specification-guide.md`; extends → `thing.md`
 - **`framework-discovery.md`** (`specification`, `stable`): complements → `domain-refresh.md`; extends → `domain-specification-guide.md`; references → `thing.md`, `git-workflow.md`
 - **`git-workflow.md`** (`specification`, `evolving`): complements → `thing.md`, `interface.md`, `write.thing.md`, `validate.thing.md`, `derived-index.md`; implements → `llm-driven-systems.manifesto.md` · +3 edge(s) outside the spec layer
-- **`interface.md`** (`specification`, `evolving`): complements → `provenance.md`, `thing.md`, `git-workflow.md`, `read.thing.md`, `write.thing.md`; implements → `llm-driven-systems.manifesto.md` · +3 edge(s) outside the spec layer
+- **`interface.md`** (`specification`, `evolving`): complements → `provenance.md`, `thing.md`, `git-workflow.md`, `read.thing.md`, `write.thing.md`; implements → `llm-driven-systems.manifesto.md` · +4 edge(s) outside the spec layer
 - **`llm-driven-systems.manifesto.md`** (`manifesto`, `evolving`): informs → `scalability-guide.md`, `domain-specification-guide.md` · +4 edge(s) outside the spec layer
 - **`operating-model.md`** (`specification`, `draft`): complements → `trigger-specification.md`, `provenance.md`, `coordination-claim.md`; extends → `universal-workflow.md`, `workflow-state.md`; references → `interface.md`
 - **`orchestration.md`** (`specification`, `evolving`): complements → `write.thing.md`, `git-workflow.md`, `interface.md`, `trigger-specification.md`, `derived-index.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md`, `session-memory.md`, `belief-revision.md`, `domain-refresh.md` · +2 edge(s) outside the spec layer
@@ -582,8 +582,8 @@ over them:
 
 - **View 1:** the root file listing and `AGENTS.md` tier structure. The
   spec-thing count is a mechanical fact — every `.md` under root and `docs/`
-  whose frontmatter `type` is specification/guide/manifesto (29 at last count:
-  22 + 6 + 1, including `docs/plans/mcp-domain-server.md` and the
+  whose frontmatter `type` is specification/guide/manifesto (32 at last count,
+  2026-09-24: 25 + 6 + 1, including `docs/plans/mcp-domain-server.md` and the
   formerly frontmatter-less `docs/estate-mechanics.md`) — recount before
   restating; a review-loop finding caught this label two behind reality.
 - **View 2:** each spec's `linked_things` frontmatter; the kernel coverage

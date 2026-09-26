@@ -2,7 +2,7 @@
 id: domain-specification-guide
 type: guide
 status: stable
-version: 2.12
+version: 2.13
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -49,7 +49,7 @@ PowerShell use `./tools/mdllm.ps1 <command>`; elsewhere use
 `python tools/mdllm.py <command>` only with an interpreter that can import
 PyYAML.
 
-**Not compatible:** Web-based chat interfaces (ChatGPT, Claude web) or raw API calls without a file-access harness. The LLM must be able to navigate directories, read markdown files, and create/modify files.
+**Not compatible:** Web-based chat interfaces without file access (a plain ChatGPT or claude.ai chat) or raw API calls without a file-access harness. A web-hosted *coding harness* with a container — Claude Code on the web is the recorded case — is compatible; see `interface.md` for what its fresh clone lacks. The LLM must be able to navigate directories, read markdown files, and create/modify files.
 
 > **The agent builds the domain with you.** You describe the problem space, make design decisions about workflows and structure, and provide feedback as things take shape. The agent applies the framework patterns, creates the files, and maintains structural integrity. You iterate together — and that iteration doesn't end at creation. You continue to direct, refine, and evolve the domain through use.
 

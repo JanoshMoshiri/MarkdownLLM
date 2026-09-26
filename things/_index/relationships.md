@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-23
-generated: 2026-09-23T20:37:35
-generated_from: HEAD@446155b
-coverage: 430
+created: 2026-09-26
+generated: 2026-09-26T22:31:16
+generated_from: HEAD@baa2320
+coverage: 431
 framework_version: 3.42.0
 ---
 
@@ -273,6 +273,10 @@ framework_version: 3.42.0
 - claude-5r2-renderer-acceptance-2026-08-13 --implements--> code-architect-governs-substrate-code
 - claude-adapter-baseline-2026-08-11 --documents--> vendor-harness-adapter-foundation
 - claude-adapter-baseline-2026-08-11 --implements--> portability-claims-need-execution-tests
+- claude-code-cloud-first-session-2026-09-24 --supports--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- claude-code-cloud-first-session-2026-09-24 --informs--> operator-seat-and-harness-native-onramp
+- claude-code-cloud-first-session-2026-09-24 --extends--> lifecycle-output-truncation-2026-08-14
+- claude-code-cloud-first-session-2026-09-24 --supports--> portability-claims-need-execution-tests
 - claude-domain-entry-pointer-observation-2026-08-17 --documents--> vendor-harness-adapter-foundation
 - claude-domain-entry-pointer-observation-2026-08-17 --references--> claude-entry-surface-unprovisioned-for-no-adapter-domains
 - claude-domain-entry-pointer-observation-2026-08-17 --extends--> claude-phase6-no-adapter-and-root-2026-08-16
@@ -956,6 +960,7 @@ framework_version: 3.42.0
 - interface-specification --derived-from--> explorer-publication-position
 - interface-specification --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - interface-specification --derived-from--> harness-native-onramp-supersedes-desktop
+- interface-specification --references--> claude-code-cloud-first-session-2026-09-24
 - isolation-must-contain-writes-not-just-reads --extends--> withholding-is-not-isolation
 - isolation-must-contain-writes-not-just-reads --complements--> committed-state-carries-defects-as-faithfully-as-facts
 - isolation-must-contain-writes-not-just-reads --informs--> evidence-and-eval-backlog

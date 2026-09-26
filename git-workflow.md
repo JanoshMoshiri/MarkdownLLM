@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: 1.9
+version: 1.10
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -308,6 +308,16 @@ read velocity. This is what `mdllm estate-sync` mechanises and the
   nonzero for cached or unresolved outcomes so a restricted harness can route
   one-command network/filesystem approval. The flag grants no authority by
   itself; it makes the missing consequence visible to the authority layer.
+- **History is part of the state.** Every reader of the event stream —
+  velocity, stall lines, pin resolution, flip surfacing, conflict age —
+  assumes the clone holds it. A shallow clone does not, and it fails by
+  answering wrongly rather than not at all (148 false Errors and eleven hidden
+  stalls in the first cloud session). The sync walk therefore completes a
+  shallow clone's history as part of its fetch — transport of state already
+  real, exactly the fast-forward argument — and reports `SHALLOW` when it
+  cannot; `doctor` fails the floor and session-start says so before the
+  figures it corrupts. A harness branch that arrives with no upstream is
+  compared with its single same-name remote ref, read-only.
 - **A dirty working tree is never touched.** Fetch is always safe; the
   fast-forward is skipped and reported. Session-end discipline (nothing left
   uncommitted) makes this rare; the guard makes it harmless.
