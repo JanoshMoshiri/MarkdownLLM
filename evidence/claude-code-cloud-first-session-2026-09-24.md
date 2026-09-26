@@ -52,12 +52,18 @@ wrongly.
 
 ## What changed because of it
 
-`build: a clone that cannot see its history says so — and estate-sync heals it`
-(framework, 2026-09-26): `clone_depth` detection; estate-sync completes shallow
+The same session, 2026-09-26, in four commits:
+
+- `commit:baa2320a6c7b5c58ff6311e5ebad30b59768a541` — build: `clone_depth` detection; estate-sync completes shallow
 history and reads an upstream-less branch against its same-name ref; validate,
 doctor and session-start report could-not-look instead of minting findings.
 Re-verified on a real depth-50 clone of this repository: 148 Errors → 0 with
 honest Warnings; one estate-sync → full history, stalls restored.
+- `commit:214770d5a267aa102c8c2a0eb36fd7a0e571bbea` — reconcile: the specs (orchestration, git-workflow,
+  validate) state the repair; five stale restatements corrected.
+- `commit:acb2746f9dfc94faeee07a847e48c48b48adf808` — plan: the onramp goes first; Phase 2 names the
+  clone defects and the open boundary-terms gap.
+- `commit:7a2deb213147543b78196884b94d65e89659a864` — reconcile: the 23 cues the digest carried answered.
 
 ## Limits of this record
 

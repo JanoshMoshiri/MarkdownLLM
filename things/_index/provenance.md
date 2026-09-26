@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-26
-generated: 2026-09-26T22:33:45
-generated_from: HEAD@acb2746
+generated: 2026-09-26T22:34:51
+generated_from: HEAD@7a2deb2
 coverage: 112
 framework_version: 3.42.0
 ---
