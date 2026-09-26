@@ -34,6 +34,7 @@ from .structural_refs import (
     iter_structural_references, structural_field_names, structural_shape_errors,
 )
 from .structural_pins import structural_pin_findings
+from .clone_depth import UNSHALLOW_REMEDY, clone_depth, shallow_warning_text
 from .session_contract import contract_fingerprint
 
 # `valid_statuses_for` moved to model.py (2026-08-28) so the vocabulary
@@ -386,6 +387,8 @@ class WorkflowDefinitionResolver:
         self._view_errors: dict[str, str] = {}
         self._corpora: dict[str, Corpus] = {}
         self._definitions: dict[tuple[str, str, str], tuple[Thing | None, str | None]] = {}
+        self._depth = None
+        self.unseen_pins: set[str] = set()
 
     @staticmethod
     def valid_pin(pin: object) -> bool:
@@ -400,6 +403,19 @@ class WorkflowDefinitionResolver:
         try:
             selected = RepositoryView.commit(self.repository_root, pin)
         except RepositoryViewError:
+            if self._depth is None:
+                self._depth = clone_depth(self.repository_root)
+            if self._depth.truncated:
+                # Below a shallow boundary a real pin is indistinguishable
+                # from a wrong one (clone_depth.py): could-not-look, Warning.
+                self.unseen_pins.add(key)
+                message = (f"`definition_commit` `{pin}` names no commit "
+                           f"visible in this clone, and the clone is SHALLOW "
+                           f"({self._depth.horizon()}) — membership and "
+                           f"transition checks for this run could not look. "
+                           f"Run {UNSHALLOW_REMEDY} and re-validate")
+                self._view_errors[key] = message
+                return None, message
             message = (f"`definition_commit` `{pin}` does not resolve to a "
                        "commit in this repository")
             self._view_errors[key] = message
@@ -508,7 +524,10 @@ def workflow_run_findings(
                     definition, error = selected.resolve(
                         str(revision), definition_id, current_definition)
                     if error is not None:
-                        findings.append(Finding(SEV_ERROR, name, error))
+                        sev = (SEV_WARNING
+                               if str(revision).lower() in selected.unseen_pins
+                               else SEV_ERROR)
+                        findings.append(Finding(sev, name, error))
                     elif definition is not None and current_stage is not None:
                         stage_ids = {
                             stage["id"]
@@ -935,6 +954,9 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
                     if line:
                         # newest-first: first add wins, matching `log -1`
                         created_map.setdefault(line, sha.strip())
+    depth = clone_depth(root)
+    shallow_roots = set(depth.boundaries) if depth.truncated else set()
+    shallow_unseen = 0
     for t in externals:
         name = t.id or t.path.name
         vb = t.meta.get("verified_by")
@@ -980,12 +1002,26 @@ def quarantine_findings(root: Path, corpus: Corpus) -> list[Finding]:
             if cmeta and cmeta.get("verified") is True:
                 flip = c
                 break
+        if created and flip and created == flip and created in shallow_roots:
+            # The grafted boundary commit of a shallow clone "adds" every file
+            # older than it, so it reads as the creation commit of all of
+            # them (clone_depth.py). The review window may be below the
+            # boundary: this run cannot tell, and says so once below.
+            shallow_unseen += 1
+            continue
         if created and flip and created == flip:
             out.append(Finding(sev, name,
                        f"born `verified: true` — the flip commit is the "
                        f"creation commit ({created[:9]}); no review window "
                        f"existed. Heal: re-quarantine, then re-verify in a "
                        f"separate commit naming `verified_by`"))
+    if shallow_unseen:
+        out.append(Finding(SEV_WARNING, "verified-flips",
+                   f"{shallow_unseen} verified external thing(s) appear "
+                   f"created by the shallow boundary commit — the clone is "
+                   f"SHALLOW ({depth.horizon()}), so whether each had a review "
+                   f"window cannot be seen here. Run {UNSHALLOW_REMEDY} and "
+                   f"re-validate"))
     return out
 
 
@@ -1140,7 +1176,25 @@ def validate_corpus(root: Path,
     # this runs on whatever view produced the corpus: the pre-commit leg
     # checks the frozen candidate's pins against the repository's history.
     findings.extend(structural_pin_findings(root, corpus))
+    findings.extend(clone_depth_findings(root, corpus))
     return corpus, findings
+
+
+def clone_depth_findings(root: Path, corpus: Corpus) -> list[Finding]:
+    """One Warning when the clone cannot see its whole history.
+
+    The per-check reclassifications (pins, born-verified) stop false findings;
+    this is the finding for the checks whose failure is SILENCE — conflict
+    age, retrospective cadence, stall lines — which a truncated stream makes
+    quieter, never louder. Warning, not Error: the corpus is not malformed,
+    the clone is, and blocking every commit on an environment fact would make
+    a shallow cloud clone uncommittable.
+    """
+    origin = corpus.view.root if corpus.view is not None else Path(root)
+    depth = clone_depth(Path(origin))
+    if not depth.truncated:
+        return []
+    return [Finding(SEV_WARNING, "clone-depth", shallow_warning_text(depth))]
 
 
 def derivation_findings(corpus: Corpus) -> list[Finding]:

@@ -319,6 +319,7 @@ def build_cli() -> argparse.ArgumentParser:
     rf.set_defaults(fn=cmd_refresh)
 
     d = sub.add_parser("doctor", help="probe the environment: floor prerequisites, "
+                                      "history completeness (shallow clones), "
                                       "hook execution, framework version drift")
     d.add_argument("path", nargs="?", default=".")
     d.add_argument("--harness", choices=tuple(
@@ -436,6 +437,8 @@ def build_cli() -> argparse.ArgumentParser:
 
     es = sub.add_parser("estate-sync", help="sync before orienting: fetch + "
                         "ff-only pull across the estate's repos (root + domain(s)/*); "
+                        "completes a shallow clone's history; compares an "
+                        "upstream-less branch with its same-name remote ref; "
                         "divergence reported, never resolved; never pushes; "
                         "--status = publication debt from cached refs, no network; "
                         "--require-fresh = fail if sync used cached or unresolved state")

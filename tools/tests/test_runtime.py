@@ -365,12 +365,17 @@ def test_powershell_resolver_enforces_total_deadline_and_kills_probe(
     marker = tmp_path / "orphan-finished.txt"
     env = dict(os.environ)
     resolver = Path(mdllm.__file__).resolve().with_name("resolve-runtime.ps1")
+    # Escape outside the f-strings: reusing the outer quote inside a
+    # replacement field is Python 3.12+ (PEP 701), and the floor supports
+    # 3.10+ — on 3.11 this module could not even be collected.
+    marker_ps = str(marker).replace("'", "''")
+    resolver_ps = str(resolver).replace("'", "''")
     stalled = ("Start-Sleep -Seconds 20; "
-               f"Set-Content -LiteralPath '{str(marker).replace("'", "''")}' "
+               f"Set-Content -LiteralPath '{marker_ps}' "
                "-Value orphan")
     stalled_ps = stalled.replace("'", "''")
     command = (
-        f". '{str(resolver).replace("'", "''")}'; "
+        f". '{resolver_ps}'; "
         "$w=[Diagnostics.Stopwatch]::StartNew(); "
         "$c=[PSCustomObject]@{Executable='powershell.exe'; "
         "PrefixArguments=@('-NoProfile','-Command','" + stalled_ps + "')}; "
