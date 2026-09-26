@@ -51,21 +51,39 @@ specified ancestor fallback) reaches a valid `.markdownllm` sentinel and
 `kernel.md`, and that the entry declares a domain name. A refusal is injected
 as failed advisory context; it never certifies or runs the ordered startup.
 
-Configure the plugin with an explicit list of OpenClaw agent ids. Each selected
-agent's configured OpenClaw workspace must be the entry for exactly one
-MarkdownLLM domain.
+Register each MarkdownLLM domain against one OpenClaw agent. Each agent's
+configured workspace must be the entry for exactly one domain; domain ids and
+agent ids are unique.
 
 Merge this shape into `openclaw.json`:
 
 ```json5
 {
+  agents: {
+    list: [
+      {
+        id: "engineering",
+        workspace: "/domains/engineering"
+      }
+    ]
+  },
+  channels: {
+    telegram: {
+      actions: { createForumTopic: true }
+    }
+  },
   plugins: {
     entries: {
       markdownllm: {
         enabled: true,
         hooks: { allowConversationAccess: true },
         config: {
-          agentIds: ["domain-agent-id"],
+          domains: {
+            engineering: {
+              agentId: "engineering",
+              topicName: "Engineering"
+            }
+          },
           command: "mdllm",
           commandArgs: [],
           timeoutMs: 115000
@@ -75,6 +93,36 @@ Merge this shape into `openclaw.json`:
   }
 }
 ```
+
+`actions.createForumTopic` is an explicit host permission. Without literal
+`true`, `/domain open` can find existing routes but will not create a
+Telegram topic.
+
+## Telegram domain commands
+
+The owner-only command surface is:
+
+```text
+/domain
+/domain list
+/domain open engineering
+```
+
+`/domain` shows the domain, agent, workspace and Telegram topic bound to the
+current conversation. `/domain list` shows registered domains and whether
+each already has a topic in the current Telegram supergroup.
+
+`/domain open engineering` verifies the Engineering agent workspace and its
+`AGENTS.md` before creating anything. It then reuses an existing routed topic
+or creates a new forum topic, persists that topic's `agentId` through
+OpenClaw's config mutation API, and returns the topic link. Opening the link and
+sending the first message causes the existing lifecycle hook to run
+session-start inside the Engineering workspace.
+
+The command never changes the current agent's working directory and never
+rebinds the current QMS or other domain session. There is deliberately no
+`/domain bind` operator command: selection happens by opening the isolated
+domain topic whose route already points at the correct agent and workspace.
 
 OpenClaw 2026.9.3 requires the explicit `allowConversationAccess` consent for
 all external `before_prompt_build` hooks. The adapter ignores raw conversation
@@ -139,7 +187,10 @@ replayed automatically.
 
 - The plugin is native Gateway code. Install only a reviewed artifact from a
   trusted publisher.
-- Scope `agentIds` narrowly. The adapter rejects every non-designated agent.
+- Register only trusted `domains` and keep each domain on a unique agent and
+  workspace. The lifecycle adapter rejects every agent not present in that
+  registry.
+- Domain opening is owner-only and requires `operator.admin` authority.
 - Point `command` and `commandArgs` only at a trusted MarkdownLLM checkout.
 - Lifecycle subprocesses use argv arrays with `shell: false`, a bounded timeout
   and a bounded output buffer.

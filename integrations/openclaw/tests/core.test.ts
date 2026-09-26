@@ -5,27 +5,42 @@ import {
   LifecycleGate,
   buildInvocation,
   contractFingerprint,
+  domainById,
+  domainForAgent,
   executeLifecycle,
   isDesignatedAgent,
   lifecycleKey,
   parsePluginConfig,
 } from "../src/core.ts";
 
-test("configuration requires explicit unique designated agents", () => {
-  assert.throws(() => parsePluginConfig({}), /agentIds/);
+test("configuration requires explicit domains with unique agents", () => {
+  assert.throws(() => parsePluginConfig({}), /domains/);
   assert.throws(
-    () => parsePluginConfig({ agentIds: ["alpha", "alpha"] }),
+    () => parsePluginConfig({
+      domains: {
+        alpha: { agentId: "shared" },
+        beta: { agentId: "shared" },
+      },
+    }),
     /unique/,
   );
-  const config = parsePluginConfig({ agentIds: ["alpha"] });
+  assert.throws(
+    () => parsePluginConfig({ domains: { "Bad Id": { agentId: "alpha" } } }),
+    /lowercase/,
+  );
+  const config = parsePluginConfig({
+    domains: { alpha: { agentId: "alpha", topicName: "Alpha" } },
+  });
   assert.deepEqual(config, {
-    agentIds: ["alpha"],
+    domains: [{ id: "alpha", agentId: "alpha", topicName: "Alpha" }],
     command: "mdllm",
     commandArgs: [],
     timeoutMs: 115_000,
   });
   assert.equal(isDesignatedAgent(config, "alpha"), true);
   assert.equal(isDesignatedAgent(config, "beta"), false);
+  assert.equal(domainById(config, "alpha")?.agentId, "alpha");
+  assert.equal(domainForAgent(config, "alpha")?.id, "alpha");
 });
 
 test("binding identity requires both OpenClaw identifiers", () => {
@@ -43,7 +58,7 @@ test("definition fingerprint is stable and version-sensitive", () => {
 
 test("invocation is an argv vector with no shell command", () => {
   const config = parsePluginConfig({
-    agentIds: ["alpha"],
+    domains: { alpha: { agentId: "alpha" } },
     command: "mdllm-custom",
     commandArgs: ["floor.py"],
     timeoutMs: 30_000,
@@ -93,7 +108,7 @@ test("gate isolates agents and sessions", () => {
 
 test("lifecycle output is injected and subprocess failure is retryable", async () => {
   const invocation = buildInvocation(
-    parsePluginConfig({ agentIds: ["alpha"] }),
+    parsePluginConfig({ domains: { alpha: { agentId: "alpha" } } }),
     "C:/domains/alpha",
     "sha256:pinned",
   );

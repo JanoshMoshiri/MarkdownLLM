@@ -9,12 +9,14 @@ import {
   lifecycleKey,
   parsePluginConfig,
 } from "./core.js";
+import { registerDomainCommand } from "./domain-command.js";
 
 export function registerMarkdownLLMPlugin(
   api: OpenClawPluginApi,
   execute: typeof executeLifecycle = executeLifecycle,
 ): void {
     const config = parsePluginConfig(api.pluginConfig ?? {});
+    registerDomainCommand(api, config);
     const gate = new LifecycleGate();
     const fingerprint = contractFingerprint();
 

@@ -73,8 +73,8 @@ try {
   ]);
   installed = true;
   await openclaw([
-    "config", "set", "plugins.entries.markdownllm.config.agentIds",
-    '["fixture-agent"]', "--strict-json",
+    "config", "set", "plugins.entries.markdownllm.config.domains",
+    '{"fixture":{"agentId":"fixture-agent","topicName":"Fixture"}}', "--strict-json",
   ]);
   await openclaw([
     "config", "set",

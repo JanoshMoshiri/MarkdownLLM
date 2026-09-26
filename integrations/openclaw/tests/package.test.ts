@@ -86,6 +86,9 @@ test("packed artifact contains only the intended public files", async () => {
       "dist/core.d.ts",
       "dist/core.js",
       "dist/core.js.map",
+      "dist/domain-command.d.ts",
+      "dist/domain-command.js",
+      "dist/domain-command.js.map",
       "dist/index.d.ts",
       "dist/index.js",
       "dist/index.js.map",
@@ -98,15 +101,19 @@ test("packed artifact contains only the intended public files", async () => {
   );
 });
 
-test("manifest is strict and requires explicit agent designation", async () => {
+test("manifest is strict and requires explicit domain routing", async () => {
   const manifest = await json("openclaw.plugin.json");
   assert.equal(manifest.id, "markdownllm");
   assert.equal(manifest.activation.onStartup, true);
+  assert.deepEqual(manifest.activation.onCommands, ["domain"]);
   assert.deepEqual(manifest.activation.onCapabilities, ["hook"]);
   assert.equal(manifest.configSchema.additionalProperties, false);
-  assert.deepEqual(manifest.configSchema.required, ["agentIds"]);
-  assert.equal(manifest.configSchema.properties.agentIds.minItems, 1);
-  assert.equal(manifest.configSchema.properties.agentIds.uniqueItems, true);
+  assert.deepEqual(manifest.configSchema.required, ["domains"]);
+  assert.equal(manifest.configSchema.properties.domains.minProperties, 1);
+  assert.deepEqual(
+    manifest.configSchema.properties.domains.additionalProperties.required,
+    ["agentId"],
+  );
   assert.deepEqual(manifest.configSchema.properties.commandArgs.default, []);
 });
 
@@ -128,7 +135,10 @@ test("source stays on public seams and has one lifecycle owner", async () => {
     .filter((name) => name.startsWith("openclaw/"));
   assert.deepEqual(
     [...new Set(imports)],
-    ["openclaw/plugin-sdk/plugin-entry"],
+    [
+      "openclaw/plugin-sdk/plugin-entry",
+      "openclaw/plugin-sdk/telegram-account",
+    ],
   );
   assert.doesNotMatch(combined, /openclaw\/(?:dist|src)\//);
   assert.doesNotMatch(

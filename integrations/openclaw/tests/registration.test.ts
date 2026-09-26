@@ -14,9 +14,10 @@ test("registration binds designated sessions and reruns after lifecycle changes"
   const hooks = new Map<string, Hook[]>();
   const warnings: string[] = [];
   const invocations: any[] = [];
+  const commands: any[] = [];
   const api = {
     pluginConfig: {
-      agentIds: ["alpha"],
+      domains: { alpha: { agentId: "alpha", topicName: "Alpha" } },
       command: "mdllm-test",
       commandArgs: ["floor.py"],
       timeoutMs: 20_000,
@@ -41,6 +42,9 @@ test("registration binds designated sessions and reruns after lifecycle changes"
       entries.push({ handler, options });
       hooks.set(name, entries);
     },
+    registerCommand(command: unknown) {
+      commands.push(command);
+    },
   } as unknown as OpenClawPluginApi;
 
   registerMarkdownLLMPlugin(api, async (invocation) => {
@@ -48,6 +52,9 @@ test("registration binds designated sessions and reruns after lifecycle changes"
     return { ok: true, context: "fixture orientation" };
   });
 
+  assert.equal(commands.length, 1);
+  assert.equal(commands[0].name, "domain");
+  assert.deepEqual(commands[0].requiredScopes, ["operator.admin"]);
   assert.deepEqual([...hooks.keys()], [
     "session_start",
     "before_reset",

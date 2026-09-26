@@ -19,8 +19,14 @@ export const LIFECYCLE_CONTRACT = Object.freeze({
   ],
 });
 
+export type DomainDefinition = Readonly<{
+  id: string;
+  agentId: string;
+  topicName?: string;
+}>;
+
 export type PluginConfig = Readonly<{
-  agentIds: readonly string[];
+  domains: readonly DomainDefinition[];
   command: string;
   commandArgs: readonly string[];
   timeoutMs: number;
@@ -47,14 +53,36 @@ function nonEmptyString(value: unknown, field: string): string {
 }
 
 export function parsePluginConfig(raw: Record<string, unknown>): PluginConfig {
-  if (!Array.isArray(raw.agentIds) || raw.agentIds.length === 0) {
-    throw new TypeError("agentIds must contain at least one agent id");
+  if (typeof raw.domains !== "object"
+      || raw.domains === null
+      || Array.isArray(raw.domains)
+      || Object.keys(raw.domains).length === 0) {
+    throw new TypeError("domains must contain at least one domain");
   }
-  const agentIds = raw.agentIds.map((value, index) =>
-    nonEmptyString(value, "agentIds[" + index + "]"),
-  );
+  const domains = Object.entries(raw.domains).map(([id, value]) => {
+    if (!/^[a-z0-9][a-z0-9_-]*$/.test(id)) {
+      throw new TypeError(
+        "domain ids must use lowercase letters, numbers, hyphens or underscores",
+      );
+    }
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+      throw new TypeError("domains." + id + " must be an object");
+    }
+    const record = value as Record<string, unknown>;
+    const agentId = nonEmptyString(record.agentId, "domains." + id + ".agentId");
+    const topicName = record.topicName === undefined
+      ? undefined
+      : nonEmptyString(record.topicName, "domains." + id + ".topicName");
+    if (topicName !== undefined && topicName.length > 128) {
+      throw new TypeError("domains." + id + ".topicName must be at most 128 characters");
+    }
+    return Object.freeze(topicName === undefined
+      ? { id, agentId }
+      : { id, agentId, topicName });
+  });
+  const agentIds = domains.map((domain) => domain.agentId);
   if (new Set(agentIds).size !== agentIds.length) {
-    throw new TypeError("agentIds must be unique");
+    throw new TypeError("each domain must use a unique agentId");
   }
 
   const command = raw.command === undefined
@@ -78,7 +106,7 @@ export function parsePluginConfig(raw: Record<string, unknown>): PluginConfig {
   }
 
   return Object.freeze({
-    agentIds: Object.freeze(agentIds),
+    domains: Object.freeze(domains),
     command,
     commandArgs: Object.freeze(parsedCommandArgs),
     timeoutMs: Number(timeoutMs),
@@ -89,7 +117,22 @@ export function isDesignatedAgent(
   config: PluginConfig,
   agentId: string | undefined,
 ): agentId is string {
-  return typeof agentId === "string" && config.agentIds.includes(agentId);
+  return typeof agentId === "string"
+    && config.domains.some((domain) => domain.agentId === agentId);
+}
+
+export function domainById(
+  config: PluginConfig,
+  domainId: string,
+): DomainDefinition | undefined {
+  return config.domains.find((domain) => domain.id === domainId);
+}
+
+export function domainForAgent(
+  config: PluginConfig,
+  agentId: string | undefined,
+): DomainDefinition | undefined {
+  return config.domains.find((domain) => domain.agentId === agentId);
 }
 
 export function lifecycleKey(
