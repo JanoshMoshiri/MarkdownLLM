@@ -1,4 +1,4 @@
-<#
+﻿<#
 The dispatcher's tick — one command a scheduler runs on the machine that holds
 the substrate (dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23).
 
@@ -30,6 +30,8 @@ param(
     [ValidateSet('claude', 'codex')][string]$Harness = 'claude',
     [string]$StopCondition = 'queue drained, or 25 minutes of work, whichever comes first',
     [string]$Name = 'windows-task',
+    [string]$Model,       # Claude only — an alias ('opus') or full name ('claude-opus-5-5');
+                          # ignored if -HarnessArgs overrides the default launch outright.
     [string[]]$HarnessArgs,
     [switch]$DryRun
 )
@@ -70,8 +72,12 @@ try {
             # Claude Code: headless print mode. The tools a dispatch run needs
             # (git, the floor, file edits) are pre-trusted here — review before
             # registering; widen or narrow to taste.
-            'claude' { @('-p', '--output-format', 'text', '--permission-mode', 'acceptEdits',
-                         '--allowedTools', 'Bash(git:*)', 'Bash(python:*)', 'Bash(*mdllm*)', 'Edit', 'Write', 'Read', 'Glob', 'Grep') }
+            'claude' {
+                $a = @('-p', '--output-format', 'text', '--permission-mode', 'acceptEdits',
+                       '--allowedTools', 'Bash(git:*)', 'Bash(python:*)', 'Bash(*mdllm*)', 'Edit', 'Write', 'Read', 'Glob', 'Grep')
+                if ($Model) { $a += @('--model', $Model) }
+                $a
+            }
             # Codex: one non-interactive turn in the estate root.
             'codex'  { @('exec', '--cd', $root, '--full-auto') }
         }
