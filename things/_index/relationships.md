@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-26
-generated: 2026-09-26T22:31:16
-generated_from: HEAD@baa2320
+generated: 2026-09-26T22:31:32
+generated_from: HEAD@214770d
 coverage: 431
 framework_version: 3.42.0
 ---
@@ -20,6 +20,7 @@ framework_version: 3.42.0
 - a-check-is-only-as-trustworthy-as-who-controls-its-inputs --complements--> consequence-is-recoverable-only-in-retrospect
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> cowork-integrity-estate-sweep
 - a-check-run-where-it-cannot-see-mints-a-false-finding --informs--> mechanical-coherence-checks-backlog
+- a-check-run-where-it-cannot-see-mints-a-false-finding --references--> claude-code-cloud-first-session-2026-09-24
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --supports--> judgement-checks-need-a-suppression-list-which-is-itself-drift
 - a-check-that-always-fires-teaches-the-operator-to-ignore-it --references--> boundary-disclosure-check
 - a-cleanup-is-scoped-by-lifecycle-not-by-location --extends--> consequence-is-recoverable-only-in-retrospect
@@ -1117,6 +1118,7 @@ framework_version: 3.42.0
 - operator-seat-and-harness-native-onramp --references--> closed-loop-operating-state
 - operator-seat-and-harness-native-onramp --references--> first-hour-guide
 - operator-seat-and-harness-native-onramp --informs--> a-surface-without-a-floor-accumulates-repairs-not-progress
+- operator-seat-and-harness-native-onramp --references--> claude-code-cloud-first-session-2026-09-24
 - orchestration-specification --extends--> thing-specification
 - orchestration-specification --informs--> estate-git-sync
 - orchestration-specification --complements--> write-thing-specification

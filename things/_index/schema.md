@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-09-26
-generated: 2026-09-26T22:31:16
-generated_from: HEAD@baa2320
+generated: 2026-09-26T22:31:32
+generated_from: HEAD@214770d
 coverage: 431
 framework_version: 3.42.0
 ---
@@ -41,7 +41,7 @@ framework_version: 3.42.0
 | period_end | 9 |
 | domain | 9 |
 | completed | 8 |
-| triggers | 7 |
+| triggers | 6 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |
