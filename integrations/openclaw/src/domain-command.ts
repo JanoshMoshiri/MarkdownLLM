@@ -1,5 +1,8 @@
+import { execFile } from "node:child_process";
 import { readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 import type {
   OpenClawConfig,
@@ -17,6 +20,10 @@ import {
 } from "./core.js";
 
 type JsonObject = Record<string, unknown>;
+
+type OpenClawCliExecutor = (args: readonly string[]) => Promise<string>;
+
+const execFileAsync = promisify(execFile);
 
 type TelegramTopicOps = Readonly<{
   create: (params: {
@@ -160,6 +167,64 @@ function topicLink(chatId: string, id: number): string {
   return "https://t.me/c/" + chatId.slice(4) + "/" + id;
 }
 
+async function executeOpenClawCli(args: readonly string[]): Promise<string> {
+  const cliEntry = fileURLToPath(import.meta.resolve("openclaw/cli-entry"));
+  const result = await execFileAsync(
+    process.execPath,
+    [cliEntry, ...args],
+    {
+      encoding: "utf8",
+      maxBuffer: 1024 * 1024,
+      timeout: 20_000,
+      windowsHide: true,
+    },
+  );
+  return String(result.stdout);
+}
+
+function parseOpenClawCliResult(stdout: string): JsonObject {
+  const start = stdout.indexOf("{");
+  const end = stdout.lastIndexOf("}");
+  if (start < 0 || end < start) {
+    throw new Error("OpenClaw returned no JSON result");
+  }
+  const parsed = JSON.parse(stdout.slice(start, end + 1)) as unknown;
+  const result = asObject(parsed);
+  if (!result) throw new Error("OpenClaw returned an invalid JSON result");
+  return result;
+}
+
+export async function createTelegramTopicViaOpenClawCli(
+  params: {
+    accountId: string | undefined;
+    chatId: string;
+    name: string;
+  },
+  execute: OpenClawCliExecutor = executeOpenClawCli,
+): Promise<number> {
+  const args = [
+    "message",
+    "thread",
+    "create",
+    "--channel",
+    "telegram",
+    "--target",
+    params.chatId,
+    "--thread-name",
+    params.name,
+  ];
+  if (params.accountId) args.push("--account", params.accountId);
+  args.push("--json");
+
+  const result = parseOpenClawCliResult(await execute(args));
+  const payload = asObject(result.payload) ?? result;
+  const id = topicId(payload.topicId);
+  if (payload.ok !== true || !id) {
+    throw new Error("OpenClaw returned no topic id");
+  }
+  return id;
+}
+
 async function telegramRequest<T>(
   config: OpenClawConfig,
   accountId: string | undefined,
@@ -201,15 +266,7 @@ const defaultTelegramOps: TelegramTopicOps = Object.freeze({
         "Telegram topic creation is disabled; enable actions.createForumTopic",
       );
     }
-    const result = await telegramRequest<{ message_thread_id?: number }>(
-      config,
-      accountId,
-      "createForumTopic",
-      { chat_id: chatId, name },
-    );
-    const id = topicId(result.message_thread_id);
-    if (!id) throw new Error("Telegram returned no topic id");
-    return id;
+    return createTelegramTopicViaOpenClawCli({ accountId, chatId, name });
   },
   async remove({ config, accountId, chatId, topicId: id }) {
     await telegramRequest<boolean>(

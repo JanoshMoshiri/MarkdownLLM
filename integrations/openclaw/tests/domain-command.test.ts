@@ -7,7 +7,10 @@ import type {
 } from "openclaw/plugin-sdk/plugin-entry";
 
 import { parsePluginConfig } from "../dist/core.js";
-import { registerDomainCommand } from "../dist/domain-command.js";
+import {
+  createTelegramTopicViaOpenClawCli,
+  registerDomainCommand,
+} from "../dist/domain-command.js";
 
 function commandContext(
   config: PluginCommandContext["config"],
@@ -29,6 +32,49 @@ function commandContext(
     getCurrentConversationBinding: async () => null,
   };
 }
+
+test("topic creation uses OpenClaw's native Telegram action", async () => {
+  const calls: string[][] = [];
+  const id = await createTelegramTopicViaOpenClawCli(
+    {
+      accountId: "work",
+      chatId: "-100123",
+      name: "Engineering",
+    },
+    async (args) => {
+      calls.push([...args]);
+      return [
+        "OpenClaw diagnostic prelude",
+        JSON.stringify({
+          action: "topic-create",
+          channel: "telegram",
+          payload: {
+            ok: true,
+            topicId: 82,
+            name: "Engineering",
+            chatId: "-100123",
+          },
+        }),
+      ].join("\n");
+    },
+  );
+
+  assert.equal(id, 82);
+  assert.deepEqual(calls, [[
+    "message",
+    "thread",
+    "create",
+    "--channel",
+    "telegram",
+    "--target",
+    "-100123",
+    "--thread-name",
+    "Engineering",
+    "--account",
+    "work",
+    "--json",
+  ]]);
+});
 
 test("domain command reports, lists and opens isolated Telegram routes", async () => {
   const hostConfig: any = {
