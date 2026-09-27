@@ -79,6 +79,17 @@ def assemble_extra(root: Path, entry: dict, path: Path, *, maintenance: bool) ->
     if branch:
         if git(path, "rev-parse", "--abbrev-ref", "HEAD") != branch:
             raise ValueError(f"{entry['name']}: cached branch differs; refusing checkout")
+        if entry["publication"] == "declared":
+            default = git(path, "symbolic-ref", "--short", "refs/remotes/origin/HEAD").removeprefix("origin/")
+            if branch != default:
+                raise ValueError(f"{entry['name']}: declared automatic publication requires the remote default branch")
+        recorded = subprocess.run(["git", "-C", str(path), "config", "--local", "--get", "mdllm.cloud.branch"],
+                                  capture_output=True, text=True, check=False)
+        if recorded.returncode == 0 and recorded.stdout.strip() != branch:
+            raise ValueError(f"{entry['name']}: cached publication branch differs from the manifest")
+        if recorded.returncode not in (0, 1):
+            raise ValueError(f"{entry['name']}: cached branch restraint could not be read")
+        git(path, "config", "--local", "mdllm.cloud.branch", branch)
         if maintenance:
             git(path, *auth_options(entry), "fetch", "--quiet", "origin")
             # Fast-forward only. Local commits are kept; divergence is a stop.
@@ -140,6 +151,10 @@ def status(config: dict, primary: Path) -> int:
                   f"drafts={dirty}, shallow={shallow}, automatic publication={policy.enabled}")
             if path == primary:
                 print("  host-managed result: review the selected repository's Codex diff/PR; not a multi-repo receipt")
+            expected_branch = entry.get("revision", {}).get("branch")
+            if expected_branch and branch != expected_branch:
+                print(f"  BRANCH MISMATCH: manifest names {expected_branch}; do not publish")
+                attention = True
             variable = entry.get("credential_env")
             print(f"  credentials: {variable} {'available' if os.environ.get(variable) else 'unavailable'} in this phase"
                   if variable else "  credentials: native Git, availability unverified (use cloud probe)")

@@ -39,6 +39,8 @@ additional writable domains' publication `manual` unless their own AGENTS.md
 already declares literal autopush true and the operator wants that behavior;
 `declared` cannot grant new authority. Treat `access: read` as intention and
 use read-scoped credentials to enforce it.
+For `declared`, ensure the manifest branch is the remote default; the adapter
+also refuses automatic publication from another checked-out branch.
 
 If the user's request includes configuring Codex, use the available browser tool and its
 instructions to find/create the matching repository environment, set exactly
@@ -58,3 +60,5 @@ local PR restraint and model-visible Tier-0 delivery (`mdllm cloud start`).
 Run `mdllm cloud status` for unpushed extra commits and unknown upstreams;
 check each remote separately. Distinguish local fixture tests, cloud setup logs,
 project-hook trust and actual agent delivery. Report any untested part explicitly.
+For each started domain, surface the full trigger evaluation, imports coverage
+and repository branch map in the working task.

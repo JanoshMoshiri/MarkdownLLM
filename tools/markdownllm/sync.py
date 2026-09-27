@@ -545,6 +545,16 @@ def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
         out["state"] = "detached"
         return out
     branch = br.stdout.strip()
+    cloud_branch = _git(repo, "config", "--local", "--get", "mdllm.cloud.branch")
+    if cloud_branch is None or cloud_branch.returncode not in (0, 1):
+        out["state"] = "failed"
+        out["detail"] = "clone-local cloud branch restraint could not be read"
+        return out
+    if cloud_branch.returncode == 0 and branch != cloud_branch.stdout.strip():
+        out["state"] = "wrong-branch"
+        out["detail"] = (f"checked out on {branch!r}; cloud manifest permits "
+                         f"automatic publication only from {cloud_branch.stdout.strip()!r}")
+        return out
     upstream = _git(repo, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}")
     if upstream is None or upstream.returncode != 0:
         out["state"] = "no-upstream"

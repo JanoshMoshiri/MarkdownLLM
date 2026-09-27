@@ -14,7 +14,7 @@ from markdownllm import cloud_bootstrap as boot
 from markdownllm.adapters.codex import CODEX
 from markdownllm.cloud_repositories import assemble_extra, complete_history, layout, provision_boundary
 from markdownllm.cloud_service import write_artifacts
-from markdownllm.sync import SyncState, publication_policy, sync_repo
+from markdownllm.sync import SyncState, autopush_repo, publication_policy, sync_repo
 
 
 def config_v2(old):
@@ -185,11 +185,16 @@ def test_multi_repo_real_setup_resume_and_publication(estate, tmp_path, monkeypa
                              text=True, capture_output=True, timeout=60)
     assert emitted.returncode == 0, emitted.stdout + emitted.stderr
     assert "Fixture kernel" in emitted.stdout
+    assert "full triggers" in emitted.stdout
+    assert "imports coverage" in emitted.stdout
     git(write_repo, "config", "user.name", "Fixture")
     git(write_repo, "config", "user.email", "fixture@example.invalid")
     (write_repo / "accepted.md").write_text("---\nid: accepted\ntype: task\nstatus: completed\ncreated: 2026-09-27\n---\n# Accepted\n")
     git(write_repo, "add", "accepted.md")
     git(write_repo, "commit", "-m", "complete: fixture")
+    assert git(sources["working"][1], "rev-parse", "trunk") == git(write_repo, "rev-parse", "HEAD")
+    git(write_repo, "checkout", "-qb", "wrong-branch")
+    assert autopush_repo(write_repo)["state"] == "wrong-branch"
     assert git(sources["working"][1], "rev-parse", "trunk") == git(write_repo, "rev-parse", "HEAD")
     # The substrate's corpus does not ingest ordinary repositories' markdown.
     from markdownllm.model import scan
@@ -272,3 +277,17 @@ def test_primary_ordinary_code_keeps_its_own_hooks(estate, tmp_path):
     assert not (primary / ".git/hooks/pre-commit").exists()
     assert git(primary, "config", "--local", "mdllm.publication") == "pr"
     assert git(primary, "config", "--local", "mdllm.sync") == "observe"
+
+
+def test_declared_publication_requires_remote_default(estate, tmp_path):
+    root, primary, old = estate
+    boot.materialise(old, primary)
+    spec = entry("feature-domain", access="write", publication="declared")
+    source, remote = source_repo(tmp_path, spec)
+    git(source, "checkout", "-qb", "feature")
+    git(source, "push", str(remote), "feature")
+    spec["revision"] = {"branch": "feature"}
+    target = root / "domains" / spec["name"]
+    with pytest.raises(ValueError, match="remote default branch"):
+        assemble_extra(root, spec, target, maintenance=False)
+    assert git(target, "rev-parse", "--abbrev-ref", "HEAD") == "feature"

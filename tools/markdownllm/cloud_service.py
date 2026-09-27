@@ -85,6 +85,8 @@ def cmd_cloud(args) -> int:
             entry, path = matches[0]
             if entry["kind"] != "domain":
                 raise ValueError("ordinary code repositories use their own AGENTS.md; select a domain with --repository")
+            if git(domain, "config", "--local", "--get", "mdllm.sync") != "observe":
+                raise ValueError("primary checkout has no host HEAD restraint; rerun cloud preparation")
             # Observe the host-selected primary without moving it; normal
             # ff-only sync applies to extra branch-following repositories.
             cmd_estate_sync(argparse.Namespace(
@@ -92,8 +94,18 @@ def cmd_cloud(args) -> int:
                 status=False, require_fresh=False, timeout=20))
             # This is deliberately an agent-invoked operation, never setup.
             # stdout is inherited so the whole Tier-0 contract reaches its caller.
-            return subprocess.run([sys.executable, str(source / "tools/mdllm.py"),
-                                   "session-start", str(path), "--contract"], check=False).returncode
+            executable = [sys.executable, str(source / "tools/mdllm.py")]
+            for index, (label, command) in enumerate((
+                    ("Tier-0 contract", ["session-start", str(path), "--contract"]),
+                    ("full triggers (judge non-evaluable conditions)", ["triggers", str(path)]),
+                    ("imports coverage (report could-not-check)", ["imports-check", str(path)]))):
+                print(f"----- {entry['name']}: {label} -----", flush=True)
+                result = subprocess.run([*executable, *command], check=False).returncode
+                if result and index == 0:
+                    return result
+                if result:
+                    print(f"{entry['name']}: {label} incomplete (exit {result}); inspect before relying on it")
+            return 0
         if args.operation == "prepare":
             if not args.config:
                 raise ValueError("prepare requires --config")

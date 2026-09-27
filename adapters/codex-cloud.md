@@ -8,6 +8,38 @@ Ordinary code repositories keep their own build and hook conventions; the
 framework's `repositories/` exclusion keeps their Markdown out of its corpus.
 This is a workspace transport and preparation layer.
 
+## Relation to the Cowork adapter
+
+Cowork installs one account-level `spin-up-domain` plugin. In each fresh
+session it reads private `config.env`, asks for a fine-grained PAT, clones the
+framework and selected domains, then emits each contract, full triggers,
+imports coverage and a branch map. Its credential is command-scoped; the
+post-commit hook cannot reuse it, so an authorised commit needs a separate
+guarded `mdllm publish` call before the container is reclaimed.
+
+Codex Cloud has a different entry point: the host creates one primary checkout
+and runs a repository-owned setup script before the agent starts. The manifest
+adds secondary domains and code repositories around it. `cloud start` emits
+the chosen domain's contract, full triggers and imports coverage; `cloud
+status` shows each branch and cached publication state. The primary result is
+reviewed through Codex's PR route. A secondary writable domain can use its
+existing post-commit autopush when its own AGENTS.md declares literal true
+and a persistent Git credential is available. The manifest's branch guard
+prevents that path from sending a different checkout. This closes Cowork's
+per-commit credential gap for that configuration, though a persistent token
+has a longer exposure window than Cowork's short-lived pasted token.
+
+Use native Git access first when it works in both setup and agent phases; leave
+`credential_env` null and verify with `cloud probe` in the actual VM. The
+[Codex Cloud guide](https://learn.chatgpt.com/docs/environments/cloud-environment)
+documents connector-backed checkout and PR review, but no general-purpose
+Git credential for arbitrary shell clones. The diagnostic in this repository
+found no such credential for private remotes in the setup terminal. Connector
+access to repositories in the product UI therefore does not establish Git
+access from the VM. A scoped token remains the proven fallback for those
+secondary clones until a live probe establishes native access. Overall
+compatibility still awaits the first full cloud task.
+
 ## Build the reusable bundle
 
 Start from a clean framework commit published to its public remote:
@@ -106,7 +138,11 @@ Secondary repositories do not inherit that PR route. `publication: manual`
 disables their automatic sends and leaves a separate, deliberate publication
 step. `publication: declared` is valid only for a writable domain; it leaves
 that domain's existing literal `git.autopush: true` in charge and grants no
-authority on its own. Failed or unpushed secondary results are reported by
+authority on its own. Its declared branch must be the remote default, and the
+clone records that branch as a local guard; a commit on a different branch
+cannot auto-publish. Guarded one-shot `mdllm publish` also requires the remote
+default branch, so work on another secondary branch needs its own reviewed Git
+publication route. Failed or unpushed secondary results are reported by
 `cloud status` and must be checked against each remote. No publication path
 forces, resets, rebases or silently resolves divergence.
 
@@ -141,8 +177,9 @@ cloud status <primary-checkout-path>
 ```
 
 `cloud start` performs a bounded estate sync, emits the selected domain's
-Tier-0 contract with an integrity trailer, and leaves skill loading to that
-domain's AGENTS.md. Run it separately for each domain whose seat is used.
+Tier-0 contract with an integrity trailer, runs its full triggers and prints
+the imports coverage check. Judge non-evaluable triggers and read that domain's
+routed skills. Run it separately for each domain whose seat is used.
 Setup logs are not model receipt. The session gate is deferred at setup and
 enforced at the first real commit. Existing `.codex/hooks.json` trust and
 execution must be inspected separately with `mdllm doctor . --harness codex`.

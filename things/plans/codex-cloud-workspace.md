@@ -54,7 +54,10 @@ another domain needs to import.
   `mdllm.publication=pr` uses its host PR path. Secondary manual publication
   is distinct; `declared` defers to the owning domain's literal autopush rule.
   `cloud start` syncs before delivering the chosen domain's contract; `cloud
-  status` reports local drafts, history and cached publication comparisons.
+  start` also runs full triggers/imports coverage, and `cloud status` reports
+  local drafts, history and cached publication comparisons. A local branch
+  guard refuses automatic sends from a secondary checkout other than the
+  manifest branch; declared automatic publication requires the remote default.
 - A cloud diagnostic found that host checkout access did not become ordinary
   shell Git authentication for two private remotes. The fixture and claim
   boundary are recorded in `evidence/codex-cloud-git-boundary-2026-09-27.md`.
