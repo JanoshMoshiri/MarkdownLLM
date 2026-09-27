@@ -79,11 +79,11 @@ test("topic creation uses OpenClaw's native Telegram action", async () => {
 test("domain command reports, lists and opens isolated Telegram routes", async () => {
   const hostConfig: any = {
     agents: {
-      list: [
-        { id: "alpha-agent", workspace: "/domains/alpha-agent" },
-        { id: "beta-agent", workspace: "/domains/beta-agent" },
-        { id: "broken-agent", workspace: "/domains/broken-agent" },
-      ],
+      entries: {
+        "alpha-agent": { workspace: "/domains/alpha-agent" },
+        "beta-agent": { workspace: "/domains/beta-agent" },
+        "broken-agent": { workspace: "/domains/broken-agent" },
+      },
     },
     channels: {
       telegram: {
@@ -199,7 +199,9 @@ test("domain command reports, lists and opens isolated Telegram routes", async (
 test("domain command rolls back a topic when route persistence fails", async () => {
   const hostConfig: any = {
     agents: {
-      list: [{ id: "beta-agent", workspace: "/domains/beta" }],
+      entries: {
+        "beta-agent": { workspace: "/domains/beta" },
+      },
     },
     channels: {
       telegram: {

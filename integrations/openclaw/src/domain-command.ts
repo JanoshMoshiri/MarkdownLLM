@@ -280,6 +280,9 @@ const defaultTelegramOps: TelegramTopicOps = Object.freeze({
 
 function hasConfiguredAgent(config: OpenClawConfig, agentId: string): boolean {
   const agents = asObject(config.agents);
+  const entries = asObject(agents?.entries);
+  if (asObject(entries?.[agentId])) return true;
+
   return Array.isArray(agents?.list)
     && agents.list.some((entry) => asObject(entry)?.id === agentId);
 }
