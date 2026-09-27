@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-27
-generated: 2026-09-27T00:52:17
-generated_from: HEAD@44bbf41
-coverage: 475
+generated: 2026-09-27T01:27:43
+generated_from: HEAD@cf37b32
+coverage: 476
 framework_version: 3.43.0
 ---
 
@@ -348,6 +348,8 @@ framework_version: 3.43.0
 - codex-5r4-root-reconciliation-2026-08-13 --implements--> framework-root-tracks-both-adapters
 - codex-5r4-root-reconciliation-2026-08-13 --extends--> codex-5r3-migration-acceptance-2026-08-13
 - codex-cli-live-dispatch-2026-08-14 --documents--> vendor-harness-adapter-foundation
+- codex-cloud-git-boundary-2026-09-27 --informs--> codex-cloud-workspace
+- codex-cloud-git-boundary-2026-09-27 --informs--> interface-specification
 - codex-cloud-workspace --references--> cowork-adapter
 - codex-cloud-workspace --implements--> framework-discovery-specification
 - codex-cloud-workspace --implements--> git-workflow-specification
@@ -1018,6 +1020,7 @@ framework_version: 3.43.0
 - interface-specification --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - interface-specification --derived-from--> harness-native-onramp-supersedes-desktop
 - interface-specification --references--> claude-code-cloud-first-session-2026-09-24
+- interface-specification --references--> codex-cloud-git-boundary-2026-09-27
 - isolation-must-contain-writes-not-just-reads --extends--> withholding-is-not-isolation
 - isolation-must-contain-writes-not-just-reads --complements--> committed-state-carries-defects-as-faithfully-as-facts
 - isolation-must-contain-writes-not-just-reads --informs--> evidence-and-eval-backlog

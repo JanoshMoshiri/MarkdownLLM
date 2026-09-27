@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: "1.11"
+version: "1.12"
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -33,9 +33,9 @@ linked_things:
 <!-- kernel -->
 **The commit is the moment state becomes real** — on this machine; publication (push/fetch) makes it real to the estate. Working directory = draft; commit = local truth. Triggers, orientation, and audit are *defined over* committed state — the evaluators read the tree as it stands, and the `post-write:commit` invariant is what makes tree and HEAD coincide; a fired trigger on a dirty tree evidences a discipline breach, not committed state.
 
-**Multi-machine sync:** sync before orienting — automatic `mdllm estate-sync` is fetch + `pull --ff-only`, bounded, never prompting, and degrades offline to "orienting from last-fetched state" so lifecycle startup does not block. When the operator explicitly asks for fresh manual state, `mdllm estate-sync --require-fresh` turns any cached or unresolved outcome into a nonzero approval/routing signal. Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets.
+**Multi-machine sync:** sync before orienting — automatic `mdllm estate-sync` is fetch + `pull --ff-only`, bounded, never prompting, and degrades offline to "orienting from last-fetched state" so lifecycle startup does not block. When the operator explicitly asks for fresh manual state, `mdllm estate-sync --require-fresh` turns any cached or unresolved outcome into a nonzero approval/routing signal. Divergence is reported (`DIVERGED (+a/+b)`), never resolved — routing it is the operator's decision. The sync walk never pushes, never auto-merges, never resets. A host-selected task checkout may set clone-local `mdllm.sync=observe`: the walk fetches and reports its state, but does not move the host's HEAD; the task's selected revision is the reference for that session.
 
-**Publication:** the autopush leg (post-commit hook) publishes a floor-validated commit **only** when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off; publication authority never comes from silence. A clone-local `mdllm.publication=pr` restraint disables automatic sends for a hosted PR workspace without changing that declaration; no clone-local value grants authority. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) declare false, so a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under explicitly enabled autopush, an anomaly report.
+**Publication:** the autopush leg (post-commit hook) publishes a floor-validated commit **only** when the owning repo declares literal `git: autopush: true`. False, absent, malformed, or unknown policy is off; publication authority never comes from silence. Clone-local `mdllm.publication=pr` (host PR) or `manual` (separate human publication) restrains automatic sends without changing that declaration; no clone-local value grants authority. Bounded, never forcing; a rejected push is divergence on the push side — surfaced, never resolved. Release surfaces (the framework root's public repo) declare false, so a release publish stays the human's deliberate act. Session end reports publication debt (`estate-sync --status`) — under explicitly enabled autopush, an anomaly report.
 
 **Turn-taking is publication, not commit.** Where two instances take turns through the repository, a turn has not passed until its new state is visible on the remote — confirm from the ref, never from the local clone. A commit can succeed while its push is rejected, and the committing side then holds every local indication that it handed over while the other side sees nothing; neither is wrong and nothing reports an error. That is silence indistinguishable from *nothing moved*. An instance that cannot publish its turn is blocked and says so; it never resolves the divergence to get unstuck. The watch says so on the side that can see it: `mdllm watch` reads its own clone's branch against the ref and wakes that role for a turn that never left — pull, merge, push again — while the floor itself never merges (`loop-turns-self-heal-2026-09-23`).
 
@@ -342,7 +342,7 @@ without treating missing or malformed policy as consent
   initiates a commit and never blocks one — a post-commit surface must not
   fail the commit it follows.
 - **A clone may narrow authority.** A hosted PR workspace sets local Git config
-  `mdllm.publication=pr`. The shared publication reader reports automatic sends
+  `mdllm.publication=pr`; an additional repository may use `manual`. The shared publication reader reports automatic sends
   as off without rewriting the domain's committed policy. Any unknown value
   also disables sends; no value can enable them. Removing the local setting
   restores the ordinary AGENTS.md decision. A deliberate one-shot publication

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-09-27
-generated: 2026-09-27T00:52:17
-generated_from: HEAD@44bbf41
-coverage: 113
+generated: 2026-09-27T01:27:44
+generated_from: HEAD@cf37b32
+coverage: 118
 framework_version: 3.43.0
 ---
 
@@ -104,8 +104,23 @@ framework_version: 3.43.0
 ## cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - serve-side-blindness-dissolves-into-composition (derived-from)
 
+## cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26
+- cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
 ## cue-carrier
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+
+## cue-operator-queue-2026-08-28-2026-09-26
+- cue-operator-queue-2026-08-28-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
+## cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26
+- cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
+## cue-vendor-harness-adapter-foundation-2026-09-26
+- cue-vendor-harness-adapter-foundation-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
+## cue-watertight-membrane-sprint-2026-08-30-2026-09-26
+- cue-watertight-membrane-sprint-2026-08-30-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
 
 ## derivation-shape-brief-2026-08
 - derivation-shape-settled-2026-08 (pinned @016150e76f1ae69aefd41331f9da1aa7fed471e6)

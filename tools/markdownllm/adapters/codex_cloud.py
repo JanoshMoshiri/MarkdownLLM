@@ -3,16 +3,17 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from ..cloud_bootstrap import primary_spec
 
 
 def settings(config) -> dict[str, str]:
     return {
-        "repository": config["domain_repo"],
+        "repository": primary_spec(config)["repo"],
         "workspace_directory": config["workspace_directory"],
         "setup_mode": "Manual",
         "setup_command": "bash .codex/cloud/bootstrap.sh",
         "maintenance_command": "bash .codex/cloud/bootstrap.sh maintenance",
-        "agent_internet": "Off (enable only for the task's needs)",
+        "agent_internet": "Enable GitHub HTTPS for agent-time probe, fetch or publication; setup already has network",
     }
 
 

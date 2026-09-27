@@ -241,7 +241,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 - **`example-things.md`** (`specification`, `stable`): complements → `domain-specification-guide.md`; extends → `thing.md`
 - **`framework-discovery.md`** (`specification`, `stable`): complements → `domain-refresh.md`; extends → `domain-specification-guide.md`; references → `thing.md`, `git-workflow.md`
 - **`git-workflow.md`** (`specification`, `evolving`): complements → `thing.md`, `interface.md`, `write.thing.md`, `validate.thing.md`, `derived-index.md`; implements → `llm-driven-systems.manifesto.md` · +3 edge(s) outside the spec layer
-- **`interface.md`** (`specification`, `evolving`): complements → `provenance.md`, `thing.md`, `git-workflow.md`, `read.thing.md`, `write.thing.md`; implements → `llm-driven-systems.manifesto.md` · +4 edge(s) outside the spec layer
+- **`interface.md`** (`specification`, `evolving`): complements → `provenance.md`, `thing.md`, `git-workflow.md`, `read.thing.md`, `write.thing.md`; implements → `llm-driven-systems.manifesto.md` · +5 edge(s) outside the spec layer
 - **`llm-driven-systems.manifesto.md`** (`manifesto`, `evolving`): informs → `scalability-guide.md`, `domain-specification-guide.md` · +4 edge(s) outside the spec layer
 - **`operating-model.md`** (`specification`, `draft`): complements → `trigger-specification.md`, `provenance.md`, `coordination-claim.md`; extends → `universal-workflow.md`, `workflow-state.md`; references → `interface.md`
 - **`orchestration.md`** (`specification`, `evolving`): complements → `write.thing.md`, `git-workflow.md`, `interface.md`, `trigger-specification.md`, `derived-index.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md`, `session-memory.md`, `belief-revision.md`, `domain-refresh.md` · +2 edge(s) outside the spec layer
@@ -412,6 +412,7 @@ flowchart LR
     C37 -->|"rings the doorbell on the remote ref for"| T36
     C38 -.->|"regenerates and drift-gates"| T37
     C39 -.->|"prepares a host-owned checkout under"| T30
+    C39 -.->|"assembles the input route defined by"| T31
 ```
 
 Notes on this view:

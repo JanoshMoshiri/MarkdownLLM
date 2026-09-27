@@ -2,7 +2,7 @@
 id: operator-seat-and-harness-native-onramp
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-09-06
 session: 2026-09-06
 priority: high
@@ -100,6 +100,10 @@ sequencing judgement under delegated authority, overturnable by editing it.
       Still open for every cloud route: `.boundary-terms` never arrive with
       a clone, so the disclosure boundary is off until the bootstrap
       supplies them from a secret.
+      *Codex Cloud adapter, 2026-09-27:* the reviewed manifest can provision
+      an ignored boundary file from an explicitly named persistent variable;
+      Linux fixtures exercised it. Actual Codex Cloud agent delivery and cache
+      handling remain for the first live task.
 - [ ] Refresh is part of the sentence, never a separate step. The manual
       substrate update was the ninety minutes.
 
@@ -110,7 +114,9 @@ sequencing judgement under delegated authority, overturnable by editing it.
       recorded.
 - [ ] Codex cloud: the route the operator is building (2026-09); the Claude
       Code cloud record is the template for its first-hand evidence —
-      entry, lifecycle, runtime, and what the fresh clone lacks.
+      entry, lifecycle, runtime, and what the fresh clone lacks. The adapter
+      now passes isolated multi-repository Git fixtures; the real route still
+      needs its first working-agent run.
 - [ ] Perplexity: probe first — can it receive the entry contract and
       operate Git on the operator's behalf? Record the result either way.
       No route claim until the probe earns it.

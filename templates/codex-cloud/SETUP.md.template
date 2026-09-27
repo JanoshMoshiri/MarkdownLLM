@@ -1,6 +1,6 @@
 # MarkdownLLM in Codex Cloud
 
-Generated setup for {{repository}}. Commit these files to the domain repository;
+Generated setup for {{repository}}. Commit these files to the primary repository;
 the default branch must carry them because Codex builds its cache there first.
 
 Configure the GitHub-backed environment once:
@@ -13,27 +13,52 @@ Configure the GitHub-backed environment once:
 | Maintenance command | `{{maintenance_command}}` |
 | Agent internet | {{agent_internet}} |
 
-Setup always has network access. No PAT or API key is required to download the
-public framework; Codex owns the domain checkout and its GitHub authorisation.
+Setup always has network access. No PAT is required to download the public
+framework. Codex owns the primary checkout; Git access to other private
+repositories must be established and verified separately.
 `environment.json` is strict JSON, so the bootstrap needs only Python's standard
 library before it creates the framework virtual environment with PyYAML 6.0.3.
 
-The bootstrap preserves the domain's selected branch/commit, index and files.
-It installs the shared Git floor and a clone-local `mdllm.publication=pr`
-restraint. This reduces automatic publication authority without changing the
-domain's AGENTS.md. Use Codex's PR flow; no setup step commits or pushes.
+The bootstrap preserves the primary checkout's selected branch/commit, index
+and files. Each additional domain is an independent checkout under `domains/`;
+ordinary code repositories live under `repositories/` and keep their own
+build hooks. The shared Git floor is installed only in domains. The primary
+clone gets `mdllm.publication=pr` and `mdllm.sync=observe`: the host's PR
+flow publishes its result, while estate sync observes without moving its HEAD.
+Additional repositories follow the explicit per-repository policies in
+`environment.json`; neither setup nor maintenance commits or pushes.
+
+The manifest names the exact branch or commit for each additional repository.
+`access: read` is an operating intention, not a filesystem sandbox. Use a
+read-scoped GitHub credential for real read-only access. `publication: manual`
+disables automatic sends; `declared` is only valid for a writable domain and
+still requires literal `git.autopush: true` in that domain's AGENTS.md. Codex's
+primary PR is not a publication receipt for secondary repositories. Review
+`cloud status` and each repository's remote after committing.
+
+For `credential_env`, provide a variable **name** in the manifest and its
+value in the cloud environment's persistent environment variables for every
+phase that needs Git. A setup-only secret disappears before the working agent;
+it cannot support agent-time fetch or publication. The bootstrap uses an exact
+GitHub repository credential helper and never writes the token value to Git
+config or the manifest. Leave `credential_env: null` only when native Git
+authentication has been proved in the relevant phase. For a private domain's
+ignored `.boundary-terms`, set `boundary_terms_env` to a persistent variable
+name. The file is created with private permissions; inspect its cache handling
+with your own data policy. Without it, no disclosure coverage is claimed.
 
 Fresh setup and cached maintenance check the same full framework commit. A
 changed pin requires Reset cache. Changing repository files alone does not
 invalidate Codex's cache. Commit the revised files and reset it deliberately.
 
-Setup logs are not agent context. At the start of the working task, the agent
-must follow AGENTS.md and run `estate-sync` then `session-start . --contract`
-using the framework runtime, read the complete Tier-0 emission, and load the
-domain skills. Setup reports the session gate as deferred; it neither creates
-an attestation nor claims lifecycle delivery. The first real commit still
-enforces the gate. Existing `.codex/hooks.json` is not modified or trusted by
-setup; inspect it with `mdllm doctor . --harness codex` separately.
+Setup logs are not agent context. At the start of a working task, run the
+framework runtime's `cloud probe <primary>`, `cloud start <primary>
+--repository <domain-name>` and `cloud status <primary>` from this checkout.
+`cloud start` performs the bounded estate sync before emitting the selected
+domain's complete Tier-0 contract; read it, then load that domain's routed
+skills. It cannot establish model receipt during setup. The first real commit
+still enforces the session gate. Existing `.codex/hooks.json` is inspected
+separately with `mdllm doctor . --harness codex`.
 
 The skill in `.agents/skills/configure-codex-cloud/` guides conversational
 configuration through the available browser UI. It does not call an undocumented

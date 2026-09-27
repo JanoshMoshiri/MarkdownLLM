@@ -53,7 +53,8 @@ def estate(tmp_path, monkeypatch):
     shutil.copytree(SOURCE / "tools/markdownllm", framework / "tools/markdownllm",
                     ignore=shutil.ignore_patterns("__pycache__"))
     shutil.copy2(SOURCE / "tools/mdllm.py", framework / "tools/mdllm.py")
-    (framework / ".gitignore").write_text("domain/\ndomains/\n.venv/\n__pycache__/\n")
+    (framework / ".gitignore").write_text("domain/\ndomains/\nrepositories/\n.venv/\n__pycache__/\n")
+    (framework / "_schema.yaml").write_text("exclude: [repositories]\n")
     (framework / ".markdownllm").write_text("framework: MarkdownLLM\nversion: 3.42.0\n")
     (framework / "kernel.md").write_text("# Fixture kernel\nRead the entry contract.\n")
     git(framework, "add", ".")

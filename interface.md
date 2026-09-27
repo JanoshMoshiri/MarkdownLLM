@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: evolving
-version: 1.8
+version: 1.9
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -30,6 +30,9 @@ linked_things:
   - id: claude-code-cloud-first-session-2026-09-24
     relation: references
     notes: "v1.8 adds the Claude Code cloud row from its first-hand record, no wider than that record."
+  - id: codex-cloud-git-boundary-2026-09-27
+    relation: references
+    notes: "v1.9 records the Codex Cloud diagnostic and isolated adapter fixture without claiming working-agent compatibility."
 ---
 
 # Interface
@@ -97,6 +100,7 @@ An input route is any channel through which a human can communicate intent to th
 | **Cowork (Claude desktop chat)** | The `spin-up-domain` bootstrap skill reconstructs a domain from a fresh session and emits its Tier-0 contract. | Bootstrap skill exists; the intent-sentence onramp over it is planned, not evidenced. |
 | **Perplexity** | Candidate route an operator's colleague already uses. | Whether it can receive the entry contract and operate Git is a probe to run, not a claim; no framework execution record. |
 | **OpenAI Codex CLI / desktop** | Reads AGENTS.md; the optional project adapter binds lifecycle events. | Automatic on the named tested Windows surfaces; CLI lifecycle and Desktop/runtime/Git claims are recorded separately rather than generalized. |
+| **OpenAI Codex Cloud (workspace adapter)** | Codex selects one primary GitHub checkout; a versioned bootstrap surrounds it with a pinned framework and declared secondary domains/code repositories. | `codex-cloud-git-boundary-2026-09-27`: selected checkout and public Git read observed in a cloud diagnostic; private Git reads failed there. The multi-repository adapter passed isolated Linux Git fixtures. Working-agent contract receipt, private Git rights, hooks and publication remain unverified in a live cloud task. |
 | **Cursor / Windsurf** | Intended AGENTS.md workspace route; editor-based chat. | Designed-for; no framework execution record yet. |
 | **Gemini CLI** | Intended AGENTS.md terminal route. | Designed-for; no framework execution record yet. |
 | **Mobile chat apps** | A file-aware client or middleware may feed the entry contract and selected context to an LLM API. | Manual bootstrap only; an ordinary web/mobile chat without file access is not a compatible route. |

@@ -1,14 +1,17 @@
 ---
 id: cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24
 type: cue
-status: open
+status: answered
 version: 1.0
 created: 2026-09-24
 subject: an-injected-file-arrives-without-its-frontmatter
 raised_at: e9c7bf18920013f24578397e7cd090d9a4b352b5
 raised_by: "floor — mdllm cues --raise"
-verdict:
-verdict_reason:
+verdict: not-inflection
+verdict_reason: "Duplicate of the ruling in cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26: only the insight's disposition changed; its claim did not."
+informed_by:
+  - id: cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26
+    commit: 7a2deb213147543b78196884b94d65e89659a864
 tags: [cue, raised-mechanically]
 ---
 
@@ -28,10 +31,5 @@ domain reasons from — or only how an existing path is expressed?
 (`change-reconciliation.md` → The Driver Names The Inflection.)
 
 ## The Answer
-Open. Two verdicts, for a human or for the framework agent citing the ruling
-that already covers it (`framework-agent-closes-settled-cues-2026-09-13`);
-set `verdict`, `verdict_reason` and `status: answered` in one commit:
-
-1. `not-inflection` — the dependants still hold as written; say why.
-2. `inflection` — run the four beats (cue → assimilate → walk → seal) and
-   name the touch points walked and the commit that sealed them.
+**Not an inflection.** The identical subject and raised commit were ruled in
+the pinned 2026-09-26 cue; its claim was unchanged.

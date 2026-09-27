@@ -2,7 +2,7 @@
 id: codex-cloud-workspace
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-09-24
 priority: high
 tags: [adapters, bootstrap, cloud, publication]
@@ -41,6 +41,23 @@ another domain needs to import.
   a private preview path for reviewing an unpublished build.
 - Linux fixtures exercise the real shell bootstrap, Git floor, fresh setup,
   cached maintenance, selected-HEAD/index preservation and strict session gate.
+- Version 2 estate manifest assembles separately versioned reference domains,
+  writable domains and ordinary code repositories around the host checkout.
+  The framework excludes code Markdown from its corpus. Each extra repository
+  has a declared GitHub URL, branch or commit, access intention, credential
+  variable and publication policy. Existing version 1 bundles still read.
+- Exact-repository credential helper takes a persistent environment variable
+  name, never a token value in the manifest or Git config. Agent-time remote
+  reads can be probed; setup-only secrets are not treated as agent credentials.
+  Optional private boundary terms are installed only into ignored domain files.
+- The primary clone's `mdllm.sync=observe` preserves Codex's selected HEAD;
+  `mdllm.publication=pr` uses its host PR path. Secondary manual publication
+  is distinct; `declared` defers to the owning domain's literal autopush rule.
+  `cloud start` syncs before delivering the chosen domain's contract; `cloud
+  status` reports local drafts, history and cached publication comparisons.
+- A cloud diagnostic found that host checkout access did not become ordinary
+  shell Git authentication for two private remotes. The fixture and claim
+  boundary are recorded in `evidence/codex-cloud-git-boundary-2026-09-27.md`.
 
 The implementation and user-facing instructions are in
 `adapters/codex-cloud.md`. No VM, environment settings or GitHub repository has
@@ -51,8 +68,9 @@ release event under the root's `autopush: false` policy.
 
 - [ ] Authorised framework release: reconcile/version/changelog/publish, then
   regenerate a deployable bundle at the published commit.
-- [ ] Adopt the generated files in the selected domain and publish them under
-  that domain's policy; inspect its lifecycle adapter currency independently.
+- [ ] Adopt the generated files in the selected primary repository and publish
+  them under that repository's policy; inspect its lifecycle adapter currency
+  independently. Choose secondary repository roles and credentials explicitly.
 - [ ] Configure the actual cloud environment and observe a fresh task plus a
   cache resume. Record setup execution, working-agent Tier-0 receipt, Git hook
   enforcement, project trust and lifecycle execution as separate facts.

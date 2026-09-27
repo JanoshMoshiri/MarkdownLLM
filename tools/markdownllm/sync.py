@@ -54,6 +54,7 @@ class SyncState(str, Enum):
     NO_UPSTREAM = "no-upstream"
     SHALLOW = "shallow"
     DETACHED = "detached"
+    PINNED = "pinned"
     UNBORN = "unborn"
     IN_OPERATION = "in-operation"
     OFFLINE = "offline"
@@ -233,7 +234,11 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
     if (r := _git(repo, "rev-parse", "--verify", "-q", "HEAD")) is None or r.returncode != 0:
         state = SyncState.UNBORN
         return result()
-    if (r := _git(repo, "symbolic-ref", "-q", "--short", "HEAD")) is None or r.returncode != 0:
+    restraint = _git(repo, "config", "--local", "--get", "mdllm.sync")
+    # A host-owned task checkout is not a branch follower. Fetch its history,
+    # but never replace the host's selection with a newer upstream commit.
+    preserve_head = restraint is not None and restraint.returncode != 1
+    if ((r := _git(repo, "symbolic-ref", "-q", "--short", "HEAD")) is None or r.returncode != 0) and not preserve_head:
         state = SyncState.DETACHED
         detail = "detached HEAD — skipped"
         return result()
@@ -303,7 +308,7 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
         if not history_note:
             return res
         new_state = res.state
-        if unhealed_shallow and new_state in (SyncState.UP_TO_DATE,
+        if unhealed_shallow and new_state in (SyncState.UP_TO_DATE, SyncState.PINNED,
                                               SyncState.AHEAD):
             new_state = SyncState.SHALLOW
         joined = "; ".join(x for x in (res.detail, history_note) if x)
@@ -333,6 +338,13 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
     dirty = _git(repo, "status", "--porcelain")
     is_dirty = bool(dirty and dirty.stdout.strip())
 
+    if preserve_head:
+        if not degraded:
+            state = SyncState.PINNED
+        detail = (f"clone-local mdllm.sync restraint: HEAD preserved; "
+                  f"+{ahead} local / +{behind} remote{cached}" +
+                  ("; working tree not clean" if is_dirty else ""))
+        return with_history(result())
     if ahead and behind:
         state = SyncState.DIVERGED
         detail = (f"+{ahead} local / +{behind} remote{cached} — "
@@ -431,10 +443,11 @@ def publication_policy(repo: Path) -> PublicationPolicy:
         if restraint.returncode == 0:
             value = restraint.stdout.strip()
             return PublicationPolicy(
-                False, (PublicationPolicyState.LOCAL_RESTRAINT if value == "pr"
+                False, (PublicationPolicyState.LOCAL_RESTRAINT if value in {"pr", "manual"}
                         else PublicationPolicyState.MALFORMED),
                 ("clone-local mdllm.publication=pr: use the host's PR workflow"
-                 if value == "pr" else "unknown clone-local mdllm.publication value; publication disabled"))
+                 if value == "pr" else "clone-local mdllm.publication=manual: publication requires a separate human instruction"
+                 if value == "manual" else "unknown clone-local mdllm.publication value; publication disabled"))
     agents = repo / "AGENTS.md"
     if not agents.is_file():
         return PublicationPolicy(
@@ -601,6 +614,7 @@ _LABEL = {
     SyncState.NO_UPSTREAM: "no-upstream",
     SyncState.SHALLOW: "SHALLOW",
     SyncState.DETACHED: "detached",
+    SyncState.PINNED: "pinned",
     SyncState.UNBORN: "unborn",
     SyncState.IN_OPERATION: "in-operation",
     SyncState.OFFLINE: "offline",
@@ -669,6 +683,7 @@ def cmd_estate_sync(args) -> int:
             SyncState.UP_TO_DATE,
             SyncState.AHEAD,
             SyncState.LOCAL_ONLY,
+            SyncState.PINNED,
         }
         incomplete = [res for res in results
                       if res.state not in fresh_states]
