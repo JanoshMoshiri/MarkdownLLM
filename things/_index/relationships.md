@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-27
-generated: 2026-09-27T01:44:42
-generated_from: HEAD@2ed6dfe
-coverage: 481
+generated: 2026-09-27T08:42:07
+generated_from: HEAD@bda4726
+coverage: 482
 framework_version: 3.43.0
 ---
 
@@ -348,6 +348,10 @@ framework_version: 3.43.0
 - codex-5r4-root-reconciliation-2026-08-13 --implements--> framework-root-tracks-both-adapters
 - codex-5r4-root-reconciliation-2026-08-13 --extends--> codex-5r3-migration-acceptance-2026-08-13
 - codex-cli-live-dispatch-2026-08-14 --documents--> vendor-harness-adapter-foundation
+- codex-cloud-conversational-launcher --references--> cowork-adapter
+- codex-cloud-conversational-launcher --references--> interface-specification
+- codex-cloud-conversational-launcher --references--> git-workflow-specification
+- codex-cloud-conversational-launcher --dependencies--> codex-cloud-workspace
 - codex-cloud-git-boundary-2026-09-27 --informs--> codex-cloud-workspace
 - codex-cloud-git-boundary-2026-09-27 --informs--> interface-specification
 - codex-cloud-workspace --references--> cowork-adapter
