@@ -150,7 +150,7 @@ def status(config: dict, primary: Path) -> int:
             print(f"{entry['name']}: {entry['kind']}, {entry['access']}, {branch}@{head[:12]}, "
                   f"drafts={dirty}, shallow={shallow}, automatic publication={policy.enabled}")
             if path == primary:
-                print("  host-managed result: review the selected repository's Codex diff/PR; not a multi-repo receipt")
+                print("  host-managed result: review the selected repository's host diff/PR; not a multi-repo receipt")
             expected_branch = entry.get("revision", {}).get("branch")
             if expected_branch and branch != expected_branch:
                 print(f"  BRANCH MISMATCH: manifest names {expected_branch}; do not publish")
@@ -164,7 +164,7 @@ def status(config: dict, primary: Path) -> int:
                 attention |= dirty or shallow or changed
                 continue
             if path == primary:
-                print("  host PR state: inspect in Codex; this local command cannot verify it")
+                print("  host PR state: inspect in the host; this local command cannot verify it")
                 attention |= dirty or shallow
                 continue
             try:

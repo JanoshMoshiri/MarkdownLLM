@@ -608,6 +608,8 @@ def test_sync_repo_passes_token_to_fetch_and_redacts_failure(
             return completed(args, stdout=".git\n")
         if args == ("rev-parse", "--verify", "-q", "HEAD"):
             return completed(args, stdout="abc\n")
+        if args == ("config", "--local", "--get", "mdllm.sync"):
+            return completed(args, rc=1)
         if args == ("symbolic-ref", "-q", "--short", "HEAD"):
             return completed(args, stdout="main\n")
         if args == ("fetch", "--quiet"):

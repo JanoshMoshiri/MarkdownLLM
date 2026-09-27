@@ -53,6 +53,9 @@ VENDOR_VOCABULARY_EXCEPTIONS = {
     "evals.py":
         "drives the vendor CLI as its eval subject (`claude -p` headless "
         "agent); the vocabulary is the module's purpose, not leaked policy",
+    "cloud_service.py":
+        "hosted-workspace command entry reads the selected adapter's checked-in "
+        "configuration path; the path is transport configuration, not domain policy",
 }
 
 # Vendor vocabulary that must not appear in neutral CODE (case-insensitive).
