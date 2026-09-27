@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-09-27
-generated: 2026-09-27T01:27:43
-generated_from: HEAD@cf37b32
-coverage: 476
+generated: 2026-09-27T01:44:42
+generated_from: HEAD@2ed6dfe
+coverage: 481
 framework_version: 3.43.0
 ---
 
@@ -476,6 +476,7 @@ framework_version: 3.43.0
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
 - cue-closed-loop-operating-state-2026-09-24 --subject--> closed-loop-operating-state
 - cue-closed-loop-operating-state-2026-09-26 --subject--> closed-loop-operating-state
+- cue-codex-cloud-workspace-2026-09-27 --subject--> codex-cloud-workspace
 - cue-coherence-mechanism-build-2026-09-24 --subject--> coherence-mechanism-build
 - cue-coherence-mechanism-build-2026-09-26 --subject--> coherence-mechanism-build
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
@@ -504,6 +505,7 @@ framework_version: 3.43.0
 - cue-framework-map-2026-09-19 --subject--> framework-map
 - cue-framework-map-2026-09-22 --subject--> framework-map
 - cue-framework-map-2026-09-26 --subject--> framework-map
+- cue-framework-map-2026-09-27 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
@@ -514,12 +516,14 @@ framework_version: 3.43.0
 - cue-git-workflow-cloud-pr-2026-09-24 --subject--> git-workflow-specification
 - cue-git-workflow-specification-2026-09-19 --subject--> git-workflow-specification
 - cue-git-workflow-specification-2026-09-26 --subject--> git-workflow-specification
+- cue-git-workflow-specification-2026-09-27 --subject--> git-workflow-specification
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
 - cue-interface-specification-2026-09-26 --subject--> interface-specification
+- cue-interface-specification-2026-09-27 --subject--> interface-specification
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
 - cue-mechanical-coherence-checks-backlog-2026-09-13 --subject--> mechanical-coherence-checks-backlog
 - cue-mechanical-coherence-checks-backlog-2026-09-15 --subject--> mechanical-coherence-checks-backlog
@@ -528,6 +532,7 @@ framework_version: 3.43.0
 - cue-operator-guide-2026-09-15 --subject--> operator-guide
 - cue-operator-guide-2026-09-22 --subject--> operator-guide
 - cue-operator-guide-2026-09-26 --subject--> operator-guide
+- cue-operator-guide-2026-09-27 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
