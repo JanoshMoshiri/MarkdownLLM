@@ -2,7 +2,7 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.3
+version: 0.4
 created: 2026-09-21
 linked_things:
   - id: thing-specification
@@ -206,7 +206,7 @@ failed poll is indistinguishable from a quiet estate.
 
 ## Scope — A Watch Watches a Run
 
-*Specified here as the direction. Not yet built; see Maturity Path.*
+*Specified 2026-09-21 as the direction; built 2026-09-22 (`--run`) — see Maturity Path, item 3.*
 
 A definition can be running in more than one stream at once — two subjects, one
 loop. A watch scoped to the *definition* sees every stream's board as one

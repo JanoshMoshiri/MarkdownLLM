@@ -31,10 +31,6 @@ linked_things:
   - id: closed-loop-operating-state
     relation: informs
     notes: "Sequencing input only: the quality loop that plan references as its sibling stays held here. The dispatcher tick, seat protocol, and census ratification do not wait on this decision."
-triggers:
-  - type: time
-    condition: "2026-09-10 reached"
-    action: "If the derivation shape is still unsettled, surface this decision at the operator's ratification sitting — the quality-loop plan and any new framework-level workflow-definition wait on it, and an undated human wait is the drift the estate learned to chase."
 ---
 
 # Decision: Workflow Reconciliation Precedes New Definitions
@@ -80,3 +76,12 @@ atom end to end, which becomes the pattern the rest follow via refresh.
 The settlement lands as a follow-up decision or as spec change to
 `universal-workflow.md` / `domain-refresh.md`, and this decision's hold on
 new definitions ends with it.
+
+## Chase disarmed (2026-09-26)
+
+It landed: `derivation-shape-settled-2026-08` (made 2026-08-27, the same day)
+satisfies the lift condition and records this hold as spent, not overturned.
+The dated chase (`2026-09-10 reached`) kept firing on this terminal carrier
+for sixteen days after its condition was answered — a trigger that fires on
+its own answer teaches the reader to scroll past the digest. Removed; the
+ruling itself stands as made.

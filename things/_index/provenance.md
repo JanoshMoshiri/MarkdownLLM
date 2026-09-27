@@ -3,11 +3,11 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-24
-generated: 2026-09-24T18:51:22
-generated_from: HEAD@fdf4a25
-coverage: 109
-framework_version: 3.42.0
+created: 2026-09-27
+generated: 2026-09-27T00:39:17
+generated_from: HEAD@183fe14
+coverage: 112
+framework_version: 3.43.0
 ---
 
 # Provenance Index (reverse) — framework
@@ -29,6 +29,7 @@ framework_version: 3.42.0
 - operating-is-programming (derived-from)
 
 ## autopush-requires-explicit-authority
+- cue-session-memory-specification-2026-09-26 (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
 - estate-wide-autopush-2026-08-22 (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
 
 ## between-sessions-surface-is-real-2026-09-21
@@ -118,6 +119,7 @@ framework_version: 3.42.0
 - cue-domain-refresh-specification-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
 - cue-estate-workflow-derivation-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
 - cue-substrate-floor-development-2026-09-13 (pinned @8aa31ecb5b902eca4b5c0d84d3275b3d52772625)
+- cue-workflow-reconciliation-precedes-new-definitions-2026-09-26 (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
 - declaring-derivation-from-the-atom (pinned @1a278dd11b6e2db4a24c36b3c64b765abc90f298)
 - declaring-derivation-from-the-atom (derived-from)
 
@@ -135,6 +137,9 @@ framework_version: 3.42.0
 
 ## dispatch-loop
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
+
+## dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23
+- cue-closed-loop-operating-state-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## divergence-is-an-unrouted-decision
 - divergence-primitive-promotion (pinned @aae0712)
@@ -322,6 +327,10 @@ framework_version: 3.42.0
 ## llm-driven-systems-manifesto
 - settled-reasoning-is-standing-authority (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
 
+## loop-turns-self-heal-2026-09-23
+- cue-git-workflow-specification-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
+- cue-standing-watch-specification-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
+
 ## markdownllm-desktop-is-primary-accessible-product
 - explorer-extraction-and-hosting (derived-from)
 - explorer-white-label-presentation-2026-09 (derived-from)
@@ -341,6 +350,9 @@ framework_version: 3.42.0
 
 ## mechanical-coherence-checks-backlog
 - floor-sprint-3-scope-2026-08-23 (pinned @4569360f7460e4a2aa97d4993d8cf6c1691f5648)
+
+## open-questions-arrive-as-a-prompt-2026-09-23
+- cue-closed-loop-operating-state-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## operating-is-programming
 - operating-scope-promotion (pinned @604dfc4)

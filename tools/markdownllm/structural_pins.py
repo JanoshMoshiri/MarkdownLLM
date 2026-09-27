@@ -60,6 +60,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from .clone_depth import UNSHALLOW_REMEDY, clone_depth
 from .model import Corpus, Finding, SEV_ERROR, SEV_WARNING
 from .structural_refs import CommitPinScope, iter_commit_pins
 
@@ -194,11 +195,20 @@ def structural_pin_findings(root: Path, corpus: Corpus) -> list[Finding]:
     # reason.
     origin = corpus.view.root if corpus.view is not None else Path(root)
     consultation = consult_git(Path(origin).resolve(), unique)
+    # In a shallow clone "no such commit" is not evidence: the pin may name a
+    # real commit below the boundary (clone_depth.py — 148 false Errors in the
+    # first cloud session that hit it). Resolved pins stay resolved; the rest
+    # are reported as could-not-look, never as transcription errors.
+    depth = clone_depth(Path(origin).resolve())
+    shallow_unresolved: set[str] = set()
 
     findings: list[Finding] = []
     unanswered: set[str] = set()
     for name, field, pin in declared:
         state = consultation.of(pin)
+        if state == UNRESOLVED and depth.truncated and _sendable(pin):
+            shallow_unresolved.add(pin)
+            continue
         if state == UNRESOLVED:
             findings.append(Finding(
                 SEV_ERROR, name,
@@ -214,4 +224,12 @@ def structural_pin_findings(root: Path, corpus: Corpus) -> list[Finding]:
             f"resolved: {consultation.obstacle or 'git returned no answer for them'}"
             f" — this run could not look, so it reports nothing about whether "
             f"those pins are valid"))
+    if shallow_unresolved:
+        findings.append(Finding(
+            SEV_WARNING, PIN_SUBJECT,
+            f"{len(shallow_unresolved)} structural commit pin(s) name no "
+            f"commit visible in this clone, and the clone is SHALLOW "
+            f"({depth.horizon()}) — they may be valid pins below the boundary "
+            f"or transcription errors; this run cannot tell. Run "
+            f"{UNSHALLOW_REMEDY} and re-validate"))
     return findings

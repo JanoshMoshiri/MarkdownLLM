@@ -2,7 +2,7 @@
 id: a-check-run-where-it-cannot-see-mints-a-false-finding
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-08-08
 session: 2026-08-08
 source: agent
@@ -16,6 +16,9 @@ linked_things:
   - id: mechanical-coherence-checks-backlog
     relation: informs
     notes: "The backlog's null-result primitive is this insight's mechanical half — does the tool distinguish nothing-found from could-not-look? The INCOMPLETE-bucket conflation item is the imports-check instance."
+  - id: claude-code-cloud-first-session-2026-09-24
+    relation: references
+    notes: "The second lived instance, by a second mechanism: a shallow clone. Its mechanical half landed the same week as clone_depth."
 ---
 
 # A check run where it cannot see mints a false finding
@@ -42,3 +45,17 @@ and tool-side, every command whose result can be empty should say whether
 it looked and could not, or looked and found nothing (the null-result
 primitive). The mechanical residue of this insight lives in the coherence
 backlog; this thing carries the reading discipline no tool can.
+
+**The second instance names a sharper form (2026-09-24).** A Claude Code cloud
+container cloned the framework root at depth 50 of 938 commits. This time the
+tool was *not* honest: git answered every pin lookup "no such commit", so
+`validate` minted 148 Errors, and the stall detector — whose failure is
+silence — went quiet, hiding eleven stalls. The first instance was a run that
+could not see *sideways* (sibling repos); this one could not see *backwards*
+(its own history), and the environment question had no tool to ask it. So the
+rule gains a clause: **the environment question includes "is my view of this
+repository complete?" — not only "can I reach it?"** A check that reads
+history owes the depth of that history before its answer. The floor now asks
+it once (`clone_depth`), repairs it where the remote is reachable
+(estate-sync), and otherwise downgrades history-dependent findings to
+could-not-look.

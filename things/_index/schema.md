@@ -3,34 +3,34 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-09-24
-generated: 2026-09-24T18:51:21
-generated_from: HEAD@fdf4a25
-coverage: 433
-framework_version: 3.42.0
+created: 2026-09-27
+generated: 2026-09-27T00:39:17
+generated_from: HEAD@183fe14
+coverage: 458
+framework_version: 3.43.0
 ---
 
 # Schema Registry — framework
 
 | field | things using it |
 |---|---|
-| id | 433 |
-| type | 433 |
-| status | 433 |
-| created | 433 |
-| version | 365 |
-| linked_things | 355 |
-| tags | 332 |
+| id | 458 |
+| type | 458 |
+| status | 458 |
+| created | 458 |
+| version | 389 |
+| tags | 357 |
+| linked_things | 356 |
 | origin | 192 |
 | confidence | 189 |
 | session | 184 |
 | source | 146 |
-| informed_by | 102 |
-| subject | 70 |
-| raised_at | 70 |
-| raised_by | 70 |
-| verdict | 70 |
-| verdict_reason | 70 |
+| informed_by | 107 |
+| subject | 94 |
+| raised_at | 94 |
+| raised_by | 94 |
+| verdict | 94 |
+| verdict_reason | 94 |
 | priority | 57 |
 | disposition | 51 |
 | disposition_reason | 51 |
@@ -41,7 +41,7 @@ framework_version: 3.42.0
 | period_end | 9 |
 | domain | 9 |
 | completed | 8 |
-| triggers | 7 |
+| triggers | 6 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |

@@ -3,11 +3,11 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-09-24
-generated: 2026-09-24T18:51:21
-generated_from: HEAD@fdf4a25
-coverage: 7
-framework_version: 3.42.0
+created: 2026-09-27
+generated: 2026-09-27T00:39:17
+generated_from: HEAD@183fe14
+coverage: 6
+framework_version: 3.43.0
 ---
 
 # Triggers Index — framework
@@ -29,14 +29,10 @@ framework_version: 3.42.0
 - trigger: type=time, condition=2026-10-13 reached, action=Retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own.
 
 ## operator-seat-and-harness-native-onramp
-- status: not-started  due_date: —
-- trigger: type=time, condition=2026-09-20 reached, action=If no phase has started, surface it plainly: the direction was ratified on felt evidence and the substrate backlog is also waiting. Ask which goes first — the onramp or the eval backlog — rather than letting both idle.
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-10-10 reached, action=Re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead.
 
 ## substrate-native-a2a
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-10-10 reached, action=Has Phase 4 run one real writer/reviewer turn through `mdllm watch` in the engineering domain? If not, establish which: the command was never armed, was armed and never woke, or woke and the turn was hand-relayed anyway. The third is the interesting failure — it would mean the doorbell rings and nobody rises, which is a seat problem and not a channel problem. Re-date once answered.
-
-## workflow-reconciliation-precedes-new-definitions
-- status: made  due_date: —
-- trigger: type=time, condition=2026-09-10 reached, action=If the derivation shape is still unsettled, surface this decision at the operator's ratification sitting — the quality-loop plan and any new framework-level workflow-definition wait on it, and an undated human wait is the drift the estate learned to chase.
 

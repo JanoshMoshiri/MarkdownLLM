@@ -34,6 +34,7 @@ from pathlib import Path
 
 import yaml
 
+from .clone_depth import UNSHALLOW_REMEDY, clone_depth
 from .git_transport import git_command, redact
 from .yaml_loader import load_yaml
 
@@ -51,6 +52,7 @@ class SyncState(str, Enum):
     DIRTY = "dirty"
     LOCAL_ONLY = "local-only"
     NO_UPSTREAM = "no-upstream"
+    SHALLOW = "shallow"
     DETACHED = "detached"
     UNBORN = "unborn"
     IN_OPERATION = "in-operation"
@@ -118,9 +120,9 @@ def discover_repos(root: Path) -> list[Path]:
     return repos
 
 
-def _counts(repo: Path) -> tuple[int, int] | None:
-    """(ahead, behind) vs @{upstream} from cached tracking refs — no network."""
-    r = _git(repo, "rev-list", "--left-right", "--count", "HEAD...@{upstream}")
+def _counts(repo: Path, ref: str = "@{upstream}") -> tuple[int, int] | None:
+    """(ahead, behind) vs ``ref`` from cached tracking refs — no network."""
+    r = _git(repo, "rev-list", "--left-right", "--count", f"HEAD...{ref}")
     if r is None or r.returncode != 0:
         return None
     try:
@@ -128,6 +130,33 @@ def _counts(repo: Path) -> tuple[int, int] | None:
         return int(a), int(b)
     except ValueError:
         return None
+
+
+def _same_name_tracking_ref(repo: Path) -> str | None:
+    """The one remote-tracking ref named like the current branch, if exactly one.
+
+    Harness-created branches arrive with no upstream configured even when the
+    remote carries a branch of the same name (Claude Code cloud sessions,
+    2026-09-24: `claude/<session>` checked out, `origin/claude/<session>`
+    fetched, no `branch.*.merge`). Reporting `no-upstream` there made the sync
+    walk a no-op in exactly the environment it exists for. Comparing against
+    that ref — read-only, no config written — is the honest reading; two
+    remotes carrying the name is ambiguous and stays `no-upstream`.
+    """
+    branch = _git(repo, "symbolic-ref", "-q", "--short", "HEAD")
+    if branch is None or branch.returncode != 0 or not branch.stdout.strip():
+        return None
+    name = branch.stdout.strip()
+    remotes = _git(repo, "remote")
+    if remotes is None or remotes.returncode != 0:
+        return None
+    found = []
+    for remote in remotes.stdout.split():
+        ref = f"refs/remotes/{remote}/{name}"
+        r = _git(repo, "rev-parse", "--verify", "-q", ref)
+        if r is not None and r.returncode == 0:
+            found.append(f"{remote}/{name}")
+    return found[0] if len(found) == 1 else None
 
 
 def _classify_fetch_failure(stderr: str) -> str:
@@ -242,12 +271,61 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
                     f"({_first_stderr_line(f.stderr, token)}) — "
                     "orienting from last-fetched state")
 
+    # History completeness before any comparison: a shallow clone answers
+    # every later git read from a truncated stream (clone_depth.py). Completing
+    # it is a fetch of state already real on the remote — the same transport
+    # argument as a fast-forward — so the walk heals it when it can and says
+    # so loudly when it cannot.
+    history_note = ""
+    unhealed_shallow = False
+    depth = clone_depth(repo)
+    if depth.truncated:
+        remaining = ((deadline - time.monotonic())
+                     if deadline is not None else float(timeout))
+        if fetch and state not in _DEGRADED_SYNC_STATES and remaining > 0:
+            u = _git(repo, "fetch", "--unshallow", "--quiet",
+                     timeout=min(float(timeout), remaining), token=token)
+            if u is not None and u.returncode == 0:
+                history_note = "history completed — the clone was shallow"
+            else:
+                why = ("timed out" if u is None
+                       else _first_stderr_line(u.stderr, token))
+                unhealed_shallow = True
+                history_note = (f"clone is SHALLOW, {depth.horizon()} — "
+                                f"unshallow failed ({why}); run "
+                                f"{UNSHALLOW_REMEDY}")
+        else:
+            unhealed_shallow = True
+            history_note = (f"clone is SHALLOW, {depth.horizon()} — run "
+                            f"{UNSHALLOW_REMEDY}")
+
+    def with_history(res: SyncResult) -> SyncResult:
+        if not history_note:
+            return res
+        new_state = res.state
+        if unhealed_shallow and new_state in (SyncState.UP_TO_DATE,
+                                              SyncState.AHEAD):
+            new_state = SyncState.SHALLOW
+        joined = "; ".join(x for x in (res.detail, history_note) if x)
+        return SyncResult(repo=res.repo, state=new_state, detail=joined,
+                          moved=res.moved)
+
+    upstream_ref = "@{upstream}"
+    tracking_note = ""
     counts = _counts(repo)
+    if counts is None and state not in _DEGRADED_SYNC_STATES:
+        fallback = _same_name_tracking_ref(repo)
+        if fallback is not None:
+            counts = _counts(repo, fallback)
+            if counts is not None:
+                upstream_ref = fallback
+                tracking_note = (f"no upstream configured — compared with "
+                                 f"`{fallback}`")
     if counts is None:
         if state in _DEGRADED_SYNC_STATES:
-            return result()
+            return with_history(result())
         state = SyncState.NO_UPSTREAM
-        return result()
+        return with_history(result())
     ahead, behind = counts
     cached = " (cached)" if state in _DEGRADED_SYNC_STATES else ""
     degraded = state if cached else None
@@ -279,8 +357,16 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
                 detail = (f"+{behind} remote (cached) — pull skipped, "
                           "global estate deadline exhausted")
             else:
-                p = _git(repo, "pull", "--ff-only", "--quiet",
-                         timeout=min(float(timeout), remaining), token=token)
+                if upstream_ref == "@{upstream}":
+                    p = _git(repo, "pull", "--ff-only", "--quiet",
+                             timeout=min(float(timeout), remaining),
+                             token=token)
+                else:
+                    # Already fetched above; ff-only against the same-name
+                    # ref is the identical transport without config.
+                    p = _git(repo, "merge", "--ff-only", "--quiet",
+                             upstream_ref,
+                             timeout=min(float(timeout), remaining))
             if p is not None and p.returncode == 0:
                 state = SyncState.SYNCED
                 detail = f"+{behind}"
@@ -300,7 +386,9 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
         if not degraded:
             state = SyncState.DIRTY
         detail = f"working tree not clean{cached}"
-    return result()
+    if tracking_note:
+        detail = "; ".join(x for x in (detail, tracking_note) if x)
+    return with_history(result())
 
 
 class PublicationPolicyState(str, Enum):
@@ -494,6 +582,7 @@ _LABEL = {
     SyncState.DIRTY: "dirty",
     SyncState.LOCAL_ONLY: "local-only",
     SyncState.NO_UPSTREAM: "no-upstream",
+    SyncState.SHALLOW: "SHALLOW",
     SyncState.DETACHED: "detached",
     SyncState.UNBORN: "unborn",
     SyncState.IN_OPERATION: "in-operation",

@@ -23,6 +23,8 @@ import yaml
 
 from .yaml_loader import load_version_sentinel
 
+from .clone_depth import clone_depth, shallow_warning_text
+
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
 from .model import is_terminal, origin_is_external, parse_frontmatter, scan
 from .repository_view import RepositoryHeadMoved, RepositoryView, RepositoryViewError
@@ -845,6 +847,15 @@ def cmd_session_start(args) -> int:
     floor = _floor_status(domain)
     if floor:
         out.append(floor)
+    # History before velocity: a shallow clone makes velocity read low and
+    # the stall section vanish, silently (clone_depth.py — the first cloud
+    # session showed `0 · 3 · 21 · 17` and no stalls against a true
+    # `44 · 14 · 21 · 17` with eleven). Say it before the figures it corrupts.
+    depth = clone_depth(domain)
+    if depth.truncated:
+        out.append(f"- **History: SHALLOW** — {shallow_warning_text(depth)}. "
+                   f"Velocity and stall lines below are NOT trustworthy until "
+                   f"then.")
 
     # One worktree scan and ONE `things/` history walk shared by every
     # consumer below — stall lines, retrospective cadence, forward
