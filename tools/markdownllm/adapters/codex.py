@@ -53,6 +53,7 @@ from .project_hook_emission import (
     lifecycle_envelope, mdllm_posix_path, posix_event_command, ps_quote,
     unavailable_text,
 )
+from .codex_cloud import artifacts as cloud_artifacts, settings as cloud_settings
 
 HOOKS_PATH = ".codex/hooks.json"
 CONFIG_PATH = ".codex/config.toml"
@@ -76,6 +77,12 @@ class CodexAdapter:
     """Pure renderer and conservative project-local inspector for Codex."""
 
     name = "codex"
+
+    def cloud_artifacts(self, source_root, config):
+        return cloud_artifacts(source_root, config)
+
+    def cloud_settings(self, config):
+        return cloud_settings(config)
 
     def capabilities(self) -> AdapterCapabilities:
         return AdapterCapabilities(

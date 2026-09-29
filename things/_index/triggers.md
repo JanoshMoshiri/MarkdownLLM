@@ -3,11 +3,11 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-09-27
-generated: 2026-09-27T00:39:17
-generated_from: HEAD@183fe14
+created: 2026-09-29
+generated: 2026-09-29T23:51:16
+generated_from: HEAD@038d084b
 coverage: 6
-framework_version: 3.43.0
+framework_version: 3.44.0
 ---
 
 # Triggers Index — framework
@@ -30,6 +30,7 @@ framework_version: 3.43.0
 
 ## operator-seat-and-harness-native-onramp
 - status: in-progress  due_date: —
+- trigger: type=time, condition=2026-10-08 reached, action=Answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it.
 - trigger: type=time, condition=2026-10-10 reached, action=Re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead.
 
 ## substrate-native-a2a

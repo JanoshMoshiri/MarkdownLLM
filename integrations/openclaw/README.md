@@ -60,12 +60,11 @@ Merge this shape into `openclaw.json`:
 ```json5
 {
   agents: {
-    list: [
-      {
-        id: "engineering",
+    entries: {
+      engineering: {
         workspace: "/domains/engineering"
       }
-    ]
+    }
   },
   channels: {
     telegram: {

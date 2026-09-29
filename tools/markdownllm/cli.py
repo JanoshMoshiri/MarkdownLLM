@@ -93,6 +93,7 @@ from .harness_ports import LIFECYCLE_BINDINGS
 from .imports_check import cmd_estate_check, cmd_imports_check
 from .assemble import cmd_assemble
 from .bundle_service import cmd_bundle
+from .cloud_service import cmd_cloud
 from .publish import cmd_publish
 from .sync import cmd_autopush, cmd_estate_sync
 from .indexes import cmd_index
@@ -475,6 +476,19 @@ def build_cli() -> argparse.ArgumentParser:
     asm.add_argument("--root", default=".",
                      help="workspace root holding domains/ (default .)")
     asm.set_defaults(fn=cmd_assemble)
+
+    cloud = sub.add_parser("cloud", help="configure, prepare and inspect a multi-repository hosted workspace around the host's checkout")
+    cloud.add_argument("operation", choices=("configure", "check", "prepare", "probe", "status", "start"))
+    cloud.add_argument("path", nargs="?", default=".")
+    cloud.add_argument("--harness", choices=tuple(sorted(adapter_names())))
+    cloud.add_argument("--out", help="artifact destination; defaults to the private .bundle-build directory")
+    cloud.add_argument("--config", help="existing environment.json manifest")
+    cloud.add_argument("--workspace-directory", help="host clone base; defaults to framework/domain or framework/repositories by primary kind")
+    cloud.add_argument("--primary-kind", choices=("domain", "repository"), default="domain")
+    cloud.add_argument("--repository", help="manifest repository name for agent-invoked cloud start")
+    cloud.add_argument("--maintenance", action="store_true", help="prepare a resumed cached checkout")
+    cloud.add_argument("--preview", action="store_true", help="render a clean unpublished commit privately for review; never a deployable bundle")
+    cloud.set_defaults(fn=cmd_cloud)
 
     bd = sub.add_parser("bundle", help="render a harness's estate-level "
                         "distribution bundle from framework-owned templates — "

@@ -54,6 +54,7 @@ class SyncState(str, Enum):
     NO_UPSTREAM = "no-upstream"
     SHALLOW = "shallow"
     DETACHED = "detached"
+    PINNED = "pinned"
     UNBORN = "unborn"
     IN_OPERATION = "in-operation"
     OFFLINE = "offline"
@@ -233,7 +234,11 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
     if (r := _git(repo, "rev-parse", "--verify", "-q", "HEAD")) is None or r.returncode != 0:
         state = SyncState.UNBORN
         return result()
-    if (r := _git(repo, "symbolic-ref", "-q", "--short", "HEAD")) is None or r.returncode != 0:
+    restraint = _git(repo, "config", "--local", "--get", "mdllm.sync")
+    # A host-owned task checkout is not a branch follower. Fetch its history,
+    # but never replace the host's selection with a newer upstream commit.
+    preserve_head = restraint is not None and restraint.returncode != 1
+    if ((r := _git(repo, "symbolic-ref", "-q", "--short", "HEAD")) is None or r.returncode != 0) and not preserve_head:
         state = SyncState.DETACHED
         detail = "detached HEAD — skipped"
         return result()
@@ -303,7 +308,7 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
         if not history_note:
             return res
         new_state = res.state
-        if unhealed_shallow and new_state in (SyncState.UP_TO_DATE,
+        if unhealed_shallow and new_state in (SyncState.UP_TO_DATE, SyncState.PINNED,
                                               SyncState.AHEAD):
             new_state = SyncState.SHALLOW
         joined = "; ".join(x for x in (res.detail, history_note) if x)
@@ -333,6 +338,13 @@ def sync_repo(repo: Path, fetch: bool = True, timeout: int = DEFAULT_TIMEOUT,
     dirty = _git(repo, "status", "--porcelain")
     is_dirty = bool(dirty and dirty.stdout.strip())
 
+    if preserve_head:
+        if not degraded:
+            state = SyncState.PINNED
+        detail = (f"clone-local mdllm.sync restraint: HEAD preserved; "
+                  f"+{ahead} local / +{behind} remote{cached}" +
+                  ("; working tree not clean" if is_dirty else ""))
+        return with_history(result())
     if ahead and behind:
         state = SyncState.DIVERGED
         detail = (f"+{ahead} local / +{behind} remote{cached} — "
@@ -399,6 +411,7 @@ class PublicationPolicyState(str, Enum):
     ABSENT = "absent"
     MALFORMED = "malformed"
     UNREADABLE = "unreadable"
+    LOCAL_RESTRAINT = "local-restraint"
 
 
 @dataclass(frozen=True)
@@ -413,11 +426,28 @@ class PublicationPolicy:
 def publication_policy(repo: Path) -> PublicationPolicy:
     """Read the fail-closed publication authority and preserve its reason.
 
-    Only the YAML boolean ``true`` at ``git.autopush`` enables a send.  The
+    Only the YAML boolean ``true`` at ``git.autopush``, with no clone-local
+    restraint, enables a send. The
     distinction between false, absent, malformed, and unreadable is retained
     for diagnostics; collapsing all four to ``False`` made a safe refusal
     operationally opaque.
     """
+    # Definition diagnostics also operate on uninitialised domain directories.
+    # There is no clone-local policy there, and querying Git would either fail
+    # or accidentally read a containing repository's unrelated restraint.
+    if (repo / ".git").exists():
+        restraint = _git(repo, "config", "--local", "--get", "mdllm.publication")
+        if restraint is None or restraint.returncode not in (0, 1):
+            return PublicationPolicy(False, PublicationPolicyState.UNREADABLE,
+                                     "clone-local publication restraint could not be read")
+        if restraint.returncode == 0:
+            value = restraint.stdout.strip()
+            return PublicationPolicy(
+                False, (PublicationPolicyState.LOCAL_RESTRAINT if value in {"pr", "manual"}
+                        else PublicationPolicyState.MALFORMED),
+                ("clone-local mdllm.publication=pr: use the host's PR workflow"
+                 if value == "pr" else "clone-local mdllm.publication=manual: publication requires a separate human instruction"
+                 if value == "manual" else "unknown clone-local mdllm.publication value; publication disabled"))
     agents = repo / "AGENTS.md"
     if not agents.is_file():
         return PublicationPolicy(
@@ -515,6 +545,16 @@ def autopush_repo(repo: Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
         out["state"] = "detached"
         return out
     branch = br.stdout.strip()
+    cloud_branch = _git(repo, "config", "--local", "--get", "mdllm.cloud.branch")
+    if cloud_branch is None or cloud_branch.returncode not in (0, 1):
+        out["state"] = "failed"
+        out["detail"] = "clone-local cloud branch restraint could not be read"
+        return out
+    if cloud_branch.returncode == 0 and branch != cloud_branch.stdout.strip():
+        out["state"] = "wrong-branch"
+        out["detail"] = (f"checked out on {branch!r}; cloud manifest permits "
+                         f"automatic publication only from {cloud_branch.stdout.strip()!r}")
+        return out
     upstream = _git(repo, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}")
     if upstream is None or upstream.returncode != 0:
         out["state"] = "no-upstream"
@@ -584,6 +624,7 @@ _LABEL = {
     SyncState.NO_UPSTREAM: "no-upstream",
     SyncState.SHALLOW: "SHALLOW",
     SyncState.DETACHED: "detached",
+    SyncState.PINNED: "pinned",
     SyncState.UNBORN: "unborn",
     SyncState.IN_OPERATION: "in-operation",
     SyncState.OFFLINE: "offline",
@@ -652,6 +693,7 @@ def cmd_estate_sync(args) -> int:
             SyncState.UP_TO_DATE,
             SyncState.AHEAD,
             SyncState.LOCAL_ONLY,
+            SyncState.PINNED,
         }
         incomplete = [res for res in results
                       if res.state not in fresh_states]

@@ -3,6 +3,8 @@
 .claude/settings.local.json
 domains/
 domain/
+# Independent non-domain repositories assembled by the optional cloud adapter.
+repositories/
 adapters/logs/
 # Run workspaces are bulky, ephemeral, and are themselves git repos (cannot
 # be partially tracked). The scored evidence is the basis of the framework's

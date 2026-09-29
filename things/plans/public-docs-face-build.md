@@ -7,6 +7,9 @@ created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
 linked_things:
+  - id: a-surface-checked-in-one-renderer-is-unchecked-in-another
+    relation: references
+    notes: "Phase 2's three live defects, none visible on the blob view; the local preview is this plan's check for the class."
   - id: public-docs-face-is-derived-not-restated
     relation: implements
     notes: "The ruling this builds. It settled the surface (Pages from docs/ on main), ruled out the wiki on mechanism, and separated the public face from `exposed`. It deliberately did not build anything or settle the selector — that residue is this plan."

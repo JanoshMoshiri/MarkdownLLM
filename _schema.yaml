@@ -8,6 +8,10 @@
 schema_version: 1
 domain: framework
 
+# Optional cloud workspaces keep ordinary code clones outside this corpus.
+# This is framework-local; other domains do not inherit an exclusion.
+exclude: [repositories]
+
 options:
   # Framework spec files are named by topic (thing.md) with ids suffixed
   # -specification (thing-specification) — an established convention; links and

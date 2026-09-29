@@ -96,14 +96,16 @@ def derive_estate_config(root: Path) -> tuple[dict[str, str], list[str]]:
     return config, notes
 
 
-def framework_source_findings(root: Path, source_root: Path) -> list[str]:
+def framework_source_findings(root: Path, source_root: Path, *,
+                              require_published: bool = True) -> list[str]:
     """Refuse a bundle pin that cannot reproduce the bytes being rendered.
 
     The bundle templates are loaded from ``source_root``.  The estate config
     and commit pin are read from ``root``.  Those must be the same clean Git
     checkout, and cached ``origin`` refs must contain HEAD; otherwise the
     ephemeral bootstrap either executes different bytes or cannot fetch the
-    promised commit at all.
+    promised commit at all. Private previews may relax publication only; they
+    still require a clean, committed source tree.
     """
     root = root.resolve()
     source_root = source_root.resolve()
@@ -125,7 +127,8 @@ def framework_source_findings(root: Path, source_root: Path) -> list[str]:
         root, "for-each-ref", "--contains", commit,
         "--format=%(refname)", "refs/remotes/origin",
     ).splitlines()
-    if not any(ref.startswith("refs/remotes/origin/") for ref in remote_refs):
+    if require_published and not any(
+            ref.startswith("refs/remotes/origin/") for ref in remote_refs):
         findings.append(
             f"framework commit {commit} is not contained by any cached "
             "origin ref; fetch or publish it before building because the "

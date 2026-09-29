@@ -3,35 +3,35 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-09-27
-generated: 2026-09-27T00:39:17
-generated_from: HEAD@183fe14
-coverage: 458
-framework_version: 3.43.0
+created: 2026-09-29
+generated: 2026-09-29T23:55:22
+generated_from: HEAD@038d084b
+coverage: 485
+framework_version: 3.44.0
 ---
 
 # Schema Registry — framework
 
 | field | things using it |
 |---|---|
-| id | 458 |
-| type | 458 |
-| status | 458 |
-| created | 458 |
-| version | 389 |
-| tags | 357 |
-| linked_things | 356 |
-| origin | 192 |
-| confidence | 189 |
-| session | 184 |
-| source | 146 |
-| informed_by | 107 |
-| subject | 94 |
-| raised_at | 94 |
-| raised_by | 94 |
-| verdict | 94 |
-| verdict_reason | 94 |
-| priority | 57 |
+| id | 485 |
+| type | 485 |
+| status | 485 |
+| created | 485 |
+| version | 412 |
+| tags | 381 |
+| linked_things | 364 |
+| origin | 194 |
+| confidence | 191 |
+| session | 186 |
+| source | 148 |
+| informed_by | 119 |
+| subject | 116 |
+| raised_at | 116 |
+| raised_by | 116 |
+| verdict | 116 |
+| verdict_reason | 116 |
+| priority | 59 |
 | disposition | 51 |
 | disposition_reason | 51 |
 | decided_by | 35 |
@@ -60,5 +60,6 @@ framework_version: 3.43.0
 | source_domain | 1 |
 | source_id | 1 |
 | source_commit | 1 |
+| dependencies | 1 |
 | definition_commit | 1 |
 | stages | 1 |

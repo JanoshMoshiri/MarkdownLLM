@@ -3,11 +3,11 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-27
-generated: 2026-09-27T00:39:17
-generated_from: HEAD@183fe14
-coverage: 112
-framework_version: 3.43.0
+created: 2026-09-29
+generated: 2026-09-29T23:51:16
+generated_from: HEAD@038d084b
+coverage: 118
+framework_version: 3.44.0
 ---
 
 # Provenance Index (reverse) — framework
@@ -104,8 +104,23 @@ framework_version: 3.43.0
 ## cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - serve-side-blindness-dissolves-into-composition (derived-from)
 
+## cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26
+- cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
 ## cue-carrier
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+
+## cue-operator-queue-2026-08-28-2026-09-26
+- cue-operator-queue-2026-08-28-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
+## cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26
+- cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
+## cue-vendor-harness-adapter-foundation-2026-09-26
+- cue-vendor-harness-adapter-foundation-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
+
+## cue-watertight-membrane-sprint-2026-08-30-2026-09-26
+- cue-watertight-membrane-sprint-2026-08-30-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
 
 ## derivation-shape-brief-2026-08
 - derivation-shape-settled-2026-08 (pinned @016150e76f1ae69aefd41331f9da1aa7fed471e6)
@@ -139,6 +154,7 @@ framework_version: 3.43.0
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 
 ## dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23
+- cue-closed-loop-operating-state-2026-09-24 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 - cue-closed-loop-operating-state-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## divergence-is-an-unrouted-decision
@@ -329,7 +345,9 @@ framework_version: 3.43.0
 
 ## loop-turns-self-heal-2026-09-23
 - cue-git-workflow-specification-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
+- cue-standing-watch-specification-2026-09-24 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 - cue-standing-watch-specification-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
+- cue-substrate-native-a2a-2026-09-24 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## markdownllm-desktop-is-primary-accessible-product
 - explorer-extraction-and-hosting (derived-from)
@@ -352,6 +370,7 @@ framework_version: 3.43.0
 - floor-sprint-3-scope-2026-08-23 (pinned @4569360f7460e4a2aa97d4993d8cf6c1691f5648)
 
 ## open-questions-arrive-as-a-prompt-2026-09-23
+- cue-closed-loop-operating-state-2026-09-24 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 - cue-closed-loop-operating-state-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## operating-is-programming
@@ -387,9 +406,14 @@ framework_version: 3.43.0
 ## public-docs-face-is-derived-not-restated
 - cue-framework-map-2026-09-22 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
 - cue-operator-guide-2026-09-22 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
+- cue-public-docs-face-build-2026-09-24 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
 - public-face-links-out-not-hosts-2026-09-22 (pinned @35aae16b2c185b6aa2d63c20d8eabae8d9432f28)
 
+## public-face-links-out-not-hosts-2026-09-22
+- cue-public-docs-face-build-2026-09-24 (pinned @dc66a7dafcc7a475c60474fcdea852bbe220f3c6)
+
 ## retrospective-cadence-is-a-dated-chase-2026-09-13
+- cue-framework-retrospective-2026-08b-2026-09-24 (pinned @7487ab3c219946dc468ecda2ee228e4157437d6e)
 - dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 
 ## retrospective-specification
@@ -482,6 +506,8 @@ framework_version: 3.43.0
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
 
 ## unattended-cue-carrier-2026-09-12
+- cue-change-reconciliation-specification-2026-09-24 (pinned @2b12791fcfb2d6eb6c3f971bf444169667fb0815)
+- cue-cue-carrier-2026-09-24 (pinned @2b12791fcfb2d6eb6c3f971bf444169667fb0815)
 - cue-derived-index-specification-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - cue-validate-thing-specification-dark-region-2026-09-12 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - feels-automatic-is-persistence-of-the-question (derived-from)

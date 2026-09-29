@@ -110,6 +110,8 @@ def cmd_doctor(args) -> int:
     if policy.state is PublicationPolicyState.LITERAL_TRUE:
         report("OK", "autopush ENABLED — literal `git.autopush: true` "
                      "authorises the post-commit send")
+    elif policy.state is PublicationPolicyState.LOCAL_RESTRAINT:
+        report("OK", f"autopush OFF — {policy.reason}")
     elif policy.state is PublicationPolicyState.LITERAL_FALSE:
         report("OK", "autopush OFF — literal `git.autopush: false`; "
                      "publication remains operator-owned")
