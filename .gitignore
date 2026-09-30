@@ -43,4 +43,3 @@ docs/.jekyll-cache/
 docs/.jekyll-metadata
 .sass-cache/
 tools/pages/Gemfile.lock
-/.openclaw-pytest-basetemp/popen-gw4/test_scaffold_autopush_is_defa0/default-domain/
