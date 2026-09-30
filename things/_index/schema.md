@@ -3,11 +3,11 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-09-29
-generated: 2026-09-29T23:55:22
-generated_from: HEAD@038d084b
+created: 2026-09-30
+generated: 2026-09-30T23:06:51
+generated_from: HEAD@21708e75
 coverage: 485
-framework_version: 3.44.0
+framework_version: 3.45.0
 ---
 
 # Schema Registry — framework

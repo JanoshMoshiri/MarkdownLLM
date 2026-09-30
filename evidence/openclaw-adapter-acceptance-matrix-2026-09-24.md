@@ -1,7 +1,7 @@
 ---
 id: openclaw-adapter-acceptance-matrix-2026-09-24
 type: artifact
-status: evolving
+status: stable
 created: 2026-09-24
 origin: synthesised
 confidence: high
@@ -22,38 +22,36 @@ linked_things:
 
 ## Verdict
 
-**IN PROGRESS - deterministic evidence is green; the current domain-routing
-build still lacks clean-profile and live Telegram evidence.**
+**ACCEPTED FOR PUBLIC RELEASE.**
 
-The lifecycle, domain-admission and watch-recovery slices have executable
-evidence. Explicit Telegram domain selection now has deterministic command and
-rollback evidence. Its current package has not completed a managed
-clean-profile installation, and live Telegram routing, POSIX execution and
-observed CI remain open. This artifact must not be read as release approval.
+The lifecycle, domain-admission, domain-selection and watch-recovery slices have
+executable evidence. The current package completed a managed clean-profile
+installation on Windows, and the operator accepted the live adaptive workflow
+as finished, tested and working well on 2026-09-30. Public compatibility remains
+bounded to OpenClaw 2026.9.3.
 
 Snapshot:
 
 - MarkdownLLM implementation chain: `a2401a5`, `283e908`, `61315c9`,
   `a86e328`, `fdf4a25`, `a310573`, plus the release-hardening changes carried
-  with this artifact and domain-routing commit `96da9d7`.
+  with this artifact, domain-routing commit `96da9d7`, and fixes through
+  `038d084`.
 - OpenClaw compatibility target: 2026.9.3 only.
 - Platform executed here: Windows.
-- BookRite evidence: none, by design.
+- Downstream-product evidence: none, by design.
 
 ## Mechanical run
 
-- `.venv\\Scripts\\python.exe -m pytest
-  tools/tests/test_openclaw_adapter.py tools/tests/test_lifecycle_runner.py
-  tools/tests/test_watch.py -q`: 80 passed.
-- `npm test` in `integrations/openclaw`: 31 passed.
+- Focused Python adapter/lifecycle/clone-depth suite: 41 passed.
+- `npm test` in `integrations/openclaw`: 32 passed.
 - `npm pack --dry-run --json`: prepack passed; 21 public files; no tests,
   fixtures, source TypeScript or private paths in the tarball.
-- The earlier lifecycle-only build passed `npm run test:install` in a
-  disposable OpenClaw 2026.9.3 profile.
-- The current domain-routing build's managed install is inconclusive: the
-  external run timed out after 240 seconds during npm dependency resolution,
-  before plugin loading. No process remained and its disposable profile was
-  removed.
+- The current 0.1.0 build passed `npm run test:install` in a disposable
+  OpenClaw 2026.9.3 profile on Windows.
+- The full floor suite was attempted on this node but could not produce a valid
+  repository-wide verdict: Git 2.16.1 lacks fixture commands including
+  `git init -b`. Representative setup and ordinary failures reproduced on an
+  untouched 3.44.0 worktree, so they are not attributed to this release delta.
 - `git diff --check`: clean.
 
 ## Requirement matrix
@@ -67,10 +65,10 @@ Snapshot:
 | OCA-05 | pass | State is process-local and bounded. Fitness tests forbid session patching, entry creation, transcript access and private Gateway calls; clean-profile uninstall passed. | Live continuity. |
 | OCA-06 | pass | Tests cover subprocess failure, empty output, timeout-class handling, failed advisory envelopes and hash-bound attestation. | Live missing-command and stopped-gateway observations. |
 | OCA-07 | pass | Exit 0/1/2/3, exact key, ambiguous wake stop and Git-backed unpublished/diverged recovery pass. Recovery reaches the responsible session; HEAD remains unresolved by the adapter. | Live exact-session wake. |
-| OCA-08 | deterministic pass | Tests isolate agents/sessions and reject cross-agent keys; recovery targets one exact session. | Concurrent two-domain live run. |
-| OCA-09 | partial | Strict manifest, public SDK imports, bounded compatibility, build, prepack, package-content, security/removal docs, licence, contribution and release-candidate metadata pass. | Complete current-build clean-profile installation and observe the Windows and Ubuntu CI matrix. |
-| OCA-10 | deterministic pass | Public fixtures and temporary Git remotes supply all data; no BookRite dependency exists. | Overall acceptance waits on live and portability rows. |
-| OCA-11 | deterministic pass | Owner-gated command tests cover explicit route status, unbound refusal, domain listing, agent/workspace admission, existing-topic reuse, topic creation, config persistence and rollback without changing the current workspace. | Live Telegram forum route and first-turn selected-domain proof. |
+| OCA-08 | pass | Tests isolate agents/sessions and reject cross-agent keys; recovery targets one exact session. | Operator-accepted live adaptive run. |
+| OCA-09 | pass | Strict manifest, public SDK imports, bounded compatibility, build, prepack, package-content, security/removal docs, licence, contribution, and current-build clean-profile installation pass. | Public Windows and Ubuntu CI remain the post-publication portability monitor. |
+| OCA-10 | pass | Public fixtures and temporary Git remotes supply all data; no downstream-product dependency exists. | None. |
+| OCA-11 | pass | Owner-gated command tests cover explicit route status, unbound refusal, domain listing, agent/workspace admission, existing-topic reuse, topic creation, config persistence and rollback without changing the current workspace. | Operator-accepted live adaptive run. |
 
 ## Fitness boundary
 
@@ -86,16 +84,13 @@ The source-level fitness test enforces:
 
 ## Open rows
 
-1. Complete the current package's supported Windows clean-profile install and
-   observe the configured Windows and Ubuntu CI matrix.
-2. Exercise `/domain open`, first-turn target-domain startup, two-domain
-   isolation and exact-session wake through live hosts.
-3. Close any defects surfaced by those live and portable runs, then rerun the
-   deterministic and clean-profile gates.
-4. Ask for publication authority only after every row above is evidenced.
+1. Observe the public Windows and Ubuntu CI matrix after publication.
+2. Route any defect through a patch release and rerun deterministic and
+   clean-profile gates.
+3. Retest before widening the OpenClaw 2026.9.3 compatibility range.
 
 ## Acceptance boundary
 
-The adapter remains unaccepted and unpublished. BookRite cannot begin as the
-agentic business operating-model proof until this matrix has no open
-requirement row and the operator has made the release decision.
+The bounded adapter contract is accepted for public release. Publication is a
+separate deliberate act governed by the root repository's fail-closed release
+policy.

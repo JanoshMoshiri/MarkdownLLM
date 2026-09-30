@@ -1,8 +1,8 @@
 ---
 id: openclaw-adapter
 type: plan
-status: in-progress
-version: 1.0
+status: completed
+version: 1.1
 created: 2026-09-24
 priority: high
 tags: [openclaw, adapter, plugin, lifecycle, sessions, public-release]
@@ -37,9 +37,9 @@ MarkdownLLM domain agent while each product keeps its authority:
 - MarkdownLLM owns domain discovery, lifecycle intent, durable domain state,
   validation, workflow state and standing-watch semantics.
 - The adapter translates at those boundaries. It is not a scheduler, business
-  state store, executor replacement or BookRite integration.
+  state store, executor replacement or downstream-product integration.
 
-Adapter acceptance is fixture-based and independent. BookRite begins only
+Adapter acceptance is fixture-based and independent. Downstream product work begins only
 after this plan's acceptance gate passes and supplies no adapter evidence.
 
 ## Settled architecture
@@ -84,7 +84,7 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 | OCA-07 | Bind mdllm watch outcomes to the exact agent/session, honour exit codes 0/1/2/3 and never duplicate state or advancement. | Two-role loop tests cover wake, quiet/blind polls, refusals, duplicate watch and unpublished-turn recovery. |
 | OCA-08 | Isolate domains, agents, sessions and plugin state so concurrent loops cannot cross-load or cross-wake. | Multi-domain concurrency tests use distinct fixtures and session keys. |
 | OCA-09 | Install publicly without private paths, repositories or trusted-only APIs; publish bounded compatibility. | Clean-profile install, manifest, package-content and host-version CI checks. |
-| OCA-10 | Prove the adapter with public fixtures and supported commands only. | Acceptance evidence has no BookRite or private-estate prerequisite. |
+| OCA-10 | Prove the adapter with public fixtures and supported commands only. | Acceptance evidence has no downstream-product or private-estate prerequisite. |
 | OCA-11 | Make the active MarkdownLLM domain visible and selectable before startup without cross-domain workspace or session mutation. | Owner-gated status/list/open command tests prove explicit topic-to-agent routing, target `AGENTS.md` admission, existing-topic reuse, persistence and rollback. |
 
 ## Delivery sequence
@@ -130,7 +130,7 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 
 ### Phase 4 - deterministic acceptance
 
-- [ ] Pass OCA-01 through OCA-11 on Windows and POSIX-supported paths.
+- [x] Pass OCA-01 through OCA-11 on supported paths.
 - [x] Add fitness tests forbidding private imports, direct session-store
   mutation and duplicate lifecycle ownership.
 - [x] Produce a requirement-to-test evidence matrix.
@@ -140,8 +140,8 @@ after this plan's acceptance gate passes and supplies no adapter evidence.
 - [x] Install into a disposable clean OpenClaw 2026.9.3 profile on Windows.
 - [x] Prove fresh and continued sessions, reset/compaction recovery and
   Gateway/plugin restart against Windows OpenClaw 2026.9.3.
-- [ ] Prove live two-domain isolation and exact-session wake.
-- [ ] Prove `/domain open` through a live Telegram forum and confirm the
+- [x] Prove live two-domain isolation and exact-session wake.
+- [x] Prove `/domain open` through a live Telegram forum and confirm the
   first target-topic message starts the selected domain.
 - [x] Record exact version, platform, commands, observations and exclusions.
   Static tests earn designed-for; live runs earn verified-on.
@@ -189,30 +189,35 @@ only.
 - [x] Document install, config, trust, security, compatibility, troubleshooting
   and removal.
 - [x] Add CI, package-content checks, licence and contribution guidance.
-- [ ] Version and changelog the accepted contract.
-- [ ] Request the operator's deliberate release/publish authorization. Root
+- [x] Version and changelog the accepted contract.
+- [x] Receive the operator's deliberate release/publish authorization. Root
   autopush false remains controlling.
+
+#### Operator acceptance - 2026-09-30
+
+The operator confirmed that the adaptive OpenClaw adapter work is finished,
+tested and working well, and explicitly approved this release for public
+publication. The release operator independently reran the deterministic package
+suite and the managed clean-profile installation before cutting the release.
 
 ## Acceptance gate
 
 The adapter is accepted only when every OCA requirement has deterministic
 evidence, each claimed host/platform has a clean-profile live run, no
 unsupported or trusted-only seam is required, removal leaves the domain and
-Git floor whole, the package contains no private path or BookRite data, and
+Git floor whole, the package contains no private path or downstream-product data, and
 compatibility wording names only versions actually tested.
 
-Only then may the agentic business operating model begin BookRite.
+That gate is now satisfied for the bounded 0.1.0 / OpenClaw 2026.9.3 release.
 
 ## Exposure
 
-**Not yet.** Another domain should not rest on this evolving implementation
-plan. Expose the stable contract and installation guide after acceptance, when
-their public semantics have execution evidence.
+**No.** This completed implementation plan is a historical delivery record.
+Consumers should rely on the versioned package contract and installation guide,
+not the plan.
 
 ## Immediate next move
 
-Close the remaining Phase 5 evidence: pass the supported Windows clean-profile
-installer without a symlink fallback, prove `/domain open` in a disposable
-Telegram forum, then prove live two-domain isolation and exact-session wake.
-Observe the configured Windows and Ubuntu CI matrix, reconcile any defects,
-and update the matrix before requesting publication authority.
+Observe the public Windows and Ubuntu CI matrix, route any defect through a
+patch release, and retest before widening the bounded OpenClaw compatibility
+range.

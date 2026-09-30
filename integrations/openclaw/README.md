@@ -5,9 +5,8 @@ session-start lifecycle. OpenClaw keeps ownership of agents, sessions and
 conversation history. MarkdownLLM keeps ownership of domain discovery, Git
 state, validation and workflow state.
 
-The package is under active development and is not yet released. Compatibility
-is currently bounded to OpenClaw 2026.9.3 while the Plugin SDK remains
-experimental.
+The initial public release is version 0.1.0. Compatibility is bounded to
+OpenClaw 2026.9.3 while the Plugin SDK remains experimental.
 
 ## Requirements
 
@@ -19,29 +18,28 @@ experimental.
 
 ## Installation
 
-The package is not published yet. For a local release-candidate check:
+For a local source-checkout verification:
 
 ```bash
 cd integrations/openclaw
 npm ci
 npm test
 npm pack
-openclaw plugins install npm-pack:/absolute/path/to/markdownllm-openclaw-adapter-0.1.0-dev.0.tgz --force --accept-capabilities
+openclaw plugins install npm-pack:/absolute/path/to/markdownllm-openclaw-adapter-0.1.0.tgz --force --accept-capabilities
 ```
 
 Use the documented `npm-pack:` prefix. It exercises OpenClaw's managed npm
 project and lockfile verification; installing the same file as a raw archive
 does not prove the registry-shaped installation path.
 
-After a public release, install the pinned npm package:
+Install the pinned public package:
 
 ```bash
 openclaw plugins install @markdownllm/openclaw-adapter@0.1.0 --pin
 ```
 
-Do not install an unreleased version from that command. Review the package and
-its native plugin code before installation: an OpenClaw plugin executes inside
-the Gateway process.
+Review the package and its native plugin code before installation: an OpenClaw
+plugin executes inside the Gateway process.
 
 ## Configuration
 

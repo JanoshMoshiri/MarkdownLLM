@@ -4,6 +4,8 @@ All notable changes to the MarkdownLLM adapter for OpenClaw are recorded here.
 
 ## Unreleased
 
+## [0.1.0] - 2026-09-30
+
 ### Added
 
 - Version-bounded OpenClaw 2026.9.3 hook plugin.
@@ -20,4 +22,4 @@ All notable changes to the MarkdownLLM adapter for OpenClaw are recorded here.
 ### Security
 
 - No shell execution, private OpenClaw imports, direct session-store mutation
-  or BookRite dependency.
+  or downstream product dependency.

@@ -22,7 +22,7 @@ python tools/mdllm.py validate .
 python tools/mdllm.py index . check
 ```
 
-Keep BookRite and private-estate data outside adapter fixtures and evidence.
+Keep downstream product and private-estate data outside adapter fixtures and evidence.
 Do not add private OpenClaw distribution imports, direct session/transcript
 storage access, trusted-only Gateway calls or a second workflow scheduler.
 
