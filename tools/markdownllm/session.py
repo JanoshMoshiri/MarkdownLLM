@@ -281,7 +281,9 @@ def _verified_flips_recent(domain: Path) -> list[str]:
                          encoding="utf-8", errors="replace")
     if log.returncode != 0 or not log.stdout.strip():
         return []
-    commits = [ln.split("\x1f", 1) for ln in log.stdout.splitlines() if ln]
+    # Split on "\n" only: str.splitlines() also breaks on a stray "\r" inside a
+    # subject, leaving a separator-less fragment that cannot unpack.
+    commits = [ln.split("\x1f", 1) for ln in log.stdout.split("\n") if "\x1f" in ln]
     base = None
     for h, subj in commits[1:]:  # HEAD itself being a session-end still ends a session
         if subj.startswith("session-end"):

@@ -204,3 +204,18 @@ def test_session_start_structural_work_is_bounded(tmp_path, capsys,
     # deliberate constant far below the corpus size and above the exact
     # count, so incidental fixed calls do not make this brittle.
     assert len(spawns) <= 12, f"{len(spawns)} git spawns: {spawns}"
+
+
+def test_stray_carriage_return_in_subject_does_not_break_flip_scan(tmp_path):
+    """A commit subject carrying a bare "\r" (a Windows-authored scaffold
+    message that was later reverted) used to split into a separator-less
+    fragment under str.splitlines() and crash session-start's unpack."""
+    from markdownllm import session
+    root = _repo(tmp_path)
+    (root / "a.md").write_text("x\n", encoding="utf-8")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", 'Revert "chore: isolate domain x\r"')
+    (root / "b.md").write_text("y\n", encoding="utf-8")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "create: b")
+    assert session._verified_flips_recent(root) == []

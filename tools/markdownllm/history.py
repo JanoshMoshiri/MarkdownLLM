@@ -63,7 +63,9 @@ def cmd_worklog(args) -> int:
                           f"--format={fmt}", "HEAD"], cwd=root,
                          capture_output=True, encoding="utf-8", errors="replace",
                          check=True).stdout
-    commits = [tuple(line.split("\x1f", 2)) for line in out.strip().splitlines() if line]
+    # "\n" only — splitlines() would also split on a stray "\r" in a subject.
+    commits = [tuple(line.split("\x1f", 2)) for line in out.strip().split("\n")
+               if line.count("\x1f") >= 2]
     if not commits:
         print("mdllm: no commits — nothing to generate")
         return 0
