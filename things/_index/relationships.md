@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-01
-generated: 2026-10-01T02:02:03
-generated_from: HEAD@38ab1d8
-coverage: 486
+generated: 2026-10-01T02:09:01
+generated_from: HEAD@5f8a90a
+coverage: 489
 framework_version: 3.45.0
 ---
 
@@ -537,6 +537,7 @@ framework_version: 3.45.0
 - cue-operator-guide-2026-09-22 --subject--> operator-guide
 - cue-operator-guide-2026-09-26 --subject--> operator-guide
 - cue-operator-guide-2026-09-27 --subject--> operator-guide
+- cue-operator-guide-2026-10-01 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -559,10 +560,12 @@ framework_version: 3.45.0
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-24 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-10-01 --subject--> standing-watch-specification
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-09-24 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-09-26 --subject--> substrate-native-a2a
+- cue-substrate-native-a2a-2026-10-01 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
@@ -1414,6 +1417,7 @@ framework_version: 3.45.0
 - srp-extraction-is-tier-promotion --supports--> example-things-specification
 - srp-extraction-is-tier-promotion --supports--> reasoning-lenses-specification
 - standing-watch-specification --extends--> thing-specification
+- standing-watch-specification --derived-from--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - standing-watch-specification --complements--> workflow-state-specification
 - standing-watch-specification --complements--> trigger-specification
 - standing-watch-specification --complements--> orchestration-specification
@@ -1464,6 +1468,7 @@ framework_version: 3.45.0
 - substrate-native-a2a --supports--> a-true-primitive-is-discovered-not-authored
 - substrate-native-a2a --complements--> closed-loop-operating-state
 - substrate-native-a2a --implements--> hook-enforcement-has-three-anchors
+- substrate-native-a2a --derived-from--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - substrate-reconciliation-2026-08-09 --informs--> orchestration-specification
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate

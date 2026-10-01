@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-09-19
 priority: high
 informed_by:
@@ -47,6 +47,9 @@ linked_things:
   - id: hook-enforcement-has-three-anchors
     relation: implements
     notes: "The wake is the harness's act, not the framework's. `--exit-on-wake` is the contract an adapter binds; the floor stays at git-fs and adapters stay optional."
+  - id: ticket-is-the-ad-hoc-carrier-2026-09-30
+    relation: derived-from
+    notes: "Phase 7 is this ruling's build. It also qualifies this plan's own 'no new thing type for the turn' refusal — artefact turns only; ad-hoc messages had no carrier."
 triggers:
   - type: time
     condition: "2026-10-10 reached"
@@ -299,6 +302,49 @@ Deliberately not lifted:
             2026-09-22, additively, under the operator's grant — an unscoped
             watch behaves exactly as before.
 
+- [ ] **Phase 7 — The ticket: ad-hoc messages with no artefact behind them.**
+      *Added 2026-10-01, from the ruling `ticket-is-the-ad-hoc-carrier-2026-09-30`.*
+      Phases 1–6 carry a turn on an artefact. They cannot carry *"Codex,
+      quickly review X"* — nothing on the board changes status, so nothing
+      rings. The operator ruled the carrier: one overwritable thing per
+      conversation whose `status` is the addressee, body the current message,
+      only the addressee writes, one message per turn, `git log -p` the
+      transcript. Domain-declared, never reserved (`read_board` skips reserved
+      types). Protocol text: `standing-watch.md` → The Ticket.
+      - [x] The decision, recorded with the two rejected alternatives (a hosted
+            mailbox MCP; `mcp_agent_mail`) and the refusal it qualifies.
+      - [x] Shipped shape: `templates/ticket.md.template`,
+            `templates/ad-hoc-message-loop.md.template` (stage ids = actor
+            names, `stages[].actor` declared), a commented `ticket` entry in
+            `_schema.yaml.template`; the birth test renders both.
+      - [x] Tests, no floor code: `TestTicketLoop` — both actors arm; a
+            reserved-type ticket is off the board; the addressee wakes and the
+            sender does not; a body-only change at the same status wakes
+            nobody; `closed` wakes nobody and keeps the ticket on the board.
+      - [x] **The double-send question, settled by evidence rather than
+            assumption:** no optional content-change wake. `diff_board` keys on
+            status and skips `was == now`, so one message per turn is what the
+            floor does, not merely what the protocol asks. Reopen only if the
+            live test shows a real need.
+      - [ ] **The live test — the operator runs it.** One real round trip on
+            one ticket, Claude Code → Codex → Claude Code, no human relay.
+            This also discharges Phase 4's unticked *GPT-side instance woken
+            through the PowerShell route*: the Codex leg arms
+            `mdllm watch` through `tools/mdllm.ps1`.
+            - **Main risk: Codex's command timeout.** Can a Codex session
+              hold a blocking `mdllm watch --exit-on-wake` across a long
+              wait? Test it explicitly, and record the number. If it cannot:
+              (a) a fresh `codex exec` / `codex exec resume` launched on the
+              watcher's exit — safe only while no TUI holds the thread; or
+              (b) OpenClaw driving the same Codex models through its own
+              adapter. Whichever leg works is what the record says works
+              (`portability-claims-need-execution-tests`).
+            - Claude Code and Hermes are already proven on the artefact loop;
+              one Hermes leg on the ticket if convenient, not required.
+      - [ ] Adoption is the domain's. The engineering domain declares `ticket`
+            with its own actor names and the definition, by its own agent —
+            nothing here writes into a domain.
+
 ## What The Build Found — Phase 4's First Input
 
 **The engineering definition's stage ids and its own board table disagree.**
@@ -336,10 +382,14 @@ status-keyed board.
   membrane that makes the face trustworthy does not cover it. When that leg is
   wanted it gets its own deliberately-shaped channel — the operator said so
   himself, and this plan holds him to it.
-- **No new thing type for the turn.** The specification loop already checked
-  this and found the state had a carrier. A separate handover thing would be a
-  contended singleton across two clones — the one object in the design that
-  must never diverge.
+- **No new thing type for an *artefact's* turn.** The specification loop
+  already checked this and found the state had a carrier. A separate handover
+  thing would be a contended singleton across two clones — the one object in
+  the design that must never diverge. *Qualified 2026-09-30
+  (`ticket-is-the-ad-hoc-carrier-2026-09-30`):* this was about turns that
+  already had a carrier. An ad-hoc message has no artefact and had none; the
+  ticket is the first declaration of that turn, not a second one, and the
+  addressee-only-writes rule is what keeps it from diverging across clones.
 - **No scheduled task.** `two-agent-review-loop` v1.6 paid for that lesson:
   every run born with permissions on manual, one hang blocking everything for
   twenty-three hours, and tokens spent to say "nothing moved".
@@ -364,3 +414,8 @@ status-keyed board.
       the first of the between-sessions band (2026-09-21).
 - [x] A watch can be scoped to one run, and two reviewers on two runs never hear
       each other's doorbell (2026-09-22, `--run`; tested).
+- [x] An ad-hoc message with no artefact behind it has a carrier — the ticket —
+      shipped as templates and pinned by tests, with no floor code
+      (2026-10-01).
+- [ ] One ticket round trip has crossed Claude Code → Codex → Claude Code with
+      no human relay, and the Codex timeout question has a measured answer.

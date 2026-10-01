@@ -2,11 +2,14 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.4
+version: 0.5
 created: 2026-09-21
 linked_things:
   - id: thing-specification
     relation: extends
+  - id: ticket-is-the-ad-hoc-carrier-2026-09-30
+    relation: derived-from
+    notes: "The ruling that gave this spec its Ticket section: an ad-hoc message between two agents, with no artefact behind it, rides the same watch on a domain-declared `ticket` whose status is the addressee."
   - id: workflow-state-specification
     relation: complements
     notes: "A watch reads a definition's stages and actor table, and its scope is a run. That spec owns all three; this one consumes them and adds none."
@@ -277,6 +280,70 @@ run leaves this watch's board, and the `GONE` line fires exactly as it does for
 a deletion — deleted, renamed, or moved off this definition *or run*. The
 watch for the run it moved *to* sees it arrive.
 
+## The Ticket — An Ad-Hoc Message With No Artefact Behind It
+
+*Ruled 2026-09-30 (`ticket-is-the-ad-hoc-carrier-2026-09-30`); built
+2026-10-01 — templates, tests, no floor code.*
+
+Everything above moves a turn on an **artefact**: a thing the two agents are
+working, whose `status` is the turn token. It cannot carry *"Codex, quickly
+review X"* or *"Hermes, go and do Y"* — a message with nothing on the board
+behind it, where no artefact changes status and so nothing rings. The ticket
+is that carrier, and it adds no mechanism: it is one more thing on one more
+board, read by the same watch.
+
+**The shape.**
+
+- A **ticket** is one overwritable thing per conversation — in practice, per
+  agent pair (`ticket-claude-codex`). Its **body is the current message**.
+  Its **`status` is the addressee**: the actor whose turn it is, drawn from
+  the domain's actor names, plus a terminal `closed`.
+- **Only the current addressee writes.** To reply: overwrite the body, set
+  `status` to the next addressee, commit, publish. One writer at any moment,
+  so two clones never produce a merge conflict on it. The status *is* the
+  claim; a ticket carries no `held_by`.
+- **One message per turn.** You speak, then wait. This is floor behaviour as
+  much as protocol: the board is `{thing_id: status}` and `diff_board` skips
+  `was == now`, so a second message written without moving the addressee
+  reaches nobody (tested). Say everything in the one turn. The question of an
+  optional content-change wake — to allow double-sends — is answered *no*
+  until a live run shows the need.
+- **Git history is the transcript.** The tree shows only the latest message;
+  `git log -p` on the ticket is the whole, audited conversation. That is a
+  feature — provenance with no archive to maintain. **No other message store
+  is built.**
+- **The ticket is transient; its products are not.** Anything durable a
+  conversation produces is written as a proper thing, linked from the ticket.
+  `closed` is terminal, wakes nobody, and leaves the ticket on the board, so
+  a later reopen is a `closed → <actor>` move the addressee's watch sees.
+
+**Why it is domain-declared and never reserved.** `read_board` skips every
+reserved type on a status-keyed board (above: a tool-owned lifecycle is never
+a domain's turn token). A reserved `ticket` would therefore never wake anyone.
+The substrate ships the shape — `templates/ticket.md.template`, the
+`ad-hoc-message-loop` `workflow-definition` whose stage ids *are* the actor
+names with `stages[].actor` declared, and a commented `_schema.yaml` entry —
+and each domain declares `ticket` with its own actors as statuses and
+`closed` as `terminal_statuses`. Then each actor arms the watch it already
+knows: `mdllm watch . --role <actor> --definition ad-hoc-message-loop
+--exit-on-wake`.
+
+**The safety rule is part of the protocol, not a footnote.** A ticket carries
+*requests*, never approvals or rulings. The recipient acts within its own
+permissions, exactly as if the request had arrived from a human in chat; a
+ticket grants nothing, and a request in one is not authority to do what the
+recipient could not otherwise do. Anything irreversible still goes to the
+human seat. A peer channel distributes requests; the moment it distributes
+authority, the mesh is exactly as unsafe as the weakest peer
+(`mesh-safety-is-the-floor-not-the-topology`).
+
+**Keeping itself awake with no adapter.** The wake is still the harness's
+act. An agent whose harness has no adapter can hold the turn open itself:
+run the blocking watch as a command inside its own turn, act on exit 0,
+re-arm. Whether a given harness can hold that command long enough is an
+execution fact, not a claim — Phase 7 of `substrate-native-a2a` tests it on
+Codex specifically, with its fallbacks named.
+
 ## Division of Labour: Floor vs Agent
 
 | Check or act | Owner | What |
@@ -304,9 +371,14 @@ refusals outlive the plan:
   read face, and the membrane that makes the face trustworthy does not cover
   it (`phase-3-run-domain-task-reverted`). When that leg is wanted it gets its
   own deliberately-shaped channel.
-- **No new thing type for the turn.** The state already has a carrier. A
-  separate handover thing would be a contended singleton across two clones —
-  the one object in the design that must never diverge.
+- **No new thing type for an *artefact's* turn.** Where the work has a
+  status, that status is the carrier and nothing else is; a separate handover
+  thing would be a second declaration of one fact and a contended singleton
+  across two clones. *Qualified 2026-09-30:* this never reached ad-hoc
+  messages, which have no artefact and so had no carrier at all. The ticket
+  (above) is the first declaration of that turn, not a second one — and the
+  addressee-only-writes rule is what keeps it from being the contended
+  singleton the refusal feared (`ticket-is-the-ad-hoc-carrier-2026-09-30`).
 - **No scheduled task.** Every run born with permissions on manual, one hang
   blocking everything for a day, and tokens spent to say "nothing moved" — a
   sibling loop paid for that lesson.
@@ -349,8 +421,11 @@ The framework's reserve-but-draft ladder, at its first rung:
    two reviewers that wake only on their own. The PowerShell route is asserted
    for nothing until a GPT-side instance has been woken through it.
 2. **→ `evolving`** when `substrate-native-a2a` Phase 4 crosses one real
-   writer → reviewer → writer turn through the command with no human relay.
-   A field validated by one turn is not `stable`; it is `evolving`.
+   writer → reviewer → writer turn through the command with no human relay —
+   or Phase 7 crosses one ticket round trip Claude Code → Codex → Claude
+   Code, which is the same proof on the ad-hoc carrier and discharges the
+   PowerShell-route item with it. A field validated by one turn is not
+   `stable`; it is `evolving`.
 3. **The scope landed on 2026-09-22**, one day after it was specified as a
    direction — because the operator ruled the membership edge
    (`run-membership-is-realisation-2026-09-22`) and `workflow-state.md` 0.8

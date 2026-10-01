@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-01
-generated: 2026-10-01T02:02:06
-generated_from: HEAD@38ab1d8
-coverage: 119
+generated: 2026-10-01T02:09:04
+generated_from: HEAD@5f8a90a
+coverage: 120
 framework_version: 3.45.0
 ---
 
@@ -505,6 +505,13 @@ framework_version: 3.45.0
 
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
+
+## ticket-is-the-ad-hoc-carrier-2026-09-30
+- cue-operator-guide-2026-10-01 (pinned @5f8a90a46920733b877528c039003f7a5583bc1c)
+- cue-standing-watch-specification-2026-10-01 (pinned @5f8a90a46920733b877528c039003f7a5583bc1c)
+- cue-substrate-native-a2a-2026-10-01 (pinned @5f8a90a46920733b877528c039003f7a5583bc1c)
+- standing-watch-specification (derived-from)
+- substrate-native-a2a (derived-from)
 
 ## transport-follows-corpus-holdability-not-distance
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
