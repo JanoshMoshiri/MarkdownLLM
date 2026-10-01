@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-01
-generated: 2026-10-01T02:11:18
-generated_from: HEAD@ee2096e
+generated: 2026-10-01T13:37:06
+generated_from: HEAD@f0faf02
 coverage: 490
-framework_version: 3.45.0
+framework_version: 3.46.0
 ---
 
 # Relationships Index — framework

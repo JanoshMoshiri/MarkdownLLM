@@ -3,7 +3,7 @@ name: OpenClaw Adapter Fixture
 description: Synthetic public domain for OpenClaw adapter acceptance tests
 version: 1.0
 framework_root: ../../../../..
-framework_version_seen: 3.45.0
+framework_version_seen: 3.46.0
 git:
   autocommit: false
   branch: main

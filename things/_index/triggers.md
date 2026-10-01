@@ -3,11 +3,11 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-09-30
-generated: 2026-09-30T23:06:51
-generated_from: HEAD@21708e75
+created: 2026-10-01
+generated: 2026-10-01T13:37:15
+generated_from: HEAD@f0faf02
 coverage: 6
-framework_version: 3.45.0
+framework_version: 3.46.0
 ---
 
 # Triggers Index — framework
