@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-01
-generated: 2026-10-01T02:09:01
-generated_from: HEAD@5f8a90a
-coverage: 489
+generated: 2026-10-01T02:11:18
+generated_from: HEAD@ee2096e
+coverage: 490
 framework_version: 3.45.0
 ---
 
@@ -510,6 +510,7 @@ framework_version: 3.45.0
 - cue-framework-map-2026-09-22 --subject--> framework-map
 - cue-framework-map-2026-09-26 --subject--> framework-map
 - cue-framework-map-2026-09-27 --subject--> framework-map
+- cue-framework-map-2026-10-01 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b

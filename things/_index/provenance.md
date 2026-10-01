@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-01
-generated: 2026-10-01T02:09:04
-generated_from: HEAD@5f8a90a
+generated: 2026-10-01T02:11:20
+generated_from: HEAD@ee2096e
 coverage: 120
 framework_version: 3.45.0
 ---
@@ -507,6 +507,7 @@ framework_version: 3.45.0
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## ticket-is-the-ad-hoc-carrier-2026-09-30
+- cue-framework-map-2026-10-01 (pinned @5f8a90a46920733b877528c039003f7a5583bc1c)
 - cue-operator-guide-2026-10-01 (pinned @5f8a90a46920733b877528c039003f7a5583bc1c)
 - cue-standing-watch-specification-2026-10-01 (pinned @5f8a90a46920733b877528c039003f7a5583bc1c)
 - cue-substrate-native-a2a-2026-10-01 (pinned @5f8a90a46920733b877528c039003f7a5583bc1c)
