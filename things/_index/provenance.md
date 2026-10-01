@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-09-30
-generated: 2026-09-30T23:06:52
-generated_from: HEAD@21708e75
-coverage: 118
+created: 2026-10-01
+generated: 2026-10-01T02:02:06
+generated_from: HEAD@38ab1d8
+coverage: 119
 framework_version: 3.45.0
 ---
 
@@ -369,6 +369,9 @@ framework_version: 3.45.0
 ## mechanical-coherence-checks-backlog
 - floor-sprint-3-scope-2026-08-23 (pinned @4569360f7460e4a2aa97d4993d8cf6c1691f5648)
 
+## mesh-safety-is-the-floor-not-the-topology
+- ticket-is-the-ad-hoc-carrier-2026-09-30 (pinned @38ab1d8643f6baaa9df5ce92f356a5134603cca0)
+
 ## open-questions-arrive-as-a-prompt-2026-09-23
 - cue-closed-loop-operating-state-2026-09-24 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 - cue-closed-loop-operating-state-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
@@ -472,6 +475,7 @@ framework_version: 3.45.0
 ## standing-watch-specification
 - loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
+- ticket-is-the-ad-hoc-carrier-2026-09-30 (pinned @38ab1d8643f6baaa9df5ce92f356a5134603cca0)
 
 ## status-vocabulary-universal-vs-domain
 - decision-status-vocabulary-domain-owned (pinned @fa03c26)
@@ -483,6 +487,7 @@ framework_version: 3.45.0
 - a-filter-is-a-missing-instance (derived-from)
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
 - loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+- ticket-is-the-ad-hoc-carrier-2026-09-30 (pinned @38ab1d8643f6baaa9df5ce92f356a5134603cca0)
 
 ## substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 (derived-from)
@@ -504,6 +509,7 @@ framework_version: 3.45.0
 ## transport-follows-corpus-holdability-not-distance
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
+- ticket-is-the-ad-hoc-carrier-2026-09-30 (pinned @38ab1d8643f6baaa9df5ce92f356a5134603cca0)
 
 ## unattended-cue-carrier-2026-09-12
 - cue-change-reconciliation-specification-2026-09-24 (pinned @2b12791fcfb2d6eb6c3f971bf444169667fb0815)

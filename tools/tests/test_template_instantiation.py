@@ -59,7 +59,10 @@ options:
 types:
   artifact:
     statuses: [evolving, stable, deprecated]
-relations: [informs, supports, challenges, contradicts]
+  ticket:
+    statuses: [writer, reviewer, closed]
+    terminal_statuses: [closed]
+relations: [informs, supports, challenges, contradicts, references]
 """,
     )
 
@@ -143,6 +146,21 @@ relations: [informs, supports, challenges, contradicts]
                 "[process-name]": "sample-process",
                 "[stage-id]": "intake",
                 "[operator-or-agent-id]": "agent-one",
+            },
+        ),
+        "things/ad-hoc-message-loop.md": (
+            FRAMEWORK_ROOT / "templates" / "ad-hoc-message-loop.md.template",
+            common | {
+                "[actor-a]": "writer",
+                "[actor-b]": "reviewer",
+            },
+        ),
+        "things/ticket-writer-reviewer.md": (
+            FRAMEWORK_ROOT / "templates" / "ticket.md.template",
+            common | {
+                "[actor-a]": "writer",
+                "[actor-b]": "reviewer",
+                "[thing-the-message-is-about]": "support-one",
             },
         ),
         "things/_index/template-birth-schema-index.md": (

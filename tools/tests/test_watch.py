@@ -823,3 +823,142 @@ class TestSelfHeal:
         assert _sync_git(writer, "rev-parse", "origin/main").stdout.strip() == remote
         # The corpus is untouched (the fixture keeps its state file in the clone root).
         assert _sync_git(writer, "status", "--porcelain", "--", "things").stdout.strip() == ""
+
+
+class TestTicketLoop:
+    """The ticket — an ad-hoc message with no artefact behind it.
+
+    Ruled 2026-09-30 (`ticket-is-the-ad-hoc-carrier-2026-09-30`): one
+    overwritable thing per conversation, whose `status` is the *addressee*
+    and whose body is the current message. The watch needs nothing new to
+    carry it — these tests pin that the existing contract already does, and
+    settle the one open question (double-sends) by evidence: a body-only
+    change at the same status wakes nobody, so one message per turn is what
+    the floor enforces, not merely what the protocol asks.
+    """
+
+    LOOP = {
+        "id": "ad-hoc-message-loop",
+        "type": "workflow-definition",
+        "status": "draft",
+        "created": "2026-09-30",
+        "stages": [
+            {"id": "claude", "to": ["codex", "closed"], "actor": "claude"},
+            {"id": "codex", "to": ["claude", "closed"], "actor": "codex"},
+            {"id": "closed", "to": []},
+        ],
+    }
+
+    @staticmethod
+    def _ticket(status: str, body: str = "Codex, quickly review X.") -> str:
+        meta = {"id": "ticket-claude-codex", "type": "ticket",
+                "status": status, "created": "2026-09-30"}
+        return thing_text(yaml.safe_dump(meta, sort_keys=False), body=body)
+
+    @pytest.fixture
+    def desk(self, tmp_path: Path) -> Path:
+        write(tmp_path, "_schema.yaml", yaml.safe_dump({
+            "schema_version": 1,
+            "domain": "ticket-fixture",
+            "types": {"ticket": {
+                "statuses": ["claude", "codex", "closed"],
+                "terminal_statuses": ["closed"],
+            }},
+        }, sort_keys=False))
+        _write(tmp_path, self.LOOP)
+        write(tmp_path, "things/ticket-claude-codex.md", self._ticket("codex"))
+        return tmp_path
+
+    @pytest.fixture(autouse=True)
+    def _no_network(self, monkeypatch):
+        monkeypatch.setattr(watch_mod, "_fetch", lambda c: None)
+        from markdownllm.repository_view import RepositoryView
+        monkeypatch.setattr(RepositoryView, "commit",
+                            classmethod(lambda cls, r, rev: cls.worktree(r)))
+
+    def _head(self, monkeypatch, sha):
+        monkeypatch.setattr(watch_mod, "resolve_remote_head",
+                            lambda c: (sha, None))
+
+    def _args_for(self, root, role, **kw):
+        return _args(root, role=role, definition="ad-hoc-message-loop",
+                     state=str(root / f".watch-{role}.json"), **kw)
+
+    def test_both_actors_arm_against_a_domain_declared_ticket(self, desk, capsys):
+        for role in ("claude", "codex"):
+            assert watch_mod.cmd_watch(self._args_for(desk, role)) != 2, role
+        out = capsys.readouterr().out
+        assert "as [claude]" in out and "as [codex]" in out
+
+    def test_a_reserved_type_could_never_carry_a_ticket(self, desk, capsys,
+                                                         monkeypatch):
+        """Why `ticket` must be domain-declared: reserved types are off a
+        status-keyed board, so a reserved ticket would never wake anyone."""
+        self._head(monkeypatch, "a" * 40)
+        write(desk, "things/ticket-claude-codex.md",
+              thing_text("id: ticket-claude-codex\ntype: cue\nstatus: codex\n"
+                         "created: 2026-09-30\n"))
+        watch_mod.cmd_watch(self._args_for(desk, "codex"))
+        assert "baseline: 0 thing(s)" in capsys.readouterr().out
+
+    def test_the_addressee_wakes_and_the_sender_does_not(
+            self, desk, capsys, monkeypatch):
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(desk, "claude"))
+        watch_mod.cmd_watch(self._args_for(desk, "codex"))
+        capsys.readouterr()
+
+        # Codex replies: overwrite the body, set status to the next addressee.
+        write(desk, "things/ticket-claude-codex.md",
+              self._ticket("claude", "Reviewed X — two findings, see below."))
+        self._head(monkeypatch, "b" * 40)
+
+        assert watch_mod.cmd_watch(
+            self._args_for(desk, "codex", exit_on_wake=True)) == 0
+        assert "CODEX UP" not in capsys.readouterr().out
+        assert watch_mod.cmd_watch(
+            self._args_for(desk, "claude", exit_on_wake=True)) == 0
+        out = capsys.readouterr().out
+        assert "CLAUDE UP: ticket-claude-codex is at 'claude' (was codex)" in out
+
+    def test_a_body_only_change_at_the_same_status_wakes_nobody(
+            self, desk, capsys, monkeypatch):
+        """The open question, settled: no double-sends.
+
+        `diff_board` keys on `{thing_id: status}` and skips `was == now`, so
+        a second message written without moving the addressee is invisible
+        to every watcher. One message per turn is therefore floor behaviour.
+        A domain that wants to say more says it in the same turn.
+        """
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(desk, "codex"))
+        capsys.readouterr()
+
+        write(desk, "things/ticket-claude-codex.md",
+              self._ticket("codex", "Also — and do Y while you are there."))
+        self._head(monkeypatch, "b" * 40)
+        assert watch_mod.cmd_watch(
+            self._args_for(desk, "codex", exit_on_wake=True)) == 0
+        out = capsys.readouterr().out
+        assert "CODEX UP" not in out and "moved:" not in out
+
+    def test_closing_wakes_nobody_and_the_ticket_leaves_no_board(
+            self, desk, capsys, monkeypatch):
+        """`closed` is terminal and declares no actor: the conversation ends
+        without a doorbell. The ticket stays on the board (its status is a
+        stage), so a reopen is a `closed -> <actor>` move, not a creation."""
+        self._head(monkeypatch, "a" * 40)
+        watch_mod.cmd_watch(self._args_for(desk, "claude"))
+        watch_mod.cmd_watch(self._args_for(desk, "codex"))
+        capsys.readouterr()
+
+        write(desk, "things/ticket-claude-codex.md",
+              self._ticket("closed", "Done; findings landed in design-x."))
+        self._head(monkeypatch, "b" * 40)
+        for role in ("claude", "codex"):
+            assert watch_mod.cmd_watch(
+                self._args_for(desk, role, exit_on_wake=True)) == 0
+            out = capsys.readouterr().out
+            assert f"{role.upper()} UP" not in out
+            assert "moved: ticket-claude-codex codex -> closed" in out
+            assert "GONE" not in out

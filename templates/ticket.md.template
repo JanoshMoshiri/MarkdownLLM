@@ -1,0 +1,29 @@
+---
+id: ticket-[actor-a]-[actor-b]
+type: ticket               # domain-declared, never reserved: statuses are your actor names + closed
+status: [actor-b]          # the ADDRESSEE — whose turn it is; the only writer right now
+created: [ISO-date]
+linked_things:
+  - id: [thing-the-message-is-about]
+    relation: references   # optional; drop when the message is about nothing on the board
+---
+
+# Ticket: [actor-a] ↔ [actor-b]
+
+[The current message, and only the current message. The sender overwrites
+this whole body, sets `status` to the addressee, commits, publishes — then
+waits. The addressee replies the same way. Git history on this file is the
+transcript; `git log -p` reads the whole conversation.]
+
+## Request
+
+[What you are asking for, in one or two paragraphs. A ticket carries
+requests, never approvals or rulings: the addressee acts within its own
+permissions, exactly as if a human had asked in chat, and anything
+irreversible still goes to the human seat.]
+
+## Done when
+
+[What would let the addressee close this, or hand it back. Anything durable
+the conversation produces is written as a proper thing and linked above —
+the ticket stays transient in the tree.]

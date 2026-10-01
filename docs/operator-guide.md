@@ -304,7 +304,7 @@ line, or a line for a subcommand that no longer exists, is a coherence Error.
 - **`touchpoints`** — Before changing a load-bearing thing, or during an inflection walk: "what did I just put at risk?"
 - **`triggers`** — "What needs attention?" without starting a full session; `--estate` after `estate-sync` when the question is "what needs doing across the estate?" It reads the working tree, so an uncommitted edit can fire one — the commit discipline is what makes tree and history agree.
 - **`validate`** — Sanity-checking a domain's whole corpus on demand. The hook runs it on every commit against the staged candidate (`--view index`).
-- **`watch`** — When a process must run while no session does: it polls the remote ref — never the worktree — and reports when a watched thing reaches a stage your `--role` acts at; `--run` scopes it to one workflow-run. Reads only; arming it is your act, and it wakes an agent rather than doing the work.
+- **`watch`** — When a process must run while no session does: it polls the remote ref — never the worktree — and reports when a watched thing reaches a stage your `--role` acts at; `--run` scopes it to one workflow-run. Reads only; arming it is your act, and it wakes an agent rather than doing the work. The same watch carries a *ticket* — one agent asking another to do something with no artefact behind the ask: declare `type: ticket` with your actor names as statuses, and the addressee's watch rings when the status is set to its name.
 - **`worklog`** — Reviewing recent session history — an on-demand view, sessions split on `session-end:` commits; `--write` saves a gitignored local snapshot. Not a committed file.
 Requires Python 3.10+ and PyYAML (`tiktoken` optional, for `tokens`).
 

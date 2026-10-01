@@ -35,6 +35,14 @@ types: {}
 #    # required_fields: [field-a, field-b]           # enforced as Error when missing
 #  another-type:
 #    statuses: [open, figures-ready, submitted]
+#  # Ad-hoc agent-to-agent messages (standing-watch.md → The Ticket): one
+#  # overwritable thing per conversation whose status is the ADDRESSEE. The
+#  # statuses are your actor names — the same ids `ad-hoc-message-loop`
+#  # declares as stages — plus a terminal `closed`. Domain-declared on
+#  # purpose: a reserved type never appears on a status-keyed board.
+#  ticket:
+#    statuses: [writer, reviewer, closed]
+#    terminal_statuses: [closed]
 
 # Relation vocabulary (validated at Warning severity). Start small — grow it
 # when a real link needs a relation that isn't here, prune at retrospectives.

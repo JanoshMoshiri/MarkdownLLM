@@ -1,0 +1,53 @@
+---
+id: ad-hoc-message-loop
+type: workflow-definition
+status: draft           # reserved: draft | evolving | stable | deprecated
+created: [ISO-date]
+# The ticket's turn graph. Each stage id IS an actor name, because a
+# ticket's `status` is its addressee; `actor` on each stage names the role
+# `mdllm watch --role <actor>` wakes there. Add a stage per actor that may
+# be addressed; `closed` is terminal and wakes nobody.
+stages:
+  - id: [actor-a]
+    to: [[actor-b], closed]
+    actor: [actor-a]
+  - id: [actor-b]
+    to: [[actor-a], closed]
+    actor: [actor-b]
+  - id: closed
+    to: []
+---
+
+# Ad-Hoc Message Loop — Definition
+
+The turn graph for `type: ticket` things: an overwritable thing per
+conversation whose `status` is the addressee and whose body is the current
+message (`standing-watch.md` → The Ticket). Declare `ticket` in
+`_schema.yaml` with these actor names as its statuses and `closed` as
+terminal; then each actor arms
+`mdllm watch . --role <actor> --definition ad-hoc-message-loop --exit-on-wake`.
+
+## Stages
+
+**[actor-a]** / **[actor-b]**
+- Entry: the other actor set `status` to this name and published.
+- Performer: the named actor — the only writer while the ticket is at its
+  name.
+- What it produces: one reply — overwrite the body, set `status` to the next
+  addressee (or `closed`), commit, publish. One message per turn: a second
+  edit at the same status reaches nobody.
+- Gate authority: none is conferred. A ticket carries requests, never
+  approvals or rulings; the recipient acts within its own permissions and the
+  irreversible goes to the human seat.
+
+**closed (terminal)**
+- Entry: whichever actor holds the turn judges the conversation finished.
+- What "done" means: anything durable has been written as a proper thing and
+  linked from the ticket; the ticket may be reopened later by setting
+  `status` back to an actor name.
+
+## Notes
+
+The transcript is `git log -p` on the ticket file. Do not build another
+message store. Rename the actor ids to match the roles your domain's agents
+actually run as (`claude`, `codex`, `hermes`, `writer`, `reviewer` …).

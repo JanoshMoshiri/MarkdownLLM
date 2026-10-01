@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-09-30
-generated: 2026-09-30T23:06:52
-generated_from: HEAD@21708e75
-coverage: 485
+created: 2026-10-01
+generated: 2026-10-01T02:02:03
+generated_from: HEAD@38ab1d8
+coverage: 486
 framework_version: 3.45.0
 ---
 
@@ -1559,6 +1559,10 @@ framework_version: 3.45.0
 - thing-specification --complements--> write-thing-specification
 - thing-specification --complements--> git-workflow-specification
 - thing-specification --complements--> interface-specification
+- ticket-is-the-ad-hoc-carrier-2026-09-30 --informs--> substrate-native-a2a
+- ticket-is-the-ad-hoc-carrier-2026-09-30 --informs--> standing-watch-specification
+- ticket-is-the-ad-hoc-carrier-2026-09-30 --implements--> mesh-safety-is-the-floor-not-the-topology
+- ticket-is-the-ad-hoc-carrier-2026-09-30 --implements--> transport-follows-corpus-holdability-not-distance
 - tiered-loading-is-tiered-reading-applied-to-specs --references--> thing-specification
 - tiered-loading-is-tiered-reading-applied-to-specs --references--> orchestration-specification
 - tracking-artifacts-can-drift-from-reality --references--> domain-spec-guide-predates-knowledge-primitives

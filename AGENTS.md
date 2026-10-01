@@ -132,7 +132,7 @@ into a second file always eventually does.
 | Two operators/sessions contending for one thing; advisory claims, leases | `coordination-claim.md` |
 | Applying or specialising the universal workflow methodology; the seven stages, the two shapes | `universal-workflow.md` |
 | Composing workflow loops — modules, the metabolism, radii, estate-level operating models | `operating-model.md` |
-| Two instances taking turns on one thing; the doorbell; a process that runs while no session does; `mdllm watch` and the scope of a watch | `standing-watch.md` |
+| Two instances taking turns on one thing; the doorbell; a process that runs while no session does; `mdllm watch` and the scope of a watch; an ad-hoc message from one agent to another with no artefact behind it (the ticket) | `standing-watch.md` |
 | Human operator asking what changed / what the tools are / what the v3 experience is | `docs/operator-guide.md` |
 | Human newcomer's first session; onboarding a non-author operator | `docs/first-hour.md` |
 | Orienting in the framework structure; what links to what; spec graph navigation | `docs/framework-map.md` |
