@@ -380,7 +380,8 @@ def test_staged_owes_the_question_for_a_changed_definition_surface(tmp_path, cap
     assert rc == 1
     assert "`surface`" in out and "definition surface (`insight`)" in out
     assert "2 dependant(s): `leaf0`, `leaf1`" in out
-    assert "native choice prompt" in out and "File to the seat" in out
+    assert "Walk it now" in out and "restatement level" in out
+    assert "native choice prompt" in out and "defer to the seat" in out
     assert "cues . --staged --raise" in out
 
 
@@ -458,9 +459,48 @@ def test_staged_unattended_is_told_to_raise_and_file_never_answer(tmp_path, caps
     monkeypatch.setenv("MDLLM_UNATTENDED", "1")
     rc, out = _run_staged(root, capsys)
     assert rc == 1
-    assert "Unattended run" in out and "never" not in out.split("Unattended run")[0]
-    assert "native choice prompt" not in out
+    assert "Unattended run" in out and "apply nothing" in out
+    assert "native choice prompt" not in out and "Walk it now" not in out
     assert "cues . --staged --raise" in out
+
+
+def test_staged_raise_prefills_the_walk_with_declared_and_literal_dependants(tmp_path, capsys):
+    root = _seed_surface(tmp_path)
+    # A thing that reasons about the surface without linking to it: the
+    # literal tier. And a cue naming it, which is not a dependant.
+    write(root, "things/mention.md",
+          "---\nid: mention\ntype: note\nstatus: active\ncreated: 2026-08-01\n---\n"
+          "# M\n\nThis note reasons from surface without a link.\n")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "a literal reference")
+    _touch(root, "things/surface.md", "this is how it needs to be")
+    rc, out = _run_staged(root, capsys, raise_=True)
+    assert rc == 0 and "walk list" in out
+    today = __import__("datetime").date.today().isoformat()
+    text = (root / "things" / "cues" / f"cue-surface-{today}.md").read_text(encoding="utf-8")
+    assert "## The Walk" in text
+    assert "- [ ] `leaf0` — linked_things `references`" in text
+    assert "- [ ] `leaf1` — linked_things `references`" in text
+    assert "- [ ] `mention` — names it in the body" in text
+    assert "cue-surface" not in text.split("## The Walk")[1].split("Mark each")[0]
+    assert "verdict:\n" in text  # the judgement is the agent's, never the floor's
+
+
+def test_a_change_confined_to_a_generated_block_is_not_a_walk_candidate(tmp_path, capsys):
+    root = _seed_surface(tmp_path)
+    p = root / "things" / "surface.md"
+    p.write_text(p.read_text(encoding="utf-8")
+                 + "\n<!-- generated:toolbox -->\nold rows\n<!-- /generated:toolbox -->\n",
+                 encoding="utf-8")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "a managed block")
+    p.write_text(p.read_text(encoding="utf-8").replace("old rows", "new rows"),
+                 encoding="utf-8")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "- none" in out  # the generator did the walk
+    _touch(root, "things/surface.md", "an authored sentence")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 1 and "`surface`" in out
 
 
 def test_staged_opens_when_git_has_no_head(tmp_path, capsys):

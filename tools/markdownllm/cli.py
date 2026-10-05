@@ -547,22 +547,25 @@ def build_cli() -> argparse.ArgumentParser:
                         "modified since the last retrospective that no cue covers; "
                         "session-start emits the same line every session — reports; "
                         "--raise writes the open cue, never the verdict; exit 0 always. "
-                        "--staged asks the gate's question for the commit in hand "
-                        "instead: definition surfaces changed with no cue on disk; "
-                        "exit 1 while one is owed — the harness's pre-commit gate "
-                        "refuses the commit on that and tells the agent to ask the "
-                        "operator through the native choice prompt")
+                        "--staged reads the commit in hand instead: definition "
+                        "surfaces changed with no walk on record; exit 1 while one "
+                        "is owed — the harness's pre-commit gate refuses the commit "
+                        "on that and tells the agent to walk the dependants now, "
+                        "asking the operator only for what it may not settle")
     cu.add_argument("path", nargs="?", default=".")
     cu.add_argument("--raise", dest="raise_", action="store_true",
                     help="write an open `type: cue` thing for every unraised "
                          "modification — the raise is mechanical, the verdict is "
                          "not; then rebuild indexes and commit them together")
     cu.add_argument("--staged", action="store_true",
-                    help="the gate's question for the commit in hand: definition "
-                         "surfaces changed against HEAD (staged or not) with no cue "
-                         "on disk created today or in the delta; exit 1 while one is "
-                         "owed; with --raise writes the open cue for each, pinned to "
-                         "HEAD, and exits 0 — the verdict stays the operator's")
+                    help="the commit in hand: definition surfaces changed against "
+                         "HEAD (staged or not) with no cue on disk created today or "
+                         "in the delta; a change confined to generated blocks does "
+                         "not count; exit 1 while one is owed; with --raise writes "
+                         "the cue for each, pinned to HEAD, with its declared and "
+                         "literal dependants as a walk checklist, and exits 0 — the "
+                         "judgement on each line is the agent's, the ruling on what "
+                         "it may not settle is the operator's")
     cu.add_argument("--since", help="baseline date (YYYY-MM-DD); default: the newest "
                     "retrospective's period end, else 30 days")
     cu.set_defaults(fn=cmd_cues)

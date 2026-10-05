@@ -89,10 +89,12 @@ _GATE_PREFILTER = "*git*commit*"
 # names "the harness's native choice prompt"; this adapter names the tool.
 _GATE_PREAMBLE = (
     "MarkdownLLM refused this commit: it changes what the domain reasons "
-    "from and carries no cue. Ask the operator with AskUserQuestion before "
-    "anything else — the questions and options below, your recommendation "
-    "first — then raise the cue as instructed and commit again. In an "
-    "unattended run, raise and file; never answer.")
+    "from and its walk is not on record. Walk its dependants now as "
+    "instructed below. Ask the operator with AskUserQuestion only for a "
+    "touchpoint you may not settle — a change of meaning, a contradiction — "
+    "with the concrete alternatives as options. Then commit again with the "
+    "cue and the revisions. In an unattended run, raise the checklist with "
+    "your proposed revisions, apply nothing, and file it.")
 # The moments every pre-gate projection carried; legacy recognition data is
 # built over these two only, so the gate's arrival changes no frozen bytes.
 _LEGACY_MOMENTS = ("session-start", "post-write")

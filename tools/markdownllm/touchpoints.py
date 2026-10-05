@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import datetime as dt
 import os
+import re
 import subprocess
 from collections import Counter
 from pathlib import Path
@@ -572,24 +573,96 @@ def raise_cues(root: Path, rep: dict) -> list[Path]:
 
 
 # ------------------------------------------------------------- the gate
-# The ask, where the change lands
-# (the-verdict-is-asked-where-the-change-lands-2026-10-05). `cues --staged`
-# asks the cue question for the commit in hand — off the delta against HEAD,
-# not the commit stream — and is the one mode of this command that is not
-# advisory: exit 1 says a definition surface changes with no cue on disk,
-# and the `pre-commit` lifecycle moment turns that into a harness refusal
-# whose text tells the agent to put the question to the operator through the
-# harness's native choice prompt. The scope is the definition surfaces only
-# — the types that exist to be reasoned from, where "this is how it needs to
-# be" lands; data things reasoned from by fan-in stay with `cues` and the
-# retrospective's net. Coverage is a cue on disk whose `subject` is the thing
-# and that was created today or is itself part of the delta: one ask per
-# subject per day. The delta is read from the worktree, not the index,
-# because the common `git add -A && git commit` chain stages *after* a
-# PreToolUse hook has asked. The floor detects and refuses; it never answers.
+# The walk runs on detection; the ruling is the residue
+# (the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05).
+# `cues --staged` reads the commit in hand — the delta against HEAD, not the
+# commit stream — and is the one mode of this command that is not advisory:
+# exit 1 says a definition surface changes with no walk on record, and the
+# `pre-commit` lifecycle moment turns that into a harness refusal whose text
+# tells the agent to walk the dependants now, revising at restatement level
+# in the same commit and asking the operator, through the harness's native
+# choice prompt, only for what it may not settle. `--staged --raise` writes
+# the cue with the subject's declared and literal dependants as a checklist —
+# the Assimilate beat done by the floor, the Walk left to the agent, the
+# residue to the human. The four bounds, in code: scope is the definition
+# surfaces only (DEFINITION_SURFACE_TYPES — data things reasoned from by
+# fan-in stay with `cues` and the retrospective's net); depth is one hop (the
+# checklist); rate is one walk per subject per day (a cue created today, or
+# in the delta, covers); attendance is the caller's (MDLLM_UNATTENDED: raise
+# the checklist, apply nothing). A change confined to generated blocks is not
+# a walk candidate: a generated surface collapses its walk. The delta is read
+# from the worktree, not the index, because the common `git add -A && git
+# commit` chain stages *after* a PreToolUse hook has asked. The floor detects,
+# assembles and refuses; it never judges a dependant and never answers.
 
 UNATTENDED_ENV = "MDLLM_UNATTENDED"   # set by the dispatcher's tick: no human to ask
 GATE_DEPENDANTS_SHOWN = 4
+_GENERATED_BLOCK_RE = re.compile(
+    r"<!-- generated:([A-Za-z0-9_-]+) -->.*?<!-- /generated:\1 -->", re.S)
+
+
+def _without_generated(text: str) -> str:
+    """The authored part of a surface: every managed generated block
+    collapsed to its marker, so a change confined to such a block compares
+    equal (`a-generated-surface-collapses-its-walk`)."""
+    return _GENERATED_BLOCK_RE.sub(lambda m: f"<!-- generated:{m.group(1)} -->", text)
+
+
+def _authored_change(root: Path, rel: str) -> bool:
+    """Did the authored part of `rel` change against HEAD? True when HEAD
+    cannot say (a new path, no HEAD) — the gate then asks rather than assumes."""
+    try:
+        r = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=root,
+                           capture_output=True, timeout=20)
+    except Exception:
+        return True
+    if r.returncode != 0:
+        return True
+    before = r.stdout.decode("utf-8", "replace").replace("\r\n", "\n")
+    try:
+        after = (root / rel).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n")
+    except OSError:
+        return True
+    return _without_generated(before) != _without_generated(after)
+
+
+def _dependants(corpus, target: str) -> list[tuple[str, str]]:
+    """The one-hop walk list — the same two tiers `touchpoints` reports:
+    every declared edge that points at the target (linked_things, structural
+    pointers, provenance pins), then every other thing whose body names it.
+    Cues and indexes are not dependants: one carries the question, the other
+    names everything."""
+    declared: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for t in corpus.things:
+        src = t.id or t.path.name
+        if src == target or str(t.meta.get("type")) in {"cue", "index"}:
+            continue
+        hows: list[str] = []
+        for ref in iter_structural_references(t.meta, reverse_only=True):
+            if ref.target != target:
+                continue
+            if ref.field == "linked_things":
+                hows.append(f"linked_things `{ref.relation}`")
+            elif ref.field == "informed_by":
+                hows.append("informed_by pin")
+            else:
+                hows.append(f"via `{ref.field}`")
+        if hows:
+            seen.add(src)
+            declared.append((src, "; ".join(dict.fromkeys(hows))))
+    literal: list[tuple[str, str]] = []
+    for t in corpus.things:
+        src = t.id or t.path.name
+        if src == target or src in seen or str(t.meta.get("type")) in {"cue", "index"}:
+            continue
+        try:
+            body = t.path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if target in body:
+            literal.append((src, "names it in the body"))
+    return sorted(declared) + sorted(literal)
 
 
 def _delta_against_head(root: Path):
@@ -677,10 +750,13 @@ def staged_report(root: Path, corpus, today: dt.date | None = None) -> dict:
         if any(c["created"] == today or (c["path"] and c["path"] in in_delta)
                for c in cues_by_subject.get(t.id, [])):
             continue
+        if not _authored_change(root, rel):
+            continue  # a regenerated block only: the generator did the walk
         if inbound is None:
             inbound = _inbound_ids(corpus)
         owed.append({"subject": t.id, "type": typ, "path": rel,
-                     "dependants": sorted(inbound.get(t.id, []))})
+                     "dependants": sorted(inbound.get(t.id, [])),
+                     "walk": _dependants(corpus, t.id)})
     try:
         head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root,
                               capture_output=True, text=True, timeout=20
@@ -698,7 +774,7 @@ def staged_text(rep: dict) -> list[str]:
         return ["## The cue question — could not look",
                 "- git has no HEAD to diff against here; the gate opens with "
                 "nothing checked"]
-    head = ("## The cue question — the commit in hand changes what the domain "
+    head = ("## The walk — the commit in hand changes what the domain "
             "reasons from")
     if not rep["owed"]:
         return [head, "- none — every definition surface changed in the commit "
@@ -716,29 +792,31 @@ def staged_text(rep: dict) -> list[str]:
     if rep["unattended"]:
         lines += [
             "",
-            "Unattended run: the verdict is not yours "
-            "(`unattended-cue-carrier-2026-09-12`). Raise and file: "
-            "`mdllm cues . --staged --raise`, then `git add things/cues`, commit "
-            "again, and name the cue in your digest as a seat item.",
+            "Unattended run (`unattended-cue-carrier-2026-09-12`): assimilate "
+            "and file, apply nothing. `mdllm cues . --staged --raise` writes the "
+            "cue with the walk list; leave it open, the checklist unmarked, and "
+            "write your proposed revisions beneath it; `git add things/cues`; "
+            "commit again; name the cue in your digest as a seat item.",
         ]
     else:
         lines += [
             "",
-            "The verdict is the operator's, asked now, where the change lands "
-            "(`the-verdict-is-asked-where-the-change-lands-2026-10-05`). Put it "
-            "to them through the harness's native choice prompt — one question "
-            "per subject, the option you judge right first and marked as "
-            "recommended:",
-            "  Inflection? — `<subject>` changes in this commit. Does the change "
-            "alter a rule, a workflow, or a thing the domain reasons from?",
-            "  1. Inflection — walk its dependants before this lands "
-            "(`mdllm touchpoints <subject>`); name them in the cue.",
-            "  2. Not an inflection — the dependants hold as written; say why.",
-            "  3. File to the seat — leave the cue open for the retrospective.",
-            "Then `mdllm cues . --staged --raise` (writes the open cue, pinned to "
-            "HEAD); for 1 or 2 set `verdict`, `verdict_reason` in the operator's "
-            "words and `status: answered`; `git add things/cues`; commit again. "
-            "The commit waits until the cue is on disk.",
+            "Walk it now, here, while the change is warm "
+            "(`the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`):",
+            "  1. `mdllm cues . --staged --raise` — writes the cue with every "
+            "declared and literal dependant as a checklist.",
+            "  2. Judge each: `consistent` (holds as written), `revised` "
+            "(restatement level only — a name, a path, a count, a reference, a "
+            "regenerated block — in this commit, say what), or `ruling`. A "
+            "revision that would change a dependant's meaning, or a dependant "
+            "that contradicts the change, is the operator's: ask it now through "
+            "the harness's native choice prompt, one question per touchpoint, "
+            "the concrete alternatives as options, *defer to the seat* among "
+            "them, and record the answer in their words.",
+            "  3. In the cue: mark each line; `verdict: inflection` if anything "
+            "was revised or ruled, else `not-inflection`; one-line "
+            "`verdict_reason`; `status: answered`. `git add things/cues` with "
+            "the revisions; commit again.",
         ]
     return lines
 
@@ -762,25 +840,26 @@ tags: [cue, raised-mechanically, commit-boundary]
 ## The Change
 Raised by the floor at the commit boundary on {today}: `{subject}` is a
 definition surface (`{typ}`) and changes in the commit this cue rides in,
-on top of `{sha7}`. {dependants} `mdllm touchpoints {subject}` lists what
-depends on it; `git show` on the carrying commit shows what moved. The raise
-is mechanical; the verdict was asked where the change landed
-(`the-verdict-is-asked-where-the-change-lands-2026-10-05`).
+on top of `{sha7}`. {dependants} `git show` on the carrying commit shows what
+moved. The raise and the walk list below are mechanical; the judgement on
+each line is the agent's, within the four bounds; the ruling on what the
+agent may not settle is the operator's
+(`the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`).
 
-## The Question
-Does this change alter the logical path — a rule, a workflow, a thing the
-domain reasons from — or only how an existing path is expressed?
-(`change-reconciliation.md` → The Driver Names The Inflection.)
+## The Walk
+{walk}
+Mark each line: `consistent` — holds as written; `revised` — a
+restatement-level edit in this commit (say what); `ruling` — the operator's
+answer, in their words, to a question you could not settle. The conceptual
+residue — a thing that reasons about `{subject}` without naming it — is yours
+to read; add a line for it if you find one.
 
 ## The Answer
-Open. The operator's pick, in their words, or the framework agent citing the
-ruling that already covers it (`framework-agent-closes-settled-cues-2026-09-13`);
-set `verdict`, `verdict_reason` and `status: answered` in the carrying commit:
-
-1. `inflection` — run the four beats (cue → assimilate → walk → seal) and
-   name the touch points walked and the commit that sealed them.
-2. `not-inflection` — the dependants still hold as written; say why.
-3. Left open — filed to the seat; answered at the retrospective.
+Open until every line above is marked. `verdict: inflection` if any line is
+`revised` or `ruling`; `not-inflection` if every line held. One-line
+`verdict_reason`; `status: answered`; the revisions in this commit. An
+unattended run leaves this open, the checklist unmarked, and writes its
+proposed revisions here (`unattended-cue-carrier-2026-09-12`).
 """
 
 
@@ -803,9 +882,12 @@ def raise_staged_cues(root: Path, rep: dict) -> list[Path]:
                       + ", ".join(f"`{d}`" for d in deps[:GATE_DEPENDANTS_SHOWN])
                       + (f", +{len(deps) - GATE_DEPENDANTS_SHOWN} more" if len(deps) > GATE_DEPENDANTS_SHOWN else "")
                       + "." if deps else "Nothing links to it yet.")
+        walk = "\n".join(f"- [ ] `{src}` — {how}" for src, how in o.get("walk", []))
+        if not walk:
+            walk = "- (no declared or literal dependant found — the conceptual residue is still yours to read)"
         path.write_text(CUE_STAGED_BODY.format(
             cue_id=cue_id, today=today, subject=o["subject"], sha=sha,
-            sha7=sha[:7], typ=o["type"], dependants=dependants),
+            sha7=sha[:7], typ=o["type"], dependants=dependants, walk=walk),
             encoding="utf-8", newline="\n")
         written.append(path)
     return written
@@ -821,9 +903,9 @@ def _cmd_cues_staged(args, root: Path, corpus) -> int:
         return 0
     if getattr(args, "raise_", False):
         written = raise_staged_cues(root, rep)
-        print(f"- **Raised ({len(written)}):** open cue thing(s) written, pinned to "
-              f"HEAD — the verdict is still owed on each; `git add things/cues` "
-              f"and commit them with the change:")
+        print(f"- **Raised ({len(written)}):** cue thing(s) written, pinned to HEAD, "
+              f"each with its walk list — mark every line, then `git add "
+              f"things/cues` and commit them with the change and the revisions:")
         for p in written:
             print(f"    - {p.relative_to(root).as_posix()}")
         if len(written) < len(rep["owed"]):

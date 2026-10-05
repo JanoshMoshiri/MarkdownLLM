@@ -93,7 +93,8 @@ def test_refusal_is_claudes_deny_envelope_and_names_the_native_prompt():
     assert hs["permissionDecision"] == "deny"
     reason = hs["permissionDecisionReason"]
     assert reason.startswith("MarkdownLLM refused this commit")
-    assert "AskUserQuestion" in reason
+    assert "walk is not on record" in reason
+    assert "AskUserQuestion" in reason and "only for a touchpoint you may not settle" in reason
     assert reason.endswith("the floor's text")
 
 
