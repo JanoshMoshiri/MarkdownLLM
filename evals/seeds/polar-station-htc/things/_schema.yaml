@@ -1,0 +1,28 @@
+# Normative schema — Skarvbreen Station (synthetic eval domain)
+schema_version: 1
+domain: skarvbreen-htc
+
+types:
+  assembly:
+    statuses: [current, superseded]
+    required_fields: [layers]
+  module:
+    statuses: [operational, decommissioned]
+    required_fields: [use, volume_m3, elements]
+  heat-load:
+    statuses: [pending, computed]
+  station-budget:
+    statuses: [pending, computed]
+  code-change:
+    statuses: [recorded, reconciled]
+
+relations:
+  - assesses
+  - uses
+  - references
+  - related
+  - informs
+  - supersedes
+  - superseded-by
+  - derived-from
+  - contradicts
