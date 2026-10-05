@@ -119,7 +119,7 @@ into a second file always eventually does.
 | I/O, deliverables, or output format questions | `interface.md` |
 | Domain agent locating the framework | `framework-discovery.md` |
 | Domain agent refreshing from framework evolution | `domain-refresh.md` |
-| Session-end work, insights, orientation (open loops) | `session-memory.md` |
+| Session-end work, insights, orientation (open loops); disposing of attention items — the reckoning (`mdllm reckon`) | `session-memory.md` |
 | Contradictions, conflicts, belief revision | `belief-revision.md` |
 | Significantly changing a rule, workflow, or thing the domain reasons from; reconciling a change across its dependents; raising or answering a reconciliation cue (the digest's *Reconciliation cues* line) | `change-reconciliation.md` |
 | Periodic quality reflection | `retrospective.md` |

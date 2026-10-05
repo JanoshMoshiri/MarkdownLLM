@@ -187,7 +187,7 @@ Detected (open)
 Held in tension — surfaces as an open loop (orient reads open conflicts)
     ↓
 Read until ruled — the session-end brake (orphaned / aged) and the retrospective
-triage force a disposition: rule, link from resolving work, or hold with a reason
+triage force a disposition: rule, link from resolving work, or hold with a reason; since 2026-10-05 `mdllm reckon` names each open conflict's candidate first — resolvable mechanically when one party is superseded or every party is closed out, the agent's to rule or hold when nothing live links it, the operator's when it is still in circulation (`session-memory.md` → The Reckoning)
     ↓
 Resolution reached (in-session or across sessions)
     ↓

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-05
-generated: 2026-10-05T21:52:59
-generated_from: HEAD@e8f8da2
-coverage: 506
+generated: 2026-10-05T22:05:15
+generated_from: HEAD@9b58abb
+coverage: 508
 framework_version: 3.46.0
 ---
 
@@ -475,6 +475,7 @@ framework_version: 3.46.0
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
+- cue-belief-revision-specification-2026-10-05 --subject--> belief-revision-specification
 - cue-carrier --implements--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - cue-carrier --references--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - cue-carrier --references--> a-preserved-question-is-not-a-done-walk
@@ -577,6 +578,7 @@ framework_version: 3.46.0
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-09-26 --subject--> session-memory-specification
+- cue-session-memory-specification-2026-10-05 --subject--> session-memory-specification
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification

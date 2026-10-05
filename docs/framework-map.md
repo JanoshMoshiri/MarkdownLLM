@@ -70,7 +70,7 @@ flowchart TD
         why, thing.md with the core operative specs, and 25 extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
-        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 39
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 40
         mechanical subcommands and a git pre-commit hook that, when current and
         runnable, blocks commits with mechanical Errors. At the base, git is
         the accepted-state machine, event stream and inspectable audit aid.
@@ -96,7 +96,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>39 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>40 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks mechanical Errors when active"]
     end
     GIT["git — accepted-state machine,<br/>event stream, inspectable history"]
@@ -272,7 +272,7 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 flowchart LR
     accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
     accDescr {
-        A left column of 39 mdllm subcommands, each with a single edge to the
+        A left column of 40 mdllm subcommands, each with a single edge to the
         spec surface it serves in the right column. The tool is a mapping, not
         a monolith. Solid edges enforce or measure a spec, and dashed edges
         generate an artifact. Enforcing or measuring: validate, triggers,
@@ -332,6 +332,7 @@ flowchart LR
         C37["watch"]
         C38["docs"]
         C39["cloud"]
+        C40["reckon"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -371,6 +372,7 @@ flowchart LR
         T35["change-reconciliation.md<br/>The Cue Persists — the question held until answered"]
         T36["standing-watch.md<br/>the doorbell in the floor — reads workflow-state's actor table"]
         T37["docs/ derived blocks<br/>the operator-guide toolbox, this map's edge list"]
+        T38["session-memory.md<br/>The Reckoning — the release half of the loop"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -409,6 +411,7 @@ flowchart LR
     C34 -->|"composes the hook's legs concurrently for"| T9
     C35 -.->|"composes the launch text from"| T34
     C36 -->|"holds the unanswered cue for"| T35
+    C40 -->|"names every attention item's exit for"| T38
     C37 -->|"rings the doorbell on the remote ref for"| T36
     C38 -.->|"regenerates and drift-gates"| T37
     C39 -.->|"prepares a host-owned checkout under"| T30

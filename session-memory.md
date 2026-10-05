@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.9
+version: 1.10
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -298,6 +298,55 @@ The lifecycle table above defines the *states* (`active` / `promoted` / `dismiss
 **Consolidation is composition, not a bespoke merge.** As a domain accumulates, several insights commonly fragment a single idea — they are one responsibility wearing several files. Consolidate them per `thing.md` → The Inverse: Composition: fold into the cohesive survivor, redirect inbound links, and tombstone the rest as `dismissed` with `superseded-by` pointing at the survivor. Mechanical candidate detection — insights sharing two or more `linked_things` targets — runs at retrospective cadence; the merge judgement is the agent's, applied conservatively (relate, don't merge). This is *not* contradiction resolution: insights that genuinely disagree are a `conflict` (`belief-revision.md`), not folded together.
 
 ---
+
+## The Reckoning
+
+The brake above is where capture and reckoning stay in balance — and until
+2026-10-05 it ran only at the end of a session, where it is the step most
+economised, or at a retrospective cadence that had not run in six weeks. The
+estate read of that day found the intake side of the loop mechanised and the
+release side missing: 307 active insights against 34 ever promoted across the
+workspaces, 44 open conflicts aged to 78 days, fired triggers queued as
+backlog (`circulation-is-not-disposition`). The operator ruled the release
+half (`the-reckoning-is-the-digestion-beat-2026-10-05`), with the split the
+walk uses: the floor detects and assembles, the agent decides within bounds,
+the operator rules on the residue, at a boundary the harness owns.
+
+**Nothing enters without its exit.** Every attention item has an exit rule
+the floor can evaluate — a default per kind, overridable per thing with
+`settles_when: YYYY-MM-DD`, the date after which its default disposition is
+proposed:
+
+| Kind | Default exit |
+|---|---|
+| `insight` (active) | promotable the moment `promoted_to` names a thing that exists; dismiss-or-consolidate candidate after 60 days with nothing live citing it; promote-or-say-why candidate after 120 days cited and never promoted; a `keep-active` hold past its interval has its stated condition read — met, dispose; not, re-date |
+| `conflict` (open) | resolvable the moment one party is superseded (the other survives) or every party is closed out (dismissed); rule-link-or-hold after 30 days untouched with nothing live linking it; **a ruling for the operator when still in circulation**; a hold past its interval has what-would-resolve-it read |
+| `cue` (open) | answer by citation, or walk — always listed |
+| fired trigger | disarm the moment its action text already answers its condition; otherwise act, re-date or disarm, with the thing's movement since the condition as evidence |
+| imported mirror | re-pin when stale, retire when withdrawn, **re-read when diverged in meaning (the operator's)**; unreachable is not reckoned; a mirrored insight or conflict is its source workspace's to reckon |
+| non-terminal work | complete the moment every box is ticked; start, unblock or pause after 21 days untouched, saying what it waits on; **cancel or re-parent when its parent is cancelled, and past its own `settles_when` — the operator's** |
+
+**The floor reckons.** `mdllm reckon` names every item's candidate with its
+evidence in three bands. *Mechanical*: derivable from a field or a git fact —
+the floor may apply it (`--apply`). *Settled*: the agent decides by reading
+the record and says why, as it answers a cue by citation. *Residue*: the
+operator, through the harness's own prompt. A clean reckoning is an empty
+residue: green is reachable, which is what keeps the line read
+(`a-check-that-always-fires-teaches-the-operator-to-ignore-it`). The floor
+proposes and applies only the derivable; it never marks a verdict of meaning —
+dismissing an insight live work still cites, choosing a side, cancelling work.
+
+**Two actors, no new ritual.** Attended, the session-end commit waits for the
+mechanical band to be applied and the settled band decided; the residue goes
+to the operator before the session closes. Unattended, the dispatcher's tick
+applies the mechanical band, drafts the settled one and files the residue in
+its digest. Retrospective scans 5 and 6 are reads of the same command.
+
+**Retention is promotion.** An insight that survives the reckoning is folded
+into a skill with `promoted_to` set; a skill is a definition surface; the walk
+gate takes it from there (`change-reconciliation.md` → The Walk Runs On
+Detection). Intake, reckoning, promotion, walk: the loop closes on primitives
+that already exist. Built in phases by `the-reckoning`; Phase 1 is the read.
 
 ## Extraction Heuristic
 

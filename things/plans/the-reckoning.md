@@ -2,7 +2,7 @@
 id: the-reckoning
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-10-05
 session: 2026-10-05
 priority: critical
@@ -54,7 +54,7 @@ dormant workspaces.
 
 - [x] **Phase 0 — Record the ruling.** `the-reckoning-is-the-digestion-beat-2026-10-05`
       in the operator's words; this plan. *Done 2026-10-05.*
-- [ ] **Phase 1 — The floor reads.** `mdllm reckon [path]`: one view over every
+- [x] **Phase 1 — The floor reads.** *Done 2026-10-05: `mdllm reckon`, 16 tests; first live reads — root 4 mechanical / 50 settled / 0 residue, QMS 121 settled / 11 residue (its open conflicts in circulation), overview 0 residue once mirrors were left to their source, engineering 1 / 62 / 0.* `mdllm reckon [path]`: one view over every
       attention item with its computed disposition candidate and evidence,
       banded mechanical / settled / residue. Exit rules per type declared in
       `session-memory.md` (insight), `belief-revision.md` (conflict),

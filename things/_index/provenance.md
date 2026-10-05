@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-05
-generated: 2026-10-05T21:52:59
-generated_from: HEAD@e8f8da2
-coverage: 127
+generated: 2026-10-05T22:05:15
+generated_from: HEAD@9b58abb
+coverage: 128
 framework_version: 3.46.0
 ---
 
@@ -521,6 +521,10 @@ framework_version: 3.46.0
 
 ## the-operating-layer-has-no-quality-loop
 - workflow-reconciliation-precedes-new-definitions (pinned @7ceb757ff4e3c11ab2023391eb39f98fdc3febe9)
+
+## the-reckoning-is-the-digestion-beat-2026-10-05
+- cue-belief-revision-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+- cue-session-memory-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)

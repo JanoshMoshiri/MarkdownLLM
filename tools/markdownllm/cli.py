@@ -107,6 +107,7 @@ from .lifecycle_runner import cmd_harness_event
 from .session import cmd_session_start
 from .tokens import cmd_tokens
 from .touchpoints import cmd_candidates, cmd_cues, cmd_touchpoints
+from .reckon import cmd_reckon
 from .triggers import cmd_triggers
 from .validation import cmd_validate
 from .watch import cmd_watch
@@ -569,6 +570,19 @@ def build_cli() -> argparse.ArgumentParser:
     cu.add_argument("--since", help="baseline date (YYYY-MM-DD); default: the newest "
                     "retrospective's period end, else 30 days")
     cu.set_defaults(fn=cmd_cues)
+
+    rk = sub.add_parser("reckon", help="the reckoning: every attention item's "
+                        "disposition candidate with its evidence — active insights, "
+                        "open conflicts, open cues, fired triggers, imported mirrors, "
+                        "stale work — in three bands: mechanical (derivable from a field "
+                        "or a git fact), settled (the agent decides by citing the "
+                        "record), residue (the operator rules). Read-only; exit 0; "
+                        "it proposes and never marks a verdict")
+    rk.add_argument("path", nargs="?", default=".")
+    rk.add_argument("--imports", action="store_true",
+                    help="also reckon the imported mirrors (reads the membrane: "
+                         "stale → re-pin, withdrawn → retire, diverged → residue)")
+    rk.set_defaults(fn=cmd_reckon)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
                         "additions, filenames, or a commit message against the "
