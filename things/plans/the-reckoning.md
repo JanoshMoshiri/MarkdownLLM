@@ -2,7 +2,7 @@
 id: the-reckoning
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-10-05
 session: 2026-10-05
 priority: critical
@@ -63,7 +63,7 @@ dormant workspaces.
       a per-item `settles_when` in trigger shape, evaluated by the trigger
       engine, overrides the default. Read-only; exit 0. Tests pin each band's
       predicate. Runs clean on the root.
-- [ ] **Phase 2 — The floor applies, and the rate goes on the wall.**
+- [x] **Phase 2 — The floor applies, and the rate goes on the wall.** *Done 2026-10-05: `--apply` writes the mechanical band in place (promote, resolve, complete; never a trigger), `--rates` and the digest line; first live reads by hand — QMS residue 11 (its open conflicts in circulation, put to the operator the same day), overview 0 once mirrors were left to their source. The `reckon:` prefix enters git-workflow's table the way prefixes do: after use.*
       `reckon --apply` performs the mechanical band only — a status derivable
       from a field or a git fact — and prints the receipt; the `reckon:`
       commit convention. The session-start digest gains one line per

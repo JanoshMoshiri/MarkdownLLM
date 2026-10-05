@@ -268,3 +268,93 @@ def test_render_lists_each_band_with_evidence(tmp_path, capsys):
     assert "**Mechanical (1):**" in out and "insight `i1` → promote" in out
     assert "**Settled (1):**" in out and "work `plan-a` → pause" in out
     assert "Residue" not in out  # green is reachable
+
+
+# --------------------------------------------------------- apply (Phase 2)
+
+def test_apply_writes_only_the_mechanical_band_in_place(tmp_path, capsys):
+    root = _repo(tmp_path)
+    write(root, "things/i1.md",
+          thing_text("id: i1\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+                     "promoted_to: plan-a"))
+    write(root, "things/d1.md", thing_text("id: d1\ntype: decision\nstatus: superseded\ncreated: 2026-08-01"))
+    write(root, "things/d2.md", thing_text("id: d2\ntype: decision\nstatus: made\ncreated: 2026-08-01"))
+    write(root, "things/c1.md",
+          thing_text("id: c1\ntype: conflict\nstatus: open\ncreated: 2026-08-01\n"
+                     "parties:\n  - d1\n  - d2\n"
+                     "linked_things:\n  - id: d1\n    relation: contradicts\n"
+                     "  - id: d2\n    relation: contradicts"))
+    write(root, "things/done.md",
+          thing_text("id: done\ntype: plan\nstatus: in-progress\ncreated: 2026-09-01",
+                     "# D\n\n- [x] one\n- [x] two\n"))
+    write(root, "things/old.md",
+          thing_text("id: old\ntype: insight\nstatus: active\ncreated: 2026-07-01"))
+    _commit(root, "a corpus with every mechanical shape and one settled")
+    from markdownllm.reckon import cmd_reckon
+    rc = cmd_reckon(argparse.Namespace(path=str(root), imports=False, apply=True, rates=False))
+    out = capsys.readouterr().out
+    assert rc == 0 and "**Applied (3):**" in out
+    assert "status: promoted" in (root / "things/i1.md").read_text(encoding="utf-8")
+    c1 = (root / "things/c1.md").read_text(encoding="utf-8")
+    assert "status: resolved" in c1 and "resolution: superseded" in c1 and "resolved_by: d2" in c1
+    assert "status: completed" in (root / "things/done.md").read_text(encoding="utf-8")
+    # The settled band is never touched: the orphan insight stays active.
+    assert "status: active" in (root / "things/old.md").read_text(encoding="utf-8")
+    # Applied, the mechanical band is empty on the next read: green is reachable.
+    rep = _reckon(root)
+    assert rep["bands"]["mechanical"] == []
+
+
+def test_apply_leaves_a_self_answering_trigger_to_the_agent(tmp_path, capsys):
+    root = _repo(tmp_path)
+    write(root, "things/t1.md",
+          thing_text("id: t1\ntype: plan\nstatus: in-progress\ncreated: 2026-09-01\n"
+                     "triggers:\n  - type: time\n    condition: \"2026-12-20 reached\"\n"
+                     "    action: \"surface — already answered on 2026-09-02; do not re-ask\"",
+                     "# T\n\n- [ ] x\n"))
+    _commit(root, "an armed trigger that answers itself")
+    from markdownllm.reckon import cmd_reckon
+    cmd_reckon(argparse.Namespace(path=str(root), imports=False, apply=True, rates=False))
+    out = capsys.readouterr().out
+    text = (root / "things/t1.md").read_text(encoding="utf-8")
+    assert "triggers:" in text and "do not re-ask" in text  # untouched by the floor
+    assert "Applied (0)" in out or "left to the agent" in out or "nothing to apply" in out
+
+
+# --------------------------------------------------------- rates (Phase 2)
+
+def test_rates_count_intake_disposal_and_walks_in_the_window(tmp_path):
+    root = _repo(tmp_path)
+    write(root, "things/i1.md", thing_text("id: i1\ntype: insight\nstatus: active\ncreated: 2026-10-01"))
+    write(root, "things/c1.md",
+          thing_text("id: c1\ntype: conflict\nstatus: open\ncreated: 2026-10-01\n"
+                     "linked_things:\n  - id: i1\n    relation: contradicts"))
+    write(root, "things/skill.md", thing_text("id: skill\ntype: skill\nstatus: active\ncreated: 2026-10-01"))
+    _commit(root, "intake", "2026-10-03")
+    p = root / "things/skill.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\nrevised\n", encoding="utf-8")
+    write(root, "things/cue-skill.md",
+          thing_text("id: cue-skill\ntype: cue\nstatus: answered\ncreated: 2026-10-04\n"
+                     "subject: skill\nraised_at: HEAD\nraised_by: test\nverdict: not-inflection\n"
+                     "verdict_reason: wording"))
+    _commit(root, "a surface changed and walked", "2026-10-04")
+    p = root / "things/c1.md"
+    p.write_text(p.read_text(encoding="utf-8").replace("status: open", "status: resolved\nresolution: dismissed"),
+                 encoding="utf-8")
+    _commit(root, "a conflict disposed", "2026-10-05")
+    from markdownllm.model import scan
+    from markdownllm.reckon import rates
+    corpus, _ = scan(root)
+    rt = rates(root, corpus, days=3650)  # the window covers the fixture's dates
+    assert rt["created"] == {"insight": 1, "conflict": 1, "cue": 1}
+    assert rt["disposed"] == 1
+    assert rt["surface_changes"] == 1 and rt["walks"] == 1
+
+
+def test_rates_line_reads_as_one_digest_line(tmp_path, capsys):
+    root = _repo(tmp_path)
+    from markdownllm.reckon import cmd_reckon
+    rc = cmd_reckon(argparse.Namespace(path=str(root), imports=False, apply=False, rates=True))
+    out = capsys.readouterr().out.strip()
+    assert rc == 0 and out.startswith("- **Reckoning (last 7d):** intake")
+    assert "mechanical /" in out and "`mdllm reckon`" in out

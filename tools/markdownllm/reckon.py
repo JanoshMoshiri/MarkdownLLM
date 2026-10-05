@@ -405,8 +405,163 @@ def render(rep: dict, root: Path) -> list[str]:
     return lines
 
 
+
+
+# ------------------------------------------------------------------ apply
+# The mechanical band is a status derivable from a field or a git fact; the
+# floor writes that status the way it writes any generated surface — in
+# place, same-builder checkable, and the agent commits it (`reckon:`). It
+# never writes a verdict of meaning, never touches the settled or residue
+# bands, and never disarms a trigger (re-conditioning a declaration stays the
+# agent's, `trigger-specification.md`).
+
+_APPLIABLE_KINDS = {"insight", "conflict", "work"}
+
+
+def _set_frontmatter(path: Path, fields: dict) -> bool:
+    """Set or add scalar fields in a thing's frontmatter, in place. Returns
+    False when the file has no frontmatter block."""
+    raw = path.open(encoding="utf-8", newline="").read()
+    crlf = "\r\n" in raw
+    text = raw.replace("\r\n", "\n")
+    if not text.startswith("---\n"):
+        return False
+    end = text.find("\n---", 4)
+    if end == -1:
+        return False
+    head, body = text[4:end], text[end:]
+    lines = head.split("\n")
+    for key, value in fields.items():
+        pat = re.compile(rf"^{re.escape(key)}:.*$")
+        for i, ln in enumerate(lines):
+            if pat.match(ln):
+                lines[i] = f"{key}: {value}"
+                break
+        else:
+            lines.append(f"{key}: {value}")
+    out = "---\n" + "\n".join(lines) + body
+    path.open("w", encoding="utf-8", newline="").write(out.replace("\n", "\r\n") if crlf else out)
+    return True
+
+
+def apply_mechanical(root: Path, corpus, rep: dict) -> list[str]:
+    """Apply the mechanical band; return one receipt line per item."""
+    by_id = {t.id: t for t in corpus.things if t.id}
+    receipts: list[str] = []
+    for it in rep["bands"]["mechanical"]:
+        if it.kind not in _APPLIABLE_KINDS or not it.fields:
+            receipts.append(f"left to the agent: {it.kind} `{it.thing_id}` → {it.proposal}")
+            continue
+        t = by_id.get(it.thing_id)
+        if t is None:
+            continue
+        if _set_frontmatter(t.path, it.fields):
+            receipts.append(f"applied: {it.kind} `{it.thing_id}` → "
+                            + ", ".join(f"{k}: {v}" for k, v in it.fields.items())
+                            + f" — {it.evidence}")
+        else:
+            receipts.append(f"could not write: {it.kind} `{it.thing_id}` (no frontmatter block)")
+    return receipts
+
+
+# ------------------------------------------------------------------ rates
+# The rate on the wall: is disposition keeping pace with intake? Read off one
+# git walk over things/ for the window — created attention items, status
+# moves into a terminal state, definition-surface changes and the walks
+# recorded for them. A rate, not a state (`coherence-is-a-maintained-rate-
+# not-a-state`).
+
+_ATTENTION = {"insight", "conflict", "cue"}
+_DISPOSED = {"promoted", "dismissed", "resolved", "answered", "completed", "cancelled"}
+_DEFINITION_SURFACES = {"specification", "skill", "guide", "manifesto", "prompt",
+                        "workflow-definition", "insight", "decision"}
+_FILE_RE = re.compile(r"^diff --git a/(.*?) b/(.*?)$")
+_PLUS_STATUS = re.compile(r"^\+status:\s*(\S+)")
+_PLUS_TYPE = re.compile(r"^\+type:\s*(\S+)")
+
+
+def rates(root: Path, corpus, days: int = 7) -> dict:
+    """{created: {kind: n}, disposed: n, surface_changes: n, walks: n, days}
+    for the last ``days`` days; None values when git cannot be read."""
+    try:
+        r = subprocess.run(["git", "log", "-p", f"--since={days}.days",
+                            "--format=%x1e%H", "--diff-filter=AM", "--", "things",
+                            "*.md"], cwd=root, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=120)
+    except Exception:
+        return {"days": days, "created": None, "disposed": None,
+                "surface_changes": None, "walks": None}
+    if r.returncode != 0:
+        return {"days": days, "created": None, "disposed": None,
+                "surface_changes": None, "walks": None}
+    type_by_path = {}
+    for t in corpus.things:
+        rel = _rel(root, t)
+        if rel:
+            type_by_path[rel] = str(t.meta.get("type"))
+    created: dict[str, int] = defaultdict(int)
+    disposed = 0
+    surfaces: set[str] = set()
+    walks: set[str] = set()
+    for rec in r.stdout.split("\x1e")[1:]:
+        cur = None
+        is_new = False
+        counted = False
+        plus_type = None
+        for line in rec.splitlines():
+            fm = _FILE_RE.match(line)
+            if fm:
+                cur = fm.group(2)
+                is_new = False
+                counted = False
+                plus_type = None
+                continue
+            if cur is None:
+                continue
+            if line.startswith("new file mode"):
+                is_new = True
+                continue
+            mt = _PLUS_TYPE.match(line)
+            if mt and plus_type is None:
+                plus_type = mt.group(1)
+            typ = type_by_path.get(cur) or plus_type
+            ms = _PLUS_STATUS.match(line)
+            # A status moving into a terminal state on an existing file is a
+            # disposal; a file born already disposed (a cue answered in the
+            # commit that raised it) is intake, not disposal.
+            if ms and not is_new and ms.group(1) in _DISPOSED and typ in (_ATTENTION | {"plan"}):
+                disposed += 1
+            if is_new and not counted and typ in _ATTENTION and plus_type:
+                created[typ] += 1
+                counted = True
+                if typ == "cue":
+                    walks.add(cur)
+            # A definition surface modified (not born): the gate's scope,
+            # insights included, so walks can be read against it.
+            if not is_new and typ in _DEFINITION_SURFACES:
+                surfaces.add(cur)
+    return {"days": days, "created": dict(created), "disposed": disposed,
+            "surface_changes": len(surfaces), "walks": len(walks)}
+
+
+def rate_line(rep: dict, rt: dict) -> str:
+    """One digest line: intake, disposal, walks, bands."""
+    if rt.get("created") is None:
+        return "- **Reckoning:** rate unknown (git history unreadable); `mdllm reckon` for the bands"
+    created = rt["created"]
+    intake = sum(created.values())
+    parts = ", ".join(f"{n} {k}{'s' if n != 1 else ''}" for k, n in sorted(created.items()))
+    bands = rep["bands"]
+    return (f"- **Reckoning (last {rt['days']}d):** intake {intake}"
+            + (f" ({parts})" if parts else "")
+            + f" · disposed {rt['disposed']} · walks {rt['walks']} of "
+            f"{rt['surface_changes']} definition-surface change(s) · now "
+            f"{len(bands['mechanical'])} mechanical / {len(bands['settled'])} settled / "
+            f"{len(bands['residue'])} residue — `mdllm reckon`")
+
+
 def cmd_reckon(args) -> int:
-    """Read-only in Phase 1; exit 0 always."""
+    """Reads, and with --apply writes the mechanical band; exit 0 always."""
     root = Path(args.path).resolve()
     try:
         corpus, _ = scan(root)
@@ -414,6 +569,18 @@ def cmd_reckon(args) -> int:
         print(f"mdllm: reckon cannot scan {root}: {exc}")
         return 2
     rep = reckon_report(root, corpus, imports=bool(getattr(args, "imports", False)))
+    if getattr(args, "rates", False):
+        print(rate_line(rep, rates(root, corpus)))
+        return 0
     for ln in render(rep, root):
         print(ln)
+    if getattr(args, "apply", False):
+        receipts = apply_mechanical(root, corpus, rep)
+        print(f"- **Applied ({sum(1 for r in receipts if r.startswith('applied'))}):** "
+              "the mechanical band, in place — commit it as `reckon:` with the "
+              "settled band's decisions:")
+        for r in receipts:
+            print(f"    - {r}")
+        if not receipts:
+            print("    - nothing to apply")
     return 0

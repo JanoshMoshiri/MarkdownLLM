@@ -910,6 +910,15 @@ def cmd_session_start(args) -> int:
 
     out.extend(_orient_forward(domain, session_corpus))
     out.extend(_cue_lines(domain, session_corpus))
+    # The rate on the wall (the-reckoning-is-the-digestion-beat-2026-10-05):
+    # is disposition keeping pace with intake? Advisory; never fails startup.
+    if session_corpus is not None:
+        try:
+            from .reckon import rate_line, rates, reckon_report
+            _rep = reckon_report(domain, session_corpus)
+            out.append(rate_line(_rep, rates(domain, session_corpus)))
+        except Exception:
+            pass
 
     # Trigger evaluation, mechanically — session start is the primary
     # evaluation point (trigger-specification.md); until v3.24.0 this emitter

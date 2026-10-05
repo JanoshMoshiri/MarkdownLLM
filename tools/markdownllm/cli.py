@@ -582,6 +582,15 @@ def build_cli() -> argparse.ArgumentParser:
     rk.add_argument("--imports", action="store_true",
                     help="also reckon the imported mirrors (reads the membrane: "
                          "stale → re-pin, withdrawn → retire, diverged → residue)")
+    rk.add_argument("--apply", action="store_true",
+                    help="apply the mechanical band in place — a status derivable "
+                         "from a field or a git fact (promote, resolve, complete); "
+                         "never the settled or residue bands, never a trigger; "
+                         "commit the result as `reckon:`")
+    rk.add_argument("--rates", action="store_true",
+                    help="one line: intake, disposed, walks against definition-"
+                         "surface changes in the last 7 days, and the bands now — "
+                         "the same line session-start emits")
     rk.set_defaults(fn=cmd_reckon)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
