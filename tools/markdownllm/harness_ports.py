@@ -81,12 +81,17 @@ class LifecycleBinding:
     Tuple order is authoritative. ``delivery`` tells an adapter whether the
     result belongs in startup context or post-action feedback. ``failure`` is
     deliberately non-enforcing: harness hooks surface failures, while the Git
-    pre-commit hook remains the complete enforcement boundary.
+    pre-commit hook remains the complete enforcement boundary. The one
+    exception is ``gate`` delivery: its step speaks in exit codes (1 refuses,
+    0 opens, anything else opens and is attested failed), and the adapter
+    translates a refusal into the harness's own deny envelope for the tool
+    call it precedes. ``failure`` still means what it says — a gate that
+    cannot run does not refuse.
     """
 
     moment: str
     steps: tuple[LifecycleStep, ...]
-    delivery: Literal["context", "feedback"]
+    delivery: Literal["context", "feedback", "gate"]
     failure: Literal["surface-and-continue"] = "surface-and-continue"
     total_timeout_seconds: int = LIFECYCLE_APPLICATION_SECONDS
     runner_reserve_seconds: int = LIFECYCLE_RUNNER_RESERVE_SECONDS
@@ -126,7 +131,13 @@ class LifecycleBinding:
 # session-start's ordering is semantic — orientation reads the git log, and
 # the log is only whole after the fetch. post-write is advisory feedback; the
 # git pre-commit hook remains the complete enforcement boundary and is NOT a
-# harness intent (it is git-fs anchored, adapter-independent).
+# harness intent (it is git-fs anchored, adapter-independent). pre-commit is
+# the gate (the-verdict-is-asked-where-the-change-lands-2026-10-05): the one
+# delivery that may refuse the harness action it precedes — the agent's
+# `git commit` while a definition surface changes with no cue on disk — so
+# the cue verdict is asked through the harness's own prompt where the change
+# lands. It guards the agent's tool call; the git hook stays the boundary for
+# every commit, from any hand.
 LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
     LifecycleBinding(
         moment="session-start",
@@ -144,6 +155,13 @@ LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
             "validate", (DOMAIN_ROOT_ARG, "--quiet"), protected_seconds=100,
             protected_characters=1900),),
         delivery="feedback",
+    ),
+    LifecycleBinding(
+        moment="pre-commit",
+        steps=(LifecycleStep(
+            "cues", (DOMAIN_ROOT_ARG, "--staged"), protected_seconds=100,
+            protected_characters=1900),),
+        delivery="gate",
     ),
 )
 

@@ -43,6 +43,7 @@ from ..harness_ports import (
     HANDLER_TIMEOUT_SECONDS, AdapterCapabilities, DiagnosticPresentation,
     HarnessContext, InspectionReport, LifecycleBinding, ManagedFragment,
 )
+from .project_hook_emission import LEGACY_SH_RESOLVE_V2, gate_envelope
 from .project_hook_emission import (
     HASH_PLACEHOLDER, LEGACY_SH_RESOLVE_V1, binding_hash_payload,
     lifecycle_envelope, mdllm_posix_path, posix_event_command,
@@ -70,12 +71,41 @@ LOCAL_SETTINGS_PATH = ".claude/settings.local.json"
 
 # Inward delivery semantics -> Claude event vocabulary. Lives here and only
 # here; a neutral module never names these.
-_DELIVERY_EVENT = {"context": "SessionStart", "feedback": "PostToolUse"}
+_DELIVERY_EVENT = {"context": "SessionStart", "feedback": "PostToolUse",
+                   "gate": "PreToolUse"}
 _DELIVERY_EVENT_BY_MOMENT = {
     "session-start": "SessionStart",
     "post-write": "PostToolUse",
+    "pre-commit": "PreToolUse",
 }
 _FEEDBACK_MATCHER = "Write|Edit"
+# The gate (the-verdict-is-asked-where-the-change-lands-2026-10-05): a
+# PreToolUse hook on the shell tools, because the commit is a shell call. The
+# sh carrier reads the hook input and pays for the runner only when it looks
+# like a commit; the runner then reads `tool_input.command` for real.
+_GATE_MATCHER = "Bash|PowerShell"
+_GATE_PREFILTER = "*git*commit*"
+# What the refusal says first, in Claude's own vocabulary — the floor's text
+# names "the harness's native choice prompt"; this adapter names the tool.
+_GATE_PREAMBLE = (
+    "MarkdownLLM refused this commit: it changes what the domain reasons "
+    "from and carries no cue. Ask the operator with AskUserQuestion before "
+    "anything else — the questions and options below, your recommendation "
+    "first — then raise the cue as instructed and commit again. In an "
+    "unattended run, raise and file; never answer.")
+# The moments every pre-gate projection carried; legacy recognition data is
+# built over these two only, so the gate's arrival changes no frozen bytes.
+_LEGACY_MOMENTS = ("session-start", "post-write")
+
+
+def _group_matcher(binding: LifecycleBinding) -> str | None:
+    """The Claude hook-group matcher for one delivery kind; None for a
+    SessionStart group, which has no tool to match."""
+    if binding.delivery == "feedback":
+        return _FEEDBACK_MATCHER
+    if binding.delivery == "gate":
+        return _GATE_MATCHER
+    return None
 _ROOT_POWERSHELL_SESSION = (
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" estate-sync .; '
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" session-start .')
@@ -97,9 +127,10 @@ class ClaudeCodeAdapter:
     def capabilities(self) -> AdapterCapabilities:
         return AdapterCapabilities(
             harness=self.name,
-            lifecycle_moments=("session-start", "post-write"),
-            notes="Claude Code lifecycle projection; Copilot shortcut output "
-                  "is separate and its lifecycle remains unverified")
+            lifecycle_moments=("session-start", "post-write", "pre-commit"),
+            notes="Claude Code lifecycle projection, including the commit "
+                  "gate (PreToolUse on the shell tools); Copilot shortcut "
+                  "output is separate and its lifecycle remains unverified")
 
     def install_policies(self):
         """Own only the top-level hooks member in composite settings."""
@@ -139,25 +170,36 @@ class ClaudeCodeAdapter:
     def legacy_definitions(
             self, context: HarnessContext) -> tuple[LegacyDefinition, ...]:
         """Exact historical managed fragments; recognition data only."""
-        output_tail_hooks: dict = {}
-        for binding in context.bindings:
-            event = _DELIVERY_EVENT[binding.delivery]
-            handler = self._handler(
-                context, binding.moment,
-                self._definition_hash(
-                    context, binding, include_output=False,
-                    resolve_fragment=LEGACY_SH_RESOLVE_V1),
-                resolve_fragment=LEGACY_SH_RESOLVE_V1)
-            group: dict = {"hooks": [handler]}
-            if binding.delivery != "context":
-                group = {"matcher": _FEEDBACK_MATCHER, "hooks": [handler]}
-            output_tail_hooks.setdefault(event, []).append(group)
         output_tail_definition = LegacyDefinition(
             legacy_id="legacy-output-tail-v1",
             path=SETTINGS_PATH,
             owned_fragment=(json.dumps(
-                {"hooks": output_tail_hooks}, separators=(",", ":"))
-                + "\n").encode("utf-8"),
+                {"hooks": self._two_moment_hooks(
+                    context, LEGACY_SH_RESOLVE_V1, include_output=False)},
+                separators=(",", ":")) + "\n").encode("utf-8"),
+        )
+        # The two generations every seat carried between the output-tail
+        # projection and the commit gate (2026-10-05): the two moments with
+        # the full (output-aware) hash, first over the v1 resolve fragment
+        # (until the existence guards landed), then over the v2 fragment
+        # frozen the day the gate arrived. Recognised so a seat can refresh
+        # into the gated shape with an explicit, reviewed `--refresh-legacy`
+        # rather than being refused as merely stale.
+        two_moment_v1_definition = LegacyDefinition(
+            legacy_id="legacy-two-moment-v1",
+            path=SETTINGS_PATH,
+            owned_fragment=(json.dumps(
+                {"hooks": self._two_moment_hooks(
+                    context, LEGACY_SH_RESOLVE_V1, include_output=True)},
+                separators=(",", ":")) + "\n").encode("utf-8"),
+        )
+        two_moment_v2_definition = LegacyDefinition(
+            legacy_id="legacy-two-moment-v2",
+            path=SETTINGS_PATH,
+            owned_fragment=(json.dumps(
+                {"hooks": self._two_moment_hooks(
+                    context, LEGACY_SH_RESOLVE_V2, include_output=True)},
+                separators=(",", ":")) + "\n").encode("utf-8"),
         )
         definitions = [LegacyDefinition(
             legacy_id="legacy-v1",
@@ -189,7 +231,33 @@ class ClaudeCodeAdapter:
                     separators=(",", ":")) + "\n").encode("utf-8"),
             ))
         definitions.append(output_tail_definition)
+        definitions.append(two_moment_v1_definition)
+        definitions.append(two_moment_v2_definition)
         return tuple(definitions)
+
+    def _two_moment_hooks(self, context: HarnessContext,
+                          resolve_fragment: str, *,
+                          include_output: bool) -> dict:
+        """The managed hooks of a pre-gate projection: the two legacy
+        moments only, rendered with a frozen resolve fragment. Recognition
+        data — the gate's own group never appears here."""
+        hooks: dict = {}
+        for binding in context.bindings:
+            if binding.moment not in _LEGACY_MOMENTS:
+                continue
+            event = _DELIVERY_EVENT[binding.delivery]
+            handler = self._handler(
+                context, binding.moment,
+                self._definition_hash(
+                    context, binding, include_output=include_output,
+                    resolve_fragment=resolve_fragment),
+                resolve_fragment=resolve_fragment)
+            group: dict = {"hooks": [handler]}
+            matcher = _group_matcher(binding)
+            if matcher is not None:
+                group = {"matcher": matcher, "hooks": [handler]}
+            hooks.setdefault(event, []).append(group)
+        return hooks
 
     def _definition_hash(self, context: HarnessContext,
                          binding: LifecycleBinding, *,
@@ -205,8 +273,9 @@ class ClaudeCodeAdapter:
         group: dict = {"hooks": [
             self._handler(context, binding.moment, HASH_PLACEHOLDER,
                           resolve_fragment=resolve_fragment)]}
-        if binding.delivery != "context":
-            group = {"matcher": _FEEDBACK_MATCHER, "hooks": group["hooks"]}
+        matcher = _group_matcher(binding)
+        if matcher is not None:
+            group = {"matcher": matcher, "hooks": group["hooks"]}
         return managed_definition_hash({
             "artifact": SETTINGS_PATH,
             "binding": binding_hash_payload(
@@ -261,6 +330,14 @@ class ClaudeCodeAdapter:
         except KeyError as exc:
             raise ValueError(
                 f"unsupported Claude lifecycle moment: {moment}") from exc
+        if moment == "pre-commit":
+            # The gate: a clean run is silence (allow); a refusal is Claude's
+            # deny envelope, and the reason the model reads opens with the
+            # tool it must use — the floor's text names only "the harness's
+            # native choice prompt".
+            if passed:
+                return ""
+            return gate_envelope(event, _GATE_PREAMBLE + "\n\n" + text)
         return lifecycle_envelope(moment, text, passed, event)
 
     # ------------------------------------------------------------- rendering
@@ -283,7 +360,12 @@ class ClaudeCodeAdapter:
         launches matching handlers in parallel, so one handler is the only
         construction that can honour an ordered binding.
         """
-        unavailable = self.format_lifecycle_output(
+        gate = ctx.binding(moment).delivery == "gate"
+        # A gate with no floor opens: an empty line is "allow" to Claude, and
+        # refusing every commit because no interpreter was found would turn a
+        # missing floor into a locked repository. The doctor reports the
+        # missing floor; the gate does not.
+        unavailable = "" if gate else self.format_lifecycle_output(
             moment, unavailable_text(moment), False)
         return posix_event_command(
             root_line=('ROOT="${CLAUDE_PROJECT_DIR'
@@ -292,7 +374,8 @@ class ClaudeCodeAdapter:
             definition_hash=definition_hash,
             mdllm_path=mdllm_posix_path(ctx),
             unavailable=unavailable,
-            resolve_fragment=resolve_fragment)
+            resolve_fragment=resolve_fragment,
+            stdin_prefilter=_GATE_PREFILTER if gate else None)
 
     def _handler(self, ctx: HarnessContext, moment: str,
                  definition_hash: str, *,
@@ -311,8 +394,9 @@ class ClaudeCodeAdapter:
             handler = self._handler(
                 ctx, binding.moment, self._definition_hash(ctx, binding))
             group: dict = {"hooks": [handler]}
-            if binding.delivery != "context":
-                group = {"matcher": _FEEDBACK_MATCHER, "hooks": [handler]}
+            matcher = _group_matcher(binding)
+            if matcher is not None:
+                group = {"matcher": matcher, "hooks": [handler]}
             hooks.setdefault(event, []).append(group)
         payload = json.dumps({"hooks": hooks}, indent=2) + "\n"
         return {SETTINGS_PATH: payload.encode("utf-8")}
@@ -521,6 +605,33 @@ class ClaudeCodeAdapter:
                 return None, tuple(tails)
         return None, ()
 
+    def _inspect_matched_event(self, event: str, moment: str, hooks: dict,
+                               desired: dict, realised: dict,
+                               extensions: list[str], issues: list[str],
+                               findings: list[str],
+                               ctx: HarnessContext) -> None:
+        """One matcher-keyed event (PostToolUse, PreToolUse): the FIRST
+        group with the managed matcher is managed; a SECOND group repeating
+        it is ambiguity — a finding, never a silent overwrite (v1.6 return
+        item 3); any other matcher is operator-owned."""
+        want = desired["hooks"][event][0]
+        managed_seen = False
+        for g in hooks.get(event) or []:
+            if g.get("matcher") != want["matcher"]:
+                extensions.append(
+                    f"{event} group with matcher {g.get('matcher')!r} "
+                    "is operator-owned")
+                continue
+            if managed_seen:
+                findings.append(
+                    f"ambiguous: duplicate {event} group repeats the "
+                    f"managed matcher {want['matcher']!r} — first group "
+                    "treated as managed, this one not inspected")
+                continue
+            managed_seen = True
+            realised[moment] = self._compare_group(
+                moment, g["hooks"], want["hooks"], extensions, issues, ctx)
+
     def _inspect_valid(self, cfg: dict, hooks: dict,
                        ctx: HarnessContext) -> InspectionReport:
         desired = json.loads(self.render(ctx)[SETTINGS_PATH].decode("utf-8"))
@@ -541,27 +652,12 @@ class ClaudeCodeAdapter:
                 extensions.append(
                     "additional SessionStart hook group is operator-owned")
 
-        # post-write: the FIRST group with the managed matcher is managed;
-        # a SECOND group repeating the managed matcher is ambiguity — a
-        # finding, never a silent overwrite (v1.6 return item 3).
-        want_pw = desired["hooks"]["PostToolUse"][0]
-        managed_pw_seen = False
-        for g in hooks.get("PostToolUse") or []:
-            if g.get("matcher") != want_pw["matcher"]:
-                extensions.append(
-                    f"PostToolUse group with matcher {g.get('matcher')!r} "
-                    "is operator-owned")
-                continue
-            if managed_pw_seen:
-                findings.append(
-                    "ambiguous: duplicate PostToolUse group repeats the "
-                    f"managed matcher {want_pw['matcher']!r} — first group "
-                    "treated as managed, this one not inspected")
-                continue
-            managed_pw_seen = True
-            realised["post-write"] = self._compare_group(
-                "post-write", g["hooks"], want_pw["hooks"],
-                extensions, issues, ctx)
+        # post-write and pre-commit are matcher-keyed events; see the helper.
+        for event, moment in (("PostToolUse", "post-write"),
+                              ("PreToolUse", "pre-commit")):
+            self._inspect_matched_event(
+                event, moment, hooks, desired, realised, extensions, issues,
+                findings, ctx)
 
         for event in sorted(hooks):
             if event not in _DELIVERY_EVENT.values():

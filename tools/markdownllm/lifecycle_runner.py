@@ -7,11 +7,17 @@ serializes the event's stdout through ``LifecycleOutputPort``.
 
 Every invocation is advisory.  Failures are surfaced to the harness and
 attested, but the command exits zero; the Git pre-commit hook remains the
-complete enforcement boundary.
+complete enforcement boundary.  The one exception is ``gate`` delivery
+(the-verdict-is-asked-where-the-change-lands-2026-10-05): the runner reads
+the harness's hook input, runs the binding only for the tool call the gate
+guards (a ``git commit``), and hands the adapter a refusal when the gate's
+step exits 1 — the adapter turns that into the harness's deny envelope.  A
+gate whose step cannot run opens, and is attested failed.
 """
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -313,6 +319,46 @@ def execute_lifecycle(
         passed=all(step.returncode == 0 for step in results))
 
 
+# The gate guards one tool call: a git commit, in any of its spellings, in
+# the same shell segment — `git commit`, `git -C x commit`, `git add -A &&
+# git commit`. A pipe or separator ends the segment, so `git log | grep
+# commit` is not one.
+GATE_COMMAND_RE = re.compile(r"\bgit\b[^\n;&|]*\bcommit\b")
+
+
+def read_hook_input() -> str:
+    """The harness's hook input on stdin, or "" when there is none (a
+    terminal, a closed stream)."""
+    try:
+        if sys.stdin is None or sys.stdin.isatty():
+            return ""
+        return sys.stdin.read() or ""
+    except (OSError, ValueError):
+        return ""
+
+
+def gate_applies(hook_input: str) -> bool:
+    """Does this hook input describe the tool call the gate guards? Reads
+    Claude Code's ``tool_input.command``; falls back to the raw text when the
+    input is not the documented JSON, so a harness that sends the command
+    plain is still gated."""
+    if not hook_input:
+        return False
+    command = hook_input
+    try:
+        data = json.loads(hook_input)
+    except ValueError:
+        data = None
+    if isinstance(data, dict):
+        tool_input = data.get("tool_input")
+        if isinstance(tool_input, dict) and isinstance(
+                tool_input.get("command"), str):
+            command = tool_input["command"]
+        else:
+            return False
+    return bool(GATE_COMMAND_RE.search(command))
+
+
 def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
                              harness: str, definition_hash: str,
                              output_port: LifecycleOutputPort) -> int:
@@ -322,6 +368,9 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
     if not isinstance(adapter, LifecycleOutputPort):
         print(f"mdllm: harness {harness!r} has no lifecycle output port")
         return 2
+
+    if binding.delivery == "gate" and not gate_applies(read_hook_input()):
+        return 0  # not the call the gate guards: silence is allow, no event ran
 
     admission: LifecycleAdmission | None = None
     if isinstance(adapter, LifecycleAdmissionPort):
@@ -352,6 +401,17 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
                 passed=execution.passed,
             )
 
+    outcome_ok = execution.passed
+    if binding.delivery == "gate":
+        # The gate's step speaks in exit codes: 1 refuses, 0 opens, anything
+        # else is a floor or runner error — which opens too (a broken floor
+        # must not lock the repository) and is attested failed.
+        denied = any(step.returncode == 1 for step in execution.steps)
+        outcome_ok = all(step.returncode in (0, 1) for step in execution.steps)
+        execution = LifecycleExecution(
+            moment=execution.moment, steps=execution.steps,
+            text=execution.text, passed=not denied)
+
     details = [
         f"{step.operation}={step.returncode}" for step in execution.steps]
     if admission is not None:
@@ -375,7 +435,7 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
     try:
         record_execution_attestation(
             root, harness, binding.moment, definition_hash,
-            outcome=("passed" if execution.passed and format_error is None
+            outcome=("passed" if outcome_ok and format_error is None
                      else "failed"),
             source=f"{harness}-project-hook", detail=detail)
     except (OSError, ValueError) as exc:

@@ -34,6 +34,14 @@ LEGACY_SH_RESOLVE_V1 = (
     Path(__file__).with_name("legacy") / "sh-resolve-v1.txt"
 ).read_text(encoding="utf-8")
 
+# The v2 fragment: the live one on the day the commit gate landed
+# (2026-10-05), frozen so the two-moment projection every seat carried until
+# then stays recognisable as `legacy-two-moment-v2` — and refreshable into
+# the gated shape — after the live fragment moves again.
+LEGACY_SH_RESOLVE_V2 = (
+    Path(__file__).with_name("legacy") / "sh-resolve-v2.txt"
+).read_text(encoding="utf-8")
+
 
 def shell_single_quote(value: str) -> str:
     """Single-quote one literal for the POSIX hook command.
@@ -63,6 +71,20 @@ def unavailable_text(moment: str) -> str:
             "or mdllm.py was found.")
 
 
+def gate_envelope(event: str, text: str) -> str:
+    """The refusal envelope of a gate delivery: the harness is told to deny
+    the tool call and the model reads ``text`` as the reason. Claude Code's
+    PreToolUse contract; the one place a project hook is not advisory
+    (the-verdict-is-asked-where-the-change-lands-2026-10-05)."""
+    return json.dumps({
+        "hookSpecificOutput": {
+            "hookEventName": event,
+            "permissionDecision": "deny",
+            "permissionDecisionReason": text,
+        },
+    }, separators=(",", ":"))
+
+
 def lifecycle_envelope(moment: str, text: str, passed: bool,
                        event: str) -> str:
     """The additional-context JSON envelope both harnesses consume.
@@ -85,7 +107,8 @@ def lifecycle_envelope(moment: str, text: str, passed: bool,
 def posix_event_command(*, root_line: str, harness: str, moment: str,
                         definition_hash: str, mdllm_path: str,
                         unavailable: str,
-                        resolve_fragment: str | None = None) -> str:
+                        resolve_fragment: str | None = None,
+                        stdin_prefilter: str | None = None) -> str:
     """One sh command entering the neutral ordered runner exactly once.
 
     Shell form in sh dialect is the portable carrier established by live
@@ -95,16 +118,32 @@ def posix_event_command(*, root_line: str, harness: str, moment: str,
     Root resolution differs per harness and arrives as ``root_line``.
     ``resolve_fragment`` defaults to the live fragment; legacy definitions
     pass a frozen generation instead.
+
+    ``stdin_prefilter`` is the gate's economy: a hook on the shell tools
+    fires on every shell call, so the carrier reads the harness's hook
+    input first and exits 0 (allow, silently) unless it matches the sh
+    ``case`` pattern — only a commit pays for the interpreter and the scan.
+    The input is then piped on to the runner, which decides for real.
+    Without it the bytes are exactly the pre-gate carrier's.
     """
     fragment = SH_RESOLVE if resolve_fragment is None else resolve_fragment
+    prefilter = ""
+    pipe = ""
+    if stdin_prefilter is not None:
+        prefilter = (
+            "MDLLM_HOOK_INPUT=$(cat)\n"
+            f'case "$MDLLM_HOOK_INPUT" in {stdin_prefilter}) ;; *) exit 0 ;; esac\n'
+        )
+        pipe = "printf '%s' \"$MDLLM_HOOK_INPUT\" | "
     return (
         f"{root_line}\n"
+        f"{prefilter}"
         f"MDLLM={mdllm_path}\n"
         f"{fragment}\n"
         'if [ -z "$PY" ] || [ ! -f "$MDLLM" ]; then\n'
         f"  printf '%s\\n' {shell_single_quote(unavailable)}\n"
         "else\n"
-        f'  mdllm_python "$MDLLM" harness-event {harness} {moment} '
+        f'  {pipe}mdllm_python "$MDLLM" harness-event {harness} {moment} '
         f'"$ROOT" {shell_single_quote(definition_hash)}\n'
         "fi\n"
         "exit 0"

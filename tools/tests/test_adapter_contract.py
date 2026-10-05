@@ -47,7 +47,9 @@ for _k in ("GIT_AUTHOR_EMAIL", "GIT_COMMITTER_EMAIL"):
 LIFECYCLE_INTENTS = {
     "session-start": ("estate-sync", "session-start"),  # ordered, sequential
     "post-write": ("validate",),                        # advisory, quiet
+    "pre-commit": ("cues",),  # the gate: refuses the commit the cue question is owed on
 }
+LEGACY_MOMENTS = ("session-start", "post-write")  # every pre-gate projection
 
 
 def _ns(**kw):
@@ -268,7 +270,8 @@ def test_scaffolded_settings_delegate_each_moment_to_the_neutral_runner(
     settings = json.loads((target / ".claude" / "settings.json")
                           .read_text(encoding="utf-8"))
     for event, moment in (("SessionStart", "session-start"),
-                          ("PostToolUse", "post-write")):
+                          ("PostToolUse", "post-write"),
+                          ("PreToolUse", "pre-commit")):
         groups = settings["hooks"][event]
         assert len(groups) == 1
         handlers = groups[0]["hooks"]
@@ -284,4 +287,6 @@ def test_scaffolded_settings_delegate_each_moment_to_the_neutral_runner(
 def test_estate_standard_legacy_shape_preserves_lifecycle_command_lists():
     cfg = json.loads((FIXTURES / "estate_shapes" / "hooks-only.json")
                      .read_text(encoding="utf-8"))
-    assert _legacy_command_lists_in(cfg) == LIFECYCLE_INTENTS
+    # legacy-v1 predates the commit gate; it carried the two moments only.
+    assert _legacy_command_lists_in(cfg) == {
+        moment: LIFECYCLE_INTENTS[moment] for moment in LEGACY_MOMENTS}

@@ -555,9 +555,12 @@ class CodexAdapter:
             operator_owned.append(f"top-level key {key!r} is operator-owned")
 
         present = bool(realised)
+        # Only the moments this adapter binds: a neutral binding Codex has
+        # no event for (the commit gate) is not a missing managed group here.
         expected = {
             binding.moment: tuple(step.operation for step in binding.steps)
             for binding in context.bindings
+            if binding.moment in _EVENT_BY_MOMENT
         }
         current = ((realised == expected and not issues and not findings)
                    if present else None)

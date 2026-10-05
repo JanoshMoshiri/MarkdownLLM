@@ -106,9 +106,15 @@ def test_doctor_codex_reports_independent_facts_without_promoting_runtime(
     fact_lines = [line for line in output.splitlines()
                   if "harness codex/" in line]
 
-    assert len(fact_lines) == 2
+    # Three neutral moments since the commit gate; Codex binds two. The
+    # third row is the honest "unsupported", as post-write already is for
+    # the session-start-only harnesses — never a missing managed group.
+    assert len(fact_lines) == 3
     assert any("codex/session-start" in line for line in fact_lines)
     assert any("codex/post-write" in line for line in fact_lines)
+    gate = next(line for line in fact_lines if "codex/pre-commit" in line)
+    assert "support=unsupported" in gate
+    fact_lines = [line for line in fact_lines if "codex/pre-commit" not in line]
     for line in fact_lines:
         assert "support=supported" in line
         assert "configuration=absent" in line
