@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-05
-generated: 2026-10-05T01:25:52
-generated_from: HEAD@14ee528
-coverage: 122
+generated: 2026-10-05T01:53:50
+generated_from: HEAD@d492283
+coverage: 123
 framework_version: 3.46.0
 ---
 
@@ -510,6 +510,13 @@ framework_version: 3.46.0
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)
+
+## the-verdict-is-asked-where-the-change-lands-2026-10-05
+- cue-change-reconciliation-specification-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
+- cue-cue-carrier-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
+- cue-framework-map-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
+- cue-operator-guide-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
+- cue-orchestration-specification-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
 
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)

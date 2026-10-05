@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-05
-generated: 2026-10-05T01:25:52
-generated_from: HEAD@14ee528
-coverage: 491
+generated: 2026-10-05T01:53:50
+generated_from: HEAD@d492283
+coverage: 496
 framework_version: 3.46.0
 ---
 
@@ -250,6 +250,7 @@ framework_version: 3.46.0
 - boundary-respect-was-interpretation-not-enforcement --complements--> live-agent-handoff-is-for-new-output-not-known-implementation
 - boundary-respect-was-interpretation-not-enforcement --supports--> phase-3-run-domain-task-reverted
 - boundary-respect-was-interpretation-not-enforcement --challenges--> llm-driven-systems-manifesto
+- change-reconciliation-specification --references--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - change-reconciliation-specification --extends--> thing-specification
 - change-reconciliation-specification --references--> unattended-cue-carrier-2026-09-12
 - change-reconciliation-specification --implements--> inflection-candidates-are-computable
@@ -475,6 +476,7 @@ framework_version: 3.46.0
 - cue-change-reconciliation-specification-2026-09-12 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-09-24 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-09-26 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-2026-10-05 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
 - cue-claude-code-cloud-first-session-2026-09-24-2026-09-26 --subject--> claude-code-cloud-first-session-2026-09-24
@@ -487,6 +489,7 @@ framework_version: 3.46.0
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
 - cue-cue-carrier-2026-09-24 --subject--> cue-carrier
 - cue-cue-carrier-2026-09-26 --subject--> cue-carrier
+- cue-cue-carrier-2026-10-05 --subject--> cue-carrier
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 --subject--> cumulative-drift-is-invisible-to-per-change-walks
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
@@ -512,6 +515,7 @@ framework_version: 3.46.0
 - cue-framework-map-2026-09-26 --subject--> framework-map
 - cue-framework-map-2026-09-27 --subject--> framework-map
 - cue-framework-map-2026-10-01 --subject--> framework-map
+- cue-framework-map-2026-10-05 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
@@ -540,6 +544,7 @@ framework_version: 3.46.0
 - cue-operator-guide-2026-09-26 --subject--> operator-guide
 - cue-operator-guide-2026-09-27 --subject--> operator-guide
 - cue-operator-guide-2026-10-01 --subject--> operator-guide
+- cue-operator-guide-2026-10-05 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -547,6 +552,7 @@ framework_version: 3.46.0
 - cue-operator-queue-2026-08-28-2026-09-26 --subject--> operator-queue-2026-08-28
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-09-26 --subject--> orchestration-specification
+- cue-orchestration-specification-2026-10-05 --subject--> orchestration-specification
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build

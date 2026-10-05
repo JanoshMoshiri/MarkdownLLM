@@ -2,9 +2,12 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.5
+version: 1.6
 created: 2026-06-13
 linked_things:
+  - id: the-verdict-is-asked-where-the-change-lands-2026-10-05
+    relation: references
+    notes: "The ruling behind The Ask: the cue verdict is asked where the change lands, through the harness's own choice prompt, and the agent's commit waits for the cue"
   - id: thing-specification
     relation: extends
   - id: unattended-cue-carrier-2026-09-12
@@ -122,8 +125,9 @@ digest until a human answers it**:
   since the newest retrospective (thirty days when none exists), keeps
   modifications of reasoned-from things — the same predicate `candidates`
   applies, so the two cannot disagree — and subtracts what a cue already
-  covers (a cue covers its subject at and before its `raised_at` commit). What
-  remains is **unraised**; open cue things are **unanswered**. The
+  covers (a cue covers its subject at and before its `raised_at` commit, and
+  on the day it was created — one ask per subject per day). What remains is
+  **unraised**; open cue things are **unanswered**. The
   session-start digest emits both, every session, under one heading. Nothing
   here depends on anyone's memory.
 - **`verdict: inflection`** means the four beats below run and a `reconcile:`
@@ -148,7 +152,9 @@ decision covers the change, or on its own walk where the corpus already holds
 the evidence and the direction. A verdict is a commit, overturnable by editing
 the cue, which is why it is grantable; a cue with no covering decision and
 unsettled reasoning stays the operator's. An attended session raises the cue
-at the moment `candidates` asks. An unattended run — a dispatch tick, a scheduled session —
+at the moment the gate asks — in a harness that projects the `pre-commit`
+moment, the agent's commit waits for it (*The Ask*, below); elsewhere, at the
+moment `candidates` asks. An unattended run — a dispatch tick, a scheduled session —
 that modifies a reasoned-from thing raises the cue as part of its own commit,
 files it in its digest as a seat-queue item, and stops there: it does not run
 the pass on its own initiative and does not widen its scope to reconcile.
@@ -161,6 +167,46 @@ What this does not change: the Cue verdict stays the driver's, the pass still
 runs only after the human "go", and the retrospective remains the cost of
 reconciliation skipped, not a licence to skip it. What it changes is where the
 question lives while it waits.
+
+### The Ask — Where The Change Lands
+
+The carrier made the question persist; it did not make it *asked*. The
+session-start digest listed it and the operator read past it — 172 and 146
+unraised in two live domains on 2026-10-01, none answered since August. The
+ruling of 2026-10-05 (`the-verdict-is-asked-where-the-change-lands-2026-10-05`)
+moves the ask to the moment the change lands and gives it the harness's own
+choice prompt:
+
+- **The gate.** A harness that projects the `pre-commit` lifecycle moment
+  (`orchestration.md` → the hook table; Claude Code today) runs
+  `mdllm cues --staged` before the agent's `git commit`. A definition surface
+  changed in the commit in hand — the types that exist to be reasoned from —
+  with no cue on disk for it is a refusal: the commit does not go through,
+  and the refusal's text, read in the tool's own channel, tells the agent to
+  put the question to the operator through the native multiple-choice prompt
+  — one question per subject, the agent's recommendation first, *file to the
+  seat* last — then `cues --staged --raise`, record the pick in the
+  operator's words, and commit again carrying the cue. The scope is
+  deliberately the definition surfaces only: that is where "this is how it
+  needs to be" lands; a data thing reasoned from by fan-in stays with the
+  digest and scan 4. One ask per subject per day: a cue raised today covers
+  the day's later edits to its subject.
+- **Unattended.** The same refusal, a different instruction: raise and file,
+  never answer. The run marks itself unattended (`MDLLM_UNATTENDED`; the
+  dispatcher's tick does) and the floor tells it so.
+  `unattended-cue-carrier-2026-09-12` is unchanged; the gate is what makes
+  its raise-never-answer rule mechanical rather than instructed.
+- **What it proves.** The commit carries the cue, the verdict and its reason.
+  Whether the dialog appeared is in the harness transcript, not in git — the
+  floor cannot see a click. The refusal makes the ask the agent's critical
+  path, which is the most certainty available. A seat whose harness has no
+  such moment (a Codex session, a hand commit) keeps the `candidates`
+  advisory and the digest, and the retrospective remains the net.
+
+What this does not change: the verdict is still the driver's (*The Driver
+Names The Inflection*), the floor still never answers, and `candidates` still
+asks at every commit from any hand. What it changes is *who is asked, and
+when*: the person, at the change, in the one channel they cannot read past.
 
 ### External Inflections — The Inbound Edge
 
@@ -355,6 +401,7 @@ The split follows the framework's standard division of labour:
 | Prose references the indexes miss | Deterministic floor (textual) | `mdllm touchpoints` literal tier + corpus grep for the thing's canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
 | The cue question waits until it is answered | Deterministic floor | `mdllm cues` — open `type: cue` things plus reasoned-from modifications since the newest retrospective that no cue covers; the same line in every session-start digest (*The Cue Persists*); `mdllm cues --raise` writes the open cue thing for every unraised modification — the raise is mechanical, the verdict never is |
+| The question is asked where the change lands | Harness gate (where an adapter projects `pre-commit`) + **the human** | `mdllm cues --staged` behind the harness's own pre-tool hook: the agent's commit is refused while a definition surface changes with no cue on disk; the refusal names the native choice prompt; an unattended run is told to raise and file (*The Ask*) |
 | The answer carries a receipt | Floor (shape) + **the human** (verdict), or the framework agent citing the human's decision | `type: cue` — `verdict` from the two-value set and a `verdict_reason`; Error without them; `informed_by` pins the ruling that covers it. The verdict itself is never mechanised |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
 | Does each touch point still hold? | **Agent (semantic)** | `validate.thing.md` Layer 2 — the Walk |

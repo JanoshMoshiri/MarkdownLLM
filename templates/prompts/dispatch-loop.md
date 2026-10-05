@@ -134,7 +134,10 @@ schedule — the repos do. You make no rulings — the seats do.
    on your own initiative, no widening of scope to "just walk it". The
    verdict is the operator's receipt
    (`unattended-cue-carrier-2026-09-12`); anything still open at
-   retrospective cadence is answered there.
+   retrospective cadence is answered there. Where the harness projects the
+   `pre-commit` moment, the gate enforces this: your commit is refused until
+   the cue is on disk, and because the tick marked this launch unattended the
+   refusal tells you to raise and file, not to ask.
 7. **Never widen yourself.** Depth limit 1: you do not launch sessions, do
    not install or modify schedules, hooks, or permissions, do not arm or
    edit triggers except as a ritual you are running legitimately writes

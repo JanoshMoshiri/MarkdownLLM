@@ -183,20 +183,40 @@ is the seeing.
       surfaces, one ask per subject per day; fan-in data things stay with the
       digest and the retrospective. Unattended (`MDLLM_UNATTENDED` set by the
       tick): the same refusal says raise-and-file, never answer. Boxes:
-      - [ ] (a) floor — `cues --staged` and `--staged --raise`; a cue raised
-            today covers the day's later edits to its subject.
-      - [ ] (b) harness — the moment and the `gate` delivery; the Claude Code
+      - [x] (a) floor — `cues --staged` and `--staged --raise`; a cue raised
+            today covers the day's later edits to its subject. *Done
+            2026-10-05.*
+      - [x] (b) harness — the moment and the `gate` delivery; the Claude Code
             projection (PreToolUse, `Bash|PowerShell`); the runner's stdin
             prefilter so only a `git commit` pays for the scan; the deny
-            envelope; goldens; doctor currency on every seat.
-      - [ ] (c) this repository's settings refreshed; the tick marks its
-            launches unattended.
-      - [ ] (d) specs — `change-reconciliation.md` gains *The Ask*;
+            envelope; goldens; doctor currency on every seat. *Done
+            2026-10-05; the two pre-gate generations are recognised legacy
+            forms (`legacy-two-moment-v1`, `-v2`) so a seat refreshes with a
+            reviewed `adapter-install --refresh-legacy` instead of a refusal.*
+      - [x] (c) this repository's settings refreshed; the tick marks its
+            launches unattended. *Done 2026-10-05.*
+      - [x] (d) specs — `change-reconciliation.md` gains *The Ask*;
             `orchestration.md`'s hook table; `dispatch-loop.md` step 6; the
-            entry file's commit hook; kernel; CHANGELOG.
+            entry file's commit hook; kernel; CHANGELOG. *Done 2026-10-05;
+            change-reconciliation 1.6, orchestration 1.25, the generated
+            domain hook list, dispatch-loop step 6.*
       - [ ] (e) see — the first commit a seat makes with the gate live: did
             the dialog appear, did the pick land in the cue, what the shape
             got wrong. The floor cannot see the click; the transcript can.
+            *First sighting, 2026-10-05, in the session that built it:* the
+            refreshed hooks went live without a restart, and the next shell
+            call that carried the words of a commit command (a `printf` of a
+            test input, not a commit) was refused — carrier, runner, floor
+            and envelope all fired, and the model read the four owed
+            subjects and the instruction to ask. The operator was not at the
+            keyboard, and the ruling of that morning covered the change, so
+            the four were answered by citation and say so. Two things the
+            sighting taught: the sh prefilter is a glob over the whole hook
+            input, so any shell line mentioning `git` and `commit` pays for
+            the floor (cheap, and the runner's regex then says no) — fine,
+            noted; and the harness picked up the refreshed hook file at once,
+            so a refresh is live in the same session. Still to see: the
+            dialog itself, in a seat with the operator present.
 
 ## Done when
 
