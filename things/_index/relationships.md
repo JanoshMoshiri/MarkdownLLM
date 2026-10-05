@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-05
-generated: 2026-10-05T01:53:50
-generated_from: HEAD@d492283
-coverage: 496
+generated: 2026-10-05T09:40:21
+generated_from: HEAD@ae4e61d
+coverage: 499
 framework_version: 3.46.0
 ---
 
@@ -111,6 +111,10 @@ framework_version: 3.46.0
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --extends--> emitted-content-is-read-instructed-content-is-economised
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --references--> a-scaffold-cannot-birth-its-own-author
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --challenges--> read-thing-specification
+- a-preserved-question-is-not-a-done-walk --informs--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+- a-preserved-question-is-not-a-done-walk --extends--> a-remembered-step-is-a-missing-actor
+- a-preserved-question-is-not-a-done-walk --references--> cue-carrier
+- a-preserved-question-is-not-a-done-walk --references--> consistency-is-maintained-at-change-not-by-sweeping
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --extends--> a-true-primitive-is-discovered-not-authored
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --supports--> source-behind-mirror-is-still-a-consumer-side-read
@@ -467,7 +471,9 @@ framework_version: 3.46.0
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
-- cue-carrier --implements--> the-verdict-is-asked-where-the-change-lands-2026-10-05
+- cue-carrier --implements--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+- cue-carrier --references--> the-verdict-is-asked-where-the-change-lands-2026-10-05
+- cue-carrier --references--> a-preserved-question-is-not-a-done-walk
 - cue-carrier --implements--> unattended-cue-carrier-2026-09-12
 - cue-carrier --implements--> closed-loop-operating-state
 - cue-carrier --extends--> change-reconciliation-specification
@@ -575,6 +581,7 @@ framework_version: 3.46.0
 - cue-substrate-native-a2a-2026-09-26 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-10-01 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
+- cue-the-verdict-is-asked-where-the-change-lands-2026-10-05-2026-10-05 --subject--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
 - cue-trigger-specification-2026-09-12 --subject--> trigger-specification
@@ -1559,12 +1566,21 @@ framework_version: 3.46.0
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
 - the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
 - the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 --superseded-by--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --extends--> open-questions-arrive-as-a-prompt-2026-09-23
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --references--> unattended-cue-carrier-2026-09-12
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --informs--> cue-carrier
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --informs--> change-reconciliation-specification
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --references--> a-remembered-step-is-a-missing-actor
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --references--> emitted-content-is-read-instructed-content-is-economised
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --supersedes--> the-verdict-is-asked-where-the-change-lands-2026-10-05
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --references--> a-preserved-question-is-not-a-done-walk
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --references--> consistency-is-maintained-at-change-not-by-sweeping
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --extends--> framework-agent-closes-settled-cues-2026-09-13
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --references--> unattended-cue-carrier-2026-09-12
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --references--> a-remembered-step-is-a-missing-actor
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --informs--> change-reconciliation-specification
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 --informs--> cue-carrier
 - the-wrong-distribution-channel-validates-clean --informs--> universal-workflow-methodology
 - the-wrong-distribution-channel-validates-clean --complements--> cross-domain-handoff-is-verified-external-input
 - thing-lifecycle-specification --extends--> thing-specification

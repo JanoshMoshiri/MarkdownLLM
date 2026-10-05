@@ -2,15 +2,21 @@
 id: cue-carrier
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-09-12
 session: 2026-09-12
 priority: high
 tags: [change-reconciliation, cue, seat-protocol, floor, session-start, dispatcher]
 linked_things:
-  - id: the-verdict-is-asked-where-the-change-lands-2026-10-05
+  - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
     relation: implements
-    notes: "Phase 7: the ask moves to the commit boundary and takes the harness's own choice dialog; the commit waits for the cue."
+    notes: "Phase 7, corrected the same day: the gate demands the walk's record, the agent walks on detection within four bounds, the operator rules on the residue through the harness's own prompt."
+  - id: the-verdict-is-asked-where-the-change-lands-2026-10-05
+    relation: references
+    notes: "The first shape of Phase 7, superseded within the day: it asked the operator first. Kept as the record of the wrong half."
+  - id: a-preserved-question-is-not-a-done-walk
+    relation: references
+    notes: "Why Phase 7 exists at all: Phases 0–6 preserved the question perfectly and the walk count did not move."
   - id: unattended-cue-carrier-2026-09-12
     relation: implements
     notes: "The ruling this plan builds. Every phase below is that decision made operative; nothing here widens it."
@@ -217,6 +223,21 @@ is the seeing.
             noted; and the harness picked up the refreshed hook file at once,
             so a refresh is live in the same session. Still to see: the
             dialog itself, in a seat with the operator present.
+            *Corrected the same day.* The operator read the build back and
+            said it was the wrong half: it asked him first, every time, for
+            a verdict only the walk can give — when his problem was that
+            the walk never ran. The estate's record agreed (see
+            `a-preserved-question-is-not-a-done-walk`). Ruled:
+            `the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`.
+      - [ ] (f) the corrected shape — the refusal demands the walk's record:
+            `cues --staged --raise` prefills the cue with the subject's
+            declared and literal touchpoints as a checklist; the agent
+            judges each (consistent / revised / ruling), revises at
+            restatement level in the same commit, and asks the operator
+            through the native prompt only for what it may not settle;
+            unattended runs assimilate and file. Spec: *The Walk Runs On
+            Detection* replaces *The Ask*; *The Driver Names The Inflection*
+            becomes the driver naming the residue.
 
 ## Done when
 

@@ -1,7 +1,7 @@
 ---
 id: the-verdict-is-asked-where-the-change-lands-2026-10-05
 type: decision
-status: made
+status: superseded
 version: 1.0
 created: 2026-10-05
 session: 2026-10-05
@@ -21,6 +21,9 @@ informed_by:
   - id: a-remembered-step-is-a-missing-actor
     commit: 68c83cee2b400b75c52f346c0506c01dfd273bb2
 linked_things:
+  - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+    relation: superseded-by
+    notes: "Same day: the walk runs on detection and the operator rules on the residue; this ruling's commit boundary, prompt carrier and unattended rule carry forward there."
   - id: open-questions-arrive-as-a-prompt-2026-09-23
     relation: extends
     notes: "That ruled the shape of an open question at session start. This moves the ask to the moment the change lands and names the harness's own choice dialog as its carrier, because the digest's relay is passed over."
@@ -42,6 +45,14 @@ linked_things:
 ---
 
 # Decision: The Verdict Is Asked Where the Change Lands, Through the Harness's Own Prompt
+
+> **Superseded the same day** by
+> `the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`. This ruling
+> answered the wrong half of the problem: it put the question in front of the
+> operator at the right moment and still asked for a verdict only the walk can
+> give. The walk now runs on detection; the operator rules on the residue. What
+> survives — the commit boundary as the actor, the harness's own prompt as the
+> carrier for a decision, the unattended rule — is carried forward there.
 
 ## Context
 

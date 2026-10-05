@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-05
-generated: 2026-10-05T01:53:50
-generated_from: HEAD@d492283
+generated: 2026-10-05T09:40:21
+generated_from: HEAD@ae4e61d
 coverage: 123
 framework_version: 3.46.0
 ---
@@ -43,6 +43,7 @@ framework_version: 3.46.0
 
 ## change-reconciliation-specification
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @54e906dcad0955857c3a086d076c4dbe7e6a8284)
 
 ## claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage (derived-from)
@@ -116,6 +117,7 @@ framework_version: 3.46.0
 ## cue-carrier
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @54e906dcad0955857c3a086d076c4dbe7e6a8284)
 
 ## cue-operator-queue-2026-08-28-2026-09-26
 - cue-operator-queue-2026-08-28-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
@@ -269,6 +271,7 @@ framework_version: 3.46.0
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-workflow-state-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-workflow-state-specification-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 
 ## framework-kernel
 - estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
@@ -517,6 +520,7 @@ framework_version: 3.46.0
 - cue-framework-map-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
 - cue-operator-guide-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
 - cue-orchestration-specification-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @3c59f9cf8b77c681c159fd9756b4e6686f4cb518)
 
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
@@ -543,6 +547,7 @@ framework_version: 3.46.0
 - framework-agent-closes-settled-cues-2026-09-13 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @2b12791fcfb2d6eb6c3f971bf444169667fb0815)
+- the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @2b12791fcfb2d6eb6c3f971bf444169667fb0815)
 
 ## universal-workflow-methodology
 - derivation-shape-brief-2026-08 (pinned @3af254117c771488898b861a9e9a30ef934c4794)
