@@ -301,6 +301,50 @@ the five opus results plus haiku t5 are quarantined under `results/excluded/`.
 workspace isolation (outside the repo tree), and haiku re-run to n≥5 clean if a
 trial is lost to the same isolation fix. Report per-session, not just totals.
 
+## Controls added after the 2026-10-05 cold review
+
+An independent cold read of the fixtures and runner found five defects that
+would have invalidated any framework-vs-bare conclusion. Each is now a
+mechanical control; none of this section reports a result.
+
+1. **The answer key is no longer reachable.** The framework arm used to be
+   granted the whole checkout with `--add-dir`, and the checkout contains
+   `evals/` — every fixture's expected figures and the generators that print
+   them. The arm is now granted a **pruned view** (`FRAMEWORK_VIEW_INCLUDE`
+   in `evals.py`: kernel, operative specs, `tools/`, the calculation
+   reference; never `evals/`, `things/`, `examples/` or `domain/`), built per
+   invocation under the run root, fingerprinted, and checked after every
+   trial — a mutated view voids the trial and stops the arm, like the seed.
+   `MDLLM_EVAL_FRAMEWORK_DIR` names a prepared view instead (refused if it
+   contains `evals/`). Transcripts are also scanned for references to fixture
+   or generator paths; a hit voids the trial (`voided` in the result).
+   Every framework-arm result recorded before this date was produced under
+   the open grant and is re-run under the guard before it is cited.
+2. **Committed state is the carrier, by construction.** Between sessions the
+   runner runs `git reset --hard && git clean -fd` in the workspace, so
+   uncommitted edits do not survive. Each session records
+   `uncommitted_at_end`.
+3. **A hint-matched control arm.** `--condition bare-coached` strips the
+   tree like `bare` but prepends the fixture's `coached_preamble` — the
+   seed's domain guidance as plain prompt text, with no schema, kernel or
+   tool behind it. A framework win over `bare` alone could be the hints; the
+   2×3 separates hints from structure.
+4. **Delta scoring.** A longitudinal fixture tags each assertion
+   `changed: true|false` against the previous session's expected value. A
+   do-nothing agent passes every unchanged assertion (≈88% of this fixture),
+   so the aggregate pass rate is nearly uninformative; results carry the
+   changed-set and unchanged-set counts per session, the failed assertion
+   labels, and `--report` prints a per-session table.
+5. **Rounding margins.** `polar-station-htc`'s generator tunes the seed so
+   every expected net load sits ≥ 0.3 W from a rounding boundary, and the
+   code states which steps round. Thirteen figures had sat within 0.3 W, one
+   at 0.012 W: a correct method carrying one more decimal failed.
+
+Also: full model ids are passed (`--model claude-haiku-4-5-20251001`), the
+ids the CLI reports using are recorded (`models_observed`), the per-session
+timeout default is 1800 s, and `--report` groups by fixture content hash so a
+regenerated fixture is never pooled with its predecessor's runs.
+
 ## Conventions
 
 - One fixture per scenario, named `<domain>-<scenario>.yaml`

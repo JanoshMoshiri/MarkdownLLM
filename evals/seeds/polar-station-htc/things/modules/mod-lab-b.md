@@ -6,8 +6,8 @@ created: '2026-01-15'
 title: Lab B
 use: lab
 occupants: 3
-equipment_w: 2600
-volume_m3: 375
+equipment_w: 2640
+volume_m3: 414
 hrv_class: H2
 hrv_commissioned: '2026-04-02'
 elements:
@@ -34,7 +34,7 @@ elements:
 - name: roof
   kind: roof
   assembly: asm-roof-std
-  area_m2: 50
+  area_m2: 55
 - name: floor
   kind: floor
   assembly: asm-floor-ice

@@ -6,8 +6,8 @@ created: '2026-01-15'
 title: Plant E
 use: plant
 occupants: 0
-equipment_w: 4000
-volume_m3: 275
+equipment_w: 3940
+volume_m3: 304
 hrv_class: H1
 hrv_commissioned: '2025-09-01'
 elements:
@@ -34,7 +34,7 @@ elements:
 - name: roof
   kind: roof
   assembly: asm-roof-std
-  area_m2: 36
+  area_m2: 39
 - name: floor
   kind: floor
   assembly: asm-floor-raised

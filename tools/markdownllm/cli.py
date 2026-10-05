@@ -225,12 +225,19 @@ def build_cli() -> argparse.ArgumentParser:
     ev.add_argument("--model", default="haiku")
     ev.add_argument("--trials", type=int, default=1)
     ev.add_argument("--bare", action="store_true",
-                    help="no-framework condition: strip AGENTS.md/skills/schema")
+                    help="alias for --condition bare")
+    ev.add_argument("--condition", choices=["framework", "bare", "bare-coached"],
+                    default=None,
+                    help="framework (seed as-is + pruned framework view); bare "
+                         "(strip AGENTS.md/skills/schema, no framework access); "
+                         "bare-coached (bare tree + the seed's domain guidance "
+                         "as prompt text — the hint-matched control)")
     ev.add_argument("--report", action="store_true",
-                    help="aggregate evals/runs/*/result.json into per-cell pass rates")
+                    help="aggregate evals/results/*.json into per-cell and "
+                         "per-session pass rates")
     ev.add_argument("--dry-run", action="store_true")
-    ev.add_argument("--timeout", type=int, default=900,
-                    help="seconds per trial (default 900)")
+    ev.add_argument("--timeout", type=int, default=1800,
+                    help="seconds per session (default 1800)")
     ev.set_defaults(fn=cmd_eval)
 
     kn = sub.add_parser("kernel", help="generate kernel.md from spec kernel blocks")

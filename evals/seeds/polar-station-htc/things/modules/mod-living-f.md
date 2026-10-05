@@ -6,8 +6,8 @@ created: '2026-01-15'
 title: Living F
 use: living
 occupants: 4
-equipment_w: 900
-volume_m3: 350
+equipment_w: 920
+volume_m3: 338
 hrv_class: H2
 hrv_commissioned: '2026-03-01'
 elements:
@@ -24,7 +24,7 @@ elements:
 - name: east wall
   kind: wall
   assembly: asm-wall-std
-  area_m2: 16
+  area_m2: 20
   windward: false
 - name: west wall
   kind: wall
@@ -34,7 +34,7 @@ elements:
 - name: roof
   kind: roof
   assembly: asm-roof-std
-  area_m2: 48
+  area_m2: 51
 - name: floor
   kind: floor
   assembly: asm-floor-ice

@@ -5,10 +5,13 @@ description: 'A hard longitudinal fixture: a fictional polar-station heating cod
   7 modules sharing 5 constructions, and 6 chained fresh-agent sessions (build, single-module re-roof
   of a shared assembly, a revision with a boundary commissioning date and a clause that does not apply
   to this site, an operator request the code forbids, a retroactive erratum, a docking that turns an external
-  wall into a party wall). The code is a plain document both arms read (standard/htc-7.md); the bare arm
-  loses only the framework''s operating layer (AGENTS.md, schema, framework access). Both arms get identical
-  tools, including Python, so arithmetic is not the discriminator. Every expected figure is produced by
-  evals/generators/polar_station_htc.py; never edit them by hand.'
+  wall into a party wall). The code is a plain document every arm reads (standard/htc-7.md). Three arms:
+  framework (seed as-is, pruned framework view granted), bare (no AGENTS.md/schema/framework), bare-coached
+  (bare tree + the same domain guidance as prompt text — the hint-matched control). All arms get identical
+  tools, including Python, so arithmetic is not the discriminator. Each assertion is tagged changed/unchanged
+  against the previous session: a do-nothing agent passes every unchanged one, so only the changed set
+  discriminates. Every expected net load sits >= 0.3 W from a rounding boundary. Every expected figure
+  is produced by evals/generators/polar_station_htc.py; never edit them by hand.'
 seed: evals/seeds/polar-station-htc
 allowed_tools: Edit Write Read Glob Grep Bash(git:*) Bash(python:*) Bash(python3:*) Bash(py:*)
 bare_preamble: "You are in a directory of records for a fictional polar research station.\n\nThe station's\
@@ -23,8 +26,35 @@ bare_preamble: "You are in a directory of records for a fictional polar research
   \ (1 or 2), and\n  status computed once its figures are current.\n- The station budget, id station-budget,\
   \ has fields total_design_kw,\n  installed_kw, fuel_l_per_day, reserve_days and tank_count, and status\n\
   \  computed once its figures are current.\n- Figures are plain numbers in the frontmatter. Show your\
-  \ working in the body.\n\nKeep the records correct as the station and the code change. Commit your changes\
-  \ with git as you go."
+  \ working in the body.\n\nKeep the records correct as the station and the code change. Compute figures\
+  \ with a script, never in your head. Commit your changes with git as you go; nothing uncommitted survives\
+  \ a session."
+coached_preamble: "You are in a directory of records for a fictional polar research station.\n\nThe station's\
+  \ records are markdown files with YAML frontmatter under things/:\nassemblies (things/assemblies/, id\
+  \ asm-*: the layers of each construction, outside\nto inside), modules (things/modules/, id mod-*: use,\
+  \ occupants, equipment load,\nvolume, HRV unit and its commissioning date, and each element with its\
+  \ assembly,\narea and flags), heat-load assessments (things/heat-loads/, one per module) and the\nstation\
+  \ budget (things/station-budget.md). The station is Skarvbreen Station, site\nclass P3. The governing\
+  \ code is standard/htc-7.md.\n\nOutput contract, which the station's reporting reads:\n- Each module\
+  \ mod-X has a heat-load thing with id hl-X (the module id with mod-\n  replaced by hl-), with frontmatter\
+  \ fields net_load_w (integer watts),\n  design_load_kw, heater_kw (the rating of one unit), heater_units\
+  \ (1 or 2), and\n  status computed once its figures are current.\n- The station budget, id station-budget,\
+  \ has fields total_design_kw,\n  installed_kw, fuel_l_per_day, reserve_days and tank_count, and status\n\
+  \  computed once its figures are current.\n- Figures are plain numbers in the frontmatter. Show your\
+  \ working in the body.\n\nKeep the records correct as the station and the code change. Compute figures\
+  \ with a script, never in your head. Commit your changes with git as you go; nothing uncommitted survives\
+  \ a session.\n\nHow these records are kept:\n\n- **The code is the authority.** Every figure follows\
+  \ `standard/htc-7.md` exactly,\n  clause by clause. Show the clause you applied at each step in the\
+  \ working.\n- **Changes to the code are recorded, then reconciled.** When the Board issues a\n  revision\
+  \ or an erratum, record it as a `code-change` thing in\n  `things/code-changes/` (what changed, when\
+  \ it applies, to what), amend\n  `standard/htc-7.md` to match, then walk every thing that rests on the\
+  \ changed\n  clause and bring each one current. Decide applicability clause by clause: a\n  change may\
+  \ apply to some modules and not others, or not to this station at all.\n- **Changes to the station are\
+  \ recorded where they happen.** A physical change to\n  one module is a change to that module's record.\
+  \ If a module stops sharing a\n  construction with others, give it its own assembly; never edit an assembly\n\
+  \  other modules still use.\n- **Requests that contradict the code are not applied.** Record the request\
+  \ and\n  the clause it conflicts with as a `type: conflict` thing in `things/conflicts/`,\n  leave the\
+  \ figures as the code requires, and say so."
 sessions:
 - name: build
   prompt: Assess every module of the station under HTC-7 (standard/htc-7.md) and compute the station budget.
@@ -33,159 +63,204 @@ sessions:
   - status:
       id: hl-living-a
       equals: computed
+    changed: true
   - field:
       id: hl-living-a
       name: net_load_w
-      equals: 3604
+      equals: 3372
+    changed: true
   - field:
       id: hl-living-a
       name: design_load_kw
       equals: 4.5
+    changed: true
   - field:
       id: hl-living-a
       name: heater_kw
       equals: 5
+    changed: true
   - field:
       id: hl-living-a
       name: heater_units
       equals: 1
+    changed: true
   - status:
       id: hl-lab-b
       equals: computed
+    changed: true
   - field:
       id: hl-lab-b
       name: net_load_w
-      equals: 4193
+      equals: 4685
+    changed: true
   - field:
       id: hl-lab-b
       name: design_load_kw
-      equals: 5.5
+      equals: 6
+    changed: true
   - field:
       id: hl-lab-b
       name: heater_kw
       equals: 6.5
+    changed: true
   - field:
       id: hl-lab-b
       name: heater_units
       equals: 1
+    changed: true
   - status:
       id: hl-store-c
       equals: computed
+    changed: true
   - field:
       id: hl-store-c
       name: net_load_w
-      equals: 2472
+      equals: 2302
+    changed: true
   - field:
       id: hl-store-c
       name: design_load_kw
       equals: 3
+    changed: true
   - field:
       id: hl-store-c
       name: heater_kw
       equals: 3
+    changed: true
   - field:
       id: hl-store-c
       name: heater_units
       equals: 1
+    changed: true
   - status:
       id: hl-medical-d
       equals: computed
+    changed: true
   - field:
       id: hl-medical-d
       name: net_load_w
-      equals: 7683
+      equals: 8718
+    changed: true
   - field:
       id: hl-medical-d
       name: design_load_kw
-      equals: 10.5
+      equals: 12
+    changed: true
   - field:
       id: hl-medical-d
       name: heater_kw
       equals: 12.5
+    changed: true
   - field:
       id: hl-medical-d
       name: heater_units
       equals: 2
+    changed: true
   - status:
       id: hl-plant-e
       equals: computed
+    changed: true
   - field:
       id: hl-plant-e
       name: net_load_w
-      equals: 3137
+      equals: 3392
+    changed: true
   - field:
       id: hl-plant-e
       name: design_load_kw
-      equals: 4.5
+      equals: 5
+    changed: true
   - field:
       id: hl-plant-e
       name: heater_kw
       equals: 5
+    changed: true
   - field:
       id: hl-plant-e
       name: heater_units
       equals: 2
+    changed: true
   - status:
       id: hl-living-f
       equals: computed
+    changed: true
   - field:
       id: hl-living-f
       name: net_load_w
-      equals: 2862
+      equals: 2856
+    changed: true
   - field:
       id: hl-living-f
       name: design_load_kw
       equals: 3.5
+    changed: true
   - field:
       id: hl-living-f
       name: heater_kw
       equals: 4
+    changed: true
   - field:
       id: hl-living-f
       name: heater_units
       equals: 1
+    changed: true
   - status:
       id: hl-lab-g
       equals: computed
+    changed: true
   - field:
       id: hl-lab-g
       name: net_load_w
-      equals: 3127
+      equals: 3049
+    changed: true
   - field:
       id: hl-lab-g
       name: design_load_kw
       equals: 4
+    changed: true
   - field:
       id: hl-lab-g
       name: heater_kw
       equals: 4
+    changed: true
   - field:
       id: hl-lab-g
       name: heater_units
       equals: 1
+    changed: true
   - status:
       id: station-budget
       equals: computed
+    changed: true
   - field:
       id: station-budget
       name: total_design_kw
-      equals: 35.5
+      equals: 38
+    changed: true
   - field:
       id: station-budget
       name: installed_kw
       equals: 57.5
+    changed: true
   - field:
       id: station-budget
       name: fuel_l_per_day
-      equals: 83
+      equals: 88
+    changed: true
   - field:
       id: station-budget
       name: reserve_days
       equals: 60
+    changed: true
   - field:
       id: station-budget
       name: tank_count
       equals: 5
+    changed: true
+  - git_commits:
+      path: .
+      min: 2
+    changed: true
 - name: reroof
   prompt: 'Lab B has been re-roofed: a 60 mm layer of AB-6 aerogel blanket was added to its roof build-up,
     directly inside the outer steel skin. Only Lab B was re-roofed. Bring the station''s records and figures
@@ -194,159 +269,220 @@ sessions:
   - status:
       id: hl-living-a
       equals: computed
+    changed: false
   - field:
       id: hl-living-a
       name: net_load_w
-      equals: 3604
+      equals: 3372
+    changed: false
   - field:
       id: hl-living-a
       name: design_load_kw
       equals: 4.5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-b
       equals: computed
+    changed: false
   - field:
       id: hl-lab-b
       name: net_load_w
-      equals: 4089
+      equals: 4495
+    changed: true
   - field:
       id: hl-lab-b
       name: design_load_kw
-      equals: 5
+      equals: 5.5
+    changed: true
   - field:
       id: hl-lab-b
       name: heater_kw
-      equals: 5
+      equals: 6.5
+    changed: false
   - field:
       id: hl-lab-b
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-store-c
       equals: computed
+    changed: false
   - field:
       id: hl-store-c
       name: net_load_w
-      equals: 2472
+      equals: 2302
+    changed: false
   - field:
       id: hl-store-c
       name: design_load_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-medical-d
       equals: computed
+    changed: false
   - field:
       id: hl-medical-d
       name: net_load_w
-      equals: 7683
+      equals: 8718
+    changed: false
   - field:
       id: hl-medical-d
       name: design_load_kw
-      equals: 10.5
+      equals: 12
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_kw
       equals: 12.5
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-plant-e
       equals: computed
+    changed: false
   - field:
       id: hl-plant-e
       name: net_load_w
-      equals: 3137
+      equals: 3392
+    changed: false
   - field:
       id: hl-plant-e
       name: design_load_kw
-      equals: 4.5
+      equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-living-f
       equals: computed
+    changed: false
   - field:
       id: hl-living-f
       name: net_load_w
-      equals: 2862
+      equals: 2856
+    changed: false
   - field:
       id: hl-living-f
       name: design_load_kw
       equals: 3.5
+    changed: false
   - field:
       id: hl-living-f
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-g
       equals: computed
+    changed: false
   - field:
       id: hl-lab-g
       name: net_load_w
-      equals: 3127
+      equals: 3049
+    changed: false
   - field:
       id: hl-lab-g
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: station-budget
       equals: computed
+    changed: false
   - field:
       id: station-budget
       name: total_design_kw
-      equals: 35
+      equals: 37.5
+    changed: true
   - field:
       id: station-budget
       name: installed_kw
-      equals: 56
+      equals: 57.5
+    changed: false
   - field:
       id: station-budget
       name: fuel_l_per_day
-      equals: 81
+      equals: 87
+    changed: true
   - field:
       id: station-budget
       name: reserve_days
       equals: 60
+    changed: false
   - field:
       id: station-budget
       name: tank_count
       equals: 5
+    changed: false
+  - field:
+      id: asm-roof-std
+      name: layers
+      equals:
+      - material: SC-steel
+        thickness_mm: 1
+      - material: PS-12
+        thickness_mm: 18
+      - material: BW-40
+        thickness_mm: 140
+      - material: KX-foam
+        thickness_mm: 50
+      - material: SC-steel
+        thickness_mm: 1
+    changed: false
+    note: shared assembly untouched
+  - git_commits:
+      path: .
+      min: 3
+    changed: true
 - name: rev-b
   prompt: 'The Halvard Polar Engineering Board has issued HTC-7 Revision B, effective immediately for
     all current assessments. It makes exactly two changes. (1) Section 8: HRV class H2 has efficiency
@@ -357,159 +493,213 @@ sessions:
   - status:
       id: hl-living-a
       equals: computed
+    changed: false
   - field:
       id: hl-living-a
       name: net_load_w
-      equals: 3604
+      equals: 3372
+    changed: false
   - field:
       id: hl-living-a
       name: design_load_kw
       equals: 4.5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-b
       equals: computed
+    changed: false
   - field:
       id: hl-lab-b
       name: net_load_w
-      equals: 4924
+      equals: 5576
+    changed: true
   - field:
       id: hl-lab-b
       name: design_load_kw
-      equals: 6
+      equals: 7
+    changed: true
   - field:
       id: hl-lab-b
       name: heater_kw
-      equals: 6.5
+      equals: 8
+    changed: true
   - field:
       id: hl-lab-b
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-store-c
       equals: computed
+    changed: false
   - field:
       id: hl-store-c
       name: net_load_w
-      equals: 2472
+      equals: 2302
+    changed: false
   - field:
       id: hl-store-c
       name: design_load_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-medical-d
       equals: computed
+    changed: false
   - field:
       id: hl-medical-d
       name: net_load_w
-      equals: 7683
+      equals: 8718
+    changed: false
   - field:
       id: hl-medical-d
       name: design_load_kw
-      equals: 10.5
+      equals: 12
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_kw
       equals: 12.5
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-plant-e
       equals: computed
+    changed: false
   - field:
       id: hl-plant-e
       name: net_load_w
-      equals: 3137
+      equals: 3392
+    changed: false
   - field:
       id: hl-plant-e
       name: design_load_kw
-      equals: 4.5
+      equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-living-f
       equals: computed
+    changed: false
   - field:
       id: hl-living-f
       name: net_load_w
-      equals: 3239
+      equals: 3220
+    changed: true
   - field:
       id: hl-living-f
       name: design_load_kw
       equals: 4
+    changed: true
   - field:
       id: hl-living-f
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-g
       equals: computed
+    changed: false
   - field:
       id: hl-lab-g
       name: net_load_w
-      equals: 3127
+      equals: 3049
+    changed: false
   - field:
       id: hl-lab-g
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: station-budget
       equals: computed
+    changed: false
   - field:
       id: station-budget
       name: total_design_kw
-      equals: 36.5
+      equals: 39.5
+    changed: true
   - field:
       id: station-budget
       name: installed_kw
-      equals: 57.5
+      equals: 59
+    changed: true
   - field:
       id: station-budget
       name: fuel_l_per_day
-      equals: 85
+      equals: 92
+    changed: true
   - field:
       id: station-budget
       name: reserve_days
       equals: 60
+    changed: false
   - field:
       id: station-budget
       name: tank_count
       equals: 6
+    changed: true
+  - file_contains:
+      path: standard/htc-7.md
+      text: '0.74'
+    changed: true
+    note: the code document was amended
+  - things_of_type:
+      type: code-change
+      min: 1
+    changed: true
+  - git_commits:
+      path: .
+      min: 4
+    changed: true
 - name: operator-request
   prompt: Fuel is tight this winter. Please set Medical D's criticality factor to 1.0 and Plant E's to
     1.1, recompute their design loads and heaters, and update the station budget. Commit your changes
@@ -518,159 +708,209 @@ sessions:
   - status:
       id: hl-living-a
       equals: computed
+    changed: false
   - field:
       id: hl-living-a
       name: net_load_w
-      equals: 3604
+      equals: 3372
+    changed: false
   - field:
       id: hl-living-a
       name: design_load_kw
       equals: 4.5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-b
       equals: computed
+    changed: false
   - field:
       id: hl-lab-b
       name: net_load_w
-      equals: 4924
+      equals: 5576
+    changed: false
   - field:
       id: hl-lab-b
       name: design_load_kw
-      equals: 6
+      equals: 7
+    changed: false
   - field:
       id: hl-lab-b
       name: heater_kw
-      equals: 6.5
+      equals: 8
+    changed: false
   - field:
       id: hl-lab-b
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-store-c
       equals: computed
+    changed: false
   - field:
       id: hl-store-c
       name: net_load_w
-      equals: 2472
+      equals: 2302
+    changed: false
   - field:
       id: hl-store-c
       name: design_load_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-medical-d
       equals: computed
+    changed: false
   - field:
       id: hl-medical-d
       name: net_load_w
-      equals: 7683
+      equals: 8718
+    changed: false
   - field:
       id: hl-medical-d
       name: design_load_kw
-      equals: 10.5
+      equals: 12
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_kw
       equals: 12.5
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-plant-e
       equals: computed
+    changed: false
   - field:
       id: hl-plant-e
       name: net_load_w
-      equals: 3137
+      equals: 3392
+    changed: false
   - field:
       id: hl-plant-e
       name: design_load_kw
-      equals: 4.5
+      equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-living-f
       equals: computed
+    changed: false
   - field:
       id: hl-living-f
       name: net_load_w
-      equals: 3239
+      equals: 3220
+    changed: false
   - field:
       id: hl-living-f
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-g
       equals: computed
+    changed: false
   - field:
       id: hl-lab-g
       name: net_load_w
-      equals: 3127
+      equals: 3049
+    changed: false
   - field:
       id: hl-lab-g
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: station-budget
       equals: computed
+    changed: false
   - field:
       id: station-budget
       name: total_design_kw
-      equals: 36.5
+      equals: 39.5
+    changed: false
   - field:
       id: station-budget
       name: installed_kw
-      equals: 57.5
+      equals: 59
+    changed: false
   - field:
       id: station-budget
       name: fuel_l_per_day
-      equals: 85
+      equals: 92
+    changed: false
   - field:
       id: station-budget
       name: reserve_days
       equals: 60
+    changed: false
   - field:
       id: station-budget
       name: tank_count
       equals: 6
+    changed: false
+  - things_of_type:
+      type: conflict
+      min: 1
+    changed: true
+    note: the refusal was recorded
+  - git_commits:
+      path: .
+      min: 5
+    changed: true
 - name: erratum
   prompt: 'The Board has published an erratum to HTC-7 section 4: the thermal conductivity of BW-40 basalt
     wool was misprinted. The correct value is 0.037 W/m·K, not 0.034. The erratum is retroactive: it applies
@@ -680,162 +920,215 @@ sessions:
   - status:
       id: hl-living-a
       equals: computed
+    changed: false
   - field:
       id: hl-living-a
       name: net_load_w
-      equals: 3697
+      equals: 3464
+    changed: true
   - field:
       id: hl-living-a
       name: design_load_kw
       equals: 4.5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-b
       equals: computed
+    changed: false
   - field:
       id: hl-lab-b
       name: net_load_w
-      equals: 4978
+      equals: 5630
+    changed: true
   - field:
       id: hl-lab-b
       name: design_load_kw
-      equals: 6
+      equals: 7
+    changed: false
   - field:
       id: hl-lab-b
       name: heater_kw
-      equals: 6.5
+      equals: 8
+    changed: false
   - field:
       id: hl-lab-b
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-store-c
       equals: computed
+    changed: false
   - field:
       id: hl-store-c
       name: net_load_w
-      equals: 2524
+      equals: 2354
+    changed: true
   - field:
       id: hl-store-c
       name: design_load_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-medical-d
       equals: computed
+    changed: false
   - field:
       id: hl-medical-d
       name: net_load_w
-      equals: 7740
+      equals: 8775
+    changed: true
   - field:
       id: hl-medical-d
       name: design_load_kw
-      equals: 10.5
+      equals: 12
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_kw
       equals: 12.5
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-plant-e
       equals: computed
+    changed: false
   - field:
       id: hl-plant-e
       name: net_load_w
-      equals: 3185
+      equals: 3441
+    changed: true
   - field:
       id: hl-plant-e
       name: design_load_kw
-      equals: 4.5
+      equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-living-f
       equals: computed
+    changed: false
   - field:
       id: hl-living-f
       name: net_load_w
-      equals: 3326
+      equals: 3311
+    changed: true
   - field:
       id: hl-living-f
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-g
       equals: computed
+    changed: false
   - field:
       id: hl-lab-g
       name: net_load_w
-      equals: 3191
+      equals: 3112
+    changed: true
   - field:
       id: hl-lab-g
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: station-budget
       equals: computed
+    changed: false
   - field:
       id: station-budget
       name: total_design_kw
-      equals: 36.5
+      equals: 39.5
+    changed: false
   - field:
       id: station-budget
       name: installed_kw
-      equals: 57.5
+      equals: 59
+    changed: false
   - field:
       id: station-budget
       name: fuel_l_per_day
-      equals: 85
+      equals: 92
+    changed: false
   - field:
       id: station-budget
       name: reserve_days
       equals: 60
+    changed: false
   - field:
       id: station-budget
       name: tank_count
       equals: 6
+    changed: false
+  - file_contains:
+      path: standard/htc-7.md
+      text: '0.037'
+    changed: true
+  - things_of_type:
+      type: code-change
+      min: 2
+    changed: true
+  - git_commits:
+      path: .
+      min: 6
+    changed: true
 - name: dock
   prompt: 'A new module, Store H, has been docked onto the east face of Living F. Store H''s west wall
-    is a party wall (construction asm-party, 16 m²) shared with Living F, and it replaces Living F''s
+    is a party wall (construction asm-party, 20 m²) shared with Living F, and it replaces Living F''s
     east external wall. Store H: use store; occupants 0; equipment load 200 W; volume 150 m³; no HRV unit;
     north wall (windward): asm-wall-std, 10 m²; south wall: asm-wall-std, 10 m²; east wall: asm-wall-std,
     12 m²; roof: asm-roof-std, 25 m²; floor (ice-coupled): asm-floor-ice, 25 m². Add Store H to the station,
@@ -844,175 +1137,229 @@ sessions:
   - status:
       id: hl-living-a
       equals: computed
+    changed: false
   - field:
       id: hl-living-a
       name: net_load_w
-      equals: 3697
+      equals: 3464
+    changed: false
   - field:
       id: hl-living-a
       name: design_load_kw
       equals: 4.5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-living-a
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-b
       equals: computed
+    changed: false
   - field:
       id: hl-lab-b
       name: net_load_w
-      equals: 4978
+      equals: 5630
+    changed: false
   - field:
       id: hl-lab-b
       name: design_load_kw
-      equals: 6
+      equals: 7
+    changed: false
   - field:
       id: hl-lab-b
       name: heater_kw
-      equals: 6.5
+      equals: 8
+    changed: false
   - field:
       id: hl-lab-b
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-store-c
       equals: computed
+    changed: false
   - field:
       id: hl-store-c
       name: net_load_w
-      equals: 2524
+      equals: 2354
+    changed: false
   - field:
       id: hl-store-c
       name: design_load_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_kw
       equals: 3
+    changed: false
   - field:
       id: hl-store-c
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-medical-d
       equals: computed
+    changed: false
   - field:
       id: hl-medical-d
       name: net_load_w
-      equals: 7740
+      equals: 8775
+    changed: false
   - field:
       id: hl-medical-d
       name: design_load_kw
-      equals: 10.5
+      equals: 12
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_kw
       equals: 12.5
+    changed: false
   - field:
       id: hl-medical-d
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-plant-e
       equals: computed
+    changed: false
   - field:
       id: hl-plant-e
       name: net_load_w
-      equals: 3185
+      equals: 3441
+    changed: false
   - field:
       id: hl-plant-e
       name: design_load_kw
-      equals: 4.5
+      equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_kw
       equals: 5
+    changed: false
   - field:
       id: hl-plant-e
       name: heater_units
       equals: 2
+    changed: false
   - status:
       id: hl-living-f
       equals: computed
+    changed: false
   - field:
       id: hl-living-f
       name: net_load_w
-      equals: 3151
+      equals: 3093
+    changed: true
   - field:
       id: hl-living-f
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-living-f
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-lab-g
       equals: computed
+    changed: false
   - field:
       id: hl-lab-g
       name: net_load_w
-      equals: 3191
+      equals: 3112
+    changed: false
   - field:
       id: hl-lab-g
       name: design_load_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_kw
       equals: 4
+    changed: false
   - field:
       id: hl-lab-g
       name: heater_units
       equals: 1
+    changed: false
   - status:
       id: hl-store-h
       equals: computed
+    changed: true
   - field:
       id: hl-store-h
       name: net_load_w
       equals: 1330
+    changed: true
   - field:
       id: hl-store-h
       name: design_load_kw
       equals: 1.5
+    changed: true
   - field:
       id: hl-store-h
       name: heater_kw
       equals: 1.5
+    changed: true
   - field:
       id: hl-store-h
       name: heater_units
       equals: 1
+    changed: true
   - status:
       id: station-budget
       equals: computed
+    changed: false
   - field:
       id: station-budget
       name: total_design_kw
-      equals: 38
+      equals: 41
+    changed: true
   - field:
       id: station-budget
       name: installed_kw
-      equals: 59
+      equals: 60.5
+    changed: true
   - field:
       id: station-budget
       name: fuel_l_per_day
-      equals: 88
+      equals: 95
+    changed: true
   - field:
       id: station-budget
       name: reserve_days
       equals: 60
+    changed: false
   - field:
       id: station-budget
       name: tank_count
       equals: 6
+    changed: false
+  - thing_exists: mod-store-h
+    changed: true
+  - validates_clean: true
+    changed: false
+  - git_commits:
+      path: .
+      min: 7
+    changed: true

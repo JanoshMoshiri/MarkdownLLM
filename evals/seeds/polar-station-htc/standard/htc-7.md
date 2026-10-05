@@ -41,9 +41,15 @@ heat to outdoor air.
 
 - Inside surface resistance R_si = 0.13.
 - Outside surface resistance R_se = 0.04, except **0.02** for elements marked
-  windward. R_se applies to every external element, including floors.
+  windward. R_se applies to every external element. **Every floor is an
+  external element**, whether raised or ice-coupled: an ice-coupled floor
+  takes R_se = 0.04 on its ice face, and only its ΔT differs (§7).
 - **Party walls** have an inside surface on both faces: use R_si on each face
   (0.13 + 0.13) and no R_se.
+
+**Precision.** Carry every intermediate value unrounded. Round only where this
+code says to: the U-value (§5), the net load (§10), the design load (§12), the
+fuel per day (§14) and the tank count (§15).
 
 ## §4 Material conductivities (W/m·K)
 
@@ -72,12 +78,14 @@ Glazing U-values are fixed (W/m²K) and are not rounded further:
 | TG-3 | 0.62 |
 | QG-4 | 0.41 |
 
-**Glazing cap.** For each module, take its external wall area: the area of its
-external walls plus the area of its glazing (party walls do not count). If the
-module's total glazing area exceeds 15% of that external wall area, the excess
-glazing area is charged at **1.5 times** its loss. Equivalently: glazing loss =
-U × (A_glazing + 0.5 × excess) × ΔT, where excess = A_glazing − 0.15 × external wall area
-(never less than zero).
+**Glazing cap.** For each module, define its **gross external wall area** as the
+area of its external walls **plus** the area of its glazing (party walls do not
+count). If the module's total glazing area exceeds 15% of that gross external
+wall area, the excess glazing area is charged at **1.5 times** its loss.
+Equivalently: glazing loss = U × (A_glazing + 0.5 × excess) × ΔT, where
+excess = A_glazing − 0.15 × gross external wall area (never less than zero).
+Worked check: 15 m² of glazing on 74 m² of external walls gives a gross
+external wall area of 89 m², a cap of 13.35 m², and an excess of 1.65 m².
 
 ## §7 Element loss
 
@@ -146,5 +154,5 @@ of that rating. All other modules get one unit.
 ## §15 Fuel reserve
 
 The station must hold its site class's fuel reserve (§2) in days of heating fuel.
-Tanks hold 1000 litres each. Tank count = (fuel per day × reserve days) ÷ 1000,
+Tanks hold 1100 litres each. Tank count = (fuel per day × reserve days) ÷ 1100,
 **rounded up** to a whole tank.

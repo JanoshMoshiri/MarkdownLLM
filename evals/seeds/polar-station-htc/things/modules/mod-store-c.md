@@ -6,8 +6,8 @@ created: '2026-01-15'
 title: Store C
 use: store
 occupants: 0
-equipment_w: 300
-volume_m3: 300
+equipment_w: 250
+volume_m3: 263
 hrv_class: none
 elements:
 - name: north wall
@@ -33,7 +33,7 @@ elements:
 - name: roof
   kind: roof
   assembly: asm-roof-std
-  area_m2: 40
+  area_m2: 38
 - name: floor
   kind: floor
   assembly: asm-floor-ice

@@ -7,7 +7,7 @@ title: Lab G
 use: lab
 occupants: 2
 equipment_w: 3400
-volume_m3: 325
+volume_m3: 315
 hrv_class: H3
 hrv_commissioned: '2026-05-20'
 elements:
@@ -24,7 +24,7 @@ elements:
 - name: east wall
   kind: wall
   assembly: asm-wall-std
-  area_m2: 14
+  area_m2: 13
   windward: false
 - name: west wall
   kind: wall
@@ -34,7 +34,7 @@ elements:
 - name: roof
   kind: roof
   assembly: asm-roof-std
-  area_m2: 42
+  area_m2: 40
 - name: floor
   kind: floor
   assembly: asm-floor-raised

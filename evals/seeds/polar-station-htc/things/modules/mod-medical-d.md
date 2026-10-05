@@ -7,7 +7,7 @@ title: Medical D
 use: medical
 occupants: 2
 equipment_w: 1800
-volume_m3: 225
+volume_m3: 263
 hrv_class: H3
 hrv_commissioned: '2025-12-01'
 elements:
@@ -19,7 +19,7 @@ elements:
 - name: east wall
   kind: wall
   assembly: asm-wall-std
-  area_m2: 12
+  area_m2: 10
   windward: false
 - name: south wall
   kind: wall
@@ -34,7 +34,7 @@ elements:
 - name: roof
   kind: roof
   assembly: asm-roof-std
-  area_m2: 32
+  area_m2: 33
 - name: floor
   kind: floor
   assembly: asm-floor-ice

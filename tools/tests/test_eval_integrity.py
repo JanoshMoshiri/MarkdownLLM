@@ -195,3 +195,70 @@ def test_seed_fingerprint_does_not_consult_git(tmp_path):
     assert after_git_dir != before, (
         "files under the seed are hashed wholesale; this documents that a .git "
         "directory inside a seed would itself count as content")
+
+
+# ---- 2026-10-05 cold-review controls -----------------------------------------
+# The framework arm used to be granted the whole checkout — including evals/,
+# every fixture's expected figures. It now gets a pruned view; the view, the
+# transcript and the assertion tags each carry a guard.
+
+from markdownllm.evals import (  # noqa: E402
+    FRAMEWORK_VIEW_INCLUDE,
+    _answer_key_hits,
+    build_framework_view,
+    check_assertions_detailed,
+)
+
+
+def test_framework_view_never_contains_the_answer_key(tmp_path, monkeypatch):
+    root = tmp_path / "fw"
+    (root / "evals").mkdir(parents=True)
+    (root / "evals" / "x-longitudinal.yaml").write_text("answers", encoding="utf-8")
+    (root / "things").mkdir()
+    (root / "things" / "secret.md").write_text("x", encoding="utf-8")
+    (root / "kernel.md").write_text("rules", encoding="utf-8")
+    (root / "tools" / "markdownllm" / "tests").mkdir(parents=True)
+    (root / "tools" / "markdownllm" / "evals.py").write_text("code", encoding="utf-8")
+    (root / "tools" / "markdownllm" / "tests" / "t.py").write_text("test", encoding="utf-8")
+    monkeypatch.delenv("MDLLM_EVAL_FRAMEWORK_DIR", raising=False)
+    view = build_framework_view(root, tmp_path / "runs")
+    assert (view / "kernel.md").read_text(encoding="utf-8") == "rules"
+    assert (view / "tools" / "markdownllm" / "evals.py").is_file()
+    assert not (view / "evals").exists()
+    assert not (view / "things").exists()
+    assert not (view / "tools" / "markdownllm" / "tests").exists()
+    assert "evals" not in FRAMEWORK_VIEW_INCLUDE
+
+
+def test_prepared_framework_view_with_evals_is_refused(tmp_path, monkeypatch):
+    prepared = tmp_path / "prepared"
+    (prepared / "evals").mkdir(parents=True)
+    monkeypatch.setenv("MDLLM_EVAL_FRAMEWORK_DIR", str(prepared))
+    with pytest.raises(SystemExit):
+        build_framework_view(tmp_path / "fw", tmp_path / "runs")
+
+
+def test_answer_key_references_in_a_transcript_are_detected():
+    assert _answer_key_hits("read C:/x/evals/polar-station-longitudinal.yaml")
+    assert _answer_key_hits("python evals/generators/polar_station_htc.py")
+    assert _answer_key_hits("cat things/station-budget.md") == []
+
+
+def test_assertions_carry_their_changed_tag_and_count_things_of_type(tmp_path):
+    things = tmp_path / "things"
+    things.mkdir()
+    (things / "a.md").write_text(_thing("id: a\ntype: conflict\nstatus: open\ncreated: 2026-01-01"),
+                                 encoding="utf-8")
+    fixture = load_yaml(
+        "assertions:\n"
+        "  - things_of_type: {type: conflict, min: 1}\n"
+        "    changed: true\n"
+        "  - things_of_type: {type: decision, min: 1}\n"
+        "    changed: false\n"
+        "  - thing_exists: a\n")
+    records = check_assertions_detailed(fixture, tmp_path)
+    assert [(r["passed"], r["changed"]) for r in records] == [
+        (True, True), (False, False), (True, None)]
+    assert "[changed]" in records[0]["line"] and "[unchanged]" in records[1]["line"]
+    passed, failed, lines = check_assertions(fixture, tmp_path)
+    assert (passed, failed) == (2, 1) and len(lines) == 3

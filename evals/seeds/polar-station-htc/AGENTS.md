@@ -60,11 +60,10 @@ Output contract, which the station's reporting reads:
 - **Requests that contradict the code are not applied.** Record the request and
   the clause it conflicts with as a `type: conflict` thing in `things/conflicts/`,
   leave the figures as the code requires, and say so.
-- **Arithmetic is mechanical.** Compute figures with a script or with the
-  framework's `mdllm calc` (`python <framework>/tools/mdllm.py calc --expr "..."`),
-  never in your head. Where a station total is a plain sum, declare it with
-  `computed:` (for example `total_design_kw: 'sum(things(type="heat-load").design_load_kw)'`)
+- **Arithmetic is mechanical.** Compute figures with a script, never in your
+  head. Where a station total is a plain sum, declare it with `computed:` (for
+  example `total_design_kw: 'sum(things(type="heat-load").design_load_kw)'`)
   and check it with `python <framework>/tools/mdllm.py calc .`.
 - **Validate before you commit:** `python <framework>/tools/mdllm.py validate .`.
 - **Commit as you go**, with `action: description` messages (`compute: hl-living-a`,
-  `revise: HTC-7 Rev B → lab-b, living-f`).
+  `revise: HTC-7 Rev B → lab-b, living-f`). Nothing uncommitted survives a session.

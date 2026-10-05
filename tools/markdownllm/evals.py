@@ -130,6 +130,85 @@ def _eval_run_dir(root: Path, run_id: str) -> Path:
         "set MDLLM_EVAL_RUN_ROOT to an isolated directory")
 
 
+CONDITIONS = ("framework", "bare", "bare-coached")
+
+# What the framework arm is allowed to see of the framework checkout. The
+# full root contains evals/ — every fixture's expected figures and the
+# generators that print them — so granting it was granting the answer key
+# (cold review, 2026-10-05). The view carries the operating layer only.
+FRAMEWORK_VIEW_INCLUDE = (
+    ".markdownllm", "AGENTS.md", "CLAUDE.md", "kernel.md",
+    "thing.md", "orchestration.md", "read.thing.md", "write.thing.md",
+    "validate.thing.md", "git-workflow.md", "provenance.md",
+    "change-reconciliation.md", "trigger-specification.md",
+    "docs/calculation-reference.md",
+    "tools/mdllm.py", "tools/mdllm.ps1", "tools/markdownllm",
+)
+FRAMEWORK_VIEW_EXCLUDE_DIRS = ("__pycache__", "tests")
+ANSWER_KEY_PATTERNS = (r"evals[\\/]", r"polar_station_htc", r"-longitudinal\.yaml",
+                       r"sleeping-bag-fac\.yaml", r"vat-quarter-basic\.yaml")
+
+
+def _tree_fingerprint(base: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(p for p in base.rglob("*") if p.is_file()):
+        if any(part in FRAMEWORK_VIEW_EXCLUDE_DIRS for part in path.relative_to(base).parts):
+            continue
+        digest.update(path.relative_to(base).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def build_framework_view(root: Path, run_root: Path) -> Path:
+    """Materialise the pruned framework the framework arm is granted.
+
+    `MDLLM_EVAL_FRAMEWORK_DIR` names a prepared view instead. The view is
+    rebuilt per command invocation and shared read-only by its trials; its
+    fingerprint is checked after every trial (the same guard the seed has).
+    """
+    import shutil
+    override = os.environ.get("MDLLM_EVAL_FRAMEWORK_DIR")
+    if override:
+        view = Path(override).resolve()
+        if not view.is_dir():
+            sys.exit(f"mdllm: MDLLM_EVAL_FRAMEWORK_DIR is not a directory: {view}")
+        if (view / "evals").exists():
+            sys.exit("mdllm: MDLLM_EVAL_FRAMEWORK_DIR contains evals/ — that is "
+                     "the answer key; prune it")
+        return view
+    view = run_root / f"framework-view-{uuid.uuid4().hex[:8]}"
+    view.mkdir(parents=True)
+    for rel in FRAMEWORK_VIEW_INCLUDE:
+        src = root / rel
+        dst = view / rel
+        if src.is_dir():
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
+                *FRAMEWORK_VIEW_EXCLUDE_DIRS))
+        elif src.is_file():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+    return view
+
+
+def _answer_key_hits(text: str) -> list[str]:
+    return sorted({m.group(0) for pat in ANSWER_KEY_PATTERNS
+                   for m in re.finditer(pat, text or "")})
+
+
+def _git_dirty(run_dir: Path) -> bool:
+    out = subprocess.run(["git", "status", "--porcelain"], cwd=run_dir,
+                         capture_output=True, text=True, encoding="utf-8")
+    return bool(out.stdout.strip())
+
+
+def _reset_to_committed(run_dir: Path) -> None:
+    """Committed state is the carrier between sessions, by construction."""
+    subprocess.run(["git", "reset", "-q", "--hard"], cwd=run_dir, check=True)
+    subprocess.run(["git", "clean", "-fdq"], cwd=run_dir, check=True)
+
+
 def _seed_fingerprint(seed: Path) -> str:
     """One digest over the seed tree's bytes — the run's input identity.
 
@@ -152,7 +231,18 @@ def _results_exit_code(results: list[dict]) -> int:
     return 1 if any(r.get("failed", 0) for r in results) else 0
 
 def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[str]]:
-    """Stage 1: deterministic assertions against a domain's current state.
+    """Stage 1: deterministic assertions against a domain's current state."""
+    records = check_assertions_detailed(fixture, domain_root)
+    passed = sum(1 for r in records if r["passed"])
+    return passed, len(records) - passed, [r["line"] for r in records]
+
+
+def check_assertions_detailed(fixture: dict, domain_root: Path) -> list[dict]:
+    """One record per assertion: {label, passed, changed, line}.
+
+    `changed` is the fixture's tag (a longitudinal generator marks whether
+    the asserted value moved since the previous session); a do-nothing agent
+    passes every unchanged assertion, so only the changed set discriminates.
 
     `domain_root` is the workspace; if the fixture declares `domain_dir`
     (scaffold-style fixtures, where the agent *creates* the domain in a
@@ -162,16 +252,23 @@ def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[s
     droot = (ws / fixture["domain_dir"]) if fixture.get("domain_dir") else ws
     corpus, _ = scan(droot) if droot.is_dir() else (Corpus(root=droot), [])
     by_id = corpus.by_id()
-    passed = failed = 0
-    lines: list[str] = []
+    records: list[dict] = []
+    current: dict | None = None
 
     def report(ok: bool, label: str):
-        nonlocal passed, failed
-        passed, failed = passed + ok, failed + (not ok)
-        lines.append(f"  {'PASS' if ok else 'FAIL'}  {label}")
+        changed = current.get("changed") if isinstance(current, dict) else None
+        tag = "" if changed is None else (" [changed]" if changed else " [unchanged]")
+        records.append({"label": label, "passed": bool(ok), "changed": changed,
+                        "line": f"  {'PASS' if ok else 'FAIL'}  {label}{tag}"})
 
     for a in fixture.get("assertions") or []:
-        if "thing_exists" in a:
+        current = a
+        if "things_of_type" in a:
+            tt = a["things_of_type"]
+            n = sum(1 for t in corpus.things if str(t.meta.get("type")) == tt["type"])
+            report(n >= tt.get("min", 1),
+                   f"things of type {tt['type']}: {n} (need >= {tt.get('min', 1)})")
+        elif "thing_exists" in a:
             tid = a["thing_exists"]
             report(tid in by_id, f"thing exists: {tid}")
         elif "status" in a:
@@ -239,11 +336,15 @@ def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[s
                    f"things in domain >= {a['min_things']} (actual: {len(corpus.things)})")
         else:
             report(False, f"unknown assertion: {a}")
-    return passed, failed, lines
+    return records
 
 
-def seed_run_dir(root: Path, fixture: dict, run_dir: Path, bare: bool) -> None:
-    """Stage 2 workspace: copy the seed into an isolated git repo."""
+def seed_run_dir(root: Path, fixture: dict, run_dir: Path, bare: bool,
+                 framework_view: Path | None = None) -> None:
+    """Stage 2 workspace: copy the seed into an isolated git repo.
+
+    `bare` is true for both no-framework conditions (bare, bare-coached) —
+    what differs between them is the prompt preamble, not the tree."""
     import shutil
     seed = root / fixture["seed"]
     if not seed.is_dir():
@@ -258,6 +359,18 @@ def seed_run_dir(root: Path, fixture: dict, run_dir: Path, bare: bool) -> None:
         skills = run_dir / "skills"
         if skills.is_dir():
             shutil.rmtree(skills)
+    elif framework_view is not None:
+        # The seed's relative framework_root pointed at the source checkout;
+        # in the isolated workspace it resolves to nothing. Point it at the
+        # granted view so the agent does not spend turns hunting.
+        agents = run_dir / "AGENTS.md"
+        if agents.is_file():
+            text = agents.read_text(encoding="utf-8")
+            new = re.sub(r"^framework_root:.*$",
+                         f"framework_root: {framework_view.as_posix()}",
+                         text, count=1, flags=re.M)
+            if new != text:
+                agents.write_text(new, encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=run_dir, check=True)
     subprocess.run(["git", "add", "-A"], cwd=run_dir, check=True)
     subprocess.run(["git", "commit", "-q", "-m", "seed"], cwd=run_dir, check=True)
@@ -281,28 +394,62 @@ def eval_report(root: Path) -> int:
     if not results:
         print(f"No run results under {runs_dir}")
         return 1
-    cells: dict[tuple[str, str, str], list[dict]] = {}
+    cells: dict[tuple[str, str, str, str], list[dict]] = {}
     for r in results:
         # Legacy runs predate the fixture tag (the 2026-06-11 2x2 was all one
         # fixture); group them under their known name rather than "?".
         fx = str(r.get("fixture", "VAT quarter prep (synthetic, known-correct figures)"))
-        cells.setdefault((fx, str(r.get("model")), str(r.get("condition"))), []).append(r)
+        # A regenerated fixture is a different fixture: group by its bytes.
+        sha = str(r.get("fixture_sha256") or "legacy")[:8]
+        cells.setdefault((fx, sha, str(r.get("model")), str(r.get("condition"))),
+                         []).append(r)
     print(f"## Eval Report — {len(results)} trials, {len(cells)} cells\n")
-    print("| fixture | model | condition | trials | fully passing | assertion pass rate "
-          "| mean wall s | mean cost $ |")
-    print("|---|---|---|---|---|---|---|---|")
-    for (fx, model, cond), rs in sorted(cells.items()):
-        full = sum(1 for r in rs if r.get("failed") == 0)
+    print("| fixture | fixture sha | model | condition | trials | fully passing | "
+          "assertion pass rate | changed-set pass rate | voided | mean wall s | mean cost $ |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|")
+    for (fx, sha, model, cond), rs in sorted(cells.items()):
+        full = sum(1 for r in rs if r.get("failed") == 0 and not r.get("voided"))
+        voided = sum(1 for r in rs if r.get("voided"))
         p = sum(r.get("passed", 0) for r in rs)
         f_ = sum(r.get("failed", 0) for r in rs)
         rate = f"{p}/{p + f_} ({p / (p + f_):.0%})" if p + f_ else "—"
+        cp = sum((s.get("changed") or {}).get("passed", 0)
+                 for r in rs for s in r.get("sessions") or [])
+        ct = sum((s.get("changed") or {}).get("total", 0)
+                 for r in rs for s in r.get("sessions") or [])
+        crate = f"{cp}/{ct} ({cp / ct:.0%})" if ct else "—"
         walls = [r["wall_s"] for r in rs if r.get("wall_s") is not None]
         costs = [r["cost_usd"] for r in rs if r.get("cost_usd") is not None]
         mw = f"{sum(walls) / len(walls):.0f}" if walls else "—"
         mc = f"{sum(costs) / len(costs):.3f}" if costs else "—"
         fx_short = fx if len(fx) <= 40 else fx[:37] + "..."
-        print(f"| {fx_short} | {model} | {cond} | {len(rs)} | {full}/{len(rs)} | {rate} "
-              f"| {mw} | {mc} |")
+        print(f"| {fx_short} | {sha} | {model} | {cond} | {len(rs)} | {full}/{len(rs)} "
+              f"| {rate} | {crate} | {voided} | {mw} | {mc} |")
+    # Per-session view for longitudinal cells: where in the chain drift enters
+    # is the finding, and the aggregate cannot show it.
+    longi = {k: rs for k, rs in cells.items() if any(r.get("sessions") for r in rs)}
+    if longi:
+        print("\n### Per session (longitudinal cells)\n")
+        print("| fixture sha | model | condition | session | trials passing | "
+              "changed-set | unchanged-set | left uncommitted |")
+        print("|---|---|---|---|---|---|---|---|")
+        for (fx, sha, model, cond), rs in sorted(longi.items()):
+            names: list[str] = []
+            for r in rs:
+                for s in r.get("sessions") or []:
+                    if s["name"] not in names:
+                        names.append(s["name"])
+            for sn in names:
+                ss = [s for r in rs for s in r.get("sessions") or [] if s["name"] == sn]
+                sp = sum(1 for s in ss if s.get("failed") == 0)
+                cp = sum((s.get("changed") or {}).get("passed", 0) for s in ss)
+                ct = sum((s.get("changed") or {}).get("total", 0) for s in ss)
+                up = sum((s.get("unchanged") or {}).get("passed", 0) for s in ss)
+                ut = sum((s.get("unchanged") or {}).get("total", 0) for s in ss)
+                dirty = sum(1 for s in ss if s.get("uncommitted_at_end"))
+                print(f"| {sha} | {model} | {cond} | {sn} | {sp}/{len(ss)} | "
+                      f"{f'{cp}/{ct}' if ct else '—'} | {f'{up}/{ut}' if ut else '—'} "
+                      f"| {dirty} |")
     return 0
 
 
@@ -407,6 +554,16 @@ def cmd_eval(args) -> int:
     bare_preamble = fixture.get("bare_preamble",
                                 "You are in a directory of markdown files with YAML "
                                 "frontmatter representing business records.")
+    condition = args.condition or ("bare" if getattr(args, "bare", False) else "framework")
+    if condition not in CONDITIONS:
+        sys.exit(f"mdllm: unknown condition {condition!r}")
+    is_bare = condition != "framework"
+    if condition == "bare-coached":
+        coached = fixture.get("coached_preamble")
+        if not coached:
+            sys.exit("mdllm: --condition bare-coached needs `coached_preamble` in "
+                     "the fixture (the seed's domain guidance as plain prompt text)")
+        bare_preamble = coached
     results = []
     claude_exe: str | None = None
     harness_build = "not executed (dry run)"
@@ -439,9 +596,24 @@ def cmd_eval(args) -> int:
     seed_before = (_seed_fingerprint(seed_dir)
                    if seed_dir and seed_dir.is_dir() else None)
 
+    # The framework arm is granted a pruned VIEW of the checkout, never the
+    # root: the root holds evals/ (expected figures, generators) — the answer
+    # key. The view is fingerprinted like the seed and checked after every
+    # trial, because --add-dir plus Bash(git:*) can write into it.
+    framework_view: Path | None = None
+    view_before: str | None = None
+    if not is_bare and not args.dry_run:
+        try:
+            run_root = _eval_run_dir(root, "x").parent
+        except ValueError as exc:
+            sys.exit(f"mdllm: {exc}")
+        run_root.mkdir(parents=True, exist_ok=True)
+        framework_view = build_framework_view(root, run_root)
+        view_before = _tree_fingerprint(framework_view)
+
+    condition_tag = {"framework": "fw", "bare": "bare", "bare-coached": "coached"}[condition]
     for trial in range(1, args.trials + 1):
-        condition = "bare" if args.bare else "fw"
-        run_id = _run_id(args.model, condition, trial)
+        run_id = _run_id(args.model, condition_tag, trial)
         # Isolation means outside the source repository, not merely under an
         # ignored folder.  The 2026-07 longitudinal run proved that an agent in
         # evals/runs can walk upward and edit the canonical seed.  Operators may
@@ -451,17 +623,19 @@ def cmd_eval(args) -> int:
         except ValueError as exc:
             sys.exit(f"mdllm: {exc}")
         run_dir.parent.mkdir(parents=True, exist_ok=True)
-        seed_run_dir(root, fixture, run_dir, args.bare)
+        seed_run_dir(root, fixture, run_dir, is_bare, framework_view)
         print(f"## Trial {trial}/{args.trials} — {run_id}"
               + (f" ({len(sessions)} sessions)" if len(sessions) > 1 else ""))
         t_passed = t_failed = 0
         sess_records: list[dict] = []
         aborted = False
         abort_reason: str | None = None
+        voided: str | None = None
+        models_observed: set[str] = set()
         for si, sess in enumerate(sessions, 1):
             sname = str(sess.get("name", f"s{si}"))
             prompt = sess["prompt"]
-            if args.bare:
+            if is_bare:
                 prompt = bare_preamble + "\n\n" + prompt
             # Per-session assertion view; file/git assertions stay
             # workspace-relative via the fixture's domain_dir, same as Stage 1.
@@ -472,15 +646,20 @@ def cmd_eval(args) -> int:
                    "--output-format", "json", "--permission-mode", "acceptEdits",
                    "--allowedTools", fixture.get("allowed_tools",
                                                  "Edit Write Read Glob Grep Bash(git:*)")]
-            if not args.bare:
-                # The seed's framework_root resolves to the framework checkout;
-                # the bare condition must NOT see it — that's the control.
-                cmd += ["--add-dir", str(root)]
+            if not is_bare:
+                # The framework condition is defined by this grant; the bare
+                # conditions must NOT see it — that's the control.
+                cmd += ["--add-dir", str(framework_view or "<framework-view>")]
             if args.dry_run:
                 print(f"  [{sname}] workspace: {run_dir}")
                 print(f"  [{sname}] would run (cwd=workspace): {' '.join(cmd[:2])} "
                       f"<prompt {len(prompt)} chars> {' '.join(cmd[3:])}")
                 continue
+            if si > 1:
+                # Sessions share one working tree; without this, uncommitted
+                # edits carry as well as committed ones and the "committed
+                # state is the only carrier" claim is untested.
+                _reset_to_committed(run_dir)
             assert claude_exe is not None
             cmd[0] = claude_exe
             t0 = dt.datetime.now()
@@ -533,12 +712,28 @@ def cmd_eval(args) -> int:
                 if isinstance(meta, dict):
                     cost = meta.get("total_cost_usd")
                     turns = meta.get("num_turns")
+                    usage = meta.get("modelUsage")
+                    if isinstance(usage, dict):
+                        models_observed.update(str(k) for k in usage)
             except (ValueError, TypeError):
                 meta = None
             agent_failure = _agent_failure(proc, meta)
             if agent_failure:
                 print(f"  [{sname}] AGENT FAILURE: {agent_failure}")
-            passed, failed, lines = check_assertions(sfx, run_dir)
+            key_hits = _answer_key_hits((proc.stdout or "") + (proc.stderr or ""))
+            if key_hits and not voided:
+                voided = f"answer-key reference in session {sname}: {key_hits}"
+                print(f"  [{sname}] VOIDED — {voided}")
+            uncommitted = _git_dirty(run_dir)
+            records = check_assertions_detailed(sfx, run_dir)
+            passed = sum(1 for r in records if r["passed"])
+            failed = len(records) - passed
+            lines = [r["line"] for r in records]
+            failures = [r["label"] for r in records if not r["passed"]]
+            changed = {"passed": sum(1 for r in records if r["changed"] is True and r["passed"]),
+                       "total": sum(1 for r in records if r["changed"] is True)}
+            unchanged = {"passed": sum(1 for r in records if r["changed"] is False and r["passed"]),
+                         "total": sum(1 for r in records if r["changed"] is False)}
             assertion_result = {"passed": passed, "failed": failed}
             validation_root = ((run_dir / fixture["domain_dir"])
                                if fixture.get("domain_dir") else run_dir)
@@ -555,8 +750,10 @@ def cmd_eval(args) -> int:
             if len(sessions) > 1:
                 print(f"  --- session {si}/{len(sessions)}: {sname} ---")
             print("\n".join(lines))
-            print(f"  [{sname}] {passed}/{passed + failed} · {wall:.0f}s "
-                  f"· cost {cost} · turns {turns}")
+            print(f"  [{sname}] {passed}/{passed + failed}"
+                  + (f" · changed {changed['passed']}/{changed['total']}" if changed["total"] else "")
+                  + f" · {wall:.0f}s · cost {cost} · turns {turns}"
+                  + (" · LEFT UNCOMMITTED" if uncommitted else ""))
             t_passed += passed
             t_failed += failed
             sess_records.append({"name": sname, "passed": passed, "failed": failed,
@@ -567,7 +764,11 @@ def cmd_eval(args) -> int:
                                  "validation_errors":
                                      validation_summary["errors"],
                                  "validation_summary": validation_summary,
-                                 "assertion_result": assertion_result})
+                                 "assertion_result": assertion_result,
+                                 "failures": failures,
+                                 "changed": changed, "unchanged": unchanged,
+                                 "uncommitted_at_end": uncommitted,
+                                 "answer_key_hits": key_hits})
             if agent_failure:
                 # Later sessions depend on a trustworthy state transition.  Do
                 # not convert a failed invocation into a longitudinal success.
@@ -583,14 +784,27 @@ def cmd_eval(args) -> int:
         if seed_before is not None:
             seed_after = _seed_fingerprint(seed_dir)
             seed_mutated = seed_after != seed_before
+        view_mutated = False
+        if framework_view is not None and view_before is not None:
+            view_mutated = _tree_fingerprint(framework_view) != view_before
+            if view_mutated and not voided:
+                voided = "framework view mutated during the trial"
+        if voided:
+            t_failed += 1
         walls = [s["wall_s"] for s in sess_records if s.get("wall_s") is not None]
         costs = [s["cost_usd"] for s in sess_records if s.get("cost_usd") is not None]
         turns_ = [s["turns"] for s in sess_records if s.get("turns") is not None]
         res = {"run_id": run_id, "fixture": name, "model": args.model,
-               "condition": "bare" if args.bare else "framework",
+               "models_observed": sorted(models_observed),
+               "condition": condition,
                "passed": t_passed, "failed": t_failed,
+               "voided": voided,
                "seed_sha256": seed_before,
                "seed_mutated": seed_mutated,
+               "framework_view": (str(framework_view) if framework_view else None),
+               "framework_view_sha256": view_before,
+               "framework_view_mutated": view_mutated,
+               "framework_root_granted": False,
                "wall_s": sum(walls) if walls else None,
                "cost_usd": round(sum(costs), 6) if costs else None,
                "turns": sum(turns_) if turns_ else None,
@@ -629,8 +843,14 @@ def cmd_eval(args) -> int:
             res["abort_reason"] = abort_reason
             if abort_reason == "timeout":
                 res["timeout"] = True
-        print(f"  trial score {t_passed}/{t_passed + t_failed}\n")
+        print(f"  trial score {t_passed}/{t_passed + t_failed}"
+              + (f" — VOIDED: {voided}" if voided else "") + "\n")
         record(run_id, run_dir, res)
+        if view_mutated:
+            print(f"!!! FRAMEWORK VIEW MUTATED during {run_id} — {framework_view}")
+            print("    The framework arm's granted directory changed under the trial;"
+                  " later trials would be seeded from a moved operating layer. Stopping.")
+            return 1
         if seed_mutated:
             # In 2026-07 this went undetected and every subsequent trial
             # was seeded from the perturbed inputs, voiding a whole arm.
@@ -644,7 +864,8 @@ def cmd_eval(args) -> int:
                   f"{fixture['seed']}`), confirm it is clean, then re-run.")
             return 1
     if results:
-        ok = sum(1 for r in results if r["failed"] == 0)
+        ok = sum(1 for r in results if r["failed"] == 0 and not r.get("voided"))
+        nv = sum(1 for r in results if r.get("voided"))
         print(f"### {name}: {ok}/{len(results)} trials fully passing "
-              f"({args.model}, {'bare' if args.bare else 'framework'})")
+              f"({args.model}, {condition})" + (f", {nv} voided" if nv else ""))
     return _results_exit_code(results)

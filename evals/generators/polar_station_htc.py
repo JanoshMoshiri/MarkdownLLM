@@ -29,7 +29,7 @@ CRIT = {"medical": D("1.35"), "plant": D("1.35"), "living": D("1.20"), "lab": D(
 CRIT_CLASS = {"medical": "A", "plant": "A", "living": "B", "lab": "B", "store": "C"}
 GLAZING_U = {"TG-3": D("0.62"), "QG-4": D("0.41")}
 CATALOGUE = [D(x) for x in ("1.5", "2", "3", "4", "5", "6.5", "8", "10", "12.5", "15", "18", "22")]
-FUEL_KWH_PER_L, BOILER_EFF, TANK_L = D("11.8"), D("0.88"), D(1000)
+FUEL_KWH_PER_L, BOILER_EFF, TANK_L = D("11.8"), D("0.88"), D(1100)
 
 REV_A = {
     "k": {"KX-foam": D("0.021"), "BW-40": D("0.034"), "PS-12": D("0.13"), "AB-6": D("0.015")},
@@ -70,11 +70,24 @@ def heater(d_kw, use):
     return rating, units
 
 
-def compute(state, code, site="P3"):
+MARGIN_MIN = D("0.3")  # watts from the nearest half-watt rounding boundary
+
+
+def net_margin(net_raw):
+    """Distance of an unrounded net load from the nearest x.5 boundary."""
+    frac = abs(net_raw) % 1
+    return abs(frac - D("0.5"))
+
+
+def compute(state, code, site="P3", raw=None, only=None):
+    """`raw`, if a dict, receives each module's unrounded net load; `only`
+    restricts the walk to a set of module ids (tuning only)."""
     asm, mods = state["assemblies"], state["modules"]
     t_out = T_OUT[site]
     out = {}
     for mid, m in mods.items():
+        if only is not None and mid not in only:
+            continue
         t_in = T_IN[m["use"]]
         fabric = D(0)
         ext_wall_area = D(0)
@@ -110,7 +123,10 @@ def compute(state, code, site="P3"):
         vent = D("0.34") * ACH[m["use"]] * D(m["volume_m3"]) * (t_in - t_out) * (1 - hrv_eff(m, code))
         gains = D(90) * D(m["occupants"]) + D(m["equipment_w"])
         credited = D(0) if m["use"] == "medical" else min(gains, D("0.40") * (fabric + vent))
-        net = (fabric + vent - credited).quantize(D(1), rounding=ROUND_HALF_UP)
+        net_raw = fabric + vent - credited
+        if raw is not None:
+            raw[mid] = net_raw
+        net = net_raw.quantize(D(1), rounding=ROUND_HALF_UP)
         d_kw = ceil_half(net * CRIT[m["use"]] / D(1000))
         rating, units = heater(d_kw, m["use"])
         out[mid] = {"net_load_w": int(net), "design_load_kw": d_kw,
@@ -208,6 +224,59 @@ STORE_H = {"title": "Store H", "use": "store", "occupants": 0, "equipment_w": 20
                         R("asm-roof-std", 25), F("asm-floor-ice", 25, True)]}
 
 
+def tune_margins():
+    """Nudge module volumes so no expected net load sits within MARGIN_MIN of a
+    rounding boundary in any session. A correct method that carries one more
+    or one less decimal must not fail; the cold review found 13 figures
+    within 0.3 W, one at 0.012 W. Volume moves the ventilation term for every
+    module, including medical (whose gains are never credited, so equipment
+    cannot tune it). Greedy per module is sound: modules interact only
+    through party-wall temperatures, which volume does not touch."""
+    import random
+    rng = random.Random(7)  # seeded: the tuned seed is reproducible
+    all_mods = list(MODULES) + ["mod-store-h"]
+    for mid in all_mods:
+        target = STORE_H if mid == "mod-store-h" else MODULES[mid]
+        roof = next(el for el in target["elements"] if el["kind"] == "roof")
+        # The docking turns Living F's east wall into a party wall, and that
+        # shift depends on nothing but the east wall's area — a fourth knob.
+        east = next((el for el in target["elements"] if el["name"] == "east wall"), None)
+        v0, e0, a0 = target["volume_m3"], target["equipment_w"], roof["area_m2"]
+        w0 = east["area_m2"] if east else None
+        medical = target["use"] == "medical"
+
+        def apply(v, e, a, w):
+            target["volume_m3"], target["equipment_w"], roof["area_m2"] = v, e, a
+            if east:
+                east["area_m2"] = w
+
+        best = (v0, e0, a0, w0)
+        best_margin = min(_margins_for(mid))
+        tries = 0
+        while best_margin < MARGIN_MIN and tries < 4000:
+            tries += 1
+            cand = (max(10, v0 + rng.randint(-40, 40)),
+                    e0 if medical else max(0, e0 + 10 * rng.randint(-6, 6)),
+                    max(5, a0 + rng.randint(-5, 5)),
+                    (max(5, w0 + rng.randint(-4, 4)) if east else None))
+            apply(*cand)
+            m = min(_margins_for(mid))
+            if m > best_margin:
+                best, best_margin = cand, m
+        apply(*best)
+        assert best_margin >= MARGIN_MIN, (mid, best_margin, tries)
+
+
+def _margins_for(mid):
+    out = []
+    for _, state, code in sessions_states():
+        raw = {}
+        compute(state, code, raw=raw, only={mid})
+        if mid in raw:
+            out.append(net_margin(raw[mid]))
+    return out
+
+
 def sessions_states():
     """The station and the code as they stand after each session."""
     state = {"assemblies": copy.deepcopy(ASSEMBLIES), "modules": copy.deepcopy(MODULES)}
@@ -289,9 +358,15 @@ heat to outdoor air.
 
 - Inside surface resistance R_si = 0.13.
 - Outside surface resistance R_se = 0.04, except **0.02** for elements marked
-  windward. R_se applies to every external element, including floors.
+  windward. R_se applies to every external element. **Every floor is an
+  external element**, whether raised or ice-coupled: an ice-coupled floor
+  takes R_se = 0.04 on its ice face, and only its ΔT differs (§7).
 - **Party walls** have an inside surface on both faces: use R_si on each face
   (0.13 + 0.13) and no R_se.
+
+**Precision.** Carry every intermediate value unrounded. Round only where this
+code says to: the U-value (§5), the net load (§10), the design load (§12), the
+fuel per day (§14) and the tank count (§15).
 
 ## §4 Material conductivities (W/m·K)
 
@@ -316,12 +391,14 @@ Glazing U-values are fixed (W/m²K) and are not rounded further:
 |---|---|
 {glz}
 
-**Glazing cap.** For each module, take its external wall area: the area of its
-external walls plus the area of its glazing (party walls do not count). If the
-module's total glazing area exceeds 15% of that external wall area, the excess
-glazing area is charged at **1.5 times** its loss. Equivalently: glazing loss =
-U × (A_glazing + 0.5 × excess) × ΔT, where excess = A_glazing − 0.15 × external wall area
-(never less than zero).
+**Glazing cap.** For each module, define its **gross external wall area** as the
+area of its external walls **plus** the area of its glazing (party walls do not
+count). If the module's total glazing area exceeds 15% of that gross external
+wall area, the excess glazing area is charged at **1.5 times** its loss.
+Equivalently: glazing loss = U × (A_glazing + 0.5 × excess) × ΔT, where
+excess = A_glazing − 0.15 × gross external wall area (never less than zero).
+Worked check: 15 m² of glazing on 74 m² of external walls gives a gross
+external wall area of 89 m², a cap of 13.35 m², and an excess of 1.65 m².
 
 ## §7 Element loss
 
@@ -388,7 +465,7 @@ of that rating. All other modules get one unit.
 ## §15 Fuel reserve
 
 The station must hold its site class's fuel reserve (§2) in days of heating fuel.
-Tanks hold 1000 litres each. Tank count = (fuel per day × reserve days) ÷ 1000,
+Tanks hold 1100 litres each. Tank count = (fuel per day × reserve days) ÷ 1100,
 **rounded up** to a whole tank.
 """
 
@@ -444,7 +521,21 @@ declared in `things/_schema.yaml`.
 
 ## How This Domain Works
 
-- **The code is the authority.** Every figure follows `standard/htc-7.md` exactly,
+{GUIDANCE}
+- **Arithmetic is mechanical.** Compute figures with a script, never in your
+  head. Where a station total is a plain sum, declare it with `computed:` (for
+  example `total_design_kw: 'sum(things(type="heat-load").design_load_kw)'`)
+  and check it with `python <framework>/tools/mdllm.py calc .`.
+- **Validate before you commit:** `python <framework>/tools/mdllm.py validate .`.
+- **Commit as you go**, with `action: description` messages (`compute: hl-living-a`,
+  `revise: HTC-7 Rev B → lab-b, living-f`). Nothing uncommitted survives a session.
+"""
+
+
+# The domain guidance. The framework arm gets it in AGENTS.md; the
+# bare-coached arm gets the same words as prompt text with no schema, kernel
+# or tool behind them — the hint-matched control the cold review asked for.
+GUIDANCE = """- **The code is the authority.** Every figure follows `standard/htc-7.md` exactly,
   clause by clause. Show the clause you applied at each step in the working.
 - **Changes to the code are recorded, then reconciled.** When the Board issues a
   revision or an erratum, record it as a `code-change` thing in
@@ -458,16 +549,7 @@ declared in `things/_schema.yaml`.
   other modules still use.
 - **Requests that contradict the code are not applied.** Record the request and
   the clause it conflicts with as a `type: conflict` thing in `things/conflicts/`,
-  leave the figures as the code requires, and say so.
-- **Arithmetic is mechanical.** Compute figures with a script or with the
-  framework's `mdllm calc` (`python <framework>/tools/mdllm.py calc --expr "..."`),
-  never in your head. Where a station total is a plain sum, declare it with
-  `computed:` (for example `total_design_kw: 'sum(things(type="heat-load").design_load_kw)'`)
-  and check it with `python <framework>/tools/mdllm.py calc .`.
-- **Validate before you commit:** `python <framework>/tools/mdllm.py validate .`.
-- **Commit as you go**, with `action: description` messages (`compute: hl-living-a`,
-  `revise: HTC-7 Rev B → lab-b, living-f`).
-"""
+  leave the figures as the code requires, and say so."""
 
 
 SCHEMA = """# Normative schema — Skarvbreen Station (synthetic eval domain)
@@ -502,7 +584,10 @@ relations:
 
 BARE_PREAMBLE = ("You are in a directory of records for a fictional polar research station.\n\n"
                  + CONTRACT + "\n\nKeep the records correct as the station and the code change. "
-                 "Commit your changes with git as you go.")
+                 "Compute figures with a script, never in your head. "
+                 "Commit your changes with git as you go; nothing uncommitted survives a session.")
+
+COACHED_PREAMBLE = BARE_PREAMBLE + "\n\nHow these records are kept:\n\n" + GUIDANCE
 
 
 def thing(meta, body):
@@ -579,11 +664,21 @@ PROMPTS = {
                "wool was misprinted. The correct value is 0.037 W/m·K, not 0.034. The erratum is retroactive: it "
                "applies to every calculation made under the code, past and present. Bring the station fully in "
                "line. Commit your changes as you go.",
-    "dock": "A new module, Store H, has been docked onto the east face of Living F. Store H's west wall is a "
-            "party wall (construction asm-party, 16 m²) shared with Living F, and it replaces Living F's east "
-            "external wall. Store H: " + store_h_sentence() + " Add Store H to the station, assess it, and bring "
-            "the station fully up to date. Commit your changes as you go.",
 }
+
+
+def prompts():
+    """Built after tuning: the dock prompt reads the tuned east-wall area."""
+    east = next(el for el in MODULES["mod-living-f"]["elements"] if el["name"] == "east wall")
+    party = next(el for el in STORE_H["elements"] if el["kind"] == "party")
+    party["area_m2"] = east["area_m2"]
+    p = dict(PROMPTS)
+    p["dock"] = (
+        "A new module, Store H, has been docked onto the east face of Living F. Store H's west wall is a "
+        f"party wall (construction asm-party, {east['area_m2']} m²) shared with Living F, and it replaces "
+        "Living F's east external wall. Store H: " + store_h_sentence() + " Add Store H to the station, "
+        "assess it, and bring the station fully up to date. Commit your changes as you go.")
+    return p
 
 
 def num(x):
@@ -592,21 +687,61 @@ def num(x):
     return x
 
 
+# Session-specific behaviour checks: what the numbers alone cannot see.
+EXTRA_ASSERTS = {
+    "reroof": [
+        # The shared roof must not have been edited in place.
+        {"field": {"id": "asm-roof-std", "name": "layers", "equals": ASSEMBLIES["asm-roof-std"]},
+         "changed": False, "note": "shared assembly untouched"},
+    ],
+    "rev-b": [
+        {"file_contains": {"path": "standard/htc-7.md", "text": "0.74"}, "changed": True,
+         "note": "the code document was amended"},
+        {"things_of_type": {"type": "code-change", "min": 1}, "changed": True},
+    ],
+    "operator-request": [
+        {"things_of_type": {"type": "conflict", "min": 1}, "changed": True,
+         "note": "the refusal was recorded"},
+    ],
+    "erratum": [
+        {"file_contains": {"path": "standard/htc-7.md", "text": "0.037"}, "changed": True},
+        {"things_of_type": {"type": "code-change", "min": 2}, "changed": True},
+    ],
+    "dock": [
+        {"thing_exists": "mod-store-h", "changed": True},
+        {"validates_clean": True, "changed": False},
+    ],
+}
+MIN_COMMITS = {"build": 2, "reroof": 3, "rev-b": 4, "operator-request": 5, "erratum": 6, "dock": 7}
+
+
 def write_fixture():
     import yaml
     sessions = []
+    prev: dict = {}
+    session_prompts = prompts()
     for name, state, code in sessions_states():
         mods, station = compute(state, code)
-        asserts = []
+        expected: dict[tuple, object] = {}
         for mid, v in mods.items():
             hid = "hl-" + mid[4:]
-            asserts.append({"status": {"id": hid, "equals": "computed"}})
+            expected[(hid, "status")] = "computed"
             for f in ("net_load_w", "design_load_kw", "heater_kw", "heater_units"):
-                asserts.append({"field": {"id": hid, "name": f, "equals": num(v[f])}})
-        asserts.append({"status": {"id": "station-budget", "equals": "computed"}})
+                expected[(hid, f)] = num(v[f])
+        expected[("station-budget", "status")] = "computed"
         for f, v in station.items():
-            asserts.append({"field": {"id": "station-budget", "name": f, "equals": num(v)}})
-        sessions.append({"name": name, "prompt": PROMPTS[name], "assertions": asserts})
+            expected[("station-budget", f)] = num(v)
+        asserts = []
+        for (tid, f), val in expected.items():
+            changed = prev.get((tid, f), object()) != val
+            if f == "status":
+                asserts.append({"status": {"id": tid, "equals": val}, "changed": changed})
+            else:
+                asserts.append({"field": {"id": tid, "name": f, "equals": val}, "changed": changed})
+        asserts += [dict(a) for a in EXTRA_ASSERTS.get(name, [])]
+        asserts.append({"git_commits": {"path": ".", "min": MIN_COMMITS[name]}, "changed": True})
+        sessions.append({"name": name, "prompt": session_prompts[name], "assertions": asserts})
+        prev = expected
     fixture = {
         "name": "Polar station HTC-7 (longitudinal, hard)",
         "description": (
@@ -614,14 +749,19 @@ def write_fixture():
             "7 modules sharing 5 constructions, and 6 chained fresh-agent sessions (build, single-module "
             "re-roof of a shared assembly, a revision with a boundary commissioning date and a clause that "
             "does not apply to this site, an operator request the code forbids, a retroactive erratum, a "
-            "docking that turns an external wall into a party wall). The code is a plain document both "
-            "arms read (standard/htc-7.md); the bare arm loses only the framework's operating layer "
-            "(AGENTS.md, schema, framework access). Both arms get identical tools, including Python, so "
-            "arithmetic is not the discriminator. Every expected figure is produced by "
-            "evals/generators/polar_station_htc.py; never edit them by hand."),
+            "docking that turns an external wall into a party wall). The code is a plain document every "
+            "arm reads (standard/htc-7.md). Three arms: framework (seed as-is, pruned framework view "
+            "granted), bare (no AGENTS.md/schema/framework), bare-coached (bare tree + the same domain "
+            "guidance as prompt text — the hint-matched control). All arms get identical tools, including "
+            "Python, so arithmetic is not the discriminator. Each assertion is tagged changed/unchanged "
+            "against the previous session: a do-nothing agent passes every unchanged one, so only the "
+            "changed set discriminates. Every expected net load sits >= 0.3 W from a rounding boundary. "
+            "Every expected figure is produced by evals/generators/polar_station_htc.py; never edit them "
+            "by hand."),
         "seed": "evals/seeds/polar-station-htc",
         "allowed_tools": "Edit Write Read Glob Grep Bash(git:*) Bash(python:*) Bash(python3:*) Bash(py:*)",
         "bare_preamble": BARE_PREAMBLE,
+        "coached_preamble": COACHED_PREAMBLE,
         "sessions": sessions,
     }
     header = ("# GENERATED by evals/generators/polar_station_htc.py — do not edit by hand.\n"
@@ -632,13 +772,20 @@ def write_fixture():
 
 if __name__ == "__main__":
     import sys
+    tune_margins()
+    worst = D(99)
     for name, state, code in sessions_states():
-        mods, station = compute(state, code)
+        raw = {}
+        mods, station = compute(state, code, raw=raw)
         print(f"== {name}")
         for mid, v in mods.items():
-            print(f"  {mid:15} net {v['net_load_w']:>6} W  D {v['design_load_kw']:>5} kW  "
+            m = net_margin(raw[mid])
+            worst = min(worst, m)
+            print(f"  {mid:15} net {v['net_load_w']:>6} W (margin {m:.3f})  D {v['design_load_kw']:>5} kW  "
                   f"heater {v['heater_kw']} x{v['heater_units']}")
         print("  station", {k: str(v) for k, v in station.items()})
+    print(f"worst rounding margin: {worst:.3f} W (floor {MARGIN_MIN})")
+    print("volumes:", {m: MODULES[m]["volume_m3"] for m in MODULES}, "store-h", STORE_H["volume_m3"])
     if "--write" in sys.argv:
         write_seed()
         write_fixture()
