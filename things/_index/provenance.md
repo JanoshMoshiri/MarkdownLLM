@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-01
-generated: 2026-10-01T13:37:10
-generated_from: HEAD@f0faf02
-coverage: 120
+created: 2026-10-05
+generated: 2026-10-05T01:25:52
+generated_from: HEAD@14ee528
+coverage: 122
 framework_version: 3.46.0
 ---
 
@@ -18,6 +18,9 @@ framework_version: 3.46.0
 
 ## a-mechanism-fails-at-its-seams-not-in-its-body
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+
+## a-remembered-step-is-a-missing-actor
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @68c83cee2b400b75c52f346c0506c01dfd273bb2)
 
 ## a-true-primitive-is-discovered-not-authored
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
@@ -37,6 +40,9 @@ framework_version: 3.46.0
 - mesh-safety-is-the-floor-not-the-topology (derived-from)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - standing-watch-specification (derived-from)
+
+## change-reconciliation-specification
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage (derived-from)
@@ -109,6 +115,7 @@ framework_version: 3.46.0
 
 ## cue-carrier
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## cue-operator-queue-2026-08-28-2026-09-26
 - cue-operator-queue-2026-08-28-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
@@ -375,6 +382,7 @@ framework_version: 3.46.0
 ## open-questions-arrive-as-a-prompt-2026-09-23
 - cue-closed-loop-operating-state-2026-09-24 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 - cue-closed-loop-operating-state-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 
 ## operating-is-programming
 - operating-scope-promotion (pinned @604dfc4)
@@ -527,6 +535,7 @@ framework_version: 3.46.0
 - feels-automatic-is-persistence-of-the-question (derived-from)
 - framework-agent-closes-settled-cues-2026-09-13 (pinned @069007b51977ac9150e1c8d5ffe9d7d9e7d7bfe7)
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @2b12791fcfb2d6eb6c3f971bf444169667fb0815)
 
 ## universal-workflow-methodology
 - derivation-shape-brief-2026-08 (pinned @3af254117c771488898b861a9e9a30ef934c4794)

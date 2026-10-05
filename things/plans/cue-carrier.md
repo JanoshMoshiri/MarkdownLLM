@@ -2,12 +2,15 @@
 id: cue-carrier
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-09-12
 session: 2026-09-12
 priority: high
 tags: [change-reconciliation, cue, seat-protocol, floor, session-start, dispatcher]
 linked_things:
+  - id: the-verdict-is-asked-where-the-change-lands-2026-10-05
+    relation: implements
+    notes: "Phase 7: the ask moves to the commit boundary and takes the harness's own choice dialog; the commit waits for the cue."
   - id: unattended-cue-carrier-2026-09-12
     relation: implements
     notes: "The ruling this plan builds. Every phase below is that decision made operative; nothing here widens it."
@@ -163,8 +166,43 @@ is the seeing.
         no-decision case (settled reasoning) still carries its authority in
         prose. One more sighting before a field.
 
+- [ ] **Phase 7 — The ask, where the change lands.** *Ruled 2026-10-05:
+      `the-verdict-is-asked-where-the-change-lands-2026-10-05`.* Phase 6's
+      wallpaper worry came true from the seat: the operator reads past the
+      digest, and a question relayed there is not decided at the moment it
+      needs to be — 172 and 146 unraised in two live domains on 1 October,
+      none answered since August. So the question moves to the commit
+      boundary and takes the harness's own choice dialog. A third lifecycle
+      moment, `pre-commit` (delivery `gate`), bound in Claude Code to a
+      PreToolUse hook on the shell tools; its one step, `mdllm cues .
+      --staged`, refuses the commit while a definition surface changes with
+      no cue on disk, and the refusal tells the agent to ask the operator
+      through the native prompt — options, the agent's recommendation first,
+      *file to the seat* last — then `cues --staged --raise`, record the
+      verdict in the operator's words, commit again. Scope: definition
+      surfaces, one ask per subject per day; fan-in data things stay with the
+      digest and the retrospective. Unattended (`MDLLM_UNATTENDED` set by the
+      tick): the same refusal says raise-and-file, never answer. Boxes:
+      - [ ] (a) floor — `cues --staged` and `--staged --raise`; a cue raised
+            today covers the day's later edits to its subject.
+      - [ ] (b) harness — the moment and the `gate` delivery; the Claude Code
+            projection (PreToolUse, `Bash|PowerShell`); the runner's stdin
+            prefilter so only a `git commit` pays for the scan; the deny
+            envelope; goldens; doctor currency on every seat.
+      - [ ] (c) this repository's settings refreshed; the tick marks its
+            launches unattended.
+      - [ ] (d) specs — `change-reconciliation.md` gains *The Ask*;
+            `orchestration.md`'s hook table; `dispatch-loop.md` step 6; the
+            entry file's commit hook; kernel; CHANGELOG.
+      - [ ] (e) see — the first commit a seat makes with the gate live: did
+            the dialog appear, did the pick land in the cue, what the shape
+            got wrong. The floor cannot see the click; the transcript can.
+
 ## Done when
 
+- [ ] A commit that changes a definition surface in a Claude Code seat
+      waits for the operator's verdict, asked through the harness's own
+      dialog, and lands carrying the cue.
 - [x] A modification of a reasoned-from thing with no cue is named in the
       next session-start digest, and keeps being named until a cue covers it.
       *Live: 36 on first reading, 27 the next morning, tests pin the rule.*

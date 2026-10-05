@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-01
-generated: 2026-10-01T13:37:06
-generated_from: HEAD@f0faf02
-coverage: 490
+created: 2026-10-05
+generated: 2026-10-05T01:25:52
+generated_from: HEAD@14ee528
+coverage: 491
 framework_version: 3.46.0
 ---
 
@@ -466,6 +466,7 @@ framework_version: 3.46.0
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
+- cue-carrier --implements--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - cue-carrier --implements--> unattended-cue-carrier-2026-09-12
 - cue-carrier --implements--> closed-loop-operating-state
 - cue-carrier --extends--> change-reconciliation-specification
@@ -1552,6 +1553,12 @@ framework_version: 3.46.0
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
 - the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
 - the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 --extends--> open-questions-arrive-as-a-prompt-2026-09-23
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 --references--> unattended-cue-carrier-2026-09-12
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 --informs--> cue-carrier
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 --informs--> change-reconciliation-specification
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 --references--> a-remembered-step-is-a-missing-actor
+- the-verdict-is-asked-where-the-change-lands-2026-10-05 --references--> emitted-content-is-read-instructed-content-is-economised
 - the-wrong-distribution-channel-validates-clean --informs--> universal-workflow-methodology
 - the-wrong-distribution-channel-validates-clean --complements--> cross-domain-handoff-is-verified-external-input
 - thing-lifecycle-specification --extends--> thing-specification
