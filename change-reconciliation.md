@@ -2,12 +2,18 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.6
+version: 1.7
 created: 2026-06-13
 linked_things:
+  - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+    relation: references
+    notes: "The ruling behind The Walk Runs On Detection: the agent walks on detection within four bounds, the driver rules on the residue through the harness's own prompt, and the agent's commit waits for the walk's record"
+  - id: a-preserved-question-is-not-a-done-walk
+    relation: references
+    notes: "The diagnosis that ended the human cue: five backstops preserved the question, none walked"
   - id: the-verdict-is-asked-where-the-change-lands-2026-10-05
     relation: references
-    notes: "The ruling behind The Ask: the cue verdict is asked where the change lands, through the harness's own choice prompt, and the agent's commit waits for the cue"
+    notes: "The first shape of the gate, superseded the same day: it asked the operator first. Kept as the record of the wrong half."
   - id: thing-specification
     relation: extends
   - id: unattended-cue-carrier-2026-09-12
@@ -66,31 +72,54 @@ everything it touches. This is change management, applied to knowledge.
 After this spec, any meaningful change can answer: **"what did I just put at
 risk, and is each of those things still true given what I changed?"**
 
-## The Driver Names The Inflection
+## The Walk Runs On Detection; The Driver Names The Residue
 
-The cue is **human, not mechanical.** The framework is supplementary structure
-for an expert who holds the domain knowledge; recognising that a change is no
-longer a refinement but an *inflection* — a change to the logical path itself,
-not merely to how an existing path is expressed — is precisely the judgement
-the framework exists to support, not to replace.
+Until 2026-10-05 this section was *The Driver Names The Inflection*: the cue
+was human, the pass was entered when the driver declared an inflection, and
+the agent did not initiate it from edit-detection alone. The record at 3.46.0
+measured what that produced. Roughly 1,250 domain commits in six weeks, zero
+declarations; the pass run nowhere but the framework root, where the agent
+held the verdict on settled questions and closed 83 of 125 cues by citation;
+two live domains carrying 184 and 146 unraised subjects; the drift of
+unwalked change surfacing late, through sweeps and accidents
+(`a-preserved-question-is-not-a-done-walk`). The operator ruled the reading
+below (`the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`).
 
-> **The reconciliation pass is entered when an inflection is declared — by the
-> driver, or by the framework agent where a recorded ruling or the corpus's
-> settled reasoning already declares it. The agent does not initiate the pass
-> from edit-detection alone; edit-detection raises the question (a cue), and
-> the "go" is a verdict — the human's, given per change or standing in a
-> decision the cue can cite.**
+> **The pass is entered on detection.** A definition surface changed; the
+> floor sees it; the agent in the session runs the pass there and then —
+> touchpoints, each dependant judged, revisions in the same commit, derived
+> surfaces regenerated — and records the walk in the cue. The driver is not
+> asked whether to start. **The driver rules on the residue:** a touchpoint
+> the agent may not settle, put to them through the harness's own choice
+> prompt with the concrete alternatives as its options.
 
-An agent may *offer* to reconcile when it notices it has changed a thing with
-many dependents — but the decision that a change is consequential enough to
-reconcile belongs to the person defining the domain, or to a ruling that
-person has already recorded. Automating the *trigger* would substitute the
-agent's pattern-following for the expert's knowing, which inverts the
-framework's purpose; propagating a verdict the expert already gave does not
-(`framework-agent-closes-settled-cues-2026-09-13`, and *The Cue Persists*
-below). The 2026-09 retrospective's conflict scan found this box and the
-who-answers paragraph below saying different things for one day; this is the
-reconciled reading.
+What the old reading protected still holds, as four bounds rather than a
+veto. The churn it feared — cascade through the graph, and an agent rewriting
+meaning it does not hold — is real; the alternative to bounded churn turned
+out to be no walk at all.
+
+1. **Scope.** Definition surfaces only — the types that exist to be reasoned
+   from (`specification`, `skill`, `guide`, `manifesto`, `prompt`,
+   `workflow-definition`, `insight`, `decision`). A data thing reasoned from
+   by fan-in — a register, a requirement — does not trigger a walk; it stays
+   with the digest and the retrospective's net.
+2. **Depth and kind of edit.** One hop: the declared and literal dependants.
+   The agent revises on its own only at restatement level — a name, a path, a
+   count, a reference, a regenerated block. A revision that would change a
+   dependant's meaning, or a dependant that contradicts the change, is the
+   driver's. That line is where knowing ends and pattern-following would
+   begin; the old reading drew it around the whole pass, this one draws it
+   where it belongs.
+3. **Rate.** One walk per subject per day. Autocommit saves every write; the
+   gate walks the first commit of a subject in a day, and the agent judges
+   whether a later edit the same day is material enough to walk again.
+4. **Attendance.** An attended session walks. An unattended run assimilates
+   and files — the checklist and its proposed revisions, applied to nothing
+   (`unattended-cue-carrier-2026-09-12`).
+
+Most walks end with nothing to rule on. That is the point, not a failure of
+the human beat: the expert's knowing is spent on the few touchpoints that
+need it, instead of on permission to look.
 
 ### The Cue Persists — The Carrier
 
@@ -116,11 +145,13 @@ digest until a human answers it**:
   top of, since the modifying commit's own id does not exist yet; the commit
   that adds the cue file is covered by construction. **`raised_by`** says who
   raised it: the operator, an agent, or a dispatch launch.
-- **`status: open`** until a human records **`verdict: inflection |
-  not-inflection`** with a **`verdict_reason`**. The pair is the *authority
-  receipt*: saying no to a named question is a decision, where not being asked
-  was drift. The floor checks the receipt's shape — an answered cue without a
-  verdict and a reason is an Error — and never supplies the verdict.
+- **`status: open`** until the walk is marked and **`verdict: inflection |
+  not-inflection`** recorded with a **`verdict_reason`** — `inflection` when a
+  touchpoint was revised or ruled, `not-inflection` when every one held. The
+  pair is the *receipt*: a named question with a recorded answer, where not
+  being asked was drift. The floor checks the receipt's shape — an answered
+  cue without a verdict and a reason is an Error — and never supplies the
+  mark on any line.
 - **The floor computes what is missing.** `mdllm cues` walks the commit stream
   since the newest retrospective (thirty days when none exists), keeps
   modifications of reasoned-from things — the same predicate `candidates`
@@ -130,8 +161,8 @@ digest until a human answers it**:
   **unraised**; open cue things are **unanswered**. The
   session-start digest emits both, every session, under one heading. Nothing
   here depends on anyone's memory.
-- **`verdict: inflection`** means the four beats below run and a `reconcile:`
-  commit seals them; the cue's body names what was walked.
+- **`verdict: inflection`** means a dependant was revised or a ruling given,
+  in the carrying commit; the cue's body names each touchpoint with its mark.
   **`verdict: not-inflection`** means the dependants hold as written, and the
   reason says why.
 - **A cue may be answered by citation.** When a decision already on the record
@@ -143,70 +174,65 @@ digest until a human answers it**:
   (`feels-automatic-is-persistence-of-the-question`). The floor checks the
   pin resolves; it does not judge whether the decision covers the change.
 
-**Who raises, who answers.** Any session may *raise* a cue. A cue is
-*answered* by a human — or by the **framework domain agent**, in an attended
-framework session, under its standing authority
-(`framework-agent-closes-settled-cues-2026-09-13`, extending
-`settled-reasoning-is-standing-authority`): by citation where a recorded
-decision covers the change, or on its own walk where the corpus already holds
-the evidence and the direction. A verdict is a commit, overturnable by editing
-the cue, which is why it is grantable; a cue with no covering decision and
-unsettled reasoning stays the operator's. An attended session raises the cue
-at the moment the gate asks — in a harness that projects the `pre-commit`
-moment, the agent's commit waits for it (*The Ask*, below); elsewhere, at the
-moment `candidates` asks. An unattended run — a dispatch tick, a scheduled session —
-that modifies a reasoned-from thing raises the cue as part of its own commit,
-files it in its digest as a seat-queue item, and stops there: it does not run
-the pass on its own initiative and does not widen its scope to reconcile.
-This is the ruling of `unattended-cue-carrier-2026-09-12` (option 3 of the
-2026-09-08 review's finding 5), with option 2 as the net beneath: whatever is
-still open at retrospective cadence is answered by scan 4 (`retrospective.md`).
-A cue missed at change time is a cue answered late, never a cue lost.
+**Who raises, who walks, who rules.** The floor *raises* — at the gate, with
+the walk list prefilled — and any session may. The **agent** in an attended
+session *walks*, within the four bounds, and marks the verdict: that is its
+standing authority since 2026-10-05, the same grant
+`framework-agent-closes-settled-cues-2026-09-13` made for settled questions
+in the framework root, extended one step earlier and to every domain
+(`settled-reasoning-is-standing-authority`). The **driver** *rules* on the
+residue — a touchpoint the agent may not settle — and may overturn any mark
+by editing the cue, which is why the grant is safe to make. In a harness that
+projects the `pre-commit` moment the agent's commit waits for the walk's
+record (*The Walk, Where The Change Lands*, below); elsewhere the cue is
+raised at the moment `candidates` asks and the walk is the session's own
+discipline. An unattended run — a dispatch tick, a scheduled session — that
+modifies a reasoned-from thing raises the cue with its checklist as part of
+its own commit, writes its proposed revisions beneath it, applies nothing,
+and files it in its digest as a seat-queue item
+(`unattended-cue-carrier-2026-09-12`), with scan 4 as the net beneath
+(`retrospective.md`): whatever is still open at retrospective cadence is
+walked there. A cue missed at change time is a walk done late, never a walk
+lost.
 
-What this does not change: the Cue verdict stays the driver's, the pass still
-runs only after the human "go", and the retrospective remains the cost of
-reconciliation skipped, not a licence to skip it. What it changes is where the
-question lives while it waits.
+What this does not change: the ruling on what the walk cannot settle stays
+the driver's, and the retrospective remains the cost of reconciliation
+skipped, not a licence to skip it. What it changes is who starts the pass:
+the change does.
 
-### The Ask — Where The Change Lands
+### The Walk, Where The Change Lands
 
-The carrier made the question persist; it did not make it *asked*. The
-session-start digest listed it and the operator read past it — 172 and 146
-unraised in two live domains on 2026-10-01, none answered since August. The
-ruling of 2026-10-05 (`the-verdict-is-asked-where-the-change-lands-2026-10-05`)
-moves the ask to the moment the change lands and gives it the harness's own
-choice prompt:
+The carrier made the question persist; it did not make the walk happen. Where
+a harness projects the `pre-commit` lifecycle moment (`orchestration.md` → the
+hook table; Claude Code today), `mdllm cues --staged` runs before the agent's
+`git commit`:
 
-- **The gate.** A harness that projects the `pre-commit` lifecycle moment
-  (`orchestration.md` → the hook table; Claude Code today) runs
-  `mdllm cues --staged` before the agent's `git commit`. A definition surface
-  changed in the commit in hand — the types that exist to be reasoned from —
-  with no cue on disk for it is a refusal: the commit does not go through,
-  and the refusal's text, read in the tool's own channel, tells the agent to
-  put the question to the operator through the native multiple-choice prompt
-  — one question per subject, the agent's recommendation first, *file to the
-  seat* last — then `cues --staged --raise`, record the pick in the
-  operator's words, and commit again carrying the cue. The scope is
-  deliberately the definition surfaces only: that is where "this is how it
-  needs to be" lands; a data thing reasoned from by fan-in stays with the
-  digest and scan 4. One ask per subject per day: a cue raised today covers
-  the day's later edits to its subject.
-- **Unattended.** The same refusal, a different instruction: raise and file,
-  never answer. The run marks itself unattended (`MDLLM_UNATTENDED`; the
-  dispatcher's tick does) and the floor tells it so.
-  `unattended-cue-carrier-2026-09-12` is unchanged; the gate is what makes
-  its raise-never-answer rule mechanical rather than instructed.
-- **What it proves.** The commit carries the cue, the verdict and its reason.
-  Whether the dialog appeared is in the harness transcript, not in git — the
-  floor cannot see a click. The refusal makes the ask the agent's critical
-  path, which is the most certainty available. A seat whose harness has no
-  such moment (a Codex session, a hand commit) keeps the `candidates`
-  advisory and the digest, and the retrospective remains the net.
-
-What this does not change: the verdict is still the driver's (*The Driver
-Names The Inflection*), the floor still never answers, and `candidates` still
-asks at every commit from any hand. What it changes is *who is asked, and
-when*: the person, at the change, in the one channel they cannot read past.
+- **The gate.** A definition surface changed in the commit in hand with no
+  cue on disk for it is a refusal: the commit does not go through, and the
+  refusal's text, read in the tool's own channel, is the walk. `cues --staged
+  --raise` writes the cue with every declared and literal dependant as a
+  checklist — the Assimilate beat, done by the floor. The agent marks each
+  line `consistent`, `revised` (restatement level, in this commit, saying
+  what) or `ruling`, asks the operator through the native choice prompt only
+  for what it may not settle — one question per touchpoint, the alternatives
+  as options, *defer to the seat* among them — and commits again carrying
+  the cue and the revisions. `verdict: inflection` records that something
+  was revised or ruled; `not-inflection` that every line held.
+- **What does not count.** A change confined to managed generated blocks: the
+  generator did that walk (`a-generated-surface-collapses-its-walk`). A data
+  thing with fan-in: the digest and scan 4. A second edit of the same subject
+  the same day: the agent's judgement, not the gate's.
+- **Unattended.** The same refusal, the other instruction: raise the
+  checklist with proposed revisions beneath it, apply nothing, file it. The
+  dispatcher's tick marks its launches (`MDLLM_UNATTENDED`) and the floor
+  tells the run so.
+- **What it proves.** The commit carries the walk — each touchpoint named
+  with its mark — and the revisions beside it. What it cannot prove is that
+  the agent read what it marked consistent; the retrospective's scan 4
+  samples that, and every revision is a visible, reversible commit. A seat
+  whose harness has no such moment (a Codex session, a hand commit) keeps
+  the `candidates` advisory and the digest, and the retrospective remains the
+  net.
 
 ### External Inflections — The Inbound Edge
 
@@ -242,8 +268,10 @@ step-through is stable: if you walked and discovered at once, reconciling one
 touch point could be undone by the next, which is the thrash this spec exists to
 prevent.
 
-1. **Cue** — the driver declares an inflection: *this change is consequential.*
-   This is the only non-mechanical beat, and the only one that initiates.
+1. **Cue** — the change itself: a definition surface moved and the floor saw
+   it (*The Walk Runs On Detection*); or the driver declares one — *this
+   change is consequential* — for anything the predicate does not reach.
+   This is the beat that initiates; since 2026-10-05 it needs no hand.
 
 2. **Assimilate** — gather the *complete* affected set, mechanically, in two
    passes of widening visibility:
@@ -374,9 +402,10 @@ Retrospective reconciliation is not a substitute for the change-time discipline
 — it is its **backward-looking mode**, and it runs in two situations. The first
 is **one-time realignment**: a domain that accumulated change before the
 discipline was adopted is twisted once, swept once, and reconciled at each change
-thereafter. The second is **recurring maintenance**: because the Cue is human
-(see *The Driver Names The Inflection*), an expert will sometimes edit without
-declaring the inflection, and those changes land un-reconciled. The change-time
+thereafter. The second is **recurring maintenance**: the walk at the change is
+the agent's, and an expert will sometimes edit by hand with no agent in the
+room, or in a seat whose harness projects no gate (see *The Walk Runs On
+Detection*), and those changes land un-reconciled. The change-time
 net cannot catch what was never handed to it, so the same backward pass runs
 periodically — bound to the `retrospective` hook (`retrospective.md` →
 Reflexive Scans At Retrospective) — as the net beneath the net. The carrier
@@ -401,11 +430,12 @@ The split follows the framework's standard division of labour:
 | Prose references the indexes miss | Deterministic floor (textual) | `mdllm touchpoints` literal tier + corpus grep for the thing's canonical name |
 | Pinned dependents that are now behind | Deterministic floor | `mdllm provenance` Freshness check (Info) |
 | The cue question waits until it is answered | Deterministic floor | `mdllm cues` — open `type: cue` things plus reasoned-from modifications since the newest retrospective that no cue covers; the same line in every session-start digest (*The Cue Persists*); `mdllm cues --raise` writes the open cue thing for every unraised modification — the raise is mechanical, the verdict never is |
-| The question is asked where the change lands | Harness gate (where an adapter projects `pre-commit`) + **the human** | `mdllm cues --staged` behind the harness's own pre-tool hook: the agent's commit is refused while a definition surface changes with no cue on disk; the refusal names the native choice prompt; an unattended run is told to raise and file (*The Ask*) |
+| The walk runs where the change lands | Harness gate (where an adapter projects `pre-commit`) + **the agent** (the walk) + **the human** (the residue) | `mdllm cues --staged` behind the harness's own pre-tool hook: the agent's commit is refused while a definition surface changes with no walk on record; `--staged --raise` prefills the dependants as a checklist; the refusal names the native choice prompt for what the agent may not settle; an unattended run assimilates and files (*The Walk, Where The Change Lands*) |
 | The answer carries a receipt | Floor (shape) + **the human** (verdict), or the framework agent citing the human's decision | `type: cue` — `verdict` from the two-value set and a `verdict_reason`; Error without them; `informed_by` pins the ruling that covers it. The verdict itself is never mechanised |
 | A rule change leaves a supersede mark | Floor (shape) + agent (judgement) | `belief-revision.md` supersede protocol |
 | Does each touch point still hold? | **Agent (semantic)** | `validate.thing.md` Layer 2 — the Walk |
-| Is this change an inflection at all? | **The human driver** | judgement; not mechanisable |
+| Is this change an inflection at all? | **The agent**, by walking — the verdict is the walk's outcome, not a permission asked before it | judgement over the prefilled checklist, within the four bounds |
+| Which touchpoints need a ruling? | **The human driver** | the residue: a change of meaning, a contradiction, an irreversible — put through the harness's own prompt, overturnable by editing the cue |
 
 The floor can guarantee the affected set is *complete* and *current*. It cannot
 decide whether a dependent still holds, and it must not decide whether a change
@@ -414,17 +444,17 @@ The floor's job here is to make the agent **unable to not see** the shape of
 what a change disturbs; the judgement of what to do about it stays where it
 belongs.
 
-The Assimilate beat is exposed as a floor affordance: `mdllm touchpoints <id>`
-reports the complete declared inbound set (every reference shape owned by the
-canonical structural registry, including provenance pins)
+The Assimilate beat is exposed as a floor affordance twice over: `mdllm
+touchpoints <id>` reports the complete declared inbound set (every reference
+shape owned by the canonical structural registry, including provenance pins)
 plus the literal textual references, computed fresh from the live corpus — not
-from the committed indexes, because assimilation must be complete *and* current.
-The subcommand is deliberately **invoked, never hooked**: it makes the blast
-radius impossible to not see, but the *Cue* — deciding a change is consequential
-enough to run the pass — stays the driver's (see *The Driver Names The
-Inflection*). The spec mandates the discipline of running the pass at an
-inflection, not the existence of the tool; the tool is the affordance that makes
-the discipline cheap.
+from the committed indexes, because assimilation must be complete *and*
+current — and `mdllm cues --staged --raise` writes the same two tiers into
+the cue as the walk's checklist at the commit boundary. The tool assembles;
+it never marks a line (see *The Walk Runs On Detection*). The spec mandates
+the discipline of walking at the change, not the existence of the tool; the
+tool is the affordance that makes the discipline cheap enough to be the
+default.
 
 The floor also asks the **cue question** without answering it
 (`inflection-candidates-are-computable`): the pre-commit hook's index-view

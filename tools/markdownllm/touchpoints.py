@@ -781,7 +781,8 @@ def staged_text(rep: dict) -> list[str]:
                       "in hand carries its cue"]
     lines = [head]
     for o in rep["owed"]:
-        deps = o["dependants"]
+        deps = ([src for src, _ in o["walk"]] if o.get("walk") is not None
+                else o["dependants"])  # the walk list: cues and indexes excluded
         shown = ", ".join(f"`{d}`" for d in deps[:GATE_DEPENDANTS_SHOWN])
         if len(deps) > GATE_DEPENDANTS_SHOWN:
             shown += f", +{len(deps) - GATE_DEPENDANTS_SHOWN} more"
@@ -877,7 +878,8 @@ def raise_staged_cues(root: Path, rep: dict) -> list[Path]:
             continue
         cues_dir.mkdir(parents=True, exist_ok=True)
         sha = rep["head"] or "HEAD"
-        deps = o["dependants"]
+        deps = ([src for src, _ in o["walk"]] if o.get("walk") is not None
+                else o["dependants"])  # the walk list: cues and indexes excluded
         dependants = (f"{len(deps)} thing(s) depend on it: "
                       + ", ".join(f"`{d}`" for d in deps[:GATE_DEPENDANTS_SHOWN])
                       + (f", +{len(deps) - GATE_DEPENDANTS_SHOWN} more" if len(deps) > GATE_DEPENDANTS_SHOWN else "")

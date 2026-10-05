@@ -37,3 +37,8 @@ asks through the harness's own prompt. Nothing the two dependants reason
 from moved.
 
 *Answered by citation under `framework-agent-closes-settled-cues-2026-09-13`: the operator's ruling of 2026-10-05 covers this change. The operator was not at the keyboard when the gate asked — the session that built the gate answered under delegated authority, and says so; overturn it by editing the verdict.*
+
+## The Walk — second edit of the day
+The authored `cues` when-line reworded: the agent walks and asks you only for
+what it may not settle. Its two dependants (`first-hour-guide`, `framework-map`)
+**consistent**.

@@ -47,10 +47,14 @@ _FRAMEWORK_HARD_HOOKS = (
     "- `pre-domain-scaffold:isolate` — new domains are born via `mdllm scaffold`. "
     "Anchor: `git-fs`.\n"
     "- `pre-commit:gate` — where the harness projects it, a commit "
-    "that changes a definition surface is refused until its cue is on disk: ask the "
-    "operator through the native choice prompt, raise the cue, commit again "
-    "(`change-reconciliation.md` → The Ask). Anchor: `harness-session` where an "
-    "adapter binds it; elsewhere `interpretation` via the `candidates` advisory.")
+    "that changes a definition surface is refused until its walk is on record: "
+    "`mdllm cues . --staged --raise` prefills the dependants as a checklist; walk "
+    "them within the four bounds (definition surfaces, one hop, restatement-level "
+    "edits, attended), ask the operator through the native choice prompt only for "
+    "what you may not settle, commit again with the cue and the revisions "
+    "(`change-reconciliation.md` → The Walk Runs On Detection). Anchor: "
+    "`harness-session` where an adapter binds it; elsewhere `interpretation` via "
+    "the `candidates` advisory.")
 
 
 def _gen_block_re(name: str) -> "re.Pattern":

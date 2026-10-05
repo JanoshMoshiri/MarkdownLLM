@@ -16,6 +16,9 @@ linked_things:
   - id: cue-carrier
     relation: references
     notes: "The carrier is the clearest instance: it made the question persist perfectly and the walk count did not move."
+  - id: feels-automatic-is-persistence-of-the-question
+    relation: extends
+    notes: "That insight is right that the operator wants nothing forgotten and that the ruling must not be mechanised. This adds the half it could not see yet: persistence of the question does not move a step whose actor is missing — the walk needed one, and it is not the ruling."
   - id: consistency-is-maintained-at-change-not-by-sweeping
     relation: references
     notes: "The principle whose practice this measures: with no actor at the change, consistency was in fact maintained by sweeps."

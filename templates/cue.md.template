@@ -20,13 +20,18 @@ informed_by:                            # the decision already on the record tha
 and why the subject is reasoned-from — a definition surface, or its fan-in.
 `mdllm touchpoints [subject-id]` lists what depends on it.]
 
-## The Question
-Does this change alter the logical path — a rule, a workflow, a thing the
-domain reasons from — or only how an existing path is expressed?
-(`change-reconciliation.md` → The Driver Names The Inflection.)
+## The Walk
+[One line per dependant — `mdllm cues . --staged --raise` prefills the declared
+and literal tiers; `mdllm touchpoints [subject-id]` lists the same. Mark each:
+`consistent` (holds as written), `revised` (a restatement-level edit in this
+commit — say what), `ruling` (the operator's answer, in their words, to a
+question you could not settle: a change of meaning, a contradiction). Add a
+line for any conceptual residue you find — a thing that reasons about the
+subject without naming it. (`change-reconciliation.md` → The Walk Runs On
+Detection.)]
 
 ## The Answer
-[Populate when answered. `inflection` → the four-beat pass ran: name the touch
-points walked and the commit that sealed them. `not-inflection` → say why the
-dependants still hold as written. Either way this section is the ruling's
-reasoning; `verdict_reason` above is its one-line receipt.]
+[`inflection` when any line is revised or ruled; `not-inflection` when every
+line held. This section is the walk's reasoning; `verdict_reason` above is its
+one-line receipt. An unattended run leaves this open and writes its proposed
+revisions here.]

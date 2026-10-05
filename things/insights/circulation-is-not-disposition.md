@@ -73,4 +73,5 @@ smallest fix — wire scan 4, add a conflict-disposition beat mirroring the
 insight brake — is what landed, plus the age check both specs had promised
 since v1.0 and the floor had never carried. The same review left one seam
 open for the operator: who declares an inflection when an unattended agent
-commits (`change-reconciliation.md` → The Driver Names The Inflection).
+commits (`change-reconciliation.md` → The Walk Runs On Detection, then
+*The Driver Names The Inflection*; ruled 2026-09-12 and re-cut 2026-10-05).

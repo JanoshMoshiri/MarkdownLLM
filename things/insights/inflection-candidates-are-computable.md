@@ -2,7 +2,7 @@
 id: inflection-candidates-are-computable
 type: insight
 status: promoted
-version: 1.0
+version: 1.1
 created: 2026-08-04
 session: 2026-08-04
 source: both
@@ -11,6 +11,9 @@ origin: synthesised
 promoted_to: change-reconciliation-specification
 tags: [change-reconciliation, cue, inflection, floor, sensors, estate]
 linked_things:
+  - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+    relation: references
+    notes: "Narrowed this insight in place on 2026-10-05: the question is mechanical, the walk is the agent's, the ruling on the residue is human."
   - id: change-reconciliation-specification
     relation: complements
     notes: "Refines, does not revise: the spec's 'invoked, never hooked' protects the cue verdict, and this insight keeps that intact. What it adds is that the *candidate* — the fact that a cue question exists — was always mechanical, and the floor can surface the question without touching the answer."
@@ -22,7 +25,13 @@ linked_things:
     notes: "The constraint on building this: candidacy must be selective (fan-in threshold, definition-surface types, modifications only) or the advisory becomes wallpaper and the cue is missed with extra steps."
 ---
 
-# Inflection candidates are computable — the cue is human, the question is not
+# Inflection candidates are computable — the question is mechanical, the walk is the agent's, the ruling is human
+
+> **Narrowed 2026-10-05, on the operator's ruling.** The computability claim
+> stands. The half that said the cue — the decision to walk — is human is
+> re-cut: the walk runs on detection and is the agent's, within four bounds;
+> what is human is the *ruling on the residue* — a touchpoint the walk cannot
+> settle (`the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`).
 
 **What happened:** the operator reported two facts in one conversation
 (2026-08-04): the change-reconciliation pass has never been run on the
@@ -35,8 +44,9 @@ net — but retrospectives were not happening either, so both nets were
 down at once.
 
 **The insight:** the spec's division of labour conflates two things under
-"the Cue is human." The cue *verdict* — is this change consequential
-enough to walk? — is genuinely human and must stay so. But the cue
+"the Cue is human." The *ruling* — a touchpoint the walk cannot settle: a
+change of meaning, a contradiction — is genuinely human and must stay so;
+the decision to walk is not, since 2026-10-05 (see the note above). But the cue
 *question* — does anything reason from what was just modified? — is a
 mechanical predicate, and the floor already holds both of its operands at
 commit time: git distinguishes a modification from an addition, and the

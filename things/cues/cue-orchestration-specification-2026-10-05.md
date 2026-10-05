@@ -38,3 +38,8 @@ points, anchors and binding semantics this spec defines are unchanged;
 its 34 dependants hold as written.
 
 *Answered by citation under `framework-agent-closes-settled-cues-2026-09-13`: the operator's ruling of 2026-10-05 covers this change. The operator was not at the keyboard when the gate asked — the session that built the gate answered under delegated authority, and says so; overturn it by editing the verdict.*
+
+## The Walk — second edit of the day (1.25 → 1.26)
+The `pre-commit:gate` row reworded from the question to the walk. A restatement
+of a rule that lives in `change-reconciliation.md`; the hook points, anchors
+and binding semantics unchanged. Every dependant **consistent**; nothing to walk.

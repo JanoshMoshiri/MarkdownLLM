@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-05
-generated: 2026-10-05T09:40:21
-generated_from: HEAD@ae4e61d
-coverage: 499
+generated: 2026-10-05T10:02:03
+generated_from: HEAD@69dade0
+coverage: 504
 framework_version: 3.46.0
 ---
 
@@ -114,6 +114,7 @@ framework_version: 3.46.0
 - a-preserved-question-is-not-a-done-walk --informs--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - a-preserved-question-is-not-a-done-walk --extends--> a-remembered-step-is-a-missing-actor
 - a-preserved-question-is-not-a-done-walk --references--> cue-carrier
+- a-preserved-question-is-not-a-done-walk --extends--> feels-automatic-is-persistence-of-the-question
 - a-preserved-question-is-not-a-done-walk --references--> consistency-is-maintained-at-change-not-by-sweeping
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --extends--> a-true-primitive-is-discovered-not-authored
 - a-primitive-crossing-a-boundary-splits-mechanism-from-authority --informs--> framework-retrospective-2026-07
@@ -254,6 +255,8 @@ framework_version: 3.46.0
 - boundary-respect-was-interpretation-not-enforcement --complements--> live-agent-handoff-is-for-new-output-not-known-implementation
 - boundary-respect-was-interpretation-not-enforcement --supports--> phase-3-run-domain-task-reverted
 - boundary-respect-was-interpretation-not-enforcement --challenges--> llm-driven-systems-manifesto
+- change-reconciliation-specification --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+- change-reconciliation-specification --references--> a-preserved-question-is-not-a-done-walk
 - change-reconciliation-specification --references--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - change-reconciliation-specification --extends--> thing-specification
 - change-reconciliation-specification --references--> unattended-cue-carrier-2026-09-12
@@ -465,6 +468,7 @@ framework_version: 3.46.0
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
 - cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 --subject--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - cue-a-mechanism-fails-at-its-seams-not-in-its-body-2026-09-14 --subject--> a-mechanism-fails-at-its-seams-not-in-its-body
+- cue-a-preserved-question-is-not-a-done-walk-2026-10-05 --subject--> a-preserved-question-is-not-a-done-walk
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
@@ -485,6 +489,7 @@ framework_version: 3.46.0
 - cue-change-reconciliation-specification-2026-10-05 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
+- cue-circulation-is-not-disposition-2026-10-05 --subject--> circulation-is-not-disposition
 - cue-claude-code-cloud-first-session-2026-09-24-2026-09-26 --subject--> claude-code-cloud-first-session-2026-09-24
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
 - cue-closed-loop-operating-state-2026-09-24 --subject--> closed-loop-operating-state
@@ -504,6 +509,7 @@ framework_version: 3.46.0
 - cue-domain-specification-guide-2026-09-15 --subject--> domain-specification-guide
 - cue-domain-specification-guide-2026-09-26 --subject--> domain-specification-guide
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
+- cue-estate-mechanics-guide-2026-10-05 --subject--> estate-mechanics-guide
 - cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
 - cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
 - cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
@@ -537,6 +543,7 @@ framework_version: 3.46.0
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
+- cue-inflection-candidates-are-computable-2026-10-05 --subject--> inflection-candidates-are-computable
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
 - cue-interface-specification-2026-09-26 --subject--> interface-specification
 - cue-interface-specification-2026-09-27 --subject--> interface-specification
@@ -562,6 +569,7 @@ framework_version: 3.46.0
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build
+- cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
 - cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
@@ -1031,6 +1039,7 @@ framework_version: 3.46.0
 - independent-substrate-review-2026-08-20-codex --informs--> session-start-hardening
 - independent-substrate-review-2026-08-20-codex --informs--> vendor-harness-adapter-foundation
 - independent-substrate-review-2026-08-20-codex --informs--> cowork-adapter
+- inflection-candidates-are-computable --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - inflection-candidates-are-computable --complements--> change-reconciliation-specification
 - inflection-candidates-are-computable --informs--> estate-cadence-cluster
 - inflection-candidates-are-computable --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -1301,6 +1310,7 @@ framework_version: 3.46.0
 - recognition-data-must-be-frozen-not-derived --complements--> existence-is-not-currency
 - recognition-data-must-be-frozen-not-derived --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - recognition-data-must-be-frozen-not-derived --derived-from--> run-floor-sprint-2-2026-08
+- reconciliation-candidates-are-detectable-from-the-commit-stream --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - reconciliation-candidates-are-detectable-from-the-commit-stream --informs--> change-reconciliation-specification
 - reconciliation-candidates-are-detectable-from-the-commit-stream --supports--> orient-and-reconciliation-are-the-corpus-two-sides
 - reconciliation-candidates-are-detectable-from-the-commit-stream --supports--> directional-graph-reads-come-in-inbound-outbound-pairs

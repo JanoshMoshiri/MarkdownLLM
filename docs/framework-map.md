@@ -229,7 +229,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 <!-- generated:spec-edges -->
 
 - **`belief-revision.md`** (`specification`, `stable`): complements → `validate.thing.md`, `session-memory.md`, `orchestration.md`, `derived-index.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md` · +1 edge(s) outside the spec layer
-- **`change-reconciliation.md`** (`specification`, `draft`): complements → `belief-revision.md`, `provenance.md`, `derived-index.md`, `validate.thing.md`, `retrospective.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md` · +9 edge(s) outside the spec layer
+- **`change-reconciliation.md`** (`specification`, `draft`): complements → `belief-revision.md`, `provenance.md`, `derived-index.md`, `validate.thing.md`, `retrospective.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md` · +11 edge(s) outside the spec layer
 - **`coordination-claim.md`** (`specification`, `evolving`): complements → `git-workflow.md`, `workflow-state.md`; extends → `thing.md` · +1 edge(s) outside the spec layer
 - **`derived-index.md`** (`specification`, `draft`): complements → `orchestration.md`, `trigger-specification.md`, `belief-revision.md`, `scalability-guide.md`, `git-workflow.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md` · +2 edge(s) outside the spec layer
 - **`docs/estate-mechanics.md`** (`guide`, `evolving`): documents → `git-workflow.md`, `change-reconciliation.md`, `retrospective.md` · +2 edge(s) outside the spec layer

@@ -2,7 +2,7 @@
 id: reconciliation-candidates-are-detectable-from-the-commit-stream
 type: insight
 status: promoted
-version: 1.1
+version: 1.2
 created: 2026-06-27
 promoted_to: change-reconciliation-specification
 session: 2026-06-27
@@ -11,6 +11,9 @@ confidence: medium
 origin: synthesised
 tags: [change-reconciliation, mechanization, commit-stream, fan-in, detection, floor, razor, undecided]
 linked_things:
+  - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+    relation: references
+    notes: "Narrowed this insight in place on 2026-10-05: the floor detects and now assembles the walk list; the agent walks; the ruling on the residue stays human."
   - id: change-reconciliation-specification
     relation: informs
   - id: orient-and-reconciliation-are-the-corpus-two-sides
@@ -44,9 +47,11 @@ reconciliation candidates, ranked."*
 ## The Razor
 
 **Mechanize the noticing, not the deciding.** This does not auto-trigger
-reconciliation and does not name the inflection — the floor only says a change has
-the *shape* of one; the driver still decides whether it *is* one, and the walk stays
-human (`change-reconciliation.md` → The Driver Names The Inflection). It hardens the
+reconciliation by itself — the floor says a change has the *shape* of one and,
+since 2026-10-05, assembles the walk list; the agent walks on detection within
+four bounds, and the ruling on what the walk cannot settle stays human
+(`change-reconciliation.md` → The Walk Runs On Detection; narrowed in place on the
+operator's ruling, `the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`). It hardens the
 spec's existing line — *"an agent may offer to reconcile when it notices it has
 changed a thing with many dependents"* — from an `interpretation` hope (the agent
 remembers to look) into a deterministic surface. Same detect-surface-don't-dispose

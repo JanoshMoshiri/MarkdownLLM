@@ -68,8 +68,9 @@ flowchart TD
         boundary terms. The commit lands; post-commit autopush transports it only
         under literal true policy, with published, disabled, debt or REJECTED
         outcomes. Branching off the mechanical rail, the cue
-        advisory feeds a human verdict: no proceeds, yes declares an inflection
-        which runs the four beats Cue, Assimilate, Walk, Seal. A REJECTED push
+        advisory and, where the harness projects it, the commit gate feed the
+        agent's walk of the dependants — Cue, Assimilate, Walk, Seal — with the
+        human ruling only on what the walk cannot settle. A REJECTED push
         is divergence on the push side, routed by the operator and never forced.
     }
     W["Add · modify · delete · rename"]
