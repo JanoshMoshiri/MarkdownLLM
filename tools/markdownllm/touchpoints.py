@@ -16,6 +16,7 @@ scores, never runs the pass.
 from __future__ import annotations
 
 import datetime as dt
+import os
 import subprocess
 from collections import Counter
 from pathlib import Path
@@ -489,15 +490,19 @@ def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
 
 def _covers(cue: dict, position: int, day: dt.date) -> bool:
     """Does this cue cover a modification at `position` (newest-first) on `day`?
-    In the commit that added the cue itself (a same-commit raise); else at or
+    In the commit that added the cue itself (a same-commit raise); on the day
+    the cue was created (one ask per subject per day —
+    `the-verdict-is-asked-where-the-change-lands-2026-10-05`); else at or
     before its `raised_at` commit when that commit is in the walk; else at or
     before the cue's own `created` date."""
     if cue.get("birth") is not None and position == cue["birth"]:
         return True
+    created = cue.get("created")
+    if created is not None and day == created:
+        return True  # one ask per subject per day: the day's later edits are covered
     pos = cue.get("pos")
     if pos is not None:
         return position >= pos
-    created = cue.get("created")
     return created is not None and day <= created
 
 
@@ -566,16 +571,282 @@ def raise_cues(root: Path, rep: dict) -> list[Path]:
     return written
 
 
+# ------------------------------------------------------------- the gate
+# The ask, where the change lands
+# (the-verdict-is-asked-where-the-change-lands-2026-10-05). `cues --staged`
+# asks the cue question for the commit in hand — off the delta against HEAD,
+# not the commit stream — and is the one mode of this command that is not
+# advisory: exit 1 says a definition surface changes with no cue on disk,
+# and the `pre-commit` lifecycle moment turns that into a harness refusal
+# whose text tells the agent to put the question to the operator through the
+# harness's native choice prompt. The scope is the definition surfaces only
+# — the types that exist to be reasoned from, where "this is how it needs to
+# be" lands; data things reasoned from by fan-in stay with `cues` and the
+# retrospective's net. Coverage is a cue on disk whose `subject` is the thing
+# and that was created today or is itself part of the delta: one ask per
+# subject per day. The delta is read from the worktree, not the index,
+# because the common `git add -A && git commit` chain stages *after* a
+# PreToolUse hook has asked. The floor detects and refuses; it never answers.
+
+UNATTENDED_ENV = "MDLLM_UNATTENDED"   # set by the dispatcher's tick: no human to ask
+GATE_DEPENDANTS_SHOWN = 4
+
+
+def _delta_against_head(root: Path):
+    """Staged and unstaged tracked changes against HEAD, or None when git
+    cannot say (no HEAD yet, not a repository) — the gate then opens and
+    says it could not look rather than minting a refusal."""
+    try:
+        r = subprocess.run(["git", "diff", "HEAD", "--name-status", "-z", "-M"],
+                           cwd=root, capture_output=True, timeout=20)
+    except Exception:
+        return None
+    if r.returncode != 0:
+        return None
+    return _parse_name_status_z(r.stdout)
+
+
+def _untracked(root: Path) -> set[str]:
+    try:
+        r = subprocess.run(["git", "ls-files", "--others", "--exclude-standard", "-z"],
+                           cwd=root, capture_output=True, timeout=20)
+    except Exception:
+        return set()
+    if r.returncode != 0:
+        return set()
+    return {p.decode("utf-8", "surrogateescape") for p in r.stdout.split(b"\0") if p}
+
+
+def _inbound_ids(corpus) -> dict[str, list[str]]:
+    """Who depends on whom, by id — the same edge set `_inbound_counts`
+    counts, kept as names so the ask can say which dependants wait."""
+    out: dict[str, list[str]] = {}
+    for t in corpus.things:
+        if not t.id:
+            continue
+        for ref in iter_structural_references(t.meta, cue_only=True):
+            out.setdefault(ref.target, []).append(t.id)
+    return out
+
+
+def staged_report(root: Path, corpus, today: dt.date | None = None) -> dict:
+    """The gate's question: definition surfaces changed in the commit in
+    hand that no cue on disk covers."""
+    today = today or dt.date.today()
+    delta = _delta_against_head(root)
+    if delta is None:
+        return {"walk_ok": False, "owed": [], "head": "",
+                "unattended": bool(os.environ.get(UNATTENDED_ENV))}
+    changed = {rel for state, _, rel in delta if state.startswith("M")}
+    in_delta = ({rel for _, _, rel in delta}
+                | {old for _, old, _ in delta if old}
+                | _untracked(root))
+    cues_by_subject: dict[str, list[dict]] = {}
+    by_path = {}
+    for t in corpus.things:
+        if not t.id:
+            continue
+        by_path[t.path.resolve()] = t
+        if str(t.meta.get("type")) != "cue":
+            continue
+        subj = t.meta.get("subject")
+        if not subj:
+            continue
+        created = t.meta.get("created")
+        if isinstance(created, dt.datetime):
+            created = created.date()
+        elif isinstance(created, str) and ISO_RE.match(created):
+            created = dt.date.fromisoformat(created[:10])
+        elif not isinstance(created, dt.date):
+            created = None
+        try:
+            rel = t.path.resolve().relative_to(root).as_posix()
+        except ValueError:
+            rel = ""
+        cues_by_subject.setdefault(str(subj), []).append(
+            {"created": created, "path": rel})
+    inbound: dict[str, list[str]] | None = None
+    owed: list[dict] = []
+    for rel in sorted(changed):
+        t = by_path.get((root / rel).resolve())
+        if t is None:
+            continue
+        typ = str(t.meta.get("type"))
+        if typ == "cue" or typ not in DEFINITION_SURFACE_TYPES:
+            continue
+        if any(c["created"] == today or (c["path"] and c["path"] in in_delta)
+               for c in cues_by_subject.get(t.id, [])):
+            continue
+        if inbound is None:
+            inbound = _inbound_ids(corpus)
+        owed.append({"subject": t.id, "type": typ, "path": rel,
+                     "dependants": sorted(inbound.get(t.id, []))})
+    try:
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root,
+                              capture_output=True, text=True, timeout=20
+                              ).stdout.strip().lower()
+    except Exception:
+        head = ""
+    return {"walk_ok": True, "owed": owed, "head": head,
+            "unattended": bool(os.environ.get(UNATTENDED_ENV))}
+
+
+def staged_text(rep: dict) -> list[str]:
+    """The refusal's text — what the agent reads in the tool's own channel.
+    Vendor-neutral: the harness adapter names its own prompt tool."""
+    if not rep["walk_ok"]:
+        return ["## The cue question — could not look",
+                "- git has no HEAD to diff against here; the gate opens with "
+                "nothing checked"]
+    head = ("## The cue question — the commit in hand changes what the domain "
+            "reasons from")
+    if not rep["owed"]:
+        return [head, "- none — every definition surface changed in the commit "
+                      "in hand carries its cue"]
+    lines = [head]
+    for o in rep["owed"]:
+        deps = o["dependants"]
+        shown = ", ".join(f"`{d}`" for d in deps[:GATE_DEPENDANTS_SHOWN])
+        if len(deps) > GATE_DEPENDANTS_SHOWN:
+            shown += f", +{len(deps) - GATE_DEPENDANTS_SHOWN} more"
+        lines.append(f"- `{o['subject']}` — definition surface (`{o['type']}`); "
+                     f"{len(deps)} dependant(s)"
+                     + (f": {shown}" if deps else "")
+                     + f" (`mdllm touchpoints {o['subject']}`)")
+    if rep["unattended"]:
+        lines += [
+            "",
+            "Unattended run: the verdict is not yours "
+            "(`unattended-cue-carrier-2026-09-12`). Raise and file: "
+            "`mdllm cues . --staged --raise`, then `git add things/cues`, commit "
+            "again, and name the cue in your digest as a seat item.",
+        ]
+    else:
+        lines += [
+            "",
+            "The verdict is the operator's, asked now, where the change lands "
+            "(`the-verdict-is-asked-where-the-change-lands-2026-10-05`). Put it "
+            "to them through the harness's native choice prompt — one question "
+            "per subject, the option you judge right first and marked as "
+            "recommended:",
+            "  Inflection? — `<subject>` changes in this commit. Does the change "
+            "alter a rule, a workflow, or a thing the domain reasons from?",
+            "  1. Inflection — walk its dependants before this lands "
+            "(`mdllm touchpoints <subject>`); name them in the cue.",
+            "  2. Not an inflection — the dependants hold as written; say why.",
+            "  3. File to the seat — leave the cue open for the retrospective.",
+            "Then `mdllm cues . --staged --raise` (writes the open cue, pinned to "
+            "HEAD); for 1 or 2 set `verdict`, `verdict_reason` in the operator's "
+            "words and `status: answered`; `git add things/cues`; commit again. "
+            "The commit waits until the cue is on disk.",
+        ]
+    return lines
+
+
+CUE_STAGED_BODY = """---
+id: {cue_id}
+type: cue
+status: open
+version: 1.0
+created: {today}
+subject: {subject}
+raised_at: {sha}
+raised_by: "floor — mdllm cues --staged --raise"
+verdict:
+verdict_reason:
+tags: [cue, raised-mechanically, commit-boundary]
+---
+
+# Cue: `{subject}` was modified — inflection?
+
+## The Change
+Raised by the floor at the commit boundary on {today}: `{subject}` is a
+definition surface (`{typ}`) and changes in the commit this cue rides in,
+on top of `{sha7}`. {dependants} `mdllm touchpoints {subject}` lists what
+depends on it; `git show` on the carrying commit shows what moved. The raise
+is mechanical; the verdict was asked where the change landed
+(`the-verdict-is-asked-where-the-change-lands-2026-10-05`).
+
+## The Question
+Does this change alter the logical path — a rule, a workflow, a thing the
+domain reasons from — or only how an existing path is expressed?
+(`change-reconciliation.md` → The Driver Names The Inflection.)
+
+## The Answer
+Open. The operator's pick, in their words, or the framework agent citing the
+ruling that already covers it (`framework-agent-closes-settled-cues-2026-09-13`);
+set `verdict`, `verdict_reason` and `status: answered` in the carrying commit:
+
+1. `inflection` — run the four beats (cue → assimilate → walk → seal) and
+   name the touch points walked and the commit that sealed them.
+2. `not-inflection` — the dependants still hold as written; say why.
+3. Left open — filed to the seat; answered at the retrospective.
+"""
+
+
+def raise_staged_cues(root: Path, rep: dict) -> list[Path]:
+    """Write one open cue per owed subject, pinned to HEAD (the parent of the
+    commit the cue will ride in). Never overwrites a cue already on disk
+    today for that subject. The verdict is left empty."""
+    today = dt.date.today().isoformat()
+    cues_dir = root / "things" / "cues"
+    written: list[Path] = []
+    for o in rep["owed"]:
+        cue_id = f"cue-{o['subject']}-{today}"
+        path = cues_dir / f"{cue_id}.md"
+        if path.exists():
+            continue
+        cues_dir.mkdir(parents=True, exist_ok=True)
+        sha = rep["head"] or "HEAD"
+        deps = o["dependants"]
+        dependants = (f"{len(deps)} thing(s) depend on it: "
+                      + ", ".join(f"`{d}`" for d in deps[:GATE_DEPENDANTS_SHOWN])
+                      + (f", +{len(deps) - GATE_DEPENDANTS_SHOWN} more" if len(deps) > GATE_DEPENDANTS_SHOWN else "")
+                      + "." if deps else "Nothing links to it yet.")
+        path.write_text(CUE_STAGED_BODY.format(
+            cue_id=cue_id, today=today, subject=o["subject"], sha=sha,
+            sha7=sha[:7], typ=o["type"], dependants=dependants),
+            encoding="utf-8", newline="\n")
+        written.append(path)
+    return written
+
+
+def _cmd_cues_staged(args, root: Path, corpus) -> int:
+    rep = staged_report(root, corpus)
+    for ln in staged_text(rep):
+        print(ln)
+    if not rep["owed"]:
+        if getattr(args, "raise_", False) and rep["walk_ok"]:
+            print("- nothing to raise")
+        return 0
+    if getattr(args, "raise_", False):
+        written = raise_staged_cues(root, rep)
+        print(f"- **Raised ({len(written)}):** open cue thing(s) written, pinned to "
+              f"HEAD — the verdict is still owed on each; `git add things/cues` "
+              f"and commit them with the change:")
+        for p in written:
+            print(f"    - {p.relative_to(root).as_posix()}")
+        if len(written) < len(rep["owed"]):
+            print("    - (a cue already on disk today for a subject was kept, "
+                  "not overwritten)")
+        return 0
+    return 1
+
+
 def cmd_cues(args) -> int:
     """Advisory, exit 0 always: the cue question, read back off the commit
     stream and held until answered. Reports; with `--raise` writes the open
-    cue for each unraised modification — never the verdict."""
+    cue for each unraised modification — never the verdict. The one
+    exception is `--staged`, the gate's question for the commit in hand,
+    which exits 1 while a definition surface changes with no cue on disk."""
     root = Path(args.path).resolve()
     try:
         corpus, _ = scan(root)
     except Exception as exc:
         print(f"mdllm: cues cannot scan {root}: {exc}")
         return 2
+    if getattr(args, "staged", False):
+        return _cmd_cues_staged(args, root, corpus)
     since = None
     raw = getattr(args, "since", None)
     if raw:

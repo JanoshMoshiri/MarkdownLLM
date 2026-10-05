@@ -335,3 +335,139 @@ def test_raise_with_nothing_unraised_says_so(tmp_path, capsys):
     rc, out = _run_raise(root, capsys)
     assert rc == 0 and "nothing to raise" in out
     assert not (root / "things" / "cues").exists()
+
+
+# ------------------------------------------------------------------ the gate
+# `cues --staged` — the ask, where the change lands
+# (the-verdict-is-asked-where-the-change-lands-2026-10-05): the question for
+# the commit in hand, exit 1 while a definition surface changes with no cue on
+# disk; `--staged --raise` writes the cue pinned to HEAD; one ask per subject
+# per day; an unattended run is told to raise and file, never answer.
+
+def _seed_surface(tmp_path: Path) -> Path:
+    """A definition surface (`insight`) with two dependants, committed once."""
+    root = tmp_path / "dom"
+    (root / "things").mkdir(parents=True)
+    _sync_git(root, "init", "-q")
+    write(root, "things/surface.md",
+          "---\nid: surface\ntype: insight\nstatus: active\ncreated: 2026-08-01\n---\n# I\n")
+    for i in range(2):
+        write(root, f"things/leaf{i}.md",
+              "---\nid: leaf%d\ntype: note\nstatus: active\ncreated: 2026-08-01\n"
+              "linked_things:\n  - id: surface\n    relation: references\n---\n# L\n" % i)
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "seed")
+    return root
+
+
+def _touch(root: Path, rel: str, msg: str) -> None:
+    """Modify without committing — the state a PreToolUse gate sees."""
+    p = root / rel
+    p.write_text(p.read_text(encoding="utf-8") + f"\n{msg}\n", encoding="utf-8")
+
+
+def _run_staged(root: Path, capsys, raise_: bool = False):
+    from markdownllm.touchpoints import cmd_cues
+    rc = cmd_cues(argparse.Namespace(path=str(root), since=None, raise_=raise_,
+                                     staged=True))
+    return rc, capsys.readouterr().out
+
+
+def test_staged_owes_the_question_for_a_changed_definition_surface(tmp_path, capsys):
+    root = _seed_surface(tmp_path)
+    _touch(root, "things/surface.md", "this is how it needs to be")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 1
+    assert "`surface`" in out and "definition surface (`insight`)" in out
+    assert "2 dependant(s): `leaf0`, `leaf1`" in out
+    assert "native choice prompt" in out and "File to the seat" in out
+    assert "cues . --staged --raise" in out
+
+
+def test_staged_is_not_asked_for_a_fan_in_data_thing(tmp_path, capsys):
+    # The gate's scope is the definition surfaces; a data thing reasoned from
+    # by fan-in stays with `cues` and the retrospective's net.
+    root = _seed(tmp_path)  # spine: type note, three inbound edges
+    _touch(root, "things/spine.md", "revise spine")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "- none" in out
+
+
+def test_staged_is_quiet_when_nothing_reasoned_from_changed(tmp_path, capsys):
+    root = _seed_surface(tmp_path)
+    _touch(root, "things/leaf0.md", "tweak a leaf")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "- none" in out
+
+
+def test_staged_raise_writes_the_cue_pinned_to_head_and_opens_the_gate(tmp_path, capsys):
+    root = _seed_surface(tmp_path)
+    head = _head(root)
+    _touch(root, "things/surface.md", "this is how it needs to be")
+    rc, out = _run_staged(root, capsys, raise_=True)
+    assert rc == 0 and "Raised (1)" in out
+    today = __import__("datetime").date.today().isoformat()
+    cue = root / "things" / "cues" / f"cue-surface-{today}.md"
+    assert cue.exists()
+    text = cue.read_text(encoding="utf-8")
+    assert f"raised_at: {head}" in text and "status: open" in text
+    assert "verdict:\n" in text  # the verdict is left empty — never the floor's
+    # The cue on disk (untracked, in the delta) opens the gate.
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "- none" in out
+    # Committed together, the carrier reads it as raised and covered.
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "revise surface, cue rides along")
+    rc, out = _run_cues(root, capsys)
+    assert "Unanswered (1)" in out and "Unraised" not in out
+
+
+def test_staged_raise_leaves_a_cue_the_validator_accepts(tmp_path):
+    root = _seed_surface(tmp_path)
+    _touch(root, "things/surface.md", "revise")
+    from markdownllm.touchpoints import cmd_cues
+    assert cmd_cues(argparse.Namespace(path=str(root), since=None, raise_=True,
+                                       staged=True)) == 0
+    assert messages(all_findings(root), "Error") == []
+
+
+def test_a_cue_created_today_covers_the_days_later_edits(tmp_path, capsys):
+    # One ask per subject per day: the fifth refinement in one sitting is not
+    # a fifth dialog, and the carrier agrees after the commit.
+    root = _seed_surface(tmp_path)
+    today = __import__("datetime").date.today().isoformat()
+    sha = _head(root)
+    _touch(root, "things/surface.md", "first edit")
+    write(root, "things/cue-surface.md",
+          _cue("surface", sha, status="answered", verdict="not-inflection",
+               reason="wording only", created=today))
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "first edit, answered at the boundary")
+    _touch(root, "things/surface.md", "second edit, same sitting")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "- none" in out
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "second edit")
+    rc, out = _run_cues(root, capsys)
+    assert "- none" in out
+
+
+def test_staged_unattended_is_told_to_raise_and_file_never_answer(tmp_path, capsys, monkeypatch):
+    root = _seed_surface(tmp_path)
+    _touch(root, "things/surface.md", "revise")
+    monkeypatch.setenv("MDLLM_UNATTENDED", "1")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 1
+    assert "Unattended run" in out and "never" not in out.split("Unattended run")[0]
+    assert "native choice prompt" not in out
+    assert "cues . --staged --raise" in out
+
+
+def test_staged_opens_when_git_has_no_head(tmp_path, capsys):
+    root = tmp_path / "dom"
+    (root / "things").mkdir(parents=True)
+    _sync_git(root, "init", "-q")
+    write(root, "things/surface.md",
+          "---\nid: surface\ntype: insight\nstatus: active\ncreated: 2026-08-01\n---\n# I\n")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "could not look" in out
