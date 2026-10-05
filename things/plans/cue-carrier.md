@@ -229,7 +229,7 @@ is the seeing.
             the walk never ran. The estate's record agreed (see
             `a-preserved-question-is-not-a-done-walk`). Ruled:
             `the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`.
-      - [ ] (f) the corrected shape — the refusal demands the walk's record:
+      - [x] (f) the corrected shape — the refusal demands the walk's record:
             `cues --staged --raise` prefills the cue with the subject's
             declared and literal touchpoints as a checklist; the agent
             judges each (consistent / revised / ruling), revises at
@@ -237,7 +237,10 @@ is the seeing.
             through the native prompt only for what it may not settle;
             unattended runs assimilate and file. Spec: *The Walk Runs On
             Detection* replaces *The Ask*; *The Driver Names The Inflection*
-            becomes the driver naming the residue.
+            becomes the driver naming the residue. *Done 2026-10-05
+            (ae4e61d, 69dade0, 8c52a72); walked on itself: nine cues in the
+            day, one residue question put through the prompt and answered
+            in the room (narrow two insights in place).*
 
 ## Done when
 
