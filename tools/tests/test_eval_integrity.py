@@ -242,6 +242,31 @@ def test_answer_key_references_in_a_transcript_are_detected():
     assert _answer_key_hits("read C:/x/evals/polar-station-longitudinal.yaml")
     assert _answer_key_hits("python evals/generators/polar_station_htc.py")
     assert _answer_key_hits("cat things/station-budget.md") == []
+    # The run root itself must not trip the guard (the first smoke voided
+    # every trial on its own workspace path).
+    assert _answer_key_hits(r"cwd C:\Temp\mdllm-evals\20261005-x-fw-t1\things") == []
+
+
+def test_reset_keeps_runner_artefacts_and_tolerates_clean_failure(tmp_path):
+    import subprocess as sp
+    from markdownllm.evals import _reset_to_committed, _uncommitted_work
+    ws = tmp_path / "ws"
+    (ws / "things").mkdir(parents=True)
+    (ws / "things" / "a.md").write_text("x", encoding="utf-8")
+    sp.run(["git", "init", "-q"], cwd=ws, check=True)
+    sp.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], cwd=ws, check=True)
+    sp.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "seed"],
+           cwd=ws, check=True)
+    (ws / "agent-stdout-1-build.json").write_text("{}", encoding="utf-8")
+    (ws / "scratch.py").write_text("print()", encoding="utf-8")
+    (ws / "things" / "b.md").write_text("new", encoding="utf-8")
+    (ws / "things" / "a.md").write_text("edited", encoding="utf-8")
+    assert sorted(_uncommitted_work(ws)) == ["things/a.md", "things/b.md"]
+    assert _reset_to_committed(ws) is None
+    assert (ws / "agent-stdout-1-build.json").exists()      # transcript survives
+    assert not (ws / "scratch.py").exists()                  # scratch does not
+    assert not (ws / "things" / "b.md").exists()
+    assert (ws / "things" / "a.md").read_text(encoding="utf-8") == "x"
 
 
 def test_assertions_carry_their_changed_tag_and_count_things_of_type(tmp_path):

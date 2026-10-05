@@ -145,8 +145,13 @@ FRAMEWORK_VIEW_INCLUDE = (
     "tools/mdllm.py", "tools/mdllm.ps1", "tools/markdownllm",
 )
 FRAMEWORK_VIEW_EXCLUDE_DIRS = ("__pycache__", "tests")
-ANSWER_KEY_PATTERNS = (r"evals[\\/]", r"polar_station_htc", r"-longitudinal\.yaml",
-                       r"sleeping-bag-fac\.yaml", r"vat-quarter-basic\.yaml")
+# Anchored so the run root (`…/mdllm-evals/…`) does not match: only the
+# framework's own evals/ folder, the generators and the fixture files do.
+ANSWER_KEY_PATTERNS = (r"(?<![A-Za-z0-9_-])evals[\\/]", r"polar_station_htc",
+                       r"-longitudinal\.yaml", r"sleeping-bag-fac\.yaml",
+                       r"vat-quarter-basic\.yaml")
+# Runner artefacts that live in the workspace but are not the agent's work.
+RUNNER_FILES = ("agent-stdout*", "agent-stderr*", "result.json")
 
 
 def _tree_fingerprint(base: Path) -> str:
@@ -197,16 +202,38 @@ def _answer_key_hits(text: str) -> list[str]:
                    for m in re.finditer(pat, text or "")})
 
 
-def _git_dirty(run_dir: Path) -> bool:
-    out = subprocess.run(["git", "status", "--porcelain"], cwd=run_dir,
-                         capture_output=True, text=True, encoding="utf-8")
-    return bool(out.stdout.strip())
+def _uncommitted_work(run_dir: Path, domain_dir: str | None = None) -> list[str]:
+    """Dirty paths that are the agent's WORK: things, the standard, AGENTS.md.
+    A scratch script, a stray harness file or the runner's own artefacts are
+    not work left uncommitted."""
+    out = subprocess.run(["git", "status", "--porcelain", "-z"], cwd=run_dir,
+                         capture_output=True, text=True, encoding="utf-8",
+                         errors="replace")
+    base = f"{domain_dir.strip('/')}/" if domain_dir else ""
+    work_prefixes = tuple(base + p for p in ("things/", "standard/", "skills/", "AGENTS.md"))
+    dirty = []
+    for entry in out.stdout.split("\0"):
+        if len(entry) < 4:
+            continue
+        path = entry[3:].replace("\\", "/")
+        if path.startswith(work_prefixes):
+            dirty.append(path)
+    return dirty
 
 
-def _reset_to_committed(run_dir: Path) -> None:
-    """Committed state is the carrier between sessions, by construction."""
+def _reset_to_committed(run_dir: Path) -> str | None:
+    """Committed state is the carrier between sessions, by construction.
+    Returns a note when the clean could not remove everything (a stray file
+    with a name git cannot handle, say) — logged, never fatal: the committed
+    tree is still what the next session reads."""
     subprocess.run(["git", "reset", "-q", "--hard"], cwd=run_dir, check=True)
-    subprocess.run(["git", "clean", "-fdq"], cwd=run_dir, check=True)
+    excludes = [arg for pat in RUNNER_FILES for arg in ("-e", pat)]
+    out = subprocess.run(["git", "clean", "-fdq", *excludes], cwd=run_dir,
+                         capture_output=True, text=True, encoding="utf-8",
+                         errors="replace")
+    if out.returncode != 0:
+        return (out.stderr or out.stdout or "git clean failed").strip()[:300]
+    return None
 
 
 def _seed_fingerprint(seed: Path) -> str:
@@ -659,7 +686,9 @@ def cmd_eval(args) -> int:
                 # Sessions share one working tree; without this, uncommitted
                 # edits carry as well as committed ones and the "committed
                 # state is the only carrier" claim is untested.
-                _reset_to_committed(run_dir)
+                note = _reset_to_committed(run_dir)
+                if note:
+                    print(f"  [{sname}] reset note: {note}")
             assert claude_exe is not None
             cmd[0] = claude_exe
             t0 = dt.datetime.now()
@@ -724,7 +753,8 @@ def cmd_eval(args) -> int:
             if key_hits and not voided:
                 voided = f"answer-key reference in session {sname}: {key_hits}"
                 print(f"  [{sname}] VOIDED — {voided}")
-            uncommitted = _git_dirty(run_dir)
+            dirty_work = _uncommitted_work(run_dir, fixture.get("domain_dir"))
+            uncommitted = bool(dirty_work)
             records = check_assertions_detailed(sfx, run_dir)
             passed = sum(1 for r in records if r["passed"])
             failed = len(records) - passed
@@ -768,6 +798,7 @@ def cmd_eval(args) -> int:
                                  "failures": failures,
                                  "changed": changed, "unchanged": unchanged,
                                  "uncommitted_at_end": uncommitted,
+                                 "uncommitted_paths": dirty_work[:20],
                                  "answer_key_hits": key_hits})
             if agent_failure:
                 # Later sessions depend on a trustworthy state transition.  Do
