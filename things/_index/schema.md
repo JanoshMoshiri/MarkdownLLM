@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-05
-generated: 2026-10-05T10:05:09
-generated_from: HEAD@8c52a72
-coverage: 504
+generated: 2026-10-05T21:52:59
+generated_from: HEAD@e8f8da2
+coverage: 506
 framework_version: 3.46.0
 ---
 
@@ -14,34 +14,34 @@ framework_version: 3.46.0
 
 | field | things using it |
 |---|---|
-| id | 504 |
-| type | 504 |
-| status | 504 |
-| created | 504 |
-| version | 431 |
-| tags | 400 |
-| linked_things | 368 |
-| origin | 197 |
-| confidence | 194 |
-| session | 190 |
+| id | 506 |
+| type | 506 |
+| status | 506 |
+| created | 506 |
+| version | 433 |
+| tags | 402 |
+| linked_things | 370 |
+| origin | 198 |
+| confidence | 195 |
+| session | 192 |
 | source | 148 |
-| informed_by | 136 |
+| informed_by | 137 |
 | subject | 131 |
 | raised_at | 131 |
 | raised_by | 131 |
 | verdict | 131 |
 | verdict_reason | 131 |
-| priority | 59 |
+| priority | 60 |
 | disposition | 51 |
 | disposition_reason | 51 |
-| decided_by | 38 |
+| decided_by | 39 |
 | exposed | 27 |
 | promoted_to | 24 |
 | period_start | 9 |
 | period_end | 9 |
 | domain | 9 |
 | completed | 8 |
-| triggers | 6 |
+| triggers | 7 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |

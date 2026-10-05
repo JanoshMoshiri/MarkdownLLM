@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-05
-generated: 2026-10-05T10:05:09
-generated_from: HEAD@8c52a72
-coverage: 124
+generated: 2026-10-05T21:52:59
+generated_from: HEAD@e8f8da2
+coverage: 127
 framework_version: 3.46.0
 ---
 
@@ -21,6 +21,9 @@ framework_version: 3.46.0
 
 ## a-remembered-step-is-a-missing-actor
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @68c83cee2b400b75c52f346c0506c01dfd273bb2)
+
+## a-stated-dismissal-condition-needs-a-reader
+- the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @7bffcb162f01c5cc6afb98756eca58bc5c5f79fe)
 
 ## a-true-primitive-is-discovered-not-authored
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
@@ -44,6 +47,9 @@ framework_version: 3.46.0
 ## change-reconciliation-specification
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
 - the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @54e906dcad0955857c3a086d076c4dbe7e6a8284)
+
+## circulation-is-not-disposition
+- the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @8c52a723496f4a45fbcb042b1c61f5b49816c60b)
 
 ## claude-entry-surface-unprovisioned-for-no-adapter-domains
 - a-missing-contract-degrades-to-semantic-drift-not-breakage (derived-from)
@@ -85,6 +91,7 @@ framework_version: 3.46.0
 - gates-census-2026-08 (pinned @8f6d92c2b498ce18c2314fd7001c97a2ddcf5ca0)
 - gates-census-ratified-2026-08-28 (pinned @d818697185cdece9e50f8ad98fc93455ae81531c)
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+- the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @68c83cee2b400b75c52f346c0506c01dfd273bb2)
 - unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
 ## codex-desktop-session-start-negative-2026-08-14
@@ -433,6 +440,7 @@ framework_version: 3.46.0
 ## retrospective-specification
 - estate-retrospective-synthesis-2026-08 (pinned @3c1b449acf2c927cad3850d55c7b393f3a67f569)
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
+- the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @7487ab3c219946dc468ecda2ee228e4157437d6e)
 
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)
@@ -475,6 +483,9 @@ framework_version: 3.46.0
 
 ## session-end-is-the-least-current-read-of-the-session
 - estate-retrospective-synthesis-2026-08 (derived-from)
+
+## session-memory-specification
+- the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @214770d5a267aa102c8c2a0eb36fd7a0e571bbea)
 
 ## settled-reasoning-is-standing-authority
 - framework-agent-closes-settled-cues-2026-09-13 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
@@ -528,6 +539,7 @@ framework_version: 3.46.0
 - cue-estate-mechanics-guide-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-inflection-candidates-are-computable-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)

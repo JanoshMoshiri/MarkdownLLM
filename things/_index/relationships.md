@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-05
-generated: 2026-10-05T10:05:09
-generated_from: HEAD@8c52a72
-coverage: 504
+generated: 2026-10-05T21:52:59
+generated_from: HEAD@e8f8da2
+coverage: 506
 framework_version: 3.46.0
 ---
 
@@ -1563,6 +1563,20 @@ framework_version: 3.46.0
 - the-orchestrators-premises-are-the-least-reliable-input --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - the-orchestrators-premises-are-the-least-reliable-input --complements--> the-root-is-not-a-representative-domain
 - the-orchestrators-premises-are-the-least-reliable-input --references--> consequence-is-recoverable-only-in-retrospect
+- the-reckoning --implements--> the-reckoning-is-the-digestion-beat-2026-10-05
+- the-reckoning --implements--> closed-loop-operating-state
+- the-reckoning --references--> cue-carrier
+- the-reckoning --extends--> session-memory-specification
+- the-reckoning --extends--> retrospective-specification
+- the-reckoning --references--> circulation-is-not-disposition
+- the-reckoning-is-the-digestion-beat-2026-10-05 --extends--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+- the-reckoning-is-the-digestion-beat-2026-10-05 --references--> circulation-is-not-disposition
+- the-reckoning-is-the-digestion-beat-2026-10-05 --references--> a-stated-dismissal-condition-needs-a-reader
+- the-reckoning-is-the-digestion-beat-2026-10-05 --references--> a-preserved-question-is-not-a-done-walk
+- the-reckoning-is-the-digestion-beat-2026-10-05 --informs--> closed-loop-operating-state
+- the-reckoning-is-the-digestion-beat-2026-10-05 --informs--> session-memory-specification
+- the-reckoning-is-the-digestion-beat-2026-10-05 --informs--> retrospective-specification
+- the-reckoning-is-the-digestion-beat-2026-10-05 --informs--> the-reckoning
 - the-record-answers-the-direction-question-first --supports--> llm-driven-systems-manifesto
 - the-record-answers-the-direction-question-first --references--> git-workflow-specification
 - the-record-answers-the-direction-question-first --references--> evidence-and-eval-backlog

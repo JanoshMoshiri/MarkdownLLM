@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: triggers
 created: 2026-10-05
-generated: 2026-10-05T10:05:09
-generated_from: HEAD@8c52a72
-coverage: 6
+generated: 2026-10-05T21:52:59
+generated_from: HEAD@e8f8da2
+coverage: 7
 framework_version: 3.46.0
 ---
 
@@ -36,4 +36,8 @@ framework_version: 3.46.0
 ## substrate-native-a2a
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-10-10 reached, action=Has Phase 4 run one real writer/reviewer turn through `mdllm watch` in the engineering domain? If not, establish which: the command was never armed, was armed and never woke, or woke and the turn was hand-relayed anyway. The third is the interesting failure — it would mean the doorbell rings and nobody rises, which is a seat problem and not a channel problem. Re-date once answered.
+
+## the-reckoning
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-10-19 reached, action=surface, note=Two weeks: has one attended session ended through the reckoning, and has one tick drafted one? If neither, the actor is the problem, not the command.
 
