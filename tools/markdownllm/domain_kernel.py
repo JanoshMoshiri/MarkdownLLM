@@ -46,7 +46,7 @@ _FRAMEWORK_HARD_HOOKS = (
     "hardened to `harness-session` where an adapter binds it.\n"
     "- `pre-domain-scaffold:isolate` — new domains are born via `mdllm scaffold`. "
     "Anchor: `git-fs`.\n"
-    "- `pre-commit:gate` — where the harness projects it (Claude Code), a commit "
+    "- `pre-commit:gate` — where the harness projects it, a commit "
     "that changes a definition surface is refused until its cue is on disk: ask the "
     "operator through the native choice prompt, raise the cue, commit again "
     "(`change-reconciliation.md` → The Ask). Anchor: `harness-session` where an "
