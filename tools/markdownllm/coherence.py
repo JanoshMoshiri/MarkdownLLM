@@ -637,6 +637,14 @@ def coherence_findings(root: Path, window: int,
     run_targets = {str(t.meta.get("definition")) for t in corpus.things
                    if str(t.meta.get("type")) == "workflow-run"
                    and t.meta.get("definition") is not None}
+    # A carrier-bound definition's runs are the things of its carrier type
+    # (workflow-state.md → Carrier Binding): one such thing answers the check.
+    from .workflows import carrier_types
+    used_types = {str(t.meta.get("type")) for t in corpus.things}
+    for t in corpus.things:
+        if (str(t.meta.get("type")) == "workflow-definition" and t.id
+                and set(carrier_types(t.meta)) & used_types):
+            run_targets.add(str(t.id))
     for t in corpus.things:
         if str(t.meta.get("type")) != "workflow-definition":
             continue
@@ -647,7 +655,7 @@ def coherence_findings(root: Path, window: int,
             continue
         findings.append(Finding(SEV_INFO, t.id or t.path.name,
             f"workflow-definition is `{status}` with zero workflow-runs "
-            f"pointing at it via `definition:` — a defined process with no "
+            f"pointing at it via `definition:` and no carrier things — a defined process with no "
             f"run governs nothing; give it its first run, or retire/park it "
             f"with the reason recorded"))
 

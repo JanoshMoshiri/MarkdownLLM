@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-07
-generated: 2026-10-07T00:45:06
-generated_from: HEAD@374b596
+generated: 2026-10-07T00:59:41
+generated_from: HEAD@01e42eb
 coverage: 129
 framework_version: 3.46.0
 ---
@@ -609,5 +609,8 @@ framework_version: 3.46.0
 - workflows-emerge-from-use-2026-10-07 (pinned @67d236571a3676215e0da63563d59532f997bdf8)
 
 ## workflows-emerge-from-use-2026-10-07
+- cue-framework-map-2026-10-07 (pinned @01e42eb2bfca0705b7b5468d09ba6027146f9167)
+- cue-operator-guide-2026-10-07 (pinned @01e42eb2bfca0705b7b5468d09ba6027146f9167)
+- cue-session-memory-specification-2026-10-07 (pinned @01e42eb2bfca0705b7b5468d09ba6027146f9167)
 - cue-workflow-state-specification-2026-10-07 (pinned @374b59657de2fb3b07edf8148a2cfdfbddf83a65)
 

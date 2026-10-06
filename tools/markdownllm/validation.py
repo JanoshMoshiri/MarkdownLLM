@@ -26,6 +26,7 @@ from .model import (
     Thing, Finding, Corpus, parse_frontmatter, scan,
 )
 from .workflow_actors import workflow_actor_findings
+from .workflows import carrier_findings
 from .yaml_loader import load_yaml
 from .repository_view import (
     RepositoryView, RepositoryViewError, RepositoryViewMode,
@@ -1168,6 +1169,7 @@ def validate_corpus(root: Path,
     findings.extend(workflow_run_findings(root, corpus, workflow_resolver))
     findings.extend(workflow_fulfilment_findings(corpus))
     findings.extend(workflow_actor_findings(corpus))
+    findings.extend(carrier_findings(corpus))
     findings.extend(workflow_transition_findings(
         root, corpus, view, workflow_resolver))
     findings.extend(validate_level3(corpus))

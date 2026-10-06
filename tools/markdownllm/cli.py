@@ -108,6 +108,7 @@ from .session import cmd_session_start
 from .tokens import cmd_tokens
 from .touchpoints import cmd_candidates, cmd_cues, cmd_touchpoints
 from .reckon import cmd_reckon
+from .workflows import cmd_workflows
 from .triggers import cmd_triggers
 from .validation import cmd_validate
 from .watch import cmd_watch
@@ -599,6 +600,26 @@ def build_cli() -> argparse.ArgumentParser:
                          "surface changes in the last 7 days, and the bands now — "
                          "the same line session-start emits")
     rk.set_defaults(fn=cmd_reckon)
+
+    wf = sub.add_parser("workflows", help="workflows and their runs: each "
+                        "definition with its carrier-derived runs by stage and "
+                        "the departures history shows since it last changed; "
+                        "--emergent adds the paths the record supports as a "
+                        "workflow no definition binds, with evidence; read-only "
+                        "except --draft; exit 0")
+    wf.add_argument("path", nargs="?", default=".")
+    wf.add_argument("--emergent", action="store_true",
+                    help="mine the commit stream for paths things of one type "
+                         "keep travelling — three or more stages, across days, "
+                         "no same-day bookkeeping, no generic lifecycles; names "
+                         "an unbound definition that already overlaps")
+    wf.add_argument("--draft", action="store_true",
+                    help="with --emergent: write each candidate with no "
+                         "overlapping definition as a workflow-definition marked "
+                         "origin: inferred, bound to its carrier, edges from what "
+                         "was observed — the skeleton the agent completes; never "
+                         "overwrites")
+    wf.set_defaults(fn=cmd_workflows)
 
     bd = sub.add_parser("boundary", help="disclosure-boundary check: staged "
                         "additions, filenames, or a commit message against the "

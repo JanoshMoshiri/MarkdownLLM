@@ -213,6 +213,10 @@ CORE_FIELDS = {
     # workflow-run cursor (structural reference fields are supplied once by
     # structural_field_names() below)
     "current_stage", "stages", "definition_commit",
+    # carrier binding (workflow-state.md → Carrier Binding): the thing type a
+    # definition's work travels through — tool-read (validation, `mdllm
+    # workflows`) and framework-shipped with the reserved type (criteria 1+2)
+    "carrier",
     # advisory coordination claim (coordination-claim.md) — read and respected
     # by convention, not by the tool; SHIPPED by the framework into every
     # domain as part of the `workflow-run` frontmatter contract

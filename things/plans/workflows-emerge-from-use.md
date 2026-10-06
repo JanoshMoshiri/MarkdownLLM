@@ -2,7 +2,7 @@
 id: workflows-emerge-from-use
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-10-07
 session: 2026-10-05
 priority: critical
@@ -42,20 +42,20 @@ semantics and checks. A Codex binding before Claude Code proves it.
 - [x] **Phase 0 — Record it.** `workflows-emerge-from-use-2026-10-07` in the
       operator's words; `workflow-state.md` 0.8 → 0.9 gains *Carrier
       Binding* and *Workflows Emerge From Use*; this plan. *Done 2026-10-07.*
-- [ ] **Phase 1 — The floor finds.** `mdllm workflows [path] --emergent`:
+- [x] **Phase 1 — The floor finds.** *Done 2026-10-07: first live read — the busiest live domain's specification loop on all three spec types and its ticket loop, each with the unbound definition that already describes it named; none in the root and five other workspaces.* `mdllm workflows [path] --emergent`:
       one pass over the commit stream, the observed state machine per domain
       type, the dominant paths with their support, candidates where a path
       of three or more stages is travelled by enough things across more than
       one day each and no definition binds the type, evidence attached, an
       honest none. Read-only. Done when it names the specification loop and
       ticket loop in the busiest live domain and nothing in the quiet ones.
-- [ ] **Phase 2 — The floor binds.** The `carrier` field validated
+- [x] **Phase 2 — The floor binds.** *Done 2026-10-07; `carrier.type` takes a list, because the first live read found one loop running through three types.* The `carrier` field validated
       (shape; stage map members of the stage set; two live definitions on
       one type refused); `mdllm workflows` lists each definition's derived
       runs by stage and its departures read from history; the zero-run check
       counts carrier things. Done when a bound definition in a live domain
       shows its runs without a run thing written.
-- [ ] **Phase 3 — The agent writes.** `--emergent --draft` writes the
+- [x] **Phase 3 — The agent writes.** *Done 2026-10-07: `--draft`, and `mdllm reckon` carries each emerged path as a settled item — write it, or bind the definition that already describes it.* `--emergent --draft` writes the
       candidate as a `workflow-definition` marked inferred, bound to its
       carrier, its edges from observed transitions, its terminal stages from
       the type's terminal statuses, and per stage the acts the commit stream
@@ -66,7 +66,7 @@ semantics and checks. A Codex binding before Claude Code proves it.
 - [ ] **Phase 4 — The agent follows.** A generated block in the entry file
       naming, per bound type, the workflow and its stages, kept current by
       the drift check the entry file's other blocks already have.
-- [ ] **Phase 5 — Evolve and dissolve.** Departures from an inferred
+- [x] **Phase 5 — Evolve and dissolve.** *Done 2026-10-07 in the reckoning: departures settled or residue by authorship, idle inferred workflows dissolve mechanically; the exit table carries the row.* Departures from an inferred
       workflow become settled reckoning items (revise, or name the slip);
       from an authored one, residue. An inferred workflow nothing has moved
       through within its interval is dissolved; an authored one is asked

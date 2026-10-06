@@ -269,7 +269,8 @@ id: specification-loop
 type: workflow-definition
 status: evolving
 carrier:
-  type: design-spec          # the thing type the work travels through
+  type: design-spec          # the thing type the work travels through — or a list,
+                             # when one loop runs through several types
   map:                       # optional: carrier status -> stage id, where they differ
     draft: drafting
 stages:

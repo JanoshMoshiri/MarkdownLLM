@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-07
-generated: 2026-10-07T00:45:06
-generated_from: HEAD@374b596
-coverage: 511
+generated: 2026-10-07T00:59:41
+generated_from: HEAD@01e42eb
+coverage: 514
 framework_version: 3.46.0
 ---
 
@@ -529,6 +529,7 @@ framework_version: 3.46.0
 - cue-framework-map-2026-09-27 --subject--> framework-map
 - cue-framework-map-2026-10-01 --subject--> framework-map
 - cue-framework-map-2026-10-05 --subject--> framework-map
+- cue-framework-map-2026-10-07 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
@@ -559,6 +560,7 @@ framework_version: 3.46.0
 - cue-operator-guide-2026-09-27 --subject--> operator-guide
 - cue-operator-guide-2026-10-01 --subject--> operator-guide
 - cue-operator-guide-2026-10-05 --subject--> operator-guide
+- cue-operator-guide-2026-10-07 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -579,6 +581,7 @@ framework_version: 3.46.0
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-09-26 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-10-05 --subject--> session-memory-specification
+- cue-session-memory-specification-2026-10-07 --subject--> session-memory-specification
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification

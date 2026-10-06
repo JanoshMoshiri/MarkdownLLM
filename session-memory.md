@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.10
+version: 1.11
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -324,6 +324,7 @@ proposed:
 | `cue` (open) | answer by citation, or walk — always listed |
 | fired trigger | disarm the moment its action text already answers its condition; otherwise act, re-date or disarm, with the thing's movement since the condition as evidence |
 | imported mirror | re-pin when stale, retire when withdrawn, **re-read when diverged in meaning (the operator's)**; unreachable is not reckoned; a mirrored insight or conflict is its source workspace's to reckon |
+| workflow (`workflow-state.md` → Workflows Emerge From Use) | a path the record supports and no definition binds: the agent writes it (`mdllm workflows --emergent --draft`), or binds the unbound definition that already describes it — carrier and map only; a departure from an inferred workflow: the agent revises it or names the slip; **a departure from an authored workflow: the operator's**; an inferred workflow nothing has moved through for 60 days dissolves (mechanical) |
 | non-terminal work | complete the moment every box is ticked; start, unblock or pause after 21 days untouched, saying what it waits on; **cancel or re-parent when its parent is cancelled, and past its own `settles_when` — the operator's** |
 
 **The floor reckons.** `mdllm reckon` names every item's candidate with its

@@ -129,7 +129,7 @@ def _due(meta, created: dt.date | None, interval: int, today: dt.date) -> tuple[
 
 
 def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
-                  imports: bool = False) -> dict:
+                  imports: bool = False, workflows: bool = False) -> dict:
     """Every attention item's disposition candidate, banded, with evidence."""
     today = today or dt.date.today()
     root = Path(root).resolve()
@@ -369,6 +369,61 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
                           f"{status} and untouched {idle}d"
                           + (f"; {ticked}/{len(boxes)} boxes ticked" if boxes else "")))
 
+    # ---- workflows (workflow-state.md → Workflows Emerge From Use) ---------
+    # Emergence and dissolution are the two halves of the workspace learning
+    # its own process; both are the agent's, organically, and only a
+    # departure from what the operator authored is theirs.
+    if workflows:
+        try:
+            from .workflows import (bindings_report, emergent_candidates,
+                                    read_history)
+            hist = read_history(root)
+            for c in emergent_candidates(root, corpus, hist):
+                if c.overlaps:
+                    items.append(Item("workflow", c.carrier, "settled",
+                                      f"bind `{c.overlaps[0]}` to it — carrier and map only, "
+                                      "stages and edges untouched",
+                                      f"{c.moves} moves by {c.things} things across {c.days} "
+                                      f"days travel `{c.carrier}` through "
+                                      f"{' · '.join(c.stages)}"))
+                else:
+                    items.append(Item("workflow", c.carrier, "settled",
+                                      "write the emerged workflow (`mdllm workflows "
+                                      "--emergent --draft`) and its steps",
+                                      f"{c.moves} moves by {c.things} things across {c.days} "
+                                      f"days: {' · '.join(c.stages)}"))
+            last_move: dict[str, dt.date] = {}
+            for mv in hist.moves:
+                if mv.thing_type:
+                    last_move[mv.thing_type] = max(last_move.get(mv.thing_type, mv.day), mv.day)
+            by_id_local = {t.id: t for t in corpus.things if t.id}
+            for row in bindings_report(root, corpus, hist):
+                if not row["carrier"] or row["origin"] == "mirror":
+                    continue
+                if row["departures"]:
+                    band = "settled" if row["origin"] == "inferred" else "residue"
+                    items.append(Item("workflow", row["id"], band,
+                                      "revise the workflow, or name the slip"
+                                      if band == "settled" else
+                                      "rule: has the practice moved, or did the work slip?",
+                                      f"{len(row['departures'])} move(s) its edges do not "
+                                      "declare, since it last changed"))
+                d = by_id_local.get(row["id"])
+                if (row["origin"] == "inferred" and row["status"] != "deprecated"
+                        and d is not None):
+                    from .workflows import carrier_types
+                    recent = [last_move.get(x) for x in carrier_types(d.meta)]
+                    recent = [x for x in recent if x]
+                    idle = (today - max(recent)).days if recent else None
+                    if idle is None or idle >= INTERVALS["insight"]:
+                        items.append(Item("workflow", row["id"], "mechanical",
+                                          "dissolve",
+                                          "inferred, and nothing has moved through it "
+                                          + (f"for {idle}d" if idle is not None else "on record"),
+                                          {"status": "deprecated"}))
+        except Exception as exc:
+            notes.append(f"workflows could not be read: {type(exc).__name__}")
+
     bands = {"mechanical": [], "settled": [], "residue": []}
     for it in items:
         bands[it.band].append(it)
@@ -415,7 +470,7 @@ def render(rep: dict, root: Path) -> list[str]:
 # bands, and never disarms a trigger (re-conditioning a declaration stays the
 # agent's, `trigger-specification.md`).
 
-_APPLIABLE_KINDS = {"insight", "conflict", "work"}
+_APPLIABLE_KINDS = {"insight", "conflict", "work", "workflow"}
 
 
 def _set_frontmatter(path: Path, fields: dict) -> bool:
@@ -568,8 +623,10 @@ def cmd_reckon(args) -> int:
     except Exception as exc:
         print(f"mdllm: reckon cannot scan {root}: {exc}")
         return 2
-    rep = reckon_report(root, corpus, imports=bool(getattr(args, "imports", False)))
-    if getattr(args, "rates", False):
+    rates_only = bool(getattr(args, "rates", False))
+    rep = reckon_report(root, corpus, imports=bool(getattr(args, "imports", False)),
+                        workflows=not rates_only)
+    if rates_only:
         print(rate_line(rep, rates(root, corpus)))
         return 0
     for ln in render(rep, root):

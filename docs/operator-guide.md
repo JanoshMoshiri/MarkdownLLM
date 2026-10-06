@@ -256,6 +256,7 @@ hook, CI, or the agent — but all of them are yours to invoke directly.
 | `triggers` | `mdllm triggers [--estate] [path]` | evaluate trigger conditions; --estate sweeps every local clone with a roll-up (run after estate-sync) |
 | `validate` | `mdllm validate [--quiet] [--view {worktree,index}] [path]` | Levels 1-3 mechanical validation |
 | `watch` | `mdllm watch --role ROLE --definition DEFINITION [--run RUN] [--field FIELD] [--remote REMOTE] [--branch BRANCH] [--interval INTERVAL] [--exit-on-wake] [--once] [--state STATE] [path]` | the doorbell: poll the remote ref and report when a watched thing reaches a stage this role acts at; reads only, never writes |
+| `workflows` | `mdllm workflows [--emergent] [--draft] [path]` | workflows and their runs: each definition with its carrier-derived runs by stage and the departures history shows since it last changed; --emergent adds the paths the record supports as a workflow no definition binds, with evidence; read-only except --draft; exit 0 |
 | `worklog` | `mdllm worklog [--write] [path]` | print a session-grouped view of the commit stream (on-demand; not committed) |
 
 <!-- /generated:toolbox -->
@@ -303,6 +304,7 @@ line, or a line for a subcommand that no longer exists, is a coherence Error.
 - **`session-start`** — A configured adapter runs the ritual for you on an evidenced harness; by hand in any harness without one. `--assert-head <full-sha>` immediately before applying a full-corpus or other long-read result — it refuses if HEAD moved.
 - **`tokens`** — Checking session-cost impact after spec edits.
 - **`reckon`** — When you want to see what the workspace is carrying that it could let go of: every active insight, open conflict, open cue, fired trigger and stalled plan, each with a proposed disposition and why, in three bands. The floor's band it can apply; the agent's it decides by citing the record; yours is the residue, and a healthy workspace shows an empty one. Run it before a session ends or a retrospective starts; `--imports` adds the mirrors.
+- **`workflows`** — When you want to see how work actually flows in the workspace: each workflow with the things currently at each of its stages, and where practice has left the path. `--emergent` shows the processes the record says you keep doing that nobody wrote down, and which of your existing definitions already describe them; you rarely need it, because the agent writes them on its own.
 - **`touchpoints`** — Before changing a load-bearing thing, or during an inflection walk: "what did I just put at risk?"
 - **`triggers`** — "What needs attention?" without starting a full session; `--estate` after `estate-sync` when the question is "what needs doing across the estate?" It reads the working tree, so an uncommitted edit can fire one — the commit discipline is what makes tree and history agree.
 - **`validate`** — Sanity-checking a domain's whole corpus on demand. The hook runs it on every commit against the staged candidate (`--view index`).
