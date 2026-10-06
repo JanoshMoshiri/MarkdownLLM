@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-05
-generated: 2026-10-05T22:10:04
-generated_from: HEAD@8830f31
-coverage: 508
+created: 2026-10-07
+generated: 2026-10-07T00:45:06
+generated_from: HEAD@374b596
+coverage: 511
 framework_version: 3.46.0
 ---
 
@@ -609,6 +609,7 @@ framework_version: 3.46.0
 - cue-workflow-state-specification-2026-09-19 --subject--> workflow-state-specification
 - cue-workflow-state-specification-2026-09-22 --derived-from--> run-membership-is-realisation-2026-09-22
 - cue-workflow-state-specification-2026-09-22 --subject--> workflow-state-specification
+- cue-workflow-state-specification-2026-10-07 --subject--> workflow-state-specification
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality
@@ -1707,6 +1708,15 @@ framework_version: 3.46.0
 - workflow-state-specification --complements--> provenance-specification
 - workflow-state-specification --complements--> orchestration-specification
 - workflow-state-specification --informs--> workflow-run-is-the-decomposition-principle-applied-to-processes
+- workflow-state-specification --references--> workflows-emerge-from-use-2026-10-07
+- workflow-state-specification --references--> workflows-emerge-from-use
+- workflows-emerge-from-use --implements--> workflows-emerge-from-use-2026-10-07
+- workflows-emerge-from-use --extends--> workflow-state-specification
+- workflows-emerge-from-use --references--> the-reckoning
+- workflows-emerge-from-use-2026-10-07 --informs--> workflow-state-specification
+- workflows-emerge-from-use-2026-10-07 --extends--> the-reckoning-is-the-digestion-beat-2026-10-05
+- workflows-emerge-from-use-2026-10-07 --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+- workflows-emerge-from-use-2026-10-07 --informs--> workflows-emerge-from-use
 - write-thing-specification --extends--> thing-specification
 - write-thing-specification --complements--> read-thing-specification
 - write-thing-specification --complements--> git-workflow-specification

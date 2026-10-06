@@ -3,10 +3,10 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-05
-generated: 2026-10-05T22:10:04
-generated_from: HEAD@8830f31
-coverage: 7
+created: 2026-10-07
+generated: 2026-10-07T00:45:06
+generated_from: HEAD@374b596
+coverage: 8
 framework_version: 3.46.0
 ---
 
@@ -40,4 +40,8 @@ framework_version: 3.46.0
 ## the-reckoning
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-10-19 reached, action=surface, note=Two weeks: has one attended session ended through the reckoning, and has one tick drafted one? If neither, the actor is the problem, not the command.
+
+## workflows-emerge-from-use
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-10-21 reached, action=surface, note=Two weeks: has a workflow emerged in a live workspace, and has the agent followed one when working on its carrier type? If neither, the actor is the problem.
 

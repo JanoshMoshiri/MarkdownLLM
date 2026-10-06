@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-05
-generated: 2026-10-05T22:10:04
-generated_from: HEAD@8830f31
-coverage: 128
+created: 2026-10-07
+generated: 2026-10-07T00:45:06
+generated_from: HEAD@374b596
+coverage: 129
 framework_version: 3.46.0
 ---
 
@@ -525,6 +525,7 @@ framework_version: 3.46.0
 ## the-reckoning-is-the-digestion-beat-2026-10-05
 - cue-belief-revision-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-session-memory-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+- workflows-emerge-from-use-2026-10-07 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)
@@ -544,6 +545,7 @@ framework_version: 3.46.0
 - cue-inflection-candidates-are-computable-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- workflows-emerge-from-use-2026-10-07 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 
 ## thing-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
@@ -604,4 +606,8 @@ framework_version: 3.46.0
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
+- workflows-emerge-from-use-2026-10-07 (pinned @67d236571a3676215e0da63563d59532f997bdf8)
+
+## workflows-emerge-from-use-2026-10-07
+- cue-workflow-state-specification-2026-10-07 (pinned @374b59657de2fb3b07edf8148a2cfdfbddf83a65)
 

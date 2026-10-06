@@ -257,7 +257,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 - **`trigger-specification.md`** (`specification`, `stable`): complements → `orchestration.md`, `derived-index.md`; extends → `thing.md`; references → `provenance.md` · +1 edge(s) outside the spec layer
 - **`universal-workflow.md`** (`specification`, `draft`): implements → `workflow-state.md` · +2 edge(s) outside the spec layer
 - **`validate.thing.md`** (`specification`, `stable`): complements → `belief-revision.md`, `domain-specification-guide.md`; validates → `thing.md`, `orchestration.md`, `derived-index.md`, `provenance.md` · +1 edge(s) outside the spec layer
-- **`workflow-state.md`** (`specification`, `evolving`): complements → `coordination-claim.md`, `interface.md`, `git-workflow.md`, `provenance.md`, `orchestration.md`; extends → `thing.md` · +1 edge(s) outside the spec layer
+- **`workflow-state.md`** (`specification`, `evolving`): complements → `coordination-claim.md`, `interface.md`, `git-workflow.md`, `provenance.md`, `orchestration.md`; extends → `thing.md` · +3 edge(s) outside the spec layer
 - **`write.thing.md`** (`specification`, `stable`): complements → `read.thing.md`, `git-workflow.md`; extends → `thing.md`; references → `validate.thing.md`, `reasoning-lenses.md`
 
 <!-- /generated:spec-edges -->

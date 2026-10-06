@@ -3,9 +3,9 @@ id: framework-kernel
 type: index
 status: live
 index_of: kernel
-created: 2026-10-05
-generated: 2026-10-05T22:03:17
-generated_from: HEAD@9b58abb
+created: 2026-10-07
+generated: 2026-10-07T00:44:12
+generated_from: HEAD@374b596
 coverage: 6
 framework_version: 3.46.0
 ---

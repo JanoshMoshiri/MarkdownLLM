@@ -2,7 +2,7 @@
 id: workflow-state-specification
 type: specification
 status: evolving
-version: 0.8
+version: 0.9
 created: 2026-06-15
 linked_things:
   - id: thing-specification
@@ -19,6 +19,12 @@ linked_things:
     relation: complements
   - id: workflow-run-is-the-decomposition-principle-applied-to-processes
     relation: informs
+  - id: workflows-emerge-from-use-2026-10-07
+    relation: references
+    notes: "The ruling behind Carrier Binding and Workflows Emerge From Use: the process is implicitly defined through usage, written organically, and the work is the run."
+  - id: workflows-emerge-from-use
+    relation: references
+    notes: "The plan that builds the carrier binding and the emergence lifecycle."
 ---
 
 # Workflow Run-State
@@ -244,11 +250,121 @@ references only, no new artefact type:
   realise more than one run; the edge is a relation, not a singular pointer,
   for that reason.
 
+## Carrier Binding — When the Work Is the Run
+
+A `workflow-run` is a pointer the work does not carry: someone has to create
+it and advance it beside the work itself. The estate measured what that
+costs. Of 25 explicit runs that moved more than once, 16 made every move on
+one day, as bookkeeping after the fact; the busiest loops in the estate ran
+through the statuses of the documents and tickets being worked, and their
+definitions had no run at all; three definitions written from observed
+practice got no run the next time that work happened. When the work already
+travels through one type of thing, that thing is the run.
+
+A definition may bind to that type:
+
+```yaml
+---
+id: specification-loop
+type: workflow-definition
+status: evolving
+carrier:
+  type: design-spec          # the thing type the work travels through
+  map:                       # optional: carrier status -> stage id, where they differ
+    draft: drafting
+stages:
+  - id: drafting
+    to: [review]
+  - id: review
+    to: [drafting, cleared]
+  - id: cleared
+    to: [ruling]
+  - id: ruling
+    to: [approved, drafting]
+  - id: approved
+    to: []
+---
+```
+
+- **Every thing of the carrier type is a run of this definition**, its stage
+  read from its `status` through the map (identity where the map is silent).
+  A status that maps to no stage is outside the workflow for now — paused,
+  blocked, parked — not a departure. Mirrors (`origin: external`) are their
+  source's runs, not this workspace's.
+- **One type, one binding.** Two live definitions binding the same carrier
+  type make a thing two runs of two processes at once; the floor refuses it.
+  That refusal is also what keeps an inferred workflow from displacing an
+  authored one (see *Workflows Emerge From Use*).
+- **The history is the commit log, as for any run.** A carrier thing's
+  status moves are its stage moves; nothing is duplicated into a run thing.
+- **A departure is information, not an error.** A status move the
+  definition's edges do not declare is read from history and reported — the
+  practice moved, or the work slipped — and the reckoning routes it. The
+  carrier's own status vocabulary is the domain schema's and is already
+  validated; the binding describes the path, it does not gate the work.
+  Explicit `workflow-run` things keep their edge check unchanged.
+- **Explicit runs and a carrier do not mix.** A run thing pointing at a
+  carrier-bound definition counts its work twice; the floor warns.
+
+## Workflows Emerge From Use
+
+A workspace's process exists before anyone writes it down, and in most
+workspaces nobody does. The operator's ruling
+(`workflows-emerge-from-use-2026-10-07`): the process is implicitly defined
+through usage; turning it into a workflow is worth doing because an agent
+following written steps repeats the work with less interpretation and less
+variance, possibly on a smaller model; and it should happen organically, so
+the person working never has to notice. Five beats, with the split the walk
+and the reckoning use.
+
+1. **Emerge — the floor finds, the agent writes.** `mdllm workflows
+   --emergent` reads the commit stream once: per domain type, the status
+   transitions things have actually made, the dominant paths and how many
+   things travelled each. A candidate is a path of three or more stages
+   travelled by enough things, each across more than one day — moves made
+   all on one day are bookkeeping and do not count — on a type no definition
+   binds. Generic lifecycles (not-started, in-progress, completed, and the
+   like) are not workflows and are not proposed. Where nothing repeats, the
+   answer is none, and that is the expected answer in a quiet workspace. The
+   agent writes the candidate as a `workflow-definition` marked `origin:
+   inferred`, bound to its carrier, its stages and edges from what was
+   observed, and per stage what to do, what to produce and what to check,
+   drawn from what the record shows was done. Nobody is prompted; the digest
+   carries one line.
+2. **Bind** — as above: the work is the run, from the moment it is written.
+3. **Follow.** The workspace's entry file carries a generated block naming,
+   per bound type, the workflow to follow and its stages. An agent about to
+   move a carrier thing reads the definition's steps first. This is the
+   repeatability the workflow exists for, and it does not depend on the agent
+   remembering to look.
+4. **Evolve.** A departure from an inferred workflow is the agent's to judge:
+   the practice moved, so revise the workflow within the walk's bounds; or
+   the work slipped, so say so. A departure from an authored workflow is the
+   operator's.
+5. **Dissolve.** An inferred workflow nothing has moved through within its
+   interval is let go by the reckoning (`session-memory.md` → The
+   Reckoning). Workflows come from use and go with disuse.
+
+**Authored and inferred.** A workflow the operator crafts deliberately is
+authored (`origin: stated`, the default): the agent follows it and never
+rewrites it, and nothing dissolves it unasked. An inferred workflow is the
+agent's to keep current. Two lines hold for both:
+
+- **The agent never invents a human gate and never removes one.** A stage at
+  which the operator approves or rules is marked as theirs in the body, as
+  gate authority always is (see *`stages[].actor`*). If practice skipped it,
+  the inferred workflow keeps the stage and the skip shows as a departure.
+- **An inferred workflow never replaces an authored one.** One type, one
+  binding: the floor refuses the second.
+
+Built by `workflows-emerge-from-use`; the phases record what is live.
+
 ## What Not to Duplicate
 
 - **No `stage_history` array.** The history of `current_stage` changes *is* the commit log — git is the event stream (`git-workflow.md`). Frontmatter holds the present cursor; git holds the path.
 - **No reverse link from the definition.** Runs point up via `definition:`; the definition does not enumerate its runs.
 - **No resume field.** The resume narrative is the body.
+- **No run thing for a carrier-bound workflow.** The carrier thing is the run; a run thing beside it says the same thing twice.
 
 Keep that discipline and the run thing stays tiny — the tell that the primitive is clean.
 
@@ -264,6 +380,11 @@ This follows the framework's standard split (`validate.thing.md`):
 | Does the prior definition declare this old→new edge? | **floor** (mechanical) | At pre-commit, compares the frozen index candidate with `HEAD`. For an unpinned run the governing edge list comes from the prior committed definition; for a pinned run it comes from the **pinned revision's** definition. Either way the candidate cannot authorize its own move by rewriting the graph. A definition migration and cursor advance must be separate meaning-boundary commits. New runs have no prior transition and are allowed. |
 | `definition_commit` resolves, and its tree carries the definition | **floor** (mechanical) | The pin names a real commit in this repository whose tree contains the governing definition (current path first, id-scan fallback). For a pinned run, `current_stage` membership is read from the pinned revision. |
 | One commit changes both `definition_commit` and `current_stage` | **floor** (mechanical, Error) | The self-authorization guard: rejected outright, regardless of whether the move would be legal under either revision. |
+| `carrier` shape; its map's values are stages; one live definition per carrier type | **floor** (mechanical) | Error on a malformed binding or a second live binding of one type; Warning on explicit runs of a carrier-bound definition. |
+| A carrier thing's stage, and its departures | **floor** (read) | `mdllm workflows`: the stage read from status through the map; a status move the edges do not declare, read from history and reported, never refused. |
+| Which paths the record supports as a workflow | **floor** (read) | `mdllm workflows --emergent`: observed transitions, dominant paths, support across days, candidates with evidence, an honest none. |
+| Writing an inferred workflow; its steps; revising it on a departure | **agent** | Organic, no prompt; within the walk's bounds; never inventing or removing a human gate. |
+| A departure from an authored workflow | **operator** | The residue: the agent follows and never rewrites what the operator crafted. |
 | Should the run advance now? Should it migrate? | **agent** (semantic, Layer 2) | Judges stage exit criteria, evidence, authorization, and whether the work deserves the mechanically-permitted move — and whether a definition change warrants migrating a live run at all (stay-pinned is the default). |
 
 Both membership and edge existence earn their place because each is a finite lookup over declared data, not judgement. A typo'd `current_stage` and an undeclared transition are the same honour-system hole at adjacent moments. The floor therefore compares the exact candidate tree to the prior commit and rejects an edge the prior definition does not declare. It does **not** infer entry/exit criteria, decide whether evidence is adequate, or advance a run; those remain Layer 2. (Cross-domain case: when the `definition` lives in another corpus the floor cannot see, membership remains unresolvable and is skipped rather than fabricated.)
@@ -299,3 +420,4 @@ A type being reserved but undeployed in most domains is expected: it is exactly 
 - **provenance.md** — A run's accrued decisions are `type: decision` things linked from it, inputs pinned to commits.
 - **interface.md** — A run produces deliverables on hand-off; the cross-domain consumer reads `current_stage`.
 - **orchestration.md** — A domain may bind reasoning to stage transitions (a domain hook point), but the run-state thing works without orchestration.
+- **session-memory.md** — The reckoning dissolves an inferred workflow nothing moves through and routes departures; emergence and dissolution are the two halves of the workspace learning its own process.

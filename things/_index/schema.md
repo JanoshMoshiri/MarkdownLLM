@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-10-05
-generated: 2026-10-05T22:10:04
-generated_from: HEAD@8830f31
-coverage: 508
+created: 2026-10-07
+generated: 2026-10-07T00:45:06
+generated_from: HEAD@374b596
+coverage: 511
 framework_version: 3.46.0
 ---
 
@@ -14,34 +14,34 @@ framework_version: 3.46.0
 
 | field | things using it |
 |---|---|
-| id | 508 |
-| type | 508 |
-| status | 508 |
-| created | 508 |
-| version | 435 |
-| tags | 404 |
-| linked_things | 370 |
-| origin | 198 |
-| confidence | 195 |
-| session | 192 |
+| id | 511 |
+| type | 511 |
+| status | 511 |
+| created | 511 |
+| version | 438 |
+| tags | 407 |
+| linked_things | 372 |
+| origin | 199 |
+| confidence | 196 |
+| session | 194 |
 | source | 148 |
-| informed_by | 139 |
-| subject | 133 |
-| raised_at | 133 |
-| raised_by | 133 |
-| verdict | 133 |
-| verdict_reason | 133 |
-| priority | 60 |
+| informed_by | 141 |
+| subject | 134 |
+| raised_at | 134 |
+| raised_by | 134 |
+| verdict | 134 |
+| verdict_reason | 134 |
+| priority | 61 |
 | disposition | 51 |
 | disposition_reason | 51 |
-| decided_by | 39 |
+| decided_by | 40 |
 | exposed | 27 |
 | promoted_to | 24 |
 | period_start | 9 |
 | period_end | 9 |
 | domain | 9 |
+| triggers | 8 |
 | completed | 8 |
-| triggers | 7 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |
