@@ -914,9 +914,11 @@ def cmd_session_start(args) -> int:
     # is disposition keeping pace with intake? Advisory; never fails startup.
     if session_corpus is not None:
         try:
-            from .reckon import rate_line, rates, reckon_report
-            _rep = reckon_report(domain, session_corpus)
-            out.append(rate_line(_rep, rates(domain, session_corpus)))
+            from .reckon import bands_line, reckon_report
+            _rep = reckon_report(
+                domain, session_corpus, triggers=False,
+                touch=(things_hist.touch if things_hist is not None else {}))
+            out.append(bands_line(_rep))
         except Exception:
             pass
 

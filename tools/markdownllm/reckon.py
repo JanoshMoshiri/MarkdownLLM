@@ -129,8 +129,16 @@ def _due(meta, created: dt.date | None, interval: int, today: dt.date) -> tuple[
 
 
 def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
-                  imports: bool = False, workflows: bool = False) -> dict:
-    """Every attention item's disposition candidate, banded, with evidence."""
+                  imports: bool = False, workflows: bool = False,
+                  triggers: bool = True,
+                  touch: dict | None = None) -> dict:
+    """Every attention item's disposition candidate, banded, with evidence.
+
+    A caller that already walked the things/ history passes its `touch` map
+    and the reckoning reads no git of its own; session start does exactly
+    that, and leaves `triggers` to the digest's own triggers line, so the
+    hook's bounded scan and walk counts do not grow (the hook once ran 67s
+    against a 60s budget because consumers each rescanned)."""
     today = today or dt.date.today()
     root = Path(root).resolve()
     by_id = {t.id: t for t in corpus.things if t.id}
@@ -143,7 +151,8 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
             continue
         for ref in iter_structural_references(t.meta, validation_only=True):
             live_inbound[ref.target] += 1
-    touch = _touch_map(root)
+    if touch is None:
+        touch = _touch_map(root)
     items: list[Item] = []
     notes: list[str] = []
     if touch is None:
@@ -270,12 +279,16 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
                               f"open {age}d on `{m.get('subject')}`"))
 
     # ---- fired triggers ---------------------------------------------------
-    try:
-        from .triggers import TriggerOutcome, evaluate_results
-        results = evaluate_results(root)
-    except Exception as exc:  # the trigger engine says what it cannot read
-        results = ()
-        notes.append(f"triggers could not be evaluated: {type(exc).__name__}")
+    results = ()
+    if triggers:
+        try:
+            from .triggers import TriggerOutcome, evaluate_typed
+            results = evaluate_typed(root, corpus=corpus).results
+        except Exception as exc:  # the trigger engine says what it cannot read
+            results = ()
+            notes.append(f"triggers could not be evaluated: {type(exc).__name__}")
+    else:
+        from .triggers import TriggerOutcome
     for r in results:
         if r.outcome is not TriggerOutcome.FIRED:
             continue
@@ -597,6 +610,17 @@ def rates(root: Path, corpus, days: int = 7) -> dict:
                 surfaces.add(cur)
     return {"days": days, "created": dict(created), "disposed": disposed,
             "surface_changes": len(surfaces), "walks": len(walks)}
+
+
+def bands_line(rep: dict) -> str:
+    """The digest's line: the bands now, read from session start's own history
+    walk — no git of its own. The week's intake and disposal are
+    `mdllm reckon --rates`, which reads the diffs."""
+    bands = rep["bands"]
+    return (f"- **Reckoning:** {len(bands['mechanical'])} mechanical / "
+            f"{len(bands['settled'])} settled / {len(bands['residue'])} residue "
+            "(fired triggers have their own line) — `mdllm reckon`; "
+            "`--rates` for the week's intake and disposal")
 
 
 def rate_line(rep: dict, rt: dict) -> str:
