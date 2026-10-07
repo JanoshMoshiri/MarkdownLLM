@@ -229,7 +229,7 @@ def _orient_forward(domain: Path, corpus=None) -> list[str]:
 
 def _cue_lines(domain: Path, corpus) -> list[str]:
     """The cue carrier's loud half (unattended-cue-carrier-2026-09-12): every
-    session, until a human answers, the digest names each open cue and each
+    session, until its walk is recorded, the digest names each open cue and each
     reasoned-from modification no cue covers. The question waits here rather
     than in anyone's memory — the countermeasure
     `partial-coverage-quiets-the-uncovered-steps` names (make the seam loud),
@@ -248,9 +248,9 @@ def _cue_lines(domain: Path, corpus) -> list[str]:
         return []
     lines = [f"- **Reconciliation cues ({total}):** {len(open_)} raised and "
              f"unanswered, {len(unraised)} modified-and-unraised since "
-             f"{rep['baseline']} — the question waits here until a human "
-             f"answers it (`mdllm cues .`; a `verdict` + `verdict_reason` on "
-             f"a `type: cue` thing):"]
+             f"{rep['baseline']} — each waits here until its walk is "
+             f"recorded (`mdllm cues .`; the agent walks and marks the "
+             f"`verdict`, the operator rules on the residue):"]
     shown = 0
     for c in open_:
         if shown >= 8:

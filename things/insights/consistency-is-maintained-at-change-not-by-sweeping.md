@@ -2,7 +2,7 @@
 id: consistency-is-maintained-at-change-not-by-sweeping
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-13
 session: 2026-06-13
 source: both
@@ -10,6 +10,9 @@ confidence: high
 origin: synthesised
 tags: [validation, change-management, semantic-validation, human-in-the-loop]
 linked_things:
+  - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+    relation: references
+    notes: "The ruling that moved the trigger from the human to the change; this insight was narrowed in place to say so."
   - id: change-reconciliation-specification
     relation: informs
   - id: provenance-specification
@@ -43,9 +46,13 @@ Two consequences follow. **The agent does not need better eyesight; it needs a
 reflex bound to the change** — the mechanical layer's job is not to judge risk
 but to make the agent unable to *not see* the shape of what a change disturbs
 (the `relationships` and reverse-`provenance` indexes already supply that shape).
-And **the trigger is the human's, not the agent's**: recognising that a change is
-a genuine inflection — a change of the logical path, not of its expression — is
-the expert judgement the framework supplements, not automates.
+And **the trigger is the change itself**: since 2026-10-05 the agent walks on
+detection, and recognising that a change of meaning or a contradiction needs a
+ruling is the expert judgement the framework supplements, not automates.
+*(Narrowed in place 2026-10-08 under the operator's ruling of 2026-10-05 for
+this class, given when two insights whose thesis was the old reading were put
+to him: narrow in place. Until then this paragraph read: the trigger is the
+human's, not the agent's.)*
 
 ## Why It Matters
 

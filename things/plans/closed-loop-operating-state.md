@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 2.2
+version: 2.3
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -57,8 +57,8 @@ linked_things:
     notes: "The pilot's first firing paid for this one. It is the standing design lens on Phase 4's remaining runs: a fail-closed loop that cannot file its own refusal is silent exactly where it is meant to speak."
 triggers:
   - type: time
-    condition: "2026-09-30 reached"
-    action: "Re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29)."
+    condition: "2026-10-21 reached"
+    action: "Answered 2026-10-08: yes. The tick was re-registered on the operator's machine on 2026-09-23 and has filed digests in two workspaces, on 2026-10-04 and 2026-10-07 (runs 2 to 5 on the 7th), last result 0; run 3 worked a fired trigger end to end. The question for this window: do digests keep landing at the daily cadence, and has the workspace one run skipped as DIVERGED been routed? A tick never merges. Earlier: re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29)."
 ---
 
 # The Closed-Loop Operating State
@@ -303,13 +303,15 @@ Two honesty clauses, so the picture cannot be over-read:
         condition at launch — the loop-optimisation insight's own dismissal
         condition, built in rather than owed; building it promotes that
         insight. The installation grant is the operator's (census row 7).
-  - [ ] **2c — Re-host: headless, on the substrate machine.** *Ruled
+  - [x] **2c — Re-host: headless, on the substrate machine.** *Ruled
         2026-09-23 (`dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23`):
         one tick per machine — a native scheduled task launching a harness's
         headless mode (`claude -p`, `codex exec`) with the launch composed by
         `dispatch-payload`; scope is a flag, not a second dispatcher. The
         command is `tools/dispatch/tick.ps1`; the registration and the trust
         grant are the operator's. Closes on the first tick's digest.*
+        *Closed 2026-10-08: the first digests landed on 2026-10-04 and
+        2026-10-07, filed by `windows-task@SURFACE` in two workspaces.*
 - [ ] **Phase 3 — The seat protocol.** Define how the system presents work
       at each seat: dissemination briefs that carry options with evidence;
       conflicts that carry proposed directions; approvals as a queue the
@@ -440,6 +442,14 @@ generated-artifact repair) and one of which is the pilot domain's own to
 supply. Phase 4's evidence begins at the first run that works a fired
 trigger and closes its digest having done something; everything downstream
 of that — the seat measurements, and Phase 5 — waits on it.
+
+*2026-10-07: the work path ran.* Run 3 in the regulatory workspace worked a
+fired trigger: it assessed and published an item, re-dated its chase and
+filed its digest. Run 5 skipped the engineering workspace because its repo
+had DIVERGED from its remote, and its digest said so. That is Phase 4's
+first evidence: a run that works a fired trigger and closes its digest
+having done something. The work path has now run once, which is a start, not
+a cycle; the seat measurements still wait on more runs.
 - [ ] **Phase 5 — Seal.** On the census's and cycle's evidence, the seat
       taxonomy and the closed-loop doctrine enter `operating-model.md`
       (operator-gated change to a draft spec expecting exactly this kind of

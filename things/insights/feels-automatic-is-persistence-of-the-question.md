@@ -1,8 +1,8 @@
 ---
 id: feels-automatic-is-persistence-of-the-question
 type: insight
-status: active
-version: 1.0
+status: dismissed
+version: 1.1
 created: 2026-09-12
 session: 2026-09-12
 source: both
@@ -75,6 +75,14 @@ record answered from its own insights: the question is automatic, the
 verdict is human, and what was missing was a place for the question to
 wait. The operator ruled exactly that, and the carrier was built and walked
 against itself the same day.
+
+**Dismissed 2026-10-08, on its own stated condition.** The carrier made the
+question persist from 2026-09-12; in the workspaces the walk count stayed at
+zero across roughly 1,250 commits, and the verdict was given only where an
+agent held standing authority to give it. Loudness did not change whether
+the verdict got given, which is the condition below. The half that stands is
+carried by `a-preserved-question-is-not-a-done-walk`: what the operator wants
+forgotten-proof needs an actor, not only a place for the question to wait.
 
 Dismissal condition: dismissed if a persisted-question carrier is found to
 produce the same skip rate as the printed advisory it replaced — that is,

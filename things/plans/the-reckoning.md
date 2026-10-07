@@ -2,7 +2,7 @@
 id: the-reckoning
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-10-05
 session: 2026-10-05
 priority: critical
@@ -71,7 +71,13 @@ dormant workspaces.
       walks against definition-surface changes. First live run by hand on the
       QMS (20 open conflicts, 87 active insights) and overview (86): the
       residue counted and put to the operator.
-- [ ] **Phase 3 — Two actors.** Attended: the commit-message leg refuses a
+- [ ] **Phase 3 — Two actors.** *First use by hand, 2026-10-08: the
+      framework root's session end applied the mechanical band (three insights
+      already promoted in fact, one plan with every box ticked). One friction
+      seen at once: the walk gate owed a walk for each insight whose only
+      change was the status the reckoning applied. A disposition-only change,
+      status and its resolution fields, should not be a walk candidate;
+      build that with the gate here.* Attended: the commit-message leg refuses a
       `session-end:` commit while the mechanical band is pending; the
       session-end prompt runs the reckoning, decides the settled band by
       citation, and puts the residue through the native prompt. Unattended:

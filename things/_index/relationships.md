@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-07
-generated: 2026-10-07T01:05:56
-generated_from: HEAD@4799100
-coverage: 514
+created: 2026-10-08
+generated: 2026-10-08T00:26:12
+generated_from: HEAD@5d9987f
+coverage: 524
 framework_version: 3.46.0
 ---
 
@@ -216,6 +216,9 @@ framework_version: 3.46.0
 - an-interface-is-what-its-consumers-call-not-what-it-declares --derived-from--> vendor-harness-adapter-foundation
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> portability-claims-need-execution-tests
+- an-owed-act-is-not-a-false-fact --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+- an-owed-act-is-not-a-false-fact --references--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- an-owed-act-is-not-a-false-fact --informs--> cue-carrier
 - asks-travel-as-exposed-things --supports--> provenance-specification
 - asks-travel-as-exposed-things --derived-from--> vantage-brief-cluster
 - assistant-register --extends--> interface-specification
@@ -414,6 +417,7 @@ framework_version: 3.46.0
 - consequence-is-recoverable-only-in-retrospect --extends--> agents-md-discovery-is-harness-dependent
 - consequence-is-recoverable-only-in-retrospect --complements--> change-safety-is-defense-in-depth
 - consequence-is-recoverable-only-in-retrospect --complements--> provenance-specification
+- consistency-is-maintained-at-change-not-by-sweeping --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - consistency-is-maintained-at-change-not-by-sweeping --informs--> change-reconciliation-specification
 - consistency-is-maintained-at-change-not-by-sweeping --supports--> provenance-specification
 - consistency-is-maintained-at-change-not-by-sweeping --supports--> validate-thing-specification
@@ -466,7 +470,9 @@ framework_version: 3.46.0
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
 - cue-a-check-run-where-it-cannot-see-mints-a-false-finding-2026-09-26 --subject--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
+- cue-a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist-2026-10-08 --subject--> a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist
 - cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 --subject--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- cue-a-flat-re-export-shim-is-an-uncollided-namespace-2026-10-08 --subject--> a-flat-re-export-shim-is-an-uncollided-namespace
 - cue-a-mechanism-fails-at-its-seams-not-in-its-body-2026-09-14 --subject--> a-mechanism-fails-at-its-seams-not-in-its-body
 - cue-a-preserved-question-is-not-a-done-walk-2026-10-05 --subject--> a-preserved-question-is-not-a-done-walk
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
@@ -476,6 +482,7 @@ framework_version: 3.46.0
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
 - cue-belief-revision-specification-2026-10-05 --subject--> belief-revision-specification
+- cue-carrier --references--> an-owed-act-is-not-a-false-fact
 - cue-carrier --implements--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - cue-carrier --references--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - cue-carrier --references--> a-preserved-question-is-not-a-done-walk
@@ -498,6 +505,7 @@ framework_version: 3.46.0
 - cue-codex-cloud-workspace-2026-09-27 --subject--> codex-cloud-workspace
 - cue-coherence-mechanism-build-2026-09-24 --subject--> coherence-mechanism-build
 - cue-coherence-mechanism-build-2026-09-26 --subject--> coherence-mechanism-build
+- cue-consistency-is-maintained-at-change-not-by-sweeping-2026-10-08 --subject--> consistency-is-maintained-at-change-not-by-sweeping
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
 - cue-cue-carrier-2026-09-24 --subject--> cue-carrier
 - cue-cue-carrier-2026-09-26 --subject--> cue-carrier
@@ -511,14 +519,17 @@ framework_version: 3.46.0
 - cue-domain-specification-guide-2026-09-26 --subject--> domain-specification-guide
 - cue-estate-mechanics-guide-2026-09-12 --subject--> estate-mechanics-guide
 - cue-estate-mechanics-guide-2026-10-05 --subject--> estate-mechanics-guide
+- cue-estate-mechanics-guide-2026-10-08 --subject--> estate-mechanics-guide
 - cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
 - cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
 - cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-09-26 --subject--> evidence-and-eval-backlog
+- cue-expertise-is-an-output-not-a-prerequisite-2026-10-08 --subject--> expertise-is-an-output-not-a-prerequisite
 - cue-explorer-extraction-and-hosting-2026-09-13 --subject--> explorer-extraction-and-hosting
 - cue-explorer-publication-position-2026-09-13 --subject--> explorer-publication-position
 - cue-explorer-publication-readiness-2026-09-13 --subject--> explorer-publication-readiness
 - cue-explorer-ui-increment-2026-08-2026-09-13 --subject--> explorer-ui-increment-2026-08
+- cue-feels-automatic-is-persistence-of-the-question-2026-10-08 --subject--> feels-automatic-is-persistence-of-the-question
 - cue-first-hour-guide-2026-09-13 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-09-15 --subject--> first-hour-guide
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
@@ -552,6 +563,7 @@ framework_version: 3.46.0
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
 - cue-mechanical-coherence-checks-backlog-2026-09-13 --subject--> mechanical-coherence-checks-backlog
 - cue-mechanical-coherence-checks-backlog-2026-09-15 --subject--> mechanical-coherence-checks-backlog
+- cue-operating-is-programming-2026-10-08 --subject--> operating-is-programming
 - cue-operating-layer-quality-loop-2026-09-13 --subject--> operating-layer-quality-loop
 - cue-operator-guide-2026-09-12 --subject--> operator-guide
 - cue-operator-guide-2026-09-15 --subject--> operator-guide
@@ -594,6 +606,7 @@ framework_version: 3.46.0
 - cue-substrate-native-a2a-2026-09-26 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-10-01 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
+- cue-the-substrate-is-a-discipline-prosthesis-2026-10-08 --subject--> the-substrate-is-a-discipline-prosthesis
 - cue-the-verdict-is-asked-where-the-change-lands-2026-10-05-2026-10-05 --subject--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
@@ -613,6 +626,7 @@ framework_version: 3.46.0
 - cue-workflow-state-specification-2026-09-22 --derived-from--> run-membership-is-realisation-2026-09-22
 - cue-workflow-state-specification-2026-09-22 --subject--> workflow-state-specification
 - cue-workflow-state-specification-2026-10-07 --subject--> workflow-state-specification
+- cue-workflows-emerge-from-use-2026-10-08 --subject--> workflows-emerge-from-use
 - cumulative-drift-is-invisible-to-per-change-walks --informs--> change-reconciliation-specification
 - cumulative-drift-is-invisible-to-per-change-walks --complements--> a-generated-surface-collapses-its-walk
 - cumulative-drift-is-invisible-to-per-change-walks --supports--> tracking-artifacts-can-drift-from-reality
@@ -747,6 +761,7 @@ framework_version: 3.46.0
 - estate-retrospective-synthesis-2026-08 --derived-from--> session-end-is-the-least-current-read-of-the-session
 - estate-wide-autopush-2026-08-22 --implements--> autopush-requires-explicit-authority
 - estate-wide-autopush-2026-08-22 --references--> estate-cadence-cluster
+- estate-workflow-derivation --references--> workflows-emerge-from-use
 - estate-workflow-derivation --implements--> derivation-shape-settled-2026-08
 - estate-workflow-derivation --implements--> universal-workflow-methodology
 - estate-workflow-derivation --informs--> closed-loop-operating-state

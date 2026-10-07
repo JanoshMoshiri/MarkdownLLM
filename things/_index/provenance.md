@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-07
-generated: 2026-10-07T01:05:56
-generated_from: HEAD@4799100
+created: 2026-10-08
+generated: 2026-10-08T00:26:12
+generated_from: HEAD@5d9987f
 coverage: 129
 framework_version: 3.46.0
 ---
@@ -523,8 +523,13 @@ framework_version: 3.46.0
 - workflow-reconciliation-precedes-new-definitions (pinned @7ceb757ff4e3c11ab2023391eb39f98fdc3febe9)
 
 ## the-reckoning-is-the-digestion-beat-2026-10-05
+- cue-a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+- cue-a-flat-re-export-shim-is-an-uncollided-namespace-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-belief-revision-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+- cue-expertise-is-an-output-not-a-prerequisite-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+- cue-operating-is-programming-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-session-memory-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+- cue-the-substrate-is-a-discipline-prosthesis-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - workflows-emerge-from-use-2026-10-07 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 
 ## the-substrate-is-a-discipline-prosthesis
@@ -541,7 +546,10 @@ framework_version: 3.46.0
 ## the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - cue-a-preserved-question-is-not-a-done-walk-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-circulation-is-not-disposition-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-consistency-is-maintained-at-change-not-by-sweeping-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-estate-mechanics-guide-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-estate-mechanics-guide-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-feels-automatic-is-persistence-of-the-question-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-inflection-candidates-are-computable-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
@@ -613,4 +621,5 @@ framework_version: 3.46.0
 - cue-operator-guide-2026-10-07 (pinned @01e42eb2bfca0705b7b5468d09ba6027146f9167)
 - cue-session-memory-specification-2026-10-07 (pinned @01e42eb2bfca0705b7b5468d09ba6027146f9167)
 - cue-workflow-state-specification-2026-10-07 (pinned @374b59657de2fb3b07edf8148a2cfdfbddf83a65)
+- cue-workflows-emerge-from-use-2026-10-08 (pinned @01e42eb2bfca0705b7b5468d09ba6027146f9167)
 

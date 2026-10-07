@@ -2,12 +2,15 @@
 id: cue-carrier
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-09-12
 session: 2026-09-12
 priority: high
 tags: [change-reconciliation, cue, seat-protocol, floor, session-start, dispatcher]
 linked_things:
+  - id: an-owed-act-is-not-a-false-fact
+    relation: references
+    notes: "Why Codex parity goes through Codex's own hooks and never through git."
   - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
     relation: implements
     notes: "Phase 7, corrected the same day: the gate demands the walk's record, the agent walks on detection within four bounds, the operator rules on the residue through the harness's own prompt."
@@ -241,6 +244,12 @@ is the seeing.
             (ae4e61d, 69dade0, 8c52a72); walked on itself: nine cues in the
             day, one residue question put through the prompt and answered
             in the room (narrow two insights in place).*
+      - [ ] (g) Codex, after Claude Code proves it: verify whether Codex's
+            hook contract has a pre-tool event that can deny; bind the
+            `pre-commit` moment there if so, and in either case carry the walk
+            list through its post-write channel. Never through git
+            (`an-owed-act-is-not-a-false-fact`): the operator ruled a gate at
+            every commit damaging to the person's experience.
 
 ## Done when
 

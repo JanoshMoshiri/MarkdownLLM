@@ -2,7 +2,7 @@
 → The Cue Persists).
 
 `candidates` asks the cue question at the commit boundary; `cues` reads the
-same question back off the commit stream and holds it until a human answers
+same question back off the commit stream and holds it until its walk is recorded
 it with a `type: cue` thing. These tests pin the two halves (unanswered open
 cues; unraised modifications), the coverage rule (a cue covers its subject at
 and before its `raised_at` commit), the receipt's shape (answered ⇒ verdict +

@@ -1,7 +1,7 @@
 ---
 id: expertise-is-an-output-not-a-prerequisite
 type: insight
-status: active
+status: promoted
 version: 1.0
 created: 2026-08-06
 session: 2026-08-06

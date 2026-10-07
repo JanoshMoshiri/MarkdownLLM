@@ -21,7 +21,7 @@ second seat owes the generated, doctor-checked entry the design named):
 
 Every launch is marked unattended (MDLLM_UNATTENDED=1): the commit gate then
 tells the run to raise and file the cue question, never to ask a human who is
-not there (the-verdict-is-asked-where-the-change-lands-2026-10-05).
+not there (the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05).
 
 Guards, in order: one tick at a time per clone (a pid lock under .git/, a
 stale lock is taken); every launch carries a stop condition (the prompt

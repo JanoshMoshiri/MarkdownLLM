@@ -2,6 +2,8 @@
 id: a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist
 type: insight
 status: active
+disposition: keep-active
+disposition_reason: "Standing pattern for a decision that names its missing safety mechanism and holds its confidence down until it exists; its one instance discharged when the calculation floor shipped (deterministic-calculation completed 2026-10-08 by the reckoning). Promote into provenance.md on a second instance."
 version: 1.0
 created: 2026-08-04
 session: 2026-08-02

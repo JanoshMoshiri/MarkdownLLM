@@ -1,7 +1,7 @@
 ---
 id: deterministic-calculation
 type: plan
-status: in-progress
+status: completed
 version: 1.1
 created: 2026-08-02
 priority: high

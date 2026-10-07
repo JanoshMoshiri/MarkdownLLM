@@ -2,6 +2,8 @@
 id: a-flat-re-export-shim-is-an-uncollided-namespace
 type: insight
 status: active
+disposition: keep-active
+disposition_reason: "The hazard stands: no floor test guards name collisions in the tools/mdllm.py re-export shim, so a new module can still silently shadow an earlier name. Dismiss when a test asserts the shim's names are unique per source module."
 version: 1.0
 created: 2026-08-04
 session: 2026-08-02

@@ -2,7 +2,7 @@
 id: estate-mechanics-guide
 type: guide
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-08-04
 linked_things:
   - id: git-workflow-specification
@@ -28,9 +28,13 @@ How state flows and stays coherent after v3.26.0, told at the three levels
 an operator actually works at: inside one domain, between domains, and at
 the substrate. The diagrams carry most of the words. One sentence governs
 everything below, at every level: **the floor asks questions, gathers
-facts, and transports state; the human answers questions, routes
-divergences, and decides.** Nothing anywhere auto-edits, auto-merges, or
-auto-judges.
+facts, transports state, and applies only what a field or a git fact
+derives; the agent walks what a change disturbs and decides what the record
+already settles; the human rules on what the walk cannot settle, routes
+divergences, and decides.** Nothing anywhere auto-merges, and nothing judges
+meaning without a person (since 2026-10-05:
+`the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`,
+`the-reckoning-is-the-digestion-beat-2026-10-05`).
 
 The optional [MarkdownLLM Explorer](../explorer/README.md) can display this
 estate and its commits, but it sits outside every operational arrow below. It
@@ -89,7 +93,7 @@ flowchart TD
     R["Remote — real to the estate"]
     W --> FLOOR --> ADV --> B --> K --> AP
     AP -->|"only when authorized and accepted"| R
-    Q -.-> H["Human verdict:<br/>no → proceed · yes → inflection"]
+    Q -.-> H["Agent walks the dependants:<br/>restatements revised · the residue to the human"]
     H -.-> FB["The four beats:<br/>Cue → Assimilate → Walk → Seal"]
     O -.-> RT["REJECTED = divergence on the push side —<br/>the operator routes it, never forced"]
 ```
@@ -97,10 +101,11 @@ flowchart TD
 The mental model: the left rail is mechanical, the right rail is human.
 `candidates` makes the cue *question* unavoidable for all four candidate
 classes, and `cues` keeps it unavoidable — a modified reasoned-from thing
-stays in every session-start digest until a `type: cue` thing carries a human
-verdict — while the
-cue *verdict* stays the driver's. Saying no to a named question is a
-decision; not being asked was drift. Autopush is transport of
+stays in every session-start digest until a `type: cue` thing records its
+walk. Where the harness projects the commit gate, the agent's commit waits
+for that walk; the agent marks each dependant and the verdict, and the
+driver rules only on what the walk cannot settle. A recorded walk that
+found nothing is a result; a change nobody walked was drift. Autopush is transport of
 floor-validated state — bounded, never forcing, and enabled only by literal
 `git: autopush: true`. False, absence, or malformed policy is disabled.
 
@@ -221,7 +226,7 @@ misses falls to the net beneath.
 
 | Radius | The floor — asks · gathers · transports | The human — decides · routes |
 |---|---|---|
-| **Commit** | `candidates` asks the cue · `cues` holds it until answered · `autopush` transports | cue verdict (recorded on the cue thing) · route rejected pushes |
+| **Commit** | `candidates` asks the cue · `cues --staged` gates the agent's commit until the walk is recorded · `cues` holds it until then · `autopush` transports | the residue of the walk (a change of meaning, a contradiction) · route rejected pushes |
 | **Membrane** | `estate-sync` freshens · `imports-check` detects drift | exposure call · verified flip |
 | **Epoch** | cadence clocks (60d domain / 30d estate) · dated triggers | retrospectives · estate rulings, routed home via porch |
 | **Release** | release-walk Assimilate, estate-wide | walk judgement · the deliberate push |
@@ -242,6 +247,7 @@ flowchart TD
     E1 -->|"epochs feed"| R1["Release radius —<br/>the walk resets the substrate"]
 ```
 
-Detection mechanical, judgement human, verdicts never scored — the
+Detection mechanical, settled judgement the agent's, the residue human,
+verdicts never scored — the
 boundary every v3.24–v3.26 change preserved, which is the strongest
 evidence it is drawn where reality wants it.
