@@ -15,8 +15,8 @@ import yaml
 
 from .yaml_loader import load_version_sentinel
 
-from .domain_kernel import (apply_domain_kernel, build_domain_kernel_blocks,
-                            domain_kernel_status)
+from .domain_kernel import (add_missing_workflows_block, apply_domain_kernel,
+                            build_domain_kernel_blocks, domain_kernel_status)
 from .model import parse_frontmatter
 from .repo import version_lt
 
@@ -91,6 +91,11 @@ def cmd_refresh(args) -> int:
     # the new version. Mechanical and idempotent — only the managed blocks change.
     present, _ = domain_kernel_status(text, build_domain_kernel_blocks(domain, meta or {}))
     if present:
+        text, added = add_missing_workflows_block(text)
+        if added:
+            agents.write_text(text, encoding="utf-8", newline="\n")
+            print("\n  added the `workflows` block (workflows-emerge-from-use): the "
+                  "entry file now names the workflow to follow per type")
         new_ag, written, _ = apply_domain_kernel(
             text, build_domain_kernel_blocks(domain, meta or {}))
         if new_ag != text:

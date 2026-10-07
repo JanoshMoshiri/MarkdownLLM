@@ -87,6 +87,12 @@ kernel's type list can never drift from the schema]
 _(managed by `mdllm domain-kernel` — do not hand-edit)_
 <!-- /generated:types -->
 
+## Workflows in This Domain
+
+<!-- generated:workflows -->
+_(managed by `mdllm domain-kernel` — do not hand-edit)_
+<!-- /generated:workflows -->
+
 ## Skills Directory
 
 [Authored descriptions; the tier table above lists the skill files mechanically]

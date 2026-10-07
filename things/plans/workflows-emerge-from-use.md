@@ -2,7 +2,7 @@
 id: workflows-emerge-from-use
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-10-07
 session: 2026-10-05
 priority: critical
@@ -63,7 +63,7 @@ semantics and checks. A Codex binding before Claude Code proves it.
       check lines from the record and marks the gate stages. The reckoning
       carries an emerged candidate as an item for the agent, so emergence
       runs at the boundaries the reckoning already has.
-- [ ] **Phase 4 — The agent follows.** A generated block in the entry file
+- [x] **Phase 4 — The agent follows.** *Done 2026-10-07: the `workflows` block, generated from the definitions' own carrier and stages with no history read so session start stays fast; in the template for new workspaces; inserted once after the `types` block on an existing workspace's next refresh.* A generated block in the entry file
       naming, per bound type, the workflow and its stages, kept current by
       the drift check the entry file's other blocks already have.
 - [x] **Phase 5 — Evolve and dissolve.** *Done 2026-10-07 in the reckoning: departures settled or residue by authorship, idle inferred workflows dissolve mechanically; the exit table carries the row.* Departures from an inferred

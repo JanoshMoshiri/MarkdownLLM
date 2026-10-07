@@ -287,3 +287,36 @@ def test_an_idle_inferred_workflow_dissolves_mechanically(tmp_path):
     # Recently used: nothing to dissolve.
     rep = reckon_report(root, corpus, workflows=True, today=dt.date(2026, 9, 20))
     assert not [i for i in rep["bands"]["mechanical"] if i.kind == "workflow"]
+
+
+# --------------------------------------------------------- the follow (Phase 4)
+
+def test_the_entry_file_block_names_the_workflow_to_follow_per_type(tmp_path):
+    root = _repo_with_loop(tmp_path, things=2)
+    write(root, "things/workflows/loop.md", _bound_def(STAGES))
+    _commit(root, "define", "2026-09-10")
+    from markdownllm.domain_kernel import _dk_workflows
+    body = _dk_workflows(root, {})
+    assert body.startswith("**Workflows in force.**")
+    assert "- `spec` → `spec-loop` (authored) — draft → review → cleared → approved · `things/workflows/loop.md`" in body
+
+
+def test_an_unbound_or_deprecated_definition_is_not_in_force(tmp_path):
+    root = _repo_with_loop(tmp_path, things=2)
+    write(root, "things/workflows/loop.md", _bound_def(STAGES, status="deprecated"))
+    _commit(root, "an old binding", "2026-09-10")
+    from markdownllm.domain_kernel import _dk_workflows
+    assert "None bound yet." in _dk_workflows(root, {})
+
+
+def test_refresh_migration_inserts_the_block_once_after_types():
+    from markdownllm.domain_kernel import add_missing_workflows_block
+    text = ("# D\n\n## Thing Types\n\n<!-- generated:types -->\nx\n<!-- /generated:types -->\n\n"
+            "## Skills\n")
+    new, added = add_missing_workflows_block(text)
+    assert added and "## Workflows in This Domain" in new
+    assert new.index("<!-- /generated:types -->") < new.index("<!-- generated:workflows -->") < new.index("## Skills")
+    again, added_again = add_missing_workflows_block(new)
+    assert not added_again and again == new
+    untouched, added_none = add_missing_workflows_block("# not kernel-shaped\n")
+    assert not added_none

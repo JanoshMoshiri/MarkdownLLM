@@ -23,7 +23,7 @@ from .repo import TIERS
 from .repository_view import RepositoryView
 
 DOMAIN_KERNEL_BLOCKS = ("standing-truth", "session-start", "tier-routing",
-                        "types", "hooks", "floor")
+                        "types", "workflows", "hooks", "floor")
 
 _FRAMEWORK_HARD_HOOKS = (
     "- `post-write:commit` — commit every created/modified frontmatter `.md` to the "
@@ -287,11 +287,82 @@ def _dk_floor(domain: Path, meta: dict,
         "staleness, duplicates); see `{framework_root}/validate.thing.md`.")
 
 
+def _definition_texts(domain: Path, view: RepositoryView | None) -> list[tuple[str, str]]:
+    """(repo-relative path, text) of every things/ file whose head declares
+    `type: workflow-definition` — a cheap read, no history and no full scan,
+    so the session-start path stays inside its budget."""
+    out: list[tuple[str, str]] = []
+    if view is None:
+        base = domain / "things"
+        if not base.is_dir():
+            return out
+        for p in sorted(base.rglob("*.md")):
+            try:
+                text = p.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            if re.search(r"^type:\s*workflow-definition\s*$", text[:1500], re.M):
+                out.append((p.relative_to(domain).as_posix(), text))
+        return out
+    relative = domain.resolve().relative_to(view.root)
+    prefix = "" if relative == Path(".") else relative.as_posix().rstrip("/") + "/"
+    for p in view.list_paths(suffix=".md"):
+        s = p.as_posix()
+        if not s.startswith(f"{prefix}things/"):
+            continue
+        try:
+            text = view.read_text(p)
+        except Exception:
+            continue
+        if re.search(r"^type:\s*workflow-definition\s*$", text[:1500], re.M):
+            out.append((s[len(prefix):], text))
+    return out
+
+
+def _dk_workflows(domain: Path, meta: dict,
+                  view: RepositoryView | None = None) -> str:
+    """The follow (workflow-state.md → Workflows Emerge From Use): per bound
+    type, the workflow to follow and its stages, so following does not depend
+    on the agent remembering to look. Generated from the definitions' own
+    `carrier` and `stages`, which are the authority; a definition that binds
+    nothing is not listed, a deprecated one is not in force."""
+    from .workflows import carrier_types
+    rows: list[str] = []
+    for rel, text in _definition_texts(domain, view):
+        fm, _, err = parse_frontmatter(text)
+        if err or not isinstance(fm, dict):
+            continue
+        if str(fm.get("status")) == "deprecated" or not fm.get("id"):
+            continue
+        if str(fm.get("origin", "")).strip() == "external":
+            continue
+        types = carrier_types(fm)
+        if not types:
+            continue
+        stages = [s.get("id") for s in fm.get("stages") or []
+                  if isinstance(s, dict) and isinstance(s.get("id"), str)]
+        kind = "inferred from use" if str(fm.get("origin")) == "inferred" else "authored"
+        rows.append(f"- {', '.join(f'`{t}`' for t in types)} → `{fm['id']}` "
+                    f"({kind}) — {' → '.join(stages)} · `{rel}`")
+    head = ("**Workflows in force.** Every thing of a type below is a run of the "
+            "named workflow; its stage is its status. Before you change one's "
+            "status, read the workflow's stage steps and follow them. A move the "
+            "workflow does not declare is a departure: for an inferred workflow, "
+            "revise it or name the slip; for an authored one, it is the "
+            "operator's (`workflow-state.md` → Workflows Emerge From Use).")
+    if not rows:
+        return (head + "\n\nNone bound yet. When the record shows a path things of "
+                "one type keep travelling, the agent writes it (`mdllm workflows "
+                "--emergent`) and it appears here.")
+    return head + "\n\n" + "\n".join(sorted(rows))
+
+
 _DK_BUILDERS = {
     "standing-truth": _dk_standing_truth,
     "session-start": _dk_session_start,
     "tier-routing": _dk_tier_routing,
     "types": _dk_types,
+    "workflows": _dk_workflows,
     "hooks": _dk_hooks,
     "floor": _dk_floor,
 }
@@ -317,6 +388,28 @@ def domain_kernel_status(text: str, blocks: dict) -> tuple[list, list]:
         if m.group(2).strip() != body.strip():
             drifted.append(name)
     return present, drifted
+
+
+WORKFLOWS_SECTION = (
+    "## Workflows in This Domain\n\n"
+    "<!-- generated:workflows -->\n"
+    "_(managed by `mdllm domain-kernel` — do not hand-edit)_\n"
+    "<!-- /generated:workflows -->\n\n")
+
+
+def add_missing_workflows_block(text: str) -> tuple[str, bool]:
+    """The one-time migration (workflows-emerge-from-use Phase 4): a
+    kernel-shaped entry file that predates the `workflows` block gains its
+    section and marker after the `types` block, so the follow reaches every
+    workspace on its next refresh without anyone remembering to add it.
+    Idempotent; a file with no `types` block is left alone."""
+    if _gen_block_re("workflows").search(text):
+        return text, False
+    m = re.search(r"<!-- /generated:types -->\n", text)
+    if not m:
+        return text, False
+    at = m.end()
+    return text[:at] + "\n" + WORKFLOWS_SECTION + text[at:].lstrip("\n"), True
 
 
 def apply_domain_kernel(text: str, blocks: dict) -> tuple[str, list, list]:
