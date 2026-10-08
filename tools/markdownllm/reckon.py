@@ -28,11 +28,25 @@ is an empty residue: green is reachable.
 
 Staleness keys on the commit stream, never mtime, in one git walk — the same
 economy validate's conflict-age row and session-start's stall lines use.
+
+A hold carries its next look: a held item leaves the band until its
+`settles_when` date, or, without one, until one interval after it was last
+changed — a hold the agent just made is not asked again tomorrow
+(`--keep` writes the hold and its date in one move). The close
+(`--close`, the-reckoning Phase 3) is what a session end owes: the mechanical
+band applied, and the backlog chased — ten decisions a day while one stands,
+or the band emptied: the oldest residue first, put to the operator through the
+harness's own prompt, then workflow items, open cues and fired triggers, then
+the longest-waiting of the rest. The commit gate
+refuses a `session-end:` commit until the close is met; an unattended run
+applies the mechanical band and drafts the rest into its digest.
 """
 
 from __future__ import annotations
 
 import datetime as dt
+import json
+import os
 import re
 import subprocess
 from collections import defaultdict
@@ -67,6 +81,7 @@ class Item:
     proposal: str    # the disposition proposed, as a verb phrase
     evidence: str    # why, in one line
     fields: dict = field(default_factory=dict)  # what --apply would set (mechanical only)
+    waited: int = 0  # days the item has waited — the close takes the oldest first
 
 
 def _date(v) -> dt.date | None:
@@ -126,6 +141,20 @@ def _due(meta, created: dt.date | None, interval: int, today: dt.date) -> tuple[
     if sw is not None:
         return today >= sw, age
     return age >= interval, age
+
+
+def _hold_due(meta, idle: int | None, created: dt.date | None, interval: int,
+              today: dt.date) -> tuple[bool, int, str]:
+    """A hold's next look: its `settles_when`, else one interval after it was
+    last changed (a hold made today is not asked again tomorrow), else — git
+    unreadable — one interval after it was created. (due?, waited, said)."""
+    sw = _settles_when(meta)
+    if sw is not None:
+        return today >= sw, max(0, (today - sw).days), f"look-again date {sw}"
+    if idle is not None:
+        return idle >= interval, idle, f"last looked at {idle}d ago"
+    age = (today - created).days if created else 0
+    return age >= interval, age, f"{age}d old"
 
 
 def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
@@ -193,21 +222,25 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
             # re-dates the hold with `settles_when`. Only a condition the
             # agent cannot read is the operator's — the agent escalates it.
             reason = str(m.get("disposition_reason", "")).strip()
-            if due:
+            hold_due, waited, said = _hold_due(
+                m, untouched_days(t), _date(m.get("created")), INTERVALS["insight"], today)
+            if hold_due:
                 items.append(Item("insight", t.id, "settled",
                                   "read the stated condition: met → dispose; not → re-date",
-                                  f"keep-active {age}d; reason: "
-                                  f"{reason or '(none stated — give one or dispose)'}"))
+                                  f"keep-active, {said}; reason: "
+                                  f"{reason or '(none stated — give one or dispose)'}",
+                                  waited=waited))
             continue
         if cited == 0:
             if due:
                 items.append(Item("insight", t.id, "settled", "dismiss or consolidate",
-                                  f"active {age}d, nothing live cites it"))
+                                  f"active {age}d, nothing live cites it", waited=age))
             continue
         if age >= 2 * INTERVALS["insight"] and _settles_when(m) is None:
             items.append(Item("insight", t.id, "settled",
                               "promote into the operating layer, or state why it stays",
-                              f"active {age}d, cited by {cited} live thing(s) and never promoted"))
+                              f"active {age}d, cited by {cited} live thing(s) and never promoted",
+                              waited=age))
 
     # ---- conflicts --------------------------------------------------------
     for t in corpus.things:
@@ -252,10 +285,12 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
         due, age = _due(m, _date(m.get("created")), INTERVALS["conflict"], today)
         idle = untouched_days(t)
         if held and reason:
-            if due:
+            hold_due, waited, said = _hold_due(
+                m, idle, _date(m.get("created")), INTERVALS["conflict"], today)
+            if hold_due:
                 items.append(Item("conflict", t.id, "settled",
                                   "read what would resolve it: happened → rule; not → re-date",
-                                  f"held {age}d; reason: {reason}"))
+                                  f"held, {said}; reason: {reason}", waited=waited))
             continue
         stale = idle is not None and idle >= INTERVALS["conflict"]
         if not (stale or due):
@@ -264,10 +299,11 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
         where = f"open {age}d, untouched {idle if idle is not None else '?'}d"
         if cited:
             items.append(Item("conflict", t.id, "residue", "rule: choose a side, or hold with a reason",
-                              f"{where}, in circulation ({cited} live thing(s) link it)"))
+                              f"{where}, in circulation ({cited} live thing(s) link it)",
+                              waited=age))
         else:
             items.append(Item("conflict", t.id, "settled", "rule, link from live work, or hold",
-                              f"{where}, nothing live links it"))
+                              f"{where}, nothing live links it", waited=age))
 
     # ---- cues -------------------------------------------------------------
     for t in corpus.things:
@@ -276,7 +312,7 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
             created = _date(m.get("created"))
             age = (today - created).days if created else 0
             items.append(Item("cue", t.id, "settled", "answer by citation, or walk",
-                              f"open {age}d on `{m.get('subject')}`"))
+                              f"open {age}d on `{m.get('subject')}`", waited=age))
 
     # ---- fired triggers ---------------------------------------------------
     results = ()
@@ -304,15 +340,16 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
             found = re.search(r"\d{4}-\d{2}-\d{2}", r.condition)
             cond_day = dt.date.fromisoformat(found.group(0)) if found else None
         idle = untouched_days(thing) if thing is not None else None
+        waited = max(0, (today - cond_day).days) if cond_day is not None else 0
         if (thing is not None and cond_day is not None and idle is not None
                 and (today - idle * dt.timedelta(days=1)) > cond_day):
             items.append(Item("trigger", label, "settled", "re-date or disarm",
                               f"fired ({r.trigger_type}); the thing moved "
                               f"{(today - cond_day).days - idle}d after the condition "
-                              "— was it acted on?"))
+                              "— was it acted on?", waited=waited))
         else:
             items.append(Item("trigger", label, "settled", "act, re-date or disarm",
-                              f"fired ({r.trigger_type}): {r.reason}"))
+                              f"fired ({r.trigger_type}): {r.reason}", waited=waited))
 
     # ---- imported mirrors (opt-in: reads the membrane) --------------------
     if imports:
@@ -358,9 +395,17 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
         idle = untouched_days(t)
         due, age = _due(m, _date(m.get("created")), INTERVALS["work"], today)
         sw = _settles_when(m)
-        if sw is not None and due:
-            items.append(Item("work", t.id, "residue", "cancel, pause or continue",
-                              f"past its `settles_when` ({sw}); status {m.get('status')}"))
+        if sw is not None:
+            # A declared look-again date governs: before it the work is
+            # waiting on purpose; after it the agent looks again, and only a
+            # cancellation is the operator's.
+            if due:
+                items.append(Item("work", t.id, "settled",
+                                  "look again: continue, re-date, or put cancelling to the operator",
+                                  f"past its `settles_when` ({sw}); status {m.get('status')}"
+                                  + (f"; it waited on: {m.get('disposition_reason')}"
+                                     if m.get("disposition_reason") else ""),
+                                  waited=(today - sw).days))
             continue
         if idle is None or idle < INTERVALS["work"]:
             continue
@@ -368,19 +413,21 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
         parent_thing = by_id.get(str(parent)) if parent else None
         if parent_thing is not None and str(parent_thing.meta.get("status")) == "cancelled":
             items.append(Item("work", t.id, "residue", "cancel or re-parent",
-                              f"untouched {idle}d; its parent `{parent}` is cancelled"))
+                              f"untouched {idle}d; its parent `{parent}` is cancelled",
+                              waited=idle))
             continue
         ticked = sum(1 for b in boxes if b.lower() == "x")
         status = str(m.get("status"))
         if status == "not-started":
-            proposal = "start, or say when"
+            proposal = "start, or say when (`--keep`)"
         elif status in {"paused", "blocked"}:
-            proposal = "unblock, or say what it waits on"
+            proposal = "unblock, or say what it waits on (`--keep`)"
         else:
-            proposal = "pause, or say what it waits on"
+            proposal = "pause, or say what it waits on (`--keep`)"
         items.append(Item("work", t.id, "settled", proposal,
                           f"{status} and untouched {idle}d"
-                          + (f"; {ticked}/{len(boxes)} boxes ticked" if boxes else "")))
+                          + (f"; {ticked}/{len(boxes)} boxes ticked" if boxes else ""),
+                          waited=idle))
 
     # ---- workflows (workflow-state.md → Workflows Emerge From Use) ---------
     # Emergence and dissolution are the two halves of the workspace learning
@@ -503,7 +550,12 @@ def _set_frontmatter(path: Path, fields: dict) -> bool:
         pat = re.compile(rf"^{re.escape(key)}:.*$")
         for i, ln in enumerate(lines):
             if pat.match(ln):
-                lines[i] = f"{key}: {value}"
+                # The old value may run on (a folded reason, a list): its
+                # continuation lines go with it, or the YAML breaks.
+                j = i + 1
+                while j < len(lines) and lines[j][:1] in (" ", "\t", "-"):
+                    j += 1
+                lines[i:j] = [f"{key}: {value}"]
                 break
         else:
             lines.append(f"{key}: {value}")
@@ -530,6 +582,95 @@ def apply_mechanical(root: Path, corpus, rep: dict) -> list[str]:
         else:
             receipts.append(f"could not write: {it.kind} `{it.thing_id}` (no frontmatter block)")
     return receipts
+
+
+def keep(root: Path, corpus, thing_id: str, reason: str,
+         until: dt.date | None = None, today: dt.date | None = None) -> str:
+    """The agent's hold, written in one move: the reason and the next look.
+    An insight or a conflict is marked `keep-active`; work keeps its status
+    and records what it waits on. Without `until`, the next look is one
+    interval out for the item's kind. Returns the receipt, or raises
+    ValueError when the thing cannot be held."""
+    today = today or dt.date.today()
+    t = next((x for x in corpus.things if x.id == thing_id), None)
+    if t is None:
+        raise ValueError(f"no thing `{thing_id}` in this corpus")
+    if not reason.strip():
+        raise ValueError("a hold states its reason")
+    typ = str(t.meta.get("type"))
+    if typ in ("insight", "conflict"):
+        kind = typ
+    elif typ in _NOT_WORK or is_terminal(corpus.schema, t.meta):
+        raise ValueError(f"`{thing_id}` is a {typ} at status "
+                         f"{t.meta.get('status')} — not an item the reckoning holds")
+    else:
+        kind = "work"
+    until = until or today + dt.timedelta(days=INTERVALS[kind])
+    fields = {}
+    if kind != "work":
+        fields["disposition"] = "keep-active"
+    fields["disposition_reason"] = json.dumps(reason.strip(), ensure_ascii=False)
+    fields["settles_when"] = until.isoformat()
+    if not _set_frontmatter(t.path, fields):
+        raise ValueError(f"`{thing_id}` has no frontmatter block")
+    return f"held: {kind} `{thing_id}` until {until.isoformat()} — {reason.strip()}"
+
+
+# ------------------------------------------------------------ disposition
+# A change that only records a disposition — a status the reckoning moved, a
+# hold and its reason, a look-again date, a trigger re-dated, a version bumped
+# alongside — moves no claim anything reasons from, so it owes no walk (the
+# walk gate and the cue listing both read this; the-reckoning Phase 3). One
+# exception keeps the walk honest: a status that *withdraws* a claim
+# (dismissed, superseded, deprecated, cancelled) leaves its dependants
+# reasoning from something no longer held, and stays a walk candidate.
+
+DISPOSITION_KEYS = frozenset({
+    "status", "version", "disposition", "disposition_reason", "settles_when",
+    "promoted_to", "resolution", "resolved_by", "resolved", "completed",
+    "triggers"})
+WITHDRAWING = frozenset({"dismissed", "superseded", "deprecated", "cancelled",
+                         "retired", "withdrawn"})
+_TOP_KEY = re.compile(r"^([A-Za-z_][\w-]*)\s*:\s*(.*)$")
+
+
+def without_disposition(text: str) -> str:
+    """The text with its disposition fields taken out of the frontmatter, so
+    two versions that differ only in disposition compare equal. A
+    withdrawing status is kept: withdrawing a claim is not bookkeeping."""
+    t = text.replace("\r\n", "\n")
+    if not t.startswith("---\n"):
+        return t
+    end = t.find("\n---", 4)
+    if end == -1:
+        return t
+    out: list[str] = []
+    skipping = False
+    for ln in t[4:end].split("\n"):
+        m = _TOP_KEY.match(ln)
+        if m:
+            key, value = m.group(1), m.group(2).strip().strip("'\"")
+            skipping = key in DISPOSITION_KEYS and not (
+                key == "status" and value in WITHDRAWING)
+            if skipping:
+                continue
+        elif skipping and (ln[:1] in (" ", "\t", "-") or not ln.strip()):
+            continue
+        else:
+            skipping = False
+        out.append(ln)
+    return "---\n" + "\n".join(out) + t[end:]
+
+
+# A diff line that records a disposition (the rate's walk count and the
+# close's count of decisions read diffs, not whole files).
+_DISPOSITION_LINE = re.compile(
+    r"^\s*(?:-\s+)?(status|version|disposition|disposition_reason|settles_when|"
+    r"promoted_to|resolution|resolved_by|resolved|completed|triggers|condition|"
+    r"action|note)\s*:")
+_DECISION_LINE = re.compile(
+    r"^\s*(?:-\s+)?(status|disposition|disposition_reason|settles_when|"
+    r"promoted_to|resolution|resolved_by|condition)\s*:")
 
 
 # ------------------------------------------------------------------ rates
@@ -605,8 +746,14 @@ def rates(root: Path, corpus, days: int = 7) -> dict:
                 if typ == "cue":
                     walks.add(cur)
             # A definition surface modified (not born): the gate's scope,
-            # insights included, so walks can be read against it.
-            if not is_new and typ in _DEFINITION_SURFACES:
+            # insights included, so walks can be read against it. A change
+            # that only records a disposition owes no walk, so it is not
+            # counted against the walks either.
+            if (not is_new and typ in _DEFINITION_SURFACES
+                    and line[:1] in ("+", "-")
+                    and not line.startswith(("+++", "--- "))
+                    and line[1:].strip()
+                    and not _DISPOSITION_LINE.match(line[1:])):
                 surfaces.add(cur)
     return {"days": days, "created": dict(created), "disposed": disposed,
             "surface_changes": len(surfaces), "walks": len(walks)}
@@ -619,8 +766,8 @@ def bands_line(rep: dict) -> str:
     bands = rep["bands"]
     return (f"- **Reckoning:** {len(bands['mechanical'])} mechanical / "
             f"{len(bands['settled'])} settled / {len(bands['residue'])} residue "
-            "(fired triggers have their own line) — `mdllm reckon`; "
-            "`--rates` for the week's intake and disposal")
+            "(fired triggers have their own line) — a session end owes the close "
+            "(`mdllm reckon . --close`); `--rates` for the week's intake and disposal")
 
 
 def rate_line(rep: dict, rt: dict) -> str:
@@ -639,22 +786,225 @@ def rate_line(rep: dict, rt: dict) -> str:
             f"{len(bands['residue'])} residue — `mdllm reckon`")
 
 
+# ------------------------------------------------------------------ the close
+# What a session end owes the reckoning (the-reckoning Phase 3). The mechanical
+# band applied, and the backlog chased: CLOSE_QUOTA decisions a day while one
+# stands, else the band emptied. One queue, never a wall: the oldest residue
+# first and at most CLOSE_RESIDUE of it, so the operator meets one native
+# prompt per close; then the time-bound kinds — a workflow the work keeps
+# travelling, an open cue, a fired trigger — then the longest-waiting of the
+# rest. (The first live read found 49 fired triggers in one workspace: a
+# kind held to "all, every close" would have been the wall.) A decision is any disposition moved today — committed since
+# midnight or in the delta in hand — so the count is the same whether the
+# agent commits its decisions as `reckon:` first or with the `session-end:`
+# commit. The commit gate reads this for a `session-end:` commit
+# (SESSION_END_ENV, set by the lifecycle runner); an unattended run is held to
+# the mechanical band only and drafts the rest, deciding nothing.
+
+SESSION_END_ENV = "MDLLM_GATE_SESSION_END"
+CLOSE_QUOTA = 10
+CLOSE_RESIDUE = 4
+CLOSE_SHOWN_AT_GATE = 3
+_FIRST = {"workflow": 0, "cue": 1, "trigger": 2}  # the time-bound kinds lead the queue
+
+
+def decided_today(root: Path, corpus, today: dt.date) -> set[str] | None:
+    """Ids of the attention items whose disposition moved today: the diffs of
+    today's commits over things/, and the delta in hand against HEAD. A thing
+    born today is intake, not a decision. None when git cannot be read."""
+    outs: list[str] = []
+    for cmd in (["git", "log", "-p", "-U0", "--format=%x1e%H",
+                 f"--since={today.isoformat()}T00:00:00", "--", "things"],
+                ["git", "diff", "HEAD", "-U0", "--", "things"]):
+        try:
+            r = subprocess.run(cmd, cwd=root, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=60)
+        except Exception:
+            return None
+        if r.returncode != 0:
+            if cmd[1] == "diff":
+                continue  # no HEAD yet: nothing in hand to compare
+            return None
+        outs.append(r.stdout or "")
+    by_rel = {_rel(root, t): t for t in corpus.things if t.id}
+    decided: set[str] = set()
+    for out in outs:
+        cur = None
+        is_new = False
+        for line in out.splitlines():
+            fm = _FILE_RE.match(line)
+            if fm:
+                cur, is_new = fm.group(2), False
+                continue
+            if cur is None:
+                continue
+            if line.startswith("new file mode"):
+                is_new = True
+                continue
+            if is_new or not line.startswith("+") or line.startswith("+++"):
+                continue
+            mm = _DECISION_LINE.match(line[1:])
+            t = by_rel.get(cur) if mm else None
+            if t is None:
+                continue
+            typ = str(t.meta.get("type"))
+            if mm.group(1) == "condition" or typ in _ATTENTION or typ not in _NOT_WORK:
+                decided.add(t.id)
+    return decided
+
+
+def _dispatcher_drafts(corpus) -> tuple[str, str] | None:
+    """The newest dispatch digest that drafted reckoning decisions: (id,
+    created). The attended close adopts what still holds, by citation."""
+    best = None
+    for t in corpus.things:
+        if str(t.meta.get("type")) != "dispatch-digest" or not t.id:
+            continue
+        try:
+            body = t.path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if "## Reckoning" not in body:
+            continue
+        created = str(t.meta.get("created") or "")
+        if best is None or created > best[1]:
+            best = (t.id, created)
+    return best
+
+
+def close_report(root: Path, corpus, rep: dict, *, today: dt.date | None = None,
+                 unattended: bool = False) -> dict:
+    """What this close owes, and whether it is met."""
+    today = today or rep["today"]
+    bands = rep["bands"]
+    mechanical = list(bands["mechanical"])
+    residue = sorted(bands["residue"], key=lambda i: (-i.waited, i.kind, i.thing_id))
+    settled = sorted(bands["settled"], key=lambda i: (
+        _FIRST.get(i.kind, len(_FIRST)), -i.waited, i.kind, i.thing_id))
+    decided = decided_today(root, corpus, today)
+    backlog = len(residue) + len(settled)
+    if decided is None:
+        quota_met = True  # a close that cannot count opens, and says so
+    else:
+        quota_met = backlog == 0 or len(decided) >= CLOSE_QUOTA
+    need = 0 if quota_met else CLOSE_QUOTA - len(decided or ())
+    owed_residue = residue[:min(CLOSE_RESIDUE, need)]
+    owed_settled = settled[:max(0, need - len(owed_residue))]
+    met = not mechanical and (unattended or quota_met)
+    return {"today": today, "mechanical": mechanical,
+            "owed_residue": owed_residue, "owed_settled": owed_settled,
+            "decided": decided, "backlog": backlog,
+            "waiting": backlog - len(owed_residue) - len(owed_settled),
+            "quota_met": quota_met, "met": met, "unattended": unattended,
+            "drafts": _dispatcher_drafts(corpus)}
+
+
+def _close_item(it: Item) -> str:
+    return f"    - {it.kind} `{it.thing_id}` → {it.proposal} — {it.evidence}"
+
+
+def close_text(cr: dict, *, gate: bool = False) -> list[str]:
+    """The close, as the agent reads it — whole from `reckon --close`, as a
+    count with the command to run when the commit gate refuses."""
+    if cr["met"]:
+        dec = cr["decided"]
+        return ["## The close — met",
+                f"- the mechanical band is applied"
+                + ("" if cr["unattended"] else
+                   f"; {len(dec or ())} decision(s) today, "
+                   f"{cr['backlog']} waiting for later closes")]
+    lines = ["## The close — what this session end owes the reckoning"]
+    if gate:
+        parts = []
+        if cr["mechanical"]:
+            parts.append(f"{len(cr['mechanical'])} mechanical item(s) pending")
+        if not cr["quota_met"] and not cr["unattended"]:
+            parts.append(f"{len(cr['decided'] or ())} of {CLOSE_QUOTA} decisions today "
+                         f"with {cr['backlog']} waiting")
+        lines.append("- " + "; ".join(parts) + ".")
+        shown = (cr["mechanical"] + cr["owed_residue"]
+                 + cr["owed_settled"])[:CLOSE_SHOWN_AT_GATE]
+        lines += [_close_item(i) for i in shown]
+        lines.append("- Run `mdllm reckon . --close --apply` for the whole list, decide "
+                     "it, and commit again.")
+        return lines
+    if cr["mechanical"]:
+        lines.append(f"- **Mechanical ({len(cr['mechanical'])}):** pending — "
+                     "`mdllm reckon . --close --apply` writes them; stage the receipts.")
+        lines += [_close_item(i) for i in cr["mechanical"]]
+    if cr["unattended"]:
+        lines.append("- **Unattended:** apply the mechanical band and commit it as "
+                     "`reckon:`; decide nothing else. Under `## Reckoning` in your "
+                     "digest, draft a decision for each item below with the record "
+                     "you would cite, and file the residue as seat items. The next "
+                     "attended close adopts what still holds.")
+    if cr["owed_residue"]:
+        lines.append(f"- **The residue ({len(cr['owed_residue'])}, oldest first):** "
+                     "the operator's — put them in one native choice prompt, one "
+                     "question each, the concrete rulings as options and *not now* "
+                     "among them; *not now* is an answer: record it as a hold "
+                     "(`--keep`) with their words as the reason.")
+        lines += [_close_item(i) for i in cr["owed_residue"]]
+    if cr["owed_settled"]:
+        lines.append(f"- **Settled ({len(cr['owed_settled'])}, time-bound kinds "
+                     "first, then the longest-waiting):** "
+                     "decide each by citing the record — dispose (set the status "
+                     "and its resolution), or hold: `mdllm reckon . --keep <id> "
+                     "--reason \"…\"` (next look one interval out; `--until "
+                     "YYYY-MM-DD` to say when). A fired trigger: act, re-date its "
+                     "condition, or disarm it; a cue: walk it or answer by "
+                     "citation; a workflow: write or bind it (`mdllm workflows`).")
+        lines += [_close_item(i) for i in cr["owed_settled"]]
+    if cr["decided"] is None:
+        lines.append("- (note) git could not be read: today's decisions are uncounted "
+                     "and the quota is not enforced")
+    else:
+        lines.append(f"- **Today:** {len(cr['decided'])} decision(s) recorded; a close "
+                     f"owes {CLOSE_QUOTA} a day while a backlog stands, or the band "
+                     f"emptied. {cr['waiting']} more wait for later closes — "
+                     "`--rates` says whether the chase is winning.")
+    if cr["drafts"]:
+        lines.append(f"- The dispatcher drafted decisions in `{cr['drafts'][0]}` "
+                     f"({cr['drafts'][1]}) — adopt by citation what still holds.")
+    return lines
+
+
 def cmd_reckon(args) -> int:
-    """Reads, and with --apply writes the mechanical band; exit 0 always."""
+    """Reads, and with --apply writes the mechanical band; with --keep writes
+    one hold; with --close says what a session end owes. Exit 0 except a
+    hold that cannot be written (2)."""
     root = Path(args.path).resolve()
     try:
         corpus, _ = scan(root)
     except Exception as exc:
         print(f"mdllm: reckon cannot scan {root}: {exc}")
         return 2
+    keep_id = getattr(args, "keep", None)
+    if keep_id:
+        until = None
+        raw = getattr(args, "until", None)
+        if raw:
+            try:
+                until = dt.date.fromisoformat(str(raw))
+            except ValueError:
+                print("mdllm: --until must be a date, YYYY-MM-DD")
+                return 2
+        try:
+            print(keep(root, corpus, keep_id, getattr(args, "reason", None) or "", until))
+        except ValueError as exc:
+            print(f"mdllm: reckon --keep: {exc}")
+            return 2
+        return 0
     rates_only = bool(getattr(args, "rates", False))
-    rep = reckon_report(root, corpus, imports=bool(getattr(args, "imports", False)),
-                        workflows=not rates_only)
+    imports = bool(getattr(args, "imports", False))
+    rep = reckon_report(root, corpus, imports=imports, workflows=not rates_only)
     if rates_only:
         print(rate_line(rep, rates(root, corpus)))
         return 0
-    for ln in render(rep, root):
-        print(ln)
+    closing = bool(getattr(args, "close", False))
+    if not closing:
+        for ln in render(rep, root):
+            print(ln)
     if getattr(args, "apply", False):
         receipts = apply_mechanical(root, corpus, rep)
         print(f"- **Applied ({sum(1 for r in receipts if r.startswith('applied'))}):** "
@@ -664,4 +1014,11 @@ def cmd_reckon(args) -> int:
             print(f"    - {r}")
         if not receipts:
             print("    - nothing to apply")
+        if closing and any(r.startswith("applied") for r in receipts):
+            corpus, _ = scan(root)
+            rep = reckon_report(root, corpus, imports=imports, workflows=True)
+    if closing:
+        unattended = bool(os.environ.get("MDLLM_UNATTENDED"))
+        for ln in close_text(close_report(root, corpus, rep, unattended=unattended)):
+            print(ln)
     return 0

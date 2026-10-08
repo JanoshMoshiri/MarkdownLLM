@@ -337,14 +337,14 @@ def read_hook_input() -> str:
         return ""
 
 
-def gate_applies(hook_input: str) -> bool:
-    """Does this hook input describe the tool call the gate guards? Reads
-    Claude Code's ``tool_input.command``; falls back to the raw text when the
-    input is not the documented JSON, so a harness that sends the command
-    plain is still gated."""
+def _guarded_command(hook_input: str) -> tuple[str, str] | None:
+    """(command, cwd) when this hook input describes the tool call the gate
+    guards, else None. Reads Claude Code's ``tool_input.command``; falls back
+    to the raw text when the input is not the documented JSON, so a harness
+    that sends the command plain is still gated."""
     if not hook_input:
-        return False
-    command = hook_input
+        return None
+    command, cwd = hook_input, ""
     try:
         data = json.loads(hook_input)
     except ValueError:
@@ -354,9 +354,47 @@ def gate_applies(hook_input: str) -> bool:
         if isinstance(tool_input, dict) and isinstance(
                 tool_input.get("command"), str):
             command = tool_input["command"]
+            cwd = str(data.get("cwd") or "")
         else:
-            return False
-    return bool(GATE_COMMAND_RE.search(command))
+            return None
+    return (command, cwd) if GATE_COMMAND_RE.search(command) else None
+
+
+def gate_applies(hook_input: str) -> bool:
+    """Does this hook input describe the tool call the gate guards?"""
+    return _guarded_command(hook_input) is not None
+
+
+# A `session-end:` commit is the close (the-reckoning Phase 3): the gate asks
+# its second question of it. The subject is read where the command carries it
+# — an inline `-m` (quoted, a shell here-string, or `$(cat <<EOF`) or the
+# file a `-F` names — and nowhere else; a commit whose message the gate cannot
+# read is an ordinary commit.
+_SESSION_END_INLINE = re.compile(
+    r"""(?:\s-[A-Za-z]*m|\s--message)(?:\s+|=)["']?"""
+    r"""(?:@["']\s*|\$\(\s*cat\s*<<-?\s*['"]?\w+['"]?\s*)?\s*session-end:""")
+_MESSAGE_FILE = re.compile(
+    r"""(?:\s-[A-Za-z]*F|\s--file)(?:\s+|=)(?:"([^"]+)"|'([^']+)'|([^\s;&|]+))""")
+
+
+def is_session_end_commit(command: str, cwd: str | Path = "") -> bool:
+    if _SESSION_END_INLINE.search(command):
+        return True
+    m = _MESSAGE_FILE.search(command)
+    named = next((g for g in m.groups() if g), "") if m else ""
+    if not named or named == "-":
+        return False
+    path = Path(named)
+    if not path.is_absolute() and cwd:
+        path = Path(cwd) / path
+    try:
+        with path.open(encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if line.strip():
+                    return line.strip().startswith("session-end:")
+    except OSError:
+        return False
+    return False
 
 
 def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
@@ -369,8 +407,15 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
         print(f"mdllm: harness {harness!r} has no lifecycle output port")
         return 2
 
-    if binding.delivery == "gate" and not gate_applies(read_hook_input()):
-        return 0  # not the call the gate guards: silence is allow, no event ran
+    if binding.delivery == "gate":
+        guarded = _guarded_command(read_hook_input())
+        if guarded is None:
+            return 0  # not the call the gate guards: silence is allow, no event ran
+        from .reckon import SESSION_END_ENV
+        if is_session_end_commit(*guarded):
+            os.environ[SESSION_END_ENV] = "1"  # the step inherits it
+        else:
+            os.environ.pop(SESSION_END_ENV, None)
 
     admission: LifecycleAdmission | None = None
     if isinstance(adapter, LifecycleAdmissionPort):

@@ -2,7 +2,7 @@
 id: session-end-continuity
 type: prompt
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-05-28
 inputs:
   - name: session-conversation
@@ -22,6 +22,8 @@ outputs:
     description: "type: conflict things created in things/conflicts/ (if contradictions found)"
   - name: conflict-dispositions
     description: "Open conflicts the brake ruled on, linked from the work that will resolve them, or deliberately held with a stated reason"
+  - name: the-close
+    description: "The reckoning's close (`mdllm reckon . --close --apply`): the mechanical band applied, and the owed items decided — the residue put to the operator in one native prompt, the settled ones by citation, holds written with `--keep`; the commit gate refuses the `session-end:` commit until it is met"
   - name: cue-dispositions
     description: "Reconciliation cues answered (verdict + reason on the cue thing), raised for this session's own reasoned-from modifications, or left open for the operator — never answered by an unattended session"
   - name: updated-open-loops
@@ -101,15 +103,30 @@ linked_things:
 ---
 ```
 
-### 3. Disposition The Standing Insights, Open Conflicts And Open Cues (the brake)
+### 3. The Close — Reckon What The Workspace Carries (the brake)
 
 Capture (steps 2 and 4) grows the insight and conflict populations every session;
 this step prunes them, so capture and reckoning stay in balance. Conflicts were the
 gap: created at three cadences, ruled on at none, re-listed by orient each session
 until the list was scrolled past (`circulation-is-not-disposition`).
 
-Run `python {framework_root}/tools/mdllm.py validate <domain>` and act on **every
-insight-disposition and conflict-disposition Info finding** the floor surfaces:
+Run `python {framework_root}/tools/mdllm.py reckon <domain> --close --apply`. The
+floor applies the mechanical band and prints what this close owes, in one queue:
+- **The residue** (at most four, oldest first) is the operator's: put it in **one
+  native choice prompt**, one question per item, the concrete rulings as options
+  and *not now* among them. *Not now* is an answer — record it as a hold with
+  their words as the reason.
+- **The settled items** (workflow items, open cues and fired triggers first, then
+  the longest-waiting) are yours: decide each by citing the record. To hold one,
+  `mdllm reckon <domain> --keep <id> --reason "…"` writes the hold and its next
+  look in one move (`--until YYYY-MM-DD` to say when).
+- If the dispatcher drafted decisions in a digest (the close names it), adopt by
+  citation what still holds.
+
+Where the harness projects the commit gate, the `session-end:` commit in step 6 is
+refused until the close is met — the mechanical band applied, and ten decisions
+recorded today while a backlog stands, or the band emptied. How to decide each
+kind — the same moves `validate`'s Info findings name:
 - *"active insight with no inbound edge from a live thing"* — force a disposition:
   **promote** (populate `promoted_to`; the insight's lesson has crystallised into a
   spec/decision/thing), **dismiss** (considered, set aside), **consolidate** (fold a
@@ -140,8 +157,14 @@ insight-disposition and conflict-disposition Info finding** the floor surfaces:
   from `git rev-parse`), or **leave it open** — the digest re-lists it next session. An
   unattended session raises and never answers: the verdict is the operator's receipt.
 
+- **Fired triggers** — act on it, re-date its condition, or disarm it. **Work** —
+  start, unblock or pause it, or hold it saying what it waits on. **Workflows** —
+  write the emerged one or bind the definition that already describes it
+  (`mdllm workflows`).
+
 This is a **forcing function, not a corpus sweep**: the floor already lists exactly the
-insights, conflicts and cues that need a decision, so none can quietly go dark. The deeper
+items that need a decision, oldest first and never more than the close owes, so none
+can quietly go dark and no close meets a wall. The deeper
 period-scoped work (composition/consolidation, the full conflict scan and whole-set
 triage, schema scans) stays the retrospective's.
 

@@ -2,7 +2,7 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.7
+version: 1.8
 created: 2026-06-13
 linked_things:
   - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
@@ -219,9 +219,14 @@ hook table; Claude Code today), `mdllm cues --staged` runs before the agent's
   the cue and the revisions. `verdict: inflection` records that something
   was revised or ruled; `not-inflection` that every line held.
 - **What does not count.** A change confined to managed generated blocks: the
-  generator did that walk (`a-generated-surface-collapses-its-walk`). A data
-  thing with fan-in: the digest and scan 4. A second edit of the same subject
-  the same day: the agent's judgement, not the gate's.
+  generator did that walk (`a-generated-surface-collapses-its-walk`). A change
+  that only records a disposition — status, a hold and its reason, a
+  look-again date, a trigger re-dated, the version beside them — moves no
+  claim (`session-memory.md` → The Reckoning); withdrawing a claim
+  (dismissed, superseded, deprecated, cancelled) still counts. The cue
+  listing reads the same exemption back off the commit stream. A data thing
+  with fan-in: the digest and scan 4. A second edit of the same subject the
+  same day: the agent's judgement, not the gate's.
 - **Unattended.** The same refusal, the other instruction: raise the
   checklist with proposed revisions beneath it, apply nothing, file it. The
   dispatcher's tick marks its launches (`MDLLM_UNATTENDED`) and the floor

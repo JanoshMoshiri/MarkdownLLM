@@ -2,7 +2,7 @@
 id: the-reckoning-is-the-digestion-beat-2026-10-05
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-10-05
 session: 2026-10-05
 decided_by: Janosh Moshiri
@@ -127,3 +127,33 @@ workspace in the digest.
 - Nothing further is built until the loop closes once: the first live
   reckoning is the QMS's twenty conflicts and eighty-seven insights, by hand,
   with the residue counted.
+
+## Refined 2026-10-08 — The Close Is A Chase, Not A Clearance
+
+Part 3 left one thing open: how much a single session end must decide. The
+first use by hand, at the framework root's own close, answered half of it —
+two insights held that evening were back in the next morning's band, because
+a hold carried no next look — and the first live read of the close answered
+the rest: one workspace carried 49 fired triggers and 67 other items. A close
+held to "decide the band" would have been a wall at its first run, the
+experience the operator ruled against for a gate at every commit.
+
+Put to the operator the same morning as two calls, and agreed ("you already
+know the decisions … execute"):
+
+1. **The session end owes a bounded chase.** The mechanical band, every
+   close. Then ten decisions a day while a backlog stands, or the band
+   emptied — oldest first, the residue leading and at most four of it, so
+   the operator meets one native prompt per close; the time-bound kinds
+   (a workflow the work keeps travelling, an open cue, a fired trigger)
+   ahead of the rest. Each decided item carries its next date, so the
+   steady state stays small.
+2. **The dispatcher drafts; the attended close adopts.** An unattended run
+   applies the mechanical band and drafts a decision for each owed item in
+   its digest; it decides nothing. The next attended close adopts by
+   citation what still holds — still invisible to the operator.
+
+Two floor consequences ship with it, neither a new ruling: a hold leaves the
+band until its look-again date (one interval after it was last changed, when
+it names none), and a change that only records a disposition owes no walk,
+while withdrawing a claim still does. Built as `the-reckoning` Phase 3.

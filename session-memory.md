@@ -2,7 +2,7 @@
 id: session-memory-specification
 type: specification
 status: evolving
-version: 1.11
+version: 1.12
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -190,7 +190,7 @@ discussed but never written.
 
 For each insight worth preserving, create a `type: insight` thing in `things/insights/`.
 
-### Step 3: Disposition The Standing Insights, Open Conflicts And Open Cues (the brake)
+### Step 3: The Close — Reckon What The Workspace Carries (the brake)
 
 Steps 2 and 4 grow the insight and conflict populations every session; this step
 prunes them, so the two stay in balance — capture is paired with reckoning, and
@@ -198,33 +198,40 @@ neither population can outrun the rate it is triaged. This is the session-cadenc
 counterpart to the retrospective's deeper triage beats (`Insight Lifecycle Management`
 below; `retrospective.md` → What A Retrospective Produces, items 2 and 3).
 
-Run `python {framework_root}/tools/mdllm.py validate .` and act on **every
-insight-disposition and conflict-disposition Info finding** the floor surfaces, and on
-the session-start digest's **Reconciliation cues** line (`mdllm cues .`) — together
-they list exactly the insights, conflicts and cues that need a decision, so none can
-quietly go dark:
-- *"active insight with no inbound edge from a live thing"* — force a disposition:
-  **promote** (populate `promoted_to`), **dismiss**, **consolidate** a genuine duplicate
-  into a survivor, **link** it from live work, or mark **`disposition: keep-active`** with
-  a one-line `disposition_reason`.
-- *"keep-active with no `disposition_reason`"* — add the reason or re-disposition.
-- *"open conflict with no inbound edge from a live thing"* or *"open conflict untouched
-  for N days"* — force a disposition: **rule** (`resolution: superseded | both-valid |
-  dismissed`, `status: resolved`, both parties updated), **link** it from the work that
-  will resolve it, or **hold** it with `disposition: keep-active` + a
-  `disposition_reason` naming what would resolve it. An inbound edge keeps a conflict
-  in circulation; it does not rule on it — which is why the age finding fires through
-  a live edge (`belief-revision.md` → Who Reads An Open Conflict).
-- *"conflict marked keep-active but has no `disposition_reason`"* — add the reason or
-  rule on it.
-- *Reconciliation cues* — open or unraised (`change-reconciliation.md` → The Cue
-  Persists): **answer** each one the session can (`verdict: inflection |
-  not-inflection` + `verdict_reason`, `status: answered`; an inflection runs the pass
-  and seals it) — by **citation** where a recorded decision covers the change
-  (`informed_by` pins it; one ruling answers many cues), **raise** a cue for any reasoned-from modification this session made
-  that is still unraised (`templates/cue.md.template`, `raised_by` set), and leave the
-  rest open — the digest re-lists them next session. An unattended session raises and
-  never answers; the operator's verdict is the receipt.
+Run `mdllm reckon . --close --apply`. The floor applies the mechanical band — a
+status a field or a git fact already derives — and prints what this close owes, in
+one queue, never a wall (*The Reckoning* → The Close, below):
+- **The residue**, oldest first, at most four: the operator's. Put them in one
+  native choice prompt, one question each, the concrete rulings as options and
+  *not now* among them. *Not now* is an answer: record it as a hold, in their words.
+- **The settled items**: workflow items, open cues and fired triggers first, then
+  the longest-waiting. Decide each by citing the record:
+  - *insight* — **promote** (`promoted_to`), **dismiss**, **consolidate** a genuine
+    duplicate into a survivor, **link** it from live work, or **hold** it;
+  - *conflict* — **rule** (`resolution: superseded | both-valid | dismissed`,
+    `status: resolved`, both parties updated), **link** it from the work that will
+    resolve it, or **hold** it naming what would resolve it. An inbound edge keeps a
+    conflict in circulation; it does not rule on it (`belief-revision.md` → Who Reads
+    An Open Conflict);
+  - *cue* — walk it, or answer **by citation** where a recorded decision covers the
+    change (`informed_by` pins it; one ruling answers many cues);
+  - *fired trigger* — act, re-date its condition, or disarm it;
+  - *work* — start, unblock or pause, or hold it saying what it waits on;
+  - *workflow* — write or bind it (`mdllm workflows`; `workflow-state.md` → Workflows
+    Emerge From Use).
+
+  A hold is one move: `mdllm reckon . --keep <id> --reason "…"` writes
+  `disposition: keep-active` (insight, conflict), the reason, and the next look —
+  one interval out, or `--until YYYY-MM-DD`.
+- **Raise** a cue for any reasoned-from modification this session made that is still
+  unraised (`templates/cue.md.template`); a definition surface's the commit gate
+  raises with you.
+
+Where the harness projects the commit gate, the `session-end:` commit is refused
+until the close is met: the mechanical band applied, and ten decisions recorded
+today while a backlog stands, or the band emptied. `validate`'s disposition Info
+findings name the same items; the close orders them. An unattended session applies
+the mechanical band and drafts the rest; it never answers.
 
 This is a forcing function, not a corpus sweep: the deeper composition/consolidation,
 the full conflict scan and whole-set triage, and the schema scans stay the
@@ -319,13 +326,13 @@ proposed:
 
 | Kind | Default exit |
 |---|---|
-| `insight` (active) | promotable the moment `promoted_to` names a thing that exists; dismiss-or-consolidate candidate after 60 days with nothing live citing it; promote-or-say-why candidate after 120 days cited and never promoted; a `keep-active` hold past its interval has its stated condition read — met, dispose; not, re-date |
-| `conflict` (open) | resolvable the moment one party is superseded (the other survives) or every party is closed out (dismissed); rule-link-or-hold after 30 days untouched with nothing live linking it; **a ruling for the operator when still in circulation**; a hold past its interval has what-would-resolve-it read |
+| `insight` (active) | promotable the moment `promoted_to` names a thing that exists; dismiss-or-consolidate candidate after 60 days with nothing live citing it; promote-or-say-why candidate after 120 days cited and never promoted; a `keep-active` hold whose next look has come has its stated condition read — met, dispose; not, re-date |
+| `conflict` (open) | resolvable the moment one party is superseded (the other survives) or every party is closed out (dismissed); rule-link-or-hold after 30 days untouched with nothing live linking it; **a ruling for the operator when still in circulation**; a hold whose next look has come has what-would-resolve-it read |
 | `cue` (open) | answer by citation, or walk — always listed |
 | fired trigger | disarm the moment its action text already answers its condition; otherwise act, re-date or disarm, with the thing's movement since the condition as evidence |
 | imported mirror | re-pin when stale, retire when withdrawn, **re-read when diverged in meaning (the operator's)**; unreachable is not reckoned; a mirrored insight or conflict is its source workspace's to reckon |
 | workflow (`workflow-state.md` → Workflows Emerge From Use) | a path the record supports and no definition binds: the agent writes it (`mdllm workflows --emergent --draft`), or binds the unbound definition that already describes it — carrier and map only; a departure from an inferred workflow: the agent revises it or names the slip; **a departure from an authored workflow: the operator's**; an inferred workflow nothing has moved through for 60 days dissolves (mechanical) |
-| non-terminal work | complete the moment every box is ticked; start, unblock or pause after 21 days untouched, saying what it waits on; **cancel or re-parent when its parent is cancelled, and past its own `settles_when` — the operator's** |
+| non-terminal work | complete the moment every box is ticked; start, unblock or pause after 21 days untouched, saying what it waits on; past its own `settles_when`, looked at again — continue or re-date; **cancel or re-parent when its parent is cancelled, and any cancelling — the operator's** |
 
 **The floor reckons.** `mdllm reckon` names every item's candidate with its
 evidence in three bands. *Mechanical*: derivable from a field or a git fact —
@@ -337,17 +344,45 @@ residue: green is reachable, which is what keeps the line read
 proposes and applies only the derivable; it never marks a verdict of meaning —
 dismissing an insight live work still cites, choosing a side, cancelling work.
 
-**Two actors, no new ritual.** Attended, the session-end commit waits for the
-mechanical band to be applied and the settled band decided; the residue goes
-to the operator before the session closes. Unattended, the dispatcher's tick
-applies the mechanical band, drafts the settled one and files the residue in
-its digest. Retrospective scans 5 and 6 are reads of the same command.
+**A hold carries its next look.** A held item leaves the band until its
+`settles_when` date, or — with none — until one interval after it was last
+changed; a hold made today is not asked again tomorrow. Without that, the
+first use by hand (2026-10-08) showed the band never drains: two insights held
+at one session end were back in the next morning's list. `mdllm reckon --keep`
+writes the hold and its date in one move.
+
+**The close: two actors, no new ritual** (the-reckoning Phase 3, shape agreed
+with the operator 2026-10-08). `mdllm reckon --close` is what a session end
+owes. The mechanical band, every close. Then the backlog, chased rather than
+cleared: ten decisions a day while one stands, or the band emptied — so a
+workspace's first close is ten decisions, never its whole history (the first
+live read found one workspace carrying 49 fired triggers and 67 other items).
+One queue, oldest first: the residue leads, at most four of it, so the
+operator meets one native prompt per close; then the time-bound kinds — a
+workflow the work keeps travelling, an open cue, a fired trigger; then the
+longest-waiting of the rest. A decision is any disposition moved today,
+committed since midnight or in the delta in hand. *Attended*, the commit gate
+refuses a `session-end:` commit until the close is met
+(`orchestration.md` → `pre-commit:gate`). *Unattended*, the dispatcher's tick
+applies the mechanical band, drafts a decision for each owed item under
+`## Reckoning` in its digest and files the residue as seat items; the next
+attended close adopts what still holds, by citation. Retrospective scans 5
+and 6 are reads of the same command.
+
+**A disposition is not a walk.** A change that only records a disposition — a
+status the reckoning moved, a hold and its reason, a look-again date, a
+trigger re-dated, the version bumped alongside — moves no claim anything
+reasons from, so neither the commit gate nor the cue listing owes a walk for
+it. Withdrawing a claim (dismissed, superseded, deprecated, cancelled) still
+does: its dependants now reason from something no longer held. Without the
+exemption the reckoning would mint the churn the walk's bounds exist to
+prevent — every disposition owing a walk of everything that cites it.
 
 **Retention is promotion.** An insight that survives the reckoning is folded
 into a skill with `promoted_to` set; a skill is a definition surface; the walk
 gate takes it from there (`change-reconciliation.md` → The Walk Runs On
 Detection). Intake, reckoning, promotion, walk: the loop closes on primitives
-that already exist. Built in phases by `the-reckoning`; Phase 1 is the read.
+that already exist. Built in phases by `the-reckoning`.
 
 ## Extraction Heuristic
 

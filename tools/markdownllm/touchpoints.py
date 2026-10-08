@@ -461,7 +461,7 @@ def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
                 c["birth"] = birth.get(c["path"])
         by_path = {t.path.resolve(): t for t in corpus.things if t.id}
         inbound: Counter | None = None
-        touched: dict[str, dict] = {}
+        mods: list[tuple[str, dt.date, str, object, str]] = []
         for i, (sha, day, paths, _) in enumerate(walk):
             for rel in paths:
                 t = by_path.get((root / rel).resolve())
@@ -474,19 +474,63 @@ def cues_report(root: Path, corpus, since: dt.date | None = None) -> dict:
                     continue
                 if any(_covers(c, i, day) for c in by_subject.get(t.id, [])):
                     continue
-                rec = touched.get(t.id)
-                if rec is None:
-                    rec = touched[t.id] = {"subject": t.id, "reason": reason,
-                                           "commits": 0, "latest": day,
-                                           "latest_sha": sha, "earliest": day}
-                rec["commits"] += 1
-                rec["earliest"] = min(rec["earliest"], day)
+                mods.append((sha, day, rel, t, reason))
+        # The gate's exemption, read back off the stream: a modification that
+        # only recorded a disposition, or only regenerated a block, moved no
+        # claim and is not owed a cue. One batched read of both sides of
+        # every candidate, never one spawn per thing.
+        sides = _blob_pairs(root, [(sha, rel) for sha, _, rel, _, _ in mods]) if mods else []
+        touched: dict[str, dict] = {}
+        for (sha, day, rel, t, reason), pair in zip(mods, sides or [None] * len(mods)):
+            if pair and pair[0] is not None and pair[1] is not None \
+                    and _walkable(pair[0]) == _walkable(pair[1]):
+                continue
+            rec = touched.get(t.id)
+            if rec is None:
+                rec = touched[t.id] = {"subject": t.id, "reason": reason,
+                                       "commits": 0, "latest": day,
+                                       "latest_sha": sha, "earliest": day}
+            rec["commits"] += 1
+            rec["earliest"] = min(rec["earliest"], day)
         unraised = sorted(touched.values(),
                           key=lambda r: (-r["commits"], r["subject"]))
     return {"baseline": baseline, "baseline_why": why,
             "walk_ok": walk is not None,
             "open": sorted(open_cues, key=lambda e: e["id"]),
             "unraised": unraised}
+
+
+def _blob_pairs(root: Path, pairs: list[tuple[str, str]]):
+    """[(text before, text after)] for each (commit, path), read in one
+    `git cat-file --batch`; a side git cannot give is None, and None for the
+    whole list when git cannot be read — the caller then keeps every
+    candidate, never hides one."""
+    reqs: list[str] = []
+    for sha, rel in pairs:
+        reqs += [f"{sha}^:{rel}", f"{sha}:{rel}"]
+    try:
+        r = subprocess.run(["git", "cat-file", "--batch"], cwd=root,
+                           input=("\n".join(reqs) + "\n").encode("utf-8"),
+                           capture_output=True, timeout=60)
+    except Exception:
+        return None
+    if r.returncode != 0:
+        return None
+    out, pos, texts = r.stdout, 0, []
+    for _ in reqs:
+        nl = out.find(b"\n", pos)
+        if nl == -1:
+            return None
+        parts = out[pos:nl].split()
+        pos = nl + 1
+        if len(parts) == 3 and parts[2].isdigit():
+            size = int(parts[2])
+            texts.append(out[pos:pos + size].decode("utf-8", "replace")
+                         if parts[1] == b"blob" else None)
+            pos += size + 1
+        else:
+            texts.append(None)  # missing, ambiguous
+    return [(texts[2 * k], texts[2 * k + 1]) for k in range(len(pairs))]
 
 
 def _covers(cue: dict, position: int, day: dt.date) -> bool:
@@ -608,8 +652,16 @@ def _without_generated(text: str) -> str:
     return _GENERATED_BLOCK_RE.sub(lambda m: f"<!-- generated:{m.group(1)} -->", text)
 
 
+def _walkable(text: str) -> str:
+    """What a walk reads: the authored text with generated blocks collapsed
+    and the disposition fields out — a change to either moves no claim
+    (`reckon.without_disposition`; the-reckoning Phase 3)."""
+    from .reckon import without_disposition
+    return without_disposition(_without_generated(text.replace("\r\n", "\n")))
+
+
 def _authored_change(root: Path, rel: str) -> bool:
-    """Did the authored part of `rel` change against HEAD? True when HEAD
+    """Did the walkable part of `rel` change against HEAD? True when HEAD
     cannot say (a new path, no HEAD) — the gate then asks rather than assumes."""
     try:
         r = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=root,
@@ -623,7 +675,7 @@ def _authored_change(root: Path, rel: str) -> bool:
         after = (root / rel).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n")
     except OSError:
         return True
-    return _without_generated(before) != _without_generated(after)
+    return _walkable(before) != _walkable(after)
 
 
 def _dependants(corpus, target: str) -> list[tuple[str, str]]:
@@ -751,7 +803,7 @@ def staged_report(root: Path, corpus, today: dt.date | None = None) -> dict:
                for c in cues_by_subject.get(t.id, [])):
             continue
         if not _authored_change(root, rel):
-            continue  # a regenerated block only: the generator did the walk
+            continue  # a regenerated block, or a disposition recorded: no claim moved
         if inbound is None:
             inbound = _inbound_ids(corpus)
         owed.append({"subject": t.id, "type": typ, "path": rel,
@@ -895,14 +947,38 @@ def raise_staged_cues(root: Path, rep: dict) -> list[Path]:
     return written
 
 
+def _close_refuses(root: Path, corpus) -> bool:
+    """The gate's second question, asked only of a `session-end:` commit (the
+    lifecycle runner sets the flag from the command it guards): has this
+    close given the reckoning what it owes? Prints the close's short form
+    and returns True to refuse. A floor error opens — a broken reckoning must
+    not lock the repository."""
+    from .reckon import SESSION_END_ENV, close_report, close_text, reckon_report
+    if not os.environ.get(SESSION_END_ENV):
+        return False
+    try:
+        rep = reckon_report(root, corpus, workflows=True)
+        cr = close_report(root, corpus, rep,
+                          unattended=bool(os.environ.get(UNATTENDED_ENV)))
+    except Exception as exc:
+        print(f"## The close — could not look ({type(exc).__name__}); the gate opens")
+        return False
+    print()
+    for ln in close_text(cr, gate=True):
+        print(ln)
+    return not cr["met"]
+
+
 def _cmd_cues_staged(args, root: Path, corpus) -> int:
     rep = staged_report(root, corpus)
     for ln in staged_text(rep):
         print(ln)
     if not rep["owed"]:
-        if getattr(args, "raise_", False) and rep["walk_ok"]:
-            print("- nothing to raise")
-        return 0
+        if getattr(args, "raise_", False):
+            if rep["walk_ok"]:
+                print("- nothing to raise")
+            return 0
+        return 1 if _close_refuses(root, corpus) else 0
     if getattr(args, "raise_", False):
         written = raise_staged_cues(root, rep)
         print(f"- **Raised ({len(written)}):** cue thing(s) written, pinned to HEAD, "
@@ -946,9 +1022,10 @@ def cmd_cues(args) -> int:
         print("- (no git history readable here — the unraised half cannot be "
               "computed; only open cue things are listed)")
     if rep["open"]:
-        print(f"- **Unanswered ({len(rep['open'])}):** open cue things — a human "
-              f"verdict is owed on each (`verdict` + `verdict_reason`, "
-              f"`status: answered`):")
+        print(f"- **Unanswered ({len(rep['open'])}):** open cue things — a walk "
+              f"is owed on each (the agent walks and marks the `verdict` + "
+              f"`verdict_reason`, `status: answered`; the operator rules on "
+              f"the residue):")
         for c in rep["open"]:
             who = f" by {c['raised_by']}" if c["raised_by"] else ""
             print(f"    - `{c['id']}` on `{c['subject']}` — raised "

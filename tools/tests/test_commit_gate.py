@@ -320,3 +320,48 @@ def test_pre_gate_seat_is_recognised_and_refreshes_into_the_gated_shape(tmp_path
 def test_the_dispatch_tick_marks_its_launches_unattended():
     tick = (FW_ROOT / "tools/dispatch/tick.ps1").read_text(encoding="utf-8-sig")
     assert "$env:MDLLM_UNATTENDED = '1'" in tick
+
+
+# ------------------------------------------------- the close's leg (Phase 3)
+# The gate asks a `session-end:` commit a second question — has the close
+# given the reckoning what it owes — without a second binding: the runner
+# reads the subject where the command carries it and flags the step through
+# the environment, so every seat's projection stays byte-identical.
+
+_COMMIT = "git " + "commit"
+
+
+def test_a_session_end_commit_is_recognised_where_its_subject_is_written(tmp_path):
+    assert lr.is_session_end_commit(f'{_COMMIT} -m "session-end: 2026-10-08 — x"')
+    assert lr.is_session_end_commit(f"git add -A && {_COMMIT} -qm 'session-end: x'")
+    assert lr.is_session_end_commit(
+        f"{_COMMIT} -m \"$(cat <<'EOF'\nsession-end: x\n\nbody\nEOF\n)\"")
+    assert lr.is_session_end_commit(f"{_COMMIT} -m @'\nsession-end: x\n'@")
+    (tmp_path / "msg.txt").write_text("\nsession-end: from a file\n", encoding="utf-8")
+    assert lr.is_session_end_commit(f"{_COMMIT} -F msg.txt", tmp_path)
+    assert lr.is_session_end_commit(f'{_COMMIT} -F "{tmp_path / "msg.txt"}"')
+    (tmp_path / "other.txt").write_text("floor: x\n", encoding="utf-8")
+    assert not lr.is_session_end_commit(f"{_COMMIT} --file=other.txt", tmp_path)
+    assert not lr.is_session_end_commit(f'{_COMMIT} -m "fix: the session-end: line"')
+    assert not lr.is_session_end_commit(f"{_COMMIT} -F missing.txt", tmp_path)
+
+
+def test_dispatch_flags_a_session_end_commit_for_the_step(tmp_path, monkeypatch, capsys):
+    from markdownllm.reckon import SESSION_END_ENV
+    seen = []
+
+    def run(root, binding):
+        seen.append(lr.os.environ.get(SESSION_END_ENV))
+        return _execution(0)
+
+    monkeypatch.setattr(lr, "execute_lifecycle", run)
+    monkeypatch.setattr(lr, "record_execution_attestation", lambda *a, **kw: None)
+    monkeypatch.delenv(SESSION_END_ENV, raising=False)
+    for command in (f'{_COMMIT} -m "session-end: x"', f"{_COMMIT} -m x"):
+        monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(
+            {"tool_name": "Bash", "tool_input": {"command": command}})))
+        lr.dispatch_lifecycle_event(
+            tmp_path, CTX.binding("pre-commit"), harness="fake-harness",
+            definition_hash="sha256:pinned", output_port=_Port())
+    capsys.readouterr()
+    assert seen == ["1", None]

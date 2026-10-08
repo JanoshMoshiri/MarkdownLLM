@@ -9,18 +9,19 @@ when *you* judge the session worth it, never automatically. Follow
 `{framework_root}/templates/prompts/session-end-continuity.md`:
 
 1. Scan this session for insights worth preserving → create `type: insight` things.
-2. **Disposition the standing insights and open conflicts (the brake):** run
-   `python {framework_root}/tools/mdllm.py validate .` and act on every
-   insight-disposition *and* conflict-disposition finding — insights: promote,
-   dismiss, consolidate, link from live work, or mark `disposition: keep-active`
-   + a reason; conflicts: rule (superseded / both-valid / dismissed → `status:
-   resolved`), link from the work that will resolve it, or mark `disposition:
-   keep-active` + a reason naming what would resolve it; **cues** (the digest's
-   *Reconciliation cues* line, or `mdllm cues .`): answer what this session can
-   (`verdict` + `verdict_reason`, `status: answered`), raise one for any
-   reasoned-from thing you modified that no cue covers, leave the rest open —
-   an unattended session never answers. Capture (steps 1 and 3) grows these
-   populations; this prunes them, so they stay balanced.
+2. **The close — reckon what the workspace carries (the brake):** run
+   `python {framework_root}/tools/mdllm.py reckon . --close --apply`. The floor
+   applies the mechanical band and lists what this close owes, oldest first:
+   the residue (at most four) goes to the operator as one set of questions,
+   *not now* among the options and recorded as a hold; the settled items you
+   decide by citing the record — insights: promote, dismiss, consolidate, link
+   or hold; conflicts: rule, link or hold; cues: walk or answer by citation;
+   fired triggers: act, re-date or disarm; work: start, unblock, pause or hold;
+   workflows: write or bind. A hold is `mdllm reckon . --keep <id> --reason "…"`.
+   Raise a cue for any reasoned-from thing you modified that no cue covers. The
+   close is met when the mechanical band is applied and ten decisions are
+   recorded today while a backlog stands, or the band is emptied — no gate
+   enforces it in this harness, so run `--close` again before you commit.
 3. Detect contradictions introduced this session → create `type: conflict` things.
 4. Manage **open-loop things** — create/update a `plan` or work thing for new forward
    intent, move resolved ones to a terminal status (orient reads them; `continuity.md`

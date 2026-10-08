@@ -2,7 +2,7 @@
 id: the-reckoning
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-10-05
 session: 2026-10-05
 priority: critical
@@ -77,10 +77,24 @@ dormant workspaces.
       seen at once: the walk gate owed a walk for each insight whose only
       change was the status the reckoning applied. A disposition-only change,
       status and its resolution fields, should not be a walk candidate;
-      build that with the gate here.* Attended: the commit-message leg refuses a
+      build that with the gate here.* *Built 2026-10-08, shape agreed with the
+      operator that morning (the decision's 10-08 refinement): `mdllm reckon
+      --close` — the mechanical band, then ten decisions a day from one
+      oldest-first queue, the residue leading and at most four, the time-bound
+      kinds ahead of the rest; `--keep` writes a hold and its next look; a
+      hold leaves the band until that date; a disposition-only change owes no
+      walk at the gate or in the cue listing; the gate's step asks a
+      `session-end:` commit the close's question, flagged by the runner from
+      the command, so no projection changed and every seat has it without a
+      refresh; the session-end prompt and its three command copies run the
+      close; the dispatch prompt applies, drafts and files. The first live
+      read: the root met (ten decisions that day), the engineering workspace
+      owing its mechanical item and the binding of its specification loop.
+      Waits on the evidence: one attended close through it, one tick's
+      drafts.* Attended: the commit-message leg refuses a
       `session-end:` commit while the mechanical band is pending; the
-      session-end prompt runs the reckoning, decides the settled band by
-      citation, and puts the residue through the native prompt. Unattended:
+      session-end prompt runs the reckoning, decides what the close owes by
+      citation, and puts the owed residue through the native prompt. Unattended:
       the dispatch prompt's ritual applies the mechanical band, drafts the
       settled one and files the residue. Done when one attended session ends
       through it and one tick drafts one.

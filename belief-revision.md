@@ -2,7 +2,7 @@
 id: belief-revision-specification
 type: specification
 status: stable
-version: 1.3
+version: 1.4
 created: 2026-05-27
 linked_things:
   - id: thing-specification
@@ -217,14 +217,17 @@ review, 2026-09-08 — `review-external-conflict-lifecycle-2026-09-08`).
 An open conflict is therefore read at the same two cadences an insight is, by
 the same two rituals, on the same marker:
 
-- **The session-end brake** (`session-memory.md` → Step 3). The floor lists the
-  conflicts that need a decision — `open` with no inbound edge from a live thing
-  (*orphaned*), or untouched in the commit stream for 30+ days (*aged*) — and
-  the ritual forces one on each: **rule** (`superseded` / `both-valid` /
-  `dismissed` → `status: resolved`, both parties updated), **link** it from the
-  work that will resolve it, or **hold** it deliberately with `disposition:
-  keep-active` and a `disposition_reason` naming what would resolve it. A hold
-  without a reason is nudged, as for insights.
+- **The session-end brake** (`session-memory.md` → Step 3, the close). The
+  floor lists the conflicts that need a decision — `open` with no inbound edge
+  from a live thing (*orphaned*), or untouched in the commit stream for 30+
+  days (*aged*) — and `mdllm reckon --close` queues them oldest first with the
+  rest of the backlog: one still in circulation is the operator's, in the
+  close's one native prompt; the others are the agent's. Each the close owes
+  gets a decision: **rule** (`superseded` / `both-valid` / `dismissed` →
+  `status: resolved`, both parties updated), **link** it from the work that
+  will resolve it, or **hold** it deliberately (`--keep`: `disposition:
+  keep-active`, a `disposition_reason` naming what would resolve it, and the
+  date to look again). A hold without a reason is nudged, as for insights.
 - **The retrospective triage** (`retrospective.md` → What A Retrospective
   Produces, item 3). The whole open set, not only what the floor aged: every
   open conflict gets a disposition once per period, and the conditions-met pass
@@ -265,7 +268,7 @@ from that moment it is read at both cadences above.
 
 - **thing.md** — `conflict` joins `insight` and `continuity-brief` as a framework-reserved type. `supersedes` and `contradicts` are added as valid `linked_things.relation` values.
 - **validate.thing.md** — A `relation: contradicts` without a corresponding conflict thing is a validation error. Open conflicts untouched in the commit stream for 30+ days are surfaced as Info (`conflict_age_findings` — promised here from v1.0, implemented 2026-09-08), as are open conflicts with no inbound edge from a live thing; `disposition: keep-active` with a `disposition_reason` exempts a conflict from both, and a hold without a reason is nudged.
-- **session-memory.md** — The session-end ritual includes a belief revision step: scan for new contradictions, create conflict things where found — and its brake (Step 3) rules on the open conflicts the floor flags.
+- **session-memory.md** — The session-end ritual includes a belief revision step: scan for new contradictions, create conflict things where found — and its brake (Step 3, the close) rules on the open conflicts the floor flags, oldest first, as many as the close owes.
 - **retrospective.md** — The period-cadence reader: item 3 of what a retrospective produces triages every open conflict, and the conditions-met pass (scan 6) re-reads the held ones' reasons.
 - **orchestration.md** — The `session-end` bound prompts encompass belief revision alongside insight extraction. The `detect-conflicts` prompt (scan mode) is bound to `on-status-change` and `retrospective` for systematic detection.
 - **derived-index.md** — The `relationships` derived index makes the full-domain conflict sweep affordable by providing the edge list to walk, so the scan loads full context only for suspect endpoints.

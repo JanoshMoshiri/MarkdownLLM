@@ -3,7 +3,7 @@
 
 `candidates` asks the cue question at the commit boundary; `cues` reads the
 same question back off the commit stream and holds it until its walk is recorded
-it with a `type: cue` thing. These tests pin the two halves (unanswered open
+on a `type: cue` thing. These tests pin the two halves (unanswered open
 cues; unraised modifications), the coverage rule (a cue covers its subject at
 and before its `raised_at` commit), the receipt's shape (answered ⇒ verdict +
 reason), and the session-start line.
@@ -511,3 +511,94 @@ def test_staged_opens_when_git_has_no_head(tmp_path, capsys):
           "---\nid: surface\ntype: insight\nstatus: active\ncreated: 2026-08-01\n---\n# I\n")
     rc, out = _run_staged(root, capsys)
     assert rc == 0 and "could not look" in out
+
+
+# ------------------------------------------ disposition is not a walk (Phase 3)
+# A change that only records a disposition — a status the reckoning moved, a
+# hold, a look-again date, a trigger re-dated — moves no claim, so neither the
+# gate nor the cue listing owes a walk for it; withdrawing a claim still does.
+
+def _dispose(root: Path, rel: str, old: str, new: str) -> None:
+    p = root / rel
+    p.write_text(p.read_text(encoding="utf-8").replace(old, new, 1), encoding="utf-8")
+
+
+def test_a_disposition_only_change_owes_no_walk_at_the_gate(tmp_path, capsys):
+    root = _seed_surface(tmp_path)
+    _dispose(root, "things/surface.md", "status: active",
+             "status: promoted\npromoted_to: leaf0\nversion: 1.1")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "- none" in out
+    _dispose(root, "things/surface.md", "status: promoted",
+             "status: active\ndisposition: keep-active\ndisposition_reason: a razor\n"
+             "settles_when: 2026-12-01")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "- none" in out
+
+
+def test_withdrawing_a_claim_is_still_walked(tmp_path, capsys):
+    root = _seed_surface(tmp_path)
+    _dispose(root, "things/surface.md", "status: active", "status: dismissed")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 1 and "`surface`" in out
+
+
+def test_the_listing_skips_a_disposition_only_modification(tmp_path, capsys):
+    root = _seed(tmp_path)  # spine: reasoned-from by fan-in
+    _dispose(root, "things/spine.md", "status: active",
+             "status: active\nsettles_when: 2026-12-01\ntriggers:\n"
+             "  - type: time\n    condition: \"2026-11-01 reached\"\n    action: surface")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "re-dated")
+    rc, out = _run_cues(root, capsys, since="2026-01-01")
+    assert rc == 0 and "spine" not in out
+    _modify(root, "things/spine.md", "a claim moved")
+    rc, out = _run_cues(root, capsys, since="2026-01-01")
+    assert "`spine`" in out and "modified in 1 commit(s)" in out
+
+
+def _seed_close(tmp_path: Path) -> Path:
+    """A surface and a plan with every box ticked: the mechanical band pends."""
+    root = _seed_surface(tmp_path)
+    write(root, "things/done.md",
+          "---\nid: done\ntype: plan\nstatus: in-progress\ncreated: 2026-08-01\n---\n"
+          "# D\n\n- [x] a\n")
+    _sync_git(root, "add", "-A")
+    _sync_git(root, "commit", "-q", "-m", "a finished plan")
+    return root
+
+
+def test_a_session_end_commit_owes_the_close(tmp_path, capsys, monkeypatch):
+    from markdownllm.reckon import SESSION_END_ENV
+    root = _seed_close(tmp_path)
+    monkeypatch.delenv(SESSION_END_ENV, raising=False)
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "The close" not in out  # an ordinary commit is not asked
+    monkeypatch.setenv(SESSION_END_ENV, "1")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 1
+    assert "## The close — what this session end owes the reckoning" in out
+    assert "1 mechanical item(s) pending" in out and "`done`" in out
+    assert "reckon . --close --apply" in out
+
+
+def test_a_session_end_commit_opens_once_the_close_is_met(tmp_path, capsys, monkeypatch):
+    from markdownllm.reckon import SESSION_END_ENV
+    root = _seed_close(tmp_path)
+    _dispose(root, "things/done.md", "status: in-progress", "status: completed")
+    monkeypatch.setenv(SESSION_END_ENV, "1")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0 and "## The close — met" in out
+
+
+def test_an_unattended_session_end_is_held_to_the_mechanical_band(tmp_path, capsys, monkeypatch):
+    from markdownllm.reckon import SESSION_END_ENV
+    from markdownllm.touchpoints import UNATTENDED_ENV
+    root = _seed_close(tmp_path)
+    monkeypatch.setenv(SESSION_END_ENV, "1")
+    monkeypatch.setenv(UNATTENDED_ENV, "1")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 1 and "mechanical item(s) pending" in out
+    _dispose(root, "things/done.md", "status: in-progress", "status: completed")
+    rc, out = _run_staged(root, capsys)
+    assert rc == 0

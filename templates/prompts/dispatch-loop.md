@@ -2,7 +2,7 @@
 id: dispatch-loop
 type: prompt
 status: evolving
-version: 1.5
+version: 1.6
 created: 2026-08-27
 dispatch_guards:
   depth_limit: 1
@@ -25,6 +25,8 @@ outputs:
     description: "Whatever the invoked rituals commit, each to its owning repo under that repo's own contract."
   - name: seat-queue-items
     description: "Conflicts, option briefs, approval requests, and reconciliation cues filed for the operator — never resolved or answered by this session."
+  - name: reckoning-drafts
+    description: "The reckoning's close, unattended: the mechanical band applied and committed as `reckon:`; a drafted decision for each owed item under `## Reckoning` in the digest, the residue filed as seat items — applied to nothing; the next attended close adopts what still holds."
   - name: dispatch-digest
     description: "The mandatory closing report, committed as a thing into the worked repo (never the framework root — the host cannot push it, so a root digest is invisible to the operator). Opened before the work as the run's advisory claim, closed after it. Emitted even when everything is empty, because silence must be a report, not an absence."
 bound_to:
@@ -116,6 +118,18 @@ schedule — the repos do. You make no rulings — the seats do.
    dispositions — to the seat. Never complete it, never answer a cue
    (`retrospective-cadence-is-a-dated-chase-2026-09-13`). If nothing moved,
    re-date the chase and report that you did.
+
+   **Then reckon the repo, unattended** (the-reckoning Phase 3). Run
+   `mdllm reckon . --close --apply`: the floor applies the mechanical band —
+   a status a field or a git fact already derives, no judgement — and you
+   commit it alone as `reckon:` naming this run. Decide nothing else. The
+   close lists what an attended session end would owe, oldest first; under
+   `## Reckoning` in your digest, draft one line per item — the disposition
+   you would make and the record you would cite (a decision, a shipped
+   mechanism, the item's own stated condition) — and file each residue item
+   as a seat item. Write no hold, no status, no workflow file: the next
+   attended close adopts by citation what still holds, and the commit gate
+   holds an attended `session-end:` commit to the close, not you.
 6. **Respect the seats.** Outputs that are seat-shaped — conflicts, option
    sets, anything irreversible, anything ambiguous across a boundary —
    are filed and queued for the operator, never resolved. The four seats
@@ -183,8 +197,9 @@ schedule — the repos do. You make no rulings — the seats do.
    the run even mid-list; remaining work stays for the next tick — the
    chase pattern is the fallback, and it is proven.
 10. **Close the digest, always.** Fill in the digest you opened in step 5
-    and release its claim: publication debt per repo, loops run, items
-    queued per seat, breakage list or "none", and the stop reason. Keep it
+    and release its claim: publication debt per repo, loops run, the
+    reckoning (applied, drafted, filed — or "none owed"), items queued per
+    seat, breakage list or "none", and the stop reason. Keep it
     small and pointer-shaped — the host retains the full run output as
     transport, and the committed digest is the record, not a copy of the
     transcript. An empty run still files the digest: the dead-man watch

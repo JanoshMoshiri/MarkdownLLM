@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-08
-generated: 2026-10-08T00:26:12
-generated_from: HEAD@5d9987f
-coverage: 524
+generated: 2026-10-08T22:42:37
+generated_from: HEAD@ab0088d
+coverage: 530
 framework_version: 3.46.0
 ---
 
@@ -482,6 +482,7 @@ framework_version: 3.46.0
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26 --subject--> an-injected-file-arrives-without-its-frontmatter
 - cue-belief-revision-specification-2026-09-13 --subject--> belief-revision-specification
 - cue-belief-revision-specification-2026-10-05 --subject--> belief-revision-specification
+- cue-belief-revision-specification-2026-10-08 --subject--> belief-revision-specification
 - cue-carrier --references--> an-owed-act-is-not-a-false-fact
 - cue-carrier --implements--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - cue-carrier --references--> the-verdict-is-asked-where-the-change-lands-2026-10-05
@@ -495,6 +496,7 @@ framework_version: 3.46.0
 - cue-change-reconciliation-specification-2026-09-24 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-09-26 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-10-05 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-2026-10-08 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
 - cue-circulation-is-not-disposition-2026-10-05 --subject--> circulation-is-not-disposition
@@ -573,6 +575,7 @@ framework_version: 3.46.0
 - cue-operator-guide-2026-10-01 --subject--> operator-guide
 - cue-operator-guide-2026-10-05 --subject--> operator-guide
 - cue-operator-guide-2026-10-07 --subject--> operator-guide
+- cue-operator-guide-2026-10-08 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -581,6 +584,7 @@ framework_version: 3.46.0
 - cue-orchestration-specification-2026-09-12 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-09-26 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-10-05 --subject--> orchestration-specification
+- cue-orchestration-specification-2026-10-08 --subject--> orchestration-specification
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build
@@ -594,6 +598,7 @@ framework_version: 3.46.0
 - cue-session-memory-specification-2026-09-26 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-10-05 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-10-07 --subject--> session-memory-specification
+- cue-session-memory-specification-2026-10-08 --subject--> session-memory-specification
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
@@ -606,6 +611,7 @@ framework_version: 3.46.0
 - cue-substrate-native-a2a-2026-09-26 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-10-01 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
+- cue-the-reckoning-is-the-digestion-beat-2026-10-05-2026-10-08 --subject--> the-reckoning-is-the-digestion-beat-2026-10-05
 - cue-the-substrate-is-a-discipline-prosthesis-2026-10-08 --subject--> the-substrate-is-a-discipline-prosthesis
 - cue-the-verdict-is-asked-where-the-change-lands-2026-10-05-2026-10-05 --subject--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - cue-thing-specification-2026-09-12 --subject--> thing-specification

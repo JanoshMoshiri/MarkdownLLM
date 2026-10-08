@@ -599,6 +599,22 @@ def build_cli() -> argparse.ArgumentParser:
                     help="one line: intake, disposed, walks against definition-"
                          "surface changes in the last 7 days, and the bands now — "
                          "the same line session-start emits")
+    rk.add_argument("--close", action="store_true",
+                    help="what a session end owes: the mechanical band applied "
+                         "and the backlog chased — ten decisions a day while one "
+                         "stands, or the band emptied: the oldest residue first, "
+                         "then workflow items, cues and fired triggers, then the "
+                         "longest-waiting; the commit gate refuses "
+                         "a `session-end:` commit until it is met. Unattended "
+                         "(MDLLM_UNATTENDED): the mechanical band only, the rest "
+                         "drafted")
+    rk.add_argument("--keep", metavar="ID",
+                    help="hold one item, written in one move: `disposition: "
+                         "keep-active` (insight, conflict), the reason, and the next "
+                         "look (`settles_when`, one interval out unless --until)")
+    rk.add_argument("--reason", help="with --keep: why it stays, in one line")
+    rk.add_argument("--until", metavar="YYYY-MM-DD",
+                    help="with --keep: when to look again")
     rk.set_defaults(fn=cmd_reckon)
 
     wf = sub.add_parser("workflows", help="workflows and their runs: each "

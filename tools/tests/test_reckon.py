@@ -108,7 +108,7 @@ def test_held_insight_past_its_interval_is_residue(tmp_path):
           thing_text("id: held\ntype: insight\nstatus: active\ncreated: 2026-07-01\n"
                      "disposition: keep-active\n"
                      "disposition_reason: until the eval lands"))
-    _commit(root, "a held insight")
+    _commit(root, "a held insight, untouched since", "2026-07-01")
     rep = _reckon(root)
     # A hold states its own exit; the agent reads it and disposes or re-dates.
     assert _ids(rep, "settled").get("held", "").startswith("read the stated condition")
@@ -358,3 +358,259 @@ def test_rates_line_reads_as_one_digest_line(tmp_path, capsys):
     out = capsys.readouterr().out.strip()
     assert rc == 0 and out.startswith("- **Reckoning (last 7d):** intake")
     assert "mechanical /" in out and "`mdllm reckon`" in out
+
+
+# ------------------------------------------- the hold and the close (Phase 3)
+# A hold carries its next look; the close is what a session end owes — the
+# mechanical band applied and the backlog chased, ten decisions a day while
+# one stands, the oldest residue first and never more than one prompt's worth,
+# the time-bound kinds leading the rest. An unattended run is held to the
+# mechanical band only.
+
+def _close(root: Path, **kw) -> dict:
+    from markdownllm.model import scan
+    from markdownllm.reckon import close_report, reckon_report
+    corpus, _ = scan(root)
+    rep = reckon_report(root, corpus, today=TODAY, triggers=False)
+    return close_report(root, corpus, rep, today=TODAY, **kw)
+
+
+def _orphans(root: Path, n: int, created: str = "2026-06-01") -> None:
+    for i in range(n):
+        write(root, f"things/o{i:02}.md",
+              thing_text(f"id: o{i:02}\ntype: insight\nstatus: active\ncreated: {created}"))
+
+
+def test_a_hold_made_recently_is_not_asked_again(tmp_path):
+    root = _repo(tmp_path)
+    write(root, "things/held.md",
+          thing_text("id: held\ntype: insight\nstatus: active\ncreated: 2026-06-01\n"
+                     "disposition: keep-active\ndisposition_reason: until the eval lands"))
+    _commit(root, "held four days ago", "2026-10-01")
+    # Without a date, a hold's next look is one interval after it was last
+    # changed — not its birth, or yesterday's hold is asked again today.
+    assert "held" not in _ids(_reckon(root), "settled")
+
+
+def test_keep_writes_the_hold_and_its_next_look(tmp_path):
+    import yaml
+    root = _repo(tmp_path)
+    write(root, "things/i1.md",
+          thing_text("id: i1\ntype: insight\nstatus: active\ncreated: 2026-06-01\n"
+                     "disposition_reason: >\n  an old folded reason\n  over two lines"))
+    _commit(root, "an orphan", "2026-06-01")
+    assert "i1" in _ids(_reckon(root), "settled")
+    from markdownllm.model import scan
+    from markdownllm.reckon import keep
+    corpus, _ = scan(root)
+    receipt = keep(root, corpus, "i1", 'stands as a razor: "measure first"', today=TODAY)
+    assert receipt.startswith("held: insight `i1` until 2026-12-04")
+    meta = yaml.safe_load((root / "things/i1.md").read_text(encoding="utf-8").split("---")[1])
+    assert meta["disposition"] == "keep-active"
+    assert meta["disposition_reason"] == 'stands as a razor: "measure first"'
+    assert str(meta["settles_when"]) == "2026-12-04" and meta["status"] == "active"
+    assert "i1" not in _ids(_reckon(root), "settled")
+
+
+def test_keep_on_work_records_what_it_waits_on_and_leaves_its_status(tmp_path):
+    import yaml
+    root = _repo(tmp_path)   # plan-a: in-progress, untouched since 2026-07-01
+    from markdownllm.model import scan
+    from markdownllm.reckon import keep
+    corpus, _ = scan(root)
+    keep(root, corpus, "plan-a", "waits on the vendor's answer",
+         until=dt.date(2026, 10, 20), today=TODAY)
+    meta = yaml.safe_load((root / "things/plan-a.md").read_text(encoding="utf-8").split("---")[1])
+    assert "disposition" not in meta and meta["status"] == "in-progress"
+    assert str(meta["settles_when"]) == "2026-10-20"
+    assert "plan-a" not in _ids(_reckon(root), "settled")
+
+
+def test_keep_refuses_what_it_cannot_hold(tmp_path):
+    import pytest
+    root = _repo(tmp_path)
+    write(root, "things/done.md",
+          thing_text("id: done\ntype: plan\nstatus: completed\ncreated: 2026-06-01"))
+    _commit(root, "a finished plan")
+    from markdownllm.model import scan
+    from markdownllm.reckon import keep
+    corpus, _ = scan(root)
+    for bad, reason in (("nope", "x"), ("plan-a", "  "), ("done", "x")):
+        with pytest.raises(ValueError):
+            keep(root, corpus, bad, reason, today=TODAY)
+
+
+def test_keep_cli_exits_two_on_a_bad_hold(tmp_path, capsys):
+    root = _repo(tmp_path)
+    from markdownllm.reckon import cmd_reckon
+    rc = cmd_reckon(argparse.Namespace(path=str(root), keep="nope", reason="x", until=None))
+    assert rc == 2 and "no thing `nope`" in capsys.readouterr().out
+
+
+def test_work_waiting_on_a_declared_date_is_quiet_until_it_then_looked_at_again(tmp_path):
+    root = _repo(tmp_path)
+    write(root, "things/waits.md",
+          thing_text("id: waits\ntype: plan\nstatus: paused\ncreated: 2026-06-01\n"
+                     "settles_when: 2026-11-01", "# W\n\n- [ ] x\n"))
+    write(root, "things/past.md",
+          thing_text("id: past\ntype: plan\nstatus: paused\ncreated: 2026-06-01\n"
+                     "settles_when: 2026-09-01\ndisposition_reason: the vendor", "# P\n\n- [ ] x\n"))
+    _commit(root, "two waits", "2026-06-01")
+    rep = _reckon(root)
+    assert "waits" not in _ids(rep, "settled") and "waits" not in _ids(rep, "residue")
+    assert _ids(rep, "settled").get("past", "").startswith("look again")
+
+
+def test_without_disposition_ignores_bookkeeping_and_keeps_a_withdrawal():
+    from markdownllm.reckon import without_disposition as wd
+    before = ("---\nid: x\ntype: insight\nstatus: active\nversion: 1.0\n"
+              "triggers:\n  - type: time\n    condition: \"2026-10-01 reached\"\n---\n# X\nclaim\n")
+    bookkeeping = (before.replace("status: active", "status: promoted\npromoted_to: spec")
+                   .replace("version: 1.0", "version: 1.1")
+                   .replace("2026-10-01", "2026-11-01")
+                   .replace("---\n# X", "disposition: keep-active\n"
+                            "disposition_reason: >\n  folded\n  reason\n---\n# X"))
+    assert wd(before) == wd(bookkeeping)
+    assert wd(before) != wd(before.replace("status: active", "status: dismissed"))
+    assert wd(before) != wd(before.replace("claim", "a new claim"))
+    assert wd(before) != wd(before.replace("type: insight", "type: insight\ntags: [a]"))
+
+
+def test_rates_do_not_count_a_disposition_as_a_surface_change(tmp_path):
+    root = _repo(tmp_path)
+    write(root, "things/i1.md", thing_text("id: i1\ntype: insight\nstatus: active\ncreated: 2026-10-01"))
+    _commit(root, "an insight", "2026-10-01")
+    p = root / "things/i1.md"
+    p.write_text(p.read_text(encoding="utf-8").replace(
+        "status: active", "status: active\ndisposition: keep-active\nsettles_when: 2026-12-01"),
+        encoding="utf-8")
+    _commit(root, "held", "2026-10-03")
+    from markdownllm.model import scan
+    from markdownllm.reckon import rates
+    corpus, _ = scan(root)
+    assert rates(root, corpus, days=3650)["surface_changes"] == 0
+    p.write_text(p.read_text(encoding="utf-8") + "\na new sentence\n", encoding="utf-8")
+    _commit(root, "restated", "2026-10-04")
+    corpus, _ = scan(root)
+    assert rates(root, corpus, days=3650)["surface_changes"] == 1
+
+
+def test_the_close_owes_ten_decisions_oldest_first_while_a_backlog_stands(tmp_path):
+    root = _repo(tmp_path)   # plan-a: untouched since 2026-07-01 → settled
+    _orphans(root, 12)
+    _commit(root, "a backlog", "2026-06-01")
+    cr = _close(root)
+    assert not cr["met"] and not cr["quota_met"] and cr["decided"] == set()
+    assert len(cr["owed_settled"]) == 10 and cr["waiting"] == 3
+    waited = [i.waited for i in cr["owed_settled"]]
+    assert waited == sorted(waited, reverse=True)
+    # Ten holds in the delta in hand are ten decisions today: the close is met
+    # whether they are committed as `reckon:` first or ride the session end.
+    from markdownllm.model import scan
+    from markdownllm.reckon import keep
+    corpus, _ = scan(root)
+    for it in cr["owed_settled"]:
+        keep(root, corpus, it.thing_id, "a standing razor", today=TODAY)
+    cr = _close(root)
+    assert cr["met"] and len(cr["decided"]) == 10 and cr["backlog"] == 3
+    _commit(root, "reckon: ten held")
+    assert _close(root)["met"]
+
+
+def test_a_small_backlog_is_emptied_not_merely_counted(tmp_path):
+    root = _repo(tmp_path)
+    _orphans(root, 1)
+    _commit(root, "a short backlog", "2026-06-01")
+    cr = _close(root)
+    assert not cr["met"] and len(cr["owed_settled"]) == 2  # plan-a and o00
+    from markdownllm.model import scan
+    from markdownllm.reckon import keep
+    corpus, _ = scan(root)
+    keep(root, corpus, "o00", "a razor", today=TODAY)
+    assert not _close(root)["met"]
+    keep(root, corpus, "plan-a", "waits on review", today=TODAY)
+    cr = _close(root)
+    assert cr["met"] and cr["backlog"] == 0
+
+
+def test_the_residue_comes_first_and_never_more_than_one_prompts_worth(tmp_path):
+    root = _repo(tmp_path)
+    write(root, "things/live.md",
+          thing_text("id: live\ntype: plan\nstatus: in-progress\ncreated: 2026-10-05\n"
+                     "linked_things:\n"
+                     + "".join(f"  - id: c{i}\n    relation: references\n" for i in range(6))))
+    for i in range(6):
+        write(root, f"things/c{i}.md",
+              thing_text(f"id: c{i}\ntype: conflict\nstatus: open\ncreated: 2026-0{i + 1}-01"))
+    _orphans(root, 8)
+    _commit(root, "conflicts in circulation and a backlog", "2026-06-01")
+    p = root / "things/live.md"
+    p.write_text(p.read_text(encoding="utf-8") + "\nfresh\n", encoding="utf-8")
+    _commit(root, "the live plan moves today")
+    cr = _close(root)
+    assert [i.thing_id for i in cr["owed_residue"]] == ["c0", "c1", "c2", "c3"]
+    assert len(cr["owed_settled"]) == 6
+
+
+def test_the_time_bound_kinds_lead_the_settled_queue(tmp_path):
+    root = _repo(tmp_path)
+    _orphans(root, 12)
+    write(root, "things/cue-x.md",
+          thing_text("id: cue-x\ntype: cue\nstatus: open\ncreated: 2026-10-04\n"
+                     "subject: plan-a\nraised_at: HEAD\nraised_by: test"))
+    _commit(root, "an open cue behind a backlog", "2026-06-01")
+    cr = _close(root)
+    assert cr["owed_settled"][0].kind == "cue"
+
+
+def test_a_thing_born_today_is_intake_not_a_decision(tmp_path):
+    root = _repo(tmp_path)
+    write(root, "things/new.md",
+          thing_text("id: new\ntype: insight\nstatus: active\ncreated: 2026-10-05\n"
+                     "disposition: keep-active\ndisposition_reason: fresh"))
+    _commit(root, "an insight born today")
+    assert _close(root)["decided"] == set()
+
+
+def test_the_mechanical_band_holds_every_close_and_unattended_is_held_to_it_alone(tmp_path):
+    root = _repo(tmp_path)
+    write(root, "things/done.md",
+          thing_text("id: done\ntype: plan\nstatus: in-progress\ncreated: 2026-10-01",
+                     "# D\n\n- [x] a\n"))
+    _orphans(root, 3)
+    _commit(root, "a finished plan and a backlog", "2026-06-01")
+    assert not _close(root, unattended=True)["met"]
+    from markdownllm.model import scan
+    from markdownllm.reckon import apply_mechanical, reckon_report
+    corpus, _ = scan(root)
+    apply_mechanical(root, corpus, reckon_report(root, corpus, today=TODAY, triggers=False))
+    assert _close(root, unattended=True)["met"]
+    assert not _close(root)["met"]  # attended: the chase is still owed
+
+
+def test_close_text_is_whole_from_the_command_and_short_at_the_gate(tmp_path):
+    from markdownllm.reckon import close_text
+    root = _repo(tmp_path)
+    _orphans(root, 12)
+    _commit(root, "a backlog", "2026-06-01")
+    cr = _close(root)
+    whole = "\n".join(close_text(cr))
+    assert "**Settled (10" in whole and "--keep <id>" in whole and "**Today:** 0" in whole
+    gate = close_text(cr, gate=True)
+    assert len(gate) <= 6 and "0 of 10 decisions today with 13 waiting" in gate[1]
+    assert "reckon . --close --apply" in gate[-1]
+
+
+def test_reckon_close_cli_applies_then_says_what_is_owed(tmp_path, capsys):
+    root = _repo(tmp_path)
+    write(root, "things/done.md",
+          thing_text("id: done\ntype: plan\nstatus: in-progress\ncreated: 2026-10-01",
+                     "# D\n\n- [x] a\n"))
+    _commit(root, "a finished plan", "2026-06-01")
+    from markdownllm.reckon import cmd_reckon
+    rc = cmd_reckon(argparse.Namespace(path=str(root), imports=False, apply=True,
+                                       rates=False, close=True))
+    out = capsys.readouterr().out
+    assert rc == 0 and "Applied (1)" in out and "## The close" in out
+    assert "**Mechanical" not in out  # applied before the close was read
+    assert "status: completed" in (root / "things/done.md").read_text(encoding="utf-8")
