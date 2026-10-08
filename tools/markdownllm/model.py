@@ -217,6 +217,12 @@ CORE_FIELDS = {
     # definition's work travels through — tool-read (validation, `mdllm
     # workflows`) and framework-shipped with the reserved type (criteria 1+2)
     "carrier",
+    # the reckoning (session-memory.md → The Reckoning): an attention item's
+    # look-again date — read by `mdllm reckon` and written by `reckon --keep`
+    # into every workspace that holds an item, so it is the tool's field, not
+    # a domain's (criteria 1+2). Unadmitted until the first `--keep`, on
+    # 2026-10-08, took five unknown-field warnings at the framework root.
+    "settles_when",
     # advisory coordination claim (coordination-claim.md) — read and respected
     # by convention, not by the tool; SHIPPED by the framework into every
     # domain as part of the `workflow-run` frontmatter contract

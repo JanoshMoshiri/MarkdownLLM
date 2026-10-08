@@ -614,3 +614,19 @@ def test_reckon_close_cli_applies_then_says_what_is_owed(tmp_path, capsys):
     assert rc == 0 and "Applied (1)" in out and "## The close" in out
     assert "**Mechanical" not in out  # applied before the close was read
     assert "status: completed" in (root / "things/done.md").read_text(encoding="utf-8")
+
+
+def test_a_hold_written_by_keep_validates_without_a_warning(tmp_path):
+    # `settles_when` is the tool's field: `--keep` writes it into any
+    # workspace, so validate must know it without a domain registering it.
+    from corpus_harness import messages
+    from markdownllm.model import scan
+    from markdownllm.reckon import keep
+    from markdownllm.validation import validate_corpus
+    root = _repo(tmp_path)
+    _orphans(root, 1)
+    _commit(root, "an orphan", "2026-06-01")
+    corpus, _ = scan(root)
+    keep(root, corpus, "o00", "a standing razor", today=TODAY)
+    _, findings = validate_corpus(root)
+    assert not [m for m in messages(findings) if "settles_when" in m]
