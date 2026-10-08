@@ -1,7 +1,7 @@
 ---
 id: derived-index-is-attention-cache-not-search-layer
 type: insight
-status: active
+status: promoted
 version: 1.0
 created: 2026-06-08
 confidence: high
@@ -16,6 +16,7 @@ linked_things:
     relation: challenges
   - id: tracking-artifacts-can-drift-from-reality
     relation: supports
+promoted_to: derived-index-specification
 ---
 
 # A Derived Index Is An Attention Cache, Not A Search Layer

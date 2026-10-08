@@ -1,7 +1,7 @@
 ---
 id: the-notation-changed-not-the-primitives
 type: insight
-status: active
+status: promoted
 version: 1.0
 created: 2026-06-08
 confidence: high
@@ -18,6 +18,7 @@ linked_things:
     relation: references
   - id: git-workflow-specification
     relation: references
+promoted_to: llm-driven-systems-manifesto
 ---
 
 # The Notation Changed, Not The Primitives

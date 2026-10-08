@@ -91,7 +91,13 @@ dormant workspaces.
       read: the root met (ten decisions that day), the engineering workspace
       owing its mechanical item and the binding of its specification loop.
       Waits on the evidence: one attended close through it, one tick's
-      drafts.* Attended: the commit-message leg refuses a
+      drafts.* *Attended half, 2026-10-08: the framework root's close ran
+      through it — ten items off the oldest end of the queue: four insights
+      promoted into the specs that already carry them, five held with a
+      reason and a look-again date, one fired trigger acted on and re-dated;
+      the backlog 45 → 35, the gate owing no walk for the nine disposed
+      insights, and the `session-end:` commit passing the gate's close leg.
+      The tick's half waits on the next scheduled run.* Attended: the commit-message leg refuses a
       `session-end:` commit while the mechanical band is pending; the
       session-end prompt runs the reckoning, decides what the close owes by
       citation, and puts the owed residue through the native prompt. Unattended:
@@ -111,7 +117,9 @@ dormant workspaces.
 
 - [ ] An attention item cannot exist without an evaluable exit rule, and
       `mdllm reckon` names every item's candidate with evidence.
-- [ ] A session cannot end with the mechanical band pending.
+- [x] A session cannot end with the mechanical band pending. *Where the
+      harness projects the gate (Claude Code), since 2026-10-08; Codex with
+      `cue-carrier` (g).*
 - [ ] One tick has reckoned a workspace unattended and filed its residue.
 - [ ] The digest shows the rate, and in the four live workspaces disposed
       keeps pace with created over four weeks.

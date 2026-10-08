@@ -1,7 +1,7 @@
 ---
 id: tracking-artifacts-can-drift-from-reality
 type: insight
-status: active
+status: promoted
 version: 1.0
 created: 2026-05-28
 confidence: high
@@ -18,6 +18,7 @@ linked_things:
     relation: informs
   - id: framework-map
     relation: informs
+promoted_to: derived-index-specification
 ---
 
 # Tracking Artifacts Can Drift From Reality

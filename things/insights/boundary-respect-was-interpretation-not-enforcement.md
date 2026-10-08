@@ -3,7 +3,7 @@ id: boundary-respect-was-interpretation-not-enforcement
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Standing claims-integrity razor; the framework-vs-bare A/B that would substantiate the enforcement claim is still unbuilt."
+disposition_reason: "Condition read 2026-10-08: not met. The October eval had a bare arm but tested reasoning on a fixture that saturated, not hook enforcement; the framework-vs-bare A/B that would substantiate the enforcement claim is still unbuilt."
 version: 1.1
 created: 2026-06-26
 session: 2026-06-26
@@ -23,6 +23,7 @@ linked_things:
     notes: "This insight's honour-system observation (boundary respect was interpretation, not enforced) is part of the reasoning that reverted run_domain_task"
   - id: llm-driven-systems-manifesto
     relation: challenges
+settles_when: 2026-12-07
 ---
 
 # The Agent Respected The Boundary By Interpretation, Not Because The Framework Enforced It

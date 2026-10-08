@@ -17,6 +17,9 @@ linked_things:
     relation: supports
   - id: reasoning-lenses-specification
     relation: supports
+disposition: keep-active
+disposition_reason: "floor-structure-residue (in progress, 4 of 5 boxes) still applies it as its extraction rule; look again when that plan completes."
+settles_when: 2026-12-07
 ---
 
 # SRP Compliance and Context Load Reduction Are the Same Operation

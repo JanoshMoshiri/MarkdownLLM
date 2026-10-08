@@ -1,7 +1,7 @@
 ---
 id: hard-hooks-require-observable-agent-caused-triggers
 type: insight
-status: active
+status: promoted
 version: 1.1
 created: 2026-05-28
 confidence: high
@@ -20,6 +20,7 @@ linked_things:
   - id: hard-hook-vocabulary-contradicts-observable-trigger-insight
     relation: references
     notes: "The conflict that surfaced the vocabulary drift and was ruled both-valid on 2026-09-13; this revision is its remedy"
+promoted_to: orchestration-specification
 ---
 
 # Hard Hooks Require Observable, Agent-Caused Triggers

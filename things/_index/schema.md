@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-08
-generated: 2026-10-08T22:42:37
-generated_from: HEAD@ab0088d
+generated: 2026-10-08T22:45:40
+generated_from: HEAD@5730ac1
 coverage: 530
 framework_version: 3.46.0
 ---
@@ -32,11 +32,11 @@ framework_version: 3.46.0
 | verdict_reason | 152 |
 | source | 148 |
 | priority | 61 |
-| disposition | 53 |
-| disposition_reason | 53 |
+| disposition | 56 |
+| disposition_reason | 56 |
 | decided_by | 40 |
+| promoted_to | 28 |
 | exposed | 27 |
-| promoted_to | 24 |
 | period_start | 9 |
 | period_end | 9 |
 | domain | 9 |
@@ -47,6 +47,7 @@ framework_version: 3.46.0
 | generated_from | 5 |
 | coverage | 5 |
 | framework_version | 5 |
+| settles_when | 5 |
 | verified | 4 |
 | definition | 4 |
 | current_stage | 4 |

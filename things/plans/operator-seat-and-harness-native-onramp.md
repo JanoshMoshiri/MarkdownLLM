@@ -31,8 +31,8 @@ linked_things:
     notes: "Phase 3 route evidence for Claude Code on the web, and the clone defects Phase 2's silent bootstrap must survive."
 triggers:
   - type: time
-    condition: "2026-10-08 reached"
-    action: "Answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it."
+    condition: "2026-10-22 reached"
+    action: "Acted 2026-10-08 at the-reckoning Phase 3's close: Phase 5 still has no account recorded, so the operator was asked for it in one line. If none is recorded by this date, ask once more in one line; never rewrite first-hour.md without it. Earlier: answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it."
   - type: time
     condition: "2026-10-10 reached"
     action: "Re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead."

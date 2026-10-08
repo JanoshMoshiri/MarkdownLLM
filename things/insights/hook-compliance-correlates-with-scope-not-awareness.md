@@ -14,6 +14,9 @@ linked_things:
     relation: informs
   - id: tiered-loading-is-tiered-reading-applied-to-specs
     relation: supports
+disposition: keep-active
+disposition_reason: "A standing design lens still applied: derived-index.md cites it for keeping indexes opt-in, and later evidence (session-start-hardening; emitted content is read, instructed content economised) extends it rather than replacing it — compliance is bought by narrowing scope and mechanising, not by more self-monitoring prose. Promote into orchestration.md's hardening paragraph when a third mechanism is designed by it."
+settles_when: 2026-12-07
 ---
 
 # Hook Compliance Correlates With Scope, Not Awareness

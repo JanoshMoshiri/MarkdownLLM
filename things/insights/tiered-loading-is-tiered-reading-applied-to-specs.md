@@ -14,6 +14,9 @@ linked_things:
     relation: references
   - id: orchestration-specification
     relation: references
+disposition: keep-active
+disposition_reason: "Its lesson lives in the entry file's tier table and mdllm tokens; AGENTS.md is not a thing, so promoted_to cannot name it. Look again when response-depth-control starts — the live plan that reasons from it."
+settles_when: 2026-12-07
 ---
 
 # Tiered Loading Is Just Tiered Reading Applied To Specs
