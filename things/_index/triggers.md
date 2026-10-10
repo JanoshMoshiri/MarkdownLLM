@@ -3,14 +3,18 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-08
-generated: 2026-10-08T23:57:47
-generated_from: HEAD@ff7e8d6
-coverage: 8
+created: 2026-10-10
+generated: 2026-10-10T07:33:30
+generated_from: HEAD@296233b
+coverage: 9
 framework_version: 3.47.0
 ---
 
 # Triggers Index — framework
+
+## a2a-conversations-on-their-own-branch
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-10-23 reached, action=surface, note=Two weeks: has Phase 1 landed, and has one pair run a conversation on its own branch? If not, say which phase stalled and why.
 
 ## closed-loop-operating-state
 - status: in-progress  due_date: —

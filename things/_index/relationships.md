@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-08
-generated: 2026-10-08T23:57:47
-generated_from: HEAD@ff7e8d6
-coverage: 530
+created: 2026-10-10
+generated: 2026-10-10T07:33:30
+generated_from: HEAD@296233b
+coverage: 532
 framework_version: 3.47.0
 ---
 
@@ -182,6 +182,16 @@ framework_version: 3.47.0
 - a-wrong-sum-is-indistinguishable-from-a-right-one --informs--> deterministic-calculation
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> divergence-is-an-unrouted-decision
 - a-wrong-sum-is-indistinguishable-from-a-right-one --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- a2a-conversations-on-their-own-branch --implements--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- a2a-conversations-on-their-own-branch --extends--> standing-watch-specification
+- a2a-conversations-on-their-own-branch --extends--> git-workflow-specification
+- a2a-conversations-on-their-own-branch --references--> loop-turns-self-heal-2026-09-23
+- a2a-conversations-on-their-own-branch --references--> the-reckoning
+- a2a-conversations-on-their-own-branch --references--> substrate-native-a2a
+- a2a-conversations-run-on-their-own-branch-2026-10-09 --extends--> loop-turns-self-heal-2026-09-23
+- a2a-conversations-run-on-their-own-branch-2026-10-09 --extends--> ticket-is-the-ad-hoc-carrier-2026-09-30
+- a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> a-shared-worktree-merges-authorship-at-the-index
+- a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> git-workflow-specification
 - adoption-reopens-birth-gaps --extends--> a-ruling-triages-more-cheaply-than-a-mechanism
 - agents-cannot-self-install-permission-bearing-hooks --informs--> hook-enforcement-has-three-anchors
 - agents-cannot-self-install-permission-bearing-hooks --supports--> consequence-is-recoverable-only-in-retrospect
