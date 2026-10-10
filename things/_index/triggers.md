@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: triggers
 created: 2026-10-10
-generated: 2026-10-10T07:33:30
-generated_from: HEAD@296233b
+generated: 2026-10-10T07:38:39
+generated_from: HEAD@a98ad97
 coverage: 9
 framework_version: 3.47.0
 ---
@@ -14,7 +14,7 @@ framework_version: 3.47.0
 
 ## a2a-conversations-on-their-own-branch
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-23 reached, action=surface, note=Two weeks: has Phase 1 landed, and has one pair run a conversation on its own branch? If not, say which phase stalled and why.
+- trigger: type=time, condition=2026-10-23 reached, action=surface, note=Have the four open rulings been made (the decision's Open section)? If not, put them to the operator in one native prompt, his leanings as the first options. If they have: has Phase 1 landed, and has one pair run a conversation on its own branch?
 
 ## closed-loop-operating-state
 - status: in-progress  due_date: —

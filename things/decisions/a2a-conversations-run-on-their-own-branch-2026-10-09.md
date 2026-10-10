@@ -2,7 +2,7 @@
 id: a2a-conversations-run-on-their-own-branch-2026-10-09
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-10-10
 session: 2026-10-09
 decided_by: Janosh Moshiri
@@ -53,45 +53,68 @@ single domain, even if their clones, becomes problematic."* The shape was put
 back to him the same day and he asked for it as a plan.
 
 1. **A conversation runs on its own branch.** `a2a/<ticket-id>`, cut from
-   `main` when the conversation opens. Its turns, and the in-repository
-   documents it revises, go there; `main` moves only when a conversation
-   concludes. Concurrent conversations never touch each other's branch, so
-   the divergence between them is removed at the source, not managed.
+   `main` when the conversation opens; its turns go there and land on
+   `main` when it concludes. Concurrent conversations never touch each
+   other's branch, so the divergence their turns cause is removed at the
+   source, not managed. (What else the branch carries is open, below.)
 2. **A conversation has a working copy of its own in each clone.** Two
    working copies cannot check out one branch, and the two sides of one
    conversation never write at the same time — so the unit of isolation is
    the conversation, not the agent: one linked working copy per conversation
    per clone, shared by its two parties, beside the workspace at the same
    depth so the framework is found the same way.
-3. **The end is a fact the floor can read: the ticket closes.** The live
-   record closes conversations by closing their ticket; a PR merging
-   elsewhere reaches the workspace only through a later record commit. The
-   ticket becomes one per conversation, not one per pair.
-4. **The merge keeps every turn.** A real merge commit, never a squash: the
-   floor's commit pins are checked by existence, so a squashed and deleted
-   branch would leave every `informed_by` pin made on it pointing at
-   nothing, and a regulated workspace wants the conversation on the record.
-5. **The merge is a commit the floor validates, and the reckoning keeps it
-   from being forgotten.** The agent holding the last turn concludes the
-   conversation into `main`; the commit gate, the pre-commit floor and
-   publication run on it as on any commit. A merge git cannot make cleanly
-   is the operator's. A concluded conversation left unmerged, or one gone
-   quiet without concluding, is an attention item at the next close.
+3. **The landing is a commit the floor validates, and the reckoning keeps
+   it from being forgotten.** Whoever concludes the conversation lands it on
+   `main` through a commit the commit gate, the pre-commit floor and
+   publication run on, like any other. A merge git cannot make cleanly is
+   the operator's. A concluded conversation left unlanded, or one gone quiet
+   without concluding, is an attention item at the next close.
 
-## Open
+## Open — The Operator's, To Weigh Before Phases 1, 3 And 4
 
-One ruling is still the operator's: whether the floor may *prepare* a merge
-git can make cleanly (`git merge --no-ff --no-commit`), leaving the commit
-to the agent, or only name the commands. Recommended: prepare. The line
-"the floor never merges" protects judgement, and a clean merge holds none;
-the act that lands it — the commit — stays the agent's and is validated.
-Until he rules, the conclude step names the commands.
+A first draft of this record (a98ad97) wrote three of these as settled from
+the live record and the floor. The operator corrected it on 2026-10-10: they
+are his, he wants to think through the options and implications, and he
+will answer later. His leanings, in his words, with what each would mean:
+
+1. **What ends a conversation.** *"What ends the conversation, which is a
+   difficult one. I'm going to have to go into my options in that."*
+   Candidates on the record: the ticket closing (what the live workspace
+   does today); the PR it is about merging; an explicit conclude by either
+   party; a run reaching its terminal stage. What any answer needs: the end
+   must be a fact the floor can read inside the workspace, or the reckoning
+   cannot chase a conversation that ended and never landed.
+2. **How it lands.** *"I don't think we should merge every turn.
+   Conversation should stay until the end, and then it merges in at the
+   end."* The conversation stays on its branch and lands once, never turn
+   by turn — the shape the plan already takes. Still open within it:
+   whether the landing keeps the turns as history (a merge commit) or
+   brings them as one commit (a squash). What a squash would mean: commit
+   pins made on the branch are checked by existence, so once the branch is
+   deleted they point at nothing — unless the branch is kept, or pins on a
+   conversation are made only against `main`.
+3. **What the branch carries.** *"In my mind, I thought the branch only
+   should carry the conversation because then normal commits will happen at
+   normal times."* The tickets and review records ride the branch; the work
+   itself is committed to `main` as it happens. What that would mean: two
+   pairs revising documents at once would still publish to one branch, so
+   their work commits — not their turns — could still refuse each other's
+   pushes: far fewer collisions than today, not none.
+4. **May the floor prepare a clean merge?** Whether the floor may set up a
+   merge git can make cleanly and leave the commit to the agent, or only
+   name the commands. Recommended: prepare — "the floor never merges"
+   protects judgement, and a clean merge holds none; the commit that lands
+   it stays the agent's and is validated.
+
+*"I need to think about all of those things, the implications, so I have to
+wait."* Nothing that depends on them is built until he rules; the plan's
+trigger puts them back to him in one prompt.
 
 ## What This Settles
 
 - `main` stays the agreed truth; a conversation's turns are not on it until
   it concludes, so orientation and the dispatcher read a conversation only
-  once it lands. Work under review is not accepted state.
+  once it lands.
 - Inside a conversation nothing changes: alternation, publication as the
   turn, the self-heal of a rejected push.
 - Exploration branches and person-to-person branching stay where

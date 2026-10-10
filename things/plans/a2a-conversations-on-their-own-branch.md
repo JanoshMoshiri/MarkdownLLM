@@ -2,7 +2,7 @@
 id: a2a-conversations-on-their-own-branch
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-10-10
 session: 2026-10-09
 priority: high
@@ -30,7 +30,7 @@ triggers:
   - type: time
     condition: "2026-10-23 reached"
     action: surface
-    note: "Two weeks: has Phase 1 landed, and has one pair run a conversation on its own branch? If not, say which phase stalled and why."
+    note: "Have the four open rulings been made (the decision's Open section)? If not, put them to the operator in one native prompt, his leanings as the first options. If they have: has Phase 1 landed, and has one pair run a conversation on its own branch?"
 ---
 
 # Plan: A2A Conversations Run On Their Own Branch
@@ -92,20 +92,22 @@ The reasons each phase exists, so a later session does not re-derive them:
 ## Phases
 
 - [x] **Phase 0 — Record it.** `a2a-conversations-run-on-their-own-branch-2026-10-09`
-      in the operator's words, the two points the record settles (the ticket
-      closing ends the conversation; the branch carries the documents it
-      revises) and the one the floor settles (a real merge, never a squash:
-      commit pins are checked by existence). This plan. *Done 2026-10-10.*
-      **Open, the operator's:** may the floor *prepare* a merge git can make
-      cleanly, leaving the commit to the agent? Recommended yes; until then
-      Phase 3 names the commands.
+      in the operator's words, and this plan. *Done 2026-10-10.* **Four
+      rulings open, the operator's** (the decision's Open section, his
+      leanings in his words): what ends a conversation; how it lands — once
+      at the end, his leaning, with merge-or-squash still open; what the
+      branch carries — the conversation only, his leaning; and whether the
+      floor may prepare a clean merge. Corrected the same day: a first draft
+      wrote three of them as settled. Phase 1 waits on the third, Phase 3 on
+      the second and fourth, Phase 4 on the first; Phase 2 waits on none.
 - [ ] **Phase 1 — A conversation gets its branch and its working copy.**
       `mdllm conversation open <ticket-id>`: cuts `a2a/<ticket-id>` from
       `main`; adds the working copy beside the workspace
       (`<domain-parent>/<workspace>--<ticket-id>`, the same depth); writes the
       ticket's first turn there; publishes the branch with its upstream where
       the workspace declares `autopush: true`, else prints the push for the
-      operator. The ticket template becomes one per conversation. Floor
+      operator. What rides the branch besides the turns follows ruling 3.
+      The ticket template becomes one per conversation. Floor
       fixes for any linked working copy: the estate walks skip a repository
       whose `.git` is a file (a view of one already walked); the corpus walk
       prunes a working copy nested inside a corpus; the hook route compares
@@ -123,25 +125,25 @@ The reasons each phase exists, so a later session does not re-derive them:
       *Done when two pairs run at once in one workspace for a working day
       with no push between them refused.*
 - [ ] **Phase 3 — The conclusion is a validated commit.**
-      `mdllm conversation conclude <ticket-id>`: checks the ticket is closed
-      at the published branch head; per the open ruling, prepares
-      `git merge --no-ff --no-commit` in the main working copy when git
-      merges it cleanly (or names the commands), and files a merge git
-      cannot make as the operator's; the agent's `conclude:` commit then
+      `mdllm conversation conclude <ticket-id>`: checks the conversation
+      has ended (ruling 1) at the published branch head; lands it as ruled —
+      a merge commit or one squashed commit (ruling 2) — prepared by the
+      floor when git can make it cleanly, or named as commands (ruling 4);
+      and files a landing git cannot make as the operator's; the agent's `conclude:` commit then
       runs the commit gate (cues from the branch arrive in the delta and
       cover their subjects), the pre-commit floor and publication like any
       commit. Backstops so no merge skips the floor: `install-hook` adds
       `pre-merge-commit` (the pre-commit floor) and `post-merge`
       (publication), and the commit gate matches a merge as well as a commit.
-      After `main` is published: the working copy removed, the branch
-      deleted locally and on the remote — its turns stay reachable through
-      the merge commit. *Done when one conversation concludes into `main`
-      with the merge validated and published and every turn in its history.*
+      After `main` is published: the working copy removed, and the branch
+      deleted or kept as ruling 2 requires (a squash orphans pins made on a
+      deleted branch). *Done when one conversation concludes into `main`
+      with its landing validated and published.*
 - [ ] **Phase 4 — Never forgotten.** The reckoning gains the `conversation`
-      kind: one ref listing reads each published `a2a/*` branch's ticket at
-      its head — closed and not merged into `main` → settled, "conclude it";
-      no turn for 14 days and not closed → the operator's, "abandoned, or
-      waiting on you?". `session-memory.md`'s exit table gains the row.
+      kind: one ref listing reads each published `a2a/*` branch at its head
+      — ended (as ruling 1 defines it) and not landed on `main` → settled,
+      "conclude it"; no turn for 14 days and not ended → the operator's,
+      "abandoned, or waiting on you?". `session-memory.md`'s exit table gains the row.
       *Done when a concluded, unmerged conversation is named at a session
       end's close.*
 - [ ] **Phase 5 — Doctrine.** `git-workflow.md`: *Branching* gains the built
@@ -164,5 +166,5 @@ The reasons each phase exists, so a later session does not re-derive them:
 - [ ] Two conversations run at once in one workspace, across two clones,
       with no push between them refused and no detached HEAD.
 - [ ] Every concluded conversation reaches `main` through a validated,
-      published merge commit with its turns intact.
+      published commit, landed as the operator ruled.
 - [ ] No concluded conversation stays unmerged past a session end.
