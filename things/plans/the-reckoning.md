@@ -97,7 +97,15 @@ dormant workspaces.
       reason and a look-again date, one fired trigger acted on and re-dated;
       the backlog 45 → 35, the gate owing no walk for the nine disposed
       insights, and the `session-end:` commit passing the gate's close leg.
-      The tick's half waits on the next scheduled run.* Attended: the commit-message leg refuses a
+      The tick's half waits on the next scheduled run.* *Tick's half,
+      2026-10-10: the dispatcher's 08:30 run reckoned the busiest live
+      workspace unattended — applied the mechanical band (a plan with every
+      box ticked → completed), committed it alone as `reckon:`, and filed a
+      `## Reckoning` section in its digest. It drafted nothing: the close
+      told an unattended run "met" once the mechanical band was applied and
+      hid the owed list it exists to draft. Fixed the same day; the live
+      unattended close now hands it eight items, the four emerged workflow
+      bindings first. Phase 3 ticks when one run drafts.* Attended: the commit-message leg refuses a
       `session-end:` commit while the mechanical band is pending; the
       session-end prompt runs the reckoning, decides what the close owes by
       citation, and puts the owed residue through the native prompt. Unattended:

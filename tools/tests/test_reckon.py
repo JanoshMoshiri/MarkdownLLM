@@ -630,3 +630,18 @@ def test_a_hold_written_by_keep_validates_without_a_warning(tmp_path):
     keep(root, corpus, "o00", "a standing razor", today=TODAY)
     _, findings = validate_corpus(root)
     assert not [m for m in messages(findings) if "settles_when" in m]
+
+
+def test_an_unattended_close_that_is_met_still_hands_over_what_to_draft(tmp_path):
+    # Met, for an unattended run, means the mechanical band is applied; its
+    # half of the close is drafting the owed list, so the list stays in view.
+    from markdownllm.reckon import close_text
+    root = _repo(tmp_path)
+    _orphans(root, 12)
+    _commit(root, "a backlog", "2026-06-01")
+    cr = _close(root, unattended=True)
+    assert cr["met"] and len(cr["owed_settled"]) == 10
+    text = "\n".join(close_text(cr))
+    assert "met for an unattended run" in text and "**Unattended:**" in text
+    assert "**Settled (10" in text
+    assert close_text(cr, gate=True)[0] == "## The close — met"  # the gate opens

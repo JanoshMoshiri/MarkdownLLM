@@ -906,14 +906,21 @@ def _close_item(it: Item) -> str:
 def close_text(cr: dict, *, gate: bool = False) -> list[str]:
     """The close, as the agent reads it — whole from `reckon --close`, as a
     count with the command to run when the commit gate refuses."""
-    if cr["met"]:
+    # An unattended run is met once the mechanical band is applied, but its
+    # half of the close is the drafting: the owed list stays in front of it.
+    # (The first unattended close, 2026-10-10, read "met" and drafted nothing
+    # over a backlog of 67 and an emerged workflow.)
+    drafting = cr["unattended"] and bool(cr["owed_residue"] or cr["owed_settled"])
+    if cr["met"] and (gate or not drafting):
         dec = cr["decided"]
         return ["## The close — met",
                 f"- the mechanical band is applied"
                 + ("" if cr["unattended"] else
                    f"; {len(dec or ())} decision(s) today, "
                    f"{cr['backlog']} waiting for later closes")]
-    lines = ["## The close — what this session end owes the reckoning"]
+    lines = (["## The close — met for an unattended run; now draft what an "
+              "attended close would owe"] if cr["met"] else
+             ["## The close — what this session end owes the reckoning"])
     if gate:
         parts = []
         if cr["mechanical"]:
