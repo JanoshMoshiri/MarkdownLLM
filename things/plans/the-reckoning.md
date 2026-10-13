@@ -2,7 +2,7 @@
 id: the-reckoning
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-10-05
 session: 2026-10-05
 priority: critical
@@ -71,7 +71,7 @@ dormant workspaces.
       walks against definition-surface changes. First live run by hand on the
       QMS (20 open conflicts, 87 active insights) and overview (86): the
       residue counted and put to the operator.
-- [ ] **Phase 3 — Two actors.** *First use by hand, 2026-10-08: the
+- [x] **Phase 3 — Two actors.** *First use by hand, 2026-10-08: the
       framework root's session end applied the mechanical band (three insights
       already promoted in fact, one plan with every box ticked). One friction
       seen at once: the walk gate owed a walk for each insight whose only
@@ -105,7 +105,13 @@ dormant workspaces.
       told an unattended run "met" once the mechanical band was applied and
       hid the owed list it exists to draft. Fixed the same day; the live
       unattended close now hands it eight items, the four emerged workflow
-      bindings first. Phase 3 ticks when one run drafts.* Attended: the commit-message leg refuses a
+      bindings first. Phase 3 ticks when one run drafts.* *Done 2026-10-11:
+      the next run drafted five decisions under `## Reckoning` in its digest —
+      the four emerged workflow bindings, each citing the floor's own count,
+      and one hold citing the record — applied none, and said the bindings
+      belong to an attended session because they change a definition
+      surface. The 2026-10-13 run found the close already met by that day's
+      attended decisions.* Attended: the commit-message leg refuses a
       `session-end:` commit while the mechanical band is pending; the
       session-end prompt runs the reckoning, decides what the close owes by
       citation, and puts the owed residue through the native prompt. Unattended:
@@ -128,6 +134,7 @@ dormant workspaces.
 - [x] A session cannot end with the mechanical band pending. *Where the
       harness projects the gate (Claude Code), since 2026-10-08; Codex with
       `cue-carrier` (g).*
-- [ ] One tick has reckoned a workspace unattended and filed its residue.
+- [x] One tick has reckoned a workspace unattended and filed its residue.
+      *2026-10-10 applied, 2026-10-11 drafted; no residue was owed.*
 - [ ] The digest shows the rate, and in the four live workspaces disposed
       keeps pace with created over four weeks.
