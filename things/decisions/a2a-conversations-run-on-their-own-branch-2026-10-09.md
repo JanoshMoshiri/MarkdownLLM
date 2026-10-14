@@ -2,7 +2,7 @@
 id: a2a-conversations-run-on-their-own-branch-2026-10-09
 type: decision
 status: made
-version: 1.1
+version: 1.2
 created: 2026-10-10
 session: 2026-10-09
 decided_by: Janosh Moshiri
@@ -109,6 +109,70 @@ will answer later. His leanings, in his words, with what each would mean:
 *"I need to think about all of those things, the implications, so I have to
 wait."* Nothing that depends on them is built until he rules; the plan's
 trigger puts them back to him in one prompt.
+
+## The Evidence — Read 2026-10-14
+
+At the operator's ask (*"focus less on my view and opinion and more on the
+evidence of what is"*), the busiest live workspace's whole history was read
+at one pinned commit: 1,230 commits, 24 ticket files, 378 ticket revisions
+across 315 commits since 2026-10-01. Three independent readers, each
+read-only. What the record says against each open question, with its
+limits:
+
+**On 1, what ends a conversation.** `closed` means *nothing is owed right
+now*, not *finished*. Of 81 conversations (a run of turns ending in
+`closed`; median 3 turns, 17 minutes), 57 were reopened — 63% continuing
+the same item, 21% moving to the next item of the same run, 16% starting
+a new topic. Only 2 of 77 closes followed the item's real end (a merge).
+The real end — the artefact merged, the specification approved — is
+recorded elsewhere, usually after the close, and three threads were never
+closed at all. No workflow run reached a terminal stage in the window.
+*Inference:* the durable unit is the work item (the change under review,
+the specification set), not the ticket round; a conversation's end is that
+item's end.
+
+**On 2, how it lands.** No merge in the window touched the same file on
+both sides; the collisions were between turns, not content. Nine merges
+in two weeks: five quick ones on one night, each joining a local turn
+under four minutes old with a remote one — the turn race this ruling
+targets — and two long divergences (a dispatcher commit unpublished for
+35 hours; one party's turn unpublished in another clone for 13 hours, so
+its addressee could not see it).
+
+**On 3, what the branch carries.** 36% of turn commits also write
+durable things in the same commit — specifications, run records, review
+records, decisions. One party's turns are almost all ticket-only (71 of
+73) because its output is the state of the external pull request. A
+branch carrying the conversation only would have to split a third of the
+turns as they are made today.
+
+**What went wrong, in order of size.** (1) Two clones on different
+framework versions fought over a generated block in the entry file: one
+rewrote it fifteen times, the others kept restoring it; it blocked commits
+and expired session gates, and stopped when every clone reached 3.47.0.
+(2) Turns that never left — the two long divergences above. (3) Two
+agents in one working copy and one git index, colliding on the index
+lock. (4) The turn race: real, and the smallest of the four. The record
+never mentions a detached HEAD. Three of the four are not what a branch
+per conversation fixes.
+
+**On the second loop and the simpler-model question.** Of 43 recorded
+incidents since 2026-09-07, the external-harness agent is named in ten,
+eight of them channel and turn mechanics (watch not running, a false
+"turn never left" from a shared checkout, heartbeat workarounds the
+operator rejected, the external review channel blocked or returning
+errors, the wrong pair asked to publish); none records a wrong review
+judgement by it. Nothing it loads points it at a loop definition — the
+workspace's entry file says no workflow is in force — and the instructed
+reading path is roughly 21,000 words, the loop definition itself 61%
+version history with role-specific rules under a tenth of its text. The
+definitions were last edited 2026-09-22 and 2026-09-29; October's rules
+live in tickets and decisions.
+
+**Limits.** Every non-external commit shares one git identity, so who
+acted comes from ticket direction and the records' own text. Push times
+are not recorded. Relatedness of a commit to a conversation is a reading,
+not a fact. The pull-request threads live outside the repository.
 
 ## What This Settles
 

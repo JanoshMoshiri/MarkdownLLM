@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-10
-generated: 2026-10-10T07:38:39
-generated_from: HEAD@a98ad97
-coverage: 533
+created: 2026-10-14
+generated: 2026-10-14T11:32:59
+generated_from: HEAD@274e16e
+coverage: 534
 framework_version: 3.47.0
 ---
 
@@ -487,6 +487,7 @@ framework_version: 3.47.0
 - cue-a-preserved-question-is-not-a-done-walk-2026-10-05 --subject--> a-preserved-question-is-not-a-done-walk
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-10 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-14 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter

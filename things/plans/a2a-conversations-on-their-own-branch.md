@@ -2,7 +2,7 @@
 id: a2a-conversations-on-their-own-branch
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-10-10
 session: 2026-10-09
 priority: high
@@ -100,6 +100,14 @@ The reasons each phase exists, so a later session does not re-derive them:
       floor may prepare a clean merge. Corrected the same day: a first draft
       wrote three of them as settled. Phase 1 waits on the third, Phase 3 on
       the second and fourth, Phase 4 on the first; Phase 2 waits on none.
+      *2026-10-14: the live record read against the four (the decision's
+      Evidence section). It points at the work item, not the ticket round,
+      as a conversation's end; at a third of turns writing durable things
+      in the same commit; and at three causes of the trouble larger than
+      the turn race — clone version drift, turns never published, a shared
+      working copy — none of which a branch per conversation fixes. The
+      rulings stay the operator's; the ordering of work now reads from the
+      evidence.*
 - [ ] **Phase 1 — A conversation gets its branch and its working copy.**
       `mdllm conversation open <ticket-id>`: cuts `a2a/<ticket-id>` from
       `main`; adds the working copy beside the workspace
