@@ -155,7 +155,7 @@ relations: [informs, supports, challenges, contradicts, references]
                 "[actor-b]": "reviewer",
             },
         ),
-        "things/ticket-writer-reviewer.md": (
+        "things/ticket-support-one.md": (
             FRAMEWORK_ROOT / "templates" / "ticket.md.template",
             common | {
                 "[actor-a]": "writer",

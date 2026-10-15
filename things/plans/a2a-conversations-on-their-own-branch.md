@@ -47,10 +47,13 @@ branching (still parked in `git-workflow.md`). Any change inside a
 conversation: turns alternate, a turn is real only on the remote, a rejected
 push is the turn-holder's to heal. Any floor act that resolves a divergence.
 
-**Sequencing.** Slots in beside `the-reckoning`, whose Phase 3 is built and
-shipped in 3.47.0 and waits only on the dispatcher's evidence and Phase 4;
-its chase on 2026-10-19 brings it back. This plan's Phase 4 uses the
-reckoning's close.
+**Sequencing.** Follows `the-seat` (2026-10-15): the evidence read of
+2026-10-14 found three causes of the trouble larger than the turn race this
+plan addresses, and that plan fixes them — a declared seat, the guard on
+regeneration, the ticket per work item. Phase 2 here (the doorbell) is
+carried by that plan's Phase 4, which keys the watch by seat. Then this
+plan, then `the-reckoning`'s Phase 4, by the operator's ordering. This
+plan's Phase 4 uses the reckoning's close.
 
 ## What the code does today (read 2026-10-10)
 
@@ -86,8 +89,9 @@ The reasons each phase exists, so a later session does not re-derive them:
   to its upstream; a branch with no upstream is reported debt). Clone-local
   restraints (`mdllm.cloud.branch`, `mdllm.sync`, `mdllm.publication`) are
   shared by every working copy of a clone.
-- **The ticket is one file per pair** (`ticket-<from>-<to>`); two branches
-  editing it would conflict at every merge.
+- **The ticket was one file per pair** (`ticket-<from>-<to>`) until
+  2026-10-15, when `the-seat` made it one per work item; two branches
+  editing a per-pair ticket would have conflicted at every merge.
 
 ## Phases
 

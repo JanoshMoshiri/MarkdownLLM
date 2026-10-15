@@ -26,7 +26,8 @@ from .yaml_loader import load_version_sentinel
 from .clone_depth import clone_depth, shallow_warning_text
 
 from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
-from .model import is_terminal, origin_is_external, parse_frontmatter, scan
+from .model import (is_terminal, load_schema, origin_is_external, parse_frontmatter,
+                    scan)
 from .repository_view import RepositoryHeadMoved, RepositoryView, RepositoryViewError
 from .session_contract import contract_fingerprint, kernel_path
 from .validation import version_tuple
@@ -324,6 +325,17 @@ def _verified_flips_recent(domain: Path) -> list[str]:
         by = by.strip() if isinstance(by, str) and by.strip() else "UNATTRIBUTED"
         lines.append(f"    - `{meta.get('id') or ln}` @ {sha} (verified_by: {by})")
     return lines
+
+
+def _declares_tickets(domain: Path) -> bool:
+    """Does this workspace run agent-to-agent loops? The ticket type is the
+    carrier every such loop uses (standing-watch.md → The Ticket)."""
+    try:
+        schema = load_schema(domain)
+    except Exception:
+        return False
+    types = schema.get("types") if isinstance(schema, dict) else None
+    return isinstance(types, dict) and "ticket" in types
 
 
 def _floor_status(root: Path) -> str | None:
@@ -849,6 +861,12 @@ def cmd_session_start(args) -> int:
     floor = _floor_status(domain)
     if floor:
         out.append(floor)
+    # The seat (the-seat Phase 1): who sits in this clone, and whether a turn
+    # it committed never left. Two constant git spawns; the loop signal is
+    # the schema's `ticket` type, read from disk, so the corpus scan below
+    # stays the one scan.
+    from .seat import seat_line
+    out.append(seat_line(domain, loops=_declares_tickets(domain)))
     # History before velocity: a shallow clone makes velocity read low and
     # the stall section vanish, silently (clone_depth.py — the first cloud
     # session showed `0 · 3 · 21 · 17` and no stalls against a true

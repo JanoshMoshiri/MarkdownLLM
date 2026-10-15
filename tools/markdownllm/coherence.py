@@ -18,7 +18,8 @@ from pathlib import Path
 import yaml
 
 from .docs_blocks import docs_block_findings
-from .domain_kernel import build_domain_kernel_blocks, domain_kernel_status
+from .domain_kernel import (build_domain_kernel_blocks, domain_kernel_status,
+                            kernel_source_check)
 from .indexes import INDEX_FILES, index_drift_findings
 from .kernel_gen import build_kernel, normalize_newlines, token_counter
 from .model import (CORE_FIELDS, Finding, RESERVED_STATUSES, SEV_ERROR,
@@ -679,6 +680,16 @@ def coherence_findings(root: Path, window: int,
         if not aerr:
             _, dk_drifted = domain_kernel_status(
                 atext, build_domain_kernel_blocks(root, ameta or {}, view))
+            if dk_drifted:
+                # A clone behind the framework that wrote the blocks sees a
+                # difference that is not drift: the blocks stand, and this
+                # clone refreshes its framework (the-seat Phase 2).
+                state, why = kernel_source_check(root, ameta or {})
+                if state != "ok":
+                    findings.append(Finding(SEV_INFO, "AGENTS.md",
+                        f"domain-kernel blocks were written by a framework this "
+                        f"clone is {state} — {why}"))
+                    dk_drifted = []
             for name in dk_drifted:
                 findings.append(Finding(SEV_ERROR, "AGENTS.md",
                     f"domain-kernel block `{name}` drifted from a fresh build — "

@@ -85,6 +85,7 @@ from .coherence import cmd_coherence
 from .dispatch_payload import cmd_dispatch_payload
 from .doctor import cmd_doctor
 from .domain_kernel import cmd_domain_kernel
+from .seat import cmd_seat
 from .evals import cmd_eval
 from .external_trust import CAPABILITY_NAMES, cmd_external_trust
 from .history import cmd_changelog, cmd_worklog
@@ -253,6 +254,21 @@ def build_cli() -> argparse.ArgumentParser:
     dk.add_argument("--check", action="store_true",
                     help="drift check: compare managed blocks against a fresh build")
     dk.set_defaults(fn=cmd_domain_kernel)
+
+    st = sub.add_parser("seat", help="the seat: which agent sits in this clone, "
+                        "under which git identity, and whether a turn it committed "
+                        "never left — read-only; `--set <actor>` declares the seat "
+                        "(clone-local config and the clone's git identity; nothing "
+                        "outside the clone changes), `--clear` withdraws it")
+    st.add_argument("path", nargs="?", default=".")
+    st.add_argument("--set", metavar="ACTOR",
+                    help="declare this clone's seat: the actor name the workspace's "
+                         "loops use; sets user.name/user.email locally to match")
+    st.add_argument("--agent", default="",
+                    help="with --set: the harness or product sitting here")
+    st.add_argument("--email", help="with --set: the git email (default <actor>@seat.local)")
+    st.add_argument("--clear", action="store_true", help="withdraw the declaration")
+    st.set_defaults(fn=cmd_seat)
 
     dc = sub.add_parser("docs", help="regenerate the derived blocks in docs/ "
                                        "(the operator-guide toolbox, the "

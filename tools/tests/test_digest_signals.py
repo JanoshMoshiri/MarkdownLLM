@@ -202,8 +202,11 @@ def test_session_start_structural_work_is_bounded(tmp_path, capsys,
         f"{len(history_walks)} git-log walks: {history_walks}")
     # 20 high-priority things must NOT mean 20+ spawns. The bound is a
     # deliberate constant far below the corpus size and above the exact
-    # count, so incidental fixed calls do not make this brittle.
-    assert len(spawns) <= 12, f"{len(spawns)} git spawns: {spawns}"
+    # count, so incidental fixed calls do not make this brittle. The seat
+    # (2026-10-15) added two constant reads — the clone's local config and a
+    # rev-list over the unpublished range — and found the bound sitting at
+    # the exact count; it is raised by those two, no more.
+    assert len(spawns) <= 14, f"{len(spawns)} git spawns: {spawns}"
 
 
 def test_stray_carriage_return_in_subject_does_not_break_flip_scan(tmp_path):

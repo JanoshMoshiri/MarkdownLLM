@@ -2,7 +2,7 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.5
+version: 0.6
 created: 2026-09-21
 linked_things:
   - id: thing-specification
@@ -294,10 +294,15 @@ board, read by the same watch.
 
 **The shape.**
 
-- A **ticket** is one overwritable thing per conversation — in practice, per
-  agent pair (`ticket-claude-codex`). Its **body is the current message**.
-  Its **`status` is the addressee**: the actor whose turn it is, drawn from
-  the domain's actor names, plus a terminal `closed`.
+- A **ticket** is one overwritable thing per conversation, and a
+  conversation is a **work item** — `ticket-<item>`: the change under
+  review, the specification set, the question. Never one per agent pair.
+  *(The first month ran per-pair tickets; the live record read on
+  2026-10-14 showed one pair's ticket closed and reopened sixteen times
+  across unrelated items, while the per-item tickets the same workspace
+  began on 2026-10-08 read as conversations.)* Its **body is the current
+  message**. Its **`status` is the addressee**: the actor whose turn it is,
+  drawn from the domain's actor names, plus `closed`.
 - **Only the current addressee writes.** To reply: overwrite the body, set
   `status` to the next addressee, commit, publish. One writer at any moment,
   so two clones never produce a merge conflict on it. The status *is* the
@@ -314,8 +319,13 @@ board, read by the same watch.
   is built.**
 - **The ticket is transient; its products are not.** Anything durable a
   conversation produces is written as a proper thing, linked from the ticket.
-  `closed` is terminal, wakes nobody, and leaves the ticket on the board, so
-  a later reopen is a `closed → <actor>` move the addressee's watch sees.
+  `closed` wakes nobody and means *nothing is owed right now* — not that the
+  conversation is over. Its end is the work item's end, recorded on the item
+  (merged, approved, answered), which is why the definition declares
+  `closed → <actor>` edges: a later turn on the same item is a move the
+  addressee's watch sees, not a departure. *(Read 2026-10-14: 57 of 81
+  conversations reopened, most continuing the same item; only two closes
+  followed the item's real end.)*
 
 **Why it is domain-declared and never reserved.** `read_board` skips every
 reserved type on a status-keyed board (above: a tool-owned lifecycle is never
@@ -327,6 +337,15 @@ and each domain declares `ticket` with its own actors as statuses and
 `closed` as `terminal_statuses`. Then each actor arms the watch it already
 knows: `mdllm watch . --role <actor> --definition ad-hoc-message-loop
 --exit-on-wake`.
+
+**Actors are seats.** An actor name is a seat: one agent in one clone, on
+one framework, under one git identity, declared in that clone with
+`mdllm seat . --set <actor>` (`seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15`).
+The record of a loop is only as legible as its seats: while every seat
+committed under the operator's identity, who took which turn could be read
+only from ticket direction. Two seats is the default shape of a loop; a
+third seat that forwards another's actions to a service it cannot reach (a
+publisher) holds no stage and carries no judgement.
 
 **The safety rule is part of the protocol, not a footnote.** A ticket carries
 *requests*, never approvals or rulings. The recipient acts within its own

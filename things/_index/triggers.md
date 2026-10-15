@@ -3,10 +3,10 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-14
-generated: 2026-10-14T11:32:59
-generated_from: HEAD@274e16e
-coverage: 9
+created: 2026-10-15
+generated: 2026-10-15T20:49:17
+generated_from: HEAD@cd68780
+coverage: 10
 framework_version: 3.47.0
 ---
 
@@ -44,6 +44,10 @@ framework_version: 3.47.0
 ## the-reckoning
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-10-19 reached, action=surface, note=Two weeks: has one attended session ended through the reckoning, and has one tick drafted one? If neither, the actor is the problem, not the command.
+
+## the-seat
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-10-29 reached, action=surface, note=Two weeks: has every clone that takes turns declared its seat (the digest says), and since the release carrying the guard, has any generated block been rewritten in turns by two clones? If seats are still undeclared, the digest line is being read past — say so.
 
 ## workflows-emerge-from-use
 - status: in-progress  due_date: —

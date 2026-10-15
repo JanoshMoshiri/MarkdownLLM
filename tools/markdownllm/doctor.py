@@ -308,8 +308,14 @@ def cmd_doctor(args) -> int:
             report("--", "AGENTS.md has no domain-kernel managed blocks "
                          "(opt-in; the entry file runs by interpretation)")
         elif drifted:
-            report("WARN", f"domain-kernel blocks STALE ({', '.join(drifted)}) — "
-                           f"run `mdllm domain-kernel .` and commit")
+            from .domain_kernel import kernel_source_check
+            state, why = kernel_source_check(root, ameta or {})
+            if state != "ok":
+                report("WARN", f"domain-kernel blocks written by a framework this "
+                               f"clone is {state} — {why}")
+            else:
+                report("WARN", f"domain-kernel blocks STALE ({', '.join(drifted)}) — "
+                               f"run `mdllm domain-kernel .` and commit")
         else:
             report("OK", f"domain-kernel in sync ({len(present)} blocks)")
         # Harness adapter advisory.  The no-option path preserves the compact

@@ -36,7 +36,8 @@ types: {}
 #  another-type:
 #    statuses: [open, figures-ready, submitted]
 #  # Ad-hoc agent-to-agent messages (standing-watch.md → The Ticket): one
-#  # overwritable thing per conversation whose status is the ADDRESSEE. The
+#  # overwritable thing per work item (`ticket-<item>`, never per agent
+#  # pair) whose status is the ADDRESSEE. The
 #  # statuses are your actor names — the same ids `ad-hoc-message-loop`
 #  # declares as stages — plus a terminal `closed`. Domain-declared on
 #  # purpose: a reserved type never appears on a status-keyed board.

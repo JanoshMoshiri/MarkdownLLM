@@ -16,7 +16,8 @@ import yaml
 from .yaml_loader import load_version_sentinel
 
 from .domain_kernel import (add_missing_workflows_block, apply_domain_kernel,
-                            build_domain_kernel_blocks, domain_kernel_status)
+                            build_domain_kernel_blocks, domain_kernel_status,
+                            kernel_source_check, set_kernel_source)
 from .model import parse_frontmatter
 from .repo import version_lt
 
@@ -90,7 +91,10 @@ def cmd_refresh(args) -> int:
     # improvements to the generated operative sections land as part of absorbing
     # the new version. Mechanical and idempotent — only the managed blocks change.
     present, _ = domain_kernel_status(text, build_domain_kernel_blocks(domain, meta or {}))
-    if present:
+    state, why = kernel_source_check(domain, meta or {})
+    if present and state != "ok":
+        print(f"\n  domain-kernel blocks left as they are — {state}: {why}")
+    elif present:
         text, added = add_missing_workflows_block(text)
         if added:
             agents.write_text(text, encoding="utf-8", newline="\n")
@@ -98,6 +102,8 @@ def cmd_refresh(args) -> int:
                   "entry file now names the workflow to follow per type")
         new_ag, written, _ = apply_domain_kernel(
             text, build_domain_kernel_blocks(domain, meta or {}))
+        if written:
+            new_ag = set_kernel_source(new_ag, domain, meta or {})
         if new_ag != text:
             agents.write_text(new_ag, encoding="utf-8", newline="\n")
             text = new_ag  # keep --seal's regex operating on the fresh text

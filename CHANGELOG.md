@@ -18,6 +18,10 @@ Prior entries followed [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ---
 
+## [Unreleased]
+
+**The seat, and a conversation is a work item.** The operator asked for evidence rather than opinion, and the busiest live workspace's history was read whole at one pinned commit: three of the four largest causes of agent-to-agent trouble were seats nothing checked — two clones on different framework versions rewriting one generated block in turns, turns committed and never published, two agents in one working copy — and all three were invisible in the record because every agent committed under the operator's identity (`seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15`). **`mdllm seat`** declares a seat in a clone — clone-local config and the clone's git identity — and the session-start digest names it, or asks for it, and names a turn that never left. The entry file records the framework commit that wrote its generated blocks; `domain-kernel`, `refresh`, coherence and doctor refuse to regenerate from a clone that is behind, and read the difference as *behind*, never drift. The ticket is one per work item, `closed` means nothing is owed, and a reopen is a declared edge (`standing-watch.md` → The Ticket; the templates). A loop definition names roles and the actor at each stage, never which agent holds which; two seats is the default shape. Plan `the-seat`; the branch-per-conversation plan follows it.
+
 ## [3.47.0] - 2026-10-08
 
 **The workspace now digests what it takes in, walks what a change disturbs, and learns its own process from use.** Three rulings in four days, each with the same split — the floor detects and assembles, the agent acts within bounds, the operator rules on the residue: the walk runs on detection at the agent's commit; the reckoning gives disposition an actor at every session end, bounded so a backlog shrinks without arriving as a wall; and workflows emerge from the commit stream instead of waiting to be written. Claude Code first, where the gates exist; Codex follows through its own hooks, never through git.

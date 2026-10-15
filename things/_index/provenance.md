@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-14
-generated: 2026-10-14T11:33:00
-generated_from: HEAD@274e16e
+created: 2026-10-15
+generated: 2026-10-15T20:49:18
+generated_from: HEAD@cd68780
 coverage: 129
 framework_version: 3.47.0
 ---

@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-14
-generated: 2026-10-14T11:32:59
-generated_from: HEAD@274e16e
-coverage: 534
+created: 2026-10-15
+generated: 2026-10-15T20:49:17
+generated_from: HEAD@cd68780
+coverage: 539
 framework_version: 3.47.0
 ---
 
@@ -555,6 +555,7 @@ framework_version: 3.47.0
 - cue-framework-map-2026-10-01 --subject--> framework-map
 - cue-framework-map-2026-10-05 --subject--> framework-map
 - cue-framework-map-2026-10-07 --subject--> framework-map
+- cue-framework-map-2026-10-15 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
@@ -588,6 +589,7 @@ framework_version: 3.47.0
 - cue-operator-guide-2026-10-05 --subject--> operator-guide
 - cue-operator-guide-2026-10-07 --subject--> operator-guide
 - cue-operator-guide-2026-10-08 --subject--> operator-guide
+- cue-operator-guide-2026-10-15 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -617,6 +619,7 @@ framework_version: 3.47.0
 - cue-standing-watch-specification-2026-09-24 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-01 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-10-15 --subject--> standing-watch-specification
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-09-24 --subject--> substrate-native-a2a
@@ -1431,6 +1434,11 @@ framework_version: 3.47.0
 - scalability-guide --complements--> thing-lifecycle-specification
 - scalability-guide --complements--> derived-index-specification
 - scalability-guide --references--> example-things-specification
+- seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --extends--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --extends--> ticket-is-the-ad-hoc-carrier-2026-09-30
+- seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> loop-turns-self-heal-2026-09-23
+- seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> a-shared-worktree-merges-authorship-at-the-index
+- seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> standing-watch-specification
 - serve-side-blindness-dissolves-into-composition --implements--> watertight-membrane-sprint-2026-08-30
 - serve-side-blindness-dissolves-into-composition --derived-from--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - serve-side-blindness-dissolves-into-composition --derived-from--> source-behind-mirror-is-still-a-consumer-side-read
@@ -1626,6 +1634,10 @@ framework_version: 3.47.0
 - the-root-is-not-a-representative-domain --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - the-rough-true-account-is-generative-infrastructure --references--> llm-driven-systems-manifesto
 - the-rough-true-account-is-generative-infrastructure --complements--> belief-revision-specification
+- the-seat --implements--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- the-seat --references--> a2a-conversations-on-their-own-branch
+- the-seat --extends--> standing-watch-specification
+- the-seat --references--> the-reckoning
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
 - the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
 - the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming

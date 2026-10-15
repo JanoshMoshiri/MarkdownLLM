@@ -6,7 +6,9 @@ created: [ISO-date]
 # The ticket's turn graph. Each stage id IS an actor name, because a
 # ticket's `status` is its addressee; `actor` on each stage names the role
 # `mdllm watch --role <actor>` wakes there. Add a stage per actor that may
-# be addressed; `closed` is terminal and wakes nobody.
+# be addressed. `closed` wakes nobody and means nothing is owed right now;
+# a reopen is a declared move back to an actor, because the conversation's
+# end is its work item's end, not the ticket's.
 stages:
   - id: [actor-a]
     to: [[actor-b], closed]
@@ -15,16 +17,18 @@ stages:
     to: [[actor-a], closed]
     actor: [actor-b]
   - id: closed
-    to: []
+    to: [[actor-a], [actor-b]]
 ---
 
 # Ad-Hoc Message Loop — Definition
 
-The turn graph for `type: ticket` things: an overwritable thing per
-conversation whose `status` is the addressee and whose body is the current
-message (`standing-watch.md` → The Ticket). Declare `ticket` in
-`_schema.yaml` with these actor names as its statuses and `closed` as
-terminal; then each actor arms
+The turn graph for `type: ticket` things: one overwritable thing per **work
+item** — `ticket-<item>`: the change under review, the specification set,
+the question — whose `status` is the addressee and whose body is the current
+message (`standing-watch.md` → The Ticket). Never one per agent pair: a
+pair's ticket carries unrelated items in turn and its history stops reading
+as one conversation. Declare `ticket` in `_schema.yaml` with these actor
+names as its statuses and `closed` as terminal; then each actor arms
 `mdllm watch . --role <actor> --definition ad-hoc-message-loop --exit-on-wake`.
 
 ## Stages
@@ -40,14 +44,20 @@ terminal; then each actor arms
   approvals or rulings; the recipient acts within its own permissions and the
   irreversible goes to the human seat.
 
-**closed (terminal)**
-- Entry: whichever actor holds the turn judges the conversation finished.
-- What "done" means: anything durable has been written as a proper thing and
-  linked from the ticket; the ticket may be reopened later by setting
-  `status` back to an actor name.
+**closed**
+- Entry: whichever actor holds the turn judges that nothing is owed right
+  now — the request was met, or the item moved on without one.
+- What it means: nothing is owed. It is not the conversation's end; that is
+  the work item's end (merged, approved, answered), recorded on the item.
+  Anything durable the turn produced is a proper thing linked from the
+  ticket. A later turn on the same item is a declared `closed → <actor>`
+  move, which the addressee's watch sees.
 
 ## Notes
 
 The transcript is `git log -p` on the ticket file. Do not build another
-message store. Rename the actor ids to match the roles your domain's agents
-actually run as (`claude`, `codex`, `hermes`, `writer`, `reviewer` …).
+message store. Rename the actor ids to match the seats your domain's agents
+actually sit in (`writer`, `reviewer`, or the agents' own names); each seat
+declares itself in its clone with `mdllm seat . --set <actor>`. Two seats is
+the default shape; a seat that only forwards another's actions (a publisher
+reaching a service the other cannot) holds no stage here.
