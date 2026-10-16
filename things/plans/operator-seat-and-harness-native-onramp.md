@@ -1,8 +1,8 @@
 ---
 id: operator-seat-and-harness-native-onramp
 type: plan
-status: in-progress
-version: 1.4
+status: paused
+version: 1.5
 created: 2026-09-06
 session: 2026-09-06
 priority: high
@@ -31,11 +31,13 @@ linked_things:
     notes: "Phase 3 route evidence for Claude Code on the web, and the clone defects Phase 2's silent bootstrap must survive."
 triggers:
   - type: time
-    condition: "2026-10-22 reached"
-    action: "Acted 2026-10-08 at the-reckoning Phase 3's close: Phase 5 still has no account recorded, so the operator was asked for it in one line. If none is recorded by this date, ask once more in one line; never rewrite first-hour.md without it. Earlier: answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it."
+    condition: "2026-10-31 reached"
+    action: "Paused with the plan 2026-10-17: the account is still owed, and asked for again when the slot comes back. Earlier: acted 2026-10-08 at the-reckoning Phase 3's close: Phase 5 still has no account recorded, so the operator was asked for it in one line. If none is recorded by this date, ask once more in one line; never rewrite first-hour.md without it. Earlier: answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it."
   - type: time
-    condition: "2026-10-10 reached"
-    action: "Re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead."
+    condition: "2026-10-31 reached"
+    action: "Answered 2026-10-17 by the operator at the session close: the eval backlog takes the onramp's slot. Neither the Codex cloud route's first-hand record nor Phase 2's silent bootstrap had moved since 2026-09-26; the plan is paused. Ask at this date whether the eval backlog has released the slot. Earlier: re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead."
+settles_when: 2026-10-31
+disposition_reason: "Paused 2026-10-17 on the operator's ruling at the session close: the eval backlog takes this plan's slot. Neither the Codex cloud route's first-hand record nor Phase 2's silent bootstrap had moved since 2026-09-26."
 ---
 
 # Operator Seat and Harness-Native Onramp

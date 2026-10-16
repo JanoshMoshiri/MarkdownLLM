@@ -8,6 +8,9 @@ session: 2026-10-15
 priority: critical
 tags: [seat, clone, identity, generated-block, version-guard, ticket, work-item, a2a, watch]
 linked_things:
+  - id: the-felt-symptom-names-one-cause-the-record-ranks-them
+    relation: references
+    notes: "How this plan came to exist: the remedy that arrived with the felt symptom addressed the smallest cause; one pinned read of the record ranked the rest, and this plan builds them in that order."
   - id: seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
     relation: implements
     notes: "The ruling this plan builds."

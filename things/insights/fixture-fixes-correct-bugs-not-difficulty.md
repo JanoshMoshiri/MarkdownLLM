@@ -14,6 +14,9 @@ linked_things:
     relation: supports
   - id: operative-rules-are-a-small-fraction-of-spec-prose
     relation: complements
+disposition: keep-active
+disposition_reason: "Standing razor for the eval programme's fixtures: fix a fixture's internal bugs, never its difficulty. The eval backlog took the next slot on 2026-10-17, so this is about to be used; promote into the programme's method text when that becomes a thing."
+settles_when: 2026-12-16
 ---
 
 # Fixture Fixes Correct Bugs, Not Difficulty

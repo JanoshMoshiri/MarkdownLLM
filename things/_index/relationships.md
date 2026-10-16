@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-16
-generated: 2026-10-16T09:41:07
-generated_from: HEAD@0fdc277
-coverage: 540
+created: 2026-10-17
+generated: 2026-10-17T00:47:56
+generated_from: HEAD@9f506ee
+coverage: 541
 framework_version: 3.47.0
 ---
 
@@ -1584,6 +1584,9 @@ framework_version: 3.47.0
 - the-corpus-answers-faster-than-it-is-asked --challenges--> the-root-is-not-a-representative-domain
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
+- the-felt-symptom-names-one-cause-the-record-ranks-them --informs--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- the-felt-symptom-names-one-cause-the-record-ranks-them --informs--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- the-felt-symptom-names-one-cause-the-record-ranks-them --supports--> partial-coverage-quiets-the-uncovered-steps
 - the-first-retrospective-is-the-one-the-floor-cannot-chase --informs--> retrospective-specification
 - the-first-retrospective-is-the-one-the-floor-cannot-chase --extends--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - the-first-retrospective-is-the-one-the-floor-cannot-chase --complements--> a-uniform-answer-is-a-dead-judgment
@@ -1635,6 +1638,7 @@ framework_version: 3.47.0
 - the-root-is-not-a-representative-domain --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - the-rough-true-account-is-generative-infrastructure --references--> llm-driven-systems-manifesto
 - the-rough-true-account-is-generative-infrastructure --complements--> belief-revision-specification
+- the-seat --references--> the-felt-symptom-names-one-cause-the-record-ranks-them
 - the-seat --implements--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - the-seat --references--> a2a-conversations-on-their-own-branch
 - the-seat --extends--> standing-watch-specification

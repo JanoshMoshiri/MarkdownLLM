@@ -18,6 +18,9 @@ linked_things:
     relation: supports
   - id: retrospective-specification
     relation: supports
+disposition: keep-active
+disposition_reason: "The layered-nets doctrine is written in no spec: change-reconciliation.md carries the walk and the dark region and the retrospective the net beneath, but nowhere states the order of the nets. This session added one (the gate where the commit lands). Promote as a short 'The nets' paragraph in change-reconciliation.md at its next enforcement change."
+settles_when: 2026-12-16
 ---
 
 # Change Safety Is Defense in Depth, Not a Single Gate

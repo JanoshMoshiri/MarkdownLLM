@@ -3,9 +3,9 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-16
-generated: 2026-10-16T09:41:07
-generated_from: HEAD@0fdc277
+created: 2026-10-17
+generated: 2026-10-17T00:47:55
+generated_from: HEAD@9f506ee
 coverage: 10
 framework_version: 3.47.0
 ---
@@ -22,7 +22,7 @@ framework_version: 3.47.0
 
 ## estate-retrospective-synthesis-2026-08
 - status: evolving  due_date: —
-- trigger: type=time, condition=2026-10-13 reached, action=Answered 2026-10-08, half: the regulated cluster's estate retrospective ran in its vantage domain on 2026-09-17. Row 6, the standing aggregation read, is unruled; since 2026-10-05 `mdllm reckon` aggregates disposition per workspace, which is the per-repo half of that read. Re-dated to the framework retrospective's chase, which is the reader for both. Earlier: defer to `operator-queue-2026-08-28`, which now carries this synthesis's undischarged rows and chases the same date — report only what is unique to this artifact: whether the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) ran and consumed this synthesis as its layer-below input, and whether the standing aggregation read (row 6) has been ruled. Do not double-chase the rows the queue holds.
+- trigger: type=time, condition=2026-10-18 reached, action=Re-dated 2026-10-17 with the framework retrospective, which the operator put first next session; it is the reader for both. Earlier: answered 2026-10-08, half: the regulated cluster's estate retrospective ran in its vantage domain on 2026-09-17. Row 6, the standing aggregation read, is unruled; since 2026-10-05 `mdllm reckon` aggregates disposition per workspace, which is the per-repo half of that read. Re-dated to the framework retrospective's chase, which is the reader for both. Earlier: defer to `operator-queue-2026-08-28`, which now carries this synthesis's undischarged rows and chases the same date — report only what is unique to this artifact: whether the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) ran and consumed this synthesis as its layer-below input, and whether the standing aggregation read (row 6) has been ruled. Do not double-chase the rows the queue holds.
 
 ## estate-workflow-derivation
 - status: in-progress  due_date: —
@@ -30,16 +30,16 @@ framework_version: 3.47.0
 
 ## framework-retrospective-2026-09
 - status: complete  due_date: —
-- trigger: type=time, condition=2026-10-13 reached, action=Retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own.
+- trigger: type=time, condition=2026-10-18 reached, action=Answered 2026-10-17 by the operator at the session close: the retrospective runs first thing next session — things/ moved 80 commits since 2026-09-13. The mechanical half at the close: the reckoning held 49 waiting after ten decisions, the cue listing four unraised bookkeeping moves, coherence clean. Earlier: retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own.
 
 ## operator-seat-and-harness-native-onramp
-- status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-22 reached, action=Acted 2026-10-08 at the-reckoning Phase 3's close: Phase 5 still has no account recorded, so the operator was asked for it in one line. If none is recorded by this date, ask once more in one line; never rewrite first-hour.md without it. Earlier: answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it.
-- trigger: type=time, condition=2026-10-10 reached, action=Re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead.
+- status: paused  due_date: —
+- trigger: type=time, condition=2026-10-31 reached, action=Paused with the plan 2026-10-17: the account is still owed, and asked for again when the slot comes back. Earlier: acted 2026-10-08 at the-reckoning Phase 3's close: Phase 5 still has no account recorded, so the operator was asked for it in one line. If none is recorded by this date, ask once more in one line; never rewrite first-hour.md without it. Earlier: answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it.
+- trigger: type=time, condition=2026-10-31 reached, action=Answered 2026-10-17 by the operator at the session close: the eval backlog takes the onramp's slot. Neither the Codex cloud route's first-hand record nor Phase 2's silent bootstrap had moved since 2026-09-26; the plan is paused. Ask at this date whether the eval backlog has released the slot. Earlier: re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead.
 
 ## substrate-native-a2a
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-10 reached, action=Has Phase 4 run one real writer/reviewer turn through `mdllm watch` in the engineering domain? If not, establish which: the command was never armed, was armed and never woke, or woke and the turn was hand-relayed anyway. The third is the interesting failure — it would mean the doorbell rings and nobody rises, which is a seat problem and not a channel problem. Re-date once answered.
+- trigger: type=time, condition=2026-11-05 reached, action=Answered 2026-10-17 from the evidence read of 2026-10-14: yes. Real writer/reviewer turns ran through `mdllm watch` in the busiest live workspace — a review conversation on 2026-10-08 woke its writer on exit 0. The failure this question called the interesting one also happened, on the other side: on 2026-10-11 no watch was running for the second seat, process exit started no turn, and the pickup came through the operator's chat — the doorbell rang and nobody rose, a seat problem and not a channel problem, as predicted. `seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15` and `the-seat` Phase 4 answer it. Ask at this date: has a pair with declared seats run one conversation end to end, both sides rising on exit 0? Earlier: has Phase 4 run one real writer/reviewer turn through `mdllm watch` in the engineering domain? If not, establish which: the command was never armed, was armed and never woke, or woke and the turn was hand-relayed anyway. The third is the interesting failure — it would mean the doorbell rings and nobody rises, which is a seat problem and not a channel problem. Re-date once answered.
 
 ## the-reckoning
 - status: in-progress  due_date: —

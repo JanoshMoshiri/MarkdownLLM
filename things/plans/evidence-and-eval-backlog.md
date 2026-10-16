@@ -38,6 +38,10 @@ with agent support**, not agent tasks with operator sign-off. The unit of schedu
 is the operator's calendar. "Felt-when-felt" was the wrong cadence for work the loop
 cannot feel — retired with this version.
 
+*2026-10-17: the operator ruled at a session close that this backlog takes the
+slot the harness-native onramp held (`operator-seat-and-harness-native-onramp`,
+paused): after the current arc and the framework retrospective, this plan is next.*
+
 ## Operator session 1 — sanitised validation record  (~1 sitting, highest leverage)
 
 The cold-start human eval happened informally (the operator's brother); a clean,

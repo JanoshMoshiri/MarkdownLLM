@@ -52,8 +52,8 @@ linked_things:
     notes: "Phase 7 is this ruling's build. It also qualifies this plan's own 'no new thing type for the turn' refusal — artefact turns only; ad-hoc messages had no carrier."
 triggers:
   - type: time
-    condition: "2026-10-10 reached"
-    action: "Has Phase 4 run one real writer/reviewer turn through `mdllm watch` in the engineering domain? If not, establish which: the command was never armed, was armed and never woke, or woke and the turn was hand-relayed anyway. The third is the interesting failure — it would mean the doorbell rings and nobody rises, which is a seat problem and not a channel problem. Re-date once answered."
+    condition: "2026-11-05 reached"
+    action: "Answered 2026-10-17 from the evidence read of 2026-10-14: yes. Real writer/reviewer turns ran through `mdllm watch` in the busiest live workspace — a review conversation on 2026-10-08 woke its writer on exit 0. The failure this question called the interesting one also happened, on the other side: on 2026-10-11 no watch was running for the second seat, process exit started no turn, and the pickup came through the operator's chat — the doorbell rang and nobody rose, a seat problem and not a channel problem, as predicted. `seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15` and `the-seat` Phase 4 answer it. Ask at this date: has a pair with declared seats run one conversation end to end, both sides rising on exit 0? Earlier: has Phase 4 run one real writer/reviewer turn through `mdllm watch` in the engineering domain? If not, establish which: the command was never armed, was armed and never woke, or woke and the turn was hand-relayed anyway. The third is the interesting failure — it would mean the doorbell rings and nobody rises, which is a seat problem and not a channel problem. Re-date once answered."
 ---
 
 # Substrate-Native A2A: The Turn Belongs To The Domain, The Wake Belongs To The Harness

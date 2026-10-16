@@ -12,6 +12,9 @@ linked_things:
   - id: framework-discovery-specification
     relation: challenges
     notes: "Discovery assumes the harness injects AGENTS.md; a growing class of harnesses does not"
+disposition: keep-active
+disposition_reason: "Its lesson is the entry file's first key innovation (not a thing) and the onramp's route table. Promote into interface.md beside the portability razor when the onramp's Phase 3 records route evidence; the onramp is paused behind the eval backlog until then."
+settles_when: 2026-12-16
 ---
 
 # AGENTS.md Discovery — And The Floor — Are Harness-Dependent

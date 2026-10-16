@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-10-16
-generated: 2026-10-16T09:41:07
-generated_from: HEAD@0fdc277
-coverage: 540
+created: 2026-10-17
+generated: 2026-10-17T00:47:56
+generated_from: HEAD@9f506ee
+coverage: 541
 framework_version: 3.47.0
 ---
 
@@ -14,30 +14,31 @@ framework_version: 3.47.0
 
 | field | things using it |
 |---|---|
-| id | 540 |
-| type | 540 |
-| status | 540 |
-| created | 540 |
-| version | 467 |
-| tags | 436 |
-| linked_things | 377 |
-| origin | 202 |
-| session | 199 |
-| confidence | 198 |
+| id | 541 |
+| type | 541 |
+| status | 541 |
+| created | 541 |
+| version | 468 |
+| tags | 437 |
+| linked_things | 378 |
+| origin | 203 |
+| session | 200 |
+| confidence | 199 |
 | subject | 158 |
 | raised_at | 158 |
 | raised_by | 158 |
 | verdict | 158 |
 | verdict_reason | 158 |
 | informed_by | 153 |
-| source | 148 |
+| source | 149 |
 | priority | 63 |
-| disposition | 56 |
-| disposition_reason | 56 |
+| disposition_reason | 61 |
+| disposition | 60 |
 | decided_by | 42 |
-| promoted_to | 28 |
+| promoted_to | 30 |
 | exposed | 27 |
 | triggers | 10 |
+| settles_when | 10 |
 | period_start | 9 |
 | period_end | 9 |
 | domain | 9 |
@@ -47,7 +48,6 @@ framework_version: 3.47.0
 | generated_from | 5 |
 | coverage | 5 |
 | framework_version | 5 |
-| settles_when | 5 |
 | verified | 4 |
 | definition | 4 |
 | current_stage | 4 |

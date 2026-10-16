@@ -1,7 +1,7 @@
 ---
 id: consistency-is-maintained-at-change-not-by-sweeping
 type: insight
-status: active
+status: promoted
 version: 1.1
 created: 2026-06-13
 session: 2026-06-13
@@ -21,6 +21,7 @@ linked_things:
     relation: supports
   - id: llm-driven-systems-manifesto
     relation: implements
+promoted_to: change-reconciliation-specification
 ---
 
 # Consistency Is Maintained at Change, Not by Sweeping

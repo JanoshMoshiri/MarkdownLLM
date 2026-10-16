@@ -18,6 +18,9 @@ linked_things:
   - id: tracking-artifacts-can-drift-from-reality
     relation: supports
     notes: "A portability claim is a tracking artifact for a capability; it drifts the same way"
+disposition: keep-active
+disposition_reason: "The corpus's hardest-working razor, cited by 27 records; its rule lives in the entry file's principle 6 (not a thing) and in doctor and runtime-probe. Promote into interface.md when its route table states the execution-evidence rule (the onramp's Phase 3, now paused behind the eval backlog)."
+settles_when: 2026-12-16
 ---
 
 # Portability Claims Need Execution Tests, Not Resolution Tests

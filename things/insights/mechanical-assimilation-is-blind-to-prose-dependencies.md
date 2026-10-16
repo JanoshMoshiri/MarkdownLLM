@@ -1,7 +1,7 @@
 ---
 id: mechanical-assimilation-is-blind-to-prose-dependencies
 type: insight
-status: active
+status: promoted
 version: 1.0
 created: 2026-06-14
 session: 2026-06-14
@@ -16,6 +16,7 @@ linked_things:
     relation: supports
   - id: tracking-artifacts-can-drift-from-reality
     relation: supports
+promoted_to: change-reconciliation-specification
 ---
 
 # Mechanical Assimilation Is Blind to Prose Dependencies

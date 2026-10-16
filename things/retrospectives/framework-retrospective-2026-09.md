@@ -10,8 +10,8 @@ domain: markdownllm-framework
 tags: [retrospective, cue-carrier, closed-loop, standing-authority, reconciliation, seat-protocol]
 triggers:
   - type: time
-    condition: "2026-10-13 reached"
-    action: "Retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own."
+    condition: "2026-10-18 reached"
+    action: "Answered 2026-10-17 by the operator at the session close: the retrospective runs first thing next session — things/ moved 80 commits since 2026-09-13. The mechanical half at the close: the reckoning held 49 waiting after ten decisions, the cue listing four unraised bookkeeping moves, coherence clean. Earlier: retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own."
 linked_things:
   - id: framework-retrospective-2026-08c
     relation: references
