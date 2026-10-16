@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-10-15
-generated: 2026-10-15T20:49:17
-generated_from: HEAD@cd68780
-coverage: 539
+created: 2026-10-16
+generated: 2026-10-16T09:41:07
+generated_from: HEAD@0fdc277
+coverage: 540
 framework_version: 3.47.0
 ---
 
@@ -14,21 +14,21 @@ framework_version: 3.47.0
 
 | field | things using it |
 |---|---|
-| id | 539 |
-| type | 539 |
-| status | 539 |
-| created | 539 |
-| version | 466 |
-| tags | 435 |
+| id | 540 |
+| type | 540 |
+| status | 540 |
+| created | 540 |
+| version | 467 |
+| tags | 436 |
 | linked_things | 377 |
 | origin | 202 |
 | session | 199 |
 | confidence | 198 |
-| subject | 157 |
-| raised_at | 157 |
-| raised_by | 157 |
-| verdict | 157 |
-| verdict_reason | 157 |
+| subject | 158 |
+| raised_at | 158 |
+| raised_by | 158 |
+| verdict | 158 |
+| verdict_reason | 158 |
 | informed_by | 153 |
 | source | 148 |
 | priority | 63 |

@@ -365,3 +365,84 @@ def test_dispatch_flags_a_session_end_commit_for_the_step(tmp_path, monkeypatch,
             definition_hash="sha256:pinned", output_port=_Port())
     capsys.readouterr()
     assert seen == ["1", None]
+
+
+# ------------------------------------- the gate runs where the commit lands
+# (cue-carrier Phase 7(h), 2026-10-16). A framework session committing in a
+# nested workspace met no gate: the step ran against the project repository,
+# which was clean. The floor now runs in the repository the commit lands in
+# when that is a workspace of its own; a domain session in its own clone is
+# unchanged; a repository with no entry file is left alone.
+
+def _init_repo(path: Path, entry: bool) -> Path:
+    path.mkdir(parents=True, exist_ok=True)
+    import subprocess as sp
+    sp.run(["git", "init", "-q", str(path)], check=True)
+    if entry:
+        (path / "AGENTS.md").write_text("---\nid: x\n---\n# x\n", encoding="utf-8")
+    return path
+
+
+def test_gate_target_follows_cd_and_git_C(tmp_path):
+    cwd = str(tmp_path)
+    assert lr.gate_target(f"{_COMMIT} -m x", cwd) == tmp_path
+    assert lr.gate_target(f"cd domain/x && git add -A && {_COMMIT} -m x", cwd) == tmp_path / "domain" / "x"
+    assert lr.gate_target(f'cd "domain/x y" && {_COMMIT} -m x', cwd) == tmp_path / "domain" / "x y"
+    assert lr.gate_target(f"git -C domain/x commit -m x", cwd) == tmp_path / "domain" / "x"
+    assert lr.gate_target(f"cd domain && git -C x commit -m x", cwd) == tmp_path / "domain" / "x"
+    assert lr.gate_target(f"{_COMMIT} -m x", "") is None
+    if lr.os.name == "nt":
+        assert lr._shell_path("/c/Users/x") == "C:/Users/x"
+
+
+def test_gate_root_is_the_workspace_the_commit_lands_in(tmp_path):
+    fw = _init_repo(tmp_path / "fw", entry=True)
+    ws = _init_repo(fw / "domain" / "ws", entry=True)
+    app = _init_repo(fw / "app", entry=False)
+    fw, ws = fw.resolve(), ws.resolve()
+    # The session's own repository: unchanged.
+    assert lr.gate_root(f"{_COMMIT} -m x", str(fw), fw) == fw
+    # A domain session in its own clone: unchanged — this is the case that
+    # must never be compromised.
+    assert lr.gate_root(f"{_COMMIT} -m x", str(ws), ws) == ws
+    assert lr.gate_root(f"git add -A && {_COMMIT} -m x", str(ws), ws) == ws
+    # The framework session stepping into a nested workspace: the floor runs there.
+    assert lr.gate_root(f"cd domain/ws && {_COMMIT} -m x", str(fw), fw) == ws
+    assert lr.gate_root(f"git -C domain/ws commit -m x", str(fw), fw) == ws
+    # A repository with no entry file (an application repo): left alone.
+    assert lr.gate_root(f"cd app && {_COMMIT} -m x", str(fw), fw) == fw
+    # A path that does not exist: left alone.
+    assert lr.gate_root(f"cd nowhere && {_COMMIT} -m x", str(fw), fw) == fw
+
+
+def test_dispatch_runs_the_floor_where_the_commit_lands(tmp_path, monkeypatch, capsys):
+    fw = _init_repo(tmp_path / "fw", entry=True).resolve()
+    ws = _init_repo(fw / "domain" / "ws", entry=True).resolve()
+    ran = []
+
+    def run(root, binding):
+        ran.append(Path(root).resolve())
+        return _execution(1)
+
+    monkeypatch.setattr(lr, "execute_lifecycle", run)
+    monkeypatch.setattr(lr, "record_execution_attestation", lambda *a, **kw: None)
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(
+        {"tool_name": "Bash", "cwd": str(fw),
+         "tool_input": {"command": f"cd domain/ws && {_COMMIT} -m x"}})))
+    port = _Port()
+    assert lr.dispatch_lifecycle_event(
+        fw, CTX.binding("pre-commit"), harness="fake-harness",
+        definition_hash="sha256:pinned", output_port=port) == 0
+    assert ran == [ws]
+    assert port.calls == [("pre-commit", False)]  # the refusal still refuses
+    capsys.readouterr()
+    # And a domain session in its own clone runs where it always did.
+    ran.clear()
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(
+        {"tool_name": "Bash", "cwd": str(ws),
+         "tool_input": {"command": f"{_COMMIT} -m x"}})))
+    lr.dispatch_lifecycle_event(
+        ws, CTX.binding("pre-commit"), harness="fake-harness",
+        definition_hash="sha256:pinned", output_port=_Port())
+    assert ran == [ws]
+    capsys.readouterr()

@@ -397,6 +397,69 @@ def is_session_end_commit(command: str, cwd: str | Path = "") -> bool:
     return False
 
 
+# Where the gate's floor runs. The hook fires for the session's project
+# repository, but the guarded command may commit elsewhere — a framework
+# session stepping into a nested workspace (`cd domain/x && git commit`,
+# `git -C domain/x commit`). Read on 2026-10-15: such a commit met no gate,
+# because the step ran against the project root, which was clean. The floor
+# now runs in the repository the commit lands in, when that repository is a
+# workspace of its own (it carries an entry file); a domain session in its
+# own clone resolves to its own root and nothing changes; a commit into a
+# repository with no entry file (an application repository) stays with the
+# project root, as before.
+_SEGMENT_SPLIT = re.compile(r"&&|\|\||;|\||\n")
+_CD_RE = re.compile(r"^\s*(?:cd|pushd)\s+(\"[^\"]+\"|'[^']+'|\S+)")
+_GIT_C_RE = re.compile(r"\bgit\b(?:\s+-c\s+\S+)*\s+-C\s+(\"[^\"]+\"|'[^']+'|\S+)")
+
+
+def _shell_path(token: str) -> str:
+    """A path as the shell wrote it: quotes off; a Git Bash drive path
+    (`/c/Users/...`) read as the Windows path it names."""
+    p = token.strip().strip("\"'")
+    m = re.fullmatch(r"/([A-Za-z])/(.*)", p)
+    if m and os.name == "nt":
+        p = f"{m.group(1).upper()}:/{m.group(2)}"
+    return p
+
+
+def gate_target(command: str, cwd: str) -> Path | None:
+    """The directory the guarded commit runs in: the hook's cwd, moved by
+    any `cd` before the commit's own segment, then by that segment's
+    `git -C`. None when the hook gave no cwd to start from."""
+    if not cwd:
+        return None
+    here = Path(cwd)
+    for seg in _SEGMENT_SPLIT.split(command):
+        if GATE_COMMAND_RE.search(seg):
+            m = _GIT_C_RE.search(seg)
+            if m:
+                here = here / _shell_path(m.group(1))
+            break
+        m = _CD_RE.match(seg)
+        if m:
+            here = here / _shell_path(m.group(1))
+    return here
+
+
+def gate_root(command: str, cwd: str, project_root: Path) -> Path:
+    """The repository the gate's floor runs in. The project root, unless the
+    commit lands in another repository that is itself a workspace."""
+    target = gate_target(command, cwd)
+    if target is None:
+        return project_root
+    try:
+        r = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=target,
+                           capture_output=True, text=True, timeout=20)
+    except Exception:
+        return project_root
+    if r.returncode != 0 or not r.stdout.strip():
+        return project_root
+    top = Path(r.stdout.strip()).resolve()
+    if top == project_root or not (top / "AGENTS.md").is_file():
+        return project_root
+    return top
+
+
 def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
                              harness: str, definition_hash: str,
                              output_port: LifecycleOutputPort) -> int:
@@ -407,6 +470,7 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
         print(f"mdllm: harness {harness!r} has no lifecycle output port")
         return 2
 
+    exec_root = root
     if binding.delivery == "gate":
         guarded = _guarded_command(read_hook_input())
         if guarded is None:
@@ -416,6 +480,7 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
             os.environ[SESSION_END_ENV] = "1"  # the step inherits it
         else:
             os.environ.pop(SESSION_END_ENV, None)
+        exec_root = gate_root(guarded[0], guarded[1], root)
 
     admission: LifecycleAdmission | None = None
     if isinstance(adapter, LifecycleAdmissionPort):
@@ -435,7 +500,15 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
         execution = LifecycleExecution(
             moment=binding.moment, steps=(), text=admission.text, passed=False)
     else:
-        execution = execute_lifecycle(root, binding)
+        execution = execute_lifecycle(exec_root, binding)
+        if exec_root != root:
+            execution = LifecycleExecution(
+                moment=execution.moment, steps=execution.steps,
+                text=_bounded_structurally(
+                    f"[gate: the commit lands in {exec_root} — a workspace of its "
+                    "own; the floor ran there, and the walk is done there]\n\n"
+                    + execution.text, binding.output_limit_characters),
+                passed=execution.passed)
         if admission is not None and admission.text:
             execution = LifecycleExecution(
                 moment=execution.moment,

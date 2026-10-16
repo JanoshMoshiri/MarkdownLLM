@@ -2,7 +2,7 @@
 id: cue-carrier
 type: plan
 status: in-progress
-version: 1.6
+version: 1.7
 created: 2026-09-12
 session: 2026-09-12
 priority: high
@@ -250,6 +250,17 @@ is the seeing.
             list through its post-write channel. Never through git
             (`an-owed-act-is-not-a-false-fact`): the operator ruled a gate at
             every commit damaging to the person's experience.
+      - [x] (h) The gate runs where the commit lands. *Found 2026-10-15 when
+            the framework session committed in a nested workspace on the
+            operator's instruction and met no gate: the step read the
+            session's project repository, which was clean. Built 2026-10-16:
+            `gate_root` resolves the command's directory (the hook's cwd,
+            any `cd` before the commit, `git -C`) to its repository and runs
+            the step there when it is another workspace with an entry file;
+            a domain session in its own clone resolves to its own root and
+            nothing changes; a repository with no entry file is left alone.
+            The operator's one condition: single-workspace use is never
+            compromised — pinned by test.*
 
 ## Done when
 

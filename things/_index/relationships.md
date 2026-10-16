@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-15
-generated: 2026-10-15T20:49:17
-generated_from: HEAD@cd68780
-coverage: 539
+created: 2026-10-16
+generated: 2026-10-16T09:41:07
+generated_from: HEAD@0fdc277
+coverage: 540
 framework_version: 3.47.0
 ---
 
@@ -509,6 +509,7 @@ framework_version: 3.47.0
 - cue-change-reconciliation-specification-2026-09-26 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-10-05 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-10-08 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-2026-10-16 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
 - cue-circulation-is-not-disposition-2026-10-05 --subject--> circulation-is-not-disposition

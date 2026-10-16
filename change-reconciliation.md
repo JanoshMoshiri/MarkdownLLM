@@ -2,7 +2,7 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.8
+version: 1.9
 created: 2026-06-13
 linked_things:
   - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
@@ -218,6 +218,14 @@ hook table; Claude Code today), `mdllm cues --staged` runs before the agent's
   as options, *defer to the seat* among them — and commits again carrying
   the cue and the revisions. `verdict: inflection` records that something
   was revised or ruled; `not-inflection` that every line held.
+- **Where the commit lands.** The hook fires for the session's own
+  repository, but the floor runs in the repository the commit lands in: a
+  session that steps into another workspace (`cd` into a nested clone, or
+  `git -C`) is gated there, and the walk is done there. A session in its own
+  clone is unchanged; a repository with no entry file is not a workspace and
+  is left alone. *(Found 2026-10-15: a framework session's commit in a nested
+  workspace met no gate, because the step read the project repository, which
+  was clean.)*
 - **What does not count.** A change confined to managed generated blocks: the
   generator did that walk (`a-generated-surface-collapses-its-walk`). A change
   that only records a disposition — status, a hold and its reason, a
