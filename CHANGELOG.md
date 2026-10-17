@@ -18,9 +18,18 @@ Prior entries followed [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ---
 
-## [Unreleased]
+## [3.48.0] - 2026-10-17
+
+**Who sits where is on the record, and a clone that is behind can no longer rewrite what a newer one wrote.** The operator asked for evidence rather than opinion about why agent-to-agent loops had been hard to run, and the busiest live workspace's history, read whole at one pinned commit, ranked the causes: clone version drift, turns never published, two agents in one working copy — and only then the turn race a branch per conversation would fix. This release fixes the first three in the substrate, makes the commit gate follow the commit into a nested workspace, and lets the unattended close hand over what it should draft.
+
 
 **The seat, and a conversation is a work item.** The operator asked for evidence rather than opinion, and the busiest live workspace's history was read whole at one pinned commit: three of the four largest causes of agent-to-agent trouble were seats nothing checked — two clones on different framework versions rewriting one generated block in turns, turns committed and never published, two agents in one working copy — and all three were invisible in the record because every agent committed under the operator's identity (`seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15`). **`mdllm seat`** declares a seat in a clone — clone-local config and the clone's git identity — and the session-start digest names it, or asks for it, and names a turn that never left. The entry file records the framework commit that wrote its generated blocks; `domain-kernel`, `refresh`, coherence and doctor refuse to regenerate from a clone that is behind, and read the difference as *behind*, never drift. The ticket is one per work item, `closed` means nothing is owed, and a reopen is a declared edge (`standing-watch.md` → The Ticket; the templates). A loop definition names roles and the actor at each stage, never which agent holds which; two seats is the default shape. Plan `the-seat`; the branch-per-conversation plan follows it. **The commit gate runs where the commit lands:** a session that commits in another workspace (`cd` into a nested clone, `git -C`) is gated there; a session in its own clone is unchanged, and a repository with no entry file is left alone.
+
+**The unattended close drafts.** An unattended close is met once the mechanical band is applied, but it had then hidden the owed list it exists to draft; the first unattended close in a live workspace drafted nothing over a backlog of 67. It now opens with "met for an unattended run; now draft what an attended close would owe" and hands over the list. The next run drafted five decisions and applied none, which closed the reckoning's Phase 3.
+
+**The branch-per-conversation ruling, with its questions left open.** `a2a-conversations-run-on-their-own-branch-2026-10-09` records the operator's ruling and four questions that stay his (what ends a conversation, how it lands, what the branch carries, whether the floor may prepare a clean merge), with the evidence read against each. Its plan now follows `the-seat`.
+
+**Upgrading.** Pull 3.48.0 into every clone of a workspace's framework **before** any clone regenerates the workspace's entry file: the guard protects only the clones that have it. No generated block's output changes in this release, so a clone still on 3.47.0 writes the same bytes until it pulls. Then `mdllm refresh`, and in each clone that takes turns in a loop, once: `mdllm seat . --set <actor> --agent <harness>`.
 
 ## [3.47.0] - 2026-10-08
 

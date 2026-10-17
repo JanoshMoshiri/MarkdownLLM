@@ -2,7 +2,7 @@
 id: the-seat
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-10-15
 session: 2026-10-15
 priority: critical
@@ -86,10 +86,13 @@ block's output before the next release.
       the seat's upstream. (The doorbell phase of the branch plan moves
       here.) *Done when two seats in one clone's working copies each hold
       their own watch.*
-- [ ] **Phase 5 — The entry file says it.** At the next release, and only
-      then, the generated session-start block gains one line: declare your
-      seat before taking a turn. Until every clone has the guard, a changed
-      block restarts the fight the guard ends.
+- [ ] **Phase 5 — The entry file says it.** The generated session-start
+      block gains one line: declare your seat before taking a turn. Not in
+      3.48.0, the release that carries the guard — a clone still on 3.47.0
+      has no guard and would rewrite the changed block in turns; in the
+      release after, once every clone that takes turns has pulled 3.48.0.
+      *(Corrected 2026-10-17 at the release: the first wording said "at the
+      next release", which is the one release this must not be.)*
 - [ ] **Phase 6 — See.** Two weeks after the release carrying the guard:
       every clone that takes turns has a declared seat (the digest says),
       no generated block has been rewritten in turns, and `git log` in the
