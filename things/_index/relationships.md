@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-17
-generated: 2026-10-17T02:05:07
-generated_from: HEAD@2a0657a
-coverage: 557
+generated: 2026-10-17T03:11:07
+generated_from: HEAD@2c95b3f
+coverage: 558
 framework_version: 3.48.0
 ---
 
@@ -1417,6 +1417,13 @@ framework_version: 3.48.0
 - retrospective-specification --complements--> derived-index-specification
 - retrospective-specification --complements--> change-reconciliation-specification
 - retrospective-specification --implements--> llm-driven-systems-manifesto
+- review-critical-comparison-2026-10-17-claude --informs--> evidence-and-eval-backlog
+- review-critical-comparison-2026-10-17-claude --informs--> session-start-hardening
+- review-critical-comparison-2026-10-17-claude --supports--> emitted-content-is-read-instructed-content-is-economised
+- review-critical-comparison-2026-10-17-claude --supports--> felt-deployment-lands-in-undisclosable-work
+- review-critical-comparison-2026-10-17-claude --references--> framework-retrospective-2026-10
+- review-critical-comparison-2026-10-17-claude --references--> harness-native-onramp-supersedes-desktop
+- review-critical-comparison-2026-10-17-claude --references--> llm-driven-systems-manifesto
 - review-external-conflict-lifecycle-2026-09-08 --informs--> circulation-is-not-disposition
 - review-external-conflict-lifecycle-2026-09-08 --references--> belief-revision-specification
 - review-external-conflict-lifecycle-2026-09-08 --references--> retrospective-specification
