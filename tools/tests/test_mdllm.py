@@ -1731,8 +1731,10 @@ def test_scaffold_deploys_slash_commands(tmp_path):
     _git_repo(tmp_path)
     target = tmp_path / "client-y"
     mdllm.cmd_scaffold(_ns(path=str(target), harness="claude"))
+    assert (target / ".claude" / "commands" / "orient.md").is_file()
     assert (target / ".claude" / "commands" / "end-session.md").is_file()
     assert (target / ".claude" / "commands" / "retrospective.md").is_file()
+    assert (target / ".github" / "prompts" / "orient.prompt.md").is_file()
     assert (target / ".github" / "prompts" / "end-session.prompt.md").is_file()
 
 

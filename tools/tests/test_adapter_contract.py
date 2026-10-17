@@ -160,6 +160,34 @@ def test_scaffold_commands_are_template_copies(tmp_path):
         assert copy.read_bytes() == (src_dir / copy.name).read_bytes()
 
 
+def test_posix_launcher_embeds_the_one_sh_runtime_policy():
+    """tools/mdllm.sh carries `hook_contract.SH_RESOLVE` verbatim — the same
+    candidate walk the installed hooks embed — so a shell line that must run
+    before an agent reads anything (the /orient command's `!` blocks) selects
+    its interpreter the way the floor does, and there is one owner."""
+    from markdownllm.hook_contract import SH_RESOLVE
+    launcher = (FW_ROOT / "tools" / "mdllm.sh").read_text(encoding="utf-8")
+    assert SH_RESOLVE in launcher
+    assert launcher.startswith("#!/bin/sh\n")
+    assert "\r" not in launcher            # sh rejects CRLF line endings
+
+
+def test_framework_root_shortcuts_are_template_copies():
+    """The framework root is itself a domain of the framework: its own
+    .claude/commands and .github/prompts are the templates byte-for-byte,
+    exactly as a scaffolded domain's are."""
+    pairs = {
+        FW_ROOT / ".claude" / "commands": FW_ROOT / "templates" / "commands",
+        FW_ROOT / ".github" / "prompts": FW_ROOT / "templates" / "copilot-prompts",
+    }
+    for deployed_dir, src_dir in pairs.items():
+        deployed = sorted(p.name for p in deployed_dir.glob("*.md"))
+        assert deployed == sorted(p.name for p in src_dir.glob("*.md"))
+        for name in deployed:
+            assert (deployed_dir / name).read_bytes() == \
+                (src_dir / name).read_bytes(), name
+
+
 def test_scaffold_completion_guidance_frozen(tmp_path, capsys):
     _scaffold(tmp_path)
     out = capsys.readouterr().out

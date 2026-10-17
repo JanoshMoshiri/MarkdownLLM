@@ -6,31 +6,36 @@ description: End-of-session continuity ritual — deliberate, operator-invoked
 Run the **session-end continuity ritual** for this domain — and only because the
 operator chose to end here. This is deliberate by design: insights are harvested
 when *you* judge the session worth it, never automatically. Follow
-`templates/prompts/session-end-continuity.md`:
+`{framework_root}/templates/prompts/session-end-continuity.md`:
 
 1. Scan this session for insights worth preserving → create `type: insight` things.
-2. **Disposition the standing insights and open conflicts (the brake):** run
-   `python tools/mdllm.py validate .` and act on every
-   insight-disposition *and* conflict-disposition finding — insights: promote,
-   dismiss, consolidate, link from live work, or mark `disposition: keep-active`
-   + a reason; conflicts: rule (superseded / both-valid / dismissed → `status:
-   resolved`), link from the work that will resolve it, or mark `disposition:
-   keep-active` + a reason naming what would resolve it. Capture (steps 1 and 3)
-   grows both populations; this prunes them, so they stay balanced.
+2. **The close — reckon what the workspace carries (the brake):** run
+   `python {framework_root}/tools/mdllm.py reckon . --close --apply`. The floor
+   applies the mechanical band and lists what this close owes, oldest first:
+   the residue (at most four) goes to the operator as one set of questions,
+   *not now* among the options and recorded as a hold; the settled items you
+   decide by citing the record — insights: promote, dismiss, consolidate, link
+   or hold; conflicts: rule, link or hold; cues: walk or answer by citation;
+   fired triggers: act, re-date or disarm; work: start, unblock, pause or hold;
+   workflows: write or bind. A hold is `mdllm reckon . --keep <id> --reason "…"`.
+   Raise a cue for any reasoned-from thing you modified that no cue covers. The
+   close is met when the mechanical band is applied and ten decisions are
+   recorded today while a backlog stands, or the band is emptied — no gate
+   enforces it in this harness, so run `--close` again before you commit.
 3. Detect contradictions introduced this session → create `type: conflict` things.
 4. Manage **open-loop things** — create/update a `plan` or work thing for new forward
    intent, move resolved ones to a terminal status (orient reads them; `continuity.md`
    is retired).
 5. Commit with a rich `session-end:` message — the commit *is* the backward record
    (no WORKLOG file; `mdllm worklog` prints an on-demand view of git when wanted).
-6. **Report publication debt:** run `python tools/mdllm.py estate-sync . --status`
-   and surface the result. Where a repo declares literal `git.autopush: true`,
-   every `ahead +n (unpushed)` line is an anomaly — an offline session or a
-   rejected push owed a routing decision. Otherwise autopush is off (it is
-   fail-closed) and the line is expected debt awaiting the operator's
-   deliberate push. Route each line; never resolve a rejection by force, and never push
-   an opted-out repo yourself (git-workflow.md → The Outbound Rules;
-   `autopush-moves-the-deliberate-act`).
+6. **Report publication debt:** run `python {framework_root}/tools/mdllm.py
+   estate-sync . --status` and surface the result. Under literal
+   `git.autopush: true`, `ahead +n (unpushed)` is an anomaly — an offline session
+   or rejected push owed a routing decision. Under false, absent, or malformed
+   policy it is expected debt awaiting a human-authorized push. Route each line;
+   never resolve a rejection by force and never infer send authority from silence
+   (git-workflow.md → The Outbound Rules;
+   `autopush-requires-explicit-authority`).
 
 If the session has no domain-relevant changes worth harvesting, say so and stop —
 not every session earns an insight (publication debt still gets reported: step 6

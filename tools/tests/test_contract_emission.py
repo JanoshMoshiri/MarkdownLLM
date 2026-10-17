@@ -127,6 +127,47 @@ def test_runner_channel_defers_kernel_loudly(pristine, capsys, monkeypatch):
     assert "sha256" in out and "END TO END" in out
 
 
+def test_kernel_mode_emits_only_the_kernel_block(pristine, capsys,
+                                                 monkeypatch):
+    """`--kernel` is the first half of a two-block injection (a slash
+    command's `!` blocks are bounded one at a time, and the single emission
+    sat 2.8k under that bound on 2026-10-17): the kernel with its trailer,
+    no ritual, and no attestation — the ritual half attests."""
+    monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
+    assert mdllm.cmd_session_start(_ns(path=str(pristine), kernel=True)) == 0
+    out = capsys.readouterr().out
+    assert "Framework Operative Kernel" in out
+    assert "[kernel emitted whole —" in out
+    assert "MarkdownLLM — Session Start" not in out
+
+
+def test_digest_mode_attests_a_separate_kernel(mutable, capsys, monkeypatch):
+    """`--digest` is the second half: the ritual without the kernel body,
+    step 1 naming the trailer to CHECK in the block before it (never a read
+    to perform), and the attestation saying where the kernel went."""
+    monkeypatch.delenv("MDLLM_LIFECYCLE_CHANNEL", raising=False)
+    assert mdllm.cmd_session_start(_ns(path=str(mutable), digest=True)) == 0
+    out = capsys.readouterr().out
+    assert out.startswith("# MarkdownLLM — Session Start")
+    assert "## The operative kernel" not in out
+    assert "emitted in its own block" in out
+    assert "sha256" in out and "integrity trailer" in out
+    attest = _attest(mutable).strip()
+    assert " kernel=separate" in attest
+    assert " delivery=kernel-separate" in attest
+    # A split emission is not a partial one: the strict gate stays clear.
+    assert mdllm.cmd_validate(_ns(path=str(mutable), quiet=True)) == 0
+    capsys.readouterr()
+
+
+def test_split_modes_are_exclusive(pristine, capsys):
+    assert mdllm.cmd_session_start(
+        _ns(path=str(pristine), kernel=True, digest=True)) == 2
+    assert mdllm.cmd_session_start(
+        _ns(path=str(pristine), contract=True, digest=True)) == 2
+    capsys.readouterr()
+
+
 def test_derived_list_cannot_be_short(mutable, capsys):
     """A file landing under skills/ or prompts/ appears in the next emission
     with no other change — the list is derived, so it cannot drift."""

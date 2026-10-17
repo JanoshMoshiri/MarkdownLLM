@@ -597,7 +597,18 @@ optional. Substrate reconciliation, 2026-08-09.)*
 (session-start-hardening Phase 4).** The framework root now routes it
 through an explicitly-invoked **`orient`** bound prompt — session-end's
 symmetry — invoked by the operator or by the agent when intent first
-touches domain state. The digest absorbed the computable cores (velocity
+touches domain state. Since 2026-10-17 the invocation has a typed form
+where the harness has one: **`/orient`** (`templates/commands/orient.md`,
+projected beside `/end-session` and `/retrospective`) runs `session-start
+--kernel` and `session-start --digest` as two `!` blocks whose output
+replaces the commands before the model reads the prompt — emission on a
+channel that carries the whole, where the SessionStart hook's
+`additionalContext` is capped at 10,000 characters against a
+27,000-character emission and delivers the digest cut and the kernel
+deferred. The split exists because the command channel bounds each block
+at roughly 30,000 characters and the single emission sat 2,800 under it.
+The first typed run (2026-10-17, the build session) landed both whole —
+delivery evidence, not adherence. The digest absorbed the computable cores (velocity
 trend, stall lines, fired triggers, self-answering cues, and — since the cue
 carrier — the reconciliation cues still waiting for a human verdict), and five-run
 evidence showed the un-pulled judgement residue does not run at t=0 on any

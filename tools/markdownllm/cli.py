@@ -290,6 +290,16 @@ def build_cli() -> argparse.ArgumentParser:
                          "injection for harnesses where no entry-file "
                          "discovery exists; too large for hook budgets, "
                          "so hook bindings never pass it")
+    ss.add_argument("--kernel", action="store_true",
+                    help="emit ONLY the operative kernel block with its "
+                         "integrity trailer — the first half of a two-block "
+                         "injection (a slash command's `!` blocks are bounded "
+                         "one at a time; the whole emission sits just under "
+                         "that bound); no ritual, no attestation")
+    ss.add_argument("--digest", action="store_true",
+                    help="emit ONLY the ritual digest, attesting that the "
+                         "kernel went in its own block — the second half; "
+                         "step 1 names the trailer to check, not a read to do")
     ss.add_argument("--assert-head", metavar="FULL_SHA",
                     help="before writing from a significant/full-corpus read, "
                          "assert that its emitted full base commit is still HEAD; "

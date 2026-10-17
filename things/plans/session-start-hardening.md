@@ -2,7 +2,7 @@
 id: session-start-hardening
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-08-19
 priority: high
 tags: [session-start, tier-0, emission, kernel, gates, adapters, hardening, evidence]
@@ -39,9 +39,10 @@ linked_things:
 ## Current purpose
 
 Tier 0 is now delivered as content or loudly deferred, its computable digest
-is mechanical, and the remaining judgement has an explicit `orient` pull. The
-plan remains open because changed delivery/attestation definitions require
-fresh product events; deterministic tests cannot accept their own harness
+is mechanical, and the remaining judgement has an explicit `orient` pull —
+typed as `/orient` in Claude Code since 2026-10-17 (Phase 6). The plan
+remains open because changed delivery/attestation definitions require fresh
+product events; deterministic tests cannot accept their own harness
 projection.
 
 The detailed baseline predictions, phase diaries and reconciliation notes are
@@ -135,6 +136,43 @@ semantics and remains historical.
   Do not build it merely because the mechanism is imaginable.
 - [ ] Reconcile specs/docs/generated kernel, add the release changelog/version,
   and offer per-domain refresh rather than silently migrating the estate.
+
+## Phase 6 — the typed pull (2026-10-17)
+
+The operator reported the hook-delivered session start "loads in, but never
+seems to get read". The record, measured rather than argued:
+
+- [x] **The channel.** Claude Code caps a hook's `additionalContext` at
+  10,000 characters, with no setting to raise it; the session-start emission
+  measured 27,203 (kernel 22,208 + digest 4,995). The runner's fair-share
+  bound therefore cut the digest mid-bullet on every line while deferring the
+  kernel — the complaint was the channel, not the model. Re-running the
+  command by hand restores the whole, and that is an *instruction*: the form
+  this plan's own insight says is economised.
+- [x] **`/orient`** — `templates/commands/orient.md`, projected beside
+  `/end-session` and `/retrospective`: two `!` blocks (`session-start
+  --kernel`, `session-start --digest`) whose output replaces the commands
+  before the model reads the prompt, then the four-step walk as the turn's
+  instruction — emission for the content, a pull for the act. The split keeps
+  each block under the command channel's ~30,000-character bound (the single
+  emission sat 2,800 under it; one busy digest would have overflowed to a
+  file plus a 2,000-character preview, the hook's failure again).
+  `tools/mdllm.sh` carries the hooks' interpreter walk verbatim so the `!`
+  line never assumes `python` has PyYAML; the attestation records
+  `kernel=separate delivery=kernel-separate`. Copilot twin:
+  `orient.prompt.md` (instruction, since that surface has no injection).
+- [x] **First typed run** (the build session, Claude Code 2.1.283): kernel
+  block landed with its trailer (106 lines, sha256 aaf8444534c1), digest with
+  no `[truncated]` marker. Delivery evidence — `emitted`, `received-whole` by
+  inspection — not adherence.
+- [ ] **Acceptance:** the next cold session that types `/orient` performs the
+  four-step walk unbidden and reports in the operator's words; a session that
+  does not type it still gets the hook's bounded digest and owes the read.
+  Record exact build and consequence here; Phase 5's ladder then re-runs with
+  this route as the Claude Code arm.
+- [ ] **Retune the hook's share** so the 5k digest lands whole and only the
+  kernel is deferred — today `_bounded_structurally` (`lifecycle_runner.py`)
+  cuts both.
 
 ## Exit condition
 

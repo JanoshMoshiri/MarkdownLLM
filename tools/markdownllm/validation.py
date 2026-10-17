@@ -1395,8 +1395,10 @@ def session_gate_findings(root: Path, corpus: Corpus) -> list[Finding]:
                         f"{SESSION_GATE_WINDOW_HOURS}h) — this session opened on "
                         "yesterday's contract; " + remedy)]
     # The kernel token (session-start-hardening Phase 2): the emitter records
-    # what it DID with the kernel — whole:<sha>:<lines> / deferred (hook
-    # channel, by design) / elided / absent. `elided` means the emission ran
+    # what it DID with the kernel — whole:<sha>:<lines> / separate (emitted
+    # in its own block of the same command: `session-start --kernel` ahead
+    # of `--digest`, the /orient route) / deferred (hook channel, by design)
+    # / elided / absent. `elided` means the emission ran
     # but the kernel did not land whole (the remote Cowork evidence: a
     # truncated emission cleared this gate's timestamp-only check unseen).
     # Deliberately a Warning in BOTH modes, never a strict Error: the remedy

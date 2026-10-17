@@ -427,8 +427,9 @@ class ClaudeCodeAdapter:
     def scaffold_guidance(self) -> str:
         return ("  - Claude Code lifecycle hardened out of the box: "
                 ".claude/settings.json fires session-start + post-write "
-                "validation automatically; /end-session + /retrospective "
-                "shortcuts are installed. VS Code Copilot lifecycle remains "
+                "validation automatically; /orient + /end-session + "
+                "/retrospective shortcuts are installed. VS Code Copilot "
+                "lifecycle remains "
                 "separately unverified. Delete .claude/ to fall back to "
                 "interpretation-only — the domain kernel still drives both.")
 

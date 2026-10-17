@@ -742,6 +742,24 @@ def cmd_session_start(args) -> int:
     # too small); this mode exists for bootstraps and adapterless harnesses
     # where nothing injects the entry file.
     emit_contract = bool(getattr(args, "contract", False))
+    # --kernel / --digest: the one emission split in two, for a channel whose
+    # inline ceiling sits just above the whole — a Claude Code slash command
+    # injects each `!` block separately (~30k characters apiece), and the
+    # single emission measured 27.2k on 2026-10-17 with one busy digest
+    # between it and the overflow-to-file that recreates the hook channel's
+    # failure. `--kernel` is content only: no ritual, no attestation.
+    # `--digest` is the ritual, attesting that the kernel went in its own
+    # block — step 1 names the trailer to check, never a read to perform.
+    kernel_only = bool(getattr(args, "kernel", False))
+    digest_only = bool(getattr(args, "digest", False))
+    if sum((emit_contract, kernel_only, digest_only)) > 1:
+        print("mdllm: --contract, --kernel and --digest are separate modes — "
+              "pass one")
+        return 2
+    if kernel_only:
+        block, _ = _kernel_emission(domain)
+        print("\n".join(block))
+        return 0
 
     # The kernel is EMITTED, not instructed, on every channel that can carry
     # it whole — the five-run baseline (session-start-hardening Phase 0):
@@ -762,6 +780,8 @@ def cmd_session_start(args) -> int:
         out += contract_block
         contract_prefix_lines = len(contract_block)
         _, kernel_state = _kernel_emission(domain)
+    elif digest_only:
+        kernel_state = "separate"
     elif runner_channel:
         kernel_state = "deferred"
     else:
@@ -782,6 +802,21 @@ def cmd_session_start(args) -> int:
                      f"anything below: {lines_n} lines, sha256 {digest}. "
                      f"A read that cannot account for both did not land "
                      f"whole.")
+        else:
+            step1 = (f"1. Load `{kernel_ref}` (operative kernel) — MISSING; "
+                     f"regenerate at the framework root (`mdllm kernel`).")
+    elif kernel_state == "separate":
+        kernel_file = _kernel_path()
+        if kernel_file.is_file():
+            lines_n, digest = _kernel_integrity(
+                kernel_file.read_text(encoding="utf-8"))
+            step1 = (f"1. The operative kernel was emitted in its own block "
+                     f"ahead of this digest (`session-start --kernel`) — "
+                     f"loaded if that block ends with its integrity trailer "
+                     f"({lines_n} lines, sha256 {digest}); if the trailer is "
+                     f"missing or a [truncated] marker appears in it, read "
+                     f"`{kernel_ref}` END TO END before acting on anything "
+                     f"below.")
         else:
             step1 = (f"1. Load `{kernel_ref}` (operative kernel) — MISSING; "
                      f"regenerate at the framework root (`mdllm kernel`).")
@@ -995,6 +1030,8 @@ def cmd_session_start(args) -> int:
 
     text = "\n".join(out)
     delivery_state: str | None = None
+    if digest_only:
+        delivery_state = "kernel-separate"
     if emit_contract:
         # Receipt path (cowork-remote-phase5-evidence-2026-08-19 F1/F2): a
         # harness may preview-truncate a large emission in its transcript

@@ -220,6 +220,12 @@ trace, and everything else is refinement.
   settings remain untouched unless their operator reviews and explicitly runs
   `adapter-install --refresh-legacy`; extensions and ambiguity still refuse.
   Copilot lifecycle compatibility remains a separate unverified claim.
+- **`/orient` is the typed session start.** The startup hook's channel is
+  capped at 10,000 characters, so what it delivers is the digest cut and the
+  kernel deferred; typing `/orient` injects both whole and then walks the
+  judgement half — what the stalls mean, which triggers the floor could not
+  judge, what to look at first. Make it the first thing you type in a session
+  that will touch domain state.
 - **Your scaffolded domain is born without publication authority.** Its
   AGENTS.md literally declares `git.autopush: false`, and false, absence, or a
   malformed value are all off. If automatic publication is the deliberate

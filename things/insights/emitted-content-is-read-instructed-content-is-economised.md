@@ -2,7 +2,7 @@
 id: emitted-content-is-read-instructed-content-is-economised
 type: insight
 status: active
-version: 1.3
+version: 1.4
 created: 2026-08-18
 session: 2026-08-18
 source: both
@@ -142,6 +142,24 @@ whole receipt, observed reading, applied evidence, and validated outcome are
 separate states. This does not satisfy the insight's behavioural dismissal
 condition. Fresh exact-build Claude, Codex, and Cowork runs remain the evidence
 owners for whether whole emitted content is read and applied in each product.
+
+**2026-10-17 — the channel measured, the typed pull built.** The operator
+reported the hook-delivered session start "loads in, but never seems to get
+read". Measured: Claude Code caps a hook's `additionalContext` at 10,000
+characters with no setting to raise it; the emission was 27,203 (kernel
+22,208 + digest 4,995), so the runner's fair-share bound cut the digest
+mid-bullet on every line and deferred the kernel. That is this insight's
+second clause turned against the agent by the channel: emission that cannot
+land whole degrades to an instruction to re-run, and the instruction is
+economised (the build session's author re-ran it by hand; most sessions will
+not). The remedy follows the first clause: `/orient`
+(`templates/commands/orient.md`) injects the kernel and the digest as two
+`!` blocks whose output replaces the commands before the model reads the
+prompt, then carries the judgement walk as the turn's instruction — emission
+for the content, a pull for the act (`session-start-hardening` Phase 6).
+First typed run: both blocks landed whole. The dismissal condition's
+behavioural half now has a route that can produce its evidence; it has not
+yet produced it.
 
 Dismissal condition: superseded when the adapters emit Tier-0 content **and
 fresh exact-build evidence shows the content-level variance disappears** (the

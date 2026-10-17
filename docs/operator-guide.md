@@ -92,7 +92,10 @@ delivery and mechanical-result facts, not proof the agent read or applied the
 contract. `doctor`, the session attestation, and the probe ladder below keep
 those evidence levels separate. The conversation can still feel ordinary; the
 important difference is that missing or partial startup is named rather than
-promoted to adherence.
+promoted to adherence. When the hook's channel has cut the digest — it is
+capped at 10,000 characters and the emission is near three times that —
+`/orient` is the typed route: the kernel and digest injected whole, then the
+judgement walk the hook never performs.
 
 *Specs: `orchestration.md` (hard hooks), `kernel.md`, `trigger-specification.md`.*
 
@@ -251,7 +254,7 @@ hook, CI, or the agent — but all of them are yours to invoke directly.
 | `runtime-probe` | `mdllm runtime-probe [path]` | report, per interpreter candidate, whether it exists and whether the floor's dependency loads — the reproducible runtime check for any harness's shell (framework root or a directly opened nested domain) |
 | `scaffold` | `mdllm scaffold [--harness {all,claude,claude-code,codex,cowork,none,openclaw,perplexity}] [--autopush {true,false}] path` | deterministic domain birth: templates, nested repo, .gitignore isolation, hook, first commit |
 | `seat` | `mdllm seat [--set ACTOR] [--agent AGENT] [--email EMAIL] [--clear] [path]` | the seat: which agent sits in this clone, under which git identity, and whether a turn it committed never left — read-only; `--set <actor>` declares the seat (clone-local config and the clone's git identity; nothing outside the clone changes), `--clear` withdraws it |
-| `session-start` | `mdllm session-start [--contract] [--assert-head FULL_SHA] [path]` | emit the session-start ritual (version + velocity) for a harness startup hook to inject |
+| `session-start` | `mdllm session-start [--contract] [--kernel] [--digest] [--assert-head FULL_SHA] [path]` | emit the session-start ritual (version + velocity) for a harness startup hook to inject |
 | `tokens` | `mdllm tokens [path]` | measure spec token costs by tier |
 | `touchpoints` | `mdllm touchpoints id [path]` | Assimilate beat: what a thing's change disturbs (declared edges + literal refs) |
 | `triggers` | `mdllm triggers [--estate] [path]` | evaluate trigger conditions; --estate sweeps every local clone with a roll-up (run after estate-sync) |
@@ -303,7 +306,7 @@ line, or a line for a subcommand that no longer exists, is a coherence Error.
 - **`runtime-probe`** — When `doctor` says the floor's interpreter or dependency resolution is unclear on this machine or in this harness shell. Rarely by hand.
 - **`scaffold`** — Creating a new domain: the mechanical half is one command. Omit `--harness` at a keyboard and it asks; headless it refuses with the list — there is no default. `none` proves the substrate does not depend on an adapter. Publication defaults to false; only a literal `--autopush true` enables sends.
 - **`seat`** — The first thing an agent does on arriving in a clone that takes turns in a loop: `--set <actor> --agent <harness>` says who sits here, and from then on every commit from this clone says so, which is the only way the loop's record can tell your agents apart. Run plain to see the seat and whether a turn committed here never reached the remote; the session-start digest says the same without being asked.
-- **`session-start`** — A configured adapter runs the ritual for you on an evidenced harness; by hand in any harness without one. `--assert-head <full-sha>` immediately before applying a full-corpus or other long-read result — it refuses if HEAD moved.
+- **`session-start`** — A configured adapter runs the ritual for you on an evidenced harness; by hand in any harness without one. In Claude Code, type `/orient`: it injects the kernel and the digest whole (`--kernel` and `--digest`, one `!` block each) where the startup hook's channel cuts them, then walks the judgement half. `--assert-head <full-sha>` immediately before applying a full-corpus or other long-read result — it refuses if HEAD moved.
 - **`tokens`** — Checking session-cost impact after spec edits.
 - **`reckon`** — When you want to see what the workspace is carrying that it could let go of: every active insight, open conflict, open cue, fired trigger and stalled plan, each with a proposed disposition and why, in three bands. The floor's band it can apply; the agent's it decides by citing the record; yours is the residue, and a healthy workspace shows an empty one. Every session end runs `--close`: the floor's band applied, then ten decisions a day from the oldest, so a backlog shrinks without ever arriving as a wall — your share, at most four, comes as one multiple-choice prompt, and *not now* is an answer. `--keep` holds an item with its reason and a date to look again; `--imports` adds the mirrors.
 - **`workflows`** — When you want to see how work actually flows in the workspace: each workflow with the things currently at each of its stages, and where practice has left the path. `--emergent` shows the processes the record says you keep doing that nobody wrote down, and which of your existing definitions already describe them; you rarely need it, because the agent writes them on its own.

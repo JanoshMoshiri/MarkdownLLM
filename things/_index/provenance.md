@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-17
-generated: 2026-10-17T02:05:07
-generated_from: HEAD@2a0657a
+generated: 2026-10-17T09:04:54
+generated_from: HEAD@cc0f502
 coverage: 129
 framework_version: 3.48.0
 ---
@@ -270,8 +270,10 @@ framework_version: 3.48.0
 - cue-cross-domain-handoff-is-verified-external-input-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-cue-carrier-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-emitted-content-is-read-instructed-content-is-economised-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-estate-workflow-derivation-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-evidence-and-eval-backlog-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-first-hour-guide-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-framework-map-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-framework-retrospective-2026-09-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-git-workflow-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -281,6 +283,8 @@ framework_version: 3.48.0
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-mechanical-coherence-checks-backlog-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-mechanical-coherence-checks-backlog-2026-09-15 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-operator-guide-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-orchestration-specification-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -292,6 +296,7 @@ framework_version: 3.48.0
 - cue-thing-specification-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-validate-thing-specification-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-workflow-state-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-workflow-state-specification-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -571,15 +576,20 @@ framework_version: 3.48.0
 - cue-consistency-is-maintained-at-change-not-by-sweeping-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-cross-domain-handoff-is-verified-external-input-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-cue-carrier-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-emitted-content-is-read-instructed-content-is-economised-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-estate-mechanics-guide-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-estate-mechanics-guide-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-feels-automatic-is-persistence-of-the-question-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-first-hour-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-git-workflow-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-inflection-candidates-are-computable-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-operator-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-orchestration-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-the-reckoning-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-validate-thing-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - workflows-emerge-from-use-2026-10-07 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 
