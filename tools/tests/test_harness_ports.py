@@ -312,10 +312,14 @@ def test_lifecycle_bindings_own_arguments_delivery_and_order():
     assert all(step.argv == (hp.DOMAIN_ROOT_ARG,) for step in start.steps)
     assert tuple(step.protected_seconds for step in start.steps) == (75, 25)
     assert tuple(step.protected_characters for step in start.steps) == \
-        (450, 1450)
+        (450, 6000)
     assert start.total_timeout_seconds == 105
     assert start.runner_reserve_seconds == 5
-    assert start.output_limit_characters == 2200
+    # The startup-context envelope: under Claude Code's 10,000-character
+    # cap on a hook's additionalContext, with the digest's measured ~5,000
+    # and the sync report's ~1,700 (2026-10-17) landing whole inside it.
+    assert start.output_limit_characters == \
+        hp.STARTUP_CONTEXT_CHARACTERS == 9800
     assert start.output_reserve_characters == 200
     assert start.delivery == "context"
 

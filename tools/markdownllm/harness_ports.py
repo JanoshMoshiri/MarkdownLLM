@@ -45,6 +45,17 @@ LIFECYCLE_APPLICATION_SECONDS = 105
 LIFECYCLE_RUNNER_RESERVE_SECONDS = 5
 LIFECYCLE_OUTPUT_CHARACTERS = 2200
 LIFECYCLE_OUTPUT_RESERVE_CHARACTERS = 200
+# The startup-context envelope. Claude Code caps a hook's `additionalContext`
+# at 10,000 characters, measured per string, with no setting to raise it
+# (code.claude.com/docs/en/hooks; measured 2026-10-17 — a longer string is
+# swapped for a file path and a 2,000-character preview, which the model is
+# not asked to read). The session-start digest measured ~5,000 and the
+# estate-sync report ~1,700 the same day, and the 2,200-character envelope
+# above cut the digest mid-bullet on every line (session-start-hardening
+# Phase 6). 200 under the cap: the margin for a harness that counts UTF-16
+# units where this counts code points. The kernel (~22,000) is still
+# deferred on this channel — session.py reads MDLLM_LIFECYCLE_CHANNEL.
+STARTUP_CONTEXT_CHARACTERS = 9_800
 
 
 @dataclass(frozen=True)
@@ -139,6 +150,12 @@ class LifecycleBinding:
 # lands. It guards the agent's tool call; the git hook stays the boundary for
 # every commit, from any hand.
 LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
+    # Output on a context delivery is allocated reader-first — the last
+    # step is the one the model acts on, so it takes what it needs before
+    # the estate-sync report takes the rest, never below each step's
+    # protected share (lifecycle_runner.py → _labelled). 450 keeps the
+    # sync report's heading, its counts line and the first attention lines
+    # when a busy digest leaves it nothing else.
     LifecycleBinding(
         moment="session-start",
         steps=(LifecycleStep(
@@ -146,8 +163,9 @@ LIFECYCLE_BINDINGS: tuple[LifecycleBinding, ...] = (
                    protected_characters=450),
                LifecycleStep(
                    "session-start", protected_seconds=25,
-                   protected_characters=1450)),
+                   protected_characters=6000)),
         delivery="context",
+        output_limit_characters=STARTUP_CONTEXT_CHARACTERS,
     ),
     LifecycleBinding(
         moment="post-write",

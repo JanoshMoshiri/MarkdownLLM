@@ -114,3 +114,37 @@ framework commit and a real, automatically dispatched large-domain
 SessionStart transcript demonstrates every orientation section under the
 bound, correlated with a fresh current-definition attestation. No earlier
 attestation is reused.
+
+## 2026-10-18 — the startup-context envelope
+
+The 2,200-character envelope and the fair share above held for the
+feedback and gate deliveries and were wrong for the one delivery the model
+acts on. Measured 2026-10-17 at the framework root: the session-start
+digest is ~5,000 characters and the estate-sync report ~1,700, under a
+Claude Code hook channel that caps `additionalContext` at 10,000; the runner
+nonetheless cut the digest mid-bullet on every line, the kernel already
+deferred. Retuned in the `floor:` commit of 2026-10-18 (session-start-hardening
+Phase 6):
+
+- the `session-start` binding's envelope is 9,800 characters
+  (`harness_ports.STARTUP_CONTEXT_CHARACTERS`, 200 under the cap), reserve
+  200, protected shares 450 for estate-sync and 6,000 for the digest; the
+  other bindings keep 2,200;
+- a `context` delivery is allocated reader-first — the last step takes what
+  it needs, the earlier step takes the rest, never below a waiting step's
+  protected share — and a step is cut on its tail, on whole lines, with one
+  `[truncated]` marker (`lifecycle_runner._bounded_tail`); feedback and gate
+  keep the declared order and the structural fair share;
+- on the runner channel `estate-sync` orders its report for that cut:
+  heading and a counts line as one section, attention lines, quiet lines
+  last;
+- Codex's `additionalContextLimit` is 5,000 — a token threshold in Codex's
+  documentation, which the "2,500-character" readings above misstated; the
+  earlier value was safe only while the envelope was 2,200 characters;
+- the pre-change gated projection is frozen as `legacy-gated-v1`, and the
+  two-moment legacies now render from frozen bindings rather than the live
+  ones, which this change caught drifting.
+
+Live proof the same day, the hook command run as `.claude/settings.json`
+carries it: every digest bullet landed uncut, no marker, the envelope under
+the cap. The sections above stand as the 2026-08-16 acceptance record.

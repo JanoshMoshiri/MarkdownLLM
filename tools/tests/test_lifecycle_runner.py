@@ -7,6 +7,7 @@ harness event, touching a Git directory, or creating project ``.codex`` state.
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from dataclasses import replace
@@ -197,47 +198,188 @@ def test_output_limit_is_strict_and_keeps_every_step_attributable(
     assert "truncated" in result.text
 
 
-def test_large_orientation_keeps_every_structural_section_and_later_share(
-        tmp_path, monkeypatch):
-    estate = (
-        "## Estate Sync — 14 repositories\n\n"
-        + "\n".join(f"- repository-{index}: up-to-date" for index in range(13))
-        + "\n- repository-14: DIVERGED — operator attention required\n\n"
-        + "This listing remains available from mdllm estate-sync.")
-    orientation = "\n".join((
-        "# Session Start",
+# ------------------------------------------------ the startup-context share
+# The session-start binding since 2026-10-18 (session-start-hardening Phase
+# 6): a 9,800-character envelope under Claude Code's 10,000-character cap on a
+# hook's additionalContext, allocated reader-first — the digest takes what it
+# needs, the sync report takes the rest — and cut on whole trailing lines with
+# one marker. The 2,200-character envelope before it cut a ~5,000-character
+# digest mid-bullet on every line (measured 2026-10-17).
+
+_UPCOMING = ("- **Upcoming (within 30d — not yet fired) (2):**\n"
+             "    - `the-reckoning`: time condition '2026-10-19 reached'"
+             " - fires in 1d\n"
+             "    - `the-seat`: time condition '2026-10-29 reached'"
+             " - fires in 11d")
+
+
+def _digest(at_least: int) -> str:
+    """A session-start digest in its emitted shape — the heading, the
+    numbered steps, then `- **Heading:**` sections in attention order with
+    nested bullets, 'Upcoming' last — grown past ``at_least`` characters."""
+    head = "\n".join((
+        "# MarkdownLLM — Session Start (run before the user's first request)",
         "",
-        "- **Version:** framework and domain are in sync. " + "v" * 500,
-        "- **Velocity:** recent committed movement is visible. " + "m" * 500,
-        "- **Open loops (20):** forward work remains.\n"
-        + "    - " + "open-loop-detail " * 80,
-        "- **Triggers fired (13):** operator attention is required.\n"
-        + "    - " + "trigger-detail " * 100,
+        "The live request will pull you toward itself; do these first:",
+        "1. **Kernel NOT emitted** (hook channel budget) — read `kernel.md`"
+        " END TO END before acting on anything below.",
+        "",
+        "- **Significant-read base:** `commit:" + "e" * 40 + "` — pin any"
+        " full-corpus read to these immutable bytes.",
+        "",
+    ))
+    sections: list[str] = []
+    while len(head) + sum(len(s) + 1 for s in sections) < at_least:
+        index = len(sections)
+        sections.append(
+            f"- **Section {index} ({index}):** attention line {index}\n"
+            f"    - `thing-{index:03d}` (plan, in-progress) untouched {index}d")
+    return head + "\n".join(sections) + "\n" + _UPCOMING
+
+
+def _sync_report(repos: int) -> str:
+    """The estate-sync report in its runner-channel shape (sync.py): the
+    heading and counts line as one section, the attention lines, the quiet
+    lines, the closing line."""
+    attention = "\n".join(
+        f"- `repo-{index:02d}`: fetch-failed — undiagnosed (remote:"
+        " Repository not found.) — orienting from last-fetched state"
+        for index in range(repos - 2))
+    quiet = ("- `quiet-repo-a`: up-to-date\n"
+             "- `quiet-repo-b`: local-only")
+    return "\n".join((
+        f"## Estate Sync — estate ({repos} repo(s))",
+        f"{repos} repo(s): {repos - 2} fetch-failed · 1 local-only"
+        " · 1 up-to-date — attention first, quiet last",
+        "", attention, "", quiet, "",
+        "This is a batch of per-repo reads — ephemeral, never an index."
+        " Sync before orienting.",
     ))
 
+
+def _run_session_start(tmp_path, monkeypatch, *, digest: str, sync: str):
     def fake_run(command, **kwargs):
         return _completed(
-            command, stdout=(estate if command[2] == "estate-sync"
-                             else orientation))
+            command, stdout=(sync if command[2] == "estate-sync" else digest))
 
     monkeypatch.setattr(lr.subprocess, "run", fake_run)
     binding = HarnessContext(".").binding("session-start")
     result = lr.execute_lifecycle(tmp_path, binding)
+    sync_block, digest_block = result.text.split(
+        "\n\n[session-start: exit 0]\n")
+    sync_block = sync_block.split("[estate-sync: exit 0]\n", 1)[1]
+    return binding, result, sync_block, digest_block
 
-    assert len(result.text) <= binding.output_limit_characters == 2200
-    assert "[estate-sync: exit 0]" in result.text
-    assert "[session-start: exit 0]" in result.text
-    assert "DIVERGED" in result.text
-    for heading in ("**Version:**", "**Velocity:**", "**Open loops (20):**",
-                    "**Triggers fired (13):**"):
-        assert heading in result.text
-    assert "[truncated]" in result.text
-    assert len(CODEX.format_lifecycle_output(
-        "session-start", result.text, True)) <= 2500
+
+def _whole_lines_of(block: str, original: str) -> bool:
+    """Every line of a cut block is a whole line of what was emitted —
+    nothing cut mid-bullet — except the one marker."""
+    emitted = set(original.splitlines())
+    return all(line in emitted for line in block.splitlines()
+               if line != "[truncated]")
+
+
+def test_startup_context_lands_the_digest_and_the_sync_report_whole(
+        tmp_path, monkeypatch):
+    digest = _digest(5000)
+    sync = _sync_report(18)
+    assert 5000 <= len(digest) <= 5400 and 1900 <= len(sync) <= 2300
+
+    binding, result, sync_block, digest_block = _run_session_start(
+        tmp_path, monkeypatch, digest=digest, sync=sync)
+
+    assert len(result.text) <= binding.output_limit_characters == 9800
+    assert result.text.startswith("[steps: estate-sync=0, session-start=0]\n")
+    assert digest_block == digest and sync_block == sync
+    assert "[truncated]" not in result.text
+    # Claude's envelope carries the text as one additionalContext string,
+    # which is what the 10,000-character cap measures.
+    envelope = json.loads(CLAUDE_CODE.format_lifecycle_output(
+        "session-start", result.text, True))
+    assert envelope["hookSpecificOutput"]["additionalContext"] == result.text
+    assert len(envelope["hookSpecificOutput"]["additionalContext"]) <= 10_000
     # Presentation is bounded; execution evidence retains the complete raw
     # output so compaction never reclassifies omitted text as disposable.
-    assert result.steps[0].stdout == estate
-    assert result.steps[1].stdout == orientation
+    assert result.steps[0].stdout == sync
+    assert result.steps[1].stdout == digest
+
+
+def test_busy_digest_is_cut_on_whole_trailing_lines_with_one_marker(
+        tmp_path, monkeypatch):
+    digest = _digest(12_000)
+    sync = _sync_report(16)
+
+    binding, result, sync_block, digest_block = _run_session_start(
+        tmp_path, monkeypatch, digest=digest, sync=sync)
+
+    assert len(result.text) <= binding.output_limit_characters
+    # The digest took first: the leading sections whole, in order, and the
+    # cut on a whole line at the tail — one marker, last.
+    assert digest_block.count("[truncated]") == 1
+    assert digest_block.endswith("\n[truncated]")
+    assert digest_block.startswith(digest[:600])
+    assert _whole_lines_of(digest_block, digest)
+    assert len(digest_block) >= 9000
+    assert "**Upcoming" not in digest_block  # the trailing section, whole
+    # The sync report gave way first — down to its protected share, which
+    # keeps the heading, the counts line and the first attention lines.
+    assert sync_block.count("[truncated]") == 1
+    assert sync_block.startswith(
+        "## Estate Sync — estate (16 repo(s))\n16 repo(s): 14 fetch-failed")
+    assert _whole_lines_of(sync_block, sync)
+    assert len(sync_block) < 600  # its 450 share plus what the digest left
+    assert "quiet-repo" not in sync_block
+
+
+def test_sync_report_is_compressed_before_the_digest_is_cut(
+        tmp_path, monkeypatch):
+    # Together over the envelope; the digest alone fits. The digest lands
+    # whole and the sync report loses its quiet tail, on whole lines.
+    digest = _digest(8000)
+    sync = _sync_report(16)
+    assert len(digest) + len(sync) > 9600
+
+    binding, result, sync_block, digest_block = _run_session_start(
+        tmp_path, monkeypatch, digest=digest, sync=sync)
+
+    assert len(result.text) <= binding.output_limit_characters
+    assert digest_block == digest
+    assert sync_block.count("[truncated]") == 1
+    assert sync_block.endswith("\n[truncated]")
+    assert sync_block.startswith("## Estate Sync — estate (16 repo(s))\n")
+    assert "- `repo-00`: fetch-failed" in sync_block
+    assert "quiet-repo" not in sync_block
+    assert _whole_lines_of(sync_block, sync)
+
+
+@pytest.mark.parametrize("limit", [0, 1, 8, 13, 40, 90, 200, 400])
+def test_tail_bound_never_overruns_and_never_cuts_a_kept_line(limit):
+    text = _sync_report(6)
+    bounded = lr._bounded_tail(text, limit)
+    assert len(bounded) <= limit
+    if limit >= 100:  # past the degenerate budget: whole lines, one marker
+        assert bounded.count("[truncated]") == 1
+        assert _whole_lines_of(bounded, text)
+    assert lr._bounded_tail(text, len(text)) == text
+
+
+def test_feedback_delivery_keeps_the_fair_share_across_findings(
+        tmp_path, monkeypatch):
+    # A findings list has no order of importance: every section keeps a
+    # share, as before (post-write validate, the gate's cues).
+    findings = "\n\n".join(
+        f"## Finding {index}\n" + f"detail-{index} " * 60 for index in range(6))
+
+    monkeypatch.setattr(
+        lr.subprocess, "run",
+        lambda command, **kwargs: _completed(command, stdout=findings))
+    binding = HarnessContext(".").binding("post-write")
+    result = lr.execute_lifecycle(tmp_path, binding)
+
+    assert len(result.text) <= binding.output_limit_characters == 2200
+    for index in range(6):
+        assert f"## Finding {index}" in result.text
+    assert result.text.count("[truncated]") == 6
 
 
 @pytest.mark.parametrize("limit", [0, 1, 8, 31])
@@ -445,9 +587,10 @@ def test_dispatch_uses_declared_output_port_without_hidden_name_dependency(
 def test_attestation_failure_is_bounded_attributable_and_advisory(
         tmp_path, monkeypatch):
     adapter = _OutputAdapter()
+    binding = HarnessContext(".").binding("session-start")
     prefix = "[steps: estate-sync=0, session-start=0]\n"
-    long_text = prefix + "x" * (2200 - len(prefix))
-    assert len(long_text) == 2200
+    long_text = prefix + "x" * (binding.output_limit_characters - len(prefix))
+    assert len(long_text) == binding.output_limit_characters
     monkeypatch.setattr(
         lr, "execute_lifecycle",
         lambda root, binding: _execution(text=long_text),
@@ -465,7 +608,7 @@ def test_attestation_failure_is_bounded_attributable_and_advisory(
     # The first pure formatting pass precedes evidence.  Evidence failure then
     # produces one final envelope containing the advisory failure.
     _, text, passed = adapter.calls[-1]
-    assert len(text) <= 2200
+    assert len(text) <= binding.output_limit_characters
     assert text.startswith("[steps: estate-sync=0, session-start=0]\n")
     assert "attestation unavailable" in text
     assert passed is False

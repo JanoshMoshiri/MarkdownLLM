@@ -92,10 +92,10 @@ delivery and mechanical-result facts, not proof the agent read or applied the
 contract. `doctor`, the session attestation, and the probe ladder below keep
 those evidence levels separate. The conversation can still feel ordinary; the
 important difference is that missing or partial startup is named rather than
-promoted to adherence. When the hook's channel has cut the digest — it is
-capped at 10,000 characters and the emission is near three times that —
-`/orient` is the typed route: the kernel and digest injected whole, then the
-judgement walk the hook never performs.
+promoted to adherence. The hook's channel carries the digest but never the
+kernel — it is capped at 10,000 characters and the kernel alone is more than
+twice that — so `/orient` is the typed route: the kernel and digest injected
+whole, then the judgement walk the hook never performs.
 
 *Specs: `orchestration.md` (hard hooks), `kernel.md`, `trigger-specification.md`.*
 

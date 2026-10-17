@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-17
-generated: 2026-10-17T09:04:54
-generated_from: HEAD@cc0f502
-coverage: 563
+created: 2026-10-18
+generated: 2026-10-18T00:54:57
+generated_from: HEAD@611ed8e
+coverage: 566
 framework_version: 3.48.0
 ---
 
@@ -559,6 +559,7 @@ framework_version: 3.48.0
 - cue-first-hour-guide-2026-09-13 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-09-15 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-10-17 --subject--> first-hour-guide
+- cue-first-hour-guide-2026-10-18 --subject--> first-hour-guide
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-framework-map-2026-09-19 --subject--> framework-map
@@ -606,6 +607,7 @@ framework_version: 3.48.0
 - cue-operator-guide-2026-10-08 --subject--> operator-guide
 - cue-operator-guide-2026-10-15 --subject--> operator-guide
 - cue-operator-guide-2026-10-17 --subject--> operator-guide
+- cue-operator-guide-2026-10-18 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -616,6 +618,7 @@ framework_version: 3.48.0
 - cue-orchestration-specification-2026-10-05 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-10-08 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-10-17 --subject--> orchestration-specification
+- cue-orchestration-specification-2026-10-18 --subject--> orchestration-specification
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 --subject--> protecting-one-budget-displaces-the-failure-into-the-other

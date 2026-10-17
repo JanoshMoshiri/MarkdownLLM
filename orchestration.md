@@ -604,8 +604,12 @@ projected beside `/end-session` and `/retrospective`) runs `session-start
 replaces the commands before the model reads the prompt — emission on a
 channel that carries the whole, where the SessionStart hook's
 `additionalContext` is capped at 10,000 characters against a
-27,000-character emission and delivers the digest cut and the kernel
-deferred. The split exists because the command channel bounds each block
+27,000-character emission and delivers the digest with the kernel
+deferred — the digest whole since 2026-10-18: the runner's startup-context
+envelope is 9,800 characters, allocated to the digest before the sync
+report, and a busy digest is cut on whole trailing lines with one marker
+rather than mid-bullet on every line, as the 2,200-character envelope had
+done. The split exists because the command channel bounds each block
 at roughly 30,000 characters and the single emission sat 2,800 under it.
 The first typed run (2026-10-17, the build session) landed both whole —
 delivery evidence, not adherence. The digest absorbed the computable cores (velocity

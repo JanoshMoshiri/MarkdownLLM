@@ -26,15 +26,20 @@ from markdownllm import harness_ports as hp  # noqa: E402
 from markdownllm import lifecycle_runner as lr  # noqa: E402
 from markdownllm.adapter_install import (  # noqa: E402
     apply_install, preflight_install, target_for_adapter)
-from markdownllm.adapters.claude_code import CLAUDE_CODE, SETTINGS_PATH  # noqa: E402
+from markdownllm.adapters.claude_code import (  # noqa: E402
+    CLAUDE_CODE, SETTINGS_PATH, _legacy_2200_bindings)
 from markdownllm.adapters.codex import CODEX, HOOKS_PATH  # noqa: E402
 from markdownllm.adapters.project_hook_emission import (  # noqa: E402
     LEGACY_SH_RESOLVE_V2)
 from markdownllm.hook_contract import SH_RESOLVE  # noqa: E402
 
 CTX = hp.HarnessContext("../..")
-TWO = hp.HarnessContext("../..", bindings=(
-    CTX.binding("session-start"), CTX.binding("post-write")))
+# The pre-gate seat: the two moments over the frozen 2,200-character
+# bindings — not the live ones, whose session-start envelope grew on
+# 2026-10-18.
+TWO = hp.HarnessContext("../..", bindings=tuple(
+    binding for binding in _legacy_2200_bindings()
+    if binding.moment in ("session-start", "post-write")))
 FW_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -71,8 +76,13 @@ def test_claude_renders_a_pretooluse_group_on_the_shell_tools():
 
 
 def test_the_two_older_moments_render_byte_identical_to_the_pre_gate_shape():
+    # The gate's group is additive: the other two render as they would
+    # without it — over the LIVE bindings, since the claim is about the
+    # gate, not the envelope (the frozen TWO is the historical seat).
+    two_live = hp.HarnessContext("../..", bindings=(
+        CTX.binding("session-start"), CTX.binding("post-write")))
     gated = json.loads(CLAUDE_CODE.render(CTX)[SETTINGS_PATH])["hooks"]
-    before = json.loads(CLAUDE_CODE.render(TWO)[SETTINGS_PATH])["hooks"]
+    before = json.loads(CLAUDE_CODE.render(two_live)[SETTINGS_PATH])["hooks"]
     assert gated["SessionStart"] == before["SessionStart"]
     assert gated["PostToolUse"] == before["PostToolUse"]
     assert set(gated) == {"SessionStart", "PostToolUse", "PreToolUse"}
@@ -263,6 +273,49 @@ def test_legacy_two_moment_v1_projection_is_frozen_migration_input():
         assert (len(projection), hashlib.sha256(projection).hexdigest()) == frozen
 
 
+def test_legacy_gated_v1_projection_is_frozen_migration_input():
+    # The gated generation with the 2,200-character envelope: what every
+    # seat carried from the gate (2026-10-05) to the startup-context
+    # envelope (2026-10-18). Frozen the day the envelope moved.
+    expected = {
+        ".": (7589, "a54eab8a2dfb826d0c3b05bb3aa491d627f4057df45750fb76a387b5be4b5318"),
+        "../..": (7601, "c464d1aee91a578bedbe85e8097aacf5099d9a4bd5bb1b529385138d3c3afdd5"),
+    }
+    for framework_root_rel, frozen in expected.items():
+        definitions = CLAUDE_CODE.legacy_definitions(
+            hp.HarnessContext(framework_root_rel=framework_root_rel))
+        projection = next(item.owned_fragment for item in definitions
+                          if item.legacy_id == "legacy-gated-v1")
+        assert b"PreToolUse" in projection
+        assert (len(projection), hashlib.sha256(projection).hexdigest()) == frozen
+
+
+def test_gated_seat_with_the_old_envelope_is_recognised_and_refreshes(tmp_path):
+    definitions = CLAUDE_CODE.legacy_definitions(CTX)
+    fragment_bytes = next(item.owned_fragment for item in definitions
+                          if item.legacy_id == "legacy-gated-v1")
+    dst = tmp_path / SETTINGS_PATH
+    dst.parent.mkdir(parents=True)
+    installed = {"permissions": {"allow": ["Bash(git add *)"]}}
+    installed.update(json.loads(fragment_bytes))
+    dst.write_text(json.dumps(installed, indent=2) + "\n", encoding="utf-8")
+
+    fragment = CLAUDE_CODE.inspect(tmp_path, CTX).fragments[0]
+    assert fragment.present and fragment.current is False
+    assert fragment.legacy_id == "legacy-gated-v1"
+
+    target = target_for_adapter(CLAUDE_CODE, CTX)
+    assert preflight_install(tmp_path, [target]).refused
+    plan = preflight_install(tmp_path, [target], refresh_legacy=True)
+    assert not plan.refused, plan.decisions
+    assert [(d.path, d.action) for d in plan.decisions] == [(SETTINGS_PATH, "refresh")]
+    apply_install(plan)
+    after = json.loads(dst.read_text(encoding="utf-8"))
+    assert after["permissions"] == {"allow": ["Bash(git add *)"]}  # untouched
+    assert after["hooks"] == json.loads(CLAUDE_CODE.render(CTX)[SETTINGS_PATH])["hooks"]
+    assert CLAUDE_CODE.inspect(tmp_path, CTX).fragments[0].current is True
+
+
 def test_v1_generation_seat_is_recognised_and_refreshes_into_the_gated_shape(tmp_path):
     definitions = CLAUDE_CODE.legacy_definitions(CTX)
     fragment_bytes = next(item.owned_fragment for item in definitions
@@ -294,7 +347,8 @@ def test_v1_generation_seat_is_recognised_and_refreshes_into_the_gated_shape(tmp
 
 def test_pre_gate_seat_is_recognised_and_refreshes_into_the_gated_shape(tmp_path):
     # Today LEGACY_SH_RESOLVE_V2 is the live fragment, so a two-binding render
-    # IS the projection every seat carried until the gate.
+    # over the frozen 2,200-character bindings IS the projection every seat
+    # carried until the gate.
     assert LEGACY_SH_RESOLVE_V2 == SH_RESOLVE
     dst = tmp_path / SETTINGS_PATH
     dst.parent.mkdir(parents=True)

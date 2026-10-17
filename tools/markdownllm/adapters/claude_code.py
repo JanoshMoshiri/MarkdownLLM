@@ -40,8 +40,9 @@ from pathlib import Path
 from ..adapter_install import LegacyDefinition, TopLevelJsonFragmentPolicy
 from ..harness_diagnostics import AdapterProbe, managed_definition_hash
 from ..harness_ports import (
-    HANDLER_TIMEOUT_SECONDS, AdapterCapabilities, DiagnosticPresentation,
-    HarnessContext, InspectionReport, LifecycleBinding, ManagedFragment,
+    DOMAIN_ROOT_ARG, HANDLER_TIMEOUT_SECONDS, AdapterCapabilities,
+    DiagnosticPresentation, HarnessContext, InspectionReport,
+    LifecycleBinding, LifecycleStep, ManagedFragment,
 )
 from .project_hook_emission import LEGACY_SH_RESOLVE_V2, gate_envelope
 from .project_hook_emission import (
@@ -115,6 +116,45 @@ _ROOT_POWERSHELL_POST_WRITE = (
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" validate . --quiet')
 _LEGACY_ROOT_FIXED_STEP_V1 = Path(__file__).with_name("legacy") / \
     "claude-hooks-root-fixed-step-v1.json"
+
+
+def _legacy_2200_bindings() -> tuple[LifecycleBinding, ...]:
+    """The bindings as every seat carried them from the allocation contract
+    (2026-08-16) to the startup-context envelope (2026-10-18): every
+    envelope at 2,200 characters, session-start's split 450 for estate-sync
+    and 1,450 for the digest. The gate (2026-10-05) added the third moment
+    without touching the first two, so the two-moment legacies render from
+    the same tuple. Literals, not the live constants — recognition data must
+    not drift with the renderer (the lesson of the frozen resolve fragments,
+    relearned here the day the envelope moved: the two-moment legacies had
+    been reading the live bindings and their frozen hashes broke)."""
+    return (
+        LifecycleBinding(
+            moment="session-start",
+            steps=(LifecycleStep("estate-sync", protected_seconds=75,
+                                 protected_characters=450),
+                   LifecycleStep("session-start", protected_seconds=25,
+                                 protected_characters=1450)),
+            delivery="context", total_timeout_seconds=105,
+            runner_reserve_seconds=5, output_limit_characters=2200,
+            output_reserve_characters=200),
+        LifecycleBinding(
+            moment="post-write",
+            steps=(LifecycleStep("validate", (DOMAIN_ROOT_ARG, "--quiet"),
+                                 protected_seconds=100,
+                                 protected_characters=1900),),
+            delivery="feedback", total_timeout_seconds=105,
+            runner_reserve_seconds=5, output_limit_characters=2200,
+            output_reserve_characters=200),
+        LifecycleBinding(
+            moment="pre-commit",
+            steps=(LifecycleStep("cues", (DOMAIN_ROOT_ARG, "--staged"),
+                                 protected_seconds=100,
+                                 protected_characters=1900),),
+            delivery="gate", total_timeout_seconds=105,
+            runner_reserve_seconds=5, output_limit_characters=2200,
+            output_reserve_characters=200),
+    )
 
 
 class ClaudeCodeAdapter:
@@ -232,19 +272,36 @@ class ClaudeCodeAdapter:
                     {"hooks": historical["hooks"]},
                     separators=(",", ":")) + "\n").encode("utf-8"),
             ))
+        # The gated generation (2026-10-05 → 2026-10-18): the three moments
+        # over the v2 fragment with the 2,200-character envelope, before the
+        # session-start envelope grew to carry the digest whole. Recognised
+        # so a seat refreshes with an explicit, reviewed `--refresh-legacy`
+        # rather than being refused as merely stale.
+        gated_v1_definition = LegacyDefinition(
+            legacy_id="legacy-gated-v1",
+            path=SETTINGS_PATH,
+            owned_fragment=(json.dumps(
+                {"hooks": self._hooks(
+                    HarnessContext(context.framework_root_rel,
+                                   bindings=_legacy_2200_bindings()),
+                    resolve_fragment=LEGACY_SH_RESOLVE_V2)},
+                separators=(",", ":")) + "\n").encode("utf-8"),
+        )
         definitions.append(output_tail_definition)
         definitions.append(two_moment_v1_definition)
         definitions.append(two_moment_v2_definition)
+        definitions.append(gated_v1_definition)
         return tuple(definitions)
 
     def _two_moment_hooks(self, context: HarnessContext,
                           resolve_fragment: str, *,
                           include_output: bool) -> dict:
         """The managed hooks of a pre-gate projection: the two legacy
-        moments only, rendered with a frozen resolve fragment. Recognition
-        data — the gate's own group never appears here."""
+        moments only, rendered with a frozen resolve fragment over the
+        frozen 2,200-character bindings. Recognition data — the gate's own
+        group never appears here."""
         hooks: dict = {}
-        for binding in context.bindings:
+        for binding in _legacy_2200_bindings():
             if binding.moment not in _LEGACY_MOMENTS:
                 continue
             event = _DELIVERY_EVENT[binding.delivery]
@@ -389,18 +446,28 @@ class ClaudeCodeAdapter:
             "timeout": HANDLER_TIMEOUT_SECONDS,
         }
 
-    def render(self, ctx: HarnessContext) -> dict[str, bytes]:
+    def _hooks(self, ctx: HarnessContext, *,
+               resolve_fragment: str | None = None) -> dict:
+        """The managed hook groups: one handler per binding, each entering
+        the neutral runner once; a gate's group carries its matcher. The
+        live projection passes no fragment; a frozen legacy passes its own."""
         hooks: dict = {}
         for binding in ctx.bindings:
             event = _DELIVERY_EVENT[binding.delivery]
             handler = self._handler(
-                ctx, binding.moment, self._definition_hash(ctx, binding))
+                ctx, binding.moment,
+                self._definition_hash(ctx, binding,
+                                      resolve_fragment=resolve_fragment),
+                resolve_fragment=resolve_fragment)
             group: dict = {"hooks": [handler]}
             matcher = _group_matcher(binding)
             if matcher is not None:
                 group = {"matcher": matcher, "hooks": [handler]}
             hooks.setdefault(event, []).append(group)
-        payload = json.dumps({"hooks": hooks}, indent=2) + "\n"
+        return hooks
+
+    def render(self, ctx: HarnessContext) -> dict[str, bytes]:
+        payload = json.dumps({"hooks": self._hooks(ctx)}, indent=2) + "\n"
         return {SETTINGS_PATH: payload.encode("utf-8")}
 
     # ------------------------------------------------- shortcut projections

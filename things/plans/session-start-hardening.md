@@ -2,7 +2,7 @@
 id: session-start-hardening
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-08-19
 priority: high
 tags: [session-start, tier-0, emission, kernel, gates, adapters, hardening, evidence]
@@ -170,9 +170,31 @@ seems to get read". The record, measured rather than argued:
   does not type it still gets the hook's bounded digest and owes the read.
   Record exact build and consequence here; Phase 5's ladder then re-runs with
   this route as the Claude Code arm.
-- [ ] **Retune the hook's share** so the 5k digest lands whole and only the
-  kernel is deferred — today `_bounded_structurally` (`lifecycle_runner.py`)
-  cuts both.
+- [x] **Retune the hook's share** (2026-10-18) — the cut was the runner's
+  own envelope, not the channel: `LifecycleBinding.output_limit_characters`
+  was 2,200 for every moment, so the digest arrived cut at a fifth of a cap
+  it fitted under with room. The `session-start` binding now declares a
+  9,800-character envelope (`harness_ports.STARTUP_CONTEXT_CHARACTERS`, 200
+  under Claude's cap), allocated reader-first — the digest takes what it
+  needs, the sync report takes the rest, never below a waiting step's
+  protected share (450 / 6,000) — and a step is cut on its tail, on whole
+  lines, with one `[truncated]` marker (`lifecycle_runner._bounded_tail`);
+  feedback and gate keep the 2,200 fair share. On the runner channel
+  `estate-sync` orders its report for that cut: heading and a counts line as
+  one section, attention lines, quiet lines last. Codex's
+  `additionalContextLimit` moved to 5,000 — a token threshold in its docs,
+  misread as characters since 2026-08-16. The pre-change gated projection is
+  frozen as `legacy-gated-v1` (the two-moment legacies now render from frozen
+  bindings too — this change caught them reading the live ones) and the
+  root's hooks were refreshed through it (`adapter-install --harness
+  claude-code --refresh-legacy`; session-start definition `sha256:6cbcf5cf…`).
+  **Live proof**, the SessionStart command run exactly as
+  `.claude/settings.json` carries it, Claude Code 2.1.283 at HEAD 611ed8e:
+  `additionalContext` 7,155 characters, no `[truncated]` marker, all 50
+  digest bullets byte-identical to a fresh `session-start` run, the kernel
+  deferral line intact. Delivery evidence — the digest lands whole and only
+  the kernel is deferred — not adherence; the acceptance bullet above still
+  owns that.
 
 ## Exit condition
 

@@ -156,6 +156,40 @@ def _bounded_structurally(text: str, limit: int) -> str:
         for section, section_limit in zip(sections, limits))
 
 
+_TAIL_MARKER = _TRUNCATION_MARKER.rstrip("\n")
+
+
+def _bounded_tail(text: str, limit: int) -> str:
+    """Bound one step's body by cutting its tail on whole lines.
+
+    Keeps the longest leading run of whole lines that fits with one marker
+    after it — the bytes of the body as emitted, then the marker; everything
+    past the cut is dropped whole, trailing sections first. Nothing is cut
+    mid-line: a bullet the model reads is a bullet that was emitted, and the
+    one marker is the token `_bounded` writes, so a reader checking for it
+    checks once. The policy for a body emitted in attention order (the
+    session-start digest: the read base, version, seat, velocity, stalls,
+    loops, cues, the reckoning, fired triggers, then what is upcoming; the
+    runner-channel sync report: counts, attention lines, quiet lines). When
+    not even the first line fits, the edge-retaining bound takes over — the
+    degenerate budget, not the policy.
+    """
+    if limit < 0:
+        raise ValueError("output limit must be non-negative")
+    if len(text) <= limit:
+        return text
+    budget = limit - len(_TAIL_MARKER)
+    cut = 0  # the end of the last whole line that fits before the marker
+    for line in text.splitlines(keepends=True):
+        if cut + len(line.rstrip("\r\n")) > budget:
+            break
+        cut += len(line)
+    kept = text[:cut].rstrip("\r\n")
+    if not kept:
+        return _bounded(text, limit)
+    return kept + _TAIL_MARKER
+
+
 def _scaled_protections(protections: tuple[int, ...], available: int) \
         -> tuple[int, ...]:
     total = sum(protections)
@@ -174,7 +208,30 @@ def _scaled_protections(protections: tuple[int, ...], available: int) \
 
 def _labelled(steps, bodies: tuple[str, ...] | str, limit: int,
               binding: LifecycleBinding | None = None) -> str:
-    """Render bounded labelled output, reserving every declared later share."""
+    """Render bounded labelled output, reserving every declared share.
+
+    Two allocation policies, chosen by the binding's delivery.
+
+    A ``context`` delivery is what the model reads at session start, in the
+    order the steps ran — the prerequisite (estate-sync), then the step the
+    model acts on (session-start's digest). Its output is allocated
+    READER-FIRST: the last step takes what it needs, each earlier step then
+    takes what is left, and no step takes below the protected share of the
+    steps still waiting — so a busy digest lands whole and the sync report
+    is what gives way, down to its heading, its counts line and its first
+    attention lines (sync.py orders the runner-channel report so that is
+    what a tail cut keeps). Inside a step the cut falls on the tail, on
+    whole lines (`_bounded_tail`), because a digest is emitted in attention
+    order and a bullet cut in the middle is read as a bullet. Until
+    2026-10-18 this channel ran the policy below on a 2,200-character
+    envelope and cut the digest mid-bullet on every line
+    (session-start-hardening Phase 6).
+
+    Every other delivery (feedback, gate) is a findings list with no order of
+    importance: allocation follows the declared order, earlier steps inherit
+    unused capacity, and every structural section keeps a fair share
+    (`_bounded_structurally`).
+    """
     if limit < 0:
         raise ValueError("output limit must be non-negative")
     summary = "[steps: " + ", ".join(
@@ -199,20 +256,25 @@ def _labelled(steps, bodies: tuple[str, ...] | str, limit: int,
     available = min(available, scaled_application)
     protections = _scaled_protections(
         tuple(step.protected_characters for step in binding.steps), available)
-    rendered: list[str] = []
+    reader_first = binding.delivery == "context"
+    bound = _bounded_tail if reader_first else _bounded_structurally
+    order = (range(len(bodies) - 1, -1, -1) if reader_first
+             else range(len(bodies)))
+    rendered: list[str] = [""] * len(bodies)
+    waiting = set(range(len(bodies)))
     remaining = available
-    for index, (result, body) in enumerate(zip(steps, bodies)):
-        later_required = sum(protections[index + 1:])
-        step_limit = max(0, remaining - later_required)
+    for index in order:
+        waiting.discard(index)
+        result, body = steps[index], bodies[index]
+        step_limit = max(0, remaining - sum(protections[i] for i in waiting))
         label = f"[{result.operation}: exit {result.returncode}]"
         if step_limit <= len(label):
             block = label[:step_limit]
         elif body:
-            block = label + "\n" + _bounded_structurally(
-                body, step_limit - len(label) - 1)
+            block = label + "\n" + bound(body, step_limit - len(label) - 1)
         else:
             block = label
-        rendered.append(block)
+        rendered[index] = block
         remaining -= len(block)
     return summary + "\n\n".join(rendered)
 
@@ -566,7 +628,8 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
             moment=execution.moment, steps=execution.steps,
             text=_labelled(
                 execution.steps, existing_body + "\n\n"
-                + f"[attestation unavailable: {exc}]", 2200),
+                + f"[attestation unavailable: {exc}]",
+                binding.output_limit_characters),
             passed=False)
         try:
             rendered = adapter.format_lifecycle_output(

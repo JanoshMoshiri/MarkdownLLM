@@ -153,7 +153,9 @@ def test_render_has_one_bounded_cross_platform_handler_per_moment():
         assert handler["type"] == "command"
         assert handler["command"] and handler["commandWindows"]
         assert 0 < handler["timeout"] <= 120
-        assert 0 < handler["additionalContextLimit"] <= 2500
+        # A token threshold in Codex (its docs' SessionStart example sets
+        # 5000); it must carry the 9,800-character startup-context envelope.
+        assert 0 < handler["additionalContextLimit"] <= 5000
         assert "git rev-parse --show-toplevel" in handler["command"]
         windows_payload = _windows_payload(handler["commandWindows"])
         assert "git rev-parse --show-toplevel" in windows_payload

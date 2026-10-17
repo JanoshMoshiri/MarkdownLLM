@@ -221,7 +221,7 @@ trace, and everything else is refinement.
   `adapter-install --refresh-legacy`; extensions and ambiguity still refuse.
   Copilot lifecycle compatibility remains a separate unverified claim.
 - **`/orient` is the typed session start.** The startup hook's channel is
-  capped at 10,000 characters, so what it delivers is the digest cut and the
+  capped at 10,000 characters, so what it delivers is the digest, with the
   kernel deferred; typing `/orient` injects both whole and then walks the
   judgement half — what the stalls mean, which triggers the floor could not
   judge, what to look at first. Make it the first thing you type in a session

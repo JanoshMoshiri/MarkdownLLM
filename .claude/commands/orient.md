@@ -5,7 +5,7 @@ allowed-tools: Bash(sh *)
 
 **Why this is a command.** The startup hook's channel is capped at 10,000
 characters and the session-start emission is near three times that, so the
-hook delivers the digest cut and the kernel deferred — and a read the entry
+hook delivers the digest and defers the kernel — and a read the entry
 file merely *instructs* is economised
 (`emitted-content-is-read-instructed-content-is-economised`). The two blocks
 below ran before you saw this prompt and their output replaced the commands:

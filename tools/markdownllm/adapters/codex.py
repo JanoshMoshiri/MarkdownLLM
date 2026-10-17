@@ -59,7 +59,17 @@ HOOKS_PATH = ".codex/hooks.json"
 CONFIG_PATH = ".codex/config.toml"
 _SESSION_MATCHER = "startup|resume|clear|compact"
 _WRITE_MATCHER = "Edit|Write"
-_CONTEXT_LIMIT = 2500
+# Codex's `additionalContextLimit` is a TOKEN threshold (its docs: "roughly
+# 2,500 tokens" by default; past it the text goes to a file and the model gets
+# a head-and-tail preview). The earlier reading of it as 2,500 characters was
+# safe while the shared envelope was 2,200 characters; the startup-context
+# envelope is now 9,800 (harness_ports.STARTUP_CONTEXT_CHARACTERS), which is
+# under 5,000 tokens of this markdown with room — the value the docs' own
+# SessionStart example sets.
+_CONTEXT_LIMIT = 5000
+# What every historical projection carried; frozen so the legacy definitions
+# below keep reproducing their installs' bytes after the live value moved.
+_LEGACY_CONTEXT_LIMIT = 2500
 _DESCRIPTION = "MarkdownLLM project lifecycle hardening"
 _NON_SEMANTIC_HANDLER_EXTENSIONS = {"statusMessage"}
 _LEGACY_ROOT_V1 = Path(__file__).with_name("legacy") / \
@@ -116,8 +126,10 @@ class CodexAdapter:
                     context, moment,
                     self._definition_hash(
                         context, moment, include_output=False,
-                        resolve_fragment=LEGACY_SH_RESOLVE_V1),
-                    resolve_fragment=LEGACY_SH_RESOLVE_V1)],
+                        resolve_fragment=LEGACY_SH_RESOLVE_V1,
+                        context_limit=_LEGACY_CONTEXT_LIMIT),
+                    resolve_fragment=LEGACY_SH_RESOLVE_V1,
+                    context_limit=_LEGACY_CONTEXT_LIMIT)],
             }]
             for moment, event in _EVENT_BY_MOMENT.items()
         }
@@ -275,7 +287,8 @@ class CodexAdapter:
 
     def _handler(self, context: HarnessContext, moment: str,
                  definition_hash: str, *,
-                 resolve_fragment: str | None = None) -> dict:
+                 resolve_fragment: str | None = None,
+                 context_limit: int = _CONTEXT_LIMIT) -> dict:
         return {
             "type": "command",
             "command": self._event_posix(
@@ -284,12 +297,13 @@ class CodexAdapter:
             "commandWindows": self._event_windows(
                 context, moment, definition_hash),
             "timeout": HANDLER_TIMEOUT_SECONDS,
-            "additionalContextLimit": _CONTEXT_LIMIT,
+            "additionalContextLimit": context_limit,
         }
 
     def _definition_hash(self, context: HarnessContext, moment: str, *,
                          include_output: bool = True,
-                         resolve_fragment: str | None = None) -> str:
+                         resolve_fragment: str | None = None,
+                         context_limit: int = _CONTEXT_LIMIT) -> str:
         """Hash the complete owned definition with a stable hash placeholder.
 
         The literal attestation hash is intentionally excluded from its own
@@ -302,7 +316,8 @@ class CodexAdapter:
             "matcher": (_SESSION_MATCHER if moment == "session-start"
                         else _WRITE_MATCHER),
             "hooks": [self._handler(context, moment, HASH_PLACEHOLDER,
-                                    resolve_fragment=resolve_fragment)],
+                                    resolve_fragment=resolve_fragment,
+                                    context_limit=context_limit)],
         }
         return managed_definition_hash({
             "artifact": HOOKS_PATH,

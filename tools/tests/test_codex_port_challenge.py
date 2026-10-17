@@ -48,7 +48,7 @@ class _CodexShapeProbeRenderer:
                             "mdllm-codex-hook.exe session-start --root "
                             f"{root_windows}"),
                         "timeout": 120,
-                        "additionalContextLimit": 2500,
+                        "additionalContextLimit": 5000,
                     }],
                 }],
                 "PostToolUse": [{
@@ -98,7 +98,7 @@ def test_codex_shape_is_cross_platform_rooted_and_bounded():
         assert "git rev-parse --show-toplevel" in handler["commandWindows"]
         assert handler["timeout"] > 0
     start = config["hooks"]["SessionStart"][0]["hooks"][0]
-    assert 0 < start["additionalContextLimit"] <= 2500
+    assert 0 < start["additionalContextLimit"] <= 5000
 
 
 def test_codex_post_write_uses_documented_alias_and_feedback_channel():

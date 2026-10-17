@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-17
-generated: 2026-10-17T09:04:54
-generated_from: HEAD@cc0f502
+created: 2026-10-18
+generated: 2026-10-18T00:54:58
+generated_from: HEAD@611ed8e
 coverage: 129
 framework_version: 3.48.0
 ---
@@ -274,6 +274,7 @@ framework_version: 3.48.0
 - cue-estate-workflow-derivation-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-evidence-and-eval-backlog-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-first-hour-guide-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-first-hour-guide-2026-10-18 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-framework-map-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-framework-retrospective-2026-09-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-git-workflow-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -284,7 +285,9 @@ framework_version: 3.48.0
 - cue-mechanical-coherence-checks-backlog-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-mechanical-coherence-checks-backlog-2026-09-15 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-operator-guide-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-operator-guide-2026-10-18 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-orchestration-specification-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-orchestration-specification-2026-10-18 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -581,10 +584,13 @@ framework_version: 3.48.0
 - cue-estate-mechanics-guide-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-feels-automatic-is-persistence-of-the-question-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-first-hour-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-first-hour-guide-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-git-workflow-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-inflection-candidates-are-computable-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-operator-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-operator-guide-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-orchestration-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-orchestration-specification-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)

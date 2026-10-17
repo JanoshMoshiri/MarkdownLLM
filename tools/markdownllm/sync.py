@@ -26,8 +26,10 @@ Doctrine, by construction:
 
 from __future__ import annotations
 
+import os
 import re
 import time
+from collections import Counter
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -635,6 +637,22 @@ _LABEL = {
     SyncState.BUDGET_EXHAUSTED: "budget-exhausted",
 }
 
+# The states that ask nothing of the reader. A synced repo MOVED (the moved
+# note names it), an ahead repo is publication debt, and everything else is
+# a failure or a decision — all attention.
+_QUIET_STATES = frozenset({
+    SyncState.UP_TO_DATE, SyncState.LOCAL_ONLY, SyncState.PINNED})
+
+
+def _counts_line(results) -> str:
+    """One line that still answers when the per-repo lines below it have
+    given way: how many repos stand in each state, busiest state first."""
+    counts = Counter(_LABEL[res.state] for res in results)
+    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    return (f"{len(results)} repo(s): "
+            + " · ".join(f"{n} {label}" for label, n in ranked)
+            + " — attention first, quiet last")
+
 
 def cmd_estate_sync(args) -> int:
     root = Path(args.paths[0] if args.paths else ".").resolve()
@@ -650,7 +668,19 @@ def cmd_estate_sync(args) -> int:
     require_fresh = getattr(args, "require_fresh", False)
     fetch = not status_only
     title = "Publication Debt" if status_only else "Estate Sync"
-    print(f"## {title} — {root.name} ({len(repos)} repo(s))\n")
+    heading = f"## {title} — {root.name} ({len(repos)} repo(s))"
+    # The runner channel — a hook's bounded startup context, marked by
+    # MDLLM_LIFECYCLE_CHANNEL (lifecycle_runner.py). There the report is
+    # one step of a budget the digest takes first, and the runner cuts a
+    # step on whole trailing sections; so the channel form is ORDERED FOR
+    # THAT CUT: heading and a counts line as one section, the attention
+    # lines next, the quiet lines last. A manual run keeps the repo-order
+    # list a human scans. Same lines, same vocabulary; only the order and
+    # the counts line differ.
+    runner_channel = (bool(os.environ.get("MDLLM_LIFECYCLE_CHANNEL"))
+                      and not status_only)
+    if not runner_channel:
+        print(heading + "\n")
     deadline = (time.monotonic() + ESTATE_GLOBAL_TIMEOUT) if fetch else None
     # Concurrent per-repo observation: each sync_repo is independent (its own
     # working directory, its own subprocesses, no shared mutable state) and
@@ -665,6 +695,8 @@ def cmd_estate_sync(args) -> int:
             lambda r: sync_repo(r, fetch=fetch, timeout=args.timeout,
                                 deadline=deadline), repos))
     debt = 0
+    attention: list[str] = []
+    quiet: list[str] = []
     for res in results:
         name = res.repo.name
         label = _LABEL[res.state]
@@ -675,9 +707,18 @@ def cmd_estate_sync(args) -> int:
         if status_only and res.state not in {
                 SyncState.AHEAD, SyncState.DIVERGED, SyncState.DIRTY}:
             continue  # debt view: only what the estate cannot see yet
+        if runner_channel:
+            (quiet if res.state in _QUIET_STATES else attention).append(line)
+            continue
         print(line)
         if status_only:
             debt += 1
+    if runner_channel:
+        print(heading)
+        print(_counts_line(results))
+        if attention:
+            print()
+            print("\n".join(attention))
     if status_only:
         if debt == 0:
             print("- nothing unpublished — the estate sees everything committed here")
@@ -717,5 +758,8 @@ def cmd_estate_sync(args) -> int:
     if diverged:
         print(f"\nDIVERGED: {', '.join(diverged)} — route each as a decision "
               f"(git-workflow.md -> The Machine Axis); never auto-merge.")
+    if runner_channel and quiet:
+        print()
+        print("\n".join(quiet))
     print("\nThis is a batch of per-repo reads — ephemeral, never an index. Sync before orienting.")
     return 0
