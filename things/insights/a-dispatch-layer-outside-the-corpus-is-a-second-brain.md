@@ -1,14 +1,13 @@
 ---
 id: a-dispatch-layer-outside-the-corpus-is-a-second-brain
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-08-27
+promoted_to: dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23
 session: 2026-08-27
 source: both
 confidence: high
-disposition: keep-active
-disposition_reason: "Standing razor for every proposal to automate a ritual: the schedule must be things, the tick must be dumb. Met again 2026-09-13 by the proposal to run the retrospective automatically on its 30-day trigger — which passes the razor only as a dated trigger the session reads, never as a scheduler that decides. Promote into orchestration.md's adapter doctrine when a second automation proposal is shaped by it on the record; dismiss if a scheduler outside the corpus is ever ruled acceptable."
 origin: stated
 tags: [dispatcher, closed-loop, scheduling, control-plane, phase-2, design-commitment]
 linked_things:
@@ -103,3 +102,7 @@ Dismissal condition: absorbed when Phase 2's design lands in
 `orchestration.md` (or a dispatch spec) carrying the schedule-is-things rule
 and the corollaries above; refuted if a real estate demonstrates a dispatch
 need that cannot be expressed as declared corpus state.
+
+## Promoted 2026-10-17
+
+The hold asked for a second automation proposal shaped by this razor on the record. The first was the retrospective's cadence (2026-09-13: a dated trigger the session reads, never a scheduler that decides). The second is `dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23`, which cites this insight and rules exactly its shape: one tick per machine, the launch text composed from the corpus by `dispatch-payload`, scope a flag and never a second dispatcher. The tick has since run (digests from 2026-10-04) and done what the razor said it must — start a session and nothing more. Promoted into that decision, where the razor crystallised; the sentence the hold wanted in `orchestration.md`'s adapter doctrine is owed at that spec's next adapter change, recorded in the 2026-10 retrospective.

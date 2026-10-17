@@ -2,7 +2,7 @@
 id: git-workflow-specification
 type: specification
 status: evolving
-version: "1.13"
+version: "1.14"
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -177,12 +177,26 @@ Commit messages in this framework are not about files — they're about domain s
 | `harvest` | Insights extracted mid-session, outside the session-end ritual | `harvest: the insight promotes, and the half of its remedy that was declined says why` |
 | `retrospective` | The retrospective ritual's commit — the thing, the scans, the dispositions | `retrospective: the floor's floor (2026-08-04 → 2026-08-27) — …` |
 | `release` | The version bump — sentinel, CHANGELOG, re-pinned examples; the push is a separate human act | `release: 3.39.0 — a floor that could not see itself …` |
+| `floor` | A floor change short of a new mechanism — a subcommand's new flag, a check's new case, a budget; `floor+spec` when the spec moves in the same commit | `floor: mdllm reckon --close — the mechanical band, then ten decisions a day` |
+| `spec` | A specification revised with no floor change — a section added, a version bumped, the walk done on itself | `spec: change-reconciliation 1.6 → 1.7 — The Walk Runs On Detection` |
+| `harness` | An adapter or lifecycle-hook change — one harness's projection of a floor contract | `harness: the commit gate runs where the commit lands` |
+| `reckon` | The reckoning's mechanical band applied — the `--apply` receipt, committed alone; the dispatcher's tick writes this | `reckon: a plan with every box ticked → completed` |
+| `cue` | A cue raised and answered outside a `reconcile:` pass — one subject, one verdict, cited | `cue: framework-map 2026-10-01 — not-inflection; the spec-edges block regenerated` |
+| `advance` | A plan's phase moved without closing — the half-step `plan:` is too final for | `advance: public-docs-face-build Phase 2 — the switch is thrown` |
+| `close` | A plan, sprint or hold closed on its stated condition | `close: 3.41.0 published — the vendor plan ends` |
+| `correct` | A record amended to say what was true — a decision's wording, a wrong attribution | `correct: the three questions are the operator's and open; his leanings in his words` |
 
 The set is a vocabulary, not a gate: `mdllm worklog` groups by whatever prefix
 the stream uses, and the pre-commit hook does not read it. Rows are added when
 a prefix has earned its place in practice — this table lagged the live stream
 by ten prefixes for weeks (the 2026-09 retrospective's skill-coherence scan
-caught it), which is the drift `review-skill-coherence` exists to read.
+caught it), and by eight more at the 2026-10 retrospective, which is the drift
+`review-skill-coherence` exists to read and the rate at which it recurs. The
+2026-10 stream also carried commits from a second seat — a contributor's
+harness — with no `action:` prefix at all (`"feat:add-…"`, `Fix-domain-…`): a
+convention anchored in interpretation reaches the seat that read it and no
+other, which is one more reason the seat is declared (`mdllm seat`) rather
+than inferred from a commit's style.
 
 ### Multi-Thing Commits
 

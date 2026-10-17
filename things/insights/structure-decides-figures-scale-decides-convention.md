@@ -2,8 +2,10 @@
 id: structure-decides-figures-scale-decides-convention
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-17
+disposition: keep-active
+disposition_reason: "Held 2026-10-17 at the 2026-10 retrospective. The FAC 2x2 result this records is the one eval the framework's central hypothesis rests on, and the entry file's principle 9 says that hypothesis stays a hypothesis until a more discriminating fixture tests it. The eval backlog took the next slot on 2026-10-17 and polar-station-htc is built; re-read when its first guarded run reports — promote into the eval programme's method text if the result holds, revise if it does not. Not promotable to a spec: it is evidence, and the spec that would carry it says the evidence is insufficient."
 confidence: medium
 origin: synthesised
 source: session — sleeping-bag-fac 2×2 (2026-06-16/17, 20 trials + smoke, one leaked trial excluded)

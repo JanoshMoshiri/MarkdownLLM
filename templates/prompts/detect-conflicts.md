@@ -2,7 +2,7 @@
 id: detect-conflicts
 type: prompt
 status: stable
-version: 1.1
+version: 1.2
 created: 2026-05-20
 inputs:
   - name: proposed-change
@@ -68,6 +68,18 @@ Triggered when claims gain weight or at periodic reflection:
   endpoints and check for contradiction. The index keeps this affordable (see
   `derived-index.md`); without it, fall back to a Level 2 load of all things, which is
   why the full sweep is reserved for retrospective cadence.
+
+  *Where the cue carrier has walked the period* — every definition-surface change
+  has an answered cue and `mdllm cues` lists nothing unraised — the sweep may be
+  scoped to the period's delta (the things created or modified since the last
+  retrospective, checked against their neighbours) plus the pairs the composition
+  pre-filter produces (scan 5: insights sharing two or more `linked_things` targets).
+  The delta is where contradiction enters and the pre-filter's pairs are where it
+  hides; the walked cues cover the rest. Record the scoping and its reason in the
+  retrospective. Two retrospectives running (2026-09, 2026-10) took this shape and
+  found what the full walk would have — the scoping was recorded as a deviation on
+  the first sighting and written here on the second. The full edge walk remains
+  the form where no carrier ran.
 
 For any contradiction found in either mode, hand off to `belief-revision.md`: create a
 `type: conflict` thing with `origin: inferred`, `confidence: low`, add `contradicts`

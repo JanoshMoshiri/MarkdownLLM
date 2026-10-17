@@ -1,8 +1,8 @@
 ---
 id: review-skill-coherence
 type: prompt
-status: draft
-version: 1.0
+status: evolving
+version: 1.1
 created: 2026-08-28
 inputs:
   - name: skill-files

@@ -2,8 +2,10 @@
 id: withholding-is-not-isolation
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-06-17
+disposition: keep-active
+disposition_reason: "Held 2026-10-17 at the 2026-10 retrospective. The eval runner now fingerprints the seed tree and stops an arm on mutation (2026-09-22) and the answer-key grant is closed (2026-10-05) — the bare arm's isolation is built on the write side; this insight is about the read side, where a model that goes looking still finds the method. The 2026-10-05 eval direction says the next fixture needs a fair bare arm. Re-read when polar-station-htc's bare arm runs: promote into the eval method text if the bare arm held, revise if a transcript again names what it found."
 confidence: high
 origin: synthesised
 source: session — sleeping-bag-fac opus-bare re-run, trial 20260617-002833 (the agent disclosed the breach in its own transcript)

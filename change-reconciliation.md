@@ -2,7 +2,7 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: 1.9
+version: "1.10"
 created: 2026-06-13
 linked_things:
   - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
@@ -456,6 +456,37 @@ is consequential — those are the semantic and the human layers respectively.
 The floor's job here is to make the agent **unable to not see** the shape of
 what a change disturbs; the judgement of what to do about it stays where it
 belongs.
+
+### The Nets
+
+No single mechanism above catches every way a change can twist a domain,
+because the dependencies a change touches are tiered — declared, literal,
+conceptual — and each tier needs a different tool. Change safety is defence in
+depth: overlapping nets, each cheaper than the one before it, so a miss falls
+through to the next and what survives them all is rare and cheap to catch late
+(`change-safety-is-defense-in-depth`, promoted here 2026-10-17). In order:
+
+1. **Design for change** — one source of truth; link, never restate. Shrinks
+   the dark region before any change is made.
+2. **The structural floor at commit** — `validate`, `coherence`, the
+   candidates advisory: false facts cannot land. Reaches the declared tier.
+3. **The walk gate, where the commit lands** — `cues --staged` behind the
+   harness's pre-tool hook: a definition surface cannot change without its
+   walk on record, and the walk reaches the declared and literal tiers with
+   the agent reading the conceptual one. Binds where an adapter projects
+   `pre-commit`; elsewhere the question is still asked and persisted.
+4. **The cue that waits** — `mdllm cues` and the session-start digest: a
+   modification the gate did not reach (a fan-in subject, a harness with no
+   gate, an unattended run) stays listed until walked.
+5. **The retrospective's backward pass** — scan 4 answers whatever the period
+   left unraised, from a baseline; the net beneath the net.
+6. **The floor's sixty-day cadence check** — fires only when the retrospective
+   itself has not run; the last net, and the quietest.
+
+Each net is labelled with the tier it reaches and the anchor that fires it
+(`orchestration.md` → Anchor decides enforcement). A proposal to add a net is
+read against this list first: which miss does it catch that the net above lets
+through, and which does it hand on?
 
 The Assimilate beat is exposed as a floor affordance twice over: `mdllm
 touchpoints <id>` reports the complete declared inbound set (every reference

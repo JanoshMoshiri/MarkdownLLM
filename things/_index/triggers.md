@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: triggers
 created: 2026-10-17
-generated: 2026-10-17T01:04:10
-generated_from: HEAD@072074c
+generated: 2026-10-17T01:59:15
+generated_from: HEAD@c26ce3b
 coverage: 10
 framework_version: 3.48.0
 ---
@@ -28,9 +28,9 @@ framework_version: 3.48.0
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-10-21 reached, action=Answered 2026-10-08, re-conditioned: the residual 'process gaps ruled by their domains' now has a floor read. `mdllm workflows --emergent` names each workspace's enacted process and the unbound definition that already describes it (`workflows-emerge-from-use-2026-10-07`), and the reckoning hands it to the domain agent. Ask at this date: has a workspace bound or written one, and have the two stale mirrors been re-synced? Earlier: the MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered.
 
-## framework-retrospective-2026-09
+## framework-retrospective-2026-10
 - status: complete  due_date: —
-- trigger: type=time, condition=2026-10-18 reached, action=Answered 2026-10-17 by the operator at the session close: the retrospective runs first thing next session — things/ moved 80 commits since 2026-09-13. The mechanical half at the close: the reckoning held 49 waiting after ten decisions, the cue listing four unraised bookkeeping moves, coherence clean. Earlier: retrospective chase (thirty days from period_end 2026-09-13; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-09-13: run the mechanical scans now, offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own.
+- trigger: type=time, condition=2026-11-16 reached, action=Retrospective chase (thirty days from period_end 2026-10-17; retrospective-cadence-is-a-dated-chase-2026-09-13). If things/ moved since 2026-10-17: run the mechanical scans now (index rebuild, mdllm cues, the reckoning's bands and held reasons), offer the ritual as this session's first item, or — unattended — draft it and file the rulings to the seat. If nothing moved: re-date this chase. Either way, the retrospective that answers it disarms this trigger and arms its own.
 
 ## operator-seat-and-harness-native-onramp
 - status: paused  due_date: —

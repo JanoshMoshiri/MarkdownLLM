@@ -1,15 +1,15 @@
 ---
 id: protecting-one-budget-displaces-the-failure-into-the-other
 type: insight
-status: active
-version: 1.0
+status: dismissed
+version: 1.1
 created: 2026-08-16
 session: 2026-08-16
 source: field
 confidence: medium
 origin: stated
 disposition: keep-active
-disposition_reason: "Checklist razor for any multi-dimensional bound (time / characters / count), dispositioned 2026-09-22. One clean instance, none since. Dismiss at the 2026-10-13 retrospective if no second instance has appeared; promote into the lifecycle runner's budget contract if one has."
+disposition_reason: "Dismissed 2026-10-17 at the 2026-10 retrospective on its own stated condition: one clean instance (2026-08-14/16), and no second appeared in the two periods since. The session-start budget work of 2026-10-07 bounded a scan count and displaced nothing. The lesson is kept by the lifecycle runner's per-step shares, which is where it landed; the insight has nothing left to wait for."
 linked_things:
   - id: the-harness-bound-path-is-the-least-tested-path
     relation: complements
@@ -69,3 +69,7 @@ tests pass, the acceptance record is honest. Nothing about that record is
 wrong — it simply measured the dimension that had just been repaired. The
 displaced failure is only visible where the resource is actually scarce,
 which on this estate meant the two largest domains and nowhere else.
+
+## Dismissed 2026-10-17
+
+On the condition written into its 2026-09-22 hold: no second instance by the next retrospective. The runner's protected per-step share in both dimensions is the lesson built; a razor with one instance and a built remedy has nothing further to watch.

@@ -122,7 +122,17 @@ dormant workspaces.
       insight folded into a skill with `promoted_to` set, tripping the walk
       gate; `retrospective.md` scans 5 and 6 rewritten as reads of the
       reckoning and scan 7's promotion half pointed at it. Done when one
-      insight promoted into a skill trips the walk.
+      insight promoted into a skill trips the walk. *Scope added 2026-10-17
+      at the retrospective: scan 5's composition pre-filter (insights sharing
+      two or more `linked_things` targets, weighted so a shared specification
+      counts for less than a shared insight or decision) has been scripted by
+      hand at two retrospectives running and found the same spec-dominated
+      noise both times — it belongs among the reckoning's reads when scans 5
+      and 6 are rewritten, not in a retrospective's scratch script. The
+      2026-10 retrospective ran scans 5 and 6 as reads of `mdllm reckon`
+      (its settled band supplied the triage list and the held reasons) with
+      the spec text unchanged — the first evidence for this phase, not its
+      completion.*
 - [ ] **Phase 5 — See the rate.** Four weeks of the digest line across the
       four live workspaces; thresholds decided from what it shows, not
       before. Done when the chase is visible and winning in all four.

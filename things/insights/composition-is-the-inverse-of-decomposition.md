@@ -1,9 +1,10 @@
 ---
 id: composition-is-the-inverse-of-decomposition
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-15
+promoted_to: thing-specification
 session: 2026-06-15
 source: both
 confidence: high
@@ -35,3 +36,7 @@ This is a razor for evolving the framework: **when a new gap looks like it needs
 ## Context
 
 Surfaced 2026-06-15 (session 2) while specifying insight lifecycle management. The proposed "consolidation" mechanism dissolved the moment the human reframed it as a problem already solved in `thing.md` — only the compose direction was unwritten. Reusing `supersedes` for the tombstone (rather than inventing a relation) was the deliberate move; it forced one reconciliation, broadening `belief-revision.md`'s narrow "incorrect or outdated" definition of `supersedes` to cover replacement-by-consolidation as well as replacement-by-correction — the single contradiction the change-reconciliation walk caught.
+
+## Promoted 2026-10-17
+
+`thing.md` carries *The Inverse: Composition* and the kernel states it in one line — compose the inverse, consolidate into the cohesive survivor, mark the rest `superseded-by`, merge duplication never contradiction. The retrospective's scan 5 is this insight's operational consequence run at cadence. Cited live by two things for 124 days without a promotion mark; the reckoning's settled band named it, and the spec already holds it.

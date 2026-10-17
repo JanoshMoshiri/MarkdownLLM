@@ -1,9 +1,10 @@
 ---
 id: change-safety-is-defense-in-depth
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-15
+promoted_to: change-reconciliation-specification
 session: 2026-06-15
 source: both
 confidence: high
@@ -18,8 +19,6 @@ linked_things:
     relation: supports
   - id: retrospective-specification
     relation: supports
-disposition: keep-active
-disposition_reason: "The layered-nets doctrine is written in no spec: change-reconciliation.md carries the walk and the dark region and the retrospective the net beneath, but nowhere states the order of the nets. This session added one (the gate where the commit lands). Promote as a short 'The nets' paragraph in change-reconciliation.md at its next enforcement change."
 settles_when: 2026-12-16
 ---
 
@@ -60,3 +59,7 @@ spec-count drift the deterministic floor structurally could not see — defense 
 depth proving itself on first use. The invariants/test-suite tier was deliberately
 deferred: the retrospective is the standing backstop, and a second mechanism for
 the same job would be redundant machinery.
+
+## Promoted 2026-10-17
+
+The hold said: promote as a short *The Nets* paragraph in `change-reconciliation.md` at its next enforcement change. The enforcement changed twice this period — the walk gate at the commit boundary (2026-10-05) and the gate that follows the commit into a nested workspace (2026-10-16) — and the paragraph was still unwritten. Written at the 2026-10 retrospective under *Enforcement*: the nets in order, each named with what it catches and what falls through to the next.

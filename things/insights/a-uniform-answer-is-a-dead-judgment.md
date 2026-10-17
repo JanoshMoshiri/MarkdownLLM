@@ -1,13 +1,12 @@
 ---
 id: a-uniform-answer-is-a-dead-judgment
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-08-05
+promoted_to: session-memory-specification
 confidence: high
 origin: synthesised
-disposition: keep-active
-disposition_reason: "The measurement to watch: the estate's disposition distribution. It stays active until a domain retrospective produces the first promote/dismiss — or until the distribution itself becomes something a retrospective reads mechanically."
 tags: [insight-lifecycle, disposition, retrospective, signal, session-memory]
 linked_things:
   - id: a-check-that-always-fires-teaches-the-operator-to-ignore-it
@@ -50,3 +49,7 @@ The general form travels beyond insights: any judgment field whose observed
 distribution is a point mass deserves suspicion — the framework's own
 `observation-is-a-distribution-not-a-value` candidate makes the same claim
 about agent outputs, from the other direction.
+
+## Promoted 2026-10-17
+
+Both halves of the hold's condition came true. The 2026-09 retrospective produced the first promotions on met conditions (four), and `mdllm reckon --rates` now reads the disposition distribution mechanically at every session start — created against disposed, the three bands' counts. The measurement this insight asked for is a digest line. Promoted into `session-memory.md` → *The Reckoning*, which is the reader it predicted.

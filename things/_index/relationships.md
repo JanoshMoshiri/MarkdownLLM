@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-17
-generated: 2026-10-17T01:04:10
-generated_from: HEAD@072074c
-coverage: 541
+generated: 2026-10-17T01:59:16
+generated_from: HEAD@c26ce3b
+coverage: 556
 framework_version: 3.48.0
 ---
 
@@ -481,11 +481,13 @@ framework_version: 3.48.0
 - cue-a-check-run-where-it-cannot-see-mints-a-false-finding-2026-09-26 --subject--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
 - cue-a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist-2026-10-08 --subject--> a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist
+- cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-2026-10-17 --subject--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - cue-a-dispatch-layer-outside-the-corpus-is-a-second-brain-retro-2026-09-13 --subject--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
 - cue-a-flat-re-export-shim-is-an-uncollided-namespace-2026-10-08 --subject--> a-flat-re-export-shim-is-an-uncollided-namespace
 - cue-a-mechanism-fails-at-its-seams-not-in-its-body-2026-09-14 --subject--> a-mechanism-fails-at-its-seams-not-in-its-body
 - cue-a-preserved-question-is-not-a-done-walk-2026-10-05 --subject--> a-preserved-question-is-not-a-done-walk
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
+- cue-a-uniform-answer-is-a-dead-judgment-2026-10-17 --subject--> a-uniform-answer-is-a-dead-judgment
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-10 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-14 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
@@ -510,21 +512,27 @@ framework_version: 3.48.0
 - cue-change-reconciliation-specification-2026-10-05 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-10-08 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-10-16 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-2026-10-17 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
+- cue-change-safety-is-defense-in-depth-2026-10-17 --subject--> change-safety-is-defense-in-depth
 - cue-circulation-is-not-disposition-2026-10-05 --subject--> circulation-is-not-disposition
 - cue-claude-code-cloud-first-session-2026-09-24-2026-09-26 --subject--> claude-code-cloud-first-session-2026-09-24
 - cue-closed-loop-operating-state-2026-09-12 --subject--> closed-loop-operating-state
 - cue-closed-loop-operating-state-2026-09-24 --subject--> closed-loop-operating-state
 - cue-closed-loop-operating-state-2026-09-26 --subject--> closed-loop-operating-state
+- cue-closed-loop-operating-state-2026-10-17 --subject--> closed-loop-operating-state
 - cue-codex-cloud-workspace-2026-09-27 --subject--> codex-cloud-workspace
 - cue-coherence-mechanism-build-2026-09-24 --subject--> coherence-mechanism-build
 - cue-coherence-mechanism-build-2026-09-26 --subject--> coherence-mechanism-build
+- cue-composition-is-the-inverse-of-decomposition-2026-10-17 --subject--> composition-is-the-inverse-of-decomposition
 - cue-consistency-is-maintained-at-change-not-by-sweeping-2026-10-08 --subject--> consistency-is-maintained-at-change-not-by-sweeping
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
+- cue-cross-domain-handoff-is-verified-external-input-2026-10-17 --subject--> cross-domain-handoff-is-verified-external-input
 - cue-cue-carrier-2026-09-24 --subject--> cue-carrier
 - cue-cue-carrier-2026-09-26 --subject--> cue-carrier
 - cue-cue-carrier-2026-10-05 --subject--> cue-carrier
+- cue-cue-carrier-2026-10-17 --subject--> cue-carrier
 - cue-cumulative-drift-is-invisible-to-per-change-walks-retro-2026-09-13 --subject--> cumulative-drift-is-invisible-to-per-change-walks
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
@@ -537,8 +545,10 @@ framework_version: 3.48.0
 - cue-estate-mechanics-guide-2026-10-08 --subject--> estate-mechanics-guide
 - cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
 - cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
+- cue-estate-workflow-derivation-2026-10-17 --subject--> estate-workflow-derivation
 - cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-09-26 --subject--> evidence-and-eval-backlog
+- cue-evidence-and-eval-backlog-2026-10-17 --subject--> evidence-and-eval-backlog
 - cue-expertise-is-an-output-not-a-prerequisite-2026-10-08 --subject--> expertise-is-an-output-not-a-prerequisite
 - cue-explorer-extraction-and-hosting-2026-09-13 --subject--> explorer-extraction-and-hosting
 - cue-explorer-publication-position-2026-09-13 --subject--> explorer-publication-position
@@ -568,6 +578,7 @@ framework_version: 3.48.0
 - cue-git-workflow-specification-2026-09-19 --subject--> git-workflow-specification
 - cue-git-workflow-specification-2026-09-26 --subject--> git-workflow-specification
 - cue-git-workflow-specification-2026-09-27 --subject--> git-workflow-specification
+- cue-git-workflow-specification-2026-10-17 --subject--> git-workflow-specification
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
@@ -602,6 +613,7 @@ framework_version: 3.48.0
 - cue-orchestration-specification-2026-10-08 --subject--> orchestration-specification
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
+- cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
@@ -621,12 +633,14 @@ framework_version: 3.48.0
 - cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-01 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-15 --subject--> standing-watch-specification
+- cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 --subject--> structural-pointers-need-reverse-edge-indexing
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-09-24 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-09-26 --subject--> substrate-native-a2a
 - cue-substrate-native-a2a-2026-10-01 --subject--> substrate-native-a2a
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
+- cue-the-reckoning-2026-10-17 --subject--> the-reckoning
 - cue-the-reckoning-is-the-digestion-beat-2026-10-05-2026-10-08 --subject--> the-reckoning-is-the-digestion-beat-2026-10-05
 - cue-the-substrate-is-a-discipline-prosthesis-2026-10-08 --subject--> the-substrate-is-a-discipline-prosthesis
 - cue-the-verdict-is-asked-where-the-change-lands-2026-10-05-2026-10-05 --subject--> the-verdict-is-asked-where-the-change-lands-2026-10-05
@@ -983,6 +997,24 @@ framework_version: 3.48.0
 - framework-retrospective-2026-09 --implements--> a-ruling-triages-more-cheaply-than-a-mechanism
 - framework-retrospective-2026-09 --references--> feels-automatic-is-persistence-of-the-question
 - framework-retrospective-2026-09 --references--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- framework-retrospective-2026-10 --references--> framework-retrospective-2026-09
+- framework-retrospective-2026-10 --references--> the-reckoning
+- framework-retrospective-2026-10 --references--> the-seat
+- framework-retrospective-2026-10 --references--> cue-carrier
+- framework-retrospective-2026-10 --references--> closed-loop-operating-state
+- framework-retrospective-2026-10 --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
+- framework-retrospective-2026-10 --references--> the-reckoning-is-the-digestion-beat-2026-10-05
+- framework-retrospective-2026-10 --references--> workflows-emerge-from-use-2026-10-07
+- framework-retrospective-2026-10 --references--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- framework-retrospective-2026-10 --references--> the-felt-symptom-names-one-cause-the-record-ranks-them
+- framework-retrospective-2026-10 --references--> a-preserved-question-is-not-a-done-walk
+- framework-retrospective-2026-10 --references--> a-remembered-step-is-a-missing-actor
+- framework-retrospective-2026-10 --implements--> a-uniform-answer-is-a-dead-judgment
+- framework-retrospective-2026-10 --implements--> change-safety-is-defense-in-depth
+- framework-retrospective-2026-10 --implements--> a-dispatch-layer-outside-the-corpus-is-a-second-brain
+- framework-retrospective-2026-10 --references--> protecting-one-budget-displaces-the-failure-into-the-other
+- framework-retrospective-2026-10 --references--> substrate-floor-development
+- framework-retrospective-2026-10 --references--> evidence-and-eval-backlog
 - framework-root-tracks-both-adapters --informs--> vendor-harness-adapter-foundation
 - framework-root-tracks-both-adapters --references--> code-architect-governs-substrate-code
 - framework-upward-signal --implements--> shared-domain-failures-are-a-framework-signal-without-a-path

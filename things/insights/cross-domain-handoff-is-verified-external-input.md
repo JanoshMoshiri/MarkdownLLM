@@ -1,9 +1,10 @@
 ---
 id: cross-domain-handoff-is-verified-external-input
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-15
+promoted_to: provenance-specification
 session: 2026-06-15
 source: both
 confidence: medium
@@ -35,3 +36,7 @@ This keeps cross-domain composition on the spine instead of inventing a global i
 ## Status / Next
 
 Deferred by deliberate choice (#6 in the 2026-06-15 review → Option B: retract the over-promise, draft the design). `confidence: medium` because the reference-triple schema and the producer-side deliverable contract are sketched, not specified. Spec it when a second concrete cross-domain case appears, or when the workflow-run hand-off is actually exercised across two domains — whichever comes first. Until then, the manifesto no longer claims it as delivered.
+
+## Promoted 2026-10-17
+
+The design this captured is the one that shipped: a cross-domain hand-off is an import — `source_domain` + `source_id` + `source_commit`, the reference triple — entering the consumer as `origin: external`, `verified: false` until a human flips it in its own attributed commit, re-quarantined when `imports-check` finds the source moved. `provenance.md` and `interface.md` carry it; `mdllm imports-check` and `estate-check` enforce it. Cited live by seven things for 124 days. Promoted into `provenance.md`.

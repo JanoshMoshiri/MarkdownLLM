@@ -1,9 +1,10 @@
 ---
 id: structural-pointers-need-reverse-edge-indexing
 type: insight
-status: active
-version: 1.0
+status: promoted
+version: 1.1
 created: 2026-06-16
+promoted_to: derived-index-specification
 session: 2026-06-16
 source: both
 confidence: high
@@ -71,3 +72,7 @@ but the index never emitted it. Made operative in `change-reconciliation.md` (th
 Assimilate beat and Dark Region tiers now name structural pointers) and
 `derived-index.md` (the `relationships` index aggregates every declared edge
 wherever it lives), with a floor self-test pinning the behaviour.
+
+## Promoted 2026-10-17
+
+The structural-reference registry is the authority for every reference shape (`parent`, `definition`, `subject`, trigger `watch`, `informed_by`, …) across validation, the reverse indexes, reconciliation cues and egress — `thing.md`'s kernel block says so, and `mdllm touchpoints` walks every registered shape including provenance pins. The reverse read this insight said was silently incomplete is complete by construction now. Promoted into `derived-index.md`, whose relationships index is the surface it corrected.
