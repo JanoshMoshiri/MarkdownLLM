@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-18
-generated: 2026-10-18T01:38:54
-generated_from: HEAD@a17f2ee
+generated: 2026-10-18T02:25:17
+generated_from: HEAD@33f2f22
 coverage: 569
 framework_version: 3.48.0
 ---
@@ -50,9 +50,9 @@ framework_version: 3.48.0
 | coverage | 5 |
 | framework_version | 5 |
 | verified | 4 |
+| verified_by | 4 |
 | definition | 4 |
 | current_stage | 4 |
-| verified_by | 3 |
 | resolution | 3 |
 | parties | 3 |
 | resolved_by | 2 |

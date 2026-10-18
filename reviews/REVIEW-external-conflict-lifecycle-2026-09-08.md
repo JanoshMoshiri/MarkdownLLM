@@ -3,10 +3,11 @@ id: review-external-conflict-lifecycle-2026-09-08
 type: artifact
 status: stable
 authorship: model-session
-version: 1.1
+version: 1.2
 created: 2026-09-08
 origin: external
-verified: false
+verified: true
+verified_by: Janosh Moshiri
 tags: [review, external, conflict, retrospective, reconciliation, invocation-point]
 linked_things:
   - id: circulation-is-not-disposition
