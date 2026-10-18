@@ -99,3 +99,4 @@ known_fields:
   - decided_by      # decision author/authority
   - promoted_to     # insight -> spec promotion target
   - completed       # ISO date a plan reached completed status (registered 2026-08-04, estate-cadence-cluster close — the field-registration sensor caught its own builder a third time)
+  - authorship      # artifact provenance: who wrote the record — `model-session` for every review in reviews/ (registered 2026-10-18; the critical comparison found all seventeen model-authored and none saying so)

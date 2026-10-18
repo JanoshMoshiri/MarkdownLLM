@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-18
-generated: 2026-10-18T00:54:58
-generated_from: HEAD@611ed8e
-coverage: 129
+generated: 2026-10-18T01:38:54
+generated_from: HEAD@a17f2ee
+coverage: 130
 framework_version: 3.48.0
 ---
 
@@ -276,6 +276,7 @@ framework_version: 3.48.0
 - cue-first-hour-guide-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-first-hour-guide-2026-10-18 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-framework-map-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-framework-map-2026-10-18 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-framework-retrospective-2026-09-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-git-workflow-specification-2026-09-19 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-git-workflow-specification-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -467,6 +468,10 @@ framework_version: 3.48.0
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @7487ab3c219946dc468ecda2ee228e4157437d6e)
 
+## review-critical-comparison-2026-10-17-claude
+- glossary (derived-from)
+- limitations-guide (derived-from)
+
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)
 
@@ -585,6 +590,7 @@ framework_version: 3.48.0
 - cue-feels-automatic-is-persistence-of-the-question-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-first-hour-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-first-hour-guide-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-framework-map-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-git-workflow-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-inflection-candidates-are-computable-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-operator-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)

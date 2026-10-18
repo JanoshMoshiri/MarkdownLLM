@@ -2,6 +2,7 @@
 id: independent-review-2026-08-11-codex
 type: artifact
 status: stable
+authorship: model-session
 version: 1.0
 created: 2026-08-11
 origin: synthesised
@@ -22,6 +23,8 @@ linked_things:
 ---
 
 # Independent Full-Corpus Review — Codex, 2026-08-11
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 **Reviewer:** OpenAI Codex, arriving without authorship history or prior participation in defining the framework.
 

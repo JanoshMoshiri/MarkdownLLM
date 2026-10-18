@@ -2,6 +2,7 @@
 id: review-loop-2026-08-10
 type: artifact
 status: stable
+authorship: model-session
 version: 1.1
 created: 2026-08-11
 linked_things:
@@ -17,6 +18,8 @@ linked_things:
 ---
 
 # The Review Loop — an experiment record (2026-08-10 → 2026-08-11)
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 **What this is:** the record of a deliberate experiment, commissioned by the
 operator after the v3.30.0 substrate reconciliation: run cold, adversarial,

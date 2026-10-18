@@ -137,6 +137,8 @@ into a second file always eventually does.
 | Human newcomer's first session; onboarding a non-author operator | `docs/first-hour.md` |
 | Orienting in the framework structure; what links to what; spec graph navigation | `docs/framework-map.md` |
 | How publication, reconciliation and cadence interact — the three radii, diagrammed | `docs/estate-mechanics.md` |
+| Meeting a coined word; mapping the vocabulary to its standard name and prior art | `docs/glossary.md` |
+| Whether this is the right tool at all; "why not `CLAUDE.md` plus a notes folder"; what other memory systems do about staleness | `docs/limitations.md` |
 
 **Session cost:** the kernel's introduction cut Tier 0 to roughly a fifth of the pre-kernel Tier 0+1 load (the dated measurements live in CHANGELOG 3.2.0). Full-spec loads are per-file and on-demand. Measure with `python tools/mdllm.py tokens`; do not assert costs in prose.
 
@@ -210,6 +212,8 @@ The framework defines itself through these interconnected specifications:
 - **docs/first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: evolving`)
 - **docs/estate-mechanics.md** — Human-facing: how publication, reconciliation and cadence interact at three radii (inside a domain, between domains, at the substrate), diagrammed. (`type: guide`, `status: evolving` — born frontmatter-less; a review-loop finding made it a thing, ending its no-special-cases exemption)
 - **docs/framework-map.md** — Visual architecture map (Mermaid): the five-band elevation, the spec-layer dependency graph, and the mdllm subcommand → spec mapping. Derived from frontmatter links, `mdllm --help`, and the tier table; the frontmatter wins on disagreement. (`type: guide`, `status: draft`)
+- **docs/glossary.md** — Human-facing: every coined word (thing, floor, walk, cue, reckoning, seat, estate, porch …) with its plain name, its nearest prior art, and the spec that defines it. The translation table the first non-author operator needed and did not have. (`type: guide`, `status: draft`)
+- **docs/limitations.md** — Human-facing: when not to use this framework, the honest answer to "why not `CLAUDE.md` plus a notes folder", what Mem0, Zep, Letta, Claude Code, Copilot, Karpathy's wiki and Hermes each do about "is it still true", and what is not yet measured. (`type: guide`, `status: draft`)
 
 ### Deferred (Spec When Foreseeable, Deploy When Felt)
 - **thing-lifecycle.md** — Rolling window, disposition to stubs, rehydration from git history, manifest index. Addresses the 200–300 thing ceiling. Deliberately outside the TIERS loading map and the `.markdownllm` catalog until reconciled with the live tool — it predates the mtime→git `stale` fix and the current index mechanics. (`type: specification`, `status: draft`)
@@ -253,18 +257,21 @@ each type to the spec that owns it, which is where a description belongs.
 Framework-reserved types (built into the tool, no declaration needed): `conflict`, `continuity-brief`, `cue`, `decision`, `guide`, `index`, `insight`, `manifesto`, `prompt`, `retrospective`, `skill`, `specification`, `workflow-definition`, `workflow-run`.
 <!-- /generated:types -->
 
-## Key Innovations
+## Design Choices And Their Prior Art
 
-1. **Harness-delivered discovery** — AGENTS.md is the one canonical contract. A harness may load it directly, reach it through a core entry pointer, or require explicit bootstrap/emission; automatic discovery is measured, not presumed.
-2. **Multi-Lens Reasoning** — Complex decisions are analysed through multiple lenses simultaneously (e.g. Domain Logic, Compliance Logic, Audit Logic). Each lens asks different questions of the same data.
+This section was titled "Key Innovations" until 2026-10-18. A critical comparison against the field (`reviews/REVIEW-critical-comparison-2026-10-17-claude.md`) ruled five of the seven repackaged prior art and two recombinations, so each item now names what it borrows. What is specific to this framework is the assembly, and three mechanisms with no found precedent: the commit gate that refuses a definition-surface change until its dependant walk is recorded, the reconciliation cue persisted until a human verdict, and decision records pinned to commits with a reverse index (`change-reconciliation.md`, `provenance.md`). `docs/glossary.md` carries the full translation.
+
+1. **Harness-delivered discovery** — AGENTS.md is the one canonical contract. A harness may load it directly, reach it through a core entry pointer, or require explicit bootstrap/emission; automatic discovery is measured, not presumed. *Prior art: the AGENTS.md convention (Codex 2025, agents.md, the Linux Foundation's AAIF); `CLAUDE.md → @AGENTS.md` is the documented mainstream route.*
+2. **Multi-Lens Reasoning** — Complex decisions are analysed through multiple lenses simultaneously (e.g. Domain Logic, Compliance Logic, Audit Logic). Each lens asks different questions of the same data. *Prior art: de Bono's Six Thinking Hats; role prompting. Storing lenses as domain data is a filing choice.*
 3. **Tiered Context Loading** — Agents choose their context depth based on the query:
    - *Level 1* — Metadata only (frontmatter fields; fast, broad)
    - *Level 2* — Relationships + metadata (linked_things, dependencies)
    - *Level 3* — Full context (complete thing files including narrative body)
-4. **Pattern Libraries via Examples** — `type: example` things teach through positive and negative patterns. The agent learns domain conventions by reading worked examples, not just rules.
-5. **Nested Repo Isolation** — Domains live as independent git repos nested within the framework directory. The framework's `.gitignore` excludes all domain folders. Domain history is always separate from framework history.
-6. **Scalable Structure** — The same three-layer pattern works from 10 things to 10,000. Abstraction layers (type grouping, status filtering, tag taxonomies) emerge as the domain grows.
-7. **Reflexive Behaviour via Derived Indexes** — The agent reasons not only *within* a domain but *about* it: domain velocity (git as telemetry), systematic trigger evaluation, conflict scanning, schema-coherence review, and reconciliation cues held until answered (`mdllm cues`). At scale these run against regenerable derived indexes (`derived-index.md`) rather than re-scanning every thing — keeping reflexive work cheap, and drift-detectable through validation.
+   *Prior art: progressive disclosure; Agent Skills' metadata → body → files; Hermes's three skill levels; MemGPT's paging.*
+4. **Pattern Libraries via Examples** — `type: example` things teach through positive and negative patterns. The agent learns domain conventions by reading worked examples, not just rules. *Prior art: few-shot in-context learning; pattern languages; Specification by Example.*
+5. **Nested Repo Isolation** — Domains live as independent git repos nested within the framework directory. The framework's `.gitignore` excludes all domain folders. Domain history is always separate from framework history. *Prior art: an inner repository ignored by the outer — the documented plain alternative to submodules; `mdllm scaffold` adds a transactional checklist, not a version-control idea.*
+6. **One Structure Across The Measured Range** — The same three-layer pattern serves a workspace from its first record to the range the framework has measured: comfortable to 200–300 things, and near 1,000 the approach should be reconsidered (`scalability-guide.md`; the largest live workspace is about 555). Abstraction layers (type grouping, status filtering, tag taxonomies) emerge as the domain grows. *Prior art: Zettelkasten, PARA, Johnny.Decimal. This item claimed "10 to 10,000" until 2026-10-18; the guide is the measured document.*
+7. **Reflexive Behaviour via Derived Indexes** — The agent reasons not only *within* a domain but *about* it: domain velocity (git as telemetry), systematic trigger evaluation, conflict scanning, schema-coherence review, and reconciliation cues held until answered (`mdllm cues`). At scale these run against regenerable derived indexes (`derived-index.md`) rather than re-scanning every thing — keeping reflexive work cheap, and drift-detectable through validation. *Prior art: GitOps continuous reconciliation (Argo CD); Wikidata's bot-maintained constraint reports; Doyle's truth maintenance; event sourcing for the git-log telemetry. The part without found precedent is the cue that persists as a record until answered.*
 
 ## Status Values For Framework Specs
 

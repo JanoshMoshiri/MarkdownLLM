@@ -1,5 +1,7 @@
 # Ninth Independent Review — 2026-08-09 (cold, post-v3.30.0)
 
+*Authorship: written by a model session the framework author commissioned — "independent" here means a different session, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so. This file carries no frontmatter, so the label lives here.*
+
 **Reviewer:** independent agent (Fable subagent, zero session context, adversarial
 brief: "recent changes deserve MORE suspicion, not less; a clean verdict must be
 evidenced"). Commissioned by the operator immediately after the v3.30.0

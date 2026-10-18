@@ -2,6 +2,7 @@
 id: review-external-conflict-lifecycle-2026-09-08
 type: artifact
 status: stable
+authorship: model-session
 version: 1.1
 created: 2026-09-08
 origin: external
@@ -23,6 +24,8 @@ linked_things:
 ---
 
 # External Review — Conflict Lifecycle And The Retrospective Entry Point (2026-09-08)
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 **Reviewer:** an independent session, relayed by the operator; it read the two
 ritual command files as the actual entry points rather than the specs as

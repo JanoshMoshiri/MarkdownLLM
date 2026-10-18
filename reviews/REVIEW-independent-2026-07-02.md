@@ -2,6 +2,7 @@
 id: independent-review-2026-07-02-fable
 type: artifact
 status: stable
+authorship: model-session
 created: 2026-07-02
 linked_things:
   - id: independent-review-2026-06-15-cowork
@@ -10,6 +11,8 @@ linked_things:
 ---
 
 # Independent Review — MarkdownLLM Framework v3.17.3
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 Full read of every tracked file: all 23 foundational specs, kernel, AGENTS.md,
 `tools/mdllm.py` (2,935 lines) and its 97-test suite, all 56 insights, 5 plans,

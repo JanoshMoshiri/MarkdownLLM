@@ -2,6 +2,7 @@
 id: independent-review-2026-06-12-fable
 type: artifact
 status: stable
+authorship: model-session
 created: 2026-06-12
 linked_things:
   - id: independent-review-2026-06-11-fable
@@ -13,6 +14,8 @@ linked_things:
 ---
 
 # Independent Review — MarkdownLLM Framework v3.5.0 (HEAD e90e2f2)
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 Second independent review, one day after the first. Full re-read of specs, kernel, tool, templates, evals, domains, and everything that changed since `REVIEW-independent-2026-06-11.md`. Verification run from a clean HEAD extract: `mdllm validate` clean across all three corpora (51 + 6 + 12 things, 0 findings), kernel in sync, 35 of 37 floor self-tests passing — the two failures are themselves findings, below. Reviewer: Claude (Fable), 2026-06-12, via Cowork.
 

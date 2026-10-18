@@ -2,6 +2,7 @@
 id: review-independent-operating-model-2026-08-26-codex
 type: artifact
 status: evolving
+authorship: model-session
 version: 1.0
 created: 2026-08-26
 origin: external
@@ -18,6 +19,8 @@ linked_things:
 ---
 
 # Independent Review — Operating-Model Convergence (Codex, 2026-08-26)
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 **Reviewer:** independent Codex agent, separate environment, read-only
 brief. **Framework snapshot:** `0bfa375f98737a5d0ae426c8de638d7d55f88b5e`

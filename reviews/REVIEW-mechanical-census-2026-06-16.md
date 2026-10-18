@@ -2,6 +2,7 @@
 id: mechanical-census-2026-06-16-cowork
 type: artifact
 status: stable
+authorship: model-session
 created: 2026-06-16
 linked_things:
   - id: independent-review-2026-06-15-cowork
@@ -10,6 +11,8 @@ linked_things:
 ---
 
 # Mechanical Census — MarkdownLLM Framework (HEAD df6e113, v3.11.0)
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 A targeted pass on one question: **are the mechanical pieces in the right place,
 and is anything left to agent diligence that could and should be mechanical?**

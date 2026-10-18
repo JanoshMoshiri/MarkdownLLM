@@ -2,6 +2,7 @@
 id: review-critical-comparison-2026-10-17-claude
 type: artifact
 status: stable
+authorship: model-session
 version: 1.2
 created: 2026-10-17
 origin: synthesised

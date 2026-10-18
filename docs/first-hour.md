@@ -36,7 +36,10 @@ You have never used this framework. You have an agent harness that can read
 files, write files, and run commands, sixty minutes, and a healthy suspicion
 of 850-line guides. Named products differ in how they discover entry files and
 bind lifecycle events; the compatibility table records what has actually been
-exercised rather than treating a product list as proof.
+exercised rather than treating a product list as proof. The framework has its
+own words for old ideas — *thing*, *floor*, *walk*, *cue* — and the
+[glossary](glossary.md) maps each to its plain name; [limitations](limitations.md)
+says when a notes folder would serve you better than any of this.
 
 Almost everything else in this repository is written for your agent to read.
 This document and the `operator-guide.md` are the two written for you — this

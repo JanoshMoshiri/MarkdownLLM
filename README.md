@@ -4,7 +4,9 @@
 
 **Read the human-facing documents as a site:** https://janoshmoshiri.github.io/MarkdownLLM/ — published from [`docs/`](docs/) on `main` at every push, so the site and this repository are never two versions.
 
-Every agent session starts from scratch, so you have to hand the agent its context back — sensibly, cheaply, without burying it. Plenty of tools already do the storing and the retrieving: Obsidian vaults, LLM wiki, file lookups. What they leave open is what happens after hundreds of sessions and a mountain of saved memory — when the question stops being *how do I retrieve this* and becomes *is any of it still true*. That's what MarkdownLLM is about: not storing more, but keeping what's stored coherent.
+Every agent session starts from scratch, so you have to hand the agent its context back — and after hundreds of sessions the hard question is no longer *how do I retrieve this* but *is any of it still true*. Other systems let a model settle that question on its own, or re-check it when a memory is next read: Zep time-stamps facts and invalidates the old ones, GitHub Copilot re-verifies a memory against the branch before using it, Letta's background pass consolidates without asking, Karpathy's LLM wiki has a lint step, Hermes keeps a short memory page the agent rewrites itself. **MarkdownLLM refuses to let a model settle that question silently.** State is typed markdown in git. A deterministic pre-commit floor checks structure, references and schema. A change to a definition raises a recorded question over everything that depends on it; the agent walks it; a human rules on what the agent may not settle; and the ruling is committed. The history is the git log, not a retention window.
+
+Most of the parts are old and borrowed — the [glossary](docs/glossary.md) gives each coined word its standard name and its prior art. What is specific is that assembly, and [limitations.md](docs/limitations.md) says plainly where it is the wrong tool and why a plain `CLAUDE.md` plus a notes folder is often the right one.
 
 State lives as plain markdown files — atomic, explicitly linked, version-controlled in git. A deterministic structural floor — one CLI and an installed three-hook Git boundary — checks declared structure, references, and schema against the candidate commit. When the current hook is installed and runnable, mechanical Errors block that commit. A probabilistic agent still interprets meaning; reconciliation and retrospectives route semantic drift for review rather than pretending code can prove truth. Each session, orientation is rebuilt from the accepted state and history recorded in git — not reloaded from a memory file.
 
@@ -20,8 +22,9 @@ becoming a second source of truth.
 **The accessible route is harness-native.** You tell the agent you already use — Claude Code,
 Cowork, or another compatible client — what you want to work on, and it performs setup, sync,
 refresh and session start for you, then tells you where things stand in your own words. That
-onramp is being built ([plan](things/plans/operator-seat-and-harness-native-onramp.md)); until
-it lands, the [first hour](docs/first-hour.md) is the published route. MarkdownLLM Desktop, a
+onramp is planned and currently paused ([plan](things/plans/operator-seat-and-harness-native-onramp.md));
+the [first hour](docs/first-hour.md) is the published route, and in Claude Code `/orient` is the
+typed session start — the kernel and the digest injected whole, then the judgement walk. MarkdownLLM Desktop, a
 local Windows application tried as this route, is frozen at its 0.1.6 installer as an
 Engineering Preview and is not published; the
 [direction record](things/decisions/harness-native-onramp-supersedes-desktop.md) says why.
@@ -101,6 +104,8 @@ The human-facing guides and visual surfaces — also [published as a site](https
 
 | File | Purpose |
 |------|---------|
+| [glossary.md](docs/glossary.md) | Every coined word, its plain name, and the prior art it came from — read this first if the vocabulary is in the way |
+| [limitations.md](docs/limitations.md) | When not to use this, why a notes folder is often right, and what the other memory systems do about "is it still true" |
 | [first-hour.md](docs/first-hour.md) | A newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor |
 | [operator-guide.md](docs/operator-guide.md) | The steady state — what the tooling carries for you, recurring scenarios, what remains your job |
 | [framework-map.md](docs/framework-map.md) | Visual architecture map — the elevation, the spec graph, the floor mapping, the estate seam |
@@ -202,7 +207,7 @@ Starting structures the agent uses when scaffolding a new domain:
 - `templates/_schema.yaml.template` — the domain's normative schema
 - `templates/domain-{specification,read.thing,write.thing,workflow}.skill.md.template` — the four skills
 - `templates/prompts/` — orchestration prompt templates (session-end continuity, cascade, conflict/schema scans)
-- `templates/commands/` + `templates/copilot-prompts/` — the deliberate `end-session` / `retrospective` rituals as slash commands for Claude Code and Copilot
+- `templates/commands/` + `templates/copilot-prompts/` — the deliberate `orient` / `end-session` / `retrospective` rituals as slash commands for Claude Code and Copilot
 - `templates/{insight,conflict,cue,decision,retrospective,workflow-definition,workflow-run}.md.template` — reserved-type things
 - `templates/boundary-terms.template` — the local, never-committed disclosure boundary
 

@@ -2,6 +2,7 @@
 id: independent-review-2026-06-11-fable
 type: artifact
 status: stable
+authorship: model-session
 created: 2026-06-11
 linked_things:
   - id: framework-retrospective-2026-06
@@ -13,6 +14,8 @@ linked_things:
 ---
 
 # Independent Review — MarkdownLLM Framework v3.4.0
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 Full read of all framework specs, kernel, tools, templates, evals, things (insights, conflicts, decisions, retrospectives, continuity), examples, and the three live domains. `mdllm validate .` run against the corpus (46 things, 0 findings). Reviewer: Claude (Fable), 2026-06-11.
 

@@ -2,6 +2,7 @@
 id: independent-review-2026-06-15-cowork
 type: artifact
 status: stable
+authorship: model-session
 created: 2026-06-15
 linked_things:
   - id: independent-review-2026-06-12-fable
@@ -13,6 +14,8 @@ linked_things:
 ---
 
 # Independent Review — MarkdownLLM Framework v3.7.0 (HEAD da47a5a)
+
+*Authorship: written by a model session the framework author commissioned — "independent" and "external" here mean a different session or vendor, not a different human. Labelled 2026-10-18 on the critical comparison's finding that all seventeen reviews were model-authored and none said so in its frontmatter.*
 
 Third independent review. Full read of the operative core (manifesto, `thing.md`,
 `kernel.md`, `AGENTS.md`, session-memory, continuity, belief-revision,

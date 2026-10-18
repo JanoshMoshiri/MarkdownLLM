@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-18
-generated: 2026-10-18T00:54:57
-generated_from: HEAD@611ed8e
-coverage: 566
+generated: 2026-10-18T01:38:54
+generated_from: HEAD@a17f2ee
+coverage: 569
 framework_version: 3.48.0
 ---
 
@@ -570,6 +570,7 @@ framework_version: 3.48.0
 - cue-framework-map-2026-10-05 --subject--> framework-map
 - cue-framework-map-2026-10-07 --subject--> framework-map
 - cue-framework-map-2026-10-15 --subject--> framework-map
+- cue-framework-map-2026-10-18 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
@@ -1050,6 +1051,10 @@ framework_version: 3.48.0
 - git-workflow-specification --complements--> validate-thing-specification
 - git-workflow-specification --complements--> derived-index-specification
 - git-workflow-specification --implements--> autopush-requires-explicit-authority
+- glossary --complements--> operator-guide
+- glossary --complements--> first-hour-guide
+- glossary --derived-from--> review-critical-comparison-2026-10-17-claude
+- glossary --references--> the-onramp-is-the-operators-own-sentence
 - hard-hook-vocabulary-contradicts-observable-trigger-insight --contradicts--> hard-hooks-require-observable-agent-caused-triggers
 - hard-hook-vocabulary-contradicts-observable-trigger-insight --contradicts--> orchestration-specification
 - hard-hook-vocabulary-contradicts-observable-trigger-insight --references--> hook-enforcement-has-three-anchors
@@ -1155,6 +1160,11 @@ framework_version: 3.48.0
 - lifecycle-output-truncation-2026-08-14 --supports--> the-harness-bound-path-is-the-least-tested-path
 - lifecycle-output-truncation-2026-08-14 --documents--> vendor-harness-adapter-foundation
 - lifecycle-output-truncation-2026-08-14 --derived-from--> claude-gate-5r5-acceptance-2026-08-13
+- limitations-guide --derived-from--> review-critical-comparison-2026-10-17-claude
+- limitations-guide --references--> scalability-guide
+- limitations-guide --references--> evidence-and-eval-backlog
+- limitations-guide --complements--> operator-guide
+- limitations-guide --complements--> glossary
 - live-agent-handoff-is-for-new-output-not-known-implementation --supports--> cross-domain-handoff-is-built-inbound-only
 - live-agent-handoff-is-for-new-output-not-known-implementation --supports--> cross-domain-handoff-is-verified-external-input
 - live-agent-handoff-is-for-new-output-not-known-implementation --informs--> interface-specification
