@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-20
-generated: 2026-10-20T21:03:02
-generated_from: HEAD@cb192bf
-coverage: 579
+generated: 2026-10-20T21:27:10
+generated_from: HEAD@6af9b4c
+coverage: 580
 framework_version: 3.49.0
 ---
 
@@ -823,6 +823,10 @@ framework_version: 3.49.0
 - estate-workflow-derivation --derived-from--> derivation-shape-brief-2026-08
 - estate-workflow-derivation --informs--> operating-layer-quality-loop
 - estate-workflow-derivation --derived-from--> estate-retrospective-synthesis-2026-08
+- eval-record-2026 --informs--> evidence-and-eval-backlog
+- eval-record-2026 --references--> review-critical-comparison-2026-10-17-claude
+- eval-record-2026 --references--> withholding-is-not-isolation
+- eval-record-2026 --references--> first-2x2-measured-convention-following-not-reasoning
 - every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated
 - every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
 - every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose
