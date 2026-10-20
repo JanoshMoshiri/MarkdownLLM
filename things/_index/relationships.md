@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-20
-generated: 2026-10-20T23:42:32
-generated_from: HEAD@e5de9fa
-coverage: 583
+generated: 2026-10-20T23:51:25
+generated_from: HEAD@66e7800
+coverage: 584
 framework_version: 3.49.0
 ---
 
@@ -1460,6 +1460,13 @@ framework_version: 3.49.0
 - review-critical-comparison-2026-10-17-claude --references--> framework-retrospective-2026-10
 - review-critical-comparison-2026-10-17-claude --references--> harness-native-onramp-supersedes-desktop
 - review-critical-comparison-2026-10-17-claude --references--> llm-driven-systems-manifesto
+- review-documentation-audit-2026-10-20-claude --references--> review-critical-comparison-2026-10-17-claude
+- review-documentation-audit-2026-10-20-claude --informs--> glossary
+- review-documentation-audit-2026-10-20-claude --informs--> limitations-guide
+- review-documentation-audit-2026-10-20-claude --informs--> first-hour-guide
+- review-documentation-audit-2026-10-20-claude --informs--> operator-guide
+- review-documentation-audit-2026-10-20-claude --informs--> change-reconciliation-specification
+- review-documentation-audit-2026-10-20-claude --informs--> session-start-hardening
 - review-external-conflict-lifecycle-2026-09-08 --informs--> circulation-is-not-disposition
 - review-external-conflict-lifecycle-2026-09-08 --references--> belief-revision-specification
 - review-external-conflict-lifecycle-2026-09-08 --references--> retrospective-specification
