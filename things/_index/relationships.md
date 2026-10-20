@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-21
-generated: 2026-10-21T00:10:03
-generated_from: HEAD@b7df283
-coverage: 594
+generated: 2026-10-21T00:13:22
+generated_from: HEAD@4dab5f7
+coverage: 595
 framework_version: 3.49.0
 ---
 
@@ -192,6 +192,7 @@ framework_version: 3.49.0
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --extends--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> a-shared-worktree-merges-authorship-at-the-index
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> git-workflow-specification
+- ad-hoc-message-loop --implements--> standing-watch-specification
 - adoption-reopens-birth-gaps --extends--> a-ruling-triages-more-cheaply-than-a-mechanism
 - agents-cannot-self-install-permission-bearing-hooks --informs--> hook-enforcement-has-three-anchors
 - agents-cannot-self-install-permission-bearing-hooks --supports--> consequence-is-recoverable-only-in-retrospect
