@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-20
-generated: 2026-10-20T23:51:25
-generated_from: HEAD@66e7800
-coverage: 584
+generated: 2026-10-20T23:52:07
+generated_from: HEAD@e59e5fb
+coverage: 585
 framework_version: 3.49.0
 ---
 
@@ -757,6 +757,10 @@ framework_version: 3.49.0
 - divergence-is-an-unrouted-decision --informs--> llm-driven-systems-manifesto
 - divergence-primitive-promotion --informs--> llm-driven-systems-manifesto
 - divergence-primitive-promotion --informs--> divergence-is-an-unrouted-decision
+- documentation-rulings-2026-10-20 --derived-from--> review-documentation-audit-2026-10-20-claude
+- documentation-rulings-2026-10-20 --informs--> glossary
+- documentation-rulings-2026-10-20 --informs--> first-hour-guide
+- documentation-rulings-2026-10-20 --informs--> operator-guide
 - domain-refresh-specification --implements--> a-domain-local-ruling-is-invisible-from-the-centre
 - domain-refresh-specification --extends--> framework-discovery-specification
 - domain-refresh-specification --references--> git-workflow-specification

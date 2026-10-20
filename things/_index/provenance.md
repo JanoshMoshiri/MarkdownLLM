@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-20
-generated: 2026-10-20T23:51:25
-generated_from: HEAD@66e7800
-coverage: 133
+generated: 2026-10-20T23:52:07
+generated_from: HEAD@e59e5fb
+coverage: 134
 framework_version: 3.49.0
 ---
 
@@ -489,6 +489,10 @@ framework_version: 3.49.0
 ## review-critical-comparison-2026-10-17-claude
 - glossary (derived-from)
 - limitations-guide (derived-from)
+
+## review-documentation-audit-2026-10-20-claude
+- documentation-rulings-2026-10-20 (pinned @e59e5fb1da3064ef2e158967f1e3ee1c432601dc)
+- documentation-rulings-2026-10-20 (derived-from)
 
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)
