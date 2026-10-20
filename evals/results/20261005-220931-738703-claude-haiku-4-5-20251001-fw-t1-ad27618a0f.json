@@ -1,0 +1,156 @@
+{
+  "run_id": "20261005-220931-738703-claude-haiku-4-5-20251001-fw-t1-ad27618a0f",
+  "fixture": "FAC longitudinal (build / perturb / resume, drift resistance)",
+  "model": "claude-haiku-4-5-20251001",
+  "models_observed": [
+    "claude-haiku-4-5-20251001"
+  ],
+  "condition": "framework",
+  "passed": 36,
+  "failed": 8,
+  "voided": null,
+  "seed_sha256": "7696293640c329151e52a5ac198c5c3eedaf9807f464f8ad71f47acdcf36b6cf",
+  "seed_mutated": false,
+  "framework_view": "C:\\Users\\Jamos\\AppData\\Local\\Temp\\mdllm-evals\\framework-view-d3435650",
+  "framework_view_sha256": "01e29b5ce2b2ef781269648e73bbe6a15a1f98592fa54b0b283f2b9c5dcfa9c0",
+  "framework_view_mutated": false,
+  "framework_root_granted": false,
+  "wall_s": 206,
+  "cost_usd": 0.394855,
+  "turns": 57,
+  "framework_commit": "374b59657de2fb3b07edf8148a2cfdfbddf83a65",
+  "framework_version": "3.46.0",
+  "fixture_sha256": "0c8c23b588f84198e8b24d786bf12334dee7b2e0ef9a2a21f6c96be75984961d",
+  "fixture_path": "sleeping-bag-longitudinal.yaml",
+  "execution_surface": "claude-cli",
+  "harness": "Claude Code CLI",
+  "harness_build": "2.1.283 (Claude Code)",
+  "tool_version": "3.46.0",
+  "reasoning_effort": "CLI default (not explicitly configured)",
+  "reasoning_effort_requested": null,
+  "process_status": [
+    0,
+    0,
+    0
+  ],
+  "validation_errors": 0,
+  "validation_summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 39
+  },
+  "assertion_result": {
+    "passed": 36,
+    "failed": 8,
+    "not_run_downstream": 0
+  },
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 17,
+      "failed": 5,
+      "wall_s": 69,
+      "cost_usd": 0.125969,
+      "turns": 20,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 13
+      },
+      "assertion_result": {
+        "passed": 17,
+        "failed": 5
+      },
+      "failures": [
+        "link: fac-aonach-ridge --assesses--> trip-aonach-ridge",
+        "link: fac-birch-hollow --assesses--> trip-birch-hollow",
+        "link: fac-glencoe-snowfield --assesses--> trip-glencoe-snowfield",
+        "link: fac-summit-bivvy --assesses--> trip-summit-bivvy",
+        "link: fac-lowland-meadow --assesses--> trip-lowland-meadow"
+      ],
+      "changed": {
+        "passed": 0,
+        "total": 0
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    },
+    {
+      "name": "perturb",
+      "passed": 10,
+      "failed": 1,
+      "wall_s": 52,
+      "cost_usd": 0.10346545,
+      "turns": 13,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 13
+      },
+      "assertion_result": {
+        "passed": 10,
+        "failed": 1
+      },
+      "failures": [
+        "link: fac-aonach-ridge --assesses--> trip-aonach-ridge"
+      ],
+      "changed": {
+        "passed": 0,
+        "total": 0
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    },
+    {
+      "name": "amend-rule",
+      "passed": 9,
+      "failed": 2,
+      "wall_s": 85,
+      "cost_usd": 0.1654203,
+      "turns": 24,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 13
+      },
+      "assertion_result": {
+        "passed": 9,
+        "failed": 2
+      },
+      "failures": [
+        "link: fac-aonach-ridge --assesses--> trip-aonach-ridge",
+        "link: fac-summit-bivvy --assesses--> trip-summit-bivvy"
+      ],
+      "changed": {
+        "passed": 0,
+        "total": 0
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    }
+  ]
+}

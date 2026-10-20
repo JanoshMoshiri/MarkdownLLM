@@ -1,0 +1,145 @@
+{
+  "run_id": "20261005-221328-568996-claude-opus-5-5-fw-t1-c66bcb2091",
+  "fixture": "FAC longitudinal (build / perturb / resume, drift resistance)",
+  "model": "claude-opus-5-5",
+  "models_observed": [
+    "claude-opus-5-5"
+  ],
+  "condition": "framework",
+  "passed": 44,
+  "failed": 0,
+  "voided": null,
+  "seed_sha256": "7696293640c329151e52a5ac198c5c3eedaf9807f464f8ad71f47acdcf36b6cf",
+  "seed_mutated": false,
+  "framework_view": "C:\\Users\\Jamos\\AppData\\Local\\Temp\\mdllm-evals\\framework-view-1b813b11",
+  "framework_view_sha256": "01e29b5ce2b2ef781269648e73bbe6a15a1f98592fa54b0b283f2b9c5dcfa9c0",
+  "framework_view_mutated": false,
+  "framework_root_granted": false,
+  "wall_s": 264,
+  "cost_usd": 2.244613,
+  "turns": 62,
+  "framework_commit": "374b59657de2fb3b07edf8148a2cfdfbddf83a65",
+  "framework_version": "3.46.0",
+  "fixture_sha256": "0c8c23b588f84198e8b24d786bf12334dee7b2e0ef9a2a21f6c96be75984961d",
+  "fixture_path": "sleeping-bag-longitudinal.yaml",
+  "execution_surface": "claude-cli",
+  "harness": "Claude Code CLI",
+  "harness_build": "2.1.283 (Claude Code)",
+  "tool_version": "3.46.0",
+  "reasoning_effort": "CLI default (not explicitly configured)",
+  "reasoning_effort_requested": null,
+  "process_status": [
+    0,
+    0,
+    0
+  ],
+  "validation_errors": 0,
+  "validation_summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 0
+  },
+  "assertion_result": {
+    "passed": 44,
+    "failed": 0,
+    "not_run_downstream": 0
+  },
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 22,
+      "failed": 0,
+      "wall_s": 109,
+      "cost_usd": 1.015383,
+      "turns": 26,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 0
+      },
+      "assertion_result": {
+        "passed": 22,
+        "failed": 0
+      },
+      "failures": [],
+      "changed": {
+        "passed": 0,
+        "total": 0
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    },
+    {
+      "name": "perturb",
+      "passed": 11,
+      "failed": 0,
+      "wall_s": 87,
+      "cost_usd": 0.621345,
+      "turns": 19,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 0
+      },
+      "assertion_result": {
+        "passed": 11,
+        "failed": 0
+      },
+      "failures": [],
+      "changed": {
+        "passed": 0,
+        "total": 0
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    },
+    {
+      "name": "amend-rule",
+      "passed": 11,
+      "failed": 0,
+      "wall_s": 68,
+      "cost_usd": 0.6078852,
+      "turns": 17,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 0
+      },
+      "assertion_result": {
+        "passed": 11,
+        "failed": 0
+      },
+      "failures": [],
+      "changed": {
+        "passed": 0,
+        "total": 0
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    }
+  ]
+}

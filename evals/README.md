@@ -345,6 +345,36 @@ ids the CLI reports using are recorded (`models_observed`), the per-session
 timeout default is 1800 s, and `--report` groups by fixture content hash so a
 regenerated fixture is never pooled with its predecessor's runs.
 
+### The 2026-10-05 runs, committed 2026-10-20 as evidence, not as a result
+
+Fifty-three FAC-longitudinal result files from 2026-10-05 sat untracked for
+fifteen days. They are committed now, sorted by what they are:
+
+- **Four clean guarded runs stay in `results/`** (pinned ids, the pruned
+  view, after the controls above landed): opus 44/44 once; haiku 36/44 twice
+  with the same eight failures, and once 240/251 across six sessions. They
+  confirm what the section above already says — the fixture's core
+  saturates at opus and leaves a stable gap at haiku — and nothing is
+  concluded from four trials.
+- **Eleven open-grant runs go to `results/excluded/`**: the morning's five
+  opus and five haiku framework trials and one bare trial were produced
+  under the whole-checkout grant that defect 1 closed, so by that rule they
+  are re-run under the guard before they are cited, never cited as they are.
+- **Thirty-eight aborted runs go to `results/excluded/`**, and they are the
+  evidence this section was missing. After the controls landed, every
+  `bare` and `bare-coached` trial on both models and eighteen of twenty-two
+  framework trials exited at launch — `process exited 1`, one turn, six
+  seconds, no cost — and the runner scored each as 44 or 266 *failed*
+  assertions with `voided` unset. Two defects follow, numbered to continue
+  the list above and owed to the next fixture before it runs:
+  6. **An aborted trial is void, never failed.** A result with no turns, no
+     cost, or `aborted: true` must carry `voided` and be excluded from the
+     table mechanically; today a dead process reads as a do-nothing agent.
+  7. **The launch failure is undiagnosed.** The same build that produced the
+     four clean runs refused the other thirty-eight within the same hour;
+     the exit status was recorded and the cause was not. Diagnose from
+     `evals/runs/` before any arm is run again.
+
 ## Conventions
 
 - One fixture per scenario, named `<domain>-<scenario>.yaml`

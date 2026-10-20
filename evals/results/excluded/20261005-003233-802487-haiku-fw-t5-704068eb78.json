@@ -1,0 +1,101 @@
+{
+  "run_id": "20261005-003233-802487-haiku-fw-t5-704068eb78",
+  "fixture": "FAC longitudinal (build / perturb / resume, drift resistance)",
+  "model": "haiku",
+  "condition": "framework",
+  "passed": 36,
+  "failed": 8,
+  "seed_sha256": "7696293640c329151e52a5ac198c5c3eedaf9807f464f8ad71f47acdcf36b6cf",
+  "seed_mutated": false,
+  "wall_s": 194,
+  "cost_usd": 0.410692,
+  "turns": 60,
+  "framework_commit": "14ee528ba74a9458d87d8ed86323dd3d260037b0",
+  "framework_version": "3.46.0",
+  "fixture_sha256": "0c8c23b588f84198e8b24d786bf12334dee7b2e0ef9a2a21f6c96be75984961d",
+  "fixture_path": "sleeping-bag-longitudinal.yaml",
+  "execution_surface": "claude-cli",
+  "harness": "Claude Code CLI",
+  "harness_build": "2.1.283 (Claude Code)",
+  "tool_version": "3.46.0",
+  "reasoning_effort": "CLI default (not explicitly configured)",
+  "reasoning_effort_requested": null,
+  "process_status": [
+    0,
+    0,
+    0
+  ],
+  "validation_errors": 0,
+  "validation_summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 39
+  },
+  "assertion_result": {
+    "passed": 36,
+    "failed": 8,
+    "not_run_downstream": 0
+  },
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 17,
+      "failed": 5,
+      "wall_s": 65,
+      "cost_usd": 0.12542499999999998,
+      "turns": 21,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 13
+      },
+      "assertion_result": {
+        "passed": 17,
+        "failed": 5
+      }
+    },
+    {
+      "name": "perturb",
+      "passed": 10,
+      "failed": 1,
+      "wall_s": 53,
+      "cost_usd": 0.1051866,
+      "turns": 14,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 13
+      },
+      "assertion_result": {
+        "passed": 10,
+        "failed": 1
+      }
+    },
+    {
+      "name": "amend-rule",
+      "passed": 9,
+      "failed": 2,
+      "wall_s": 76,
+      "cost_usd": 0.1800808,
+      "turns": 25,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 13
+      },
+      "assertion_result": {
+        "passed": 9,
+        "failed": 2
+      }
+    }
+  ]
+}

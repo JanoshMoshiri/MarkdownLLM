@@ -1,0 +1,101 @@
+{
+  "run_id": "20261005-221740-273148-claude-haiku-4-5-20251001-fw-t4-a5988e2772",
+  "fixture": "FAC longitudinal (build / perturb / resume, drift resistance)",
+  "model": "claude-haiku-4-5-20251001",
+  "models_observed": [],
+  "condition": "framework",
+  "passed": 1,
+  "failed": 44,
+  "voided": null,
+  "seed_sha256": "7696293640c329151e52a5ac198c5c3eedaf9807f464f8ad71f47acdcf36b6cf",
+  "seed_mutated": false,
+  "framework_view": "C:\\Users\\Jamos\\AppData\\Local\\Temp\\mdllm-evals\\framework-view-991264e9",
+  "framework_view_sha256": "01e29b5ce2b2ef781269648e73bbe6a15a1f98592fa54b0b283f2b9c5dcfa9c0",
+  "framework_view_mutated": false,
+  "framework_root_granted": false,
+  "wall_s": 8,
+  "cost_usd": 0,
+  "turns": 1,
+  "framework_commit": "374b59657de2fb3b07edf8148a2cfdfbddf83a65",
+  "framework_version": "3.46.0",
+  "fixture_sha256": "0c8c23b588f84198e8b24d786bf12334dee7b2e0ef9a2a21f6c96be75984961d",
+  "fixture_path": "sleeping-bag-longitudinal.yaml",
+  "execution_surface": "claude-cli",
+  "harness": "Claude Code CLI",
+  "harness_build": "2.1.283 (Claude Code)",
+  "tool_version": "3.46.0",
+  "reasoning_effort": "CLI default (not explicitly configured)",
+  "reasoning_effort_requested": null,
+  "process_status": [
+    1
+  ],
+  "validation_errors": 0,
+  "validation_summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 8
+  },
+  "assertion_result": {
+    "passed": 1,
+    "failed": 21,
+    "not_run_downstream": 0
+  },
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 1,
+      "failed": 22,
+      "wall_s": 8,
+      "cost_usd": 0,
+      "turns": 1,
+      "process_returncode": 1,
+      "agent_failure": "process exited 1",
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 8
+      },
+      "assertion_result": {
+        "passed": 1,
+        "failed": 21
+      },
+      "failures": [
+        "thing exists: fac-aonach-ridge",
+        "status of fac-aonach-ridge == computed (actual: <missing>)",
+        "fac-aonach-ridge.fac_celsius == 4.0 (actual: '<missing>')",
+        "link: fac-aonach-ridge --assesses--> trip-aonach-ridge",
+        "thing exists: fac-birch-hollow",
+        "status of fac-birch-hollow == computed (actual: <missing>)",
+        "fac-birch-hollow.fac_celsius == -1.0 (actual: '<missing>')",
+        "link: fac-birch-hollow --assesses--> trip-birch-hollow",
+        "thing exists: fac-glencoe-snowfield",
+        "status of fac-glencoe-snowfield == computed (actual: <missing>)",
+        "fac-glencoe-snowfield.fac_celsius == -5.0 (actual: '<missing>')",
+        "link: fac-glencoe-snowfield --assesses--> trip-glencoe-snowfield",
+        "thing exists: fac-summit-bivvy",
+        "status of fac-summit-bivvy == computed (actual: <missing>)",
+        "fac-summit-bivvy.fac_celsius == 2.0 (actual: '<missing>')",
+        "link: fac-summit-bivvy --assesses--> trip-summit-bivvy",
+        "thing exists: fac-lowland-meadow",
+        "status of fac-lowland-meadow == computed (actual: <missing>)",
+        "fac-lowland-meadow.fac_celsius == -5.0 (actual: '<missing>')",
+        "link: fac-lowland-meadow --assesses--> trip-lowland-meadow",
+        "git commits in .: 1 (need >= 2)"
+      ],
+      "changed": {
+        "passed": 0,
+        "total": 0
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    }
+  ],
+  "aborted": true,
+  "abort_reason": "process exited 1"
+}

@@ -1,0 +1,122 @@
+{
+  "run_id": "20261005-221911-242716-claude-opus-5-5-bare-t1-b6cbf35a09",
+  "fixture": "Polar station HTC-7 (longitudinal, hard)",
+  "model": "claude-opus-5-5",
+  "models_observed": [],
+  "condition": "bare",
+  "passed": 0,
+  "failed": 266,
+  "voided": null,
+  "seed_sha256": "434c03552ebaa3d6784b2eb3c649429b4dcb98f142def5847f43ee929799a190",
+  "seed_mutated": false,
+  "framework_view": null,
+  "framework_view_sha256": null,
+  "framework_view_mutated": false,
+  "framework_root_granted": false,
+  "wall_s": 6,
+  "cost_usd": 0,
+  "turns": 1,
+  "framework_commit": "374b59657de2fb3b07edf8148a2cfdfbddf83a65",
+  "framework_version": "3.46.0",
+  "fixture_sha256": "abad0ddc3c7681def7c0ce09cecdfffed57915972026cf1e7b82ef0bb9a30eca",
+  "fixture_path": "polar-station-longitudinal.yaml",
+  "execution_surface": "claude-cli",
+  "harness": "Claude Code CLI",
+  "harness_build": "2.1.283 (Claude Code)",
+  "tool_version": "3.46.0",
+  "reasoning_effort": "CLI default (not explicitly configured)",
+  "reasoning_effort_requested": null,
+  "process_status": [
+    1
+  ],
+  "validation_errors": 0,
+  "validation_summary": {
+    "errors": 0,
+    "warnings": 20,
+    "info": 6
+  },
+  "assertion_result": {
+    "passed": 0,
+    "failed": 42,
+    "not_run_downstream": 0
+  },
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 0,
+      "failed": 43,
+      "wall_s": 6,
+      "cost_usd": 0,
+      "turns": 1,
+      "process_returncode": 1,
+      "agent_failure": "process exited 1",
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 20,
+        "info": 6
+      },
+      "assertion_result": {
+        "passed": 0,
+        "failed": 42
+      },
+      "failures": [
+        "status of hl-living-a == computed (actual: pending)",
+        "hl-living-a.net_load_w == 3372 (actual: None)",
+        "hl-living-a.design_load_kw == 4.5 (actual: None)",
+        "hl-living-a.heater_kw == 5 (actual: None)",
+        "hl-living-a.heater_units == 1 (actual: None)",
+        "status of hl-lab-b == computed (actual: pending)",
+        "hl-lab-b.net_load_w == 4685 (actual: None)",
+        "hl-lab-b.design_load_kw == 6 (actual: None)",
+        "hl-lab-b.heater_kw == 6.5 (actual: None)",
+        "hl-lab-b.heater_units == 1 (actual: None)",
+        "status of hl-store-c == computed (actual: pending)",
+        "hl-store-c.net_load_w == 2302 (actual: None)",
+        "hl-store-c.design_load_kw == 3 (actual: None)",
+        "hl-store-c.heater_kw == 3 (actual: None)",
+        "hl-store-c.heater_units == 1 (actual: None)",
+        "status of hl-medical-d == computed (actual: pending)",
+        "hl-medical-d.net_load_w == 8718 (actual: None)",
+        "hl-medical-d.design_load_kw == 12 (actual: None)",
+        "hl-medical-d.heater_kw == 12.5 (actual: None)",
+        "hl-medical-d.heater_units == 2 (actual: None)",
+        "status of hl-plant-e == computed (actual: pending)",
+        "hl-plant-e.net_load_w == 3392 (actual: None)",
+        "hl-plant-e.design_load_kw == 5 (actual: None)",
+        "hl-plant-e.heater_kw == 5 (actual: None)",
+        "hl-plant-e.heater_units == 2 (actual: None)",
+        "status of hl-living-f == computed (actual: pending)",
+        "hl-living-f.net_load_w == 2856 (actual: None)",
+        "hl-living-f.design_load_kw == 3.5 (actual: None)",
+        "hl-living-f.heater_kw == 4 (actual: None)",
+        "hl-living-f.heater_units == 1 (actual: None)",
+        "status of hl-lab-g == computed (actual: pending)",
+        "hl-lab-g.net_load_w == 3049 (actual: None)",
+        "hl-lab-g.design_load_kw == 4 (actual: None)",
+        "hl-lab-g.heater_kw == 4 (actual: None)",
+        "hl-lab-g.heater_units == 1 (actual: None)",
+        "status of station-budget == computed (actual: pending)",
+        "station-budget.total_design_kw == 38 (actual: None)",
+        "station-budget.installed_kw == 57.5 (actual: None)",
+        "station-budget.fuel_l_per_day == 88 (actual: None)",
+        "station-budget.reserve_days == 60 (actual: None)",
+        "station-budget.tank_count == 5 (actual: None)",
+        "git commits in .: 1 (need >= 2)"
+      ],
+      "changed": {
+        "passed": 0,
+        "total": 42
+      },
+      "unchanged": {
+        "passed": 0,
+        "total": 0
+      },
+      "uncommitted_at_end": false,
+      "uncommitted_paths": [],
+      "answer_key_hits": []
+    }
+  ],
+  "aborted": true,
+  "abort_reason": "process exited 1"
+}

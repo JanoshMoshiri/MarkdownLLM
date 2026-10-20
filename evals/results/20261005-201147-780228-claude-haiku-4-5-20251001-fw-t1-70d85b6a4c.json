@@ -1,0 +1,164 @@
+{
+  "run_id": "20261005-201147-780228-claude-haiku-4-5-20251001-fw-t1-70d85b6a4c",
+  "fixture": "Polar station HTC-7 (longitudinal, hard)",
+  "model": "claude-haiku-4-5-20251001",
+  "condition": "framework",
+  "passed": 240,
+  "failed": 11,
+  "seed_sha256": "ea957ebca74b2f082f990f9c7c3420711372aa570af7746ca8ececf3bba0bfd9",
+  "seed_mutated": false,
+  "wall_s": 1219,
+  "cost_usd": 2.292316,
+  "turns": 223,
+  "framework_commit": "e8f8da2b40fe2877a1a3c4fd6bbab5e8b4f330fb",
+  "framework_version": "3.46.0",
+  "fixture_sha256": "bfddcbeed52c1c4d535a7b0c703cbafcb5019659074ece91298a8a798e2618d4",
+  "fixture_path": "polar-station-longitudinal.yaml",
+  "execution_surface": "claude-cli",
+  "harness": "Claude Code CLI",
+  "harness_build": "2.1.283 (Claude Code)",
+  "tool_version": "3.46.0",
+  "reasoning_effort": "CLI default (not explicitly configured)",
+  "reasoning_effort_requested": null,
+  "process_status": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "validation_errors": 0,
+  "validation_summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 47
+  },
+  "assertion_result": {
+    "passed": 240,
+    "failed": 11,
+    "not_run_downstream": 0
+  },
+  "sessions": [
+    {
+      "name": "build",
+      "passed": 41,
+      "failed": 0,
+      "wall_s": 286,
+      "cost_usd": 0.5720308000000002,
+      "turns": 49,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 6
+      },
+      "assertion_result": {
+        "passed": 41,
+        "failed": 0
+      }
+    },
+    {
+      "name": "reroof",
+      "passed": 39,
+      "failed": 2,
+      "wall_s": 171,
+      "cost_usd": 0.35784160000000015,
+      "turns": 34,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 7
+      },
+      "assertion_result": {
+        "passed": 39,
+        "failed": 2
+      }
+    },
+    {
+      "name": "rev-b",
+      "passed": 40,
+      "failed": 1,
+      "wall_s": 136,
+      "cost_usd": 0.279391,
+      "turns": 39,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 8
+      },
+      "assertion_result": {
+        "passed": 40,
+        "failed": 1
+      }
+    },
+    {
+      "name": "operator-request",
+      "passed": 40,
+      "failed": 1,
+      "wall_s": 68,
+      "cost_usd": 0.16424219999999998,
+      "turns": 18,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 8
+      },
+      "assertion_result": {
+        "passed": 40,
+        "failed": 1
+      }
+    },
+    {
+      "name": "erratum",
+      "passed": 38,
+      "failed": 3,
+      "wall_s": 328,
+      "cost_usd": 0.5088469999999999,
+      "turns": 46,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 9
+      },
+      "assertion_result": {
+        "passed": 38,
+        "failed": 3
+      }
+    },
+    {
+      "name": "dock",
+      "passed": 42,
+      "failed": 4,
+      "wall_s": 230,
+      "cost_usd": 0.4099638,
+      "turns": 37,
+      "process_returncode": 0,
+      "agent_failure": null,
+      "validation_errors": 0,
+      "validation_summary": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 9
+      },
+      "assertion_result": {
+        "passed": 42,
+        "failed": 4
+      }
+    }
+  ]
+}
