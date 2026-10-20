@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-20
-generated: 2026-10-20T23:57:26
-generated_from: HEAD@08f6ac7
+created: 2026-10-21
+generated: 2026-10-21T00:10:03
+generated_from: HEAD@b7df283
 coverage: 135
 framework_version: 3.49.0
 ---
@@ -180,6 +180,7 @@ framework_version: 3.49.0
 ## documentation-rulings-2026-10-20
 - cue-estate-mechanics-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
 - cue-first-hour-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-first-hour-guide-2026-10-21 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
 - cue-framework-map-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
 - cue-glossary-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
 - cue-limitations-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)

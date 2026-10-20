@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-20
-generated: 2026-10-20T23:57:26
-generated_from: HEAD@08f6ac7
-coverage: 593
+created: 2026-10-21
+generated: 2026-10-21T00:10:03
+generated_from: HEAD@b7df283
+coverage: 594
 framework_version: 3.49.0
 ---
 
@@ -564,6 +564,7 @@ framework_version: 3.49.0
 - cue-first-hour-guide-2026-10-17 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-10-18 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-10-20 --subject--> first-hour-guide
+- cue-first-hour-guide-2026-10-21 --subject--> first-hour-guide
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-framework-map-2026-09-19 --subject--> framework-map
@@ -925,6 +926,7 @@ framework_version: 3.49.0
 - first-hour-guide --derived-from--> markdownllm-desktop-is-primary-accessible-product
 - first-hour-guide --derived-from--> harness-native-onramp-supersedes-desktop
 - first-hour-guide --references--> the-onramp-is-the-operators-own-sentence
+- first-hour-guide --implements--> documentation-rulings-2026-10-20
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
 - floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08

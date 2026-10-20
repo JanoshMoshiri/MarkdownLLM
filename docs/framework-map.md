@@ -235,7 +235,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 - **`coordination-claim.md`** (`specification`, `evolving`): complements → `git-workflow.md`, `workflow-state.md`; extends → `thing.md` · +1 edge(s) outside the spec layer
 - **`derived-index.md`** (`specification`, `draft`): complements → `orchestration.md`, `trigger-specification.md`, `belief-revision.md`, `scalability-guide.md`, `git-workflow.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md` · +2 edge(s) outside the spec layer
 - **`docs/estate-mechanics.md`** (`guide`, `evolving`): documents → `git-workflow.md`, `change-reconciliation.md`, `retrospective.md` · +2 edge(s) outside the spec layer
-- **`docs/first-hour.md`** (`guide`, `evolving`): complements → `operator-guide.md`; references → `domain-specification-guide.md`, `framework-map.md`, `framework-discovery.md` · +4 edge(s) outside the spec layer
+- **`docs/first-hour.md`** (`guide`, `evolving`): complements → `operator-guide.md`; references → `domain-specification-guide.md`, `framework-map.md`, `framework-discovery.md` · +5 edge(s) outside the spec layer
 - **`docs/framework-map.md`** (`guide`, `draft`): complements → `operator-guide.md`; documents → `llm-driven-systems.manifesto.md`, `thing.md`, `validate.thing.md`, `orchestration.md`, `git-workflow.md`, `derived-index.md` · +1 edge(s) outside the spec layer
 - **`docs/glossary.md`** (`guide`, `draft`): complements → `operator-guide.md`, `first-hour.md` · +3 edge(s) outside the spec layer
 - **`docs/limitations.md`** (`guide`, `draft`): complements → `operator-guide.md`, `glossary.md`; references → `scalability-guide.md` · +2 edge(s) outside the spec layer

@@ -2,7 +2,7 @@
 id: first-hour-guide
 type: guide
 status: evolving
-version: 1.7
+version: 1.8
 created: 2026-06-12
 linked_things:
   - id: operator-guide
@@ -16,231 +16,199 @@ linked_things:
     relation: references
   - id: explorer-publication-position
     relation: derived-from
-    notes: "v1.5 offers Explorer as an optional visual orientation path, never as a prerequisite or agent route."
+    notes: "v1.5 offered Explorer as an optional visual route; v1.8 drops it while Explorer is parked."
   - id: markdownllm-desktop-is-primary-accessible-product
     relation: derived-from
-    notes: "v1.6 names the eventual guided route while retaining the current published first-hour path until acceptance."
+    notes: "v1.6 named the eventual guided route while retaining the published first-hour path."
   - id: harness-native-onramp-supersedes-desktop
     relation: derived-from
-    notes: "v1.7 records Desktop frozen, names the harness-native onramp as the guided route being built, and admits the persona this guide lacks."
+    notes: "v1.7 recorded Desktop frozen and named the harness-native onramp; that onramp is paused, and v1.8 says so."
   - id: the-onramp-is-the-operators-own-sentence
     relation: references
     notes: "The domain-expert newcomer — ten minutes, four ideas — is the guide still to be written."
+  - id: documentation-rulings-2026-10-20
+    relation: implements
+    notes: "v1.8 is package 5: workspace wording, the generated install pin, and an hour that ends in one whole session — /orient, real work, a refused commit walked, /end-session."
 ---
 
 # The First Hour
 
 ## Who This Is For
 
-You have never used this framework. You have an agent harness that can read
-files, write files, and run commands, sixty minutes, and a healthy suspicion
-of 850-line guides. Named products differ in how they discover entry files and
-bind lifecycle events; the compatibility table records what has actually been
-exercised rather than treating a product list as proof. The framework has its
-own words for old ideas — *thing*, *floor*, *walk*, *cue* — and the
-[glossary](glossary.md) maps each to its plain name; [limitations](limitations.md)
-says when a notes folder would serve you better than any of this.
+You have never used this framework. You have an agent tool that can read
+files, write files and run commands — Claude Code, Codex or Cowork — sixty
+minutes, and a healthy suspicion of long guides. By the end of the hour you will
+have a [workspace](glossary.md#workspace) of your own, you will have watched the
+[floor](glossary.md#floor) refuse a mistake, and you will have run one whole
+session from start to close.
 
 Almost everything else in this repository is written for your agent to read.
-This document and the `operator-guide.md` are the two written for you — this
-one for your first hour, the operator's guide for every hour after that. You
-do not need to read any specification to finish this page.
+This page and the [operator guide](operator-guide.md) are written for you. When
+a word gets in the way, the [glossary](glossary.md) has its plain name; if you
+are still deciding whether to use this at all, [limitations](limitations.md)
+says when a notes folder would serve you better.
 
 ## What This Is, In Three Sentences
 
-You describe a domain — anything you want to track and reason about over
-time — and your agent builds it as a folder of markdown files with structured
-YAML headers, in its own git repository. A supported entry route delivers the
-domain contract; the agent reasons within that structure and updates it as your
-situation changes — git records the accepted state. A small Python tool
-(`tools/mdllm.py`) plus a set of current, runnable git hooks deterministically
-checks structural invariants and blocks commits with mechanical Errors. The
-agent remains a probabilistic interpreter responsible for meaning.
+You describe something you want to track and reason about over time, and your
+agent builds it as a workspace: a folder of markdown records with structured
+headers, in its own git repository. A small tool, `mdllm`, runs at every commit
+and refuses anything that breaks the workspace's declared structure. The agent
+reasons about meaning, and the questions it may not settle on its own come to
+you.
 
 ## Minutes 0–10: Install, Then a Look Around
 
-Use the [verified release installation](../README.md#getting-started): fetch the
-named immutable commit, confirm the checked-out commit and installer SHA-256,
-then run the local script. Do not pipe a moving branch into a shell. The
-verified sequence provisions the exact PyYAML runtime before invoking the
-published installer, installs the hooks, and finishes on a `doctor` report that
-should read **FLOOR ACTIVE**. That pre-install matters because the published
-v3.32.0 scripts predate the dependency pin now present in the next-release
-installers. The README also names the remaining trust roots; release metadata
-is not yet signed.
+Follow [Get started](../README.md#get-started) in the README: it fetches the
+newest release by its exact commit, checks the installer's SHA-256, and runs it.
+Do not pipe a moving branch into a shell. The installer finishes on an
+`mdllm doctor` report that should read **FLOOR ACTIVE**.
 
-Open the verified checkout; then, before involving the agent, look at two things
-yourself:
+Below, `mdllm <command>` means the repository's tool: on Windows run
+`./tools/mdllm.ps1 <command>`, elsewhere `sh tools/mdllm.sh <command>`.
 
-In the prose below, `mdllm <command>` means this repository's CLI. On Windows
-PowerShell use `./tools/mdllm.ps1 <command>`; elsewhere use
-`python tools/mdllm.py <command>` only with a Python that can import PyYAML.
+Before involving the agent, look at two files yourself:
 
-1. **One real thing.** Open
-   `examples/life-manager/things/task-choose-worktop.md`. That is the entire
-   atom of the system: YAML frontmatter (identity, status, dates, links — what
-   the machine reads) above a markdown body (context and reasoning — what the
-   agent reads). Every domain is just files shaped like this.
-2. **The example's `AGENTS.md`.** Open `examples/life-manager/AGENTS.md` and
-   skim the headings only. This is the file an agent reads on arrival: what
-   the domain is, what types exist, what to do on startup. Your domain will
-   get one of these, written for you.
+1. **One real record.** Open
+   `examples/life-manager/things/task-choose-worktop.md`. That is the whole
+   unit of the system: a header of structured fields (identity, status, dates,
+   links — what the tool checks) above a plain body (context and reasoning —
+   what the agent reads). Every workspace is files shaped like this. The
+   framework calls each one a [*thing*](glossary.md#thing).
+2. **The example's entry file.** Skim the headings of
+   `examples/life-manager/AGENTS.md`. This is what the agent reads on arrival:
+   what the workspace is, which record types exist, what to do first. Yours
+   will be written for you.
 
-**Optional visual route.** If you have installed the [MarkdownLLM Explorer
-Windows preview](../explorer/docs/installation-guide.md), open it now. On a Mac,
-ask the framework agent to **open MarkdownLLM Explorer** and it will bootstrap
-the portable viewer. Use the substrate and domain lists to look around. It is a
-read-only orientation aid, not part of installing the floor and not a
-replacement for the agent that will create or change a domain. Nothing in the
-rest of this first hour depends on it.
-
-MarkdownLLM Desktop, a local application tried as a guided first-use route, is frozen as an
-Engineering Preview (2026-09-06) and is not the path this guide describes. The guided route now
-being built is harness-native — you tell your agent what you want to work on and it performs this
-hour's setup for you; see `operator-seat-and-harness-native-onramp`. Until that lands, this is
-the published route.
-
-One honest gap. This guide is written for someone with a harness, a terminal and a healthy
-suspicion. The person the framework most needs to reach — a domain expert who will never open a
-terminal — is not yet written for. When that guide exists it will be ten minutes, not sixty, and
-about four ideas: the agent writes things down in files you can read; nothing is real until it is
-committed, and you can always see what changed; the agent proposes, and some things only you can
-rule on; what you rule on accumulates.
-
-The README is the one-page overview if you want the *why*; skip
-`domain-specification-guide.md` entirely — that one is your *agent's* reading,
-not yours.
+Skip `domain-specification-guide.md` — that one is your agent's reading.
 
 ## Minutes 10–15: Confirm the Agent Found the Framework
 
-Open the framework folder as a workspace and ask your agent:
+Open the `MarkdownLLM` folder in your agent tool and ask:
 
 > What is this repository, and what would you do here on my behalf?
 
-A correctly oriented agent answers in terms of `AGENTS.md` — domains, things,
-skills, the validation floor. If it answers generically ("this appears to be
-a documentation project"), your harness did not auto-discover `AGENTS.md`.
-That happens; discovery is a harness property, not a framework property.
-The fix is one pasted line:
+A correctly oriented agent answers in the framework's terms — workspaces,
+records, skills, the floor. If it answers generically ("this appears to be a
+documentation project"), your tool did not find `AGENTS.md` on its own. That
+happens; it is a property of the tool, not of the framework. One pasted line
+fixes it:
 
 > Read AGENTS.md at the repository root and follow its startup instructions
 > before anything else.
 
-## Minutes 15–45: Scaffold a Real Domain
+## Minutes 15–40: Create a Real Workspace
 
 Pick something real but small — expense tracking, a hiring pipeline, your
-allotment. Real, because invented domains teach you nothing about the fit;
-small, because the structure grows with use by design. Then say what you
-want in one honest paragraph, for example:
+allotment. Real, because an invented subject teaches you nothing about the fit;
+small, because the structure grows with use by design. Say what you want in one
+honest paragraph:
 
-> I want a domain for tracking my freelance clients: each client, the
-> projects I run for them, invoices and whether they're paid. I care most
-> about never losing track of an unpaid invoice.
+> I want a workspace for tracking my freelance clients: each client, the
+> projects I run for them, invoices and whether they're paid. I care most about
+> never losing track of an unpaid invoice.
 
-What should happen next — and what you should do:
+What should happen, and what you do:
 
-- **The agent proposes** thing types, skills, and a folder structure, and
-  asks for confirmation. The proposal is yours to shape: rename types to
-  *your* words, cut anything you don't recognise as yours. You are the
-  domain expert; it is the structure expert.
-- **The agent builds in isolation.** A new domain gets its *own* git
-  repository, and the domain folder is added to the framework's
-  `.gitignore`. This is mandatory, not stylistic — your domain's history
-  stays yours. The mechanical half of this is one command
-  (`mdllm scaffold <path> --harness <selection>`), which the agent should
-  reach for. Select `claude`, `codex`, `cowork`, `all`, or `none`; omit it and
-  `scaffold` asks — or, with nobody at the keyboard, refuses with the list. `none` keeps
-  the entry contract and Git floor but installs no lifecycle adapter, while a
-  run-time-bound selection such as Cowork has no project artifact to write.
-  Red flag worth catching in hour one: domain files appearing in the
+- **The agent proposes** record types, skills and a folder structure, and asks
+  you to confirm. Rename the types into *your* words and cut anything you do not
+  recognise as yours. You know the subject; it knows the structure.
+- **The agent builds it as its own repository.** The workspace gets its own git
+  history, and the framework ignores its folder. The mechanical half is one
+  command the agent should reach for: `mdllm scaffold <path> --harness
+  <selection>` (`claude`, `codex`, `cowork`, `all` or `none` — omit it and it
+  asks). A red flag worth catching now: the workspace's files appearing in the
   *framework's* `git log`.
-- **You get a seed thing or two**, not an empty shell. Ask for one if you
-  don't get one.
+- **You get a seed record or two**, not an empty shell. Ask for one if you
+  don't.
 
-When it's done, open the domain folder as its own workspace. From now on you
-talk to *that* agent, in that workspace; the framework workspace is only for
-framework work.
+When it is done, open the workspace's own folder in your agent tool. From now on
+you work there; the framework folder is only for creating workspaces and
+changing the framework itself.
 
-## Minutes 45–55: Watch the Floor Catch Something
+## Minutes 40–45: Watch the Floor Catch Something
 
-The floor should now be in place — the installer set it up for the framework, and
-`scaffold` installed the git hooks inside your new domain (validation before
-each commit, a disclosure check on the commit message, publication after).
-Prove it bites: open any thing in your domain, change its `status:` to
-`banana`, and run
+`scaffold` installed git hooks in your workspace: the floor runs before every
+commit. Prove it bites — open any record, change its `status:` to `banana`, and
+run
 
 ```
-mdllm validate <path-to-your-domain>
+mdllm validate .
 ```
 
-You get an Error naming the file, the field, and the legal values — and with
-the hook installed, that same Error would have *blocked the commit*. Revert it.
+You get an Error naming the file, the field and the legal values; with the hooks
+installed, that same Error would have refused the commit. Revert it.
 
-That sixty-second exercise is the framework's core bargain: everything
-mechanical — structure, references, vocabularies — is checked by code at the
-commit boundary. The agent never spot-checks those by reasoning, and neither
-do you. What stays yours and the agent's is what code cannot check: whether
-a status is *truthful*, whether a link is *meaningful*, whether the narrative
-still matches reality.
+That is the framework's core bargain. Everything mechanical — structure,
+references, vocabularies — is checked by code at the commit. Neither the agent
+nor you spot-checks it by eye. What stays yours and the agent's is what code
+cannot check: whether a status is *true*, whether a link *means* something,
+whether the text still matches the world.
 
-## Minutes 55–60: One Real Session
+## Minutes 45–60: One Whole Session
 
-In your domain workspace, do one piece of real work by talking — "add the
-client I signed yesterday, invoice due end of month." Watch what lands in
-git: the agent commits as it writes (`git log` in the domain shows the event
-stream). Then stop. That loop — talk, files change, git records the accepted
-state — is the whole system; unrecorded reasoning is not a complete audit
-trace, and everything else is refinement.
+This is what every working session looks like from here on. In Claude Code the
+start and the end are typed commands; in another tool, say "orient" and "end the
+session" and the agent runs the same steps.
+
+1. **Start: `/orient`.** The agent is handed the framework's rules and your
+   workspace's current state whole, then tells you in plain words what matters
+   today — what changed, what is due, what is stuck. It should read like a
+   colleague catching you up, not a dashboard. ([orient](glossary.md#orient))
+2. **Work by talking.** "Add the client I signed yesterday, invoice due at the
+   end of the month." The agent writes the records and commits as it goes; `git
+   log` in the workspace shows each step.
+3. **Change something other records rely on.** Ask for a rule to change — "our
+   payment terms are 14 days now, not 30" — where the rule lives in the
+   workspace's skills or a record others link to. Where the tool runs the commit
+   gate (Claude Code does), the agent cannot commit that change until it has read
+   every record that depends on it. It tells you which still hold, which it
+   revised, and asks you only what it may not settle — "do existing invoices keep
+   30 days?" Your answer is committed with the change. That refusal is the point:
+   nothing a later session relies on changes silently. ([walk](glossary.md#walk))
+4. **End: `/end-session`.** The close: anything worth keeping becomes a lesson
+   on record, up to ten open items are decided, and the ones only you can rule on
+   come to you as one question with options. The session ends in a commit;
+   nothing is left uncommitted. ([the close](glossary.md#the-close))
+
+That loop — orient, talk, rule, close — is the whole system. Everything else is
+refinement.
 
 ## What to Read Next
 
-- **`operator-guide.md`** — the steady state: what the tooling carries for
-  you, the eight recurring scenarios, what remains irreducibly your job.
-- **`framework-map.md`** — one visual page of how the specs relate, for when
-  you're curious what's underneath.
-- **Explorer's `user-guide.md`** — the short visual walkthrough if you prefer
-  to inspect the estate through the optional Windows preview.
-- Nothing else. The specifications are your agent's operating manual; read
-  them when you *want* to, not because you must.
+- **[Operator guide](operator-guide.md)** — the steady state: what the tooling
+  carries for you, the eight recurring scenarios, what remains your job.
+- **[Glossary](glossary.md)** — keep it open; every coined word has a row.
+- **[Framework map](framework-map.md)** — how the specifications relate, for
+  when you are curious what is underneath.
+
+The specifications are your agent's operating manual; read them when you want
+to, not because you must.
 
 ## Honest Footnotes for Hour One
 
-- **Discovery varies by harness.** Claude Code's scaffolded `CLAUDE.md` →
-  `AGENTS.md` pointer route and named Codex entry/lifecycle surfaces have
-  execution records; Copilot, Cursor, Windsurf, and Gemini remain designed-for
-  where no framework record exists. The pasted bootstrap line works in a
-  file-aware session, but it is manual discovery, not proof of auto-load.
-- **The floor needs Python.** If the hook can't run on some machine (no
-  Python, sandboxed git), you are in degraded mode: ask the agent to run
-  `mdllm validate` manually before each commit and say so out loud.
-  `mdllm doctor <path> --harness <name>` checks all of this mechanically —
-  including whether the hook actually *executes*, not just exists — and
-  tells you which mode you're in.
-- **Session-start hardening uses one ordered handler.** Current Claude launches
-  matching handlers in parallel, so the historical two-handler projection is
-  retained only as recognised migration data. New scaffolds emit one handler
-  entering the neutral ordered runner. Existing project permissions and
-  settings remain untouched unless their operator reviews and explicitly runs
-  `adapter-install --refresh-legacy`; extensions and ambiguity still refuse.
-  Copilot lifecycle compatibility remains a separate unverified claim.
-- **`/orient` is the typed session start.** The startup hook's channel is
-  capped at 10,000 characters, so what it delivers is the digest, with the
-  kernel deferred; typing `/orient` injects both whole and then walks the
-  judgement half — what the stalls mean, which triggers the floor could not
-  judge, what to look at first. Make it the first thing you type in a session
-  that will touch domain state.
-- **Your scaffolded domain is born without publication authority.** Its
-  AGENTS.md literally declares `git.autopush: false`, and false, absence, or a
-  malformed value are all off. If automatic publication is the deliberate
-  choice, make it at birth with `mdllm scaffold <path> --autopush true` (or
-  change the declaration later) and add the remote explicitly. The post-commit
-  hook can then publish each validated commit through `mdllm autopush`; no
-  repository gets publication authority by omission.
-- **Some words should never reach a commit.** `scaffold` gave your domain a
-  local `.boundary-terms` file (never committed, never cloned). List client
-  names or personal identifiers there and the commit-msg/pre-commit hooks block
-  any commit that would carry them — with no trace of the terms themselves in
-  the repository.
-- **If validation blocks a legitimate change**, the schema is wrong, not
-  you: extend `things/_schema.yaml` with the agent rather than fighting the
-  finding.
+- **The person this framework most needs to reach is not yet written for.** This
+  guide assumes a terminal and a healthy suspicion. A guide for someone who will
+  never open a terminal would be ten minutes and four ideas: the agent writes
+  things down in files you can read; nothing is real until it is committed, and
+  you can always see what changed; the agent proposes, and some things only you
+  can rule on; what you rule on accumulates. The route that would serve them —
+  your agent doing this hour's setup for you — is planned and paused
+  (`operator-seat-and-harness-native-onramp`).
+- **Finding the entry file varies by tool.** Claude Code and the named Codex
+  builds have execution records; Copilot, Cursor, Windsurf and Gemini are
+  designed for but not yet exercised. The pasted bootstrap line works in any
+  tool that can read files, but it is manual, not proof of auto-loading.
+- **The floor needs Python.** If the hooks cannot run on some machine (no Python,
+  sandboxed git), you are in degraded mode: ask the agent to run `mdllm
+  validate` before each commit and say so out loud. `mdllm doctor <path>
+  --harness <name>` checks whether the hooks actually *run*, not just exist.
+- **Your workspace is born without permission to publish.** Its `AGENTS.md`
+  declares `git.autopush: false`. If automatic pushing is what you want, choose
+  it at birth (`mdllm scaffold <path> --autopush true`) or change the
+  declaration later, and add the remote yourself.
+- **Some words should never reach a commit.** `scaffold` gave your workspace a
+  local `.boundary-terms` file, never committed. List client names or personal
+  identifiers there and the hooks refuse any commit that would carry them.
+- **If validation blocks a legitimate change**, the schema is wrong, not you:
+  extend `things/_schema.yaml` with the agent rather than fighting the finding.

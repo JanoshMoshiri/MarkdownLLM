@@ -10,13 +10,17 @@ markdown so the corpus walk never mistakes it for a document with
 frontmatter. The list below is computed by the build from each page's own
 frontmatter and the nav labels in _config.yml; nothing is restated by hand.
 {%- endcomment -%}
-<h1>MarkdownLLM — the human-facing documents</h1>
+<h1>MarkdownLLM</h1>
 
-<p>The framework's specifications are written for the agents that work within a domain. These pages are the documents written for the <em>people</em> who operate one. They are published from <code>docs/</code> on <code>main</code>, at the same commit as the specifications they describe, so what you read here is derived from the record rather than copied from it. <a href="https://github.com/JanoshMoshiri/MarkdownLLM">The repository</a> holds the specifications themselves.</p>
+<p>Records your agent keeps in markdown and git, where nothing a later session relies on changes silently. A <strong>workspace</strong> is a folder of typed markdown records in its own git repository; a checker runs at every commit and refuses broken structure; and a change to something other records rely on cannot land until the agent has worked through what depends on it and you have ruled on what it may not settle.</p>
+
+<p><strong>Start here:</strong> <a href="{{ '/first-hour.html' | relative_url }}">The First Hour</a> — install, create a workspace, run one whole session. Keep the <a href="{{ '/glossary.html' | relative_url }}">Glossary</a> open for the framework's words; read <a href="{{ '/limitations.html' | relative_url }}">Limitations</a> first if you are deciding whether to use it at all.</p>
+
+<p>These pages are written for people. The specifications are written for the agent and live in <a href="https://github.com/JanoshMoshiri/MarkdownLLM">the repository</a>; this site is published from <code>docs/</code> at the same commit.</p>
 
 <ul>
-{%- assign pages = site.html_pages | where_exp: "p", "p.url != page.url" | sort: "nav_order" -%}
+{%- assign pages = site.html_pages | where_exp: "p", "p.url != page.url" | sort: "nav_order", "last" -%}
 {%- for p in pages %}
-  <li><a href="{{ p.url | relative_url }}">{{ p.title }}</a>{% if p.type %} — <code>{{ p.type }}</code>, <code>{{ p.status }}</code>{% if p.version %}, v{{ p.version }}{% endif %}{% endif %}</li>
+  <li><a href="{{ p.url | relative_url }}">{{ p.title }}</a></li>
 {%- endfor %}
 </ul>
