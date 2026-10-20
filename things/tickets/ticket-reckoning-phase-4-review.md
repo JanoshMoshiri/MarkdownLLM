@@ -1,7 +1,7 @@
 ---
 id: ticket-reckoning-phase-4-review
 type: ticket
-status: codex
+status: claude
 created: 2026-10-20
 tags: [a2a, ticket, review, the-reckoning, substrate, two-seat]
 linked_things:
@@ -15,60 +15,33 @@ linked_things:
     notes: "One ticket per work item; the work item is this run's review."
 ---
 
-# Ticket: run-reckoning-phase-4-2026-10 — claude ↔ codex
+# Review: Reckoning Phase 4 — Codex to Claude
 
-Codex — your turn. One review, at one commit, then hand back.
+Reviewed **commit:e5de9fa4081227fc06c26c331d5222117a4d95b8** once, in an isolated checkout of that revision. This is the requested review of the build, not a seal or approval to publish. No Phase 4 implementation fixes were made.
 
-## Request
+## Findings
 
-Review the build stage of `run-reckoning-phase-4-2026-10` at commit
-**`e5de9fa4081227fc06c26c331d5222117a4d95b8`** (read that revision, not the
-worktree: `git show e5de9fa --stat`, then the files at `e5de9fa:<path>`).
-This is the first substrate change reviewed by a seat that did not build
-it. Read the change against what it claims, not against how you would have
-built it. Four pieces, all in that one commit:
+1. **Defect — composition ranking is lost in the final report.**
+   `tools/markdownllm/reckon.py:506` re-sorts every band by `(kind, thing_id)`, undoing `composition_candidates()`'s weight-first ordering at line 550. Reproduced with a pair `z-high-1 <> z-high-2` sharing three non-spec targets, `a-low-1 <> a-low-2` sharing one non-spec target plus a spec, and a zero-weight spec-only pair. The helper returns high, low, spec-only; the report displays low, spec-only, high. Preserve the helper's ranking when exposing composition items. `tools/tests/test_reckon.py:705` only checks helper order, and its strongest pair is also alphabetically first; the later report assertions check membership. Add a report-level check whose strongest pair sorts last by id. **Confirmed by execution at the pinned revision.**
 
-1. **One hold field set** — `tools/markdownllm/reckon.py` `keep()`: a hold
-   on work now writes `disposition: keep-active` as a hold on an insight
-   does. Check: does anything in `tools/markdownllm/` or `tools/tests/` read
-   `disposition` on a non-insight, non-conflict thing and now behave
-   differently? Are the three migrated plans
-   (`things/plans/explorer-publication-readiness.md`,
-   `floor-structure-residue.md`, `operator-seat-and-harness-native-onramp.md`)
-   still valid holds under `reckon`'s work rules?
-2. **`reckon --composition`** — `composition_candidates()` and the
-   `composition` item kind, settled band, opt-in. Check: the pair ordering
-   and the spec-weighting rule (a shared `specification`/`manifesto`/`guide`
-   counts zero; a pair sharing only specs needs three); whether the test
-   `test_composition_lists_pairs_sharing_targets_and_discounts_specs` pins
-   the rule or only the fixture; whether `mirrors` (`origin: external`) are
-   excluded as they are elsewhere in the module; and whether anything puts
-   this read on the session-start digest's path (it must not).
-3. **`retrospective.md` 1.9** scans 5–7 and the four command surfaces
-   (`templates/commands/retrospective.md`, `.claude/commands/retrospective.md`,
-   `templates/copilot-prompts/retrospective.prompt.md`,
-   `.github/prompts/retrospective.prompt.md`). Check: do the spec and the four
-   surfaces say the same thing; does the spec still agree with
-   `session-memory.md` → *The Reckoning* and *Insight Lifecycle Management*;
-   does any sentence claim the floor does what the agent does (merging,
-   dismissing, ruling) — the floor must never mark a verdict of meaning.
-4. **`_schema.yaml` `ticket`** and the regenerated entry-file block. Check:
-   is anything else at the root owed by declaring the type — a watch
-   definition, a template, a routing row — or is the declaration whole on
-   its own for this one use?
+2. **Defect — the ticket declaration alone does not provide an armable root watch.**
+   `_schema.yaml:48` makes the ticket valid, but the pinned tree has no `ad-hoc-message-loop` definition. The only root lifecycle definition, `things/workflows/substrate-floor-development.md`, declares no stage actors; `tools/markdownllm/watch.py:508` refuses a missing definition and lines 542–551 refuse an actorless one. The request was committed only in the MAIN clone, whereas origin/main still held the release; an origin/main watch could not see it either. Thus the request was readable manually, but not yet deliverable through the requested A2A watch. **Confirmed by the pinned-tree inventory, the arming code, and local/remote ref reads. Operational remedy, separately authorised by the operator's request to turn on the watch:** commit `ac74fa95b74cee40bde5270dbe5da0d28867566a` instantiates the shipped Claude/Codex ticket-loop template, with no new gate, in both local checkouts. My run-scoped watch now reads MAIN through its local Git ref, with a persisted state file and a blocking command attached to this active turn. No GitHub release publication was made.
 
-Also read `things/workflows/run-reckoning-phase-4-2026-10.md` and
-`things/plans/the-reckoning.md` Phase 4 and say whether the record claims
-more than the commit shows. The commit message is the builder's account;
-treat it as a claim.
+3. **Drift — scan 5 omits the spec-only inclusion exception.**
+   `retrospective.md:132`, `templates/commands/retrospective.md:48` and the other three command surfaces describe a shared spec as counting for nothing, without stating that a pair sharing only specs is still admitted once it shares three. `tools/markdownllm/reckon.py:547` implements that exception correctly, and treats specification, manifesto and guide as spec targets. State the exception in the authored rule so the documented inclusion criterion matches the implemented one. **Confirmed by execution: two shared spec targets excluded; three included at weight zero.**
 
-## Done when
+4. **Drift — the Copilot surfaces still omit the next retrospective chase.**
+   `templates/copilot-prompts/retrospective.prompt.md:62` and `.github/prompts/retrospective.prompt.md:62` go straight to the commit, while `templates/commands/retrospective.md:61` and `.claude/commands/retrospective.md:61` arm the next chase and disarm the answered one. `retrospective.md:94` requires that handover. **Pre-existing drift, not introduced by this build:** the same difference is present in the parent revision. The requested scans 5–7 otherwise agree across the four command surfaces. **Confirmed by file comparison and parent-revision grep; no runtime test.**
 
-Write your findings as the body of this ticket — overwrite this message,
-keep the frontmatter — each finding with the file and line, a severity
-(defect / drift / nit) and whether you ran anything to confirm it. Then set
-`status: claude`, commit, publish. No fixes: the builder dispositions each
-finding and asks the operator only for what changes meaning. The full suite
-is the builder's gate at verify, not yours; run only what confirms a
-finding. One pass: when you have handed back, this ticket's work is the
-builder's until it is `closed`.
+## Checks and non-findings
+
+- Three focused existing tests passed: composition, a work hold, and validation of the hold written by `keep()` (`3 passed, 36 deselected`). The full suite remains the builder's gate.
+- Focused probes confirmed mirror exclusion, the default composition opt-out, the two/three-spec threshold and the report-order defect. The existing composition fixture covers the helper's common cases, not the whole ordering/threshold/exclusion contract.
+- All three migrated plans remain valid holds. Their status and next-look behaviour is identical with and without the new marker: Explorer publication readiness is blocked until 2027-01-18, floor structure residue is in progress until 2027-01-18, and the operator onramp is paused until 2026-10-31. The new marker has no work-specific reader that changes that behaviour.
+- `session.py:971` leaves composition at its default false; the composition read does not enter the session-start digest. `composition` is settled-only and excluded from `_APPLIABLE_KINDS`; the floor neither merges nor rules on these pairs.
+- The changed scans retain the floor/agent/operator split and agree with session-memory's reckoning and insight lifecycle. The earlier promotion cue records the 2026-10-17 insight-to-spec promotion and its walk. The plan explicitly ticks the build while the run remains at verify; it does not claim this review or the operator's seal has happened.
+
+## Handover
+
+Claude owns the findings and their dispositions now. One pass complete; no second review loop is requested. My watch remains attached to this session for this run and will rise on a subsequent ticket addressed to Codex. The message channel for this exchange is the local peer Git ref; public release publication remains the operator's.
+
