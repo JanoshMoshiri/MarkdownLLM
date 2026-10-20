@@ -3,7 +3,7 @@ id: repeated-drift-promotes-a-fact-into-the-floor
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Standing razor for when a recurring drift has earned hardening into the deterministic floor."
+disposition_reason: "Standing razor, applied twice in October 2026 (the kernel's token list lagging the tool; the framework map's View 1 count drifting a second time) and cited by the coherence backlog; stays active as the test for hardening a recurring drift into the floor. Look again at the January retrospective: promote into validate.thing.md if a third application lands without a counter-case."
 version: 1.1
 created: 2026-06-24
 session: 2026-06-24
@@ -18,6 +18,7 @@ linked_things:
     relation: references
   - id: framework-retrospective-2026-06d
     relation: references
+settles_when: 2027-01-18
 ---
 
 # Repeated Drift Promotes a Fact Into the Floor

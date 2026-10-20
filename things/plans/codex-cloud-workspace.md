@@ -1,8 +1,8 @@
 ---
 id: codex-cloud-workspace
 type: plan
-status: in-progress
-version: 1.1
+status: paused
+version: 1.2
 created: 2026-09-24
 priority: high
 tags: [adapters, bootstrap, cloud, publication]
@@ -79,3 +79,7 @@ release event under the root's `autopush: false` policy.
   enforcement, project trust and lifecycle execution as separate facts.
 
 The route is built and fixture-tested, not yet a live cloud compatibility claim.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** The release half of box 1 happened — 3.49.0, published 2026-10-18 with the pin refreshed; the adoption and cloud-environment halves are the operator's, in a private workspace. Resumes when a cloud task is next run.

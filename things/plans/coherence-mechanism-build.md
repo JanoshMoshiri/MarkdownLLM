@@ -1,8 +1,8 @@
 ---
 id: coherence-mechanism-build
 type: plan
-status: in-progress
-version: 1.2
+status: paused
+version: 1.3
 created: 2026-08-11
 priority: high
 tags: [coherence, floor, derivation, probes, sequencing]
@@ -190,3 +190,7 @@ No more review loops (the measured argument is the linked insight). No
 umbrella restatement of other plans' items (one owner per fact applies to
 plans too). No new judgement-shaped checks (the backlog's suppression-list
 gate stands).
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** Phase 4 is standing by its own text: exit when the loop insight is dismissed and one post-release cold read returns zero findings. The 2026-10-17 critical comparison was that cold read and returned findings, so the condition is unmet and no work is in flight.

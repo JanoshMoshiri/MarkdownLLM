@@ -1,15 +1,14 @@
 ---
 id: a-true-primitive-is-discovered-not-authored
 type: insight
-status: active
-version: 1.0
+status: promoted
+promoted_to: operating-model-specification
+version: 1.1
 created: 2026-06-30
 session: 2026-06-30
 source: both
 confidence: high
 origin: stated
-disposition: keep-active
-disposition_reason: "Standing methodological razor for evaluating any candidate framework/manifesto primitive; deliberately held active — itself a manifesto-promotion candidate that must recur with evidence before it earns enshrinement, per the bar it describes."
 tags: [primitive, manifesto, method, philosophy, framework-promotion]
 linked_things:
   - id: divergence-is-an-unrouted-decision
@@ -71,3 +70,5 @@ The operator's articulation — *"we're not here to write the laws of existence,
 discover them, articulate them, and share them so someone else can see them too… it was always
 stable because it was true from the beginning"* — sharpened jointly with the framework agent
 into the test above. `source: both`, `origin: stated` (operator-led).
+
+**Promoted 2026-10-20 (the reckoning):** carried by `operating-model.md` ("doctrine over existing primitives — adds no mechanism; grows only on cross-corpus convergence") and linked from `standing-watch.md` and `universal-workflow.md` as the bar each met; the condition it set for its own enshrinement — recurrence with evidence — was met three times.

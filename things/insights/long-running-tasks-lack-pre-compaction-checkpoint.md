@@ -3,7 +3,7 @@ id: long-running-tasks-lack-pre-compaction-checkpoint
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Parked framework gap — long tasks can lose state on compaction; the continuity work mitigated it (open loops are committed things) but the general gap awaits a felt fix."
+disposition_reason: "No incident since it was recorded: open loops are committed things, session-end treats compaction as not a boundary, and the harness now carries a context summary across compaction. Held for one more interval; dismiss at the January retrospective if still no incident."
 version: 1.2
 created: 2026-06-20
 confidence: medium
@@ -18,6 +18,7 @@ linked_things:
     relation: informs
   - id: git-workflow-specification
     relation: references
+settles_when: 2027-01-18
 ---
 
 # Long-Running Tasks Lack a Pre-Compaction Checkpoint

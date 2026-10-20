@@ -1,8 +1,8 @@
 ---
 id: v3-33-release-and-external-acceptance
 type: plan
-status: not-started
-version: 1.0
+status: cancelled
+version: 1.1
 created: 2026-08-20
 priority: high
 tags: [release, acceptance, evidence, harness, publication, operator-owned]
@@ -83,3 +83,7 @@ rows do.
 - [ ] The Cowork rows recorded to the same standard, or explicitly re-scoped.
 - [ ] The release decision taken — published with the pin refreshed, or
       deliberately deferred with the reason written down.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Cancelled — superseded.** The release decision this plan waited on was taken sixteen times, 3.34 through 3.49; the acceptance re-probe on two harnesses is `session-start-hardening` Phase 5, where it stays open and owned; the Cowork rows are `cowork-adapter`'s.

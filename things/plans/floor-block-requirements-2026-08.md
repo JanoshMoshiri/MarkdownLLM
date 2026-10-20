@@ -1,8 +1,9 @@
 ---
 id: floor-block-requirements-2026-08
 type: plan
-status: in-progress
-version: 1.5
+status: completed
+completed: 2026-10-20
+version: 1.6
 created: 2026-08-21
 priority: high
 tags: [requirements, floor, performance, tests, concurrency, sprint]
@@ -350,3 +351,7 @@ The retrospective (sequenced after, operator's order); sync-scope redesign
 (D2 declined for now, dated ruling in the remedy); machine-level remedies
 (Defender exclusion is a system security setting — operator-only); any
 harness receipt or release work (Phases 5–6 carriers own them).
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Completed as a record.** Functional requirements, the non-functional budget table, the measured baseline and two seal reports are written; it carries no open work of its own, and the measurement rows that cite it live in `substrate-review-consolidated-remedy-2026-08-20`. A requirements record, not work in flight — `in-progress` was the wrong status for fifty-five days.

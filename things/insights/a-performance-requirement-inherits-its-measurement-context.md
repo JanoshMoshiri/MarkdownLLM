@@ -19,6 +19,9 @@ linked_things:
   - id: an-incident-seeded-list-encodes-the-symptom-not-the-rule
     relation: complements
     notes: "Both are the same class error at different altitudes: that one enumerates from an incident instead of a rule, this one carries a symptom forward without its conditions."
+disposition: keep-active
+disposition_reason: "Its carrier plan (floor-block-requirements-2026-08) closed as a record on 2026-10-20, so the live edge went with it; the razor still gates how the remedy plan's measurement rows are read (reference environment before figures). Hold to the January retrospective; promote into scalability-guide.md if the validate-time series lands, else dismiss."
+settles_when: 2027-01-18
 ---
 
 # A Performance Requirement Inherits Its Measurement Context

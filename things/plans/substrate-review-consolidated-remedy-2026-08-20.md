@@ -1,8 +1,8 @@
 ---
 id: substrate-review-consolidated-remedy-2026-08-20
 type: plan
-status: in-progress
-version: 1.1
+status: paused
+version: 1.2
 created: 2026-08-20
 tags: [substrate, remedy, deterministic-floor, performance, coherence]
 priority: high
@@ -533,3 +533,6 @@ This plan is complete only when all of the following are true:
 - Promising zero defects. The promise is that every found residue has an owner,
   evidence, and an honest disposition.
 
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** An umbrella whose live rows are carried by their subtask plans — `floor-structure-residue` (4/5), `coherence-mechanism-build`, `evidence-and-eval-backlog`, `session-start-hardening` — and whose other fifty-five boxes were the status of record for work nobody was doing (`framework-retrospective-2026-10`: "in-progress has become the status of record"). Nothing here is in flight; its rows are re-triaged one by one at the next retrospective, and a row that is still wanted gets its own plan.

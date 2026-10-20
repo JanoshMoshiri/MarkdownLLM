@@ -1,8 +1,8 @@
 ---
 id: cowork-adapter
 type: plan
-status: in-progress
-version: 1.6
+status: paused
+version: 1.7
 created: 2026-08-18
 priority: high
 tags: [harness, adapters, cowork, bootstrap, discovery, contract-emission, publication, estate, clean-architecture]
@@ -166,3 +166,7 @@ Unavailable evidence is `NOT TESTED`, never reconstructed.
 - Making the bundle a second specification source.
 - Automatic conflict/divergence resolution or unattended account-level
   installation.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** Thirteen open boxes need a live Cowork session on a real workspace, which is the operator's act; the harness register entry and the bundle exist. Resumes with the next Cowork run.

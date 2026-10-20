@@ -1,8 +1,8 @@
 ---
 id: public-docs-face-build
 type: plan
-status: in-progress
-version: 1.8
+status: paused
+version: 1.9
 created: 2026-08-13
 priority: high
 tags: [documentation, accessibility, derivation, publication, pages, visibility]
@@ -372,3 +372,7 @@ to plans as much as to prose. No new authored guide: every phase either derives
 an existing truth or asks a question whose answer is a decision. No content
 about the harness adapters, which the ruling held until their gates are green
 and which is Phase 7's regardless.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** The site is live from `docs/` on every push and now carries the glossary and the limitations; the three open rows are judgement calls that wait on `mechanical-coherence-checks-backlog`. Not in flight.

@@ -3,7 +3,7 @@ id: judgement-checks-need-a-suppression-list-which-is-itself-drift
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Standing razor for whether a proposed coherence check belongs in the floor or the human Walk — gates future check proposals; worked example (the v3.17.2 retired-vocab check) is recent and instructive."
+disposition_reason: "Standing razor for whether a proposed check belongs in the floor or the human walk; applied at the 2026-10-18 framework-map walk (the accDescr prose is the dark region it names). Look again at the January retrospective with the coherence backlog's next check proposal as the test case."
 version: 1.0
 created: 2026-06-28
 session: 2026-06-28
@@ -18,6 +18,7 @@ linked_things:
     relation: informs
   - id: repeated-drift-promotes-a-fact-into-the-floor
     relation: complements
+settles_when: 2027-01-18
 ---
 
 # A Check That Needs a Suppression List Is Judgement in Mechanical Clothing

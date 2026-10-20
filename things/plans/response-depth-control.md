@@ -1,8 +1,8 @@
 ---
 id: response-depth-control
 type: plan
-status: not-started
-version: 1.0
+status: paused
+version: 1.1
 created: 2026-08-01
 priority: high
 tags: [interface, register, verbosity, depth, operator-experience, configuration]
@@ -156,3 +156,7 @@ system — the system, as far as the operator can see it. A capable engine
 behind an unreadable screen is not a capable system; it is an unusable one.
 Depth control is the part of that interface the operator holds in their own
 hand.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** No actor; by its own Phase 0 it sits behind the harness-native onramp's second drive, and the onramp is paused (`operator-seat-and-harness-native-onramp`). Resumes when the onramp does.

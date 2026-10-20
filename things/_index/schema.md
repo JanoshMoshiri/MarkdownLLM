@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-10-18
-generated: 2026-10-18T02:26:55
-generated_from: HEAD@52bca5b
-coverage: 569
+created: 2026-10-20
+generated: 2026-10-20T20:42:07
+generated_from: HEAD@1f4f6b8
+coverage: 578
 framework_version: 3.49.0
 ---
 
@@ -14,36 +14,36 @@ framework_version: 3.49.0
 
 | field | things using it |
 |---|---|
-| id | 569 |
-| type | 569 |
-| status | 569 |
-| created | 569 |
-| version | 496 |
-| tags | 465 |
+| id | 578 |
+| type | 578 |
+| status | 578 |
+| created | 578 |
+| version | 505 |
+| tags | 474 |
 | linked_things | 382 |
 | origin | 204 |
 | session | 200 |
 | confidence | 199 |
-| subject | 182 |
-| raised_at | 182 |
-| raised_by | 182 |
-| verdict | 182 |
-| verdict_reason | 182 |
-| informed_by | 177 |
+| subject | 191 |
+| raised_at | 191 |
+| raised_by | 191 |
+| verdict | 191 |
+| verdict_reason | 191 |
+| informed_by | 186 |
 | source | 149 |
 | priority | 63 |
-| disposition_reason | 60 |
+| disposition_reason | 62 |
 | disposition | 59 |
 | decided_by | 42 |
-| promoted_to | 36 |
+| promoted_to | 39 |
 | exposed | 28 |
+| settles_when | 19 |
 | authorship | 17 |
+| completed | 11 |
 | triggers | 10 |
-| settles_when | 10 |
 | period_start | 10 |
 | period_end | 10 |
 | domain | 10 |
-| completed | 8 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |

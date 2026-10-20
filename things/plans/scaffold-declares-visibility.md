@@ -1,8 +1,8 @@
 ---
 id: scaffold-declares-visibility
 type: plan
-status: not-started
-version: 1.1
+status: paused
+version: 1.2
 created: 2026-08-04
 priority: medium
 tags: [scaffold, boundary, disclosure, birth, visibility, floor]
@@ -165,3 +165,7 @@ there. That is the same trap the framework root's own terms file documents from
 2026-07-28. The staged and commit-message paths — the ones that block — are
 unaffected; only the on-demand full-archive audit is noisy, and only about
 history that cannot be changed without rewriting published commits.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** The ruling stands (birth is the right place; no running sensor) and the boundary-terms stub still ships empty; asking the question at birth is scaffold's semantic half — the onramp's, which is paused. No actor at the root.

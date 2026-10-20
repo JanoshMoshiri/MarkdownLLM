@@ -21,6 +21,8 @@ linked_things:
   - id: an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction
     relation: informs
     notes: "Signing reseals the bundle. The signed build is a tree change, so the seal must follow it and nothing may follow the seal."
+disposition_reason: "Blocked on the operator's own act — authorised Authenticode signing credentials and an RFC 3161 timestamp service — while Explorer is parked (2026-09-02). Not a stall: a wait with a named owner. Look again if Explorer is un-parked."
+settles_when: 2027-01-18
 ---
 
 # Explorer publication readiness

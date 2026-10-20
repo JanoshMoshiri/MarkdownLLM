@@ -1,8 +1,8 @@
 ---
 id: explorer-macos-and-navigation-sprint-2026-09
 type: plan
-status: in-progress
-version: 1.6
+status: paused
+version: 1.7
 created: 2026-09-01
 priority: high
 tags: [explorer, macos, navigation, memory, portability, release, sprint]
@@ -392,3 +392,7 @@ installer with WinError 4551 (Code Integrity event 3077). The existing installed
 0.4.2 copy is therefore unchanged. The new shortcut icon routing is built but
 awaits a permitted native installer run; neither native acceptance nor an
 installed upgrade is claimed for 0.4.3.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** Explorer is parked (2026-09-02, `explorer-white-label` ruling) and every open box needs a Mac in the partner's hands. Resumes only if Explorer is un-parked.

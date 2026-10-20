@@ -1,8 +1,8 @@
 ---
 id: cold-read-of-the-seams-release
 type: plan
-status: not-started
-version: 1.0
+status: cancelled
+version: 1.1
 created: 2026-08-26
 priority: medium
 tags: [review, cold-read, verification, revision-binding, independence]
@@ -51,3 +51,7 @@ falls if it waits long enough for the corpus to move underneath it.
 what depth, and against which commit — that judgement is the
 retrospective's, not this plan's. If it declines, this closes as
 `cancelled` with the reason recorded rather than lingering.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Cancelled — happened in another form.** The cold read this plan asked for was performed on 2026-10-17 by the critical comparison: the whole substrate read from outside at HEAD 2c95b3f by six research sessions, recorded in `reviews/REVIEW-critical-comparison-2026-10-17-claude.md`. A second, seams-specific cold read would duplicate it.

@@ -1,8 +1,8 @@
 ---
 id: scaffold-carries-the-universal-workflow
 type: plan
-status: not-started
-version: 1.0
+status: paused
+version: 1.1
 created: 2026-08-25
 priority: high
 tags: [scaffold, workflow, template, birth, adoption]
@@ -65,3 +65,7 @@ end.
 
 Run this through `substrate-floor-development` when picked up — it is a
 floor change and earns the full traversal.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** No actor; the guided birth is scaffold's semantic half, which is the onramp's, and the onramp is paused.

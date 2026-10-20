@@ -1,8 +1,8 @@
 ---
 id: pretooluse-action-boundary-gate
 type: plan
-status: paused
-version: 1.0
+status: cancelled
+version: 1.1
 created: 2026-06-27
 priority: medium
 tags: [pretooluse, hooks, security, action-boundary, irreversibility]
@@ -45,3 +45,7 @@ not a floor gap. Hence `paused`, not `not-started`.
 - Where the mechanical-vs-interpretation line falls — `consequence-is-recoverable-only-in-retrospect`
   says the irreversibility judgment is human + structure, not a forward prediction,
   so this is likely `interpretation`-anchored with a narrow `git-fs`/mechanical core.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Cancelled — resolved for now.** Of the two candidates this plan named, the five-run evidence favoured mechanical emission, and the emission route is now built: `/orient` injects the kernel and the digest whole (`session-start-hardening` Phase 6, 2026-10-17). Reopen only if live evidence shows an irreversible pre-action failure that git cannot recover — the condition that plan's Phase 5 records.

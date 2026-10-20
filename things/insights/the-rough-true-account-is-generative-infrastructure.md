@@ -3,7 +3,7 @@ id: the-rough-true-account-is-generative-infrastructure
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Standing value-principle naming the why under provenance, belief-revision, and the honest CHANGELOG — that the corpus's worth is its truth, not its polish. Foundational; gates how the record is kept."
+disposition_reason: "Value principle under provenance, belief revision and the honest changelog; applied on 2026-10-18 when the README lead was narrowed to the claim the record supports and seventeen reviews were labelled model-authored. A manifesto-promotion candidate: promote at the January retrospective if the manifesto's honesty passage cites it, else hold."
 version: 1.0
 created: 2026-06-28
 session: 2026-06-28
@@ -16,6 +16,7 @@ linked_things:
     relation: references
   - id: belief-revision-specification
     relation: complements
+settles_when: 2027-01-18
 ---
 
 # The Rough, True Account Is Generative Infrastructure, Not a Confession

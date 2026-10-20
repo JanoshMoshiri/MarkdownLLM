@@ -31,6 +31,8 @@ linked_things:
   - id: a-declaration-is-inert-until-its-mechanism-is-current
     relation: implements
     notes: "Item 7's generalisation: the estate's hooks were three releases stale, so a current autopush declaration would have been unreadable by every installed byte. The item is the tool-side repair; the insight is the rule."
+disposition_reason: "One box left, a supply-chain decision by its own text (the legacy hook upgrade path and the Node 20 action bump) that stays open rather than being repaired in passing; the legacy path exists (adapter-install --refresh-legacy). Decide the action bump at the January retrospective."
+settles_when: 2027-01-18
 ---
 
 # Floor Structure Residue

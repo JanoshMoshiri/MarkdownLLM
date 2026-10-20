@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-18
-generated: 2026-10-18T02:26:55
-generated_from: HEAD@52bca5b
-coverage: 569
+created: 2026-10-20
+generated: 2026-10-20T20:42:07
+generated_from: HEAD@1f4f6b8
+coverage: 578
 framework_version: 3.49.0
 ---
 
@@ -487,6 +487,7 @@ framework_version: 3.49.0
 - cue-a-mechanism-fails-at-its-seams-not-in-its-body-2026-09-14 --subject--> a-mechanism-fails-at-its-seams-not-in-its-body
 - cue-a-preserved-question-is-not-a-done-walk-2026-10-05 --subject--> a-preserved-question-is-not-a-done-walk
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
+- cue-a-true-primitive-is-discovered-not-authored-2026-10-20 --subject--> a-true-primitive-is-discovered-not-authored
 - cue-a-uniform-answer-is-a-dead-judgment-2026-10-17 --subject--> a-uniform-answer-is-a-dead-judgment
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-10 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-14 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
@@ -526,6 +527,7 @@ framework_version: 3.49.0
 - cue-coherence-mechanism-build-2026-09-24 --subject--> coherence-mechanism-build
 - cue-coherence-mechanism-build-2026-09-26 --subject--> coherence-mechanism-build
 - cue-composition-is-the-inverse-of-decomposition-2026-10-17 --subject--> composition-is-the-inverse-of-decomposition
+- cue-consequence-is-recoverable-only-in-retrospect-2026-10-20 --subject--> consequence-is-recoverable-only-in-retrospect
 - cue-consistency-is-maintained-at-change-not-by-sweeping-2026-10-08 --subject--> consistency-is-maintained-at-change-not-by-sweeping
 - cue-coordination-claim-specification-2026-09-13 --subject--> coordination-claim-specification
 - cue-cross-domain-handoff-is-verified-external-input-2026-10-17 --subject--> cross-domain-handoff-is-verified-external-input
@@ -588,6 +590,9 @@ framework_version: 3.49.0
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
+- cue-independent-review-2026-07-14-fable-2026-10-20 --subject--> independent-review-2026-07-14-fable
+- cue-independent-substrate-review-2026-08-20-claude-2026-10-20 --subject--> independent-substrate-review-2026-08-20-claude
+- cue-independent-substrate-review-2026-08-20-codex-2026-10-20 --subject--> independent-substrate-review-2026-08-20-codex
 - cue-inflection-candidates-are-computable-2026-10-05 --subject--> inflection-candidates-are-computable
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
 - cue-interface-specification-2026-09-26 --subject--> interface-specification
@@ -620,6 +625,7 @@ framework_version: 3.49.0
 - cue-orchestration-specification-2026-10-08 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-10-17 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-10-18 --subject--> orchestration-specification
+- cue-orient-and-reconciliation-are-the-corpus-two-sides-2026-10-20 --subject--> orient-and-reconciliation-are-the-corpus-two-sides
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
@@ -629,6 +635,8 @@ framework_version: 3.49.0
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
 - cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
+- cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 --subject--> review-external-conflict-lifecycle-2026-09-08
+- cue-review-independent-operating-model-2026-08-26-codex-2026-10-20 --subject--> review-independent-operating-model-2026-08-26-codex
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-09-26 --subject--> session-memory-specification
@@ -637,6 +645,7 @@ framework_version: 3.49.0
 - cue-session-memory-specification-2026-10-08 --subject--> session-memory-specification
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
+- cue-session-start-hardening-2026-10-20 --subject--> session-start-hardening
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-24 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification

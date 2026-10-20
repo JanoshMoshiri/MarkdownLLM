@@ -1,8 +1,8 @@
 ---
 id: framework-upward-signal
 type: plan
-status: not-started
-version: 1.0
+status: paused
+version: 1.1
 created: 2026-08-05
 priority: medium
 tags: [membrane, estate, upward-signal, aggregation, spec-when-foreseeable]
@@ -77,3 +77,7 @@ today). Until then this stays a parked spec with its evidence attached.
       trigger, not before).
 - [ ] Phase 2 — walk the dark region: operator-guide + estate-mechanics
       describe the upward path; retrospective.md's estate radius cites it.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** Phase 1's aggregation line now exists mechanically — `mdllm reckon` bands disposition per workspace and the session-start digest carries the rate (`the-reckoning` Phase 2) — so the remaining gap is Phase 0's upward route for a domain-side finding. No actor at the root; look again at the next retrospective.

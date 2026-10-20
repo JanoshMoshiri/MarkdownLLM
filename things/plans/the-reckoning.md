@@ -2,7 +2,7 @@
 id: the-reckoning
 type: plan
 status: in-progress
-version: 1.5
+version: 1.6
 created: 2026-10-05
 session: 2026-10-05
 priority: critical
@@ -28,9 +28,9 @@ linked_things:
     notes: "The diagnosis this plan answers."
 triggers:
   - type: time
-    condition: "2026-10-19 reached"
+    condition: "2026-11-02 reached"
     action: surface
-    note: "Two weeks: has one attended session ended through the reckoning, and has one tick drafted one? If neither, the actor is the problem, not the command."
+    note: "Four weeks of the rate line (Phase 5): does disposed keep pace with created across the four live workspaces? The two-week question was answered yes on 2026-10-20 — one attended close (2026-10-08) and one tick's draft (2026-10-11), both recorded in Phase 3."
 ---
 
 # Plan: The Reckoning
@@ -148,3 +148,7 @@ dormant workspaces.
       *2026-10-10 applied, 2026-10-11 drafted; no residue was owed.*
 - [ ] The digest shows the rate, and in the four live workspaces disposed
       keeps pace with created over four weeks.
+
+## Trigger answered 2026-10-20
+
+The two-week check fired on 2026-10-19 and the answer is yes on both counts: the framework root's session end ran through the close on 2026-10-08 (ten decisions off the oldest end of the queue), and the dispatcher's 2026-10-11 run drafted five decisions under `## Reckoning` in its digest. Re-dated to 2026-11-02 for Phase 5's question — four weeks of the rate line.

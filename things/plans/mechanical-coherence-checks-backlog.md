@@ -2,7 +2,7 @@
 id: mechanical-coherence-checks-backlog
 type: plan
 status: in-progress
-version: 1.8
+version: 1.9
 created: 2026-06-27
 priority: high
 tags: [coherence, floor, drift, tooling, backlog]
@@ -447,3 +447,8 @@ the external review, which lifts this hold for the review-9 promotions and the
 perimeter currency check (`external-review-response-2026-08-10`). The remaining
 items keep the original hold; the payoff is automatic drift enforcement the day
 each fact drifts again.
+
+## Added 2026-10-20 (from the October retrospective and the positioning commit)
+
+- **estate-sync names the credential case.** A remote fetched before and "not found" now is a credential change in every instance on record (eleven repos said it on 2026-10-17); the check is whether the remote-tracking ref already exists. `framework-retrospective-2026-10` → What Should Change, item 5.
+- **The framework map's View 1 count.** The spec-thing count in `docs/framework-map.md`'s View 1 prose has now drifted by hand twice (two behind on 2026-09-24, two behind on 2026-10-18); `repeated-drift-promotes-a-fact-into-the-floor` says the second drift is the case for mechanising it — the count is derivable from frontmatter `type` under root and `docs/`.

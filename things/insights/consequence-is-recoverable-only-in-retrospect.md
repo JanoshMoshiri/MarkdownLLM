@@ -1,8 +1,9 @@
 ---
 id: consequence-is-recoverable-only-in-retrospect
 type: insight
-status: active
-version: 1.0
+status: promoted
+promoted_to: llm-driven-systems-manifesto
+version: 1.1
 created: 2026-06-21
 session: 2026-06-21
 source: both
@@ -65,3 +66,5 @@ Synthesised 2026-06-21 from a human-led exploration: an LLM is truly generative 
 **Deferred by design — spec when foreseeable, deploy when felt.** It requires nothing in the framework now: the framework's native medium is markdown and git, fully reversible, and the agentic-action surface (an agent that can delete files, book flights, act on a PC or the internet) is not yet in play. Building the gate now would be over-engineering against a pressure that does not exist.
 
 **Revisit when felt:** when a domain's agent is given real, recoverability-collapsing capability on a harness that exposes an action-boundary interposition point — at which the clearance artifact and its mediated-action contract earn specification, and the manifesto thesis earns its `See` pointer here.
+
+**Promoted 2026-10-20 (the reckoning):** carried in the operating layer since v3.3x as `AGENTS.md` → A Standing Truth About This Agent, in the manifesto's processor paragraph, and as `operating-model.md`'s gate-authority dimension (human-only irreversible edges); cited by 21 live things and 121 days active without a promotion — the retention was the promotion.

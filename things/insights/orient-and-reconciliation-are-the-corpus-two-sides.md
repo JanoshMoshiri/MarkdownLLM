@@ -1,10 +1,9 @@
 ---
 id: orient-and-reconciliation-are-the-corpus-two-sides
 type: insight
-status: active
-disposition: keep-active
-disposition_reason: "Architectural capstone — the standing placement test for any new corpus-maintenance mechanism (work-content vs session-memory side)."
-version: 1.1
+status: promoted
+promoted_to: session-memory-specification
+version: 1.2
 created: 2026-06-27
 session: 2026-06-27
 source: both
@@ -65,3 +64,5 @@ Surfaced 2026-06-27 by the operator while finishing the continuity dissolution
 change-reconciliation — reconciliation is focused on worklog state, orient on
 session-memory state; two sides of the whole corpus." The build (`mdllm session-start`
 now generates the forward open-loops view) is this insight made operational.
+
+**Promoted 2026-10-20 (the reckoning):** carried by `session-memory.md` (the two halves of the retired continuity brief and their homes) and `git-workflow.md` (the WORKLOG retirement); its placement test — work-content side or session-memory side — is the spec's own structure now.

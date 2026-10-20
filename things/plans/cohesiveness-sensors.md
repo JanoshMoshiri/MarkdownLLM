@@ -1,8 +1,9 @@
 ---
 id: cohesiveness-sensors
 type: plan
-status: in-progress
-version: 1.1
+status: completed
+completed: 2026-10-20
+version: 1.2
 created: 2026-08-01
 priority: high
 tags: [cohesiveness, drift, floor, sensors, estate, self-describing, awareness]
@@ -291,3 +292,7 @@ Rulings made at build, recorded per the plan's own demand:
   message describing why a term was lifted can disclose what the term was
   protecting. Judgement, not mechanism (`a-ruling-triages-more-cheaply-
   than-a-mechanism`).
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Completed at the root.** Twenty-one of twenty-three boxes done. The two that remain are, by their own text, the regulated workspace's: the inert relationship triggers are "its trigger-vocabulary repair plan's final phase — execute there, not here", and the aged promotion candidate is blocked at the domain end by a missing `exposed: true`, so no membrane path exists for the root to act on. Both re-homed to that workspace's own queue; nothing is left that this plan can do here.

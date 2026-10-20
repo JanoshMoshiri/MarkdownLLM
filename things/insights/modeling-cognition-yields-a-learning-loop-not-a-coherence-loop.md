@@ -3,7 +3,7 @@ id: modeling-cognition-yields-a-learning-loop-not-a-coherence-loop
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Standing razor for whether a new mechanism serves coherence or learning; the loop-scoped insight sibling it names is still unbuilt."
+disposition_reason: "Standing razor; the loop-scoped sibling it names is still unbuilt and workflows-emerge-from-use (Phase 6, four weeks in the live workspaces) is the first mechanism it would be applied to. Look again when that phase closes or at the January retrospective."
 version: 1.3
 created: 2026-06-21
 session: 2026-06-21
@@ -22,6 +22,7 @@ linked_things:
     relation: supports
   - id: consequence-is-recoverable-only-in-retrospect
     relation: complements
+settles_when: 2027-01-18
 ---
 
 # Modeling Cognition Yields a Learning Loop, Not a Coherence Loop

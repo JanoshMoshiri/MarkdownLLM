@@ -3,9 +3,9 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-18
-generated: 2026-10-18T02:26:55
-generated_from: HEAD@52bca5b
+created: 2026-10-20
+generated: 2026-10-20T20:42:07
+generated_from: HEAD@1f4f6b8
 coverage: 10
 framework_version: 3.49.0
 ---
@@ -43,7 +43,7 @@ framework_version: 3.49.0
 
 ## the-reckoning
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-19 reached, action=surface, note=Two weeks: has one attended session ended through the reckoning, and has one tick drafted one? If neither, the actor is the problem, not the command.
+- trigger: type=time, condition=2026-11-02 reached, action=surface, note=Four weeks of the rate line (Phase 5): does disposed keep pace with created across the four live workspaces? The two-week question was answered yes on 2026-10-20 — one attended close (2026-10-08) and one tick's draft (2026-10-11), both recorded in Phase 3.
 
 ## the-seat
 - status: in-progress  due_date: —

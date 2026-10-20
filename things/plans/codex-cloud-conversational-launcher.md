@@ -1,8 +1,8 @@
 ---
 id: codex-cloud-conversational-launcher
 type: plan
-status: not-started
-version: 1.0
+status: paused
+version: 1.1
 created: 2026-09-27
 priority: medium
 tags: [adapters, codex-cloud, bootstrap, discovery, publication]
@@ -90,3 +90,7 @@ not sufficient evidence.
 
 Until Gate 0 and the operator's Gate 1 choice are complete, these are
 acceptance questions, not implementation tasks.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Paused.** Depends on `codex-cloud-workspace`, paused the same day for the same reason.

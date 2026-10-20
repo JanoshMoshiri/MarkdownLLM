@@ -1,8 +1,9 @@
 ---
 id: external-review-response-2026-08-10
 type: plan
-status: in-progress
-version: 2.0
+status: completed
+completed: 2026-10-20
+version: 2.1
 created: 2026-08-11
 priority: medium
 tags: [reconciliation, review-response, doctrine, cadence]
@@ -96,12 +97,16 @@ sources and the flip is committed with attribution.
 - [x] Doctrine insights created (F4, F1 corroboration)
 - [x] Build sequencing superseded by `coherence-mechanism-build`
 - [x] Ordinal collision resolved by date+kind naming
-- [ ] R3 cadence home chosen, or consciously declined
-- [ ] R4 re-judged after the backlog's checks land
-- [ ] Manifesto Standing-on-Shoulders extension written, or consciously declined
+- [x] R3 cadence home chosen *(chosen 2026-10-20: the floor's retrospective-cadence sensor, in the digest since v3.24)*, or consciously declined
+- [x] R4 re-judged after the backlog's checks land *(re-homed 2026-10-20 to mechanical-coherence-checks-backlog)*
+- [x] Manifesto Standing-on-Shoulders extension written *(written 2026-10-18 as the prior-art section in AGENTS.md and docs/glossary.md)*, or consciously declined
 - [x] Literature claims verified (2026-08-11, `verified_by: Janosh Moshiri` —
       the flip committed separately from the declaration, per the quarantine
       rule; canon citations confirmed at claim level, not page level)
 
 When the remaining three close, this plan completes — there is nothing else
 holding it open.
+
+## Disposition 2026-10-20 (the reckoning)
+
+**Completed.** The execution sequence was superseded by `coherence-mechanism-build` in August; the three rows left open are now chosen or re-homed: R3's cadence home is the floor (the retrospective-cadence sensor fires in the session-start digest and as a validate finding since v3.24); the Standing-on-Shoulders extension was written as prior-art acknowledgement on 2026-10-18 (`AGENTS.md` → Design Choices And Their Prior Art; `docs/glossary.md`); R4 is re-homed to `mechanical-coherence-checks-backlog`, where its subject lives.

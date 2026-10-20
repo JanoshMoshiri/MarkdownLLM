@@ -18,6 +18,9 @@ linked_things:
   - id: divergence-is-an-unrouted-decision
     relation: supports
     notes: "Retiring a delegated-to plan is the silent-default sin at the plan layer: the orphaned items resolve however they fall out"
+disposition: keep-active
+disposition_reason: "Its carrier plan (external-review-response-2026-08-10) completed on 2026-10-20; the razor was applied the same day when thirteen stalled plans were paused, completed or cancelled by what still pointed at them. Hold to the January retrospective; promote into session-memory.md's consolidation passage if the next retrospective applies it again."
+settles_when: 2027-01-18
 ---
 
 # Inbound Edges Decide Which Plan Survives Consolidation — Not Which One Feels Stale
