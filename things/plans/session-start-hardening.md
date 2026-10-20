@@ -2,7 +2,7 @@
 id: session-start-hardening
 type: plan
 status: in-progress
-version: 1.6
+version: 1.7
 created: 2026-08-19
 priority: high
 tags: [session-start, tier-0, emission, kernel, gates, adapters, hardening, evidence]
@@ -165,7 +165,7 @@ seems to get read". The record, measured rather than argued:
   block landed with its trailer (106 lines, sha256 aaf8444534c1), digest with
   no `[truncated]` marker. Delivery evidence — `emitted`, `received-whole` by
   inspection — not adherence.
-- [ ] **Acceptance:** the next cold session that types `/orient` performs the
+- [x] **Acceptance — met 2026-10-20:** the next cold session that types `/orient` performs the
   four-step walk unbidden and reports in the operator's words; a session that
   does not type it still gets the hook's bounded digest and owes the read.
   Record exact build and consequence here; Phase 5's ladder then re-runs with
@@ -203,3 +203,34 @@ or explicitly owed, its attestation is bound to the contract actually emitted,
 the digest supplies computable attention, and `orient` carries the remaining
 judgement. The evidence record states exact builds and does not promote
 delivery into a claim of compliance.
+
+## Acceptance run 2026-10-20 (Phase 6)
+
+A fresh Claude Code session (2.1.283, Fable, auto mode) was opened with the
+single message `/orient` and nothing else. Recorded from its own report:
+
+- **Receipt.** The SessionStart hook delivered the estate-sync report and the
+  digest whole, the kernel deferred with its integrity facts; the command then
+  delivered the kernel block ending in its trailer and the digest again, no
+  `[truncated]` marker. Both receipts were checked unprompted. The digest
+  arrived twice, once per channel — about 5k characters, harmless.
+- **The walk ran unbidden.** It read the four prompts, then: git log and diff
+  since the last `session-end:` commit; `mdllm cues`, `triggers`, `reckon
+  --rates`, `touchpoints`; 30-day churn and the unblock commits; the trigger
+  blocks of the fired and imminent things; the heads of seven stalled plans.
+  Read-only throughout — no commits, no file changes, HEAD unmoved.
+- **It reported in the operator's words**, leading with what mattered: the
+  undeclared seat; both fired triggers answerable from the record; six more
+  triggers within three days; five of six unraised cues owing no walk; the
+  thirteen stalls as statuses that no longer told the truth; 53 untracked eval
+  result files; the estate's credential case; and "fine, said once" for what
+  was fine.
+
+This is the first instance of the behavioural evidence
+`emitted-content-is-read-instructed-content-is-economised` has waited for:
+content emitted whole on a channel that carries it, and the judgement half
+performed because the typed command made it the pulled thing. One instance
+is not the disappearance of variance; Phase 5's ladder still owes the second
+harness. Its findings were independently reached and acted on the same day
+by the parent session (`close:` 379f497, `ruling:` cb192bf), which is its own
+small evidence that the walk reads the record rather than the session.
