@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-20
-generated: 2026-10-20T23:41:00
-generated_from: HEAD@46ef499
-coverage: 582
+generated: 2026-10-20T23:42:32
+generated_from: HEAD@e5de9fa
+coverage: 583
 framework_version: 3.49.0
 ---
 
@@ -1762,6 +1762,9 @@ framework_version: 3.49.0
 - ticket-is-the-ad-hoc-carrier-2026-09-30 --informs--> standing-watch-specification
 - ticket-is-the-ad-hoc-carrier-2026-09-30 --implements--> mesh-safety-is-the-floor-not-the-topology
 - ticket-is-the-ad-hoc-carrier-2026-09-30 --implements--> transport-follows-corpus-holdability-not-distance
+- ticket-reckoning-phase-4-review --implements--> run-reckoning-phase-4-2026-10
+- ticket-reckoning-phase-4-review --references--> the-reckoning
+- ticket-reckoning-phase-4-review --references--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - tiered-loading-is-tiered-reading-applied-to-specs --references--> thing-specification
 - tiered-loading-is-tiered-reading-applied-to-specs --references--> orchestration-specification
 - tracking-artifacts-can-drift-from-reality --references--> domain-spec-guide-predates-knowledge-primitives

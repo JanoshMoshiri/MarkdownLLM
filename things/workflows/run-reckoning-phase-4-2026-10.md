@@ -2,12 +2,12 @@
 id: run-reckoning-phase-4-2026-10
 type: workflow-run
 status: active
-version: 1.0
+version: 1.1
 created: 2026-10-20
 definition: substrate-floor-development
 definition_commit: e01966a71111cd839135ce9623c032217c234fe6
-current_stage: build
-held_by: claude
+current_stage: verify
+held_by: codex
 tags: [run, floor, the-reckoning, two-seat-review, codex]
 informed_by:
   - id: the-reckoning
@@ -42,7 +42,7 @@ linked_things:
 
 ## Where This Is
 
-At `build`. Born at `design`: the problems, requirements and the cut were
+At `verify`, with the review in the Codex seat's hands and the full suite running as the builder's half of the gate. Born at `design`: the problems, requirements and the cut were
 settled before this run existed — `the-reckoning` Phase 4 names the four
 pieces (the promotion path tripping the walk gate; `retrospective.md` scans 5
 and 6 rewritten as reads of the reckoning and scan 7's promotion half pointed
@@ -83,12 +83,20 @@ evidence, not this run's.
   into change-reconciliation.md tripped the gate
   (`cue-change-reconciliation-specification-2026-10-17`).
 
+- **verify (2026-10-20, from e5de9fa)** — the build committed at
+  `e5de9fa4081227fc06c26c331d5222117a4d95b8`; `ticket-reckoning-phase-4-review`
+  raised to the Codex seat with that SHA and the four pieces as scope, one
+  pass, findings as the ticket body, no fixes; the full suite started at this
+  boundary on the builder's side. The run is held by the reviewer until the
+  ticket comes back `claude`.
+
 ## Next
 
-Commit the build at a pinned SHA; raise the ticket to the Codex seat with
-that SHA and the four pieces as the review's scope; advance to `verify`. The
-focused suites ran at build; the full suite is `verify`'s gate and runs once
-there, alongside the review.
+The Codex seat's findings land on the ticket; the builder dispositions each
+(fix in a `build` loop-back, record as drift, or decline with reason), asks
+the operator only for what changes meaning, and advances to `reconcile` —
+the dark-region walk for the spec and command surfaces — then `seal`, where
+the push is the operator's.
 
 ## Notes
 
