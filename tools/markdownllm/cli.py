@@ -634,10 +634,17 @@ def build_cli() -> argparse.ArgumentParser:
                          "a `session-end:` commit until it is met. Unattended "
                          "(MDLLM_UNATTENDED): the mechanical band only, the rest "
                          "drafted")
+    rk.add_argument("--composition", action="store_true",
+                    help="also list the composition pre-filter (retrospective.md "
+                         "scan 5): pairs of active insights sharing two or more "
+                         "linked_things targets, a shared spec counting for nothing — "
+                         "merge candidates for the agent to judge, never merged by the "
+                         "floor")
     rk.add_argument("--keep", metavar="ID",
                     help="hold one item, written in one move: `disposition: "
-                         "keep-active` (insight, conflict), the reason, and the next "
-                         "look (`settles_when`, one interval out unless --until)")
+                         "keep-active` (insight, conflict or work — one field set), "
+                         "the reason, and the next look (`settles_when`, one interval "
+                         "out unless --until)")
     rk.add_argument("--reason", help="with --keep: why it stays, in one line")
     rk.add_argument("--until", metavar="YYYY-MM-DD",
                     help="with --keep: when to look again")

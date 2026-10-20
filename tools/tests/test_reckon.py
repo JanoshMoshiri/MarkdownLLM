@@ -421,7 +421,9 @@ def test_keep_on_work_records_what_it_waits_on_and_leaves_its_status(tmp_path):
     keep(root, corpus, "plan-a", "waits on the vendor's answer",
          until=dt.date(2026, 10, 20), today=TODAY)
     meta = yaml.safe_load((root / "things/plan-a.md").read_text(encoding="utf-8").split("---")[1])
-    assert "disposition" not in meta and meta["status"] == "in-progress"
+    # One hold, one field set: work carries the same marker an insight does
+    # (the schema review of 2026-10-17 found the two shapes drifting apart).
+    assert meta["disposition"] == "keep-active" and meta["status"] == "in-progress"
     assert str(meta["settles_when"]) == "2026-10-20"
     assert "plan-a" not in _ids(_reckon(root), "settled")
 
@@ -628,8 +630,10 @@ def test_a_hold_written_by_keep_validates_without_a_warning(tmp_path):
     _commit(root, "an orphan", "2026-06-01")
     corpus, _ = scan(root)
     keep(root, corpus, "o00", "a standing razor", today=TODAY)
+    keep(root, corpus, "plan-a", "waits on the vendor", today=TODAY)
     _, findings = validate_corpus(root)
-    assert not [m for m in messages(findings) if "settles_when" in m]
+    assert not [m for m in messages(findings)
+                if "settles_when" in m or "disposition" in m]
 
 
 def test_an_unattended_close_that_is_met_still_hands_over_what_to_draft(tmp_path):
@@ -645,3 +649,62 @@ def test_an_unattended_close_that_is_met_still_hands_over_what_to_draft(tmp_path
     assert "met for an unattended run" in text and "**Unattended:**" in text
     assert "**Settled (10" in text
     assert close_text(cr, gate=True)[0] == "## The close — met"  # the gate opens
+
+
+# --------------------------------------------------------------- composition
+
+def test_composition_lists_pairs_sharing_targets_and_discounts_specs(tmp_path):
+    # retrospective.md scan 5's pre-filter as a read of the reckoning: pairs
+    # of active insights sharing two or more targets, a shared spec counting
+    # for nothing (two insights citing the manifesto is shared authority, not
+    # duplication). Opt-in — a quality read, never on the digest's path.
+    root = _repo(tmp_path)
+    write(root, "things/spec.md",
+          thing_text("id: spec\ntype: specification\nstatus: stable\ncreated: 2026-01-01"))
+    write(root, "things/d1.md",
+          thing_text("id: d1\ntype: decision\nstatus: made\ncreated: 2026-06-01"))
+    links = ("linked_things:\n  - id: {a}\n    relation: informs\n"
+             "  - id: {b}\n    relation: informs\n")
+    write(root, "things/i1.md", thing_text(
+        "id: i1\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+        + links.format(a="d1", b="plan-a")))
+    write(root, "things/i2.md", thing_text(
+        "id: i2\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+        + links.format(a="d1", b="plan-a")))
+    write(root, "things/i3.md", thing_text(
+        "id: i3\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+        + links.format(a="spec", b="d1")))
+    write(root, "things/i4.md", thing_text(
+        "id: i4\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+        + links.format(a="spec", b="d1")))
+    write(root, "things/i5.md", thing_text(
+        "id: i5\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+        "linked_things:\n  - id: spec\n    relation: informs\n"
+        "  - id: plan-a\n    relation: informs\n"))
+    write(root, "things/i6.md", thing_text(
+        "id: i6\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+        "linked_things:\n  - id: spec\n    relation: informs\n"
+        "  - id: plan-a\n    relation: informs\n"))
+    write(root, "things/spec2.md",
+          thing_text("id: spec2\ntype: specification\nstatus: stable\ncreated: 2026-01-01"))
+    for i in ("i7", "i8"):   # two specs shared and nothing else: shared authority
+        write(root, f"things/{i}.md", thing_text(
+            f"id: {i}\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+            + links.format(a="spec", b="spec2")))
+    _commit(root, "eight fresh insights")
+    from markdownllm.model import scan
+    from markdownllm.reckon import composition_candidates
+    corpus, _ = scan(root)
+    rows = composition_candidates(corpus)
+    pairs = {(a, b): (shared, w) for a, b, shared, w in rows}
+    assert pairs[("i1", "i2")] == (["d1", "plan-a"], 2)
+    assert pairs[("i3", "i4")] == (["d1", "spec"], 1)
+    assert pairs[("i5", "i6")] == (["plan-a", "spec"], 1)
+    assert ("i1", "i3") not in pairs      # one shared target is not a pair
+    assert ("i7", "i8") not in pairs      # two shared specs is not a pair
+    assert rows[0][:2] == ("i1", "i2")    # the heaviest pair first
+    # Not on the default read; on the opt-in one, in the settled band.
+    assert not [i for i in _ids(_reckon(root), "settled") if " <> " in i]
+    rep = _reckon(root, composition=True)
+    assert "i1 <> i2" in _ids(rep, "settled")
+    assert "i7 <> i8" not in _ids(rep, "settled")

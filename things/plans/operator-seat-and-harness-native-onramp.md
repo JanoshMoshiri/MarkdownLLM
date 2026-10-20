@@ -37,6 +37,7 @@ triggers:
     condition: "2026-10-31 reached"
     action: "Answered 2026-10-17 by the operator at the session close: the eval backlog takes the onramp's slot. Neither the Codex cloud route's first-hand record nor Phase 2's silent bootstrap had moved since 2026-09-26; the plan is paused. Ask at this date whether the eval backlog has released the slot. Earlier: re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead."
 settles_when: 2026-10-31
+disposition: keep-active
 disposition_reason: "Paused 2026-10-17 on the operator's ruling at the session close: the eval backlog takes this plan's slot. Neither the Codex cloud route's first-hand record nor Phase 2's silent bootstrap had moved since 2026-09-26."
 ---
 

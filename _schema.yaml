@@ -38,6 +38,17 @@ types:
   artifact: # (the original examples, WORKLOG/REVIEWLOG, retired at v3.17)
     description: A committed record artifact with its own lifecycle — today the independent review records in `reviews/`
     statuses: [evolving, stable, deprecated]
+  # The ticket (standing-watch.md → The Ticket): an agent-to-agent message with
+  # no artefact behind it. `status` is the ADDRESSEE — the seat whose turn it is
+  # — and only that seat writes; `closed` is terminal. Domain-declared on
+  # purpose: a reserved type never appears on a status-keyed board, so a
+  # reserved ticket would wake nobody. Declared at the root on 2026-10-20 for
+  # the first two-seat review of a substrate change (run-reckoning-phase-4-2026-10):
+  # Claude builds, Codex reviews once at the pinned commit, the operator seals.
+  ticket:
+    description: An agent-to-agent message with no artefact behind it; `status` names the seat whose turn it is, `closed` means nothing is owed
+    statuses: [claude, codex, closed]
+    terminal_statuses: [closed]
 
 # Declared relation vocabulary (validated at Warning severity).
 # Pruned 2026-06-12 (independent-review action 5): 35 -> 13. Inverse pairs

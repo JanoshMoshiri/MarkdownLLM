@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-20
-generated: 2026-10-20T21:27:10
-generated_from: HEAD@6af9b4c
-coverage: 131
+generated: 2026-10-20T23:41:00
+generated_from: HEAD@46ef499
+coverage: 133
 framework_version: 3.49.0
 ---
 
@@ -298,6 +298,7 @@ framework_version: 3.49.0
 - cue-orient-and-reconciliation-are-the-corpus-two-sides-2026-10-20 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-retrospective-specification-2026-10-20 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-review-independent-operating-model-2026-08-26-codex-2026-10-20 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
@@ -450,6 +451,9 @@ framework_version: 3.49.0
 - watertight-membrane-sprint-2026-08-30 (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
 - watertight-membrane-sprint-2026-08-30 (derived-from)
 
+## operator-rulings-at-the-reckoning-2026-10-20
+- run-reckoning-phase-4-2026-10 (pinned @cb192bf747eab0651aadc08730a374ef2a36abdd)
+
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
@@ -566,12 +570,16 @@ framework_version: 3.49.0
 ## the-operating-layer-has-no-quality-loop
 - workflow-reconciliation-precedes-new-definitions (pinned @7ceb757ff4e3c11ab2023391eb39f98fdc3febe9)
 
+## the-reckoning
+- run-reckoning-phase-4-2026-10 (pinned @379f4970290d4f8792bf5ed898fb591bbd95b588)
+
 ## the-reckoning-is-the-digestion-beat-2026-10-05
 - cue-a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-a-flat-re-export-shim-is-an-uncollided-namespace-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-belief-revision-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-expertise-is-an-output-not-a-prerequisite-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-operating-is-programming-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+- cue-retrospective-specification-2026-10-20 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-session-memory-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-the-substrate-is-a-discipline-prosthesis-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - workflows-emerge-from-use-2026-10-07 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)

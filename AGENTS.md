@@ -253,6 +253,7 @@ each type to the spec that owns it, which is where a description belongs.
 - `artifact` — A committed record artifact with its own lifecycle — today the independent review records in `reviews/` (statuses: evolving / stable / deprecated)
 - `example` — A worked framework pattern distilled from verified execution, teaching by positive and negative contrast (statuses: draft / evolving / stable / deprecated)
 - `plan` — A phased, multi-session work plan for evolving the framework; phase checkboxes updated as work lands (statuses: not-started / in-progress / blocked / paused / completed / cancelled)
+- `ticket` — An agent-to-agent message with no artefact behind it; `status` names the seat whose turn it is, `closed` means nothing is owed (statuses: claude / codex / closed)
 
 Framework-reserved types (built into the tool, no declaration needed): `conflict`, `continuity-brief`, `cue`, `decision`, `guide`, `index`, `insight`, `manifesto`, `prompt`, `retrospective`, `skill`, `specification`, `workflow-definition`, `workflow-run`.
 <!-- /generated:types -->

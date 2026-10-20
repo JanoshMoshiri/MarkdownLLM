@@ -43,16 +43,20 @@ that casts it.
    contradictions as `type: conflict` things. This is the only pass that catches
    an inflection nobody declared — including every change an unattended agent
    commits.
-6. **Insight triage and consolidation** (spec scan 5) — act on the insight
-   orphan findings (`validate`), then cluster `active` insights sharing two or more
-   `linked_things` targets as merge candidates and judge each cluster.
-7. **Conditions-met pass** (spec scan 6) — re-read every `disposition_reason` on
-   the kept insights *and* the held conflicts, and rule on each condition that has
-   since come true.
+6. **Insight triage and consolidation** (spec scan 5) — a read of the reckoning:
+   `mdllm reckon` names the insights that have earned a disposition (orphaned,
+   cited-and-never-promoted, promotable) and `mdllm reckon --composition` the merge
+   candidates — pairs sharing two or more `linked_things` targets, a shared spec
+   counting for nothing. Judge each: promote (`promoted_to`), dismiss, consolidate
+   into one survivor, or hold with `--keep`.
+7. **Conditions-met pass** (spec scan 6) — the holds `mdllm reckon` lists as due,
+   plus any hold the period's events plainly met before its date: read each
+   `disposition_reason` and rule on it; `--keep` re-dates the rest.
 8. `review-skill-coherence` (spec scan 7) — read the skills and the entry file
    against the commit stream since the last retrospective and force a per-skill
-   disposition (confirm-current / update / park / retire);
-   `{framework_root}/templates/prompts/review-skill-coherence.md`.
+   disposition (confirm-current / update / park / retire); fold what the reckoning
+   says to promote into the skill that carries it, `promoted_to` set — the walk gate
+   takes it from there; `{framework_root}/templates/prompts/review-skill-coherence.md`.
 
 9. **Arm the next chase, disarm the one answered** — a `type: time` trigger on
    the new retrospective, thirty days from its `period_end`, `action: surface`

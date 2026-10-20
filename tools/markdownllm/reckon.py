@@ -75,7 +75,7 @@ _SELF_ANSWERED = re.compile(r"already answers", re.I)
 
 @dataclass
 class Item:
-    kind: str        # insight | conflict | cue | trigger | import | work
+    kind: str        # insight | conflict | cue | trigger | import | work | workflow | composition
     thing_id: str
     band: str        # mechanical | settled | residue
     proposal: str    # the disposition proposed, as a verb phrase
@@ -159,7 +159,7 @@ def _hold_due(meta, idle: int | None, created: dt.date | None, interval: int,
 
 def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
                   imports: bool = False, workflows: bool = False,
-                  triggers: bool = True,
+                  triggers: bool = True, composition: bool = False,
                   touch: dict | None = None) -> dict:
     """Every attention item's disposition candidate, banded, with evidence.
 
@@ -241,6 +241,21 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
                               "promote into the operating layer, or state why it stays",
                               f"active {age}d, cited by {cited} live thing(s) and never promoted",
                               waited=age))
+
+    # ---- composition (opt-in: retrospective cadence) ----------------------
+    # The pre-filter retrospective.md scan 5 asks for: active insights that
+    # share two or more `linked_things` targets are merge candidates for the
+    # agent to judge — consolidate per thing.md's Inverse, or relate and
+    # leave. Opt-in because it is a quality read, not a correctness one, and
+    # a pair that shares only the manifesto is not evidence of overlap: a
+    # shared specification counts for nothing, a shared insight or decision
+    # for one. Two retrospectives scripted this by hand before it came here.
+    if composition:
+        for a, b, shared, weight in composition_candidates(corpus):
+            items.append(Item("composition", f"{a} <> {b}", "settled",
+                              "judge the pair: consolidate into one survivor, or relate and leave",
+                              f"share {len(shared)} target(s), {weight} of them not a spec: "
+                              + ", ".join(f"`{x}`" for x in shared)))
 
     # ---- conflicts --------------------------------------------------------
     for t in corpus.things:
@@ -500,6 +515,42 @@ _BAND_HEAD = {
 }
 
 
+_SPEC_TYPES = {"specification", "manifesto", "guide"}
+
+
+def composition_candidates(corpus, *, min_shared: int = 2
+                           ) -> list[tuple[str, str, list[str], int]]:
+    """Pairs of active insights sharing `min_shared` or more declared
+    `linked_things` targets, ordered by how many of the shared targets are
+    not a spec (a shared spec is shared authority, not duplication), then by
+    how many are shared at all. A pair whose every shared target is a spec
+    is listed only when it shares three or more. Returns
+    (id_a, id_b, shared_targets, non_spec_count)."""
+    types = {t.id: str(t.meta.get("type")) for t in corpus.things if t.id}
+    targets: dict[str, set[str]] = {}
+    for t in corpus.things:
+        m = t.meta
+        if not t.id or str(m.get("type")) != "insight" or str(m.get("status")) != "active":
+            continue
+        if origin_is_external(m):
+            continue
+        targets[t.id] = {str(l.get("id")) for l in (m.get("linked_things") or [])
+                         if isinstance(l, dict) and l.get("id")}
+    out = []
+    ids = sorted(targets)
+    for i, a in enumerate(ids):
+        for b in ids[i + 1:]:
+            shared = sorted(targets[a] & targets[b])
+            if len(shared) < min_shared:
+                continue
+            weight = sum(1 for x in shared if types.get(x) not in _SPEC_TYPES)
+            if weight == 0 and len(shared) < min_shared + 1:
+                continue
+            out.append((a, b, shared, weight))
+    out.sort(key=lambda r: (-r[3], -len(r[2]), r[0], r[1]))
+    return out
+
+
 def render(rep: dict, root: Path) -> list[str]:
     lines = [f"## The reckoning — {root}", f"as of {rep['today']}"]
     if not rep["imports_read"]:
@@ -606,10 +657,15 @@ def keep(root: Path, corpus, thing_id: str, reason: str,
     else:
         kind = "work"
     until = until or today + dt.timedelta(days=INTERVALS[kind])
-    fields = {}
-    if kind != "work":
-        fields["disposition"] = "keep-active"
-    fields["disposition_reason"] = json.dumps(reason.strip(), ensure_ascii=False)
+    # One hold, one field set, whatever it is on. Until 2026-10-20 a hold on
+    # work wrote only the reason and the date, a hold on an insight wrote
+    # `disposition: keep-active` too, and the schema registry showed the
+    # drift as 61 reasons against 60 dispositions — the first overlap the
+    # schema review caught that the tool itself had introduced
+    # (framework-retrospective-2026-10, scan 2). Work keeps its status; the
+    # marker says the stall was looked at and held, as it does on an insight.
+    fields = {"disposition": "keep-active",
+              "disposition_reason": json.dumps(reason.strip(), ensure_ascii=False)}
     fields["settles_when"] = until.isoformat()
     if not _set_frontmatter(t.path, fields):
         raise ValueError(f"`{thing_id}` has no frontmatter block")
@@ -1004,7 +1060,9 @@ def cmd_reckon(args) -> int:
         return 0
     rates_only = bool(getattr(args, "rates", False))
     imports = bool(getattr(args, "imports", False))
-    rep = reckon_report(root, corpus, imports=imports, workflows=not rates_only)
+    composition = bool(getattr(args, "composition", False))
+    rep = reckon_report(root, corpus, imports=imports, workflows=not rates_only,
+                        composition=composition)
     if rates_only:
         print(rate_line(rep, rates(root, corpus)))
         return 0

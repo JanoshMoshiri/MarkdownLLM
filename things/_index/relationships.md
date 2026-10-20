@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-20
-generated: 2026-10-20T21:27:10
-generated_from: HEAD@6af9b4c
-coverage: 580
+generated: 2026-10-20T23:41:00
+generated_from: HEAD@46ef499
+coverage: 582
 framework_version: 3.49.0
 ---
 
@@ -633,6 +633,7 @@ framework_version: 3.49.0
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
+- cue-retrospective-specification-2026-10-20 --subject--> retrospective-specification
 - cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 --subject--> review-external-conflict-lifecycle-2026-09-08
@@ -1495,6 +1496,14 @@ framework_version: 3.49.0
 - run-operating-model-seams-2026-08 --references--> run-floor-sprint-3-2026-08
 - run-operating-model-seams-2026-08 --implements--> universal-workflow-methodology
 - run-operating-model-seams-2026-08 --definition--> substrate-floor-development
+- run-reckoning-phase-4-2026-10 --implements--> the-reckoning
+- run-reckoning-phase-4-2026-10 --references--> substrate-floor-development
+- run-reckoning-phase-4-2026-10 --references--> operator-rulings-at-the-reckoning-2026-10-20
+- run-reckoning-phase-4-2026-10 --references--> framework-retrospective-2026-10
+- run-reckoning-phase-4-2026-10 --references--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- run-reckoning-phase-4-2026-10 --references--> execution-independence-is-not-judgement-independence
+- run-reckoning-phase-4-2026-10 --references--> an-adversarial-review-loop-converges-on-its-own-fix-residue
+- run-reckoning-phase-4-2026-10 --definition--> substrate-floor-development
 - scaffold-carries-the-universal-workflow --references--> universal-workflow-methodology
 - scaffold-carries-the-universal-workflow --references--> operating-model-specification
 - scaffold-declares-visibility --extends--> boundary-disclosure-check

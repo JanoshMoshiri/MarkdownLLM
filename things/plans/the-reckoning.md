@@ -118,7 +118,19 @@ dormant workspaces.
       the dispatch prompt's ritual applies the mechanical band, drafts the
       settled one and files the residue. Done when one attended session ends
       through it and one tick drafts one.
-- [ ] **Phase 4 — Retention is promotion.** The promotion path: a surviving
+- [x] **Phase 4 — Retention is promotion.** *Built 2026-10-20 as
+      `run-reckoning-phase-4-2026-10`, the definition's first run with a
+      second seat — Claude built, Codex reviews once at the pinned commit,
+      the operator seals. The promotion path's evidence was already on the
+      record: the 2026-10-17 promotion of `change-safety-is-defense-in-depth`
+      into change-reconciliation.md tripped the walk gate on the spec it
+      entered (`cue-change-reconciliation-specification-2026-10-17`).
+      `retrospective.md` 1.9 reads scans 5 and 6 off `mdllm reckon` and
+      points scan 7's promotion half at it; `reckon --composition` carries
+      the pre-filter (opt-in, a shared spec weighted zero); `reckon --keep`
+      writes one field set on work and insights alike, and the three plans
+      it had held without the marker were migrated. The phase ticks on the
+      build; the run closes on the review.* The promotion path: a surviving
       insight folded into a skill with `promoted_to` set, tripping the walk
       gate; `retrospective.md` scans 5 and 6 rewritten as reads of the
       reckoning and scan 7's promotion half pointed at it. Done when one
