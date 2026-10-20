@@ -2,7 +2,7 @@
 id: thing-specification
 type: specification
 status: evolving
-version: 2.24
+version: 2.25
 created: 2026-05-13
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -93,7 +93,7 @@ These fields must be present in every thing to do:
   - `decision` — a judgement made from knowledge, with inputs pinned to git commits via `informed_by`
   - `workflow-definition` — a reusable process skeleton with its stages expressed as data and the transitions allowed between them
   - `workflow-run` — one live instance advancing through a `workflow-definition`: a `current_stage` cursor, an advisory `held_by` claim, and a resume narrative
-  - `cue` — the change-reconciliation cue question, persisted: `subject` names the reasoned-from thing that was modified, `raised_at` pins the commit, and it stays `open` until a `verdict` (`inflection` / `not-inflection`) is recorded with a `verdict_reason` — the receipt — by a human, or by the framework agent citing in `informed_by` the decision that already ruled the change (`framework-agent-closes-settled-cues-2026-09-13`). Any session may raise one; an unattended run never answers
+  - `cue` — the change-reconciliation cue question, persisted: `subject` names the reasoned-from thing that was modified, `raised_at` pins the commit, and it stays `open` until a `verdict` (`inflection` / `not-inflection`) is recorded with a `verdict_reason` — the receipt — by the agent that walked it, citing in `informed_by` the ruling it rests on where one exists; only what the agent may not settle goes to the operator (`the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`). Any session may raise one; an unattended run never answers
   - See `session-memory.md`, `belief-revision.md`, `retrospective.md`, `provenance.md`, `workflow-state.md`, and `change-reconciliation.md` for full specifications.
 - Two types are **framework-internal**: `guide` and `manifesto`. These are used by the framework's own files only. They carry lifecycle status semantics (`draft`, `evolving`, `stable`, `deprecated`) and should not be used for domain things.
 - `specification` is framework-defined with the same lifecycle vocabulary and has exactly **two legitimate homes**: the framework's own spec files, and a domain's *specification skill* — the one scaffold-delivered file that states why the domain exists (`templates/domain-specification.skill.md.template` types it `specification`, and every scaffolded domain carries it that way). Any other domain use is misuse. *(The tenth review caught v2.18's "framework-internal only" claim contradicting the scaffold's own delivery — the classification followed neither the template nor the estate; this one follows both.)*
@@ -168,7 +168,7 @@ These aren't required, but they unlock richer reasoning from the agent:
 - Relationships to other things
 - Structure: `{ id: "thing-id", relation: "[type]", notes: "optional context" }`
 - Allows the agent to traverse the graph of your life
-- Common relation values: `subtask`, `related`, `informs`, `implements`, `extends`, `references`, `complements`, `documents`
+- Common relation values: `subtask`, `informs`, `implements`, `extends`, `references`, `complements`, `documents` (the domain's `_schema.yaml` declares its own set; `related` was pruned on 2026-06-12)
 - Keep the vocabulary small: declare it in `_schema.yaml`, prefer the forward direction over inverse pairs (the link lives on the dependent thing), and don't duplicate the `dependencies`/`blocks` fields as relations
 - Decomposition relation values — signal that two things should be structurally separate (see **Thing Cohesion and Decomposition**):
   - `instance-of` — this thing is a specific occurrence of the referenced methodology, pattern, or template

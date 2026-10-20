@@ -4,7 +4,10 @@ MarkdownLLM Explorer is a small, read-only window into your substrate. The
 Windows installer includes everything it needs: you do not have to install
 Python, Node or a browser extension.
 
-> Explorer is currently a **Windows preview candidate**. The reviewed product
+> **Explorer is parked** (since 2026-09-02): no installer has been published, so
+> the steps below cannot be followed with a public release asset today.
+>
+> Explorer is a **Windows preview candidate**. The reviewed product
 > is accepted as a read-only viewer, but an unsigned local build is not a public
 > release asset. Publish only after the application and setup are signed and the
 > signed installer has completed the native lifecycle verification.
@@ -13,8 +16,8 @@ Python, Node or a browser extension.
 
 ### 1. Open the installer
 
-Get `MarkdownLLM-Explorer-Installer-0.4.1.exe` from your trusted MarkdownLLM
-release source, then double-click it.
+Get the signed `MarkdownLLM-Explorer-Installer-<version>.exe` from a MarkdownLLM
+release, once one is published, then double-click it.
 
 Windows may warn about or, under Smart App Control or enterprise code-integrity
 policy, fully block an unsigned build. A public release must carry a trusted

@@ -1,8 +1,8 @@
 ---
 id: scalability-guide
 type: guide
-status: stable
-version: 1.3
+status: evolving
+version: 1.4
 created: 2026-05-17
 linked_things:
   - id: thing-specification
@@ -57,7 +57,7 @@ This gives you three actionable rules:
 2. **Let the agent choose the level** — The read/write specs already define tiered loading (Level 1: metadata, Level 2: relationships, Level 3: full context). The agent picks the appropriate level based on what you're asking.
 3. **Compress completed work** — Things that are done don't need to occupy the same space as things that are active. Summarise them. The detail is still in git history if you ever need it.
 
-These three rules scale from 50 things to 5,000 without changing the data structure, the file format, or the framework architecture.
+These three rules carry a workspace through the range this guide has measured — comfortable to 200–300 things, workable beyond with tiered loading — without changing the data structure, the file format, or the framework architecture. Near 1,000 active things, read the last section before going further.
 
 ## Three Approaches to Scaling
 
@@ -200,8 +200,7 @@ Agent:
 - As you use the system at scale, this becomes natural
 
 **Pros:**
-- Maximally scalable (works at 10,000+ things)
-- Mirrors how neural networks actually work
+- The most scalable of the three approaches (not measured beyond the largest live workspace, about 555 things)
 - Elegant: same files, different loading patterns
 - Evolves naturally from Approach 1
 

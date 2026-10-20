@@ -1,5 +1,10 @@
 # Codex Cloud workspace adapter
 
+> **Status: paused** (2026-10-20). The framework half shipped in 3.49.0; adopting
+> it in a primary repository and the live cloud acceptance run are the operator's
+> and wait for the next cloud task (`codex-cloud-workspace`,
+> `codex-cloud-conversational-launcher`).
+
 Codex selects one GitHub repository as its primary checkout. The cloud adapter
 surrounds that checkout with a pinned public MarkdownLLM framework and assembles
 declared secondary domains and ordinary code repositories as independent Git

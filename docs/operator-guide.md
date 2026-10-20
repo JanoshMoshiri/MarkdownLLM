@@ -70,7 +70,7 @@ Your role narrows to the part that was always genuinely yours: judgment.
 | Spot-check structure, statuses, and links after the agent wrote things | The pre-commit hook runs `mdllm validate`; commits containing Errors are blocked before they exist |
 | Remember which status values are legitimate for which thing type | `things/_schema.yaml` declares them; the validator enforces exactly what the domain declared |
 | Re-check by hand that a thing marked done didn't still hang on unfinished prerequisites | `mdllm validate` blocks a terminal-status thing that still depends on unfinished work — completing on top of an open prerequisite is an Error at the commit boundary (v3.15.0); if the edge was never really a prerequisite, model it as `linked_things` instead |
-| Notice when a derived index no longer matched the things | `mdllm index check` rebuilds and diffs; index drift is detectable, and CI checks it on every push |
+| Notice when a derived index no longer matched the things | `mdllm index check` rebuilds and diffs; index drift is detectable, and the framework repository's own CI checks it on every push |
 | Mentally track deadlines and re-raise them to the agent | `mdllm triggers` evaluates time/dependency/threshold/import conditions mechanically; the scheduled-triggers adapter surfaces them even with no session open |
 | Wonder whether the framework had moved on since the domain was scaffolded | The `session-start:version-check` hard hook compares the version sentinel against the domain's `framework_version_seen` every session — and since v3.4.0 the sentinel itself is drift-proofed (it had silently stalled once; that class of failure is now an Error the framework's own hook blocks) |
 | Reconstruct *why* a judgment call was made months ago | `type: decision` things pin their inputs to exact commits (`informed_by`); `mdllm provenance` enforces the chain |
@@ -80,7 +80,7 @@ The pattern across every row: mechanically decidable facts you once held in
 your head became checks the active floor can reproduce. Meaning and omissions
 remain the work of the probabilistic agent and your review.
 
-## What It Feels Like: Seven Scenarios
+## What It Feels Like: Eight Scenarios
 
 ### 1. An ordinary session — nothing changed, and that's the point
 
@@ -137,9 +137,9 @@ You don't open a session for weeks. The scheduled-triggers adapter
 (`adapters/scheduled-triggers.ps1`, registered in Task Scheduler) runs
 `mdllm triggers` against the domain on a schedule and surfaces anything whose
 condition has fired — a confirmation statement coming due, a blocked thing
-whose dependency cleared. Separately, the GitHub Actions workflow runs
-validation, provenance, and index-drift checks on every push, so a domain
-with a remote has CI watching its floor.
+whose dependency cleared. Separately, the framework repository's own GitHub Actions workflow runs
+validation, provenance, and index-drift checks on every push. A workspace
+gets no CI workflow from `scaffold`; its floor is the installed git hooks.
 
 *Specs: `trigger-specification.md`; `adapters/`.*
 
@@ -173,22 +173,21 @@ surfaces, then one command to install the hook.
 ### 7. Seeing the estate without opening a coding harness
 
 You want to understand what exists before asking an agent to change anything.
-The optional [MarkdownLLM Explorer](../explorer/README.md) opens the substrate
-and nested domain estate as a read-only visual surface: repository commits, the
-file tree, skills and memory, with Markdown rendered as a document. Windows has
-an installer preview. On macOS, ask the framework agent to **open MarkdownLLM
-Explorer**; it runs the tracked portable launcher and opens the browser.
+The optional [MarkdownLLM Explorer](../explorer/README.md) opens the framework
+and your workspaces as a read-only visual surface: repository commits, the file
+tree, skills and memory, with Markdown rendered as a document. **Explorer is
+parked** (since 2026-09-02, `explorer-publication-readiness`): there is no
+published Windows installer — publication waits on code signing — and the macOS
+work is paused. From a framework checkout on macOS you can still ask the
+framework agent to **open MarkdownLLM Explorer**; it runs the tracked portable
+launcher and opens the browser.
 
 Explorer is a viewer, not an agent route. It cannot accept instructions, invoke
 skills, edit files, run `estate-sync`, validate, reconcile or publish. If its
 view is stale, synchronise the underlying repositories through the normal
-operator/agent workflow and refresh Explorer. Start with the [installation
-guide](../explorer/docs/installation-guide.md) and then the [user
-guide](../explorer/docs/user-guide.md).
-
-The local service stops after 30 minutes without authenticated browser activity.
-Ask the agent to open it again when needed; no server-management command needs
-to be remembered.
+operator/agent workflow and refresh Explorer. The [user guide](../explorer/docs/user-guide.md) describes what it shows.
+The local service keeps running until you stop it (**Exit Explorer**, or ask
+the agent to stop it).
 
 *Boundary: `interface.md`; release position: `explorer-publication-position`.*
 
@@ -196,10 +195,9 @@ to be remembered.
 
 The accessible route is harness-native: you say what you want to work on, in the harness you
 already use, and the agent does the rest — sync, refresh, floor, session start — and tells you
-where things stand in your own words. That onramp is being built as a skill for Claude Code and
-Cowork, with Perplexity as a candidate route pending a probe; see
-`operator-seat-and-harness-native-onramp`. Until it lands, this guide's command-line sequence is
-the published route.
+where things stand in your own words. That onramp is planned and **paused**
+(`operator-seat-and-harness-native-onramp`); this guide's command-line sequence is the
+published route, and in Claude Code `/orient` starts a session with everything the agent needs.
 
 MarkdownLLM Desktop, the local application tried as this route, is **frozen at its issued 0.1.6
 installer as an Engineering Preview** (2026-09-06). It is not published and is not the first-use
@@ -211,7 +209,7 @@ existing harnesses and the read-only Explorer remain valid routes and integratio
 ## The Toolbox
 
 Everything runs through one entry point:
-`python {framework_root}/tools/mdllm.py <subcommand> [path]` (the
+`mdllm <subcommand> [path]` — on Windows `tools/mdllm.ps1`, elsewhere `sh tools/mdllm.sh` (the
 implementation lives in the `tools/markdownllm/` package beside it — one
 module per responsibility). Most of these run *for* you — via the pre-commit
 hook, CI, or the agent — but all of them are yours to invoke directly.
@@ -356,7 +354,7 @@ Codex's lifecycle projection is verified on Codex CLI 0.147.0 / Windows 11,
 and the Desktop managed shell has separate root and directly opened nested
 domain runtime/Git evidence. Gate 7.0 additionally proved the dependency-
 probing PowerShell route and the restricted-then-approved strict estate sync,
-pre-commit, and publication path in QMS. Each fact keeps its own surface and
+pre-commit, and publication path in the regulated deployment. Each fact keeps its own surface and
 build; none is relabelled as global Codex compatibility or machine-readable
 trust.
 
@@ -534,8 +532,8 @@ a ladder — each rung extracts a stratum the previous one can't:
    rung 1 (observed live: a kernel load that arrived cut, reported as
    "loaded" in good faith). Since the emission carries an integrity trailer
    (line count + sha256), you can ask the agent to account for both.
-3. **The walk probe** — *"Did you perform the orientation walk, steps four
-   to six?"* Separates relaying the digest from having judged it. The
+3. **The walk probe** — *"Did you perform the orientation walk — all four
+   steps?"* Separates relaying the digest from having judged it. The
    strongest sessions audit themselves *before* answering this one; weaker
    ones confess without completing. Either way you learn where this
    session economised — and the evidence says the gap moves every session,

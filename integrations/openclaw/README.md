@@ -32,11 +32,15 @@ Use the documented `npm-pack:` prefix. It exercises OpenClaw's managed npm
 project and lockfile verification; installing the same file as a raw archive
 does not prove the registry-shaped installation path.
 
-Install the pinned public package:
+Install the pinned package once it is published:
 
 ```bash
 openclaw plugins install @markdownllm/openclaw-adapter@0.1.0 --pin
 ```
+
+> **Not yet on the public npm registry** (checked 2026-10-20: `npm view`
+> returns 404). Publication is a separate deliberate act; until it happens,
+> use the `npm-pack:` route above from a local checkout.
 
 Review the package and its native plugin code before installation: an OpenClaw
 plugin executes inside the Gateway process.

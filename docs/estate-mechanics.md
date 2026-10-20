@@ -36,13 +36,13 @@ meaning without a person (since 2026-10-05:
 `the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05`,
 `the-reckoning-is-the-digestion-beat-2026-10-05`).
 
-The optional [MarkdownLLM Explorer](../explorer/README.md) can display this
-estate and its commits, but it sits outside every operational arrow below. It
+The optional — and currently parked — [MarkdownLLM Explorer](../explorer/README.md)
+can display your workspaces and their commits, but it sits outside every operational arrow below. It
 does not run `estate-sync`, `imports-check`, reconciliation or publication;
 its freshness is exactly the freshness of the repositories it reads.
 
-The architect can see these internals from memory. Nobody else can without
-reading the specs whole — this page is the shortcut. (Normative sources:
+These internals are spread across five specifications; this page gathers
+them in one place. (Normative sources:
 `git-workflow.md`, `change-reconciliation.md`, `retrospective.md`,
 `orchestration.md`; decision `autopush-requires-explicit-authority`.)
 
@@ -218,13 +218,15 @@ equivalent — nothing nests beneath a domain.
 
 ---
 
-## 4 · The interconnection — one primitive at four radii
+## 4 · The interconnection — one primitive at four boundaries
 
 There are not three systems to hold in your head. There is one split,
-repeated at every radius — and the radii nest as safety nets: what one
-misses falls to the net beneath.
+repeated at every boundary a change crosses — and the boundaries nest as
+safety nets: what one misses falls to the net beneath. (The three *radii*
+above are how far a change reaches; the four *boundaries* here are where it
+is caught.)
 
-| Radius | The floor — asks · gathers · transports | The human — decides · routes |
+| Boundary | The floor — asks · gathers · transports | The human — decides · routes |
 |---|---|---|
 | **Commit** | `candidates` asks the cue · `cues --staged` gates the agent's commit until the walk is recorded · `cues` holds it until then · `autopush` transports | the residue of the walk (a change of meaning, a contradiction) · route rejected pushes |
 | **Membrane** | `estate-sync` freshens · `imports-check` detects drift | exposure call · verified flip |
@@ -233,18 +235,18 @@ misses falls to the net beneath.
 
 ```mermaid
 flowchart TD
-    accTitle: The four radii nesting as safety nets
+    accTitle: The four boundaries nesting as safety nets
     accDescr {
         A single chain of four stages, each catching what the one before it
-        missed. An unwalked change at the commit radius surfaces as drift at
-        the membrane radius, reported as stale or DIVERGED. What drift cannot
-        see falls to the epoch radius and its retrospective clocks. Epochs in
-        turn feed the release radius, where the walk resets the substrate. One
-        split repeated at every radius: detection mechanical, judgement human.
+        missed. An unwalked change at the commit boundary surfaces as drift at
+        the membrane, reported as stale or DIVERGED. What drift cannot see
+        falls to the epoch and its retrospective clocks. Epochs in turn feed
+        the release, where the walk resets the substrate. One split repeated
+        at every boundary: detection mechanical, judgement the operator's.
     }
-    C1["Commit radius —<br/>an unwalked change"] -->|"surfaces as drift"| M1["Membrane radius —<br/>stale / DIVERGED"]
-    M1 -->|"what drift can't see"| E1["Epoch radius —<br/>the retrospective clocks"]
-    E1 -->|"epochs feed"| R1["Release radius —<br/>the walk resets the substrate"]
+    C1["Commit —<br/>an unwalked change"] -->|"surfaces as drift"| M1["Membrane —<br/>stale / DIVERGED"]
+    M1 -->|"what drift can't see"| E1["Epoch —<br/>the retrospective clocks"]
+    E1 -->|"epochs feed"| R1["Release —<br/>the walk resets the substrate"]
 ```
 
 Detection mechanical, settled judgement the agent's, the residue human,

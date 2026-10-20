@@ -195,7 +195,7 @@ trace, and everything else is refinement.
 ## What to Read Next
 
 - **`operator-guide.md`** — the steady state: what the tooling carries for
-  you, the seven recurring scenarios, what remains irreducibly your job.
+  you, the eight recurring scenarios, what remains irreducibly your job.
 - **`framework-map.md`** — one visual page of how the specs relate, for when
   you're curious what's underneath.
 - **Explorer's `user-guide.md`** — the short visual walkthrough if you prefer

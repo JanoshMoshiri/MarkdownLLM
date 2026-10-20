@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-20
-generated: 2026-10-20T23:52:07
-generated_from: HEAD@e59e5fb
-coverage: 134
+generated: 2026-10-20T23:57:26
+generated_from: HEAD@08f6ac7
+coverage: 135
 framework_version: 3.49.0
 ---
 
@@ -176,6 +176,16 @@ framework_version: 3.49.0
 
 ## divergence-is-an-unrouted-decision
 - divergence-primitive-promotion (pinned @aae0712)
+
+## documentation-rulings-2026-10-20
+- cue-estate-mechanics-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-first-hour-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-framework-map-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-glossary-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-limitations-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-operator-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-scalability-guide-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
+- cue-thing-specification-2026-10-20 (pinned @08f6ac78389c5fe1355089f80c166a707f3a3dc5)
 
 ## domain-specification-guide
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
@@ -615,17 +625,23 @@ framework_version: 3.49.0
 - cue-emitted-content-is-read-instructed-content-is-economised-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-estate-mechanics-guide-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-estate-mechanics-guide-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-estate-mechanics-guide-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-feels-automatic-is-persistence-of-the-question-2026-10-08 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-first-hour-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-first-hour-guide-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-first-hour-guide-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-framework-map-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-framework-map-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-git-workflow-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-glossary-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-independent-review-2026-07-14-fable-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-independent-substrate-review-2026-08-20-claude-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-independent-substrate-review-2026-08-20-codex-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-inflection-candidates-are-computable-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-limitations-guide-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-operator-guide-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-operator-guide-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-operator-guide-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-orchestration-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-orchestration-specification-2026-10-18 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-orient-and-reconciliation-are-the-corpus-two-sides-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
@@ -633,9 +649,11 @@ framework_version: 3.49.0
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-review-independent-operating-model-2026-08-26-codex-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-scalability-guide-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-session-start-hardening-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-the-reckoning-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
+- cue-thing-specification-2026-10-20 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - cue-validate-thing-specification-2026-10-17 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)
 - workflows-emerge-from-use-2026-10-07 (pinned @69dade015b2d6114c706d8539dfb58434e11e488)

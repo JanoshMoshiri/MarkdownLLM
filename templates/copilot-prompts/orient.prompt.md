@@ -5,8 +5,8 @@ description: Orient — the session-start ritual read whole, then the judgement 
 
 Run **orient** for this domain — the session-start ritual in full, then the
 judgement half that no hook performs. Invoked deliberately: the startup hook's
-channel delivers the digest cut and the kernel deferred, and a read the entry
-file merely *instructs* is economised
+channel carries the digest but defers the kernel, and a read the entry file
+merely *instructs* is economised
 (`emitted-content-is-read-instructed-content-is-economised`); this prompt is
 the pull.
 

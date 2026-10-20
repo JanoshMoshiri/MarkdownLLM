@@ -6,6 +6,10 @@ Version 0.4.3 uses matching neutral side panels and cyan accents, with the
 MarkdownLLM mark in the app, browser tab and Windows shortcuts. Light mode uses
 the dark-ink logo; the existing light, dark and system choices remain available.
 
+> **Parked since 2026-09-02** (`explorer-publication-readiness`): there is
+> no published installer — Windows publication waits on code signing — and
+> the macOS work is paused. The text below describes the product as built.
+
 > **Current release position — operator-accepted Windows preview candidate.**
 > Independent review corrections are implemented. Public Windows publication
 > is still gated by Authenticode signing and a final native lifecycle run on the

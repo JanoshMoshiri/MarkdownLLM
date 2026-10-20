@@ -2,7 +2,7 @@
 id: run-reckoning-phase-4-2026-10
 type: workflow-run
 status: active
-version: 1.1
+version: 1.2
 created: 2026-10-20
 definition: substrate-floor-development
 definition_commit: e01966a71111cd839135ce9623c032217c234fe6
@@ -86,8 +86,10 @@ evidence, not this run's.
 - **verify (2026-10-20, from e5de9fa)** — the build committed at
   `e5de9fa4081227fc06c26c331d5222117a4d95b8`; `ticket-reckoning-phase-4-review`
   raised to the Codex seat with that SHA and the four pieces as scope, one
-  pass, findings as the ticket body, no fixes; the full suite started at this
-  boundary on the builder's side. The run is held by the reviewer until the
+  pass, findings as the ticket body, no fixes; the full suite ran once at this
+  boundary on the builder's side: **1111 passed, 14 skipped** (11m31s,
+  Windows, Python 3.12) — the builder's half of verify is green; the
+  reviewer's half is the ticket. The run is held by the reviewer until the
   ticket comes back `claude`.
 
 ## Next

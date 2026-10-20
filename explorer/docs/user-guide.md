@@ -4,7 +4,8 @@ MarkdownLLM Explorer turns a substrate and its domains into a calm, visual
 map. Files and git remain the source of truth; Explorer gives you a way to see
 and read them without using the command line.
 
-> Explorer is currently a **Windows preview**. It is for inspection only: it
+> **Explorer is parked** (since 2026-09-02); there is no published installer.
+> Explorer is a **Windows preview**. It is for inspection only: it
 > does not change files, run an agent, synchronise repositories or publish
 > anything.
 

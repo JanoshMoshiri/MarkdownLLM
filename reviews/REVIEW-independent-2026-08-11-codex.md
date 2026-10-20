@@ -42,7 +42,7 @@ But it is not deterministic end-to-end, and one foundational implementation mism
 
 ### 1. Critical: the pre-commit floor validates the worktree, not the commit candidate
 
-Git commits the index. The hook invokes `validate` against ordinary filesystem paths, and the scanner reads those paths from the worktree: [hook](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/scaffold.py:28), [scanner](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/model.py:294).
+Git commits the index. The hook invokes `validate` against ordinary filesystem paths, and the scanner reads those paths from the worktree: [hook](../tools/markdownllm/scaffold.py:28), [scanner](../tools/markdownllm/model.py:294).
 
 I reproduced this directly:
 
@@ -81,7 +81,7 @@ I would have every session and significant tool result name a base commit. Befor
 
 ### 3. High: autopush fails open on an irreversible operation
 
-[`_autopush_enabled`](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/sync.py:183) returns `True` when:
+[`_autopush_enabled`](../tools/markdownllm/sync.py:183) returns `True` when:
 
 - `AGENTS.md` is missing.
 - Frontmatter is absent.
@@ -97,14 +97,14 @@ Require explicit `autopush: true`. Treat absent, malformed, and unknown as off o
 
 ### 4. High: scaffold and hook installation are not transactional
 
-The scaffold flow stages `.gitignore` in the outer repository and then runs an ordinary `git commit`: [scaffold isolation](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/scaffold.py:310).
+The scaffold flow stages `.gitignore` in the outer repository and then runs an ordinary `git commit`: [scaffold isolation](../tools/markdownllm/scaffold.py:310).
 
 If the operator already has unrelated staged changes, that commit will include them. `git add .gitignore` does not constrain `git commit` to that file.
 
 There are related hazards:
 
 - A later failure leaves an outer isolation commit plus a partially born domain.
-- [`install_hook`](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/scaffold.py:121) overwrites existing `pre-commit`, `commit-msg`, and `post-commit` hooks without chaining or backup.
+- [`install_hook`](../tools/markdownllm/scaffold.py:121) overwrites existing `pre-commit`, `commit-msg`, and `post-commit` hooks without chaining or backup.
 - It assumes `.git` is a directory and ignores Git worktrees, gitfiles, and `core.hooksPath`.
 - Installing the framework can therefore destroy an unrelated hook system.
 
@@ -112,7 +112,7 @@ Preflight the outer index and refuse or isolate the commit when unrelated staged
 
 ### 5. High: MCP provenance can assert a commit that did not produce the served content
 
-The MCP server constructs payload content from the live scanned `Thing`, but obtains `source_commit` from the last commit that touched its path: [MCP payload](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/mcp_server.py:140).
+The MCP server constructs payload content from the live scanned `Thing`, but obtains `source_commit` from the last commit that touched its path: [MCP payload](../tools/markdownllm/mcp_server.py:140).
 
 If the file is dirty, a consumer receives uncommitted bytes stamped with an older commit. The reference triple is then false. It also uses abbreviated hashes, which are weak identifiers for long-lived, cross-repository provenance.
 
@@ -128,7 +128,7 @@ The manifest, deliverable, and imported copy should all refer to the same immuta
 
 ### 6. High: the declared graph is implemented by several drifting field lists
 
-[`touchpoints`](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/touchpoints.py:25) says it reports the “COMPLETE declared inbound set,” but it examines only:
+[`touchpoints`](../tools/markdownllm/touchpoints.py:25) says it reports the “COMPLETE declared inbound set,” but it examines only:
 
 - `linked_things`
 - `parent`
@@ -141,17 +141,17 @@ That makes completeness claims unstable by construction.
 
 Define one canonical structural-reference iterator or registry and make validation, indexes, touchpoints, cascade, and MCP consume it.
 
-A neighbouring issue is more conceptual: [change-reconciliation](C:/Users/Jamos/Projects/MarkdownLLM/change-reconciliation.md:48) says a fresh thing carries no consistency risk, while [`candidates`](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/touchpoints.py:129) considers only staged `M` modifications.
+A neighbouring issue is more conceptual: [change-reconciliation](../change-reconciliation.md:48) says a fresh thing carries no consistency risk, while [`candidates`](../tools/markdownllm/touchpoints.py:129) considers only staged `M` modifications.
 
 A new thing can absolutely contradict existing knowledge. A deleted thing can invalidate conceptual assumptions even when declared references remain clean. Candidate handling needs `A`, `M`, `D`, and rename semantics, with different cue questions for each.
 
 ### 7. High: duplicate YAML keys are silently accepted
 
-The parser uses `yaml.safe_load`, which follows last-value-wins behaviour for duplicate keys: [parser](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/model.py:237).
+The parser uses `yaml.safe_load`, which follows last-value-wins behaviour for duplicate keys: [parser](../tools/markdownllm/model.py:237).
 
 The current corpus contains a concrete example that validates cleanly:
 
-- [`source_domain` appears twice](C:/Users/Jamos/Projects/MarkdownLLM/things/insights/divergence-is-an-unrouted-decision.md:11).
+- [`source_domain` appears twice](../things/insights/divergence-is-an-unrouted-decision.md:11).
 
 Today that duplication is harmless because the values agree. The same behaviour could silently discard one of two conflicting statuses, origins, dependency lists, or publication settings.
 
@@ -159,13 +159,13 @@ A definition-driven framework should reject duplicate mapping keys before constr
 
 ### 8. High: the evaluation harness can return success for failed evidence
 
-Several independent gaps exist in [evals.py](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/evals.py:21):
+Several independent gaps exist in [evals.py](../tools/markdownllm/evals.py:21):
 
 - Scan findings are discarded at line 30.
 - `validates_clean` invokes only three validation functions, not the complete validation command.
 - The headless agent’s process return code is not made part of the trial result.
 - An agent-reported error is printed but does not necessarily fail the trial.
-- The command returns `0` after Stage 2 even when assertions failed: [final return](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/evals.py:377).
+- The command returns `0` after Stage 2 even when assertions failed: [final return](../tools/markdownllm/evals.py:377).
 - Second-resolution run IDs can collide under concurrent or repeated execution.
 
 This means the JSON evidence may be informative, but the command is not yet a trustworthy CI/evidence boundary.
@@ -176,18 +176,18 @@ The repository is admirably honest that its first model-size fixture saturated a
 
 ### 9. High for financial domains: calculation enforcement has three loopholes
 
-The calculator says “Decimal, never float,” but YAML has already parsed unquoted numeric scalars before [`to_decimal`](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/calc.py:93) receives them. Converting the resulting float through `str` avoids exposing the binary expansion, but it cannot recover decimal precision already discarded by YAML.
+The calculator says “Decimal, never float,” but YAML has already parsed unquoted numeric scalars before [`to_decimal`](../tools/markdownllm/calc.py:93) receives them. Converting the resulting float through `str` avoids exposing the binary expansion, but it cannot recover decimal precision already discarded by YAML.
 
 Two more consequential gaps exist:
 
-- A non-evaluable expression remains only a warning even under `computed: strict`: [validation](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/validation.py:644). A typo can therefore disable a supposedly blocking calculation.
+- A non-evaluable expression remains only a warning even under `computed: strict`: [validation](../tools/markdownllm/validation.py:644). A typo can therefore disable a supposedly blocking calculation.
 - Cross-corpus calculations exclude unverified external things and record a context note, but commit validation does not surface those notes when the remaining result agrees. A total can validate cleanly while omitting quarantined inputs.
 
 In strict mode, unevaluable computation should be an error. For exact financial values, parse numeric source lexemes directly or require quoted decimal values. Any exclusion that changes a declared aggregate’s input set should appear in validation output.
 
 ### 10. Medium-high: workflow transition legality is classified as semantic when it is mechanical
 
-A workflow definition contains machine-readable adjacency lists. Git contains the prior `current_stage`. Yet [workflow-state.md](C:/Users/Jamos/Projects/MarkdownLLM/workflow-state.md:139) explicitly delegates transition legality to the agent, and validation checks only membership: [validator](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/validation.py:236).
+A workflow definition contains machine-readable adjacency lists. Git contains the prior `current_stage`. Yet [workflow-state.md](../workflow-state.md:139) explicitly delegates transition legality to the agent, and validation checks only membership: [validator](../tools/markdownllm/validation.py:236).
 
 A move from `draft` directly to `done` can validate even when the definition permits only `draft → review → done`.
 
@@ -195,7 +195,7 @@ Whether the work deserves to advance is semantic. Whether `old_stage → new_sta
 
 ### 11. Medium-high: trigger evaluation can crash or fire incorrectly
 
-In [triggers.py](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/triggers.py:118):
+In [triggers.py](../tools/markdownllm/triggers.py:118):
 
 - A malformed stale threshold reaches `int(thresh)` and can crash the command instead of producing a validation finding.
 - `subtasks_complete` ignores subtask IDs absent from the corpus. If every named subtask is missing, `all(empty)` is true and the trigger fires.
@@ -206,15 +206,15 @@ Compile and validate trigger declarations before evaluation. An evaluator should
 
 ### 12. Medium: session attestation records a SHA but never checks it
 
-Session start writes a timestamp and `HEAD` SHA: [attestation writer](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/session.py:722). Validation reads only the timestamp: [gate](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/validation.py:721).
+Session start writes a timestamp and `HEAD` SHA: [attestation writer](../tools/markdownllm/session.py:722). Validation reads only the timestamp: [gate](../tools/markdownllm/validation.py:721).
 
-A Tier-0 contract can change immediately after session start and the attestation remains accepted until its time window expires. The test also contains a vacuous assertion: [`assert _gate(...) == [] or True`](C:/Users/Jamos/Projects/MarkdownLLM/tools/tests/test_mdllm.py:3082).
+A Tier-0 contract can change immediately after session start and the attestation remains accepted until its time window expires. The test also contains a vacuous assertion: [`assert _gate(...) == [] or True`](../tools/tests/test_mdllm.py:3082).
 
 Pin the contract content rather than requiring `HEAD` equality, since ordinary work legitimately advances HEAD. Hash the relevant AGENTS/kernel/spec set or record its commit and invalidate only when those surfaces change.
 
 ### 13. Medium-high: external integrations need an explicit trust boundary
 
-[`imports-check`](C:/Users/Jamos/Projects/MarkdownLLM/tools/markdownllm/imports_check.py:30) treats `.mcp.json` as an address book and can:
+[`imports-check`](../tools/markdownllm/imports_check.py:30) treats `.mcp.json` as an address book and can:
 
 - Execute an arbitrary configured command.
 - Make requests to any HTTP or HTTPS URL.
@@ -229,7 +229,7 @@ The provenance spec correctly recognizes external things as durable prompt-injec
 
 ### 14. Medium: examples and birth surfaces sometimes claim enforcement they do not provide
 
-The compliance example says metadata such as `access_control` “enforces” least privilege and that Git provides an access audit trail: [example](C:/Users/Jamos/Projects/MarkdownLLM/examples/compliance-patterns/things/example-gdpr-compliant-data-handling.md:52).
+The compliance example says metadata such as `access_control` “enforces” least privilege and that Git provides an access audit trail: [example](../examples/compliance-patterns/things/example-gdpr-compliant-data-handling.md:52).
 
 Those fields declare a desired control; the framework does not implement authorization, access logging, residency enforcement, or retention deletion. The legal rules shown—UK-only processing and a universal seven-year hold—are context-dependent, not GDPR invariants.
 
@@ -243,7 +243,7 @@ Label legal examples synthetic and non-authoritative.
 
 There are smaller birth-surface defects too:
 
-- The sanitised evidence template places comments before `---`, so the frontmatter parser ignores it; it also uses an artifact status inconsistent with the framework’s artifact vocabulary: [template](C:/Users/Jamos/Projects/MarkdownLLM/evidence/sanitised-validation-record.md.template:1).
+- The sanitised evidence template places comments before `---`, so the frontmatter parser ignores it; it also uses an artifact status inconsistent with the framework’s artifact vocabulary: [template](../evidence/sanitised-validation-record.md.template:1).
 - Example skills reference a nonexistent `../thing.md`.
 - Scaffolded skill `applies_to` globs point at a nested domain-name directory even though the domain is normally opened at its own root.
 - The insight template suggests relations not present in the scaffold schema’s starting vocabulary.

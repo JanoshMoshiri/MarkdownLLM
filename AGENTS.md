@@ -206,7 +206,7 @@ The framework defines itself through these interconnected specifications:
 - **reasoning-lenses.md** — Canonical multi-lens reasoning spec: how to apply lenses in read mode and write mode, compliance domain examples, and how to surface and handle conflicts. (`type: specification`, `status: stable`)
 
 ### Guides
-- **scalability-guide.md** — How to scale from tens to thousands of things. (`type: guide`, `status: stable`)
+- **scalability-guide.md** — How a workspace grows: comfortable to 200–300 things, tiered loading beyond, and the line near 1,000 where the approach should be reconsidered. (`type: guide`, `status: evolving`)
 - **domain-specification-guide.md** — How to create a new domain using the framework. (`type: guide`, `status: stable`)
 - **docs/operator-guide.md** — Human-facing: what working in a domain feels like since v3, the mdllm toolbox with scenarios, and what remains the operator's job. The specs are agent-first; this is the human's walkthrough. (`type: guide`, `status: draft`)
 - **docs/first-hour.md** — Human-facing: a newcomer's first sixty minutes — orientation, scaffolding a first domain, installing the floor, one real session. Covers arrival; the operator-guide covers the steady state. (`type: guide`, `status: evolving`)

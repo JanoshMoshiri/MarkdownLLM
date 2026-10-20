@@ -41,8 +41,9 @@ around.
 - **Many concurrent writers.** Coordination is by publication to a git
   remote and by advisory claims with a lease — read and respected, never a
   lock. Two agents taking turns works; twenty people editing at once does not.
-- **Sub-second latency.** There is no index and no search by design: a broad
-  question is answered by scanning frontmatter. At roughly 560 records,
+- **Sub-second latency.** There is no search index by design: a broad
+  question is answered by scanning frontmatter (the derived indexes cache a
+  few signals, not content). At roughly 560 records,
   `mdllm validate` takes about 27 seconds on one machine. If you need an
   answer before the next keystroke, this is not the layer that gives it.
 - **Genuinely relational queries.** "Every record linked to X whose status

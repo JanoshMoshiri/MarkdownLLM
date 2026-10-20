@@ -39,7 +39,7 @@ the prose.
 is layering.** The manifesto defines [thing.md](../thing.md); five operative specs
 say what may be done to the atom; those six are distilled into
 [kernel.md](../kernel.md) so a session starts on a small fraction of the
-full-spec load (`mdllm tokens` measures it — never assert); fourteen extension
+full-spec load (`mdllm tokens` measures it — never assert); the extension
 specs each bolt one capability onto the atom; the guides only point inward and
 never define anything. The mdllm floor is not a tenth concept — it is the same
 paper layer made mechanical, each subcommand mechanising a piece of it (mostly
@@ -66,8 +66,8 @@ flowchart TD
     accDescr {
         Five stacked bands. The entry band, tier 0, holds AGENTS.md as the
         harness-delivered entry contract and kernel.md as a generated digest. Below
-        it the specification layer holds 34 spec things: the manifesto for the
-        why, thing.md with the core operative specs, and 27 extension and guide
+        it the specification layer holds the spec things: the manifesto for the
+        why, thing.md with the core operative specs, and the extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
         deterministic floor is tools/mdllm.py, providing the mdllm CLI with 42
@@ -84,10 +84,10 @@ flowchart TD
         AGENTS["AGENTS.md<br/>entry contract — harness-delivered"]
         KERNEL["kernel.md<br/>generated digest"]
     end
-    subgraph specs ["specification layer — 32 spec things"]
+    subgraph specs ["specification layer — the spec things"]
         MANIFESTO["manifesto<br/>the why"]
         THING["thing.md<br/>+ core operative specs"]
-        EXT["extensions<br/>+ guides — 25 specs"]
+        EXT["extensions<br/>+ guides"]
     end
     subgraph memory ["domain memory — things/"]
         INSIGHTS["insights"]
@@ -237,7 +237,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 - **`docs/estate-mechanics.md`** (`guide`, `evolving`): documents → `git-workflow.md`, `change-reconciliation.md`, `retrospective.md` · +2 edge(s) outside the spec layer
 - **`docs/first-hour.md`** (`guide`, `evolving`): complements → `operator-guide.md`; references → `domain-specification-guide.md`, `framework-map.md`, `framework-discovery.md` · +4 edge(s) outside the spec layer
 - **`docs/framework-map.md`** (`guide`, `draft`): complements → `operator-guide.md`; documents → `llm-driven-systems.manifesto.md`, `thing.md`, `validate.thing.md`, `orchestration.md`, `git-workflow.md`, `derived-index.md` · +1 edge(s) outside the spec layer
-- **`docs/glossary.md`** (`guide`, `draft`): complements → `operator-guide.md`, `first-hour.md` · +2 edge(s) outside the spec layer
+- **`docs/glossary.md`** (`guide`, `draft`): complements → `operator-guide.md`, `first-hour.md` · +3 edge(s) outside the spec layer
 - **`docs/limitations.md`** (`guide`, `draft`): complements → `operator-guide.md`, `glossary.md`; references → `scalability-guide.md` · +2 edge(s) outside the spec layer
 - **`docs/operator-guide.md`** (`guide`, `draft`): complements → `domain-specification-guide.md`; references → `validate.thing.md`, `provenance.md`, `domain-refresh.md`, `orchestration.md`, `git-workflow.md` · +5 edge(s) outside the spec layer
 - **`domain-refresh.md`** (`specification`, `evolving`): extends → `framework-discovery.md`; references → `git-workflow.md`, `domain-specification-guide.md`, `thing.md` · +1 edge(s) outside the spec layer
@@ -253,7 +253,7 @@ a `(draft)` tag in the drawing above can be checked against it.
 - **`read.thing.md`** (`specification`, `stable`): complements → `write.thing.md`; extends → `thing.md`; references → `reasoning-lenses.md`
 - **`reasoning-lenses.md`** (`specification`, `stable`): no edges to other specs
 - **`retrospective.md`** (`specification`, `stable`): complements → `session-memory.md`, `belief-revision.md`, `git-workflow.md`, `derived-index.md`, `change-reconciliation.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md`
-- **`scalability-guide.md`** (`guide`, `stable`): complements → `thing-lifecycle.md`, `derived-index.md`; extends → `thing.md`; informs → `read.thing.md`, `write.thing.md`; references → `example-things.md`
+- **`scalability-guide.md`** (`guide`, `evolving`): complements → `thing-lifecycle.md`, `derived-index.md`; extends → `thing.md`; informs → `read.thing.md`, `write.thing.md`; references → `example-things.md`
 - **`session-memory.md`** (`specification`, `evolving`): complements → `orchestration.md`, `write.thing.md`, `git-workflow.md`, `belief-revision.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md`
 - **`standing-watch.md`** (`specification`, `draft`): complements → `workflow-state.md`, `trigger-specification.md`, `orchestration.md`, `git-workflow.md`, `coordination-claim.md`, `session-memory.md`; extends → `thing.md` · +11 edge(s) outside the spec layer
 - **`thing-lifecycle.md`** (`specification`, `draft`): complements → `scalability-guide.md`, `git-workflow.md`; extends → `thing.md`; implements → `llm-driven-systems.manifesto.md`; informs → `read.thing.md`, `write.thing.md`
@@ -596,14 +596,10 @@ This map is hand-drawn, and
 Its sources of truth are mechanical — check against them, do not trust the map
 over them:
 
-- **View 1:** the root file listing and `AGENTS.md` tier structure. The
-  spec-thing count is a mechanical fact — every `.md` under root and `docs/`
-  whose frontmatter `type` is specification/guide/manifesto (34 at last count,
-  2026-10-18: 27 + 6 + 1, the two newest being `docs/glossary.md` and
-  `docs/limitations.md`; the 2026-09-24 count of 32 included
-  `docs/plans/mcp-domain-server.md` and the formerly frontmatter-less
-  `docs/estate-mechanics.md`) — recount before restating; a review-loop
-  finding caught this label two behind reality.
+- **View 1:** the root file listing and `AGENTS.md` tier structure. The map
+  no longer states how many spec things there are: the count drifted by hand
+  twice (`repeated-drift-promotes-a-fact-into-the-floor`), and View 2's
+  nodes — gated against the files on disk — are the count.
 - **View 2:** each spec's `linked_things` frontmatter; the kernel coverage
   count in `kernel.md` frontmatter (`coverage: 6`). **Gated since `mdllm
   docs` landed:** every spec on disk must have a node here, a node's
