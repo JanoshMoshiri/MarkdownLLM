@@ -2,7 +2,7 @@
 id: estate-retrospective-synthesis-2026-08
 type: artifact
 status: evolving
-version: 1.1
+version: 1.2
 created: 2026-08-27
 session: 2026-08-27
 tags: [retrospectives, estate, synthesis, aggregation-read, closed-loop, upward-signal]
@@ -40,10 +40,6 @@ linked_things:
   - id: session-end-is-the-least-current-read-of-the-session
     relation: derived-from
     notes: "Harvested at this synthesis's own session close, when the ritual was handed a base 40+ commits stale. The reason this discharge record exists rather than a ratification claim."
-triggers:
-  - type: time
-    condition: "2026-10-18 reached"
-    action: "Re-dated 2026-10-17 with the framework retrospective, which the operator put first next session; it is the reader for both. Earlier: answered 2026-10-08, half: the regulated cluster's estate retrospective ran in its vantage domain on 2026-09-17. Row 6, the standing aggregation read, is unruled; since 2026-10-05 `mdllm reckon` aggregates disposition per workspace, which is the per-repo half of that read. Re-dated to the framework retrospective's chase, which is the reader for both. Earlier: defer to `operator-queue-2026-08-28`, which now carries this synthesis's undischarged rows and chases the same date — report only what is unique to this artifact: whether the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) ran and consumed this synthesis as its layer-below input, and whether the standing aggregation read (row 6) has been ruled. Do not double-chase the rows the queue holds."
 ---
 
 # Estate Retrospective Synthesis — August 2026
@@ -459,3 +455,7 @@ first aggregation read. What the operator asked this analysis to recover, it
 recovered: **the loops are real and closing where they are carried by
 things; the one loop still open is the upward one — and this document is
 what running it looks like.**
+
+## Disarmed 2026-10-20 (the operator's ruling at the reckoning)
+
+The time trigger that chased this synthesis — armed 2026-08-27, re-dated on 2026-09-03, 2026-10-08 and 2026-10-17, fired a fourth time on 2026-10-18 — is disarmed. Its two remaining questions have found their readers elsewhere: the standing aggregation read (row 6) has its per-workspace half in `mdllm reckon` (bands per workspace, the rate on the digest, since 2026-10-05), and whether the regulated cluster's own estate retrospective consumed this synthesis is a question only that workspace's record answers, chased there since 2026-09-03. The ruling: disarm, rather than re-date a fifth time (`operator-rulings-at-the-reckoning-2026-10-20`). The synthesis stands as the August record.

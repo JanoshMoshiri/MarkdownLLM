@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-20
-generated: 2026-10-20T20:42:07
-generated_from: HEAD@1f4f6b8
-coverage: 130
+generated: 2026-10-20T21:00:32
+generated_from: HEAD@379f497
+coverage: 131
 framework_version: 3.49.0
 ---
 
@@ -190,6 +190,7 @@ framework_version: 3.49.0
 - estate-workflow-derivation (derived-from)
 - operator-queue-2026-08-28 (pinned @e1ad077a01d31bc85c9904a1674cf9669e64cd89)
 - operator-queue-2026-08-28 (derived-from)
+- operator-rulings-at-the-reckoning-2026-10-20 (pinned @379f4970290d4f8792bf5ed898fb591bbd95b588)
 - serve-side-blindness-dissolves-into-composition (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
 - session-end-is-the-least-current-read-of-the-session (derived-from)
 - watertight-membrane-sprint-2026-08-30 (pinned @26b0777edca4a4a146891e0b52492b8b22ba0f49)
@@ -330,6 +331,10 @@ framework_version: 3.49.0
 
 ## framework-retrospective-2026-09
 - the-corpus-answers-faster-than-it-is-asked (derived-from)
+
+## framework-retrospective-2026-10
+- operator-rulings-at-the-reckoning-2026-10-20 (pinned @2a0657a94031dbbff5277b9367df40d77a73096d)
+- operator-rulings-at-the-reckoning-2026-10-20 (derived-from)
 
 ## framework-v3-transformation-plan
 - decision-status-vocabulary-domain-owned (pinned @da5d31d)

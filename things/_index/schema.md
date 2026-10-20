@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-20
-generated: 2026-10-20T20:42:07
-generated_from: HEAD@1f4f6b8
-coverage: 578
+generated: 2026-10-20T21:00:32
+generated_from: HEAD@379f497
+coverage: 579
 framework_version: 3.49.0
 ---
 
@@ -14,36 +14,36 @@ framework_version: 3.49.0
 
 | field | things using it |
 |---|---|
-| id | 578 |
-| type | 578 |
-| status | 578 |
-| created | 578 |
-| version | 505 |
-| tags | 474 |
-| linked_things | 382 |
-| origin | 204 |
-| session | 200 |
-| confidence | 199 |
+| id | 579 |
+| type | 579 |
+| status | 579 |
+| created | 579 |
+| version | 506 |
+| tags | 475 |
+| linked_things | 383 |
+| origin | 205 |
+| session | 201 |
+| confidence | 200 |
 | subject | 191 |
 | raised_at | 191 |
 | raised_by | 191 |
 | verdict | 191 |
 | verdict_reason | 191 |
-| informed_by | 186 |
+| informed_by | 187 |
 | source | 149 |
 | priority | 63 |
 | disposition_reason | 62 |
 | disposition | 59 |
-| decided_by | 42 |
+| decided_by | 43 |
 | promoted_to | 39 |
-| exposed | 28 |
+| exposed | 29 |
 | settles_when | 19 |
 | authorship | 17 |
 | completed | 11 |
-| triggers | 10 |
 | period_start | 10 |
 | period_end | 10 |
 | domain | 10 |
+| triggers | 9 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |

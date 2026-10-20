@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-20
-generated: 2026-10-20T20:42:07
-generated_from: HEAD@1f4f6b8
-coverage: 578
+generated: 2026-10-20T21:00:32
+generated_from: HEAD@379f497
+coverage: 579
 framework_version: 3.49.0
 ---
 
@@ -1321,6 +1321,10 @@ framework_version: 3.49.0
 - operator-queue-2026-08-28 --derived-from--> gates-census-2026-08
 - operator-queue-2026-08-28 --derived-from--> estate-retrospective-synthesis-2026-08
 - operator-queue-2026-08-28 --derived-from--> estate-workflow-derivation
+- operator-rulings-at-the-reckoning-2026-10-20 --derived-from--> framework-retrospective-2026-10
+- operator-rulings-at-the-reckoning-2026-10-20 --informs--> estate-retrospective-synthesis-2026-08
+- operator-rulings-at-the-reckoning-2026-10-20 --informs--> cue-carrier
+- operator-rulings-at-the-reckoning-2026-10-20 --references--> the-reckoning
 - operator-seat-and-harness-native-onramp --implements--> harness-native-onramp-supersedes-desktop
 - operator-seat-and-harness-native-onramp --informs--> the-onramp-is-the-operators-own-sentence
 - operator-seat-and-harness-native-onramp --references--> an-attestation-bound-to-a-whole-tree-hash-is-terminal-by-construction

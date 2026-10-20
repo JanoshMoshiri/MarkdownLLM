@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: triggers
 created: 2026-10-20
-generated: 2026-10-20T20:42:07
-generated_from: HEAD@1f4f6b8
-coverage: 10
+generated: 2026-10-20T21:00:32
+generated_from: HEAD@379f497
+coverage: 9
 framework_version: 3.49.0
 ---
 
@@ -19,10 +19,6 @@ framework_version: 3.49.0
 ## closed-loop-operating-state
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-10-21 reached, action=Answered 2026-10-08: yes. The tick was re-registered on the operator's machine on 2026-09-23 and has filed digests in two workspaces, on 2026-10-04 and 2026-10-07 (runs 2 to 5 on the 7th), last result 0; run 3 worked a fired trigger end to end. The question for this window: do digests keep landing at the daily cadence, and has the workspace one run skipped as DIVERGED been routed? A tick never merges. Earlier: re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29).
-
-## estate-retrospective-synthesis-2026-08
-- status: evolving  due_date: —
-- trigger: type=time, condition=2026-10-18 reached, action=Re-dated 2026-10-17 with the framework retrospective, which the operator put first next session; it is the reader for both. Earlier: answered 2026-10-08, half: the regulated cluster's estate retrospective ran in its vantage domain on 2026-09-17. Row 6, the standing aggregation read, is unruled; since 2026-10-05 `mdllm reckon` aggregates disposition per workspace, which is the per-repo half of that read. Re-dated to the framework retrospective's chase, which is the reader for both. Earlier: defer to `operator-queue-2026-08-28`, which now carries this synthesis's undischarged rows and chases the same date — report only what is unique to this artifact: whether the regulated cluster's formal estate retrospective (chased 2026-09-03 in its vantage domain) ran and consumed this synthesis as its layer-below input, and whether the standing aggregation read (row 6) has been ruled. Do not double-chase the rows the queue holds.
 
 ## estate-workflow-derivation
 - status: in-progress  due_date: —
