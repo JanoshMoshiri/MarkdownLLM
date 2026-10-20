@@ -283,6 +283,88 @@ def test_cmd_docs_refuses_to_run_without_the_inventory(tmp_path):
         db.cmd_docs(_ns(path=str(root), check=False))
 
 
+# --------------------------------------------------------------- the install pin
+
+
+def _git(root: Path, *args: str) -> None:
+    import subprocess
+    subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t",
+                    "-c", "core.autocrlf=false", *args],
+                   cwd=root, check=True, capture_output=True)
+
+
+def _release_repo(tmp_path: Path) -> Path:
+    root = _tiny_root(tmp_path)
+    (root / "docs").mkdir(exist_ok=True)
+    (root / db.SITE_CONFIG).write_text("repository: someone/MarkdownLLM\n",
+                                       encoding="utf-8")
+    (root / "install.sh").write_bytes(b"#!/bin/sh\necho one\n")
+    (root / "install.ps1").write_bytes(b"Write-Host one\n")
+    (root / db.README).write_text(
+        "# R\n\n<!-- generated:install -->\n\n<!-- /generated:install -->\n",
+        encoding="utf-8")
+    _git(root, "init", "-q")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "release: 1.0.0 — the first")
+    return root
+
+
+def _readme_errors(root: Path) -> list:
+    return [f for f in db.docs_block_findings(root, None, ROWS)
+            if f.thing == db.README and f.severity == SEV_ERROR]
+
+
+def test_install_block_pins_the_newest_release_commit_and_its_installer_bytes(
+        tmp_path, capsys):
+    import hashlib
+    root = _release_repo(tmp_path)
+    first, version = db.latest_release(root)
+    assert version == "1.0.0" and len(first) == 40
+    # An ordinary commit after the release does not move the pin.
+    (root / "notes.md").write_text("x\n", encoding="utf-8")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "docs: unrelated")
+    assert db.latest_release(root) == (first, "1.0.0")
+
+    body = db.build_docs_blocks(root, None, ROWS)[db.README][db.INSTALL_BLOCK]
+    assert f"RELEASE_COMMIT={first}" in body
+    assert hashlib.sha256(b"#!/bin/sh\necho one\n").hexdigest() in body
+    assert hashlib.sha256(b"Write-Host one\n").hexdigest() in body
+    assert "https://github.com/someone/MarkdownLLM.git" in body
+    assert _readme_errors(root), "an empty block is drift"
+    db.cmd_docs(_ns(path=str(root), check=False), rows=ROWS)
+    capsys.readouterr()
+    assert _readme_errors(root) == []
+
+
+def test_a_new_release_makes_the_old_pin_drift_until_regenerated(tmp_path, capsys):
+    root = _release_repo(tmp_path)
+    db.cmd_docs(_ns(path=str(root), check=False), rows=ROWS)
+    capsys.readouterr()
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "docs: pin 1.0.0")
+    (root / "install.sh").write_bytes(b"#!/bin/sh\necho two\n")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "release: 1.1.0 — the second")
+    errs = _readme_errors(root)
+    assert len(errs) == 1 and "`install` drifted" in errs[0].message
+    db.cmd_docs(_ns(path=str(root), check=False), rows=ROWS)
+    capsys.readouterr()
+    assert _readme_errors(root) == []
+    assert "1.1.0" in (root / db.README).read_text(encoding="utf-8")
+
+
+def test_an_install_marker_without_a_release_record_could_not_look(tmp_path):
+    root = _tiny_root(tmp_path)
+    (root / db.README).write_text(
+        "# R\n\n<!-- generated:install -->\n\n<!-- /generated:install -->\n",
+        encoding="utf-8")
+    findings = [f for f in db.docs_block_findings(root, None, ROWS)
+                if f.thing == db.README]
+    assert [f.severity for f in findings] == [SEV_WARNING]
+    assert "could not be built" in findings[0].message
+
+
 # --------------------------------------------------------------- dogfood
 
 

@@ -29,7 +29,9 @@ A call without them says so as a Warning ("could not look"), never a pass.
 
 from __future__ import annotations
 
+import hashlib
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,6 +43,8 @@ from .repository_view import RepositoryView
 
 OPERATOR_GUIDE = "docs/operator-guide.md"
 FRAMEWORK_MAP = "docs/framework-map.md"
+README = "README.md"
+SITE_CONFIG = "docs/_config.yml"
 
 # Which managed blocks each doc carries. The registry is the one place the
 # fact lives; `cmd_docs`, the drift check, and the tests all read it.
@@ -48,6 +52,18 @@ DOCS_BLOCKS: dict[str, tuple[str, ...]] = {
     OPERATOR_GUIDE: ("toolbox",),
     FRAMEWORK_MAP: ("spec-edges",),
 }
+
+# The README's verified-install block (documentation arc, package 2). It is
+# built from the release record rather than from a file: the newest commit
+# whose subject is `release: X.Y.Z`, and the sha256 of that commit's two
+# installers. It is optional per root — a root without a README, or a README
+# without the marker, carries no install block — so it lives beside the
+# registry, not in it. Until 2026-10-20 this block was hand-kept and pinned
+# v3.32.0 for seventeen releases: nothing tied it to a release.
+INSTALL_BLOCK = "install"
+_RELEASE_SUBJECT = re.compile(r"^release: (\d+\.\d+\.\d+)\b")
+_SITE_REPOSITORY = re.compile(r"^repository:\s*([\w.-]+/[\w.-]+)", re.MULTILINE)
+_INSTALL_MARKER = f"<!-- generated:{INSTALL_BLOCK} -->"
 
 # Blocks that cannot be built without the CLI inventory.
 _NEEDS_ROWS = {"toolbox"}
@@ -245,17 +261,100 @@ _DB_BUILDERS = {
 }
 
 
+def latest_release(root: Path, revision: str = "HEAD") -> tuple[str, str] | None:
+    """(full commit id, version) of the newest `release: X.Y.Z` commit
+    reachable from `revision`, or None when there is no such record (not a
+    repository, no release yet). At a release commit's own pre-commit the
+    newest release is the previous one, so the block it carries names the
+    previous release; the first commit after the release regenerates it."""
+    try:
+        r = subprocess.run(
+            ["git", "log", "--format=%H%x09%s", "--end-of-options", revision],
+            cwd=root, capture_output=True, text=True, encoding="utf-8")
+    except OSError:
+        return None
+    if r.returncode != 0:
+        return None
+    for line in r.stdout.splitlines():
+        sha, _, subject = line.partition("\t")
+        m = _RELEASE_SUBJECT.match(subject)
+        if m:
+            return sha.strip().lower(), m.group(1)
+    return None
+
+
+def _db_install(root: Path, view: RepositoryView | None) -> str | None:
+    """The verified-install block for the newest release, or None when the
+    release record, the public repository identity or an installer cannot
+    be read — the caller reports that as could-not-look, never as clean."""
+    revision = getattr(view, "commit_sha", None) or "HEAD"
+    release = latest_release(root, revision)
+    config = _read(root, SITE_CONFIG, view)
+    repo = _SITE_REPOSITORY.search(config) if config else None
+    if release is None or repo is None:
+        return None
+    sha, version = release
+    try:
+        at = RepositoryView.commit(root, sha)
+        sh = hashlib.sha256(at.read_bytes("install.sh")).hexdigest()
+        ps = hashlib.sha256(at.read_bytes("install.ps1")).hexdigest()
+    except Exception:
+        return None
+    url = f"https://github.com/{repo.group(1)}.git"
+    return "\n".join([
+        f"The newest release is **{version}**, commit `{sha[:12]}`. Fetch exactly",
+        "that commit, check the installer's bytes, then run it:",
+        "",
+        "```bash",
+        "# macOS / Linux",
+        f"RELEASE_COMMIT={sha}",
+        f"INSTALLER_SHA256={sh}",
+        "git init MarkdownLLM",
+        "git -C MarkdownLLM config core.autocrlf false",
+        f"git -C MarkdownLLM remote add origin {url}",
+        'git -C MarkdownLLM fetch --depth 1 origin "$RELEASE_COMMIT:refs/remotes/origin/verified-release"',
+        'git -C MarkdownLLM checkout --detach "$RELEASE_COMMIT"',
+        'test "$(git -C MarkdownLLM rev-parse HEAD)" = "$RELEASE_COMMIT"',
+        "cd MarkdownLLM",
+        "printf '%s  install.sh\\n' \"$INSTALLER_SHA256\" | sha256sum -c -",
+        "./install.sh",
+        "```",
+        "",
+        "```powershell",
+        "# Windows (PowerShell 7+)",
+        f"$ReleaseCommit = '{sha}'",
+        f"$InstallerSha256 = '{ps}'",
+        "git init MarkdownLLM",
+        "git -C MarkdownLLM config core.autocrlf false",
+        f"git -C MarkdownLLM remote add origin {url}",
+        'git -C MarkdownLLM fetch --depth 1 origin "${ReleaseCommit}:refs/remotes/origin/verified-release"',
+        "git -C MarkdownLLM checkout --detach $ReleaseCommit",
+        "if ((git -C MarkdownLLM rev-parse HEAD) -ne $ReleaseCommit) { throw 'release commit mismatch' }",
+        "Set-Location MarkdownLLM",
+        "if ((Get-FileHash ./install.ps1 -Algorithm SHA256).Hash.ToLowerInvariant() -ne $InstallerSha256) { throw 'installer hash mismatch' }",
+        "./install.ps1",
+        "```",
+    ])
+
+
 def build_docs_blocks(root: Path, view: RepositoryView | None = None,
                       rows: tuple[SubcommandRow, ...] | None = None,
                       ) -> dict[str, dict[str, str]]:
     """Canonical body for every managed block that can be built with what
     was supplied, keyed by doc then block name. Shared by `mdllm docs` and
     the coherence drift check — one source. Blocks that need the CLI
-    inventory are omitted when `rows` is None; the check reports that."""
+    inventory are omitted when `rows` is None; the check reports that. The
+    README's install block joins only where the README carries its marker
+    and the release record can be read."""
     out: dict[str, dict[str, str]] = {}
     for rel, names in DOCS_BLOCKS.items():
         out[rel] = {name: _pad(_DB_BUILDERS[name](root, view, rows)) for name in names
                     if rows is not None or name not in _NEEDS_ROWS}
+    readme = _read(root, README, view)
+    if readme is not None and _INSTALL_MARKER in readme:
+        body = _db_install(root, view)
+        if body is not None:
+            out[README] = {INSTALL_BLOCK: _pad(body)}
     return out
 
 
@@ -384,7 +483,13 @@ def docs_block_findings(root: Path, view: RepositoryView | None = None,
     not look; they never pass by omission."""
     findings: list[Finding] = []
     blocks = build_docs_blocks(root, view, rows)
-    texts = {rel: _read(root, rel, view) for rel in DOCS_BLOCKS}
+    texts = {rel: _read(root, rel, view) for rel in (*DOCS_BLOCKS, *blocks)}
+    readme = _read(root, README, view)
+    if readme is not None and _INSTALL_MARKER in readme and README not in blocks:
+        findings.append(Finding(SEV_WARNING, README,
+            "the install block could not be built — no `release: X.Y.Z` commit, "
+            f"no `repository:` in {SITE_CONFIG}, or an installer missing at the "
+            "release — so the pin was not checked"))
     for rel, bodies in blocks.items():
         text = texts[rel]
         if text is None:
