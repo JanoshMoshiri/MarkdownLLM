@@ -4,10 +4,10 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-21
-generated: 2026-10-21T01:05:59
-generated_from: HEAD@75fd7dc
+generated: 2026-10-21T01:12:13
+generated_from: HEAD@ff4df6c
 coverage: 596
-framework_version: 3.49.0
+framework_version: 3.50.0
 ---
 
 # Schema Registry — framework

@@ -18,6 +18,29 @@ Prior entries followed [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ---
 
+## [3.50.0] - 2026-10-21
+
+**The documentation says what the record supports, the install can no longer lag a release, and the backlog was metabolised by citation.** A whole-documentation audit (`reviews/REVIEW-documentation-audit-2026-10-20-claude.md`) found the shape buried under the record: an install pinned seventeen releases back, parked and paused things presented as live, copied counts that disagreed, no session shown end to end. The operator ruled on four of its questions (`documentation-rulings-2026-10-20`) and the people-facing half landed.
+
+**Changed**
+- **README** cut from 435 lines to about 190 plus a generated install block: what it is, who it is for and who it isn't, a ten-line session, one record, which tools work (one status each, linked to the evidence), what is claimed and what is a hypothesis. The spec inventory and principles now live only in `AGENTS.md`.
+- **First hour** (1.8) ends in one whole session — `/orient`, real work, a change refused until its dependants are walked and ruled on, `/end-session`.
+- **Outward words:** a *workspace* is the record repository; what you open in your agent tool is just *the folder*; *operator* is the one name for the human role. Internal specs keep *domain*.
+- **Correctness pass** across 17 files: Explorer marked parked wherever it was offered as installable, the onramp marked paused, no CI claimed for workspaces, the OpenClaw package marked unpublished, drifted counts fixed or removed, `thing.md` and `scalability-guide.md` brought in line with their records (the guide moves to `evolving`).
+- **Glossary** (1.1): *porch* corrected; *session*, *refresh*, *operator*, *substrate*, *membrane*, *harness*, *adapter*, *seal*, *radius* and *publication debt* added; every row anchored.
+- **Site:** glossary and limitations in the Start group beside the first hour; the home page says what MarkdownLLM is.
+- **Reckoning Phase 4:** `reckon --keep` writes one field set whatever it holds; retrospective scans 5–7 read the reckoning; built in the MAIN clone and reviewed by the Codex seat through a ticket — the first two-seat substrate change.
+
+**Added**
+- `mdllm docs` writes the README's **install block** from the newest `release:` commit and its installers' sha256, and the floor checks it at every commit.
+- `mdllm reckon --composition`: merge candidates among insights, ranked, for the agent to judge.
+- A ticket type and loop at the framework root, so the Claude and Codex seats share a watchable board.
+- The 2026-10-20 reckoning: thirteen stalled plans paused, completed or cancelled with their reasons; three insights promoted; the operator's rulings recorded (`operator-rulings-at-the-reckoning-2026-10-20`).
+
+**Upgrade**
+- After every `release:` commit, the next commit runs `mdllm docs .` — the floor refuses anything else until the install pin moves.
+- Workspaces are unchanged by this release; their generated contract (still the eager session start) is the next arc and will be offered per workspace by `mdllm refresh`.
+
 ## [3.49.0] - 2026-10-18
 
 **The record read itself against the field, and the outward surface caught up.** A model-authored critical comparison (`reviews/REVIEW-critical-comparison-2026-10-17-claude.md`) read the framework against twelve memory systems — Mem0, Zep/Graphiti, Letta, Claude Code, Copilot Memory, Karpathy's LLM wiki, Cline's Memory Bank, Basic Memory, spec-kit/Kiro, Backstage, org-mode and Hermes Agent — and ruled five of the seven "Key Innovations" repackaged prior art, two recombinations, and three mechanisms without found precedent: the commit gate that refuses a definition-surface change until its dependant walk is recorded, the reconciliation cue persisted until a human verdict, and the commit-pinned decision record. The README lead no longer claims other tools "leave open" whether stored memory is still true; it says what each of them does about it and states the one thing this framework does that none of them does — it refuses to let a model settle that question silently. `docs/glossary.md` gives every coined word its plain name and its prior art; `docs/limitations.md` says when not to use this, why a `CLAUDE.md` plus a notes folder is often right, and what is not yet measured; `AGENTS.md`'s innovations are now design choices with their prior art, and the "10 to 10,000 things" claim is the measured range; all seventeen reviews are labelled model-authored in their frontmatter, and the external review of 2026-09-08 is verified under the operator's name.
