@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-21
-generated: 2026-10-21T01:23:54
-generated_from: HEAD@4de3c68
-coverage: 596
+generated: 2026-10-21T22:08:38
+generated_from: HEAD@341e3b9
+coverage: 593
 framework_version: 3.50.0
 ---
 
@@ -1488,6 +1488,15 @@ framework_version: 3.50.0
 - review-external-conflict-lifecycle-2026-09-08 --references--> belief-revision-specification
 - review-external-conflict-lifecycle-2026-09-08 --references--> retrospective-specification
 - review-external-conflict-lifecycle-2026-09-08 --references--> change-reconciliation-specification
+- review-holistic-substrate-2026-10-21-codex --references--> operating-model-specification
+- review-holistic-substrate-2026-10-21-codex --informs--> change-reconciliation-specification
+- review-holistic-substrate-2026-10-21-codex --informs--> framework-map
+- review-holistic-substrate-2026-10-21-codex --references--> framework-discovery-specification
+- review-holistic-substrate-2026-10-21-codex --informs--> workflows-emerge-from-use
+- review-holistic-substrate-2026-10-21-codex --references--> closed-loop-operating-state
+- review-holistic-substrate-2026-10-21-codex --references--> estate-workflow-derivation
+- review-holistic-substrate-2026-10-21-codex --informs--> evidence-and-eval-backlog
+- review-holistic-substrate-2026-10-21-codex --references--> eval-record-2026
 - review-independent-operating-model-2026-08-26-codex --validates--> operating-model-specification
 - review-independent-operating-model-2026-08-26-codex --validates--> workflow-state-specification
 - review-independent-seams-verification-2026-08-26-claude --validates--> run-operating-model-seams-2026-08
