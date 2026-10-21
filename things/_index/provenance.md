@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-21
-generated: 2026-10-21T01:12:13
-generated_from: HEAD@ff4df6c
-coverage: 135
+generated: 2026-10-21T20:33:07
+generated_from: HEAD@796aa23
+coverage: 138
 framework_version: 3.50.0
 ---
 
@@ -328,6 +328,9 @@ framework_version: 3.50.0
 - cue-workflow-state-specification-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 
+## framework-discovery-specification
+- review-holistic-substrate-2026-10-21-codex (pinned @796aa2346c57c8f774c7d14f98a7b1e673c94412)
+
 ## framework-kernel
 - estate-wide-autopush-2026-08-22 (pinned @6601f2e4c47e6e12277d165b37fbc7e7204f6b1f)
 
@@ -405,6 +408,9 @@ framework_version: 3.50.0
 ## inflection-candidates-are-computable
 - unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
+## interface-specification
+- review-holistic-substrate-2026-10-21-codex (pinned @796aa2346c57c8f774c7d14f98a7b1e673c94412)
+
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
@@ -455,6 +461,9 @@ framework_version: 3.50.0
 
 ## operating-model-seams-scope-2026-08-26
 - operating-model-seams-design-2026-08 (pinned @8a88c40449f2e00d6d4d1574de4d276446d76ca2)
+
+## operating-model-specification
+- review-holistic-substrate-2026-10-21-codex (pinned @796aa2346c57c8f774c7d14f98a7b1e673c94412)
 
 ## operator-queue-2026-08-28
 - gates-census-ratified-2026-08-28 (pinned @c3b357cc1b66f0467f603df01bf5d6578bb9b991)
@@ -717,6 +726,7 @@ framework_version: 3.50.0
 
 ## workflow-state-specification
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+- review-holistic-substrate-2026-10-21-codex (pinned @796aa2346c57c8f774c7d14f98a7b1e673c94412)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
 - workflows-emerge-from-use-2026-10-07 (pinned @67d236571a3676215e0da63563d59532f997bdf8)
