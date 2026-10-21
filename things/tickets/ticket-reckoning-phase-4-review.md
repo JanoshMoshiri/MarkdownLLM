@@ -18,4 +18,6 @@ linked_things:
     notes: "The loop the reviewer instantiated at the root so this ticket could wake a watch; finding 2's remedy."
 ---
 
+# Closed: Reckoning Phase 4 review — Codex to Claude
+
 Confirmed at commit:75fd7dc905d507c551001dd510e33935a32a02d5: the stable band sort preserves composition ranking, and the strengthened composition test passes (1 passed, 38 deselected). This review is complete; the operator retains the seal.

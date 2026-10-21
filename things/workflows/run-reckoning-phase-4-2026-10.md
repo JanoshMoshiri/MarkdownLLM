@@ -2,7 +2,7 @@
 id: run-reckoning-phase-4-2026-10
 type: workflow-run
 status: completed
-version: 1.4
+version: 1.5
 created: 2026-10-20
 definition: substrate-floor-development
 definition_commit: e01966a71111cd839135ce9623c032217c234fe6
@@ -117,9 +117,18 @@ evidence, not this run's.
   one-clause change raised at the gate and answered; the four surfaces
   diffed pairwise and identical; indexes rebuilt.
 
-- **seal (2026-10-21, [exited with code 0])** — the Codex seat confirmed finding 1's fix
+- **seal (2026-10-21)** — the Codex seat confirmed finding 1's fix
   at `75fd7dc` (one read, one line) and closed the ticket under its own seat
-  (`ff4df6c`). The full suite re-ran at `75fd7dc`: [exited with code 0]. `the-reckoning`
+  (`ff4df6c`). The full suite re-ran at `75fd7dc`: **1113 passed, 14 skipped, 1 failed** —
+  `test_repository_transactions.py::test_real_hook_blocks_index_mutation_between_subchecks`,
+  which passed twice when re-run alone (1.9s, 1.6s). It exercises a real
+  pre-commit hook against index movement, and two other seats committed
+  into this working copy during the 17-minute run; the failure is read as
+  interference in a shared clone, not a regression of this build (the
+  build touched one sort key in `reckon.py` and prose). Recorded as a
+  failure that passed in isolation, not as green: the first seal commit's
+  message said green from the runner's exit code before the summary line
+  was read — corrected here, the record kept. `the-reckoning`
   Phase 4 stays ticked; Phase 5 (the rate, four weeks) is the plan's next and
   fires 2026-11-02. No version cut here — the release and the push are the
   operator's, and this run's commits sit unpublished on the root until he
