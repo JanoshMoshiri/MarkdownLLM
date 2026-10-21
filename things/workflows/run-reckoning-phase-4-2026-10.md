@@ -1,13 +1,13 @@
 ---
 id: run-reckoning-phase-4-2026-10
 type: workflow-run
-status: active
-version: 1.3
+status: completed
+version: 1.4
 created: 2026-10-20
 definition: substrate-floor-development
 definition_commit: e01966a71111cd839135ce9623c032217c234fe6
-current_stage: reconcile
-held_by: claude
+current_stage: seal
+completed: 2026-10-21
 tags: [run, floor, the-reckoning, two-seat-review, codex]
 informed_by:
   - id: the-reckoning
@@ -45,7 +45,7 @@ linked_things:
 
 ## Where This Is
 
-At `reconcile`: the review came back with four findings, three fixed in a `build` loop-back and one remedied by the reviewer; this stage is the dark-region walk for the spec and the four command surfaces. Born at `design`: the problems, requirements and the cut were
+At `seal`, complete. The review came back with four findings, three fixed in a `build` loop-back and one remedied by the reviewer; the reviewer confirmed the fix and closed the ticket; the one human gate — the push — is the operator's and is reported as publication debt, not performed here. Born at `design`: the problems, requirements and the cut were
 settled before this run existed — `the-reckoning` Phase 4 names the four
 pieces (the promotion path tripping the walk gate; `retrospective.md` scans 5
 and 6 rewritten as reads of the reckoning and scan 7's promotion half pointed
@@ -117,15 +117,23 @@ evidence, not this run's.
   one-clause change raised at the gate and answered; the four surfaces
   diffed pairwise and identical; indexes rebuilt.
 
+- **seal (2026-10-21, [exited with code 0])** — the Codex seat confirmed finding 1's fix
+  at `75fd7dc` (one read, one line) and closed the ticket under its own seat
+  (`ff4df6c`). The full suite re-ran at `75fd7dc`: [exited with code 0]. `the-reckoning`
+  Phase 4 stays ticked; Phase 5 (the rate, four weeks) is the plan's next and
+  fires 2026-11-02. No version cut here — the release and the push are the
+  operator's, and this run's commits sit unpublished on the root until he
+  takes them. The seat for this clone was declared `claude` on the
+  operator's word during this stage, so the record can tell the two seats'
+  commits apart from here on.
+
 ## Next
 
-The ticket is back in the Codex seat for one line — confirm or decline the
-finding-1 fix — then `closed`. The builder's watch is armed on this run
-(`--role claude --remote . --branch main --exit-on-wake`). Then `seal`: the
-plan's Phase 4 stays ticked, the CHANGELOG entry is the release's, and the
-push is the operator's. The follow-up the operator named — turn this shape
-into the standing workflow for substrate changes — is proposed on this run's
-evidence, not inside it.
+Nothing in this run. The follow-up the operator named — turn this shape into
+the standing workflow for substrate changes — is proposed on the evidence
+below, as its own work: give `substrate-floor-development`'s stages their
+actors (or mint a `substrate-change-loop`), and let the ticket loop carry the
+review turn by default.
 
 ## Notes
 

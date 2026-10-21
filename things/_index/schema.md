@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-21
-generated: 2026-10-21T01:12:13
-generated_from: HEAD@ff4df6c
+generated: 2026-10-21T01:21:40
+generated_from: HEAD@796aa23
 coverage: 596
 framework_version: 3.50.0
 ---
@@ -39,7 +39,7 @@ framework_version: 3.50.0
 | exposed | 33 |
 | settles_when | 19 |
 | authorship | 18 |
-| completed | 11 |
+| completed | 12 |
 | period_start | 10 |
 | period_end | 10 |
 | domain | 10 |
@@ -65,4 +65,3 @@ framework_version: 3.50.0
 | source_id | 1 |
 | source_commit | 1 |
 | dependencies | 1 |
-| held_by | 1 |
