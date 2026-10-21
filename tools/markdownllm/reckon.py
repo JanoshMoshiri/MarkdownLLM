@@ -503,7 +503,11 @@ def reckon_report(root: Path, corpus, *, today: dt.date | None = None,
     for it in items:
         bands[it.band].append(it)
     for band in bands.values():
-        band.sort(key=lambda i: (i.kind, i.thing_id))
+        # Kinds group, ids order within a kind — except composition, whose
+        # items arrive ranked (weight first) and keep that order: the sort
+        # is stable, so an empty id key preserves it (Codex review at
+        # e5de9fa, finding 1: the report re-sorted them alphabetically).
+        band.sort(key=lambda i: (i.kind, "" if i.kind == "composition" else i.thing_id))
     return {"today": today, "bands": bands, "notes": notes,
             "imports_read": imports}
 

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-21
-generated: 2026-10-21T00:19:48
-generated_from: HEAD@ac74fa9
-coverage: 595
+generated: 2026-10-21T01:03:26
+generated_from: HEAD@c0f20e1
+coverage: 596
 framework_version: 3.49.0
 ---
 
@@ -642,6 +642,7 @@ framework_version: 3.49.0
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
 - cue-retrospective-specification-2026-10-20 --subject--> retrospective-specification
+- cue-retrospective-specification-2026-10-21 --subject--> retrospective-specification
 - cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 --subject--> review-external-conflict-lifecycle-2026-09-08
@@ -1523,6 +1524,7 @@ framework_version: 3.49.0
 - run-reckoning-phase-4-2026-10 --references--> substrate-floor-development
 - run-reckoning-phase-4-2026-10 --references--> operator-rulings-at-the-reckoning-2026-10-20
 - run-reckoning-phase-4-2026-10 --references--> framework-retrospective-2026-10
+- run-reckoning-phase-4-2026-10 --references--> ad-hoc-message-loop
 - run-reckoning-phase-4-2026-10 --references--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - run-reckoning-phase-4-2026-10 --references--> execution-independence-is-not-judgement-independence
 - run-reckoning-phase-4-2026-10 --references--> an-adversarial-review-loop-converges-on-its-own-fix-residue
@@ -1788,6 +1790,7 @@ framework_version: 3.49.0
 - ticket-reckoning-phase-4-review --implements--> run-reckoning-phase-4-2026-10
 - ticket-reckoning-phase-4-review --references--> the-reckoning
 - ticket-reckoning-phase-4-review --references--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- ticket-reckoning-phase-4-review --references--> ad-hoc-message-loop
 - tiered-loading-is-tiered-reading-applied-to-specs --references--> thing-specification
 - tiered-loading-is-tiered-reading-applied-to-specs --references--> orchestration-specification
 - tracking-artifacts-can-drift-from-reality --references--> domain-spec-guide-predates-knowledge-primitives

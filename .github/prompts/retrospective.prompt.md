@@ -48,7 +48,7 @@ that casts it.
    `mdllm reckon` names the insights that have earned a disposition (orphaned,
    cited-and-never-promoted, promotable) and `mdllm reckon --composition` the merge
    candidates — pairs sharing two or more `linked_things` targets, a shared spec
-   counting for nothing. Judge each: promote (`promoted_to`), dismiss, consolidate
+   counting for nothing (a pair sharing only specs needs three). Judge each: promote (`promoted_to`), dismiss, consolidate
    into one survivor, or hold with `--keep`.
 7. **Conditions-met pass** (spec scan 6) — the holds `mdllm reckon` lists as due,
    plus any hold the period's events plainly met before its date: read each
@@ -58,6 +58,12 @@ that casts it.
    disposition (confirm-current / update / park / retire); fold what the reckoning
    says to promote into the skill that carries it, `promoted_to` set — the walk gate
    takes it from there; `{framework_root}/templates/prompts/review-skill-coherence.md`.
+
+9. **Arm the next chase, disarm the one answered** — a `type: time` trigger on
+   the new retrospective, thirty days from its `period_end`, `action: surface`
+   (template in `{framework_root}/templates/retrospective.md.template`); remove
+   or re-date the trigger on the retrospective this one succeeds, since a
+   trigger on a terminal carrier keeps firing until it is.
 
 Commit the retrospective, the conflicts surfaced and the dispositions ruled, the
 reconciled things, and the skill edits the dispositions imply.

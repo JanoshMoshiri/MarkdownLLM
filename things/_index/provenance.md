@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-21
-generated: 2026-10-21T00:19:48
-generated_from: HEAD@ac74fa9
+generated: 2026-10-21T01:03:26
+generated_from: HEAD@c0f20e1
 coverage: 135
 framework_version: 3.49.0
 ---
@@ -310,6 +310,7 @@ framework_version: 3.49.0
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-2026-10-20 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
+- cue-retrospective-specification-2026-10-21 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-retrospective-specification-cadence-2026-09-13 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)
 - cue-review-independent-operating-model-2026-08-26-codex-2026-10-20 (pinned @e0fb483b2bed72edcb69f36a3e9fc56e900813d9)

@@ -708,3 +708,14 @@ def test_composition_lists_pairs_sharing_targets_and_discounts_specs(tmp_path):
     rep = _reckon(root, composition=True)
     assert "i1 <> i2" in _ids(rep, "settled")
     assert "i7 <> i8" not in _ids(rep, "settled")
+    # The report keeps the helper's ranking (Codex review at e5de9fa,
+    # finding 1): the heaviest pair leads even when its ids sort last.
+    for i in ("z1", "z2"):
+        write(root, f"things/{i}.md", thing_text(
+            f"id: {i}\ntype: insight\nstatus: active\ncreated: 2026-09-30\n"
+            "linked_things:\n  - id: d1\n    relation: informs\n"
+            "  - id: plan-a\n    relation: informs\n  - id: i5\n    relation: informs\n"))
+    _commit(root, "a heavier pair that sorts last")
+    shown = [it.thing_id for it in _reckon(root, composition=True)["bands"]["settled"]
+             if it.kind == "composition"]
+    assert shown[0] == "z1 <> z2" and shown.index("i1 <> i2") < shown.index("i3 <> i4")
