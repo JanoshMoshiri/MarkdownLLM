@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-21
-generated: 2026-10-21T22:08:38
-generated_from: HEAD@341e3b9
-coverage: 138
+generated: 2026-10-21T22:14:34
+generated_from: HEAD@439a787
+coverage: 139
 framework_version: 3.50.0
 ---
 
@@ -517,6 +517,10 @@ framework_version: 3.50.0
 
 ## review-external-conflict-lifecycle-2026-09-08
 - circulation-is-not-disposition (derived-from)
+
+## review-holistic-substrate-2026-10-21-codex
+- holistic-review-rulings-2026-10-21 (pinned @f3ccc9b4efcc2d9fd3b9cc2744c2f02ae1e3c5aa)
+- holistic-review-rulings-2026-10-21 (derived-from)
 
 ## review-independent-operating-model-2026-08-26-codex
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)

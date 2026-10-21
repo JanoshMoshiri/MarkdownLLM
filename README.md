@@ -174,10 +174,11 @@ it. On Windows run the tool as `tools/mdllm.ps1`, elsewhere as
 
 ## What is claimed, and what isn't
 
-- **Shown:** typed records validated at every commit; changes to what other
-  records rely on walked before they land; decisions pinned to the commits they
-  rest on; a workspace's whole history readable in git. The framework runs
-  itself this way.
+- **Shown:** typed records validated at every commit; a change to what other
+  records rely on refused until a recorded question names every dependant,
+  and that question held open at each session start until it is answered;
+  decisions pinned to the commits they rest on; a workspace's whole history
+  readable in git. The framework runs itself this way.
 - **A hypothesis, not a result:** that this structure lets a smaller model match
   a larger one without it. One evaluation pointed that way and then saturated;
   the [eval record](things/artifacts/eval-record-2026.md) has the honest reading,
@@ -203,8 +204,10 @@ it. On Windows run the tool as `tools/mdllm.ps1`, elsewhere as
 **Why not just a `CLAUDE.md` and a notes folder?** Often you should —
 [limitations](docs/limitations.md) says when. The folder fails one specific way:
 when a rule changes, nothing knows which notes relied on it, and the agent reads
-whichever it opens. Here that change is refused at the commit until its
-dependants are walked.
+whichever it opens. Here the commit is refused until a recorded question names
+every note that relied on the rule; the agent walks them, you rule on what it
+may not settle, and the question stays open at every session start until it
+is answered.
 
 **Do I need to understand the specs?** No. They are written for the agent. You
 need to know your own workspace.

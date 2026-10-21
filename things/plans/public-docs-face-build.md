@@ -339,6 +339,14 @@ decision when it is taken rather than a discovery at the next release walk.
 - **README's live 5R gate prose** — three paragraphs of in-flight adapter state
   in a project README, which the perimeter-currency item and vendor Phase 7 both
   reach. **Vendor Phase 7's**, as a capability claim.
+- **An evidence view — defined, built, configured, run, reliable.** The
+  holistic review of 2026-10-21 (finding F5) had to reconstruct across specs,
+  code, plans, prompts and dispatch records which of those five claims each
+  capability had earned. The framework map draws definitions and machinery;
+  this would be a further derived view over it, never a parallel ledger.
+  **Noted here, not built** — the operator's 2026-10-21 ruling was
+  dispositions only; it joins the rows that wait on
+  [[mechanical-coherence-checks-backlog]].
 
 ## Deferred until vendor Phase 7 lands
 

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-21
-generated: 2026-10-21T22:09:10
-generated_from: HEAD@341e3b9
-coverage: 597
+generated: 2026-10-21T22:14:34
+generated_from: HEAD@439a787
+coverage: 599
 framework_version: 3.50.0
 ---
 
@@ -14,29 +14,29 @@ framework_version: 3.50.0
 
 | field | things using it |
 |---|---|
-| id | 597 |
-| type | 597 |
-| status | 597 |
-| created | 597 |
-| version | 523 |
-| tags | 492 |
-| linked_things | 390 |
-| origin | 209 |
-| session | 202 |
-| subject | 202 |
-| raised_at | 202 |
-| raised_by | 202 |
-| verdict | 202 |
-| verdict_reason | 202 |
-| confidence | 201 |
-| informed_by | 201 |
+| id | 599 |
+| type | 599 |
+| status | 599 |
+| created | 599 |
+| version | 525 |
+| tags | 494 |
+| linked_things | 391 |
+| origin | 210 |
+| session | 203 |
+| subject | 203 |
+| raised_at | 203 |
+| raised_by | 203 |
+| verdict | 203 |
+| verdict_reason | 203 |
+| confidence | 202 |
+| informed_by | 202 |
 | source | 149 |
 | priority | 63 |
 | disposition | 62 |
 | disposition_reason | 62 |
-| decided_by | 44 |
+| decided_by | 45 |
 | promoted_to | 39 |
-| exposed | 34 |
+| exposed | 35 |
 | authorship | 19 |
 | settles_when | 19 |
 | completed | 12 |

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-21
-generated: 2026-10-21T22:08:38
-generated_from: HEAD@341e3b9
-coverage: 593
+generated: 2026-10-21T22:14:34
+generated_from: HEAD@439a787
+coverage: 599
 framework_version: 3.50.0
 ---
 
@@ -604,6 +604,7 @@ framework_version: 3.50.0
 - cue-interface-specification-2026-09-26 --subject--> interface-specification
 - cue-interface-specification-2026-09-27 --subject--> interface-specification
 - cue-limitations-guide-2026-10-20 --subject--> limitations-guide
+- cue-limitations-guide-2026-10-21 --subject--> limitations-guide
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
 - cue-mechanical-coherence-checks-backlog-2026-09-13 --subject--> mechanical-coherence-checks-backlog
 - cue-mechanical-coherence-checks-backlog-2026-09-15 --subject--> mechanical-coherence-checks-backlog
@@ -1114,6 +1115,12 @@ framework_version: 3.50.0
 - harness-native-onramp-supersedes-desktop --references--> closed-loop-operating-state
 - harness-native-onramp-supersedes-desktop --references--> the-record-answers-the-direction-question-first
 - harness-native-onramp-supersedes-desktop --references--> a-surface-without-a-floor-accumulates-repairs-not-progress
+- holistic-review-rulings-2026-10-21 --derived-from--> review-holistic-substrate-2026-10-21-codex
+- holistic-review-rulings-2026-10-21 --informs--> limitations-guide
+- holistic-review-rulings-2026-10-21 --informs--> evidence-and-eval-backlog
+- holistic-review-rulings-2026-10-21 --informs--> public-docs-face-build
+- holistic-review-rulings-2026-10-21 --references--> workflows-emerge-from-use
+- holistic-review-rulings-2026-10-21 --references--> cold-read-of-the-seams-release
 - hook-compliance-correlates-with-scope-not-awareness --informs--> orchestration-specification
 - hook-compliance-correlates-with-scope-not-awareness --supports--> tiered-loading-is-tiered-reading-applied-to-specs
 - hook-enforcement-has-three-anchors --informs--> orchestration-specification

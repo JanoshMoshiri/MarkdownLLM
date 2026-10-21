@@ -2,7 +2,7 @@
 id: evidence-and-eval-backlog
 type: plan
 status: in-progress
-version: 2.1
+version: 2.2
 created: 2026-06-27
 priority: high
 tags: [evals, evidence, validation, isolation, longitudinal, docs]
@@ -109,12 +109,19 @@ another trial from moved bytes — the precise way the opus arm was lost. The
 digest reads bytes rather than revisions, because the 2026-07 damage was
 *committed*, so a HEAD comparison would have moved with it and agreed.
 
-**Still owed — and it is now only the operator's evening:** a valid opus
-longitudinal arm from the restored seed, and haiku re-run to n≥5 clean.
-Report per-session, not just totals. The one constraint that has not moved is
-the credential one: the runner shells out to `claude -p`, and a hosted agent
-session's token does not propagate to that child, so this is an
-operator-terminal task and no amount of agent pre-work changes that.
+**Still owed — the runner first, then the operator's evening.** The eval
+record (`eval-record-2026`) names two runner defects ahead of any new run: an
+aborted trial is scored as failed assertions instead of voided (defect 6), and
+the launch failure that refused thirty-eight trials in the hour the same build
+ran four clean ones is undiagnosed (defect 7). Both are agent pre-work with no
+gate, and no arm runs before they close — this line read "only the operator's
+evening" until 2026-10-21, when the holistic review caught the plan and the
+record disagreeing. Then the operator's evening: a valid opus longitudinal arm
+from the restored seed, and haiku re-run to n≥5 clean. Report per-session, not
+just totals. The one constraint that has not moved is the credential one: the
+runner shells out to `claude -p`, and a hosted agent session's token does not
+propagate to that child, so the run itself is an operator-terminal task and no
+amount of agent pre-work changes that.
 
 ## Behind those two
 

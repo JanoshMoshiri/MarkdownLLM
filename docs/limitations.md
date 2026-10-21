@@ -2,7 +2,7 @@
 id: limitations-guide
 type: guide
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-10-18
 tags: [limitations, positioning, when-not-to-use, prior-art, memory-systems]
 linked_things:
@@ -80,10 +80,11 @@ notes were written against it. The rule changes. In a notes folder nothing
 knows that the seven exist. The agent reads whichever note it opens, and the
 harness documentation is candid about what happens when notes disagree: it
 "may pick one arbitrarily". With the floor installed, the rule is a
-*definition surface*: the commit that changes it is refused until the seven
-dependants have been read and each one marked as still holding, revised, or
-needing a human's ruling; the question persists as a file until that record
-exists; the human rules on the one the agent may not settle; and the ruling is
+*definition surface*: the commit that changes it is refused until a question
+naming the seven dependants is on record; the agent reads each one and marks
+it as still holding, revised, or needing a human's ruling; the question
+persists as a file, re-listed at every session start, until it is answered;
+the human rules on the one the agent may not settle; and the ruling is
 committed. That is the whole difference. It costs a file per question and a
 slower commit, and it is only worth paying when the record will be reasoned
 from for longer than anyone will remember writing it.
