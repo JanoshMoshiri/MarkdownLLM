@@ -2,7 +2,7 @@
 id: holistic-review-rulings-2026-10-21
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-10-21
 session: 2026-10-21
 decided_by: human
@@ -101,6 +101,18 @@ the local clone on the operator's word (439a787); nothing was pushed.
    operator's own trust grants in those clones — never granted automatically.
    F5 is noted on `public-docs-face-build` as a further derived view over the
    framework map, not built.
+
+## Amendment 2026-10-22
+
+The review moved to v1.2 after this ruling: the withdrawal of the
+discoverability diagnosis now opens the record, F5 is reclassified from a
+finding to an audit observation that "must not be cited as a defect", and a
+cold-test design is set out, unrun — A, a broad identification brief against
+the existing entry route; B, the original memory-framed brief; C, the
+discovery route, only after A is recorded. Nothing above changes: ruling 4
+already treated F5 as a view to note rather than a defect to fix, and ruling
+3's exclusion of both reviews from a future first pass is the design's own
+control. The note on `public-docs-face-build` now calls F5 an observation.
 
 ## Consequences
 
