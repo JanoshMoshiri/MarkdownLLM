@@ -3,7 +3,7 @@ id: review-holistic-substrate-2026-10-21-codex
 type: artifact
 status: stable
 authorship: model-session
-version: 1.1
+version: 1.2
 created: 2026-10-21
 origin: synthesised
 exposed: false
@@ -26,7 +26,7 @@ linked_things:
     notes: "Finding F1 distinguishes recording a cue from recording the completed dependant walk."
   - id: framework-map
     relation: informs
-    notes: "A capability and execution-evidence view complements the existing specification map."
+    notes: "An operational-evidence view is a proposal to test, not a demonstrated remedy for a discoverability defect."
   - id: framework-discovery-specification
     relation: references
     notes: "Locating and loading the substrate already exists; the proposed discovery route concerns identifying and evaluating the system without a category imposed by the review brief."
@@ -49,14 +49,25 @@ linked_things:
 
 # Holistic substrate review — corrected framing and a discovery-route proposal
 
+**Correction for readers — 2026-10-22.** This review does not establish a
+discoverability defect in the substrate. The agent's earlier causal claim is
+withdrawn. The initial prompt explicitly requested comparison with memory
+systems, while also asking about whole-system coherence; the agent over-weighted
+the comparison category. Subsequent author guidance therefore cannot prove
+that a fresh reviewer given a broad identification brief would fail to discover
+the system. F5 is an observation about this guided audit, not a validated
+defect, and must not be cited as one. A discovery workflow remains an optional
+experiment, not a required remedy supported by this session. This correction
+also does not establish that discoverability is good: that question is untested.
+
 **Position.** The core architecture is substantially coherent. The substrate
 already defines a domain that combines specialist knowledge, procedures,
 durable work state, authority, exchange and revision, and applies that same
 pattern to itself. No additional foundational primitive was identified as
 necessary for the concrete workflows examined. The remaining findings concern
-enforcement, execution bindings, deployment, recovery and visibility of the
-existing compositions. This is a bounded conclusion, not proof that every
-future application is covered.
+enforcement, execution bindings, deployment and recovery. Visibility and
+discoverability remain questions to test. This is a bounded conclusion, not
+proof that every future application is covered.
 
 **Review status.** This is a model-authored, operator-guided review, captured at
 the operator's request. It is not a cold or independently framed review.
@@ -78,10 +89,13 @@ for same-domain deliberation and later comparison.
 
 ## How the framing changed
 
-The initial request asked for comparison with current agent memory systems.
-That supplied a category before the system had been identified as a whole.
-The agent consequently underweighted workflow execution and the network of
-expert domains. The operator then supplied examples of repeatable workflows,
+The initial request asked for comparison with current agent memory systems
+and also asked about whole-system coherence. The comparison supplied a category
+before the system had been identified as a whole. The agent should have kept
+that comparison lens distinct from the system's overall classification; it
+instead underweighted workflow execution and the network of expert domains.
+The relative causal contributions of prompt wording and agent choices were not
+experimentally isolated. The operator then supplied examples of repeatable workflows,
 peer-domain exchange, several agents and machines, human acceptance gates,
 and an external intake-to-assessment-to-publication route. A further challenge
 pointed to tiered loading, the kernel and the domain pattern repeating at
@@ -113,6 +127,9 @@ reconstructed from the retrieved user messages and agent responses in this
 chat. It preserves the material intermediate positions, not just the final
 view. It is a chronological account rather than a verbatim transcript or a
 complete archive of tool output; the original chat remains the dialogue record.
+Version 1.2 makes the causal withdrawal prominent, reclassifies F5 and records
+how a cold test could separate prompt framing from the existing entry route
+and from a proposed discovery workflow.
 
 ## The model recovered from the evidence
 
@@ -203,7 +220,7 @@ execution. That failure does not erase the successful earlier run. Live Notion
 inspection in this audit required reauthentication, so current remote state
 was not independently confirmed.
 
-## Remaining findings
+## Findings and bounded observations
 
 **F1 — Reconciliation completion is not established by cue presence.**
 The README promises that a definition change is refused until its dependants
@@ -253,15 +270,22 @@ identity, durable receipt and lookup/reconciliation before retry could use
 existing records and identifiers. Transport retries must remain distinct from
 a requested new assessment. Private evidence: intake publication steps 1.6–1.7.
 
-**F5 — Definition, implementation, deployment and execution evidence are hard
-to assess together.** The audit had to reconstruct these across specifications,
-code, plans, prompts and dispatch records. A definition, an implemented tool,
-a configured deployment, one successful run and repeated reliability are
-different claims. A derived operational view could make their evidence and
-unknowns visible without adding another parallel ledger. This is a reviewer's
-visibility judgement; this session does not isolate its effect on an uncoached
-reader. The existing [framework map](../docs/framework-map.md) already maps
-definitions and machinery; it should be built upon, not disregarded.
+**F5 — Audit observation only; discoverability is untested.** In this guided
+audit, the reviewer assembled its account from specifications, code, plans,
+prompts and dispatch records. That describes the reviewer's path. It does not
+establish that the information is intrinsically hard to discover, that the
+existing entry route is inadequate, or that an uncoached reviewer would need
+author intervention. The earlier general heading, "Definition, implementation,
+deployment and execution evidence are hard to assess together", is withdrawn
+as a finding about the system. F5 retains its identifier for historical
+traceability, not defect status.
+
+A definition, an implemented tool, a configured deployment, one successful run
+and repeated reliability remain different evidence classes. A derived view
+could be tested for usefulness, but the need for it has not been demonstrated.
+The existing [framework map](../docs/framework-map.md) is part of the current
+entry surface to evaluate. Neither this observation nor the author's later
+explanations can substitute for a cold test of that surface.
 
 **F6 — The workflow-discovery heuristic excludes same-day histories.**
 The emergence code retains a carrier's moves only when they span more than one
@@ -273,8 +297,9 @@ are unaffected. Sources: [workflows.py](../tools/markdownllm/workflows.py),
 [workflows-emerge-from-use](../things/plans/workflows-emerge-from-use.md).
 
 F1 and F6 are inspectable in the public snapshot. F2–F4 rely in part on private
-deployment evidence. F5 is an interpretive assessment. None has been repaired
-by filing this review; proposed fixes have not been approved or tested here.
+deployment evidence. F5 is not a defect finding. No implementation has been
+repaired by filing this review; proposed fixes have not been approved or tested
+here. The discoverability claim has been corrected in this record.
 
 ## Extrapolation from existing pieces
 
@@ -376,6 +401,68 @@ more context or coaching. The evaluator should check trace accuracy, justified
 classifications, discovery of known defects and handling of unknowns, rather
 than reward reproduction of this review's architecture vocabulary. One trial
 would demonstrate a case, not general reliability.
+
+## Proposed cold test — separate the questions before changing the route
+
+Added 2026-10-22. This is a test design, not a test result. First evaluate the
+existing entry route; do not make a new discovery workflow part of the baseline.
+
+| Condition | Material and brief | What the comparison can test |
+|---|---|---|
+| A — Broad identification | Existing entry contract, documentation, implementation and authorised examples; the broad brief below | How a fresh reviewer identifies the system through the current route under stated conditions |
+| B — Memory-framed review | The same material; the original memory-system comparison brief, including its request for whole-system coherence | A versus B tests sensitivity to the initial brief; it does not isolate the effect of a single word |
+| C — Discovery route, later | The same underlying material and broad brief as A, with the proposed discovery workflow | C versus A tests the route's incremental usefulness, after the baseline is recorded |
+
+For A, a suitable starting brief is:
+
+> Examine this repository and the supplied examples. Explain what the system
+> does, what it is for, and how its parts work together. Support your account
+> with evidence, distinguish implemented behaviour from claims or plans, and
+> identify strengths, limitations and uncertainty. Choose comparison categories
+> after forming that account.
+
+This avoids prescribing memory system, workflow engine, fractal or expert-domain
+network as the answer. It is still a brief with an explicit purpose, not a
+claim to be free of all framing.
+
+**Controls.** Use fresh sessions without this conversation, these reviews or
+answers from another condition. Freeze a common source snapshot and an explicit
+source manifest; exclude prior review verdicts from the initial pass while
+retaining ordinary entry instructions and documentation, which are part of the
+product being tested. Retain any ordinary author claims as claims to assess.
+Keep model version, harness, tool access, reasoning settings, source access and
+total budget comparable within A/B. Record credential failures, missing private
+evidence and context truncation rather than scoring them as failed discovery
+of inaccessible material. Use separate sessions per condition, repeat them,
+and vary assignment/order rather than teaching one session and rerunning it.
+Replicate on other models only after obtaining a within-model baseline.
+
+**Assessment.** Fix the questions and evidence-backed checks before seeing the
+outputs. Check correct reconstruction of actual operations and boundaries,
+traceable claims, unsupported assertions, material omissions, handling of
+unknowns and transfer to a held-out example. Also record reading effort and
+cost. Have outputs assessed without revealing their condition where feasible.
+Do not score the use of words such as "substrate" or "fractal", agreement with
+the author, or reproduction of this review's conclusions. The reference
+answers must cite the relevant specification, implementation or execution
+evidence and preserve those distinctions; keep undocumented author intentions
+separate. A reviewer cannot be
+expected to discover an ambition that is not represented in its inputs.
+
+**Interpretation.** If A reconstructs capabilities that B consistently misses,
+that supports a prompt-framing effect for these settings. If both succeed,
+this session's difficulty has not reproduced. If both fail, establish whether
+the failures arise from access, budget, model capability, test design or the
+entry material before assigning a cause. If C improves on A, that supports the
+workflow's usefulness under the tested conditions; it does not retrospectively
+validate the original discoverability diagnosis. A claim specifically about
+documentation navigation needs a further controlled comparison that changes
+navigation while holding available facts and evaluation conditions constant.
+
+One fresh broad review is a useful first observation, not proof of general
+discoverability. Preserve each review before author clarification. Author
+feedback afterwards can explain mismatches but cannot turn the initial run
+into a different experimental condition. These trials have not been run.
 
 ## Still untrodden; not reasons to delay this capture
 
@@ -647,6 +734,17 @@ the intermediate reasoning, the change in comparison classes, and the full
 sequence of interventions. Version 1.1 retains those stages here instead of
 presenting the final assessment as the agent's starting position.
 
+**9. The operator required a direct causal answer on 2026-10-22.** The operator
+again asked whether their initial scoped prompt had led the assessment, whether
+the agent could therefore claim a discoverability defect, and how a cold test
+could answer the question. They noted that other agents read the record. The
+agent accepted that the memory frame shaped its reading while acknowledging
+that the original brief also requested broader coherence. The record already
+contained a withdrawal, but F5's general heading and placement among findings
+could still carry the unsupported diagnosis. Version 1.2 makes the withdrawal
+prominent, removes that defect classification and separates the proposed tests
+of initial framing, the current entry route and an optional discovery workflow.
+
 ## Disposition of the earlier judgements
 
 | Position or issue discussed | Where the session left it |
@@ -662,7 +760,7 @@ presenting the final assessment as the agent's starting position.
 | Scope of the loading and composition recommendations | The intermediate response already cautioned against another overarching abstraction. The later read sharpened this further: the definitions and generators themselves already exist, so recommendations must identify particular composition or deployment work. |
 | Quality of workflows inferred from repetition | Recurrence and outcome quality were distinguished. Repeated behaviour can preserve omissions; the session did not establish that an inferred procedure is necessarily good practice. |
 | Independence of peer-domain corroboration | Connectivity alone was never accepted as proof. Evidence lineage and visible disagreement remain necessary; repeated citation of one inference is still one evidential origin. |
-| Author-guided correction proves a discoverability defect | Withdrawn. The initial prompt is a confound; causes remain unresolved. |
+| Author-guided correction proves a discoverability defect | Withdrawn. The initial prompt is a confound; causes remain unresolved. Version 1.2 also removes F5's general defect framing so the withdrawal governs the headline as well as the caveat. |
 | Independence of the final assessment | Evidence improved the assessment, but cannot erase the history of framing and intervention. The filed review is explicitly guided. |
 | Practical utility versus comparative proof | Reported use and specific execution records support utility; comparative superiority and general reliability need different evidence. The operator's emphasis on actual use changed the weighting, rather than making these the same evidentiary question. |
 
