@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-22
-generated: 2026-10-22T21:50:20
-generated_from: HEAD@7424e72
-coverage: 599
+generated: 2026-10-22T23:56:16
+generated_from: HEAD@68a1d30
+coverage: 604
 framework_version: 3.50.0
 ---
 
@@ -492,6 +492,7 @@ framework_version: 3.50.0
 - cue-a-uniform-answer-is-a-dead-judgment-2026-10-17 --subject--> a-uniform-answer-is-a-dead-judgment
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-10 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-14 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- cue-agents-cannot-self-install-permission-bearing-hooks-2026-10-22 --subject--> agents-cannot-self-install-permission-bearing-hooks
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter
@@ -540,6 +541,7 @@ framework_version: 3.50.0
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
 - cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
+- cue-directional-graph-reads-come-in-inbound-outbound-pairs-2026-10-22 --subject--> directional-graph-reads-come-in-inbound-outbound-pairs
 - cue-domain-refresh-specification-2026-09-13 --subject--> domain-refresh-specification
 - cue-domain-specification-guide-2026-09-15 --subject--> domain-specification-guide
 - cue-domain-specification-guide-2026-09-26 --subject--> domain-specification-guide
@@ -554,6 +556,7 @@ framework_version: 3.50.0
 - cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-09-26 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-10-17 --subject--> evidence-and-eval-backlog
+- cue-existence-is-not-currency-2026-10-22 --subject--> existence-is-not-currency
 - cue-expertise-is-an-output-not-a-prerequisite-2026-10-08 --subject--> expertise-is-an-output-not-a-prerequisite
 - cue-explorer-extraction-and-hosting-2026-09-13 --subject--> explorer-extraction-and-hosting
 - cue-explorer-publication-position-2026-09-13 --subject--> explorer-publication-position
@@ -595,6 +598,7 @@ framework_version: 3.50.0
 - cue-glossary-2026-10-20 --subject--> glossary
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
+- cue-hard-invariants-encode-a-semantic-assumption-2026-10-22 --subject--> hard-invariants-encode-a-semantic-assumption
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
 - cue-independent-review-2026-07-14-fable-2026-10-20 --subject--> independent-review-2026-07-14-fable
 - cue-independent-substrate-review-2026-08-20-claude-2026-10-20 --subject--> independent-substrate-review-2026-08-20-claude
@@ -658,6 +662,7 @@ framework_version: 3.50.0
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-session-start-hardening-2026-10-20 --subject--> session-start-hardening
+- cue-session-start-loses-to-the-first-request-2026-10-22 --subject--> session-start-loses-to-the-first-request
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-24 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification

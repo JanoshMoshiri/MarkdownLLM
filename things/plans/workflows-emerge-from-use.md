@@ -2,7 +2,7 @@
 id: workflows-emerge-from-use
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-10-07
 session: 2026-10-05
 priority: critical
@@ -19,9 +19,9 @@ linked_things:
     notes: "The reckoning dissolves an inferred workflow nothing moves through, and carries the emerged candidate as an item for the agent."
 triggers:
   - type: time
-    condition: "2026-10-21 reached"
+    condition: "2026-11-04 reached"
     action: surface
-    note: "Two weeks: has a workflow emerged in a live workspace, and has the agent followed one when working on its carrier type? If neither, the actor is the problem."
+    note: "Answered 2026-10-22: no workflow emerged in the framework root (mdllm workflows --emergent: none — nothing repeats across three days; two authored definitions, the floor-development one with five runs and no carrier), and none is reported bound in a live workspace; the actor question stands and the close is the actor. Next look 2026-11-04: has a workflow emerged in a live workspace, and has the agent followed one when working on its carrier type? If neither, the actor is the problem."
 ---
 
 # Plan: Workflows Emerge From Use

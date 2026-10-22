@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-22
-generated: 2026-10-22T21:50:20
-generated_from: HEAD@7424e72
-coverage: 599
+generated: 2026-10-22T23:56:16
+generated_from: HEAD@68a1d30
+coverage: 604
 framework_version: 3.50.0
 ---
 
@@ -14,31 +14,31 @@ framework_version: 3.50.0
 
 | field | things using it |
 |---|---|
-| id | 599 |
-| type | 599 |
-| status | 599 |
-| created | 599 |
-| version | 525 |
-| tags | 494 |
+| id | 604 |
+| type | 604 |
+| status | 604 |
+| created | 604 |
+| version | 530 |
+| tags | 499 |
 | linked_things | 391 |
 | origin | 210 |
+| subject | 208 |
+| raised_at | 208 |
+| raised_by | 208 |
+| verdict | 208 |
+| verdict_reason | 208 |
 | session | 203 |
-| subject | 203 |
-| raised_at | 203 |
-| raised_by | 203 |
-| verdict | 203 |
-| verdict_reason | 203 |
 | confidence | 202 |
 | informed_by | 202 |
 | source | 149 |
+| disposition | 64 |
+| disposition_reason | 64 |
 | priority | 63 |
-| disposition | 62 |
-| disposition_reason | 62 |
 | decided_by | 45 |
-| promoted_to | 39 |
+| promoted_to | 44 |
 | exposed | 35 |
+| settles_when | 21 |
 | authorship | 19 |
-| settles_when | 19 |
 | completed | 12 |
 | period_start | 10 |
 | period_end | 10 |

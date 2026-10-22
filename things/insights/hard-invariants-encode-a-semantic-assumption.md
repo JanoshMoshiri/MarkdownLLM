@@ -1,8 +1,9 @@
 ---
 id: hard-invariants-encode-a-semantic-assumption
 type: insight
-status: active
-version: 1.0
+status: promoted
+promoted_to: thing-specification
+version: 1.1
 created: 2026-06-24
 session: 2026-06-24
 source: both
@@ -72,3 +73,7 @@ human pushing on "when would I *not* want this to fire in a domain?" — which
 exposed that the gate encodes the prerequisite reading of `dependencies`, that
 the principled release valve is remodeling onto `linked_things` rather than a
 config flag, and that the one earned exception is the honest-but-too-strict case.
+
+## Promoted 2026-10-22
+
+The remedy is in the kernel: a type may declare `terminal_statuses`, replacing the universal terminal set for that type, so the one frozen reading the invariant encoded is now the domain's to declare.

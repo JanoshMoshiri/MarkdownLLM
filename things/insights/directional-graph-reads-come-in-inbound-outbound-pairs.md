@@ -1,8 +1,9 @@
 ---
 id: directional-graph-reads-come-in-inbound-outbound-pairs
 type: insight
-status: active
-version: 1.0
+status: promoted
+promoted_to: change-reconciliation-specification
+version: 1.1
 created: 2026-06-24
 session: 2026-06-24
 source: both
@@ -67,3 +68,7 @@ just touchpoints rebound?" — resolved to *no*: they walk **different edge sets
 which is exactly what makes them a genuine pair rather than a duplicate. The
 shared architecture (live neighbourhood read, report-not-apply) is the invariant;
 the edge set and direction are the variables.
+
+## Promoted 2026-10-22
+
+Both reads are built and specified: `touchpoints` serves the assimilate beat inbound, `cascade` serves write.thing.md's after-change pass outbound. The pair is the mechanism now, not an observation about it.

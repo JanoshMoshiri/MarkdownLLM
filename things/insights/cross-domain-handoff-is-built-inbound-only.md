@@ -22,6 +22,9 @@ linked_things:
     relation: informs
   - id: change-reconciliation-specification
     relation: informs
+disposition: keep-active
+disposition_reason: "The outbound mechanism exists (exposed faces, egress, imports-check, trust grants) but no consumer clone checks its imports yet: coverage 0/101 and 0/43 (estate-workflow-derivation) and the 2026-10-21 holistic review's audit-time estate-check could check none (F3); the gap is deployment now, not design — look again when a consumer clone's trust grants are made"
+settles_when: 2026-11-19
 ---
 
 # Cross-Domain Hand-off Is Built Inbound-Only — The Outbound Half Is The Standing Gap
