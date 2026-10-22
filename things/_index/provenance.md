@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-22
-generated: 2026-10-22T23:56:16
-generated_from: HEAD@68a1d30
+generated: 2026-10-22T23:57:47
+generated_from: HEAD@f83e82d
 coverage: 139
 framework_version: 3.50.0
 ---
@@ -519,6 +519,7 @@ framework_version: 3.50.0
 - circulation-is-not-disposition (derived-from)
 
 ## review-holistic-substrate-2026-10-21-codex
+- cold-test-condition-a (derived-from)
 - holistic-review-rulings-2026-10-21 (pinned @f3ccc9b4efcc2d9fd3b9cc2744c2f02ae1e3c5aa)
 - holistic-review-rulings-2026-10-21 (derived-from)
 

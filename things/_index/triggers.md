@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: triggers
 created: 2026-10-22
-generated: 2026-10-22T23:56:16
-generated_from: HEAD@68a1d30
+generated: 2026-10-22T23:57:46
+generated_from: HEAD@f83e82d
 coverage: 9
 framework_version: 3.50.0
 ---

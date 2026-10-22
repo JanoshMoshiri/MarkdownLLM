@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-22
-generated: 2026-10-22T23:56:16
-generated_from: HEAD@68a1d30
-coverage: 604
+generated: 2026-10-22T23:57:47
+generated_from: HEAD@f83e82d
+coverage: 608
 framework_version: 3.50.0
 ---
 
@@ -227,6 +227,10 @@ framework_version: 3.50.0
 - an-interface-is-what-its-consumers-call-not-what-it-declares --derived-from--> vendor-harness-adapter-foundation
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> portability-claims-need-execution-tests
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --supports--> holistic-review-rulings-2026-10-21
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --references--> review-holistic-substrate-2026-10-21-codex
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --supports--> documentation-rulings-2026-10-20
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --extends--> repeated-drift-promotes-a-fact-into-the-floor
 - an-owed-act-is-not-a-false-fact --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - an-owed-act-is-not-a-false-fact --references--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - an-owed-act-is-not-a-false-fact --informs--> cue-carrier
@@ -417,6 +421,10 @@ framework_version: 3.50.0
 - cold-read-of-the-seams-release --references--> review-independent-seams-verification-2026-08-26-claude
 - cold-read-of-the-seams-release --implements--> a-verifier-assumes-the-inputs-it-did-not-observe
 - cold-read-of-the-seams-release --references--> framework-retrospective-2026-08b
+- cold-test-condition-a --derived-from--> review-holistic-substrate-2026-10-21-codex
+- cold-test-condition-a --references--> holistic-review-rulings-2026-10-21
+- cold-test-condition-a --references--> cold-read-of-the-seams-release
+- cold-test-condition-a --implements--> the-public-corpus-is-the-self-description-the-use-is-private
 - committed-state-carries-defects-as-faithfully-as-facts --extends--> structure-decides-figures-scale-decides-convention
 - committed-state-carries-defects-as-faithfully-as-facts --challenges--> mis-keyed-links-pass-the-floor-silently
 - committed-state-carries-defects-as-faithfully-as-facts --informs--> evidence-and-eval-backlog
@@ -1126,6 +1134,9 @@ framework_version: 3.50.0
 - holistic-review-rulings-2026-10-21 --informs--> public-docs-face-build
 - holistic-review-rulings-2026-10-21 --references--> workflows-emerge-from-use
 - holistic-review-rulings-2026-10-21 --references--> cold-read-of-the-seams-release
+- holistic-review-rulings-2026-10-21 --informs--> an-outward-claim-about-a-mechanism-is-read-off-its-test
+- holistic-review-rulings-2026-10-21 --informs--> the-public-corpus-is-the-self-description-the-use-is-private
+- holistic-review-rulings-2026-10-21 --informs--> cold-test-condition-a
 - hook-compliance-correlates-with-scope-not-awareness --informs--> orchestration-specification
 - hook-compliance-correlates-with-scope-not-awareness --supports--> tiered-loading-is-tiered-reading-applied-to-specs
 - hook-enforcement-has-three-anchors --informs--> orchestration-specification
@@ -1744,6 +1755,10 @@ framework_version: 3.50.0
 - the-orchestrators-premises-are-the-least-reliable-input --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - the-orchestrators-premises-are-the-least-reliable-input --complements--> the-root-is-not-a-representative-domain
 - the-orchestrators-premises-are-the-least-reliable-input --references--> consequence-is-recoverable-only-in-retrospect
+- the-public-corpus-is-the-self-description-the-use-is-private --challenges--> review-holistic-substrate-2026-10-21-codex
+- the-public-corpus-is-the-self-description-the-use-is-private --supports--> review-critical-comparison-2026-10-17-claude
+- the-public-corpus-is-the-self-description-the-use-is-private --informs--> limitations-guide
+- the-public-corpus-is-the-self-description-the-use-is-private --informs--> holistic-review-rulings-2026-10-21
 - the-reckoning --implements--> the-reckoning-is-the-digestion-beat-2026-10-05
 - the-reckoning --implements--> closed-loop-operating-state
 - the-reckoning --references--> cue-carrier
@@ -1832,6 +1847,9 @@ framework_version: 3.50.0
 - unattended-cue-carrier-2026-09-12 --extends--> change-reconciliation-specification
 - unattended-cue-carrier-2026-09-12 --implements--> consequence-is-recoverable-only-in-retrospect
 - unattended-cue-carrier-2026-09-12 --implements--> partial-coverage-quiets-the-uncovered-steps
+- uncommitted-work-is-judged-from-the-record-that-left-it --extends--> git-workflow-specification
+- uncommitted-work-is-judged-from-the-record-that-left-it --informs--> session-memory-specification
+- uncommitted-work-is-judged-from-the-record-that-left-it --supports--> consequence-is-recoverable-only-in-retrospect
 - universal-workflow-methodology --implements--> workflow-state-specification
 - universal-workflow-methodology --references--> a-true-primitive-is-discovered-not-authored
 - universal-workflow-methodology --references--> the-wrong-distribution-channel-validates-clean
