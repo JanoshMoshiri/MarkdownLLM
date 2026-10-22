@@ -35,7 +35,7 @@ CI (`.github/workflows/validate.yml`) runs the suite on a
 **Windows CI is green as of 2026-08-22** (`7fc38d4`, both legs, 3m22s) —
 the framework's first Windows execution evidence. It took three published
 runs to get there, and the two failures were environmental, neither a floor
-defect:
+defect; a third red streak followed in October and was not one either:
 
 1. *Interpreter setup* (first run): the shared pin `3.12.13` has no
    win32-x64 build — `actions/python-versions` ships Windows builds of 3.12
@@ -47,6 +47,15 @@ defect:
    scaffolds into `tmp_path` hit scaffold's deliberate refusal to embed an
    absolute machine-specific adapter route. Fixed by pointing pytest's
    `--basetemp` at `RUNNER_TEMP`, which shares the workspace drive.
+3. *Line endings* (every push from 3.49.0 to `0b3d892`, 2026-10-18 to
+   2026-10-22, Windows leg only): one test, one cause.
+   `test_framework_root_shortcuts_are_template_copies` compares the root's
+   deployed `.claude/commands/*.md` and `.github/prompts/*.md` byte-for-byte
+   with `templates/`; the templates carried `text eol=lf`, the deployed
+   copies carried no attribute, so the runner's `core.autocrlf=true`
+   checkout wrote them CRLF. Invisible locally, where the tool writes those
+   files with LF and git reports them clean. Fixed by giving both deployed
+   directories the same attribute (`dced262`); the index already held LF.
 
 **Running the suite on Windows requires the temp tree and the checkout to
 share a drive.** If yours differ, pass `--basetemp` explicitly to a
