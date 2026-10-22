@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-22
-generated: 2026-10-22T23:57:47
-generated_from: HEAD@f83e82d
-coverage: 608
+created: 2026-10-23
+generated: 2026-10-23T00:02:09
+generated_from: HEAD@47e16fc
+coverage: 611
 framework_version: 3.50.0
 ---
 
@@ -608,6 +608,7 @@ framework_version: 3.50.0
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-hard-invariants-encode-a-semantic-assumption-2026-10-22 --subject--> hard-invariants-encode-a-semantic-assumption
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
+- cue-holistic-review-rulings-2026-10-21-2026-10-23 --subject--> holistic-review-rulings-2026-10-21
 - cue-independent-review-2026-07-14-fable-2026-10-20 --subject--> independent-review-2026-07-14-fable
 - cue-independent-substrate-review-2026-08-20-claude-2026-10-20 --subject--> independent-substrate-review-2026-08-20-claude
 - cue-independent-substrate-review-2026-08-20-codex-2026-10-20 --subject--> independent-substrate-review-2026-08-20-codex
@@ -651,6 +652,7 @@ framework_version: 3.50.0
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build
+- cue-public-docs-face-build-2026-10-23 --subject--> public-docs-face-build
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
@@ -659,6 +661,7 @@ framework_version: 3.50.0
 - cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 --subject--> review-external-conflict-lifecycle-2026-09-08
+- cue-review-holistic-substrate-2026-10-21-codex-2026-10-23 --subject--> review-holistic-substrate-2026-10-21-codex
 - cue-review-independent-operating-model-2026-08-26-codex-2026-10-20 --subject--> review-independent-operating-model-2026-08-26-codex
 - cue-scalability-guide-2026-10-20 --subject--> scalability-guide
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
