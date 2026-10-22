@@ -14,3 +14,9 @@ templates/cowork-bundle/* text eol=lf
 # must expose the same LF bytes that the renderer emits and hashes.
 templates/** text eol=lf
 tools/tests/fixtures/** text eol=lf
+
+# The framework root's own deployed shortcuts are byte copies of the
+# templates (test_framework_root_shortcuts_are_template_copies): a fresh
+# Windows checkout must expose the same LF bytes on both sides of each pair.
+.claude/commands/** text eol=lf
+.github/prompts/** text eol=lf
