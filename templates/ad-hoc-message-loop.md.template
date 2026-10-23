@@ -7,8 +7,9 @@ created: [ISO-date]
 # ticket's `status` is its addressee; `actor` on each stage names the role
 # `mdllm watch --role <actor>` wakes there. Add a stage per actor that may
 # be addressed. `closed` wakes nobody and means nothing is owed right now;
-# a reopen is a declared move back to an actor, because the conversation's
-# end is its work item's end, not the ticket's.
+# a reopen is a declared move back to an actor. Either party explicitly
+# concludes the conversation in committed state; ordinary closure is not
+# that declaration.
 stages:
   - id: [actor-a]
     to: [[actor-b], closed]
@@ -47,11 +48,17 @@ names as its statuses and `closed` as terminal; then each actor arms
 **closed**
 - Entry: whichever actor holds the turn judges that nothing is owed right
   now — the request was met, or the item moved on without one.
-- What it means: nothing is owed. It is not the conversation's end; that is
-  the work item's end (merged, approved, answered), recorded on the item.
+- What it means: nothing is owed. It is not the conversation's end; either
+  party explicitly declares that end in committed state. The work item's
+  completion does not substitute for an explicit conclusion.
   Anything durable the turn produced is a proper thing linked from the
   ticket. A later turn on the same item is a declared `closed → <actor>`
   move, which the addressee's watch sees.
+
+The branch lifecycle that detects an explicit conclusion and stops its
+watch is planned in `a2a-conversations-on-their-own-branch` at the framework
+root. This turn graph alone does not implement that lifecycle or add a
+conclusion status.
 
 ## Notes
 

@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-23
-generated: 2026-10-23T00:02:09
-generated_from: HEAD@47e16fc
-coverage: 611
+created: 2026-10-24
+generated: 2026-10-24T00:38:53
+generated_from: HEAD@b2e5d04
+coverage: 616
 framework_version: 3.50.0
 ---
 
@@ -188,10 +188,12 @@ framework_version: 3.50.0
 - a2a-conversations-on-their-own-branch --references--> loop-turns-self-heal-2026-09-23
 - a2a-conversations-on-their-own-branch --references--> the-reckoning
 - a2a-conversations-on-their-own-branch --references--> substrate-native-a2a
+- a2a-conversations-run-on-their-own-branch-2026-10-09 --supersedes--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --extends--> loop-turns-self-heal-2026-09-23
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --extends--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> a-shared-worktree-merges-authorship-at-the-index
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> git-workflow-specification
+- ad-hoc-message-loop --references--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - ad-hoc-message-loop --implements--> standing-watch-specification
 - adoption-reopens-birth-gaps --extends--> a-ruling-triages-more-cheaply-than-a-mechanism
 - agents-cannot-self-install-permission-bearing-hooks --informs--> hook-enforcement-has-three-anchors
@@ -498,8 +500,11 @@ framework_version: 3.50.0
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cue-a-true-primitive-is-discovered-not-authored-2026-10-20 --subject--> a-true-primitive-is-discovered-not-authored
 - cue-a-uniform-answer-is-a-dead-judgment-2026-10-17 --subject--> a-uniform-answer-is-a-dead-judgment
+- cue-a2a-conversations-on-their-own-branch-2026-10-24 --subject--> a2a-conversations-on-their-own-branch
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-10 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-14 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-24 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- cue-ad-hoc-message-loop-2026-10-24 --subject--> ad-hoc-message-loop
 - cue-agents-cannot-self-install-permission-bearing-hooks-2026-10-22 --subject--> agents-cannot-self-install-permission-bearing-hooks
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
@@ -664,6 +669,7 @@ framework_version: 3.50.0
 - cue-review-holistic-substrate-2026-10-21-codex-2026-10-23 --subject--> review-holistic-substrate-2026-10-21-codex
 - cue-review-independent-operating-model-2026-08-26-codex-2026-10-20 --subject--> review-independent-operating-model-2026-08-26-codex
 - cue-scalability-guide-2026-10-20 --subject--> scalability-guide
+- cue-seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15-2026-10-24 --subject--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-09-26 --subject--> session-memory-specification
@@ -679,6 +685,7 @@ framework_version: 3.50.0
 - cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-01 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-15 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-10-24 --subject--> standing-watch-specification
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 --subject--> structural-pointers-need-reverse-edge-indexing
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
@@ -1580,6 +1587,7 @@ framework_version: 3.50.0
 - scalability-guide --complements--> derived-index-specification
 - scalability-guide --references--> example-things-specification
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --extends--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --superseded-by--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --extends--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> loop-turns-self-heal-2026-09-23
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> a-shared-worktree-merges-authorship-at-the-index
@@ -1633,6 +1641,7 @@ framework_version: 3.50.0
 - srp-extraction-is-tier-promotion --references--> thing-specification
 - srp-extraction-is-tier-promotion --supports--> example-things-specification
 - srp-extraction-is-tier-promotion --supports--> reasoning-lenses-specification
+- standing-watch-specification --references--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - standing-watch-specification --extends--> thing-specification
 - standing-watch-specification --derived-from--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - standing-watch-specification --complements--> workflow-state-specification

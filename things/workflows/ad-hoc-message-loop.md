@@ -2,7 +2,7 @@
 id: ad-hoc-message-loop
 type: workflow-definition
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-10-21
 exposed: false
 stages:
@@ -15,6 +15,9 @@ stages:
   - id: closed
     to: [claude, codex]
 linked_things:
+  - id: a2a-conversations-run-on-their-own-branch-2026-10-09
+    relation: references
+    notes: "2026-10-24: explicit conclusion is distinct from ordinary ticket closure; branch lifecycle support remains planned."
   - id: standing-watch-specification
     relation: implements
 ---
@@ -46,9 +49,16 @@ them. A local peer ref can carry a review without publishing a release.
 
 ## Closed
 
-Nothing is owed at present, and no seat wakes. The work item's end is
-recorded on the work item. A later request on the same item reopens the
-ticket to its addressee through a declared edge.
+Nothing is owed at present, and no seat wakes. Either party explicitly
+concludes the conversation in committed state; ordinary ticket closure and
+the work item's completion do not substitute for that declaration. A later
+request on an item whose ticket is ordinarily closed reopens the ticket to
+its addressee through a declared edge.
+
+The branch lifecycle that detects that declaration and terminates its
+watch remains planned in `a2a-conversations-on-their-own-branch`. This
+definition's stages and transitions are unchanged; `closed` continues to
+mean nothing is owed now.
 
 ## Session wake
 

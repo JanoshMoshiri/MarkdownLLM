@@ -2,7 +2,7 @@
 id: a2a-conversations-run-on-their-own-branch-2026-10-09
 type: decision
 status: made
-version: 1.2
+version: 1.3
 created: 2026-10-10
 session: 2026-10-09
 decided_by: Janosh Moshiri
@@ -10,6 +10,9 @@ confidence: high
 origin: stated
 tags: [a2a, ticket, branch, worktree, concurrency, turn-taking, merge, git]
 linked_things:
+  - id: seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+    relation: supersedes
+    notes: "2026-10-24: replaces only ruling 3's conversation-end clause with an explicit conclusion by either party. Its seat, version-guard, work-item identity and role rulings remain in force."
   - id: loop-turns-self-heal-2026-09-23
     relation: extends
     notes: "Inside one conversation nothing changes: turns alternate, a turn is real only on the remote, and the agent who holds a rejected turn pulls, merges and pushes again. This ruling removes the cause of rejection between conversations."
@@ -56,7 +59,8 @@ back to him the same day and he asked for it as a plan.
    `main` when the conversation opens; its turns go there and land on
    `main` when it concludes. Concurrent conversations never touch each
    other's branch, so the divergence their turns cause is removed at the
-   source, not managed. (What else the branch carries is open, below.)
+   source, not managed. (The contents ruling is settled in the
+   2026-10-24 amendment below.)
 2. **A conversation has a working copy of its own in each clone.** Two
    working copies cannot check out one branch, and the two sides of one
    conversation never write at the same time — so the unit of isolation is
@@ -70,7 +74,7 @@ back to him the same day and he asked for it as a plan.
    the operator's. A concluded conversation left unlanded, or one gone quiet
    without concluding, is an attention item at the next close.
 
-## Open — The Operator's, To Weigh Before Phases 1, 3 And 4
+## Questions Held Open — 2026-10-10 (Answered 2026-10-24)
 
 A first draft of this record (a98ad97) wrote three of these as settled from
 the live record and the floor. The operator corrected it on 2026-10-10: they
@@ -107,8 +111,44 @@ will answer later. His leanings, in his words, with what each would mean:
    it stays the agent's and is validated.
 
 *"I need to think about all of those things, the implications, so I have to
-wait."* Nothing that depends on them is built until he rules; the plan's
-trigger puts them back to him in one prompt.
+wait."* These questions held Phases 1, 3 and 4 until the operator answered
+the plan's reminder on 2026-10-24, below. This section preserves the earlier
+options and leanings; the answers below govern implementation.
+
+## Four Implementation Rulings — 2026-10-24
+
+Janosh Moshiri answered all four through the native choice prompt during
+session start:
+
+1. **End:** *"A party explicitly concludes the conversation."* Either
+   party's explicit conclusion is the end signal. The implementation must
+   record that declaration in committed state so the watch and reckoning
+   can read it. A ticket closing still means nothing is owed now; neither
+   that close nor the underlying work item's completion substitutes for an
+   explicit conclusion. This replaces only the end clause of ruling 3 in
+   `seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15`;
+   conversation identity remains one per work item.
+2. **Landing:** *"Merge once, preserving turn history."* Land the
+   conversation branch on `main` once at its conclusion, through a merge
+   commit preserving the turns. The existing requirement that the landing
+   commit runs the floor remains in force; branch commits remain reachable
+   through that history, including any commit pins they carry.
+3. **Contents:** *"Conversation records only; work commits go to main."*
+   Tickets and review records travel on the conversation branch; changes
+   to the work being discussed are committed to `main` at their normal
+   meaning boundaries. The earlier evidence that 36% of turns also wrote
+   durable work remains evidence of the split the implementation must
+   support. Conversation branches isolate turn traffic; concurrent work
+   commits still share `main` and can require reconciliation.
+4. **Preparation:** *"Allow preparation; the agent makes the validated
+   commit."* The floor may prepare a merge Git can make without conflicts.
+   The agent makes the landing commit through the commit gate and
+   pre-commit validation. A merge with conflicts remains the operator's.
+
+The four design holds are answered. This records the contract for the
+existing build plan; none of its implementation phases is marked delivered
+by these answers. The fired 2026-10-23 questions reminder is disarmed on the
+plan; its implementation and seat prerequisites remain visible there.
 
 ## The Evidence — Read 2026-10-14
 
@@ -127,9 +167,11 @@ a new topic. Only 2 of 77 closes followed the item's real end (a merge).
 The real end — the artefact merged, the specification approved — is
 recorded elsewhere, usually after the close, and three threads were never
 closed at all. No workflow run reached a terminal stage in the window.
-*Inference:* the durable unit is the work item (the change under review,
-the specification set), not the ticket round; a conversation's end is that
-item's end.
+*Inference at the time:* the durable unit is the work item (the change
+under review, the specification set), not the ticket round; a
+conversation's end is that item's end. The 2026-10-24 ruling retains the
+work-item identity and replaces that inferred end signal with an explicit
+conclusion by either party.
 
 **On 2, how it lands.** No merge in the window touched the same file on
 both sides; the collisions were between turns, not content. Nine merges
@@ -178,7 +220,10 @@ not a fact. The pull-request threads live outside the repository.
 
 - `main` stays the agreed truth; a conversation's turns are not on it until
   it concludes, so orientation and the dispatcher read a conversation only
-  once it lands.
+  once it lands. The work being discussed continues to commit to `main`.
+- An explicit conclusion by either party ends the conversation; the merge
+  preserves its history and lands once. The floor may prepare a clean
+  merge, and the agent makes the validated landing commit.
 - Inside a conversation nothing changes: alternation, publication as the
   turn, the self-heal of a rejected push.
 - Exploration branches and person-to-person branching stay where

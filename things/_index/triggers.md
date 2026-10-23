@@ -3,18 +3,14 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-23
-generated: 2026-10-23T00:02:09
-generated_from: HEAD@47e16fc
-coverage: 9
+created: 2026-10-24
+generated: 2026-10-24T00:38:53
+generated_from: HEAD@b2e5d04
+coverage: 8
 framework_version: 3.50.0
 ---
 
 # Triggers Index — framework
-
-## a2a-conversations-on-their-own-branch
-- status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-23 reached, action=surface, note=Have the four open rulings been made (the decision's Open section)? If not, put them to the operator in one native prompt, his leanings as the first options. If they have: has Phase 1 landed, and has one pair run a conversation on its own branch?
 
 ## closed-loop-operating-state
 - status: in-progress  due_date: —

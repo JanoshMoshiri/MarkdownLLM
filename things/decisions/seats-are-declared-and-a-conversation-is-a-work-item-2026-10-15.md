@@ -2,7 +2,7 @@
 id: seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-10-15
 session: 2026-10-15
 decided_by: Janosh Moshiri
@@ -13,6 +13,9 @@ linked_things:
   - id: a2a-conversations-run-on-their-own-branch-2026-10-09
     relation: extends
     notes: "That ruling's evidence read (2026-10-14) found three causes of the trouble larger than the turn race it targets; this ruling answers those three, and leaves the branch plan behind it in order."
+  - id: a2a-conversations-run-on-their-own-branch-2026-10-09
+    relation: superseded-by
+    notes: "2026-10-24: only ruling 3's end clause is replaced by an explicit conclusion by either party. Seats, the version guard, work-item identity and roles remain in force."
   - id: ticket-is-the-ad-hoc-carrier-2026-09-30
     relation: extends
     notes: "The ticket becomes one per work item rather than one per pair, and `closed` means nothing is owed rather than finished."
@@ -83,8 +86,10 @@ loop. Do what needs to be done."*
    behind, and read the difference as *behind*, never drift.
 3. **A conversation is a work item.** A ticket is one per work item,
    `ticket-<item>`, never per pair. `closed` means nothing is owed now; a
-   reopen is a declared move; the conversation's end is the item's end,
-   read from the item.
+   reopen is a declared move. **Amended 2026-10-24:** either party
+   explicitly concludes the conversation, as ruled in
+   `a2a-conversations-run-on-their-own-branch-2026-10-09`. The original
+   item's-end clause is superseded; work-item identity remains in force.
 4. **Roles, not agents; seats, not roles.** A loop definition names its
    roles and the actor at each stage, never which agent holds which role
    — that is assigned by the ticket or run that commissions the work, and
@@ -98,8 +103,9 @@ loop. Do what needs to be done."*
 
 ## What This Settles
 
-- The branch-per-conversation ruling stands and its four questions stay
-  the operator's; its plan now follows this one in order, because it
+- The branch-per-conversation ruling stands; its four implementation
+  questions were answered by the operator on 2026-10-24 in that decision's
+  amendment. Its plan follows this one in order, because it
   addresses the smallest of the four causes and needs seats first.
 - The framework carries 1, 2, and the templates and spec for 3 and 4; a
   workspace carries its own definitions and skills. Both halves were built

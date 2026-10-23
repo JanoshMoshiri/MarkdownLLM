@@ -2,9 +2,12 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.6
+version: 0.7
 created: 2026-09-21
 linked_things:
+  - id: a2a-conversations-run-on-their-own-branch-2026-10-09
+    relation: references
+    notes: "2026-10-24: either party explicitly concludes a conversation. Branch watch termination and validated merge preparation remain planned on a2a-conversations-on-their-own-branch."
   - id: thing-specification
     relation: extends
   - id: ticket-is-the-ad-hoc-carrier-2026-09-30
@@ -320,12 +323,22 @@ board, read by the same watch.
 - **The ticket is transient; its products are not.** Anything durable a
   conversation produces is written as a proper thing, linked from the ticket.
   `closed` wakes nobody and means *nothing is owed right now* — not that the
-  conversation is over. Its end is the work item's end, recorded on the item
-  (merged, approved, answered), which is why the definition declares
-  `closed → <actor>` edges: a later turn on the same item is a move the
-  addressee's watch sees, not a departure. *(Read 2026-10-14: 57 of 81
+  conversation is over. Either party **explicitly concludes** the
+  conversation, as ruled on 2026-10-24 in
+  `a2a-conversations-run-on-their-own-branch-2026-10-09`; the declaration
+  must be recorded in committed state. The work item's end does not
+  substitute for that declaration. The definition still declares
+  `closed → <actor>` edges: an ordinary later turn on the same item is a
+  move the addressee's watch sees, not a departure. *(Read 2026-10-14: 57 of 81
   conversations reopened, most continuing the same item; only two closes
   followed the item's real end.)*
+
+**Implementation boundary.** The explicit-end ruling replaces the earlier
+item's-end clause. Recording and detecting the declaration, stopping a
+branch watch on conclusion, and landing conversation records through a
+validated merge are still unbuilt phases of
+`a2a-conversations-on-their-own-branch`. The current watch's exit contract
+above is unchanged; ordinary ticket closure does not terminate it.
 
 **Why it is domain-declared and never reserved.** `read_board` skips every
 reserved type on a status-keyed board (above: a tool-owned lifecycle is never
