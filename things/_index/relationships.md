@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-22
-generated: 2026-10-22T21:50:20
-generated_from: HEAD@7424e72
-coverage: 599
+created: 2026-10-24
+generated: 2026-10-24T20:20:46
+generated_from: HEAD@68a1d30
+coverage: 600
 framework_version: 3.50.0
 ---
 
@@ -603,6 +603,7 @@ framework_version: 3.50.0
 - cue-interface-specification-2026-09-13 --subject--> interface-specification
 - cue-interface-specification-2026-09-26 --subject--> interface-specification
 - cue-interface-specification-2026-09-27 --subject--> interface-specification
+- cue-interface-specification-2026-10-24 --subject--> interface-specification
 - cue-limitations-guide-2026-10-20 --subject--> limitations-guide
 - cue-limitations-guide-2026-10-21 --subject--> limitations-guide
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product

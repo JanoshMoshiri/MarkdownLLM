@@ -2,7 +2,7 @@
 id: interface-specification
 type: specification
 status: evolving
-version: 1.9
+version: 1.10
 created: 2026-05-19
 linked_things:
   - id: llm-driven-systems-manifesto
@@ -168,6 +168,21 @@ This has implications:
 - **Conversational tone is natural** — LLMs handle informal, spoken-style input well
 - **Accessibility is built-in** — Voice input works for anyone who can speak, regardless of typing ability
 - **Speed advantage** — Speaking is faster than typing for most people; combined with an LLM that reasons about your domain, this creates a rapid feedback loop
+
+**Proven in use, not hypothetical** *(recorded 2026-10-24)*. The framework's own
+estate is operated by voice roughly nine times in ten: the operator speaks and
+listens on whatever surface is to hand — computer, phone, tablet — using any
+speech-to-text or text-to-speech the surface already offers, and types only
+for the remainder. Where a harness or surface had no spoken turn loop of its
+own, one was built through the substrate's discipline: **Reverb**, a voice
+bridge that attaches to a surface's prompt input and output (Telegram, Claude
+Code, Codex among them), carries the spoken turn in and reads the reply back
+through a configurable TTS engine (Kokoro or ElevenLabs). Its design record
+lives in the operator's `code-architect` workspace; the `agent-architect`
+discipline produced it. The point above stands — voice is a layer beneath the
+route, not a route — and the record adds that where the layer was missing, the
+substrate was enough to make it. This is one operator's route, recorded as
+evidence that the layer works; it is not a recommendation that it be yours.
 
 ## Output Types
 
