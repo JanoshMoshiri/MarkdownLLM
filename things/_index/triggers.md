@@ -3,10 +3,10 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-24
-generated: 2026-10-24T20:20:46
-generated_from: HEAD@68a1d30
-coverage: 9
+created: 2026-10-27
+generated: 2026-10-27T22:13:37
+generated_from: HEAD@992bf04
+coverage: 10
 framework_version: 3.50.0
 ---
 
@@ -40,6 +40,10 @@ framework_version: 3.50.0
 ## the-reckoning
 - status: in-progress  due_date: —
 - trigger: type=time, condition=2026-11-02 reached, action=surface, note=Four weeks of the rate line (Phase 5): does disposed keep pace with created across the four live workspaces? The two-week question was answered yes on 2026-10-20 — one attended close (2026-10-08) and one tick's draft (2026-10-11), both recorded in Phase 3.
+
+## the-record-holds-unattended
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-11-24 reached, action=surface — has one paused workspace been brought current by an unattended run and resumed at zero cost (Phase 1's Done line), and does every session start in any repo now say when the dispatcher last filed (Phase 2)? If neither, name what the operator's attention was pulled to instead; this plan exists because that pull is the standing condition, not a surprise. Re-date once answered.
 
 ## the-seat
 - status: in-progress  due_date: —

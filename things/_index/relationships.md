@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-27
-generated: 2026-10-27T21:07:00
-generated_from: HEAD@367c155
-coverage: 601
+generated: 2026-10-27T22:13:37
+generated_from: HEAD@992bf04
+coverage: 602
 framework_version: 3.50.0
 ---
 
@@ -1759,6 +1759,17 @@ framework_version: 3.50.0
 - the-record-answers-the-direction-question-first --supports--> llm-driven-systems-manifesto
 - the-record-answers-the-direction-question-first --references--> git-workflow-specification
 - the-record-answers-the-direction-question-first --references--> evidence-and-eval-backlog
+- the-record-holds-unattended --implements--> llm-driven-systems-manifesto
+- the-record-holds-unattended --extends--> closed-loop-operating-state
+- the-record-holds-unattended --extends--> cohesiveness-sensors
+- the-record-holds-unattended --extends--> domain-refresh-specification
+- the-record-holds-unattended --references--> cue-carrier
+- the-record-holds-unattended --references--> standing-watch-specification
+- the-record-holds-unattended --complements--> framework-upward-signal
+- the-record-holds-unattended --implements--> consistency-is-maintained-at-change-not-by-sweeping
+- the-record-holds-unattended --informs--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- the-record-holds-unattended --informs--> judgement-checks-need-a-suppression-list-which-is-itself-drift
+- the-record-holds-unattended --supports--> the-record-answers-the-direction-question-first
 - the-root-is-not-a-representative-domain --derived-from--> estate-workflow-derivation
 - the-root-is-not-a-representative-domain --informs--> derivation-shape-settled-2026-08
 - the-root-is-not-a-representative-domain --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it

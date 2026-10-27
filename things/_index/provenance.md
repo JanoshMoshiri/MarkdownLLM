@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-24
-generated: 2026-10-24T20:20:46
-generated_from: HEAD@68a1d30
+created: 2026-10-27
+generated: 2026-10-27T22:13:37
+generated_from: HEAD@992bf04
 coverage: 139
 framework_version: 3.50.0
 ---
@@ -92,6 +92,7 @@ framework_version: 3.50.0
 - gates-census-ratified-2026-08-28 (pinned @d818697185cdece9e50f8ad98fc93455ae81531c)
 - open-questions-arrive-as-a-prompt-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @68c83cee2b400b75c52f346c0506c01dfd273bb2)
+- the-record-holds-unattended (pinned @992bf04ddf69bc44bd8ef7d16985c7dc0e2cfe6d)
 - unattended-cue-carrier-2026-09-12 (pinned @7c5c21111295793ccb50ec41a67545bf62c82f47)
 
 ## codex-desktop-session-start-negative-2026-08-14
@@ -417,6 +418,7 @@ framework_version: 3.50.0
 
 ## llm-driven-systems-manifesto
 - settled-reasoning-is-standing-authority (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
+- the-record-holds-unattended (pinned @992bf04ddf69bc44bd8ef7d16985c7dc0e2cfe6d)
 
 ## loop-turns-self-heal-2026-09-23
 - cue-git-workflow-specification-2026-09-26 (pinned @8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a)
