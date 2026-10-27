@@ -141,7 +141,20 @@ about whether the foundation keeps its own commitment when nobody is looking.
   regeneration, and a run brings one current with the resume costing the
   operator a read of the cue and nothing else.
 
-- [ ] **Phase 2 — Silence is distinguishable from death.** *(a) The line.*
+- [ ] **Phase 2 — Silence is distinguishable from death.** *(a) shipped
+  2026-10-27: `dispatch_silence` in the sync module reads the newest
+  `type: dispatch-digest` across the clones this machine holds — from a
+  workspace, through its `framework_root` to the estate — and judges the age
+  against the cadence the digests themselves show (median gap of the last
+  six; silent past twice it); `estate-sync` prints the one line first among
+  the attention lines, in every clone, only when silent. Live at ship: "last
+  digest 12d ago, cadence observed 2d — silent". Four tests. (b) built as
+  `estate-sync --silence-exit` → exit 5 rather than as a `watch` condition:
+  the watch is keyed to workflow boards on a remote ref, and a silence read
+  needs the digests' dates, which live in the clones; a scheduled task on
+  the operator's machine running the flag is the ring, and arming it stays
+  the operator's act. (c) filed on `closed-loop-operating-state` as the seat
+  item, three options, no recommendation.)* *(a) The line.*
   `estate-sync` already walks the clones; it reads the newest
   `dispatch-digest` across them and emits one line at every session start,
   in every repo — *only* when the age exceeds the declared cadence (daily

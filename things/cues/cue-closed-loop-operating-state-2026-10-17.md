@@ -52,3 +52,29 @@ not a cycle. The plan's phases, seats and doctrine are as they were at 2.2.
 **Not inflection.** Events recorded, a trigger re-dated, a box closed on the
 condition it named. Walked by the framework agent at the retrospective, citing
 the rulings above.
+
+## Second change — 2026-10-27, walked on this cue
+
+The plan changed again on top of `0ca893d` and `mdllm cues . --staged
+--raise` raised nothing, because this cue exists for the subject: the gate
+reads presence, not the verdict's currency (`the-record-holds-unattended`
+Phase 4 files that question; this is its second live instance today). The
+change is recorded here rather than slipped past.
+
+What moved: one section appended — **Seat item 2026-10-27 — an owned
+credential for the tick** — filed by `the-record-holds-unattended` Phase 2c.
+It records the dead-man's third answer (digest 2026-10-15, OAuth expired
+2026-10-22, same cause-class as September), states what an identity owned
+by the dispatcher host would be and cost, why the grant is the operator's
+under this plan's own boundary law, what the floor does meanwhile (the
+silence line and `--silence-exit`, shipped the same day), and three options
+with no recommendation. No phase, box, trigger or design moved.
+
+The walk, second pass: every dependant above reasons from the loop's
+design — seats, the dumb tick, the persisted question, the irreversible
+staying human — and the seat item is that design applied to its own
+credential: a grant that would let the tick act without the operator
+present is routed to the operator. `consequence-is-recoverable-only-in-
+retrospect` (implements) is the law the item cites. `codex-cloud-workspace`
+is named as option (iii), as the paused sketch it is. **Verdict stands:
+not-inflection.** The ruling itself is open and the operator's.
