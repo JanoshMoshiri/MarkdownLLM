@@ -2,7 +2,7 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: evolving
-version: 2.10
+version: 2.11
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
@@ -12,6 +12,9 @@ linked_things:
   - id: reasoning-lenses-specification
     relation: references
     notes: "v2.10's Accumulation section: the lens a reader brings to the record is itself a thing the record can hold"
+  - id: the-record-answers-the-direction-question-first
+    relation: references
+    notes: "v2.11's training-harness paragraph rests on this insight's two recorded instances — the direction question (2026-09) and the ordering prediction (2026-10-27)"
   - id: divergence-is-an-unrouted-decision
     relation: references
     notes: "v2.6 names the divergence-routing primitive beneath change-reconciliation, belief-revision, provenance, and validate; this insight is its canonical articulation"
@@ -80,6 +83,8 @@ A scope note the thesis's own words already permit: "integrity that does not dep
 There is a reason the processor cannot hold these properties alone: a language model predicts the next move — the next token, the next action — but does not certify its future consequence. It can compare plausible outcomes and risks; actual consequence becomes recoverable only in retrospect. Asking the model to "consider the consequences" is useful prospective analysis, not foresight guaranteed. Irreversible authority therefore belongs to the human and to structures considered ahead of time, alongside ordinary risk analysis. See `consequence-is-recoverable-only-in-retrospect` for the canonical articulation.
 
 That bet is what the framework exists to test. Everything else in this document — the three decoupled layers, atomic things, git as the accepted-state machine, the deterministic floor — is machinery in service of it. To build or extend a domain is to place structure around a reasoning processor and then measure how well the resulting system earns trust over time.
+
+It has a consequence for the operator that the Accumulation section below draws out: the record becomes, over time, what training is for a model — and unlike training, in a language its operator can read.
 
 ## The Primitive Beneath: A Divergence Is an Unrouted Decision
 
@@ -239,6 +244,8 @@ A creation carries weight that its medium and its size do not bound. A poem surv
 The inspection of a person's decisions, words and work is not new. Literature, biography, history, psychology and philosophy have read a life from its record for as long as there has been a record to read, and the framework claims no new way of seeing. What it offers is a different instrument. What those fields reconstruct from the artefact and the evidence around it — what the author knew, what they set aside, what they were contradicting, when and why they changed their mind — is here written by the author, contemporaneously, with the inputs pinned, the contradictions held rather than blurred, and every ruling dated. The reasons arrive with the record instead of being inferred afterwards. That is closer to a scientific record than any earlier form, and it is open to every lens the older fields bring — psychological, philosophical, biological, systemic — because the lens is itself a thing the record can hold (`reasoning-lenses.md`).
 
 The second commitment follows from what accumulation makes possible: a record kept this way, across enough of a life or a practice, can be read across — how attention moves, what stalls at the same stage, which beliefs outlived their evidence, what the subject itself does over time — with the reasons preserved rather than guessed. For that, the record must hold while nobody attends. One person's attention is always pulled elsewhere, and a workspace set down must cost nothing to set down and nothing to pick up: it settles to tidy in a few unattended passes and then stays quiet, accruing no debt from the framework moving beneath it, its silence distinguishable from a stopped process, and the dates its operator declared still reaching them when they arrive — without a session opening. Where attention *is* present but not continuous, everything except judgement runs between sessions, and judgement waits at the ruling points. And the read across the record is made by the structure, not by the operator's spare attention — the question declared as data, the pass run unattended, the drafts pinned to the commits they were read from, the ruling the only attended act.
+
+One consequence deserves stating plainly. A record kept this way is, for its operator, what training is for a model: the accumulated specifics the processor would otherwise have to be trained on, kept outside the weights, current to the last session, read by whichever file-aware processor opens it next. The weights stay generic; the record is where the operator is. And where training encodes the general in vectors no one can open and freezes it at a date, the record encodes the particular in files its operator can inspect, dispute and correct, for the cost of keeping it, and keeps moving — every line the next session will be read from is a line its operator can rule on. The model is never changed; what changes is what it is given. Two recorded instances so far (`the-record-answers-the-direction-question-first`: the direction question of 2026-09 and the ordering prediction of 2026-10-27).
 
 This half is the untested half. The capture is demonstrated; accumulation without rot is demonstrated by the workspaces that paused and lost nothing; the read across a growing, unattended record has not yet been run once. It is stated here as the reason, not as a result.
 

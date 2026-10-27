@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-27
-generated: 2026-10-27T22:13:37
-generated_from: HEAD@992bf04
-coverage: 602
+generated: 2026-10-27T22:19:06
+generated_from: HEAD@f1c8f40
+coverage: 604
 framework_version: 3.50.0
 ---
 
@@ -593,6 +593,7 @@ framework_version: 3.50.0
 - cue-git-workflow-specification-2026-10-17 --subject--> git-workflow-specification
 - cue-git-workflow-specification-retro-2026-09-13 --subject--> git-workflow-specification
 - cue-glossary-2026-10-20 --subject--> glossary
+- cue-glossary-2026-10-27 --subject--> glossary
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
@@ -674,6 +675,7 @@ framework_version: 3.50.0
 - cue-the-operating-layer-has-no-quality-loop-2026-09-13 --subject--> the-operating-layer-has-no-quality-loop
 - cue-the-reckoning-2026-10-17 --subject--> the-reckoning
 - cue-the-reckoning-is-the-digestion-beat-2026-10-05-2026-10-08 --subject--> the-reckoning-is-the-digestion-beat-2026-10-05
+- cue-the-record-answers-the-direction-question-first-2026-10-27 --subject--> the-record-answers-the-direction-question-first
 - cue-the-substrate-is-a-discipline-prosthesis-2026-10-08 --subject--> the-substrate-is-a-discipline-prosthesis
 - cue-the-verdict-is-asked-where-the-change-lands-2026-10-05-2026-10-05 --subject--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
@@ -1214,6 +1216,7 @@ framework_version: 3.50.0
 - llm-driven-systems-manifesto --informs--> scalability-guide
 - llm-driven-systems-manifesto --informs--> domain-specification-guide
 - llm-driven-systems-manifesto --references--> reasoning-lenses-specification
+- llm-driven-systems-manifesto --references--> the-record-answers-the-direction-question-first
 - llm-driven-systems-manifesto --references--> divergence-is-an-unrouted-decision
 - llm-driven-systems-manifesto --references--> operating-is-programming
 - llm-driven-systems-manifesto --references--> the-substrate-is-a-discipline-prosthesis
@@ -1757,6 +1760,7 @@ framework_version: 3.50.0
 - the-reckoning-is-the-digestion-beat-2026-10-05 --informs--> retrospective-specification
 - the-reckoning-is-the-digestion-beat-2026-10-05 --informs--> the-reckoning
 - the-record-answers-the-direction-question-first --supports--> llm-driven-systems-manifesto
+- the-record-answers-the-direction-question-first --references--> the-record-holds-unattended
 - the-record-answers-the-direction-question-first --references--> git-workflow-specification
 - the-record-answers-the-direction-question-first --references--> evidence-and-eval-backlog
 - the-record-holds-unattended --implements--> llm-driven-systems-manifesto

@@ -27,6 +27,10 @@ rewrites itself.
   the agent may not settle, and the ruling is committed. The history is the git
   log, not a retention window.
 
+Over time the record becomes, for whoever keeps it, what training is for a
+model: the specifics no training set contains, kept in files you can read and
+correct rather than in weights no one can open.
+
 Most of the parts are old and borrowed — the [glossary](docs/glossary.md) gives
 each word its plain name and its prior art. What is specific is the assembly.
 
@@ -178,7 +182,10 @@ it. On Windows run the tool as `tools/mdllm.ps1`, elsewhere as
   records rely on refused until a recorded question names every dependant,
   and that question held open at each session start until it is answered;
   decisions pinned to the commits they rest on; a workspace's whole history
-  readable in git. The framework runs itself this way.
+  readable in git. The framework runs itself this way. Shown in two recorded
+  instances: that a session reading the record predicts its operator's choice
+  better than a session without it
+  ([the insight](things/insights/the-record-answers-the-direction-question-first.md)).
 - **A hypothesis, not a result:** that this structure lets a smaller model match
   a larger one without it. One evaluation pointed that way and then saturated;
   the [eval record](things/artifacts/eval-record-2026.md) has the honest reading,

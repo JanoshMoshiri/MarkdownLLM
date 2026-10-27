@@ -2,7 +2,7 @@
 id: glossary
 type: guide
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-10-18
 tags: [glossary, vocabulary, prior-art, onboarding, positioning]
 linked_things:
@@ -49,6 +49,7 @@ can link a word at its first use (`glossary.md#walk`).
 | <a id="the-close"></a>**the close** | the end of a session (`/end-session`): lessons kept, ten open items decided, the ones only you can rule on put to you in one prompt | end-of-sprint triage | `session-memory.md` |
 | <a id="refresh"></a>**refresh** | bringing a workspace's generated parts up to the framework's current version (`mdllm refresh`) | a dependency upgrade | `domain-refresh.md` |
 | <a id="substrate"></a>**substrate** | the framework itself — the specs, the tool and the floor every workspace stands on | a platform; a runtime | `README.md` |
+| <a id="training-harness"></a>**training harness** (for its operator) | the human-readable record a generic model is given at session start in place of being trained on its operator; the model is not changed. What is specific here: contemporaneous reasons, pinned inputs, held contradictions, human-ruled settlement, and inspection by the operator | in-context learning; RAG; agent memory tools | `llm-driven-systems.manifesto.md` → The Accumulation |
 
 ## How change is kept honest
 

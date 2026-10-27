@@ -96,3 +96,33 @@ the section in on 2026-10-27 after two corrections to the draft — the
 novelty claim withdrawn (the inspection is literature's; the instrument is
 new), and "the record must keep moving" replaced by "the record must hold" —
 and ruled that it stands without a canonical insight behind it.
+
+## Second change, same day — 2.10 → 2.11
+
+The manifesto changed again on top of `f1c8f40`, and `mdllm cues . --staged
+--raise` did not raise a second cue because this one — same subject, same
+date — already existed on disk, answered. That is the gap
+`the-record-holds-unattended` Phase 4 files: the gate reads presence, not
+the verdict's currency. It is noted here rather than exploited; the second
+change is walked below against the same 44 dependants.
+
+What moved: one sentence in *The Thesis* pointing to the Accumulation
+section; one paragraph at the end of the Accumulation section — the record
+as, for its operator, what training is for a model, kept outside the weights
+in a language the operator can read, inspect, dispute and correct; the model
+never changed, only what it is given; two recorded instances named. One
+`references` edge to `the-record-answers-the-direction-question-first`.
+Nothing else moved.
+
+The walk, second pass: every line above holds as marked. One line changes
+character — `the-record-answers-the-direction-question-first` was a
+`supports` edge *from* the insight and is now also a `references` edge
+*to* it; the insight gained its second instance in the same commit, so the
+citation points at a record that exists. The manifesto's Corollary (*Elegant
+Constraint Enables Efficiency*) still says structure-beats-scale is a
+hypothesis; the new paragraph claims the orthogonal thing — the record
+contains what no training set does — and names two instances, which is the
+claims discipline the three-claims paragraph set. `limitations-guide`'s *What
+the others do* lists in-context memory tools; the paragraph does not
+contradict it — it names what none of them is pointed at. **Verdict stands:
+not-inflection.**

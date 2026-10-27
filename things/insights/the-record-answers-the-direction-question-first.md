@@ -2,7 +2,7 @@
 id: the-record-answers-the-direction-question-first
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-09-07
 session: 2026-09-06
 source: both
@@ -12,7 +12,10 @@ tags: [direction, orientation, telemetry, decisions, moat, evidence, method]
 linked_things:
   - id: llm-driven-systems-manifesto
     relation: supports
-    notes: "Evidence in favour of the thesis that the git-versioned record is the memory no vendor owns: a direction question answered from the corpus, not from priors."
+    notes: "Evidence in favour of the thesis that the git-versioned record is the memory no vendor owns: a direction question answered from the corpus, not from priors. The second instance (v1.1) is the one the manifesto's training-harness paragraph cites."
+  - id: the-record-holds-unattended
+    relation: references
+    notes: "The plan whose order the second instance predicted — the operator's choice, read from the session's own record before it was made."
   - id: git-workflow-specification
     relation: references
     notes: "Git log as domain telemetry — the velocity read this rule takes first; the weekly buckets that looked like collapse and were displacement."
@@ -71,3 +74,28 @@ evidence*, held in a form a reasoning system can read at session start.
 
 Corollary: an advisor's answer that could have been given without the
 record is the tell that the record was not read.
+
+## Second instance — 2026-10-27
+
+The operator, deciding whether to proceed to a four-part capture plan, asked
+the session: *what do you think I would choose?* The session had no prior on
+the operator beyond the session itself — eleven rulings, four corrections of
+its drafts, and one manifesto section ruled in that afternoon. From that
+record alone it predicted not only the choice (proceed) but the order: write
+the work as a plan thing first so it survives a pause; build the pieces that
+reduce the operator's own intervention before the pieces that add to what
+they can see; file the one ruling that genuinely needs the operator to the
+seat rather than block on it; show each draft before committing it. The
+operator's reckoning: *above 95% — you are correct*, with the residue
+attributed to mood and the moment, not to the read.
+
+What makes it the same observation as September's: nothing in the
+prediction came from training. It came from the rulings' reasons, kept as
+they were made — the same corrections that had cropped the session's earlier
+drafts were the evidence that ordered the plan. A log of the choices would
+have supported "he tends to say yes"; the record of *why* supported a choice
+in a situation that had not occurred before. The operator named the
+consequence: a record kept this way is, for its operator, what training is
+for a model — and in a language the operator can read. The manifesto carries
+that paragraph from 2.11; the plan the prediction ordered is
+`the-record-holds-unattended`.
