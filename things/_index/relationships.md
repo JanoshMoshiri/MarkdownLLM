@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-24
-generated: 2026-10-24T20:20:46
-generated_from: HEAD@68a1d30
-coverage: 600
+created: 2026-10-27
+generated: 2026-10-27T21:07:00
+generated_from: HEAD@367c155
+coverage: 601
 framework_version: 3.50.0
 ---
 
@@ -606,6 +606,7 @@ framework_version: 3.50.0
 - cue-interface-specification-2026-10-24 --subject--> interface-specification
 - cue-limitations-guide-2026-10-20 --subject--> limitations-guide
 - cue-limitations-guide-2026-10-21 --subject--> limitations-guide
+- cue-llm-driven-systems-manifesto-2026-10-27 --subject--> llm-driven-systems-manifesto
 - cue-markdownllm-desktop-is-primary-accessible-product-2026-09-13 --subject--> markdownllm-desktop-is-primary-accessible-product
 - cue-mechanical-coherence-checks-backlog-2026-09-13 --subject--> mechanical-coherence-checks-backlog
 - cue-mechanical-coherence-checks-backlog-2026-09-15 --subject--> mechanical-coherence-checks-backlog
@@ -1212,6 +1213,7 @@ framework_version: 3.50.0
 - live-eval-scope-bounded-to-claude --informs--> evidence-and-eval-backlog
 - llm-driven-systems-manifesto --informs--> scalability-guide
 - llm-driven-systems-manifesto --informs--> domain-specification-guide
+- llm-driven-systems-manifesto --references--> reasoning-lenses-specification
 - llm-driven-systems-manifesto --references--> divergence-is-an-unrouted-decision
 - llm-driven-systems-manifesto --references--> operating-is-programming
 - llm-driven-systems-manifesto --references--> the-substrate-is-a-discipline-prosthesis

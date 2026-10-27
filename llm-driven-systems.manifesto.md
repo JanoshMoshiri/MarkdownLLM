@@ -2,13 +2,16 @@
 id: llm-driven-systems-manifesto
 type: manifesto
 status: evolving
-version: 2.9
+version: 2.10
 created: 2026-05-13
 linked_things:
   - id: scalability-guide
     relation: informs
   - id: domain-specification-guide
     relation: informs
+  - id: reasoning-lenses-specification
+    relation: references
+    notes: "v2.10's Accumulation section: the lens a reader brings to the record is itself a thing the record can hold"
   - id: divergence-is-an-unrouted-decision
     relation: references
     notes: "v2.6 names the divergence-routing primitive beneath change-reconciliation, belief-revision, provenance, and validate; this insight is its canonical articulation"
@@ -226,6 +229,18 @@ The pattern is the same: define your domain in definition files, structure your 
 And the operator this pattern asks for is not a professional. Read what the floor actually demands of its human: quarantine requires that *a human confirms*, and the flip names a person — never a credential. The requirement is **authority**: standing to say "this is true in my domain." For a regulated quality system that standing happens to require a profession; for a person's own spending, household, or plans it is automatic and absolute — no professional on earth knows which of your transactions was a gift and which was a mistake. The everyday operator is not a degraded case of the expert operator; they are the purest case of what the substrate requires.
 
 Expertise, meanwhile, runs the other direction. Classic expert systems encoded an expert's knowledge so non-experts could consult it — expertise in, answers out. Here the operator brings authority and intent, the substrate brings discipline, and **expertise accumulates in the domain as a product of use**: insights with dispositions, decisions with rationale, the graph of what was learned and why it still holds. A domain, after enough use, knows things about its subject no professional knows and no generic tool could — it becomes the only expert on its subject in existence. The same primitives, unchanged and unsimplified, run the regulated system and the spending tracker; what differs is only the definition, which is data, not code. The app category dissolves into descriptions — and *definition-driven* turns out to have been the right name all along, with "expert" describing what the domain becomes, not what the operator must be. See `expertise-is-an-output-not-a-prerequisite` for the canonical articulation.
+
+## The Accumulation: Why Capture This Way
+
+Everything above describes how state is kept honest. It does not yet say why anyone would keep it so intimately. The reason the framework exists is older than any of its mechanisms, and it is personal before it is regulated.
+
+A creation carries weight that its medium and its size do not bound. A poem survives centuries whole; a painting, a paper, a story told across generations, a few plain words at the right moment — each can turn a life. A mind produces more of these than it can carry forward: ideas taken part of the way and set down, some finished enough, most because attention moved. The framework's first commitment is that a thought taken partway is kept whole — a thing: typed, dated, linked, with its reasons committed at the moment it was made — not because it must go further to matter, but so that a later purpose its author never had can pick it up. A parked capability in one workspace producing a voice bridge in another is one such instance on record.
+
+The inspection of a person's decisions, words and work is not new. Literature, biography, history, psychology and philosophy have read a life from its record for as long as there has been a record to read, and the framework claims no new way of seeing. What it offers is a different instrument. What those fields reconstruct from the artefact and the evidence around it — what the author knew, what they set aside, what they were contradicting, when and why they changed their mind — is here written by the author, contemporaneously, with the inputs pinned, the contradictions held rather than blurred, and every ruling dated. The reasons arrive with the record instead of being inferred afterwards. That is closer to a scientific record than any earlier form, and it is open to every lens the older fields bring — psychological, philosophical, biological, systemic — because the lens is itself a thing the record can hold (`reasoning-lenses.md`).
+
+The second commitment follows from what accumulation makes possible: a record kept this way, across enough of a life or a practice, can be read across — how attention moves, what stalls at the same stage, which beliefs outlived their evidence, what the subject itself does over time — with the reasons preserved rather than guessed. For that, the record must hold while nobody attends. One person's attention is always pulled elsewhere, and a workspace set down must cost nothing to set down and nothing to pick up: it settles to tidy in a few unattended passes and then stays quiet, accruing no debt from the framework moving beneath it, its silence distinguishable from a stopped process, and the dates its operator declared still reaching them when they arrive — without a session opening. Where attention *is* present but not continuous, everything except judgement runs between sessions, and judgement waits at the ruling points. And the read across the record is made by the structure, not by the operator's spare attention — the question declared as data, the pass run unattended, the drafts pinned to the commits they were read from, the ruling the only attended act.
+
+This half is the untested half. The capture is demonstrated; accumulation without rot is demonstrated by the workspaces that paused and lost nothing; the read across a growing, unattended record has not yet been run once. It is stated here as the reason, not as a result.
 
 ## Core Principles
 
