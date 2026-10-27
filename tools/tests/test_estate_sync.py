@@ -149,6 +149,74 @@ def test_estate_sync_local_only_repo_is_legitimate(tmp_path):
     assert res.state is SyncState.LOCAL_ONLY
 
 
+def _digest(repo, day, n=1):
+    """A filed dispatch digest dated `day`, where the pilot repo files them."""
+    write(repo, f"things/dispatch/dispatch-digest-{day}-run-{n}.md",
+          thing_text(f"id: dispatch-digest-{day}-run-{n}\ntype: dispatch-digest\n"
+                     f"status: filed\ncreated: {day}",
+                     "# Digest\n\nfiled.\n"))
+
+
+def test_dispatch_silence_judges_age_against_the_digests_own_cadence(tmp_path):
+    # the-record-holds-unattended Phase 2a: no declared cadence anywhere —
+    # the digests show it. Three days apart, three days since: quiet. Seven
+    # days since: silent, because twice the cadence has passed.
+    import datetime as _dt
+    from markdownllm.sync import dispatch_silence
+    today = _dt.date(2026, 10, 27)
+    repo = tmp_path / "pilot"
+    for d in ("2026-10-15", "2026-10-18", "2026-10-21", "2026-10-24"):
+        _digest(repo, d)
+    info = dispatch_silence([repo], today=today)
+    assert info["cadence"] == 3 and info["age"] == 3 and not info["silent"]
+    _digest(tmp_path / "other", "2026-10-01")   # an older digest elsewhere does not win
+    info = dispatch_silence([tmp_path / "other", repo], today=today)
+    assert info["repo"] == "pilot" and info["last"] == "2026-10-24"
+    info = dispatch_silence([repo], today=_dt.date(2026, 10, 31))
+    assert info["age"] == 7 and info["silent"]
+
+
+def test_dispatch_silence_is_quiet_when_healthy_and_absent_when_no_dispatcher(tmp_path):
+    from markdownllm.sync import dispatch_silence, dispatch_silence_line
+    assert dispatch_silence([tmp_path]) is None          # no digest: nothing to say
+    assert dispatch_silence_line(None) is None
+    import datetime as _dt
+    _digest(tmp_path, "2026-10-26")
+    info = dispatch_silence([tmp_path], today=_dt.date(2026, 10, 27))
+    assert not info["silent"] and dispatch_silence_line(info) is None
+
+
+def test_dispatch_silence_from_a_workspace_reads_its_framework_estate(tmp_path):
+    # A session start inside a workspace walks only that clone; the silence
+    # read follows `framework_root` to the estate the clone belongs to — a
+    # filesystem fact about this machine, the estate-check precedent.
+    from markdownllm.sync import _estate_roots_for_digests
+    fw = tmp_path / "fw"
+    write(fw, ".markdownllm", "framework: F\nversion: 3.50.0\nfoundational_specs: []\n")
+    _sync_git(fw, "init", "-q")
+    for name in ("pilot", "mine"):
+        d = fw / "domain" / name
+        write(d, "AGENTS.md", "---\nname: T\nframework_root: ../..\n---\n# T\n")
+        _sync_git(d, "init", "-q")
+    roots = _estate_roots_for_digests(fw / "domain" / "mine", [fw / "domain" / "mine"])
+    assert [r.name for r in roots] == ["fw", "mine", "pilot"]
+
+
+def test_estate_sync_prints_the_silence_line_and_rings_on_request(tmp_path, capsys):
+    import mdllm
+    src, clone = _seed_pair(tmp_path)
+    _digest(clone, "2026-09-01")
+    rc = mdllm.cmd_estate_sync(_ns(paths=[str(clone)], status=False, timeout=20))
+    out = capsys.readouterr().out
+    assert rc == 0 and "dispatch: silent" in out and "2026-09-01" in out
+    rc = mdllm.cmd_estate_sync(_ns(paths=[str(clone)], status=False, timeout=20,
+                                   silence_exit=True))
+    assert rc == 5                                       # the ring
+    capsys.readouterr()
+    rc = mdllm.cmd_estate_sync(_ns(paths=[str(clone)], status=True, timeout=20))
+    assert "dispatch:" not in capsys.readouterr().out    # not in the debt view
+
+
 def test_estate_sync_status_mode_reports_debt_without_network(tmp_path, capsys):
     import mdllm
     src, clone = _seed_pair(tmp_path)

@@ -644,6 +644,107 @@ _QUIET_STATES = frozenset({
     SyncState.UP_TO_DATE, SyncState.LOCAL_ONLY, SyncState.PINNED})
 
 
+_DIGEST_GLOB = "things/**/*digest*.md"
+_DATE_RE = re.compile(r"^\s*created:\s*['\"]?(\d{4}-\d{2}-\d{2})")
+_TYPE_RE = re.compile(r"^\s*type:\s*['\"]?dispatch-digest\b")
+
+
+def _digest_dates(repo: Path) -> list:
+    """`created` dates of every `type: dispatch-digest` thing in the repo —
+    read from the frontmatter of files whose NAME says digest, so a session
+    start pays for a handful of reads, never a corpus walk."""
+    import datetime as _dt
+    dates = []
+    for path in repo.glob(_DIGEST_GLOB):
+        try:
+            head = path.read_text(encoding="utf-8", errors="replace")[:4000]
+        except OSError:
+            continue
+        if not head.startswith("---"):
+            continue
+        front = head.split("\n---", 1)[0]
+        is_digest = created = None
+        for line in front.splitlines():
+            if _TYPE_RE.match(line):
+                is_digest = True
+            m = _DATE_RE.match(line)
+            if m:
+                created = m.group(1)
+        if is_digest and created:
+            try:
+                dates.append(_dt.date.fromisoformat(created))
+            except ValueError:
+                continue
+    return sorted(dates)
+
+
+def _estate_roots_for_digests(root: Path, repos: list) -> list:
+    """The clones whose digests the silence read may see. From the framework
+    root that is the walked estate; from inside a workspace it is the
+    workspace's framework root's estate, found through `framework_root` in
+    its entry file — a filesystem fact about this machine, the same read
+    `estate-check` makes, never a registry."""
+    if len(repos) > 1 or not (root / "AGENTS.md").is_file():
+        return list(repos)
+    try:
+        text = (root / "AGENTS.md").read_text(encoding="utf-8", errors="replace")[:4000]
+    except OSError:
+        return list(repos)
+    m = re.search(r"(?m)^framework_root:\s*['\"]?([^'\"\n]+)", text)
+    if not m:
+        return list(repos)
+    fw = (root / m.group(1).strip()).resolve()
+    if not (fw / ".markdownllm").is_file():
+        return list(repos)
+    return discover_repos(fw) or list(repos)
+
+
+def dispatch_silence(repos: list, today=None) -> dict | None:
+    """The newest dispatch digest across `repos`, judged against the cadence
+    the digests themselves show (the-record-holds-unattended Phase 2a).
+
+    Returns None when no clone holds a digest — an estate with no dispatcher
+    has nothing to be silent about, and a line that is always there is a line
+    the operator learns to skip. Otherwise a dict with `repo`, `last`, `age`
+    (days), `cadence` (the median gap between the last digests, at least one
+    day) and `silent` — true when the age exceeds twice the cadence, which is
+    the grace a daily tick gets before its silence is a report. The dead-man
+    on `closed-loop-operating-state` asks the same question as a dated chase
+    read at the root; this read asks it at every session start in every
+    clone, so silence is distinguishable from death within a day or two of
+    it beginning, not when someone next opens the root.
+    """
+    import datetime as _dt
+    import statistics
+    today = today or _dt.date.today()
+    newest = None
+    for repo in repos:
+        dates = _digest_dates(repo)
+        if not dates:
+            continue
+        if newest is None or dates[-1] > newest[1][-1]:
+            newest = (repo, dates)
+    if newest is None:
+        return None
+    repo, dates = newest
+    recent = dates[-6:]
+    gaps = [(b - a).days for a, b in zip(recent, recent[1:]) if (b - a).days > 0]
+    cadence = max(1, int(statistics.median(gaps))) if gaps else 1
+    age = (today - dates[-1]).days
+    return {"repo": repo.name, "last": dates[-1].isoformat(), "age": age,
+            "cadence": cadence, "silent": age > 2 * cadence}
+
+
+def dispatch_silence_line(info: dict | None) -> str | None:
+    """The attention line, or None when there is nothing to say."""
+    if not info or not info["silent"]:
+        return None
+    return (f"- dispatch: silent — last digest {info['age']}d ago "
+            f"(`{info['repo']}`, {info['last']}; cadence observed {info['cadence']}d). "
+            f"Silence is not health: the tick is dead, deregistered, or filing "
+            f"elsewhere (closed-loop-operating-state -> dead-man)")
+
+
 def _counts_line(results) -> str:
     """One line that still answers when the per-repo lines below it have
     given way: how many repos stand in each state, busiest state first."""
@@ -697,6 +798,17 @@ def cmd_estate_sync(args) -> int:
     debt = 0
     attention: list[str] = []
     quiet: list[str] = []
+    # The silence read: one line, only when the newest dispatch digest on
+    # this machine is older than the cadence the digests show, in every
+    # clone's session start — the-record-holds-unattended Phase 2a.
+    silence = None
+    if not status_only:
+        silence = dispatch_silence(_estate_roots_for_digests(root, repos))
+        sline = dispatch_silence_line(silence)
+        if sline:
+            attention.append(sline)
+            if not runner_channel:
+                print(sline)
     for res in results:
         name = res.repo.name
         label = _LABEL[res.state]
@@ -762,4 +874,8 @@ def cmd_estate_sync(args) -> int:
         print()
         print("\n".join(quiet))
     print("\nThis is a batch of per-repo reads — ephemeral, never an index. Sync before orienting.")
+    if getattr(args, "silence_exit", False) and silence and silence["silent"]:
+        # The ring (Phase 2b): a scheduled task or watch wrapper that runs
+        # this with --silence-exit can wake the operator on the code alone.
+        return 5
     return 0

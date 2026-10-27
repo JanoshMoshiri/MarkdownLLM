@@ -480,6 +480,11 @@ def build_cli() -> argparse.ArgumentParser:
                         "--require-fresh = fail if sync used cached or unresolved state")
     es.add_argument("paths", nargs="*", help="root to discover under (default .), "
                     "or several explicit repo paths")
+    es.add_argument("--silence-exit", action="store_true",
+                    help="exit 5 when the dispatcher is silent — the newest "
+                         "dispatch digest on this machine is older than twice "
+                         "the cadence the digests show; the line prints either "
+                         "way, this is the ring a scheduled task can wake on")
     es_mode = es.add_mutually_exclusive_group()
     es_mode.add_argument("--status", action="store_true",
                          help="no network: report unpushed/diverged/dirty repos only "

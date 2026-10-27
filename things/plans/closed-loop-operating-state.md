@@ -510,3 +510,38 @@ a cycle; the seat measurements still wait on more runs.
       remaining content is pointers, not restatements.
       *Judged not ready 2026-08-29 — see Phase 5 for the seal condition:
       the shape must be felt in a corpus that did not author it.*
+
+## Seat item 2026-10-27 — an owned credential for the tick
+
+Filed by `the-record-holds-unattended` Phase 2c; the operator's to rule,
+not this plan's to build. The dead-man answered a third time on
+2026-10-27: the tick last filed a digest on 2026-10-15 and died on
+2026-10-22 when the OAuth session its harness runs under expired. That is
+the second silent stop in three months with the same cause-class — a
+credential the operator must renew by hand, from a second framework
+checkout the tick runs in. A loop that breathes only while a human's login
+is warm pauses exactly when the human does.
+
+What an owned credential would be: an identity that belongs to the
+dispatcher host rather than to the operator's interactive session — a
+harness API key or service login provisioned for the tick, scoped to the
+pilot repos, rotated on a calendar the record carries as a dated trigger,
+and revocable without touching the operator's own. What it costs: a paid
+or metered key where the interactive session was bundled; a secret on the
+host that must be kept out of every clone (`.boundary-terms` names the
+class); and a grant that is irreversible in the sense this plan refuses to
+automate — once the tick can act without the operator present, every run
+is on the operator's standing authority. Why it waits for the seat: that
+grant is the operator's, by the plan's own boundary law.
+
+What the floor does meanwhile: since 2026-10-27 `estate-sync` prints one
+line at every session start in every clone when the newest digest is
+older than twice the cadence the digests show, and `--silence-exit`
+returns 5 on it so a scheduled task can ring. Silence is now visible
+within a day or two; it is still not the loop breathing.
+
+**Options for the ruling:** (i) provision the owned credential as above;
+(ii) keep the operator's session and accept that the tick stops when it
+does, with the silence line as the whole remedy; (iii) move the tick to a
+harness whose unattended identity is native (a cloud environment with its
+own service identity), which `codex-cloud-workspace` sketched and paused.
