@@ -1561,6 +1561,62 @@ def test_domain_kernel_check_detects_drift(tmp_path):
     assert "session-start" in drifted
 
 
+def _pinned_domain(tmp_path, seen, running="3.50.0", tamper=True):
+    """A framework root at `running` with a nested workspace whose entry file
+    declares `framework_version_seen: {seen}`; `tamper` leaves its managed
+    blocks differing from a fresh build, the way a paused workspace's do once
+    the framework beside it has moved."""
+    write(tmp_path, ".markdownllm",
+          f"framework: F\nversion: {running}\nfoundational_specs: []\n")
+    dom = tmp_path / "dom"
+    dom.mkdir()
+    text = (_agents_with_blocks()
+            .replace("framework_root: ../..", "framework_root: ..")
+            .replace("framework_version_seen: 3.14.0",
+                     f"framework_version_seen: {seen}"))
+    meta, _, _ = mdllm.parse_frontmatter(text)
+    filled, _, _ = mdllm.apply_domain_kernel(
+        text, mdllm.build_domain_kernel_blocks(dom, meta))
+    if tamper:
+        filled = filled.replace("Then await intent.", "Then do whatever.")
+    write(dom, "AGENTS.md", filled)
+    return dom
+
+
+def test_domain_kernel_pin_behind_is_info_not_error(tmp_path):
+    # the-record-holds-unattended Phase 1a: a workspace pinned at an older
+    # framework is coherent AT that version until it bumps the pin. Before
+    # this, every release the operator did not attend was refused as drift
+    # on every paused workspace — four one-line commits on 2026-10-25.
+    from markdownllm.domain_kernel import pin_behind
+    dom = _pinned_domain(tmp_path, seen="3.14.0")
+    meta, _, _ = mdllm.parse_frontmatter((dom / "AGENTS.md").read_text(encoding="utf-8"))
+    assert pin_behind(dom, meta) == ("3.14.0", "3.50.0")
+    found = mdllm.coherence_findings(dom, 15)
+    assert not any("domain-kernel block" in m
+                   for m in messages(found, mdllm.SEV_ERROR))
+    assert any("stand at framework 3.14.0" in m and "this clone runs 3.50.0" in m
+               for m in messages(found, mdllm.SEV_INFO))
+
+
+def test_domain_kernel_pin_current_still_refuses_drift(tmp_path):
+    # The pin governs; a current pin with tampered blocks is drift as before.
+    from markdownllm.domain_kernel import pin_behind
+    dom = _pinned_domain(tmp_path, seen="3.50.0")
+    meta, _, _ = mdllm.parse_frontmatter((dom / "AGENTS.md").read_text(encoding="utf-8"))
+    assert pin_behind(dom, meta) == ("", "")
+    assert any("drifted from a fresh build" in m
+               for m in messages(mdllm.coherence_findings(dom, 15), mdllm.SEV_ERROR))
+
+
+def test_domain_kernel_pin_behind_in_sync_is_quiet(tmp_path):
+    # Quiet when healthy: a behind pin whose blocks happen to match a fresh
+    # build says nothing at all — the pin line is for differing blocks only.
+    dom = _pinned_domain(tmp_path, seen="3.14.0", tamper=False)
+    found = mdllm.coherence_findings(dom, 15)
+    assert not any("domain-kernel" in m for m in messages(found))
+
+
 def test_domain_kernel_types_render_optional_descriptions(tmp_path):
     # `description:` is the schema documenting its own vocabulary, beside
     # `statuses:` and `required_fields:`. Rendered where declared.

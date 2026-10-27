@@ -113,7 +113,16 @@ about whether the foundation keeps its own commitment when nobody is looking.
 - [x] **Phase 0 — Define it.** This document, pinned to the manifesto at
   2.10 and dated. *Done 2026-10-27.*
 
-- [ ] **Phase 1 — Pausing is free.** Two halves, both in the floor.
+- [ ] **Phase 1 — Pausing is free.** Two halves, both in the floor. *(a)
+  shipped 2026-10-27: `pin_behind` in the domain-kernel module; coherence
+  reports a behind pin's differing blocks as Info, `domain-kernel --check`
+  prints `PIN-BEHIND` and exits 0; three tests; `domain-refresh.md` 1.7 →
+  The Pin Governs Drift. Live at ship: three workspaces (3.36–3.41 pins)
+  went from DRIFT-refused to PIN-BEHIND on the same bytes. The version-named
+  renderer was not needed — the fallback the phase named is the design. (b)
+  written into `dispatch-loop` 1.7 as the narrow allowance's sibling —
+  regenerate, never seal — and unexercised: no run has entered a paused
+  domain since the tick died.)*
   *(a) Drift is measured against the pin.* `coherence` compares a domain's
   generated blocks to what the framework version the domain declares
   (`framework_version_seen`) would generate, not what the running framework

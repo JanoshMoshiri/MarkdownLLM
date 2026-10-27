@@ -19,6 +19,7 @@ import yaml
 
 from .docs_blocks import docs_block_findings
 from .domain_kernel import (build_domain_kernel_blocks, domain_kernel_status,
+                            pin_behind,
                             kernel_source_check)
 from .indexes import INDEX_FILES, index_drift_findings
 from .kernel_gen import build_kernel, normalize_newlines, token_counter
@@ -689,6 +690,20 @@ def coherence_findings(root: Path, window: int,
                     findings.append(Finding(SEV_INFO, "AGENTS.md",
                         f"domain-kernel blocks were written by a framework this "
                         f"clone is {state} — {why}"))
+                    dk_drifted = []
+            if dk_drifted:
+                # The pin governs drift (the-record-holds-unattended Phase 1a):
+                # a workspace that declared an older framework and has not
+                # refreshed is coherent at that version until it bumps the
+                # pin. Its debt is paid once, at the bump, never at every
+                # release the operator did not attend.
+                seen, running = pin_behind(root, ameta or {})
+                if seen:
+                    findings.append(Finding(SEV_INFO, "AGENTS.md",
+                        f"domain-kernel blocks stand at framework {seen}; this "
+                        f"clone runs {running} — not drift until the pin moves: "
+                        f"`mdllm refresh .` regenerates them, `--seal` after "
+                        f"adoption records the bump"))
                     dk_drifted = []
             for name in dk_drifted:
                 findings.append(Finding(SEV_ERROR, "AGENTS.md",

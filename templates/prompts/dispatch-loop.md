@@ -2,7 +2,7 @@
 id: dispatch-loop
 type: prompt
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-08-27
 dispatch_guards:
   depth_limit: 1
@@ -177,6 +177,20 @@ schedule — the repos do. You make no rulings — the seats do.
    same-builder, the remedy is deterministic, and the floor supplied the
    command. Any block you would have to *reason* about is a surprise, and
    surprises end the run.
+
+   **The same allowance, one step earlier.** A domain whose floor reports
+   `PIN-BEHIND` — its `framework_version_seen` behind the framework this
+   clone runs, its managed blocks differing from a fresh build — is not
+   blocked (the pin governs drift, `domain-refresh.md`), but it is a paused
+   workspace carrying a regeneration its operator would otherwise pay on
+   return. Run `mdllm refresh <path>` **without `--seal`**: it regenerates
+   the managed blocks and nothing else. Commit that alone, naming this run;
+   raise the cue the regeneration owes and file it to the seat with the
+   CHANGELOG deltas the refresh printed. Never seal — the seal records
+   semantic adoption, which is the attended act — and never touch skills,
+   prompts or authored sections. If `refresh` prints anything it would need
+   judgement to act on, that is a surprise (`the-record-holds-unattended`
+   Phase 1b).
 
    **Repair to convergence, in one commit.** Regenerating an index can
    itself move another index — a new index thing changes the schema the

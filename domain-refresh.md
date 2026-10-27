@@ -2,7 +2,7 @@
 id: domain-refresh-specification
 type: specification
 status: evolving
-version: 1.6
+version: 1.7
 created: 2026-05-19
 linked_things:
   - id: a-domain-local-ruling-is-invisible-from-the-centre
@@ -70,6 +70,27 @@ The refresh process reads these framework files in order:
 | `AGENTS.md` | Framework self-description | New skills listed, new spec types, updated workflows |
 
 > **Note:** The version *detection* step (reading `.markdownllm` and comparing to `framework_version_seen`) is handled by the `session-start:version-check` hard hook before the refresh process begins. The steps below assume a mismatch has already been confirmed.
+
+### The Pin Governs Drift
+
+`framework_version_seen` is not only a reminder; it is the version the
+domain's generated blocks are judged against. While the pin is **current**,
+`mdllm coherence` refuses a commit whose managed blocks differ from a fresh
+build (Error) — the domain said it stands at this version, so its blocks must.
+While the pin is **behind** the framework the clone runs, differing blocks are
+reported as Info (*the blocks stand at framework X; this clone runs Y*) and
+`mdllm domain-kernel . --check` prints `PIN-BEHIND` and exits 0: the domain is
+coherent at the version it declared, and the framework moving beside it is
+not the domain's debt. Debt is paid once, at the bump — `mdllm refresh .`
+regenerates the blocks, `--seal` after adoption moves the pin, and the commit
+carries its cue — never at every release the operator did not attend.
+
+This is what lets a workspace be set down for free. A paused domain accrues
+nothing while the framework moves; the first commit on return is not a
+regeneration. An unattended run (the dispatcher) may regenerate the blocks in
+a pin-behind domain under its narrow repair allowance, because that step is
+mechanical, but it never seals: the seal records *semantic* adoption and is
+the attended act. (`the-record-holds-unattended` Phase 1; shipped 2026-10-27.)
 
 ### The Refresh Algorithm
 

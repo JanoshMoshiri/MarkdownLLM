@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-27
-generated: 2026-10-27T22:19:06
-generated_from: HEAD@f1c8f40
-coverage: 604
+generated: 2026-10-27T22:28:09
+generated_from: HEAD@0e17b52
+coverage: 605
 framework_version: 3.50.0
 ---
 
@@ -541,6 +541,7 @@ framework_version: 3.50.0
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
 - cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
 - cue-domain-refresh-specification-2026-09-13 --subject--> domain-refresh-specification
+- cue-domain-refresh-specification-2026-10-27 --subject--> domain-refresh-specification
 - cue-domain-specification-guide-2026-09-15 --subject--> domain-specification-guide
 - cue-domain-specification-guide-2026-09-26 --subject--> domain-specification-guide
 - cue-emitted-content-is-read-instructed-content-is-economised-2026-10-17 --subject--> emitted-content-is-read-instructed-content-is-economised

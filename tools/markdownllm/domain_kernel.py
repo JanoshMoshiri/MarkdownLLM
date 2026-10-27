@@ -438,6 +438,30 @@ def _framework_root(domain: Path, meta: dict) -> Path | None:
     return root if (root / ".markdownllm").is_file() else None
 
 
+def pin_behind(domain: Path, meta: dict) -> tuple[str, str]:
+    """(seen, running) when the domain's `framework_version_seen` pin is
+    behind the framework this clone runs; ("", "") otherwise.
+
+    The pin governs drift (the-record-holds-unattended Phase 1a): a domain
+    that declared 3.34 and has not refreshed is coherent AT 3.34 until it
+    bumps the pin, however far the framework beside it has moved. Before this
+    helper the blocks were compared against the running framework alone, so
+    every release the operator did not attend became debt on every paused
+    workspace — four one-line commits refused for it on 2026-10-25. Debt is
+    paid once, at the bump (`mdllm refresh . --seal`), which is a change with
+    its cue. The framework root itself never has a pin.
+    """
+    meta = meta or {}
+    root = _framework_root(domain, meta)
+    if root is None or root == domain:
+        return "", ""
+    seen = str(meta.get("framework_version_seen") or "").strip()
+    running = framework_version(root)
+    if seen and running != "unknown" and version_lt(seen, running):
+        return seen, running
+    return "", ""
+
+
 def framework_head(root: Path) -> str:
     """The framework clone's HEAD, full sha, or "" when it is not a git
     repository (a bundle, a bare copy) — the guard then falls back to the
@@ -566,6 +590,13 @@ def cmd_domain_kernel(args) -> int:
         if drifted and state != "ok":
             print(f"domain-kernel: {state.upper()} — {why}\n  (the blocks differ from "
                   "what this clone would write, which is not drift)")
+            return 0
+        seen, running = pin_behind(domain, meta or {}) if drifted else ("", "")
+        if seen:
+            print(f"domain-kernel: PIN-BEHIND — the blocks stand at framework {seen}; "
+                  f"this clone runs {running}\n  (not drift until the pin moves: "
+                  f"`mdllm refresh {args.path}` regenerates them, `--seal` after "
+                  "adoption records the bump)")
             return 0
         if drifted:
             print("domain-kernel: DRIFT — managed blocks differ from a fresh build: "

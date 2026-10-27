@@ -242,13 +242,18 @@ def test_fired_trigger_is_settled_and_a_self_answering_one_is_mechanical(tmp_pat
 # --------------------------------------------------------------- the surface
 
 def test_clean_corpus_reports_none_and_the_cli_exits_zero(tmp_path, capsys):
+    # Dated today, not on a fixed day: a fixed `created` crosses the 21-day
+    # work-stall interval on its own and the clean corpus stops being clean
+    # (it did on 2026-10-25, three weeks after the date it was written with).
+    import datetime as _dt
+    today = _dt.date.today().isoformat()
     root = tmp_path / "clean"
     (root / "things").mkdir(parents=True)
     _sync_git(root, "init", "-q")
     write(root, "things/fresh.md",
-          thing_text("id: fresh\ntype: plan\nstatus: in-progress\ncreated: 2026-10-04",
+          thing_text(f"id: fresh\ntype: plan\nstatus: in-progress\ncreated: {today}",
                      "# F\n\n- [ ] x\n"))
-    _commit(root, "fresh", "2026-10-04")
+    _commit(root, "fresh", today)
     from markdownllm.reckon import cmd_reckon
     rc = cmd_reckon(argparse.Namespace(path=str(root), imports=False))
     out = capsys.readouterr().out
