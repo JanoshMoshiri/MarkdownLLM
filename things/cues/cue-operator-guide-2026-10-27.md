@@ -63,3 +63,17 @@ answer, in their words, to a question you could not settle.
 Every line held. An authored one-liner gained a clause for a flag shipped in
 the same commit; the derived block followed the CLI. **Verdict:
 not-inflection.**
+
+## Second change, same day — the `estate-check` when-line
+
+Later on 2026-10-27 the authored when-line for `estate-check` gained a
+clause for `--health` (`the-record-holds-unattended` Phase 3) and the toolbox
+block regenerated for the new flag's help. Under `cue-carrier` Phase 7(a) —
+a cue raised today covers the day's later edits to its subject — the floor
+raised nothing; the change is walked here. Same 27 dependants, same
+judgement: an authored one-liner and a derived block; `estate-git-sync` and
+`membrane-attention-cluster` built and read the membrane half of
+`estate-check`, which the health read sits beside and does not alter;
+`review-documentation-audit-2026-10-20-claude` audited the toolbox's
+completeness, which the regenerated block keeps mechanical. **Verdict
+stands: not-inflection.**

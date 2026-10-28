@@ -46,6 +46,9 @@ linked_things:
   - id: judgement-checks-need-a-suppression-list-which-is-itself-drift
     relation: informs
     notes: "The admission gate for Phase 3: each measurement is keyed to a same-builder source (git log, frontmatter, the floor's own evaluations). None needs an allow-list to stay quiet."
+  - id: the-gate-reads-presence-the-spec-promises-the-walk
+    relation: references
+    notes: "Phase 4's filing: the conflict between the spec's promise (refused until the walk is on record) and the 2026-10-05 ruling the gate implements (presence, once per subject per day). This plan keeps it in circulation; the ruling is the operator's."
   - id: the-record-answers-the-direction-question-first
     relation: supports
     notes: "The session that wrote this plan predicted the operator's choice from the session's own record at better than 95% by the operator's reckoning. The record answered; the plan is what the record asked for."
@@ -174,7 +177,18 @@ about whether the foundation keeps its own commitment when nobody is looking.
   *Done when:* a session in any domain says the dispatcher is silent within
   a day of it going silent, and the operator has been rung once by the watch.
 
-- [ ] **Phase 3 — The measurements are the floor's.** Extend `estate-check`
+- [ ] **Phase 3 — The measurements are the floor's.** *(shipped 2026-10-27:
+  `mdllm estate-check --health`, module `health.py`, five tests. The floor's
+  definitions supersede the hand ones in this plan's opening where they
+  differ — maintenance is "every path generated or tool-written, or a
+  refresh/reckon/index/kernel/docs subject", not the message-prefix
+  heuristic the session used; cue precision is answered-not-inflection over
+  answered, per repo. Live at ship: the busiest workspace 4% maintenance,
+  38 fired (13 older than 30d), retrospective 62d with 44 insights since,
+  99% of insights active, cues 51% not-inflection, dispatch silent 12d; a
+  small one 72% maintenance over 90d. The Done line's "every figure
+  reproduced" is met in kind, not in digit, and that is the point. The 2026-10
+  framework retrospective is next to cite the command.)* Extend `estate-check`
   with a `--health` read, per repo, stdout only, no artifact, ranked when
   loud and silent when not: maintenance share (commits in the window whose
   changed paths are only generated or index paths ÷ all commits, 30d and
@@ -190,7 +204,14 @@ about whether the foundation keeps its own commitment when nobody is looking.
   command, and the 2026-10 framework retrospective cites the command, not a
   session.
 
-- [ ] **Phase 4 — The gate question, filed to the seat.** The gate demands
+- [ ] **Phase 4 — The gate question, filed to the seat.** *(filed
+  2026-10-27: `the-gate-reads-presence-the-spec-promises-the-walk`,
+  `type: conflict`, `status: open`, parties the spec and the 2026-10-05
+  ruling. Reading the ruling corrected this phase's premise: presence-per-
+  day is `cue-carrier` Phase 7(a)'s stated rule, not an accident — the
+  conflict is between a deliberate floor and a spec sentence that promises
+  more. Met live three times the same day. The ruling is the operator's; the
+  box below closes when the conflict is on record, which it is.)* The gate demands
   that a cue exist; the spec says the walk runs on detection and is sealed
   in the same commit; the cue's persistence rule says the question may wait
   until answered. Three readings are each specified somewhere: *(i)* the

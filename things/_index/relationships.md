@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-27
-generated: 2026-10-27T23:08:55
-generated_from: HEAD@0ca893d
-coverage: 606
+generated: 2026-10-27T23:18:40
+generated_from: HEAD@8373b46
+coverage: 607
 framework_version: 3.50.0
 ---
 
@@ -1724,6 +1724,13 @@ framework_version: 3.50.0
 - the-first-retrospective-is-the-one-the-floor-cannot-chase --extends--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - the-first-retrospective-is-the-one-the-floor-cannot-chase --complements--> a-uniform-answer-is-a-dead-judgment
 - the-first-retrospective-is-the-one-the-floor-cannot-chase --supports--> existence-is-not-currency
+- the-gate-reads-presence-the-spec-promises-the-walk --references--> change-reconciliation-specification
+- the-gate-reads-presence-the-spec-promises-the-walk --references--> the-verdict-is-asked-where-the-change-lands-2026-10-05
+- the-gate-reads-presence-the-spec-promises-the-walk --references--> cue-carrier
+- the-gate-reads-presence-the-spec-promises-the-walk --derived-from--> the-record-holds-unattended
+- the-gate-reads-presence-the-spec-promises-the-walk --references--> review-holistic-substrate-2026-10-21-codex
+- the-gate-reads-presence-the-spec-promises-the-walk --parties--> change-reconciliation-specification
+- the-gate-reads-presence-the-spec-promises-the-walk --parties--> the-verdict-is-asked-where-the-change-lands-2026-10-05
 - the-harness-bound-path-is-the-least-tested-path --supports--> portability-claims-need-execution-tests
 - the-harness-bound-path-is-the-least-tested-path --derived-from--> field-report-2026-08-13-domain-session
 - the-harness-bound-path-is-the-least-tested-path --derived-from--> claude-gate-5r4-acceptance-2026-08-13
@@ -1775,6 +1782,7 @@ framework_version: 3.50.0
 - the-record-holds-unattended --implements--> consistency-is-maintained-at-change-not-by-sweeping
 - the-record-holds-unattended --informs--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - the-record-holds-unattended --informs--> judgement-checks-need-a-suppression-list-which-is-itself-drift
+- the-record-holds-unattended --references--> the-gate-reads-presence-the-spec-promises-the-walk
 - the-record-holds-unattended --supports--> the-record-answers-the-direction-question-first
 - the-root-is-not-a-representative-domain --derived-from--> estate-workflow-derivation
 - the-root-is-not-a-representative-domain --informs--> derivation-shape-settled-2026-08

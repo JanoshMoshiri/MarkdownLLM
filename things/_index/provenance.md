@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-10-27
-generated: 2026-10-27T23:08:56
-generated_from: HEAD@0ca893d
-coverage: 139
+generated: 2026-10-27T23:18:40
+generated_from: HEAD@8373b46
+coverage: 140
 framework_version: 3.50.0
 ---
 
@@ -614,6 +614,9 @@ framework_version: 3.50.0
 - cue-session-memory-specification-2026-10-05 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - cue-the-substrate-is-a-discipline-prosthesis-2026-10-08 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
 - workflows-emerge-from-use-2026-10-07 (pinned @9b58abb27f1ec94f4f2151138d1673d925da4ba6)
+
+## the-record-holds-unattended
+- the-gate-reads-presence-the-spec-promises-the-walk (derived-from)
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)

@@ -91,6 +91,7 @@ from .external_trust import CAPABILITY_NAMES, cmd_external_trust
 from .history import cmd_changelog, cmd_worklog
 from .docs_blocks import cmd_docs, rows_from_parser
 from .harness_ports import LIFECYCLE_BINDINGS
+from .health import cmd_estate_health
 from .imports_check import cmd_estate_check, cmd_imports_check
 from .assemble import cmd_assemble
 from .bundle_service import cmd_bundle
@@ -469,7 +470,20 @@ def build_cli() -> argparse.ArgumentParser:
                         "per-consumer reads, never an index")
     ec.add_argument("paths", nargs="*", help="consumer domain roots; omit to walk "
                     "local clones (a filesystem fact, not an estate manifest)")
-    ec.set_defaults(fn=cmd_estate_check)
+    ec.add_argument("--health", action="store_true",
+                    help="instead of the membrane, the estate's own health per "
+                         "repo: maintenance share of commits (30d/90d), fired-"
+                         "trigger backlog and age, retrospective age, open "
+                         "insights/conflicts/plans, cue precision, dispatch-digest "
+                         "age — git and frontmatter facts, stdout only, `!` past a "
+                         "spec-named threshold")
+    # The health read (the-record-holds-unattended Phase 3) is dispatched
+    # here, not inside imports_check: the membrane module must not depend
+    # on the health module, which reads the trigger evaluator, which reads
+    # the membrane.
+    ec.set_defaults(fn=lambda args: (cmd_estate_health(args)
+                                     if getattr(args, "health", False)
+                                     else cmd_estate_check(args)))
 
     es = sub.add_parser("estate-sync", help="sync before orienting: fetch + "
                         "ff-only pull across the estate's repos (root + domain(s)/*); "
