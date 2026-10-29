@@ -1,8 +1,9 @@
 ---
 id: agents-cannot-self-install-permission-bearing-hooks
 type: insight
-status: active
-version: 1.1
+status: promoted
+promoted_to: orchestration-specification
+version: 1.2
 created: 2026-06-24
 session: 2026-06-24
 source: both
@@ -60,3 +61,7 @@ new domains precisely because it ran as the tool, outside the guarded editor pat
 That incident remains the evidence for the authority boundary. The later
 `adapter-install` service replaced the paste mechanism without changing who
 authorises the consequence.
+
+## Promoted 2026-10-22
+
+Crystallised in the adapter contract: `mdllm adapter-install` shows the permission-bearing change and the operator applies it. A domain agent's refresh on 2026-10-22 left a stale adapter to the operator for exactly this reason.

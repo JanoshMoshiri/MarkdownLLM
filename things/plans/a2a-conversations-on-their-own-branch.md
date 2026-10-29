@@ -2,7 +2,7 @@
 id: a2a-conversations-on-their-own-branch
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-10-10
 session: 2026-10-09
 priority: high
@@ -26,26 +26,34 @@ linked_things:
   - id: substrate-native-a2a
     relation: references
     notes: "The loop this plan makes safe to run several of at once."
-triggers:
-  - type: time
-    condition: "2026-10-23 reached"
-    action: surface
-    note: "Have the four open rulings been made (the decision's Open section)? If not, put them to the operator in one native prompt, his leanings as the first options. If they have: has Phase 1 landed, and has one pair run a conversation on its own branch?"
 ---
 
 # Plan: A2A Conversations Run On Their Own Branch
 
 **What this delivers.** Several agent pairs taking turns in one workspace at
-once, across clones, without one pair's turn refusing the other's push. Each
-conversation runs on its own branch in a working copy of its own; `main`
-moves once per concluded conversation, through a commit the floor
-validates; and a conversation that concluded but never landed cannot be
-forgotten, because the reckoning carries it.
+once, across clones, without one pair's turn refusing the other's turn
+push. Each conversation runs on its own branch in a working copy of its
+own. Either party explicitly concludes it, and its conversation records
+land on `main` once through a merge commit the floor validates, preserving
+turn history. Work commits continue to land on `main` at their normal
+meaning boundaries. A conversation that concluded but never landed cannot
+be forgotten, because the reckoning carries it.
+
+**Rulings answered 2026-10-24.** The operator settled all four: explicit
+conclusion by either party; one merge preserving history; conversation
+records only on the branch, work on `main`; clean merge preparation allowed,
+with the agent making the validated commit. Recorded on
+`a2a-conversations-run-on-their-own-branch-2026-10-09`, v1.3. The
+2026-10-23 questions reminder is disarmed because its rulings are answered.
+The implementation boxes below remain open; the seat prerequisite still
+governs sequencing.
 
 **What it does not deliver.** Exploration branches or person-to-person
 branching (still parked in `git-workflow.md`). Any change inside a
 conversation: turns alternate, a turn is real only on the remote, a rejected
-push is the turn-holder's to heal. Any floor act that resolves a divergence.
+push is the turn-holder's to heal. Concurrent work commits still share
+`main` and may require reconciliation. Any floor act that resolves a
+conflicted merge.
 
 **Sequencing.** Follows `the-seat` (2026-10-15): the evidence read of
 2026-10-14 found three causes of the trouble larger than the turn race this
@@ -97,7 +105,7 @@ The reasons each phase exists, so a later session does not re-derive them:
 
 - [x] **Phase 0 — Record it.** `a2a-conversations-run-on-their-own-branch-2026-10-09`
       in the operator's words, and this plan. *Done 2026-10-10.* **Four
-      rulings open, the operator's** (the decision's Open section, his
+      rulings were open, the operator's** (the decision's historical questions section, his
       leanings in his words): what ends a conversation; how it lands — once
       at the end, his leaning, with merge-or-squash still open; what the
       branch carries — the conversation only, his leaning; and whether the
@@ -111,14 +119,17 @@ The reasons each phase exists, so a later session does not re-derive them:
       the turn race — clone version drift, turns never published, a shared
       working copy — none of which a branch per conversation fixes. The
       rulings stay the operator's; the ordering of work now reads from the
-      evidence.*
+      evidence.* **2026-10-24: all four ruled** in the native prompt, as
+      summarised above. The design holds on Phases 1, 3 and 4 are released;
+      their implementation and the seat prerequisite are still owed.
 - [ ] **Phase 1 — A conversation gets its branch and its working copy.**
       `mdllm conversation open <ticket-id>`: cuts `a2a/<ticket-id>` from
       `main`; adds the working copy beside the workspace
       (`<domain-parent>/<workspace>--<ticket-id>`, the same depth); writes the
       ticket's first turn there; publishes the branch with its upstream where
       the workspace declares `autopush: true`, else prints the push for the
-      operator. What rides the branch besides the turns follows ruling 3.
+      operator. Only tickets and review records ride the branch; work
+      changes go to `main`, split from a turn where necessary (ruling 3).
       The ticket template becomes one per conversation. Floor
       fixes for any linked working copy: the estate walks skip a repository
       whose `.git` is a file (a view of one already walked); the corpus walk
@@ -131,29 +142,32 @@ The reasons each phase exists, so a later session does not re-derive them:
       `git rev-parse --git-dir` (the lock survives in a linked working copy);
       `--branch` defaults to the checked-out branch's upstream; the
       turn-that-never-left check reads that upstream, not a bare
-      `refs/heads/<branch>`; a conversation that concluded — the ticket
-      closed at the branch head, or the branch merged into `main` — ends the
-      watch with its own exit code instead of reading as blind.
+      `refs/heads/<branch>`; an explicit conclusion by either party,
+      recorded at the published branch head, or the branch merged into
+      `main`, ends the watch with its own exit code instead of reading as
+      blind. A ticket's ordinary `closed` state is not a conclusion.
       *Done when two pairs run at once in one workspace for a working day
-      with no push between them refused.*
+      with no conversation-turn push between them refused.*
 - [ ] **Phase 3 — The conclusion is a validated commit.**
-      `mdllm conversation conclude <ticket-id>`: checks the conversation
-      has ended (ruling 1) at the published branch head; lands it as ruled —
-      a merge commit or one squashed commit (ruling 2) — prepared by the
-      floor when git can make it cleanly, or named as commands (ruling 4);
-      and files a landing git cannot make as the operator's; the agent's `conclude:` commit then
+      `mdllm conversation conclude <ticket-id>`: records either party's
+      explicit conclusion in committed state and verifies it at the
+      published branch head (ruling 1); prepares a single merge commit
+      preserving turn history (ruling 2), without committing when Git can
+      make it cleanly (ruling 4); and files a landing Git cannot make
+      cleanly as the operator's. The agent's `conclude:` merge commit then
       runs the commit gate (cues from the branch arrive in the delta and
       cover their subjects), the pre-commit floor and publication like any
       commit. Backstops so no merge skips the floor: `install-hook` adds
       `pre-merge-commit` (the pre-commit floor) and `post-merge`
       (publication), and the commit gate matches a merge as well as a commit.
-      After `main` is published: the working copy removed, and the branch
-      deleted or kept as ruling 2 requires (a squash orphans pins made on a
-      deleted branch). *Done when one conversation concludes into `main`
+      After `main` is published: the working copy removed, and branch
+      cleanup leaves every turn reachable through the merge history.
+      *Done when one conversation concludes into `main`
       with its landing validated and published.*
 - [ ] **Phase 4 — Never forgotten.** The reckoning gains the `conversation`
       kind: one ref listing reads each published `a2a/*` branch at its head
-      — ended (as ruling 1 defines it) and not landed on `main` → settled,
+      — explicitly concluded by either party (ruling 1) and not landed on
+      `main` → settled,
       "conclude it"; no turn for 14 days and not ended → the operator's,
       "abandoned, or waiting on you?". `session-memory.md`'s exit table gains the row.
       *Done when a concluded, unmerged conversation is named at a session
@@ -176,7 +190,9 @@ The reasons each phase exists, so a later session does not re-derive them:
 ## Done when
 
 - [ ] Two conversations run at once in one workspace, across two clones,
-      with no push between them refused and no detached HEAD.
+      with no conversation-turn push between them refused and no detached
+      HEAD.
 - [ ] Every concluded conversation reaches `main` through a validated,
-      published commit, landed as the operator ruled.
+      published merge commit preserving turn history; work commits remain
+      on `main`.
 - [ ] No concluded conversation stays unmerged past a session end.

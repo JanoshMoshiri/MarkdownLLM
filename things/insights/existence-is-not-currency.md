@@ -1,8 +1,9 @@
 ---
 id: existence-is-not-currency
 type: insight
-status: active
-version: 1.1
+status: promoted
+promoted_to: validate-thing-specification
+version: 1.2
 created: 2026-06-23
 session: 2026-06-23
 source: both
@@ -55,3 +56,7 @@ v3.15.0 domain-kernel work added a fifth — managed-block drift detection in
 `kernel`/`index` already do — plus `doctor` reporting domain-kernel and adapter freshness.
 That tipped it from candidate to principle. Generalises [[tracking-artifacts-can-drift-from-reality]]
 to *generated* (not just hand-tracked) artefacts.
+
+## Promoted 2026-10-22
+
+The lesson is the floor's: `mdllm kernel --check`, `index check`, `domain-kernel --check`, `coherence` and `doctor`'s adapter `currency` each compare an artefact against a fresh build of its source, and the pre-commit hook refuses a stale one. validate.thing.md owns that boundary; this insight is its rationale.

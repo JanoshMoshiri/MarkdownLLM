@@ -1,8 +1,9 @@
 ---
 id: session-start-loses-to-the-first-request
 type: insight
-status: active
-version: 1.1
+status: promoted
+promoted_to: orchestration-specification
+version: 1.2
 created: 2026-06-23
 session: 2026-06-23
 source: both
@@ -60,3 +61,7 @@ The fix became `mdllm session-start` emitting the ritual to stdout for a `Sessio
 hook to inject. Extends [[hook-enforcement-has-three-anchors]]: the `harness-session`
 anchor is enforced only where an adapter binds it, and session-start is the case that
 proves why.
+
+## Promoted 2026-10-22
+
+Crystallised as the `orient` binding (3.49.0): the judgement half of session start is routed to an explicit invocation because an un-pulled instruction at t=0 loses to the first request on every tier, and the mechanical half is emitted by the hook. orchestration.md → Bindings carries it.

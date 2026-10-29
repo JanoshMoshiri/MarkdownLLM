@@ -2,7 +2,7 @@
 id: estate-workflow-derivation
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-08-27
 priority: high
 tags: [derivation, universal-workflow, workflow-definitions, estate, closed-loop-gate]
@@ -37,8 +37,8 @@ linked_things:
     notes: "F4 supplies the zero-run class and its named candidates; the inventory below is the dated re-count."
 triggers:
   - type: time
-    condition: "2026-10-21 reached"
-    action: "Answered 2026-10-08, re-conditioned: the residual 'process gaps ruled by their domains' now has a floor read. `mdllm workflows --emergent` names each workspace's enacted process and the unbound definition that already describes it (`workflows-emerge-from-use-2026-10-07`), and the reckoning hands it to the domain agent. Ask at this date: has a workspace bound or written one, and have the two stale mirrors been re-synced? Earlier: the MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered."
+    condition: "2026-11-04 reached"
+    action: "Answered 2026-10-22 by citation: no workspace has bound or written an emergent workflow, and the framework root has none to offer (mdllm workflows --emergent on 2026-10-22: nothing repeats across three days; review-holistic-substrate-2026-10-21-codex F6 notes the multi-day filter is deliberate and the operator kept it, holistic-review-rulings-2026-10-21); the two stale mirrors remain unchecked — the review's audit-time estate-check could check none of the enumerated imports in the two consumer clones (F3), which the operator ruled waits on his own trust grants. Re-dated to 2026-11-04. Earlier — answered 2026-10-08, re-conditioned: the residual 'process gaps ruled by their domains' now has a floor read. `mdllm workflows --emergent` names each workspace's enacted process and the unbound definition that already describes it (`workflows-emerge-from-use-2026-10-07`), and the reckoning hands it to the domain agent. Ask at this date: has a workspace bound or written one, and have the two stale mirrors been re-synced? Earlier: the MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered."
 ---
 
 # Estate Workflow Derivation

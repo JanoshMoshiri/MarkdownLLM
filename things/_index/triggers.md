@@ -3,26 +3,22 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-27
-generated: 2026-10-27T23:18:40
-generated_from: HEAD@8373b46
-coverage: 10
+created: 2026-10-29
+generated: 2026-10-29T18:05:06
+generated_from: HEAD@f2da8b7
+coverage: 9
 framework_version: 3.50.0
 ---
 
 # Triggers Index — framework
 
-## a2a-conversations-on-their-own-branch
-- status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-23 reached, action=surface, note=Have the four open rulings been made (the decision's Open section)? If not, put them to the operator in one native prompt, his leanings as the first options. If they have: has Phase 1 landed, and has one pair run a conversation on its own branch?
-
 ## closed-loop-operating-state
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-21 reached, action=Answered 2026-10-08: yes. The tick was re-registered on the operator's machine on 2026-09-23 and has filed digests in two workspaces, on 2026-10-04 and 2026-10-07 (runs 2 to 5 on the 7th), last result 0; run 3 worked a fired trigger end to end. The question for this window: do digests keep landing at the daily cadence, and has the workspace one run skipped as DIVERGED been routed? A tick never merges. Earlier: re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29).
+- trigger: type=time, condition=2026-11-04 reached, action=Answered 2026-10-22 by citation: the tick is alive — a dispatch record dated 2026-10-19 exists in the pilot workspace (cited, anonymised, in review-holistic-substrate-2026-10-21-codex, F2), where the run found the external connector unavailable in unattended execution; so digests land and the external leg failed, and whether the DIVERGED run was routed is not visible from the root. Next window: do digests keep the daily cadence, and was the connector repaired in the workspace? Earlier — answered 2026-10-08: yes. The tick was re-registered on the operator's machine on 2026-09-23 and has filed digests in two workspaces, on 2026-10-04 and 2026-10-07 (runs 2 to 5 on the 7th), last result 0; run 3 worked a fired trigger end to end. The question for this window: do digests keep landing at the daily cadence, and has the workspace one run skipped as DIVERGED been routed? A tick never merges. Earlier: re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29).
 
 ## estate-workflow-derivation
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-21 reached, action=Answered 2026-10-08, re-conditioned: the residual 'process gaps ruled by their domains' now has a floor read. `mdllm workflows --emergent` names each workspace's enacted process and the unbound definition that already describes it (`workflows-emerge-from-use-2026-10-07`), and the reckoning hands it to the domain agent. Ask at this date: has a workspace bound or written one, and have the two stale mirrors been re-synced? Earlier: the MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered.
+- trigger: type=time, condition=2026-11-04 reached, action=Answered 2026-10-22 by citation: no workspace has bound or written an emergent workflow, and the framework root has none to offer (mdllm workflows --emergent on 2026-10-22: nothing repeats across three days; review-holistic-substrate-2026-10-21-codex F6 notes the multi-day filter is deliberate and the operator kept it, holistic-review-rulings-2026-10-21); the two stale mirrors remain unchecked — the review's audit-time estate-check could check none of the enumerated imports in the two consumer clones (F3), which the operator ruled waits on his own trust grants. Re-dated to 2026-11-04. Earlier — answered 2026-10-08, re-conditioned: the residual 'process gaps ruled by their domains' now has a floor read. `mdllm workflows --emergent` names each workspace's enacted process and the unbound definition that already describes it (`workflows-emerge-from-use-2026-10-07`), and the reckoning hands it to the domain agent. Ask at this date: has a workspace bound or written one, and have the two stale mirrors been re-synced? Earlier: the MVP was met 2026-08-28, so this fires on the residuals, not the gate. Report whether the two stale mirrors (residual 2) have been re-synced and re-flipped by the operator — nothing mechanical will detect them while imports-check coverage is 0/101 and 0/43 — and whether the three recorded process gaps have been ruled by their domains. Re-conditioned from the original MVP chase, which its own outcome answered.
 
 ## framework-retrospective-2026-10
 - status: complete  due_date: —
@@ -51,5 +47,5 @@ framework_version: 3.50.0
 
 ## workflows-emerge-from-use
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-10-21 reached, action=surface, note=Two weeks: has a workflow emerged in a live workspace, and has the agent followed one when working on its carrier type? If neither, the actor is the problem.
+- trigger: type=time, condition=2026-11-04 reached, action=surface, note=Answered 2026-10-22: no workflow emerged in the framework root (mdllm workflows --emergent: none — nothing repeats across three days; two authored definitions, the floor-development one with five runs and no carrier), and none is reported bound in a live workspace; the actor question stands and the close is the actor. Next look 2026-11-04: has a workflow emerged in a live workspace, and has the agent followed one when working on its carrier type? If neither, the actor is the problem.
 

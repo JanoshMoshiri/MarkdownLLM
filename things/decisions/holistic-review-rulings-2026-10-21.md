@@ -2,7 +2,7 @@
 id: holistic-review-rulings-2026-10-21
 type: decision
 status: made
-version: 1.1
+version: 1.2
 created: 2026-10-21
 session: 2026-10-21
 decided_by: human
@@ -32,6 +32,15 @@ linked_things:
   - id: cold-read-of-the-seams-release
     relation: references
     notes: "Its cancellation reasoned that the 2026-10-17 comparison performed the cold read; the review names that comparison's memory-system brief as a category confound, so the next cold read excludes both reviews from its first pass."
+  - id: an-outward-claim-about-a-mechanism-is-read-off-its-test
+    relation: informs
+    notes: "Harvested from ruling 2 at the session end: the three overstated surfaces were written from the gate's intent, and the review read its test."
+  - id: the-public-corpus-is-the-self-description-the-use-is-private
+    relation: informs
+    notes: "Harvested at the session end: why a condition-A run would still under-identify the system from the public corpus, and what the honest fix is."
+  - id: cold-test-condition-a
+    relation: informs
+    notes: "The baseline run ruling 3 presupposes, carried as a plan so its conditions are not reconstructed from the review's appendix."
 ---
 
 # Decision: The holistic review — the gate's promise, the discovery route, and the private-domain findings

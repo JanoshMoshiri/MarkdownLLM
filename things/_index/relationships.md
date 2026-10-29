@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-27
-generated: 2026-10-27T23:18:40
-generated_from: HEAD@8373b46
-coverage: 607
+created: 2026-10-29
+generated: 2026-10-29T18:05:06
+generated_from: HEAD@f2da8b7
+coverage: 620
 framework_version: 3.50.0
 ---
 
@@ -188,10 +188,12 @@ framework_version: 3.50.0
 - a2a-conversations-on-their-own-branch --references--> loop-turns-self-heal-2026-09-23
 - a2a-conversations-on-their-own-branch --references--> the-reckoning
 - a2a-conversations-on-their-own-branch --references--> substrate-native-a2a
+- a2a-conversations-run-on-their-own-branch-2026-10-09 --supersedes--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --extends--> loop-turns-self-heal-2026-09-23
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --extends--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> a-shared-worktree-merges-authorship-at-the-index
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> git-workflow-specification
+- ad-hoc-message-loop --references--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - ad-hoc-message-loop --implements--> standing-watch-specification
 - adoption-reopens-birth-gaps --extends--> a-ruling-triages-more-cheaply-than-a-mechanism
 - agents-cannot-self-install-permission-bearing-hooks --informs--> hook-enforcement-has-three-anchors
@@ -227,6 +229,10 @@ framework_version: 3.50.0
 - an-interface-is-what-its-consumers-call-not-what-it-declares --derived-from--> vendor-harness-adapter-foundation
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - an-interface-is-what-its-consumers-call-not-what-it-declares --complements--> portability-claims-need-execution-tests
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --supports--> holistic-review-rulings-2026-10-21
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --references--> review-holistic-substrate-2026-10-21-codex
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --supports--> documentation-rulings-2026-10-20
+- an-outward-claim-about-a-mechanism-is-read-off-its-test --extends--> repeated-drift-promotes-a-fact-into-the-floor
 - an-owed-act-is-not-a-false-fact --references--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - an-owed-act-is-not-a-false-fact --references--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - an-owed-act-is-not-a-false-fact --informs--> cue-carrier
@@ -417,6 +423,10 @@ framework_version: 3.50.0
 - cold-read-of-the-seams-release --references--> review-independent-seams-verification-2026-08-26-claude
 - cold-read-of-the-seams-release --implements--> a-verifier-assumes-the-inputs-it-did-not-observe
 - cold-read-of-the-seams-release --references--> framework-retrospective-2026-08b
+- cold-test-condition-a --derived-from--> review-holistic-substrate-2026-10-21-codex
+- cold-test-condition-a --references--> holistic-review-rulings-2026-10-21
+- cold-test-condition-a --references--> cold-read-of-the-seams-release
+- cold-test-condition-a --implements--> the-public-corpus-is-the-self-description-the-use-is-private
 - committed-state-carries-defects-as-faithfully-as-facts --extends--> structure-decides-figures-scale-decides-convention
 - committed-state-carries-defects-as-faithfully-as-facts --challenges--> mis-keyed-links-pass-the-floor-silently
 - committed-state-carries-defects-as-faithfully-as-facts --informs--> evidence-and-eval-backlog
@@ -490,8 +500,12 @@ framework_version: 3.50.0
 - cue-a-ruling-triages-more-cheaply-than-a-mechanism-retro-2026-09-13 --subject--> a-ruling-triages-more-cheaply-than-a-mechanism
 - cue-a-true-primitive-is-discovered-not-authored-2026-10-20 --subject--> a-true-primitive-is-discovered-not-authored
 - cue-a-uniform-answer-is-a-dead-judgment-2026-10-17 --subject--> a-uniform-answer-is-a-dead-judgment
+- cue-a2a-conversations-on-their-own-branch-2026-10-24 --subject--> a2a-conversations-on-their-own-branch
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-10 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-14 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-24 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- cue-ad-hoc-message-loop-2026-10-24 --subject--> ad-hoc-message-loop
+- cue-agents-cannot-self-install-permission-bearing-hooks-2026-10-22 --subject--> agents-cannot-self-install-permission-bearing-hooks
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 --subject--> an-injected-file-arrives-without-its-frontmatter
@@ -540,6 +554,7 @@ framework_version: 3.50.0
 - cue-derivation-shape-brief-2026-08-2026-09-13 --subject--> derivation-shape-brief-2026-08
 - cue-derivation-shape-settled-2026-08-2026-09-13 --subject--> derivation-shape-settled-2026-08
 - cue-derived-index-specification-2026-09-12 --subject--> derived-index-specification
+- cue-directional-graph-reads-come-in-inbound-outbound-pairs-2026-10-22 --subject--> directional-graph-reads-come-in-inbound-outbound-pairs
 - cue-domain-refresh-specification-2026-09-13 --subject--> domain-refresh-specification
 - cue-domain-refresh-specification-2026-10-27 --subject--> domain-refresh-specification
 - cue-domain-specification-guide-2026-09-15 --subject--> domain-specification-guide
@@ -555,6 +570,7 @@ framework_version: 3.50.0
 - cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-09-26 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-10-17 --subject--> evidence-and-eval-backlog
+- cue-existence-is-not-currency-2026-10-22 --subject--> existence-is-not-currency
 - cue-expertise-is-an-output-not-a-prerequisite-2026-10-08 --subject--> expertise-is-an-output-not-a-prerequisite
 - cue-explorer-extraction-and-hosting-2026-09-13 --subject--> explorer-extraction-and-hosting
 - cue-explorer-publication-position-2026-09-13 --subject--> explorer-publication-position
@@ -597,7 +613,9 @@ framework_version: 3.50.0
 - cue-glossary-2026-10-27 --subject--> glossary
 - cue-hard-hook-vocabulary-contradicts-observable-trigger-insight-2026-09-13 --subject--> hard-hook-vocabulary-contradicts-observable-trigger-insight
 - cue-hard-hooks-require-observable-agent-caused-triggers-2026-09-13 --subject--> hard-hooks-require-observable-agent-caused-triggers
+- cue-hard-invariants-encode-a-semantic-assumption-2026-10-22 --subject--> hard-invariants-encode-a-semantic-assumption
 - cue-harness-native-onramp-supersedes-desktop-2026-09-13 --subject--> harness-native-onramp-supersedes-desktop
+- cue-holistic-review-rulings-2026-10-21-2026-10-23 --subject--> holistic-review-rulings-2026-10-21
 - cue-independent-review-2026-07-14-fable-2026-10-20 --subject--> independent-review-2026-07-14-fable
 - cue-independent-substrate-review-2026-08-20-claude-2026-10-20 --subject--> independent-substrate-review-2026-08-20-claude
 - cue-independent-substrate-review-2026-08-20-codex-2026-10-20 --subject--> independent-substrate-review-2026-08-20-codex
@@ -644,6 +662,7 @@ framework_version: 3.50.0
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-10-17 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-public-docs-face-build-2026-09-24 --subject--> public-docs-face-build
+- cue-public-docs-face-build-2026-10-23 --subject--> public-docs-face-build
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
@@ -652,8 +671,10 @@ framework_version: 3.50.0
 - cue-retrospective-specification-cadence-2026-09-13 --subject--> retrospective-specification
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-09-12 --subject--> review-external-conflict-lifecycle-2026-09-08
 - cue-review-external-conflict-lifecycle-2026-09-08-2026-10-20 --subject--> review-external-conflict-lifecycle-2026-09-08
+- cue-review-holistic-substrate-2026-10-21-codex-2026-10-23 --subject--> review-holistic-substrate-2026-10-21-codex
 - cue-review-independent-operating-model-2026-08-26-codex-2026-10-20 --subject--> review-independent-operating-model-2026-08-26-codex
 - cue-scalability-guide-2026-10-20 --subject--> scalability-guide
+- cue-seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15-2026-10-24 --subject--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - cue-serve-side-blindness-dissolves-into-composition-2026-09-13 --subject--> serve-side-blindness-dissolves-into-composition
 - cue-session-memory-specification-2026-09-12 --subject--> session-memory-specification
 - cue-session-memory-specification-2026-09-26 --subject--> session-memory-specification
@@ -663,11 +684,13 @@ framework_version: 3.50.0
 - cue-session-memory-specification-own-tail-2026-09-13 --subject--> session-memory-specification
 - cue-session-start-hardening-2026-09-13 --subject--> session-start-hardening
 - cue-session-start-hardening-2026-10-20 --subject--> session-start-hardening
+- cue-session-start-loses-to-the-first-request-2026-10-22 --subject--> session-start-loses-to-the-first-request
 - cue-standing-watch-specification-2026-09-22 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-24 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-09-26 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-01 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-15 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-10-24 --subject--> standing-watch-specification
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 --subject--> structural-pointers-need-reverse-edge-indexing
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
@@ -1127,6 +1150,9 @@ framework_version: 3.50.0
 - holistic-review-rulings-2026-10-21 --informs--> public-docs-face-build
 - holistic-review-rulings-2026-10-21 --references--> workflows-emerge-from-use
 - holistic-review-rulings-2026-10-21 --references--> cold-read-of-the-seams-release
+- holistic-review-rulings-2026-10-21 --informs--> an-outward-claim-about-a-mechanism-is-read-off-its-test
+- holistic-review-rulings-2026-10-21 --informs--> the-public-corpus-is-the-self-description-the-use-is-private
+- holistic-review-rulings-2026-10-21 --informs--> cold-test-condition-a
 - hook-compliance-correlates-with-scope-not-awareness --informs--> orchestration-specification
 - hook-compliance-correlates-with-scope-not-awareness --supports--> tiered-loading-is-tiered-reading-applied-to-specs
 - hook-enforcement-has-three-anchors --informs--> orchestration-specification
@@ -1569,6 +1595,7 @@ framework_version: 3.50.0
 - scalability-guide --complements--> derived-index-specification
 - scalability-guide --references--> example-things-specification
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --extends--> a2a-conversations-run-on-their-own-branch-2026-10-09
+- seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --superseded-by--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --extends--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> loop-turns-self-heal-2026-09-23
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> a-shared-worktree-merges-authorship-at-the-index
@@ -1622,6 +1649,7 @@ framework_version: 3.50.0
 - srp-extraction-is-tier-promotion --references--> thing-specification
 - srp-extraction-is-tier-promotion --supports--> example-things-specification
 - srp-extraction-is-tier-promotion --supports--> reasoning-lenses-specification
+- standing-watch-specification --references--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - standing-watch-specification --extends--> thing-specification
 - standing-watch-specification --derived-from--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - standing-watch-specification --complements--> workflow-state-specification
@@ -1754,6 +1782,10 @@ framework_version: 3.50.0
 - the-orchestrators-premises-are-the-least-reliable-input --extends--> a-boundary-defect-is-visible-only-from-the-seat-that-did-not-build-it
 - the-orchestrators-premises-are-the-least-reliable-input --complements--> the-root-is-not-a-representative-domain
 - the-orchestrators-premises-are-the-least-reliable-input --references--> consequence-is-recoverable-only-in-retrospect
+- the-public-corpus-is-the-self-description-the-use-is-private --challenges--> review-holistic-substrate-2026-10-21-codex
+- the-public-corpus-is-the-self-description-the-use-is-private --supports--> review-critical-comparison-2026-10-17-claude
+- the-public-corpus-is-the-self-description-the-use-is-private --informs--> limitations-guide
+- the-public-corpus-is-the-self-description-the-use-is-private --informs--> holistic-review-rulings-2026-10-21
 - the-reckoning --implements--> the-reckoning-is-the-digestion-beat-2026-10-05
 - the-reckoning --implements--> closed-loop-operating-state
 - the-reckoning --references--> cue-carrier
@@ -1855,6 +1887,9 @@ framework_version: 3.50.0
 - unattended-cue-carrier-2026-09-12 --extends--> change-reconciliation-specification
 - unattended-cue-carrier-2026-09-12 --implements--> consequence-is-recoverable-only-in-retrospect
 - unattended-cue-carrier-2026-09-12 --implements--> partial-coverage-quiets-the-uncovered-steps
+- uncommitted-work-is-judged-from-the-record-that-left-it --extends--> git-workflow-specification
+- uncommitted-work-is-judged-from-the-record-that-left-it --informs--> session-memory-specification
+- uncommitted-work-is-judged-from-the-record-that-left-it --supports--> consequence-is-recoverable-only-in-retrospect
 - universal-workflow-methodology --implements--> workflow-state-specification
 - universal-workflow-methodology --references--> a-true-primitive-is-discovered-not-authored
 - universal-workflow-methodology --references--> the-wrong-distribution-channel-validates-clean

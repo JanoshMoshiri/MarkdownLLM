@@ -2,7 +2,7 @@
 id: closed-loop-operating-state
 type: plan
 status: in-progress
-version: 2.3
+version: 2.4
 created: 2026-08-27
 informed_by:
   - id: estate-workflow-derivation
@@ -57,8 +57,8 @@ linked_things:
     notes: "The pilot's first firing paid for this one. It is the standing design lens on Phase 4's remaining runs: a fail-closed loop that cannot file its own refusal is silent exactly where it is meant to speak."
 triggers:
   - type: time
-    condition: "2026-10-21 reached"
-    action: "Answered 2026-10-08: yes. The tick was re-registered on the operator's machine on 2026-09-23 and has filed digests in two workspaces, on 2026-10-04 and 2026-10-07 (runs 2 to 5 on the 7th), last result 0; run 3 worked a fired trigger end to end. The question for this window: do digests keep landing at the daily cadence, and has the workspace one run skipped as DIVERGED been routed? A tick never merges. Earlier: re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29)."
+    condition: "2026-11-04 reached"
+    action: "Answered 2026-10-22 by citation: the tick is alive — a dispatch record dated 2026-10-19 exists in the pilot workspace (cited, anonymised, in review-holistic-substrate-2026-10-21-codex, F2), where the run found the external connector unavailable in unattended execution; so digests land and the external leg failed, and whether the DIVERGED run was routed is not visible from the root. Next window: do digests keep the daily cadence, and was the connector repaired in the workspace? Earlier — answered 2026-10-08: yes. The tick was re-registered on the operator's machine on 2026-09-23 and has filed digests in two workspaces, on 2026-10-04 and 2026-10-07 (runs 2 to 5 on the 7th), last result 0; run 3 worked a fired trigger end to end. The question for this window: do digests keep landing at the daily cadence, and has the workspace one run skipped as DIVERGED been routed? A tick never merges. Earlier: re-dated 2026-09-15 after its first answer (Phase 4: the tick had been deliberately retired, not lost). The question now is whether the tick has been re-registered on the operator's own host and has filed a digest. Dead-man on the dispatcher. Check whether a dispatch digest has been filed in the pilot repo within the window; if none has, the loop is silent and silence is not health — establish whether the job was never registered, was registered and never fired, or fired and died mid-run (a digest left in-flight with a live claim says the third). Re-date this trigger to the next window once answered. Coverage is honestly partial: this fires into the operator's own session-start orientation at the framework root, so it is read at the operator's session cadence and not before — the chase pattern, not a monitor (dispatch-digest-home-2026-08-29)."
 ---
 
 # The Closed-Loop Operating State
