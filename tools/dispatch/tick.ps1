@@ -17,7 +17,7 @@ Register it (the operator's act — one hand-registered task is an install; a
 second seat owes the generated, doctor-checked entry the design named):
 
   schtasks /Create /TN "MarkdownLLM dispatch tick" /SC DAILY /ST 08:00 /RL LIMITED ^
-    /TR "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Users\Jamos\Projects\MarkdownLLM\tools\dispatch\tick.ps1 -Scope domain/<name>"
+    /TR "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Users\<user>\Projects\MarkdownLLM\tools\dispatch\tick.ps1 -Scope domain/<name>"
 
 Every launch is marked unattended (MDLLM_UNATTENDED=1): the commit gate then
 tells the run to raise and file the cue question, never to ask a human who is

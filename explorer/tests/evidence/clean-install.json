@@ -46,5 +46,5 @@
     "name": "pyyaml-6.0.3-cp312-cp312-win_amd64.whl",
     "sha256": "5fcd34e47f6e0b794d17de1b4ff496c00986e1c83f7ab2fb8fcfe9616ff7477b"
   },
-  "installer_output_tail": "Looking in links: c:\\Users\\Jamos\\Projects\\MarkdownLLM\\.test-tmp\\explorer-wheelhouse-040\nProcessing c:\\users\\jamos\\projects\\markdownllm\\.test-tmp\\explorer-wheelhouse-040\\markdownllm_explorer-0.4.0-py3-none-any.whl\nProcessing c:\\users\\jamos\\projects\\markdownllm\\.test-tmp\\explorer-wheelhouse-040\\pyyaml-6.0.3-cp312-cp312-win_amd64.whl\nInstalling collected packages: PyYAML, markdownllm-explorer\nSuccessfully installed PyYAML-6.0.3 markdownllm-explorer-0.4.0\n"
+  "installer_output_tail": "Looking in links: c:\\Users\\<user>\\Projects\\MarkdownLLM\\.test-tmp\\explorer-wheelhouse-040\nProcessing c:\\users\\<user>\\projects\\markdownllm\\.test-tmp\\explorer-wheelhouse-040\\markdownllm_explorer-0.4.0-py3-none-any.whl\nProcessing c:\\users\\<user>\\projects\\markdownllm\\.test-tmp\\explorer-wheelhouse-040\\pyyaml-6.0.3-cp312-cp312-win_amd64.whl\nInstalling collected packages: PyYAML, markdownllm-explorer\nSuccessfully installed PyYAML-6.0.3 markdownllm-explorer-0.4.0\n"
 }

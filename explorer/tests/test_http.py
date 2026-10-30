@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import http.client
 import json
+import os
 import re
 import threading
 import time
@@ -14,6 +15,11 @@ from markdownllm_explorer.composition import build_runtime
 from markdownllm_explorer.core.limits import ExplorerLimits
 from markdownllm_explorer.delivery import http_server
 from markdownllm_explorer.delivery.http_server import serve
+
+# The redaction tests assert that no error envelope leaks the host's home
+# directory name. Derived from the running machine, never hard-coded: a
+# literal username in a public test file is itself the leak being tested for.
+_HOME_NAME = os.path.basename(os.path.expanduser("~")) or "home"
 
 
 @pytest.fixture
@@ -155,7 +161,7 @@ def test_error_dto_is_exact_contextual_and_redacted(live_server):
     assert set(envelope["error"]) == {"code", "message", "retryable", "source_id", "relative_path"}
     assert envelope["error"]["source_id"] == "substrate" and envelope["error"]["relative_path"] == "secret-token.md"
     assert set(envelope["meta"]) == {"request_id", "observed_at"}
-    assert not any("Jamos" in str(value) for value in envelope.values())
+    assert not any(_HOME_NAME in str(value) for value in envelope.values())
 
 
 @pytest.mark.system
@@ -171,7 +177,7 @@ def test_http_boundary_attacks_return_stable_public_errors(live_server, target, 
     payload = json.loads(body)["error"]
     assert status in {400, 403}
     assert payload["code"] in {"invalid_path", "path_excluded"}
-    assert "Jamos" not in payload["message"] and "substrate" not in payload["message"].casefold()
+    assert _HOME_NAME not in payload["message"] and "substrate" not in payload["message"].casefold()
     captured = capsys.readouterr().err
     assert "outside.md" not in captured and "secret-token" not in captured and "../" not in captured
 
