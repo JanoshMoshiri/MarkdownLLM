@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-29
-generated: 2026-10-29T18:05:06
-generated_from: HEAD@f2da8b7
-coverage: 140
+created: 2026-10-30
+generated: 2026-10-30T21:05:25
+generated_from: HEAD@454f131
+coverage: 143
 framework_version: 3.50.0
 ---
 
@@ -217,6 +217,9 @@ framework_version: 3.50.0
 - operator-queue-2026-08-28 (derived-from)
 - the-root-is-not-a-representative-domain (derived-from)
 
+## eval-record-2026
+- review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
+
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
 
@@ -376,6 +379,9 @@ framework_version: 3.50.0
 - loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
+## harness-capability-evidence-matrix-2026-08-20
+- review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
+
 ## harness-native-onramp-supersedes-desktop
 - cue-explorer-extraction-and-hosting-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
 - cue-explorer-publication-position-2026-09-13 (pinned @f5406a844eaef10f827d42259155599a83ccb99f)
@@ -417,6 +423,7 @@ framework_version: 3.50.0
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
 
 ## llm-driven-systems-manifesto
+- review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
 - settled-reasoning-is-standing-authority (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
 - the-record-holds-unattended (pinned @992bf04ddf69bc44bd8ef7d16985c7dc0e2cfe6d)
 
@@ -512,6 +519,7 @@ framework_version: 3.50.0
 ## review-critical-comparison-2026-10-17-claude
 - glossary (derived-from)
 - limitations-guide (derived-from)
+- review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
 
 ## review-documentation-audit-2026-10-20-claude
 - documentation-rulings-2026-10-20 (pinned @e59e5fb1da3064ef2e158967f1e3ee1c432601dc)
@@ -524,6 +532,7 @@ framework_version: 3.50.0
 - cold-test-condition-a (derived-from)
 - holistic-review-rulings-2026-10-21 (pinned @f3ccc9b4efcc2d9fd3b9cc2744c2f02ae1e3c5aa)
 - holistic-review-rulings-2026-10-21 (derived-from)
+- review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
 
 ## review-independent-operating-model-2026-08-26-codex
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
@@ -554,6 +563,9 @@ framework_version: 3.50.0
 - cue-domain-specification-guide-2026-09-15 (pinned @4d56957223c45678f01709d5731b685899efe3d4)
 - cue-first-hour-guide-2026-09-15 (pinned @4d56957223c45678f01709d5731b685899efe3d4)
 - cue-operator-guide-2026-09-15 (pinned @4d56957223c45678f01709d5731b685899efe3d4)
+
+## scalability-guide
+- review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
 
 ## serve-side-blindness-dissolves-into-composition
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 (pinned @3e530d4eac0836ba81aa87c0f492239f97773eca)

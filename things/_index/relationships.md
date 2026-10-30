@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-29
-generated: 2026-10-29T18:05:06
-generated_from: HEAD@f2da8b7
-coverage: 620
+created: 2026-10-30
+generated: 2026-10-30T21:05:25
+generated_from: HEAD@454f131
+coverage: 625
 framework_version: 3.50.0
 ---
 
@@ -1549,6 +1549,21 @@ framework_version: 3.50.0
 - review-remediation-v3-17 --implements--> a-crossing-thing-carries-its-producers-private-graph
 - review-remediation-v3-17 --implements--> directional-graph-reads-come-in-inbound-outbound-pairs
 - review-remediation-v3-17 --implements--> repeated-drift-promotes-a-fact-into-the-floor
+- review-substrate-examination-2026-10-24-claude --informs--> llm-driven-systems-manifesto
+- review-substrate-examination-2026-10-24-claude --informs--> the-record-holds-unattended
+- review-substrate-examination-2026-10-24-claude --informs--> the-gate-reads-presence-the-spec-promises-the-walk
+- review-substrate-examination-2026-10-24-claude --informs--> closed-loop-operating-state
+- review-substrate-examination-2026-10-24-claude --informs--> estate-workflow-derivation
+- review-substrate-examination-2026-10-24-claude --references--> review-holistic-substrate-2026-10-21-codex
+- review-substrate-examination-2026-10-24-claude --references--> review-critical-comparison-2026-10-17-claude
+- review-substrate-examination-2026-10-24-claude --references--> the-record-answers-the-direction-question-first
+- review-substrate-examination-2026-10-24-claude --references--> mesh-safety-is-the-floor-not-the-topology
+- review-substrate-examination-2026-10-24-claude --informs--> floor-structure-residue
+- review-substrate-examination-2026-10-24-claude --informs--> cue-carrier
+- review-substrate-examination-2026-10-24-claude --informs--> evidence-and-eval-backlog
+- review-substrate-examination-2026-10-24-claude --informs--> public-docs-face-build
+- review-substrate-examination-2026-10-24-claude --references--> operating-model-specification
+- review-substrate-examination-2026-10-24-claude --references--> interface-specification
 - rich-founding-context-breaks-scaffold-then-jump --references--> agents-drop-mechanical-birth-steps-not-semantic-ones
 - run-floor-sprint-1-2026-08 --references--> substrate-review-consolidated-remedy-2026-08-20
 - run-floor-sprint-1-2026-08 --definition--> substrate-floor-development
