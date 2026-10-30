@@ -257,6 +257,55 @@ def _seed_fingerprint(seed: Path) -> str:
 def _results_exit_code(results: list[dict]) -> int:
     return 1 if any(r.get("failed", 0) for r in results) else 0
 
+
+# A process that dies at launch reports at most one turn and no cost — the
+# 2026-10-05 evening lost thirty-eight trials that way, each scored as 44 or
+# 266 failed assertions (eval-record-2026, defects 6 and 7).
+LAUNCH_DEAD_TURNS = 1
+LAUNCH_DEAD_STREAK = 2
+EXCERPT_CHARS = 600
+
+
+def _void_reason(aborted: bool, abort_reason: str | None,
+                 costs: list, turns: list) -> str | None:
+    """Defect 6: an aborted trial is void, never failed.
+
+    A result with no turns, no cost, or an abort carries `voided`, so a dead
+    process can never be read as a do-nothing agent. Success is ``None``.
+    """
+    if aborted:
+        return f"aborted: {abort_reason or 'unspecified'}"
+    if not costs or not any(costs):
+        return "no cost recorded — the agent did no work"
+    if not turns or not any(turns):
+        return "no turns recorded — the agent did no work"
+    return None
+
+
+def _died_at_launch(sess: dict) -> bool:
+    """A session whose process failed within one turn at no cost never ran.
+
+    Distinct from a timeout (the agent ran and did not finish) and from an
+    agent that ran, spent, and then reported an error.
+    """
+    if not sess.get("agent_failure") or sess.get("timeout"):
+        return False
+    return (sess.get("turns") or 0) <= LAUNCH_DEAD_TURNS and not sess.get("cost_usd")
+
+
+def _failure_excerpts(stdout: str, stderr: str, meta: object) -> dict:
+    """What the agent said when it failed, kept with the committed result.
+
+    Defect 7: the 2026-10-05 launch failures were undiagnosable because the
+    only copy of the agent's error lived in the run workspace under the OS
+    temp directory, which was cleaned before anyone read it. The result JSON
+    is the evidence mirror, so the excerpt travels with it.
+    """
+    result = meta.get("result") if isinstance(meta, dict) else None
+    head = result if isinstance(result, str) and result else (stdout or "")
+    return {"agent_result_excerpt": head[:EXCERPT_CHARS],
+            "stderr_tail": (stderr or "")[-EXCERPT_CHARS:]}
+
 def check_assertions(fixture: dict, domain_root: Path) -> tuple[int, int, list[str]]:
     """Stage 1: deterministic assertions against a domain's current state."""
     records = check_assertions_detailed(fixture, domain_root)
@@ -437,16 +486,19 @@ def eval_report(root: Path) -> int:
     for (fx, sha, model, cond), rs in sorted(cells.items()):
         full = sum(1 for r in rs if r.get("failed") == 0 and not r.get("voided"))
         voided = sum(1 for r in rs if r.get("voided"))
-        p = sum(r.get("passed", 0) for r in rs)
-        f_ = sum(r.get("failed", 0) for r in rs)
+        # A voided trial is counted, never scored: its assertions say nothing
+        # about the agent (defect 6).
+        live = [r for r in rs if not r.get("voided")]
+        p = sum(r.get("passed", 0) for r in live)
+        f_ = sum(r.get("failed", 0) for r in live)
         rate = f"{p}/{p + f_} ({p / (p + f_):.0%})" if p + f_ else "—"
         cp = sum((s.get("changed") or {}).get("passed", 0)
-                 for r in rs for s in r.get("sessions") or [])
+                 for r in live for s in r.get("sessions") or [])
         ct = sum((s.get("changed") or {}).get("total", 0)
-                 for r in rs for s in r.get("sessions") or [])
+                 for r in live for s in r.get("sessions") or [])
         crate = f"{cp}/{ct} ({cp / ct:.0%})" if ct else "—"
-        walls = [r["wall_s"] for r in rs if r.get("wall_s") is not None]
-        costs = [r["cost_usd"] for r in rs if r.get("cost_usd") is not None]
+        walls = [r["wall_s"] for r in live if r.get("wall_s") is not None]
+        costs = [r["cost_usd"] for r in live if r.get("cost_usd") is not None]
         mw = f"{sum(walls) / len(walls):.0f}" if walls else "—"
         mc = f"{sum(costs) / len(costs):.3f}" if costs else "—"
         fx_short = fx if len(fx) <= 40 else fx[:37] + "..."
@@ -467,7 +519,8 @@ def eval_report(root: Path) -> int:
                     if s["name"] not in names:
                         names.append(s["name"])
             for sn in names:
-                ss = [s for r in rs for s in r.get("sessions") or [] if s["name"] == sn]
+                ss = [s for r in rs if not r.get("voided")
+                      for s in r.get("sessions") or [] if s["name"] == sn]
                 sp = sum(1 for s in ss if s.get("failed") == 0)
                 cp = sum((s.get("changed") or {}).get("passed", 0) for s in ss)
                 ct = sum((s.get("changed") or {}).get("total", 0) for s in ss)
@@ -639,6 +692,7 @@ def cmd_eval(args) -> int:
         view_before = _tree_fingerprint(framework_view)
 
     condition_tag = {"framework": "fw", "bare": "bare", "bare-coached": "coached"}[condition]
+    launch_dead_streak = 0
     for trial in range(1, args.trials + 1):
         run_id = _run_id(args.model, condition_tag, trial)
         # Isolation means outside the source repository, not merely under an
@@ -747,8 +801,13 @@ def cmd_eval(args) -> int:
             except (ValueError, TypeError):
                 meta = None
             agent_failure = _agent_failure(proc, meta)
+            excerpts: dict = {}
             if agent_failure:
                 print(f"  [{sname}] AGENT FAILURE: {agent_failure}")
+                excerpts = _failure_excerpts(proc.stdout or "", proc.stderr or "", meta)
+                if excerpts["agent_result_excerpt"].strip():
+                    print(f"  [{sname}] agent said: "
+                          f"{excerpts['agent_result_excerpt'].strip()[:200]}")
             key_hits = _answer_key_hits((proc.stdout or "") + (proc.stderr or ""))
             if key_hits and not voided:
                 voided = f"answer-key reference in session {sname}: {key_hits}"
@@ -799,7 +858,8 @@ def cmd_eval(args) -> int:
                                  "changed": changed, "unchanged": unchanged,
                                  "uncommitted_at_end": uncommitted,
                                  "uncommitted_paths": dirty_work[:20],
-                                 "answer_key_hits": key_hits})
+                                 "answer_key_hits": key_hits,
+                                 **excerpts})
             if agent_failure:
                 # Later sessions depend on a trustworthy state transition.  Do
                 # not convert a failed invocation into a longitudinal success.
@@ -820,11 +880,13 @@ def cmd_eval(args) -> int:
             view_mutated = _tree_fingerprint(framework_view) != view_before
             if view_mutated and not voided:
                 voided = "framework view mutated during the trial"
-        if voided:
-            t_failed += 1
         walls = [s["wall_s"] for s in sess_records if s.get("wall_s") is not None]
         costs = [s["cost_usd"] for s in sess_records if s.get("cost_usd") is not None]
         turns_ = [s["turns"] for s in sess_records if s.get("turns") is not None]
+        if not voided:
+            voided = _void_reason(aborted, abort_reason, costs, turns_)
+        if voided:
+            t_failed += 1
         res = {"run_id": run_id, "fixture": name, "model": args.model,
                "models_observed": sorted(models_observed),
                "condition": condition,
@@ -877,6 +939,21 @@ def cmd_eval(args) -> int:
         print(f"  trial score {t_passed}/{t_passed + t_failed}"
               + (f" — VOIDED: {voided}" if voided else "") + "\n")
         record(run_id, run_dir, res)
+        if sess_records and _died_at_launch(sess_records[0]):
+            launch_dead_streak += 1
+        else:
+            launch_dead_streak = 0
+        if launch_dead_streak >= LAUNCH_DEAD_STREAK:
+            # Two launches in a row that never ran are not two measurements
+            # of the model; they are one fact about the account, the CLI or
+            # the network, and every further trial would record it again.
+            print(f"!!! {launch_dead_streak} consecutive trials died at launch "
+                  f"({abort_reason}) — stopping the arm.")
+            print("    The agent's own words are in the result JSON "
+                  "(`agent_result_excerpt`, `stderr_tail`). Check the account, "
+                  "the CLI build and the network before running any arm again; "
+                  "the recorded trials are voided, not failed.")
+            return 1
         if view_mutated:
             print(f"!!! FRAMEWORK VIEW MUTATED during {run_id} — {framework_view}")
             print("    The framework arm's granted directory changed under the trial;"

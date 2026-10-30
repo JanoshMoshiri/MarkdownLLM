@@ -2,7 +2,7 @@
 id: evidence-and-eval-backlog
 type: plan
 status: in-progress
-version: 2.2
+version: 2.3
 created: 2026-06-27
 priority: high
 tags: [evals, evidence, validation, isolation, longitudinal, docs]
@@ -122,6 +122,26 @@ just totals. The one constraint that has not moved is the credential one: the
 runner shells out to `claude -p`, and a hosted agent session's token does not
 propagate to that child, so the run itself is an operator-terminal task and no
 amount of agent pre-work changes that.
+
+**2026-10-30 — the runner's half is done; the evening is the whole of what
+is owed.** Defects 6 and 7 are closed (`eval-record-2026` → *Defects 6 and
+7 closed*): an aborted trial is voided, a launch failure keeps the agent's
+words in the result JSON, and two launch deaths in a row stop the arm. The
+diagnosis came from the committed results alone — the temp run root had
+been cleaned — and reads as an account- or CLI-level fault from 22:17 UTC
+on 2026-10-05, not a runner or fixture defect. What the run evening now
+needs, in order: (1) confirm the account's usage window is open and run
+**one** trial before any arm — the stop will catch a dead launch at trial
+two, but one is cheaper; (2) the polar-station fixture first — it is the fixture the direction
+named, it has one valid haiku-framework trial of an earlier revision
+(240/251) and no opus or bare trial at all; haiku
+framework ×5, opus framework ×5, then the two bare conditions ×5 each per
+model, **one arm at a time** (three concurrent arms are on the record the
+night everything died, and are not ruled out); (3) read the result against
+the prediction in `flagship-models-look-around-the-edges` before reading
+it any other way. The FAC longitudinal opus arm and haiku n≥5 stay owed
+behind it. Still an operator-terminal task: the credential constraint has
+not moved.
 
 ## Behind those two
 

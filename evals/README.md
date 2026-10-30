@@ -63,7 +63,15 @@ Run workspaces live outside the source repository by default (`$TMP/mdllm-evals`
 or `MDLLM_EVAL_RUN_ROOT`). This is an isolation boundary, not merely a
 gitignored folder: an agent cannot walk upward into the canonical seed and edit
 or read the answer key. The bare condition also withholds the framework
-`--add-dir`. Timed-out and failed invocations are recorded, never discarded.
+`--add-dir`. Timed-out and failed invocations are recorded, never discarded —
+and because the OS cleans its temp directory, **the result JSON is the only
+durable copy of a trial**: when an invocation fails, the agent's reported
+result and the stderr tail travel with it (`agent_result_excerpt`,
+`stderr_tail`). A trial that aborts, or runs no turns at no cost, is
+`voided`, never failed, and `--report` scores only live trials. Two
+consecutive trials that die at launch stop the arm: that is one fact about
+the account or the CLI, not two about the model (eval-record-2026, defects
+6 and 7).
 
 Every result uses a collision-resistant run id and records the full framework
 commit, framework/tool version, fixture SHA-256, model, requested and observed

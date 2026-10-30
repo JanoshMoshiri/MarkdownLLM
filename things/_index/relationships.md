@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-29
-generated: 2026-10-29T18:05:06
-generated_from: HEAD@f2da8b7
-coverage: 620
+created: 2026-10-30
+generated: 2026-10-30T23:02:16
+generated_from: HEAD@454f131
+coverage: 626
 framework_version: 3.50.0
 ---
 
@@ -873,6 +873,7 @@ framework_version: 3.50.0
 - eval-record-2026 --references--> review-critical-comparison-2026-10-17-claude
 - eval-record-2026 --references--> withholding-is-not-isolation
 - eval-record-2026 --references--> first-2x2-measured-convention-following-not-reasoning
+- eval-record-2026 --references--> flagship-models-look-around-the-edges
 - every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated
 - every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
 - every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose
@@ -961,6 +962,11 @@ framework_version: 3.50.0
 - first-hour-guide --implements--> documentation-rulings-2026-10-20
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
+- flagship-models-look-around-the-edges --supports--> withholding-is-not-isolation
+- flagship-models-look-around-the-edges --references--> structure-decides-figures-scale-decides-convention
+- flagship-models-look-around-the-edges --informs--> evidence-and-eval-backlog
+- flagship-models-look-around-the-edges --references--> eval-record-2026
+- flagship-models-look-around-the-edges --references--> isolation-must-contain-writes-not-just-reads
 - floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-block-requirements-2026-08 --derived-from--> substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 --references--> floor-structure-residue
@@ -1600,6 +1606,9 @@ framework_version: 3.50.0
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> loop-turns-self-heal-2026-09-23
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> a-shared-worktree-merges-authorship-at-the-index
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> standing-watch-specification
+- seats-are-named-for-the-clone-not-the-agent-2026-10-30 --extends--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- seats-are-named-for-the-clone-not-the-agent-2026-10-30 --informs--> the-seat
+- seats-are-named-for-the-clone-not-the-agent-2026-10-30 --references--> standing-watch-specification
 - serve-side-blindness-dissolves-into-composition --implements--> watertight-membrane-sprint-2026-08-30
 - serve-side-blindness-dissolves-into-composition --derived-from--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - serve-side-blindness-dissolves-into-composition --derived-from--> source-behind-mirror-is-still-a-consumer-side-read

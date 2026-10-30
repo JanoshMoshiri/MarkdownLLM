@@ -15,8 +15,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from markdownllm.evals import (  # noqa: E402
     _agent_failure,
     _command_version,
+    _died_at_launch,
     _eval_run_dir,
+    _failure_excerpts,
     _results_exit_code,
+    _void_reason,
     _run_id,
     _seed_fingerprint,
     _validation_control_failure,
@@ -287,3 +290,41 @@ def test_assertions_carry_their_changed_tag_and_count_things_of_type(tmp_path):
     assert "[changed]" in records[0]["line"] and "[unchanged]" in records[1]["line"]
     passed, failed, lines = check_assertions(fixture, tmp_path)
     assert (passed, failed) == (2, 1) and len(lines) == 3
+
+
+# --- eval-record-2026 defects 6 and 7 (2026-10-30) --------------------------
+
+def test_an_aborted_trial_is_void_never_failed():
+    """Defect 6: the 2026-10-05 launch deaths were scored as 44 or 266 failed
+    assertions with `voided` unset — a dead process read as a do-nothing agent."""
+    assert _void_reason(True, "process exited 1", [0], [1]) == "aborted: process exited 1"
+    assert _void_reason(True, "timeout", [], []) == "aborted: timeout"
+    assert "no cost" in _void_reason(False, None, [0, 0], [12, 30])
+    assert "no cost" in _void_reason(False, None, [], [12])
+    assert "no turns" in _void_reason(False, None, [0.4], [0])
+    assert _void_reason(False, None, [0.39, 2.2], [57, 62]) is None
+
+
+def test_a_launch_death_is_distinct_from_a_timeout_and_a_spent_failure():
+    dead = {"agent_failure": "process exited 1", "turns": 1, "cost_usd": 0}
+    assert _died_at_launch(dead)
+    assert _died_at_launch({**dead, "turns": None, "cost_usd": None})
+    assert not _died_at_launch({"agent_failure": "timeout", "timeout": True,
+                                "turns": None, "cost_usd": None})
+    assert not _died_at_launch({"agent_failure": "agent reported error (x)",
+                                "turns": 40, "cost_usd": 1.2})
+    assert not _died_at_launch({"agent_failure": None, "turns": 57, "cost_usd": 0.39})
+
+
+def test_failure_excerpts_travel_with_the_result():
+    """Defect 7: the only copy of the agent's error lived in the temp run root."""
+    meta = {"is_error": True, "result": "You have hit your usage limit"}
+    ex = _failure_excerpts('{"is_error": true}', "warn: x\nfatal: y", meta)
+    assert ex["agent_result_excerpt"] == "You have hit your usage limit"
+    assert ex["stderr_tail"].endswith("fatal: y")
+    # Unparseable stdout: keep the raw head rather than nothing.
+    ex = _failure_excerpts("not json at all", "", None)
+    assert ex["agent_result_excerpt"] == "not json at all"
+    assert ex["stderr_tail"] == ""
+    long = "x" * 5000
+    assert len(_failure_excerpts(long, long, None)["agent_result_excerpt"]) == 600
