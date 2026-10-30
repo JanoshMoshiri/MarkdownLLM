@@ -30,7 +30,11 @@ message (`standing-watch.md` → The Ticket). Never one per agent pair: a
 pair's ticket carries unrelated items in turn and its history stops reading
 as one conversation. Declare `ticket` in `_schema.yaml` with these actor
 names as its statuses and `closed` as terminal; then each actor arms
-`mdllm watch . --role <actor> --definition ad-hoc-message-loop --exit-on-wake`.
+`mdllm watch . --role <actor> --definition ad-hoc-message-loop --exit-on-wake`
+the way its harness rises on an exit (`standing-watch.md` → Harness
+bindings): in Claude Code as a background command, `/watch <actor>
+ad-hoc-message-loop`; in Hermes as a notifying background terminal; never as
+a blocking command inside a bounded tool call.
 
 ## Stages
 

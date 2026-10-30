@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.6
+version: 1.7
 created: 2026-09-19
 priority: high
 informed_by:
@@ -204,7 +204,20 @@ Deliberately not lifted:
 - **The wake itself.** `--exit-on-wake` is the contract; *what* rises on that
   exit is the harness's act — a Claude Code background process re-invoking on
   exit, a Hermes `terminal(background=true, notify=true)`. Adapters stay
-  optional and the floor stays at `git-fs`.
+  optional and the floor stays at `git-fs`. *2026-10-30:* the Claude Code
+  half of that sentence had never been recorded as a binding, and the loop
+  definitions told a seat without an adapter to hold a blocking watch inside
+  its turn — which dies at the tool timeout. The record of 2026-10-11 shows
+  the consequence three times in one day ("picked up through the operator's
+  chat prompt, not an automatic wake"; "process exit also did not start a
+  new turn"). Now recorded: `standing-watch.md` → Harness bindings, and
+  `/watch <role> <definition> [run]` (`templates/commands/watch.md`) arms
+  the watch as a background command and says what to do on each exit code.
+  The same day the self-wake became seat-aware: the four false "your turn
+  never left" wakes for other parties' commits each exited a watch nobody
+  re-armed (`in-a-shared-checkout-ahead-of-origin-says-nothing-about-whose-
+  turn-it-is`); a declared seat is now rung only for its own. Phase 4's
+  live round trip with no human relay is still the proof owed.
 
 ## Route
 

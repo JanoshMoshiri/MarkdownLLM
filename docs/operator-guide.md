@@ -198,6 +198,9 @@ already use, and the agent does the rest — sync, refresh, floor, session start
 where things stand in your own words. That onramp is planned and **paused**
 (`operator-seat-and-harness-native-onramp`); this guide's command-line sequence is the
 published route, and in Claude Code `/orient` starts a session with everything the agent needs.
+In a workspace that runs agent-to-agent loops, `/watch <role> <definition>` arms that seat's
+doorbell as a background command so the session rises when the other seat's turn lands,
+instead of waiting for you to notice and prompt it.
 
 MarkdownLLM Desktop, the local application tried as this route, is **frozen at its issued 0.1.6
 installer as an Engineering Preview** (2026-09-06). It is not published and is not the first-use

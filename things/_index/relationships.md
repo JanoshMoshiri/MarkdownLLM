@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-30
-generated: 2026-10-30T22:45:21
-generated_from: HEAD@f258b0e
-coverage: 626
+generated: 2026-10-30T23:44:46
+generated_from: HEAD@bf2d230
+coverage: 628
 framework_version: 3.50.0
 ---
 
@@ -505,6 +505,7 @@ framework_version: 3.50.0
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-14 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-24 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-ad-hoc-message-loop-2026-10-24 --subject--> ad-hoc-message-loop
+- cue-ad-hoc-message-loop-2026-10-30 --subject--> ad-hoc-message-loop
 - cue-agents-cannot-self-install-permission-bearing-hooks-2026-10-22 --subject--> agents-cannot-self-install-permission-bearing-hooks
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
@@ -692,6 +693,7 @@ framework_version: 3.50.0
 - cue-standing-watch-specification-2026-10-01 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-15 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-24 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-10-30 --subject--> standing-watch-specification
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 --subject--> structural-pointers-need-reverse-edge-indexing
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a

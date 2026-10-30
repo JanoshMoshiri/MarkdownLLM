@@ -2,7 +2,7 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.7
+version: 0.8
 created: 2026-09-21
 linked_things:
   - id: a2a-conversations-run-on-their-own-branch-2026-10-09
@@ -192,6 +192,39 @@ exits; it also reads its own clone's branch against that ref, because the one
 failure the ref cannot show — a turn that never left — is visible only there
 (`loop-turns-self-heal-2026-09-23`). The turn stays the agent's act and the
 ruling stays the human's.
+
+**Whose turn never left.** In a shared checkout the branch is ahead whenever
+*any* party committed without publishing. The live record holds four wakes
+of one seat for commits that were another party's, each of which exited the
+watch and left the next real turn with nothing running
+(`in-a-shared-checkout-ahead-of-origin-says-nothing-about-whose-turn-it-is`).
+Since 2026-10-30 the self-wake reads the authors of the unpublished range
+against the clone's declared seat (`the-seat`): a declared seat is rung only
+for its own commits; another party's are reported once per tip as *not your
+turn* and the watch stays armed; an undeclared seat is rung as before and
+told the watch cannot narrow it.
+
+### Harness bindings — what rises on exit 0
+
+The exit is the floor's; the rising is the harness's, and a harness with no
+binding is a loop that only runs while a human relays. The record of
+2026-10-11 says it plainly: "picked up through the operator's chat prompt,
+not an automatic wake", three times in one day. What each harness has:
+
+| Harness | Binding | Standing |
+|---|---|---|
+| Hermes | `terminal(background=true, notify=true)`: a background process whose exit starts a new turn in the chat. Cron delivery is outbound and starts nothing; attaching to a session mirrors text and starts nothing. | Evidenced in the live workspace since 2026-09-18; its host expires the process every 30 minutes, which is why state persists across restarts (decision 4). |
+| Claude Code | The watch runs as a **background** Bash command: the harness keeps it running across turns and re-invokes the agent with its output when it exits. `/watch <role> <definition> [run]` (`templates/commands/watch.md`, projected beside `/orient`) arms it that way and says what to do on each exit code. A detached process can instead post into the session's inbox socket (`CLAUDE_CODE_MESSAGING_SOCKET`), which starts a turn when the session is idle. | Binding recorded 2026-10-30; the live round trip with no human relay is still owed (`substrate-native-a2a` Phase 4 and Phase 7). |
+| Codex | Operator-relayed: told to run the watch and bind it to the session, the session holds the blocking watch and rises on its exit. | Relayed evidence only; the plan's measurement of how long the session holds it is still owed. |
+
+Two rules hold across all three. **Never hold the watch as a blocking
+command inside a bounded tool call**: it dies at the tool's timeout and the
+turn that lands after that is unseen — the 623-second wake on record was a
+near miss, not a mechanism. **Never substitute a scheduled heartbeat**: the
+one tried hung once and blocked every run for twenty-three hours (What This
+Refuses). The stall ring (`the-seat` Phase 7) is the backstop beneath every
+binding: a turn unanswered past the window rings the operator whether or
+not a harness rose.
 
 ## The Five Inherited Decisions
 
@@ -385,9 +418,9 @@ Codex specifically, with its fallbacks named.
 | One instance per (definition, role, clone) | **floor** (arming) | Exit 3, never 0. |
 | Read at the remote head, never the worktree | **floor** (running) | The turn is real on the remote or not at all. |
 | Diff, emit, persist, then exit on this role's entry | **floor** (running) | Record, then signal — the ordering is load-bearing. |
-| Rise on exit 0 | **harness** | The wake itself. `--exit-on-wake` is the contract; what rises is the adapter's act. Optional, and never the difference between the substrate working and not. |
+| Rise on exit 0 | **harness** | The wake itself. `--exit-on-wake` is the contract; what rises is the adapter's act (The Contract → Harness bindings). Optional for the substrate, and the whole difference between a loop that runs and one a human relays. |
 | Take the turn — read the thing, do the work, move the token, publish | **agent** | Everything after the doorbell. The watch never advances anything. |
-| Report this clone's own turn that never left — the local branch ahead of, or diverged from, the ref — and wake this role, once per local tip | **floor** (running) | A commit can succeed while its push is rejected; the committing side then holds every local indication that it handed over while the other side sees nothing. The ref cannot show it; the local branch can, and only on this side (`loop-turns-self-heal-2026-09-23`). |
+| Report this clone's own turn that never left — the local branch ahead of, or diverged from, the ref, by commits the declared seat authored — and wake this role, once per local tip; another party's unpublished commits are reported, never rung | **floor** (running) | A commit can succeed while its push is rejected; the committing side then holds every local indication that it handed over while the other side sees nothing. The ref cannot show it; the local branch can, and only on this side (`loop-turns-self-heal-2026-09-23`). |
 | Take that wake: pull, merge, push again — and file a merge it cannot make cleanly to the seat | **agent** | The decision a rejected push owes belongs to whoever holds the turn. The floor rings and never merges; an instance that still cannot publish is blocked and says so. |
 | Rule | **human** | The loop exists to make one act better-informed, not to remove it. |
 

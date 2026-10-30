@@ -2,7 +2,7 @@
 id: ad-hoc-message-loop
 type: workflow-definition
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-10-21
 exposed: false
 stages:
@@ -62,9 +62,17 @@ mean nothing is owed now.
 
 ## Session wake
 
-The watch observes committed peer state. A session without a wake adapter
-holds a blocking watch command in its active turn, acts when it exits 0,
-and re-arms. A detached process alone is not evidence that a session will
-rise. The existing request is read explicitly when first arming: a new
-watch establishes a baseline and does not ring for an already-addressed
-ticket.
+The watch observes committed peer state. Each seat arms it the way its
+harness rises on an exit (`standing-watch.md` → Harness bindings): the
+Claude seat as a background command through `/watch claude
+ad-hoc-message-loop`, which Claude Code keeps running across turns and
+re-invokes the agent on when it exits; the Codex seat bound to its session
+as the operator directs. A blocking watch inside a bounded tool call dies
+at the tool's timeout and is not a binding — the earlier wording here told
+a seat without an adapter to do exactly that, and the record of 2026-10-11
+shows what followed: turns "picked up through the operator's chat prompt,
+not an automatic wake". A detached process alone is still not evidence that
+a session will rise; the receipt is the harness re-invoking on the exit,
+and the stall ring (`the-seat` Phase 7) is the backstop when it does not.
+The existing request is read explicitly when first arming: a new watch
+establishes a baseline and does not ring for an already-addressed ticket.

@@ -37,6 +37,7 @@ from pathlib import Path
 from .git_transport import command_token, git_command, redact
 from .model import RESERVED_STATUSES, Corpus, scan
 from .repository_view import RepositoryView, RepositoryViewError
+from .seat import read_seat
 from .workflow_actors import declared_actors, stages_for_actor
 
 __all__ = [
@@ -392,6 +393,33 @@ def local_publication_state(config: WatchConfig,
     return "diverged", local
 
 
+def _unpublished_authors(config: WatchConfig, head: str,
+                         local: str) -> list[tuple[str, str]]:
+    """(name, email) of each commit the remote lacks, newest first. One git
+    spawn over the unpublished range only."""
+    r = git_command(config.root, "log", "--format=%an%x1f%ae", f"{head}..{local}",
+                    timeout=LOCAL_TIMEOUT)
+    if r is None or r.returncode != 0:
+        return []
+    out = []
+    for line in (r.stdout or "").splitlines():
+        name, _, email = line.partition("\x1f")
+        if name.strip() or email.strip():
+            out.append((name.strip(), email.strip().lower()))
+    return out
+
+
+def _own_commits(authors: list[tuple[str, str]], seat: dict) -> list[tuple[str, str]]:
+    """The commits a declared seat made: author name equals the seat's name,
+    or author email equals the identity the seat declaration set."""
+    if not seat.get("name"):
+        return list(authors)
+    name = seat["name"].strip().lower()
+    email = (seat.get("user_email") or "").strip().lower()
+    return [a for a in authors
+            if a[0].strip().lower() == name or (email and a[1] == email)]
+
+
 def _self_wake(config: WatchConfig, head: str, state: _LoopState,
                state_path: Path) -> bool:
     """Ring this role for its own turn that never left — once per local tip.
@@ -405,15 +433,43 @@ def _self_wake(config: WatchConfig, head: str, state: _LoopState,
     if kind in ("unpublished", "diverged"):
         if state.woke_unpublished == local:
             return False
-        r = git_command(config.root, "rev-list", "--count", f"{head}..{local}",
-                        timeout=LOCAL_TIMEOUT)
-        ahead = r.stdout.strip() if r is not None and r.returncode == 0 else "?"
+        authors = _unpublished_authors(config, head, local)
+        ahead = str(len(authors)) if authors else "?"
         state.woke_unpublished = local
         _save_state(state_path, state)
         moved = " and the remote moved under it" if kind == "diverged" else ""
+        # Whose turn never left? In a shared checkout the branch is ahead
+        # whenever ANY party committed without publishing, and the four false
+        # wakes on record (in-a-shared-checkout-ahead-of-origin-says-nothing-
+        # about-whose-turn-it-is) each exited a watch for someone else's
+        # commit, leaving the next real turn with no watch running. The seat
+        # is the author the record can now tell apart (the-seat Phase 1): a
+        # declared seat is rung only for its own commits; another party's are
+        # reported once per tip and never ring. An undeclared seat is rung as
+        # before, told why the watch cannot narrow it.
+        seat = read_seat(config.root)
+        own = _own_commits(authors, seat)
+        if seat["name"] and authors and not own:
+            names = ", ".join(sorted({a for a, _ in authors})) or "unknown"
+            print(f"not your turn [{config.role}]: local {config.branch} is "
+                  f"{ahead} commit(s) ahead of {config.remote}/{config.branch}"
+                  f"{moved} ({kind}), none of them this seat's (`{seat['name']}`); "
+                  f"authored by {names}. A shared checkout holds another party's "
+                  f"unpublished work — a routing question for the operator, not a "
+                  f"turn for you to repair; this watch stays armed "
+                  f"(in-a-shared-checkout-ahead-of-origin-says-nothing-about-whose-"
+                  f"turn-it-is)")
+            return False
+        whose = ""
+        if seat["name"] and authors:
+            whose = (f" {len(own)} of them this seat's (`{seat['name']}`);"
+                     if len(own) != len(authors) else "")
+        elif not seat["name"]:
+            whose = (" (seat undeclared, so the watch cannot tell whose: "
+                     "`mdllm seat . --set <actor>`)")
         print(f"{config.role.upper()} UP: your last turn never left — local "
               f"{config.branch} is {ahead} commit(s) ahead of "
-              f"{config.remote}/{config.branch}{moved} ({kind}). Pull, merge, "
+              f"{config.remote}/{config.branch}{moved} ({kind}).{whose} Pull, merge, "
               f"push again; a merge you cannot make cleanly goes to the seat, "
               f"not to a guess. (loop-turns-self-heal-2026-09-23)")
         return True

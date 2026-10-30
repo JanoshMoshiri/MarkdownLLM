@@ -824,6 +824,64 @@ class TestSelfHeal:
         # The corpus is untouched (the fixture keeps its state file in the clone root).
         assert _sync_git(writer, "status", "--porcelain", "--", "things").stdout.strip() == ""
 
+    # ---- the seat-aware self-wake (the-seat; 2026-10-30) ---------------------
+    # `in-a-shared-checkout-ahead-of-origin-says-nothing-about-whose-turn-it-is`:
+    # the Claude seat was woken four times for commits that were Codex's or the
+    # dispatcher's, and each false wake exited a watch that nobody re-armed. A
+    # declared seat is rung only for its own commits.
+
+    def _commit_as(self, root, name, email, msg):
+        spec = root / "things" / "m04-design.md"
+        spec.write_text(spec.read_text(encoding="utf-8")
+                        .replace("status: draft", "status: review"),
+                        encoding="utf-8")
+        env = {**os.environ, "GIT_AUTHOR_NAME": name, "GIT_AUTHOR_EMAIL": email,
+               "GIT_COMMITTER_NAME": name, "GIT_COMMITTER_EMAIL": email}
+        import subprocess
+        subprocess.run(["git", "commit", "-qam", msg], cwd=root, check=True, env=env)
+
+    def test_another_partys_unpublished_commit_does_not_wake_a_declared_seat(
+            self, clones, capsys):
+        from markdownllm.seat import set_seat
+        writer, _ = clones
+        set_seat(writer, "writer", "claude-code")
+        assert self._watch(writer, "writer") == 0
+        capsys.readouterr()
+        self._commit_as(writer, "codex", "codex@seat.local", "codex's turn, unpublished")
+        # exit_on_wake: a ring would return 0 from the wake; `once` returns 0
+        # quietly, so the text is the evidence.
+        assert self._watch(writer, "writer", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "WRITER UP" not in out
+        assert "not your turn [writer]" in out
+        assert "none of them this seat's (`writer`)" in out and "authored by codex" in out
+        assert "this watch stays armed" in out
+        # Once per tip, like the ring it replaces.
+        assert self._watch(writer, "writer") == 0
+        assert "not your turn" not in capsys.readouterr().out
+
+    def test_the_seats_own_unpublished_commit_still_wakes_it(self, clones, capsys):
+        from markdownllm.seat import set_seat
+        writer, _ = clones
+        set_seat(writer, "writer", "claude-code")
+        assert self._watch(writer, "writer") == 0
+        capsys.readouterr()
+        self._commit_as(writer, "writer", "writer@seat.local", "my turn, unpublished")
+        assert self._watch(writer, "writer", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "WRITER UP: your last turn never left" in out
+        assert "seat undeclared" not in out and "not your turn" not in out
+
+    def test_an_undeclared_seat_is_rung_as_before_and_told_why(self, clones, capsys):
+        writer, _ = clones
+        assert self._watch(writer, "writer") == 0
+        capsys.readouterr()
+        self._commit_as(writer, "somebody", "somebody@example.invalid", "unpublished")
+        assert self._watch(writer, "writer", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "WRITER UP: your last turn never left" in out
+        assert "seat undeclared, so the watch cannot tell whose" in out
+
 
 class TestTicketLoop:
     """The ticket — an ad-hoc message with no artefact behind it.
