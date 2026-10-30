@@ -2,7 +2,7 @@
 id: flagship-models-look-around-the-edges
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-10-30
 session: 2026-10-30
 source: human
@@ -25,6 +25,9 @@ linked_things:
   - id: isolation-must-contain-writes-not-just-reads
     relation: references
     notes: "The isolation controls are the operational answer to this inclination on the bare arms."
+  - id: eval-cycle
+    relation: references
+    notes: "The loop that tests this one surface at a time; the read set the runner now records is the measurement the refinement below asked for."
 ---
 
 # Flagship models look around the edges
@@ -99,6 +102,43 @@ earlier fixture revision on record (240/251) and nothing in any other cell:
 The prediction is written down so the run can falsify it, not confirm it.
 The standing direction holds: no conclusion from fewer than five clean
 trials per cell.
+
+## The refinement (the operator, 2026-10-30) — structure must *promote* the walk
+
+> The only way we can prove that the structure will be the model that's
+> more superior with a bare environment to a structured environment is if
+> we play on that inclination to explore outside — and the structure that
+> the lesser model sits in encourages and promotes that exploration
+> outside.
+
+This sharpens the mechanism from *structure substitutes for exploration*
+to *structure that wins is structure that induces it*. A rulebook contract
+(the polar seed's `AGENTS.md` as committed: the code is the authority,
+compute with a script, validate, commit) constrains; its one exploratory
+push is "walk every thing that rests on the changed clause." If the
+refinement is right, a seed variant whose contract says *before you
+compute, read what links here and what it rests on* should lift the small
+model's changed-set figures **and** its read set together — and a variant
+that constrains harder without pushing the walk should not.
+
+Two things followed the same day, so the refinement is testable rather
+than a reading:
+
+1. **The read set is now a recorded surface.** The runner captures every
+   tool call (`stream-json`) and records per session what the agent read
+   in the workspace, what it read in the framework view, and any path it
+   reached outside both. "Haiku under structure explores like opus bare"
+   becomes a comparison of two numbers per cell.
+2. **The seed's contract is a declared moving surface** of the
+   `eval-cycle` definition, and cycle 3 of the polar programme moves it
+   alone: same model, same fixture, same framework — only how hard the
+   contract pushes the walk.
+
+The prediction this adds to the list above: on the framework arm, the
+small model's **changed-set pass rate tracks its read set** across
+contract variants; on the bare arm the flagship's read set is large
+without being asked. Where the read set rises and the figures do not, the
+walk is not the mechanism and this insight falls.
 
 ## Status
 

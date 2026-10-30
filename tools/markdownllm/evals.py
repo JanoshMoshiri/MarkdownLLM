@@ -293,6 +293,108 @@ def _died_at_launch(sess: dict) -> bool:
     return (sess.get("turns") or 0) <= LAUNCH_DEAD_TURNS and not sess.get("cost_usd")
 
 
+def _parse_stream(stdout: str) -> tuple[dict | None, list[dict]]:
+    """Split a `--output-format stream-json` transcript into (result, tool uses).
+
+    The result event is the same object `--output-format json` used to print
+    (cost, turns, is_error, subtype, modelUsage), so every downstream check
+    is unchanged. The tool-use events are new: they are what the agent did,
+    and the read set is built from them. A legacy single-object stdout is
+    accepted as a result with no events; anything else is (None, []).
+    """
+    text = (stdout or "").strip()
+    if not text:
+        return None, []
+    result: dict | None = None
+    events: list[dict] = []
+    saw_event = False
+    for line in text.splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            ev = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(ev, dict):
+            continue
+        saw_event = True
+        kind = ev.get("type")
+        if kind == "result" or (kind is None and "type" not in ev):
+            # A `result` event, or a legacy single-object stdout (the
+            # `json` format's whole output, which carries no `type`).
+            result = ev
+        elif kind == "assistant":
+            content = (ev.get("message") or {}).get("content") or []
+            for block in content:
+                if isinstance(block, dict) and block.get("type") == "tool_use":
+                    events.append({"name": str(block.get("name") or ""),
+                                   "input": block.get("input") or {}})
+    if result is None and not saw_event:
+        try:
+            whole = json.loads(text)
+        except ValueError:
+            return None, []
+        return (whole if isinstance(whole, dict) else None), []
+    if result is None and events:
+        # The agent acted and never reported: that is a failure with a name,
+        # not an unparseable transcript.
+        result = {"is_error": True, "subtype": "no-result-event"}
+    return result, events
+
+
+READ_TOOLS = {"Read", "Glob", "Grep"}
+WRITE_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
+
+
+def _classify_path(raw: str, run_dir: Path, framework_view: Path | None) -> tuple[str, str]:
+    """Where a path the agent touched lives: the workspace, the granted
+    framework view, or outside both (the exploration-past-the-boundary
+    signal `flagship-models-look-around-the-edges` names)."""
+    p = Path(raw)
+    if not p.is_absolute():
+        p = run_dir / p
+    try:
+        p = p.resolve()
+    except OSError:
+        pass
+    for scope, base in (("workspace", run_dir), ("framework", framework_view)):
+        if base is None:
+            continue
+        try:
+            return scope, p.relative_to(base.resolve()).as_posix()
+        except ValueError:
+            continue
+    return "outside", p.as_posix()
+
+
+def _read_set(events: list[dict], run_dir: Path,
+              framework_view: Path | None) -> dict:
+    """What the agent explored: the files it read, where they live, what it
+    wrote, and how often it reached for each tool. Observed from the
+    transcript, never inferred from the outcome."""
+    reads: dict[str, set[str]] = {"workspace": set(), "framework": set(), "outside": set()}
+    writes: set[str] = set()
+    counts: dict[str, int] = {}
+    for ev in events:
+        name, inp = ev.get("name") or "", ev.get("input") or {}
+        counts[name] = counts.get(name, 0) + 1
+        if name in READ_TOOLS:
+            raw = inp.get("file_path") or inp.get("path")
+            if raw:
+                scope, rel = _classify_path(str(raw), run_dir, framework_view)
+                reads[scope].add(rel)
+        elif name in WRITE_TOOLS:
+            raw = inp.get("file_path") or inp.get("notebook_path")
+            if raw:
+                writes.add(_classify_path(str(raw), run_dir, framework_view)[1])
+    return {"files_read": sorted(reads["workspace"]),
+            "framework_files_read": sorted(reads["framework"]),
+            "outside_paths": sorted(reads["outside"]),
+            "files_written": sorted(writes),
+            "tool_counts": dict(sorted(counts.items()))}
+
+
 def _failure_excerpts(stdout: str, stderr: str, meta: object) -> dict:
     """What the agent said when it failed, kept with the committed result.
 
@@ -481,8 +583,9 @@ def eval_report(root: Path) -> int:
                          []).append(r)
     print(f"## Eval Report — {len(results)} trials, {len(cells)} cells\n")
     print("| fixture | fixture sha | model | condition | trials | fully passing | "
-          "assertion pass rate | changed-set pass rate | voided | mean wall s | mean cost $ |")
-    print("|---|---|---|---|---|---|---|---|---|---|---|")
+          "assertion pass rate | changed-set pass rate | voided | mean wall s | mean cost $ | "
+          "mean reads ws/fw |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|")
     for (fx, sha, model, cond), rs in sorted(cells.items()):
         full = sum(1 for r in rs if r.get("failed") == 0 and not r.get("voided"))
         voided = sum(1 for r in rs if r.get("voided"))
@@ -501,9 +604,13 @@ def eval_report(root: Path) -> int:
         costs = [r["cost_usd"] for r in live if r.get("cost_usd") is not None]
         mw = f"{sum(walls) / len(walls):.0f}" if walls else "—"
         mc = f"{sum(costs) / len(costs):.3f}" if costs else "—"
+        exs = [r["exploration"] for r in live if isinstance(r.get("exploration"), dict)]
+        reads = (f"{sum(e.get('files_read', 0) for e in exs) / len(exs):.0f}"
+                 f"/{sum(e.get('framework_files_read', 0) for e in exs) / len(exs):.0f}"
+                 if exs else "—")
         fx_short = fx if len(fx) <= 40 else fx[:37] + "..."
         print(f"| {fx_short} | {sha} | {model} | {cond} | {len(rs)} | {full}/{len(rs)} "
-              f"| {rate} | {crate} | {voided} | {mw} | {mc} |")
+              f"| {rate} | {crate} | {voided} | {mw} | {mc} | {reads} |")
     # Per-session view for longitudinal cells: where in the chain drift enters
     # is the finding, and the aggregate cannot show it.
     longi = {k: rs for k, rs in cells.items() if any(r.get("sessions") for r in rs)}
@@ -723,8 +830,12 @@ def cmd_eval(args) -> int:
             sfx = {"assertions": sess.get("assertions") or []}
             if fixture.get("domain_dir"):
                 sfx["domain_dir"] = fixture["domain_dir"]
+            # stream-json (which needs --verbose in print mode) carries every
+            # tool call as well as the final result object `json` printed, so
+            # the read set is observed rather than inferred from the outcome.
             cmd = ["claude", "-p", prompt, "--model", args.model,
-                   "--output-format", "json", "--permission-mode", "acceptEdits",
+                   "--output-format", "stream-json", "--verbose",
+                   "--permission-mode", "acceptEdits",
                    "--allowedTools", fixture.get("allowed_tools",
                                                  "Edit Write Read Glob Grep Bash(git:*)")]
             if not is_bare:
@@ -781,25 +892,30 @@ def cmd_eval(args) -> int:
                 break
             wall = (dt.datetime.now() - t0).total_seconds()
             # Always persist the agent's raw output — a 2-second 1-turn
-            # "trial" is indistinguishable from a real one without it.
+            # "trial" is indistinguishable from a real one without it. The
+            # stream is the transcript; the result event is kept beside it
+            # under the name the `json` format used to write.
             suffix = "" if len(sessions) == 1 else f"-{si}-{sname}"
-            (run_dir / f"agent-stdout{suffix}.json").write_text(
+            (run_dir / f"agent-stream{suffix}.jsonl").write_text(
                 proc.stdout or "", encoding="utf-8")
             if proc.stderr:
                 (run_dir / f"agent-stderr{suffix}.txt").write_text(
                     proc.stderr, encoding="utf-8")
             cost = turns = None
-            meta = None
-            try:
-                meta = json.loads(proc.stdout)
-                if isinstance(meta, dict):
-                    cost = meta.get("total_cost_usd")
-                    turns = meta.get("num_turns")
-                    usage = meta.get("modelUsage")
-                    if isinstance(usage, dict):
-                        models_observed.update(str(k) for k in usage)
-            except (ValueError, TypeError):
-                meta = None
+            meta, tool_events = _parse_stream(proc.stdout or "")
+            (run_dir / f"agent-stdout{suffix}.json").write_text(
+                json.dumps(meta, indent=2) if meta is not None else (proc.stdout or ""),
+                encoding="utf-8")
+            if isinstance(meta, dict):
+                cost = meta.get("total_cost_usd")
+                turns = meta.get("num_turns")
+                usage = meta.get("modelUsage")
+                if isinstance(usage, dict):
+                    models_observed.update(str(k) for k in usage)
+            exploration = _read_set(tool_events, run_dir, framework_view)
+            if exploration["outside_paths"]:
+                print(f"  [{sname}] reached outside the workspace and view: "
+                      f"{exploration['outside_paths'][:5]}")
             agent_failure = _agent_failure(proc, meta)
             excerpts: dict = {}
             if agent_failure:
@@ -842,6 +958,8 @@ def cmd_eval(args) -> int:
             print(f"  [{sname}] {passed}/{passed + failed}"
                   + (f" · changed {changed['passed']}/{changed['total']}" if changed["total"] else "")
                   + f" · {wall:.0f}s · cost {cost} · turns {turns}"
+                  + f" · read {len(exploration['files_read'])} ws"
+                  f"/{len(exploration['framework_files_read'])} fw"
                   + (" · LEFT UNCOMMITTED" if uncommitted else ""))
             t_passed += passed
             t_failed += failed
@@ -859,6 +977,7 @@ def cmd_eval(args) -> int:
                                  "uncommitted_at_end": uncommitted,
                                  "uncommitted_paths": dirty_work[:20],
                                  "answer_key_hits": key_hits,
+                                 "exploration": exploration,
                                  **excerpts})
             if agent_failure:
                 # Later sessions depend on a trustworthy state transition.  Do
@@ -929,6 +1048,19 @@ def cmd_eval(args) -> int:
                        (s.get("assertion_result") or {}).get(
                            "not_run_downstream", 0) for s in sess_records),
                }}
+        # Trial-level exploration: the union over sessions, so a cell's
+        # "how much did it look around" is one number per trial.
+        ws_read: set[str] = set()
+        fw_read: set[str] = set()
+        outside: set[str] = set()
+        for s in sess_records:
+            ex = s.get("exploration") or {}
+            ws_read.update(ex.get("files_read") or [])
+            fw_read.update(ex.get("framework_files_read") or [])
+            outside.update(ex.get("outside_paths") or [])
+        res["exploration"] = {"files_read": len(ws_read),
+                              "framework_files_read": len(fw_read),
+                              "outside_paths": sorted(outside)}
         if len(sessions) > 1:
             res["sessions"] = sess_records
         if aborted:

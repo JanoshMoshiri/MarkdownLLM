@@ -18,6 +18,8 @@ from markdownllm.evals import (  # noqa: E402
     _died_at_launch,
     _eval_run_dir,
     _failure_excerpts,
+    _parse_stream,
+    _read_set,
     _results_exit_code,
     _void_reason,
     _run_id,
@@ -328,3 +330,64 @@ def test_failure_excerpts_travel_with_the_result():
     assert ex["stderr_tail"] == ""
     long = "x" * 5000
     assert len(_failure_excerpts(long, long, None)["agent_result_excerpt"]) == 600
+
+
+# --- the read set is observed, not inferred (eval-cycle, 2026-10-30) ---------
+
+def _stream(*events) -> str:
+    import json as _json
+    return "\n".join(_json.dumps(e) for e in events)
+
+
+def test_stream_json_yields_the_same_result_object_plus_tool_uses():
+    stdout = _stream(
+        {"type": "system", "subtype": "init"},
+        {"type": "assistant", "message": {"content": [
+            {"type": "text", "text": "reading"},
+            {"type": "tool_use", "name": "Read", "input": {"file_path": "things/a.md"}}]}},
+        {"type": "user", "message": {"content": [{"type": "tool_result"}]}},
+        {"type": "result", "subtype": "success", "is_error": False,
+         "total_cost_usd": 0.42, "num_turns": 7, "modelUsage": {"claude-haiku-4-5-20251001": {}}},
+    )
+    meta, events = _parse_stream(stdout)
+    assert meta["total_cost_usd"] == 0.42 and meta["num_turns"] == 7
+    assert _agent_failure(SimpleNamespace(returncode=0), meta) is None
+    assert events == [{"name": "Read", "input": {"file_path": "things/a.md"}}]
+
+
+def test_legacy_single_object_stdout_and_garbage_still_parse_predictably():
+    meta, events = _parse_stream('{"subtype": "success", "num_turns": 3}')
+    assert meta == {"subtype": "success", "num_turns": 3} and events == []
+    assert _parse_stream("not json") == (None, [])
+    assert _parse_stream("") == (None, [])
+    # Acted, never reported: a named failure, not an unreadable transcript.
+    meta, events = _parse_stream(_stream(
+        {"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "name": "Bash", "input": {"command": "git status"}}]}}))
+    assert "no-result-event" in _agent_failure(SimpleNamespace(returncode=0), meta)
+    assert len(events) == 1
+
+
+def test_read_set_classifies_workspace_view_and_outside(tmp_path):
+    ws = tmp_path / "ws"
+    view = tmp_path / "view"
+    (ws / "things").mkdir(parents=True)
+    (view / "specs").mkdir(parents=True)
+    elsewhere = tmp_path / "elsewhere" / "seed.md"
+    events = [
+        {"name": "Read", "input": {"file_path": "things/a.md"}},
+        {"name": "Read", "input": {"file_path": str(ws / "things" / "a.md")}},
+        {"name": "Grep", "input": {"pattern": "x", "path": str(ws / "things")}},
+        {"name": "Read", "input": {"file_path": str(view / "specs" / "kernel.md")}},
+        {"name": "Read", "input": {"file_path": str(elsewhere)}},
+        {"name": "Write", "input": {"file_path": "things/b.md"}},
+        {"name": "Bash", "input": {"command": "git commit -m x"}},
+    ]
+    ex = _read_set(events, ws, view)
+    assert ex["files_read"] == ["things", "things/a.md"]  # relative and absolute collapse to one
+    assert ex["framework_files_read"] == ["specs/kernel.md"]
+    assert ex["outside_paths"] == [elsewhere.resolve().as_posix()]
+    assert ex["files_written"] == ["things/b.md"]
+    assert ex["tool_counts"] == {"Bash": 1, "Grep": 1, "Read": 4, "Write": 1}
+    # No framework view (bare arms): the view's path is just outside.
+    assert _read_set(events[3:4], ws, None)["outside_paths"]

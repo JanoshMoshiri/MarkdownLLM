@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-30
-generated: 2026-10-30T23:02:16
-generated_from: HEAD@454f131
-coverage: 626
+generated: 2026-10-30T23:45:12
+generated_from: HEAD@0f403e5
+coverage: 629
 framework_version: 3.50.0
 ---
 
@@ -583,6 +583,7 @@ framework_version: 3.50.0
 - cue-first-hour-guide-2026-10-18 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-10-20 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-10-21 --subject--> first-hour-guide
+- cue-flagship-models-look-around-the-edges-2026-10-30 --subject--> flagship-models-look-around-the-edges
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-framework-map-2026-09-19 --subject--> framework-map
@@ -869,6 +870,10 @@ framework_version: 3.50.0
 - estate-workflow-derivation --derived-from--> derivation-shape-brief-2026-08
 - estate-workflow-derivation --informs--> operating-layer-quality-loop
 - estate-workflow-derivation --derived-from--> estate-retrospective-synthesis-2026-08
+- eval-cycle --derived-from--> universal-workflow-methodology
+- eval-cycle --implements--> evidence-and-eval-backlog
+- eval-cycle --references--> eval-record-2026
+- eval-cycle --references--> flagship-models-look-around-the-edges
 - eval-record-2026 --informs--> evidence-and-eval-backlog
 - eval-record-2026 --references--> review-critical-comparison-2026-10-17-claude
 - eval-record-2026 --references--> withholding-is-not-isolation
@@ -967,6 +972,7 @@ framework_version: 3.50.0
 - flagship-models-look-around-the-edges --informs--> evidence-and-eval-backlog
 - flagship-models-look-around-the-edges --references--> eval-record-2026
 - flagship-models-look-around-the-edges --references--> isolation-must-contain-writes-not-just-reads
+- flagship-models-look-around-the-edges --references--> eval-cycle
 - floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-block-requirements-2026-08 --derived-from--> substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 --references--> floor-structure-residue
@@ -1556,6 +1562,9 @@ framework_version: 3.50.0
 - review-remediation-v3-17 --implements--> directional-graph-reads-come-in-inbound-outbound-pairs
 - review-remediation-v3-17 --implements--> repeated-drift-promotes-a-fact-into-the-floor
 - rich-founding-context-breaks-scaffold-then-jump --references--> agents-drop-mechanical-birth-steps-not-semantic-ones
+- run-eval-cycle-0-polar-baseline-2026-10 --implements--> evidence-and-eval-backlog
+- run-eval-cycle-0-polar-baseline-2026-10 --references--> eval-record-2026
+- run-eval-cycle-0-polar-baseline-2026-10 --definition--> eval-cycle
 - run-floor-sprint-1-2026-08 --references--> substrate-review-consolidated-remedy-2026-08-20
 - run-floor-sprint-1-2026-08 --definition--> substrate-floor-development
 - run-floor-sprint-2-2026-08 --references--> run-floor-sprint-1-2026-08

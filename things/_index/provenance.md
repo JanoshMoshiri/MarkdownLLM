@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-10-29
-generated: 2026-10-29T18:05:06
-generated_from: HEAD@f2da8b7
-coverage: 140
+created: 2026-10-30
+generated: 2026-10-30T23:45:31
+generated_from: HEAD@0f403e5
+coverage: 142
 framework_version: 3.50.0
 ---
 
@@ -217,6 +217,9 @@ framework_version: 3.50.0
 - operator-queue-2026-08-28 (derived-from)
 - the-root-is-not-a-representative-domain (derived-from)
 
+## eval-record-2026
+- run-eval-cycle-0-polar-baseline-2026-10 (pinned @0f403e54abb8cda4f4dc2ddbd36e28f7ee7547c4)
+
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
 
@@ -245,6 +248,9 @@ framework_version: 3.50.0
 ## field-report-2026-08-13-domain-session
 - assistant-register-does-not-graduate (derived-from)
 - the-harness-bound-path-is-the-least-tested-path (derived-from)
+
+## flagship-models-look-around-the-edges
+- run-eval-cycle-0-polar-baseline-2026-10 (pinned @0f403e54abb8cda4f4dc2ddbd36e28f7ee7547c4)
 
 ## floor-block-requirements-2026-08
 - floor-sprint-1-design-2026-08 (pinned @8521d0d7b99e1a72eb68ca8fa513012ec59b1a6f)
@@ -708,6 +714,7 @@ framework_version: 3.50.0
 
 ## universal-workflow-methodology
 - derivation-shape-brief-2026-08 (pinned @3af254117c771488898b861a9e9a30ef934c4794)
+- eval-cycle (derived-from)
 - workflow-reconciliation-precedes-new-definitions (pinned @3af254117c771488898b861a9e9a30ef934c4794)
 
 ## validate-thing-specification
