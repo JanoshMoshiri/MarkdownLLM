@@ -267,36 +267,65 @@ def _ticket_repo(tmp_path: Path) -> Path:
     return root
 
 
-def _ticket(root: Path, item: str, addressee: str, day: str) -> None:
+def _ticket(root: Path, item: str, addressee: str, when: str) -> None:
+    """A ticket turn committed at `when`, an ISO UTC instant such as
+    2026-10-15T06:00:00+0000, so the test's clock and git's agree."""
     write(root, f"things/tickets/ticket-{item}.md", thing_text(
-        f"id: ticket-{item}\ntype: ticket\nstatus: {addressee}\ncreated: {day}",
+        f"id: ticket-{item}\ntype: ticket\nstatus: {addressee}\ncreated: {when[:10]}",
         "# Ticket\n\nthe current message.\n"))
-    _commit(root, f"ticket: {item} -> {addressee}", day)
+    env = {**os.environ, "GIT_AUTHOR_DATE": when, "GIT_COMMITTER_DATE": when}
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", f"ticket: {item} -> {addressee}"],
+                   cwd=root, check=True, env=env)
 
 
-def test_turn_stalls_reads_open_tickets_against_the_window(tmp_path):
-    # the-seat, the ring: an open ticket whose last turn is older than the
-    # window has stalled — owed here when its addressee is this seat, awaiting
-    # the other seat otherwise. Closed tickets owe nothing; fresh ones wait.
+def _ago(hours: float) -> str:
+    when = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=hours)
+    return when.strftime("%Y-%m-%dT%H:%M:%S+0000")
+
+
+def test_turn_stalls_reads_open_tickets_against_the_window_and_the_ceiling(tmp_path):
+    # the-seat, the ring: an open ticket quiet for longer than the window and
+    # no longer than the ceiling has stalled -- owed here when its addressee is
+    # this seat, awaiting the other seat otherwise. Past the ceiling it is
+    # abandoned, reported and never rung. Closed tickets owe nothing; fresh
+    # ones wait. The window is one hour: the busiest workspace's replies
+    # arrive in a median of five minutes and 90% within about an hour.
     from markdownllm.seat import set_seat, stall_lines, turn_stalls
     root = _ticket_repo(tmp_path)
     set_seat(root, "codex", "codex-cli", today=dt.date(2026, 10, 15))
-    _ticket(root, "old", "codex", "2026-10-13")
-    _ticket(root, "theirs", "claude", "2026-10-13")
-    _ticket(root, "done", "closed", "2026-10-13")
-    _ticket(root, "fresh", "codex", "2026-10-15")
+    _ticket(root, "mine", "codex", "2026-10-15T06:00:00+0000")      # 7h: stalled, owed here
+    _ticket(root, "theirs", "claude", "2026-10-15T05:00:00+0000")   # 8h: stalled, awaiting
+    _ticket(root, "done", "closed", "2026-10-13T12:00:00+0000")     # closed: nothing owed
+    _ticket(root, "fresh", "codex", "2026-10-15T12:30:00+0000")     # 30m: waiting
+    _ticket(root, "old", "claude", "2026-10-13T12:00:00+0000")      # 49h: abandoned
     now = dt.datetime(2026, 10, 15, 13, 0, tzinfo=dt.timezone.utc)
     info = turn_stalls(root, now=now)
+    assert info["stall_hours"] == 1.0 and info["abandon_hours"] == 24.0
     by_id = {t["id"]: t for t in info["tickets"]}
-    assert set(by_id) == {"ticket-old", "ticket-theirs"}
-    assert by_id["ticket-old"]["owed_here"] and not by_id["ticket-theirs"]["owed_here"]
+    assert set(by_id) == {"ticket-mine", "ticket-theirs"}
+    assert by_id["ticket-mine"]["owed_here"] and not by_id["ticket-theirs"]["owed_here"]
+    assert [t["id"] for t in info["abandoned"]] == ["ticket-old"]
     assert info["stalled"] and info["seat"] == "codex"
     lines = stall_lines(info)
-    assert any("`ticket-old` owed by this seat" in ln for ln in lines)
-    assert any("`ticket-theirs` awaiting `claude`" in ln for ln in lines)
-    assert all("window 12h" in ln for ln in lines)
-    # A wider window than the oldest turn: nothing has stalled.
-    assert not turn_stalls(root, now=now, stall_hours=72)["stalled"]
+    assert any("`ticket-mine` owed by this seat for 7h" in ln for ln in lines)
+    assert any("`ticket-theirs` awaiting `claude` for 8h" in ln for ln in lines)
+    assert any(ln.startswith("- tickets abandoned (1, the oldest 2d quiet")
+               and "`ticket-old`" in ln for ln in lines)
+    assert all("window 1h" in ln for ln in lines if "turn stalled" in ln)
+    # A wider window than the live turns: only the abandoned line remains, and
+    # nothing rings.
+    info = turn_stalls(root, now=now, stall_hours=10)
+    assert not info["stalled"] and info["abandoned"]
+    # The clone may declare its own thresholds: a 9h window and a 100h ceiling
+    # make the 7h and 8h turns wait and bring the 49h ticket back as stalled.
+    subprocess.run(["git", "config", "--local", "mdllm.seat.stall-hours", "9"],
+                   cwd=root, check=True)
+    subprocess.run(["git", "config", "--local", "mdllm.seat.abandon-hours", "100"],
+                   cwd=root, check=True)
+    info = turn_stalls(root, now=now)
+    assert info["stall_hours"] == 9.0 and info["abandon_hours"] == 100.0
+    assert [t["id"] for t in info["tickets"]] == ["ticket-old"] and not info["abandoned"]
     # A workspace with no ticket type has no turns to stall.
     plain = _repo(tmp_path, "plain")
     assert turn_stalls(plain, now=now)["tickets"] == []
@@ -307,13 +336,17 @@ def test_seat_stall_exit_rings_only_when_a_turn_has_stalled(tmp_path, capsys):
     root = _ticket_repo(tmp_path)
     set_seat(root, "codex", "codex-cli")
     ns = argparse.Namespace(path=str(root), set=None, clear=False,
-                            stall_exit=True, stall_hours=12.0)
+                            stall_exit=True, stall_hours=None, abandon_hours=None)
     assert cmd_seat(ns) == 0                       # nothing open: no ring
     assert "turn stalled" not in capsys.readouterr().out
-    _ticket(root, "waiting", "codex", "2026-10-01")
-    assert cmd_seat(ns) == 5                       # the ring
+    _ticket(root, "forgotten", "codex", _ago(72))  # abandoned: reported, never rings
+    assert cmd_seat(ns) == 0
     out = capsys.readouterr().out
-    assert "turn stalled: `ticket-waiting` owed by this seat" in out
+    assert "tickets abandoned (1" in out and "turn stalled" not in out
+    _ticket(root, "waiting", "codex", _ago(3))     # stalled: the ring
+    assert cmd_seat(ns) == 5
+    out = capsys.readouterr().out
+    assert "turn stalled: `ticket-waiting` owed by this seat for 3h" in out
     ns.stall_exit = False
     assert cmd_seat(ns) == 0                       # the line prints either way
     assert "turn stalled" in capsys.readouterr().out
@@ -322,7 +355,7 @@ def test_seat_stall_exit_rings_only_when_a_turn_has_stalled(tmp_path, capsys):
 def test_session_start_carries_the_stall_line(tmp_path, capsys):
     from markdownllm.session import cmd_session_start
     root = _ticket_repo(tmp_path)
-    _ticket(root, "unanswered", "claude", "2026-10-01")
+    _ticket(root, "unanswered", "claude", _ago(3))
     assert cmd_session_start(argparse.Namespace(path=str(root))) == 0
     out = capsys.readouterr().out
-    assert "turn stalled: `ticket-unanswered` awaiting `claude`" in out
+    assert "turn stalled: `ticket-unanswered` awaiting `claude` for 3h" in out

@@ -429,6 +429,7 @@ def test_estate_sync_rings_on_a_stalled_turn(tmp_path, capsys):
     # the-seat, the ring: a walked workspace that runs loops and holds an
     # open ticket unanswered past the window is attention, and rings with
     # --silence-exit the way a dead dispatcher does.
+    import datetime as _dt
     import os
     import subprocess
     import yaml
@@ -441,14 +442,15 @@ def test_estate_sync_rings_on_a_stalled_turn(tmp_path, capsys):
     write(clone, "things/tickets/ticket-x.md", thing_text(
         "id: ticket-x\ntype: ticket\nstatus: codex\ncreated: 2026-10-01",
         "# Ticket\n\nwaiting.\n"))
-    env = {**os.environ, "GIT_AUTHOR_DATE": "2026-10-01T12:00:00",
-           "GIT_COMMITTER_DATE": "2026-10-01T12:00:00"}
+    when = (_dt.datetime.now(_dt.timezone.utc) - _dt.timedelta(hours=3)).strftime(
+        "%Y-%m-%dT%H:%M:%S+0000")
+    env = {**os.environ, "GIT_AUTHOR_DATE": when, "GIT_COMMITTER_DATE": when}
     subprocess.run(["git", "add", "-A"], cwd=clone, check=True)
     subprocess.run(["git", "commit", "-q", "-m", "ticket: x -> codex"], cwd=clone,
                    check=True, env=env)
     rc = mdllm.cmd_estate_sync(_ns(paths=[str(clone)], status=False, timeout=20))
     out = capsys.readouterr().out
-    assert rc == 0 and "turn stalled: `ticket-x` awaiting `codex`" in out
+    assert rc == 0 and "turn stalled: `ticket-x` awaiting `codex` for 3h" in out
     rc = mdllm.cmd_estate_sync(_ns(paths=[str(clone)], status=False, timeout=20,
                                    silence_exit=True))
     assert rc == 5                                        # the ring

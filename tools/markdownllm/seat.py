@@ -31,10 +31,21 @@ same read now rings: a commit unpublished, or an open ticket unanswered, for
 longer than a declared window is a *stalled turn*, printed as an attention
 line at session start and in estate-sync, and `--stall-exit` returns 5 so a
 scheduled task can wake the operator on the code alone — the shape Phase 2
-of the-record-holds-unattended gave the dispatcher's silence. The window is
-declared, not inferred: turns inside a conversation are minutes apart and a
-cadence read would ring on every coffee break; the failures on record were
-half a day and more.
+of the-record-holds-unattended gave the dispatcher's silence.
+
+Two thresholds, both declared. The first cut set the window at twelve
+hours from the failures on record, and the operator corrected it the same
+day: the turns that wait half a day are the ones the loop has finished and
+nobody closed, and the ones that need attending are an hour apart or less.
+The busiest workspace's tickets said the same (783 turn gaps on 87 tickets,
+2026-09-25 to 10-30): a reply from the other seat arrives in a median of
+five minutes, 90% within about an hour, 95% within four. So the *window*
+(`STALL_HOURS`, 1h) rings on a conversation that has gone quiet while it
+was alive, and the *ceiling* (`ABANDON_HOURS`, 24h) stops ringing: a ticket
+open past it is reported once as abandoned — close it or reopen it — never
+rung about, because a ring that fires on every forgotten ticket teaches the
+operator to ignore the ring. A clone may declare both in local config
+(`mdllm.seat.stall-hours`, `mdllm.seat.abandon-hours`); flags override.
 """
 
 from __future__ import annotations
@@ -48,10 +59,13 @@ from .model import load_schema
 
 SEAT_KEYS = ("mdllm.seat.name", "mdllm.seat.agent", "mdllm.seat.declared")
 
-# The stall window, in hours. Half a day: the shortest unseen turn on the
-# 2026-10-14 evidence read was 13 hours, and no healthy conversation on
-# record waited that long for a reply.
-STALL_HOURS = 12.0
+# The stall window and the abandonment ceiling, in hours. One hour is past
+# the 90th percentile of healthy replies on the busiest workspace's record;
+# a day is past everything the record shows a live conversation doing.
+STALL_HOURS = 1.0
+ABANDON_HOURS = 24.0
+_CFG_STALL = "mdllm.seat.stall-hours"
+_CFG_ABANDON = "mdllm.seat.abandon-hours"
 
 # Tickets by name, the way the dispatch read finds digests: the template
 # names them `ticket-<item>`, so a seat read pays for a handful of
@@ -113,6 +127,24 @@ def unpublished(repo: Path, now: dt.datetime | None = None) -> tuple[int, float]
     return len(stamps), max(0.0, (now - oldest).total_seconds() / 3600)
 
 
+def stall_thresholds(repo: Path, stall_hours: float | None = None,
+                     abandon_hours: float | None = None) -> tuple[float, float]:
+    """(window, ceiling) in hours: an explicit argument, else the clone's
+    local config, else the defaults. The ceiling is never below the window."""
+    cfg = {}
+    r = _run(repo, "config", "--local", "--get-regexp", r"^mdllm\.seat\.(stall|abandon)-hours$")
+    if r is not None and r.returncode in (0, 1):
+        for line in (r.stdout or "").splitlines():
+            key, _, value = line.partition(" ")
+            try:
+                cfg[key.strip().lower()] = float(value.strip())
+            except ValueError:
+                continue
+    window = stall_hours if stall_hours is not None else cfg.get(_CFG_STALL, STALL_HOURS)
+    ceiling = abandon_hours if abandon_hours is not None else cfg.get(_CFG_ABANDON, ABANDON_HOURS)
+    return float(window), max(float(ceiling), float(window))
+
+
 def declares_tickets(repo: Path) -> bool:
     """Does this workspace run agent-to-agent loops? The ticket type is the
     carrier every such loop uses (standing-watch.md -> The Ticket)."""
@@ -151,7 +183,8 @@ def ticket_stalls(repo: Path, seat_name: str = "", now: dt.datetime | None = Non
     """Open tickets whose last turn is older than the window: {id, status,
     hours, owed_here}. `owed_here` is true when the addressee is this clone's
     seat — the stall is ours to end; otherwise another seat has not risen.
-    A ticket in a terminal status owes nothing and is skipped."""
+    A ticket in a terminal status owes nothing and is skipped. The caller
+    splits the result at the ceiling into stalled and abandoned."""
     now = now or dt.datetime.now(dt.timezone.utc)
     terminal = _terminal_ticket_statuses(repo)
     out: list[dict] = []
@@ -185,39 +218,64 @@ def ticket_stalls(repo: Path, seat_name: str = "", now: dt.datetime | None = Non
     return out
 
 
+def _age(hours: float) -> str:
+    if hours < 1:
+        return f"{hours * 60:.0f}m"
+    if hours < 48:
+        return f"{hours:.0f}h"
+    return f"{hours / 24:.0f}d"
+
+
 def turn_stalls(repo: Path, now: dt.datetime | None = None,
-                stall_hours: float = STALL_HOURS, *, seat: dict | None = None,
+                stall_hours: float | None = None, abandon_hours: float | None = None,
+                *, seat: dict | None = None,
                 up: tuple[int, float] | None | bool = False) -> dict:
-    """The stall read: {seat, unpublished, tickets, stall_hours, stalled}.
-    `seat` and `up` may be passed in by a caller that already read them, so
-    the digest pays its two git spawns once."""
+    """The stall read: {seat, unpublished, tickets, abandoned, stall_hours,
+    abandon_hours, stalled}. `tickets` are open tickets quiet for longer
+    than the window and no longer than the ceiling — a live conversation
+    that has stopped, which is what rings. `abandoned` are open tickets
+    quiet past the ceiling — a loop that finished and was never closed,
+    reported and never rung. `seat` and `up` may be passed in by a caller
+    that already read them, so the digest pays its two git spawns once."""
     now = now or dt.datetime.now(dt.timezone.utc)
+    window, ceiling = stall_thresholds(repo, stall_hours, abandon_hours)
     seat = seat if seat is not None else read_seat(repo)
     if up is False:
         up = unpublished(repo, now)
-    left_stalled = bool(up and up[0] and up[1] > stall_hours)
-    tickets = (ticket_stalls(repo, seat["name"], now, stall_hours)
-               if declares_tickets(repo) else [])
+    left_stalled = bool(up and up[0] and up[1] > window)
+    quiet = (ticket_stalls(repo, seat["name"], now, window)
+             if declares_tickets(repo) else [])
+    tickets = [t for t in quiet if t["hours"] <= ceiling]
+    abandoned = [t for t in quiet if t["hours"] > ceiling]
     return {"seat": seat["name"], "unpublished": up, "tickets": tickets,
-            "stall_hours": stall_hours, "stalled": left_stalled or bool(tickets)}
+            "abandoned": abandoned, "stall_hours": window, "abandon_hours": ceiling,
+            "stalled": left_stalled or bool(tickets)}
 
 
 def stall_lines(info: dict) -> list[str]:
-    """Attention lines for the stall read; empty when nothing has stalled."""
+    """Attention lines for the stall read; empty when nothing has stalled
+    or been abandoned."""
     lines: list[str] = []
     window = f"{info['stall_hours']:g}h"
     up = info["unpublished"]
     if up and up[0] and up[1] > info["stall_hours"]:
-        lines.append(f"- turn stalled: {up[0]} commit(s) unpublished for {up[1]:.0f}h "
+        lines.append(f"- turn stalled: {up[0]} commit(s) unpublished for {_age(up[1])} "
                      f"(window {window}) — the addressee cannot see this turn; "
                      f"push it, or say in the record why it waits")
     for t in info["tickets"]:
         who = ("owed by this seat" if t["owed_here"]
                else f"awaiting `{t['status']}`")
-        lines.append(f"- turn stalled: `{t['id']}` {who} for {t['hours']:.0f}h "
-                     f"(window {window}) — a conversation nobody has risen to; "
+        lines.append(f"- turn stalled: `{t['id']}` {who} for {_age(t['hours'])} "
+                     f"(window {window}) — a live conversation has stopped; "
                      f"the watch did not ring, or rang and nobody rose "
                      f"(the-seat -> the ring)")
+    if info.get("abandoned"):
+        ids = ", ".join(f"`{t['id']}`" for t in info["abandoned"])
+        oldest = max(t["hours"] for t in info["abandoned"])
+        lines.append(f"- tickets abandoned ({len(info['abandoned'])}, the oldest "
+                     f"{_age(oldest)} quiet; ceiling {info['abandon_hours']:g}h): {ids} — "
+                     f"open past the ceiling, so the loop finished and nobody closed "
+                     f"it, or it was forgotten; close or reopen, this never rings")
     return lines
 
 
@@ -250,14 +308,14 @@ def seat_line(repo: Path, *, loops: bool = False, seat: dict | None = None,
     return f"- **Seat: undeclared** — this clone commits as {identity}{tail} · {left}"
 
 
-def seat_lines(repo: Path, *, loops: bool = False,
-               stall_hours: float = STALL_HOURS) -> list[str]:
+def seat_lines(repo: Path, *, loops: bool = False) -> list[str]:
     """The seat line followed by any stall lines, reading the seat and the
-    unpublished range once."""
+    unpublished range once. Thresholds come from the clone's config or the
+    defaults."""
     seat = read_seat(repo)
     up = unpublished(repo)
     lines = [seat_line(repo, loops=loops, seat=seat, up=up)]
-    lines.extend(stall_lines(turn_stalls(repo, stall_hours=stall_hours, seat=seat, up=up)))
+    lines.extend(stall_lines(turn_stalls(repo, seat=seat, up=up)))
     return lines
 
 
@@ -314,12 +372,13 @@ def cmd_seat(args) -> int:
         clear_seat(repo)
         print(f"seat cleared in {repo} (user.name/user.email left as they are)")
         return 0
-    stall_hours = float(getattr(args, "stall_hours", None) or STALL_HOURS)
     print(f"## Seat — {repo}")
     seat = read_seat(repo)
     up = unpublished(repo)
     print(seat_line(repo, loops=True, seat=seat, up=up))
-    info = turn_stalls(repo, stall_hours=stall_hours, seat=seat, up=up)
+    info = turn_stalls(repo, stall_hours=getattr(args, "stall_hours", None),
+                       abandon_hours=getattr(args, "abandon_hours", None),
+                       seat=seat, up=up)
     for line in stall_lines(info):
         print(line)
     if getattr(args, "stall_exit", False) and info["stalled"]:

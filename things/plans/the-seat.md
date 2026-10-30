@@ -107,18 +107,36 @@ block's output before the next release.
       weak joint, never the message channel), the fix is the one Phase 2
       of `the-record-holds-unattended` gave the dispatcher: the same read,
       made to ring. `mdllm seat` now reads two stalls against a declared
-      window (12h by default; `--stall-hours`): a commit unpublished, and
-      an open ticket whose last turn is older than the window — *owed by
-      this seat* when its addressee is this clone's seat, *awaiting
-      `<seat>`* otherwise. The lines ride the session-start digest and
-      estate-sync's attention section in every walked workspace that
-      declares a ticket type; `mdllm seat --stall-exit` and `estate-sync
-      --silence-exit` return 5 on a stall so a scheduled task rings on the
-      code alone. The window is declared, not inferred from cadence: turns
-      inside a conversation are minutes apart and a cadence read would
-      ring on every pause; the failures on record were half a day and
-      more. *Done when:* a stalled turn has rung an operator who was not
-      in a session — the same unexercised half the dispatcher's ring has.
+      window: a commit unpublished, and an open ticket whose last turn is
+      older than the window — *owed by this seat* when its addressee is
+      this clone's seat, *awaiting `<seat>`* otherwise. The lines ride
+      the session-start digest and estate-sync's attention section in
+      every walked workspace that declares a ticket type; `mdllm seat
+      --stall-exit` and `estate-sync --silence-exit` return 5 on a stall
+      so a scheduled task rings on the code alone.
+      **Calibration, corrected the same day.** The first cut set the
+      window at 12 hours from the failures on record. The operator: the
+      turns that wait half a day or three weeks "are ones that I've
+      forgotten about and the loop has finished… a bad metric to calibrate
+      on"; the ones that need attending are "maybe an hour or less"
+      apart. The busiest workspace's tickets were then measured at one
+      pinned read (783 gaps between consecutive turns on 87 tickets,
+      2026-09-25 to 10-30): a reply from the other seat arrives in a
+      median of 5 minutes, 75% within 16 minutes, 90% within about an
+      hour, 95% within under four; the 16 gaps past 12 hours and the 4
+      past a day are the forgotten tail. So there are two thresholds,
+      both declared, neither inferred from cadence: the **window** (1h
+      by default; `--stall-hours`, or clone config
+      `mdllm.seat.stall-hours`) rings on a live conversation that has
+      stopped, and the **ceiling** (24h; `--abandon-hours`,
+      `mdllm.seat.abandon-hours`) stops it ringing — a ticket open past
+      the ceiling is reported once as *abandoned*, close it or reopen it,
+      because a ring that fires on every forgotten ticket teaches the
+      operator to ignore the ring. At the 1h window the ring is false on
+      about one healthy gap in ten; at 2h about one in twenty. The
+      operator chose the hour. *Done when:* a stalled turn has rung an
+      operator who was not in a session — the same unexercised half the
+      dispatcher's ring has.
 
 ## Done when
 

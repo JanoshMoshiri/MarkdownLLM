@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-10-30
-generated: 2026-10-30T22:27:41
-generated_from: HEAD@af2e160
-coverage: 625
+generated: 2026-10-30T22:45:21
+generated_from: HEAD@f258b0e
+coverage: 626
 framework_version: 3.50.0
 ---
 
@@ -646,6 +646,7 @@ framework_version: 3.50.0
 - cue-operator-guide-2026-10-18 --subject--> operator-guide
 - cue-operator-guide-2026-10-20 --subject--> operator-guide
 - cue-operator-guide-2026-10-27 --subject--> operator-guide
+- cue-operator-guide-2026-10-30 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28

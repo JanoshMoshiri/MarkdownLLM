@@ -271,11 +271,18 @@ def build_cli() -> argparse.ArgumentParser:
     st.add_argument("--clear", action="store_true", help="withdraw the declaration")
     st.add_argument("--stall-exit", action="store_true",
                     help="exit 5 when a turn has stalled — a commit unpublished, "
-                         "or an open ticket unanswered, for longer than "
-                         "--stall-hours; the lines print either way, so a "
-                         "scheduled task can ring on the code (the-seat, the ring)")
-    st.add_argument("--stall-hours", type=float, default=12.0,
-                    help="the window a turn may wait before it is a stall (default 12)")
+                         "or an open ticket unanswered, for longer than the window "
+                         "and no longer than the ceiling; the lines print either "
+                         "way, so a scheduled task can ring on the code (the-seat, "
+                         "the ring); a ticket quiet past the ceiling is reported as "
+                         "abandoned and never rings")
+    st.add_argument("--stall-hours", type=float, default=None,
+                    help="the window a turn may wait before it is a stall (default: "
+                         "clone config mdllm.seat.stall-hours, else 1)")
+    st.add_argument("--abandon-hours", type=float, default=None,
+                    help="the ceiling past which an open ticket is abandoned, not "
+                         "stalled (default: clone config mdllm.seat.abandon-hours, "
+                         "else 24)")
     st.set_defaults(fn=cmd_seat)
 
     dc = sub.add_parser("docs", help="regenerate the derived blocks in docs/ "
@@ -506,7 +513,8 @@ def build_cli() -> argparse.ArgumentParser:
                          "dispatch digest on this machine is older than twice "
                          "the cadence the digests show — or a turn has stalled "
                          "in a walked workspace that runs loops (an unpublished "
-                         "commit or an unanswered open ticket past 12h); the lines print either "
+                         "commit or an unanswered open ticket past the stall window, "
+                         "1h unless the clone declares one); the lines print either "
                          "way, this is the ring a scheduled task can wake on")
     es_mode = es.add_mutually_exclusive_group()
     es_mode.add_argument("--status", action="store_true",
