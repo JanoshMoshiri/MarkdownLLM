@@ -4,8 +4,8 @@ type: index
 status: live
 index_of: schema
 created: 2026-10-30
-generated: 2026-10-30T23:45:10
-generated_from: HEAD@0f403e5
+generated: 2026-10-30T23:46:31
+generated_from: HEAD@9932765
 coverage: 629
 framework_version: 3.50.0
 ---
@@ -56,11 +56,11 @@ framework_version: 3.50.0
 | parties | 4 |
 | resolution | 3 |
 | stages | 3 |
+| definition_commit | 3 |
 | resolved_by | 2 |
 | pattern_type | 2 |
 | demonstrates | 2 |
 | applies_to | 2 |
-| definition_commit | 2 |
 | source_domain | 1 |
 | source_id | 1 |
 | source_commit | 1 |

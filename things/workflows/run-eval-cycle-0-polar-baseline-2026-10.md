@@ -6,6 +6,7 @@ version: 1.0
 created: 2026-10-30
 session: 2026-10-30
 definition: eval-cycle
+definition_commit: 99327652afc99d85a508e0ad759f3d53a7afd5fc
 current_stage: baseline
 informed_by:
   - id: eval-record-2026
