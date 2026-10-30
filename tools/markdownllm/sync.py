@@ -809,6 +809,25 @@ def cmd_estate_sync(args) -> int:
             attention.append(sline)
             if not runner_channel:
                 print(sline)
+    # The stall ring (the-seat, the ring): in every walked workspace that
+    # runs loops, a turn unpublished or an open ticket unanswered past the
+    # window is attention, and with --silence-exit it rings like silence.
+    # A workspace with no ticket type has no turns to stall; it costs no read.
+    stalls: list[str] = []
+    if not status_only:
+        from .seat import declares_tickets, stall_lines, turn_stalls
+        for repo in repos:
+            if not declares_tickets(repo):
+                continue
+            info = turn_stalls(repo)
+            if not info["stalled"]:
+                continue
+            for ln in stall_lines(info):
+                stalls.append(f"- `{repo.name}`: {ln[2:]}")
+        for ln in stalls:
+            attention.append(ln)
+            if not runner_channel:
+                print(ln)
     for res in results:
         name = res.repo.name
         label = _LABEL[res.state]
@@ -874,8 +893,10 @@ def cmd_estate_sync(args) -> int:
         print()
         print("\n".join(quiet))
     print("\nThis is a batch of per-repo reads — ephemeral, never an index. Sync before orienting.")
-    if getattr(args, "silence_exit", False) and silence and silence["silent"]:
-        # The ring (Phase 2b): a scheduled task or watch wrapper that runs
-        # this with --silence-exit can wake the operator on the code alone.
+    if getattr(args, "silence_exit", False) and (
+            (silence and silence["silent"]) or stalls):
+        # The ring (Phase 2b, and the-seat's stall ring): a scheduled task
+        # or watch wrapper that runs this with --silence-exit can wake the
+        # operator on the code alone — for a dead dispatcher or a stalled turn.
         return 5
     return 0

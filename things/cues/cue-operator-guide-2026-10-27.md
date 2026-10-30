@@ -77,3 +77,15 @@ judgement: an authored one-liner and a derived block; `estate-git-sync` and
 `review-documentation-audit-2026-10-20-claude` audited the toolbox's
 completeness, which the regenerated block keeps mechanical. **Verdict
 stands: not-inflection.**
+
+## Third change — 2026-10-30, the stall ring
+
+The `seat` and `estate-sync` when-lines each gained a clause for the stall
+ring (`the-seat` Phase 7: `--stall-exit`, `--stall-hours`, and
+`--silence-exit` ringing on a stalled turn), and the toolbox block
+regenerated for the new flags. The commit gate's staged read owed no cue
+for it; the change is walked here so the walk is on record, which is what
+the open conflict on the gate says the spec promises. Same dependants,
+same judgement: authored one-liners describing flags shipped in the same
+commit, a derived block following the CLI. Nothing a dependant reasons
+from has moved. **Verdict stands: not-inflection.**

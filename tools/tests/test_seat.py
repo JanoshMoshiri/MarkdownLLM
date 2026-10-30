@@ -251,3 +251,78 @@ def test_coherence_reads_behind_as_info_not_error(tmp_path):
     kernel = [f for f in findings if "domain-kernel" in f.message]
     assert kernel and all(f.severity == SEV_INFO for f in kernel)
     assert not [f for f in kernel if f.severity == SEV_ERROR]
+
+
+# ------------------------------------------------------------- the stall ring
+
+def _ticket_repo(tmp_path: Path) -> Path:
+    import yaml
+    root = _repo(tmp_path)
+    write(root, "things/_schema.yaml", yaml.safe_dump({
+        "schema_version": 1, "domain": "x",
+        "types": {"task": {"statuses": ["in-progress", "done"]},
+                  "ticket": {"statuses": ["claude", "codex", "closed"],
+                             "terminal_statuses": ["closed"]}}}, sort_keys=False))
+    _commit(root, "schema")
+    return root
+
+
+def _ticket(root: Path, item: str, addressee: str, day: str) -> None:
+    write(root, f"things/tickets/ticket-{item}.md", thing_text(
+        f"id: ticket-{item}\ntype: ticket\nstatus: {addressee}\ncreated: {day}",
+        "# Ticket\n\nthe current message.\n"))
+    _commit(root, f"ticket: {item} -> {addressee}", day)
+
+
+def test_turn_stalls_reads_open_tickets_against_the_window(tmp_path):
+    # the-seat, the ring: an open ticket whose last turn is older than the
+    # window has stalled — owed here when its addressee is this seat, awaiting
+    # the other seat otherwise. Closed tickets owe nothing; fresh ones wait.
+    from markdownllm.seat import set_seat, stall_lines, turn_stalls
+    root = _ticket_repo(tmp_path)
+    set_seat(root, "codex", "codex-cli", today=dt.date(2026, 10, 15))
+    _ticket(root, "old", "codex", "2026-10-13")
+    _ticket(root, "theirs", "claude", "2026-10-13")
+    _ticket(root, "done", "closed", "2026-10-13")
+    _ticket(root, "fresh", "codex", "2026-10-15")
+    now = dt.datetime(2026, 10, 15, 13, 0, tzinfo=dt.timezone.utc)
+    info = turn_stalls(root, now=now)
+    by_id = {t["id"]: t for t in info["tickets"]}
+    assert set(by_id) == {"ticket-old", "ticket-theirs"}
+    assert by_id["ticket-old"]["owed_here"] and not by_id["ticket-theirs"]["owed_here"]
+    assert info["stalled"] and info["seat"] == "codex"
+    lines = stall_lines(info)
+    assert any("`ticket-old` owed by this seat" in ln for ln in lines)
+    assert any("`ticket-theirs` awaiting `claude`" in ln for ln in lines)
+    assert all("window 12h" in ln for ln in lines)
+    # A wider window than the oldest turn: nothing has stalled.
+    assert not turn_stalls(root, now=now, stall_hours=72)["stalled"]
+    # A workspace with no ticket type has no turns to stall.
+    plain = _repo(tmp_path, "plain")
+    assert turn_stalls(plain, now=now)["tickets"] == []
+
+
+def test_seat_stall_exit_rings_only_when_a_turn_has_stalled(tmp_path, capsys):
+    from markdownllm.seat import cmd_seat, set_seat
+    root = _ticket_repo(tmp_path)
+    set_seat(root, "codex", "codex-cli")
+    ns = argparse.Namespace(path=str(root), set=None, clear=False,
+                            stall_exit=True, stall_hours=12.0)
+    assert cmd_seat(ns) == 0                       # nothing open: no ring
+    assert "turn stalled" not in capsys.readouterr().out
+    _ticket(root, "waiting", "codex", "2026-10-01")
+    assert cmd_seat(ns) == 5                       # the ring
+    out = capsys.readouterr().out
+    assert "turn stalled: `ticket-waiting` owed by this seat" in out
+    ns.stall_exit = False
+    assert cmd_seat(ns) == 0                       # the line prints either way
+    assert "turn stalled" in capsys.readouterr().out
+
+
+def test_session_start_carries_the_stall_line(tmp_path, capsys):
+    from markdownllm.session import cmd_session_start
+    root = _ticket_repo(tmp_path)
+    _ticket(root, "unanswered", "claude", "2026-10-01")
+    assert cmd_session_start(argparse.Namespace(path=str(root))) == 0
+    out = capsys.readouterr().out
+    assert "turn stalled: `ticket-unanswered` awaiting `claude`" in out

@@ -900,8 +900,11 @@ def cmd_session_start(args) -> int:
     # it committed never left. Two constant git spawns; the loop signal is
     # the schema's `ticket` type, read from disk, so the corpus scan below
     # stays the one scan.
-    from .seat import seat_line
-    out.append(seat_line(domain, loops=_declares_tickets(domain)))
+    # The stall ring (the-seat, the ring) rides the same two reads: a turn
+    # unpublished or a ticket unanswered past the window is an attention
+    # line here, not only a count.
+    from .seat import seat_lines
+    out.extend(seat_lines(domain, loops=_declares_tickets(domain)))
     # History before velocity: a shallow clone makes velocity read low and
     # the stall section vanish, silently (clone_depth.py — the first cloud
     # session showed `0 · 3 · 21 · 17` and no stalls against a true

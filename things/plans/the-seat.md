@@ -2,7 +2,7 @@
 id: the-seat
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-10-15
 session: 2026-10-15
 priority: critical
@@ -97,6 +97,28 @@ block's output before the next release.
       every clone that takes turns has a declared seat (the digest says),
       no generated block has been rewritten in turns, and `git log` in the
       busiest workspace reads who took each turn.
+- [x] **Phase 7 — The ring.** *(Added and shipped 2026-10-30.)* The
+      second-largest cause — a turn that never left — was named at the
+      next session start, which is when somebody arrives; the operator's
+      account of every attempt is that this stall "has bitten more times
+      than most" and cost the most to intervene on. Read against
+      Anthropic's published orchestration (every mechanism they ship for
+      scale restarts or rings on a silent agent; the wake channel is the
+      weak joint, never the message channel), the fix is the one Phase 2
+      of `the-record-holds-unattended` gave the dispatcher: the same read,
+      made to ring. `mdllm seat` now reads two stalls against a declared
+      window (12h by default; `--stall-hours`): a commit unpublished, and
+      an open ticket whose last turn is older than the window — *owed by
+      this seat* when its addressee is this clone's seat, *awaiting
+      `<seat>`* otherwise. The lines ride the session-start digest and
+      estate-sync's attention section in every walked workspace that
+      declares a ticket type; `mdllm seat --stall-exit` and `estate-sync
+      --silence-exit` return 5 on a stall so a scheduled task rings on the
+      code alone. The window is declared, not inferred from cadence: turns
+      inside a conversation are minutes apart and a cadence read would
+      ring on every pause; the failures on record were half a day and
+      more. *Done when:* a stalled turn has rung an operator who was not
+      in a session — the same unexercised half the dispatcher's ring has.
 
 ## Done when
 
@@ -104,4 +126,6 @@ block's output before the next release.
 - [ ] Two clones on different frameworks never rewrite one block in turns.
 - [ ] A turn that never left is named at the next session start in the
       clone that holds it.
+- [ ] A stalled turn — unpublished, or unanswered past the window — rings
+      an operator who is not in a session (Phase 7).
 - [ ] The loop's own record reads as conversations, one per work item.

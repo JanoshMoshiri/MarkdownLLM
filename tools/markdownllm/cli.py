@@ -269,6 +269,13 @@ def build_cli() -> argparse.ArgumentParser:
                     help="with --set: the harness or product sitting here")
     st.add_argument("--email", help="with --set: the git email (default <actor>@seat.local)")
     st.add_argument("--clear", action="store_true", help="withdraw the declaration")
+    st.add_argument("--stall-exit", action="store_true",
+                    help="exit 5 when a turn has stalled — a commit unpublished, "
+                         "or an open ticket unanswered, for longer than "
+                         "--stall-hours; the lines print either way, so a "
+                         "scheduled task can ring on the code (the-seat, the ring)")
+    st.add_argument("--stall-hours", type=float, default=12.0,
+                    help="the window a turn may wait before it is a stall (default 12)")
     st.set_defaults(fn=cmd_seat)
 
     dc = sub.add_parser("docs", help="regenerate the derived blocks in docs/ "
@@ -497,7 +504,9 @@ def build_cli() -> argparse.ArgumentParser:
     es.add_argument("--silence-exit", action="store_true",
                     help="exit 5 when the dispatcher is silent — the newest "
                          "dispatch digest on this machine is older than twice "
-                         "the cadence the digests show; the line prints either "
+                         "the cadence the digests show — or a turn has stalled "
+                         "in a walked workspace that runs loops (an unpublished "
+                         "commit or an unanswered open ticket past 12h); the lines print either "
                          "way, this is the ring a scheduled task can wake on")
     es_mode = es.add_mutually_exclusive_group()
     es_mode.add_argument("--status", action="store_true",
