@@ -402,12 +402,29 @@ human seat. A peer channel distributes requests; the moment it distributes
 authority, the mesh is exactly as unsafe as the weakest peer
 (`mesh-safety-is-the-floor-not-the-topology`).
 
-**Keeping itself awake with no adapter.** The wake is still the harness's
-act. An agent whose harness has no adapter can hold the turn open itself:
-run the blocking watch as a command inside its own turn, act on exit 0,
-re-arm. Whether a given harness can hold that command long enough is an
-execution fact, not a claim — Phase 7 of `substrate-native-a2a` tests it on
-Codex specifically, with its fallbacks named.
+**A conversation has a turn budget.** An agent inside a loop evaluates each
+turn and never the loop; the question that ends a run is exogenous
+(`an-agent-in-a-loop-optimises-the-loop-not-the-goal`). So the floor
+carries it: every commit that touched a ticket is a turn, and an open ticket
+at or past its budget is a line at session start and in estate-sync, and
+rings with `mdllm seat --stall-exit` and `estate-sync --silence-exit`. The
+budget is 120 by default — the operator's number, set 2026-10-31 — or the
+clone's `mdllm.seat.turn-budget`, or the ticket's own `turn_budget` (declare
+the field in `_schema.yaml` `known_fields` to use it). The line asks for a
+decision, not a reflex: conclude the conversation, split the work item, or
+raise the budget deliberately. A closed ticket owes nothing however long it
+ran. Counted from the record, never from a counter an agent keeps.
+
+**Keeping itself awake.** The wake is the harness's act, and the binding
+each harness has is recorded above (The Contract → Harness bindings). An
+earlier version of this paragraph told an agent whose harness had no adapter
+to hold the blocking watch as a command inside its own turn; in a harness
+with a bounded tool call that command dies at the timeout, and the record of
+2026-10-11 shows the turn then arriving unseen. Arm the watch the way the
+harness rises — a background command in Claude Code, a notifying background
+terminal in Hermes — and let the stall ring be the backstop. Whether a given
+harness holds a blocking command long enough remains an execution fact, not
+a claim; Phase 7 of `substrate-native-a2a` still owes Codex's number.
 
 ## Division of Labour: Floor vs Agent
 

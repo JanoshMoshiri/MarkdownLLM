@@ -65,3 +65,17 @@ binding per harness; `substrate-native-a2a` records the same under *The
 wake itself*. The OpenClaw adapter things hold: their binding is theirs and
 this section does not claim it. **Verdict: inflection**, ruled by the
 operator; the live round trip with no human relay remains the proof owed.
+
+## Second change, next day — 2026-10-31, the turn budget
+
+The Ticket section gains *A conversation has a turn budget* (120 by
+default, the operator's number; the clone's or the ticket's own may
+override) and its *Keeping itself awake* paragraph is corrected: it still
+told an adapterless harness to hold the blocking watch inside its turn,
+the instruction the Harness bindings section had just ruled out. The gate's
+staged read owed no new cue for the spec; the change is walked here. Same
+fourteen dependants, same judgement: `ad-hoc-message-loop`'s stages are
+unchanged and the budget is read by the floor, not declared in the loop;
+`the-seat` carries Phase 8 for it in the same commit (revised, 1.2 -> 1.3);
+`substrate-native-a2a` holds. **Verdict stands: inflection** — one
+dependant revised with the change, by the operator's ruling of 2026-10-31.

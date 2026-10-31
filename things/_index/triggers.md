@@ -3,9 +3,9 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-10-30
-generated: 2026-10-30T23:44:46
-generated_from: HEAD@bf2d230
+created: 2026-10-31
+generated: 2026-10-31T00:50:11
+generated_from: HEAD@5862d17
 coverage: 9
 framework_version: 3.50.0
 ---

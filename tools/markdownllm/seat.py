@@ -67,6 +67,17 @@ ABANDON_HOURS = 24.0
 _CFG_STALL = "mdllm.seat.stall-hours"
 _CFG_ABANDON = "mdllm.seat.abandon-hours"
 
+# The turn budget: the number of turns a conversation may take before the
+# floor says so. The exogenous stop an agent inside a loop never asks for
+# (an-agent-in-a-loop-optimises-the-loop-not-the-goal), made a line at
+# session start rather than a question the operator must remember. The
+# operator set the number on 2026-10-31: "120 sounds like a good number".
+# A ticket may declare its own `turn_budget` (declare the field in the
+# schema's known_fields); a clone may set `mdllm.seat.turn-budget`.
+TURN_BUDGET = 120
+_CFG_BUDGET = "mdllm.seat.turn-budget"
+_FM_BUDGET_RE = re.compile(r"^\s*turn_budget:\s*['\"]?(\d+)")
+
 # Tickets by name, the way the dispatch read finds digests: the template
 # names them `ticket-<item>`, so a seat read pays for a handful of
 # frontmatter heads and never a corpus walk.
@@ -132,7 +143,17 @@ def stall_thresholds(repo: Path, stall_hours: float | None = None,
     """(window, ceiling) in hours: an explicit argument, else the clone's
     local config, else the defaults. The ceiling is never below the window."""
     cfg = {}
-    r = _run(repo, "config", "--local", "--get-regexp", r"^mdllm\.seat\.(stall|abandon)-hours$")
+    cfg = _seat_config(repo)
+    window = stall_hours if stall_hours is not None else cfg.get(_CFG_STALL, STALL_HOURS)
+    ceiling = abandon_hours if abandon_hours is not None else cfg.get(_CFG_ABANDON, ABANDON_HOURS)
+    return float(window), max(float(ceiling), float(window))
+
+
+def _seat_config(repo: Path) -> dict:
+    """The clone's numeric seat settings, one git spawn."""
+    cfg: dict = {}
+    r = _run(repo, "config", "--local", "--get-regexp",
+             r"^mdllm\.seat\.(stall-hours|abandon-hours|turn-budget)$")
     if r is not None and r.returncode in (0, 1):
         for line in (r.stdout or "").splitlines():
             key, _, value = line.partition(" ")
@@ -140,9 +161,18 @@ def stall_thresholds(repo: Path, stall_hours: float | None = None,
                 cfg[key.strip().lower()] = float(value.strip())
             except ValueError:
                 continue
-    window = stall_hours if stall_hours is not None else cfg.get(_CFG_STALL, STALL_HOURS)
-    ceiling = abandon_hours if abandon_hours is not None else cfg.get(_CFG_ABANDON, ABANDON_HOURS)
-    return float(window), max(float(ceiling), float(window))
+    return cfg
+
+
+def turn_budget(repo: Path, explicit: int | None = None) -> int:
+    """The clone's default budget: an explicit argument, else local config,
+    else TURN_BUDGET. A ticket's own `turn_budget` overrides per ticket."""
+    if explicit is not None:
+        return max(1, int(explicit))
+    cfg = _seat_config(repo)
+    if _CFG_BUDGET in cfg:
+        return max(1, int(cfg[_CFG_BUDGET]))
+    return TURN_BUDGET
 
 
 def declares_tickets(repo: Path) -> bool:
@@ -178,14 +208,9 @@ def _hours_since_last_commit(repo: Path, path: Path, now: dt.datetime) -> float 
     return max(0.0, (now - stamp).total_seconds() / 3600)
 
 
-def ticket_stalls(repo: Path, seat_name: str = "", now: dt.datetime | None = None,
-                  stall_hours: float = STALL_HOURS) -> list[dict]:
-    """Open tickets whose last turn is older than the window: {id, status,
-    hours, owed_here}. `owed_here` is true when the addressee is this clone's
-    seat — the stall is ours to end; otherwise another seat has not risen.
-    A ticket in a terminal status owes nothing and is skipped. The caller
-    splits the result at the ceiling into stalled and abandoned."""
-    now = now or dt.datetime.now(dt.timezone.utc)
+def _open_tickets(repo: Path) -> list[dict]:
+    """Every open ticket by name: {path, id, status, turn_budget}. A ticket in
+    a terminal status owes nothing and is skipped."""
     terminal = _terminal_ticket_statuses(repo)
     out: list[dict] = []
     for path in sorted(repo.glob(_TICKET_GLOB)):
@@ -199,6 +224,7 @@ def ticket_stalls(repo: Path, seat_name: str = "", now: dt.datetime | None = Non
         is_ticket = False
         status = ""
         tid = path.stem
+        budget = None
         for line in front.splitlines():
             if _FM_TYPE_RE.match(line):
                 is_ticket = True
@@ -208,13 +234,57 @@ def ticket_stalls(repo: Path, seat_name: str = "", now: dt.datetime | None = Non
             m = _FM_ID_RE.match(line)
             if m:
                 tid = m.group(1)
+            m = _FM_BUDGET_RE.match(line)
+            if m:
+                budget = int(m.group(1))
         if not is_ticket or not status or status in terminal:
             continue
-        hours = _hours_since_last_commit(repo, path, now)
+        out.append({"path": path, "id": tid, "status": status, "turn_budget": budget})
+    return out
+
+
+def ticket_stalls(repo: Path, seat_name: str = "", now: dt.datetime | None = None,
+                  stall_hours: float = STALL_HOURS) -> list[dict]:
+    """Open tickets whose last turn is older than the window: {id, status,
+    hours, owed_here}. `owed_here` is true when the addressee is this clone's
+    seat — the stall is ours to end; otherwise another seat has not risen.
+    The caller splits the result at the ceiling into stalled and abandoned."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    out: list[dict] = []
+    for t in _open_tickets(repo):
+        hours = _hours_since_last_commit(repo, t["path"], now)
         if hours is None or hours <= stall_hours:
             continue
-        out.append({"id": tid, "status": status, "hours": hours,
-                    "owed_here": bool(seat_name) and status == seat_name})
+        out.append({"id": t["id"], "status": t["status"], "hours": hours,
+                    "owed_here": bool(seat_name) and t["status"] == seat_name})
+    return out
+
+
+def _turns_taken(repo: Path, path: Path) -> int | None:
+    """The turns a ticket has taken: the commits that touched it. None when
+    it has never been committed."""
+    rel = path.resolve().relative_to(repo.resolve()).as_posix()
+    r = _run(repo, "rev-list", "--count", "HEAD", "--", rel)
+    if r is None or r.returncode != 0 or not (r.stdout or "").strip().isdigit():
+        return None
+    return int(r.stdout.strip())
+
+
+def ticket_budgets(repo: Path, default_budget: int = TURN_BUDGET) -> list[dict]:
+    """Open tickets at or past their turn budget: {id, status, turns, budget}.
+    The budget is the ticket's own `turn_budget` when it declares one, else
+    the clone's default. Counted from the record — every commit that touched
+    the ticket is a turn — so the number is the floor's, not a counter an
+    agent maintains."""
+    out: list[dict] = []
+    for t in _open_tickets(repo):
+        turns = _turns_taken(repo, t["path"])
+        if turns is None:
+            continue
+        budget = t["turn_budget"] or default_budget
+        if turns >= budget:
+            out.append({"id": t["id"], "status": t["status"], "turns": turns,
+                        "budget": budget})
     return out
 
 
@@ -228,28 +298,34 @@ def _age(hours: float) -> str:
 
 def turn_stalls(repo: Path, now: dt.datetime | None = None,
                 stall_hours: float | None = None, abandon_hours: float | None = None,
-                *, seat: dict | None = None,
+                budget: int | None = None, *, seat: dict | None = None,
                 up: tuple[int, float] | None | bool = False) -> dict:
-    """The stall read: {seat, unpublished, tickets, abandoned, stall_hours,
-    abandon_hours, stalled}. `tickets` are open tickets quiet for longer
-    than the window and no longer than the ceiling — a live conversation
-    that has stopped, which is what rings. `abandoned` are open tickets
-    quiet past the ceiling — a loop that finished and was never closed,
-    reported and never rung. `seat` and `up` may be passed in by a caller
-    that already read them, so the digest pays its two git spawns once."""
+    """The stall read: {seat, unpublished, tickets, abandoned, over_budget,
+    stall_hours, abandon_hours, turn_budget, stalled}. `tickets` are open
+    tickets quiet for longer than the window and no longer than the ceiling
+    — a live conversation that has stopped, which is what rings. `abandoned`
+    are open tickets quiet past the ceiling — a loop that finished and was
+    never closed, reported and never rung. `over_budget` are open tickets at
+    or past their turn budget — the loop optimising the loop, which rings.
+    `seat` and `up` may be passed in by a caller that already read them, so
+    the digest pays its two git spawns once."""
     now = now or dt.datetime.now(dt.timezone.utc)
     window, ceiling = stall_thresholds(repo, stall_hours, abandon_hours)
+    default_budget = turn_budget(repo, budget)
     seat = seat if seat is not None else read_seat(repo)
     if up is False:
         up = unpublished(repo, now)
     left_stalled = bool(up and up[0] and up[1] > window)
-    quiet = (ticket_stalls(repo, seat["name"], now, window)
-             if declares_tickets(repo) else [])
+    loops = declares_tickets(repo)
+    quiet = ticket_stalls(repo, seat["name"], now, window) if loops else []
+    over = ticket_budgets(repo, default_budget) if loops else []
     tickets = [t for t in quiet if t["hours"] <= ceiling]
     abandoned = [t for t in quiet if t["hours"] > ceiling]
     return {"seat": seat["name"], "unpublished": up, "tickets": tickets,
-            "abandoned": abandoned, "stall_hours": window, "abandon_hours": ceiling,
-            "stalled": left_stalled or bool(tickets)}
+            "abandoned": abandoned, "over_budget": over,
+            "stall_hours": window, "abandon_hours": ceiling,
+            "turn_budget": default_budget,
+            "stalled": left_stalled or bool(tickets) or bool(over)}
 
 
 def stall_lines(info: dict) -> list[str]:
@@ -269,6 +345,14 @@ def stall_lines(info: dict) -> list[str]:
                      f"(window {window}) — a live conversation has stopped; "
                      f"the watch did not ring, or rang and nobody rose "
                      f"(the-seat -> the ring)")
+    for t in info.get("over_budget") or []:
+        lines.append(f"- turn budget reached: `{t['id']}` at {t['turns']} turns "
+                     f"(budget {t['budget']}; addressee `{t['status']}`) — a "
+                     f"conversation this long is the loop optimising the loop, not "
+                     f"the goal; conclude it, split the item, or raise the budget "
+                     f"deliberately (`turn_budget` on the ticket, or "
+                     f"`mdllm.seat.turn-budget` in the clone) "
+                     f"(an-agent-in-a-loop-optimises-the-loop-not-the-goal)")
     if info.get("abandoned"):
         ids = ", ".join(f"`{t['id']}`" for t in info["abandoned"])
         oldest = max(t["hours"] for t in info["abandoned"])
@@ -378,6 +462,7 @@ def cmd_seat(args) -> int:
     print(seat_line(repo, loops=True, seat=seat, up=up))
     info = turn_stalls(repo, stall_hours=getattr(args, "stall_hours", None),
                        abandon_hours=getattr(args, "abandon_hours", None),
+                       budget=getattr(args, "turn_budget", None),
                        seat=seat, up=up)
     for line in stall_lines(info):
         print(line)

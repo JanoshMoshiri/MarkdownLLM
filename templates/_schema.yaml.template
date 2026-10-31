@@ -44,6 +44,7 @@ types: {}
 #  ticket:
 #    statuses: [writer, reviewer, closed]
 #    terminal_statuses: [closed]
+#    known_fields: [turn_budget]   # a ticket may declare its own turn budget (default 120)
 
 # Relation vocabulary (validated at Warning severity). Start small — grow it
 # when a real link needs a relation that isn't here, prune at retrospectives.

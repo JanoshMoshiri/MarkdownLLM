@@ -359,3 +359,50 @@ def test_session_start_carries_the_stall_line(tmp_path, capsys):
     assert cmd_session_start(argparse.Namespace(path=str(root))) == 0
     out = capsys.readouterr().out
     assert "turn stalled: `ticket-unanswered` awaiting `claude` for 3h" in out
+
+
+# ------------------------------------------------------------- the turn budget
+
+def test_a_ticket_at_its_turn_budget_is_reported_and_rings(tmp_path, capsys):
+    # the-seat Phase 8: the exogenous stop an agent in a loop never asks for.
+    # Turns are the commits that touched the ticket, read from the record.
+    # Default 120 (the operator's number, 2026-10-31); the clone or the ticket
+    # may declare another. At or past it the line prints and --stall-exit rings.
+    from markdownllm.seat import cmd_seat, set_seat, turn_stalls
+    root = _ticket_repo(tmp_path)
+    set_seat(root, "codex", "codex-cli")
+    for i, who in enumerate(["codex", "claude", "codex", "claude"]):   # four turns
+        _ticket(root, "long", who, _ago(0.5 - i * 0.1))
+    info = turn_stalls(root)
+    assert info["turn_budget"] == 120 and info["over_budget"] == [] and not info["stalled"]
+    # An explicit budget of three: four turns is over it.
+    info = turn_stalls(root, budget=3)
+    assert [(t["id"], t["turns"], t["budget"]) for t in info["over_budget"]] == [("ticket-long", 4, 3)]
+    assert info["stalled"]
+    # The clone's config sets the default.
+    subprocess.run(["git", "config", "--local", "mdllm.seat.turn-budget", "4"], cwd=root, check=True)
+    assert turn_stalls(root)["over_budget"][0]["turns"] == 4            # at the budget counts
+    subprocess.run(["git", "config", "--local", "--unset", "mdllm.seat.turn-budget"], cwd=root, check=True)
+    # The ticket's own declaration wins over the clone's default.
+    write(root, "things/tickets/ticket-long.md", thing_text(
+        "id: ticket-long\ntype: ticket\nstatus: codex\ncreated: 2026-10-31\nturn_budget: 2",
+        "# Ticket\n\nstill going.\n"))
+    env = {**os.environ, "GIT_AUTHOR_DATE": _ago(0.05), "GIT_COMMITTER_DATE": _ago(0.05)}
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "ticket: long -> codex (budget 2)"], cwd=root,
+                   check=True, env=env)
+    over = turn_stalls(root)["over_budget"]
+    assert over and over[0]["budget"] == 2 and over[0]["turns"] == 5
+    # The CLI prints it and rings.
+    ns = argparse.Namespace(path=str(root), set=None, clear=False, stall_exit=True,
+                            stall_hours=None, abandon_hours=None, turn_budget=None)
+    assert cmd_seat(ns) == 5
+    out = capsys.readouterr().out
+    assert "turn budget reached: `ticket-long` at 5 turns (budget 2; addressee `codex`)" in out
+    # A closed ticket owes nothing, however long it ran.
+    write(root, "things/tickets/ticket-long.md", thing_text(
+        "id: ticket-long\ntype: ticket\nstatus: closed\ncreated: 2026-10-31\nturn_budget: 2",
+        "# Ticket\n\nconcluded.\n"))
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "ticket: long -> closed"], cwd=root, check=True, env=env)
+    assert turn_stalls(root)["over_budget"] == []

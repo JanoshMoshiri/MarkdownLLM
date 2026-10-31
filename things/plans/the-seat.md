@@ -2,7 +2,7 @@
 id: the-seat
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-10-15
 session: 2026-10-15
 priority: critical
@@ -137,6 +137,24 @@ block's output before the next release.
       operator chose the hour. *Done when:* a stalled turn has rung an
       operator who was not in a session — the same unexercised half the
       dispatcher's ring has.
+- [x] **Phase 8 — The turn budget.** *(Added and shipped 2026-10-31.)*
+      Asked what the loop still lacked against Anthropic's published
+      orchestration (every shipped mechanism caps a run; a conversation
+      here ran until someone stopped it), the operator ruled one addition
+      and refused another: *"What we do need is a turn count. 120 sounds
+      like a good number."* And no rule asking a seat to record that it was
+      woken by hand: *"The system that was designed to document documents,
+      we don't need to tell it to document again."* So: every commit that
+      touched a ticket is a turn, read from the record; an open ticket at or
+      past its budget is a line in the same read as the stall ring and
+      rings with it (`--stall-exit`, `--silence-exit`); the budget is 120,
+      or the clone's `mdllm.seat.turn-budget`, or the ticket's own
+      `turn_budget` where the schema declares the field. A closed ticket
+      owes nothing. The line asks for a decision — conclude, split, or
+      raise the budget deliberately — because the insight it implements
+      says the agent inside the loop will not ask it. *Done when:* a
+      conversation has reached its budget and been concluded or re-budgeted
+      on the line rather than on someone noticing.
 
 ## Done when
 
@@ -146,4 +164,6 @@ block's output before the next release.
       clone that holds it.
 - [ ] A stalled turn — unpublished, or unanswered past the window — rings
       an operator who is not in a session (Phase 7).
+- [ ] A conversation at its turn budget is concluded or re-budgeted on the
+      floor's line, not on someone noticing (Phase 8).
 - [ ] The loop's own record reads as conversations, one per work item.

@@ -3,6 +3,8 @@ id: ticket-[thing-the-message-is-about]   # one ticket per work item, never per 
 type: ticket               # domain-declared, never reserved: statuses are your actor names + closed
 status: [actor-b]          # the ADDRESSEE — whose turn it is; the only writer right now
 created: [ISO-date]
+# turn_budget: 120        # optional: this conversation's own budget (declare the field in
+#                         # _schema.yaml known_fields); else the clone's, else 120
 linked_things:
   - id: [thing-the-message-is-about]
     relation: references   # optional; drop when the message is about nothing on the board

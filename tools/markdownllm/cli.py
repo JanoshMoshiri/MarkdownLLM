@@ -283,6 +283,11 @@ def build_cli() -> argparse.ArgumentParser:
                     help="the ceiling past which an open ticket is abandoned, not "
                          "stalled (default: clone config mdllm.seat.abandon-hours, "
                          "else 24)")
+    st.add_argument("--turn-budget", type=int, default=None,
+                    help="the turns a conversation may take before the floor says so "
+                         "and --stall-exit rings; counted as the commits that touched "
+                         "the ticket (default: the ticket's own turn_budget, else clone "
+                         "config mdllm.seat.turn-budget, else 120)")
     st.set_defaults(fn=cmd_seat)
 
     dc = sub.add_parser("docs", help="regenerate the derived blocks in docs/ "
