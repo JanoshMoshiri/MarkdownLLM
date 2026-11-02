@@ -63,7 +63,26 @@ Run workspaces live outside the source repository by default (`$TMP/mdllm-evals`
 or `MDLLM_EVAL_RUN_ROOT`). This is an isolation boundary, not merely a
 gitignored folder: an agent cannot walk upward into the canonical seed and edit
 or read the answer key. The bare condition also withholds the framework
-`--add-dir`. Timed-out and failed invocations are recorded, never discarded.
+`--add-dir`. Timed-out and failed invocations are recorded, never discarded —
+and because the OS cleans its temp directory, **the result JSON is the only
+durable copy of a trial**: when an invocation fails, the agent's reported
+result and the stderr tail travel with it (`agent_result_excerpt`,
+`stderr_tail`). A trial that aborts, or runs no turns at no cost, is
+`voided`, never failed, and `--report` scores only live trials. Two
+consecutive trials that die at launch stop the arm: that is one fact about
+the account or the CLI, not two about the model (eval-record-2026, defects
+6 and 7).
+
+**The read set is observed, not inferred.** The agent runs under
+`--output-format stream-json`, so every tool call is in the transcript
+(`agent-stream*.jsonl` in the run dir; the result event alone in
+`agent-stdout*.json`). Each session's result carries `exploration`: the
+workspace files it read, the framework-view files it read, any path it
+reached *outside* both, what it wrote, and a count per tool; the trial
+carries the union, and `--report` prints mean reads (workspace/framework)
+per cell. This is the measurement the `eval-cycle` definition's hypotheses
+are written against: whether structure makes a model look around is a
+number, not a story.
 
 Every result uses a collision-resistant run id and records the full framework
 commit, framework/tool version, fixture SHA-256, model, requested and observed
@@ -110,6 +129,16 @@ what the framework buys), but it caps the bare cells below 7/7 by construction.
 Report per-assertion results, not just totals, so the comparison stays honest:
 the figures assertions (output/input/net VAT) are condition-neutral; the
 link/status assertions measure structure-following.
+
+## The loop the evenings run
+
+`things/workflows/eval-cycle.md` — the operator's evidence-led
+traceability loop as a workflow-definition: name the moving surfaces,
+freeze them, take a baseline, change **one** surface, write the hypothesis
+before the run, run one arm at a time, reflect, log either way; the next
+cycle is a new run pinned to the last. The 2×3 above is six single-surface
+moves from one baseline when run this way. Cycle 0 is
+`run-eval-cycle-0-polar-baseline-2026-10`.
 
 ## Where the record lives
 

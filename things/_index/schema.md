@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-10-31
-generated: 2026-10-31T00:50:11
-generated_from: HEAD@5862d17
-coverage: 629
+created: 2026-11-02
+generated: 2026-11-02T17:52:49
+generated_from: HEAD@d82db7b
+coverage: 634
 framework_version: 3.50.0
 ---
 
@@ -14,29 +14,29 @@ framework_version: 3.50.0
 
 | field | things using it |
 |---|---|
-| id | 629 |
-| type | 629 |
-| status | 629 |
-| created | 629 |
-| version | 554 |
-| tags | 524 |
-| linked_things | 398 |
-| subject | 226 |
-| raised_at | 226 |
-| raised_by | 226 |
-| verdict | 226 |
-| verdict_reason | 226 |
-| origin | 215 |
-| session | 208 |
-| confidence | 206 |
-| informed_by | 204 |
-| source | 152 |
+| id | 634 |
+| type | 634 |
+| status | 634 |
+| created | 634 |
+| version | 559 |
+| tags | 528 |
+| linked_things | 402 |
+| subject | 227 |
+| raised_at | 227 |
+| raised_by | 227 |
+| verdict | 227 |
+| verdict_reason | 227 |
+| origin | 217 |
+| session | 212 |
+| confidence | 208 |
+| informed_by | 205 |
+| source | 153 |
 | priority | 65 |
 | disposition | 65 |
 | disposition_reason | 65 |
-| decided_by | 45 |
+| decided_by | 46 |
 | promoted_to | 44 |
-| exposed | 37 |
+| exposed | 39 |
 | settles_when | 21 |
 | authorship | 20 |
 | completed | 12 |
@@ -44,23 +44,23 @@ framework_version: 3.50.0
 | period_end | 10 |
 | domain | 10 |
 | triggers | 9 |
+| definition | 6 |
+| current_stage | 6 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |
 | coverage | 5 |
 | framework_version | 5 |
-| definition | 5 |
-| current_stage | 5 |
 | verified | 4 |
 | verified_by | 4 |
 | parties | 4 |
 | resolution | 3 |
+| stages | 3 |
+| definition_commit | 3 |
 | resolved_by | 2 |
 | pattern_type | 2 |
 | demonstrates | 2 |
 | applies_to | 2 |
-| stages | 2 |
-| definition_commit | 2 |
 | source_domain | 1 |
 | source_id | 1 |
 | source_commit | 1 |

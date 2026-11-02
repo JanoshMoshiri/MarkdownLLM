@@ -15,8 +15,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from markdownllm.evals import (  # noqa: E402
     _agent_failure,
     _command_version,
+    _died_at_launch,
     _eval_run_dir,
+    _failure_excerpts,
+    _parse_stream,
+    _read_set,
     _results_exit_code,
+    _void_reason,
     _run_id,
     _seed_fingerprint,
     _validation_control_failure,
@@ -287,3 +292,102 @@ def test_assertions_carry_their_changed_tag_and_count_things_of_type(tmp_path):
     assert "[changed]" in records[0]["line"] and "[unchanged]" in records[1]["line"]
     passed, failed, lines = check_assertions(fixture, tmp_path)
     assert (passed, failed) == (2, 1) and len(lines) == 3
+
+
+# --- eval-record-2026 defects 6 and 7 (2026-10-30) --------------------------
+
+def test_an_aborted_trial_is_void_never_failed():
+    """Defect 6: the 2026-10-05 launch deaths were scored as 44 or 266 failed
+    assertions with `voided` unset — a dead process read as a do-nothing agent."""
+    assert _void_reason(True, "process exited 1", [0], [1]) == "aborted: process exited 1"
+    assert _void_reason(True, "timeout", [], []) == "aborted: timeout"
+    assert "no cost" in _void_reason(False, None, [0, 0], [12, 30])
+    assert "no cost" in _void_reason(False, None, [], [12])
+    assert "no turns" in _void_reason(False, None, [0.4], [0])
+    assert _void_reason(False, None, [0.39, 2.2], [57, 62]) is None
+
+
+def test_a_launch_death_is_distinct_from_a_timeout_and_a_spent_failure():
+    dead = {"agent_failure": "process exited 1", "turns": 1, "cost_usd": 0}
+    assert _died_at_launch(dead)
+    assert _died_at_launch({**dead, "turns": None, "cost_usd": None})
+    assert not _died_at_launch({"agent_failure": "timeout", "timeout": True,
+                                "turns": None, "cost_usd": None})
+    assert not _died_at_launch({"agent_failure": "agent reported error (x)",
+                                "turns": 40, "cost_usd": 1.2})
+    assert not _died_at_launch({"agent_failure": None, "turns": 57, "cost_usd": 0.39})
+
+
+def test_failure_excerpts_travel_with_the_result():
+    """Defect 7: the only copy of the agent's error lived in the temp run root."""
+    meta = {"is_error": True, "result": "You have hit your usage limit"}
+    ex = _failure_excerpts('{"is_error": true}', "warn: x\nfatal: y", meta)
+    assert ex["agent_result_excerpt"] == "You have hit your usage limit"
+    assert ex["stderr_tail"].endswith("fatal: y")
+    # Unparseable stdout: keep the raw head rather than nothing.
+    ex = _failure_excerpts("not json at all", "", None)
+    assert ex["agent_result_excerpt"] == "not json at all"
+    assert ex["stderr_tail"] == ""
+    long = "x" * 5000
+    assert len(_failure_excerpts(long, long, None)["agent_result_excerpt"]) == 600
+
+
+# --- the read set is observed, not inferred (eval-cycle, 2026-10-30) ---------
+
+def _stream(*events) -> str:
+    import json as _json
+    return "\n".join(_json.dumps(e) for e in events)
+
+
+def test_stream_json_yields_the_same_result_object_plus_tool_uses():
+    stdout = _stream(
+        {"type": "system", "subtype": "init"},
+        {"type": "assistant", "message": {"content": [
+            {"type": "text", "text": "reading"},
+            {"type": "tool_use", "name": "Read", "input": {"file_path": "things/a.md"}}]}},
+        {"type": "user", "message": {"content": [{"type": "tool_result"}]}},
+        {"type": "result", "subtype": "success", "is_error": False,
+         "total_cost_usd": 0.42, "num_turns": 7, "modelUsage": {"claude-haiku-4-5-20251001": {}}},
+    )
+    meta, events = _parse_stream(stdout)
+    assert meta["total_cost_usd"] == 0.42 and meta["num_turns"] == 7
+    assert _agent_failure(SimpleNamespace(returncode=0), meta) is None
+    assert events == [{"name": "Read", "input": {"file_path": "things/a.md"}}]
+
+
+def test_legacy_single_object_stdout_and_garbage_still_parse_predictably():
+    meta, events = _parse_stream('{"subtype": "success", "num_turns": 3}')
+    assert meta == {"subtype": "success", "num_turns": 3} and events == []
+    assert _parse_stream("not json") == (None, [])
+    assert _parse_stream("") == (None, [])
+    # Acted, never reported: a named failure, not an unreadable transcript.
+    meta, events = _parse_stream(_stream(
+        {"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "name": "Bash", "input": {"command": "git status"}}]}}))
+    assert "no-result-event" in _agent_failure(SimpleNamespace(returncode=0), meta)
+    assert len(events) == 1
+
+
+def test_read_set_classifies_workspace_view_and_outside(tmp_path):
+    ws = tmp_path / "ws"
+    view = tmp_path / "view"
+    (ws / "things").mkdir(parents=True)
+    (view / "specs").mkdir(parents=True)
+    elsewhere = tmp_path / "elsewhere" / "seed.md"
+    events = [
+        {"name": "Read", "input": {"file_path": "things/a.md"}},
+        {"name": "Read", "input": {"file_path": str(ws / "things" / "a.md")}},
+        {"name": "Grep", "input": {"pattern": "x", "path": str(ws / "things")}},
+        {"name": "Read", "input": {"file_path": str(view / "specs" / "kernel.md")}},
+        {"name": "Read", "input": {"file_path": str(elsewhere)}},
+        {"name": "Write", "input": {"file_path": "things/b.md"}},
+        {"name": "Bash", "input": {"command": "git commit -m x"}},
+    ]
+    ex = _read_set(events, ws, view)
+    assert ex["files_read"] == ["things", "things/a.md"]  # relative and absolute collapse to one
+    assert ex["framework_files_read"] == ["specs/kernel.md"]
+    assert ex["outside_paths"] == [elsewhere.resolve().as_posix()]
+    assert ex["files_written"] == ["things/b.md"]
+    assert ex["tool_counts"] == {"Bash": 1, "Grep": 1, "Read": 4, "Write": 1}
+    # No framework view (bare arms): the view's path is just outside.
+    assert _read_set(events[3:4], ws, None)["outside_paths"]

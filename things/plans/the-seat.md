@@ -2,7 +2,7 @@
 id: the-seat
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-10-15
 session: 2026-10-15
 priority: critical
@@ -97,6 +97,17 @@ block's output before the next release.
       every clone that takes turns has a declared seat (the digest says),
       no generated block has been rewritten in turns, and `git log` in the
       busiest workspace reads who took each turn.
+      *First observation, 2026-10-30 (the trigger's answer):* this clone had
+      declared a seat — `codex (codex)`, 2026-10-24 — and the declaration
+      was wrong the first time its occupant changed: a Claude session
+      arrived and would have committed as codex. The digest line was not
+      read past; it was read and said nothing wrong, because the seat was
+      named after the agent and the agent had moved. Ruled the same day:
+      seats are named for the clone, agnostic of the agent
+      (`seats-are-named-for-the-clone-not-the-agent-2026-10-30`); this clone
+      is `workspace-1`, the other `workspace-2`. Whether any generated block
+      was rewritten in turns needs the second clone's log and is not yet
+      read.
 - [x] **Phase 7 — The ring.** *(Added and shipped 2026-10-30.)* The
       second-largest cause — a turn that never left — was named at the
       next session start, which is when somebody arrives; the operator's

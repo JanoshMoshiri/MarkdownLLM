@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-10-31
-generated: 2026-10-31T00:50:12
-generated_from: HEAD@5862d17
-coverage: 629
+created: 2026-11-02
+generated: 2026-11-02T17:52:49
+generated_from: HEAD@d82db7b
+coverage: 634
 framework_version: 3.50.0
 ---
 
@@ -584,6 +584,7 @@ framework_version: 3.50.0
 - cue-first-hour-guide-2026-10-18 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-10-20 --subject--> first-hour-guide
 - cue-first-hour-guide-2026-10-21 --subject--> first-hour-guide
+- cue-flagship-models-look-around-the-edges-2026-10-30 --subject--> flagship-models-look-around-the-edges
 - cue-floor-structure-residue-2026-09-13 --subject--> floor-structure-residue
 - cue-framework-map-2026-09-12 --subject--> framework-map
 - cue-framework-map-2026-09-19 --subject--> framework-map
@@ -873,10 +874,15 @@ framework_version: 3.50.0
 - estate-workflow-derivation --derived-from--> derivation-shape-brief-2026-08
 - estate-workflow-derivation --informs--> operating-layer-quality-loop
 - estate-workflow-derivation --derived-from--> estate-retrospective-synthesis-2026-08
+- eval-cycle --derived-from--> universal-workflow-methodology
+- eval-cycle --implements--> evidence-and-eval-backlog
+- eval-cycle --references--> eval-record-2026
+- eval-cycle --references--> flagship-models-look-around-the-edges
 - eval-record-2026 --informs--> evidence-and-eval-backlog
 - eval-record-2026 --references--> review-critical-comparison-2026-10-17-claude
 - eval-record-2026 --references--> withholding-is-not-isolation
 - eval-record-2026 --references--> first-2x2-measured-convention-following-not-reasoning
+- eval-record-2026 --references--> flagship-models-look-around-the-edges
 - every-reader-class-needs-its-own-kernel --informs--> public-docs-face-is-derived-not-restated
 - every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
 - every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose
@@ -965,6 +971,12 @@ framework_version: 3.50.0
 - first-hour-guide --implements--> documentation-rulings-2026-10-20
 - fixture-fixes-correct-bugs-not-difficulty --supports--> hook-compliance-correlates-with-scope-not-awareness
 - fixture-fixes-correct-bugs-not-difficulty --complements--> operative-rules-are-a-small-fraction-of-spec-prose
+- flagship-models-look-around-the-edges --supports--> withholding-is-not-isolation
+- flagship-models-look-around-the-edges --references--> structure-decides-figures-scale-decides-convention
+- flagship-models-look-around-the-edges --informs--> evidence-and-eval-backlog
+- flagship-models-look-around-the-edges --references--> eval-record-2026
+- flagship-models-look-around-the-edges --references--> isolation-must-contain-writes-not-just-reads
+- flagship-models-look-around-the-edges --references--> eval-cycle
 - floor-block-requirements-2026-08 --informs--> run-floor-sprint-1-2026-08
 - floor-block-requirements-2026-08 --derived-from--> substrate-review-consolidated-remedy-2026-08-20
 - floor-block-requirements-2026-08 --references--> floor-structure-residue
@@ -1569,6 +1581,9 @@ framework_version: 3.50.0
 - review-substrate-examination-2026-10-24-claude --references--> operating-model-specification
 - review-substrate-examination-2026-10-24-claude --references--> interface-specification
 - rich-founding-context-breaks-scaffold-then-jump --references--> agents-drop-mechanical-birth-steps-not-semantic-ones
+- run-eval-cycle-0-polar-baseline-2026-10 --implements--> evidence-and-eval-backlog
+- run-eval-cycle-0-polar-baseline-2026-10 --references--> eval-record-2026
+- run-eval-cycle-0-polar-baseline-2026-10 --definition--> eval-cycle
 - run-floor-sprint-1-2026-08 --references--> substrate-review-consolidated-remedy-2026-08-20
 - run-floor-sprint-1-2026-08 --definition--> substrate-floor-development
 - run-floor-sprint-2-2026-08 --references--> run-floor-sprint-1-2026-08
@@ -1619,6 +1634,9 @@ framework_version: 3.50.0
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> loop-turns-self-heal-2026-09-23
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> a-shared-worktree-merges-authorship-at-the-index
 - seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15 --references--> standing-watch-specification
+- seats-are-named-for-the-clone-not-the-agent-2026-10-30 --extends--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- seats-are-named-for-the-clone-not-the-agent-2026-10-30 --informs--> the-seat
+- seats-are-named-for-the-clone-not-the-agent-2026-10-30 --references--> standing-watch-specification
 - serve-side-blindness-dissolves-into-composition --implements--> watertight-membrane-sprint-2026-08-30
 - serve-side-blindness-dissolves-into-composition --derived-from--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - serve-side-blindness-dissolves-into-composition --derived-from--> source-behind-mirror-is-still-a-consumer-side-read

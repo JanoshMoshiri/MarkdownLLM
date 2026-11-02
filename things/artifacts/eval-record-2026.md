@@ -2,11 +2,11 @@
 id: eval-record-2026
 type: artifact
 status: evolving
-version: 1.0
+version: 1.1
 created: 2026-10-20
 origin: stated
 exposed: false
-tags: [evals, record, results, controls, defects, structure-beats-scale, longitudinal]
+tags: [evals, record, results, controls, defects, structure-beats-scale, longitudinal, prediction]
 linked_things:
   - id: evidence-and-eval-backlog
     relation: informs
@@ -20,6 +20,9 @@ linked_things:
   - id: first-2x2-measured-convention-following-not-reasoning
     relation: references
     notes: "The honest reading of the first 2×2, recorded here with its table."
+  - id: flagship-models-look-around-the-edges
+    relation: references
+    notes: "The pre-registered prediction for the polar-station 2×3 lives there; this record is where the run checks it."
 ---
 
 # Eval record 2026 — every run, what it found, and what the runner still owes
@@ -297,3 +300,62 @@ fifteen days. They are committed now, sorted by what they are:
      four clean runs refused the other thirty-eight within the same hour;
      the exit status was recorded and the cause was not. Diagnose from
      `evals/runs/` before any arm is run again.
+
+### Defects 6 and 7 closed (2026-10-30) — diagnosed from the committed evidence alone
+
+The run workspaces under the OS temp root were gone by the time anyone
+looked (`%TEMP%\mdllm-evals` no longer existed on 2026-10-30), so the
+`evals/runs/` diagnosis defect 7 asked for could not happen as written.
+The fifty-three committed result files were enough. Read in time order:
+
+| UTC, 2026-10-05 | what launched | outcome |
+|---|---|---|
+| 20:11 | haiku **polar-station** t1, six sessions | clean, 240/251, $2.29, 1219 s — the fixture's one valid trial |
+| 22:09 | haiku FAC t1 | clean, 36/44 |
+| 22:13:28 | haiku FAC t1 **and** opus FAC t1, same second | both clean (233 s, 264 s) |
+| 22:17:26 → 22:20:14 | 46 launches: FAC t2–t5 on both models, then every polar-station trial of the evening (30) on both models in all three conditions, from at least three arms running at once | every one `process exited 1`, 1 turn, $0, 5–10 s |
+
+**Diagnosis.** From 22:17:26 nothing launched successfully for three
+minutes, across models, conditions, fixtures and arms. A fault that
+correlates with the clock and with nothing the runner varies is upstream
+of the runner — the account (a usage window closing after the morning's
+eleven open-grant trials and the evening's clean ones), the CLI, or the
+network — not the fixture, the condition or the controls landed that
+afternoon. The agent's own words would have named which; they were in
+`agent-stdout*.json` in the temp root, and the temp root is not an
+evidence store. Three arms running concurrently is also on the record and
+is not excluded as a contributing cause; it is not asserted as one.
+
+**Two consequences, both built the same day:**
+
+6. **An aborted trial is void, never failed** — `_void_reason`: an abort,
+   no cost, or no turns sets `voided` on the result, and `--report` scores
+   only live trials (voided ones are counted in their own column and never
+   enter a pass rate). The fifty-three files above are not rewritten; the
+   rule applies from the next run.
+7. **The next launch failure diagnoses itself, and stops the arm.** When
+   an invocation fails, the agent's reported `result` (or the raw stdout
+   head) and the stderr tail are kept **in the result JSON** —
+   `agent_result_excerpt`, `stderr_tail` — so the evidence mirror carries
+   the cause. Two consecutive trials that die at launch (failed within one
+   turn at no cost; a timeout is not that) stop the arm with the excerpt
+   on screen, because the third would measure the same fact about the
+   account a third time. Regressions: `tools/tests/test_eval_integrity.py`.
+
+**One more fact the table surfaces, and a correction to the 2026-10-20
+section above:** the "once 240/251 across six sessions" listed there under
+the FAC heading is not a FAC trial — FAC has three sessions and 44
+assertions. It is the **polar-station fixture's one valid trial**: haiku,
+framework, 20:11 that evening, 41/41 · 39/41 · 40/41 · 40/41 · 38/41 ·
+42/46 across build → dock, $2.29, under fixture bytes `bfddcbee` — a
+revision *before* delta scoring and the rounding margins (the current
+fixture is `abad0ddc`, so `--report` will never pool them). No opus trial
+of the fixture exists, and no bare trial of it has ever run. One haiku
+trial at 96% on the framework arm says the fixture is not trivially hard
+for the framework condition at the small tier; it says nothing yet about
+the bare arms, which is where the hypothesis is decided.
+
+**Pre-registered before that run:** `flagship-models-look-around-the-edges`
+records what the 2×3 should show if the operator's observation about
+model tiers holds, cell by cell, with the one cell that decides it
+(haiku-framework against opus-bare). Written so the run can falsify it.
