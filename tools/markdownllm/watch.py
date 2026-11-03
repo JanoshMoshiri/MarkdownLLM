@@ -66,6 +66,10 @@ DEFAULT_INTERVAL = 60.0
 POLL_TIMEOUT = 30.0
 FETCH_TIMEOUT = 120.0
 LOCAL_TIMEOUT = 20.0   # rev-parse / merge-base / rev-list: local reads, never the network
+# The message a wake delivers is the woken thing's body, read from the same
+# commit view as the board. Capped so a wake stays a wake and not a dump;
+# past the cap the line says how much more there is and where to read it.
+MESSAGE_CAP = 6000
 
 
 class WatchError(RuntimeError):
@@ -580,18 +584,36 @@ def read_board(
 
 def read_content(
     corpus: Corpus, board: dict[str, str],
-) -> tuple[dict[str, str], dict[str, Path]]:
-    """A digest of each board thing's bytes, and where it lives — read from
-    the same commit view as the board, never the worktree."""
+) -> tuple[dict[str, str], dict[str, Path], dict[str, str]]:
+    """A digest of each board thing's bytes, where it lives, and its body —
+    read from the same commit view as the board, never the worktree."""
     content: dict[str, str] = {}
     paths: dict[str, Path] = {}
+    bodies: dict[str, str] = {}
     for thing in corpus.things:
         if thing.id not in board:
             continue
         raw = thing.source_text if thing.source_text is not None else thing.body
         content[thing.id] = hashlib.sha1(raw.encode("utf-8", "replace")).hexdigest()
         paths[thing.id] = thing.path
-    return content, paths
+        bodies[thing.id] = thing.body or ""
+    return content, paths, bodies
+
+
+def message_block(thing_id: str, status: str, head: str, body: str) -> str:
+    """The message a wake delivers: the woken thing's body, as committed at
+    the head that rang. The watch has the bytes in hand from the commit view
+    it diffed, so handing them over crosses no wire and spares the woken
+    agent a read it would otherwise make blind (the operator's ruling of
+    2026-11-03: the watcher delivers the updated message, not a pointer)."""
+    text = body.strip("\n")
+    more = ""
+    if len(text) > MESSAGE_CAP:
+        more = (f"\n[… {len(text) - MESSAGE_CAP} more character(s) — read "
+                f"{thing_id} at {head[:8]}]")
+        text = text[:MESSAGE_CAP]
+    return (f"--- message: {thing_id} @ {head[:8]} ('{status}') ---\n"
+            f"{text}{more}\n--- end of message ---")
 
 
 def diff_notes(
@@ -764,9 +786,22 @@ def _declarable_statuses(corpus: Corpus, field_name: str) -> set[str]:
 
 def cmd_watch(args) -> int:
     root = Path(getattr(args, "path", ".") or ".").resolve()
+    role = (getattr(args, "role", None) or "").strip()
+    from_seat = False
+    if not role:
+        # Actors are seats (standing-watch.md). A clone that has declared
+        # its seat watches as that seat; `--role` remains for a loop whose
+        # actor names predate the seat ruling.
+        role = (read_seat(root).get("name") or "").strip()
+        from_seat = True
+        if not role:
+            print("mdllm watch: no --role and no declared seat — this clone "
+                  "cannot know who it watches for. `mdllm seat . --set <actor> "
+                  "--agent <harness>` declares it, or pass --role.")
+            return 2
     config = WatchConfig(
         root=root,
-        role=args.role,
+        role=role,
         definition_id=args.definition,
         remote=getattr(args, "remote", "origin") or "origin",
         branch=getattr(args, "branch", "main") or "main",
@@ -781,7 +816,13 @@ def cmd_watch(args) -> int:
     try:
         _, stage_ids, wake_stages = _resolve_definition(config)
     except WatchError as exc:
-        print(f"mdllm watch: {exc}")
+        hint = ""
+        if from_seat and "declares no stage with" in str(exc):
+            hint = (f" — the role came from this clone's seat (`{role}`); the "
+                    "loop's actors are named otherwise, so rename them to the "
+                    "seats or pass --role "
+                    "(seats-are-named-for-the-clone-not-the-agent-2026-10-30)")
+        print(f"mdllm watch: {exc}{hint}")
         return 2
     except RepositoryViewError as exc:
         print(f"mdllm watch: {exc}")
@@ -870,7 +911,7 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             continue
 
         board = read_board(corpus, config, stage_ids)
-        content, paths = read_content(corpus, board)
+        content, paths, bodies = read_content(corpus, board)
 
         # The bad-read guard is the *threshold*, never emptiness on its own.
         # An earlier version also refused any board that went from populated
@@ -900,6 +941,9 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             changes, gone = diff_board(state.board, board, wake_stages)
             for change in changes:
                 print(change.line(config.role))
+                if change.wakes:
+                    print(message_block(change.thing_id, change.now, head,
+                                        bodies.get(change.thing_id, "")))
                 woke = woke or change.wakes
             for missing in gone:
                 # The analogue of the sibling's vanished line: the event that
@@ -921,6 +965,9 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
                 note = _Note(thing_id=thing_id, status=status, authors=authors,
                              own=own, addressed=addressed)
                 print(note.line(config.role, seat.get("name", "")))
+                if addressed and not own:
+                    print(message_block(thing_id, status, head,
+                                        bodies.get(thing_id, "")))
                 woke = woke or (addressed and not own)
 
         state.board = board

@@ -260,7 +260,7 @@ hook, CI, or the agent — but all of them are yours to invoke directly.
 | `touchpoints` | `mdllm touchpoints id [path]` | Assimilate beat: what a thing's change disturbs (declared edges + literal refs) |
 | `triggers` | `mdllm triggers [--estate] [path]` | evaluate trigger conditions; --estate sweeps every local clone with a roll-up (run after estate-sync) |
 | `validate` | `mdllm validate [--quiet] [--view {worktree,index}] [path]` | Levels 1-3 mechanical validation |
-| `watch` | `mdllm watch --role ROLE --definition DEFINITION [--run RUN] [--field FIELD] [--remote REMOTE] [--branch BRANCH] [--interval INTERVAL] [--exit-on-wake] [--once] [--state STATE] [path]` | the doorbell: poll the remote ref and report when a watched thing reaches a stage this role acts at; reads only, never writes |
+| `watch` | `mdllm watch [--role ROLE] --definition DEFINITION [--run RUN] [--field FIELD] [--remote REMOTE] [--branch BRANCH] [--interval INTERVAL] [--exit-on-wake] [--once] [--state STATE] [path]` | the doorbell: poll the remote ref and report when a watched thing reaches a stage this role acts at; reads only, never writes |
 | `workflows` | `mdllm workflows [--emergent] [--draft] [path]` | workflows and their runs: each definition with its carrier-derived runs by stage and the departures history shows since it last changed; --emergent adds the paths the record supports as a workflow no definition binds, with evidence; read-only except --draft; exit 0 |
 | `worklog` | `mdllm worklog [--write] [path]` | print a session-grouped view of the commit stream (on-demand; not committed) |
 

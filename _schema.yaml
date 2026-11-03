@@ -44,10 +44,13 @@ types:
   # purpose: a reserved type never appears on a status-keyed board, so a
   # reserved ticket would wake nobody. Declared at the root on 2026-10-20 for
   # the first two-seat review of a substrate change (run-reckoning-phase-4-2026-10):
-  # Claude builds, Codex reviews once at the pinned commit, the operator seals.
+  # one seat builds, the other reviews once at the pinned commit, the operator
+  # seals. Seats are named for the clone, not the agent
+  # (seats-are-named-for-the-clone-not-the-agent-2026-10-30): `claude` and
+  # `codex` became `workspace-1` and `workspace-2` on 2026-11-03.
   ticket:
     description: An agent-to-agent message with no artefact behind it; `status` names the seat whose turn it is, `closed` means nothing is owed
-    statuses: [claude, codex, closed]
+    statuses: [workspace-1, workspace-2, closed]
     terminal_statuses: [closed]
 
 # Declared relation vocabulary (validated at Warning severity).

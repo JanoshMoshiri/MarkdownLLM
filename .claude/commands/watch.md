@@ -23,7 +23,7 @@ Run the watch **in the background** (the Bash tool's `run_in_background`),
 from the workspace root, through the launch route the entry file names:
 
 ```
-mdllm watch . --role <role> --definition <definition> [--run <run>] --exit-on-wake
+mdllm watch . --definition <definition> [--role <role>] [--run <run>] --exit-on-wake
 ```
 
 Before arming, confirm the seat is declared (`mdllm seat .`): the watch

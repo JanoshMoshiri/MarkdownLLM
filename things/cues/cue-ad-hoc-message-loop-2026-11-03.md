@@ -52,3 +52,18 @@ other seat may append and the ring it causes. The shipped template says the
 same. The run and the ticket that instantiate this loop are unaffected: a
 note is a new kind of write, not a new stage. **Verdict: inflection**,
 ruled by the operator.
+
+## Second change, same day — the actors are the seat names
+
+The stages and edges are renamed `claude` / `codex` -> `workspace-1` /
+`workspace-2`, the rename the 2026-10-30 seat ruling deferred until both
+clones carried clone names; the schema's ticket vocabulary and the generated
+types block follow, and the session-wake paragraph says the role defaults
+to the declared seat and the message rides the wake. The gate found this
+cue already carrying the day. Same six dependants: the completed run
+`run-reckoning-phase-4-2026-10` names the old vocabulary in its narrative
+as what was declared on 2026-10-20, which is history and holds; its
+`current_stage` is its own definition's, not this loop's; the one ticket is
+closed and reads nothing by the old names; the spec, the plan and the
+carrier decision are unchanged by a rename. **Verdict stands: inflection**
+— the definition's turn tokens changed on the operator's ruling.

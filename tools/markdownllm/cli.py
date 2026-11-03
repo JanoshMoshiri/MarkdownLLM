@@ -150,9 +150,10 @@ def build_cli() -> argparse.ArgumentParser:
                        "report when a watched thing reaches a stage this role "
                        "acts at; reads only, never writes")
     w.add_argument("path", nargs="?", default=".")
-    w.add_argument("--role", required=True,
+    w.add_argument("--role", default=None,
                    help="the actor to wake for; must be declared as a "
-                        "`stages[].actor` in the definition")
+                        "`stages[].actor` in the definition. Defaults to this "
+                        "clone's declared seat (`mdllm seat`)")
     w.add_argument("--definition", required=True,
                    help="id of the workflow-definition whose stages are the board")
     w.add_argument("--run",

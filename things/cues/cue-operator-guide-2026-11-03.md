@@ -73,3 +73,9 @@ note as on a turn. The dependants link the guide as the human-facing
 walkthrough or name it in a body; none reasons from a when-line's wording,
 as the walks of 2026-10-30 and 10-31 found for the ring and the budget.
 **Verdict: not-inflection.**
+
+## Second change, same day — the toolbox block
+
+The derived toolbox block regenerated for `watch --role` becoming optional
+(it defaults to the declared seat). No authored when-line moved. Mechanical;
+every line still holds. **Verdict stands: not-inflection.**

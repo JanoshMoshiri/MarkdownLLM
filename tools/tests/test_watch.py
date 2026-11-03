@@ -955,6 +955,37 @@ class TestNoteWake:
         assert "REVIEWER UP" not in out
         assert "body [reviewer]: m04-design changed at 'draft'" in out
 
+    def test_the_role_defaults_to_the_declared_seat(self, clones, capsys):
+        """Actors are seats: a clone that declared its seat watches as it,
+        and `--role` is for a loop whose actor names predate the ruling."""
+        writer, reviewer = clones
+        assert self._watch(writer, None) == 0
+        out = capsys.readouterr().out
+        assert "as [writer]" in out
+        self._note(reviewer, "reviewer", "Note from the reviewer.", "note")
+        assert self._watch(writer, None, exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "WRITER UP: a note landed on m04-design" in out
+        assert "--- message: m04-design @" in out and "Note from the reviewer." in out
+
+    def test_a_seat_the_loop_does_not_name_is_refused_with_the_rename_hint(
+            self, clones, capsys):
+        from markdownllm.seat import set_seat
+        writer, _ = clones
+        set_seat(writer, "workspace-9", "claude-code")
+        assert self._watch(writer, None) == 2
+        out = capsys.readouterr().out
+        assert "declares no stage with `actor: workspace-9`" in out
+        assert "the role came from this clone's seat (`workspace-9`)" in out
+        assert "rename them to the seats or pass --role" in out
+
+    def test_no_role_and_no_seat_is_refused(self, clones, capsys):
+        from markdownllm.seat import clear_seat
+        writer, _ = clones
+        clear_seat(writer)
+        assert self._watch(writer, None) == 2
+        assert "no --role and no declared seat" in capsys.readouterr().out
+
     def test_the_holders_own_write_does_not_ring_it(self, clones, capsys):
         writer, reviewer = clones
         assert self._watch(writer, "writer") == 0
@@ -1066,6 +1097,11 @@ class TestTicketLoop:
             self._args_for(desk, "claude", exit_on_wake=True)) == 0
         out = capsys.readouterr().out
         assert "CLAUDE UP: ticket-claude-codex is at 'claude' (was codex)" in out
+        # The message arrives with the wake: the body as committed at the
+        # head that rang, so the woken agent reads nothing blind.
+        assert "--- message: ticket-claude-codex @ bbbbbbbb ('claude') ---" in out
+        assert "Reviewed X — two findings, see below." in out
+        assert "--- end of message ---" in out
 
     def test_a_body_only_change_at_the_same_status_is_a_note_that_rings_the_addressee(
             self, desk, capsys, monkeypatch):
@@ -1096,12 +1132,15 @@ class TestTicketLoop:
         assert "an author the record does not show" in out
         assert "seat undeclared" in out
         assert "moved:" not in out and "is at" not in out
+        assert "--- message: ticket-claude-codex @ bbbbbbbb ('codex') ---" in out
+        assert "Also — and do Y while you are there." in out
         # The other side: the holder's ticket changed, not its turn.
         assert watch_mod.cmd_watch(
             self._args_for(desk, "claude", exit_on_wake=True)) == 0
         out = capsys.readouterr().out
         assert "CLAUDE UP" not in out
         assert "body [claude]: ticket-claude-codex changed at 'codex'" in out
+        assert "--- message:" not in out
 
     def test_closing_wakes_nobody_and_the_ticket_leaves_no_board(
             self, desk, capsys, monkeypatch):

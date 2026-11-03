@@ -2,18 +2,18 @@
 id: ad-hoc-message-loop
 type: workflow-definition
 status: draft
-version: 1.3
+version: 1.4
 created: 2026-10-21
 exposed: false
 stages:
-  - id: claude
-    to: [codex, closed]
-    actor: claude
-  - id: codex
-    to: [claude, closed]
-    actor: codex
+  - id: workspace-1
+    to: [workspace-2, closed]
+    actor: workspace-1
+  - id: workspace-2
+    to: [workspace-1, closed]
+    actor: workspace-2
   - id: closed
-    to: [claude, codex]
+    to: [workspace-1, workspace-2]
 linked_things:
   - id: a2a-conversations-run-on-their-own-branch-2026-10-09
     relation: references
@@ -27,10 +27,14 @@ linked_things:
 The root's declared `ticket` type carries one conversation per work item.
 Its `status` is the addressee, its body the current message, and its git
 history the transcript. This definition instantiates the shipped
-`templates/ad-hoc-message-loop.md.template` for the framework's Claude and
-Codex seats. It is internal coordination, with no cross-domain exposure.
+`templates/ad-hoc-message-loop.md.template` for the framework's two seats,
+`workspace-1` and `workspace-2` — named for the clone, not the agent sitting
+in it (`seats-are-named-for-the-clone-not-the-agent-2026-10-30`; the actors
+were `claude` and `codex` until 2026-11-03, the rename that ruling deferred
+until both clones carried clone names). It is internal coordination, with
+no cross-domain exposure.
 
-## Claude and Codex
+## workspace-1 and workspace-2
 
 Entry: the other seat commits a ticket addressed to this seat and makes the
 commit visible through the Git ref that the receiving watch reads.
@@ -67,11 +71,14 @@ mean nothing is owed now.
 ## Session wake
 
 The watch observes committed peer state. Each seat arms it the way its
-harness rises on an exit (`standing-watch.md` → Harness bindings): the
-Claude seat as a background command through `/watch claude
-ad-hoc-message-loop`, which Claude Code keeps running across turns and
-re-invokes the agent on when it exits; the Codex seat bound to its session
-as the operator directs. A blocking watch inside a bounded tool call dies
+harness rises on an exit (`standing-watch.md` → Harness bindings): a seat
+in Claude Code as a background command through `/watch`, which arms
+`mdllm watch` for the clone's declared seat (the role defaults to it) and
+which Claude Code keeps running across turns and re-invokes the agent on
+when it exits — with the woken ticket's body in the exit output, so the
+message arrives with the wake; a seat in Codex bound to its session as the
+operator directs. Arming is the operator's act: the watch runs when told
+to, and nothing nags that it is not running. A blocking watch inside a bounded tool call dies
 at the tool's timeout and is not a binding — the earlier wording here told
 a seat without an adapter to do exactly that, and the record of 2026-10-11
 shows what followed: turns "picked up through the operator's chat prompt,
