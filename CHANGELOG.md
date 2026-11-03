@@ -18,6 +18,35 @@ Prior entries followed [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ---
 
+## [3.51.0] - 2026-11-03
+
+**The loop rings, delivers, and stops.** The agent-to-agent loop's weak joint was the wake channel, never the message channel. The record showed four ways a turn failed to arrive: picked up through the operator's chat prompt rather than a wake; a watch in a shared checkout exiting on another party's unpublished commit and leaving the next real turn with nothing running; a note left on a ticket its addressee already held, ringing nothing; and a conversation that ran until someone noticed. Each is now read from the record and answered on the floor, calibrated on the busiest workspace's healthy rhythm rather than its failures, and the operator's rulings that shaped them are recorded in their words.
+
+**Changed**
+- **The self-wake is seat-aware** (`standing-watch.md` 0.7 → 0.8): *your last turn never left* rings only for commits the declared seat authored; another party's unpublished commit reads as *not your turn* and the watch stays armed. Claude Code's binding is `/watch`, a background command the harness re-invokes on.
+- **The stall ring** (`the-seat` Phase 7): `mdllm seat` reads a commit unpublished or an open ticket unanswered against a one-hour window and a one-day ceiling, both clone-declarable; past the ceiling a ticket is listed as abandoned and never rings. The lines ride the session-start digest and estate-sync; `seat --stall-exit` and `estate-sync --silence-exit` return 5 on a stall. Measured on 783 gaps across 87 tickets: replies arrive in a median of five minutes, 90% within about an hour.
+- **A turn budget** (Phase 8): 120 turns per ticket, read from the record as the commits that touched it; at the budget a line asks for a decision — conclude, split, or raise it deliberately — and rings. Clone config or the ticket's own `turn_budget` overrides.
+- **A note on a held ticket rings its addressee** (`standing-watch.md` 0.8 → 0.9; `a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`): the watch keys the things at its role's stages on content as well as status, so a write by another seat that does not move the turn rings the holder; the seat read reports an unread note at rest. The September deferral of a content-change wake is answered *yes* on the live run it waited for; the carrier decision is superseded in that one clause.
+- **The watcher delivers the message**: the woken ticket's body rides the wake between `--- message:` and `--- end of message ---`, capped at 6,000 characters, so the woken agent reads nothing blind. `--role` defaults to the clone's declared seat; the root loop's actors are the seat names.
+- **Seats are named for the clone, not the agent** (`seats-are-named-for-the-clone-not-the-agent-2026-10-30`): a seat declared after its occupant was wrong the first time the occupant changed. The two framework clones are `workspace-1` and `workspace-2`; the root ticket vocabulary follows.
+- **The record holds unattended** (Phases 1–4): a paused workspace accrues no debt from the framework moving beneath it; the dispatcher's silence is one line at every session start and a ring; `estate-check --health` carries the measurements; the gate question is on record as an open conflict.
+- **The eval cycle** is a workflow-definition, cycle 0 set at the polar baseline, and the runner records its read set; an aborted trial is void, a launch failure keeps the agent's words, two deaths stop the arm.
+- **The operator's machine username** leaves the published tree (26 files, one placeholder); the redaction tests derive the name instead of spelling it.
+- Manifesto 2.9 → 2.11 (The Accumulation; the record as a training harness for its operator), glossary 1.1 → 1.2, interface 1.9 → 1.10 (voice as a proven layer beneath any route).
+- The framework root's deployed shortcuts keep LF on a Windows checkout; the Windows CI leg had failed on every push since 3.49.0.
+
+**Added**
+- `/watch <role> <definition> [run]` for Claude Code, beside `/orient` and `/end-session`.
+- `mdllm seat --stall-exit --stall-hours --abandon-hours --turn-budget`; clone config `mdllm.seat.stall-hours`, `.abandon-hours`, `.turn-budget`; the ticket template's commented `turn_budget`.
+- `mdllm watch` without `--role` watches as the declared seat.
+- The substrate examination of 2026-10-23/24, recorded as a Fable reading with the operator's corrections (`reviews/REVIEW-substrate-examination-2026-10-24-claude.md`).
+- The 2026-10-22 reckoning: three fired triggers answered by citation, five 120-day insights promoted into the specs that crystallised them.
+
+**Upgrade**
+- Workspaces: `mdllm refresh` reports the delta. A loop whose actor names are not the clone's seat name keeps passing `--role`, or renames its actors to the seats. The first watch poll after upgrading baselines note content silently; from the second poll on, notes ring.
+- The live round trip with no human relay — a Claude Code seat rising on `/watch` with the message in hand — is still owed, for the turn and for the note.
+- After this `release:` commit, the next commit runs `mdllm docs .` to move the README's install pin.
+
 ## [3.50.0] - 2026-10-21
 
 **The documentation says what the record supports, the install can no longer lag a release, and the backlog was metabolised by citation.** A whole-documentation audit (`reviews/REVIEW-documentation-audit-2026-10-20-claude.md`) found the shape buried under the record: an install pinned seventeen releases back, parked and paused things presented as live, copied counts that disagreed, no session shown end to end. The operator ruled on four of its questions (`documentation-rulings-2026-10-20`) and the people-facing half landed.
