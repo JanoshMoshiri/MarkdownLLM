@@ -279,6 +279,21 @@ def _ticket(root: Path, item: str, addressee: str, when: str) -> None:
                    cwd=root, check=True, env=env)
 
 
+def _turn(root: Path, item: str, addressee: str, author: str, when: str,
+          body: str = "the current message.") -> None:
+    """A ticket turn by a named author at `when` — the handover when the
+    status moves, a note when it does not."""
+    write(root, f"things/tickets/ticket-{item}.md", thing_text(
+        f"id: ticket-{item}\ntype: ticket\nstatus: {addressee}\ncreated: {when[:10]}",
+        f"# Ticket\n\n{body}\n"))
+    env = {**os.environ, "GIT_AUTHOR_DATE": when, "GIT_COMMITTER_DATE": when,
+           "GIT_AUTHOR_NAME": author, "GIT_AUTHOR_EMAIL": f"{author}@seat.local",
+           "GIT_COMMITTER_NAME": author, "GIT_COMMITTER_EMAIL": f"{author}@seat.local"}
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", f"{author}: {item} @ {addressee}"],
+                   cwd=root, check=True, env=env)
+
+
 def _ago(hours: float) -> str:
     when = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=hours)
     return when.strftime("%Y-%m-%dT%H:%M:%S+0000")
@@ -359,6 +374,56 @@ def test_session_start_carries_the_stall_line(tmp_path, capsys):
     assert cmd_session_start(argparse.Namespace(path=str(root))) == 0
     out = capsys.readouterr().out
     assert "turn stalled: `ticket-unanswered` awaiting `claude` for 3h" in out
+
+
+# ------------------------------------------------------------------- the note
+
+def test_a_note_on_a_held_ticket_is_reported_and_rings_until_the_seat_writes(
+        tmp_path, capsys):
+    # a-note-on-a-held-ticket-rings-its-addressee-2026-11-02: the watch's
+    # interrupt, read at rest. A write by another seat at an unchanged
+    # status, after the handover and after this seat's own last write, is an
+    # unread note: reported, and rung with --stall-exit. The handover itself
+    # is not a note; this seat's next write on the ticket clears it.
+    from markdownllm.seat import cmd_seat, set_seat, unread_notes, read_seat
+    root = _ticket_repo(tmp_path)
+    set_seat(root, "codex", "codex-cli")
+    ns = argparse.Namespace(path=str(root), set=None, clear=False,
+                            stall_exit=True, stall_hours=None, abandon_hours=None)
+    _turn(root, "item", "codex", "claude", _ago(0.75))           # the handover
+    assert unread_notes(root, read_seat(root)) == []
+    assert cmd_seat(ns) == 0
+    assert "note unread" not in capsys.readouterr().out
+
+    _turn(root, "item", "codex", "claude", _ago(0.5), "also: merged — go ahead")
+    notes = unread_notes(root, read_seat(root))
+    assert [(n["id"], n["count"], n["author"]) for n in notes] == [
+        ("ticket-item", 1, "claude")]
+    assert cmd_seat(ns) == 5                                     # the ring
+    out = capsys.readouterr().out
+    assert ("note unread: `ticket-item` is addressed to this seat and `claude` "
+            "wrote on it once since your last turn, the latest 30m ago") in out
+
+    _turn(root, "item", "codex", "codex", _ago(0.25), "on it.")  # read, and said so
+    assert unread_notes(root, read_seat(root)) == []
+    assert cmd_seat(ns) == 0
+    assert "note unread" not in capsys.readouterr().out
+    # A ticket addressed elsewhere is never this seat's note.
+    _turn(root, "theirs", "claude", "codex", _ago(0.2))
+    _turn(root, "theirs", "claude", "codex", _ago(0.1), "and one more thing")
+    assert unread_notes(root, read_seat(root)) == []
+
+
+def test_session_start_carries_the_note_line(tmp_path, capsys):
+    from markdownllm.seat import set_seat
+    from markdownllm.session import cmd_session_start
+    root = _ticket_repo(tmp_path)
+    set_seat(root, "codex", "codex-cli")
+    _turn(root, "item", "codex", "claude", _ago(0.5))
+    _turn(root, "item", "codex", "claude", _ago(0.25), "ps: the thing you were waiting for landed")
+    assert cmd_session_start(argparse.Namespace(path=str(root))) == 0
+    out = capsys.readouterr().out
+    assert "note unread: `ticket-item` is addressed to this seat and `claude` wrote on it once" in out
 
 
 # ------------------------------------------------------------- the turn budget

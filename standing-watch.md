@@ -2,7 +2,7 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.8
+version: 0.9
 created: 2026-09-21
 linked_things:
   - id: a2a-conversations-run-on-their-own-branch-2026-10-09
@@ -214,7 +214,7 @@ not an automatic wake", three times in one day. What each harness has:
 | Harness | Binding | Standing |
 |---|---|---|
 | Hermes | `terminal(background=true, notify=true)`: a background process whose exit starts a new turn in the chat. Cron delivery is outbound and starts nothing; attaching to a session mirrors text and starts nothing. | Evidenced in the live workspace since 2026-09-18; its host expires the process every 30 minutes, which is why state persists across restarts (decision 4). |
-| Claude Code | The watch runs as a **background** Bash command: the harness keeps it running across turns and re-invokes the agent with its output when it exits. `/watch <role> <definition> [run]` (`templates/commands/watch.md`, projected beside `/orient`) arms it that way and says what to do on each exit code. A detached process can instead post into the session's inbox socket (`CLAUDE_CODE_MESSAGING_SOCKET`), which starts a turn when the session is idle. | Binding recorded 2026-10-30; the live round trip with no human relay is still owed (`substrate-native-a2a` Phase 4 and Phase 7). |
+| Claude Code | The watch runs as a **background** Bash command: the harness keeps it running across turns and re-invokes the agent with its output when it exits. `/watch <role> <definition> [run]` (`templates/commands/watch.md`, projected beside `/orient`) arms it that way and says what to do on each exit code. An exit that lands while the agent is mid-turn reaches it at its next tool boundary — the steer a note is meant to be; idle, it starts a turn. A detached process can instead post into the session's inbox socket (`CLAUDE_CODE_MESSAGING_SOCKET`), which starts a turn when the session is idle. | Binding recorded 2026-10-30; the live round trip with no human relay is still owed (`substrate-native-a2a` Phase 4 and Phase 7). |
 | Codex | Operator-relayed: told to run the watch and bind it to the session, the session holds the blocking watch and rises on its exit. | Relayed evidence only; the plan's measurement of how long the session holds it is still owed. |
 
 Two rules hold across all three. **Never hold the watch as a blocking
@@ -339,16 +339,37 @@ board, read by the same watch.
   began on 2026-10-08 read as conversations.)* Its **body is the current
   message**. Its **`status` is the addressee**: the actor whose turn it is,
   drawn from the domain's actor names, plus `closed`.
-- **Only the current addressee writes.** To reply: overwrite the body, set
-  `status` to the next addressee, commit, publish. One writer at any moment,
-  so two clones never produce a merge conflict on it. The status *is* the
-  claim; a ticket carries no `held_by`.
-- **One message per turn.** You speak, then wait. This is floor behaviour as
-  much as protocol: the board is `{thing_id: status}` and `diff_board` skips
-  `was == now`, so a second message written without moving the addressee
-  reaches nobody (tested). Say everything in the one turn. The question of an
-  optional content-change wake — to allow double-sends — is answered *no*
-  until a live run shows the need.
+- **The addressee owns the turn; anyone may leave a note.** To reply:
+  overwrite the body, set `status` to the next addressee, commit, publish.
+  The addressee is the one writer *of the turn*; the status *is* the claim,
+  and a ticket carries no `held_by`. Another seat may write on a ticket it
+  does not hold — the fact the holder is waiting for, a correction — without
+  moving the turn: a **note**. A note is appended, never an overwrite of the
+  holder's message, and short, because two writers on one file can conflict
+  at the holder's next commit, and the holder resolves it as its own file.
+- **One message per turn, and a note rings.** You speak, then wait; a second
+  message that moves the addressee is the ordinary turn. A write at the
+  *same* status is a note, and since 2026-11-02 the watch rings its
+  addressee on it: the board is still `{thing_id: status}` and `diff_board`
+  still skips `was == now`, but beside it the watch keeps a digest of each
+  board thing's bytes, and a body that changes under an unchanged status at
+  one of this role's stages rings — `ROLE UP: a note landed on <id> while
+  it is addressed to you` — unless this seat wrote it (the author is read
+  from the commits between the two polls and matched to the declared seat,
+  as the self-wake matches its own; an unknown author is rung). The
+  holder's own writes at its status ring nobody — the other side is not
+  waiting on drafts — and read as a quiet `body:` line. The question
+  deferred on 2026-09-30, an optional content-change wake to allow
+  double-sends, was answered *no until a live run shows the need*; the first
+  run that needed it handed a ticket to a seat whose next act was the
+  operator's, and the fact that seat was waiting for arrived as a note that
+  rang nothing. The operator ruled the note an interrupt
+  (`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`): where the
+  harness delivers a background exit mid-turn, it is one; where it cannot,
+  the seat read is the flag — `mdllm seat`, the session-start digest and
+  estate-sync report an unread note on a ticket addressed to this seat, and
+  ring on it with `--stall-exit` / `--silence-exit`, until this seat next
+  writes on the ticket.
 - **Git history is the transcript.** The tree shows only the latest message;
   `git log -p` on the ticket is the whole, audited conversation. That is a
   feature — provenance with no archive to maintain. **No other message store

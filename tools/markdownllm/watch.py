@@ -28,6 +28,7 @@ exits. The turn stays the agent's act and the ruling stays the human's.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import time
@@ -124,6 +125,44 @@ class _Gone:
 
 
 @dataclass
+class _Note:
+    """A write on a thing at one of this role's stages that did not move the
+    turn — a note left on a ticket its addressee holds.
+
+    Until 2026-11-02 this was invisible by design: the board was
+    `{thing_id: status}` and `diff_board` skipped `was == now`, so one message
+    per turn was floor behaviour and the double-send question was answered
+    *no* until a live run showed the need. The first live run that needed it
+    handed a ticket to a seat whose next act was the operator's, and the fact
+    that seat was waiting for arrived as a note that rang nothing. The
+    operator's ruling: the note is an interrupt
+    (`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`).
+    """
+
+    thing_id: str
+    status: str
+    authors: list[tuple[str, str]]
+    own: bool
+    addressed: bool
+
+    def line(self, role: str, seat_name: str) -> str:
+        who = (", ".join(sorted({a[0] or a[1] for a in self.authors}))
+               or "an author the record does not show")
+        if not self.addressed:
+            return (f"body [{role}]: {self.thing_id} changed at '{self.status}' "
+                    f"— the holder's own write, not your turn")
+        if self.own:
+            return (f"noted [{role}]: {self.thing_id} changed at '{self.status}' "
+                    f"by this seat (`{seat_name}`) — your own write, not a ring")
+        tail = ("" if seat_name else " (seat undeclared, so the watch cannot tell "
+                "whether it was yours: `mdllm seat . --set <actor>`)")
+        return (f"{role.upper()} UP: a note landed on {self.thing_id} while it is "
+                f"addressed to you ('{self.status}') — written by {who} without "
+                f"moving the turn; reread it before continuing "
+                f"(a-note-on-a-held-ticket-rings-its-addressee-2026-11-02){tail}")
+
+
+@dataclass
 class _LoopState:
     """Everything that must survive a restart.
 
@@ -133,6 +172,10 @@ class _LoopState:
     """
 
     board: dict[str, str] = field(default_factory=dict)
+    # What each board thing *said* at the last read — a digest of its bytes,
+    # so a write that leaves the status alone is still a change the watch
+    # can see (the note).
+    content: dict[str, str] = field(default_factory=dict)
     last_head: str | None = None
     seen: bool = False
     # The local tip this watch last rang its own role for — a turn that
@@ -278,8 +321,11 @@ def _load_state(path: Path) -> _LoopState:
     board = raw.get("board")
     if not isinstance(board, dict):
         return _LoopState()
+    content = raw.get("content")
     return _LoopState(
         board={str(k): str(v) for k, v in board.items()},
+        content=({str(k): str(v) for k, v in content.items()}
+                 if isinstance(content, dict) else {}),
         last_head=raw.get("last_head") or None,
         seen=bool(raw.get("seen")),
         woke_unpublished=raw.get("woke_unpublished") or None,
@@ -298,6 +344,7 @@ def _save_state(path: Path, state: _LoopState) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({
             "board": state.board,
+            "content": state.content,
             "last_head": state.last_head,
             "seen": state.seen,
             "woke_unpublished": state.woke_unpublished,
@@ -529,6 +576,65 @@ def read_board(
         if isinstance(value, str) and value in stage_ids:
             board[thing.id] = value
     return board
+
+
+def read_content(
+    corpus: Corpus, board: dict[str, str],
+) -> tuple[dict[str, str], dict[str, Path]]:
+    """A digest of each board thing's bytes, and where it lives — read from
+    the same commit view as the board, never the worktree."""
+    content: dict[str, str] = {}
+    paths: dict[str, Path] = {}
+    for thing in corpus.things:
+        if thing.id not in board:
+            continue
+        raw = thing.source_text if thing.source_text is not None else thing.body
+        content[thing.id] = hashlib.sha1(raw.encode("utf-8", "replace")).hexdigest()
+        paths[thing.id] = thing.path
+    return content, paths
+
+
+def diff_notes(
+    previous_board: dict[str, str], board: dict[str, str],
+    previous_content: dict[str, str], content: dict[str, str],
+    wake_stages: set[str],
+) -> list[tuple[str, str, bool]]:
+    """(thing_id, status, addressed) for each thing whose bytes changed while
+    its status did not. `addressed` is whether that status is one this role
+    acts at — the note that rings — as against the holder's own write at a
+    stage that is not this role's, which does not."""
+    out: list[tuple[str, str, bool]] = []
+    for thing_id, now in sorted(board.items()):
+        if previous_board.get(thing_id) != now:
+            continue
+        before = previous_content.get(thing_id)
+        if before is None or before == content.get(thing_id):
+            continue
+        out.append((thing_id, now, now in wake_stages))
+    return out
+
+
+def _note_authors(config: WatchConfig, since: str | None, head: str,
+                  path: Path) -> list[tuple[str, str]]:
+    """(name, email) of each commit between the last read and this one that
+    touched `path`, newest first. Empty when git cannot say — and an unknown
+    author is rung, never assumed to be this seat."""
+    if not since:
+        return []
+    try:
+        rel = Path(path).resolve().relative_to(config.root.resolve()).as_posix()
+    except ValueError:
+        rel = Path(path).as_posix()
+    r = git_command(config.root, "log", "--format=%an%x1f%ae", f"{since}..{head}",
+                    "--", rel, timeout=LOCAL_TIMEOUT)
+    if r is None or r.returncode != 0:
+        return []
+    out = []
+    for line in (r.stdout or "").splitlines():
+        name, _, email = line.partition("\x1f")
+        if name.strip() or email.strip():
+            out.append((name.strip(), email.strip().lower()))
+    return out
 
 
 def diff_board(
@@ -764,6 +870,7 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             continue
 
         board = read_board(corpus, config, stage_ids)
+        content, paths = read_content(corpus, board)
 
         # The bad-read guard is the *threshold*, never emptiness on its own.
         # An earlier version also refused any board that went from populated
@@ -785,6 +892,10 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
         woke = _self_wake(config, head, state, state_path)
         if not state.seen:
             print(f"baseline: {len(board)} thing(s) on the board at {head[:8]}")
+            # Content is baselined with the board. A state file written
+            # before content was kept has no digest for a thing, and the
+            # first poll after it reports nothing for that thing: a note
+            # older than the state is the seat read's to report.
         else:
             changes, gone = diff_board(state.board, board, wake_stages)
             for change in changes:
@@ -795,8 +906,25 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
                 # must stop anything in flight, for any role.
                 print(missing.line())
                 woke = True
+            notes = diff_notes(state.board, board, state.content, content,
+                               wake_stages)
+            seat = read_seat(config.root) if notes else {}
+            for thing_id, status, addressed in notes:
+                authors = (_note_authors(config, state.last_head, head,
+                                         paths[thing_id])
+                           if addressed and thing_id in paths else [])
+                # Own only when the seat is declared and every author is it.
+                # No author on record is rung: the one event the channel
+                # exists to carry is not absorbed on a guess.
+                own = (bool(seat.get("name")) and bool(authors)
+                       and len(_own_commits(authors, seat)) == len(authors))
+                note = _Note(thing_id=thing_id, status=status, authors=authors,
+                             own=own, addressed=addressed)
+                print(note.line(config.role, seat.get("name", "")))
+                woke = woke or (addressed and not own)
 
         state.board = board
+        state.content = content
         state.last_head = head
         state.seen = True
         _save_state(state_path, state)

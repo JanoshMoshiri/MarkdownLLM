@@ -883,16 +883,104 @@ class TestSelfHeal:
         assert "seat undeclared, so the watch cannot tell whose" in out
 
 
+class TestNoteWake:
+    """`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`, on a real
+    remote: the note rings the holder when another seat wrote it, stays a
+    quiet line when the holder wrote it, and never rings the seat that is
+    not the holder. The author is read from the commits between the two
+    polls, matched to the declared seat the way the self-wake does."""
+
+    STAGES = TestRealRemoteTurn.STAGES
+
+    @pytest.fixture
+    def clones(self, tmp_path):
+        bare = tmp_path / "origin.git"
+        _sync_git(tmp_path, "init", "-q", "--bare", str(bare))
+        _sync_git(tmp_path, "--git-dir", str(bare),
+                  "symbolic-ref", "HEAD", "refs/heads/main")
+        writer = tmp_path / "writer"
+        _sync_git(tmp_path, "clone", "-q", str(bare), str(writer))
+        _sync_git(writer, "checkout", "-q", "-b", "main")
+        _schema(writer)
+        _write(writer, {**DEFINITION, "stages": self.STAGES})
+        _write(writer, _spec("m04-design", "draft"))
+        _sync_git(writer, "add", "-A")
+        _sync_git(writer, "commit", "-q", "-m", "create: the board")
+        _sync_git(writer, "push", "-q", "-u", "origin", "main")
+        reviewer = tmp_path / "reviewer"
+        _sync_git(tmp_path, "clone", "-q", str(bare), str(reviewer))
+        _sync_git(reviewer, "checkout", "-q", "-b", "main", "origin/main")
+        from markdownllm.seat import set_seat
+        set_seat(writer, "writer", "claude-code")
+        set_seat(reviewer, "reviewer", "codex")
+        return writer, reviewer
+
+    def _watch(self, root, role, **kw):
+        return watch_mod.cmd_watch(_args(root, role=role, **kw))
+
+    @staticmethod
+    def _note(root, seat, text, msg):
+        """A write at an unchanged status, committed as the clone's declared
+        seat (the harness's `_sync_git` pins its own author, so the seat's
+        identity is passed explicitly here, as `set_seat` would have it)."""
+        spec = root / "things" / "m04-design.md"
+        spec.write_text(spec.read_text(encoding="utf-8") + f"\n{text}\n",
+                        encoding="utf-8")
+        env = {**os.environ, "GIT_AUTHOR_NAME": seat,
+               "GIT_AUTHOR_EMAIL": f"{seat}@seat.local",
+               "GIT_COMMITTER_NAME": seat,
+               "GIT_COMMITTER_EMAIL": f"{seat}@seat.local"}
+        import subprocess
+        subprocess.run(["git", "commit", "-qam", msg], cwd=root, check=True, env=env)
+        _sync_git(root, "push", "-q", "origin", "main")
+
+    def test_another_seats_note_rings_the_holder_and_nobody_else(
+            self, clones, capsys):
+        writer, reviewer = clones
+        assert self._watch(writer, "writer") == 0
+        assert self._watch(reviewer, "reviewer") == 0
+        capsys.readouterr()
+
+        # The reviewer writes on the writer's held thing without moving it.
+        self._note(reviewer, "reviewer", "Note: the merge landed, you can go ahead.",
+                   "note: merged")
+
+        assert self._watch(writer, "writer", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert ("WRITER UP: a note landed on m04-design while it is addressed "
+                "to you ('draft') — written by reviewer") in out
+        assert "seat undeclared" not in out
+        assert self._watch(reviewer, "reviewer", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "REVIEWER UP" not in out
+        assert "body [reviewer]: m04-design changed at 'draft'" in out
+
+    def test_the_holders_own_write_does_not_ring_it(self, clones, capsys):
+        writer, reviewer = clones
+        assert self._watch(writer, "writer") == 0
+        capsys.readouterr()
+
+        self._note(writer, "writer", "Progress: half done.", "progress")
+
+        assert self._watch(writer, "writer", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "WRITER UP" not in out
+        assert ("noted [writer]: m04-design changed at 'draft' by this seat "
+                "(`writer`) — your own write, not a ring") in out
+
+
 class TestTicketLoop:
     """The ticket — an ad-hoc message with no artefact behind it.
 
     Ruled 2026-09-30 (`ticket-is-the-ad-hoc-carrier-2026-09-30`): one
     overwritable thing per conversation, whose `status` is the *addressee*
-    and whose body is the current message. The watch needs nothing new to
-    carry it — these tests pin that the existing contract already does, and
-    settle the one open question (double-sends) by evidence: a body-only
-    change at the same status wakes nobody, so one message per turn is what
-    the floor enforces, not merely what the protocol asks.
+    and whose body is the current message. The watch needed nothing new to
+    carry it — these tests pin that the existing contract does. The one open
+    question (double-sends) was first settled *no* by evidence here: a
+    body-only change at the same status woke nobody. It was reopened and
+    answered *yes* on 2026-11-02 by the first live run that needed it
+    (`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`): a write at
+    an unchanged status is a note, and it rings the addressee.
     """
 
     LOOP = {
@@ -979,17 +1067,22 @@ class TestTicketLoop:
         out = capsys.readouterr().out
         assert "CLAUDE UP: ticket-claude-codex is at 'claude' (was codex)" in out
 
-    def test_a_body_only_change_at_the_same_status_wakes_nobody(
+    def test_a_body_only_change_at_the_same_status_is_a_note_that_rings_the_addressee(
             self, desk, capsys, monkeypatch):
-        """The open question, settled: no double-sends.
+        """The double-send question, reopened and answered on live evidence.
 
-        `diff_board` keys on `{thing_id: status}` and skips `was == now`, so
-        a second message written without moving the addressee is invisible
-        to every watcher. One message per turn is therefore floor behaviour.
-        A domain that wants to say more says it in the same turn.
+        `diff_board` still keys on `{thing_id: status}` and skips `was ==
+        now`; the note is read beside it, from a digest of each board
+        thing's bytes. A write that leaves the addressee alone rings the
+        addressee — not as a turn (`is at … was …`) but as a note landed on
+        a ticket it holds. The sender's own watch sees the holder's write at
+        a stage it does not act at, and stays quiet. No git here, so the
+        author is unknown, and an unknown author is rung, never assumed to be
+        this seat.
         """
         self._head(monkeypatch, "a" * 40)
         watch_mod.cmd_watch(self._args_for(desk, "codex"))
+        watch_mod.cmd_watch(self._args_for(desk, "claude"))
         capsys.readouterr()
 
         write(desk, "things/ticket-claude-codex.md",
@@ -998,7 +1091,17 @@ class TestTicketLoop:
         assert watch_mod.cmd_watch(
             self._args_for(desk, "codex", exit_on_wake=True)) == 0
         out = capsys.readouterr().out
-        assert "CODEX UP" not in out and "moved:" not in out
+        assert ("CODEX UP: a note landed on ticket-claude-codex while it is "
+                "addressed to you ('codex')") in out
+        assert "an author the record does not show" in out
+        assert "seat undeclared" in out
+        assert "moved:" not in out and "is at" not in out
+        # The other side: the holder's ticket changed, not its turn.
+        assert watch_mod.cmd_watch(
+            self._args_for(desk, "claude", exit_on_wake=True)) == 0
+        out = capsys.readouterr().out
+        assert "CLAUDE UP" not in out
+        assert "body [claude]: ticket-claude-codex changed at 'codex'" in out
 
     def test_closing_wakes_nobody_and_the_ticket_leaves_no_board(
             self, desk, capsys, monkeypatch):

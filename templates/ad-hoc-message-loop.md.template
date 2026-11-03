@@ -40,11 +40,13 @@ a blocking command inside a bounded tool call.
 
 **[actor-a]** / **[actor-b]**
 - Entry: the other actor set `status` to this name and published.
-- Performer: the named actor — the only writer while the ticket is at its
-  name.
+- Performer: the named actor — the only writer of the turn while the ticket
+  is at its name. The other actor may append a short note without moving
+  the status; the holder's watch rings on it.
 - What it produces: one reply — overwrite the body, set `status` to the next
-  addressee (or `closed`), commit, publish. One message per turn: a second
-  edit at the same status reaches nobody.
+  addressee (or `closed`), commit, publish. One message per turn; a second
+  edit at the same status is a note, which rings the addressee and nobody
+  else.
 - Gate authority: none is conferred. A ticket carries requests, never
   approvals or rulings; the recipient acts within its own permissions and the
   irreversible goes to the human seat.

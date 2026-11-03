@@ -2,7 +2,7 @@
 id: substrate-native-a2a
 type: plan
 status: in-progress
-version: 1.7
+version: 1.8
 created: 2026-09-19
 priority: high
 informed_by:
@@ -338,7 +338,15 @@ Deliberately not lifted:
             assumption:** no optional content-change wake. `diff_board` keys on
             status and skips `was == now`, so one message per turn is what the
             floor does, not merely what the protocol asks. Reopen only if the
-            live test shows a real need.
+            live test shows a real need. *Reopened and answered 2026-11-02:*
+            the live record showed the need — a ticket handed to a seat whose
+            next act was the operator's, the fact it waited for written as a
+            note that rang nothing — and the operator ruled the note an
+            interrupt (`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`).
+            The watch now keys the things at this role's stages on content
+            as well as status and rings the addressee on a note by another
+            seat; the seat read reports an unread note at rest. The live
+            round trip below is owed for the note as well as the turn.
       - [ ] **The live test — the operator runs it.** One real round trip on
             one ticket, Claude Code → Codex → Claude Code, no human relay.
             This also discharges Phase 4's unticked *GPT-side instance woken

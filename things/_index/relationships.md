@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-02
-generated: 2026-11-02T17:52:49
-generated_from: HEAD@d82db7b
-coverage: 634
+created: 2026-11-03
+generated: 2026-11-03T00:27:16
+generated_from: HEAD@ee5940d
+coverage: 639
 framework_version: 3.50.0
 ---
 
@@ -105,6 +105,11 @@ framework_version: 3.50.0
 - a-never-crossed-gate-hides-the-defects-behind-it --extends--> the-harness-bound-path-is-the-least-tested-path
 - a-never-crossed-gate-hides-the-defects-behind-it --complements--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - a-never-crossed-gate-hides-the-defects-behind-it --supports--> portability-claims-need-execution-tests
+- a-note-on-a-held-ticket-rings-its-addressee-2026-11-02 --supersedes--> ticket-is-the-ad-hoc-carrier-2026-09-30
+- a-note-on-a-held-ticket-rings-its-addressee-2026-11-02 --informs--> standing-watch-specification
+- a-note-on-a-held-ticket-rings-its-addressee-2026-11-02 --informs--> substrate-native-a2a
+- a-note-on-a-held-ticket-rings-its-addressee-2026-11-02 --informs--> ad-hoc-message-loop
+- a-note-on-a-held-ticket-rings-its-addressee-2026-11-02 --references--> the-seat
 - a-performance-requirement-inherits-its-measurement-context --informs--> floor-block-requirements-2026-08
 - a-performance-requirement-inherits-its-measurement-context --derived-from--> run-floor-sprint-2-2026-08
 - a-performance-requirement-inherits-its-measurement-context --complements--> an-incident-seeded-list-encodes-the-symptom-not-the-rule
@@ -506,6 +511,7 @@ framework_version: 3.50.0
 - cue-a2a-conversations-run-on-their-own-branch-2026-10-09-2026-10-24 --subject--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - cue-ad-hoc-message-loop-2026-10-24 --subject--> ad-hoc-message-loop
 - cue-ad-hoc-message-loop-2026-10-30 --subject--> ad-hoc-message-loop
+- cue-ad-hoc-message-loop-2026-11-03 --subject--> ad-hoc-message-loop
 - cue-agents-cannot-self-install-permission-bearing-hooks-2026-10-22 --subject--> agents-cannot-self-install-permission-bearing-hooks
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
@@ -650,6 +656,7 @@ framework_version: 3.50.0
 - cue-operator-guide-2026-10-27 --subject--> operator-guide
 - cue-operator-guide-2026-10-30 --subject--> operator-guide
 - cue-operator-guide-2026-10-31 --subject--> operator-guide
+- cue-operator-guide-2026-11-03 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -696,6 +703,7 @@ framework_version: 3.50.0
 - cue-standing-watch-specification-2026-10-15 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-24 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-30 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-11-03 --subject--> standing-watch-specification
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 --subject--> structural-pointers-need-reverse-edge-indexing
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
@@ -711,6 +719,7 @@ framework_version: 3.50.0
 - cue-thing-specification-2026-09-12 --subject--> thing-specification
 - cue-thing-specification-2026-10-20 --subject--> thing-specification
 - cue-thing-specification-own-tail-2026-09-13 --subject--> thing-specification
+- cue-ticket-is-the-ad-hoc-carrier-2026-09-30-2026-11-03 --subject--> ticket-is-the-ad-hoc-carrier-2026-09-30
 - cue-trigger-specification-2026-09-12 --subject--> trigger-specification
 - cue-unattended-cue-carrier-2026-09-12-own-tail-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
 - cue-unattended-cue-carrier-2026-09-12-provenance-2026-09-13 --subject--> unattended-cue-carrier-2026-09-12
@@ -1900,6 +1909,7 @@ framework_version: 3.50.0
 - ticket-is-the-ad-hoc-carrier-2026-09-30 --informs--> standing-watch-specification
 - ticket-is-the-ad-hoc-carrier-2026-09-30 --implements--> mesh-safety-is-the-floor-not-the-topology
 - ticket-is-the-ad-hoc-carrier-2026-09-30 --implements--> transport-follows-corpus-holdability-not-distance
+- ticket-is-the-ad-hoc-carrier-2026-09-30 --superseded-by--> a-note-on-a-held-ticket-rings-its-addressee-2026-11-02
 - ticket-reckoning-phase-4-review --implements--> run-reckoning-phase-4-2026-10
 - ticket-reckoning-phase-4-review --references--> the-reckoning
 - ticket-reckoning-phase-4-review --references--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15

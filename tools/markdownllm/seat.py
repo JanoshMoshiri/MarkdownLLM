@@ -288,6 +288,69 @@ def ticket_budgets(repo: Path, default_budget: int = TURN_BUDGET) -> list[dict]:
     return out
 
 
+def _status_at(repo: Path, sha: str, rel: str) -> str:
+    """The ticket's `status` as committed at `sha`; empty when unreadable."""
+    r = _run(repo, "show", f"{sha}:{rel}")
+    if r is None or r.returncode != 0:
+        return ""
+    head = (r.stdout or "")[:4000]
+    if not head.startswith("---"):
+        return ""
+    for line in head.split("\n---", 1)[0].splitlines():
+        m = _FM_STATUS_RE.match(line)
+        if m:
+            return m.group(1)
+    return ""
+
+
+def unread_notes(repo: Path, seat: dict, now: dt.datetime | None = None,
+                 limit: int = 50) -> list[dict]:
+    """Open tickets addressed to this seat that another seat has written on
+    since this seat last touched them: {id, status, count, author, hours}.
+
+    A write at an unchanged status is a note — the thing the watch rings on
+    since 2026-11-02 (`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`).
+    This is the same event read at rest, for a seat that arrives without a
+    watch running: the flag at session start and in estate-sync. Walked
+    newest-first per ticket and bounded by `limit` commits: stops at the
+    seat's own last write (everything older it has seen) or at the handover
+    itself (the commit whose parent held a different status)."""
+    name = (seat.get("name") or "").strip().lower()
+    if not name:
+        return []
+    email = (seat.get("user_email") or "").strip().lower()
+    now = now or dt.datetime.now(dt.timezone.utc)
+    out: list[dict] = []
+    for t in _open_tickets(repo):
+        if t["status"].lower() != name:
+            continue
+        rel = t["path"].resolve().relative_to(repo.resolve()).as_posix()
+        r = _run(repo, "log", f"--max-count={limit}",
+                 "--format=%H%x1f%an%x1f%ae%x1f%ct", "--", rel)
+        if r is None or r.returncode != 0:
+            continue
+        rows = []
+        for line in (r.stdout or "").splitlines():
+            parts = line.split("\x1f")
+            if len(parts) == 4 and parts[3].isdigit():
+                rows.append(parts)
+        notes: list[tuple[str, int]] = []
+        for i, (sha, an, ae, ct) in enumerate(rows):
+            if an.strip().lower() == name or (email and ae.strip().lower() == email):
+                break                                   # read up to here
+            older = rows[i + 1][0] if i + 1 < len(rows) else None
+            if older is None or _status_at(repo, older, rel).lower() != name:
+                break                                   # the handover, not a note
+            notes.append((an.strip() or ae.strip(), int(ct)))
+        if not notes:
+            continue
+        latest = dt.datetime.fromtimestamp(notes[0][1], dt.timezone.utc)
+        out.append({"id": t["id"], "status": t["status"], "count": len(notes),
+                    "author": notes[0][0],
+                    "hours": max(0.0, (now - latest).total_seconds() / 3600)})
+    return out
+
+
 def _age(hours: float) -> str:
     if hours < 1:
         return f"{hours * 60:.0f}m"
@@ -301,7 +364,10 @@ def turn_stalls(repo: Path, now: dt.datetime | None = None,
                 budget: int | None = None, *, seat: dict | None = None,
                 up: tuple[int, float] | None | bool = False) -> dict:
     """The stall read: {seat, unpublished, tickets, abandoned, over_budget,
-    stall_hours, abandon_hours, turn_budget, stalled}. `tickets` are open
+    notes, stall_hours, abandon_hours, turn_budget, stalled}. `notes` are
+    open tickets addressed to this seat that another seat wrote on since
+    this seat last touched them — the interrupt the watch rings, read at
+    rest; it rings here too. `tickets` are open
     tickets quiet for longer than the window and no longer than the ceiling
     — a live conversation that has stopped, which is what rings. `abandoned`
     are open tickets quiet past the ceiling — a loop that finished and was
@@ -319,13 +385,14 @@ def turn_stalls(repo: Path, now: dt.datetime | None = None,
     loops = declares_tickets(repo)
     quiet = ticket_stalls(repo, seat["name"], now, window) if loops else []
     over = ticket_budgets(repo, default_budget) if loops else []
+    notes = unread_notes(repo, seat, now) if loops else []
     tickets = [t for t in quiet if t["hours"] <= ceiling]
     abandoned = [t for t in quiet if t["hours"] > ceiling]
     return {"seat": seat["name"], "unpublished": up, "tickets": tickets,
-            "abandoned": abandoned, "over_budget": over,
+            "abandoned": abandoned, "over_budget": over, "notes": notes,
             "stall_hours": window, "abandon_hours": ceiling,
             "turn_budget": default_budget,
-            "stalled": left_stalled or bool(tickets) or bool(over)}
+            "stalled": left_stalled or bool(tickets) or bool(over) or bool(notes)}
 
 
 def stall_lines(info: dict) -> list[str]:
@@ -353,6 +420,13 @@ def stall_lines(info: dict) -> list[str]:
                      f"deliberately (`turn_budget` on the ticket, or "
                      f"`mdllm.seat.turn-budget` in the clone) "
                      f"(an-agent-in-a-loop-optimises-the-loop-not-the-goal)")
+    for t in info.get("notes") or []:
+        times = "once" if t["count"] == 1 else f"{t['count']} times"
+        lines.append(f"- note unread: `{t['id']}` is addressed to this seat and "
+                     f"`{t['author']}` wrote on it {times} since your last turn, "
+                     f"the latest {_age(t['hours'])} ago — the turn did not move, "
+                     f"so only the watch rang; reread the ticket before continuing "
+                     f"(a-note-on-a-held-ticket-rings-its-addressee-2026-11-02)")
     if info.get("abandoned"):
         ids = ", ".join(f"`{t['id']}`" for t in info["abandoned"])
         oldest = max(t["hours"] for t in info["abandoned"])

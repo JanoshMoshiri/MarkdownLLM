@@ -2,7 +2,7 @@
 id: ticket-is-the-ad-hoc-carrier-2026-09-30
 type: decision
 status: made
-version: 1.0
+version: 1.1
 created: 2026-09-30
 session: 2026-10-01
 decided_by: Janosh Moshiri
@@ -31,6 +31,9 @@ linked_things:
   - id: transport-follows-corpus-holdability-not-distance
     relation: implements
     notes: "The governing constraint, honoured: the ticket crosses no wire git does not already send."
+  - id: a-note-on-a-held-ticket-rings-its-addressee-2026-11-02
+    relation: superseded-by
+    notes: "In part: the double-send clause only. A write at an unchanged status is a note and rings the addressee, since the live run of 2026-11-02 showed the need this ruling deferred to. Every other clause stands."
 ---
 
 # Decision: The Ticket Is the Carrier for Ad-Hoc Agent-to-Agent Messages
@@ -149,3 +152,14 @@ from being the contended singleton the refusal feared.
 - The live test is the operator's. Its main risk is Codex's command timeout
   on a long blocking `mdllm watch --exit-on-wake`; the fallbacks are recorded
   on the plan.
+
+## Superseded in part — 2026-11-02
+
+The double-send clause above — *no optional content-change wake unless the
+live test shows the need* — is superseded by
+`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`. The live run
+that showed the need arrived on 2026-11-02: a ticket handed to a seat
+whose next act was the operator's, and the fact that seat was waiting for
+recorded as a note that rang nothing. A write at an unchanged status is
+now a note, and it rings the addressee. Every other clause of this
+ruling stands; `TestTicketLoop` pins the new behaviour under its old name.

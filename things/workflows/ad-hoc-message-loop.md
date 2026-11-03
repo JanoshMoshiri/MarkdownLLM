@@ -2,7 +2,7 @@
 id: ad-hoc-message-loop
 type: workflow-definition
 status: draft
-version: 1.2
+version: 1.3
 created: 2026-10-21
 exposed: false
 stages:
@@ -35,9 +35,13 @@ Codex seats. It is internal coordination, with no cross-domain exposure.
 Entry: the other seat commits a ticket addressed to this seat and makes the
 commit visible through the Git ref that the receiving watch reads.
 
-The named addressee is the only writer. It reads the request, acts within
-the operator's authority, overwrites the body with one reply, and changes
-the status to the other seat or `closed`. It commits the turn and verifies
+The named addressee is the only writer of the turn. It reads the request,
+acts within the operator's authority, overwrites the body with one reply,
+and changes the status to the other seat or `closed`. The other seat may
+append a note to a ticket it does not hold — the fact the holder is waiting
+for — without moving the status; the holder's watch rings on it, and its
+seat read reports it unread until the holder next writes
+(`a-note-on-a-held-ticket-rings-its-addressee-2026-11-02`). It commits the turn and verifies
 that the receiving ref carries it before treating the handover as complete.
 Each seat arms `mdllm watch` for this definition with its own role and
 `--exit-on-wake`; a run-scoped conversation also passes `--run`.
