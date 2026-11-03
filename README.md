@@ -104,12 +104,12 @@ files — Claude Code, Codex or Cowork today.
 
 <!-- generated:install -->
 
-The newest release is **3.50.0**, commit `f100b16b3c9d`. Fetch exactly
+The newest release is **3.51.0**, commit `56699dfc2b6c`. Fetch exactly
 that commit, check the installer's bytes, then run it:
 
 ```bash
 # macOS / Linux
-RELEASE_COMMIT=f100b16b3c9d9b780decd69e146c91001aa3bd08
+RELEASE_COMMIT=56699dfc2b6ce065d6afc4bdcd7abd687f00be51
 INSTALLER_SHA256=cf9ec80117912db8077ae92e10eb718c53f3d49b42485538fdd8b54354eeb7c6
 git init MarkdownLLM
 git -C MarkdownLLM config core.autocrlf false
@@ -124,7 +124,7 @@ printf '%s  install.sh\n' "$INSTALLER_SHA256" | sha256sum -c -
 
 ```powershell
 # Windows (PowerShell 7+)
-$ReleaseCommit = 'f100b16b3c9d9b780decd69e146c91001aa3bd08'
+$ReleaseCommit = '56699dfc2b6ce065d6afc4bdcd7abd687f00be51'
 $InstallerSha256 = 'ae3444fc655e04ff55a06eb8d412af40904bb6164e55e5d1c3a9913ff156be01'
 git init MarkdownLLM
 git -C MarkdownLLM config core.autocrlf false
