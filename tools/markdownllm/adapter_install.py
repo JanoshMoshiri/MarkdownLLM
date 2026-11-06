@@ -594,6 +594,7 @@ class NestedJsonArrayGroupsPolicy:
         """Replace only exact declared legacy arrays below the container.
 
         Each owned event array is one independently located JSON value span.
+        An event added after the legacy definition must be absent on disk.
         Top-level metadata, unrelated event arrays, whitespace, and every
         other source byte remain outside the replacement boundary.  The
         inspector must first establish an unextended, unambiguous legacy ID;
@@ -630,30 +631,37 @@ class NestedJsonArrayGroupsPolicy:
                     legacy_container, wanted_container, existing_container)):
                 raise ValueError(
                     f"{self.container_member!r} is not an object")
-            if set(legacy_container) != set(self.owned_array_members):
+            if not legacy_container or not (
+                    legacy_container.keys() <= set(self.owned_array_members)):
                 raise ValueError(
                     "legacy definition arrays do not match the policy schema")
             if set(wanted_container) != set(self.owned_array_members):
                 raise ValueError(
                     "renderer-owned arrays do not match the policy schema")
             for member in self.owned_array_members:
-                if existing_container.get(member) != legacy_container[member]:
+                if (member in existing_container) != (member in legacy_container) or (
+                        existing_container.get(member) != legacy_container.get(member)):
                     raise ValueError(
                         f"installed {member!r} array no longer matches the "
                         "exact legacy definition")
 
             refreshed = before
             for member in self.owned_array_members:
-                refreshed = replace_json_value(
-                    refreshed, (self.container_member, member),
-                    desired, (self.container_member, member))
+                if member not in legacy_container:
+                    refreshed = insert_json_object_member(
+                        refreshed, (self.container_member,), member,
+                        wanted_container[member])
+                elif legacy_container[member] != wanted_container[member]:
+                    refreshed = replace_json_value(
+                        refreshed, (self.container_member, member),
+                        desired, (self.container_member, member))
             load_unique_json(refreshed)
         except (KeyError, ValueError) as exc:
             return PolicyDecision(
                 "refuse", desired, f"safe legacy refresh is unavailable: {exc}")
         return PolicyDecision(
             "refresh", refreshed,
-            f"replace exact {definition.legacy_id!r} managed arrays")
+            f"refresh exact {definition.legacy_id!r} managed arrays")
 
     def decide(
         self,

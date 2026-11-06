@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-03
-generated: 2026-11-03T01:16:56
-generated_from: HEAD@6aa23c3
-coverage: 639
+created: 2026-11-06
+generated: 2026-11-06T02:23:21
+generated_from: HEAD@f8168b1
+coverage: 642
 framework_version: 3.51.0
 ---
 
@@ -536,6 +536,7 @@ framework_version: 3.51.0
 - cue-change-reconciliation-specification-2026-10-08 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-10-16 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-2026-10-17 --subject--> change-reconciliation-specification
+- cue-change-reconciliation-specification-2026-11-06 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-own-tail-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-reconciliation-specification-retro-2026-09-13 --subject--> change-reconciliation-specification
 - cue-change-safety-is-defense-in-depth-2026-10-17 --subject--> change-safety-is-defense-in-depth
@@ -657,6 +658,7 @@ framework_version: 3.51.0
 - cue-operator-guide-2026-10-30 --subject--> operator-guide
 - cue-operator-guide-2026-10-31 --subject--> operator-guide
 - cue-operator-guide-2026-11-03 --subject--> operator-guide
+- cue-operator-guide-2026-11-06 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -668,6 +670,7 @@ framework_version: 3.51.0
 - cue-orchestration-specification-2026-10-08 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-10-17 --subject--> orchestration-specification
 - cue-orchestration-specification-2026-10-18 --subject--> orchestration-specification
+- cue-orchestration-specification-2026-11-06 --subject--> orchestration-specification
 - cue-orient-and-reconciliation-are-the-corpus-two-sides-2026-10-20 --subject--> orient-and-reconciliation-are-the-corpus-two-sides
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-24 --subject--> protecting-one-budget-displaces-the-failure-into-the-other
 - cue-protecting-one-budget-displaces-the-failure-into-the-other-2026-09-26 --subject--> protecting-one-budget-displaces-the-failure-into-the-other

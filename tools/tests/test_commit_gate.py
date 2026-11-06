@@ -17,6 +17,8 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -219,16 +221,50 @@ def test_dispatch_opens_and_attests_failed_when_the_floor_cannot_run(
 
 # ------------------------------------------------- the other harnesses
 
-def test_codex_binds_two_moments_and_stays_current_without_the_gate(tmp_path):
-    assert CODEX.capabilities().lifecycle_moments == ("session-start", "post-write")
+def test_codex_binds_the_same_three_moments_and_inspects_the_gate(tmp_path):
+    assert CODEX.capabilities().lifecycle_moments == CLAUDE_CODE.capabilities().lifecycle_moments
     rendered = CODEX.render(CTX)[HOOKS_PATH]
-    assert b"pre-commit" not in rendered and b"PreToolUse" not in rendered
     dst = tmp_path / HOOKS_PATH
     dst.parent.mkdir(parents=True)
     dst.write_bytes(rendered)
     fragment = CODEX.inspect(tmp_path, CTX).fragments[0]
     assert fragment.current is True, fragment
-    assert set(fragment.intents_realised) == {"session-start", "post-write"}
+    assert fragment.intents_realised["pre-commit"] == ("cues",)
+
+
+def test_codex_gate_runs_the_staged_walk_on_the_platform_carrier(tmp_path):
+    framework = Path(os.path.relpath(FW_ROOT, tmp_path)).as_posix()
+    context = hp.HarnessContext(framework)
+    handler = json.loads(CODEX.render(context)[HOOKS_PATH])["hooks"]["PreToolUse"][0]["hooks"][0]
+    command = handler["commandWindows"] if os.name == "nt" else ["sh", "-c", handler["command"]]
+
+    def run(args, **kwargs):
+        return subprocess.run(args, cwd=tmp_path, check=True, capture_output=True,
+                              encoding="utf-8", timeout=120, **kwargs).stdout
+
+    def gate(shell_command):
+        return run(command, input=json.dumps({
+            "cwd": str(tmp_path), "tool_name": "Bash",
+            "tool_input": {"command": shell_command},
+        }))
+
+    run(["git", "init", "-q"])
+    (tmp_path / "AGENTS.md").write_text("---\nname: fixture\n---\n", encoding="utf-8")
+    thing = tmp_path / "definition.md"
+    frontmatter = "---\nid: fixture-definition\ntype: specification\nstatus: draft\ncreated: 2026-10-01\n---\n"
+    thing.write_text(frontmatter + "\nOriginal definition.\n", encoding="utf-8")
+    run(["git", "add", "."])
+    run(["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.com",
+         "commit", "-qm", "seed"])
+    assert gate("git commit -m test") == ""
+    thing.write_text(frontmatter + "\nRevised definition.\n", encoding="utf-8")
+    run(["git", "add", "definition.md"])
+    assert gate("git status") == ""
+    result = json.loads(gate("git commit -m test"))["hookSpecificOutput"]
+    assert result["hookEventName"] == "PreToolUse"
+    assert result["permissionDecision"] == "deny"
+    assert "fixture-definition" in result["permissionDecisionReason"]
+    assert "request_user_input_async" in result["permissionDecisionReason"]
 
 
 # ------------------------------------------------ legacy recognition (v2)
@@ -393,6 +429,7 @@ def test_a_session_end_commit_is_recognised_where_its_subject_is_written(tmp_pat
     assert lr.is_session_end_commit(f"{_COMMIT} -m @'\nsession-end: x\n'@")
     (tmp_path / "msg.txt").write_text("\nsession-end: from a file\n", encoding="utf-8")
     assert lr.is_session_end_commit(f"{_COMMIT} -F msg.txt", tmp_path)
+    assert lr.is_session_end_commit(f"git -C {tmp_path.name} commit -F msg.txt", tmp_path.parent)
     assert lr.is_session_end_commit(f'{_COMMIT} -F "{tmp_path / "msg.txt"}"')
     (tmp_path / "other.txt").write_text("floor: x\n", encoding="utf-8")
     assert not lr.is_session_end_commit(f"{_COMMIT} --file=other.txt", tmp_path)

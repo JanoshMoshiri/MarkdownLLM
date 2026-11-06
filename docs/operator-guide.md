@@ -329,7 +329,7 @@ registry now contains two binding shapes:
 
 ```powershell
 ./tools/mdllm.ps1 doctor . --harness codex
-./tools/mdllm.ps1 adapter-install . --harness codex --dry-run
+./tools/mdllm.ps1 adapter-install . --harness codex --refresh-legacy --dry-run
 ```
 
 - **Run-time bound:** Cowork renders no project artifact; its account-level
@@ -352,6 +352,18 @@ not be conflated. `doctor` reports execution as `untested` until a real
 lifecycle event is correlated with harness-owned transcript evidence and a
 fresh definition-hash-bound record. The installer never mutates user-global
 Codex configuration.
+
+Codex uses the same staged cue and session-end reckoning checks as Claude
+Code. With the gate active, stage changes before calling `git commit`. If
+the walk reaches a decision reserved for you, Codex presents the alternatives
+in its choice UI when available, with the option to defer. Ask Codex to
+orient, end the session, or run a retrospective to invoke the same rituals
+that Claude Code exposes as slash commands.
+
+The shared `mdllm watch` command can still read and deliver a wake in Codex.
+Claude Code's `/watch` binding starts a new turn on background exit. Codex
+background hooks deliver output to an active or subsequent user turn. A
+Codex session still needs a turn to receive the watch result.
 
 Codex's lifecycle projection is verified on Codex CLI 0.147.0 / Windows 11,
 and the Desktop managed shell has separate root and directly opened nested

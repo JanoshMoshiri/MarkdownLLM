@@ -40,11 +40,14 @@ from pathlib import Path
 from ..adapter_install import LegacyDefinition, TopLevelJsonFragmentPolicy
 from ..harness_diagnostics import AdapterProbe, managed_definition_hash
 from ..harness_ports import (
-    DOMAIN_ROOT_ARG, HANDLER_TIMEOUT_SECONDS, AdapterCapabilities,
+    HANDLER_TIMEOUT_SECONDS, AdapterCapabilities,
     DiagnosticPresentation, HarnessContext, InspectionReport,
-    LifecycleBinding, LifecycleStep, ManagedFragment,
+    LifecycleBinding, ManagedFragment,
 )
-from .project_hook_emission import LEGACY_SH_RESOLVE_V2, gate_envelope
+from .project_hook_emission import (
+    LEGACY_SH_RESOLVE_V2, gate_envelope,
+    legacy_2200_bindings as _legacy_2200_bindings,
+)
 from .project_hook_emission import (
     HASH_PLACEHOLDER, LEGACY_SH_RESOLVE_V1, binding_hash_payload,
     lifecycle_envelope, mdllm_posix_path, posix_event_command,
@@ -116,45 +119,6 @@ _ROOT_POWERSHELL_POST_WRITE = (
     'python "$env:CLAUDE_PROJECT_DIR/tools/mdllm.py" validate . --quiet')
 _LEGACY_ROOT_FIXED_STEP_V1 = Path(__file__).with_name("legacy") / \
     "claude-hooks-root-fixed-step-v1.json"
-
-
-def _legacy_2200_bindings() -> tuple[LifecycleBinding, ...]:
-    """The bindings as every seat carried them from the allocation contract
-    (2026-08-16) to the startup-context envelope (2026-10-18): every
-    envelope at 2,200 characters, session-start's split 450 for estate-sync
-    and 1,450 for the digest. The gate (2026-10-05) added the third moment
-    without touching the first two, so the two-moment legacies render from
-    the same tuple. Literals, not the live constants — recognition data must
-    not drift with the renderer (the lesson of the frozen resolve fragments,
-    relearned here the day the envelope moved: the two-moment legacies had
-    been reading the live bindings and their frozen hashes broke)."""
-    return (
-        LifecycleBinding(
-            moment="session-start",
-            steps=(LifecycleStep("estate-sync", protected_seconds=75,
-                                 protected_characters=450),
-                   LifecycleStep("session-start", protected_seconds=25,
-                                 protected_characters=1450)),
-            delivery="context", total_timeout_seconds=105,
-            runner_reserve_seconds=5, output_limit_characters=2200,
-            output_reserve_characters=200),
-        LifecycleBinding(
-            moment="post-write",
-            steps=(LifecycleStep("validate", (DOMAIN_ROOT_ARG, "--quiet"),
-                                 protected_seconds=100,
-                                 protected_characters=1900),),
-            delivery="feedback", total_timeout_seconds=105,
-            runner_reserve_seconds=5, output_limit_characters=2200,
-            output_reserve_characters=200),
-        LifecycleBinding(
-            moment="pre-commit",
-            steps=(LifecycleStep("cues", (DOMAIN_ROOT_ARG, "--staged"),
-                                 protected_seconds=100,
-                                 protected_characters=1900),),
-            delivery="gate", total_timeout_seconds=105,
-            runner_reserve_seconds=5, output_limit_characters=2200,
-            output_reserve_characters=200),
-    )
 
 
 class ClaudeCodeAdapter:

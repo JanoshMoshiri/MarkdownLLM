@@ -437,7 +437,7 @@ def test_codex_operator_only_composite_receives_groups_losslessly(tmp_path):
     parsed = json.loads(decision.after)
     assert parsed["hooks"]["Stop"] == json.loads(before)["hooks"]["Stop"]
     assert set(parsed["hooks"]) == {
-        "Stop", "SessionStart", "PostToolUse"}
+        "Stop", "SessionStart", "PostToolUse", "PreToolUse"}
 
     apply_install(plan)
 
@@ -522,6 +522,8 @@ def test_codex_stale_and_duplicate_managed_json_are_refused(tmp_path):
 @pytest.mark.parametrize("legacy_id", [
     "legacy-root-v1", "legacy-root-fixed-step-v1",
     "legacy-output-tail-v1",
+    "legacy-output-allocation-v1",
+    "legacy-codex-two-moment-v2",
 ])
 def test_codex_root_legacy_refresh_replaces_only_owned_event_arrays(
         tmp_path, legacy_id):

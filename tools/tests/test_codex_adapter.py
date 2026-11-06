@@ -68,7 +68,7 @@ def test_codex_adapter_satisfies_its_declared_service_ports():
     assert isinstance(CODEX, InstallPolicyPort)
     assert isinstance(CODEX, LegacyDefinitionPort)
     assert CODEX.capabilities().lifecycle_moments == (
-        "session-start", "post-write")
+        "session-start", "post-write", "pre-commit")
 
 
 def test_root_legacy_definition_is_frozen_and_root_scoped():
@@ -76,7 +76,8 @@ def test_root_legacy_definition_is_frozen_and_root_scoped():
 
     assert [item.legacy_id for item in definitions] == [
         "legacy-root-v1", "legacy-root-fixed-step-v1",
-        "legacy-output-tail-v1"]
+        "legacy-output-tail-v1", "legacy-output-allocation-v1",
+        "legacy-codex-two-moment-v2"]
     assert all(item.path == HOOKS_PATH for item in definitions)
     assert [(len(item.owned_fragment),
              hashlib.sha256(item.owned_fragment).hexdigest())
@@ -87,14 +88,25 @@ def test_root_legacy_definition_is_frozen_and_root_scoped():
          "7e17affd756a09e6a96d67e01b8ef7d2d72e2499071d21c9c1851b72bb580df0"),
         (15508,
          "4c229fca8a71ed7a528268867823505bc9d0f1ebc131cf0d7bc27e1c61618aa3"),
+        (15508,
+         "d1b53e125e00548ffaade58396c65989acbc229ffc6fc08e5f608561c9e54cbd"),
+        (16044,
+         "0a5798ebf8a1a8319b25277e783cb3a4578d8c02f34b4d5aa93a78285be3c572"),
     ]
     nested = CODEX.legacy_definitions(CTX)
-    assert [item.legacy_id for item in nested] == ["legacy-output-tail-v1"]
+    assert [item.legacy_id for item in nested] == [
+        "legacy-output-tail-v1", "legacy-output-allocation-v1",
+        "legacy-codex-two-moment-v2"]
     assert [(len(item.owned_fragment),
              hashlib.sha256(item.owned_fragment).hexdigest())
             for item in nested] == [
         (15646,
-         "fa36d164c1190fd3e33ed20fea0a15c9beaaa149353fd57b8011f4a7ef5bfcf9")]
+         "fa36d164c1190fd3e33ed20fea0a15c9beaaa149353fd57b8011f4a7ef5bfcf9"),
+        (15646,
+         "49563588c30aab75bbcf4a57857aee123eb5edc94ae8dcfeecdaee6502aaa581"),
+        (16182,
+         "8c1f779fe0665e5a04035c6715eb5dd625d8b06d30f6123f4c31fcfcfa17c9c6"),
+    ]
 
 
 def test_inspect_names_only_the_exact_unextended_root_legacy(tmp_path):
@@ -143,7 +155,8 @@ def test_render_has_one_bounded_cross_platform_handler_per_moment():
     assert config["description"].startswith("MarkdownLLM")
     for event, matcher in (
             ("SessionStart", "startup|resume|clear|compact"),
-            ("PostToolUse", "Edit|Write")):
+            ("PostToolUse", "Edit|Write"),
+            ("PreToolUse", "^Bash$")):
         groups = config["hooks"][event]
         assert len(groups) == 1
         assert groups[0]["matcher"] == matcher
@@ -292,12 +305,13 @@ def test_probe_hashes_match_the_literals_baked_into_each_handler(tmp_path):
     probe = CODEX.probe(tmp_path, CTX)
     assert probe.trust == "unknown"
     assert "/hooks" in " ".join(probe.remediations)
-    assert set(probe.definition_hashes) == {"session-start", "post-write"}
+    assert set(probe.definition_hashes) == {"session-start", "post-write", "pre-commit"}
     assert probe.definition_hashes["session-start"] != \
         probe.definition_hashes["post-write"]
     for moment, event in (
             ("session-start", "SessionStart"),
-            ("post-write", "PostToolUse")):
+            ("post-write", "PostToolUse"),
+            ("pre-commit", "PreToolUse")):
         handler = config["hooks"][event][0]["hooks"][0]
         expected = probe.definition_hashes[moment]
         assert expected in handler["command"]
@@ -354,6 +368,7 @@ def test_inspect_current_is_format_insensitive_and_preserves_operator_data(
     assert fragment.intents_realised == {
         "session-start": ("estate-sync", "session-start"),
         "post-write": ("validate",),
+        "pre-commit": ("cues",),
     }
     assert "top-level key 'owner-note' is operator-owned" in \
         report.operator_owned

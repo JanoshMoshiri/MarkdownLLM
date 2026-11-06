@@ -42,6 +42,9 @@ from .yaml_loader import load_yaml
 
 DEFAULT_TIMEOUT = 20  # seconds per network call; a hook that can hang a session start is worse than none
 ESTATE_GLOBAL_TIMEOUT = 75
+# Startup has to leave time for local diagnostics and the digest even when
+# every remote is slow. The standalone sync keeps its full network budget.
+ESTATE_STARTUP_FETCH_TIMEOUT = 30
 
 
 class SyncState(str, Enum):
@@ -782,7 +785,9 @@ def cmd_estate_sync(args) -> int:
                       and not status_only)
     if not runner_channel:
         print(heading + "\n")
-    deadline = (time.monotonic() + ESTATE_GLOBAL_TIMEOUT) if fetch else None
+    fetch_budget = (ESTATE_STARTUP_FETCH_TIMEOUT if runner_channel
+                    else ESTATE_GLOBAL_TIMEOUT)
+    deadline = (time.monotonic() + fetch_budget) if fetch else None
     # Concurrent per-repo observation: each sync_repo is independent (its own
     # working directory, its own subprocesses, no shared mutable state) and
     # the wall time of a serial walk is the SUM of every repo's network round

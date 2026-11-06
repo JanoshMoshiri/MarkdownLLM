@@ -23,6 +23,7 @@ from __future__ import annotations
 import base64
 import json
 import re
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -49,7 +50,8 @@ from ..adapter_install import (
     load_unique_json,
 )
 from .project_hook_emission import (
-    HASH_PLACEHOLDER, LEGACY_SH_RESOLVE_V1, binding_hash_payload,
+    HASH_PLACEHOLDER, LEGACY_SH_RESOLVE_V1, LEGACY_SH_RESOLVE_V2,
+    binding_hash_payload, gate_envelope, legacy_2200_bindings,
     lifecycle_envelope, mdllm_posix_path, posix_event_command, ps_quote,
     unavailable_text,
 )
@@ -80,7 +82,24 @@ _LEGACY_ROOT_FIXED_STEP_V1 = Path(__file__).with_name("legacy") / \
 _EVENT_BY_MOMENT = {
     "session-start": "SessionStart",
     "post-write": "PostToolUse",
+    "pre-commit": "PreToolUse",
 }
+_MATCHER_BY_MOMENT = {
+    "session-start": _SESSION_MATCHER,
+    "post-write": _WRITE_MATCHER,
+    "pre-commit": "^Bash$",
+}
+_LEGACY_MOMENTS = ("session-start", "post-write")
+_GATE_PREAMBLE = (
+    "MarkdownLLM paused this commit. Follow the gate instructions below. For "
+    "a reconciliation touchpoint that needs the operator's ruling, use Codex's "
+    "request_user_input_async tool in the desktop app, or request_user_input "
+    "when available in the current mode. Offer the concrete alternatives and "
+    "'Defer to the seat'. For a reckoning close, use the same choice prompt "
+    "for the unresolved dispositions. If neither tool is available, present "
+    "the choices in chat. Await the answer before applying a ruling. A "
+    "deferral leaves the question open. "
+    "In an unattended run, record and file the unresolved question.")
 
 
 class CodexAdapter:
@@ -97,9 +116,10 @@ class CodexAdapter:
     def capabilities(self) -> AdapterCapabilities:
         return AdapterCapabilities(
             harness=self.name,
-            lifecycle_moments=("session-start", "post-write"),
+            lifecycle_moments=tuple(_EVENT_BY_MOMENT),
             notes=("project-local hooks.json; one SessionStart handler owns "
-                   "ordered startup; trust/review remain human-observed"),
+                   "ordered startup; PreToolUse gates commits; trust/review "
+                   "remain human-observed"),
         )
 
     def install_policies(self) -> dict[str, NestedJsonArrayGroupsPolicy]:
@@ -119,9 +139,8 @@ class CodexAdapter:
         acquire a speculative migration path.
         """
         output_tail_hooks = {
-            event: [{
-                "matcher": (_SESSION_MATCHER if moment == "session-start"
-                            else _WRITE_MATCHER),
+            _EVENT_BY_MOMENT[moment]: [{
+                "matcher": _MATCHER_BY_MOMENT[moment],
                 "hooks": [self._handler(
                     context, moment,
                     self._definition_hash(
@@ -131,7 +150,7 @@ class CodexAdapter:
                     resolve_fragment=LEGACY_SH_RESOLVE_V1,
                     context_limit=_LEGACY_CONTEXT_LIMIT)],
             }]
-            for moment, event in _EVENT_BY_MOMENT.items()
+            for moment in _LEGACY_MOMENTS
         }
         output_tail_definition = LegacyDefinition(
             legacy_id="legacy-output-tail-v1",
@@ -140,9 +159,23 @@ class CodexAdapter:
                 {"hooks": output_tail_hooks}, separators=(",", ":"))
                 + "\n").encode("utf-8"),
         )
+        # These are the bindings of the two deployed pre-gate generations.
+        # The earlier one is the projection tracked by the 3.51 release.
+        start, post_write, _ = legacy_2200_bindings()
+        allocated = replace(context, bindings=(start, post_write))
+        expanded = replace(context, bindings=(replace(
+            start, output_limit_characters=9800,
+            steps=(start.steps[0], replace(start.steps[1], protected_characters=6000))),
+            post_write))
+        pre_gate = tuple(self._legacy_two_moment_definition(
+            ctx, legacy_id, resolver, limit) for ctx, legacy_id, resolver, limit in (
+                (allocated, "legacy-output-allocation-v1",
+                 LEGACY_SH_RESOLVE_V1, _LEGACY_CONTEXT_LIMIT),
+                (expanded, "legacy-codex-two-moment-v2", LEGACY_SH_RESOLVE_V2, 5000),
+            ))
         definitions = []
         if (context.framework_root_rel.rstrip("/") or ".") != ".":
-            return (output_tail_definition,)
+            return (output_tail_definition, *pre_gate)
         for legacy_id, path in (
                 ("legacy-root-v1", _LEGACY_ROOT_V1),
                 ("legacy-root-fixed-step-v1",
@@ -159,8 +192,28 @@ class CodexAdapter:
                 path=HOOKS_PATH,
                 owned_fragment=owned,
             ))
-        definitions.append(output_tail_definition)
+        definitions.extend((output_tail_definition, *pre_gate))
         return tuple(definitions)
+
+    def _legacy_two_moment_definition(self, context: HarnessContext,
+                                      legacy_id: str, resolver: str,
+                                      context_limit: int) -> LegacyDefinition:
+        hooks = {
+            _EVENT_BY_MOMENT[moment]: [{
+                "matcher": _MATCHER_BY_MOMENT[moment],
+                "hooks": [self._handler(
+                    context, moment, self._definition_hash(
+                        context, moment, resolve_fragment=resolver,
+                        context_limit=context_limit),
+                    resolve_fragment=resolver, context_limit=context_limit)],
+            }]
+            for moment in _LEGACY_MOMENTS
+        }
+        return LegacyDefinition(
+            legacy_id=legacy_id, path=HOOKS_PATH,
+            owned_fragment=(json.dumps({"hooks": hooks}, separators=(",", ":"))
+                            + "\n").encode("utf-8"),
+        )
 
     # ------------------------------------------------------------- rendering
 
@@ -192,21 +245,25 @@ class CodexAdapter:
         remains quiet when validation passes and sends model-visible context
         only on failure; plain stdout is ignored for that event.
         """
-        return lifecycle_envelope(moment, text, passed,
-                                  self._event_name(moment))
+        event = self._event_name(moment)
+        if moment == "pre-commit":
+            return "" if passed else gate_envelope(event, _GATE_PREAMBLE + "\n\n" + text)
+        return lifecycle_envelope(moment, text, passed, event)
 
     def _event_posix(self, context: HarnessContext, moment: str,
                      definition_hash: str, *,
                      resolve_fragment: str | None = None) -> str:
-        unavailable = self.format_lifecycle_output(
-            moment, unavailable_text(moment), False)
+        gate = moment == "pre-commit"
+        unavailable = lifecycle_envelope(
+            moment, unavailable_text(moment), False, self._event_name(moment))
         return posix_event_command(
             root_line='ROOT="$(git rev-parse --show-toplevel)"',
             harness=self.name, moment=moment,
             definition_hash=definition_hash,
             mdllm_path=mdllm_posix_path(context),
             unavailable=unavailable,
-            resolve_fragment=resolve_fragment)
+            resolve_fragment=resolve_fragment,
+            stdin_prefilter="*git*commit*" if gate else None)
 
     def _event_windows(self, context: HarnessContext, moment: str,
                        definition_hash: str) -> str:
@@ -219,9 +276,19 @@ class CodexAdapter:
         failed = ps_quote(
             f"MarkdownLLM {moment} returned a non-zero status; the lifecycle "
             "failure was surfaced but does not enforce the harness action.")
+        gate = moment == "pre-commit"
+        prefilter = (
+            "[Console]::InputEncoding = [Text.UTF8Encoding]::new($false); "
+            "$hookInput = [Console]::In.ReadToEnd(); "
+            "if ($hookInput -cnotlike '*git*commit*') { exit 0 }; "
+            "$OutputEncoding = [Text.UTF8Encoding]::new($false); "
+            "$env:PYTHONIOENCODING = 'utf-8'; "
+        ) if gate else ""
+        stdin_pipe = "$hookInput | " if gate else ""
         script = (
             "$ErrorActionPreference = 'Stop'; "
             "$PSNativeCommandUseErrorActionPreference = $false; "
+            f"{prefilter}"
             "function Write-MdllmFailure([string]$detail) { "
             f"$payload = @{{ hookSpecificOutput = @{{ hookEventName = {event}; "
             "additionalContext = $detail } }; "
@@ -254,7 +321,7 @@ class CodexAdapter:
             "$launchPrefix = @('-NoProfile', '-ExecutionPolicy', 'Bypass', "
             "'-File', $runner) }; "
             "if ($executable) { "
-            f"& $executable @launchPrefix harness-event codex {moment} "
+            f"{stdin_pipe}& $executable @launchPrefix harness-event codex {moment} "
             f"$root {ps_quote(definition_hash)}; "
             f"if ($LASTEXITCODE -ne 0) {{ Write-MdllmFailure {failed} }} "
             f"}} else {{ Write-MdllmFailure {unavailable} }} "
@@ -313,8 +380,7 @@ class CodexAdapter:
         event = self._event_name(moment)
         binding = context.binding(moment)
         group = {
-            "matcher": (_SESSION_MATCHER if moment == "session-start"
-                        else _WRITE_MATCHER),
+            "matcher": _MATCHER_BY_MOMENT[moment],
             "hooks": [self._handler(context, moment, HASH_PLACEHOLDER,
                                     resolve_fragment=resolve_fragment,
                                     context_limit=context_limit)],
@@ -337,8 +403,9 @@ class CodexAdapter:
             trust_detail=("Codex project trust and exact-hook review are "
                           "human-observed, not inferred from config bytes"),
             definition_hashes={
-                moment: self._definition_hash(context, moment)
-                for moment in self.capabilities().lifecycle_moments
+                binding.moment: self._definition_hash(context, binding.moment)
+                for binding in context.bindings
+                if binding.moment in _EVENT_BY_MOMENT
             },
             remediations=(
                 "review project trust and the exact current hook definitions "
@@ -352,25 +419,15 @@ class CodexAdapter:
         )
 
     def render(self, context: HarnessContext) -> dict[str, bytes]:
-        # Fail early if the neutral context omitted a moment this adapter
-        # declares. The runner consumes these same bindings at execution.
-        context.binding("session-start")
-        context.binding("post-write")
-        session_hash = self._definition_hash(context, "session-start")
-        post_write_hash = self._definition_hash(context, "post-write")
         payload = {
             "description": _DESCRIPTION,
             "hooks": {
-                "SessionStart": [{
-                    "matcher": _SESSION_MATCHER,
+                event: [{
+                    "matcher": _MATCHER_BY_MOMENT[moment],
                     "hooks": [self._handler(
-                        context, "session-start", session_hash)],
-                }],
-                "PostToolUse": [{
-                    "matcher": _WRITE_MATCHER,
-                    "hooks": [self._handler(
-                        context, "post-write", post_write_hash)],
-                }],
+                        context, moment, self._definition_hash(context, moment))],
+                }]
+                for moment, event in _EVENT_BY_MOMENT.items()
             },
         }
         return {HOOKS_PATH:
@@ -570,8 +627,6 @@ class CodexAdapter:
             operator_owned.append(f"top-level key {key!r} is operator-owned")
 
         present = bool(realised)
-        # Only the moments this adapter binds: a neutral binding Codex has
-        # no event for (the commit gate) is not a missing managed group here.
         expected = {
             binding.moment: tuple(step.operation for step in binding.steps)
             for binding in context.bindings
