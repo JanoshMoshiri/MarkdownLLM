@@ -17,6 +17,9 @@ linked_things:
   - id: mis-keyed-links-pass-the-floor-silently
     relation: supports
     notes: "That hole was in frontmatter links; this is the same hole one layer out, in body prose."
+disposition: keep-active
+disposition_reason: "Stays active: the floor still has no prose-reference check (validation.py reads frontmatter links only), so the operating layer has nothing to promote it into; it is the specification for a check not yet built"
+settles_when: 2026-12-06
 ---
 
 # The Prose Dark Region Has A Mechanical Half — Referential Integrity

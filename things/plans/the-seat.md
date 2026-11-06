@@ -23,11 +23,14 @@ linked_things:
   - id: the-reckoning
     relation: references
     notes: "The next arc after this one, by the operator's ordering."
+  - id: a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures
+    relation: references
+    notes: "What Phase 7's calibration correction taught: the window is the healthy rhythm's tail, the ceiling silences the forgotten; harvested at the 2026-11-06 close."
 triggers:
   - type: time
-    condition: "2026-10-29 reached"
+    condition: "2026-11-20 reached"
     action: surface
-    note: "Two weeks: has every clone that takes turns declared its seat (the digest says), and since the release carrying the guard, has any generated block been rewritten in turns by two clones? If seats are still undeclared, the digest line is being read past — say so."
+    note: "Answered 2026-11-06 by citation: both clones had declared seats by 2026-11-02 — and the first declaration was wrong by naming, caught by an occupant change, not by the digest (seats-are-named-for-the-clone-not-the-agent-2026-10-30); the root vocabulary followed on 2026-11-03 (ad-hoc-message-loop 1.4, release 3.51.0). Whether any generated block was rewritten in turns is still unread; the second clone's log is on this machine since the merge of 2026-11-02, so the next look reads it. Earlier: Two weeks: has every clone that takes turns declared its seat (the digest says), and since the release carrying the guard, has any generated block been rewritten in turns by two clones? If seats are still undeclared, the digest line is being read past — say so."
 ---
 
 # Plan: The Seat

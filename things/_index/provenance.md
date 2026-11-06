@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-11-03
-generated: 2026-11-03T01:16:56
-generated_from: HEAD@6aa23c3
-coverage: 144
+created: 2026-11-06
+generated: 2026-11-06T15:07:13
+generated_from: HEAD@f8168b1
+coverage: 146
 framework_version: 3.51.0
 ---
 
@@ -18,6 +18,9 @@ framework_version: 3.51.0
 
 ## a-mechanism-fails-at-its-seams-not-in-its-body
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
+
+## a-note-on-a-held-ticket-rings-its-addressee-2026-11-02
+- a-floor-rule-reads-the-need-it-forbids-as-a-slip (derived-from)
 
 ## a-remembered-step-is-a-missing-actor
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @68c83cee2b400b75c52f346c0506c01dfd273bb2)
@@ -634,6 +637,9 @@ framework_version: 3.51.0
 
 ## the-record-holds-unattended
 - the-gate-reads-presence-the-spec-promises-the-walk (derived-from)
+
+## the-seat
+- a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures (derived-from)
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)

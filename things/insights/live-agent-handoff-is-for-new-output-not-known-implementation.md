@@ -19,6 +19,9 @@ linked_things:
   - id: phase-3-run-domain-task-reverted
     relation: informs
     notes: "run_domain_task was reverted 2026-06-27; this is design knowledge for the deferred A2A layer, not a live tool"
+disposition: keep-active
+disposition_reason: "Stays active as design knowledge for the live-agent hand-off surface, which is still unbuilt: the ticket that shipped since is a message between seats, not a hand-off that returns a deliverable, so there is no operating layer to promote the razor into yet"
+settles_when: 2026-12-06
 ---
 
 # The Live-Agent Hand-off Is For Producing New Output, Not Implementing What's Already Specified

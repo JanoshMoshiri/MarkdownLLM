@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-03
-generated: 2026-11-03T01:16:56
-generated_from: HEAD@6aa23c3
-coverage: 639
+created: 2026-11-06
+generated: 2026-11-06T15:07:13
+generated_from: HEAD@f8168b1
+coverage: 641
 framework_version: 3.51.0
 ---
 
@@ -81,6 +81,10 @@ framework_version: 3.51.0
 - a-flat-re-export-shim-is-an-uncollided-namespace --complements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - a-flat-re-export-shim-is-an-uncollided-namespace --references--> srp-extraction-is-tier-promotion
 - a-flat-re-export-shim-is-an-uncollided-namespace --informs--> repeated-drift-promotes-a-fact-into-the-floor
+- a-floor-rule-reads-the-need-it-forbids-as-a-slip --derived-from--> a-note-on-a-held-ticket-rings-its-addressee-2026-11-02
+- a-floor-rule-reads-the-need-it-forbids-as-a-slip --references--> ticket-is-the-ad-hoc-carrier-2026-09-30
+- a-floor-rule-reads-the-need-it-forbids-as-a-slip --supports--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- a-floor-rule-reads-the-need-it-forbids-as-a-slip --references--> consequence-is-recoverable-only-in-retrospect
 - a-generated-contract-change-is-an-estate-migration --complements--> a-generated-surface-collapses-its-walk
 - a-generated-contract-change-is-an-estate-migration --complements--> existence-is-not-currency
 - a-generated-contract-change-is-an-estate-migration --derived-from--> vendor-harness-adapter-foundation
@@ -141,6 +145,9 @@ framework_version: 3.51.0
 - a-remembered-step-is-a-missing-actor --references--> dispatcher-ticks-headless-on-the-substrate-machine-2026-09-23
 - a-remote-fetched-before-and-not-found-now-is-a-credential-change --informs--> git-workflow-specification
 - a-remote-fetched-before-and-not-found-now-is-a-credential-change --supports--> a-check-run-where-it-cannot-see-mints-a-false-finding
+- a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures --derived-from--> the-seat
+- a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures --extends--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
+- a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures --informs--> standing-watch-specification
 - a-ruling-triages-more-cheaply-than-a-mechanism --informs--> membrane-attention-cluster
 - a-ruling-triages-more-cheaply-than-a-mechanism --supports--> a-true-primitive-is-discovered-not-authored
 - a-ruling-triages-more-cheaply-than-a-mechanism --supports--> cross-domain-readiness-is-a-shared-signal-not-a-producer-push
@@ -1749,6 +1756,7 @@ framework_version: 3.51.0
 - substrate-native-a2a --complements--> closed-loop-operating-state
 - substrate-native-a2a --implements--> hook-enforcement-has-three-anchors
 - substrate-native-a2a --derived-from--> ticket-is-the-ad-hoc-carrier-2026-09-30
+- substrate-native-a2a --references--> a-floor-rule-reads-the-need-it-forbids-as-a-slip
 - substrate-reconciliation-2026-08-09 --informs--> orchestration-specification
 - substrate-reconciliation-2026-08-09 --informs--> git-workflow-specification
 - substrate-reconciliation-2026-08-09 --informs--> pretooluse-action-boundary-gate
@@ -1874,6 +1882,7 @@ framework_version: 3.51.0
 - the-seat --references--> a2a-conversations-on-their-own-branch
 - the-seat --extends--> standing-watch-specification
 - the-seat --references--> the-reckoning
+- the-seat --references--> a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
 - the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
 - the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming

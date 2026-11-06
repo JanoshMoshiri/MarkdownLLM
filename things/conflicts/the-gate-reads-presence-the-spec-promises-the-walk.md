@@ -1,7 +1,7 @@
 ---
 id: the-gate-reads-presence-the-spec-promises-the-walk
 type: conflict
-status: open
+status: resolved
 created: 2026-10-27
 session: 2026-10-27
 parties:
@@ -26,6 +26,8 @@ linked_things:
   - id: review-holistic-substrate-2026-10-21-codex
     relation: references
     notes: "F1: the gate checks that a cue exists, not that it was answered. Confirmed by probe 2026-10-24 and met live three times on 2026-10-27."
+resolution: superseded
+resolved_by: change-reconciliation-specification
 ---
 
 # The gate reads presence; the spec promises the walk

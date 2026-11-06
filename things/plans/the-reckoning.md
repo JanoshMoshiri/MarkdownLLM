@@ -28,9 +28,9 @@ linked_things:
     notes: "The diagnosis this plan answers."
 triggers:
   - type: time
-    condition: "2026-11-02 reached"
+    condition: "2026-11-30 reached"
     action: surface
-    note: "Four weeks of the rate line (Phase 5): does disposed keep pace with created across the four live workspaces? The two-week question was answered yes on 2026-10-20 — one attended close (2026-10-08) and one tick's draft (2026-10-11), both recorded in Phase 3."
+    note: "Answered 2026-11-06 by citation, at the close: the rate line read intake 10 (9 cues, 1 insight), disposed 0, walks 9 of 5 definition-surface changes in the last 7 days; this close emptied the mechanical band (one conflict resolved as superseded) and chased nine settled items, with 37 standing. In the root, disposal does not keep pace with intake this week; the walks do. The four-workspace read is still four separate closes, not one line. Next look four weeks on. Earlier: Four weeks of the rate line (Phase 5): does disposed keep pace with created across the four live workspaces? The two-week question was answered yes on 2026-10-20 — one attended close (2026-10-08) and one tick's draft (2026-10-11), both recorded in Phase 3."
 ---
 
 # Plan: The Reckoning
