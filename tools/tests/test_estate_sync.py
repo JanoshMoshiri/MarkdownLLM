@@ -4,6 +4,7 @@ floor-structure-residue item 4)."""
 
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -309,11 +310,12 @@ def test_estate_sync_clamps_fetch_to_remaining_global_budget(
         return original(repo, *args, **kwargs)
 
     monkeypatch.setattr(sync_mod, "_git", timed)
-    sync_mod.sync_repo(
-        clone, timeout=20, deadline=sync_mod.time.monotonic() + 2)
+    # Check the transport timeout independently of how long Git takes to
+    # inspect the fixture repository on a loaded machine.
+    monkeypatch.setattr(sync_mod, "time", SimpleNamespace(monotonic=lambda: 100))
+    sync_mod.sync_repo(clone, timeout=20, deadline=102)
 
-    assert len(observed) == 1
-    assert 0 < observed[0] <= 2
+    assert observed == [2]
 
 
 
