@@ -2,7 +2,7 @@
 id: limitations-guide
 type: guide
 status: draft
-version: 1.2
+version: 1.3
 created: 2026-10-18
 tags: [limitations, positioning, when-not-to-use, prior-art, memory-systems]
 linked_things:
@@ -143,9 +143,13 @@ asking.
 
 ## What is not yet known
 
-- **Whether structure beats scale.** The framework's central hypothesis — a
-  smaller model with this structure matching a larger one without it — rests
-  on one evaluation whose reasoning core saturated. It is a hypothesis.
+- **Which parts of the structure do the work.** Since 2026-11-08 this is the
+  question the eval programme asks: with model, facts and the knowledge layer
+  held constant, does removing the computed session-start digest, or the
+  status on every record, or the change gate, cost anything measurable? No
+  cycle has run. The older question — whether a smaller model with this
+  structure matches a larger one without it — rested on one evaluation whose
+  reasoning core saturated and is set aside as a corollary, not re-proved.
 - **Whether the coherence claim holds over time.** The longitudinal
   measurement — seeded definition changes and contradictions across many
   sessions, this framework against a plain notes folder, detection rate and

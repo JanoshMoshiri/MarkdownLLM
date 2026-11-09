@@ -103,10 +103,19 @@ result JSON gains a per-session breakdown; `--report` aggregates trial totals
 as before. Stage 1 (no `--run`) against an existing domain checks the *final*
 session's assertions — the end-state contract.
 
-## The structure-beats-scale experiment
+## The structure-beats-scale experiment (historical framing)
 
-The manifesto claims a smaller model in a well-defined domain outperforms a
-larger model without structure. The 2×2 that tests it:
+*Reframed 2026-11-08: the model-tier claim is no longer what the programme
+tests. The arms below remain as the runner's conditions and as the record of
+the 2026-06 and 2026-10 runs; the live question is which surfaces of the
+structure carry the weight, run as an ablation of the structure against
+itself with model and facts held constant — see* `things/workflows/eval-cycle.md`
+*(The moving surfaces → the work-continuity layer) and*
+`things/decisions/the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08.md`.
+
+The manifesto's efficiency corollary holds that a smaller model in a
+well-defined domain can outperform a larger model without structure. The 2×2
+that was built to test it:
 
 | | framework | bare |
 |---|---|---|
