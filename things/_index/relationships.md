@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-09
-generated: 2026-11-09T00:04:39
-generated_from: HEAD@b9bb9a7
-coverage: 644
+generated: 2026-11-09T01:04:20
+generated_from: HEAD@9bcf5c6
+coverage: 645
 framework_version: 3.51.0
 ---
 
@@ -575,6 +575,7 @@ framework_version: 3.51.0
 - cue-estate-retrospective-synthesis-2026-08-2026-09-13 --subject--> estate-retrospective-synthesis-2026-08
 - cue-estate-workflow-derivation-2026-09-13 --subject--> estate-workflow-derivation
 - cue-estate-workflow-derivation-2026-10-17 --subject--> estate-workflow-derivation
+- cue-eval-cycle-2026-11-09 --subject--> eval-cycle
 - cue-evidence-and-eval-backlog-2026-09-24 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-09-26 --subject--> evidence-and-eval-backlog
 - cue-evidence-and-eval-backlog-2026-10-17 --subject--> evidence-and-eval-backlog
@@ -890,6 +891,8 @@ framework_version: 3.51.0
 - eval-cycle --implements--> evidence-and-eval-backlog
 - eval-cycle --references--> eval-record-2026
 - eval-cycle --references--> flagship-models-look-around-the-edges
+- eval-cycle --references--> the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08
+- eval-cycle --references--> review-memory-systems-reread-2026-11-09-workspace-1
 - eval-record-2026 --informs--> evidence-and-eval-backlog
 - eval-record-2026 --references--> review-critical-comparison-2026-10-17-claude
 - eval-record-2026 --references--> withholding-is-not-isolation
@@ -1601,6 +1604,7 @@ framework_version: 3.51.0
 - rich-founding-context-breaks-scaffold-then-jump --references--> agents-drop-mechanical-birth-steps-not-semantic-ones
 - run-eval-cycle-0-polar-baseline-2026-10 --implements--> evidence-and-eval-backlog
 - run-eval-cycle-0-polar-baseline-2026-10 --references--> eval-record-2026
+- run-eval-cycle-0-polar-baseline-2026-10 --references--> the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08
 - run-eval-cycle-0-polar-baseline-2026-10 --definition--> eval-cycle
 - run-floor-sprint-1-2026-08 --references--> substrate-review-consolidated-remedy-2026-08-20
 - run-floor-sprint-1-2026-08 --definition--> substrate-floor-development

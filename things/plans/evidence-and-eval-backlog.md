@@ -2,7 +2,7 @@
 id: evidence-and-eval-backlog
 type: plan
 status: in-progress
-version: 2.3
+version: 2.4
 created: 2026-06-27
 priority: high
 tags: [evals, evidence, validation, isolation, longitudinal, docs]
@@ -142,6 +142,35 @@ the prediction in `flagship-models-look-around-the-edges` before reading
 it any other way. The FAC longitudinal opus arm and haiku n≥5 stay owed
 behind it. Still an operator-terminal task: the credential constraint has
 not moved.
+
+**2026-11-09 — the purpose changes; the method and the evening do not.**
+The operator ruled on 2026-11-08
+(`the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08`) that
+this backlog no longer exists to evidence the model-tier claim — that a
+smaller model with the structure matches a larger one without. The manifesto
+already called that secondary and said re-proving it adds little; the
+operator's week in a harness with no record beneath it said the rest. **The
+purpose now is to find which surfaces of the structure carry the weight**:
+every arm holds the same model, the same facts and the same knowledge layer,
+and one surface of the work-continuity layer moves per cycle — the computed
+session-start digest against the same files injected verbatim, records with
+`status` and stage cursors against records without, the change gate on
+against off (`eval-cycle` → The moving surfaces; the first prediction is
+pre-registered in
+`review-memory-systems-reread-2026-11-09-workspace-1` §6). What is
+measured changes with it: re-establishment (how much of the read set
+re-derives what the record already settled), wrong turns against a stale
+record, and whether the session acts on the open loop the record names
+unprompted — the changed-set pass rate stays as the floor under those, not
+the headline. What does *not* change: the baseline cell (haiku × framework
+at polar-station, ×5, one trial first, one arm at a time) is still the
+departure point for every ablation and still the operator's evening; the
+runner still has no digest-off or status-stripped arm, so each cycle's
+surface is agent pre-work before that cycle, not before the baseline. The
+two bare conditions in the run order above are no longer arms of this plan —
+`bare` and `bare-coached` answered the old question — and the FAC
+longitudinal arms stay owed as drift evidence, which the new question still
+needs. Operator session 1 is untouched by any of this.
 
 ## Behind those two
 

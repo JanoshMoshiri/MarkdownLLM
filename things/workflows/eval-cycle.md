@@ -2,9 +2,9 @@
 id: eval-cycle
 type: workflow-definition
 status: draft
-version: 1.0
+version: 1.1
 created: 2026-10-30
-session: 2026-10-30
+session: 2026-11-09
 exposed: false
 tags: [evals, method, traceability, evidence, one-surface, hypothesis, workflow]
 stages:
@@ -38,6 +38,12 @@ linked_things:
   - id: flagship-models-look-around-the-edges
     relation: references
     notes: "The first hypothesis this definition carries, and the refinement that made the read set a measured surface."
+  - id: the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08
+    relation: references
+    notes: "The ruling that made the structure's own layers the surfaces a cycle moves, with model and facts held constant; the loop itself did not change."
+  - id: review-memory-systems-reread-2026-11-09-workspace-1
+    relation: references
+    notes: "Where the work-continuity layer was identified as the surface no surveyed system has, and the first prediction over it was pre-registered."
 ---
 
 # Eval Cycle — the evidence-led traceability loop
@@ -83,9 +89,19 @@ move — one per cycle, the rest frozen:
 | harness | `harness_build` | the installed CLI |
 | tools | the fixture's `allowed_tools` | the fixture |
 | effort | `reasoning_effort_requested` | the fixture |
+| the work-continuity layer (added 2026-11-09) | not yet a runner field — three sub-surfaces, each moved alone: **the digest** (the session start emits the computed `mdllm session-start` digest, or injects the same files verbatim); **status and stage cursors** (the seed's records carry `status` / `current_stage`, or carry the same facts without them); **the gate** (the pre-commit floor and the definition-surface gate installed, or absent) | a runner switch for the digest; a seed variant for status; the hook set for the gate — each is pre-work before the cycle that moves it |
 
 Anything not in this table that changes between two cycles is a confound,
 and the reflection says so.
+
+**Which surfaces a programme moves is the programme's question.** The
+polar-station programme's first framing (2026-10-30) moved *structure*
+(framework → bare) and *model tier*; its reframing (2026-11-08,
+`the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08`) holds
+model, fixture, facts and the knowledge layer constant and moves one
+sub-surface of the work-continuity layer per cycle — an ablation of the
+structure against itself, not a contest against a bare arm. The loop is the
+same either way; only the row that moves differs.
 
 ## Stages
 

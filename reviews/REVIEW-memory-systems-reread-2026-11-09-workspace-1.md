@@ -3,7 +3,7 @@ id: review-memory-systems-reread-2026-11-09-workspace-1
 type: artifact
 status: evolving
 authorship: model-session
-version: 1.0
+version: 1.1
 created: 2026-11-09
 session: 2026-11-09
 origin: synthesised
@@ -265,6 +265,12 @@ name the work-continuity layer as a surface; the backlog's purpose line still
 reads as evidence for the model-tier claim. Those are three edits the operator
 has not yet asked for, listed so that the next session finds them here rather
 than re-deriving them.
+
+*2026-11-09, later the same day:* the operator asked for the three edits and
+they are made — `eval-cycle` 1.1 carries the work-continuity row,
+`run-eval-cycle-0` 1.1 re-plans its cycles over it, and the backlog's 2.4
+paragraph states the new purpose. The runner work named above is still not
+done, and is now listed as each cycle's pre-work where the cycle sits.
 
 ## Unverified, and what this reading is not
 
