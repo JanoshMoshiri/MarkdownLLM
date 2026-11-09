@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-11-03
-generated: 2026-11-03T01:16:56
-generated_from: HEAD@6aa23c3
-coverage: 144
+created: 2026-11-09
+generated: 2026-11-09T00:04:41
+generated_from: HEAD@b9bb9a7
+coverage: 147
 framework_version: 3.51.0
 ---
 
@@ -221,6 +221,10 @@ framework_version: 3.51.0
 - review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
 - run-eval-cycle-0-polar-baseline-2026-10 (pinned @0f403e54abb8cda4f4dc2ddbd36e28f7ee7547c4)
 
+## evidence-and-eval-backlog
+- review-memory-systems-reread-2026-11-09-workspace-1 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
+
 ## expertise-is-an-output-not-a-prerequisite
 - operating-scope-promotion (pinned @604dfc4)
 
@@ -426,9 +430,14 @@ framework_version: 3.51.0
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)
 - protecting-one-budget-displaces-the-failure-into-the-other (derived-from)
 
+## limitations-guide
+- review-memory-systems-reread-2026-11-09-workspace-1 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
+
 ## llm-driven-systems-manifesto
+- review-memory-systems-reread-2026-11-09-workspace-1 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
 - review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
 - settled-reasoning-is-standing-authority (pinned @a14b0c3f9439cb14e5058bc5820526e65e2ee402)
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
 - the-record-holds-unattended (pinned @992bf04ddf69bc44bd8ef7d16985c7dc0e2cfe6d)
 
 ## loop-turns-self-heal-2026-09-23
@@ -523,6 +532,7 @@ framework_version: 3.51.0
 ## review-critical-comparison-2026-10-17-claude
 - glossary (derived-from)
 - limitations-guide (derived-from)
+- review-memory-systems-reread-2026-11-09-workspace-1 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
 - review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
 
 ## review-documentation-audit-2026-10-20-claude
@@ -541,6 +551,9 @@ framework_version: 3.51.0
 ## review-independent-operating-model-2026-08-26-codex
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
 - run-operating-model-seams-2026-08 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
+
+## run-eval-cycle-0-polar-baseline-2026-10
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
 
 ## run-floor-sprint-1-2026-08
 - floor-sprint-2-scope-2026-08-22 (pinned @967773cb50f2dc9b9f661f8309c7aaacded8f4f1)

@@ -2,7 +2,7 @@
 id: limitations-guide
 type: guide
 status: draft
-version: 1.1
+version: 1.2
 created: 2026-10-18
 tags: [limitations, positioning, when-not-to-use, prior-art, memory-systems]
 linked_things:
@@ -118,6 +118,21 @@ with sources in the [critical comparison](../reviews/REVIEW-critical-comparison-
   itself and skills it patches as it uses them; nothing validates or versions
   a write, and the one independent benchmark names replacing outdated state
   as its weakest step.
+
+*Reread 2026-11-08* (`reviews/REVIEW-memory-systems-reread-2026-11-09-workspace-1.md`):
+three of those facts moved. Mem0's Platform now runs a background "Dream"
+pass whose Supersede step retires facts into labelled history, while its own
+evaluation page still calls knowledge update "the hardest category for an
+additive, ADD-only architecture." Copilot Memory's expiry reads 90 days by
+default (7–180 configurable) on the current concept page, and a "Dreaming"
+pass in public preview edits memories and proposes pull requests to
+instruction files, without undo. Hermes gained a write-approval gate
+(default off) and then made its instruction files, skills and memory stores
+always require approval. Codex, absent from the first reading, now has a
+background two-phase memory with usage decay. The general movement is that
+four vendors run a model over the memory while nobody is watching, and the
+human gates appearing are at *write* time, on security grounds, off by
+default — none at the moment a definition others depend on changes.
 
 What this framework does, and no surveyed system does, is refuse to let a
 model settle that question silently: the walk, the persisted cue, the pinned

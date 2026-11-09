@@ -3,10 +3,10 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-11-06
-generated: 2026-11-06T02:23:14
-generated_from: HEAD@f8168b1
-coverage: 642
+created: 2026-11-09
+generated: 2026-11-09T00:04:38
+generated_from: HEAD@b9bb9a7
+coverage: 644
 framework_version: 3.51.0
 ---
 
@@ -14,31 +14,31 @@ framework_version: 3.51.0
 
 | field | things using it |
 |---|---|
-| id | 642 |
-| type | 642 |
-| status | 642 |
-| created | 642 |
-| version | 567 |
-| tags | 536 |
-| linked_things | 403 |
+| id | 644 |
+| type | 644 |
+| status | 644 |
+| created | 644 |
+| version | 569 |
+| tags | 538 |
+| linked_things | 405 |
 | subject | 234 |
 | raised_at | 234 |
 | raised_by | 234 |
 | verdict | 234 |
 | verdict_reason | 234 |
-| origin | 218 |
-| session | 213 |
-| confidence | 209 |
-| informed_by | 205 |
+| origin | 220 |
+| session | 215 |
+| confidence | 210 |
+| informed_by | 207 |
 | source | 153 |
 | priority | 65 |
 | disposition | 65 |
 | disposition_reason | 65 |
-| decided_by | 47 |
+| decided_by | 48 |
 | promoted_to | 44 |
-| exposed | 40 |
+| exposed | 42 |
+| authorship | 21 |
 | settles_when | 21 |
-| authorship | 20 |
 | completed | 12 |
 | period_start | 10 |
 | period_end | 10 |

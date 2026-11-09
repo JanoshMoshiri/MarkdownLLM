@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-06
-generated: 2026-11-06T02:23:21
-generated_from: HEAD@f8168b1
-coverage: 642
+created: 2026-11-09
+generated: 2026-11-09T00:04:39
+generated_from: HEAD@b9bb9a7
+coverage: 644
 framework_version: 3.51.0
 ---
 
@@ -1573,6 +1573,12 @@ framework_version: 3.51.0
 - review-loop-2026-08-10 --informs--> an-adversarial-review-loop-converges-on-its-own-fix-residue
 - review-loop-2026-08-10 --informs--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - review-loop-2026-08-10 --informs--> coherence-mechanism-build
+- review-memory-systems-reread-2026-11-09-workspace-1 --extends--> review-critical-comparison-2026-10-17-claude
+- review-memory-systems-reread-2026-11-09-workspace-1 --informs--> limitations-guide
+- review-memory-systems-reread-2026-11-09-workspace-1 --references--> llm-driven-systems-manifesto
+- review-memory-systems-reread-2026-11-09-workspace-1 --informs--> the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08
+- review-memory-systems-reread-2026-11-09-workspace-1 --informs--> eval-cycle
+- review-memory-systems-reread-2026-11-09-workspace-1 --informs--> evidence-and-eval-backlog
 - review-remediation-v3-17 --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - review-remediation-v3-17 --implements--> a-crossing-thing-carries-its-producers-private-graph
 - review-remediation-v3-17 --implements--> directional-graph-reads-come-in-inbound-outbound-pairs
@@ -1794,6 +1800,12 @@ framework_version: 3.51.0
 - the-corpus-answers-faster-than-it-is-asked --challenges--> the-root-is-not-a-representative-domain
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 --informs--> evidence-and-eval-backlog
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 --informs--> eval-cycle
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 --informs--> flagship-models-look-around-the-edges
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 --informs--> run-eval-cycle-0-polar-baseline-2026-10
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 --references--> llm-driven-systems-manifesto
+- the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 --references--> review-memory-systems-reread-2026-11-09-workspace-1
 - the-felt-symptom-names-one-cause-the-record-ranks-them --informs--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - the-felt-symptom-names-one-cause-the-record-ranks-them --informs--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
 - the-felt-symptom-names-one-cause-the-record-ranks-them --supports--> partial-coverage-quiets-the-uncovered-steps
