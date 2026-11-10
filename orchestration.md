@@ -2,7 +2,7 @@
 id: orchestration-specification
 type: specification
 status: evolving
-version: 1.27
+version: 1.28
 created: 2026-05-20
 linked_things:
   - id: thing-specification
@@ -123,7 +123,7 @@ accepted state unverifiable. That is a recovery property, not proof it ran.
 | `session-start:estate-sync` | interpretation → harness-session (adapter) | interpretation (adapters bind it where installed) | Moderate — orientation reads a stale log; an unpulled checkout orients on a past domain |
 | `session-start`, `session-end` | harness-session | interpretation | **Moderate** — the state is regenerable from git, but the session *acts on the misread live*: two 2026-08-08 field incidents (an orientation the operator could not follow; a write made without the workflow skill's authorisation step) trace to skipped session-start steps |
 | `post-write` | interpretation (act) — git-fs is only the pre-commit drift net | interpretation (`PostToolUse` adapter exists) | Moderate — cascades missed |
-| `pre-commit:gate` (the walk at the agent's commit; the close at a `session-end:` commit) | harness-session (adapter) | ⚙️ Claude Code `PreToolUse` adapter where installed — mechanical: the commit is refused until the walk is on record, the cue's checklist is prefilled by the floor, and the refusal names the native choice prompt for the residue (`change-reconciliation.md` → The Walk, Where The Change Lands). A `session-end:` commit is also refused until the reckoning's close is met — the mechanical band applied, ten decisions today while a backlog stands (`session-memory.md` → The Reckoning); the runner reads the subject from the command and flags the same step, so no projection changes. Elsewhere interpretation (`candidates` advisory, the digest, `mdllm reckon --close`) | Moderate — the walk waits for the retrospective and the backlog grows, which is the drift the gate exists to end |
+| `pre-commit:gate` (the walk at the agent's commit; the close at a `session-end:` commit) | harness-session (adapter) | ⚙️ Claude Code and Codex `PreToolUse` adapters where installed and active. The gate refuses the commit when a staged definition change owes a cue. The floor prefills the checklist and the refusal directs the agent to the harness's choice prompt for the operator's rulings (`change-reconciliation.md` → The Walk, Where The Change Lands). A `session-end:` commit is also refused until the reckoning's close is met. The runner reads the subject from the command and flags the same step (`session-memory.md` → The Reckoning). Elsewhere interpretation (`candidates` advisory, the digest, `mdllm reckon --close`) | Moderate — the walk waits for the retrospective and the backlog grows, which is the drift the gate exists to end |
 | `post-commit` | git/fs | ⚙️ git hook invokes `mdllm autopush`; a send occurs only under literal `git.autopush: true` | Low — publication debt, surfaced by `estate-sync --status` |
 | `on-create`, `on-status-change`, `on-error`, `retrospective` | interpretation (semantic) | interpretation — no mechanical detector possible | Moderate — downstream not cascaded |
 | reasoning prompts (`cascade-completion`, `evaluate-triggers`, `surface-attention`, `detect-conflicts`, `session-orientation`, `domain-velocity`, `review-schema-coherence`, `review-skill-coherence`, `session-end-continuity`) | interpretation | interpretation — they *are* reasoning | Low–Moderate |

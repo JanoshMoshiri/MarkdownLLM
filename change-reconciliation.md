@@ -2,7 +2,7 @@
 id: change-reconciliation-specification
 type: specification
 status: draft
-version: "1.10"
+version: "1.11"
 created: 2026-06-13
 linked_things:
   - id: the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
@@ -204,8 +204,9 @@ the change does.
 
 The carrier made the question persist; it did not make the walk happen. Where
 a harness projects the `pre-commit` lifecycle moment (`orchestration.md` → the
-hook table; Claude Code today), `mdllm cues --staged` runs before the agent's
-`git commit`:
+hook table), `mdllm cues --staged` runs before the agent's `git commit`.
+Claude Code and Codex both project this check on their shell tool. Stage
+the candidate in a separate call so the gate can read it:
 
 - **The gate.** A definition surface changed in the commit in hand with no
   cue on disk for it is a refusal: the commit does not go through, and the
@@ -243,7 +244,7 @@ hook table; Claude Code today), `mdllm cues --staged` runs before the agent's
   with its mark — and the revisions beside it. What it cannot prove is that
   the agent read what it marked consistent; the retrospective's scan 4
   samples that, and every revision is a visible, reversible commit. A seat
-  whose harness has no such moment (a Codex session, a hand commit) keeps
+  whose harness has no active gate, or who commits by hand, keeps
   the `candidates` advisory and the digest, and the retrospective remains the
   net.
 

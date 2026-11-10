@@ -250,6 +250,10 @@ is the seeing.
             list through its post-write channel. Never through git
             (`an-owed-act-is-not-a-false-fact`): the operator ruled a gate at
             every commit damaging to the person's experience.
+            *2026-11-06:* Codex `PreToolUse` now carries the staged walk and
+            the session-end close. The Windows carrier returned the denial
+            and choice instructions on a staged definition change. Live
+            Desktop prompt delivery and a post-write preview are still owed.
       - [x] (h) The gate runs where the commit lands. *Found 2026-10-15 when
             the framework session committed in a nested workspace on the
             operator's instruction and met no gate: the step read the

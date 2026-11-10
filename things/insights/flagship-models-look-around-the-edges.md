@@ -2,9 +2,9 @@
 id: flagship-models-look-around-the-edges
 type: insight
 status: active
-version: 1.1
+version: 1.2
 created: 2026-10-30
-session: 2026-10-30
+session: 2026-11-09
 source: human
 confidence: medium
 origin: stated
@@ -53,7 +53,14 @@ that. Withholding was not isolation precisely because of this inclination.
 
 ## Why it matters to the structure-beats-scale question
 
-The framework's central hypothesis is that structure lets a smaller model
+*(Until 2026-11-08 this was the claim the eval programme tested; it is now
+the manifesto's efficiency corollary, set aside as the thing to prove —
+`the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08`. The
+observation below survives the demotion: it says what the structure
+substitutes for, which is a question about the structure's surfaces, and
+the read-set prediction in the refinement section is unchanged.)*
+
+The framework's efficiency corollary is that structure lets a smaller model
 compete with a larger one. If the operator's observation is right, it says
 *what* the structure is substituting for: the exploratory inclination that
 finds the governing document, the output contract, the related record,

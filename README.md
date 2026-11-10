@@ -186,10 +186,14 @@ it. On Windows run the tool as `tools/mdllm.ps1`, elsewhere as
   instances: that a session reading the record predicts its operator's choice
   better than a session without it
   ([the insight](things/insights/the-record-answers-the-direction-question-first.md)).
-- **A hypothesis, not a result:** that this structure lets a smaller model match
-  a larger one without it. One evaluation pointed that way and then saturated;
-  the [eval record](things/artifacts/eval-record-2026.md) has the honest reading,
-  and no conclusion is drawn until a harder test runs.
+- **Under test, one surface at a time:** which parts of the structure do the
+  work — the computed "where did we get to" at session start, the status on
+  every record, the change gate — and which are ceremony. The
+  [eval record](things/artifacts/eval-record-2026.md) has the honest reading
+  so far, and no conclusion is drawn until the cycles run. The older claim
+  that this lets a *smaller* model match a larger one is a corollary, set
+  aside as the claim to prove on 2026-11-08
+  ([the ruling](things/decisions/the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08.md)).
 - **Not yet shown:** use by anyone outside the author's own workspaces, and
   coherence held over months measured against a plain notes folder.
 

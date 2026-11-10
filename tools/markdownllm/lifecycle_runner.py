@@ -401,7 +401,7 @@ def read_hook_input() -> str:
 
 def _guarded_command(hook_input: str) -> tuple[str, str] | None:
     """(command, cwd) when this hook input describes the tool call the gate
-    guards, else None. Reads Claude Code's ``tool_input.command``; falls back
+    guards, else None. Reads the shell hook's ``tool_input.command``; falls back
     to the raw text when the input is not the documented JSON, so a harness
     that sends the command plain is still gated."""
     if not hook_input:
@@ -416,7 +416,7 @@ def _guarded_command(hook_input: str) -> tuple[str, str] | None:
         if isinstance(tool_input, dict) and isinstance(
                 tool_input.get("command"), str):
             command = tool_input["command"]
-            cwd = str(data.get("cwd") or "")
+            cwd = str(tool_input.get("workdir") or data.get("cwd") or "")
         else:
             return None
     return (command, cwd) if GATE_COMMAND_RE.search(command) else None
@@ -448,7 +448,7 @@ def is_session_end_commit(command: str, cwd: str | Path = "") -> bool:
         return False
     path = Path(named)
     if not path.is_absolute() and cwd:
-        path = Path(cwd) / path
+        path = (gate_target(command, str(cwd)) or Path(cwd)) / path
     try:
         with path.open(encoding="utf-8", errors="replace") as fh:
             for line in fh:
@@ -470,7 +470,9 @@ def is_session_end_commit(command: str, cwd: str | Path = "") -> bool:
 # repository with no entry file (an application repository) stays with the
 # project root, as before.
 _SEGMENT_SPLIT = re.compile(r"&&|\|\||;|\||\n")
-_CD_RE = re.compile(r"^\s*(?:cd|pushd)\s+(\"[^\"]+\"|'[^']+'|\S+)")
+_CD_RE = re.compile(
+    r"^\s*(?:cd|pushd|Set-Location|Push-Location)\s+"
+    r"(?:(?:-LiteralPath|-Path)\s+)?(\"[^\"]+\"|'[^']+'|\S+)", re.IGNORECASE)
 _GIT_C_RE = re.compile(r"\bgit\b(?:\s+-c\s+\S+)*\s+-C\s+(\"[^\"]+\"|'[^']+'|\S+)")
 
 
@@ -630,7 +632,7 @@ def dispatch_lifecycle_event(root: Path, binding: LifecycleBinding, *,
                 execution.steps, existing_body + "\n\n"
                 + f"[attestation unavailable: {exc}]",
                 binding.output_limit_characters),
-            passed=False)
+            passed=execution.passed if binding.delivery == "gate" else False)
         try:
             rendered = adapter.format_lifecycle_output(
                 binding.moment, execution.text, execution.passed)
