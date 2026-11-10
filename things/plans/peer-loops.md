@@ -2,7 +2,7 @@
 id: peer-loops
 type: plan
 status: in-progress
-version: 1.0
+version: 1.1
 created: 2026-11-10
 priority: high
 origin: stated
@@ -215,7 +215,8 @@ else.
 
 1. The wake carries two reminder lines and the last few turns of the
    ticket, read from git.
-2. The floor refuses a new ticket body that holds more than one turn.
+2. The floor refuses a new ticket body that holds more than one turn,
+   where the workspace has opted in; elsewhere it warns.
 3. The floor checks the signature on the operator's approvals.
 4. Codex gets a short loop that resumes its session when its watch exits,
    because nothing documented wakes a local Codex session from outside.
@@ -229,16 +230,24 @@ and fixed before the next one starts.
       2026-11-10.
 
 - [ ] **Phase 1 — The doorbell carries the contract.**
-      - [ ] The wake emits two reminder lines with every message: the body
-            is one message, and the last turns are below.
-      - [ ] The wake emits the last few turns of the woken ticket, read
-            from the ticket's git history, bounded, newest last.
-      - [ ] The floor refuses a ticket created on or after this phase's
-            release whose body holds more than one turn. Older tickets are
-            left alone.
-      - [ ] The loop definition template is rewritten around the fourteen
-            rules, and the root's own loop follows it.
-      - [ ] A note names its kind: steer, follow up, or aware.
+      - [x] The wake emits two reminder lines with every ticket message:
+            the body is one message, and the earlier turns are above and in
+            git. Built 2026-11-10 (`standing-watch.md` 0.10). An artefact's
+            wake is unchanged, because its body is the artefact.
+      - [x] The wake emits the last three turns of the woken ticket, read
+            from the ticket's git history, each cut at 1,500 characters,
+            oldest first. Built 2026-11-10.
+      - [x] The floor reports an open ticket created on or after 2026-11-10
+            whose body holds more than one message, and refuses the commit
+            where the workspace declares `ticket_body: strict`. Built
+            2026-11-10; the root declares it. Opt-in, as the session gate
+            is: a refusal arriving with a refresh would stop every seat's
+            commits in a live workspace the moment one ticket stacked.
+            Older tickets and closed ones are left alone.
+      - [x] The loop definition template carries the fourteen rules, and
+            the root's own loop follows it (`ad-hoc-message-loop` 1.5).
+      - [x] A note names its kind: steer, follow up, or aware (rule 4).
+            A rule and nothing more; the watch does not read the kind.
       - [ ] **Proof.** One ticket crosses between the two substrate clones
             with a note landing mid-task, and no body grows past a page.
             This is also the live round trip `substrate-native-a2a` has

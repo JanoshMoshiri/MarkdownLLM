@@ -2,7 +2,7 @@
 id: standing-watch-specification
 type: specification
 status: draft
-version: 0.9
+version: 0.10
 created: 2026-09-21
 linked_things:
   - id: a2a-conversations-run-on-their-own-branch-2026-10-09
@@ -34,6 +34,9 @@ linked_things:
   - id: between-sessions-surface-is-real-2026-09-21
     relation: derived-from
     notes: "The ruling that gave this spec its own file rather than a section in workflow-state.md or orchestration.md."
+  - id: peer-loops
+    relation: references
+    notes: "The plan whose Phase 1 changed what a ticket's wake carries (the recent turns and two lines of rule) and added the one-message finding. Its later phases own the harness rows this spec still records as unchecked."
   - id: substrate-native-a2a
     relation: implements
     notes: "The plan that built the command. This spec is the contract the build was carrying in docstrings."
@@ -226,6 +229,15 @@ Refuses). The stall ring (`the-seat` Phase 7) is the backstop beneath every
 binding: a turn unanswered past the window rings the operator whether or
 not a harness rose.
 
+*Read 2026-11-09 and not yet tried by hand
+(`review-peer-agent-loops-field-research-2026-11-10-workspace-2`): the
+vendors' documentation describes a hook that wakes an idle Claude Code
+session, no way for an outside event to start a turn in a local Codex
+session, a scheduled Hermes job that can decline to wake, and an OpenClaw
+wake endpoint. A row above changes when its `peer-loops` phase has tried
+it, never on the documentation's word: the same reading was wrong about
+one Codex feature on the machine it was checked against.*
+
 ## The Five Inherited Decisions
 
 Each was paid for by a defect in the domain that found it first. They are
@@ -346,7 +358,10 @@ board, read by the same watch.
   does not hold — the fact the holder is waiting for, a correction — without
   moving the turn: a **note**. A note is appended, never an overwrite of the
   holder's message, and short, because two writers on one file can conflict
-  at the holder's next commit, and the holder resolves it as its own file.
+  at the holder's next commit, and the holder resolves it as its own file. A note says which kind
+  it is — **steer** (act on this now), **follow up** (take it into your
+  next turn) or **aware** (no action asked) — and the holder's next reply
+  says what it did with it (`peer-loops`, rule 4).
 - **One message per turn, and a note rings.** You speak, then wait; a second
   message that moves the addressee is the ordinary turn. A write at the
   *same* status is a note, and since 2026-11-02 the watch rings its
@@ -374,6 +389,33 @@ board, read by the same watch.
   `git log -p` on the ticket is the whole, audited conversation. That is a
   feature — provenance with no archive to maintain. **No other message store
   is built.**
+- **The wake carries the recent turns and the rule.** Since 2026-11-10 a
+  wake on a ticket prints, in order: up to three earlier turns read from
+  the ticket file's history at the head that rang (oldest first, each cut
+  at 1,500 characters and named by author, date and commit); the message;
+  and two lines — *this ticket's body is one message, replace it and never
+  append; earlier turns are above and in `git log`, never copy one into the
+  body*. An artefact's wake is unchanged: its body is the artefact, not a
+  message. The reason is a record, not a preference. The body-is-the-message
+  and history-is-the-transcript clauses of this section were in force from
+  2026-09-30, the loop definition repeated them, and for two months the
+  seats of the busiest live workspace stacked every turn into the body
+  anyway — on a ticket per reply, on a ticket per lane and on the run
+  itself, to bodies past 100,000 characters — because the transcript had no
+  read an agent would make, and the body was the only place a writer could
+  be sure a reader would look (`peer-loops`). The field says the same: what
+  arrives with the turn is read and what must be looked up is skipped
+  (`review-peer-agent-loops-field-research-2026-11-10-workspace-2`;
+  `emitted-content-is-read-instructed-content-is-economised`). So the read
+  is delivered, and the rule rides with it.
+- **A body that holds more than one message is a finding.** `mdllm
+  validate` reports an open ticket created on or after 2026-11-10 whose
+  body runs past 8,000 characters or carries more than one level-1 heading:
+  a Warning, and an Error — a refused commit — where the domain declares
+  `options: {ticket_body: strict}`. It is opt-in for the reason the session
+  gate is: a refusal that arrived with a framework refresh would stop every
+  seat's commits in a live workspace the moment one ticket stacked. Tickets
+  born before the rule, and closed ones, are not judged by it.
 - **The ticket is transient; its products are not.** Anything durable a
   conversation produces is written as a proper thing, linked from the ticket.
   `closed` wakes nobody and means *nothing is owed right now* — not that the
@@ -435,6 +477,10 @@ the field in `_schema.yaml` `known_fields` to use it). The line asks for a
 decision, not a reflex: conclude the conversation, split the work item, or
 raise the budget deliberately. A closed ticket owes nothing however long it
 ran. Counted from the record, never from a counter an agent keeps.
+*(2026-11-10: published reviewer-and-writer loops run five to fifteen
+rounds. `peer-loops` rule 5 asks for about twenty turns a ticket once a
+lane is a run with one ticket per exchange; the default here stays where
+it is until that plan's Phase 4 has read a lane back.)*
 
 **Keeping itself awake.** The wake is the harness's act, and the binding
 each harness has is recorded above (The Contract → Harness bindings). An

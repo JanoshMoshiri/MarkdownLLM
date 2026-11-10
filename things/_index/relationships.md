@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-10
-generated: 2026-11-10T22:00:40
-generated_from: HEAD@ef7215d
-coverage: 657
+generated: 2026-11-10T22:39:46
+generated_from: HEAD@f95867a
+coverage: 659
 framework_version: 3.51.0
 ---
 
@@ -210,6 +210,7 @@ framework_version: 3.51.0
 - a2a-conversations-run-on-their-own-branch-2026-10-09 --references--> git-workflow-specification
 - ad-hoc-message-loop --references--> a2a-conversations-run-on-their-own-branch-2026-10-09
 - ad-hoc-message-loop --implements--> standing-watch-specification
+- ad-hoc-message-loop --implements--> peer-loops
 - adoption-reopens-birth-gaps --extends--> a-ruling-triages-more-cheaply-than-a-mechanism
 - agents-cannot-self-install-permission-bearing-hooks --informs--> hook-enforcement-has-three-anchors
 - agents-cannot-self-install-permission-bearing-hooks --supports--> consequence-is-recoverable-only-in-retrospect
@@ -522,6 +523,7 @@ framework_version: 3.51.0
 - cue-ad-hoc-message-loop-2026-10-24 --subject--> ad-hoc-message-loop
 - cue-ad-hoc-message-loop-2026-10-30 --subject--> ad-hoc-message-loop
 - cue-ad-hoc-message-loop-2026-11-03 --subject--> ad-hoc-message-loop
+- cue-ad-hoc-message-loop-2026-11-10 --subject--> ad-hoc-message-loop
 - cue-agents-cannot-self-install-permission-bearing-hooks-2026-10-22 --subject--> agents-cannot-self-install-permission-bearing-hooks
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
@@ -723,6 +725,7 @@ framework_version: 3.51.0
 - cue-standing-watch-specification-2026-10-24 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-10-30 --subject--> standing-watch-specification
 - cue-standing-watch-specification-2026-11-03 --subject--> standing-watch-specification
+- cue-standing-watch-specification-2026-11-10 --subject--> standing-watch-specification
 - cue-structural-pointers-need-reverse-edge-indexing-2026-10-17 --subject--> structural-pointers-need-reverse-edge-indexing
 - cue-substrate-floor-development-2026-09-13 --subject--> substrate-floor-development
 - cue-substrate-native-a2a-2026-09-22 --subject--> substrate-native-a2a
@@ -1750,6 +1753,7 @@ framework_version: 3.51.0
 - standing-watch-specification --complements--> coordination-claim-specification
 - standing-watch-specification --complements--> session-memory-specification
 - standing-watch-specification --derived-from--> between-sessions-surface-is-real-2026-09-21
+- standing-watch-specification --references--> peer-loops
 - standing-watch-specification --implements--> substrate-native-a2a
 - standing-watch-specification --implements--> transport-follows-corpus-holdability-not-distance
 - standing-watch-specification --implements--> a-true-primitive-is-discovered-not-authored

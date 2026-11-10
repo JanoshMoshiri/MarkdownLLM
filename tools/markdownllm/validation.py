@@ -1174,6 +1174,7 @@ def validate_corpus(root: Path,
         root, corpus, view, workflow_resolver))
     findings.extend(validate_level3(corpus))
     findings.extend(derivation_findings(corpus))
+    findings.extend(ticket_body_findings(root, corpus))
     # Structural pins resolve against git, not against the candidate tree, so
     # this runs on whatever view produced the corpus: the pre-commit leg
     # checks the frozen candidate's pins against the repository's history.
@@ -1243,6 +1244,90 @@ def derivation_findings(corpus: Corpus) -> list[Finding]:
                     out.append(Finding(SEV_ERROR if strict else SEV_WARNING,
                                name, f"`computed.{d.target}` used a reduced "
                                f"input set: {note}"))
+    return out
+
+
+# A ticket's body is one message; its earlier turns are its git history
+# (peer-loops, rule 1). Tickets born before the rule are not judged by it:
+# their bodies were written under the old append-in-place habit.
+TICKET_ONE_MESSAGE_FROM = dt.date(2026, 11, 10)
+# Characters a single message plausibly needs; past it, the body is
+# almost certainly carrying earlier turns.
+TICKET_BODY_BUDGET = 8000
+
+
+def _created_date(value) -> dt.date | None:
+    if isinstance(value, dt.datetime):
+        return value.date()
+    if isinstance(value, dt.date):
+        return value
+    if isinstance(value, str) and ISO_RE.match(value):
+        try:
+            return dt.date.fromisoformat(value[:10])
+        except ValueError:
+            return None
+    return None
+
+
+def _level1_heading_count(body: str) -> int:
+    """Lines starting `# ` at column zero, outside ``` fenced code."""
+    count = 0
+    fenced = False
+    for line in body.splitlines():
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            continue
+        if not fenced and line.startswith("# "):
+            count += 1
+    return count
+
+
+def ticket_body_findings(root: Path, corpus: Corpus) -> list[Finding]:
+    """A ticket whose body holds more than one message (peer-loops, rule 1).
+
+    A ticket's body is the current message and its git history is the
+    transcript; a body that keeps the earlier turns grows without bound and
+    hands every reader the whole conversation as if it were one message.
+    Two mechanical signs: more than one level-1 heading (each turn tends to
+    open with one), or a body past `TICKET_BODY_BUDGET` characters.
+
+    Scope: `type: ticket`, not at a terminal status (a closed ticket is a
+    finished record), created on or after `TICKET_ONE_MESSAGE_FROM`.
+    Severity: Warning by default; `options: {ticket_body: strict}` in
+    _schema.yaml raises it to Error (the pre-commit hook then blocks).
+    """
+    strict = ((corpus.schema or {}).get("options") or {}).get("ticket_body") == "strict"
+    sev = SEV_ERROR if strict else SEV_WARNING
+    out: list[Finding] = []
+    for t in corpus.things:
+        if str(t.meta.get("type", "")) != "ticket":
+            continue
+        if is_terminal(corpus.schema, t.meta):
+            continue
+        created = _created_date(t.meta.get("created"))
+        if created is None or created < TICKET_ONE_MESSAGE_FROM:
+            continue
+        # Line endings are normalised so a CRLF checkout counts as LF does.
+        body = (t.body or "").replace("\r\n", "\n").strip()
+        headings = _level1_heading_count(body)
+        tripped: list[str] = []
+        if headings > 1:
+            tripped.append(f"{headings} level-1 headings")
+        if len(body) > TICKET_BODY_BUDGET:
+            tripped.append(f"{len(body):,} characters against a budget of "
+                           f"{TICKET_BODY_BUDGET:,}")
+        if not tripped:
+            continue
+        try:
+            rel = Path(t.path).resolve().relative_to(
+                Path(root).resolve()).as_posix()
+        except (ValueError, OSError):
+            rel = Path(t.path).as_posix()
+        out.append(Finding(sev, t.id or t.path.name,
+                   f"the body holds more than one message ({' and '.join(tripped)}) "
+                   f"— a ticket's body is the current message and its earlier "
+                   f"turns are in git (`git log -- {rel}`); replace the body "
+                   f"with the latest turn (peer-loops, rule 1)"))
     return out
 
 

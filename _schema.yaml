@@ -17,6 +17,10 @@ options:
   # -specification (thing-specification) — an established convention; links and
   # history depend on the ids. Domain things (things/**) do match filenames.
   id_filename_match: false
+  # One message per ticket body (standing-watch.md -> The Ticket; peer-loops
+  # Phase 1, 2026-11-10): a ticket whose body holds more than one message is
+  # refused at commit here. Undeclared, the same finding is a Warning.
+  ticket_body: strict
   # The session gate (validate.thing.md, v3.28.0): advisory at the framework
   # root — a commit without a fresh `mdllm session-start` attestation warns
   # rather than blocks, because release and CI flows legitimately commit here

@@ -41,7 +41,7 @@ output. Read the exit code before anything else:
 
 | Exit | Meaning | What you do |
 |---|---|---|
-| `0` | Your turn: a thing moved to a stage this role acts at, a note landed on one you hold (`a note landed on …` — reread it, the turn did not move), or your own turn never left | Take the turn as the loop definition says — read the thing **at the remote head**, do the work, move the token, commit, publish — then **re-arm** with the same command, in the background, before ending the turn |
+| `0` | Your turn: a thing moved to a stage this role acts at, a note landed on one you hold (`a note landed on …` — reread it, the turn did not move), or your own turn never left | Take the turn as the loop definition says (for a ticket the wake prints its last turns, the message and the rule: replace the body, never append) — read the thing **at the remote head**, do the work, move the token, commit, publish — then **re-arm** with the same command, in the background, before ending the turn |
 | `3` | Another instance of this role is already watching | Nothing. The other instance is the watch |
 | `1` | A poll failed in `--once` mode | Report the line; re-arm |
 | `2` | Refused to arm | Fix the declaration it names; do not retry blindly |

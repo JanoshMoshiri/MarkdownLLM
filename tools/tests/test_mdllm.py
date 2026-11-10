@@ -3306,3 +3306,73 @@ def test_origin_external_predicate_is_whitespace_normalising():
     assert not origin_is_external({"origin": None})
     assert not origin_is_external({})
     assert not origin_is_external(None)
+
+
+# ---------------------------------------------------------------- ticket body
+# peer-loops, rule 1: a ticket's body is one message; its turns are in git.
+
+TICKET_SCHEMA = (
+    "schema_version: 1\ndomain: t\n{options}types:\n"
+    "  ticket:\n    statuses: [workspace-1, workspace-2, closed]\n"
+    "    terminal_statuses: [closed]\n"
+    "  memo:\n    statuses: [draft, closed]\n    terminal_statuses: [closed]\n")
+
+TWO_TURNS = "# Turn one\n\nFirst message.\n\n# Turn two\n\nSecond message.\n"
+
+
+def _ticket_findings(tmp_path, body, *, created="2026-11-10",
+                     status="workspace-2", typ="ticket", strict=False):
+    from markdownllm.validation import ticket_body_findings
+    options = "options:\n  ticket_body: strict\n" if strict else ""
+    write(tmp_path, "_schema.yaml", TICKET_SCHEMA.format(options=options))
+    write(tmp_path, "things/tk.md", thing_text(
+        f"id: tk\ntype: {typ}\nstatus: {status}\ncreated: {created}\n",
+        body=body))
+    corpus, _ = scan(tmp_path)
+    return ticket_body_findings(tmp_path, corpus)
+
+
+def test_ticket_body_two_level1_headings_is_a_warning(tmp_path):
+    found = _ticket_findings(tmp_path, TWO_TURNS)
+    assert [f.severity for f in found] == [mdllm.SEV_WARNING]
+    assert found[0].thing == "tk"
+    msg = found[0].message
+    assert msg.startswith("the body holds more than one message "
+                          "(2 level-1 headings)")
+    assert "`git log -- things/tk.md`" in msg
+    assert "(peer-loops, rule 1)" in msg
+
+
+def test_ticket_body_strict_option_raises_it_to_error(tmp_path):
+    found = _ticket_findings(tmp_path, TWO_TURNS, strict=True)
+    assert [f.severity for f in found] == [mdllm.SEV_ERROR]
+
+
+def test_ticket_body_over_budget_single_heading_fires(tmp_path):
+    from markdownllm.validation import TICKET_BODY_BUDGET
+    body = "# One turn\n\n" + "y" * TICKET_BODY_BUDGET + "\n"
+    found = _ticket_findings(tmp_path, body)
+    assert len(found) == 1
+    size = len(body.strip())
+    assert (f"({size:,} characters against a budget of "
+            f"{TICKET_BODY_BUDGET:,})") in found[0].message
+    assert "level-1 headings" not in found[0].message
+
+
+def test_ticket_body_born_before_the_rule_is_not_judged(tmp_path):
+    assert _ticket_findings(tmp_path, TWO_TURNS, created="2026-11-09") == []
+
+
+def test_ticket_body_closed_ticket_is_exempt(tmp_path):
+    assert _ticket_findings(tmp_path, TWO_TURNS, status="closed") == []
+
+
+def test_ticket_body_rule_is_for_tickets_only(tmp_path):
+    body = TWO_TURNS + "z" * 9000 + "\n"
+    assert _ticket_findings(tmp_path, body, typ="memo", status="draft") == []
+
+
+def test_ticket_body_headings_inside_fenced_code_do_not_count(tmp_path):
+    body = ("# The one message\n\nA script:\n\n```sh\n# a comment\n"
+            "# another comment\n```\n")
+    assert _ticket_findings(tmp_path, body) == []

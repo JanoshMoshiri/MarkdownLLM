@@ -2,7 +2,7 @@
 id: ad-hoc-message-loop
 type: workflow-definition
 status: draft
-version: 1.4
+version: 1.5
 created: 2026-10-21
 exposed: false
 stages:
@@ -20,6 +20,9 @@ linked_things:
     notes: "2026-10-24: explicit conclusion is distinct from ordinary ticket closure; branch lifecycle support remains planned."
   - id: standing-watch-specification
     relation: implements
+  - id: peer-loops
+    relation: implements
+    notes: "The contract this loop runs under since 2026-11-10: the fourteen rules, carried by the shipped template and not restated here."
 ---
 
 # Framework Ad-Hoc Message Loop
@@ -34,13 +37,20 @@ were `claude` and `codex` until 2026-11-03, the rename that ruling deferred
 until both clones carried clone names). It is internal coordination, with
 no cross-domain exposure.
 
+The contract is the fourteen rules of `peer-loops`, carried by the shipped
+template (*The Rules*) and not restated here. The first three arrive with
+every wake, which since 2026-11-10 also hands over the ticket's last three
+turns, so the body is one message and never the transcript. The root
+declares `ticket_body: strict`: a ticket body holding more than one
+message is refused at commit.
+
 ## workspace-1 and workspace-2
 
 Entry: the other seat commits a ticket addressed to this seat and makes the
 commit visible through the Git ref that the receiving watch reads.
 
 The named addressee is the only writer of the turn. It reads the request,
-acts within the operator's authority, overwrites the body with one reply,
+acts within the operator's authority, replaces the body with one reply,
 and changes the status to the other seat or `closed`. The other seat may
 append a note to a ticket it does not hold — the fact the holder is waiting
 for — without moving the status; the holder's watch rings on it, and its

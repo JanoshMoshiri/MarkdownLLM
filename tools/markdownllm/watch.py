@@ -36,7 +36,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .git_transport import command_token, git_command, redact
-from .model import RESERVED_STATUSES, Corpus, scan
+from .model import RESERVED_STATUSES, Corpus, parse_frontmatter, scan
 from .repository_view import RepositoryView, RepositoryViewError
 from .seat import read_seat
 from .workflow_actors import declared_actors, stages_for_actor
@@ -70,6 +70,8 @@ LOCAL_TIMEOUT = 20.0   # rev-parse / merge-base / rev-list: local reads, never t
 # commit view as the board. Capped so a wake stays a wake and not a dump;
 # past the cap the line says how much more there is and where to read it.
 MESSAGE_CAP = 6000
+EARLIER_TURNS = 3   # how many earlier turns a ticket wake carries, from the file's git history
+TURN_CAP = 1500     # characters of each earlier turn a ticket wake carries
 
 
 class WatchError(RuntimeError):
@@ -584,12 +586,14 @@ def read_board(
 
 def read_content(
     corpus: Corpus, board: dict[str, str],
-) -> tuple[dict[str, str], dict[str, Path], dict[str, str]]:
-    """A digest of each board thing's bytes, where it lives, and its body —
-    read from the same commit view as the board, never the worktree."""
+) -> tuple[dict[str, str], dict[str, Path], dict[str, str], dict[str, str]]:
+    """A digest of each board thing's bytes, where it lives, its body, and
+    its type — read from the same commit view as the board, never the
+    worktree."""
     content: dict[str, str] = {}
     paths: dict[str, Path] = {}
     bodies: dict[str, str] = {}
+    kinds: dict[str, str] = {}
     for thing in corpus.things:
         if thing.id not in board:
             continue
@@ -597,7 +601,8 @@ def read_content(
         content[thing.id] = hashlib.sha1(raw.encode("utf-8", "replace")).hexdigest()
         paths[thing.id] = thing.path
         bodies[thing.id] = thing.body or ""
-    return content, paths, bodies
+        kinds[thing.id] = str(thing.meta.get("type") or "")
+    return content, paths, bodies, kinds
 
 
 def message_block(thing_id: str, status: str, head: str, body: str) -> str:
@@ -614,6 +619,129 @@ def message_block(thing_id: str, status: str, head: str, body: str) -> str:
         text = text[:MESSAGE_CAP]
     return (f"--- message: {thing_id} @ {head[:8]} ('{status}') ---\n"
             f"{text}{more}\n--- end of message ---")
+
+
+def reminder_block() -> str:
+    """The two lines a ticket wake ends on: the body is one message, and
+    the transcript is git, never the body (peer-loops, rule 1)."""
+    return "\n".join((
+        "--- before you reply ---",
+        "This ticket's body is one message. Replace it with your reply; "
+        "never append to it.",
+        "Earlier turns are above and in `git log` on the file. Never copy a "
+        "turn into the body.",
+    ))
+
+
+def _turn_text(body: str) -> str:
+    """A body normalised for comparison between versions."""
+    return body.replace("\r\n", "\n").strip("\n")
+
+
+def _git_utf8(root: Path, *args: str) -> tuple[int, str] | None:
+    """(returncode, stdout decoded as UTF-8) of a local git read, or None
+    when git cannot be run. `git_command` decodes with the locale encoding,
+    which on Windows (cp1252) garbles — and can fail on — the UTF-8 bodies
+    and subjects a ticket's history carries; this reads bytes instead."""
+    import subprocess
+    try:
+        r = subprocess.run(["git", "-C", str(root), *args],
+                           capture_output=True, timeout=LOCAL_TIMEOUT)
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return None
+    return r.returncode, (r.stdout or b"").decode("utf-8", errors="replace")
+
+
+def earlier_turns_block(config: WatchConfig, head: str, path: Path,
+                        thing_id: str, current_body: str) -> str:
+    """Up to `EARLIER_TURNS` earlier messages of a ticket, read from its
+    file's git history at `head`, oldest first. A ticket's body is the
+    current message and its history is the transcript, so the woken agent is
+    handed the last few turns rather than left to reconstruct them — or to
+    keep them in the body. Empty for a first turn. Never raises: once armed,
+    a failure is emitted, not raised."""
+    unavailable = (f"earlier turns unavailable: could not read the history "
+                   f"of {thing_id} at {head[:8]}")
+    try:
+        try:
+            rel = Path(path).resolve().relative_to(
+                config.root.resolve()).as_posix()
+        except ValueError:
+            rel = Path(path).as_posix()
+        r = _git_utf8(config.root, "log", "-n", "12",
+                      "--format=%H%x1f%an%x1f%cs%x1f%s", head, "--", rel)
+        if r is None or r[0] != 0:
+            return unavailable
+        current = _turn_text(current_body or "")
+        turns: list[tuple[str, str, str, str, str]] = []
+        previous: str | None = None
+        for line in r[1].splitlines():
+            if len(turns) >= EARLIER_TURNS:
+                break
+            sha, _, rest = line.partition("\x1f")
+            author, _, rest = rest.partition("\x1f")
+            date, _, subject = rest.partition("\x1f")
+            sha = sha.strip()
+            if not sha:
+                continue
+            shown = _git_utf8(config.root, "show", f"{sha}:{rel}")
+            if shown is None or shown[0] != 0:
+                continue
+            try:
+                _, body, _ = parse_frontmatter(shown[1], rel)
+            except Exception:
+                continue
+            body = _turn_text(body or "")
+            if body == current or body == previous:
+                # The current message itself, or a commit that changed only
+                # frontmatter (a status move): not an earlier turn.
+                continue
+            previous = body
+            turns.append((sha, author.strip(), date.strip(), subject.strip(),
+                          body))
+        if not turns:
+            return ""
+        parts = [f"--- earlier turns: {thing_id} ({len(turns)} shown, oldest "
+                 f"first; `git log -- {rel}` has the rest) ---"]
+        for k in range(len(turns), 0, -1):
+            sha, author, date, subject, body = turns[k - 1]
+            text = body
+            more = ""
+            if len(text) > TURN_CAP:
+                more = f"\n[… {len(text) - TURN_CAP} more character(s)]"
+                text = text[:TURN_CAP]
+            entry = (f"[{k} back · {author} · {date} · {sha[:8]} · "
+                     f"{subject[:100]}]\n{text}{more}")
+            if k != len(turns):
+                entry = "\n" + entry
+            parts.append(entry)
+        parts.append("--- end of earlier turns ---")
+        return "\n".join(parts)
+    except Exception:
+        return unavailable
+
+
+def _wake_message(config: WatchConfig, head: str, thing_id: str, status: str,
+                  bodies: dict[str, str], paths: dict[str, Path],
+                  kinds: dict[str, str]) -> str:
+    """What a wake prints after its line: the message block, and — for a
+    ticket — the earlier turns before it and the reminder after it."""
+    body = bodies.get(thing_id, "")
+    message = message_block(thing_id, status, head, body)
+    if kinds.get(thing_id) != "ticket":
+        return message
+    out = []
+    if thing_id in paths:
+        earlier = earlier_turns_block(config, head, paths[thing_id], thing_id,
+                                      body)
+    else:
+        earlier = (f"earlier turns unavailable: could not read the history "
+                   f"of {thing_id} at {head[:8]}")
+    if earlier:
+        out.append(earlier)
+    out.append(message)
+    out.append(reminder_block())
+    return "\n".join(out)
 
 
 def diff_notes(
@@ -911,7 +1039,7 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             continue
 
         board = read_board(corpus, config, stage_ids)
-        content, paths, bodies = read_content(corpus, board)
+        content, paths, bodies, kinds = read_content(corpus, board)
 
         # The bad-read guard is the *threshold*, never emptiness on its own.
         # An earlier version also refused any board that went from populated
@@ -942,8 +1070,8 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
             for change in changes:
                 print(change.line(config.role))
                 if change.wakes:
-                    print(message_block(change.thing_id, change.now, head,
-                                        bodies.get(change.thing_id, "")))
+                    print(_wake_message(config, head, change.thing_id,
+                                        change.now, bodies, paths, kinds))
                 woke = woke or change.wakes
             for missing in gone:
                 # The analogue of the sibling's vanished line: the event that
@@ -966,8 +1094,8 @@ def _watch_loop(config: WatchConfig, stage_ids: set[str],
                              own=own, addressed=addressed)
                 print(note.line(config.role, seat.get("name", "")))
                 if addressed and not own:
-                    print(message_block(thing_id, status, head,
-                                        bodies.get(thing_id, "")))
+                    print(_wake_message(config, head, thing_id, status,
+                                        bodies, paths, kinds))
                 woke = woke or (addressed and not own)
 
         state.board = board

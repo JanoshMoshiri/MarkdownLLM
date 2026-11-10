@@ -36,20 +36,74 @@ bindings): in Claude Code as a background command, `/watch <actor>
 ad-hoc-message-loop`; in Hermes as a notifying background terminal; never as
 a blocking command inside a bounded tool call.
 
+## The Rules
+
+These are the whole contract. The first three also arrive with every wake,
+because a rule that has to be looked up is the rule that gets skipped.
+
+**Conversation**
+
+1. A ticket is one conversation. Its status names whose turn it is. Its
+   body is one message.
+2. The wake brings the last few turns. Older history is `git log` on the
+   file. Never copy a turn into the body.
+3. Reply by replacing the body. Then hand the turn on, or close.
+4. Anyone may leave a note on a ticket they do not hold: a short appended
+   paragraph that says which kind it is — **steer** (act on this now),
+   **follow up** (take it into your next turn) or **aware** (no action
+   asked). The holder says in its next reply what it did with it.
+5. A conversation has a budget of about twenty turns. At the budget,
+   conclude it or split the work.
+
+**Work**
+
+6. The state of the work goes on the run and on the pull request. The
+   ticket carries only what nothing else carries: never restate a state
+   another record already holds.
+7. A run's body says where the work is and what is next. Its past is git.
+8. The run names who holds the work and who reviews it. The reviewer
+   finds. The holder decides which findings to act on.
+
+**Authority**
+
+9. A go is the operator's own act: a signed commit from the operator's
+   seat that names the commit it approves. Cite it. Never relay it, and
+   never treat another seat's account of it as the go. *(Where a workspace
+   has no signed operator seat yet, a go is the operator's own words in the
+   session that acts on them.)*
+10. A standing delegation is a written decision with a class of gate,
+    conditions and an end date. Act inside it without asking. Outside it,
+    address the operator's seat.
+
+**Starting**
+
+11. To start a loop: write the run with each role named to a seat, write
+    each seat's opening ticket, launch any local seat that is not
+    listening, take its first commit as the receipt, then act as a peer.
+    Never send a message as the operator.
+12. Who sits where is read from the commits. Nothing lists the seats.
+
+**Stopping**
+
+13. When blocked, address the ticket to the seat that can unblock you and
+    say what you need. Never wait silently.
+14. A doorbell that cannot read says so. Silence means nothing moved only
+    when the bell can still look.
+
 ## Stages
 
 **[actor-a]** / **[actor-b]**
 - Entry: the other actor set `status` to this name and published.
 - Performer: the named actor — the only writer of the turn while the ticket
-  is at its name. The other actor may append a short note without moving
-  the status; the holder's watch rings on it.
-- What it produces: one reply — overwrite the body, set `status` to the next
-  addressee (or `closed`), commit, publish. One message per turn; a second
-  edit at the same status is a note, which rings the addressee and nobody
-  else.
+  is at its name (rules 1 to 3). Another seat may leave a note (rule 4);
+  the holder's watch rings on it.
+- What it produces: one reply — replace the body, set `status` to the next
+  addressee (or `closed`), commit, publish, and confirm the remote carries
+  it. A second edit at the same status is a note, which rings the addressee
+  and nobody else.
 - Gate authority: none is conferred. A ticket carries requests, never
-  approvals or rulings; the recipient acts within its own permissions and the
-  irreversible goes to the human seat.
+  approvals or rulings (rules 9 and 10); the recipient acts within its own
+  permissions and the irreversible goes to the operator's seat.
 
 **closed**
 - Entry: whichever actor holds the turn judges that nothing is owed right
@@ -68,8 +122,11 @@ conclusion status.
 
 ## Notes
 
-The transcript is `git log -p` on the ticket file. Do not build another
-message store. Rename the actor ids to match the seats your domain's agents
+The transcript is the ticket file's git history, and the wake hands over
+its last three turns, so the body never has to hold them. Do not build
+another message store. `mdllm validate` reports an open ticket whose body
+holds more than one message; declare `options: {ticket_body: strict}` in
+`_schema.yaml` to have that commit refused. Rename the actor ids to match the seats your domain's agents
 actually sit in (`writer`, `reviewer`, or the agents' own names); each seat
 declares itself in its clone with `mdllm seat . --set <actor>`. Two seats is
 the default shape; a seat that only forwards another's actions (a publisher

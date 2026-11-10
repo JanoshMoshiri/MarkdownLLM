@@ -1162,3 +1162,198 @@ class TestTicketLoop:
             assert f"{role.upper()} UP" not in out
             assert "moved: ticket-claude-codex codex -> closed" in out
             assert "GONE" not in out
+
+
+class TestTicketTranscript:
+    """A ticket's body is one message and its git history is the transcript
+    (peer-loops, rule 1). A ticket wake therefore carries the last few
+    earlier turns, read from the file's history at the head that rang,
+    oldest first, then the message, then a reminder that the body is to be
+    replaced, never appended to. Any other thing wakes exactly as before.
+
+    Real commits in one local repository: the history is the thing under
+    test, so the commit view is real; only the remote head and the fetch are
+    stubbed (the head is this repository's own HEAD)."""
+
+    LOOP = TestTicketLoop.LOOP
+    TICKET = "things/ticket-claude-codex.md"
+
+    @pytest.fixture
+    def desk(self, tmp_path: Path, monkeypatch) -> Path:
+        root = tmp_path / "desk"
+        root.mkdir()
+        _sync_git(root, "init", "-q")
+        write(root, "_schema.yaml", yaml.safe_dump({
+            "schema_version": 1,
+            "domain": "ticket-fixture",
+            "types": {
+                "ticket": {"statuses": ["claude", "codex", "closed"],
+                           "terminal_statuses": ["closed"]},
+                "memo": {"statuses": ["claude", "codex", "closed"],
+                         "terminal_statuses": ["closed"]},
+            },
+        }, sort_keys=False))
+        _write(root, self.LOOP)
+        _sync_git(root, "add", "-A")
+        _sync_git(root, "commit", "-q", "-m", "create: the desk")
+        monkeypatch.setattr(watch_mod, "_fetch", lambda c: None)
+        monkeypatch.setattr(watch_mod, "_self_wake", lambda *a, **k: False)
+        monkeypatch.setattr(
+            watch_mod, "resolve_remote_head",
+            lambda c: (_sync_git(c.root, "rev-parse", "HEAD").stdout.strip(),
+                       None))
+        return root
+
+    @staticmethod
+    def _turn(root, status, body, author, msg, day,
+              rel=TICKET, thing_id="ticket-claude-codex", kind="ticket"):
+        """Write the whole thing (one message in the body) and commit it as
+        `author` on 2026-11-<day>."""
+        meta = {"id": thing_id, "type": kind, "status": status,
+                "created": "2026-11-01"}
+        write(root, rel, thing_text(yaml.safe_dump(meta, sort_keys=False),
+                                    body=body))
+        stamp = f"2026-11-{day:02d}T12:00:00+00:00"
+        env = {**os.environ, "GIT_AUTHOR_NAME": author,
+               "GIT_AUTHOR_EMAIL": f"{author}@seat.local",
+               "GIT_COMMITTER_NAME": author,
+               "GIT_COMMITTER_EMAIL": f"{author}@seat.local",
+               "GIT_AUTHOR_DATE": stamp, "GIT_COMMITTER_DATE": stamp}
+        import subprocess
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        subprocess.run(["git", "commit", "-qm", msg], cwd=root, check=True,
+                       env=env)
+        return _sync_git(root, "rev-parse", "HEAD").stdout.strip()
+
+    def _watch(self, root, role, **kw):
+        return watch_mod.cmd_watch(_args(
+            root, role=role, definition="ad-hoc-message-loop",
+            state=str(root.parent / f".watch-{role}.json"), **kw))
+
+    def test_four_earlier_turns_wake_with_the_last_three_oldest_first(
+            self, desk, capsys):
+        self._turn(desk, "codex", "Turn one: please review X.\n", "claude",
+                   "ticket: turn one", 1)
+        two = self._turn(desk, "claude", "Turn two: X has two findings.\n",
+                         "codex", "ticket: turn two", 2)
+        three = self._turn(desk, "codex", "Turn three: both fixed, recheck.\n",
+                           "claude", "ticket: turn three", 3)
+        four = self._turn(desk, "claude", "Turn four: one still open.\n",
+                          "codex", "ticket: turn four", 4)
+        assert self._watch(desk, "codex") == 0          # baseline
+        capsys.readouterr()
+        head = self._turn(desk, "codex", "Turn five: closed the last one.\n",
+                          "claude", "ticket: turn five", 5)
+
+        assert self._watch(desk, "codex", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "CODEX UP: ticket-claude-codex is at 'codex' (was claude)" in out
+        assert ("--- earlier turns: ticket-claude-codex (3 shown, oldest "
+                "first; `git log -- things/ticket-claude-codex.md` has the "
+                "rest) ---") in out
+        assert "Turn one" not in out
+        h3 = (f"[3 back · codex · 2026-11-02 · {two[:8]} · "
+              "ticket: turn two]\nTurn two: X has two findings.")
+        h2 = (f"[2 back · claude · 2026-11-03 · {three[:8]} · "
+              "ticket: turn three]\nTurn three: both fixed, recheck.")
+        h1 = (f"[1 back · codex · 2026-11-04 · {four[:8]} · "
+              "ticket: turn four]\nTurn four: one still open.")
+        for header in (h3, h2, h1):
+            assert header in out
+        message = f"--- message: ticket-claude-codex @ {head[:8]} ('codex') ---"
+        indexes = [out.index(x) for x in (
+            "--- earlier turns:", h3, h2, h1, "--- end of earlier turns ---",
+            message, "Turn five: closed the last one.", "--- end of message ---",
+            "--- before you reply ---")]
+        assert indexes == sorted(indexes)
+        assert out.count("Turn five: closed the last one.") == 1
+        assert watch_mod.reminder_block() in out
+
+    def test_a_first_turn_has_no_earlier_turns_block(self, desk, capsys):
+        assert self._watch(desk, "codex") == 0          # baseline: empty board
+        capsys.readouterr()
+        self._turn(desk, "codex", "Turn one: please review X.\n", "claude",
+                   "ticket: open", 1)
+        assert self._watch(desk, "codex", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "CODEX UP: ticket-claude-codex is at 'codex'" in out
+        assert "--- message: ticket-claude-codex @" in out
+        assert "--- before you reply ---" in out
+        assert "earlier turns" not in out
+        assert out.index("--- end of message ---") < out.index(
+            "--- before you reply ---")
+
+    def test_a_thing_that_is_not_a_ticket_wakes_as_before(self, desk, capsys):
+        memo = dict(rel="things/memo-x.md", thing_id="memo-x", kind="memo")
+        self._turn(desk, "codex", "Memo one.\n", "claude", "memo: one", 1,
+                   **memo)
+        self._turn(desk, "claude", "Memo two.\n", "codex", "memo: two", 2,
+                   **memo)
+        assert self._watch(desk, "codex") == 0
+        capsys.readouterr()
+        self._turn(desk, "codex", "Memo three.\n", "claude", "memo: three", 3,
+                   **memo)
+        assert self._watch(desk, "codex", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "CODEX UP: memo-x is at 'codex' (was claude)" in out
+        assert "--- message: memo-x @" in out and "Memo three." in out
+        assert "earlier turns" not in out
+        assert "--- before you reply ---" not in out
+        assert "Memo two." not in out
+
+    def test_a_long_earlier_turn_is_cut_at_the_cap(self, desk, capsys):
+        long_body = "# Long turn\n\n" + "x" * (watch_mod.TURN_CAP + 500) + "\n"
+        self._turn(desk, "claude", long_body, "codex", "ticket: long", 1)
+        assert self._watch(desk, "codex") == 0
+        capsys.readouterr()
+        self._turn(desk, "codex", "Short reply.\n", "claude", "ticket: short", 2)
+        assert self._watch(desk, "codex", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        cut = len(long_body.strip("\n")) - watch_mod.TURN_CAP
+        assert f"\n[… {cut} more character(s)]\n" in out
+        assert "x" * (watch_mod.TURN_CAP + 1) not in out
+        assert "(1 shown, oldest first;" in out
+
+    def test_a_status_only_commit_is_not_a_duplicate_turn(self, desk, capsys):
+        self._turn(desk, "claude", "Turn A.\n", "codex", "ticket: A", 1)
+        self._turn(desk, "codex", "Turn B.\n", "claude", "ticket: B", 2)
+        self._turn(desk, "claude", "Turn B.\n", "codex",
+                   "ticket: hand back, status only", 3)
+        assert self._watch(desk, "codex") == 0
+        capsys.readouterr()
+        self._turn(desk, "codex", "Turn C.\n", "claude", "ticket: C", 4)
+        assert self._watch(desk, "codex", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert "(2 shown, oldest first;" in out
+        assert out.count("Turn B.") == 1
+        assert "hand back, status only" in out           # the newest B commit
+        assert "ticket: B]" not in out
+        assert out.index("Turn A.") < out.index("Turn B.") < out.index("Turn C.")
+
+    def test_a_note_on_a_held_ticket_carries_the_transcript_and_reminder(
+            self, desk, capsys):
+        self._turn(desk, "claude", "Turn A.\n", "codex", "ticket: A", 1)
+        self._turn(desk, "codex", "Turn B.\n", "claude", "ticket: B", 2)
+        assert self._watch(desk, "codex") == 0
+        capsys.readouterr()
+        self._turn(desk, "codex", "Note: and do Y too.\n", "claude",
+                   "ticket: note", 3)
+        assert self._watch(desk, "codex", exit_on_wake=True) == 0
+        out = capsys.readouterr().out
+        assert ("CODEX UP: a note landed on ticket-claude-codex while it is "
+                "addressed to you ('codex')") in out
+        assert "is at" not in out
+        assert "--- earlier turns: ticket-claude-codex (2 shown" in out
+        assert "[2 back · codex · 2026-11-01" in out
+        assert "[1 back · claude · 2026-11-02" in out
+        assert out.index("--- end of earlier turns ---") < out.index(
+            "--- message: ticket-claude-codex @") < out.index(
+            "Note: and do Y too.") < out.index("--- before you reply ---")
+
+    def test_an_unreadable_history_is_emitted_never_raised(self, tmp_path):
+        config = WatchConfig(root=tmp_path, role="codex",
+                             definition_id="ad-hoc-message-loop")
+        out = watch_mod.earlier_turns_block(
+            config, "c" * 40, tmp_path / "things" / "t.md", "t", "body")
+        assert out == ("earlier turns unavailable: could not read the history "
+                       "of t at cccccccc")
