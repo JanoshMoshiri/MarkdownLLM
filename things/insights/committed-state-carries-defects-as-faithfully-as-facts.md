@@ -19,6 +19,9 @@ linked_things:
   - id: evidence-and-eval-backlog
     relation: informs
     notes: "First data from the session-2 pre-work smoke; the full trial run decides whether this holds beyond n=1"
+disposition: keep-active
+disposition_reason: "Stays: the longitudinal measurement it rests on is designed and not yet run (docs/limitations.md, What is not yet known). Promote or dismiss on that run's result."
+settles_when: 2027-01-09
 ---
 
 # Committed State Carries Defects As Faithfully As Facts

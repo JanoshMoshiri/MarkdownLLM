@@ -9,7 +9,7 @@ source: both
 confidence: high
 origin: synthesised
 disposition: keep-active
-disposition_reason: "Evidence-gated hold: the operator's estate pinning pass produces the design input (the legitimately-unpinnable residue). Promote to a floor change when that residue is visible; dismiss if none remains."
+disposition_reason: "Evidence-gated hold unchanged: the estate pinning pass that would show the unpinnable residue has not run."
 tags: [cross-domain, provenance, quarantine, sync, gap]
 linked_things:
   - id: provenance-specification
@@ -18,6 +18,7 @@ linked_things:
   - id: cross-domain-sync-catchup
     relation: informs
     notes: "Surfaced by the first estate run: 30 of 31 imports read INCOMPLETE, many correctly so"
+settles_when: 2027-01-09
 ---
 
 # `origin: external` Conflates Ingestion With Import — Two Species, One Value

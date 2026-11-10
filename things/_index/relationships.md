@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-10
-generated: 2026-11-10T09:23:50
-generated_from: HEAD@c502b0c
-coverage: 652
+generated: 2026-11-10T11:34:21
+generated_from: HEAD@9f0cc58
+coverage: 655
 framework_version: 3.51.0
 ---
 
@@ -184,6 +184,9 @@ framework_version: 3.51.0
 - a-uniform-answer-is-a-dead-judgment --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - a-value-cannot-recover-its-own-spelling --informs--> thing-specification
 - a-value-cannot-recover-its-own-spelling --informs--> provenance-specification
+- a-vault-tool-writes-back-what-it-shows --informs--> the-substrate-picks-no-surface-2026-11-10
+- a-vault-tool-writes-back-what-it-shows --informs--> interface-specification
+- a-vault-tool-writes-back-what-it-shows --supports--> portability-claims-need-execution-tests
 - a-verifier-assumes-the-inputs-it-did-not-observe --extends--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - a-verifier-assumes-the-inputs-it-did-not-observe --complements--> a-transcribed-identifier-is-unverifiable-by-reading
 - a-well-kept-record-reads-as-a-governed-world --derived-from--> estate-retrospective-synthesis-2026-08
@@ -691,6 +694,7 @@ framework_version: 3.51.0
 - cue-public-docs-face-build-2026-10-23 --subject--> public-docs-face-build
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-2026-10-05 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
 - cue-reconciliation-candidates-are-detectable-from-the-commit-stream-retro-2026-09-13 --subject--> reconciliation-candidates-are-detectable-from-the-commit-stream
+- cue-relative-path-hooks-break-in-nested-domain-repos-2026-11-10 --subject--> relative-path-hooks-break-in-nested-domain-repos
 - cue-retrospective-specification-2026-09-12 --subject--> retrospective-specification
 - cue-retrospective-specification-2026-10-20 --subject--> retrospective-specification
 - cue-retrospective-specification-2026-10-21 --subject--> retrospective-specification
@@ -1906,6 +1910,8 @@ framework_version: 3.51.0
 - the-seat --extends--> standing-watch-specification
 - the-seat --references--> the-reckoning
 - the-seat --references--> a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures
+- the-session-gate-has-no-human-committer --informs--> validate-thing-specification
+- the-session-gate-has-no-human-committer --informs--> the-substrate-picks-no-surface-2026-11-10
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
 - the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
 - the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming

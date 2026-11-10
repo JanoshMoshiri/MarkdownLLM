@@ -9,7 +9,7 @@ source: both
 confidence: high
 origin: synthesised
 disposition: keep-active
-disposition_reason: "Design lens for every future check the floor gains — vocabulary/threshold selection is part of correctness. Promote if a second check ships with a calibration defect found the same way."
+disposition_reason: "Candidate second case: 78% of the first 173 cues were ruled not-inflection (docs/limitations.md), a calibration defect found by measurement. Weigh promotion at the October retrospective."
 tags: [floor, checks, calibration, boundary, alerting, trust]
 linked_things:
   - id: judgement-checks-need-a-suppression-list-which-is-itself-drift
@@ -18,6 +18,7 @@ linked_things:
   - id: boundary-disclosure-check
     relation: references
     notes: "The check whose first full history audit surfaced this — 550+ hits, every one synthetic test vocabulary"
+settles_when: 2026-11-16
 ---
 
 # A Check That Always Fires Teaches The Operator To Ignore It

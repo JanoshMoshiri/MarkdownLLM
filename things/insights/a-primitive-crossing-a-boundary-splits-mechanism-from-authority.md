@@ -9,7 +9,7 @@ source: both
 confidence: high
 origin: synthesised
 disposition: keep-active
-disposition_reason: "The test the estate month passed; keep as the standing lens for the next boundary the framework crosses (a third party, a public face, a non-git substrate). Promote if it correctly predicts that crossing too."
+disposition_reason: "Held as predicted at a new crossing: a third-party vault tool got mechanism only (generated notes outside every repository) and no authority (the-substrate-picks-no-surface-2026-11-10). One more crossing before promotion."
 tags: [primitives, membrane, estate, indexes, authority, design-lens]
 linked_things:
   - id: a-true-primitive-is-discovered-not-authored
@@ -23,6 +23,7 @@ linked_things:
   - id: estate-git-sync
     relation: references
     notes: "commit-is-real crossing the machine axis: mechanism transferred (fetch/ff), authority did not (no auto-merge, no push)"
+settles_when: 2027-01-09
 ---
 
 # A Primitive Crossing A Boundary Splits Into Mechanism And Authority

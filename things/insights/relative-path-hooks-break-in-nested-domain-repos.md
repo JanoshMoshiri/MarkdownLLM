@@ -1,20 +1,19 @@
 ---
 id: relative-path-hooks-break-in-nested-domain-repos
 type: insight
-status: active
+status: dismissed
 version: 1.0
 created: 2026-07-01
 session: 2026-07-01
 source: both
 confidence: high
 origin: stated
-disposition: keep-active
-disposition_reason: "Candidate settings-template fix (anchor hook script paths to $env:CLAUDE_PROJECT_DIR in both framework and scaffolded-domain templates). Held active until that template change is made or the pattern recurs."
 tags: [hooks, cwd, nested-repo, harness, portability]
 linked_things:
   - id: hook-enforcement-has-three-anchors
     relation: references
     notes: A git-fs / harness anchor detail — hook path resolution across nested repos.
+disposition_reason: "Settled 2026-11-10: the condition its hold named is met. The rendered Claude Code hooks, the framework root's and every scaffolded workspace's, resolve the script from ROOT=${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}, so a hook firing inside a nested repo no longer resolves a cwd-relative path. Nothing left to carry."
 ---
 
 # Relative-path hooks break when they fire against a nested domain repo

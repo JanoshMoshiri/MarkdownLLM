@@ -16,6 +16,9 @@ linked_things:
   - id: evidence-and-eval-backlog
     relation: informs
     notes: "The v2.0 reframe of the backlog operationalises this: two operator sessions with agent support, agent pre-work listed separately."
+disposition: keep-active
+disposition_reason: "Stays: it still describes live work — evidence-and-eval-backlog's Bucket 3 is blocked on operator sessions 1-2, as public-docs-face-build records. Promote when the backlog schedules those sessions on the operator's calendar."
+settles_when: 2027-01-09
 ---
 
 # Operator-Gated Work Is Scheduled on the Operator's Calendar, Not in a Backlog Row

@@ -9,12 +9,13 @@ source: both
 confidence: high
 origin: stated
 disposition: keep-active
-disposition_reason: "Candidate framework-workflow enhancement (scaffold guidance/affordance for context-rich domain births). Held active until it recurs across future complex births with evidence, per the discovery-earns-promotion bar — not enshrined on one occurrence."
+disposition_reason: "Not recurred: the one birth since, a business-modelling workspace on 2026-10-28, was born light and its semantic half was written in the scaffolding session without loss. Still one occurrence."
 tags: [domain-birth, scaffold, workflow, interpretation-loss, context]
 linked_things:
   - id: agents-drop-mechanical-birth-steps-not-semantic-ones
     relation: references
     notes: Both concern the gap between mechanical domain birth and its semantic half.
+settles_when: 2027-01-09
 ---
 
 # Rich founding context breaks the scaffold-then-jump discipline

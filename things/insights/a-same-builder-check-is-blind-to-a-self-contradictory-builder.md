@@ -3,7 +3,7 @@ id: a-same-builder-check-is-blind-to-a-self-contradictory-builder
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Names the precise blind spot of every same-builder drift check (kernel, derived-index, domain-kernel) and tells the human Walk where to look — emitter source, not just corpus. Fresh, paid for by a real downstream miss; gates how vocabulary retirements are walked."
+disposition_reason: "No same-builder miss in the commit range to 2026-11-10; it stays the walk's lens for the next vocabulary retirement."
 version: 1.1
 created: 2026-06-30
 session: 2026-06-30
@@ -21,6 +21,7 @@ linked_things:
   - id: mechanical-coherence-checks-backlog
     relation: informs
     notes: "The retire-vocab Walk this backlog defers to must include emitter source, not only things + specs."
+settles_when: 2027-01-09
 ---
 
 # A Same-Builder Check Is Blind to a Self-Contradictory Builder

@@ -3,7 +3,7 @@ id: an-incident-seeded-list-encodes-the-symptom-not-the-rule
 type: insight
 status: active
 disposition: keep-active
-disposition_reason: "Standing design razor with no single live consumer to key liveness to: it applies at every future defensive enumeration (strip lists, allow lists, field registries). Paid for by a real two-version leak."
+disposition_reason: "Standing razor with no single consumer; no new enumerated defence was added this session (vault-map resolves from the reference registry, not a list)."
 version: 1.0
 created: 2026-07-03
 session: 2026-07-03
@@ -15,6 +15,7 @@ linked_things:
   - id: a-crossing-thing-carries-its-producers-private-graph
     relation: extends
     notes: "That insight states the rule (every relational field is producer-private); this names why its own implementation still leaked — the list under the rule was seeded from the incident, not derived from the rule."
+settles_when: 2027-01-09
 ---
 
 # An Incident-Seeded List Encodes the Symptom, Not the Rule

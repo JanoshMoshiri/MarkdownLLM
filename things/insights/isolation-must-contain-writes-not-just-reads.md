@@ -20,6 +20,9 @@ linked_things:
     notes: "The 'run workspaces outside the repo tree' item is now required for the FRAMEWORK condition, not just bare."
   - id: hook-compliance-correlates-with-scope-not-awareness
     relation: supports
+disposition: keep-active
+disposition_reason: "Stays: cited by three live eval things; the eval cycle has not run a trial under a write boundary since. Promote when cycle 1 shows the runner contains writes."
+settles_when: 2027-01-09
 ---
 
 # Isolation Must Contain Writes, Not Just Reads
