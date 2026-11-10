@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-10
-generated: 2026-11-10T11:34:21
-generated_from: HEAD@9f0cc58
-coverage: 655
+generated: 2026-11-10T22:00:40
+generated_from: HEAD@ef7215d
+coverage: 657
 framework_version: 3.51.0
 ---
 
@@ -1462,6 +1462,18 @@ framework_version: 3.51.0
 - partial-coverage-quiets-the-uncovered-steps --extends--> emitted-content-is-read-instructed-content-is-economised
 - partial-coverage-quiets-the-uncovered-steps --complements--> session-start-loses-to-the-first-request
 - partial-coverage-quiets-the-uncovered-steps --references--> review-independent-seams-verification-2026-08-26-claude
+- peer-loops --derived-from--> review-peer-agent-loops-field-research-2026-11-10-workspace-2
+- peer-loops --extends--> substrate-native-a2a
+- peer-loops --extends--> the-seat
+- peer-loops --extends--> standing-watch-specification
+- peer-loops --extends--> ad-hoc-message-loop
+- peer-loops --implements--> ticket-is-the-ad-hoc-carrier-2026-09-30
+- peer-loops --extends--> a-note-on-a-held-ticket-rings-its-addressee-2026-11-02
+- peer-loops --extends--> seats-are-declared-and-a-conversation-is-a-work-item-2026-10-15
+- peer-loops --implements--> emitted-content-is-read-instructed-content-is-economised
+- peer-loops --references--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
+- peer-loops --references--> a2a-conversations-on-their-own-branch
+- peer-loops --references--> workflow-state-specification
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-built-inbound-only
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-verified-external-input
@@ -1597,6 +1609,11 @@ framework_version: 3.51.0
 - review-memory-systems-reread-2026-11-09-workspace-1 --informs--> the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08
 - review-memory-systems-reread-2026-11-09-workspace-1 --informs--> eval-cycle
 - review-memory-systems-reread-2026-11-09-workspace-1 --informs--> evidence-and-eval-backlog
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 --informs--> peer-loops
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 --informs--> standing-watch-specification
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 --informs--> the-seat
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 --supports--> emitted-content-is-read-instructed-content-is-economised
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 --complements--> review-critical-comparison-2026-10-17-claude
 - review-remediation-v3-17 --implements--> a-same-builder-check-is-blind-to-a-self-contradictory-builder
 - review-remediation-v3-17 --implements--> a-crossing-thing-carries-its-producers-private-graph
 - review-remediation-v3-17 --implements--> directional-graph-reads-come-in-inbound-outbound-pairs

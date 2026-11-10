@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-11-10
-generated: 2026-11-10T11:34:21
-generated_from: HEAD@9f0cc58
-coverage: 149
+generated: 2026-11-10T22:00:40
+generated_from: HEAD@ef7215d
+coverage: 151
 framework_version: 3.51.0
 ---
 
@@ -33,6 +33,10 @@ framework_version: 3.51.0
 
 ## a-well-kept-record-reads-as-a-governed-world
 - estate-retrospective-synthesis-2026-08 (derived-from)
+
+## ad-hoc-message-loop
+- peer-loops (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
 
 ## assistant-register
 - operating-is-programming (derived-from)
@@ -557,6 +561,9 @@ framework_version: 3.51.0
 - operating-model-seams-scope-2026-08-26 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
 - run-operating-model-seams-2026-08 (pinned @ed44b2d91b84215fb7a5d95f33a8dbbf2325468b)
 
+## review-peer-agent-loops-field-research-2026-11-10-workspace-2
+- peer-loops (derived-from)
+
 ## run-eval-cycle-0-polar-baseline-2026-10
 - the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
 
@@ -610,6 +617,8 @@ framework_version: 3.51.0
 
 ## standing-watch-specification
 - loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+- peer-loops (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - ticket-is-the-ad-hoc-carrier-2026-09-30 (pinned @38ab1d8643f6baaa9df5ce92f356a5134603cca0)
 
@@ -623,6 +632,7 @@ framework_version: 3.51.0
 - a-filter-is-a-missing-instance (derived-from)
 - between-sessions-surface-is-real-2026-09-21 (pinned @e0bc244da5572bfe6fef02cf32d0b962222f89e8)
 - loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
 - ticket-is-the-ad-hoc-carrier-2026-09-30 (pinned @38ab1d8643f6baaa9df5ce92f356a5134603cca0)
 
 ## substrate-review-consolidated-remedy-2026-08-20
@@ -655,6 +665,8 @@ framework_version: 3.51.0
 
 ## the-seat
 - a-ring-is-calibrated-on-the-healthy-rhythm-not-the-failures (derived-from)
+- peer-loops (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
+- review-peer-agent-loops-field-research-2026-11-10-workspace-2 (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
 
 ## the-substrate-is-a-discipline-prosthesis
 - operating-scope-promotion (pinned @604dfc4)

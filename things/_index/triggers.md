@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: triggers
 created: 2026-11-10
-generated: 2026-11-10T11:34:21
-generated_from: HEAD@9f0cc58
-coverage: 9
+generated: 2026-11-10T22:00:40
+generated_from: HEAD@ef7215d
+coverage: 10
 framework_version: 3.51.0
 ---
 
@@ -28,6 +28,10 @@ framework_version: 3.51.0
 - status: paused  due_date: —
 - trigger: type=time, condition=2026-11-30 reached, action=Asked once more 2026-11-06 at the close; the operator: 'Not now'. Asked again at this date, in one line; first-hour.md is not rewritten without the account. Earlier: Paused with the plan 2026-10-17: the account is still owed, and asked for again when the slot comes back. Earlier: acted 2026-10-08 at the-reckoning Phase 3's close: Phase 5 still has no account recorded, so the operator was asked for it in one line. If none is recorded by this date, ask once more in one line; never rewrite first-hour.md without it. Earlier: answered 2026-09-23: the operator put this arc first (birth arc — onramp, guided scaffold, first-hour rewrite as one piece) ahead of the eval evening. It starts from his own account of how scaffolding a domain actually goes, which he said he would give. If Phase 5 still has no account recorded, ask for it in one line — do not rewrite first-hour.md without it.
 - trigger: type=time, condition=2026-11-30 reached, action=Asked 2026-11-06 at the close whether the eval backlog had released the slot; the operator: 'Not yet, keep it paused'. Ask again at this date. Earlier: Answered 2026-10-17 by the operator at the session close: the eval backlog takes the onramp's slot. Neither the Codex cloud route's first-hand record nor Phase 2's silent bootstrap had moved since 2026-09-26; the plan is paused. Ask at this date whether the eval backlog has released the slot. Earlier: re-dated 2026-09-26 after its first answer (onramp first — see Sequencing). Chase: has the Codex cloud route produced a first-hand record, and has Phase 2's silent bootstrap been started for any route? If neither moved, surface the wait plainly and ask whether the eval backlog should take the slot instead.
+
+## peer-loops
+- status: in-progress  due_date: —
+- trigger: type=time, condition=2026-11-24 reached, action=surface, note=Has Phase 1's proof crossed? One ticket between the two substrate clones, a note landing mid-task, no body past a page, and the wake carrying the two lines and the last turns. If it has not, say which of the three it stopped at: the payload was not built, the clones were not armed, or the ticket crossed and the body still grew. Also read whether the operator has declared a seat and a signing key, which Phase 2 waits on and no agent may do for them.
 
 ## substrate-native-a2a
 - status: in-progress  due_date: —
