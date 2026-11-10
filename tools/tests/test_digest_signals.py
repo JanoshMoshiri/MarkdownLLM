@@ -205,8 +205,15 @@ def test_session_start_structural_work_is_bounded(tmp_path, capsys,
     # count, so incidental fixed calls do not make this brittle. The seat
     # (2026-10-15) added two constant reads — the clone's local config and a
     # rev-list over the unpublished range — and found the bound sitting at
-    # the exact count; it is raised by those two, no more.
-    assert len(spawns) <= 14, f"{len(spawns)} git spawns: {spawns}"
+    # the exact count; it is raised by those two, no more. The stall ring
+    # and the turn budget (the-seat Phases 7 and 8, 2026-10-30 to 11-02)
+    # each added one more constant read of the clone's local config — the
+    # window and ceiling, and the budget — and shipped in 3.51.0 with this
+    # bound still at 14, so it failed on the published head until
+    # 2026-11-10. Raised by those two. Three separate `git config --local`
+    # reads of one clone are a candidate for one shared read; none of them
+    # scales with the corpus, which is what this bound guards.
+    assert len(spawns) <= 16, f"{len(spawns)} git spawns: {spawns}"
 
 
 def test_stray_carriage_return_in_subject_does_not_break_flip_scan(tmp_path):
