@@ -113,6 +113,7 @@ from .reckon import cmd_reckon
 from .workflows import cmd_workflows
 from .triggers import cmd_triggers
 from .validation import cmd_validate
+from .vault_map import DEFAULT_OUT, VIEW_KINDS, cmd_vault_map
 from .watch import cmd_watch
 
 
@@ -367,6 +368,21 @@ def build_cli() -> argparse.ArgumentParser:
     wl.add_argument("path", nargs="?", default=".")
     wl.add_argument("--write", action="store_true", help="save a local (gitignored) WORKLOG.md snapshot; default prints to stdout")
     wl.set_defaults(fn=cmd_worklog)
+
+    vm = sub.add_parser("vault-map", help="generate a map folder beside a folder "
+                        "of domains, for markdown-vault tools: each thing's "
+                        "structural references as links, the open work and the "
+                        "newest commits per domain; writes only its own folder")
+    vm.add_argument("vault", help="the folder that holds the domains (the one a "
+                                  "vault tool opens)")
+    vm.add_argument("--out", default=DEFAULT_OUT, metavar="NAME",
+                    help=f"name of the generated folder (default: {DEFAULT_OUT!r})")
+    vm.add_argument("--views", choices=VIEW_KINDS,
+                    help="also write view files in one named tool's own format; "
+                         "omitted, only plain notes are written — no tool is assumed")
+    vm.add_argument("--commits", type=int, default=30, metavar="N",
+                    help="commits per domain in Recent changes (default 30; 0 omits them)")
+    vm.set_defaults(fn=cmd_vault_map)
 
     rf = sub.add_parser("refresh", help="floor-only domain refresh: report version "
                                         "delta + unseen CHANGELOG; --seal bumps seen")

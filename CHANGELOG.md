@@ -18,6 +18,10 @@ Prior entries followed [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ---
 
+## [Unreleased]
+
+**A map folder for markdown-vault tools.** A folder of domains opened in a vault tool shows every record as a note but none of what the substrate knows about them: structural references are ids in frontmatter, which such tools do not read as links; the open set is computed from declared terminal statuses; the event stream is the commit log. `mdllm vault-map <folder of domains>` restates the three as plain notes in a folder of its own beside the domains — per domain, every thing with every structural reference field as a path-qualified link (a target is placed by ownership or reported, never guessed), the open work from the same function the session-start digest renders, and the newest commits. It is a projection: it writes only its own folder, replaces only files carrying its generated mark, leaves an operator's file or edit alone, and refuses a location a repository would track. View files in one tool's own format are a named choice (`--views obsidian`), never a default — the operator's ruling (`the-substrate-picks-no-surface-2026-11-10`) is that the substrate becomes more reachable from a vault tool without picking a surface. Generalises one operator's hand-built relationship map. `session.open_loops` is the digest's forward set as data, so the two cannot disagree.
+
 ## [3.51.0] - 2026-11-03
 
 **The loop rings, delivers, and stops.** The agent-to-agent loop's weak joint was the wake channel, never the message channel. The record showed four ways a turn failed to arrive: picked up through the operator's chat prompt rather than a wake; a watch in a shared checkout exiting on another party's unpublished commit and leaving the next real turn with nothing running; a note left on a ticket its addressee already held, ringing nothing; and a conversation that ran until someone noticed. Each is now read from the record and answered on the floor, calibrated on the busiest workspace's healthy rhythm rather than its failures, and the operator's rulings that shaped them are recorded in their words.

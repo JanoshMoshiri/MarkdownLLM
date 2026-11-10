@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-11-09
-generated: 2026-11-09T23:02:01
-generated_from: HEAD@e346d97
+created: 2026-11-10
+generated: 2026-11-10T09:23:51
+generated_from: HEAD@c502b0c
 coverage: 149
 framework_version: 3.51.0
 ---
@@ -403,6 +403,7 @@ framework_version: 3.51.0
 - first-hour-guide (derived-from)
 - interface-specification (derived-from)
 - operator-guide (derived-from)
+- the-substrate-picks-no-surface-2026-11-10 (pinned @c502b0c599993ee43cf53681b4335f154e823727)
 
 ## independent-substrate-current-state-review-2026-08-20-codex
 - floor-sprint-1-scope-2026-08-21 (pinned @35de802608d896e4e533ed6c2990d89966948e17)
@@ -428,6 +429,7 @@ framework_version: 3.51.0
 
 ## interface-specification
 - review-holistic-substrate-2026-10-21-codex (pinned @796aa2346c57c8f774c7d14f98a7b1e673c94412)
+- the-substrate-picks-no-surface-2026-11-10 (pinned @c502b0c599993ee43cf53681b4335f154e823727)
 
 ## lifecycle-output-truncation-2026-08-14
 - claude-gate-6r-acceptance-2026-08-16 (derived-from)

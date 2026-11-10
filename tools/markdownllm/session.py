@@ -179,17 +179,11 @@ def _stall_lines(domain: Path, corpus=None,
     return [line for _, line in sorted(stalls, reverse=True)]
 
 
-def _orient_forward(domain: Path, corpus=None) -> list[str]:
-    """The forward half of orientation — the open loops the next session inherits,
-    computed from the thing graph. Orient is the session-memory counterpart to
-    change-reconciliation's work-content state: backward orientation is the commit
-    stream (velocity), this is its forward complement (what is still open). Replaces
-    the hand-maintained continuity brief (dissolve-continuity-into-reconciliation)."""
-    try:
-        if corpus is None:
-            corpus, _ = scan(domain)
-    except Exception:
-        return []
+def open_loops(corpus) -> tuple[list, list, list]:
+    """The forward set as data: (open conflicts, open loops, watched). One
+    owner for "what is still open" — the digest renders it below, and a
+    projection that shows the same fact elsewhere (`vault_map`) reads it
+    here rather than restating the rule."""
     conflicts, loops, watched = [], [], []
     for t in corpus.things:
         typ, status = str(t.meta.get("type")), str(t.meta.get("status"))
@@ -207,6 +201,21 @@ def _orient_forward(domain: Path, corpus=None) -> list[str]:
                 watched.append((t.id, typ, status))
             else:
                 loops.append((t.id, typ, status))
+    return conflicts, loops, watched
+
+
+def _orient_forward(domain: Path, corpus=None) -> list[str]:
+    """The forward half of orientation — the open loops the next session inherits,
+    computed from the thing graph. Orient is the session-memory counterpart to
+    change-reconciliation's work-content state: backward orientation is the commit
+    stream (velocity), this is its forward complement (what is still open). Replaces
+    the hand-maintained continuity brief (dissolve-continuity-into-reconciliation)."""
+    try:
+        if corpus is None:
+            corpus, _ = scan(domain)
+    except Exception:
+        return []
+    conflicts, loops, watched = open_loops(corpus)
     lines: list[str] = []
     if conflicts:
         lines.append("- **Open conflicts (%d):** %s — resolve or carry forward."

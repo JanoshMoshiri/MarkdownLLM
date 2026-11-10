@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-09
-generated: 2026-11-09T23:02:01
-generated_from: HEAD@e346d97
-coverage: 649
+created: 2026-11-10
+generated: 2026-11-10T09:23:50
+generated_from: HEAD@c502b0c
+coverage: 652
 framework_version: 3.51.0
 ---
 
@@ -613,6 +613,7 @@ framework_version: 3.51.0
 - cue-framework-map-2026-10-15 --subject--> framework-map
 - cue-framework-map-2026-10-18 --subject--> framework-map
 - cue-framework-map-2026-10-20 --subject--> framework-map
+- cue-framework-map-2026-11-10 --subject--> framework-map
 - cue-framework-map-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-framework-map-cloud-2026-09-24 --subject--> framework-map
 - cue-framework-retrospective-2026-08b-2026-09-24 --subject--> framework-retrospective-2026-08b
@@ -669,6 +670,7 @@ framework_version: 3.51.0
 - cue-operator-guide-2026-10-31 --subject--> operator-guide
 - cue-operator-guide-2026-11-03 --subject--> operator-guide
 - cue-operator-guide-2026-11-06 --subject--> operator-guide
+- cue-operator-guide-2026-11-10 --subject--> operator-guide
 - cue-operator-guide-cloud-2026-09-24 --references--> codex-cloud-workspace
 - cue-operator-guide-cloud-2026-09-24 --subject--> operator-guide
 - cue-operator-queue-2026-08-28-2026-09-13 --subject--> operator-queue-2026-08-28
@@ -1907,6 +1909,9 @@ framework_version: 3.51.0
 - the-substrate-is-a-discipline-prosthesis --informs--> llm-driven-systems-manifesto
 - the-substrate-is-a-discipline-prosthesis --complements--> expertise-is-an-output-not-a-prerequisite
 - the-substrate-is-a-discipline-prosthesis --complements--> operating-is-programming
+- the-substrate-picks-no-surface-2026-11-10 --informs--> interface-specification
+- the-substrate-picks-no-surface-2026-11-10 --informs--> operator-guide
+- the-substrate-picks-no-surface-2026-11-10 --references--> harness-native-onramp-supersedes-desktop
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --superseded-by--> the-walk-runs-on-detection-the-ruling-is-the-residue-2026-10-05
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --extends--> open-questions-arrive-as-a-prompt-2026-09-23
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 --references--> unattended-cue-carrier-2026-09-12

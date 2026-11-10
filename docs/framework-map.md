@@ -70,7 +70,7 @@ flowchart TD
         why, thing.md with the core operative specs, and the extension and guide
         specs. Below that, domain memory in the things directory holds insights,
         decisions, conflicts, retrospectives and plans. Below that, the
-        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 42
+        deterministic floor is tools/mdllm.py, providing the mdllm CLI with 43
         mechanical subcommands and a git pre-commit hook that, when current and
         runnable, blocks commits with mechanical Errors. At the base, git is
         the accepted-state machine, event stream and inspectable audit aid.
@@ -96,7 +96,7 @@ flowchart TD
         RETROS["retros & plans"]
     end
     subgraph floor ["deterministic floor — tools/mdllm.py"]
-        MDLLM["mdllm CLI<br/>42 mechanical subcommands"]
+        MDLLM["mdllm CLI<br/>43 mechanical subcommands"]
         HOOK["git pre-commit hook<br/>blocks mechanical Errors when active"]
     end
     GIT["git — accepted-state machine,<br/>event stream, inspectable history"]
@@ -276,7 +276,7 @@ edges enforce or measure a spec; dashed edges generate an artifact.
 flowchart LR
     accTitle: View 3 - each mdllm subcommand mapped to the one spec it mechanises
     accDescr {
-        A left column of 42 mdllm subcommands, each with a single edge to the
+        A left column of 43 mdllm subcommands, each with a single edge to the
         spec surface it serves in the right column. The tool is a mapping, not
         a monolith. Solid edges enforce or measure a spec, and dashed edges
         generate an artifact. Enforcing or measuring: validate, triggers,
@@ -287,7 +287,9 @@ flowchart LR
         precommit (the hook's legs composed concurrently against one frozen
         candidate), and the harness-event dispatcher.
         Generating: kernel, changelog, install-hook, worklog, domain-kernel,
-        session-start, mcp-serve, bundle, autopush, adapter-install, docs and
+        session-start, mcp-serve, bundle, autopush, adapter-install, docs,
+        vault-map (a map folder beside the domains for markdown-vault tools,
+        written outside every repository) and
         dispatch-payload, which composes a scheduler tick's launch text from
         the standing dispatch prompt and writes nothing. The
         new assembly and guarded-publication commands mechanise explicit
@@ -339,6 +341,7 @@ flowchart LR
         C40["reckon"]
         C41["workflows"]
         C42["seat"]
+        C43["vault-map"]
     end
     subgraph target ["what it serves"]
         T1["validate.thing.md"]
@@ -381,6 +384,7 @@ flowchart LR
         T38["session-memory.md<br/>The Reckoning — the release half of the loop"]
         T39["workflow-state.md<br/>Carrier Binding — workflows emerge from use"]
         T40["standing-watch.md<br/>The Ticket — actors are seats"]
+        T41["interface.md<br/>optional inspection — a view beside the record, never a route"]
     end
 
     C1 -->|"enforces (levels 1–3)"| T1
@@ -422,6 +426,7 @@ flowchart LR
     C40 -->|"names every attention item's exit for"| T38
     C41 -->|"reads runs, departures and emerging paths for"| T39
     C42 -->|"declares who sits in this clone, and names a turn that never left, for"| T40
+    C43 -.->|"restates references, open work and commits as notes for"| T41
     C37 -->|"rings the doorbell on the remote ref for"| T36
     C38 -.->|"regenerates and drift-gates"| T37
     C39 -.->|"prepares a host-owned checkout under"| T30
