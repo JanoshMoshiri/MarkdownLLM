@@ -2,7 +2,7 @@
 id: peer-loops
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-11-10
 priority: high
 origin: stated
@@ -51,6 +51,12 @@ linked_things:
   - id: workflow-state-specification
     relation: references
     notes: "A run names each role to a seat and holds the cursor. Rule 8 adds that it names who holds the work and who reviews it."
+  - id: a-filter-is-a-missing-instance
+    relation: references
+    notes: "The Scope section is this insight's second case: sessions in one clone reached for a filter on the wake, and the lane they were each working was a run the watch could already be scoped to."
+  - id: run-membership-is-realisation-2026-09-22
+    relation: references
+    notes: "A ticket joins a lane by declaring `implements: <run>`, the membership edge that ruling made the watch's scope. The Scope section uses it as built."
 triggers:
   - type: time
     condition: "2026-11-24 reached"
@@ -221,6 +227,47 @@ else.
 4. Codex gets a short loop that resumes its session when its watch exits,
    because nothing documented wakes a local Codex session from outside.
 
+Scoping a session's watch to its own conversation is not a fifth piece.
+It is already built; the next section says how.
+
+## Scope: Which Conversation a Watch Hears
+
+*Added 2026-11-11, from the first reading of Phase 1 in use.*
+
+A seat is a clone: its name, its agent and the git identity its commits
+carry are clone-local configuration, and every session in that clone shares
+them. A ticket waits for a seat, because its status names one. So when two
+sessions in one clone work two lanes, each session's watch wakes on every
+ticket addressed to that seat, and each session ends up reaching for a
+filter on what the wake prints. On 2026-11-11 two live sessions had done
+exactly that, one with `tail -40` and one with a filter that kept only the
+message block, and the earlier turns Phase 1 built never reached either of
+them.
+
+Three answers were weighed in session with the operator.
+
+- **A seat per session.** Rejected. A watch refuses to arm for a role that
+  is not a stage of the loop, and the floor refuses a status the schema
+  does not declare, so every session's name would have to be added to both
+  and pruned when its lane ends. That is the roster this plan refuses. It
+  also does not separate the record: two sessions in one clone still commit
+  under one identity. A seat per session is right only when each session
+  has its own clone or worktree, which is a Phase 3 item.
+- **A ticket-id scope** (`--ticket <id>`). Proposed in session, then set
+  aside. `standing-watch.md` → Scope rules that a watch is scoped to a run
+  and never to a thing, and the narrowing it would add already exists.
+- **The run.** Chosen. The scope was built on 2026-09-22 (`--run`). A lane
+  is a run; a ticket joins it by declaring `implements: <run>`; a session's
+  watch armed with `--run <lane>` hears only that lane's tickets. Nothing is
+  listed, nothing new is built, and the seat stays per clone. This is
+  `a-filter-is-a-missing-instance` a second time: the lane was the instance,
+  unnamed to the watch.
+
+**Dismissal condition.** A seat routinely holds two conversations at once
+that belong to no run, often enough that writing a run for each is the
+burden. Then a ticket scope comes back as a fifth piece of code, and the
+spec's never-to-a-thing ruling is revised with it.
+
 ## Phases
 
 Each phase is built, used on something real, read back from the record,
@@ -248,10 +295,22 @@ and fixed before the next one starts.
             the root's own loop follows it (`ad-hoc-message-loop` 1.5).
       - [x] A note names its kind: steer, follow up, or aware (rule 4).
             A rule and nothing more; the watch does not read the kind.
+      - [ ] Rule 2 gains a clause, and the template carries it: read the
+            wake whole, never cut or filter what it prints. Owed since
+            2026-11-11, when two live sessions were found cutting it (see
+            Scope).
       - [ ] **Proof.** One ticket crosses between the two substrate clones
             with a note landing mid-task, and no body grows past a page.
             This is also the live round trip `substrate-native-a2a` has
             owed since 2026-11-03.
+            *First reading, 2026-11-11, not the proof.* The payload was
+            published and both substrate clones carry it. Every live ticket
+            turn that day stayed one message. One wake was seen carrying
+            the earlier turns and the rule whole; two sessions cut theirs
+            before reading it, and one watch was still on code from before
+            the change. The check for a stacked body has not yet fired,
+            because no ticket born on or after 2026-11-10 had turns. The
+            proof still needs a new ticket, with watches armed whole.
 
 - [ ] **Phase 2 — The operator's signed seat.**
       - [ ] The operator declares a seat and creates a signing key the
@@ -271,6 +330,12 @@ and fixed before the next one starts.
       - [ ] The start skill is written from rules 11 and 12.
       - [ ] A seat names its surface in its own address when it declares,
             so every commit says both.
+      - [ ] Two agents never share a clone. On 2026-11-11 a reviewer seat's
+            turns were found authored as the builder's seat, because both
+            ran in a clone declared for the builder. Each seat gets its own
+            clone or worktree; where a session needs a seat of its own, that
+            is a worktree per session, and its seat is declared there by
+            the operator.
       - [ ] The Codex resume loop, tested by hand before it is trusted.
       - [ ] **Proof.** From one Claude Code session, one spoken
             instruction starts a Codex seat on the same machine and a
@@ -280,7 +345,8 @@ and fixed before the next one starts.
       - [ ] In the busiest workspace: one doorbell per seat in place of
             five, a lane as a run with one short ticket per exchange, the
             holder and the reviewer named, and one class of gate under a
-            delegation.
+            delegation. Each session's watch is armed with `--run` for its
+            own lane, so two lanes in one clone never hear each other.
       - [ ] The turn budget's default is revisited on that lane's record.
       - [ ] **Proof.** The script that produced the baseline reads the
             lane back: body size, the slow tail of handovers, and the

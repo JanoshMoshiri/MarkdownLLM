@@ -3,9 +3,9 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-10
-generated: 2026-11-10T22:39:46
-generated_from: HEAD@f95867a
+created: 2026-11-12
+generated: 2026-11-12T22:51:20
+generated_from: HEAD@5767e0b
 coverage: 659
 framework_version: 3.51.0
 ---
@@ -1477,6 +1477,8 @@ framework_version: 3.51.0
 - peer-loops --references--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - peer-loops --references--> a2a-conversations-on-their-own-branch
 - peer-loops --references--> workflow-state-specification
+- peer-loops --references--> a-filter-is-a-missing-instance
+- peer-loops --references--> run-membership-is-realisation-2026-09-22
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-built-inbound-only
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-verified-external-input
