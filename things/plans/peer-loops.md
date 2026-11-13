@@ -2,7 +2,7 @@
 id: peer-loops
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-11-10
 priority: high
 origin: stated
@@ -54,6 +54,9 @@ linked_things:
   - id: a-filter-is-a-missing-instance
     relation: references
     notes: "The Scope section is this insight's second case: sessions in one clone reached for a filter on the wake, and the lane they were each working was a run the watch could already be scoped to."
+  - id: review-agent-coordination-leaders-2026-11-13-workspace-2
+    relation: derived-from
+    notes: "The wider reading of the field made after the operator stepped back on 2026-11-12, against the shape the operator actually runs. Phases 2 to 5 are to be re-cut against it."
   - id: run-membership-is-realisation-2026-09-22
     relation: references
     notes: "A ticket joins a lane by declaring `implements: <run>`, the membership edge that ruling made the watch's scope. The Scope section uses it as built."
@@ -78,6 +81,16 @@ operator agreed it on 2026-11-10: *"I like it. Let's go."*
 It adds no thing type, no service and no coordinator. It changes what a
 wake carries, gives the operator a seat whose rulings can be checked, and
 writes down how one seat starts a loop and then steps back.
+
+**Under revision since 2026-11-13.** On 2026-11-12 the operator stepped
+back from the design: the plan assumes equal peers with no lead, while the
+loops the operator runs are an orchestrated star, with one seat as hub and
+reviewer and the others as spokes. Peer-to-peer stays wanted, for bounded
+work, once agents can carry it. The configuration has to land on the hub,
+never on a non-technical user. The field was then read against that shape
+(`review-agent-coordination-leaders-2026-11-13-workspace-2`). Phase 1 and
+the Scope section stand. Phases 2 to 5 are to be re-cut against that review
+before any of them is built.
 
 ## The Evidence
 

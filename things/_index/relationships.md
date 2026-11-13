@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-12
-generated: 2026-11-12T22:51:20
-generated_from: HEAD@5767e0b
-coverage: 659
+created: 2026-11-13
+generated: 2026-11-13T00:44:49
+generated_from: HEAD@2adf194
+coverage: 660
 framework_version: 3.51.0
 ---
 
@@ -1478,6 +1478,7 @@ framework_version: 3.51.0
 - peer-loops --references--> a2a-conversations-on-their-own-branch
 - peer-loops --references--> workflow-state-specification
 - peer-loops --references--> a-filter-is-a-missing-instance
+- peer-loops --derived-from--> review-agent-coordination-leaders-2026-11-13-workspace-2
 - peer-loops --references--> run-membership-is-realisation-2026-09-22
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-built-inbound-only
@@ -1574,6 +1575,11 @@ framework_version: 3.51.0
 - retrospective-specification --complements--> derived-index-specification
 - retrospective-specification --complements--> change-reconciliation-specification
 - retrospective-specification --implements--> llm-driven-systems-manifesto
+- review-agent-coordination-leaders-2026-11-13-workspace-2 --informs--> peer-loops
+- review-agent-coordination-leaders-2026-11-13-workspace-2 --complements--> review-peer-agent-loops-field-research-2026-11-10-workspace-2
+- review-agent-coordination-leaders-2026-11-13-workspace-2 --informs--> standing-watch-specification
+- review-agent-coordination-leaders-2026-11-13-workspace-2 --informs--> evidence-and-eval-backlog
+- review-agent-coordination-leaders-2026-11-13-workspace-2 --references--> live-eval-scope-bounded-to-claude
 - review-critical-comparison-2026-10-17-claude --informs--> evidence-and-eval-backlog
 - review-critical-comparison-2026-10-17-claude --informs--> session-start-hardening
 - review-critical-comparison-2026-10-17-claude --supports--> emitted-content-is-read-instructed-content-is-economised

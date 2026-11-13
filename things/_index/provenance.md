@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-11-10
-generated: 2026-11-10T22:39:46
-generated_from: HEAD@f95867a
-coverage: 151
+created: 2026-11-13
+generated: 2026-11-13T00:46:00
+generated_from: HEAD@2adf194
+coverage: 153
 framework_version: 3.51.0
 ---
 
@@ -509,6 +509,9 @@ framework_version: 3.51.0
 ## orchestration-specification
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
+## peer-loops
+- review-agent-coordination-leaders-2026-11-13-workspace-2 (pinned @2adf194f657f2e1f815185ae477282c2b941552e)
+
 ## phase-3-run-domain-task-reverted
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
 
@@ -538,6 +541,9 @@ framework_version: 3.51.0
 - retrospective-cadence-is-a-dated-chase-2026-09-13 (pinned @43dc588d461076773ff3a65b66537d2610bb03d5)
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @7487ab3c219946dc468ecda2ee228e4157437d6e)
 
+## review-agent-coordination-leaders-2026-11-13-workspace-2
+- peer-loops (derived-from)
+
 ## review-critical-comparison-2026-10-17-claude
 - glossary (derived-from)
 - limitations-guide (derived-from)
@@ -563,6 +569,7 @@ framework_version: 3.51.0
 
 ## review-peer-agent-loops-field-research-2026-11-10-workspace-2
 - peer-loops (derived-from)
+- review-agent-coordination-leaders-2026-11-13-workspace-2 (pinned @2adf194f657f2e1f815185ae477282c2b941552e)
 
 ## run-eval-cycle-0-polar-baseline-2026-10
 - the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
@@ -618,6 +625,7 @@ framework_version: 3.51.0
 ## standing-watch-specification
 - loop-turns-self-heal-2026-09-23 (pinned @446155b8936ef32de98af6d713d77a8700f4b4a2)
 - peer-loops (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
+- review-agent-coordination-leaders-2026-11-13-workspace-2 (pinned @2adf194f657f2e1f815185ae477282c2b941552e)
 - review-peer-agent-loops-field-research-2026-11-10-workspace-2 (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
 - run-membership-is-realisation-2026-09-22 (pinned @dc673b5e41755511c47f0a98e7b97e9f6bd52aaf)
 - ticket-is-the-ad-hoc-carrier-2026-09-30 (pinned @38ab1d8643f6baaa9df5ce92f356a5134603cca0)
