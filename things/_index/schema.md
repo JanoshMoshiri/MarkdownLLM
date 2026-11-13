@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-11-13
-generated: 2026-11-13T00:45:59
-generated_from: HEAD@2adf194
-coverage: 660
+generated: 2026-11-13T22:31:41
+generated_from: HEAD@83ad75d
+coverage: 662
 framework_version: 3.51.0
 ---
 
@@ -14,28 +14,28 @@ framework_version: 3.51.0
 
 | field | things using it |
 |---|---|
-| id | 660 |
-| type | 660 |
-| status | 660 |
-| created | 660 |
-| version | 585 |
-| tags | 552 |
-| linked_things | 413 |
+| id | 662 |
+| type | 662 |
+| status | 662 |
+| created | 662 |
+| version | 587 |
+| tags | 554 |
+| linked_things | 415 |
 | subject | 242 |
 | raised_at | 242 |
 | raised_by | 242 |
 | verdict | 242 |
 | verdict_reason | 242 |
-| origin | 228 |
-| session | 222 |
-| confidence | 215 |
-| informed_by | 211 |
+| origin | 229 |
+| session | 224 |
+| confidence | 216 |
+| informed_by | 213 |
 | source | 157 |
 | disposition_reason | 72 |
 | disposition | 71 |
 | priority | 66 |
-| decided_by | 49 |
-| exposed | 45 |
+| decided_by | 50 |
+| exposed | 47 |
 | promoted_to | 44 |
 | settles_when | 34 |
 | authorship | 23 |
@@ -44,8 +44,8 @@ framework_version: 3.51.0
 | period_start | 10 |
 | period_end | 10 |
 | domain | 10 |
-| definition | 6 |
-| current_stage | 6 |
+| definition | 7 |
+| current_stage | 7 |
 | index_of | 5 |
 | generated | 5 |
 | generated_from | 5 |
@@ -55,9 +55,9 @@ framework_version: 3.51.0
 | verified_by | 4 |
 | resolution | 4 |
 | parties | 4 |
+| definition_commit | 4 |
 | resolved_by | 3 |
 | stages | 3 |
-| definition_commit | 3 |
 | pattern_type | 2 |
 | demonstrates | 2 |
 | applies_to | 2 |

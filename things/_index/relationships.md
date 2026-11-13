@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-13
-generated: 2026-11-13T00:44:49
-generated_from: HEAD@2adf194
-coverage: 660
+generated: 2026-11-13T22:31:34
+generated_from: HEAD@83ad75d
+coverage: 662
 framework_version: 3.51.0
 ---
 
@@ -505,6 +505,11 @@ framework_version: 3.51.0
 - cross-domain-sync-catchup --extends--> provenance-specification
 - cross-domain-sync-catchup --extends--> change-reconciliation-specification
 - cross-domain-sync-catchup --complements--> mechanical-coherence-checks-backlog
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 --extends--> live-eval-scope-bounded-to-claude
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 --derived-from--> review-agent-coordination-leaders-2026-11-13-workspace-2
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 --references--> eval-cycle
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 --informs--> evidence-and-eval-backlog
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 --informs--> peer-loops
 - cue-a-check-run-where-it-cannot-see-mints-a-false-finding-2026-09-26 --subject--> a-check-run-where-it-cannot-see-mints-a-false-finding
 - cue-a-crossing-thing-carries-its-producers-private-graph-2026-09-13 --subject--> a-crossing-thing-carries-its-producers-private-graph
 - cue-a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist-2026-10-08 --subject--> a-decision-can-stake-itself-on-a-mechanism-that-does-not-exist
@@ -1649,6 +1654,11 @@ framework_version: 3.51.0
 - run-eval-cycle-0-polar-baseline-2026-10 --references--> eval-record-2026
 - run-eval-cycle-0-polar-baseline-2026-10 --references--> the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08
 - run-eval-cycle-0-polar-baseline-2026-10 --definition--> eval-cycle
+- run-eval-cycle-0-review-catch-baseline-2026-11 --implements--> cross-vendor-review-eval-opens-the-live-scope-2026-11-13
+- run-eval-cycle-0-review-catch-baseline-2026-11 --derived-from--> review-agent-coordination-leaders-2026-11-13-workspace-2
+- run-eval-cycle-0-review-catch-baseline-2026-11 --references--> eval-record-2026
+- run-eval-cycle-0-review-catch-baseline-2026-11 --informs--> peer-loops
+- run-eval-cycle-0-review-catch-baseline-2026-11 --definition--> eval-cycle
 - run-floor-sprint-1-2026-08 --references--> substrate-review-consolidated-remedy-2026-08-20
 - run-floor-sprint-1-2026-08 --definition--> substrate-floor-development
 - run-floor-sprint-2-2026-08 --references--> run-floor-sprint-1-2026-08

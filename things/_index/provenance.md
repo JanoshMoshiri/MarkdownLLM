@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-11-13
-generated: 2026-11-13T00:46:00
-generated_from: HEAD@2adf194
-coverage: 153
+generated: 2026-11-13T22:31:48
+generated_from: HEAD@83ad75d
+coverage: 155
 framework_version: 3.51.0
 ---
 
@@ -223,6 +223,9 @@ framework_version: 3.51.0
 - operator-queue-2026-08-28 (pinned @cb68dfb8468021db2a2a99b7ff889546b4d8bda4)
 - operator-queue-2026-08-28 (derived-from)
 - the-root-is-not-a-representative-domain (derived-from)
+
+## eval-cycle
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
 
 ## eval-record-2026
 - review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
@@ -442,6 +445,9 @@ framework_version: 3.51.0
 ## limitations-guide
 - review-memory-systems-reread-2026-11-09-workspace-1 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
 
+## live-eval-scope-bounded-to-claude
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
+
 ## llm-driven-systems-manifesto
 - review-memory-systems-reread-2026-11-09-workspace-1 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
 - review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
@@ -542,7 +548,11 @@ framework_version: 3.51.0
 - the-reckoning-is-the-digestion-beat-2026-10-05 (pinned @7487ab3c219946dc468ecda2ee228e4157437d6e)
 
 ## review-agent-coordination-leaders-2026-11-13-workspace-2
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
+- cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (derived-from)
 - peer-loops (derived-from)
+- run-eval-cycle-0-review-catch-baseline-2026-11 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
+- run-eval-cycle-0-review-catch-baseline-2026-11 (derived-from)
 
 ## review-critical-comparison-2026-10-17-claude
 - glossary (derived-from)

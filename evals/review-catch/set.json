@@ -1,0 +1,1375 @@
+{
+  "schema": 1,
+  "repo_head": "83ad75d008fdc7ad2f96a3f799c9c4327ca01b26",
+  "selection": {
+    "items": 16,
+    "controls": "walk chosen items by ascending sha; each takes the unused control with the closest changed_lines (ties: lower sha); one control per item",
+    "items_order": "sha ascending",
+    "id_shuffle_seed": 20261113,
+    "candidates_mined_at": "2026-11-13T22:26:21+00:00"
+  },
+  "entries": [
+    {
+      "id": "r001",
+      "commit": "6572fb76edd0a9d69a2dc4308491157e9bad8e90",
+      "date": "2026-08-13T05:42:52+01:00",
+      "subject": "evidence: POSIX floor verified on Linux — resolution, validation, git boundary; WSL interop defeats Windows-only skip guards",
+      "files": [
+        "tools/markdownllm/adapters/claude_code.py",
+        "tools/markdownllm/adapters/codex.py",
+        "tools/markdownllm/doctor.py",
+        "tools/markdownllm/harness_diagnostics.py",
+        "tools/markdownllm/harness_ports.py",
+        "tools/markdownllm/lifecycle_runner.py",
+        "tools/markdownllm/sync.py",
+        "tools/mdllm.py"
+      ],
+      "changed_lines": 186,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "244fdfea3941da020b742360a77cf3b0530403c5",
+          "fix_date": "2026-08-13T15:19:26+01:00",
+          "fix_subject": "fix: forward unused lifecycle budget to orientation",
+          "file": "tools/markdownllm/adapters/codex.py",
+          "ranges": [
+            [
+              283,
+              283
+            ]
+          ],
+          "share": 0.6154,
+          "days_to_fix": 0.4,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 21,
+            "ignored_moved": 8,
+            "ignored_blank": 0,
+            "blamed_lines": 13
+          }
+        },
+        {
+          "fix": "244fdfea3941da020b742360a77cf3b0530403c5",
+          "fix_date": "2026-08-13T15:19:26+01:00",
+          "fix_subject": "fix: forward unused lifecycle budget to orientation",
+          "file": "tools/markdownllm/harness_ports.py",
+          "ranges": [
+            [
+              59,
+              59
+            ],
+            [
+              88,
+              89
+            ],
+            [
+              95,
+              95
+            ]
+          ],
+          "share": 0.6154,
+          "days_to_fix": 0.4,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 21,
+            "ignored_moved": 8,
+            "ignored_blank": 0,
+            "blamed_lines": 13
+          }
+        },
+        {
+          "fix": "244fdfea3941da020b742360a77cf3b0530403c5",
+          "fix_date": "2026-08-13T15:19:26+01:00",
+          "fix_subject": "fix: forward unused lifecycle budget to orientation",
+          "file": "tools/markdownllm/lifecycle_runner.py",
+          "ranges": [
+            [
+              111,
+              111
+            ],
+            [
+              122,
+              123
+            ]
+          ],
+          "share": 0.6154,
+          "days_to_fix": 0.4,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 21,
+            "ignored_moved": 8,
+            "ignored_blank": 0,
+            "blamed_lines": 13
+          }
+        }
+      ]
+    },
+    {
+      "id": "r002",
+      "commit": "a86e328bc2745497f23ee8f27f05d445bdf4f66b",
+      "date": "2026-09-24T18:26:07+01:00",
+      "subject": "\"feat:add-openclaw-domain-admission-gate\"",
+      "files": [
+        "tools/markdownllm/adapters/openclaw.py",
+        "tools/markdownllm/harness_ports.py",
+        "tools/markdownllm/lifecycle_runner.py"
+      ],
+      "changed_lines": 161,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r003",
+      "commit": "99327652afc99d85a508e0ad759f3d53a7afd5fc",
+      "date": "2026-10-30T23:45:31Z",
+      "subject": "workflow+evals: the operator's evidence-led traceability loop is a workflow-definition (eval-cycle), cycle 0 is set at the polar baseline, a",
+      "files": [
+        "tools/markdownllm/evals.py"
+      ],
+      "changed_lines": 166,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r004",
+      "commit": "fda4fa8c48eca9289e7cabf55d2bd8b1684d0364",
+      "date": "2026-09-22T18:53:40+01:00",
+      "subject": "derive: the docs learn to read the tool — public-docs-face-build Phase 1",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/coherence.py",
+        "tools/markdownllm/docs_blocks.py"
+      ],
+      "changed_lines": 443,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "f29c96e404b8263c4b920db3b75c02d936e3cdcf",
+          "fix_date": "2026-09-22T19:06:56+01:00",
+          "fix_subject": "fix: the docs checks take the CLI's inventory from the root instead of reaching back for it",
+          "file": "tools/markdownllm/cli.py",
+          "ranges": [
+            [
+              90,
+              90
+            ]
+          ],
+          "share": 0.9211,
+          "days_to_fix": 0.01,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 41,
+            "ignored_moved": 3,
+            "ignored_blank": 0,
+            "blamed_lines": 38
+          }
+        },
+        {
+          "fix": "f29c96e404b8263c4b920db3b75c02d936e3cdcf",
+          "fix_date": "2026-09-22T19:06:56+01:00",
+          "fix_subject": "fix: the docs checks take the CLI's inventory from the root instead of reaching back for it",
+          "file": "tools/markdownllm/coherence.py",
+          "ranges": [
+            [
+              704,
+              704
+            ]
+          ],
+          "share": 0.9211,
+          "days_to_fix": 0.01,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 41,
+            "ignored_moved": 3,
+            "ignored_blank": 0,
+            "blamed_lines": 38
+          }
+        },
+        {
+          "fix": "f29c96e404b8263c4b920db3b75c02d936e3cdcf",
+          "fix_date": "2026-09-22T19:06:56+01:00",
+          "fix_subject": "fix: the docs checks take the CLI's inventory from the root instead of reaching back for it",
+          "file": "tools/markdownllm/docs_blocks.py",
+          "ranges": [
+            [
+              19,
+              24
+            ],
+            [
+              119,
+              120
+            ],
+            [
+              122,
+              123
+            ],
+            [
+              125,
+              126
+            ],
+            [
+              140,
+              141
+            ],
+            [
+              200,
+              200
+            ],
+            [
+              206,
+              206
+            ],
+            [
+              211,
+              211
+            ],
+            [
+              240,
+              245
+            ],
+            [
+              354,
+              355
+            ],
+            [
+              357,
+              357
+            ],
+            [
+              359,
+              359
+            ],
+            [
+              378,
+              378
+            ],
+            [
+              390,
+              391
+            ],
+            [
+              395,
+              395
+            ],
+            [
+              398,
+              398
+            ],
+            [
+              407,
+              407
+            ]
+          ],
+          "share": 0.9211,
+          "days_to_fix": 0.01,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 41,
+            "ignored_moved": 3,
+            "ignored_blank": 0,
+            "blamed_lines": 38
+          }
+        }
+      ]
+    },
+    {
+      "id": "r005",
+      "commit": "07590f833a0b1c57507c371296fe0fa6a043fae9",
+      "date": "2026-08-28T18:44:02+01:00",
+      "subject": "sense(floor): a skill that instructs vocabulary the schema never declared",
+      "files": [
+        "tools/markdownllm/coherence.py",
+        "tools/markdownllm/model.py",
+        "tools/markdownllm/skill_vocabulary.py",
+        "tools/markdownllm/validation.py",
+        "tools/mdllm.py"
+      ],
+      "changed_lines": 509,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r006",
+      "commit": "0fdc27714c07f7edbab8679f2f8752d1d8de6c6d",
+      "date": "2026-10-15T20:49:49+01:00",
+      "subject": "floor+spec: the seat — who sits in a clone, a guard on regenerating from behind, and the ticket as a work item (the-seat Phases 0 to 3)",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/coherence.py",
+        "tools/markdownllm/doctor.py",
+        "tools/markdownllm/domain_kernel.py",
+        "tools/markdownllm/refresh.py",
+        "tools/markdownllm/seat.py",
+        "tools/markdownllm/session.py"
+      ],
+      "changed_lines": 367,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r007",
+      "commit": "460bb5a8aaf89515fe62d6db6f7e65c9bed9f915",
+      "date": "2026-08-13T11:00:29+01:00",
+      "subject": "build: add explicit recognised-legacy adapter refresh",
+      "files": [
+        "tools/markdownllm/adapter_install.py",
+        "tools/markdownllm/adapters/claude_code.py",
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/doctor.py",
+        "tools/markdownllm/harness_diagnostics.py"
+      ],
+      "changed_lines": 415,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r008",
+      "commit": "690d75bd17c4c70a27c937fb0d1d56edc5665717",
+      "date": "2026-09-27T01:29:25+01:00",
+      "subject": "reconcile: make Codex Cloud a multi-repository workspace",
+      "files": [
+        "tools/markdownllm/adapters/codex_cloud.py",
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/cloud_bootstrap.py",
+        "tools/markdownllm/cloud_repositories.py",
+        "tools/markdownllm/cloud_service.py",
+        "tools/markdownllm/cloud_workspace.py",
+        "tools/markdownllm/sync.py"
+      ],
+      "changed_lines": 506,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "5359f5bd40e1617de0838b7d6ad98a646e07d37b",
+          "fix_date": "2026-09-27T11:28:45+01:00",
+          "fix_subject": "fix: keep Cloud host vocabulary explicit at the architecture gate",
+          "file": "tools/markdownllm/cloud_repositories.py",
+          "ranges": [
+            [
+              142,
+              142
+            ],
+            [
+              152,
+              152
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.42,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 2,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "r009",
+      "commit": "8830f3163bd5daa665fbe0204609f13ccfd22c58",
+      "date": "2026-10-05T22:05:37+01:00",
+      "subject": "floor: mdllm reckon — the reckoning reads every attention item's exit, in three bands; session-memory 1.9 → 1.10 (The Reckoning); the-reckon",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/reckon.py"
+      ],
+      "changed_lines": 433,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "75fd7dc905d507c551001dd510e33935a32a02d5",
+          "fix_date": "2026-10-21T01:03:49+01:00",
+          "fix_subject": "fix+reconcile: the Codex review of e5de9fa dispositioned — the composition report keeps its rank, the spec-only exception is stated, the Cop",
+          "file": "tools/markdownllm/reckon.py",
+          "ranges": [
+            [
+              376,
+              376
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 15.12,
+          "found_by_keywords": [
+            "review",
+            "codex",
+            "test",
+            "first",
+            "operator"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 1,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "r010",
+      "commit": "f258b0ebff4cd45d7a538698c8d1e2dc8d805554",
+      "date": "2026-10-30T22:27:41Z",
+      "subject": "floor+plan: a stalled turn rings — the seat reads unpublished commits and unanswered tickets against a window, and estate-sync and `mdllm se",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/seat.py",
+        "tools/markdownllm/session.py",
+        "tools/markdownllm/sync.py"
+      ],
+      "changed_lines": 214,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "bf2d230080bb08cf27afa82735b343bbec516c6b",
+          "fix_date": "2026-10-30T22:45:21Z",
+          "fix_subject": "fix: the stall ring is calibrated on the healthy rhythm, not the failures — a one-hour window, a one-day ceiling past which a ticket is aban",
+          "file": "tools/markdownllm/cli.py",
+          "ranges": [
+            [
+              274,
+              278
+            ],
+            [
+              509,
+              509
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.01,
+          "found_by_keywords": [
+            "test",
+            "first",
+            "live",
+            "operator"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 33,
+            "ignored_moved": 1,
+            "ignored_blank": 0,
+            "blamed_lines": 32
+          }
+        },
+        {
+          "fix": "bf2d230080bb08cf27afa82735b343bbec516c6b",
+          "fix_date": "2026-10-30T22:45:21Z",
+          "fix_subject": "fix: the stall ring is calibrated on the healthy rhythm, not the failures — a one-hour window, a one-day ceiling past which a ticket is aban",
+          "file": "tools/markdownllm/seat.py",
+          "ranges": [
+            [
+              34,
+              37
+            ],
+            [
+              51,
+              54
+            ],
+            [
+              154,
+              154
+            ],
+            [
+              189,
+              189
+            ],
+            [
+              191,
+              193
+            ],
+            [
+              198,
+              199
+            ],
+            [
+              202,
+              202
+            ],
+            [
+              206,
+              206
+            ],
+            [
+              211,
+              211
+            ],
+            [
+              217,
+              218
+            ],
+            [
+              253,
+              254
+            ],
+            [
+              256,
+              256
+            ],
+            [
+              260,
+              260
+            ],
+            [
+              317,
+              317
+            ],
+            [
+              322,
+              322
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.01,
+          "found_by_keywords": [
+            "test",
+            "first",
+            "live",
+            "operator"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 33,
+            "ignored_moved": 1,
+            "ignored_blank": 0,
+            "blamed_lines": 32
+          }
+        }
+      ]
+    },
+    {
+      "id": "r011",
+      "commit": "d47b86d3ef2449f01b4418fb5e47d4720afe4b53",
+      "date": "2026-08-08T12:17:51+01:00",
+      "subject": "v3.28.0 — the session gate: a contract-less session becomes loud at its first write, in any harness, with no adapter",
+      "files": [
+        "tools/markdownllm/session.py",
+        "tools/markdownllm/validation.py",
+        "tools/mdllm.py"
+      ],
+      "changed_lines": 74,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "a8786c2208a9a92d66e486d52c5cebd66535461e",
+          "fix_date": "2026-08-09T10:02:26+01:00",
+          "fix_subject": "fix(floor): the gate stops crying wolf at fresh clones",
+          "file": "tools/markdownllm/validation.py",
+          "ranges": [
+            [
+              716,
+              717
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.91,
+          "found_by_keywords": [
+            "operator"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 10,
+            "ignored_moved": 8,
+            "ignored_blank": 0,
+            "blamed_lines": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "r012",
+      "commit": "75cf830e04be18cfd2483e310a83558e1edc4c6c",
+      "date": "2026-09-24T20:09:29+01:00",
+      "subject": "session-end: build reusable Codex Cloud workspace setup",
+      "files": [
+        "tools/markdownllm/adapters/codex.py",
+        "tools/markdownllm/adapters/codex_cloud.py",
+        "tools/markdownllm/bundle_service.py",
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/cloud_bootstrap.py",
+        "tools/markdownllm/cloud_service.py",
+        "tools/markdownllm/cloud_workspace.py",
+        "tools/markdownllm/doctor.py",
+        "tools/markdownllm/harness_ports.py",
+        "tools/markdownllm/sync.py"
+      ],
+      "changed_lines": 458,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r013",
+      "commit": "69963094b53426306442f503044cf206f0ef467c",
+      "date": "2026-08-11T19:27:41+01:00",
+      "subject": "extract: Claude behind the accepted ports — Phase 2C of vendor-harness-adapter-foundation (adapters/ registry + claude_code adapter own rend",
+      "files": [
+        "tools/markdownllm/adapters/__init__.py",
+        "tools/markdownllm/adapters/claude_code.py",
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/doctor.py",
+        "tools/markdownllm/harness_ports.py",
+        "tools/markdownllm/scaffold.py"
+      ],
+      "changed_lines": 421,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "f64480cf01acbc60219d9bc957175aa8b8807b8e",
+          "fix_date": "2026-08-12T22:53:05+01:00",
+          "fix_subject": "fix: withdraw false Claude ordering claim",
+          "file": "tools/markdownllm/adapters/claude_code.py",
+          "ranges": [
+            [
+              17,
+              20
+            ],
+            [
+              61,
+              61
+            ],
+            [
+              78,
+              78
+            ]
+          ],
+          "share": 0.6667,
+          "days_to_fix": 1.14,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 9,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 9
+          }
+        }
+      ]
+    },
+    {
+      "id": "r014",
+      "commit": "8d3a635f49dfb5a58e3b44ebe4facd50e7e36c5a",
+      "date": "2026-09-23T20:48:00+01:00",
+      "subject": "build: the between-sessions band gets its actor — a loop heals its own dropped turn, the cue raise is mechanical, and the dispatcher's tick ",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/touchpoints.py",
+        "tools/markdownllm/watch.py"
+      ],
+      "changed_lines": 181,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r015",
+      "commit": "ae4e61d0ba02999c868474b8dcbdd6611f436907",
+      "date": "2026-10-05T09:38:01+01:00",
+      "subject": "floor+harness: the gate demands the walk, not a verdict — cues --staged --raise prefills the dependants as a checklist; a regenerated block ",
+      "files": [
+        "tools/markdownllm/adapters/claude_code.py",
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/touchpoints.py"
+      ],
+      "changed_lines": 229,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r016",
+      "commit": "ba65fb598654e1dfd01a6570118463575ff2d153",
+      "date": "2026-07-28T00:08:45+01:00",
+      "subject": "floor: both sync directions become visible consumer-side — imports-check gains DIVERGED (pin current, content differs: the loop was bypassed",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/imports_check.py",
+        "tools/mdllm.py"
+      ],
+      "changed_lines": 230,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "0200054786935b695b76367eb796f07d7cc1bee6",
+          "fix_date": "2026-08-05T15:57:05+01:00",
+          "fix_subject": "fix: pin comparison survives YAML int coercion — _pins_match normalises both sides to str (vantage-brief-cluster phase 1; the all-digit-hash",
+          "file": "tools/markdownllm/imports_check.py",
+          "ranges": [
+            [
+              148,
+              148
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 8.66,
+          "found_by_keywords": [
+            "ci"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 1,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "r017",
+      "commit": "89d1e7ad72c5b9a9d5a57d74c3021b98ff066b6d",
+      "date": "2026-08-18T14:55:00+01:00",
+      "subject": "build: guarded publication — Phase 2 of cowork-adapter",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/publish.py"
+      ],
+      "changed_lines": 218,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r018",
+      "commit": "6de8474be2cbba78ad08accc7d64fd94c331553f",
+      "date": "2026-09-08T01:07:23+01:00",
+      "subject": "floor: the stale-open-conflict Info both specs promised, and the hold marker on conflicts",
+      "files": [
+        "tools/markdownllm/validation.py",
+        "tools/mdllm.py"
+      ],
+      "changed_lines": 95,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r019",
+      "commit": "f041d4b4f8cbaf1b805d38651e5c33a08d67339a",
+      "date": "2026-08-18T15:08:40+01:00",
+      "subject": "build: assemble + the rendered bundle — Phase 3 of cowork-adapter",
+      "files": [
+        "tools/markdownllm/adapters/cowork.py",
+        "tools/markdownllm/assemble.py",
+        "tools/markdownllm/bundle_service.py",
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/harness_ports.py"
+      ],
+      "changed_lines": 565,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "f87a9b9b97688986a7d4c407a2d26aa61803e50f",
+          "fix_date": "2026-08-18T16:13:07+01:00",
+          "fix_subject": "fix: refuse to build a bundle the harness would reject at install",
+          "file": "tools/markdownllm/adapters/cowork.py",
+          "ranges": [
+            [
+              139,
+              139
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.04,
+          "found_by_keywords": [
+            "test",
+            "first",
+            "operator"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 2,
+            "ignored_moved": 1,
+            "ignored_blank": 0,
+            "blamed_lines": 1
+          }
+        },
+        {
+          "fix": "646bf8603292b0b6b42253177bd2e339def8e7b7",
+          "fix_date": "2026-08-18T15:11:28+01:00",
+          "fix_subject": "fix: bundle bytes are LF-only and the mechanism hash is EOL-stable",
+          "file": "tools/markdownllm/adapters/cowork.py",
+          "ranges": [
+            [
+              104,
+              104
+            ],
+            [
+              124,
+              124
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.0,
+          "found_by_keywords": [],
+          "fix_line_filter": {
+            "old_side_lines": 2,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "r020",
+      "commit": "27b072371d83a5971d90a27c243cfa5b3f5942dd",
+      "date": "2026-08-13T05:31:52+01:00",
+      "subject": "fix: centralize prefix-aware runtime candidates",
+      "files": [
+        "tools/markdownllm/adapters/codex.py",
+        "tools/markdownllm/runtime.py",
+        "tools/markdownllm/scaffold.py"
+      ],
+      "changed_lines": 167,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "82f2cfc6883badd074c6e565517a597659300c6b",
+          "fix_date": "2026-08-13T06:02:26+01:00",
+          "fix_subject": "fix: bound shared Windows launch resolution",
+          "file": "tools/markdownllm/adapters/codex.py",
+          "ranges": [
+            [
+              45,
+              45
+            ],
+            [
+              194,
+              195
+            ],
+            [
+              198,
+              199
+            ],
+            [
+              201,
+              202
+            ],
+            [
+              205,
+              209
+            ],
+            [
+              212,
+              212
+            ]
+          ],
+          "share": 0.7021,
+          "days_to_fix": 0.02,
+          "found_by_keywords": [
+            "codex"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 50,
+            "ignored_moved": 0,
+            "ignored_blank": 3,
+            "blamed_lines": 47
+          }
+        },
+        {
+          "fix": "82f2cfc6883badd074c6e565517a597659300c6b",
+          "fix_date": "2026-08-13T06:02:26+01:00",
+          "fix_subject": "fix: bound shared Windows launch resolution",
+          "file": "tools/markdownllm/runtime.py",
+          "ranges": [
+            [
+              74,
+              74
+            ],
+            [
+              85,
+              85
+            ],
+            [
+              106,
+              108
+            ],
+            [
+              110,
+              114
+            ],
+            [
+              116,
+              119
+            ],
+            [
+              121,
+              126
+            ]
+          ],
+          "share": 0.7021,
+          "days_to_fix": 0.02,
+          "found_by_keywords": [
+            "codex"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 50,
+            "ignored_moved": 0,
+            "ignored_blank": 3,
+            "blamed_lines": 47
+          }
+        },
+        {
+          "fix": "59d023bb876427507890710250accecf1bb4aae2",
+          "fix_date": "2026-08-13T05:46:05+01:00",
+          "fix_subject": "fix: keep POSIX resolution inside its host boundary",
+          "file": "tools/markdownllm/runtime.py",
+          "ranges": [
+            [
+              59,
+              63
+            ],
+            [
+              65,
+              68
+            ],
+            [
+              75,
+              76
+            ],
+            [
+              78,
+              81
+            ],
+            [
+              86,
+              86
+            ],
+            [
+              115,
+              115
+            ],
+            [
+              120,
+              120
+            ],
+            [
+              134,
+              135
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.01,
+          "found_by_keywords": [
+            "codex"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 20,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "r021",
+      "commit": "4c2a3ddeecd37004ec5d7fa4efdccbe34fe20df8",
+      "date": "2026-07-16T06:31:35+01:00",
+      "subject": "floor: quarantine flip discipline — born-verified + verified_by attribution checks in validate (Warning default, options.quarantine: strict ",
+      "files": [
+        "tools/markdownllm/model.py",
+        "tools/markdownllm/validation.py",
+        "tools/mdllm.py"
+      ],
+      "changed_lines": 95,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "1d841e6e4c808fc96133715dd9836c847afd3e01",
+          "fix_date": "2026-07-21T22:55:36+01:00",
+          "fix_subject": "fix: _git_stdout decodes git output as UTF-8, not the platform locale",
+          "file": "tools/markdownllm/validation.py",
+          "ranges": [
+            [
+              392,
+              393
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 5.68,
+          "found_by_keywords": [
+            "operator",
+            "use"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 2,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "r022",
+      "commit": "9f0cc58ce63168642381af315547ed8ba746da0b",
+      "date": "2026-11-10T09:27:29Z",
+      "subject": "floor+decision: vault-map — a generated map folder beside the workspaces for markdown-vault tools, and the substrate picks no surface",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/session.py",
+        "tools/markdownllm/vault_map.py"
+      ],
+      "changed_lines": 523,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r023",
+      "commit": "5237b9f7148f924950595011a118c22086acac49",
+      "date": "2026-08-20T08:31:38+01:00",
+      "subject": "harden: kernel emitted, not instructed — channel-aware Tier-0 delivery (Phase 2)",
+      "files": [
+        "tools/markdownllm/lifecycle_runner.py",
+        "tools/markdownllm/session.py",
+        "tools/markdownllm/validation.py"
+      ],
+      "changed_lines": 227,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r024",
+      "commit": "413a082118ffbf8e8463b948eb5907635945dbf6",
+      "date": "2026-08-21T22:01:16+01:00",
+      "subject": "build: mdllm precommit — the hook's four legs, concurrent against one candidate (F11 / remedy 3C)",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/precommit.py",
+        "tools/markdownllm/scaffold.py"
+      ],
+      "changed_lines": 154,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "039dd84761440bde228040c859aa31e69244fb00",
+          "fix_date": "2026-09-12T18:06:15+01:00",
+          "fix_subject": "fix: the hook's block message stops advertising --no-verify",
+          "file": "tools/markdownllm/precommit.py",
+          "ranges": [
+            [
+              43,
+              44
+            ],
+            [
+              47,
+              48
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 21.84,
+          "found_by_keywords": [
+            "review",
+            "test",
+            "operator"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 4,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 4
+          }
+        },
+        {
+          "fix": "3daf1d18bc133be6978946dac158d6870617b40e",
+          "fix_date": "2026-08-21T22:23:02+01:00",
+          "fix_subject": "fix: coordinator children run the entry the hook invoked; CAS fixture follows the composition",
+          "file": "tools/markdownllm/precommit.py",
+          "ranges": [
+            [
+              61,
+              61
+            ],
+            [
+              63,
+              63
+            ],
+            [
+              88,
+              88
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.02,
+          "found_by_keywords": [
+            "test"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 3,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "r025",
+      "commit": "f29c96e404b8263c4b920db3b75c02d936e3cdcf",
+      "date": "2026-09-22T19:06:56+01:00",
+      "subject": "fix: the docs checks take the CLI's inventory from the root instead of reaching back for it",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/coherence.py",
+        "tools/markdownllm/docs_blocks.py"
+      ],
+      "changed_lines": 122,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "446155b8936ef32de98af6d713d77a8700f4b4a2",
+          "fix_date": "2026-09-22T22:54:45+01:00",
+          "fix_subject": "fix: the toolbox renders on the site — two kramdown differences the blob view never showed",
+          "file": "tools/markdownllm/docs_blocks.py",
+          "ranges": [
+            [
+              257,
+              257
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.16,
+          "found_by_keywords": [
+            "test",
+            "live",
+            "operator"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 1,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "r026",
+      "commit": "927693f57299fe716dc6b63c6d49dcc3d4ed11f8",
+      "date": "2026-08-30T19:20:02+01:00",
+      "subject": "floor(membrane): the route is proven end-to-end — three defects between the grant and the first read",
+      "files": [
+        "tools/markdownllm/imports_check.py",
+        "tools/markdownllm/mcp_server.py",
+        "tools/markdownllm/repository_view.py"
+      ],
+      "changed_lines": 123,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r027",
+      "commit": "6d3aa819e798dfa3daf2e34c8763a5a29dbcf6e6",
+      "date": "2026-08-22T09:10:49+01:00",
+      "subject": "framework: F5 — adapter duplication collapses into project_hook_emission, byte-identical",
+      "files": [
+        "tools/markdownllm/adapters/claude_code.py",
+        "tools/markdownllm/adapters/codex.py",
+        "tools/markdownllm/adapters/project_hook_emission.py"
+      ],
+      "changed_lines": 299,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r028",
+      "commit": "371692df3b225ecaf5c75799509efcbb29c15c49",
+      "date": "2026-08-15T18:25:54+01:00",
+      "subject": "remove: the assistant-register Phase 0 prototype — the decision cancelled it, so the flag, renderer, its twelve register-only helpers, the o",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/session.py"
+      ],
+      "changed_lines": 399,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r029",
+      "commit": "58212ce7767ebac99e8928101cecacf13eb3bf9d",
+      "date": "2026-10-05T22:53:08+01:00",
+      "subject": "fix(eval): close the answer-key grant, make committed state the carrier, add the hint-matched arm and delta scoring — the 2026-10-05 cold-re",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/evals.py"
+      ],
+      "changed_lines": 306,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "374b59657de2fb3b07edf8148a2cfdfbddf83a65",
+          "fix_date": "2026-10-05T23:08:36+01:00",
+          "fix_subject": "fix(eval): the first guarded smoke found three runner bugs — anchor the answer-key pattern so the run root (mdllm-evals/) does not void ever",
+          "file": "tools/markdownllm/evals.py",
+          "ranges": [
+            [
+              148,
+              149
+            ],
+            [
+              200,
+              203
+            ],
+            [
+              206,
+              207
+            ],
+            [
+              209,
+              209
+            ],
+            [
+              662,
+              662
+            ],
+            [
+              727,
+              727
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.01,
+          "found_by_keywords": [
+            "smoke",
+            "first"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 11,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 11
+          }
+        }
+      ]
+    },
+    {
+      "id": "r030",
+      "commit": "9f506ee30d6de0112a91db4086b85532295a825c",
+      "date": "2026-10-16T09:41:29+01:00",
+      "subject": "harness: the commit gate runs where the commit lands — a session committing in a nested workspace is gated there (cue-carrier Phase 7(h))",
+      "files": [
+        "tools/markdownllm/lifecycle_runner.py"
+      ],
+      "changed_lines": 75,
+      "kind": "control",
+      "defects": []
+    },
+    {
+      "id": "r031",
+      "commit": "065248158f482fbec32377c41ed8ab62c57e5004",
+      "date": "2026-07-28T11:47:26+01:00",
+      "subject": "floor: mdllm estate-sync — the machine axis mechanised; discovery walks root + domain(s)/* (repos-not-membranes, the estate-check guardrail ",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/sync.py",
+        "tools/mdllm.py"
+      ],
+      "changed_lines": 224,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "2bdc60f7faed91db670f468df286f604c20217c3",
+          "fix_date": "2026-08-18T14:57:26+01:00",
+          "fix_subject": "fix: make explicit estate freshness route Codex approval",
+          "file": "tools/markdownllm/cli.py",
+          "ranges": [
+            [
+              206,
+              206
+            ],
+            [
+              209,
+              209
+            ]
+          ],
+          "share": 0.6429,
+          "days_to_fix": 21.13,
+          "found_by_keywords": [
+            "codex"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 18,
+            "ignored_moved": 4,
+            "ignored_blank": 0,
+            "blamed_lines": 14
+          }
+        },
+        {
+          "fix": "2bdc60f7faed91db670f468df286f604c20217c3",
+          "fix_date": "2026-08-18T14:57:26+01:00",
+          "fix_subject": "fix: make explicit estate freshness route Codex approval",
+          "file": "tools/markdownllm/sync.py",
+          "ranges": [
+            [
+              154,
+              154
+            ],
+            [
+              163,
+              163
+            ],
+            [
+              177,
+              178
+            ],
+            [
+              188,
+              188
+            ],
+            [
+              191,
+              191
+            ],
+            [
+              193,
+              193
+            ]
+          ],
+          "share": 0.6429,
+          "days_to_fix": 21.13,
+          "found_by_keywords": [
+            "codex"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 18,
+            "ignored_moved": 4,
+            "ignored_blank": 0,
+            "blamed_lines": 14
+          }
+        }
+      ]
+    },
+    {
+      "id": "r032",
+      "commit": "e2bad9f808fef9d6721cf91d8bc333db82766776",
+      "date": "2026-09-12T18:28:06+01:00",
+      "subject": "build: the cue carrier — `type: cue`, `mdllm cues`, and a session-start line that waits until a human answers",
+      "files": [
+        "tools/markdownllm/cli.py",
+        "tools/markdownllm/model.py",
+        "tools/markdownllm/session.py",
+        "tools/markdownllm/structural_refs.py",
+        "tools/markdownllm/touchpoints.py",
+        "tools/markdownllm/validation.py"
+      ],
+      "changed_lines": 352,
+      "kind": "item",
+      "defects": [
+        {
+          "fix": "812f7d7e7dec59fbbd404e1c6e1f82fbafe3ccca",
+          "fix_date": "2026-09-13T14:31:57+01:00",
+          "fix_subject": "fix: the cue walk read a bare --since date as \"today at now\", so the retrospective's own day was dark",
+          "file": "tools/markdownllm/touchpoints.py",
+          "ranges": [
+            [
+              353,
+              353
+            ]
+          ],
+          "share": 1.0,
+          "days_to_fix": 0.84,
+          "found_by_keywords": [
+            "test"
+          ],
+          "fix_line_filter": {
+            "old_side_lines": 1,
+            "ignored_moved": 0,
+            "ignored_blank": 0,
+            "blamed_lines": 1
+          }
+        }
+      ]
+    }
+  ]
+}
