@@ -2,7 +2,7 @@
 id: run-eval-cycle-0-review-catch-baseline-2026-11
 type: workflow-run
 status: active
-version: 1.0
+version: 1.1
 created: 2026-11-13
 session: 2026-11-11/13
 definition: eval-cycle
@@ -34,10 +34,42 @@ linked_things:
 
 At `set-scene`. The review set was frozen on 2026-11-13 and its hash is in
 the table below. This run is committed with its hypothesis before any
-reviewer's output exists. One thing is still owed before the stage moves
-to `baseline`: one smoke review per vendor runs clean from the operator's
-terminal. A smoke review goes to a scratch folder under trial 0 and is
-never scored. The baseline is the operator's stage.
+reviewer's output exists. One smoke review per vendor ran clean on
+2026-11-14 (next section). One thing is still owed before the stage moves
+to `baseline`: the operator names the baseline reviewer's full model id.
+The baseline is the operator's stage.
+
+## Smoke reviews, 2026-11-14
+
+A smoke review goes to a scratch folder under trial 0 and is never scored.
+The operator told the session to launch them. They ran in the operator's
+terminal, on the operator's accounts, on one entry, into `evals/runs/`,
+which git ignores. The decision's line that no agent launches a reviewer
+stands for scored trials.
+
+- **Claude: clean at the first attempt.** Build 2.1.318, placeholder model
+  `claude-opus-5-5`, 54 seconds, 11 turns, ten read and search calls,
+  nothing outside the folder, two findings offered and kept. The flag
+  combination the README marked untried works. The harness also called a
+  smaller model of its own beside the one requested, so a trial records
+  every model observed. That is confound 6 seen in practice.
+- **Codex: void twice, then clean.** Two causes, both in the launch and
+  neither in the review. The command-line Codex on this machine is build
+  0.147.0 and is not offered the model the operator's Codex seat runs; the
+  desktop app carries a newer build that is. And `--ignore-user-config`
+  did not stop Codex dialling the account's connected apps. The runner now
+  switches eight features off (README, *Codex*). Rerun on a model the
+  command-line build does offer, `gpt-5.6-sol`: 58 seconds, six shell
+  commands all inside the folder, no connector dialled, two findings.
+  Codex names no model in its events, so the requested id is the only
+  record of the reviewer.
+- **What changed after the freeze.** The runner's Codex flags, on the
+  error text of a launch that failed. The review set and the instruction
+  are unchanged and their hashes stand. No scored review existed.
+- **Owed before cycle 1, not before the baseline.** Either the
+  command-line Codex is updated until it offers the model the operator's
+  Codex seat runs, or cycle 1 names the older model and says so. This is
+  the operator's choice: it changes software on the operator's machine.
 
 ## The question
 

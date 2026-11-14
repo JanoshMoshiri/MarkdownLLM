@@ -3,9 +3,9 @@ id: framework-schema-index
 type: index
 status: live
 index_of: schema
-created: 2026-11-13
-generated: 2026-11-13T22:31:41
-generated_from: HEAD@83ad75d
+created: 2026-11-14
+generated: 2026-11-14T17:29:08
+generated_from: HEAD@888eb7b
 coverage: 662
 framework_version: 3.51.0
 ---

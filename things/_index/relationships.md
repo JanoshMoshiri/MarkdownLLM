@@ -3,9 +3,9 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-13
-generated: 2026-11-13T22:31:34
-generated_from: HEAD@83ad75d
+created: 2026-11-14
+generated: 2026-11-14T17:29:06
+generated_from: HEAD@888eb7b
 coverage: 662
 framework_version: 3.51.0
 ---
@@ -1484,6 +1484,7 @@ framework_version: 3.51.0
 - peer-loops --references--> workflow-state-specification
 - peer-loops --references--> a-filter-is-a-missing-instance
 - peer-loops --derived-from--> review-agent-coordination-leaders-2026-11-13-workspace-2
+- peer-loops --references--> cross-vendor-review-eval-opens-the-live-scope-2026-11-13
 - peer-loops --references--> run-membership-is-realisation-2026-09-22
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-built-inbound-only

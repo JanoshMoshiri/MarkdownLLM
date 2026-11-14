@@ -3,9 +3,9 @@ id: framework-triggers-index
 type: index
 status: live
 index_of: triggers
-created: 2026-11-10
-generated: 2026-11-10T22:39:45
-generated_from: HEAD@f95867a
+created: 2026-11-14
+generated: 2026-11-14T17:29:43
+generated_from: HEAD@888eb7b
 coverage: 10
 framework_version: 3.51.0
 ---
@@ -31,7 +31,7 @@ framework_version: 3.51.0
 
 ## peer-loops
 - status: in-progress  due_date: —
-- trigger: type=time, condition=2026-11-24 reached, action=surface, note=Has Phase 1's proof crossed? One ticket between the two substrate clones, a note landing mid-task, no body past a page, and the wake carrying the two lines and the last turns. If it has not, say which of the three it stopped at: the payload was not built, the clones were not armed, or the ticket crossed and the body still grew. Also read whether the operator has declared a seat and a signing key, which Phase 2 waits on and no agent may do for them.
+- trigger: type=time, condition=2026-11-24 reached, action=surface, note=Has Phase 1's proof crossed? One ticket between the two substrate clones, a note landing mid-task, no body past a page, and the wake carrying the two lines and the last turns. If it has not, say which of the three it stopped at: the payload was not built, the clones were not armed, or the ticket crossed and the body still grew. Then Phase 2: has the operator picked the star lane, and has it started? Also read whether the operator has declared a seat and a signing key, which Phase 5 waits on and no agent may do for them.
 
 ## substrate-native-a2a
 - status: in-progress  due_date: —

@@ -212,13 +212,23 @@ def claude_command(base: list[str], model: str, prompt: str) -> list[str]:
             "--permission-prompts", "none"]
 
 
+# Codex features switched off for a review. `--ignore-user-config` drops the
+# config file but not the account's connectors: the first smoke review
+# (2026-11-14) showed Codex still dialling the operator's connected apps. A
+# reviewer gets the shell in a read-only sandbox and nothing else.
+CODEX_FEATURES_OFF = ("apps", "plugins", "hooks", "memories", "multi_agent",
+                      "browser_use", "computer_use", "image_generation")
+
+
 def codex_command(base: list[str], model: str, folder: Path, last_file: Path) -> list[str]:
     # Prompt arrives on stdin ("-"), so no multi-line argument crosses a shell.
+    off = [flag for name in CODEX_FEATURES_OFF for flag in ("--disable", name)]
     return [*base, "exec",
             "--skip-git-repo-check",
             "--ephemeral",
             "--ignore-user-config",
             "--ignore-rules",
+            *off,
             "--sandbox", "read-only",
             "--model", model,
             "--cd", str(folder),

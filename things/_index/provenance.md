@@ -3,9 +3,9 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-11-13
-generated: 2026-11-13T22:31:48
-generated_from: HEAD@83ad75d
+created: 2026-11-14
+generated: 2026-11-14T17:29:09
+generated_from: HEAD@888eb7b
 coverage: 155
 framework_version: 3.51.0
 ---
@@ -550,6 +550,7 @@ framework_version: 3.51.0
 ## review-agent-coordination-leaders-2026-11-13-workspace-2
 - cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
 - cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (derived-from)
+- peer-loops (pinned @888eb7b388ff121e55664f8f42b580912c8d8656)
 - peer-loops (derived-from)
 - run-eval-cycle-0-review-catch-baseline-2026-11 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
 - run-eval-cycle-0-review-catch-baseline-2026-11 (derived-from)

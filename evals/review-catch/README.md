@@ -125,6 +125,14 @@ The flags are `--skip-git-repo-check`, `--ephemeral`, `--ignore-user-config` (no
 `config.toml`, so none of its MCP servers, profiles or hooks), `--ignore-rules` (no
 execpolicy `.rules`), `--sandbox read-only`, `--cd <folder>`, `--json` and
 `--output-last-message <file outside the folder>`. The prompt is sent on stdin (`-`).
+Eight features are switched off with `--disable`: `apps`, `plugins`, `hooks`,
+`memories`, `multi_agent`, `browser_use`, `computer_use` and `image_generation`. The
+first smoke review (2026-11-14) showed that `--ignore-user-config` alone left Codex
+dialling the account's connected apps.
+
+The command-line Codex and the desktop app are separate installs and can be different
+versions offering different models. The model id passed to `--model` must be one the
+command-line build offers; the runner records the build per trial.
 
 What could NOT be isolated:
 
