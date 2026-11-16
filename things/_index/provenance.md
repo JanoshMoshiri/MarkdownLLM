@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-11-14
-generated: 2026-11-14T17:29:09
-generated_from: HEAD@888eb7b
-coverage: 155
+created: 2026-11-16
+generated: 2026-11-16T18:52:43
+generated_from: HEAD@20c5682
+coverage: 157
 framework_version: 3.51.0
 ---
 
@@ -113,6 +113,9 @@ framework_version: 3.51.0
 
 ## coherence-mechanism-build
 - floor-sprint-3-scope-2026-08-23 (pinned @b764aaf96096caeea4be3ce2a77f9b1c9d4039d2)
+
+## coordination-claim-specification
+- review-agent-swarms-scaling-limit-2026-11-16-workspace-2 (pinned @20c56827419e9c4a58174f1ac6c008ba0b650281)
 
 ## cowork-adapter
 - a-consuming-environments-gate-is-a-build-time-constraint (derived-from)
@@ -517,6 +520,7 @@ framework_version: 3.51.0
 
 ## peer-loops
 - review-agent-coordination-leaders-2026-11-13-workspace-2 (pinned @2adf194f657f2e1f815185ae477282c2b941552e)
+- review-agent-swarms-scaling-limit-2026-11-16-workspace-2 (pinned @20c56827419e9c4a58174f1ac6c008ba0b650281)
 
 ## phase-3-run-domain-task-reverted
 - substrate-native-a2a (pinned @cb1f86bd01866ffea2e5d4ce69cb18859272fe58)
@@ -552,8 +556,12 @@ framework_version: 3.51.0
 - cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (derived-from)
 - peer-loops (pinned @888eb7b388ff121e55664f8f42b580912c8d8656)
 - peer-loops (derived-from)
+- review-agent-swarms-scaling-limit-2026-11-16-workspace-2 (pinned @20c56827419e9c4a58174f1ac6c008ba0b650281)
 - run-eval-cycle-0-review-catch-baseline-2026-11 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
 - run-eval-cycle-0-review-catch-baseline-2026-11 (derived-from)
+
+## review-agent-swarms-scaling-limit-2026-11-16-workspace-2
+- peer-loops (derived-from)
 
 ## review-critical-comparison-2026-10-17-claude
 - glossary (derived-from)

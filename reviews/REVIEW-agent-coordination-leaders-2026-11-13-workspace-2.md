@@ -3,7 +3,7 @@ id: review-agent-coordination-leaders-2026-11-13-workspace-2
 type: artifact
 status: evolving
 authorship: model-session
-version: 1.0
+version: 1.1
 created: 2026-11-13
 session: 2026-11-11/13
 origin: synthesised
@@ -61,6 +61,16 @@ overrides two of the report's inferences, and states what the loop is for.
   to pursue as an eval: nobody has published the catch rate of cross-vendor
   review against same-model review with the reviewer isolated from the
   author's verdict.
+
+- **Correction of 2026-11-16: the three-to-four-agents line.** Below, per-agent
+  capacity is said to thin beyond three or four agents, and that is tied to
+  the wakes failing at four or five loops. Both are wrong. Kim et al. held
+  almost every configuration at three workers and matched the total
+  reasoning budget; the sentence is their extrapolation from a curve fitted
+  to coordination turns under that fixed budget, and their own small sweep
+  peaked at five to seven agents. Each seat in a star has its own budget
+  and context, so the mechanism does not apply to concurrent loops
+  (`review-agent-swarms-scaling-limit-2026-11-16-workspace-2`).
 
 The report follows as written, its first line excepted.
 

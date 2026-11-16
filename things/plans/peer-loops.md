@@ -2,7 +2,7 @@
 id: peer-loops
 type: plan
 status: in-progress
-version: 2.0
+version: 2.1
 created: 2026-11-10
 priority: high
 origin: stated
@@ -59,6 +59,12 @@ linked_things:
   - id: review-agent-coordination-leaders-2026-11-13-workspace-2
     relation: derived-from
     notes: "The wider reading of the field made after the operator stepped back on 2026-11-12, against the shape the operator actually runs. Everything after Phase 1 was re-cut against it on 2026-11-14 (version 2.0)."
+  - id: review-agent-swarms-scaling-limit-2026-11-16-workspace-2
+    relation: derived-from
+    notes: "How swarms of tens to thousands of agents coordinate, read on 2026-11-16 against the operator's shape of a hub, two or three spokes and one graph per spoke. The Graphs Below A Spoke section and Phase 8 are written from it."
+  - id: coordination-claim-specification
+    relation: references
+    notes: "A graph's workers claim nodes. Phase 8 tests the claim under contention before any change to it is proposed."
   - id: cross-vendor-review-eval-opens-the-live-scope-2026-11-13
     relation: references
     notes: "Phase 4, review that starts blind, waits on what that programme finds. Who reviews whom in a star is written from its record and not from the field's argument alone."
@@ -222,6 +228,106 @@ the estate sync already compute all three. Spoken by the hub on request,
 they are the single inbox the review found the operator lacks, with
 nothing built.
 
+**A first look at a live star, 2026-11-16.** Two of the operator's loops
+were read from their shared history before Phase 2: a hub with one
+Hermes spoke, and a hub with two Codex lanes and the same Hermes spoke.
+The operator had begun waking the Hermes spoke over SSH from the hub.
+What the record showed, and what the operator corrected:
+
+- Every handover went spoke to hub or hub to spoke, though the
+  workspace's turn graph lets any seat address any other. The star held
+  as a habit. That is the evidence for leaving its floor check unbuilt.
+- The hub answered its 17 handovers that day with a median of three
+  minutes.
+- The spoke's stalls were turns that ended before handing back, and a
+  watch that hit its notification cap. They were not a bell that failed
+  to ring. Each time, the hub wrote a note on the ticket and then woke
+  the spoke over SSH. The babysitting moved from the operator to the hub.
+- One spoke serving two lanes left one lane without a turn for two days
+  until the hub set the order.
+- The hub's turns were committed under another seat's name, because the
+  clone it ran in was declared for that seat. Phase 2 measures from
+  status moves, never from authors.
+- **Corrected by the operator.** A ticket that read as stalled on the hub
+  had been paused deliberately. A quiet day was the operator's own quiet
+  day. Two silent lanes were silent because the operator had switched
+  their runners off. None of that was in the record. Stall readings from
+  the record alone mislead while the operator's pauses go unrecorded, and
+  the operator means to record them.
+
+Three things follow, and are added to Phase 2. The waker list gains
+`hub`. A hub's nudge is written on the ticket first and then delivered by
+whatever channel reaches the spoke: SSH, a harness's own messages, a
+queue. The ticket stays the truth, and the shape does not depend on any
+one channel. And a spoke holds one lane at a time, or the hub sets its
+order on the ticket.
+
+## Graphs Below A Spoke
+
+*Added 2026-11-16, from the operator's shape and the reading of the
+field it was checked against
+(`review-agent-swarms-scaling-limit-2026-11-16-workspace-2`).*
+
+The operator's rule:
+
+> You never have more than 3 spokes. Maybe 2 is favorable. Maybe 3 if
+> one's doing the other side task. [...] You'd only ever run 1 graph on a
+> single harness, because then it can run and be managed by a spoke or by
+> the orchestrator. In my mind, it'd probably be managed by the spoke.
+> [...] You could then essentially have 2,000 agents, more than 2,000, 2
+> spokes with 1,000 each and an orchestrator.
+
+**What the field says about it.** The "three to four agents" figure
+behind the spoke limit was not measured. It is an extrapolation, under a
+fixed budget split across agents, from a curve fitted to coordination
+turns. The same study's own small sweep peaked at five to seven. What
+the evidence does show is that conversation scales badly: agents that
+talk, share one context or split one budget get worse as more are added,
+and a peer network of a hundred agents falls to near nothing. Agents that
+never talk, each with its own budget, working separable pieces and
+handing back only a result, scale to hundreds. Every system found above
+about twenty agents on code is a tree of this kind. So the operator's
+shape is the one the evidence supports: a small conversation at the top,
+and wide, silent fan-out beneath it. The limit on spokes is the hub's
+review load and the operator's attention, and Phase 2's record is where
+it is read.
+
+**The rules for a graph.**
+
+- A hub has two spokes by default, three when one holds a side task.
+  Revisited on the record, not on a lab number.
+- A spoke may run one graph, inside its own harness, with the harness's
+  own way of starting workers. The spoke plans it, runs it and checks it.
+- A graph's workers never write a ticket and never address a seat. The
+  spoke hands the hub one turn per graph result.
+- Every node of a graph has an automatic check that decides when it is
+  done. Every working swarm the field has had one; where it stopped
+  producing separable pieces, the swarm collapsed to one effective agent.
+  A contract without a check is not enough, and no system found declares
+  contracts between sibling nodes at all.
+- A graph's working state stays off the shared branch until the spoke
+  merges it: on its own branch, or in a repository local to the harness.
+  A hosted repository serialises pushes at about six a minute, which on
+  the review's own arithmetic holds a few dozen workers on one branch.
+- Two spokes' graphs work on separate parts of the codebase, and the hub
+  merges between them. Changes from different agents conflicted about
+  twice as often as changes from the same agent.
+- A graph is as wide as the work has separable pieces. Gains flatten
+  around a hundred agents, cost grows with every one, and on sequential
+  work more agents make the result worse.
+- The hub runs no graph. It plans the spokes' work and reviews what comes
+  back.
+
+**What the record would need, and does not have yet.** A record per
+node, kept apart from tickets, with a gate that holds the parent's merge
+until its children are done. The floor refusing a node's move to done
+unless its check passes. Claims that count only once pushed and are
+written as new files rather than edits. And node records kept out of the
+framework corpus or retired on merge, since one graph of a hundred
+workers can write more records than the corpus is sized for. Phase 8 is
+the experiment that says which of these are needed; none is built before
+it.
+
 ## The Principle: Derive, Never Define
 
 Anything written down as a list has to be kept true by someone. Anything
@@ -313,7 +419,9 @@ as built. These enter it in Phase 2.)*
     the operator's words on its ticket as a steer note. The turn stays
     where it was.
 18. Every turn's commit says what woke the seat: `Woke: bell`,
-    `Woke: ring` or `Woke: operator`.
+    `Woke: ring`, `Woke: hub` or `Woke: operator`. A hub's nudge is a note
+    on the ticket first, then delivered by any channel that reaches the
+    spoke.
 19. Asked who is waiting, the hub reads the record and says it. It keeps
     no list of its own.
 20. Peers needs four things written in the run: a holder, a check that
@@ -471,6 +579,13 @@ earlier Phase 5 is now Phase 7.*
             runs current code. The hub reads these with tools that exist
             and tells the operator in a sentence. It does not fix a login.
       - [ ] The operator rules on rule 9 as proposed for a star.
+      - [ ] A spoke holds one lane at a time, or the hub sets its order
+            on the ticket. The start card tells a spoke that when its
+            turn runs low it pushes what it has and hands back, because
+            on 2026-11-16 the hub had to say so in every nudge.
+      - [ ] The operator's own pauses, holds and switched-off runners are
+            recorded where the stall read sees them, so a deliberate
+            pause does not read as a stall.
       - [ ] One doorbell per seat in place of the five wake mechanisms
             the baseline counted, each session's watch armed with `--run`
             for its own lane, and the lane a run with one short ticket
@@ -478,8 +593,9 @@ earlier Phase 5 is now Phase 7.*
       - [ ] **Proof.** One real lane with three seats runs as a star for
             its natural length, the operator speaking to the hub. The
             script that produced the baseline reads it back: the share of
-            turns woken by the bell, the ring and the operator; each
-            operator wake sorted to the loop, a login or the machine; any
+            turns woken by the bell, the ring, the hub and the operator;
+            each hub or operator wake sorted to the loop, a turn that ran
+            out, a capped watch, a login or the machine; any
             spoke that addressed a spoke; handovers that waited past the
             window; body size. The baseline to beat is 46 of 396 handovers
             waiting more than an hour and about three ticket commits in
@@ -555,6 +671,24 @@ earlier Phase 5 is now Phase 7.*
             overnight, and the morning's record shows no stall longer than
             the ring's window.
 
+- [ ] **Phase 8 — A graph under one spoke.** May start once Phase 2's
+      lane has run; it does not wait on Phases 3 to 7.
+      - [ ] One spoke runs one graph inside its own harness on a task with
+            a real check per node: tests, a known-good oracle, or a
+            comparison against a reference. The graph's width is the
+            task's separable pieces.
+      - [ ] The graph's working state lives on its own branch or in a
+            repository local to the harness. Only the spoke's merged
+            result and its one turn reach the shared record.
+      - [ ] Measured as it runs: claim races, pushes rejected, merge
+            conflicts, the floor's time per commit, tokens, and the
+            nodes whose check passed at the first attempt.
+      - [ ] **Proof.** The graph's result merges, the hub reviews it from
+            one turn, and the measures say which of the four missing
+            pieces in Graphs Below A Spoke were needed. A run of this
+            kind on a git-backed record would be one of very few
+            published data points.
+
 ## What This Plan Refuses
 
 - A roster, a registry, or any list of seats that someone has to keep
@@ -585,6 +719,8 @@ earlier Phase 5 is now Phase 7.*
   programme is how this repository gets evidence of its own, and Phase 4
   waits on it.
 - Granting peers to a task.
+- How many spokes a hub holds, and which spoke and task run the first
+  graph in Phase 8.
 - The status of `a2a-conversations-on-their-own-branch`.
 
 ## Done When
@@ -597,5 +733,7 @@ earlier Phase 5 is now Phase 7.*
       operator speaking only to the hub, and its record shows what woke
       every turn.
 - [ ] One bounded task has run as peers and ended inside its budget.
+- [ ] One graph has run under one spoke, merged, and been reviewed by the
+      hub from a single turn.
 - [ ] The three baseline measures have been read again after the change,
       and the reading is in the record whichever way it came out.

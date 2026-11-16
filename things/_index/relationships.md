@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-14
-generated: 2026-11-14T17:29:06
-generated_from: HEAD@888eb7b
-coverage: 662
+created: 2026-11-16
+generated: 2026-11-16T18:52:39
+generated_from: HEAD@20c5682
+coverage: 663
 framework_version: 3.51.0
 ---
 
@@ -1484,6 +1484,8 @@ framework_version: 3.51.0
 - peer-loops --references--> workflow-state-specification
 - peer-loops --references--> a-filter-is-a-missing-instance
 - peer-loops --derived-from--> review-agent-coordination-leaders-2026-11-13-workspace-2
+- peer-loops --derived-from--> review-agent-swarms-scaling-limit-2026-11-16-workspace-2
+- peer-loops --references--> coordination-claim-specification
 - peer-loops --references--> cross-vendor-review-eval-opens-the-live-scope-2026-11-13
 - peer-loops --references--> run-membership-is-realisation-2026-09-22
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
@@ -1586,6 +1588,9 @@ framework_version: 3.51.0
 - review-agent-coordination-leaders-2026-11-13-workspace-2 --informs--> standing-watch-specification
 - review-agent-coordination-leaders-2026-11-13-workspace-2 --informs--> evidence-and-eval-backlog
 - review-agent-coordination-leaders-2026-11-13-workspace-2 --references--> live-eval-scope-bounded-to-claude
+- review-agent-swarms-scaling-limit-2026-11-16-workspace-2 --informs--> peer-loops
+- review-agent-swarms-scaling-limit-2026-11-16-workspace-2 --complements--> review-agent-coordination-leaders-2026-11-13-workspace-2
+- review-agent-swarms-scaling-limit-2026-11-16-workspace-2 --informs--> coordination-claim-specification
 - review-critical-comparison-2026-10-17-claude --informs--> evidence-and-eval-backlog
 - review-critical-comparison-2026-10-17-claude --informs--> session-start-hardening
 - review-critical-comparison-2026-10-17-claude --supports--> emitted-content-is-read-instructed-content-is-economised
