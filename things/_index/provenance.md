@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-11-16
-generated: 2026-11-16T21:38:35
-generated_from: HEAD@0b5be86
-coverage: 157
+generated: 2026-11-16T22:45:41
+generated_from: HEAD@589e5b8
+coverage: 159
 framework_version: 3.51.0
 ---
 
@@ -129,6 +129,9 @@ framework_version: 3.51.0
 ## cross-domain-readiness-is-a-shared-signal-not-a-producer-push
 - serve-side-blindness-dissolves-into-composition (derived-from)
 
+## cross-vendor-review-eval-opens-the-live-scope-2026-11-13
+- review-catch-runs-each-harness-on-one-road-2026-11-16 (pinned @589e5b8f409da69431e51388a8b1e23cd760517f)
+
 ## cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26
 - cue-an-injected-file-arrives-without-its-frontmatter-2026-09-24 (pinned @7a2deb213147543b78196884b94d65e89659a864)
 
@@ -229,6 +232,7 @@ framework_version: 3.51.0
 
 ## eval-cycle
 - cross-vendor-review-eval-opens-the-live-scope-2026-11-13 (pinned @83ad75d008fdc7ad2f96a3f799c9c4327ca01b26)
+- review-catch-runs-each-harness-on-one-road-2026-11-16 (pinned @589e5b8f409da69431e51388a8b1e23cd760517f)
 
 ## eval-record-2026
 - review-substrate-examination-2026-10-24-claude (pinned @68a1d30493c1b8c83a0196bfa7c20720c01849a1)
@@ -592,6 +596,9 @@ framework_version: 3.51.0
 
 ## run-eval-cycle-0-polar-baseline-2026-10
 - the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 (pinned @b9bb9a716e928f446d8b9a99ae16b5b52ba605e8)
+
+## run-eval-cycle-0-review-catch-baseline-2026-11
+- review-catch-runs-each-harness-on-one-road-2026-11-16 (pinned @589e5b8f409da69431e51388a8b1e23cd760517f)
 
 ## run-floor-sprint-1-2026-08
 - floor-sprint-2-scope-2026-08-22 (pinned @967773cb50f2dc9b9f661f8309c7aaacded8f4f1)

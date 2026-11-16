@@ -1,8 +1,8 @@
 ---
 id: run-eval-cycle-0-review-catch-baseline-2026-11
 type: workflow-run
-status: active
-version: 1.3
+status: abandoned
+version: 1.4
 created: 2026-11-13
 session: 2026-11-11/13
 definition: eval-cycle
@@ -26,13 +26,25 @@ linked_things:
   - id: peer-loops
     relation: informs
     notes: "Who reviews whom in a loop, and whether a review starts blind, wait on what this programme finds."
+  - id: review-catch-runs-each-harness-on-one-road-2026-11-16
+    relation: references
+    notes: "The operator's ruling that closed this run: each reviewer whole, on one identical isolated machine."
 ---
 
 # Run: Eval Cycle 0 — the review-catch baseline
 
 ## Where this is
 
-At `baseline` since 2026-11-16. The review set was frozen on 2026-11-13
+**Abandoned on 2026-11-16, with one pass complete.** The operator ruled
+that a reviewer in a box measures a configuration nobody uses, and that
+each reviewer runs whole on one identical isolated machine instead
+(`review-catch-runs-each-harness-on-one-road-2026-11-16`). The rebuild is
+`review-catch-on-the-road`, and its baseline is a new run with new
+predictions. The review set below is reused there as frozen. Pass 1 is
+kept unscored, as the boxed half of a later comparison of the same model
+in a box and on the road. The rest of this record stands as written.
+
+Before that: at `baseline` since 2026-11-16. The review set was frozen on 2026-11-13
 and its hash is in the table below. This run was committed with its
 hypothesis before any reviewer's output existed. One smoke review per
 vendor ran clean on 2026-11-14. On 2026-11-16 the operator named the
