@@ -2,7 +2,7 @@
 id: peer-loops
 type: plan
 status: in-progress
-version: 2.1
+version: 2.2
 created: 2026-11-10
 priority: high
 origin: stated
@@ -292,10 +292,31 @@ and wide, silent fan-out beneath it. The limit on spokes is the hub's
 review load and the operator's attention, and Phase 2's record is where
 it is read.
 
-**The rules for a graph.**
+**Revised by the operator the same day.** On reading the review, the
+operator dropped the limit and named what the plan is for:
 
-- A hub has two spokes by default, three when one holds a side task.
-  Revisited on the record, not on a lab number.
+> We're not going to give a limit to the amount of spokes that a hub can
+> run. We'll leave that for now. I think there'll be a limit. [...] I
+> want to say that we've tested it with [...] 3.
+
+> You have all of these separate domain agents working together to
+> achieve a goal. [...] The graph only works when the test is strict.
+> [...] I achieve that by tests and handover contracts, but it can just
+> be tests, that's fine, but that strictness has to hold.
+
+So the unit of this plan is a domain agent: a long-lived seat whose
+specialisation is its record. A graph is an option below a spoke, never
+the plan's unit. And one rule covers every handover, between seats or
+between nodes: it carries a strict check.
+
+**The rules.**
+
+- No limit on spokes is set. The shape has been seen working at three
+  spokes, across two vendors' harnesses and a Hermes agent, on one
+  operator's work. The limit is read from the record: the point where the
+  hub's time to answer, or the spokes' time waiting, starts to climb.
+- Every handover carries a strict check. Tests are enough; a contract
+  beside them is welcome and is not a substitute.
 - A spoke may run one graph, inside its own harness, with the harness's
   own way of starting workers. The spoke plans it, runs it and checks it.
 - A graph's workers never write a ticket and never address a seat. The
@@ -615,12 +636,15 @@ earlier Phase 5 is now Phase 7.*
             Phase 2's check.
       - [ ] A seat names its surface in its own address when it declares,
             so every commit says both.
-      - [ ] Two agents never share a clone. On 2026-11-11 a reviewer seat's
-            turns were found authored as the builder's seat, because both
-            ran in a clone declared for the builder. Each seat gets its own
-            clone or worktree; where a session needs a seat of its own, that
-            is a worktree per session, and its seat is declared there by
-            the operator. This is once per clone, never once per lane.
+      - [ ] Every seat commits under its own identity. Two seats may share
+            a clone, as the operator runs them today (ruled 2026-11-16),
+            but on 2026-11-11 and again on 2026-11-16 one seat's turns
+            were found authored as another's, because both ran in a clone
+            declared for one of them. A worktree per seat is the first
+            thing to try. Whether a worktree can hold a seat of its own
+            is checked at source before it is relied on: git shares one
+            configuration across worktrees unless told otherwise. The
+            operator declares each seat, once, never once per lane.
       - [ ] **Proof.** One spoken instruction to the hub starts a
             three-seat star across two vendors, and the first round trip
             completes before the operator types into any spoke.
@@ -688,6 +712,74 @@ earlier Phase 5 is now Phase 7.*
             pieces in Graphs Below A Spoke were needed. A run of this
             kind on a git-backed record would be one of very few
             published data points.
+
+## Order Of Work, And What Is Still Open
+
+*Added 2026-11-16. The operator asked for the approach to be examined
+critically before the plan was committed, and then set the order.*
+
+**The order.** The review-catch eval runs first. Nothing in Phases 2 to
+8 is built until its first two cycles have been reflected on. Meanwhile
+the record is read, because that needs nothing built. The operator's own
+experience is that two vendors reviewing one piece of work find
+different things, on code and on a contract alike. That is the reason
+for the loop and it is the eval's first prediction. What the experience
+does not yet show is whether the difference comes from the vendor or
+from a fresh context, and how many of the extra findings are real.
+
+**What the eval's result changes here.**
+
+- A second vendor catches more than the same model reviewing twice:
+  review by a different vendor becomes a rule of the loop, the hub's own
+  work included.
+- The two come out equal: fresh context is what matters, and reviews are
+  routed by budget and speed.
+- Showing the author's account lowers catches: a reviewer receives the
+  change without it.
+
+**Open, from the critical reading.**
+
+1. Nothing yet shows the loop does better than one good agent. The
+   controlled studies find multi-agent coding neutral to slightly worse
+   at matched cost. The answer offered is validation, and it is untested
+   until the eval reports.
+2. The operator is the part that scales worst. Every change waits on the
+   operator's approval, and pauses and priorities live outside the record.
+3. Nobody reviews the hub. It reviews the spokes, answers in minutes, and
+   makes rulings of its own that cite no one.
+4. Strictness is not holding even on code. On 2026-11-16 a spoke handed
+   back with every check green several times and the hub still sent the
+   work back. The real check was the hub looking, which does not carry to
+   a graph.
+5. Shared clones conflict with The Principle's first row. Who sits in a
+   workspace cannot be read from commit authors while one seat commits
+   under another's name. Either each seat gets its own identity (Phase 3)
+   or that row goes.
+6. Cost per merged change has never been measured.
+7. Every fix so far has needed the operator. No non-technical person has
+   run a loop.
+8. This plan has twenty rules, and its own evidence is that a rule which
+   does not arrive with the wake is skipped, while the star held with no
+   rule at all. It may need fewer rules and more measurement.
+
+**What the record could answer with nothing built.**
+
+- Review rounds per change, by builder, and how often a handback with
+  every check green was sent back.
+- The hub's rulings: which cite the operator and which are its own, and
+  how many were later reversed.
+- Where elapsed time goes: agents working, agents waiting on each other,
+  work waiting on the operator.
+- Fixes made after the hub cleared a change, traced back to that change.
+  This is the review-catch method pointed at product work.
+
+**What needs research or thought.**
+
+- A strict check for work that has no tests.
+- Hubs of hubs: a domain agent that is hub in its own domain and spoke in
+  another's. No evidence was found either way.
+- One seat's ticket is another seat's instructions, and a hub may now
+  hold a command channel into a spoke's machine.
 
 ## What This Plan Refuses
 

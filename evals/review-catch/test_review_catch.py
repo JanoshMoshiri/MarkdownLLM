@@ -35,7 +35,7 @@ def make_set(tmp_path: Path) -> Path:
 
 
 def args_for(set_path, arm, tmp_path, **kw):
-    ns = argparse.Namespace(set=str(set_path), arm=arm, model="test-model-id", trial=1,
+    ns = argparse.Namespace(set=str(set_path), arm=arm, model="test-model-id", effort="xhigh", trial=1,
                             out=str(tmp_path / "out"), entries=None, timeout=5, dry_run=False)
     for k, v in kw.items():
         setattr(ns, k, v)
@@ -202,11 +202,13 @@ def test_mcnemar_hand_computed():
 # ---------------------------------------------------------------- scoring end to end
 
 def result_file(tmp_path, name, set_sha, arm="claude-blind", trial=1, findings=None,
-                complete=True, prompt_sha="p" * 64):
-    r = {"schema": 1, "arm": arm, "vendor": arm.split("-")[0], "model_requested": "m",
+                complete=True, prompt_sha="p" * 64, model="m", effort=None):
+    r = {"schema": 1, "arm": arm, "vendor": arm.split("-")[0], "model_requested": model,
          "prompt_sha256": prompt_sha, "set_sha256": set_sha, "trial": trial, "complete": complete,
          "reviews": [{"entry": "r001", "findings": findings or [], "void": False},
                      {"entry": "r002", "findings": [], "void": False}]}
+    if effort is not None:
+        r["effort_requested"] = effort
     p = tmp_path / name
     p.write_text(json.dumps(r), encoding="utf-8")
     return p
@@ -235,6 +237,26 @@ def test_prompt_hashes_never_pooled(tmp_path):
     result_file(res, "b.json", sha, trial=2, prompt_sha="b" * 64)
     groups, _ = sr.load_results([str(res)], sha)
     assert len(groups) == 2
+
+
+def test_model_and_effort_never_pooled(tmp_path, capsys):
+    set_path = make_set(tmp_path)
+    _, sha = rr.load_set(set_path)
+    res = tmp_path / "res"
+    res.mkdir()
+    result_file(res, "a.json", sha, trial=1, effort="xhigh")
+    result_file(res, "b.json", sha, trial=2, effort="high")
+    result_file(res, "c.json", sha, trial=3)  # no effort_requested: counts as default
+    result_file(res, "d.json", sha, trial=4, effort="default")
+    result_file(res, "e.json", sha, trial=5, effort="xhigh", model="other")
+    groups, skipped = sr.load_results([str(res)], sha)
+    assert not skipped
+    assert {(k[1], k[2]): sorted(v) for k, v in groups.items()} == {
+        ("m", "xhigh"): [1], ("m", "high"): [2], ("m", "default"): [3, 4], ("other", "xhigh"): [5]}
+    assert sr.main(["--set", str(set_path), "--results", str(res)]) == 0
+    out = capsys.readouterr().out
+    assert "3 values of effort" in out and "2 values of model" in out
+    assert "effort xhigh" in out and "effort default" in out
 
 
 def test_score_near_emit_and_rulings(tmp_path, capsys):
@@ -356,12 +378,12 @@ def test_claude_outside_read_voids_review(tmp_path):
     run = {"stdout": claude_stream([("Read", {"file_path": str(tmp_path / "x.py")})], good),
            "stderr": "", "exit_code": 0, "timed_out": False, "started": "s", "ended": "e",
            "seconds": 1}
-    rec = rr.review_once("claude", ["fake"], "m", "p", folder, tmp_path, 5,
+    rec = rr.review_once("claude", ["fake"], "m", "default", "p", folder, tmp_path, 5,
                          launcher=lambda *a: run)
     assert rec["void"] and rec["void_reason"] == "reached outside the work folder"
     assert rec["outside_reach"]
     run["stdout"] = claude_stream([("Read", {"file_path": "tools/a.py"})], good)
-    rec = rr.review_once("claude", ["fake"], "m", "p", folder, tmp_path, 5,
+    rec = rr.review_once("claude", ["fake"], "m", "default", "p", folder, tmp_path, 5,
                          launcher=lambda *a: run)
     assert not rec["void"]
 
@@ -426,6 +448,45 @@ def test_summary_printed(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "r001:" in out and "r002:" in out and "1 findings kept, ok" in out
     assert "totals: 2 reviews, 0 void" in out and "cost $0.0200" in out
+
+
+def test_claude_effort_flag():
+    cmd = rr.claude_command(["claude"], "m", "xhigh", "p")
+    i = cmd.index("--effort")
+    assert cmd[i + 1] == "xhigh"
+    assert "--effort" not in rr.claude_command(["claude"], "m", "default", "p")
+
+
+def test_codex_effort_flag(tmp_path):
+    cmd = rr.codex_command(["codex"], "m", "xhigh", tmp_path, tmp_path / "l.txt")
+    i = cmd.index("-c")
+    assert cmd[i + 1] == 'model_reasoning_effort="xhigh"'
+    assert cmd[-1] == "-"
+    plain = rr.codex_command(["codex"], "m", "default", tmp_path, tmp_path / "l.txt")
+    assert "-c" not in plain and not any("model_reasoning_effort" in a for a in plain)
+
+
+def test_effort_is_required_and_checked():
+    with pytest.raises(SystemExit):
+        rr.main(["--set", "x", "--arm", "claude-blind", "--model", "m", "--trial", "1"])
+    with pytest.raises(SystemExit):
+        rr.main(["--set", "x", "--arm", "claude-blind", "--model", "m", "--effort", "huge",
+                 "--trial", "1"])
+
+
+def test_payload_records_effort_and_launch_carries_it(tmp_path, capsys):
+    set_path = make_set(tmp_path)
+    good = claude_reply(json.dumps({"findings": []}))
+    launcher = fake_launcher([(good, 0)])
+    assert rr.run_arm(args_for(set_path, "claude-blind", tmp_path), launcher=launcher,
+                      base_cmd=["fake-claude"], work_root=tmp_path / "w") == 0
+    (res,) = list((tmp_path / "out").glob("*.json"))
+    data = json.loads(res.read_text(encoding="utf-8"))
+    assert data["effort_requested"] == "xhigh" and data["model_requested"] == "test-model-id"
+    assert all(c[c.index("--effort") + 1] == "xhigh" for c in launcher.calls)
+    out = capsys.readouterr().out
+    assert "[test-model-id, effort xhigh]" in out
+    assert "summary claude-blind t1 [test-model-id, effort xhigh]" in out
 
 
 def test_order_is_seeded_by_trial(tmp_path):

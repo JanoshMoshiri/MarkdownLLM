@@ -68,7 +68,8 @@ def near_key(set_sha: str, result_sha: str, entry: str, fi: int, di: int) -> str
 # ---------------------------------------------------------------- loading
 
 def load_results(paths: list[str], set_sha: str) -> tuple[dict, list[str]]:
-    """Group usable result files by (arm, model, prompt sha). Returns (groups, skipped notes)."""
+    """Group usable result files by (arm, model, effort, prompt sha); a file with no
+    effort_requested counts as `default`. Returns (groups, skipped notes)."""
     files: list[Path] = []
     for p in paths:
         q = Path(p)
@@ -91,7 +92,8 @@ def load_results(paths: list[str], set_sha: str) -> tuple[dict, list[str]]:
         if r.get("set_sha256") != set_sha:
             skipped.append(f"{f.name}: set sha256 {str(r.get('set_sha256'))[:12]} != {set_sha[:12]}")
             continue
-        key = (r["arm"], r.get("model_requested"), str(r.get("prompt_sha256")))
+        key = (r["arm"], r.get("model_requested"), r.get("effort_requested") or "default",
+               str(r.get("prompt_sha256")))
         g = groups.setdefault(key, {})
         if r.get("trial") in g:
             skipped.append(f"{f.name}: duplicate trial {r.get('trial')} for {label(key)} "
@@ -104,8 +106,8 @@ def load_results(paths: list[str], set_sha: str) -> tuple[dict, list[str]]:
 
 
 def label(key: tuple) -> str:
-    arm, model, psha = key
-    return f"{arm} / {model} / prompt {psha[:8]}"
+    arm, model, effort, psha = key
+    return f"{arm} / {model} / effort {effort} / prompt {psha[:8]}"
 
 
 # ---------------------------------------------------------------- scoring
@@ -147,7 +149,9 @@ def score_group(set_data: dict, set_sha: str, trials: dict, rulings: dict) -> di
                                      "finding_lines": [f["line_start"], f["line_end"]],
                                      "defect_file": norm_path(d["file"]), "defect_lines": d["ranges"],
                                      "_where": {"result": r["_file"], "arm": r["arm"],
-                                                "model": r.get("model_requested"), "trial": t,
+                                                "model": r.get("model_requested"),
+                                                "effort": r.get("effort_requested") or "default",
+                                                "trial": t,
                                                 "entry": d["entry"], "finding": fi, "defect": d["id"]}})
                 if c == "hit":
                     hit = True
@@ -271,12 +275,17 @@ def main(argv: list[str] | None = None) -> int:
     out = [f"# Review-catch score — set {set_sha[:12]} (repo_head {str(set_data.get('repo_head'))[:12]})", ""]
     if skipped:
         out += ["Skipped result files:", ""] + [f"- {s}" for s in skipped] + [""]
-    arm_prompts: dict = {}
-    for arm, _, psha in groups:
-        arm_prompts.setdefault(arm, set()).add(psha)
-    for arm, ps in arm_prompts.items():
-        if len(ps) > 1:
-            out.append(f"- note: arm {arm} has {len(ps)} prompt hashes; they are reported separately, never pooled")
+    arm_split: dict = {}
+    for arm, model, effort, psha in groups:
+        d = arm_split.setdefault(arm, {"model": set(), "effort": set(), "prompt hash": set()})
+        d["model"].add(model)
+        d["effort"].add(effort)
+        d["prompt hash"].add(psha)
+    for arm, d in arm_split.items():
+        for what, vals in d.items():
+            if len(vals) > 1:
+                out.append(f"- note: arm {arm} has {len(vals)} values of {what}; "
+                           "they are reported separately, never pooled")
     scores = {k: score_group(set_data, set_sha, v, rulings) for k, v in sorted(groups.items(),
                                                                                key=lambda kv: str(kv[0]))}
     if not scores:

@@ -22,8 +22,13 @@ same. The result file records this as `hashes_over`.
 
 ```
 python evals/review-catch/run_reviews.py --set evals/review-catch/set.json \
-  --arm claude-blind --model <full model id> --trial 1 [--entries r001,r002] [--dry-run]
+  --arm claude-blind --model <full model id> --effort xhigh --trial 1 [--entries r001,r002] [--dry-run]
 ```
+
+`--model` and `--effort` are both required and never defaulted. Effort is passed to the
+CLI explicitly (`--effort <level>` for Claude, `-c model_reasoning_effort="<level>"` for
+Codex; `--effort default` passes nothing and leaves the CLI's own) and recorded per trial
+as `effort_requested`, and the scorer never pools results that differ in model or effort.
 
 Entries are shuffled with `random.Random(trial)` and reviewed one at a time. Each
 review gets a fresh folder at `<system temp>/mdllm-review-catch/<arm>-t<trial>/<entry id>/`.
@@ -84,7 +89,8 @@ python evals/review-catch/score_reviews.py --set evals/review-catch/set.json \
 
 - Only complete files whose set sha256 matches are counted. The scorer lists the
   skipped files and the reason for each.
-- Files are grouped by (arm, model, prompt sha256). Different groups are never pooled.
+- Files are grouped by (arm, model, effort, prompt sha256). Different groups are never
+  pooled. A file with no `effort_requested` counts as effort `default`.
 - **Hit:** a kept finding names the same file (slashes and a leading `./` normalised),
   and its line range, widened by 5 lines on each side, overlaps a defect range.
 - **Near miss:** not a hit, but the same file within 30 lines.
@@ -101,7 +107,8 @@ python evals/review-catch/score_reviews.py --set evals/review-catch/set.json \
 **Claude** (`claude -p`, the real `claude.exe` behind the npm shim). The flags are
 `--safe-mode`, `--restricted`, `--strict-mcp-config`, `--disable-slash-commands`,
 `--no-session-persistence`, `--tools Read,Glob,Grep`, `--allowedTools Read,Glob,Grep`,
-`--permission-prompts none` and `--output-format stream-json --verbose`.
+`--permission-prompts none` and `--output-format stream-json --verbose`, plus
+`--effort <level>` unless the effort is `default`.
 
 - `--safe-mode` disables CLAUDE.md, skills, plugins, hooks, MCP servers, commands,
   agents and output styles.
@@ -124,7 +131,8 @@ What could NOT be isolated:
 The flags are `--skip-git-repo-check`, `--ephemeral`, `--ignore-user-config` (no
 `config.toml`, so none of its MCP servers, profiles or hooks), `--ignore-rules` (no
 execpolicy `.rules`), `--sandbox read-only`, `--cd <folder>`, `--json` and
-`--output-last-message <file outside the folder>`. The prompt is sent on stdin (`-`).
+`--output-last-message <file outside the folder>`, plus `-c model_reasoning_effort="<level>"`
+unless the effort is `default`. The prompt is sent on stdin (`-`).
 Eight features are switched off with `--disable`: `apps`, `plugins`, `hooks`,
 `memories`, `multi_agent`, `browser_use`, `computer_use` and `image_generation`. The
 first smoke review (2026-11-14) showed that `--ignore-user-config` alone left Codex
@@ -151,14 +159,16 @@ What could NOT be isolated:
 ## Order of an evening
 
 1. Freeze the set: `mine_set.py --freeze` writes `set.json`.
-2. Smoke-test one entry per vendor into a scratch folder with `--trial 0 --out <scratch dir>`.
+2. Smoke-test one entry per vendor into a scratch folder with
+   `--effort xhigh --trial 0 --out <scratch dir>`.
    Smoke output is never scored, so never pass that folder to `score_reviews.py`.
-3. Run five trials of one arm (`--trial 1` to `--trial 5`) into the default `--out`, then
-   the next arm.
+3. Run five trials of one arm (`--effort xhigh --trial 1` to `--trial 5`) into the default
+   `--out`, then the next arm. Keep the same `--model` and `--effort` across an arm's trials;
+   a trial at another effort is scored as a separate group, not pooled.
 
 ## Smoke review (operator, own terminal)
 
 ```
-python evals/review-catch/run_reviews.py --set evals/review-catch/set.json --arm claude-blind --model <claude model id> --trial 0 --entries <one id> --out <scratch dir>
-python evals/review-catch/run_reviews.py --set evals/review-catch/set.json --arm codex-blind  --model <codex model id>  --trial 0 --entries <one id> --out <scratch dir>
+python evals/review-catch/run_reviews.py --set evals/review-catch/set.json --arm claude-blind --model <claude model id> --effort xhigh --trial 0 --entries <one id> --out <scratch dir>
+python evals/review-catch/run_reviews.py --set evals/review-catch/set.json --arm codex-blind  --model <codex model id>  --effort xhigh --trial 0 --entries <one id> --out <scratch dir>
 ```

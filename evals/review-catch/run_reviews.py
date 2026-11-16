@@ -198,9 +198,15 @@ def harness_build(base_cmd: list[str]) -> str:
     return text.splitlines()[0].strip()
 
 
-def claude_command(base: list[str], model: str, prompt: str) -> list[str]:
+EFFORTS = ("default", "low", "medium", "high", "xhigh", "max")
+
+
+def claude_command(base: list[str], model: str, effort: str, prompt: str) -> list[str]:
+    # `default` passes no flag, leaving the CLI's own effort in force.
+    effort_flag = [] if effort == "default" else ["--effort", effort]
     return [*base, "-p", prompt,
             "--model", model,
+            *effort_flag,
             "--output-format", "stream-json", "--verbose",
             "--safe-mode",
             "--restricted",
@@ -220,9 +226,12 @@ CODEX_FEATURES_OFF = ("apps", "plugins", "hooks", "memories", "multi_agent",
                       "browser_use", "computer_use", "image_generation")
 
 
-def codex_command(base: list[str], model: str, folder: Path, last_file: Path) -> list[str]:
+def codex_command(base: list[str], model: str, effort: str, folder: Path,
+                  last_file: Path) -> list[str]:
     # Prompt arrives on stdin ("-"), so no multi-line argument crosses a shell.
     off = [flag for name in CODEX_FEATURES_OFF for flag in ("--disable", name)]
+    # One argv element holding a TOML string; `default` leaves the CLI's own.
+    effort_flag = [] if effort == "default" else ["-c", f'model_reasoning_effort="{effort}"']
     return [*base, "exec",
             "--skip-git-repo-check",
             "--ephemeral",
@@ -231,6 +240,7 @@ def codex_command(base: list[str], model: str, folder: Path, last_file: Path) ->
             *off,
             "--sandbox", "read-only",
             "--model", model,
+            *effort_flag,
             "--cd", str(folder),
             "--color", "never",
             "--json",
@@ -536,17 +546,17 @@ def extract_findings(text: str | None) -> dict:
 
 # ---------------------------------------------------------------- one review
 
-def review_once(vendor: str, base: list[str], model: str, prompt: str, folder: Path,
+def review_once(vendor: str, base: list[str], model: str, effort: str, prompt: str, folder: Path,
                 out_dir: Path, timeout: int, launcher=launch) -> dict:
     if vendor == "claude":
-        cmd = claude_command(base, model, prompt)
+        cmd = claude_command(base, model, effort, prompt)
         run = launcher(cmd, folder, None, timeout)
         parsed = parse_claude(run, folder)
     else:
         last_file = out_dir / f"{folder.name}.last.txt"
         if last_file.exists():
             last_file.unlink()
-        cmd = codex_command(base, model, folder, last_file)
+        cmd = codex_command(base, model, effort, folder, last_file)
         run = launcher(cmd, folder, prompt.encode("utf-8"), timeout)
         parsed = parse_codex(run, folder, last_file)
         if last_file.exists():
@@ -621,14 +631,17 @@ def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
 
     if args.dry_run:
         base = base_cmd or ["claude" if vendor == "claude" else "codex"]
+        print(f"{args.arm} t{args.trial} [{args.model}, effort {args.effort}] - dry run, "
+              f"{len(entries)} reviews")
         for e in entries:
             folder = build_work_folder(e, variant, base_dir / e["id"], repo=repo)
             assert_no_leak(folder, variant, e, set_data)
             if vendor == "claude":
-                cmd = claude_command(base, args.model, "<PROMPT>")
+                cmd = claude_command(base, args.model, args.effort, "<PROMPT>")
                 stdin_note = ""
             else:
-                cmd = codex_command(base, args.model, folder, out_tmp / f"{e['id']}.last.txt")
+                cmd = codex_command(base, args.model, args.effort, folder,
+                                    out_tmp / f"{e['id']}.last.txt")
                 stdin_note = f"   < {prompt_path.name}"
             print(f"[{e['id']}] work folder: {folder}  (leak check passed)")
             print(f"[{e['id']}] cwd={folder}")
@@ -646,6 +659,7 @@ def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
     out_tmp.mkdir(parents=True, exist_ok=True)
     result_path = out_dir / f"{utc_stamp()}-{args.arm}-t{args.trial}.json"
     payload = {"schema": 1, "arm": args.arm, "vendor": vendor, "model_requested": args.model,
+               "effort_requested": args.effort,
                "models_observed": [], "harness_build": build,
                "prompt_file": prompt_path.name, "prompt_sha256": sha256_bytes(prompt_bytes),
                "set_sha256": set_sha, "hashes_over": "LF-normalised bytes (CRLF -> LF)",
@@ -663,7 +677,8 @@ def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
         return code
 
     streak = 0
-    print(f"{args.arm} t{args.trial} [{args.model}] - {len(entries)} reviews -> {result_path}")
+    print(f"{args.arm} t{args.trial} [{args.model}, effort {args.effort}] - {len(entries)} reviews "
+          f"-> {result_path}")
     write_result(result_path, payload)
     for e in entries:
         attempts = []
@@ -671,7 +686,8 @@ def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
         for attempt in (1, 2):
             folder = build_work_folder(e, variant, base_dir / e["id"], repo=repo)
             assert_no_leak(folder, variant, e, set_data)
-            rec = review_once(vendor, base, args.model, prompt, folder, out_tmp, args.timeout, launcher)
+            rec = review_once(vendor, base, args.model, args.effort, prompt, folder, out_tmp,
+                              args.timeout, launcher)
             _rmtree(folder)
             if rec["void"]:
                 streak += 1
@@ -741,7 +757,8 @@ def compute_totals(reviews: list[dict]) -> dict:
 def print_summary(payload: dict, result_path: Path) -> None:
     """One line per review, then the totals: readable after a smoke."""
     print("")
-    print(f"summary {payload['arm']} t{payload['trial']} [{payload['model_requested']}]"
+    print(f"summary {payload['arm']} t{payload['trial']} [{payload['model_requested']}, "
+          f"effort {payload.get('effort_requested', 'default')}]"
           f" - {'complete' if payload['complete'] else 'NOT complete'}")
     for r in payload["reviews"]:
         state = f"VOID ({r['void_reason']})" if r["void"] else "ok"
@@ -761,6 +778,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--set", required=True)
     ap.add_argument("--arm", required=True, choices=ARMS)
     ap.add_argument("--model", required=True, help="full model id; never defaulted")
+    ap.add_argument("--effort", required=True, choices=EFFORTS,
+                    help="reasoning effort; never defaulted silently — pass `default` to leave the CLI's own")
     ap.add_argument("--trial", required=True, type=int)
     ap.add_argument("--out", default="evals/results/review-catch")
     ap.add_argument("--entries", default=None, help="comma-separated entry ids")

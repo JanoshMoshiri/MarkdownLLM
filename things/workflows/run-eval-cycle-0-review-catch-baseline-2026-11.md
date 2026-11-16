@@ -2,12 +2,12 @@
 id: run-eval-cycle-0-review-catch-baseline-2026-11
 type: workflow-run
 status: active
-version: 1.1
+version: 1.2
 created: 2026-11-13
 session: 2026-11-11/13
 definition: eval-cycle
 definition_commit: 83ad75d008fdc7ad2f96a3f799c9c4327ca01b26
-current_stage: set-scene
+current_stage: baseline
 exposed: false
 tags: [evals, review-catch, cross-vendor, reviewer-independence, baseline, pre-registration]
 informed_by:
@@ -32,12 +32,43 @@ linked_things:
 
 ## Where this is
 
-At `set-scene`. The review set was frozen on 2026-11-13 and its hash is in
-the table below. This run is committed with its hypothesis before any
-reviewer's output exists. One smoke review per vendor ran clean on
-2026-11-14 (next section). One thing is still owed before the stage moves
-to `baseline`: the operator names the baseline reviewer's full model id.
-The baseline is the operator's stage.
+At `baseline` since 2026-11-16. The review set was frozen on 2026-11-13
+and its hash is in the table below. This run was committed with its
+hypothesis before any reviewer's output existed. One smoke review per
+vendor ran clean on 2026-11-14. On 2026-11-16 the operator named the
+reviewer and the effort and told the session to start the passes (next
+section). Five clean passes make the cell; they are run one at a time,
+when the operator's own loops leave the machine room.
+
+## Set before the baseline, 2026-11-16
+
+All of this was fixed before any scored review existed.
+
+- **Reviewer and effort, the operator's choice.** `claude-opus-5-5` for
+  this baseline, and `gpt-6.1-sol` for the Codex cycle, both at extra
+  high reasoning effort. The operator's reason for stopping short of the
+  maximum: *"both of them have slightly different behavior at max."* The
+  frozen table said each CLI's default effort; it now says `xhigh`. The
+  hypothesis below was written for a Claude reviewer at default effort
+  and is left as written. Higher effort can only make its catch-rate band
+  easier to exceed, and the band's upper check (above 60%, look for a
+  leak) still applies.
+- **Who launches.** The decision said no agent launches a reviewer. The
+  operator has since directed otherwise for this programme: *"I would
+  like to run it now"*, with the session starting each pass in the
+  operator's terminal, on the operator's accounts. A pass is still one
+  command the operator can see and stop.
+- **The runner** takes the effort as a required argument, records it,
+  and the scorer never pools passes that differ in model or effort.
+- **The review timeout** is raised from 600 to 1,200 seconds for every
+  pass, because extra-high effort runs longer than the smoke reviews did.
+- **Owed to the Codex cycle's own run, before it starts.** A comparison
+  the operator's experience makes necessary: two passes by the same
+  model against one pass by each vendor, at the same number of reviews.
+  Two vendors finding different things does not yet say whether the
+  vendor or the fresh context is the cause. The five passes of this
+  baseline supply the same-model half at no further cost. The
+  command-line Codex must also be updated until it offers `gpt-6.1-sol`.
 
 ## Smoke reviews, 2026-11-14
 
@@ -132,9 +163,9 @@ there was none.
 | reviewer's tools | read and search only |
 | findings | at most five; the first five are kept and the number offered is recorded |
 | scoring | a catch is the same file, with the finding's lines within 5 lines of the lines the fix changed; a finding within 30 lines is a near miss and is ruled by the operator without knowing which arm made it |
-| effort | each CLI's default, recorded |
+| effort | extra high (`xhigh`), passed explicitly to each CLI and recorded per trial. Changed from "each CLI's default" on 2026-11-16, before any scored review (see *Set before the baseline*) |
 | harness | `claude --version` and `codex --version` on the evening, recorded per trial |
-| reviewer | **baseline: a Claude model**, its full id chosen on the evening and recorded, never an alias |
+| reviewer | **baseline: `claude-opus-5-5`**, named by the operator on 2026-11-16 |
 | author's verdict | **baseline: absent** |
 
 The two surfaces this programme moves are the last two rows. `eval-cycle`'s
