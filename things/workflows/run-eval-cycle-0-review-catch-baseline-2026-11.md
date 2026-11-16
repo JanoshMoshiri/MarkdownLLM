@@ -2,7 +2,7 @@
 id: run-eval-cycle-0-review-catch-baseline-2026-11
 type: workflow-run
 status: active
-version: 1.2
+version: 1.3
 created: 2026-11-13
 session: 2026-11-11/13
 definition: eval-cycle
@@ -62,6 +62,29 @@ All of this was fixed before any scored review existed.
   and the scorer never pools passes that differ in model or effort.
 - **The review timeout** is raised from 600 to 1,200 seconds for every
   pass, because extra-high effort runs longer than the smoke reviews did.
+- **Two runner fixes, made during pass 1 and before any scored Codex
+  review.** The command-line Codex was updated from 0.147.0 to 0.169.0 so
+  that it offers `gpt-6.1-sol`. That build refuses every command under the
+  read-only sandbox on Windows unless the elevated Windows sandbox is
+  named, so the runner now names it; a write is still refused, checked by
+  hand. Before that fix a Codex review that could read nothing returned an
+  empty, parsable answer and scored as clean, so a review that made no
+  read at all is now void, for both vendors. Pass 1 ran on the runner as
+  it stood before this rule; all 32 of its reviews made reads, so it is
+  unaffected.
+- **Pass 1, 2026-11-16: complete.** 32 reviews, none void, none retried,
+  none reaching outside its folder; 115 findings; 101 minutes; $33.25 at
+  list price, which on the operator's plan took the five-hour window from
+  about 10% to 79% and the week from 20% to 27%. So one pass per
+  five-hour window. Not scored: the cell is scored when its five passes
+  are in.
+- **Open before the Codex cycle: a reviewer that runs code.** At extra
+  high effort `gpt-6.1-sol` does not only read. Its smoke review searched
+  the machine for Python interpreters and ran the code under review, and
+  was rightly voided under the reach rule. The Claude reviewer cannot run
+  code; its tools are read and search. Whether the rule is narrowed to
+  what it guards (the repository, its history and the answer key), or
+  kept, is the operator's ruling, recorded here before the Codex run.
 - **Owed to the Codex cycle's own run, before it starts.** A comparison
   the operator's experience makes necessary: two passes by the same
   model against one pass by each vendor, at the same number of reviews.

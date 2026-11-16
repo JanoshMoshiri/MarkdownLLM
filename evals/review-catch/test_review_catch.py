@@ -323,7 +323,7 @@ def test_two_consecutive_voids_stop_the_arm(tmp_path):
 
 def test_void_is_retried_once_then_run_completes(tmp_path):
     set_path = make_set(tmp_path)
-    good = claude_reply("Done.\n" + json.dumps({"findings": [F]}))
+    good = claude_stream([("Read", {"file_path": "CHANGE.diff"})], "Done.\n" + json.dumps({"findings": [F]}))
     launcher = fake_launcher([("garbage", 1), (good, 0), (good, 0)])
     code = rr.run_arm(args_for(set_path, "claude-message", tmp_path), launcher=launcher,
                       base_cmd=["fake-claude"], work_root=tmp_path / "w")
@@ -442,7 +442,7 @@ def test_codex_outside_reach_voids_and_retries_then_stops(tmp_path):
 
 def test_summary_printed(tmp_path, capsys):
     set_path = make_set(tmp_path)
-    good = claude_reply(json.dumps({"findings": [F]}))
+    good = claude_stream([("Read", {"file_path": "CHANGE.diff"})], json.dumps({"findings": [F]}))
     rr.run_arm(args_for(set_path, "claude-blind", tmp_path), launcher=fake_launcher([(good, 0)]),
                base_cmd=["fake-claude"], work_root=tmp_path / "w")
     out = capsys.readouterr().out
@@ -459,11 +459,32 @@ def test_claude_effort_flag():
 
 def test_codex_effort_flag(tmp_path):
     cmd = rr.codex_command(["codex"], "m", "xhigh", tmp_path, tmp_path / "l.txt")
-    i = cmd.index("-c")
-    assert cmd[i + 1] == 'model_reasoning_effort="xhigh"'
+    i = cmd.index('model_reasoning_effort="xhigh"')
+    assert cmd[i - 1] == "-c"
     assert cmd[-1] == "-"
     plain = rr.codex_command(["codex"], "m", "default", tmp_path, tmp_path / "l.txt")
-    assert "-c" not in plain and not any("model_reasoning_effort" in a for a in plain)
+    assert not any("model_reasoning_effort" in a for a in plain)
+
+
+def test_codex_windows_sandbox_named(tmp_path):
+    cmd = rr.codex_command(["codex"], "m", "xhigh", tmp_path, tmp_path / "l.txt")
+    named = 'windows.sandbox="elevated"' in cmd
+    assert named == (rr.os.name == "nt")
+    assert cmd[cmd.index("--sandbox") + 1] == "read-only"
+
+
+def test_review_that_read_nothing_is_void(tmp_path):
+    set_path = make_set(tmp_path)
+    empty = claude_reply(json.dumps({"findings": []}))
+    launcher = fake_launcher([(empty, 0)])
+    code = rr.run_arm(args_for(set_path, "claude-blind", tmp_path), launcher=launcher,
+                      base_cmd=["fake-claude"], work_root=tmp_path / "w")
+    assert code != 0
+    (res,) = list((tmp_path / "out").glob("*.json"))
+    data = json.loads(res.read_text(encoding="utf-8"))
+    assert data["reviews"][0]["void"] and "read nothing" in data["reviews"][0]["void_reason"]
+    assert rr.reads_made("codex", {"commands": ["Get-Content CHANGE.diff"]})
+    assert not rr.reads_made("codex", {"commands": []})
 
 
 def test_effort_is_required_and_checked():
@@ -476,7 +497,7 @@ def test_effort_is_required_and_checked():
 
 def test_payload_records_effort_and_launch_carries_it(tmp_path, capsys):
     set_path = make_set(tmp_path)
-    good = claude_reply(json.dumps({"findings": []}))
+    good = claude_stream([("Read", {"file_path": "CHANGE.diff"})], json.dumps({"findings": []}))
     launcher = fake_launcher([(good, 0)])
     assert rr.run_arm(args_for(set_path, "claude-blind", tmp_path), launcher=launcher,
                       base_cmd=["fake-claude"], work_root=tmp_path / "w") == 0

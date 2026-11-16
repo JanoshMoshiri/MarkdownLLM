@@ -226,6 +226,23 @@ CODEX_FEATURES_OFF = ("apps", "plugins", "hooks", "memories", "multi_agent",
                       "browser_use", "computer_use", "image_generation")
 
 
+def reads_made(vendor: str, parsed: dict) -> bool:
+    """Whether the reviewer read anything at all: a Claude read/search tool
+    call, or a Codex command that ran (a command the sandbox refuses never
+    becomes a command item)."""
+    if vendor == "claude":
+        counts = parsed.get("tool_counts") or {}
+        return any(counts.get(t, 0) for t in CLAUDE_TOOLS.split(","))
+    return bool(parsed.get("commands"))
+
+
+# On Windows, Codex 0.169 refuses every shell command under `--sandbox
+# read-only` unless the elevated Windows sandbox is named; the operator's own
+# config names it, and `--ignore-user-config` drops that. Checked 2026-11-16:
+# with it, reads work and a write is still refused.
+CODEX_WINDOWS_SANDBOX = ["-c", 'windows.sandbox="elevated"'] if os.name == "nt" else []
+
+
 def codex_command(base: list[str], model: str, effort: str, folder: Path,
                   last_file: Path) -> list[str]:
     # Prompt arrives on stdin ("-"), so no multi-line argument crosses a shell.
@@ -239,6 +256,7 @@ def codex_command(base: list[str], model: str, effort: str, folder: Path,
             "--ignore-rules",
             *off,
             "--sandbox", "read-only",
+            *CODEX_WINDOWS_SANDBOX,
             "--model", model,
             *effort_flag,
             "--cd", str(folder),
@@ -571,6 +589,11 @@ def review_once(vendor: str, base: list[str], model: str, effort: str, prompt: s
     elif not ext["ok"]:
         void = (f"exit {run['exit_code']}, no parsable reply: {ext['reason']}"
                 if run["exit_code"] != 0 else f"unparsable reply: {ext['reason']}")
+    elif not reads_made(vendor, parsed):
+        # A reviewer that could not read the change returns a parsable,
+        # empty answer. On 2026-11-16 a Codex build whose sandbox refused
+        # every command did exactly that, and it scored as a clean review.
+        void = "read nothing: the reviewer made no file read or command"
     raw = parsed.get("final_message")
     if raw is None and void:
         raw = (run["stdout"][-RAW_CHARS // 2:] + "\n--- stderr ---\n" + run["stderr"][-RAW_CHARS // 2:])
