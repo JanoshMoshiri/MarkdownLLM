@@ -22,8 +22,16 @@ def lf_bytes(path: Path) -> bytes:
     return path.read_bytes().replace(b"\r\n", b"\n")
 
 
+# A road reviewer works in a clone at /home/reviewer/work/review.XXXXXXXX/
+# (a neutral mktemp name) and is asked for paths from the repository root,
+# the form the set's defects use (`tools/...`). An absolute path into that
+# clone is the same file.
+ROAD_CLONE = re.compile(r"^/home/reviewer/work/review\.[A-Za-z0-9]+/")
+
+
 def norm_path(p: str) -> str:
     p = (p or "").strip().replace("\\", "/")
+    p = ROAD_CLONE.sub("", p)
     while p.startswith("./"):
         p = p[2:]
     return p

@@ -1,5 +1,9 @@
 """Run one arm of the review-catch eval for one trial.
 
+Road arms (`claude-road`, `codex-road` and their `-message` twins) run each
+harness whole inside the review-road WSL distro; see "On the road" in
+README.md and the road section below. The boxed arms follow.
+
 Each review gets a fresh, bare work folder outside the repository holding only
 the `tools/` tree at the entry's commit, `CHANGE.diff`, and (``-message`` arms
 only) `COMMIT_MESSAGE.txt`. The reviewer never sees the set file, the entry
@@ -418,22 +422,40 @@ def codex_reach(command, folder: Path) -> list[str]:
     return reasons
 
 
-def parse_claude(run: dict, folder: Path) -> dict:
-    """stream-json: the `result` event carries the final text, cost and modelUsage."""
+TEST_RUN = re.compile(r"pytest|unittest")
+# Not a void rule: a road review that names the bundle store is recorded, because
+# the other entries' bundles hold later history.
+ROAD_REACH = re.compile(r"/home/reviewer/road|road/bundles|[.]bundle(?![A-Za-z0-9_])")
+
+
+def parse_claude(run: dict, folder: Path | None, check_reach: bool = True) -> dict:
+    """stream-json: the `result` event carries the final text, cost and modelUsage.
+    With check_reach False (road arms) no reach rule runs; Bash commands are
+    recorded either way."""
     events = _jsonl(run["stdout"])
     result = next((e for e in reversed(events) if e.get("type") == "result"), None)
-    tools, outside = [], []
+    tools, outside, commands, road = [], [], [], []
     for ev in events:
         if ev.get("type") != "assistant":
             continue
         for block in (ev.get("message") or {}).get("content") or []:
             if isinstance(block, dict) and block.get("type") == "tool_use":
                 inp = block.get("input") or {}
+                inp = inp if isinstance(inp, dict) else {}
                 name = str(block.get("name"))
                 tools.append(name)
-                outside.extend(claude_reach(name, inp if isinstance(inp, dict) else {}, folder))
+                if check_reach:
+                    outside.extend(claude_reach(name, inp, folder))
+                if name == "Bash" and isinstance(inp.get("command"), str):
+                    commands.append(inp["command"])
+                text = json.dumps(inp, ensure_ascii=False)
+                if ROAD_REACH.search(text):
+                    road.append(f"{name} {text[:200]}")
     rec = {"final_message": None, "cost_usd": None, "tokens": None, "turns": None,
-           "models_observed": [], "agent_error": None, "tool_counts": {}, "outside_reach": outside}
+           "models_observed": [], "agent_error": None, "tool_counts": {}, "outside_reach": outside,
+           "commands": [c[:300] for c in commands],
+           "test_commands": [c[:300] for c in commands if TEST_RUN.search(c)],
+           "road_reach": road}
     for t in tools:
         rec["tool_counts"][t] = rec["tool_counts"].get(t, 0) + 1
     if result is None:
@@ -462,11 +484,15 @@ def _find_models(obj, found: set) -> None:
             _find_models(v, found)
 
 
-def parse_codex(run: dict, folder: Path, last_file: Path) -> dict:
+def parse_codex(run: dict, folder: Path | None, last_file: Path | None,
+                last_text: str | None = None, check_reach: bool = True) -> dict:
+    """JSONL events. The final message is the --output-last-message file (or,
+    on the road, its text carried back in the output), else the last
+    agent_message. With check_reach False (road arms) no reach rule runs."""
     events = _jsonl(run["stdout"])
     rec = {"final_message": None, "cost_usd": None, "tokens": None, "turns": None,
            "models_observed": [], "agent_error": None, "tool_counts": {}, "commands": [],
-           "outside_reach": []}
+           "outside_reach": [], "test_commands": [], "road_reach": []}
     tokens: dict = {}
     turns = 0
     last_agent_msg = None
@@ -482,8 +508,9 @@ def parse_codex(run: dict, folder: Path, last_file: Path) -> dict:
             key = (any_item.get("id"), json.dumps(cmd))
             if key not in seen_cmds:
                 seen_cmds.add(key)
-                for why in codex_reach(cmd, folder):
-                    rec["outside_reach"].append(f"{why} :: {str(cmd)[:200]}")
+                if check_reach:
+                    for why in codex_reach(cmd, folder):
+                        rec["outside_reach"].append(f"{why} :: {str(cmd)[:200]}")
         if kind == "turn.completed":
             turns += 1
             for k, v in (ev.get("usage") or {}).items():
@@ -498,11 +525,18 @@ def parse_codex(run: dict, folder: Path, last_file: Path) -> dict:
             if itype == "agent_message" and isinstance(item.get("text"), str):
                 last_agent_msg = item["text"]
             if itype == "command_execution" and item.get("command"):
-                rec["commands"].append(str(item["command"])[:300])
+                full = str(item["command"])
+                rec["commands"].append(full[:300])
+                if TEST_RUN.search(full):
+                    rec["test_commands"].append(full[:300])
+                if ROAD_REACH.search(full):
+                    rec["road_reach"].append(full[:200])
     rec["tokens"] = tokens or None
     rec["turns"] = turns or None
     rec["models_observed"] = sorted(models)
-    if last_file.is_file():
+    if last_text is not None:
+        rec["final_message"] = last_text
+    elif last_file is not None and last_file.is_file():
         rec["final_message"] = decode(last_file.read_bytes())
     if not rec["final_message"]:
         rec["final_message"] = last_agent_msg
@@ -611,6 +645,410 @@ def review_once(vendor: str, base: list[str], model: str, effort: str, prompt: s
     return rec
 
 
+# ---------------------------------------------------------------- on the road
+#
+# Road arms run each harness whole inside the review-road WSL distro
+# (things/plans/review-catch-on-the-road.md). This runner only launches and
+# records. Per review it calls the root script review-run (road/review-run.sh),
+# which stages only this entry's bundle out of the root-only store and starts
+# review-one (road/review-one.sh) as the reviewer behind the network lock.
+# review-one clones the staged bundle into a neutrally named work directory,
+# deletes the bundle, sets the commit message, checks that no bundle is within
+# reach, fingerprints the reviewer's harness configuration, runs the harness
+# under `timeout` with its normal tools, fingerprints again, and prints the
+# harness's stream, the Codex last message and one meta line. There is no
+# reach rule: the machine holds the line. Every argument that crosses
+# wsl.exe is a simple token, because wsl.exe joins its arguments into a
+# /bin/sh command line inside the distro.
+
+ROAD_ARMS = ("claude-road", "codex-road", "claude-road-message", "codex-road-message")
+DISTRO = "review-road"
+WSL = "wsl.exe"
+REVIEW_RUN = "/usr/local/sbin/review-run"
+REVIEW_ONE = "/usr/local/bin/review-one"
+DISTRO_PROMPT = "/home/reviewer/road/prompt-road.md"
+DISTRO_WORK = "/home/reviewer/work"
+DISTRO_STAGE = "/home/reviewer/road/stage"
+BUNDLE_STORE = "/srv/review-road/bundles"
+ROAD_PROMPT = HERE / "prompt-road.md"
+ROAD_SCRIPT = HERE / "road" / "review-one.sh"
+ROAD_RUN_SCRIPT = HERE / "road" / "review-run.sh"
+ROAD_MANIFEST = HERE / "road" / "bundles.json"
+ROAD_OUT = "evals/results/review-catch-road"
+BOXED_OUT = "evals/results/review-catch"
+BOXED_TIMEOUT = 600
+ROAD_TIMEOUT = 1800
+# On top of the review's own timeout: staging, clone, gc, fingerprints, and
+# timeout's --kill-after.
+ROAD_MARGIN = 180
+LAST_DELIM = "=====REVIEW-ONE-LAST-MESSAGE====="
+META_DELIM = "=====REVIEW-ONE-META====="
+ARGV_TOKEN = re.compile(r"^[A-Za-z0-9._/-]+$")
+WEB_SEARCH_DENIED = ('claude: --disallowedTools WebSearch,WebFetch; '
+                     'codex: -c web_search="disabled"')
+CONFIG_CHANGED = "changed the harness configuration"
+# The installed files, by their path in the distro and their local source.
+INSTALLED = {"prompt": (DISTRO_PROMPT, ROAD_PROMPT),
+             "review_one": (REVIEW_ONE, ROAD_SCRIPT),
+             "review_run": (REVIEW_RUN, ROAD_RUN_SCRIPT)}
+
+
+def road_parts(arm: str) -> tuple[str, bool]:
+    """(vendor, message shown) for a road arm."""
+    if arm not in ROAD_ARMS:
+        raise ValueError(f"not a road arm: {arm!r}")
+    return arm.split("-", 1)[0], arm.endswith("-message")
+
+
+def wsl_root(*args: str) -> list[str]:
+    """wsl.exe argv running ARGS as root in the distro. Refuses any argument
+    that is not a simple token (letters, digits, . _ - /)."""
+    argv = [WSL, "-d", DISTRO, "-u", "root", "--", *[str(a) for a in args]]
+    bad = [a for a in argv[1:] if not ARGV_TOKEN.match(a)]
+    if bad:
+        raise ValueError(f"not a simple token for wsl.exe: {bad}")
+    return argv
+
+
+def road_command(vendor: str, arm: str, trial: int, entry_id: str, model: str, effort: str,
+                 timeout: int, show_message: bool, prepare_only: bool = False) -> list[str]:
+    return wsl_root(REVIEW_RUN, *(["--prepare-only"] if prepare_only else []),
+                    vendor, arm, str(trial), entry_id, model, effort, str(timeout),
+                    "1" if show_message else "0")
+
+
+def run_distro(argv: list[str], stdin: bytes | None = None, timeout: int = 300) -> dict:
+    """One short side command in the distro (install, hash check, cleanup)."""
+    try:
+        proc = subprocess.run(argv, input=stdin, capture_output=True, timeout=timeout,
+                              stdin=None if stdin is not None else subprocess.DEVNULL)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {"exit_code": None, "stdout": "", "stderr": f"{type(exc).__name__}: {exc}"}
+    return {"exit_code": proc.returncode, "stdout": decode(proc.stdout), "stderr": decode(proc.stderr)}
+
+
+def split_road_output(text: str | None) -> dict:
+    """Split review-one's stdout into the harness stream, the Codex last
+    message (None when absent) and the meta object (None when absent or
+    unreadable). The last-message delimiter is the first at a line start (a
+    JSONL stream cannot hold one there); the meta delimiter is the last."""
+    text = (text or "").replace("\r\n", "\n")
+    out = {"stream": text, "last_message": None, "meta": None}
+    metas = list(re.finditer(r"(?m)^" + re.escape(META_DELIM) + r"$", text))
+    if metas:
+        m = metas[-1]
+        out["stream"] = text[:m.start()]
+        lines = [ln for ln in text[m.end():].splitlines() if ln.strip()]
+        if lines:
+            try:
+                meta = json.loads(lines[0])
+            except ValueError:
+                meta = None
+            out["meta"] = meta if isinstance(meta, dict) else None
+    last = re.search(r"(?m)^" + re.escape(LAST_DELIM) + r"$", out["stream"])
+    if last:
+        out["last_message"] = out["stream"][last.end():].strip("\n")
+        out["stream"] = out["stream"][:last.start()]
+    return out
+
+
+def road_reads_made(vendor: str, parsed: dict) -> bool:
+    """Claude: any tool use at all. Codex: any command executed."""
+    if vendor == "claude":
+        return any((parsed.get("tool_counts") or {}).values())
+    return bool(parsed.get("commands"))
+
+
+def road_cleanup(distro=run_distro) -> None:
+    """After a Windows-side timeout the in-distro traps may not have run.
+    One review runs at a time, so everything the reviewer side holds goes."""
+    distro(wsl_root("pkill", "-KILL", "-u", "reviewer"))
+    distro(wsl_root("rm", "-rf", DISTRO_WORK, DISTRO_STAGE))
+
+
+def review_road_once(vendor: str, arm: str, trial: int, entry: dict, model: str, effort: str,
+                     timeout: int, show_message: bool, launcher=launch, distro=run_distro,
+                     bundle_sha256: str | None = None) -> dict:
+    cmd = road_command(vendor, arm, trial, entry["id"], model, effort, timeout, show_message)
+    run = launcher(cmd, HERE, None, timeout + ROAD_MARGIN)
+    if run["timed_out"]:
+        road_cleanup(distro)
+    parts = split_road_output(run["stdout"])
+    meta = parts["meta"]
+    if vendor == "claude":
+        parsed = parse_claude({"stdout": parts["stream"]}, None, check_reach=False)
+    else:
+        parsed = parse_codex({"stdout": parts["stream"]}, None, None,
+                             last_text=parts["last_message"], check_reach=False)
+    ext = extract_findings(parsed.get("final_message"))
+    m = meta or {}
+    harness_exit = m.get("exit_code")
+    timed_out = bool(run["timed_out"] or m.get("timed_out"))
+    changed = m.get("config_changed") or []
+    preflight = m.get("preflight_failures") or []
+    void = None
+    if changed:
+        # Checked first: whatever else happened, later reviews would run on a
+        # contaminated configuration, so the arm stops.
+        void = CONFIG_CHANGED
+    elif timed_out:
+        void = f"timeout after {timeout}s"
+    elif meta is None:
+        void = f"review-one did not finish (wsl exit {run['exit_code']})"
+    elif preflight:
+        void = "preflight failed, harness not started: " + "; ".join(preflight)
+    elif m.get("entry_commit") != entry["commit"]:
+        void = "the bundle's HEAD is not the entry commit"
+    elif bundle_sha256 and m.get("bundle_sha256") != bundle_sha256:
+        void = "the staged bundle differs from the manifest"
+    elif not ext["ok"]:
+        void = (f"exit {harness_exit}, no parsable reply: {ext['reason']}"
+                if harness_exit != 0 else f"unparsable reply: {ext['reason']}")
+    elif not road_reads_made(vendor, parsed):
+        void = ("read nothing: the reviewer used no tool" if vendor == "claude"
+                else "read nothing: the reviewer executed no command")
+    raw = parsed.get("final_message")
+    if raw is None and void:
+        raw = parts["stream"][-RAW_CHARS // 2:] + "\n--- stderr ---\n" + run["stderr"][-RAW_CHARS // 2:]
+    tests = parsed.get("test_commands") or []
+    return {"started": run["started"], "ended": run["ended"], "seconds": run["seconds"],
+            "review_seconds": m.get("seconds"),
+            "exit_code": harness_exit, "launcher_exit": run["exit_code"], "timed_out": timed_out,
+            "harness_run": m.get("harness_run"),
+            "harness_build": m.get("harness_version"),
+            "head_reviewed": m.get("head_reviewed"),
+            "message_shown": show_message,
+            "staged_bundle_sha256": m.get("bundle_sha256"),
+            "preflight_failures": preflight,
+            "config_before": m.get("config_before"), "config_after": m.get("config_after"),
+            "config_changed": changed,
+            "stop_arm": bool(changed),
+            "cost_usd": parsed.get("cost_usd"), "tokens": parsed.get("tokens"),
+            "turns": parsed.get("turns"), "models_observed": parsed.get("models_observed") or [],
+            "agent_error": parsed.get("agent_error"), "tool_counts": parsed.get("tool_counts"),
+            "commands": parsed.get("commands") or [],
+            "ran_tests": bool(tests), "test_commands": tests,
+            "road_reach": parsed.get("road_reach") or [],
+            "findings": ext["findings"] if not void else [], "findings_offered": ext["offered"],
+            "trailing_text": ext["trailing_text"],
+            "raw_final_message": (raw or "")[:RAW_CHARS],
+            "stderr_tail": run["stderr"][-2000:],
+            "void": bool(void), "void_reason": void}
+
+
+def road_bundles(path: Path, set_sha: str, entries: list[dict]) -> dict:
+    """The bundle manifest's row per entry. Refuses a manifest for another set,
+    and any entry whose bundle failed (or lacks) the leak check."""
+    doc = json.loads(decode(lf_bytes(path)))
+    if doc.get("set_sha256") != set_sha:
+        raise ValueError(f"{path.name} is for set {str(doc.get('set_sha256'))[:12]}, "
+                         f"not {set_sha[:12]}")
+    rows = {b["id"]: b for b in doc.get("bundles") or []}
+    bad = []
+    for e in entries:
+        b = rows.get(e["id"])
+        if not b or b.get("leak_check") != "pass" or b.get("commit") != e["commit"]:
+            bad.append(e["id"])
+    if bad:
+        raise ValueError(f"no passed bundle for: {', '.join(bad)} - those entries are not run")
+    return rows
+
+
+def _sha256sum(paths: list[str], distro=run_distro) -> tuple[dict, str | None]:
+    """sha256 of files inside the distro, read as root: {path: sha}, error."""
+    res = distro(wsl_root("sha256sum", *paths))
+    out = {}
+    for line in (res.get("stdout") or "").splitlines():
+        parts = line.split()
+        if len(parts) == 2:
+            out[parts[1]] = parts[0]
+    err = None if res.get("exit_code") == 0 else (res.get("stderr") or "").strip()[:300] or "failed"
+    return out, err
+
+
+def distro_hashes(distro=run_distro) -> dict:
+    """sha256 of the installed prompt, review-one and review-run, read in the distro."""
+    got, err = _sha256sum([p for p, _ in INSTALLED.values()], distro)
+    return {**{k: got.get(p) for k, (p, _) in INSTALLED.items()}, "error": err}
+
+
+def local_hashes() -> dict:
+    return {k: sha256_bytes(lf_bytes(src)) for k, (_, src) in INSTALLED.items()}
+
+
+def store_mismatches(bundles: dict, entries: list[dict], distro=run_distro) -> list[str]:
+    """Entries whose bundle in the root store is missing or differs from the manifest."""
+    paths = {e["id"]: f"{BUNDLE_STORE}/{e['id']}.bundle" for e in entries}
+    got, _ = _sha256sum(list(paths.values()), distro)
+    return [i for i, p in paths.items() if got.get(p) != bundles[i]["bundle_sha256"]]
+
+
+def install(distro=run_distro) -> int:
+    """Copy prompt-road.md, review-one.sh and review-run.sh (as LF bytes) into
+    the distro, root-owned, set the bundle store's permissions (dirs 700, files
+    600, root), and confirm the hashes there."""
+    steps = []
+    for key, mode in (("review_run", "755"), ("review_one", "755"), ("prompt", "644")):
+        path, src = INSTALLED[key]
+        steps += [(wsl_root("tee", path), lf_bytes(src)),
+                  (wsl_root("chown", "root", path), None),
+                  (wsl_root("chgrp", "root", path), None),
+                  (wsl_root("chmod", mode, path), None)]
+    store_root = BUNDLE_STORE.rsplit("/", 1)[0]
+    steps += [(wsl_root("chown", "-R", "root", store_root), None),
+              (wsl_root("chgrp", "-R", "root", store_root), None),
+              (wsl_root("chmod", "-R", "600", store_root), None),
+              (wsl_root("chmod", "700", store_root, BUNDLE_STORE), None)]
+    for argv, data in steps:
+        res = distro(argv, data)
+        if res.get("exit_code") != 0:
+            print(f"install: {' '.join(argv[6:])} failed: {(res.get('stderr') or '').strip()}",
+                  file=sys.stderr)
+            return 1
+    want, got = local_hashes(), distro_hashes(distro)
+    for key, (path, _) in INSTALLED.items():
+        print(f"{path}: sha256 {got[key]} (local LF {want[key]})")
+    ok = all(got[k] == want[k] for k in want)
+    print("install: ok" if ok else "install: HASH MISMATCH")
+    return 0 if ok else 1
+
+
+def run_road_arm(args, launcher=launch, distro=run_distro, repo: Path = REPO) -> int:
+    vendor, show = road_parts(args.arm)
+    set_data, set_sha = load_set(Path(args.set).resolve())
+    want = local_hashes()
+    only = [x.strip() for x in args.entries.split(",") if x.strip()] if args.entries else None
+    entries = ordered_entries(set_data, args.trial, only)
+    timeout = args.timeout or ROAD_TIMEOUT
+    manifest = Path(getattr(args, "bundles", None) or ROAD_MANIFEST)
+    bundles = road_bundles(manifest, set_sha, entries)
+    prepare_only = bool(getattr(args, "prepare_only", False))
+    head = (f"{args.arm} t{args.trial} [{args.model}, effort {args.effort}] on {DISTRO}, "
+            f"message {'shown' if show else 'replaced'}")
+
+    if not args.dry_run:
+        got = distro_hashes(distro)
+        if any(got[k] != want[k] for k in want):
+            print(f"run_reviews: the distro's installed files differ from this checkout "
+                  f"({got}); run `run_reviews.py --install` first", file=sys.stderr)
+            return 3
+        bad = store_mismatches(bundles, entries, distro)
+        if bad:
+            print(f"run_reviews: the root store's bundle is missing or differs from the "
+                  f"manifest for: {', '.join(bad)}", file=sys.stderr)
+            return 3
+
+    if args.dry_run or prepare_only:
+        print(f"{head} - {'dry run' if args.dry_run else 'prepare only'}, {len(entries)} entries")
+        failed = 0
+        for e in entries:
+            cmd = road_command(vendor, args.arm, args.trial, e["id"], args.model, args.effort,
+                               timeout, show, prepare_only=prepare_only)
+            store = "not checked (dry run)" if args.dry_run else "store copy matches"
+            print(f"[{e['id']}] bundle sha256 {bundles[e['id']]['bundle_sha256'][:12]}, "
+                  f"leak check pass, {store}")
+            print("  " + subprocess.list2cmdline(cmd))
+            if args.dry_run:
+                continue
+            res = distro(cmd)
+            print((res.get("stdout") or "").rstrip())
+            if res.get("exit_code") != 0:
+                failed += 1
+                print(f"  prepare failed (exit {res.get('exit_code')}): "
+                      f"{(res.get('stderr') or '').strip()[:500]}")
+        if args.dry_run:
+            print(f"dry run: {len(entries)} commands printed, nothing launched")
+        return 1 if failed else 0
+
+    out_dir = Path(args.out or ROAD_OUT)
+    if not out_dir.is_absolute():
+        out_dir = repo / out_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+    result_path = out_dir / f"{utc_stamp()}-{args.arm}-t{args.trial}.json"
+    payload = {"schema": 1, "arm": args.arm, "vendor": vendor, "road": True, "distro": DISTRO,
+               "model_requested": args.model, "effort_requested": args.effort,
+               "message_shown": show, "models_observed": [],
+               "harness_build": None, "harness_builds": [],
+               "prompt_file": ROAD_PROMPT.name, "prompt_sha256": want["prompt"],
+               "prompt_sha256_in_distro": want["prompt"],
+               "review_one_sha256": want["review_one"],
+               "review_one_sha256_in_distro": want["review_one"],
+               "review_run_sha256": want["review_run"],
+               "review_run_sha256_in_distro": want["review_run"],
+               "bundle_store": BUNDLE_STORE, "bundle_store_verified": True,
+               "web_search": WEB_SEARCH_DENIED,
+               "set_sha256": set_sha,
+               "bundles_manifest_sha256": sha256_bytes(lf_bytes(manifest)),
+               "hashes_over": "LF-normalised bytes (CRLF -> LF)",
+               "repo_head": set_data.get("repo_head"),
+               "trial": args.trial, "entries_filter": only, "timeout_s": timeout,
+               "started": now_iso(), "ended": None, "complete": False, "stopped": None,
+               "reviews": [], "totals": {}}
+
+    def stop(reason: str) -> int:
+        payload["stopped"] = reason
+        payload["ended"] = now_iso()
+        write_result(result_path, payload)
+        print(f"STOPPED: {reason}", file=sys.stderr)
+        print_summary(payload, result_path)
+        return 2
+
+    streak = 0
+    print(f"{head} - {len(entries)} reviews -> {result_path}")
+    write_result(result_path, payload)
+    first = True
+    for e in entries:
+        attempts = []
+        rec = None
+        for attempt in (1, 2):
+            if not first:
+                now = distro_hashes(distro)
+                if any(now[k] != want[k] for k in want):
+                    return stop(f"the distro's installed files changed before {e['id']} ({now})")
+            first = False
+            rec = review_road_once(vendor, args.arm, args.trial, e, args.model, args.effort,
+                                   timeout, show, launcher, distro,
+                                   bundle_sha256=bundles[e["id"]]["bundle_sha256"])
+            rec["bundle_sha256"] = bundles[e["id"]]["bundle_sha256"]
+            if rec["void"]:
+                streak += 1
+                attempts.append({k: rec[k] for k in (
+                    "void_reason", "exit_code", "launcher_exit", "seconds", "cost_usd", "tokens",
+                    "harness_build", "commands", "config_changed", "preflight_failures",
+                    "raw_final_message", "stderr_tail")})
+                print(f"  [{e['id']}] VOID (attempt {attempt}): {rec['void_reason']}")
+                if streak >= VOID_STREAK_STOP or rec["stop_arm"]:
+                    break
+            else:
+                streak = 0
+                break
+        rec = {"entry": e["id"], **rec, "retries": len(attempts) if not rec["void"] else len(attempts) - 1,
+               "void_attempts": attempts if not rec["void"] else attempts[:-1]}
+        payload["reviews"].append(rec)
+        payload["models_observed"] = sorted({m for r in payload["reviews"] for m in r["models_observed"]})
+        builds = sorted({r["harness_build"] for r in payload["reviews"] if r.get("harness_build")})
+        payload["harness_builds"] = builds
+        payload["harness_build"] = "; ".join(builds) or None
+        payload["totals"] = compute_totals(payload["reviews"])
+        write_result(result_path, payload)
+        if not rec["void"]:
+            print(f"  [{e['id']}] {len(rec['findings'])} kept / {rec['findings_offered']} offered, "
+                  f"{rec['seconds']}s, {len(rec['commands'])} commands, "
+                  f"tests {'run' if rec['ran_tests'] else 'not run'}, cost {rec['cost_usd']}")
+        if rec["stop_arm"]:
+            return stop(f"{e['id']} {CONFIG_CHANGED}: {', '.join(rec['config_changed'])} - "
+                        "later reviews would be contaminated; a stopped arm is not a run")
+        if streak >= VOID_STREAK_STOP:
+            return stop(f"two consecutive voided reviews (last: {e['id']}: "
+                        f"{rec['void_reason']}) - a stopped arm is not a run")
+    payload["complete"] = True
+    payload["ended"] = now_iso()
+    payload["totals"] = compute_totals(payload["reviews"])
+    write_result(result_path, payload)
+    print_summary(payload, result_path)
+    return 0
+
+
 # ---------------------------------------------------------------- the arm
 
 def load_set(path: Path) -> tuple[dict, str]:
@@ -640,8 +1078,11 @@ def write_result(path: Path, payload: dict) -> None:
 
 
 def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
-            work_root: Path | None = None, repo: Path = REPO) -> int:
+            work_root: Path | None = None, repo: Path = REPO, distro=run_distro) -> int:
+    if args.arm in ROAD_ARMS:
+        return run_road_arm(args, launcher=launcher, distro=distro, repo=repo)
     vendor, variant = arm_parts(args.arm)
+    timeout = args.timeout or BOXED_TIMEOUT
     set_path = Path(args.set).resolve()
     set_data, set_sha = load_set(set_path)
     prompt_path = PROMPTS[variant]
@@ -675,7 +1116,7 @@ def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
 
     base = base_cmd or find_exe(vendor)
     build = harness_build(base)
-    out_dir = Path(args.out)
+    out_dir = Path(args.out or BOXED_OUT)
     if not out_dir.is_absolute():
         out_dir = (repo / out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -687,7 +1128,7 @@ def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
                "prompt_file": prompt_path.name, "prompt_sha256": sha256_bytes(prompt_bytes),
                "set_sha256": set_sha, "hashes_over": "LF-normalised bytes (CRLF -> LF)",
                "repo_head": set_data.get("repo_head"),
-               "trial": args.trial, "entries_filter": only, "timeout_s": args.timeout,
+               "trial": args.trial, "entries_filter": only, "timeout_s": timeout,
                "started": now_iso(), "ended": None, "complete": False, "stopped": None,
                "reviews": [], "totals": {}}
 
@@ -710,7 +1151,7 @@ def run_arm(args, launcher=launch, base_cmd: list[str] | None = None,
             folder = build_work_folder(e, variant, base_dir / e["id"], repo=repo)
             assert_no_leak(folder, variant, e, set_data)
             rec = review_once(vendor, base, args.model, args.effort, prompt, folder, out_tmp,
-                              args.timeout, launcher)
+                              timeout, launcher)
             _rmtree(folder)
             if rec["void"]:
                 streak += 1
@@ -786,7 +1227,8 @@ def print_summary(payload: dict, result_path: Path) -> None:
     for r in payload["reviews"]:
         state = f"VOID ({r['void_reason']})" if r["void"] else "ok"
         retry = f", {r.get('retries')} retry" if r.get("retries") else ""
-        print(f"  {r['entry']}: {r['seconds']}s, {len(r['findings'])} findings kept, {state}{retry}")
+        tests = ", ran tests" if r.get("ran_tests") else ""
+        print(f"  {r['entry']}: {r['seconds']}s, {len(r['findings'])} findings kept, {state}{retry}{tests}")
     t = compute_totals(payload["reviews"])
     cost = "unknown" if t["cost_usd"] is None else f"${t['cost_usd']:.4f}"
     tokens = ("unknown" if not t["tokens"]
@@ -797,20 +1239,36 @@ def print_summary(payload: dict, result_path: Path) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if "--install" in argv:
+        if argv != ["--install"]:
+            sys.exit("run_reviews: --install takes no other arguments")
+        return install()
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0],
+                                 epilog="`run_reviews.py --install` copies prompt-road.md and "
+                                        "road/review-one.sh into the review-road distro.")
     ap.add_argument("--set", required=True)
-    ap.add_argument("--arm", required=True, choices=ARMS)
+    ap.add_argument("--arm", required=True, choices=ARMS + ROAD_ARMS)
     ap.add_argument("--model", required=True, help="full model id; never defaulted")
     ap.add_argument("--effort", required=True, choices=EFFORTS,
                     help="reasoning effort; never defaulted silently — pass `default` to leave the CLI's own")
     ap.add_argument("--trial", required=True, type=int)
-    ap.add_argument("--out", default="evals/results/review-catch")
+    ap.add_argument("--out", default=None,
+                    help=f"default {BOXED_OUT}, or {ROAD_OUT} for road arms")
     ap.add_argument("--entries", default=None, help="comma-separated entry ids")
-    ap.add_argument("--timeout", type=int, default=600)
+    ap.add_argument("--timeout", type=int, default=None,
+                    help=f"seconds per review; default {BOXED_TIMEOUT}, or {ROAD_TIMEOUT} for road arms")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--bundles", default=str(ROAD_MANIFEST),
+                    help="road arms: the bundle manifest (bundles.json)")
+    ap.add_argument("--prepare-only", action="store_true",
+                    help="road arms: run review-one's clone-and-message step per entry, "
+                         "print the HEAD it would review, clean up; no harness is launched")
     args = ap.parse_args(argv)
     if not args.model.strip():
         ap.error("--model must be a non-empty model id")
+    if args.prepare_only and args.arm not in ROAD_ARMS:
+        ap.error("--prepare-only is for road arms")
     return run_arm(args)
 
 

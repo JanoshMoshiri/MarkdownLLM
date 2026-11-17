@@ -3,6 +3,9 @@
 .gitattributes text eol=lf
 *.sh text eol=lf
 *.ps1 text eol=lf
+# Named on its own as well: the review-catch road scripts are installed into
+# a Linux distro byte for byte and their sha256 is recorded with each result.
+evals/review-catch/road/*.sh text eol=lf
 
 # Bundle templates render into files that run on Linux (bootstrap.sh in an
 # ephemeral VM), and the mechanism hash reads their bytes — keep both

@@ -1,8 +1,8 @@
 ---
 id: review-catch-on-the-road
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-11-16
 priority: high
 origin: stated
@@ -55,48 +55,50 @@ hash `c9537dcb…`. What changes is the road each reviewer drives on.
 
 ## Phases
 
-- [ ] **Phase 1 — The road.**
-      - [ ] One container image inside the operator's WSL Ubuntu: Linux,
+*Phases 1 to 4 built on 2026-11-17. What was built differs from the first draft in four places, each closing a gap found on the way: the bundles sit in a store only root can read, and one is staged per review and deleted before the reviewer starts; the working folder has a random name, so it does not say which arm a review is in; the reviewer's harness configuration is fingerprinted before and after, and a change stops the arm, except for the folders each harness syncs itself, which stopped the first Claude smoke review; and the blind arms replace the commit message under review with `Change under review.` so `git log` does not show the author's account. Codex read the instruction for bias, found none in its wording, and three ambiguities that could change scoring were fixed: line numbering, an empty answer, and what counts as pre-existing.*
+
+- [x] **Phase 1 — The road.**
+      - [x] One container image inside the operator's WSL Ubuntu: Linux,
             git, Python and the test tools the repository needs, and both
             vendors' command-line harnesses at recorded versions.
-      - [ ] The image cannot see the Windows drive, the operator's other
+      - [x] The image cannot see the Windows drive, the operator's other
             repositories, or any memory, session history or settings the
             harnesses keep on the host.
-      - [ ] Network out of the container reaches each vendor's model
+      - [x] Network out of the container reaches each vendor's model
             service and nothing else. Checked by trying to reach GitHub
             from inside it and failing.
-      - [ ] The operator signs each vendor in inside the image. That is
+      - [x] The operator signs each vendor in inside the image. That is
             the operator's act, and no agent does it.
 
-- [ ] **Phase 2 — The repositories.**
-      - [ ] For each entry, a repository holding the commit under review
+- [x] **Phase 2 — The repositories.**
+      - [x] For each entry, a repository holding the commit under review
             and its history and nothing after it, with no remote and no
             reflog. Built from the commit's own ancestry, not by deleting
             later commits from a full clone.
-      - [ ] A leak check per entry, run before any review: the later fix
+      - [x] A leak check per entry, run before any review: the later fix
             commit is absent, and no object from after the commit exists.
             An entry that fails is not run.
-      - [ ] Each repository is mounted fresh for each review and thrown
+      - [x] Each repository is mounted fresh for each review and thrown
             away after it, so no review sees another's leftovers.
 
-- [ ] **Phase 3 — The instruction.**
-      - [ ] Cut to the minimum: review the change at `HEAD` for defects,
+- [x] **Phase 3 — The instruction.**
+      - [x] Cut to the minimum: review the change at `HEAD` for defects,
             and the output format, at most five findings.
-      - [ ] The other vendor reads it for anything that favours the model
+      - [x] The other vendor reads it for anything that favours the model
             that wrote it. Changes are recorded, and then it is frozen by
             hash.
 
-- [ ] **Phase 4 — The runner and the scorer.**
-      - [ ] The runner launches each harness inside the image, one review
+- [x] **Phase 4 — The runner and the scorer.**
+      - [x] The runner launches each harness inside the image, one review
             at a time, and records what the reviewer did: commands, tests
             run, time and tokens. There is no reach rule. A review is void
             only if the reviewer dies, returns nothing parsable, or reads
             nothing.
-      - [ ] The scorer keeps its matching rule and its refusal to pool
+      - [x] The scorer keeps its matching rule and its refusal to pool
             across set, instruction, model or effort. Near misses are
             exported without the arm, for the operator or a third
             vendor's agent to rule.
-      - [ ] Tests for both, and one dry run per vendor, before any real
+      - [x] Tests for both, and one dry run per vendor, before any real
             review.
 
 - [ ] **Phase 5 — Pre-registration and smoke.**
@@ -107,7 +109,7 @@ hash `c9537dcb…`. What changes is the road each reviewer drives on.
       - [ ] The same-model comparison is written into the predictions
             now: two passes by one model against one pass by each vendor,
             at the same number of reviews.
-      - [ ] One unscored smoke review per vendor inside the image.
+      - [x] One unscored smoke review per vendor inside the image. Ran clean on 2026-11-17: Codex in 3.2 minutes, 35 commands, the tests run, two findings; Claude in 3.0 minutes, 23 commands, the tests run, three findings, $1.54 at list price. Neither reached outside its repository; neither searched the web.
 
 - [ ] **Phase 6 — The Claude baseline.** `claude-opus-5-5` at extra high
       effort, five passes, one per five-hour window. On the boxed setup a
