@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-17
-generated: 2026-11-17T22:04:54
-generated_from: HEAD@d273f69
-coverage: 665
+created: 2026-11-18
+generated: 2026-11-18T02:16:39
+generated_from: HEAD@4141bed
+coverage: 668
 framework_version: 3.51.0
 ---
 
@@ -132,6 +132,11 @@ framework_version: 3.51.0
 - a-probe-and-a-ruling-enter-the-corpus-in-the-same-shape --informs--> settled-reasoning-is-standing-authority
 - a-probe-and-a-ruling-enter-the-corpus-in-the-same-shape --complements--> existence-is-not-currency
 - a-probe-and-a-ruling-enter-the-corpus-in-the-same-shape --complements--> a-uniform-answer-is-a-dead-judgment
+- a-record-that-only-accumulates-has-no-metabolism --informs--> thing-lifecycle-specification
+- a-record-that-only-accumulates-has-no-metabolism --references--> operating-model-specification
+- a-record-that-only-accumulates-has-no-metabolism --references--> session-memory-specification
+- a-record-that-only-accumulates-has-no-metabolism --complements--> conformance-not-determinism
+- a-record-that-only-accumulates-has-no-metabolism --supports--> a-surface-without-a-floor-accumulates-repairs-not-progress
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --complements--> a-check-that-always-fires-teaches-the-operator-to-ignore-it
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --supports--> consequence-is-recoverable-only-in-retrospect
 - a-records-home-must-not-sit-behind-the-gate-it-reports-on --complements--> existence-is-not-currency
@@ -450,6 +455,11 @@ framework_version: 3.51.0
 - composition-is-the-inverse-of-decomposition --supports--> srp-extraction-is-tier-promotion
 - composition-is-the-inverse-of-decomposition --supports--> the-notation-changed-not-the-primitives
 - composition-is-the-inverse-of-decomposition --informs--> session-memory-specification
+- conformance-not-determinism --extends--> consequence-is-recoverable-only-in-retrospect
+- conformance-not-determinism --informs--> llm-driven-systems-manifesto
+- conformance-not-determinism --informs--> operating-model-specification
+- conformance-not-determinism --complements--> universal-workflow-methodology
+- conformance-not-determinism --supports--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
 - consequence-is-recoverable-only-in-retrospect --informs--> llm-driven-systems-manifesto
 - consequence-is-recoverable-only-in-retrospect --extends--> agents-md-discovery-is-harness-dependent
 - consequence-is-recoverable-only-in-retrospect --complements--> change-safety-is-defense-in-depth
@@ -2079,6 +2089,10 @@ framework_version: 3.51.0
 - withholding-is-not-isolation --supports--> hook-compliance-correlates-with-scope-not-awareness
 - withholding-is-not-isolation --supports--> portability-claims-need-execution-tests
 - withholding-is-not-isolation --complements--> structure-decides-figures-scale-decides-convention
+- work-set-on-trust-has-nothing-to-check-against --supports--> conformance-not-determinism
+- work-set-on-trust-has-nothing-to-check-against --extends--> consequence-is-recoverable-only-in-retrospect
+- work-set-on-trust-has-nothing-to-check-against --supports--> a-remembered-step-is-a-missing-actor
+- work-set-on-trust-has-nothing-to-check-against --references--> standing-watch-specification
 - workflow-reconciliation-precedes-new-definitions --references--> universal-workflow-methodology
 - workflow-reconciliation-precedes-new-definitions --informs--> operating-layer-quality-loop
 - workflow-reconciliation-precedes-new-definitions --derived-from--> estate-retrospective-synthesis-2026-08
