@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-18
-generated: 2026-11-18T02:16:39
-generated_from: HEAD@4141bed
-coverage: 668
+generated: 2026-11-18T02:24:08
+generated_from: HEAD@42dbac2
+coverage: 669
 framework_version: 3.51.0
 ---
 
@@ -460,6 +460,16 @@ framework_version: 3.51.0
 - conformance-not-determinism --informs--> operating-model-specification
 - conformance-not-determinism --complements--> universal-workflow-methodology
 - conformance-not-determinism --supports--> a-check-is-only-as-trustworthy-as-who-controls-its-inputs
+- conformance-roadmap --implements--> conformance-not-determinism
+- conformance-roadmap --implements--> work-set-on-trust-has-nothing-to-check-against
+- conformance-roadmap --implements--> a-record-that-only-accumulates-has-no-metabolism
+- conformance-roadmap --references--> consequence-is-recoverable-only-in-retrospect
+- conformance-roadmap --references--> peer-loops
+- conformance-roadmap --references--> a2a-conversations-on-their-own-branch
+- conformance-roadmap --references--> review-catch-on-the-road
+- conformance-roadmap --references--> thing-lifecycle-specification
+- conformance-roadmap --references--> standing-watch-specification
+- conformance-roadmap --references--> change-reconciliation-specification
 - consequence-is-recoverable-only-in-retrospect --informs--> llm-driven-systems-manifesto
 - consequence-is-recoverable-only-in-retrospect --extends--> agents-md-discovery-is-harness-dependent
 - consequence-is-recoverable-only-in-retrospect --complements--> change-safety-is-defense-in-depth
