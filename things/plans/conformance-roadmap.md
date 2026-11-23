@@ -2,7 +2,7 @@
 id: conformance-roadmap
 type: plan
 status: in-progress
-version: 1.2
+version: 1.3
 created: 2026-11-18
 priority: critical
 origin: stated
@@ -163,13 +163,47 @@ phase below.
    Proposed, for the operator's approval: commit
    `6d4e504ee2727305d65fae9b303c63698f14311c` is this corpus's baseline, and
    each gauge's first count is taken against it.
-9. **The floor gauges what crosses a boundary and leaves the inside to the
-   agent.** Stated by the operator on 2026-11-23. Proposed from it, for the
-   operator's approval: a rule becomes a check only where its effect can be
-   seen in the record at a boundary: a commit, a handback, a session end,
-   an answered wake. A rule about how an agent works inside its turn is
-   guidance and is labelled as guidance. This is the test Phase 4 uses to
-   give each rule its class.
+9. **Guidance and the floor do different jobs, and both stay.** Guidance
+   raises the odds that an agent's work passes first time; the floor
+   decides what is accepted. The operator, 2026-11-23: "I agree that the
+   things we have already should be guidance. We can give the agents pros
+   [prose] and hope they follow, but the flaw [floor] is what we know they
+   will have to follow. So I still feel there's value in those pieces, for
+   now at least." What the specifications say falls into three kinds,
+   proposed by the session for the operator's approval:
+   - **The map:** how the record is laid out, what a link means, where the
+     authority for a thing lives. No model can guess a private structure,
+     however strong it is, so the map stays as guidance. The operator: "I
+     still think the read skill is important because it helps guide the
+     agent in how it traverses through the knowledge graph and the memory
+     graph."
+   - **The contract:** what a record must look like when it crosses a
+     boundary: a commit, a handback, a session end, an answered wake. This
+     is the floor's. A rule becomes a check only where its effect can be
+     seen in the record at a boundary.
+   - **The procedure:** the order of steps and how to reason through them.
+     It stays as guidance, labelled as guidance, until the gauges show it
+     no longer helps the work pass (rule 11).
+10. **A new view enters as a hypothesis beside the one it would change.**
+    Proposed by the session, for the operator's approval. The operator,
+    2026-11-23: "what is said in words is taken as truth in every instance
+    by the agent, so it can change perspectives, and it's vulnerable to
+    perspective infiltration in that way." The view that the floor holds
+    the boundary and the agent holds the inside is itself a hypothesis
+    here. The operator came to it "by sort of studying what works well in
+    agent behavior", and it has not been run in this estate; the
+    prescriptive specifications it is in tension with are partly tried. So
+    it sits beside them and does not displace them. A stated view changes
+    a ruling only when the operator rules that it does, or when use has
+    tested it. The session broke this rule on the day it was written, by
+    drafting rule 9's first version from the newest statement.
+11. **Guidance is retired by the gauges, never by hand.** Proposed by the
+    session, for the operator's approval. A piece of guidance goes when the
+    gauges show no difference in passing with it or without it, and the
+    metabolism (Phase 3) retires it. Until then it stays. Reading leaves no
+    trace at a boundary, so the floor can never prove an agent read well;
+    the nearest trace is a decision's pinned inputs. That is why the map
+    stays as guidance however strong the floor becomes.
 
 The checks written below are specifications of the test, not the test. The
 test itself is the first commit of its phase.
@@ -220,8 +254,9 @@ phases keep their numbers.*
       `review-catch-on-the-road` closes or stays paused. Whether the
       work-continuity ablation continues. The baseline commit. How the
       standing of a specification is told. The cold-pickup check for
-      Phase 7. The order proposed under *The Order Of Work*. Rule 9's test
-      for what becomes a check. Whether `AGENTS.md` opens with the problem
+      Phase 7. The order proposed under *The Order Of Work*. Rules 9, 10
+      and 11: the three kinds, a new view as a hypothesis, and guidance
+      retired by the gauges. Whether `AGENTS.md` opens with the problem
       it solves.
 - [ ] **The research is banked.** The two research reports of 2026-11-17 and
       2026-11-18 are committed as review artifacts with pinned inputs, as the
@@ -324,7 +359,16 @@ before they run.
 
 - [ ] **Every operative rule carries its enforcement class:** enforced,
       tested, detectable and routed, human-owned, or doctrine. A rule marked
-      enforced names the check that enforces it.
+      enforced names the check that enforces it. Each also carries its kind
+      under rule 9: map, contract or procedure. An agent today reads every
+      "must" with equal weight, including stale ones; the label is what
+      tells it which ones bind.
+- [ ] **The map moves into tools where it can.** Proposed by the session.
+      Where the read skill describes a traversal a tool can perform, the
+      tool performs it and hands the agent the records, as the session-start
+      digest does. What is emitted is read; what is only instructed is
+      economised (`emitted-content-is-read-instructed-content-is-economised`).
+      The skill keeps what no tool can do.
 - [ ] **Prose that must happen becomes a check or is relabelled.** The
       kernel, `AGENTS.md`, the skills and the bound prompts are instructions.
       Each "must" in them either gains a check or is marked as guidance.
