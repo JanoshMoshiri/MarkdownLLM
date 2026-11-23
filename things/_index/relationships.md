@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-23
-generated: 2026-11-23T15:28:04
-generated_from: HEAD@6d4e504
-coverage: 671
+generated: 2026-11-23T18:50:36
+generated_from: HEAD@e01169c
+coverage: 672
 framework_version: 3.51.0
 ---
 
@@ -217,6 +217,9 @@ framework_version: 3.51.0
 - ad-hoc-message-loop --implements--> standing-watch-specification
 - ad-hoc-message-loop --implements--> peer-loops
 - adoption-reopens-birth-gaps --extends--> a-ruling-triages-more-cheaply-than-a-mechanism
+- agentic-workflow-across-tools-needs-a-mechanically-validated-record --extends--> continuity-across-surfaces-is-the-purpose-2026-11-23
+- agentic-workflow-across-tools-needs-a-mechanically-validated-record --complements--> conformance-not-determinism
+- agentic-workflow-across-tools-needs-a-mechanically-validated-record --informs--> conformance-roadmap
 - agents-cannot-self-install-permission-bearing-hooks --informs--> hook-enforcement-has-three-anchors
 - agents-cannot-self-install-permission-bearing-hooks --supports--> consequence-is-recoverable-only-in-retrospect
 - agents-drop-mechanical-birth-steps-not-semantic-ones --supports--> hook-compliance-correlates-with-scope-not-awareness
