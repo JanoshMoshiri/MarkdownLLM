@@ -1,8 +1,8 @@
 ---
 id: conformance-roadmap
 type: plan
-status: not-started
-version: 1.0
+status: in-progress
+version: 1.1
 created: 2026-11-18
 priority: critical
 origin: stated
@@ -23,13 +23,13 @@ linked_things:
     notes: "The standing truth the principle rests on."
   - id: peer-loops
     relation: references
-    notes: "Phases 5 to 7 carry that plan's rules and phases forward. Its order of work, the eval first, waits on the operator's ruling in Phase 0."
+    notes: "Phases 5 to 7 carry that plan's rules and phases forward. Its order of work, the eval first, was lifted by the operator's ruling of 2026-11-21."
   - id: a2a-conversations-on-their-own-branch
     relation: references
     notes: "Phase 1 builds the watcher's check at the remote ref. That plan's validated landing stays its own phase."
   - id: review-catch-on-the-road
     relation: references
-    notes: "Continues in its own plan as part of Phase 8. Proposed to gate nothing here."
+    notes: "Paused by the operator's ruling of 2026-11-23. Gates nothing here. Its isolated machine is proposed as the clean surface for Phase 7's cold pickup."
   - id: thing-lifecycle-specification
     relation: references
     notes: "The deferred spec that already holds the expulsion half of Phase 3."
@@ -39,11 +39,17 @@ linked_things:
   - id: change-reconciliation-specification
     relation: references
     notes: "Owns the gate Phase 1 carries to every repository."
+  - id: continuity-across-surfaces-is-the-purpose-2026-11-23
+    relation: implements
+    notes: "What the four pillars are for, and what Phase 7 has to show."
+  - id: every-spec-stays-and-gauges-come-before-clearing-2026-11-23
+    relation: implements
+    notes: "The Phase 0 rulings: the eval gates nothing, every specification stays, the gauges come before any clearing."
 triggers:
   - type: time
     condition: "2026-12-02 reached"
     action: surface
-    note: "Two weeks in. Has the operator made the Phase 0 rulings? Is Phase 1's first check committed and approved, and is it green or red? If nothing has moved, say which of the two stopped it: the rulings were not made, or the check was not written. A roadmap that sits is the accumulation Phase 3 exists to end."
+    note: "Two weeks in. The Phase 0 rulings were made on 2026-11-21 and 2026-11-23. Is Phase 1's first check committed and approved, and is it green or red? If nothing has moved, say what stopped it: the check was not written, or it was written and not approved. A roadmap that sits is the accumulation Phase 3 exists to end."
 ---
 
 # The Conformance Roadmap
@@ -71,6 +77,22 @@ The pillars:
 
 This plan sits above the open plans. It does not replace them. It orders
 them, and says which phase each one serves.
+
+## What It Is For
+
+Ruled by the operator on 2026-11-23
+(`continuity-across-surfaces-is-the-purpose-2026-11-23`): continuity of the
+work across every point of handoff. A handoff is any move to a new surface:
+a new session in the same environment, a new machine, a different vendor's
+agent. Each one starts cold. The person carries on their stream of thought,
+and the new surface already knows where things got to, what was decided and
+why, and the state of the whole.
+
+What carries it is one shared record under one floor, "managed by the
+floor, not the agent", one that "discards as well as creates". Each agent
+keeps its own context. The four pillars exist to make that record sound
+enough to pick up cold. This is not a claim that the record beats a good
+prompt, and nothing here sets out to prove that.
 
 ## What It Rests On
 
@@ -118,6 +140,17 @@ phase below.
    has seen the count. Counts may then only fall.
 6. **Each phase leaves one line of evidence:** the commit where its check
    went green.
+7. **A gauge checks against a reference the worker did not write:** the
+   record's structure, the commit history, a timestamp, a re-run. A field
+   in which an agent reports its own behaviour is a form, not a gauge.
+   Where the thing to be held is behaviour, a tool that does it and records
+   it comes before a check.
+8. **The accumulated record is the gauges' first test.** Nothing is cleared
+   by hand before the gauges run
+   (`every-spec-stays-and-gauges-come-before-clearing-2026-11-23`).
+   Proposed, for the operator's approval: commit
+   `6d4e504ee2727305d65fae9b303c63698f14311c` is this corpus's baseline, and
+   each gauge's first count is taken against it.
 
 The checks written below are specifications of the test, not the test. The
 test itself is the first commit of its phase.
@@ -128,20 +161,27 @@ test itself is the first commit of its phase.
 
 *Nothing is built. The operator rules, and the evidence is banked.*
 
-- [ ] **Ruling: the order of work.** `peer-loops` 2.2 says the eval comes
-      first and nothing in its Phases 2 to 8 is built until two eval cycles
-      have run. This roadmap proposes that the review-catch eval continues in
-      its own plan and gates nothing here, because the roadmap no longer
-      depends on whether a second vendor beats a second fresh session. The
-      operator accepts or rejects that. If accepted, `peer-loops` is revised
-      under its own reconciliation.
-- [ ] **Ruling: doctrine.** Which specifications are doctrine, kept because
-      they state truths and not because a check reads them. Proposed: the
-      manifesto, `universal-workflow.md`, `operating-model.md`. Nothing is
-      dropped by this roadmap.
-- [ ] **Ruling: the open plans.** The table under *The Open Plans* proposes
-      which phase each open plan serves. The operator confirms it, and rules
-      on the plans this roadmap does not touch: stay paused, or close.
+- [x] **Ruling: the order of work.** Made 2026-11-21: the eval gates
+      nothing. The gauges are built and run without waiting on any eval. On
+      2026-11-23 the operator went further and stepped away from the
+      cross-vendor review question, and `review-catch-on-the-road` is paused
+      (`continuity-across-surfaces-is-the-purpose-2026-11-23`). `peer-loops`
+      is revised to match.
+- [x] **Ruling: doctrine.** Made 2026-11-21: every specification stays, and
+      none is set aside as doctrine to make the enforced set smaller. The
+      proposal of three doctrine specifications is withdrawn. The manifesto
+      and the writing about history and theory are the exception. Tried and
+      tested is to be told apart from hypothesised, and Phase 4 carries
+      that.
+- [x] **Ruling: the open plans.** Made 2026-11-21: none is closed. The
+      accumulated record stays as the test the gauges will sort. The table
+      under *The Open Plans* stands as proposed, and each row is confirmed
+      by reading the plan when its phase opens.
+- [ ] **Still the operator's, from the rulings.** Whether
+      `review-catch-on-the-road` closes or stays paused. Whether the
+      work-continuity ablation continues. The baseline commit. How the
+      standing of a specification is told. The cold-pickup check for
+      Phase 7.
 - [ ] **The research is banked.** The two research reports of 2026-11-17 and
       2026-11-18 are committed as review artifacts with pinned inputs, as the
       swarms review was.
@@ -189,6 +229,10 @@ until this is decided.
 *Pillar 2. What is left to convention today gets a gauge, one rule at a
 time, warning first.*
 
+*Opens only when Phase 1's checks are green. The rules that exist run
+everywhere before a new rule is added. Each new rule arrives with its own
+resolution, or it adds to the operator's queue.*
+
 - [ ] **Claims are read.** `held_by` is enforced with an expiry in
       `held_until`: a second writer on a held thing is a finding, and a claim
       past its expiry is released and reported.
@@ -228,9 +272,10 @@ and disposal per type. A fixture thing past its state's age yields the
 finding. Run on this corpus for the week ending 2026-11-18, the rate reports
 the things that week added, where `mdllm reckon --rates` reported none.
 
-*Yours:* the ages and the exits for each type, and the first clearing of
-what has accumulated: the stalled plans, the open cues, the abandoned
-tickets.
+*Yours:* the ages and the exits for each type, and the verdict on the first
+clearing of what has accumulated: the stalled plans, the open cues, the
+abandoned tickets. The gauges do that clearing. Nothing is cleared by hand
+before they run.
 
 ### Phase 4. The blueprint
 
@@ -246,12 +291,19 @@ tickets.
       fixes its stations and gates each one. An accumulative workflow fixes
       only the gate on its result and on each step that cannot be taken
       back.
+- [ ] **Each specification carries a standing: tried and tested, or
+      hypothesised.** A hypothesis may sit in the record to be proven or
+      disproven, and the two are told apart. Proposed, not yet ruled: the
+      floor derives the standing from history, from live records of the
+      types the specification owns or from commits in which use changed
+      it, and does not trust a label.
 
 *Check:* coherence fails when a kernel rule has no class, or names a check
 that does not exist. A generated report lists every operative rule with its
 class and its check.
 
-*Yours:* which rules are human-owned, and who owns each.
+*Yours:* which rules are human-owned, and who owns each. How a
+specification's standing is told.
 
 ### Phase 5. The handoff contract
 
@@ -296,7 +348,8 @@ document it, and no test here can stand in for it.
 
 ### Phase 7. Two domains, one contract
 
-*All four pillars. The proof nobody has published.*
+*All four pillars. The proof nobody has published, and the purpose shown
+on real work: a handoff that needs nothing told again.*
 
 - [ ] Two real domains, each with its own agent, pass one real piece of
       work under the Phase 5 contract and the Phase 6 wakes.
@@ -305,10 +358,22 @@ document it, and no test here can stand in for it.
 - [ ] The run records, from the commit history alone: every turn and its
       acknowledging commit, every handback and its verdict, and each time
       the operator had to step in.
+- [ ] **A cold pickup across surfaces.** Proposed by the session, for the
+      operator's approval. A fresh surface of a different vendor, on a
+      clean machine and given only the record, states what is open, what
+      was decided and why, and what comes next, and then carries the work
+      on. Its statement is compared with what the record holds. This is a
+      pass or a fail for that surface. It is not a comparison with a
+      prompt. The isolated machine built for `review-catch-on-the-road` is
+      the clean surface.
 
 *Check:* the record shows the exchange complete with no turn missing its
 acknowledgement and no handback accepted without its proof re-run. The
-count of operator interventions is stated against the prediction.
+count of operator interventions is stated against the prediction. For the
+cold pickup: every open item and every governing decision the record holds
+for the piece of work appears in the receiving surface's statement, and the
+count of things the operator had to tell it again is stated against the
+prediction.
 
 *Yours:* which two domains, which piece of work, and the verdict.
 
@@ -321,7 +386,8 @@ count of operator interventions is stated against the prediction.
 - [ ] **The walk:** how often an agent's reconciliation walk misses a
       dependant that a fresh session or a person finds.
 - [ ] **Wake reliability:** one month of the Phase 6 log.
-- [ ] **Review-catch on the road** continues in its own plan.
+- [ ] **Review-catch on the road** is paused by the operator's ruling of
+      2026-11-23. It is not part of this phase unless it is reopened.
 
 *Check:* each measurement has its predictions written before it runs.
 
@@ -331,8 +397,8 @@ holds: nothing is concluded until much more testing.
 ## The Open Plans
 
 Proposed, from each plan's title and the session-start digest. Each mapping
-is confirmed by reading the plan when its phase opens. The operator rules on
-the whole table in Phase 0.
+is confirmed by reading the plan when its phase opens. The operator ruled on
+2026-11-21 that none is closed by hand.
 
 | Open plan | Serves |
 |---|---|
@@ -342,9 +408,11 @@ the whole table in Phase 0.
 | `workflows-emerge-from-use`, `estate-workflow-derivation`, `session-start-hardening` | Phase 4 |
 | `peer-loops`, `substrate-native-a2a` | Phases 5 to 7 |
 | `the-seat`, `closed-loop-operating-state` | Phase 6 |
-| `review-catch-on-the-road`, `evidence-and-eval-backlog` | Phase 8 |
+| `evidence-and-eval-backlog` | Phase 8 |
+| `review-catch-on-the-road` | Paused by ruling. Its machine is proposed for Phase 7 |
 
-Not touched by this roadmap, for the operator to keep paused or close:
+Not touched by this roadmap. They stay as they are, part of the test the
+gauges will sort:
 `codex-cloud-workspace`, `codex-cloud-conversational-launcher`,
 `cowork-adapter`, `explorer-macos-and-navigation-sprint-2026-09`,
 `explorer-publication-readiness`, `public-docs-face-build`,
@@ -374,3 +442,5 @@ Not touched by this roadmap, for the operator to keep paused or close:
 - [ ] The rate shows disposal keeping pace with intake across the estate.
 - [ ] Two domains have passed one piece of work under the contract with no
       turn carried by the operator.
+- [ ] A piece of work has moved to a fresh surface of another vendor and
+      carried on with nothing told again by the operator.

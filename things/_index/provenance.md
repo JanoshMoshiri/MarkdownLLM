@@ -3,10 +3,10 @@ id: framework-provenance-index
 type: index
 status: live
 index_of: provenance
-created: 2026-11-18
-generated: 2026-11-18T02:24:11
-generated_from: HEAD@42dbac2
-coverage: 159
+created: 2026-11-23
+generated: 2026-11-23T15:28:07
+generated_from: HEAD@6d4e504
+coverage: 165
 framework_version: 3.51.0
 ---
 
@@ -21,6 +21,10 @@ framework_version: 3.51.0
 
 ## a-note-on-a-held-ticket-rings-its-addressee-2026-11-02
 - a-floor-rule-reads-the-need-it-forbids-as-a-slip (derived-from)
+
+## a-record-that-only-accumulates-has-no-metabolism
+- continuity-across-surfaces-is-the-purpose-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
 
 ## a-remembered-step-is-a-missing-actor
 - the-verdict-is-asked-where-the-change-lands-2026-10-05 (pinned @68c83cee2b400b75c52f346c0506c01dfd273bb2)
@@ -114,6 +118,13 @@ framework_version: 3.51.0
 ## coherence-mechanism-build
 - floor-sprint-3-scope-2026-08-23 (pinned @b764aaf96096caeea4be3ce2a77f9b1c9d4039d2)
 
+## conformance-not-determinism
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
+
+## conformance-roadmap
+- continuity-across-surfaces-is-the-purpose-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
+
 ## coordination-claim-specification
 - review-agent-swarms-scaling-limit-2026-11-16-workspace-2 (pinned @20c56827419e9c4a58174f1ac6c008ba0b650281)
 
@@ -130,6 +141,7 @@ framework_version: 3.51.0
 - serve-side-blindness-dissolves-into-composition (derived-from)
 
 ## cross-vendor-review-eval-opens-the-live-scope-2026-11-13
+- continuity-across-surfaces-is-the-purpose-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
 - review-catch-runs-each-harness-on-one-road-2026-11-16 (pinned @589e5b8f409da69431e51388a8b1e23cd760517f)
 
 ## cue-an-injected-file-arrives-without-its-frontmatter-2026-09-26
@@ -523,6 +535,7 @@ framework_version: 3.51.0
 - substrate-reconciliation-2026-08-09 (pinned @d327309)
 
 ## peer-loops
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
 - review-agent-coordination-leaders-2026-11-13-workspace-2 (pinned @2adf194f657f2e1f815185ae477282c2b941552e)
 - review-agent-swarms-scaling-limit-2026-11-16-workspace-2 (pinned @20c56827419e9c4a58174f1ac6c008ba0b650281)
 
@@ -566,6 +579,12 @@ framework_version: 3.51.0
 
 ## review-agent-swarms-scaling-limit-2026-11-16-workspace-2
 - peer-loops (derived-from)
+
+## review-catch-on-the-road
+- continuity-across-surfaces-is-the-purpose-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
+
+## review-catch-runs-each-harness-on-one-road-2026-11-16
+- continuity-across-surfaces-is-the-purpose-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
 
 ## review-critical-comparison-2026-10-17-claude
 - glossary (derived-from)
@@ -810,6 +829,9 @@ framework_version: 3.51.0
 
 ## watertight-membrane-sprint-2026-08-30
 - a-never-crossed-gate-hides-the-defects-behind-it (derived-from)
+
+## work-set-on-trust-has-nothing-to-check-against
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
 
 ## workflow-reconciliation-precedes-new-definitions
 - cue-operating-layer-quality-loop-2026-09-13 (pinned @f52b93013b1d40bd120741b8c4c0d866d4c00748)

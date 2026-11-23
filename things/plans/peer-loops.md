@@ -2,7 +2,7 @@
 id: peer-loops
 type: plan
 status: in-progress
-version: 2.2
+version: 2.3
 created: 2026-11-10
 priority: high
 origin: stated
@@ -68,6 +68,9 @@ linked_things:
   - id: cross-vendor-review-eval-opens-the-live-scope-2026-11-13
     relation: references
     notes: "Phase 4, review that starts blind, waits on what that programme finds. Who reviews whom in a star is written from its record and not from the field's argument alone."
+  - id: continuity-across-surfaces-is-the-purpose-2026-11-23
+    relation: references
+    notes: "Lifts the order of work set on 2026-11-16 and ends Phase 4's wait on the review-catch programme."
   - id: run-membership-is-realisation-2026-09-22
     relation: references
     notes: "A ticket joins a lane by declaring `implements: <run>`, the membership edge that ruling made the watch's scope. The Scope section uses it as built."
@@ -649,18 +652,21 @@ earlier Phase 5 is now Phase 7.*
             three-seat star across two vendors, and the first round trip
             completes before the operator types into any spoke.
 
-- [ ] **Phase 4 — Review that starts blind.** Waits on the review-catch
-      programme (`cross-vendor-review-eval-opens-the-live-scope-2026-11-13`).
+- [ ] **Phase 4 — Review that starts blind.** No longer waits on the
+      review-catch programme. The operator stepped away from that question
+      on 2026-11-21 (`continuity-across-surfaces-is-the-purpose-2026-11-23`),
+      so the items below are settled from the operator's practice and not
+      from an eval.
       - [ ] Who reviews whom in a star, the hub's own work included. The
             review argues the hub's work should go to a spoke.
       - [ ] Whether a reviewer receives the change without the author's
             account of it, and records a verdict before reading the
             author's reasoning.
-      - [ ] Both are written from what the programme finds, whichever way
-            it comes out. Until then the operator's practice stands: the
-            hub reviews.
-      - [ ] **Proof.** Set when the programme's first two cycles have been
-            reflected on.
+      - [ ] Both are written from the operator's practice. Today that
+            practice is that the hub reviews, and that a cold review by a
+            fresh session holds at least as much weight as a second vendor.
+      - [ ] **Proof.** To be set by the operator. It was to be set from the
+            programme's first two cycles, which are paused.
 
 - [ ] **Phase 5 — The operator's signed seat.** Moved after the star
       because the star lane does not need it, and because it has waited
@@ -717,6 +723,14 @@ earlier Phase 5 is now Phase 7.*
 
 *Added 2026-11-16. The operator asked for the approach to be examined
 critically before the plan was committed, and then set the order.*
+
+*Revised 2026-11-23. The operator lifted this order. The eval gates
+nothing, and the cross-vendor review question is no longer pursued
+(`every-spec-stays-and-gauges-come-before-clearing-2026-11-23`,
+`continuity-across-surfaces-is-the-purpose-2026-11-23`). The order of work
+is now the conformance roadmap's. "The order" and "What the eval's result
+changes here" are kept below as they stood from 2026-11-16 to 2026-11-21.
+The open points from the critical reading still stand.*
 
 **The order.** The review-catch eval runs first. Nothing in Phases 2 to
 8 is built until its first two cycles have been reflected on. Meanwhile
@@ -807,9 +821,9 @@ from a fresh context, and how many of the extra findings are real.
 - Rule 9 as proposed for a star: whether the hub's quoted record of a go
   is enough for work a spoke can undo.
 - Whether the hub also reviews. The field's evidence points at the split
-  in rule 8 and at a reviewer that starts blind; the review-catch
-  programme is how this repository gets evidence of its own, and Phase 4
-  waits on it.
+  in rule 8 and at a reviewer that starts blind. The review-catch
+  programme that was to give this repository evidence of its own is
+  paused, so this is the operator's judgement from practice.
 - Granting peers to a task.
 - How many spokes a hub holds, and which spoke and task run the first
   graph in Phase 8.

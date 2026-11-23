@@ -1,8 +1,8 @@
 ---
 id: review-catch-on-the-road
 type: plan
-status: in-progress
-version: 1.1
+status: paused
+version: 1.2
 created: 2026-11-16
 priority: high
 origin: stated
@@ -20,10 +20,28 @@ linked_things:
     notes: "The boxed run this replaces. Its frozen review set is reused as it stands; its one pass is kept for the boxed-against-road comparison."
   - id: peer-loops
     relation: informs
-    notes: "That plan's order of work waits on this programme's first two cycles."
+    notes: "That plan's order of work waited on this programme's first two cycles until the operator lifted it on 2026-11-21."
+  - id: continuity-across-surfaces-is-the-purpose-2026-11-23
+    relation: references
+    notes: "The ruling that pauses this plan at Phase 5."
 ---
 
 # Review-Catch On The Road
+
+## Paused
+
+*2026-11-23.* The operator stepped away from the question this plan exists
+to answer (`continuity-across-surfaces-is-the-purpose-2026-11-23`):
+
+> "I think the ability of these agents is increasingly converging, and I
+> think it would be a race not worth running, trying to prove that."
+
+Phases 1 to 4 stand as built: the image, the cut repositories, the
+instruction, the runner and the scorer. Phases 5 to 8 are not run. Nothing
+is concluded from the one boxed pass or the two smoke reviews. Whether the
+plan closes outright is the operator's, and is not yet ruled. The isolated
+machine is proposed as the clean surface for the cold pickup in the
+conformance roadmap's Phase 7.
 
 ## What This Is
 

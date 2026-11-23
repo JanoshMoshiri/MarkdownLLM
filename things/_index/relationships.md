@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-18
-generated: 2026-11-18T02:24:08
-generated_from: HEAD@42dbac2
-coverage: 669
+created: 2026-11-23
+generated: 2026-11-23T15:28:04
+generated_from: HEAD@6d4e504
+coverage: 671
 framework_version: 3.51.0
 ---
 
@@ -470,6 +470,8 @@ framework_version: 3.51.0
 - conformance-roadmap --references--> thing-lifecycle-specification
 - conformance-roadmap --references--> standing-watch-specification
 - conformance-roadmap --references--> change-reconciliation-specification
+- conformance-roadmap --implements--> continuity-across-surfaces-is-the-purpose-2026-11-23
+- conformance-roadmap --implements--> every-spec-stays-and-gauges-come-before-clearing-2026-11-23
 - consequence-is-recoverable-only-in-retrospect --informs--> llm-driven-systems-manifesto
 - consequence-is-recoverable-only-in-retrospect --extends--> agents-md-discovery-is-harness-dependent
 - consequence-is-recoverable-only-in-retrospect --complements--> change-safety-is-defense-in-depth
@@ -479,6 +481,13 @@ framework_version: 3.51.0
 - consistency-is-maintained-at-change-not-by-sweeping --supports--> provenance-specification
 - consistency-is-maintained-at-change-not-by-sweeping --supports--> validate-thing-specification
 - consistency-is-maintained-at-change-not-by-sweeping --implements--> llm-driven-systems-manifesto
+- continuity-across-surfaces-is-the-purpose-2026-11-23 --extends--> cross-vendor-review-eval-opens-the-live-scope-2026-11-13
+- continuity-across-surfaces-is-the-purpose-2026-11-23 --extends--> review-catch-runs-each-harness-on-one-road-2026-11-16
+- continuity-across-surfaces-is-the-purpose-2026-11-23 --informs--> review-catch-on-the-road
+- continuity-across-surfaces-is-the-purpose-2026-11-23 --informs--> conformance-roadmap
+- continuity-across-surfaces-is-the-purpose-2026-11-23 --informs--> peer-loops
+- continuity-across-surfaces-is-the-purpose-2026-11-23 --references--> a-record-that-only-accumulates-has-no-metabolism
+- continuity-across-surfaces-is-the-purpose-2026-11-23 --references--> conformance-not-determinism
 - continuity-briefs-solve-external-state-drift --informs--> session-memory-specification
 - continuity-briefs-solve-external-state-drift --informs--> orchestration-specification
 - coordination-claim-specification --extends--> thing-specification
@@ -945,6 +954,11 @@ framework_version: 3.51.0
 - every-reader-class-needs-its-own-kernel --informs--> a-generated-surface-collapses-its-walk
 - every-reader-class-needs-its-own-kernel --supports--> operative-rules-are-a-small-fraction-of-spec-prose
 - every-reader-class-needs-its-own-kernel --supports--> a-true-primitive-is-discovered-not-authored
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 --informs--> conformance-roadmap
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 --complements--> continuity-across-surfaces-is-the-purpose-2026-11-23
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 --informs--> peer-loops
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 --implements--> conformance-not-determinism
+- every-spec-stays-and-gauges-come-before-clearing-2026-11-23 --implements--> a-record-that-only-accumulates-has-no-metabolism
 - evidence-and-eval-backlog --references--> felt-deployment-lands-in-undisclosable-work
 - evidence-and-eval-backlog --implements--> withholding-is-not-isolation
 - evidence-and-eval-backlog --implements--> isolation-must-contain-writes-not-just-reads
@@ -1507,6 +1521,7 @@ framework_version: 3.51.0
 - peer-loops --derived-from--> review-agent-swarms-scaling-limit-2026-11-16-workspace-2
 - peer-loops --references--> coordination-claim-specification
 - peer-loops --references--> cross-vendor-review-eval-opens-the-live-scope-2026-11-13
+- peer-loops --references--> continuity-across-surfaces-is-the-purpose-2026-11-23
 - peer-loops --references--> run-membership-is-realisation-2026-09-22
 - phase-3-run-domain-task-reverted --informs--> mcp-domain-server-design
 - phase-3-run-domain-task-reverted --supports--> cross-domain-handoff-is-built-inbound-only
@@ -1615,6 +1630,7 @@ framework_version: 3.51.0
 - review-catch-on-the-road --implements--> cross-vendor-review-eval-opens-the-live-scope-2026-11-13
 - review-catch-on-the-road --references--> run-eval-cycle-0-review-catch-baseline-2026-11
 - review-catch-on-the-road --informs--> peer-loops
+- review-catch-on-the-road --references--> continuity-across-surfaces-is-the-purpose-2026-11-23
 - review-catch-runs-each-harness-on-one-road-2026-11-16 --extends--> cross-vendor-review-eval-opens-the-live-scope-2026-11-13
 - review-catch-runs-each-harness-on-one-road-2026-11-16 --references--> run-eval-cycle-0-review-catch-baseline-2026-11
 - review-catch-runs-each-harness-on-one-road-2026-11-16 --informs--> review-catch-on-the-road
