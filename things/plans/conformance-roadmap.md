@@ -2,7 +2,7 @@
 id: conformance-roadmap
 type: plan
 status: in-progress
-version: 1.4
+version: 1.5
 created: 2026-11-18
 priority: critical
 origin: stated
@@ -520,9 +520,35 @@ decision or a dated bet, taken one at a time.*
    what reaches the record. The rulings of 2026-11-21 sat in a conversation
    for two days and failed no check. Capture happens inside the turn, the
    part left to the agent, and it is the one piece of the inside the
-   operator has to care about. *Proposed:* a second reader compares a
-   session's transcript with its commits at session end and reports what
-   was decided and not recorded. It is detectable and routed, not enforced.
+   operator has to care about.
+
+   *The operator's answer, 2026-11-23.* Capture is meant to be intentional:
+   "the capture piece is kind of it's intentional, and I want it to be
+   intentional." "And I think there should be a reason for creation. It
+   shouldn't just be a running history, you know." And on who decides: "I
+   think I don't want the agent to be the only one responsible for that.
+   But I think in many cases, I do let the agent make that decision. So I
+   think we need to be clear on what I actually do and maybe what the
+   records say."
+
+   The session's first proposal, a second reader comparing every transcript
+   with its commits, is withdrawn: it leans towards the running history the
+   operator does not want. What stands is narrower. On 2026-11-21 the
+   reason for creation existed, a ruling was made, and nobody acted on it.
+   An intention with no actor is a remembered step
+   (`a-remembered-step-is-a-missing-actor`). *Proposed instead, for the
+   operator's approval:*
+   - **The test for what merits a record:** a cold surface would act
+     wrongly without it. That covers a ruling, a changed plan, a reason, a
+     corrected reading. The conversation that led there is not stored.
+   - **What is actually done, said plainly:** the operator decides the
+     content, and the agent usually decides to record it. The agent names a
+     ruling when it hears one and records it then. At session end it lists
+     the rulings it heard beside what was recorded, and the operator keeps
+     or discards. The agent proposes and the operator can refuse, so the
+     agent is not the only one responsible.
+   - **The gauge is point 2's count.** Anything the operator has to tell an
+     agent again is a capture that was missed.
 2. **A record that conforms can still be useless.** The gauges measure
    whether the record obeys its rules, not whether it helps. *Proposed:*
    the count of things the operator had to tell an agent again is taken
