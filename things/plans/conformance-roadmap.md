@@ -2,7 +2,7 @@
 id: conformance-roadmap
 type: plan
 status: in-progress
-version: 1.3
+version: 1.4
 created: 2026-11-18
 priority: critical
 origin: stated
@@ -48,6 +48,9 @@ linked_things:
   - id: agentic-workflow-across-tools-needs-a-mechanically-validated-record
     relation: implements
     notes: "The problem at its full width, and the operator's statement that the floor's concern is the handoff and not the inside."
+  - id: the-entry-file-opens-with-what-the-domain-is-for-2026-11-23
+    relation: implements
+    notes: "The ruling on Phase 4's entry-contract item."
 triggers:
   - type: time
     condition: "2026-12-02 reached"
@@ -256,8 +259,8 @@ phases keep their numbers.*
       standing of a specification is told. The cold-pickup check for
       Phase 7. The order proposed under *The Order Of Work*. Rules 9, 10
       and 11: the three kinds, a new view as a hypothesis, and guidance
-      retired by the gauges. Whether `AGENTS.md` opens with the problem
-      it solves.
+      retired by the gauges. The six points under *The Session's
+      Critique*, one at a time.
 - [ ] **The research is banked.** The two research reports of 2026-11-17 and
       2026-11-18 are committed as review artifacts with pinned inputs, as the
       swarms review was.
@@ -342,6 +345,18 @@ when it moves from warning to blocking.
 - [ ] **`thing-lifecycle.md` is brought back** and rebuilt around this, with
       the floor behind it. It already specifies the rolling window, stubs
       and rehydration.
+- [ ] **Retired by disuse, recalled by association.** Proposed by the
+      session, for the operator's approval. The operator, 2026-11-23: "how
+      do I judge what's important and what's not?" and "my mind works from
+      association. I forget it until there's something that brings me to
+      that place, and all of a sudden the connections come together and I
+      remember again." Nobody judges importance ahead of time: consequence
+      is recoverable only in retrospect. A thing leaves the working set
+      when no live thing links to it or pins it and it has not moved for
+      its type's age. It returns when a live thing links to it again. Git
+      keeps everything, so a wrong retirement costs one rehydration. The
+      floor sees links and pins and cannot see reading, so use is told
+      from those. An exemption carries a reason and an expiry (Phase 2).
 
 *Check:* a fixture repository with a known history returns its known intake
 and disposal per type. A fixture thing past its state's age yields the
@@ -382,11 +397,16 @@ before they run.
       floor derives the standing from history, from live records of the
       types the specification owns or from commits in which use changed
       it, and does not trust a label.
-- [ ] **The entry contract opens with the problem it solves.** Proposed by
-      the session, for the operator's approval. `AGENTS.md` tells a session
-      how the system is built. It does not say what the system is for in
-      the operator's terms, and a session that starts from the mechanism
-      answers the narrow question.
+- [ ] **The entry file opens with what the domain is for.** Ruled by the
+      operator on 2026-11-23
+      (`the-entry-file-opens-with-what-the-domain-is-for-2026-11-23`): its
+      first lines say what the domain is and what it must achieve, before
+      the launch mechanics. A building domain states its outcome and a
+      standing domain states the steady state it keeps. The entry template
+      puts this below about twenty-five lines of mechanics today. The
+      check is written first: coherence reports each entry file whose first
+      section is not the statement, and the first count across the estate
+      is recorded before anything is changed.
 
 *Check:* coherence fails when a kernel rule has no class, or names a check
 that does not exist. A generated report lists every operative rule with its
@@ -488,6 +508,43 @@ prediction.
 
 *Yours:* what is written up, and when. The standing direction of 2026-10-05
 holds: nothing is concluded until much more testing.
+
+## The Session's Critique
+
+*Asked for by the operator on 2026-11-23: "Be critical. Don't tell me what
+I want to hear." The operator's answer: "I like your critiques". Each point
+is the session's and none is ruled. Each is to become a check, a named
+decision or a dated bet, taken one at a time.*
+
+1. **The floor cannot see what was never written.** It checks the form of
+   what reaches the record. The rulings of 2026-11-21 sat in a conversation
+   for two days and failed no check. Capture happens inside the turn, the
+   part left to the agent, and it is the one piece of the inside the
+   operator has to care about. *Proposed:* a second reader compares a
+   session's transcript with its commits at session end and reports what
+   was decided and not recorded. It is detectable and routed, not enforced.
+2. **A record that conforms can still be useless.** The gauges measure
+   whether the record obeys its rules, not whether it helps. *Proposed:*
+   the count of things the operator had to tell an agent again is taken
+   every session, not only in Phase 7. On 2026-11-23 it was four.
+3. **The purpose grew in one conversation.** Memory across one person's
+   sessions is tried. The record under a business's agentic workflow has
+   never been run end to end, and under rule 10 it is a hypothesis.
+   *Proposed:* Phases 1 to 3 serve both readings; if the thin slice of
+   Phase 7 does not prove useful, the roadmap falls back to them.
+4. **"Nothing cleared by hand" is a bet on timing.** Metabolism is third in
+   line, and until it runs every session start carries the whole
+   accumulated record. *Proposed:* the bet carries a date, and the
+   operator rules again if Phase 3's gauge is not running by then.
+5. **Keeping every specification has a running cost.** Each is kept
+   consistent with the rest on every change, and twenty-six changes with no
+   walk show the cost is not being paid. *Proposed:* a hypothesised
+   specification carries a lighter duty until it is used, so that standing
+   is more than a label.
+6. **One person checks everything.** The operator holds the vision, approves
+   the checks and judges the results. *Named, since no check can stand in
+   for it:* a second person picking a piece of work up cold tells more
+   than a handoff between two vendors with the author watching.
 
 ## The Open Plans
 

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-23
-generated: 2026-11-23T19:52:17
-generated_from: HEAD@eb63889
-coverage: 673
+generated: 2026-11-23T20:26:28
+generated_from: HEAD@8b63351
+coverage: 674
 framework_version: 3.51.0
 ---
 
@@ -476,6 +476,7 @@ framework_version: 3.51.0
 - conformance-roadmap --implements--> continuity-across-surfaces-is-the-purpose-2026-11-23
 - conformance-roadmap --implements--> every-spec-stays-and-gauges-come-before-clearing-2026-11-23
 - conformance-roadmap --implements--> agentic-workflow-across-tools-needs-a-mechanically-validated-record
+- conformance-roadmap --implements--> the-entry-file-opens-with-what-the-domain-is-for-2026-11-23
 - consequence-is-recoverable-only-in-retrospect --informs--> llm-driven-systems-manifesto
 - consequence-is-recoverable-only-in-retrospect --extends--> agents-md-discovery-is-harness-dependent
 - consequence-is-recoverable-only-in-retrospect --complements--> change-safety-is-defense-in-depth
@@ -1913,6 +1914,9 @@ framework_version: 3.51.0
 - the-corpus-answers-faster-than-it-is-asked --supports--> feels-automatic-is-persistence-of-the-question
 - the-corpus-answers-faster-than-it-is-asked --derived-from--> framework-retrospective-2026-09
 - the-corpus-answers-faster-than-it-is-asked --challenges--> the-root-is-not-a-representative-domain
+- the-entry-file-opens-with-what-the-domain-is-for-2026-11-23 --informs--> conformance-roadmap
+- the-entry-file-opens-with-what-the-domain-is-for-2026-11-23 --implements--> agentic-workflow-across-tools-needs-a-mechanically-validated-record
+- the-entry-file-opens-with-what-the-domain-is-for-2026-11-23 --informs--> domain-specification-guide
 - the-estates-second-clone-is-an-independent-witness --references--> cowork-remote-phase5-evidence-2026-08-19
 - the-estates-second-clone-is-an-independent-witness --extends--> git-workflow-specification
 - the-eval-question-is-which-surfaces-carry-the-weight-2026-11-08 --informs--> evidence-and-eval-backlog

@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: provenance
 created: 2026-11-23
-generated: 2026-11-23T19:52:35
-generated_from: HEAD@eb63889
-coverage: 165
+generated: 2026-11-23T20:26:46
+generated_from: HEAD@8b63351
+coverage: 166
 framework_version: 3.51.0
 ---
 
@@ -41,6 +41,9 @@ framework_version: 3.51.0
 ## ad-hoc-message-loop
 - peer-loops (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
 - review-peer-agent-loops-field-research-2026-11-10-workspace-2 (pinned @ef7215d2186a844beabef705300a7cb0e6c5a015)
+
+## agentic-workflow-across-tools-needs-a-mechanically-validated-record
+- the-entry-file-opens-with-what-the-domain-is-for-2026-11-23 (pinned @8b633511dd7dfbf455efbdd1244eaf0decdbd9ff)
 
 ## assistant-register
 - operating-is-programming (derived-from)
@@ -124,6 +127,7 @@ framework_version: 3.51.0
 ## conformance-roadmap
 - continuity-across-surfaces-is-the-purpose-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
 - every-spec-stays-and-gauges-come-before-clearing-2026-11-23 (pinned @6d4e504ee2727305d65fae9b303c63698f14311c)
+- the-entry-file-opens-with-what-the-domain-is-for-2026-11-23 (pinned @8b633511dd7dfbf455efbdd1244eaf0decdbd9ff)
 
 ## coordination-claim-specification
 - review-agent-swarms-scaling-limit-2026-11-16-workspace-2 (pinned @20c56827419e9c4a58174f1ac6c008ba0b650281)
