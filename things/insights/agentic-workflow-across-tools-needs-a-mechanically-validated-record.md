@@ -2,7 +2,7 @@
 id: agentic-workflow-across-tools-needs-a-mechanically-validated-record
 type: insight
 status: active
-version: 1.0
+version: 1.1
 created: 2026-11-23
 session: 2026-11-23
 source: both
@@ -131,5 +131,51 @@ agent and picked up by another's to make the video.
 ## Context
 
 Said on 2026-11-23, in answer to the session asking whether its recorded
-reading of the purpose was right. No plan is changed by this record; the
-weighting above is a proposal.
+reading of the purpose was right. This record changes no plan itself; the
+weighting is carried as a proposal in `conformance-roadmap` 1.2.
+
+## The Operator's Answer
+
+Later the same day the operator confirmed the reading and took two of its
+points further, in the operator's own words.
+
+On where the value lies, and what the floor is concerned with:
+
+> "The value is in the mechanical piece that upholds the structure and
+> defines, you know, the laws that have always applied to software. You
+> know, loosely coupled, tightly cohesive structure. And actually, what's
+> clear now is, if anything, you don't care what happens inside. You just
+> care about the handoff, the contract, the handover."
+
+On the practice of one model vendor, as the operator understands it:
+
+> "If we take the learnings and the lessons from Anthropic, this is how they
+> do it. They don't even try to figure that out anymore. They leave it to
+> the agent to figure out. But they are very strict on the test, on what
+> done looks like."
+
+On what the model is missing, and where the framework began:
+
+> "It's very good at solving problems, but what's, you know, what's the
+> power of solving a problem if I can't remember what problem I'm solving?
+> You know, if I can't see what direction I need to go in, other than the
+> last thing that was said to me. You know, it's like this ultimate powerful
+> force with the mind of a goldfish."
+
+On why the record is kept this way:
+
+> "I can look back at the record and I can, you know, objectively say, these
+> were the decisions that I made. This was the outcome that had, you know,
+> fallen out."
+
+On adapting from use and not from theory:
+
+> "Because through doing, you realize what's required, because you know what
+> missed when you tried and it didn't work. So, and everything else is just
+> theoretical."
+
+Of the session's five readings above, the operator took up the fourth (the
+value is the floor, since anyone can keep a record) and the third (the
+handoff and its contract are what matter, and the inside is left to the
+agent). The second and the fifth, the gate at the record and the entry
+contract, were not answered and stay proposals.

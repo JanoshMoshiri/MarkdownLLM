@@ -2,7 +2,7 @@
 id: conformance-roadmap
 type: plan
 status: in-progress
-version: 1.1
+version: 1.2
 created: 2026-11-18
 priority: critical
 origin: stated
@@ -45,6 +45,9 @@ linked_things:
   - id: every-spec-stays-and-gauges-come-before-clearing-2026-11-23
     relation: implements
     notes: "The Phase 0 rulings: the eval gates nothing, every specification stays, the gauges come before any clearing."
+  - id: agentic-workflow-across-tools-needs-a-mechanically-validated-record
+    relation: implements
+    notes: "The problem at its full width, and the operator's statement that the floor's concern is the handoff and not the inside."
 triggers:
   - type: time
     condition: "2026-12-02 reached"
@@ -93,6 +96,15 @@ floor, not the agent", one that "discards as well as creates". Each agent
 keeps its own context. The four pillars exist to make that record sound
 enough to pick up cold. This is not a claim that the record beats a good
 prompt, and nothing here sets out to prove that.
+
+Stated at its full width the same day
+(`agentic-workflow-across-tools-needs-a-mechanically-validated-record`):
+the work moves between agents of any vendor, repeatable, structured and
+audited, and continuity between one person's sessions is one case of it.
+The value is "the mechanical piece that upholds the structure", since
+anyone can keep a record. The floor's concern is the boundary: "you don't
+care what happens inside. You just care about the handoff, the contract,
+the handover."
 
 ## What It Rests On
 
@@ -151,9 +163,36 @@ phase below.
    Proposed, for the operator's approval: commit
    `6d4e504ee2727305d65fae9b303c63698f14311c` is this corpus's baseline, and
    each gauge's first count is taken against it.
+9. **The floor gauges what crosses a boundary and leaves the inside to the
+   agent.** Stated by the operator on 2026-11-23. Proposed from it, for the
+   operator's approval: a rule becomes a check only where its effect can be
+   seen in the record at a boundary: a commit, a handback, a session end,
+   an answered wake. A rule about how an agent works inside its turn is
+   guidance and is labelled as guidance. This is the test Phase 4 uses to
+   give each rule its class.
 
 The checks written below are specifications of the test, not the test. The
 test itself is the first commit of its phase.
+
+## The Order Of Work
+
+*Proposed by the session on 2026-11-23, for the operator's approval. The
+phases keep their numbers.*
+
+1. **Phase 1 first.** A check that rides one vendor's harness does not hold
+   another vendor's agent. The gauge at the remote is the only one every
+   agent's work passes through, so no handoff is trusted before it.
+2. **Then a thin slice of Phase 7,** before Phase 5 is designed in full: one
+   real piece of work handed from an agent of one vendor to an agent of
+   another, with its acceptance check written first. The operator's own
+   example is a story written with one agent and picked up by another to
+   make the video. It runs on the least contract that can be checked.
+3. **Then Phase 5,** written from what the slice showed missing. The
+   operator, 2026-11-23: "through doing, you realize what's required".
+4. **Phases 2, 3 and 4 run alongside once Phase 1 is green,** each on its
+   own check. They make the record sound. They do not wait on the handoff,
+   and the handoff does not wait on them.
+5. **Phase 6, then Phase 7 in full, then Phase 8.**
 
 ## Phases
 
@@ -181,7 +220,9 @@ test itself is the first commit of its phase.
       `review-catch-on-the-road` closes or stays paused. Whether the
       work-continuity ablation continues. The baseline commit. How the
       standing of a specification is told. The cold-pickup check for
-      Phase 7.
+      Phase 7. The order proposed under *The Order Of Work*. Rule 9's test
+      for what becomes a check. Whether `AGENTS.md` opens with the problem
+      it solves.
 - [ ] **The research is banked.** The two research reports of 2026-11-17 and
       2026-11-18 are committed as review artifacts with pinned inputs, as the
       swarms review was.
@@ -297,6 +338,11 @@ before they run.
       floor derives the standing from history, from live records of the
       types the specification owns or from commits in which use changed
       it, and does not trust a label.
+- [ ] **The entry contract opens with the problem it solves.** Proposed by
+      the session, for the operator's approval. `AGENTS.md` tells a session
+      how the system is built. It does not say what the system is for in
+      the operator's terms, and a session that starts from the mechanism
+      answers the narrow question.
 
 *Check:* coherence fails when a kernel rule has no class, or names a check
 that does not exist. A generated report lists every operative rule with its
@@ -320,6 +366,11 @@ specification's standing is told.
 - [ ] **The proof is re-run by someone other than the worker.** The
       worker's report routes the work. It is not the evidence.
 - [ ] **Each domain publishes what it accepts and what it returns.**
+- [ ] **The contract binds what crosses and is silent on the inside.** It
+      says which clauses the floor checks and which a named person judges.
+      Form, references, required parts and the proof are the floor's.
+      Whether the result is good is a person's decision, or a second
+      agent's review.
 
 *Check:* fixture tests for each refusal, and one fixture exchange that
 passes end to end.

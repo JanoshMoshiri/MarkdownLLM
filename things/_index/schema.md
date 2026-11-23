@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: schema
 created: 2026-11-23
-generated: 2026-11-23T18:50:44
-generated_from: HEAD@e01169c
-coverage: 672
+generated: 2026-11-23T19:29:56
+generated_from: HEAD@5645f58
+coverage: 673
 framework_version: 3.51.0
 ---
 
@@ -14,18 +14,18 @@ framework_version: 3.51.0
 
 | field | things using it |
 |---|---|
-| id | 672 |
-| type | 672 |
-| status | 672 |
-| created | 672 |
-| version | 597 |
-| tags | 564 |
+| id | 673 |
+| type | 673 |
+| status | 673 |
+| created | 673 |
+| version | 598 |
+| tags | 565 |
 | linked_things | 425 |
-| subject | 242 |
-| raised_at | 242 |
-| raised_by | 242 |
-| verdict | 242 |
-| verdict_reason | 242 |
+| subject | 243 |
+| raised_at | 243 |
+| raised_by | 243 |
+| verdict | 243 |
+| verdict_reason | 243 |
 | origin | 239 |
 | session | 232 |
 | confidence | 223 |

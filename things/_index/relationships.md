@@ -4,9 +4,9 @@ type: index
 status: live
 index_of: relationships
 created: 2026-11-23
-generated: 2026-11-23T18:50:36
-generated_from: HEAD@e01169c
-coverage: 672
+generated: 2026-11-23T19:29:49
+generated_from: HEAD@5645f58
+coverage: 673
 framework_version: 3.51.0
 ---
 
@@ -475,6 +475,7 @@ framework_version: 3.51.0
 - conformance-roadmap --references--> change-reconciliation-specification
 - conformance-roadmap --implements--> continuity-across-surfaces-is-the-purpose-2026-11-23
 - conformance-roadmap --implements--> every-spec-stays-and-gauges-come-before-clearing-2026-11-23
+- conformance-roadmap --implements--> agentic-workflow-across-tools-needs-a-mechanically-validated-record
 - consequence-is-recoverable-only-in-retrospect --informs--> llm-driven-systems-manifesto
 - consequence-is-recoverable-only-in-retrospect --extends--> agents-md-discovery-is-harness-dependent
 - consequence-is-recoverable-only-in-retrospect --complements--> change-safety-is-defense-in-depth
@@ -561,6 +562,7 @@ framework_version: 3.51.0
 - cue-ad-hoc-message-loop-2026-10-30 --subject--> ad-hoc-message-loop
 - cue-ad-hoc-message-loop-2026-11-03 --subject--> ad-hoc-message-loop
 - cue-ad-hoc-message-loop-2026-11-10 --subject--> ad-hoc-message-loop
+- cue-agentic-workflow-across-tools-needs-a-mechanically-validated-record-2026-11-23 --subject--> agentic-workflow-across-tools-needs-a-mechanically-validated-record
 - cue-agents-cannot-self-install-permission-bearing-hooks-2026-10-22 --subject--> agents-cannot-self-install-permission-bearing-hooks
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
 - cue-an-agent-in-a-loop-optimises-the-loop-not-the-goal-retro-2026-09-13 --subject--> an-agent-in-a-loop-optimises-the-loop-not-the-goal
