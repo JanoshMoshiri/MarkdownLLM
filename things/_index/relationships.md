@@ -3,10 +3,10 @@ id: framework-relationships-index
 type: index
 status: live
 index_of: relationships
-created: 2026-11-23
-generated: 2026-11-23T21:02:42
-generated_from: HEAD@672386e
-coverage: 674
+created: 2026-11-26
+generated: 2026-11-26T00:03:56
+generated_from: HEAD@9155182
+coverage: 675
 framework_version: 3.51.0
 ---
 
@@ -117,6 +117,9 @@ framework_version: 3.51.0
 - a-performance-requirement-inherits-its-measurement-context --informs--> floor-block-requirements-2026-08
 - a-performance-requirement-inherits-its-measurement-context --derived-from--> run-floor-sprint-2-2026-08
 - a-performance-requirement-inherits-its-measurement-context --complements--> an-incident-seeded-list-encodes-the-symptom-not-the-rule
+- a-pre-existing-corpus-has-no-way-in-before-the-work --extends--> origin-external-conflates-ingestion-with-import
+- a-pre-existing-corpus-has-no-way-in-before-the-work --informs--> provenance-specification
+- a-pre-existing-corpus-has-no-way-in-before-the-work --complements--> agentic-workflow-across-tools-needs-a-mechanically-validated-record
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --extends--> emitted-content-is-read-instructed-content-is-economised
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --references--> a-scaffold-cannot-birth-its-own-author
 - a-prerequisite-declared-only-inside-its-target-cannot-gate-it --challenges--> read-thing-specification
